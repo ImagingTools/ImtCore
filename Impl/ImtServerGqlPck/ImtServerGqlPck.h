@@ -32,6 +32,7 @@
 #include <imtservergql/CHeadersDataProviderComp.h>
 #include <imtservergql/CDocumentRevisionControllerComp.h>
 #include <imtservergql/CCommandsControllerComp.h>
+#include <imtservergql/CSettingsControllerComp.h>
 
 
 /**
@@ -67,6 +68,7 @@ typedef imtservergql::CConnectionStatusSubscriberControllerComp ConnectionStatus
 typedef imtservergql::CHeadersDataProviderComp HeadersDataProvider;
 typedef imtservergql::CDocumentRevisionControllerComp DocumentRevisionController;
 typedef imtservergql::CCommandsControllerComp CommandsController;
+typedef imtservergql::CSettingsControllerComp SettingsController;
 
 
 } // namespace ImtServerGqlPck

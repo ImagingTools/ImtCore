@@ -8,6 +8,7 @@ import imtbaseComplexCollectionFilterSdl 1.0
 DecoratorBase {
 	id: filterPanelDecorator;
 	
+	width: content.width
 	height: content.height;
 	
 	property alias contentWidth: content.width;

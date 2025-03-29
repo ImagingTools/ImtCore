@@ -4,6 +4,7 @@ include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
+QT += sql
 CONFIG += network
 
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc

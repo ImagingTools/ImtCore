@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5147" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -16,17 +16,16 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="NetworkSettings"/>
+                    <AttributeInfo Id="ModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Network"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Network"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerUrl</Value>
-                                <Value>WebSocketServerUrl</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -42,34 +41,13 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ModelId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="ServerUrl"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Server URL"/>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Server Url"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="ServerUrlPath">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="WebSocketServerUrl" PackageId="ImtRestPck" ComponentId="UrlParamRepresentationController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="WebSocketServerUrl"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Web Socket Server URL"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="WebSocketServerUrlPath">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -81,7 +59,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="NetworkSettings"/>
+        <Interface InterfaceId="imtrest::IJsonRepresentationController" ComponentId="NetworkSettings"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="NetworkSettings"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

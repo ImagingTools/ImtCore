@@ -226,6 +226,7 @@
                                 <Value>Backup</Value>
                                 <Value>LoggingParams</Value>
                                 <Value>FileBasedSslConfiguration</Value>
+                                <Value>SmtpServerParams</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -237,6 +238,7 @@
                                 <Value>Backup</Value>
                                 <Value>Log</Value>
                                 <Value>SslConfiguration</Value>
+                                <Value>SmtpServer</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -299,6 +301,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SmtpServerParams" PackageId="ImtHttpServerVoce" ComponentId="SmtpServerParams">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces/>
@@ -309,6 +316,10 @@
         <Component ExportedId="PumaUrl" ComponentId="ServerConnectionParams/PumaUrl"/>
         <Component ExportedId="PumaWebSocketPort" ComponentId="ServerConnectionParams/PumaWebSocketPort"/>
         <Component ExportedId="ServerPort" ComponentId="ServerConnectionParams/ServerPort"/>
+        <Component ExportedId="SmtpPasswordParam" ComponentId="SmtpServerParams/SmtpPasswordParam"/>
+        <Component ExportedId="SmtpPortParam" ComponentId="SmtpServerParams/SmtpPortParam"/>
+        <Component ExportedId="SmtpServerAddressParam" ComponentId="SmtpServerParams/SmtpServerAddressParam"/>
+        <Component ExportedId="SmtpUsernameParam" ComponentId="SmtpServerParams/SmtpUsernameParam"/>
         <Component ExportedId="WebSocketServerPort" ComponentId="ServerConnectionParams/WebSocketServerPort"/>
     </ExportedComponents>
 </Acf>

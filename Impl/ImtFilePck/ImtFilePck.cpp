@@ -25,11 +25,6 @@ I_EXPORT_COMPONENT(
 			"File Format Conversion");
 
 I_EXPORT_COMPONENT(
-			FileNameParamRepresentationController,
-			"File name param representation controller",
-			"FileName Param Representation Controller");
-
-I_EXPORT_COMPONENT(
 			SimpleFileJoiner,
 			"Simple file joiner. Joins text files into a single",
 			"Simple File Join Text");

@@ -379,11 +379,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 	if (m_paramsSetFactCompPtr.IsValid()){
 		filterParamsPtr.SetPtr(m_paramsSetFactCompPtr.CreateInstance());
 	}
-	else{
-		filterParamsPtr.SetPtr(new iprm::CParamsSet);
-	}
 
-	if (!data.isEmpty()){
+	if (filterParamsPtr.IsValid() && !data.isEmpty()){
 		if (!DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data))){
 			SendErrorMessage(0, "Unable to deserialize collection filter");
 
@@ -530,11 +527,15 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 	if (m_paramsSetFactCompPtr.IsValid()){
 		filterParamsPtr.SetPtr(m_paramsSetFactCompPtr.CreateInstance());
 	}
-	else{
-		filterParamsPtr.SetPtr(new iprm::CParamsSet);
+	
+	if (filterParamsPtr.IsValid() && !data.isEmpty()){
+		if (!DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data))){
+			errorMessage = QString("Unable to get elements Ids. Error: Filter deserialization failed");
+			SendWarningMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
+			
+			return nullptr;
+		}
 	}
-
-	DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data));
 
 	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(offset, count, filterParamsPtr.GetPtr());
 
@@ -569,13 +570,12 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 	if (m_paramsSetFactCompPtr.IsValid()){
 		filterParamsPtr.SetPtr(m_paramsSetFactCompPtr.CreateInstance());
 	}
-	else{
-		filterParamsPtr.SetPtr(new iprm::CParamsSet);
-	}
-
-	if (!DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data))){
-		errorMessage = QString("Unable to get elements count. Error: Filter deserialization failed");
-		SendWarningMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
+	
+	if (filterParamsPtr.IsValid() && !data.isEmpty()){
+		if (!DeSerializeObject(filterParamsPtr.GetPtr(), QByteArray::fromBase64(data))){
+			errorMessage = QString("Unable to get elements count. Error: Filter deserialization failed");
+			SendWarningMessage(0, errorMessage, "CSerializableObjectCollectionControllerComp");
+		}
 	}
 
 	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(filterParamsPtr.GetPtr());

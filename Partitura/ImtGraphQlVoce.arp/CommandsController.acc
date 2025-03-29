@@ -71,30 +71,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GqlCommandsController" PackageId="ImtServerGqlPck" ComponentId="GqlRepresentationDataController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="CommandPermissions">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="PermissionChecker">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="GuiElementContainer" PackageId="ImtCoreVoce" ComponentId="GuiElementContainer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -173,7 +149,6 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="GqlCommandsController"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CommandsController"/>
         <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="GuiElementContainer"/>
         <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="GuiElementContainer"/>

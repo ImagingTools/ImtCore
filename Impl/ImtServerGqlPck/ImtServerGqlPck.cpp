@@ -144,6 +144,11 @@ I_EXPORT_COMPONENT(
 			"Commands controller",
 			"Commands Controller");
 
+I_EXPORT_COMPONENT(
+			SettingsController,
+			"Settings controller",
+			"Settings Controller");
+
 
 } // namespace ImtServerGqlPck
 

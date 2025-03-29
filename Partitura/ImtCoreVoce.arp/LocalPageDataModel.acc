@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5147" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -59,7 +59,9 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="Local"/>
         <Interface InterfaceId="iser::ISerializable" ComponentId="Local"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Local"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ServerUrl" ComponentId="ServerUrl"/>

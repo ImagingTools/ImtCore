@@ -9,10 +9,8 @@ include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 
-target_link_libraries(${PROJECT_NAME} imtrepo imtrest imtcom imtbase idoc iqt i2d)
+target_link_libraries(${PROJECT_NAME} imtrepo imtrest imtcom imtbase imtbasesdl idoc iqt i2d)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::WebSockets)
-
-
 
 if (WIN32)
 	set(files \"${IMTCOREDIR_BUILD}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")

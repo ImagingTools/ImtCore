@@ -12,7 +12,7 @@ Item {
 	
 	property Decorators decorators: decorators_
 	
-	property alias localSettings: application.settingsProvider.localModel;
+	property alias localSettings: clientSettingsController.json
 	
 	property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
 	
@@ -24,6 +24,7 @@ Item {
 	property bool useWebSocketSubscription: false;
 	
 	property bool firstModelsIsInit: true;
+	property bool serverConnected: subscriptionManager_.status == 1;
 	
 	property alias subscriptionManager: subscriptionManager_;
 	
@@ -34,8 +35,9 @@ Item {
 		application.firstModelsInit();
 	}
 	
-	signal settingsUpdate();
-	signal localSettingsUpdated();
+	signal saveSettings(string json);
+	signal settingsSaved();
+	signal settingsSaveFailed();
 	
 	Component.onCompleted: {
 		setDecorators()
@@ -52,6 +54,12 @@ Item {
 		Events.sendEvent("AppHeightChanged", height)
 	}
 	
+	onServerConnectedChanged: {
+		if (serverConnected){
+			applicationInfoProvider.updateModel();
+		}
+	}
+	
 	Decorators {
 		id: decorators_
 	}
@@ -65,13 +73,7 @@ Item {
 	}
 	
 	function getServerUrl(){
-		if (application.settingsProvider){
-			let serverUrl = application.settingsProvider.getValue("ServerUrl");
-			
-			return serverUrl;
-		}
-		
-		return "";
+		return clientSettingsController.getServerUrl()
 	}
 	
 	function reconnect(){
@@ -91,70 +93,54 @@ Item {
 				context.appId = serverApplicationInfo.m_applicationId;
 				context.appName = serverApplicationInfo.m_applicationName;
 				
+				pageAboutProvider.serverVersion = serverApplicationInfo.m_version
+				
 				AuthorizationController.productId = serverApplicationInfo.m_applicationId
 			}
 		}
 	}
 	
-	property SettingsObserver settingsObserver : SettingsObserver
-	{
-		designProvider: application.designProvider;
-		languageProvider: application.languageProvider;
-		settingsProvider: application.settingsProvider;
-		
-		onUrlChanged: {
-			AuthorizationController.logout();
-			application.reconnect();
-		}
-	}
-	
-	property SettingsProvider settingsProvider : SettingsProvider
-	{
-		applicationInfoProvider: application.applicationInfoProvider;
-		
-		onServerModelChanged: {
-			let design = application.designProvider.getDesignSchema();
-			
-			let index = application.designProvider.getDesignSchemaIndex(design);
-			if (index >= 0){
-				application.settingsObserver.onDesignSchemaChanged(index);
-			}
-		}
-		
-		onLocalSettingsSaved: {
-			application.settingsUpdate();
-		}
-		
-		property bool applyCachedLanguage: application.settingsProvider.serverModel != null;
-		onApplyCachedLanguageChanged: {
-			if (applyCachedLanguage){
-				let lang = application.languageProvider.getLanguage();
-				context.language = lang;
-				
-				application.settingsUpdate();
-			}
-		}
-		
-		property bool applyCachedSchema: application.settingsProvider.localModel != null;
-		onApplyCachedSchemaChanged: {
-			if (applyCachedSchema){
-				application.designProvider.applyCachedDesignSchema();
-			}
-		}
-		
-		function getHeaders(){
-			return application.getHeaders();
-		}
-	}
-	
 	property DesignSchemaProvider designProvider : DesignSchemaProvider
 	{
-		settingsProvider: application.settingsProvider;
 	}
 	
 	property LanguageProvider languageProvider : LanguageProvider
 	{
-		settingsProvider: application.settingsProvider;
+	}
+	
+	ClientSettingsController {
+		id: clientSettingsController
+		
+		onSaveSettings: {
+			application.saveSettings(paramsSet.toJson())
+		}
+		
+		onUrlChanged: {
+			// AuthorizationController.logout();
+			application.reconnect();
+		}
+	}
+	
+	UserSettingsController {
+		id: userSettingsController
+		
+		onParamModelCreated: {
+			let languageSelectionParam = application.languageProvider.selectionParam;
+			let languageParamter = getParamJsonByPath([application.languageProvider.typeId]);
+			if (languageParamter != languageSelectionParam.toJson()){
+				application.languageProvider.selectionParam.createFromJson(languageParamter)
+			}
+
+			let designSelectionParam = application.designProvider.selectionParam;
+			let designParamter = getParamJsonByPath([application.designProvider.typeId]);
+			if (designParamter != designSelectionParam.toJson()){
+				application.designProvider.selectionParam.createFromJson(designParamter)
+			}
+		}
+	}
+	
+	PageAboutProvider {
+		id: pageAboutProvider
 	}
 	
 	SubscriptionManager {
@@ -174,12 +160,12 @@ Item {
 	function checkStatus(status){
 		thumbnailDecorator.stackView.clear();
 		
-		//        0 - WebSocket.Connecting
-		//        1 - WebSocket.Open
-		//        2 - WebSocket.Closing
-		//        3 - WebSocket.Closed
-		//        4 - WebSocket.Error
-		//        5 - Authorization Error
+		//	0 - WebSocket.Connecting
+		//	1 - WebSocket.Open
+		//	2 - WebSocket.Closing
+		//	3 - WebSocket.Closed
+		//	4 - WebSocket.Error
+		//	5 - Authorization Error
 		
 		Events.sendEvent("SearchVisible", false);
 		Events.sendEvent("SetUserPanelEnabled", false);
@@ -252,17 +238,34 @@ Item {
 		}
 	}
 	
+	Component {
+		id: serverLogProviderComp
+		ServerLogProvider {}
+	}
+	
 	ThumbnailDecorator {
 		id: thumbnailDecorator;
 		
 		anchors.fill: parent;
+		Component.onCompleted: {
+			settingsController.registerParamEditor("ServerLog", serverLogProviderComp)
+		}
 		
-		settingsProvider: application.settingsProvider;
-		settingsObserver: application.settingsObserver;
+		function fillPreferenceParamsSet(){
+			console.log("fillPreferenceParamsSet", application.serverConnected)
+			if (Qt.platform.os != "web"){
+				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
+			}
+			
+			if (application.serverConnected){
+				settingsController.registerParamsSetController("General", qsTr("General"), userSettingsController)
+				settingsController.registerParamsSetController("About", qsTr("About"), pageAboutProvider)
+			}
+		}
 	}
 	
 	function updateAllModels(){
-		settingsProvider.updateModel();
+		userSettingsController.getSettings()
 		thumbnailDecorator.updateModels();
 	}
 	
@@ -283,8 +286,6 @@ Item {
 	}
 	
 	function firstModelsInit(){
-		applicationInfoProvider.updateModel();
-		
 		if (AuthorizationController.isStrongUserManagement() && !authorizationServerConnected){
 			checkStatus(5);
 			
@@ -352,7 +353,6 @@ Item {
 			thumbnailDecorator.stopLoading();
 			application.firstModelsInit();
 			NavigationController.clear();
-			application.settingsProvider.serverModel = null;
 			subscriptionManager_.clear();
 		}
 	}

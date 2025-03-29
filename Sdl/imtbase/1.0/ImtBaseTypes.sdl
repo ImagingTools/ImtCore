@@ -23,3 +23,104 @@ type SdlPoint
 	y: Double!
 }
 
+type ParamTypeIds
+{
+	UrlParam: ID
+	IdParam: ID
+	TextParam: ID
+	TextView: ID
+	SelectionParam: ID
+	SchedulerParam: ID
+	BackupSettings: ID
+	DatabaseAccessSettings: ID
+	ParamsSet: ID
+	FileNameParam: ID
+	IntegerParam: ID
+	DoubleParam: ID
+	PasswordParam: ID
+}
+
+type UrlParam
+{
+	scheme: String
+	host: String
+	port: Integer
+	path: String
+}
+
+type IdParam
+{
+	id: ID
+}
+
+type TextParam
+{
+	text: String
+}
+
+type IntegerParam
+{
+	value: Integer
+}
+
+type DoubleParam
+{
+	value: Double
+}
+
+type Option
+{
+	id: ID
+	name: String
+	description: String
+	enabled: Boolean
+}
+
+type OptionsList
+{
+	options: [Option]
+}
+
+type SelectionParam
+{
+	selectedIndex: Integer
+	constraints: OptionsList
+}
+
+type SchedulerParam
+{
+	startTime: String
+	interval: Integer
+}
+
+type BackupSettings
+{
+	schedulerParam: SchedulerParam
+	folderPath: String
+}
+
+type DatabaseAccessSettings
+{
+	dbName: String
+	host: String
+	port: Integer
+	dbPath: String
+	username: String
+	password: String
+}
+
+type FileNameParam
+{
+	pathType: Integer
+	path: String
+}
+
+type ParamsSet
+{
+	paramIds: [ID]
+	paramTypeIds: [ID]
+	paramNames: [String]
+	paramDescriptions: [String]
+	parameters: [String]
+}
+

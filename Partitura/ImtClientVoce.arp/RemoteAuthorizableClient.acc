@@ -2,14 +2,29 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ClientRequestRemoteSuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="su"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="PumaLoginStatusSubscriber" PackageId="ImtClientGqlPck" ComponentId="ConnectionStatusSubscriber">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -32,6 +47,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RemoteSuperuserController" PackageId="ImtAuthGqlPck" ComponentId="RemoteSuperuserController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserMail" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="superuser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserName" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="superuser"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Rights" PackageId="ImtAuthVoce" ComponentId="LoginClient">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -40,6 +73,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ClientRequestRemoteSuperuserProvider"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -60,10 +96,10 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SuperuserController" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Rights/RemoteSuperuserController"/>
+                        <Data IsEnabled="true" Value="RemoteSuperuserController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Rights/RemoteSuperuserProvider"/>
+                        <Data IsEnabled="true" Value="ClientRequestRemoteSuperuserProvider"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

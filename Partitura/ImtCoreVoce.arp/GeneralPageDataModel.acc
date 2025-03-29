@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5229" Description="ACF"/>
-            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -16,7 +16,7 @@
                     <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="DesignOptions"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="DefaultIndex">
+                    <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -25,7 +25,7 @@
         <Element Id="DesignOptions" PackageId="BasePck" ComponentId="SelectionConstraints">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="SchemeIds">
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Light</Value>
@@ -33,7 +33,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="SchemeNames">
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Light</Value>
@@ -74,7 +74,7 @@
         <Element Id="Language" PackageId="BasePck" ComponentId="SelectionParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="LanguageConstraints">
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LanguageOptions"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
@@ -86,12 +86,21 @@
         <Element Id="LanguageOptions" PackageId="BasePck" ComponentId="SelectionConstraints">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="SchemeIds">
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>en_US</Value>
                                 <Value>de_DE</Value>
                                 <Value>ru_RU</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>English</Value>
+                                <Value>German</Value>
+                                <Value>Russian</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

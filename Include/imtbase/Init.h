@@ -16,6 +16,7 @@
 #include <imtqml/CRemoteFileController.h>
 #include <imtqml/CFileIO.h>
 #include <imtqml/CNetworkEventInterceptor.h>
+#include <imtqml/CQmlProcess.h>
 
 
 class DefaultImtCoreQmlInitializer
@@ -45,9 +46,10 @@ public:
 
 	static void InitImtCoreSdl()
 	{
-		Q_INIT_RESOURCE(imtbaseImtBaseTypesSdl);
 		Q_INIT_RESOURCE(imtbaseSearchSdl);
 		Q_INIT_RESOURCE(imtbaseCommandsSdl);
+		Q_INIT_RESOURCE(imtbaseSettingsSdl);
+		Q_INIT_RESOURCE(imtbaseImtBaseTypesSdl);
 		Q_INIT_RESOURCE(imtbaseImtCollectionSdl);
 		Q_INIT_RESOURCE(imtbaseDocumentCollectionFilterSdl);
 		Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);
@@ -78,6 +80,7 @@ public:
 		qmlRegisterType<imtqml::CGqlRequest>("Acf", 1, 0, "GqlRequest");
 		qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
 		qmlRegisterType<imtqml::FileIO>("Acf", 1, 0, "FileIO");
+		qmlRegisterType<imtqml::CQmlProcess>("Acf", 1, 0, "Process");
 		qmlRegisterSingletonInstance<imtqml::CNetworkEventInterceptor>("Acf", 1, 0, "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
 
 	#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)

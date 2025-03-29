@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5191" Description="ACF"/>
-            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -39,26 +39,16 @@
         </Element>
         <Element Id="GeneralPageData" PackageId="ImtCoreVoce" ComponentId="GeneralPageDataModel">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="DefaultSchemaIndex">
-                        <Data IsEnabled="true" Value="0"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="GeneralPageRepresentation" PackageId="ImtCoreVoce" ComponentId="GeneralPageRepresentationModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DesignPathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/SelectionParamEditor.qml"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LanguagePathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/SelectionParamEditor.qml"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -91,8 +81,8 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerUrlPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/UrlParamEditor.qml"/>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -128,19 +118,21 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ModelId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Settings"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Settings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>LocalPageRepresentation</Value>
-                                <Value>GeneralPageRepresentation</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -151,12 +143,9 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imod::IModel" ComponentId="Settings"/>
-        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="SettingsRepresentation"/>
-        <Interface InterfaceId="iprm::IParamsSet" ComponentId="Settings"/>
-        <Interface InterfaceId="iser::ISerializable" ComponentId="Settings"/>
-        <Interface InterfaceId="istd::IChangeable" ComponentId="Settings"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Settings"/>
+        <Interface InterfaceId="imtrest::IJsonRepresentationController" ComponentId="LocalPageRepresentation"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="LocalPageData"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="LocalPageData"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="Design" ComponentId="GeneralPageData/Design"/>

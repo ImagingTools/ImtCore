@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -38,29 +38,9 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ApplicationInfoRepresentation" PackageId="ImtRestPck" ComponentId="ApplicationInfoRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ServerVersion"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Server Version"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Source" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/Params/TextParamView.qml"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IApplicationInfoRepresentation" ComponentId="ApplicationInfoRepresentation"/>
-        <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="ApplicationInfoController"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ApplicationInfoController"/>
     </ExportedInterfaces>
     <ExportedComponents/>

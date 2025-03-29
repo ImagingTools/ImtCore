@@ -4,9 +4,6 @@
 // ACF includes
 #include <iprm/ITextParam.h>
 
-// ImtCore includes
-#include <iqt/iqt.h>
-
 
 namespace imtrest
 {
@@ -14,25 +11,14 @@ namespace imtrest
 
 // protected methods
 
-// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
 
-bool CTextParamRepresentationControllerComp::GetRepresentationFromValue(
-			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
-			const iprm::IParamsSet* /*paramsPtr*/) const
+// reimplemented (imtrest::TJsonRepresentationControllerCompWrap<sdl::imtbase::Settings::CTextParam::V1_0>)
+
+QByteArray CTextParamRepresentationControllerComp::GetTypeId() const
 {
-	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
-	Q_ASSERT(textParamPtr != nullptr);
-
-	QString textParam = textParamPtr->GetText();
-
-	representation.SetData("Value", textParam);
-
-	return true;
+	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::TextParam.toUtf8();
 }
 
-
-// reimplemented (IRepresentationController)
 
 bool CTextParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
@@ -40,25 +26,47 @@ bool CTextParamRepresentationControllerComp::IsModelSupported(const istd::IChang
 	if (textParamPtr != nullptr){
 		return true;
 	}
-
+	
 	return false;
 }
 
 
-bool CTextParamRepresentationControllerComp::GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const
+bool CTextParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
+			sdl::imtbase::ImtBaseTypes::CTextParam::V1_0& sdlRepresentation,
+			const istd::IChangeable& dataModel,
+			const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
+	Q_ASSERT(textParamPtr != nullptr);
+	if (textParamPtr == nullptr){
+		return false;
+	}
+	
+	QString text = textParamPtr->GetText();
+	sdlRepresentation.text = text;
+	
+	return true;
+}
+
+
+bool CTextParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
+			istd::IChangeable& dataModel,
+			const sdl::imtbase::ImtBaseTypes::CTextParam::V1_0& sdlRepresentation) const
 {
 	iprm::ITextParam* textParamPtr = dynamic_cast<iprm::ITextParam*>(&dataModel);
 	Q_ASSERT(textParamPtr != nullptr);
-
-	if (representation.ContainsKey("Value")){
-		QString text = representation.GetData("Value").toString();
-
-		textParamPtr->SetText(text);
-
-		return true;
+	if (textParamPtr == nullptr){
+		return false;
 	}
-
-	return false;
+	
+	if (!sdlRepresentation.text){
+		return false;
+	}
+	
+	QString text = *sdlRepresentation.text;
+	textParamPtr->SetText(text);
+	
+	return true;
 }
 
 

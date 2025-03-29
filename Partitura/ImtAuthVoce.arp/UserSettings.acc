@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="GeneralSettingsFactory" PackageId="ImtCoreVoce" ComponentId="GeneralPageDataModel">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserSettings" PackageId="ImtAuthPck" ComponentId="UserSettings">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SettingsFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="GeneralSettingsFactory"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="UserSettings"/>
+        <Interface InterfaceId="imtauth::IUserSettings" ComponentId="UserSettings"/>
+        <Interface InterfaceId="iser::IObject" ComponentId="UserSettings"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="UserSettings"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="UserSettings"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="UserSettings"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

@@ -11,134 +11,93 @@ namespace imtrest
 
 // public methods
 
-// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
+// reimplemented (imtrest::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0>)
 
-bool CDatabaseAccessSettingsRepresentationControllerComp::GetRepresentationFromValue(
-			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
-			const iprm::IParamsSet* /*paramsPtr*/) const
+QByteArray CDatabaseAccessSettingsRepresentationControllerComp::GetTypeId() const
 {
-	const imtdb::IDatabaseLoginSettings* databaseLoginSettingsPtr = dynamic_cast<const imtdb::IDatabaseLoginSettings*>(&dataModel);
-	Q_ASSERT(databaseLoginSettingsPtr != nullptr);
-
-	imtbase::CTreeItemModel* elementsModelPtr = representation.AddTreeModel("Parameters");
-	Q_ASSERT(elementsModelPtr != nullptr);
-
-	int index = elementsModelPtr->InsertNewItem();
-
-	QString dbName = databaseLoginSettingsPtr->GetDatabaseName();
-
-	elementsModelPtr->SetData("Id", "DatabaseName", index);
-	elementsModelPtr->SetData("Name", QT_TR_NOOP("Database Name"), index);
-	elementsModelPtr->SetData("Value", dbName, index);
-	if (m_dbNamePathAttrPtr.IsValid()){
-		elementsModelPtr->SetData("Source", *m_dbNamePathAttrPtr, index);
-	}
-
-	index = elementsModelPtr->InsertNewItem();
-
-	QString hostName = databaseLoginSettingsPtr->GetHost();
-
-	elementsModelPtr->SetData("Id", "Host", index);
-	elementsModelPtr->SetData("Name", QT_TR_NOOP("Host"), index);
-	elementsModelPtr->SetData("Value", hostName, index);
-	if (m_hostPathAttrPtr.IsValid()){
-		elementsModelPtr->SetData("Source", *m_hostPathAttrPtr, index);
-	}
-
-	index = elementsModelPtr->InsertNewItem();
-
-	QString password = databaseLoginSettingsPtr->GetPassword();
-
-	elementsModelPtr->SetData("Id", "Password", index);
-	elementsModelPtr->SetData("Name", QT_TR_NOOP("Password"), index);
-	elementsModelPtr->SetData("Value", password, index);
-	if (m_passwordPathAttrPtr.IsValid()){
-		elementsModelPtr->SetData("Source", *m_passwordPathAttrPtr, index);
-	}
-
-	index = elementsModelPtr->InsertNewItem();
-
-	int port = databaseLoginSettingsPtr->GetPort();
-
-	elementsModelPtr->SetData("Id", "Port", index);
-	elementsModelPtr->SetData("Name", QT_TR_NOOP("Port"), index);
-	elementsModelPtr->SetData("Value", port, index);
-	if (m_portAttrPtr.IsValid()){
-		elementsModelPtr->SetData("Source", *m_portAttrPtr, index);
-	}
-
-	index = elementsModelPtr->InsertNewItem();
-
-	QString userName = databaseLoginSettingsPtr->GetUserName();
-
-	elementsModelPtr->SetData("Id", "Username", index);
-	elementsModelPtr->SetData("Name", QT_TR_NOOP("Username"), index);
-	elementsModelPtr->SetData("Value", userName, index);
-	if (m_usernamePathAttrPtr.IsValid()){
-		elementsModelPtr->SetData("Source", *m_usernamePathAttrPtr, index);
-	}
-
-	return true;
+	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::DatabaseAccessSettings.toUtf8();
 }
 
 
-// reimplemented (IRepresentationController)
-
-bool CDatabaseAccessSettingsRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
+bool CDatabaseAccessSettingsRepresentationControllerComp::IsModelSupported(const istd::IChangeable &dataModel) const
 {
 	const imtdb::IDatabaseLoginSettings* databaseLoginSettingsPtr = dynamic_cast<const imtdb::IDatabaseLoginSettings*>(&dataModel);
 	if (databaseLoginSettingsPtr != nullptr){
 		return true;
 	}
-
+	
 	return false;
 }
 
 
-bool CDatabaseAccessSettingsRepresentationControllerComp::GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const
+bool CDatabaseAccessSettingsRepresentationControllerComp::GetSdlRepresentationFromDataModel(
+			sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0& sdlRepresentation,
+			const istd::IChangeable& dataModel,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
-	if (!IsModelSupported(dataModel)){
+	const imtdb::IDatabaseLoginSettings* databaseLoginSettingsPtr = dynamic_cast<const imtdb::IDatabaseLoginSettings*>(&dataModel);
+	Q_ASSERT(databaseLoginSettingsPtr != nullptr);
+	if (databaseLoginSettingsPtr == nullptr){
 		return false;
 	}
+	
+	QString dbName = databaseLoginSettingsPtr->GetDatabaseName();
+	sdlRepresentation.dbName = dbName;
+	
+	QString dbPath = databaseLoginSettingsPtr->GetDatabasePath();
+	sdlRepresentation.dbPath = dbPath;
+	
+	QString host = databaseLoginSettingsPtr->GetHost();
+	sdlRepresentation.host = host;
+	
+	QString password = databaseLoginSettingsPtr->GetPassword();
+	sdlRepresentation.password = password;
+	
+	QString userName = databaseLoginSettingsPtr->GetUserName();
+	sdlRepresentation.username = userName;
+	
+	int port = databaseLoginSettingsPtr->GetPort();
+	sdlRepresentation.port = port;
+	
+	return true;
+}
 
+
+bool CDatabaseAccessSettingsRepresentationControllerComp::GetDataModelFromSdlRepresentation(
+			istd::IChangeable& dataModel,
+			const sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0& sdlRepresentation) const
+{
 	imtdb::IDatabaseLoginSettings* databaseLoginSettingsPtr = dynamic_cast<imtdb::IDatabaseLoginSettings*>(&dataModel);
-	if (databaseLoginSettingsPtr != nullptr){
-		imtbase::CTreeItemModel* parametersPtr = representation.GetTreeItemModel("Parameters");
-		if (parametersPtr != nullptr){
-			for (int i = 0; i < parametersPtr->GetItemsCount(); ++i){
-				QByteArray parameterId;
-				if (parametersPtr->ContainsKey("Id", i)){
-					parameterId = parametersPtr->GetData("Id", i).toByteArray();
-				}
-
-				QString parameterValue;
-				if (parametersPtr->ContainsKey("Value", i)){
-					parameterValue = parametersPtr->GetData("Value", i).toString();
-				}
-
-				if (parameterId == "DatabaseName"){
-					databaseLoginSettingsPtr->SetDatabaseName(parameterValue);
-				}
-				else if (parameterId == "Host"){
-					databaseLoginSettingsPtr->SetHost(parameterValue);
-				}
-				else if (parameterId == "Password"){
-					databaseLoginSettingsPtr->SetPassword(parameterValue);
-				}
-				else if (parameterId == "Port"){
-					databaseLoginSettingsPtr->SetPort(parameterValue.toInt());
-				}
-				else if (parameterId == "Username"){
-					databaseLoginSettingsPtr->SetUserName(parameterValue);
-				}
-			}
-
-			return true;
-		}
+	Q_ASSERT(databaseLoginSettingsPtr != nullptr);
+	if (databaseLoginSettingsPtr == nullptr){
+		return false;
 	}
-
-	return false;
+	
+	if (sdlRepresentation.dbName){
+		databaseLoginSettingsPtr->SetDatabaseName(*sdlRepresentation.dbName);
+	}
+	
+	if (sdlRepresentation.dbPath){
+		databaseLoginSettingsPtr->SetDatabasePath(*sdlRepresentation.dbPath);
+	}
+	
+	if (sdlRepresentation.host){
+		databaseLoginSettingsPtr->SetHost(*sdlRepresentation.host);
+	}
+	
+	if (sdlRepresentation.password){
+		databaseLoginSettingsPtr->SetPassword(*sdlRepresentation.password);
+	}
+	
+	if (sdlRepresentation.username){
+		databaseLoginSettingsPtr->SetUserName(*sdlRepresentation.username);
+	}
+	
+	if (sdlRepresentation.port){
+		databaseLoginSettingsPtr->SetPort(*sdlRepresentation.port);
+	}
+	
+	return true;
 }
 
 

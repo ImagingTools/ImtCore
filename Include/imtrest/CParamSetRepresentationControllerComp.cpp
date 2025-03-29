@@ -2,8 +2,9 @@
 
 
 // ACF includes
+#include <iprm/IIdParam.h>
 #include <iprm/TParamsPtr.h>
-#include <iprm/IParamsSet.h>
+#include <iqt/iqt.h>
 
 // ImtCore includes
 #include <iqt/iqt.h>
@@ -16,84 +17,29 @@ namespace imtrest
 
 // protected methods
 
-const imtrest::IRepresentationController* CParamSetRepresentationControllerComp::FindSubController(const QByteArray& parameterId) const
+const imtrest::IJsonRepresentationController* CParamSetRepresentationControllerComp::FindSubController(const QByteArray& modelId) const
 {
 	for (int i = 0; i < m_paramRepresentationControllersCompPtr.GetCount(); i++){
-		const IRepresentationController* subControllerPtr = m_paramRepresentationControllersCompPtr[i];
+		const IJsonRepresentationController* subControllerPtr = m_paramRepresentationControllersCompPtr[i];
 		if (subControllerPtr != nullptr){
-			if (subControllerPtr->GetModelId() == parameterId){
+			RepresentationInfo representationInfo = subControllerPtr->GetRepresentationInfo();
+			if (representationInfo.modelId == modelId){
 				return subControllerPtr;
 			}
 		}
 	}
-
+	
 	return nullptr;
 }
 
 
-// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
+// reimplemented (imtrest::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
 
-bool CParamSetRepresentationControllerComp::GetRepresentationFromValue(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
+QByteArray CParamSetRepresentationControllerComp::GetTypeId() const
 {
-	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(&dataModel);
-	Q_ASSERT(paramsSetPtr != nullptr);
-
-	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
-
-	bool isAdmin = true;
-	imtauth::IUserInfo::FeatureIds userPermissions;
-	if (userInfoParamPtr.IsValid()){
-		userPermissions = userInfoParamPtr->GetPermissions();
-
-		isAdmin = userInfoParamPtr->IsAdmin();
-		if (!isAdmin){
-			bool result = CheckPermissions(userPermissions, *m_objectIdAttrPtr);
-			if (!result){
-				return false;
-			}
-		}
-	}
-
-	imtbase::CTreeItemModel* parametersRepresentationPtr = representation.AddTreeModel("Parameters");
-	Q_ASSERT(parametersRepresentationPtr != nullptr);
-
-	iprm::IParamsSet::Ids parameterIds = paramsSetPtr->GetParamIds();
-
-	QByteArrayList ids = parameterIds.values();
-	std::sort(ids.begin(), ids.end());
-
-	for (const QByteArray& paramId : ids){
-		if (!paramId.contains('/')){
-			if (!isAdmin){
-				bool result = CheckPermissions(userPermissions, paramId);
-				if (!result){
-					continue;
-				}
-			}
-
-			const iser::ISerializable* paramPtr = paramsSetPtr->GetParameter(paramId);
-			Q_ASSERT(paramPtr != nullptr);
-
-			const IRepresentationController* subControllerPtr = FindSubController(paramId);
-			if (subControllerPtr != nullptr){
-				istd::TDelPtr<imtbase::CTreeItemModel> parameterRepresentationPtr = new imtbase::CTreeItemModel();
-				if (subControllerPtr->GetRepresentationFromDataModel(*paramPtr, *parameterRepresentationPtr, paramsPtr)){
-					int index = parametersRepresentationPtr->InsertNewItem();
-
-					parametersRepresentationPtr->CopyItemDataFromModel(index, parameterRepresentationPtr.PopPtr());
-				}
-				else{
-					return false;
-				}
-			}
-		}
-	}
-
-	return true;
+	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::ParamsSet.toUtf8();
 }
 
-
-// reimplemented (IRepresentationController)
 
 bool CParamSetRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
@@ -101,42 +47,133 @@ bool CParamSetRepresentationControllerComp::IsModelSupported(const istd::IChange
 	if (paramsSetPtr != nullptr){
 		return true;
 	}
-
+	
 	return false;
 }
 
 
-bool CParamSetRepresentationControllerComp::GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const
+bool CParamSetRepresentationControllerComp::GetSdlRepresentationFromDataModel(
+			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdlRepresentation,
+			const istd::IChangeable& dataModel,
+			const iprm::IParamsSet* paramsPtr) const
 {
-	if (!IsModelSupported(dataModel)){
+	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(&dataModel);
+	Q_ASSERT(paramsSetPtr != nullptr);
+	if (paramsSetPtr == nullptr){
 		return false;
 	}
-
-	iprm::IParamsSet* paramsSetPtr = dynamic_cast<iprm::IParamsSet*>(&dataModel);
-	if (paramsSetPtr != nullptr){
-		const imtbase::CTreeItemModel* parametersModelPtr = representation.GetTreeItemModel("Parameters");
-		if (parametersModelPtr != nullptr){
-			for (int i = 0; i < parametersModelPtr->GetItemsCount(); i++){
-				QByteArray parameterId;
-				if (parametersModelPtr->ContainsKey("Id", i)){
-					parameterId = parametersModelPtr->GetData("Id", i).toByteArray();
-				}
-
-				if (!parameterId.isEmpty()){
-					const IRepresentationController* subControllerPtr = FindSubController(parameterId);
-					if (subControllerPtr != nullptr){
-						istd::IChangeable* modelPtr = paramsSetPtr->GetEditableParameter(parameterId);
-						const imtbase::CTreeItemModel* representationModelPtr = parametersModelPtr->GetModelFromItem(i);
-
-						if (modelPtr != nullptr && representationModelPtr != nullptr){
-							bool result = subControllerPtr->GetDataModelFromRepresentation(*representationModelPtr, *modelPtr);
-							if (!result){
-								return false;
-							}
-						}
+	
+	QByteArray languageId;
+	if (paramsPtr != nullptr){
+		iprm::TParamsPtr<iprm::IIdParam> languageParamPtr(paramsPtr, "LanguageParam");
+		if (languageParamPtr.IsValid()){
+			languageId = languageParamPtr->GetId();
+		}
+	}
+	
+	iprm::IParamsSet::Ids paramSetIds = paramsSetPtr->GetParamIds();
+	QByteArrayList parameterIds = paramSetIds.values();
+	std::sort(parameterIds.begin(), parameterIds.end());
+	
+	QByteArrayList paramTypeIds;
+	QByteArrayList paramIds;
+	QStringList paramNames;
+	QStringList paramDescriptions;
+	QStringList parameters;
+	
+	for (const QByteArray& parameterId : parameterIds){
+		if (!parameterId.contains("/")){
+			const iser::ISerializable* parameterPtr = paramsSetPtr->GetParameter(parameterId);
+			if (parameterPtr == nullptr){
+				continue;
+			}
+			
+			const IJsonRepresentationController* subControllerPtr = FindSubController(parameterId);
+			if (subControllerPtr != nullptr){
+				QJsonObject parameterRepresentation;
+				if (subControllerPtr->GetRepresentationFromDataModel(*parameterPtr, parameterRepresentation, paramsPtr)){
+					QJsonDocument jsonDocument(parameterRepresentation);
+					parameters << jsonDocument.toJson(QJsonDocument::Compact);
+					
+					IJsonRepresentationController::RepresentationInfo representationInfo = subControllerPtr->GetRepresentationInfo();
+					QByteArray typeId = subControllerPtr->GetTypeId();
+					
+					paramTypeIds << typeId;
+					paramIds << representationInfo.modelId;
+					
+					QString name = representationInfo.name;
+					QString description = representationInfo.description;
+					
+					if (m_translationManagerCompPtr.IsValid()){
+						name = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), name.toUtf8(), languageId, "Attribute");
+						description = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), description.toUtf8(), languageId, "Attribute");
 					}
+					
+					paramNames << name;
+					paramDescriptions << description;
 				}
 			}
+		}
+	}
+	
+	sdlRepresentation.paramIds = paramIds;
+	sdlRepresentation.paramTypeIds = paramTypeIds;
+	sdlRepresentation.paramNames = paramNames;
+	sdlRepresentation.paramDescriptions = paramDescriptions;
+	sdlRepresentation.parameters = parameters;
+	
+	return true;
+}
+
+
+bool CParamSetRepresentationControllerComp::GetDataModelFromSdlRepresentation(
+			istd::IChangeable& dataModel,
+			const sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdlRepresentation) const
+{
+	iprm::IParamsSet* paramsSetPtr = dynamic_cast<iprm::IParamsSet*>(&dataModel);
+	Q_ASSERT(paramsSetPtr != nullptr);
+	if (paramsSetPtr == nullptr){
+		return false;
+	}
+	
+	if (!sdlRepresentation.paramIds.has_value()){
+		return false;
+	}
+	
+	if (!sdlRepresentation.parameters.has_value()){
+		return false;
+	}
+	
+	QList<QByteArray> parameterIds = *sdlRepresentation.paramIds;
+	QList<QString> parameters = *sdlRepresentation.parameters;
+	
+	if (parameterIds.size() != parameters.size()){
+		return false;
+	}
+	
+	for (int i = 0; i < parameterIds.size(); i++){
+		const QByteArray parameterId = parameterIds[i];
+		iser::ISerializable* parameterPtr = paramsSetPtr->GetEditableParameter(parameterId);
+		if (parameterPtr == nullptr){
+			continue;
+		}
+
+		QJsonDocument document = QJsonDocument::fromJson(parameters[i].toUtf8());
+		if (document.isNull()){
+			return false;
+		}
+		
+		if (!document.isObject()){
+			return false;
+		}
+		
+		const IJsonRepresentationController* jsonRepresentationControllerPtr = FindSubController(parameterId);
+		if (jsonRepresentationControllerPtr == nullptr){
+			return false;
+		}
+		
+		if (!jsonRepresentationControllerPtr->GetDataModelFromRepresentation(document.object(), *parameterPtr)){
+			return false;
 		}
 	}
 

@@ -2,16 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="CheckPermissionOr" X="625" Y="50" Note=""/>
         <Element ComponentName="RemoteRoleInfoProvider" X="925" Y="325" Note=""/>
-        <Element ComponentName="RemoteSuperuserController" X="1000" Y="50" Note=""/>
-        <Element ComponentName="RemoteSuperuserProvider" X="200" Y="325" Note=""/>
         <Element ComponentName="RemoteUserGroupInfoProvider" X="625" Y="475" Note=""/>
         <Element ComponentName="Role" X="1125" Y="450" Note=""/>
         <Element ComponentName="SimpleLoginWrap" X="625" Y="175" Note=""/>

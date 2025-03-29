@@ -40,6 +40,12 @@
 #include <imtrest/CDelegatedBinaryDataProviderComp.h>
 #include <imtrest/CTableViewParamRepresentationControllerComp.h>
 #include <imtrest/CBinaryDataProviderComp.h>
+#include <imtrest/CFileNameParamRepresentationControllerComp.h>
+#include <imtrest/CBackupSettingsRepresentationControllerComp.h>
+#include <imtrest/CSchedulerParamsRepresentationControllerComp.h>
+#include <imtrest/CIntegerParamRepresentationControllerComp.h>
+#include <imtrest/CDoubleParamRepresentationControllerComp.h>
+#include <imtrest/CPasswordParamRepresentationControllerComp.h>
 
 
 /**
@@ -83,9 +89,14 @@ typedef imtrest::CGuiElementContainerComp GuiElementContainer;
 typedef imtrest::CGuiElementModelRepresentationControllerComp GuiElementModelRepresentationController;
 typedef imtrest::CGuiElementContainerRepresentationControllerComp GuiElementContainerRepresentationController;
 typedef imtrest::CPageGuiElementModelRepresentationControllerComp PageGuiElementModelRepresentationController;
+typedef imtrest::CFileNameParamRepresentationControllerComp FileNameParamRepresentationController;
+typedef imtrest::CBackupSettingsRepresentationControllerComp BackupSettingsRepresentationController;
+typedef imtrest::CSchedulerParamsRepresentationControllerComp SchedulerParamsRepresentationController;
+typedef imtrest::CIntegerParamRepresentationControllerComp IntegerParamRepresentationController;
+typedef imtrest::CDoubleParamRepresentationControllerComp DoubleParamRepresentationController;
+typedef imtrest::CPasswordParamRepresentationControllerComp PasswordParamRepresentationController;
 
 
 } // namespace ImtRestPck
-
 
 

@@ -1,0 +1,49 @@
+schema {
+	name: Settings
+	namespace: imtbase
+	version: 1.0
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"../../imtbase/1.0/ImtBaseTypes.sdl"
+}
+
+type SetSettingsPayload
+{
+	ok: Boolean
+}
+
+input GetSettingsInput
+{
+	userId: ID!
+}
+
+input SetSettingsInput
+{
+	userId: ID!
+	settings: String!
+}
+
+input GetStyleDataInput
+{
+	schemeId: ID!
+}
+
+type StyleData
+{
+	data: ID!
+}
+
+
+type Mutation {
+	SetSettings(input: SetSettingsInput): SetSettingsPayload!
+}
+
+type Query {
+	GetSettings(input: GetSettingsInput): ParamsSet!
+	GetStyleData(input: GetStyleDataInput): StyleData!
+	GetWebSocketUrl: UrlParam!
+}
+

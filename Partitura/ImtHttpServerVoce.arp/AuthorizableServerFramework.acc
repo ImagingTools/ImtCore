@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5343" Description="ACF"/>
-            <Version Id="1" Number="2232" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -211,6 +211,10 @@
         <Component ExportedId="PumaWebSocketPort" ComponentId="ServerSettings/PumaWebSocketPort"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
         <Component ExportedId="ServerPort" ComponentId="ServerSettings/ServerPort"/>
+        <Component ExportedId="SmtpPasswordParam" ComponentId="ServerSettings/SmtpPasswordParam"/>
+        <Component ExportedId="SmtpPortParam" ComponentId="ServerSettings/SmtpPortParam"/>
+        <Component ExportedId="SmtpServerAddressParam" ComponentId="ServerSettings/SmtpServerAddressParam"/>
+        <Component ExportedId="SmtpUsernameParam" ComponentId="ServerSettings/SmtpUsernameParam"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="PumaClientEngine/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaClientEngine/UserSessionRemoteRepository"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>

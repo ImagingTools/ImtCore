@@ -345,6 +345,9 @@ macro(getImtBaseQmlWebDirs webdirs buildwebdir useImtControlsStyle)
 	
 	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseCommandsSdl)
 	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseCommandsSdl)
+	
+	list(APPEND ${webdirs} ${IMTCOREDIR}/AuxInclude/${TARGETNAME}/GeneratedFiles/imtbasesdl/SDL/1.0/QML/imtbaseSettingsSdl)
+	list(APPEND ${webdirs} ${buildwebdir}/src/imtbaseSettingsSdl)
 endmacro(getImtBaseQmlWebDirs)
 
 macro(getImtLicQmlWebDirs webdirs buildwebdir)

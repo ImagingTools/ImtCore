@@ -20,6 +20,7 @@
         <Element ComponentName="SchedulerParams" X="825" Y="525" Note=""/>
         <Element ComponentName="Server" X="525" Y="300" Note=""/>
         <Element ComponentName="ServerConnectionParams" X="525" Y="525" Note=""/>
+        <Element ComponentName="SmtpServerParams" X="1025" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

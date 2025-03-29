@@ -2,48 +2,108 @@ import QtQuick 2.0
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtbaseImtBaseTypesSdl 1.0
 
-Column {
-    id: root;
-    spacing: Style.sizeLargeMargin;
-    property int contentWidth: 700;
+ParamEditorBase {
+	id: composedParamsGui
+	
+	typeId: ParamTypeIdsTypeMetaInfo.s_paramsSet
+	property ParamsSet paramsSet: editorModel
+	
+	paramController: ParamsSetController {}
 
-    property alias model: bodyPanelRepeater.model;
+	editorModelComp: Component {
+		ParamsSet {}
+	}
+	
+	property var settingsController: null
 
-    Repeater {
-        id: bodyPanelRepeater;
-        delegate: Loader {
-            id: loader;
-            property int rootWidth: root.width;
-            Component.onCompleted: {
-                if (model.Source && model.Source !== ""){
-                    loader.source = model.Source;
-                }
-            }
+	sourceComp: Component {
+		Column {
+			id: column
+			width: composedParamsGui.width;
+			spacing: Style.sizeLargeMargin
+	
+			property int contentWidth: 700
 
-            onRootWidthChanged: {
-                checkWidth();
-            }
+			Repeater {
+				id: bodyPanelRepeater
+				model: composedParamsGui.paramsSet ? composedParamsGui.paramsSet.m_paramTypeIds : 0
+				delegate: Loader {
+					id: loader
+					
+					property string paramId
+					property string paramTypeId
+					property string paramName
+					property string paramDescription
+					property string parameterJson
+					
+					Component.onCompleted: {
+						paramId = composedParamsGui.paramsSet.m_paramIds[model.index]
+						paramTypeId = composedParamsGui.paramsSet.m_paramTypeIds[model.index]
+						paramName = composedParamsGui.paramsSet.m_paramNames[model.index]
+						paramDescription = composedParamsGui.paramsSet.m_paramDescriptions[model.index]
+						parameterJson = composedParamsGui.paramsSet.m_parameters[model.index]
 
-            onLoaded: {
-                checkWidth();
+						if (composedParamsGui.settingsController && paramTypeId in composedParamsGui.settingsController.supportedParamEditors){
+							let paramEditorComp = composedParamsGui.settingsController.supportedParamEditors[paramTypeId]
+							sourceComponent = paramEditorComp
+						}
+						else{
+							console.error("Param editor with type-ID '", paramTypeId, "' unregistered")
+						}
+					}
 
-                if (item.modelData != undefined && item.modelData != null){
-                    item.modelData = model;
-                }
-            }
+					onLoaded: {
+						if (item.paramId != undefined){
+							item.paramId = paramId
+						}
+						
+						if (item.name != undefined){
+							item.name = paramName
+						}
+						
+						if (item.description != undefined){
+							item.description = paramDescription
+						}
+						
+						if (item.paramController){
+							if (!item.paramController.createParamFromJson(parameterJson)){
+								console.error("Unable to create param from json. Param: ", paramId, paramName)
+							}
+						}
 
-            function checkWidth(){
-                if (item){
-                    if (item.width >= root.width){
-                        item.width = root.width;
-                    }
-                    else{
-                        item.width = root.contentWidth;
-                    }
-                }
-            }
-        }
-    }
-}//Column
+						checkWidth()
+					}
+					
+					property int rootWidth: composedParamsGui.width
+					onRootWidthChanged: {
+						checkWidth()
+					}
+
+					function checkWidth() {
+						if (item) {
+							let newWidth = Math.min(rootWidth, column.contentWidth);
+							
+							if (item.width !== newWidth) {
+								item.width = newWidth;
+							}
+						}
+					}
+					
+					Connections {
+						target: loader.item
+
+						function onEditorModelDataChanged(paramId, key){
+							let json = loader.item.editorModel.toJson();
+
+							composedParamsGui.paramsSet.m_parameters[model.index] = json
+							composedParamsGui.editorModelDataChanged(composedParamsGui.paramId + "/" + paramId, key)
+						}
+					}
+				}
+			}
+		}//Column
+	}
+}
 

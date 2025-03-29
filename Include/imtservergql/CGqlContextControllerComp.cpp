@@ -40,12 +40,6 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 		return nullptr;
 	}
 
-	if (!m_jwtSessionControllerCompPtr->ValidateJwt(token)){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Token is invalid").arg(qPrintable(token));
-		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
-		return nullptr;
-	}
-
 	QByteArray userObjectId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
 	if (userObjectId.isEmpty()){
 		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: Session model is invalid.").arg(qPrintable(token));
@@ -67,8 +61,6 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 		return nullptr;
 	}
 
-	QByteArray userId = userInfoPtr->GetId();
-
 	imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
 
 	gqlContextPtr->SetUserInfo(userInfoPtr);
@@ -79,7 +71,7 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 
 	if (m_userSettingsCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		if (m_userSettingsCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 			imtauth::IUserSettings* userSettingsPtr = dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr());
 			if (userSettingsPtr != nullptr){
 				iprm::IParamsSet* paramsSetPtr = userSettingsPtr->GetSettings();

@@ -12,7 +12,7 @@ Item {
         anchors.fill: parent;
 
         Component.onCompleted: {
-            designProvider.applyDesignSchema("Light");
+            designProvider.setDesignSchema("Light");
 
             application.firstModelsInit();
         }

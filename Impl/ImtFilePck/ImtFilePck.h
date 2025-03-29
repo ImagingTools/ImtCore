@@ -4,7 +4,6 @@
 // ImtCore includes
 #include <imtfile/CFileProviderComp.h>
 #include <imtfile/CFileFormatConversionComp.h>
-#include <imtfile/CFileNameParamRepresentationControllerComp.h>
 #include <imtfile/CSimpleFileJoinerComp.h>
 
 
@@ -17,7 +16,6 @@ namespace ImtFilePck
 
 typedef imtfile::CFileProviderComp FileProvider;
 typedef imtfile::CFileFormatConversionComp FileFormatConversion;
-typedef imtfile::CFileNameParamRepresentationControllerComp FileNameParamRepresentationController;
 typedef imtfile::CSimpleFileJoinerComp SimpleFileJoiner;
 
 

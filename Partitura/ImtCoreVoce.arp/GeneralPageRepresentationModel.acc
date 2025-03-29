@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5229" Description="ACF"/>
-            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -16,13 +16,13 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ModelId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="DesignSchema"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Design Schema"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="DesignPathToQml">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -37,10 +37,10 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ModelId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="General"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="General"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">
@@ -50,6 +50,9 @@
                                 <Value>Design</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -63,13 +66,13 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ModelId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Language"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Language"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="LanguagePathToQml">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -81,7 +84,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="General"/>
+        <Interface InterfaceId="imtrest::IJsonRepresentationController" ComponentId="General"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="General"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtguivars);
 	Q_INIT_RESOURCE(imtbaseImtBaseTypesSdl);
 	Q_INIT_RESOURCE(imtbaseCommandsSdl);
+	Q_INIT_RESOURCE(imtbaseSettingsSdl);
 	Q_INIT_RESOURCE(imtbaseImtCollectionSdl);
 	Q_INIT_RESOURCE(imtbaseDocumentCollectionFilterSdl);
 	Q_INIT_RESOURCE(imtbaseComplexCollectionFilterSdl);

@@ -3,10 +3,6 @@
 
 // ACF includes
 #include <iprm/ISelectionParam.h>
-#include <iprm/IOptionsList.h>
-
-// ImtCore includes
-#include <iqt/iqt.h>
 
 
 namespace imtrest
@@ -15,42 +11,13 @@ namespace imtrest
 
 // protected methods
 
-// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
+// reimplemented (imtrest::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0>)
 
-bool CSelectionParamRepresentationControllerComp::GetRepresentationFromValue(
-			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
-			const iprm::IParamsSet* /*paramsPtr*/) const
+QByteArray CSelectionParamRepresentationControllerComp::GetTypeId() const
 {
-	const iprm::ISelectionParam* selectionParamPtr = dynamic_cast<const iprm::ISelectionParam*>(&dataModel);
-	Q_ASSERT(selectionParamPtr != nullptr);
-
-	const iprm::IOptionsList* optionListPtr = selectionParamPtr->GetSelectionConstraints();
-	if (optionListPtr != nullptr){
-		imtbase::CTreeItemModel* parametersModelPtr = representation.AddTreeModel("Parameters");
-		Q_ASSERT(parametersModelPtr != nullptr);
-
-		for (int i = 0; i < optionListPtr->GetOptionsCount(); ++i){
-			QByteArray optionId = optionListPtr->GetOptionId(i);
-			QString optionName = optionListPtr->GetOptionName(i);
-			QString optionDescription = optionListPtr->GetOptionDescription(i);
-
-			int index = parametersModelPtr->InsertNewItem();
-
-			parametersModelPtr->SetData("Id", optionId, index);
-			parametersModelPtr->SetData("Name", optionName, index);
-			parametersModelPtr->SetData("Description", optionDescription, index);
-		}
-	}
-
-	int selectedIndex = selectionParamPtr->GetSelectedOptionIndex();
-	representation.SetData("Value", selectedIndex);
-
-	return true;
+	return sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0::ParamTypeIdsFields::SelectionParam.toUtf8();
 }
 
-
-// reimplemented (IRepresentationController)
 
 bool CSelectionParamRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
@@ -58,28 +25,66 @@ bool CSelectionParamRepresentationControllerComp::IsModelSupported(const istd::I
 	if (selectionParamPtr != nullptr){
 		return true;
 	}
-
+	
 	return false;
 }
 
 
-bool CSelectionParamRepresentationControllerComp::GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const
+bool CSelectionParamRepresentationControllerComp::GetSdlRepresentationFromDataModel(
+			sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0& sdlRepresentation,
+			const istd::IChangeable& dataModel,
+			const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	const iprm::ISelectionParam* selectionParamPtr = dynamic_cast<const iprm::ISelectionParam*>(&dataModel);
+	Q_ASSERT(selectionParamPtr != nullptr);
+	if (selectionParamPtr == nullptr){
+		return false;
+	}
+	
+	QList<sdl::imtbase::ImtBaseTypes::COption::V1_0> optionList;
+	
+	const iprm::IOptionsList* optionListPtr = selectionParamPtr->GetSelectionConstraints();
+	if (optionListPtr != nullptr){
+		for (int i = 0; i < optionListPtr->GetOptionsCount(); ++i){
+			sdl::imtbase::ImtBaseTypes::COption::V1_0 option;
+			option.id = optionListPtr->GetOptionId(i);
+			option.name = optionListPtr->GetOptionName(i);
+			option.description = optionListPtr->GetOptionDescription(i);
+			option.enabled = optionListPtr->IsOptionEnabled(i);
+			
+			optionList << option;
+		}
+	}
+	
+	sdl::imtbase::ImtBaseTypes::COptionsList::V1_0 optionsList;
+	optionsList.options = optionList;
+	
+	int selectedIndex = selectionParamPtr->GetSelectedOptionIndex();
+	sdlRepresentation.selectedIndex = selectedIndex;
+	sdlRepresentation.constraints = optionsList;
+	
+	return true;
+}
+
+
+bool CSelectionParamRepresentationControllerComp::GetDataModelFromSdlRepresentation(
+			istd::IChangeable& dataModel,
+			const sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0& sdlRepresentation) const
 {
 	iprm::ISelectionParam* selectionParamPtr = dynamic_cast<iprm::ISelectionParam*>(&dataModel);
 	Q_ASSERT(selectionParamPtr != nullptr);
-
-	int selectedIndex = -1;
-	if (representation.ContainsKey("Value")){
-		selectedIndex = representation.GetData("Value").toInt();
+	if (selectionParamPtr == nullptr){
+		return false;
 	}
-
-	if (selectedIndex >= 0){
-		selectionParamPtr->SetSelectedOptionIndex(selectedIndex);
-
-		return true;
+	
+	if (!sdlRepresentation.selectedIndex){
+		return false;
 	}
-
-	return false;
+	
+	int selectedIndex = *sdlRepresentation.selectedIndex;
+	selectionParamPtr->SetSelectedOptionIndex(selectedIndex);
+	
+	return true;
 }
 
 

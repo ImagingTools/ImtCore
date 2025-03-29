@@ -2,30 +2,37 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5241" Description="ACF"/>
-            <Version Id="1" Number="2216" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="GeneralSettingsFactory" PackageId="ImtCoreVoce" ComponentId="GeneralPageDataModel">
-            <Data IsEnabled="true" Flags="2">
+        <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserSettings</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>User Settings</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserSettings" PackageId="ImtAuthPck" ComponentId="UserSettings">
+        <Element Id="UserSettings" PackageId="ImtAuthVoce" ComponentId="UserSettings">
             <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="SettingsFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="GeneralSettingsFactory"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="UserSettingsRepository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
@@ -58,6 +65,9 @@
                     <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="UserId"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Types"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="UserSettings"/>
                     </AttributeInfo>
@@ -76,7 +86,6 @@
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="UserSettingsRepository"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="UserSettings" ComponentId="UserSettings"/>
         <Component ExportedId="UserSettingsRepository" ComponentId="UserSettingsRepository"/>
     </ExportedComponents>
 </Acf>

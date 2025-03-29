@@ -43,7 +43,7 @@ TreeItemModelObserver {
         }
 
         if (container.designProvider != null && container.settingsProvider != null){
-            container.designProvider.applyDesignSchema();
+            container.designProvider.setDesignSchema();
         }
     }
 

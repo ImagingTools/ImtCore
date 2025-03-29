@@ -1455,16 +1455,14 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectTypeIdFromRequest(const
 {
 	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr != nullptr){
-		QByteArray typeId = gqlInputParamPtr->GetFieldArgumentValue("typeId").toByteArray();
-
-		if (typeId.isEmpty()){
-			const imtgql::CGqlObject* additionalParamsPtr = gqlInputParamPtr->GetFieldArgumentObjectPtr("addition");
-			if (additionalParamsPtr != nullptr){
-				typeId = additionalParamsPtr->GetFieldArgumentValue("typeId").toByteArray();
+		static const QByteArrayList possibleKeys = {"typeId", "TypeId"};
+		
+		for (const QByteArray& key : possibleKeys) {
+			QVariant typeId = gqlInputParamPtr->GetFieldArgumentValue(key);
+			if (!typeId.isNull()){
+				return typeId.toByteArray();
 			}
 		}
-
-		return typeId;
 	}
 
 	return QByteArray();

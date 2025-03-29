@@ -9,10 +9,10 @@ DesignSchemaProvider 1.0 ./Application/DesignSchemaProvider.qml
 LanguageProvider 1.0 ./Application/LanguageProvider.qml
 PagesManager 1.0 ./Application/PagesManager.qml
 PagesProvider 1.0 ./Application/PagesProvider.qml
-SchedulerParams 1.0 ./Application/SchedulerParams.qml
 ShortcutManager 1.0 ./Application/ShortcutManager.qml
 ThumbnailDecorator 1.0 ./Application/ThumbnailDecorator.qml
 ApplicationEvents 1.0 ./Application/ApplicationEvents.qml
+ClientSettingsController 1.0 ./Application/ClientSettingsController.qml
 
 ButtonPanel 1.0 Panels/ButtonPanel.qml
 CommandsDecorator 1.0 Panels/CommandsDecorator.qml
@@ -43,6 +43,7 @@ PreferenceButton 1.0 Settings/PreferenceButton.qml
 ServerLogProvider 1.0 Settings/ServerLogProvider.qml
 SettingsObserver 1.0 Settings/SettingsObserver.qml
 SettingsProvider 1.0 Settings/SettingsProvider.qml
+SettingsController 1.0 Settings/SettingsController.qml
 
 MultiPageView 1.0 View/MultiPageView.qml
 TabView 1.0 View/TabView.qml
@@ -85,10 +86,15 @@ singleton PopupManager 1.0 View/PopupManager.qml
 
 TextParamEditor 1.0 Params/TextParamEditor.qml
 UrlParamEditor 1.0 Params/UrlParamEditor.qml
-FilePickerParam 1.0 Params/FilePickerParam.qml
+FileNameParamEditor 1.0 Params/FileNameParamEditor.qml
 ComposedParamsGui 1.0 Params/ComposedParamsGui.qml
 PasswordParamEditor 1.0 Params/PasswordParamEditor.qml
-DatabaseParams 1.0 Params/DatabaseParams.qml
 DatabaseAccessSettingsEditor 1.0 Params/DatabaseAccessSettingsEditor.qml
 SelectionParamEditor 1.0 Params/SelectionParamEditor.qml
 TextParamView 1.0 Params/TextParamView.qml
+ParamEditorBase 1.0 Params/ParamEditorBase.qml
+SchedulerParamEditor 1.0 Params/SchedulerParamEditor.qml
+ParamController 1.0 Params/ParamController.qml
+ParamsSetController 1.0 Params/ParamsSetController.qml
+DoubleParamEditor 1.0 Params/DoubleParamEditor.qml
+IntegerParamEditor 1.0 Params/IntegerParamEditor.qml

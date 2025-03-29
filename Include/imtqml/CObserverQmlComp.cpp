@@ -1,81 +1,76 @@
 #include <imtqml/CObserverQmlComp.h>
 
 
+// ImtCore includes
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
+
+
 namespace imtqml
 {
 
 
-CObserverQmlComp::CObserverQmlComp()
-	:m_settingsObserver(*this)
-{
-}
-
-
 // protected methods
-
-void CObserverQmlComp::UpdateSettingsRepresentation()
-{
-	if (m_quickObjectCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
-		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
-		if (quickItem != nullptr){
-			m_settingsModel.Clear();
-
-			bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, m_settingsModel);
-			if (result){
-				if (m_settingsModel.ContainsKey("Parameters")){
-					imtbase::CTreeItemModel* parametersPtr = m_settingsModel.GetTreeItemModel("Parameters");
-					if (parametersPtr != nullptr){
-						QVariant data = QVariant::fromValue(parametersPtr);
-
-						quickItem->setProperty("localSettings", data);
-					}
-				}
-			}
-		}
-	}
-}
-
 
 // reimplemented (icomp::CComponentBase)
 
 void CObserverQmlComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	if (m_quickObjectCompPtr.IsValid()){
-		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
-		if (quickItem != nullptr){
-			connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnGuiChanged()));
-		}
+	
+	if (!m_quickObjectCompPtr.IsValid()){
+		return;
+	}
+	
+	if (!m_settingsRepresentationControllerCompPtr.IsValid()){
+		return;
+	}
+	
+	QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
+	if (quickItem == nullptr){
+		return;
 	}
 
-	UpdateSettingsRepresentation();
-}
-
-
-void CObserverQmlComp::OnComponentDestroyed()
-{
-	m_settingsObserver.UnregisterAllObjects();
-
-	BaseClass::OnComponentDestroyed();
-}
-
-
-void CObserverQmlComp::OnChangeSourceItem(QString src)
-{
-	if (m_quickObjectCompPtr.IsValid()){
-		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
-		Q_ASSERT(quickItem != nullptr);
-
-		quickItem->setProperty("sourceItem", "qrc:///qml/" + src);
+	connect(quickItem, SIGNAL(saveSettings(QString)), this, SLOT(OnSettingsChanged(QString)));
+	
+	QJsonObject jsonRepresentation;
+	if (m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, jsonRepresentation)){
+		QJsonDocument jsonDocument(jsonRepresentation);
+		quickItem->setProperty("localSettings", jsonDocument.toJson(QJsonDocument::Compact));
 	}
 }
 
 
-void CObserverQmlComp::OnGuiChanged()
+void CObserverQmlComp::OnSettingsChanged(QString jsonData)
 {
-	if (m_settingsRepresentationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
-		m_settingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(m_settingsModel, *m_settingsCompPtr);
+	if (!m_settingsRepresentationControllerCompPtr.IsValid()){
+		return;
+	}
+	
+	if (!m_settingsCompPtr.IsValid()){
+		return;
+	}
+	
+	if (!m_quickObjectCompPtr.IsValid()){
+		return;
+	}
+
+	QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
+	if (quickItem == nullptr){
+		return;
+	}
+	
+	QJsonParseError jsonParseError;
+	QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonData.toUtf8(), &jsonParseError);
+	if (jsonParseError.error != QJsonParseError::NoError){
+		qDebug() << jsonParseError.errorString();
+		return;
+	}
+	
+	if (m_settingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(jsonDocument.object(), *m_settingsCompPtr)){
+		QMetaObject::invokeMethod(quickItem, "settingsSaved");
+	}
+	else{
+		QMetaObject::invokeMethod(quickItem, "settingsSaveFailed");
 	}
 }
 

@@ -185,6 +185,36 @@ I_EXPORT_COMPONENT(
 			"Page gui element model representation controller",
 			"Page Gui Element Model Representation Controller");
 
+I_EXPORT_COMPONENT(
+			FileNameParamRepresentationController,
+			"File name param representation controller",
+			"FileName Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			BackupSettingsRepresentationController,
+			"Backup settings representation controller",
+			"Backup Settings Representation Controller");
+
+I_EXPORT_COMPONENT(
+			SchedulerParamsRepresentationController,
+			"Scheduler params representation controller",
+			"Scheduler Params Representation Controller");
+
+I_EXPORT_COMPONENT(
+			IntegerParamRepresentationController,
+			"Integer param representation controller",
+			"Integer Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			DoubleParamRepresentationController,
+			"Double param representation controller",
+			"Double Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			PasswordParamRepresentationController,
+			"Password param representation controller",
+			"Password Param Representation Controller");
+
 
 } // namespace ImtRestPck
 

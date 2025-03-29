@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -23,33 +23,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RoleFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="Role"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RemoteSuperuserController" PackageId="ImtAuthGqlPck" ComponentId="RemoteSuperuserController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RemoteSuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SuperuserId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="su"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -87,8 +60,8 @@
                     <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CheckPermissionOr"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RemoteSuperuserProvider"/>
+                    <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="SuperuserProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="UserInfo"/>
@@ -133,8 +106,5 @@
         <Interface InterfaceId="istd::IChangeable" ComponentId="SimpleLoginWrap"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SimpleLoginWrap"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="RemoteSuperuserController" ComponentId="RemoteSuperuserController"/>
-        <Component ExportedId="RemoteSuperuserProvider" ComponentId="RemoteSuperuserProvider"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>

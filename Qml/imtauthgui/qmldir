@@ -35,3 +35,4 @@ ChangePasswordDialog 1.0 ChangePasswordDialog.qml
 PasswordInput 1.0 PasswordInput.qml
 UserGeneralEditor 1.0 UserGeneralEditor.qml
 PasswordRecoveryDialog 1.0 PasswordRecoveryDialog.qml
+UserSettingsController 1.0 UserSettingsController.qml

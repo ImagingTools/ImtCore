@@ -2,28 +2,33 @@
 
 
 // ImtCore includes
-#include <imtrest/CObjectRepresentationControllerCompBase.h>
+#include <imtrest/TJsonRepresentationControllerCompWrap.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
 namespace imtrest
 {
 
 
-class CUrlParamRepresentationControllerComp: public imtrest::CObjectRepresentationControllerCompBase
+class CUrlParamRepresentationControllerComp: public imtrest::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0>
 {
 public:
-	typedef imtrest::CObjectRepresentationControllerCompBase BaseClass;
+	typedef imtrest::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0> BaseClass;
 
 	I_BEGIN_COMPONENT(CUrlParamRepresentationControllerComp)
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
-	virtual bool GetRepresentationFromValue(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
-
-	// reimplemented (IRepresentationController)
+	// reimplemented (imtrest::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0>)
+	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
-	virtual bool GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const override;
+	virtual bool GetSdlRepresentationFromDataModel(
+				sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0& sdlRepresentation,
+				const istd::IChangeable& dataModel,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
+	virtual bool GetDataModelFromSdlRepresentation(
+				istd::IChangeable& dataModel,
+				const sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0& sdlRepresentation) const override;
 };
 
 
