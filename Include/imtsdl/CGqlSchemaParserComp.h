@@ -33,6 +33,7 @@ public:
 	static const QByteArray s_requestListParamId;
 	static const QByteArray s_documentTypeListParamId;
 	static const QByteArray s_enumListParamId;
+	static const QByteArray s_unionListParamId;
 
 public:
 	typedef ilog::TLoggerCompWrap<icomp::TMakeComponentWrap<CGqlExtSchemaParser>> BaseClass;
@@ -43,6 +44,7 @@ public:
 		I_REGISTER_INTERFACE(ISdlTypeListProvider)
 		I_REGISTER_INTERFACE(ISdlEnumListProvider)
 		I_REGISTER_INTERFACE(ISdlRequestListProvider)
+		I_REGISTER_INTERFACE(ISdlUnionListProvider)
 		I_REGISTER_INTERFACE(ISdlDocumentTypeListProvider)
 		I_REGISTER_SUBELEMENT(SchemaCustomParams)
 		I_REGISTER_SUBELEMENT_INTERFACE(SchemaCustomParams, iprm::IParamsSet, ExtractSchemaCustomParams);

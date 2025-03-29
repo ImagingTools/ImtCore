@@ -27,6 +27,7 @@ const QByteArray CGqlSchemaParserComp::s_typeListParamId = QByteArrayLiteral("Ty
 const QByteArray CGqlSchemaParserComp::s_requestListParamId = QByteArrayLiteral("RequestList");
 const QByteArray CGqlSchemaParserComp::s_documentTypeListParamId = QByteArrayLiteral("DocumentTypeList");
 const QByteArray CGqlSchemaParserComp::s_enumListParamId = QByteArrayLiteral("EnumList");
+const QByteArray CGqlSchemaParserComp::s_unionListParamId = QByteArrayLiteral("UnionList");
 
 
 // public methods
@@ -64,6 +65,7 @@ int CGqlSchemaParserComp::DoProcessing(
 	iprm::CParamsSet* requestListParamsPtr = nullptr;
 	iprm::CParamsSet* documentTypeListParamsPtr = nullptr;
 	iprm::CParamsSet* enumListParamsPtr = nullptr;
+	iprm::CParamsSet* unionListParamsPtr = nullptr;
 	if (outputParamsSetPtr != nullptr){
 		processedFilesPtr = dynamic_cast<iprm::IOptionsManager*>(outputParamsSetPtr->GetEditableParameter(s_processedFilesParamId));
 		if (processedFilesPtr == nullptr){
@@ -93,6 +95,12 @@ int CGqlSchemaParserComp::DoProcessing(
 		if (enumListParamsPtr == nullptr){
 			enumListParamsPtr = new iprm::CParamsSet;
 			outputParamsSetPtr->SetEditableParameter(s_enumListParamId, enumListParamsPtr, true);
+		}
+
+		unionListParamsPtr = dynamic_cast<iprm::CParamsSet*>(outputParamsSetPtr->GetEditableParameter(s_unionListParamId));
+		if (unionListParamsPtr == nullptr){
+			unionListParamsPtr = new iprm::CParamsSet;
+			outputParamsSetPtr->SetEditableParameter(s_unionListParamId, unionListParamsPtr, true);
 		}
 
 	}
@@ -204,6 +212,13 @@ int CGqlSchemaParserComp::DoProcessing(
 		for (const CSdlEnum& sdlEnum: std::as_const(m_enums)){
 			CSdlEnum* sdlEnumPtr = new CSdlEnum(sdlEnum);
 			enumListParamsPtr->SetEditableParameter(QByteArray::number(enumListParamsPtr->GetParamIds().size()), sdlEnumPtr, true);
+		}
+	}
+
+	if (unionListParamsPtr != nullptr){
+		for (const CSdlUnion& sdlUnion : std::as_const(m_unions)){
+			CSdlUnion* sdlUnionPtr = new CSdlUnion(sdlUnion);
+			unionListParamsPtr->SetEditableParameter(QByteArray::number(unionListParamsPtr->GetParamIds().size()), sdlUnionPtr, true);
 		}
 	}
 
@@ -458,6 +473,39 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				// it is ok if it already imported from another scheme
 				if (!m_enums.contains(copiedType)){
 					m_enums << copiedType;
+				}
+			}
+		}
+
+		iprm::IParamsSet* unionListParamsPtr = dynamic_cast<iprm::IParamsSet*>(outputParams.GetEditableParameter(s_unionListParamId));
+		if (unionListParamsPtr != nullptr){
+			const iprm::IParamsSet::Ids paramIdList = unionListParamsPtr->GetParamIds();
+			for (const QByteArray& paramId : paramIdList){
+				iprm::TParamsPtr<CSdlUnion> sdlUnionParam(unionListParamsPtr, paramId, true);
+				if (!sdlUnionParam.IsValid()){
+					SendCriticalMessage(0, "Import processing failed");
+
+					return false;
+				}
+
+				// look for duplicates
+				const QString sdlUnionName = sdlUnionParam->GetName();
+				for (const CSdlUnion& sdlUnion : std::as_const(m_unions)){
+					if (sdlUnion.GetName() == sdlUnionName && sdlUnion != *sdlUnionParam){
+						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
+							sdlUnionName,
+							schemaPath,
+							sdlUnion.GetSchemaFilePath(),
+							sdlUnionParam->GetSchemaFilePath()));
+
+						return false;
+					}
+				}
+
+				CSdlUnion copiedType(*sdlUnionParam);
+				// it is ok if it already imported from another scheme
+				if (!m_unions.contains(copiedType)){
+					m_unions << copiedType;
 				}
 			}
 		}
