@@ -44,7 +44,10 @@ void CProductInstanceInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet&
 	UpdateFeatureTree();
 
 	ProductInstanceIdEdit->setText(productInstanceInfoPtr->GetProductInstanceId());
-	CustomerNameEdit->setText(productInstanceInfoPtr->GetCustomerId());
+
+	// #12524
+	CustomerGroup->hide();
+	//CustomerNameEdit->setText(productInstanceInfoPtr->GetCustomerId());
 }
 
 
@@ -59,7 +62,9 @@ void CProductInstanceInfoViewComp::OnGuiCreated()
 	NewLicenseRequestButton->setVisible(*m_showLicenseRequestAttrPtr);
 	LicenseRequestDescriptionLabel->setVisible(*m_showLicenseRequestAttrPtr);
 
-	FeatureTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	//FeatureTree->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	FeatureTree->header()->setSectionResizeMode(QHeaderView::Interactive);
+	FeatureTree->header()->setSectionsMovable(false);
 
 	m_importLicenseEnablerObserver.RegisterObject(m_importLicenseEnablerCompPtr.GetPtr(), &CProductInstanceInfoViewComp::OnImportLicenseEnabled);
 	m_licenseRequestEnablerObserver.RegisterObject(m_licenseRequestEnablerCompPtr.GetPtr(), &CProductInstanceInfoViewComp::OnLicenseRequestEnabled);
