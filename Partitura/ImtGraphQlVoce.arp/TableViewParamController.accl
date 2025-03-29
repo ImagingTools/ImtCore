@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5347" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -11,7 +11,7 @@
         <Element ComponentName="GeneralSettingsFactory" X="325" Y="600" Note=""/>
         <Element ComponentName="PageViewParamSet" X="875" Y="375" Note=""/>
         <Element ComponentName="TableViewParamController" X="600" Y="175" Note=""/>
-        <Element ComponentName="TableViewParamRepresentationController" X="825" Y="600" Note=""/>
+        <Element ComponentName="TableViewParamRepresentationController" X="600" Y="50" Note=""/>
         <Element ComponentName="UserSettings" X="250" Y="375" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

@@ -2,14 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5343" Description="ACF"/>
-            <Version Id="1" Number="2232" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5347" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ConsoleApplicationFramework" X="550" Y="175" Note=""/>
-        <Element ComponentName="LogDatabase" X="550" Y="425" Note=""/>
+        <Element ComponentName="ConsoleApplicationFramework" X="325" Y="150" Note=""/>
+        <Element ComponentName="LogDatabase" X="900" Y="500" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="LogDatabase">

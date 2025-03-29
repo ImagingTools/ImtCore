@@ -2,18 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5347" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CenterCommands" X="625" Y="300" Note=""/>
-        <Element ComponentName="CommandsController" X="700" Y="50" Note=""/>
-        <Element ComponentName="GqlCommandsController" X="250" Y="50" Note=""/>
-        <Element ComponentName="GuiElementContainer" X="625" Y="150" Note=""/>
-        <Element ComponentName="LeftCommands" X="225" Y="300" Note=""/>
-        <Element ComponentName="RightCommands" X="975" Y="300" Note=""/>
+        <Element ComponentName="CenterCommands" X="600" Y="425" Note=""/>
+        <Element ComponentName="CommandsController" X="600" Y="125" Note=""/>
+        <Element ComponentName="GqlCommandsController" X="225" Y="125" Note=""/>
+        <Element ComponentName="GuiElementContainer" X="600" Y="250" Note=""/>
+        <Element ComponentName="LeftCommands" X="175" Y="425" Note=""/>
+        <Element ComponentName="RightCommands" X="950" Y="425" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
