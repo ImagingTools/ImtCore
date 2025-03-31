@@ -710,7 +710,7 @@ StyleComponents {
                 width: rangeSliderItem.height;
                 height: width;
                 radius: width;
-                color: "green"//!rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
+				color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
 
             }
 
