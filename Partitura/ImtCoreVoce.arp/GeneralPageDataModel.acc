@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5347" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -86,7 +86,7 @@
         <Element Id="LanguageOptions" PackageId="BasePck" ComponentId="SelectionConstraints">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="OptionIds">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>en_US</Value>
@@ -95,7 +95,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="OptionNames">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>English</Value>
