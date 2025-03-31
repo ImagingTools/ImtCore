@@ -65,6 +65,10 @@ ControlBase {
 
     }
 
+	onWidthChanged: {
+		controlRecX = position * (width - controlWidth)
+	}
+
     MouseArea{
         id: ma;
 

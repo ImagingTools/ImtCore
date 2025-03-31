@@ -74,6 +74,11 @@ ControlBase {
         controlRecXSecond = positionSecond * (width - controlWidth)
     }
 
+	onWidthChanged: {
+		controlRecXFirst = positionFirst * (width - controlWidth)
+		controlRecXSecond = positionSecond * (width - controlWidth)
+	}
+
     Binding {
         id: bindWidth
         property: "width"
