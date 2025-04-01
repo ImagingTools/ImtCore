@@ -15,14 +15,19 @@ MouseArea{
 
     property int alwaysVisibleSize: 150;
     property var coord: mapToItem(this,0,0);
+	property bool isPressed: false;
     onPressed: {
         if(moving.movingItem && moving.globalParent){
             var coord_ = mapToItem(this,mouse.x,mouse.y);
             this.coord = coord_;
+			isPressed = true;
         }
     }
+	onReleased: {
+		isPressed = false;
+	}
     onPositionChanged: {
-        if(moving.movingItem && moving.globalParent){
+		if(moving.movingItem && moving.globalParent && isPressed){
             var newCoords = mapToItem(this, mouse.x,mouse.y);
             var deltaX = newCoords.x - this.coord.x;
             var deltaY = newCoords.y - this.coord.y;
