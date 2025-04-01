@@ -397,10 +397,17 @@ Rectangle{
         }
     }//listContainer
 
+	function getModelItemsCount(model_){
+		return model_.getItemsCount();
+	}
+
+	function copyModelItemData(index, externModel_, externIndex){
+		treeViewGql.model.copyItemDataFromModel(index, externModel_, externIndex);
+	}
 
     function insertTree(index, model_){
 
-        if(!model_ || !model_.getItemsCount()){
+		if(!model_ || !treeViewGql.getModelItemsCount(model_)){
             return;
         }
 
@@ -419,10 +426,13 @@ Rectangle{
         let branchIds = branchIds_parent !== "" ? branchIds_parent + "," + innerId_parent: innerId_parent;
 
         let counter = 0;
-        for(let i = 0; i < model_.getItemsCount(); i++){
+		for(let i = 0; i < treeViewGql.getModelItemsCount(model_); i++){
             let newIndex =  index + i + 1;
             treeViewGql.model.insertNewItem(newIndex);
-            treeViewGql.model.copyItemDataFromModel(newIndex, model_, i);
+
+			//treeViewGql.model.copyItemDataFromModel(newIndex, model_, i);
+			treeViewGql.copyModelItemData(newIndex, model_, i);
+
             treeViewGql.model.setData("Level__", level_ + 1, newIndex);
             treeViewGql.model.setData("BranchIds__", branchIds, newIndex);
             treeViewGql.model.setData("Visible__", true, newIndex);
@@ -442,7 +452,7 @@ Rectangle{
         }
         //console.log("ChildrenCount__", model_.getItemsCount())
         if(index >= 0){
-            treeViewGql.model.setData("ChildrenCount__", model_.getItemsCount(), index);
+			treeViewGql.model.setData("ChildrenCount__", treeViewGql.getModelItemsCount(model_), index);
         }
 
         if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
