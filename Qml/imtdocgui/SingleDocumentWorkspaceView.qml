@@ -3,7 +3,6 @@ import Acf 1.0
 import imtguigql 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtbaseImtCollectionSdl 1.0
 
 Rectangle {
 	id: root;
@@ -14,7 +13,7 @@ Rectangle {
 	property bool initialItemTitleVisible: false;
 
 	property DocumentManager documentManager;
-
+	
 	Connections {
 		id: connections;
 		target: root.documentManager;
@@ -22,25 +21,23 @@ Rectangle {
 		function onDocumentSaved(documentId){
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
 			
-			objectVisualStatusInput.m_objectId = documentId
-			objectVisualStatusInput.m_typeId = typeId
-			
-			getVisualStatusInfoRequest.send(objectVisualStatusInput)
+			let name = root.getViewName(documentId, typeId)
+			root.setViewName(documentId, name);
 		}
 
 		function onDocumentAdded(documentId){
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
 			
-			objectVisualStatusInput.m_objectId = documentId
-			objectVisualStatusInput.m_typeId = typeId
-			
-			getVisualStatusInfoRequest.send(objectVisualStatusInput)
+			let name = root.getViewName(documentId, typeId)
+			if (name == ""){
+				name = root.documentManager.defaultDocumentName
+			}
+
+			headersModel.addHeader(documentId, name)
 
 			let documentData = root.documentManager.getDocumentDataById(documentId);
 			if (documentData){
 				stackView.push(documentData.viewComp);
-				let name = root.documentManager.defaultDocumentName;
-				headersModel.addHeader(documentId, name);
 			}
 		}
 
@@ -81,6 +78,14 @@ Rectangle {
 		stackView.push(viewComp);
 		headersModel.addHeader(UuidGenerator.generateUUID(), name)
 	}
+	
+	function setViewName(id, name){
+		headersModel.setHeaderName(id, name)
+	}
+	
+	function getViewName(id, typeId){
+		return ""
+	}
 
 	Item {
 		id: buttonPanel;
@@ -107,7 +112,7 @@ Rectangle {
 		id: headersModel;
 
 		function addHeader(id, name){
-			console.log("addHeader", id, name);
+			console.log("addHeader", id, name)
 			headersModel.append({Id: id, Name: name})
 		}
 
@@ -131,9 +136,10 @@ Rectangle {
 		}
 
 		function setHeaderName(id, name){
+			console.log("setHeaderName", id, name)
+			
 			for (let i = 0; i < headersModel.count; i++){
 				if (headersModel.get(i).Id === id){
-					console.log("setHeaderName", id, name);
 					headersModel.setProperty(i, "Name", name)
 					return;
 				}
@@ -150,29 +156,7 @@ Rectangle {
 		}
 	}
 	
-	ObjectVisualStatusInput {
-		id: objectVisualStatusInput;
-	}
 
-	GqlSdlRequestSender {
-		id: getVisualStatusInfoRequest;
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus;
-		sdlObjectComp: Component {
-			VisualStatus {
-				onFinished: {
-					let name = m_text;
-					if (name === ""){
-						name = root.documentManager.defaultDocumentName;
-					}
-
-					headersModel.setHeaderName(m_objectId, name)
-				}
-			}
-		}
-
-		function onError(message, type){
-		}
-	}
 
 	ListView {
 		id: headersListView;
