@@ -7,6 +7,7 @@ Rectangle {
 	radius: Style.buttonRadius;
 	property alias text: stickerText.text
 	property alias textColor: stickerText.color
+	property alias font: stickerText.font
 
 	Text {
 		id: stickerText;
