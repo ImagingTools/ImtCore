@@ -38,6 +38,7 @@ type ParamTypeIds
 	IntegerParam: ID
 	DoubleParam: ID
 	PasswordParam: ID
+	EnableableParam: ID
 }
 
 type UrlParam
@@ -56,6 +57,11 @@ type IdParam
 type TextParam
 {
 	text: String
+}
+
+type EnableableParam
+{
+	value: Boolean
 }
 
 type IntegerParam
