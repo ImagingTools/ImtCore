@@ -23,11 +23,8 @@ ParamEditorBase {
 			text: integerParamEditor.valueParam ? integerParamEditor.valueParam.m_value : 0
 			readOnly: integerParamEditor.readOnly
 			onEditingFinished: {
-				console.log("onEditingFinished", value, integerParamEditor.valueParam)
 				if (integerParamEditor.valueParam){
 					integerParamEditor.valueParam.m_value = value
-					console.log("ok", value)
-					
 				}
 			}
 		}

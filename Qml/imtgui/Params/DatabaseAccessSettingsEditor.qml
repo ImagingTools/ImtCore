@@ -152,12 +152,12 @@ ParamEditorBase {
 						process.start("psql", ["-U", "postgres", "-d", databaseNameInput_.text, "-c", "SELECT 1"]);
 					}
 					
-					// Process {
-					// 	id: process;
-					// 	onFinished: {
-					// 		buttonElementView.bottomComp = exitCode != 0 ? errorComp : connectionComp;
-					// 	}
-					// }
+					Process {
+						id: process;
+						onFinished: {
+							buttonElementView.bottomComp = exitCode != 0 ? errorComp : connectionComp;
+						}
+					}
 					
 					Component {
 						id: errorComp;

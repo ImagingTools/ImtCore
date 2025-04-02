@@ -94,6 +94,7 @@
         <file alias="imtgui/Params/ParamsSetController.qml">Params/ParamsSetController.qml</file>
 	<file alias="imtgui/Params/IntegerParamEditor.qml">Params/IntegerParamEditor.qml</file>
 	<file alias="imtgui/Params/DoubleParamEditor.qml">Params/DoubleParamEditor.qml</file>
+	<file alias="imtgui/Params/EnableableParamEditor.qml">Params/EnableableParamEditor.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

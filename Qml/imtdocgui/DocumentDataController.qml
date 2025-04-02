@@ -55,9 +55,11 @@ QtObject {
 	}
 	
 	function insertDocument(){
+		saved(documentId, documentName)
 	}
 	
 	function saveDocument(){
+		saved(documentId, documentName)
 	}
 	
 	function createDocumentModel(){

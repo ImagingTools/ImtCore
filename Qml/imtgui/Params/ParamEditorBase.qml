@@ -2,7 +2,7 @@ import QtQuick 2.15
 
 Item {
 	id: paramEditorBase
-	
+
 	width: loader.width
 	height: loader.item ? loader.item.height : 0
 

@@ -7,6 +7,12 @@ import imtbaseImtBaseTypesSdl 1.0
 ParamEditorBase {
 	id: filePickerParam
 	
+	// Path Type
+	// 0 - Unknown
+	// 1 - File
+	// 2 - Directory
+	// 3 - Url
+	
 	property FileNameParam fileNameParam: editorModel
 	editorModelComp: Component {
 		FileNameParam {}
@@ -18,10 +24,9 @@ ParamEditorBase {
 			width: filePickerParam.width
 			
 			path: filePickerParam.fileNameParam ? filePickerParam.fileNameParam.m_path : ""
+			pathType: filePickerParam.fileNameParam ? filePickerParam.fileNameParam.m_pathType : 1
 			name: filePickerParam.name;
 			description: filePickerParam.description
-			fileDialog.currentFolder: path
-		
 			onAccepted: {
 				filePickerParam.fileNameParam.m_path = path
 			}

@@ -231,7 +231,12 @@ Rectangle {
 
 		tableContainer.setWidth();
 	}
-
+	
+	onVisibleChanged: {
+		if (visible){
+			tableContainer.setWidth();
+		}
+	}
 
 	onSelectionChanged: {
 		if (selection.length > 0){

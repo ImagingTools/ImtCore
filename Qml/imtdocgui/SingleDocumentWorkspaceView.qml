@@ -22,6 +22,10 @@ Rectangle {
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
 			
 			let name = root.getViewName(documentId, typeId)
+			if (name == ""){
+				name = root.documentManager.defaultDocumentName
+			}
+			
 			root.setViewName(documentId, name);
 		}
 

@@ -130,7 +130,7 @@ Item {
 			if (languageParamter != languageSelectionParam.toJson()){
 				application.languageProvider.selectionParam.createFromJson(languageParamter)
 			}
-
+			
 			let designSelectionParam = application.designProvider.selectionParam;
 			let designParamter = getParamJsonByPath([application.designProvider.typeId]);
 			if (designParamter != designSelectionParam.toJson()){
@@ -213,17 +213,18 @@ Item {
 		try {
 			let url = new URL(serverUrl);
 			
+			let protocol = "ws";
 			if (url.protocol === "https:"){
-				url.protocol = "wss";
+				protocol = "wss";
+			}
+			
+			url.protocol = protocol
+			
+			if (webSocketPortProvider.port >= 0){
+				url.port = webSocketPortProvider.port;
 			}
 			else{
-				url.protocol = "ws";
-				if (webSocketPortProvider.port >= 0){
-					url.port = webSocketPortProvider.port;
-				}
-				else{
-					console.error("WebSocket port provider has invalid port!");
-				}
+				console.error("WebSocket port provider has invalid port!");
 			}
 			
 			if (context.appId && context.appId !== ""){
@@ -252,7 +253,6 @@ Item {
 		}
 		
 		function fillPreferenceParamsSet(){
-			console.log("fillPreferenceParamsSet", application.serverConnected)
 			if (Qt.platform.os != "web"){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
 			}

@@ -11,50 +11,133 @@ ParamEditorBase {
 	property ParamsSet paramsSet: editorModel
 	
 	paramController: ParamsSetController {}
-
+	
 	editorModelComp: Component {
 		ParamsSet {}
 	}
-	
+
 	property var settingsController: null
+	property int spacing: Style.sizeLargeMargin
 
 	sourceComp: Component {
 		Column {
 			id: column
-			width: composedParamsGui.width;
-			spacing: Style.sizeLargeMargin
-	
+			width: contentWidth;
+			spacing: composedParamsGui.spacing
+			
 			property int contentWidth: 700
-
+			
+			property int rootWidth: composedParamsGui.width
+			onRootWidthChanged: {
+				checkWidth()
+			}
+			
+			function checkWidth(){
+				let newWidth = Math.min(rootWidth, contentWidth);
+				if (width !== newWidth) {
+					width = newWidth;
+				}
+			}
+			
 			Repeater {
 				id: bodyPanelRepeater
 				model: composedParamsGui.paramsSet ? composedParamsGui.paramsSet.m_paramTypeIds : 0
-				delegate: Loader {
-					id: loader
+				
+				delegate: Column {
+					id: paramItem
 					
-					property string paramId
-					property string paramTypeId
-					property string paramName
-					property string paramDescription
-					property string parameterJson
+					width: column.width;
+					
+					property string paramId: composedParamsGui.paramsSet.m_paramIds[model.index]
+					property string paramTypeId: composedParamsGui.paramsSet.m_paramTypeIds[model.index]
+					property string paramName: composedParamsGui.paramsSet.m_paramNames[model.index]
+					property string paramDescription: composedParamsGui.paramsSet.m_paramDescriptions[model.index]
+					property string parameterJson: composedParamsGui.paramsSet.m_parameters[model.index]
 					
 					Component.onCompleted: {
-						paramId = composedParamsGui.paramsSet.m_paramIds[model.index]
-						paramTypeId = composedParamsGui.paramsSet.m_paramTypeIds[model.index]
-						paramName = composedParamsGui.paramsSet.m_paramNames[model.index]
-						paramDescription = composedParamsGui.paramsSet.m_paramDescriptions[model.index]
-						parameterJson = composedParamsGui.paramsSet.m_parameters[model.index]
-
 						if (composedParamsGui.settingsController && paramTypeId in composedParamsGui.settingsController.supportedParamEditors){
 							let paramEditorComp = composedParamsGui.settingsController.supportedParamEditors[paramTypeId]
-							sourceComponent = paramEditorComp
+							
+							if (paramTypeId == ParamTypeIdsTypeMetaInfo.s_paramsSet){
+								groupLoader.sourceComponent = paramEditorComp
+							}
+							else{
+								elementLoader.sourceComponent = paramEditorComp
+							}
 						}
 						else{
 							console.error("Param editor with type-ID '", paramTypeId, "' unregistered")
 						}
 					}
+					
+					Loader {
+						id: elementLoader
+						onLoaded: {
+							paramItem.itemOnLoaded(item)
+						}
+					}
+					
+					Column {
+						id: groupColumn
+						width: parent.width
+						visible: false
+						spacing: composedParamsGui.spacing
+						clip: true
+						
+						GroupHeaderView {
+							id: headerView
+							width: parent.width
+							groupView: groupElementView
+							title: paramItem.paramName
+						}
+						
+						GroupElementView {
+							id: groupElementView
+							width: parent.width
+							Column {
+								Loader {
+									id: groupLoader
+									onLoaded: {
+										item.spacing = 0
+										item.settingsController = composedParamsGui.settingsController
+										
+										paramItem.itemOnLoaded(item)
 
-					onLoaded: {
+										groupColumn.visible = true
+									}
+								}
+							}
+						}
+					}
+					
+					// Width from paramSet to params
+					Connections {
+						target: paramItem
+						
+						function onWidthChanged(){
+							if (elementLoader.item){
+								elementLoader.item.width = paramItem.width
+							}
+							
+							if (groupLoader.item){
+								groupLoader.item.width = paramItem.width
+							}
+						}
+					}
+					
+					Connections {
+						id: itemConnections
+						target: paramItem.paramTypeId == ParamTypeIdsTypeMetaInfo.s_paramsSet ? groupLoader.item : elementLoader.item
+
+						function onEditorModelDataChanged(paramId, key){
+							let json = target.editorModel.toJson();
+							
+							composedParamsGui.paramsSet.m_parameters[model.index] = json
+							composedParamsGui.editorModelDataChanged(composedParamsGui.paramId + "/" + paramId, key)
+						}
+					}
+					
+					function itemOnLoaded(item){
 						if (item.paramId != undefined){
 							item.paramId = paramId
 						}
@@ -72,34 +155,8 @@ ParamEditorBase {
 								console.error("Unable to create param from json. Param: ", paramId, paramName)
 							}
 						}
-
-						checkWidth()
-					}
-					
-					property int rootWidth: composedParamsGui.width
-					onRootWidthChanged: {
-						checkWidth()
-					}
-
-					function checkWidth() {
-						if (item) {
-							let newWidth = Math.min(rootWidth, column.contentWidth);
-							
-							if (item.width !== newWidth) {
-								item.width = newWidth;
-							}
-						}
-					}
-					
-					Connections {
-						target: loader.item
-
-						function onEditorModelDataChanged(paramId, key){
-							let json = loader.item.editorModel.toJson();
-
-							composedParamsGui.paramsSet.m_parameters[model.index] = json
-							composedParamsGui.editorModelDataChanged(composedParamsGui.paramId + "/" + paramId, key)
-						}
+						
+						item.width = paramItem.width
 					}
 				}
 			}

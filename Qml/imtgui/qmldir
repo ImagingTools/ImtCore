@@ -98,3 +98,4 @@ ParamController 1.0 Params/ParamController.qml
 ParamsSetController 1.0 Params/ParamsSetController.qml
 DoubleParamEditor 1.0 Params/DoubleParamEditor.qml
 IntegerParamEditor 1.0 Params/IntegerParamEditor.qml
+EnableableParamEditor 1.0 Params/EnableableParamEditor.qml

@@ -21,7 +21,7 @@ Item {
 		anchors.bottom: parent.bottom;
 		anchors.margins: Style.sizeMainMargin;
 		
-		width: 150;
+		width: 200;
 		height: parent.height;
 		
 		color: Style.baseColor;
@@ -120,57 +120,5 @@ Item {
 				}
 			}
 		}//Flickable
-		
-		// Flickable {
-		// 	id: flickable;
-		// 	anchors.top: parent.top;
-		// 	anchors.topMargin: Style.sizeLargeMargin;
-		// 	anchors.left: mainPanelBackground.right;
-		// 	anchors.leftMargin: Style.sizeLargeMargin;
-		// 	anchors.right: parent.right;
-		// 	anchors.rightMargin: Style.sizeLargeMargin;
-		// 	anchors.bottom: parent.bottom;
-		// 	anchors.bottomMargin: Style.sizeLargeMargin;
-		// 	clip: true;
-		// 	contentWidth: width;
-		// 	contentHeight: content.height;
-		// 	boundsBehavior: Flickable.StopAtBounds;
-		
-		// 	Repeater {
-		// 		id: repeater;
-		// 		model: root.paramsSet.m_paramIds;
-		
-		// 		delegate: ComposedParamsGui {
-		// 			id: bodyPanel;
-		// 			width: parent.width;
-		// 			visible: mainPanelRepeater.currentIndex == model.index
-		// 			settingsController: root.settingsController
-		
-		// 			paramId: root.paramsSet.m_paramIds[model.index]
-		// 			typeId: root.paramsSet.m_paramTypeIds[model.index]
-		// 			name: root.paramsSet.m_paramNames[model.index]
-		// 			description: root.paramsSet.m_paramDescriptions[model.index]
-		
-		// 			onEditorModelDataChanged: {
-		// 				if (mainPanelRepeater.currentIndex >= 0){
-		// 					let json = bodyPanel.paramsSet.toJson()
-		// 					root.paramsSet.m_parameters[mainPanelRepeater.currentIndex] = json
-		// 				}
-		
-		// 				root.editorModelDataChanged(paramId, key)
-		// 			}
-		
-		// 			Component.onCompleted: {
-		// 				if (paramController){
-		// 					let json = root.paramsSet.m_parameters[model.index]
-		// 					if (!paramController.createParamFromJson(json)){
-		// 						console.error("Unable to create params set from JSON")
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }//Flickable
 	}
-	
 }

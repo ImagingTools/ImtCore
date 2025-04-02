@@ -28,7 +28,6 @@ ParamEditorBase {
 			controlWidth: 300
 			textInputValidator: urlValid
 			showErrorWhenInvalid: true
-			// text: urlParamEditor.urlParam ? urlParamEditor.urlParam.m_host : ""
 			onEditingFinished: {
 				if (urlParamEditor.urlParam && acceptableInput){
 					parseUrl(text)

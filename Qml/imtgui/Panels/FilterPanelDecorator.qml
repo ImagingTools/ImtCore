@@ -160,12 +160,26 @@ DecoratorBase {
 		CustomTextField {
 			id: tfc;
 			anchors.verticalCenter: content.verticalCenter;
+			
+			textFieldLeftMargin: searchIcon.width + 2 * margin;
 			textFieldRightMargin: iconClear.width + 2 * margin;
 			width: 270;
 			height: 30;
 			
 			onTextChanged: {
 				timer.restart();
+			}
+			
+			Image {
+				id: searchIcon
+				anchors.left: parent.left
+				anchors.leftMargin: Style.sizeMainMargin
+				anchors.verticalCenter: parent.verticalCenter
+				width: Style.buttonWidthSmall;
+				height: width;
+				source: "../../../" + Style.getIconPath("Icons/Search", Icon.State.On, Icon.Mode.Normal);
+				sourceSize.width: width
+				sourceSize.height: height
 			}
 			
 			Timer {
