@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QFile>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlComponent>
 #include <QtQml/QQmlContext>
@@ -111,7 +112,20 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr) const
 	if (enginePtr != nullptr){
 		enginePtr->addImportPath("qrc:/qml");
 
-		QUrl componentUrl("qrc" + m_pathToQmlAttrPtr->GetValue());
+		QString qmlFilePath = m_pathToQmlAttrPtr->GetValue();
+		if (!qmlFilePath.startsWith(QStringLiteral("qrc"))){
+			qmlFilePath.prepend(QStringLiteral("qrc"));
+		}
+
+		// endure, the file is exists. Remove first 'qml', because file access from resource MUST start from '/:'
+		QFile qmlFile((QString(QString(qmlFilePath.data() + 3, qmlFilePath.size() - 3))));		
+		if (!qmlFile.exists()){
+			Q_ASSERT_X(false, __func__, QString("Unable to find file '%1'").arg(qmlFilePath + ' ' + qmlFile.fileName()).toLocal8Bit());
+
+			return nullptr;
+		}
+
+		QUrl componentUrl(qmlFilePath);
 		QQmlComponent component(enginePtr, componentUrl);
 
 		QQmlContext* contextPtr = enginePtr->rootContext();
@@ -120,8 +134,9 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr) const
 		QObject* createdComponentPtr = component.create(contextPtr);
 		QQuickItem* quickItemPtr = qobject_cast<QQuickItem*>(createdComponentPtr);
 
-		if (component.isError()){
+		if (component.isError() || createdComponentPtr == nullptr || quickItemPtr == nullptr){
 			qWarning() << "UNABLE TO CREATE QML COMPONENT " << componentUrl;
+			qWarning() << component.errorString();
 			qWarning() << component.errors();
 			qWarning() << "----------------";
 		}
