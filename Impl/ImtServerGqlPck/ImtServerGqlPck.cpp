@@ -65,11 +65,6 @@ I_EXPORT_COMPONENT(
 			"Collection Object Provider");
 
 I_EXPORT_COMPONENT(
-			GqlController,
-			"Simple GQL controller",
-			"GqlController");
-
-I_EXPORT_COMPONENT(
 			SerializableObjectCollectionController,
 			"Serializable object collection Gql controller for gql collection",
 			"GqlController Serializable Collection");

@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtrest/IRepresentationController.h>
+#include <imtserverapp/IRepresentationController.h>
 #include <imtauth/IUserSettings.h>
 #include <imtservergql/CGqlRepresentationDataControllerCompBase.h>
 
@@ -29,7 +29,7 @@ protected:
 	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const override;
 
 protected:
-	I_REF(imtrest::IRepresentationController, m_userSettingsRepresentationControllerCompPtr);
+	I_REF(imtserverapp::IRepresentationController, m_userSettingsRepresentationControllerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 	I_FACT(imtauth::IUserSettings, m_userSettingsInfoFactCompPtr);
 };

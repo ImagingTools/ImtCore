@@ -11,7 +11,7 @@
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtbase/IOperationContextController.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
-#include <imtrest/CTimeFilterParamRepresentationController.h>
+#include <imtserverapp/CTimeFilterParamRepresentationController.h>
 #include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/IComplexCollectionFilter.h>
 
@@ -195,7 +195,7 @@ protected:
 	I_MULTIFACT(istd::IChangeable, m_importExportObjectFactCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_filePersistenceCompPtr);
 
-	imtrest::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
+	imtserverapp::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
 };
 
 

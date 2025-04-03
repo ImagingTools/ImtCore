@@ -36,6 +36,7 @@ Item {
 	property alias metaInfoView: collectionMetaInfo;
 	
 	property bool visibleMetaInfo: false;
+	property int metaInfoWidth: 200;
 	
 	signal selectedIndexChanged(int index);
 	signal elementsChanged();
@@ -57,6 +58,14 @@ Item {
 		if (event.key === Qt.Key_Delete){
 			container.commandsDelegate.commandHandle("Remove");
 		}
+	}
+	
+	onWidthChanged: {
+		if (!visibleMetaInfo){
+			return
+		}
+		
+		collectionMetaInfo.width = width / 5 <= metaInfoWidth ? 0 : metaInfoWidth
 	}
 	
 	function doubleClicked(id, index){
@@ -269,8 +278,6 @@ Item {
 			if (!internal.isReady){
 				return;
 			}
-
-			console.log("CollectionView.qml doUpdateGui");
 			
 			let count = -1;
 			let offset = 0;
@@ -288,7 +295,6 @@ Item {
 		}
 		
 		function openPopupMenu(x, y){
-			console.log("openPopupMenu", x, y)
 			if (container.commandsDelegate){
 				let contextMenuModel = container.commandsDelegate.getContextMenuModel();
 				let count = contextMenuModel.getItemsCount();
@@ -338,7 +344,7 @@ Item {
 		anchors.top: parent.top;
 		anchors.right: parent.right;
 		
-		width: visible ? 200 : 0;
+		width: visible ? root.metaInfoWidth : 0;
 		height: parent.height;
 		
 		visible: root.visibleMetaInfo;

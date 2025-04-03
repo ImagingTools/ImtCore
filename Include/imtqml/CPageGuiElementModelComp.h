@@ -6,17 +6,17 @@
 
 // ImtCore includes
 #include <imtqml/IPageGuiElementModel.h>
-#include <imtrest/CGuiElementModelComp.h>
+#include <imtserverapp/CGuiElementModelComp.h>
 
 
 namespace imtqml
 {
 
 
-class CPageGuiElementModelComp: virtual public imtqml::IPageGuiElementModel, public imtrest::CGuiElementModelComp
+class CPageGuiElementModelComp: virtual public imtqml::IPageGuiElementModel, public imtserverapp::CGuiElementModelComp
 {
 public:
-	typedef imtrest::CGuiElementModelComp BaseClass;
+	typedef imtserverapp::CGuiElementModelComp BaseClass;
 
 	I_BEGIN_COMPONENT(CPageGuiElementModelComp);
 		I_REGISTER_INTERFACE(imtqml::IPageGuiElementModel);

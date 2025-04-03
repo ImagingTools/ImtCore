@@ -2,15 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5229" Description="ACF"/>
-            <Version Id="1" Number="2213" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ElementContainer" PackageId="ImtRestPck" ComponentId="GuiElementContainer">
+        <Element Id="ElementContainer" PackageId="ImtServerAppPck" ComponentId="GuiElementContainer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="GuiElementModels">
@@ -22,7 +22,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ElementContainerRepresentationController" PackageId="ImtRestPck" ComponentId="GuiElementContainerRepresentationController">
+        <Element Id="ElementContainerRepresentationController" PackageId="ImtServerAppPck" ComponentId="GuiElementContainerRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -43,9 +43,10 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="ElementContainerRepresentationController"/>
-        <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="ElementContainer"/>
+        <Interface InterfaceId="imtserverapp::IGuiElementContainer" ComponentId="ElementContainer"/>
+        <Interface InterfaceId="imtserverapp::IRepresentationController" ComponentId="ElementContainerRepresentationController"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="ElementContainer"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ElementContainer"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

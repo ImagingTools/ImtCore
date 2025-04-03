@@ -1572,20 +1572,6 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		SetObjectFilter(gqlRequest, objectFilterModel, *objectFilterPtr);
 	}
 
-	if (generalModel.ContainsKey("TimeFilter")){
-		imtbase::CTreeItemModel* timeRangeFilterModelPtr = generalModel.GetTreeItemModel("TimeFilter");
-		if (timeRangeFilterModelPtr != nullptr){
-			imtbase::CTimeFilterParam* timeFilterParamPtr = new imtbase::CTimeFilterParam();
-
-			if (m_timeFilterParamRepresentationController.GetDataModelFromRepresentation(*timeRangeFilterModelPtr, *timeFilterParamPtr)){
-				filterParams.SetEditableParameter("TimeFilter", timeFilterParamPtr, true);
-			}
-			else{
-				SendWarningMessage(0, QString("Unable to create time range filter param from representation model"));
-			}
-		}
-	}
-
 	filterParams.SetEditableParameter("Filter", collectionFilterPtr, true);
 	filterParams.SetEditableParameter("ObjectFilter", objectFilterPtr, true);
 }

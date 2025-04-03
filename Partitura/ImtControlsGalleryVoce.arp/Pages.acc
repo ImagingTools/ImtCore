@@ -204,7 +204,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Pages" PackageId="ImtRestPck" ComponentId="GuiElementContainer">
+        <Element Id="Pages" PackageId="ImtServerAppPck" ComponentId="GuiElementContainer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="GuiElementModels" Type="Reference[]" ExportId="">
@@ -227,7 +227,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PagesRepresentation" PackageId="ImtRestPck" ComponentId="PageBasedGuiRepresentationController">
+        <Element Id="PagesRepresentation" PackageId="ImtServerAppPck" ComponentId="PageBasedGuiRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ObjectId" Type="Id" ExportId="">

@@ -2,7 +2,7 @@ project(ImtAuthPck LANGUAGES CXX)
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtauth imtlic imtbase imtrest)
+target_link_libraries(${PROJECT_NAME} imtauth imtlic imtbase imtrest imtserverapp)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)

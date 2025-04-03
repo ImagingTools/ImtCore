@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtrest/CObjectRepresentationControllerCompBase.h>
+#include <imtserverapp/CObjectRepresentationControllerCompBase.h>
 #include <imtlic/CFeatureInfo.h>
 
 
@@ -10,16 +10,16 @@ namespace imtauth
 {
 
 
-class CFeaturePackageRepresentationControllerComp: public imtrest::CObjectRepresentationControllerCompBase
+class CFeaturePackageRepresentationControllerComp: public imtserverapp::CObjectRepresentationControllerCompBase
 {
 public:
-	typedef imtrest::CObjectRepresentationControllerCompBase BaseClass;
+	typedef imtserverapp::CObjectRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CFeaturePackageRepresentationControllerComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtrest::CObjectRepresentationControllerCompBase)
+	// reimplemented (imtserverapp::CObjectRepresentationControllerCompBase)
 	virtual bool GetRepresentationFromValue(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 	// reimplemented (imtrest::IRepresentationController)

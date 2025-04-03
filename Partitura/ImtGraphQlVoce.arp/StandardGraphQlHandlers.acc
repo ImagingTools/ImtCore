@@ -231,7 +231,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerLogDataProvider" PackageId="ImtRestPck" ComponentId="ServerLogDataProvider">
+        <Element Id="ServerLogDataProvider" PackageId="ImtServerAppPck" ComponentId="ServerLogDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Command-ID" Type="Id" ExportId="">

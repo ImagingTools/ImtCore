@@ -2,15 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5323" Description="ACF"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="BackupRevision" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="BackupRevision" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -32,7 +32,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DeleteRevision" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="DeleteRevision" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -54,7 +54,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ExportRevision" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="ExportRevision" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -76,7 +76,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PermissionsJoiner" PackageId="ImtRestPck" ComponentId="CommandPermissionsProviderJoiner">
+        <Element Id="PermissionsJoiner" PackageId="ImtServerAppPck" ComponentId="CommandPermissionsProviderJoiner">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandPermissionsProvider" Type="Reference[]" ExportId="">
@@ -93,7 +93,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RestoreRevision" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="RestoreRevision" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -115,7 +115,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ViewRevisions" PackageId="ImtRestPck" ComponentId="SingleCommandPermissionsProvider">
+        <Element Id="ViewRevisions" PackageId="ImtServerAppPck" ComponentId="SingleCommandPermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
@@ -140,7 +140,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::ICommandPermissionsProvider" ComponentId="PermissionsJoiner"/>
+        <Interface InterfaceId="imtserverapp::ICommandPermissionsProvider" ComponentId="PermissionsJoiner"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="PermissionsJoiner"/>
     </ExportedInterfaces>
     <ExportedComponents/>

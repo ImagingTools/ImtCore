@@ -17,11 +17,6 @@ DecoratorBase {
 	
 	Component.onCompleted: {
 		updateText();
-		checkWidth()
-	}
-
-	onWidthChanged: {
-		checkWidth();
 	}
 	
 	LocalizationEvent {
@@ -30,13 +25,7 @@ DecoratorBase {
 		}
 	}
 	
-	function checkWidth(){
-		//        rect.visible = width - rect.width <= contentWidth + Style.sizeLargeMargin;
-		//        tfc.visible = width - tfc.width <= contentWidth + Style.sizeLargeMargin;
-	}
-	
 	function updateText(){
-		tfc.placeHolderText = qsTr("Enter some text to filter the item list");
 	}
 	
 	Component {
@@ -157,68 +146,13 @@ DecoratorBase {
 			}
 		}
 		
-		CustomTextField {
+		SearchTextInput {
 			id: tfc;
 			anchors.verticalCenter: content.verticalCenter;
-			
-			textFieldLeftMargin: searchIcon.width + 2 * margin;
-			textFieldRightMargin: iconClear.width + 2 * margin;
-			width: 270;
-			height: 30;
-			
-			onTextChanged: {
-				timer.restart();
-			}
-			
-			Image {
-				id: searchIcon
-				anchors.left: parent.left
-				anchors.leftMargin: Style.sizeMainMargin
-				anchors.verticalCenter: parent.verticalCenter
-				width: Style.buttonWidthSmall;
-				height: width;
-				source: "../../../" + Style.getIconPath("Icons/Search", Icon.State.On, Icon.Mode.Normal);
-				sourceSize.width: width
-				sourceSize.height: height
-			}
-			
-			Timer {
-				id: timer;
-				
-				interval: 500;
-				
-				onTriggered: {
-					if (filterPanelDecorator.complexFilter){
-						filterPanelDecorator.complexFilter.setTextFilter(tfc.text);
-						filterPanelDecorator.complexFilter.filterChanged()
-					}
-				}
-			}
-			
-			ToolButton {
-				id: iconClear;
-				
-				z: 999;
-				
-				anchors.verticalCenter: tfc.verticalCenter;
-				anchors.right: tfc.right;
-				anchors.rightMargin: Style.sizeMainMargin;
-				
-				width: Style.buttonWidthSmall;
-				height: width;
-				
-				visible: tfc.text != "";
-				
-				iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-				decorator: Component {
-					ToolButtonDecorator {
-						color: "transparent";
-						icon.width: 16;
-					}
-				}
-				
-				onClicked: {
-					tfc.text = "";
+			onSearchChanged: {
+				if (filterPanelDecorator.complexFilter){
+					filterPanelDecorator.complexFilter.setTextFilter(tfc.text);
+					filterPanelDecorator.complexFilter.filterChanged()
 				}
 			}
 		}

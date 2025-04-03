@@ -4,7 +4,7 @@
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
 #include <imtauth/IUserSettings.h>
-#include <imtrest/IJsonRepresentationController.h>
+#include <imtserverapp/IJsonRepresentationController.h>
 #include <imtbase/IObjectCollection.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
@@ -50,7 +50,7 @@ private:
 	bool SetUserSettings(const QByteArray& userId, const imtauth::IUserSettings& userSettings) const;
 	
 protected:
-	I_REF(imtrest::IJsonRepresentationController, m_userSettingsRepresentationControllerCompPtr);
+	I_REF(imtserverapp::IJsonRepresentationController, m_userSettingsRepresentationControllerCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 	I_REF(imtbase::IUrlParam, m_webSocketUrlParamCompPtr);
 	I_ATTR(QString, m_styleFileNamePrefixAttrPtr);

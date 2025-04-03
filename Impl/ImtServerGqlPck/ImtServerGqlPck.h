@@ -17,7 +17,6 @@
 #include <imtservergql/CObjectProviderComp.h>
 #include <imtservergql/CWebSocketServletComp.h>
 #include <imtservergql/CCollectionObjectProviderComp.h>
-#include <imtservergql/CGqlControllerComp.h>
 #include <imtservergql/COperationContextControllerComp.h>
 #include <imtservergql/CObjectCollectionChangeNotifierComp.h>
 #include <imtservergql/CModelChangeNotifierComp.h>
@@ -52,7 +51,6 @@ typedef imtservergql::CApplicationInfoControllerComp ApplicationInfoController;
 typedef imtservergql::CGqlContextControllerComp GqlContextController;
 typedef imtservergql::CObjectProviderComp ObjectProvider;
 typedef imtservergql::CCollectionObjectProviderComp CollectionObjectProvider;
-typedef imtservergql::CGqlControllerComp GqlController;
 typedef imtservergql::CSerializableObjectCollectionControllerComp SerializableObjectCollectionController;
 typedef imtservergql::COperationContextControllerComp OperationContextController;
 typedef imtservergql::CObjectCollectionChangeNotifierComp ObjectCollectionChangeNotifier;

@@ -6,7 +6,7 @@
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
-#include <imtrest/IJsonRepresentationController.h>
+#include <imtserverapp/IJsonRepresentationController.h>
 #include <imtqml/IQuickObject.h>
 
 
@@ -35,7 +35,7 @@ private Q_SLOTS:
 
 private:
 	I_REF(iprm::IParamsSet, m_settingsCompPtr);
-	I_REF(imtrest::IJsonRepresentationController, m_settingsRepresentationControllerCompPtr);
+	I_REF(imtserverapp::IJsonRepresentationController, m_settingsRepresentationControllerCompPtr);
 	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
 };
 

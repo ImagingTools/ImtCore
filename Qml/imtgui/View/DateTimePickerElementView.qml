@@ -42,6 +42,14 @@ ElementView {
 
     Component {
         id: datePickerComp;
+		
+		// DateTimeInput {
+		// 	hasTitle: false
+			
+		// 	onDateChanged: {
+				
+		// 	}
+		// }
 
         DateTimePicker {
             width: 200;

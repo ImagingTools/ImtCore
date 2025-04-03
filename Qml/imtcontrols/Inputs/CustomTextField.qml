@@ -6,7 +6,7 @@ FocusScope {
 
     height: 40;
 
-//    property alias text: textField.text;
+    // property alias text: textField.text;
     property string text: textField.text; // for web TEMP!!!
     property alias acceptableInput: textField.acceptableInput;
     property alias textInputFocus: textField.focus;

@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtrest/IRepresentationController.h>
+#include <imtserverapp/IRepresentationController.h>
 #include <imtservice/CUrlConnectionParam.h>
 
 
@@ -10,7 +10,7 @@ namespace imtservice
 {
 
 
-class CUrlConnectionParamRepresentationController: public imtrest::IRepresentationController
+class CUrlConnectionParamRepresentationController: public imtserverapp::IRepresentationController
 {
 public:
 	// reimplemented (imtrest::IRepresentationController)

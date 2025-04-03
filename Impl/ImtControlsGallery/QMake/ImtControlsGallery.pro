@@ -9,7 +9,7 @@ QT += quickcontrols2
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
-LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtauthdb -limtclientgql -limtauthgui -limtappsdl -limtauthsdl -limtservergql -limtbase -limtzip -limtrest -limtstyle -limtqml -limtauth -limtgui -limtguigqlqml -limtauthguiqml -limtguiqml -limtcolguiqml -limtstylecontrolsqml -limtcontrolsqml -limtdocguiqml -limtlicgql -limtguigql -limtgql -limtauthgql -limtauthdb -limtcom -limtapp
+LIBS += -L$(IMTCOREDIR)/Lib/$$COMPILER_DIR -limtauthdb -limtclientgql -limtauthgui -limtappsdl -limtauthsdl -limtservergql -limtbase -limtzip -limtrest -limtstyle -limtqml -limtauth -limtgui -limtguigqlqml -limtauthguiqml -limtguiqml -limtcolguiqml -limtstylecontrolsqml -limtcontrolsqml -limtdocguiqml -limtlicgql -limtguigql -limtgql -limtauthgql -limtauthdb -limtcom -limtapp -limtserverapp
 
 # Set OS-specific build options:
 win32-msvc*{

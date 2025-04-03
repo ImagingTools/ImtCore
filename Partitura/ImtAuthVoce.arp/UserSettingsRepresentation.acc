@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="Design" PackageId="ImtRestPck" ComponentId="SelectionParamRepresentationController">
+        <Element Id="Design" PackageId="ImtServerAppPck" ComponentId="SelectionParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -31,7 +31,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Language" PackageId="ImtRestPck" ComponentId="SelectionParamRepresentationController">
+        <Element Id="Language" PackageId="ImtServerAppPck" ComponentId="SelectionParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -52,7 +52,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserSettings" PackageId="ImtRestPck" ComponentId="ParamSetRepresentationController">
+        <Element Id="UserSettings" PackageId="ImtServerAppPck" ComponentId="ParamSetRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -84,7 +84,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IJsonRepresentationController" ComponentId="UserSettings"/>
+        <Interface InterfaceId="imtserverapp::IJsonRepresentationController" ComponentId="UserSettings"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="UserSettings"/>
     </ExportedInterfaces>
     <ExportedComponents/>

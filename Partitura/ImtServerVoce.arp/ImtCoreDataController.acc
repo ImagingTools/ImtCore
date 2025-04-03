@@ -100,7 +100,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UrlParamRepresentationController" PackageId="ImtRestPck" ComponentId="UrlParamRepresentationController">
+        <Element Id="UrlParamRepresentationController" PackageId="ImtServerAppPck" ComponentId="UrlParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">

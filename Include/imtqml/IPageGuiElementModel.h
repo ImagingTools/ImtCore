@@ -2,14 +2,14 @@
 
 
 // ImtCore includes
-#include <imtrest/IGuiElementModel.h>
+#include <imtserverapp/IGuiElementModel.h>
 
 
 namespace imtqml
 {
 
 
-class IPageGuiElementModel: virtual public imtrest::IGuiElementModel
+class IPageGuiElementModel: virtual public imtserverapp::IGuiElementModel
 {
 public:
 	/**

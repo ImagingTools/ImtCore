@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/ITableViewParam.h>
+#include <imtauth/CUserInfo.h>
 
 
 namespace imtservergql
@@ -37,16 +38,6 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 		return nullptr;
 	}
 
-	imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
-	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. User info from GraphQL context is invalid").arg(qPrintable(commandId));
-		SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
-
-		return nullptr;
-	}
-
-	QByteArray userId = userInfoPtr->GetId();
-
 	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. Invalid GraphQL input params.").arg(qPrintable(commandId));
@@ -54,6 +45,16 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 
 		return nullptr;
 	}
+	
+	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
+	if (userInfoPtr == nullptr){
+		errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. User info from GraphQL context is invalid").arg(qPrintable(commandId));
+		SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");
+		
+		return nullptr;
+	}
+	
+	QByteArray userId = userInfoPtr->GetObjectUuid();
 
 	QByteArray tableId = gqlInputParamPtr->GetFieldArgumentValue("TableId").toByteArray();
 
@@ -160,7 +161,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 			}
 		}
 		else{
-			QByteArray retVal = m_userSettingsCollectionCompPtr->InsertNewObject("", "", "", userSettingsPtr.GetPtr(), userId);
+			QByteArray retVal = m_userSettingsCollectionCompPtr->InsertNewObject("UserSettings", "", "", userSettingsPtr.GetPtr(), userId);
 			if (retVal.isEmpty()){
 				errorMessage = QString("Unable to create settings for user '%1'. Error: Insert object failed").arg(qPrintable(userId));
 				SendErrorMessage(0, errorMessage, "CTableViewParamControllerComp");

@@ -312,6 +312,7 @@
     <ExportedComponents>
         <Component ExportedId="Backup" ComponentId="Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
+        <Component ExportedId="FileBasedSslConfiguration" ComponentId="FileBasedSslConfiguration"/>
         <Component ExportedId="LoggingParams" ComponentId="LoggingParams"/>
         <Component ExportedId="PumaUrl" ComponentId="ServerConnectionParams/PumaUrl"/>
         <Component ExportedId="PumaWebSocketPort" ComponentId="ServerConnectionParams/PumaWebSocketPort"/>

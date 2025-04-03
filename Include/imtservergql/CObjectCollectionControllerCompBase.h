@@ -12,7 +12,6 @@
 #include <imtbase/IOperationContextController.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
-#include <imtrest/CTimeFilterParamRepresentationController.h>
 #include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/CMimeType.h>
@@ -213,8 +212,6 @@ protected:
 	I_MULTIATTR(QString, m_mimeTypeAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_importExportObjectFactCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_filePersistenceCompPtr);
-
-	imtrest::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
 };
 
 

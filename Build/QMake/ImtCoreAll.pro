@@ -72,6 +72,10 @@ SUBDIRS += imtbasesdl
 imtbasesdl.file = ../../Sdl/imtbase/QMake/imtbasesdl.pro
 imtbasesdl.depends = SdlCodeGenerator
 
+SUBDIRS += imtserverapp
+imtserverapp.file = ../../Include/imtserverapp/QMake/imtserverapp.pro
+imtserverapp.depends = imtbasesdl
+
 SUBDIRS += imtcol
 imtcol.file = ../../Include/imtcol/QMake/imtcol.pro
 imtcol.depends = imtbase imtbasesdl
@@ -406,6 +410,9 @@ SUBDIRS += ImtColPck
 ImtColPck.file = ../../Impl/ImtColPck/QMake/ImtColPck.pro
 ImtColPck.depends = imtcol imtbase
 
+SUBDIRS += ImtServerAppPck
+ImtServerAppPck.file = ../../Impl/ImtServerAppPck/QMake/ImtServerAppPck.pro
+ImtServerAppPck.depends = imtserverapp
 
 # SUBDIRS += ImtControlsGallery
 # ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro

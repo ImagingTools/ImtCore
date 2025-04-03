@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="NetworkSettings" PackageId="ImtRestPck" ComponentId="ParamSetRepresentationController">
+        <Element Id="NetworkSettings" PackageId="ImtServerAppPck" ComponentId="ParamSetRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -35,7 +35,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerUrl" PackageId="ImtRestPck" ComponentId="UrlParamRepresentationController">
+        <Element Id="ServerUrl" PackageId="ImtServerAppPck" ComponentId="UrlParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -59,7 +59,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IJsonRepresentationController" ComponentId="NetworkSettings"/>
+        <Interface InterfaceId="imtserverapp::IJsonRepresentationController" ComponentId="NetworkSettings"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="NetworkSettings"/>
     </ExportedInterfaces>
     <ExportedComponents/>

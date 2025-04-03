@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="PasswordRepresentation" PackageId="ImtRestPck" ComponentId="PasswordParamRepresentationController">
+        <Element Id="PasswordRepresentation" PackageId="ImtServerAppPck" ComponentId="PasswordParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ModelId" Type="Id" ExportId="">
@@ -28,7 +28,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PortRepresentation" PackageId="ImtRestPck" ComponentId="IntegerParamRepresentationController">
+        <Element Id="PortRepresentation" PackageId="ImtServerAppPck" ComponentId="IntegerParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ModelId" Type="Id" ExportId="">
@@ -46,7 +46,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerAddressRepresentation" PackageId="ImtRestPck" ComponentId="TextParamRepresentationController">
+        <Element Id="ServerAddressRepresentation" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -67,7 +67,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SmtpParamsRepresentation" PackageId="ImtRestPck" ComponentId="ParamSetRepresentationController">
+        <Element Id="SmtpParamsRepresentation" PackageId="ImtServerAppPck" ComponentId="ParamSetRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -98,7 +98,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UsernameRepresentation" PackageId="ImtRestPck" ComponentId="TextParamRepresentationController">
+        <Element Id="UsernameRepresentation" PackageId="ImtServerAppPck" ComponentId="TextParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -122,7 +122,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IJsonRepresentationController" ComponentId="SmtpParamsRepresentation"/>
+        <Interface InterfaceId="imtserverapp::IJsonRepresentationController" ComponentId="SmtpParamsRepresentation"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SmtpParamsRepresentation"/>
     </ExportedInterfaces>
     <ExportedComponents/>

@@ -14,7 +14,8 @@ LIBS += -limtbase \
 		-limtgql \
 		-limtgui \
 		-liser \
-		-limtrest
+		-limtrest \
+		-limtserverapp
 
 # Get build output directory of shadow build:
 ACFSLNDIRBUILD = $$(ACFSLNDIR_BUILD)

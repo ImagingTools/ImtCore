@@ -15,6 +15,7 @@
         <Element ComponentName="QtResourceLoaderComp" X="850" Y="725" Note=""/>
         <Element ComponentName="ServerSettings" X="375" Y="250" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="675" Y="350" Note=""/>
+        <Element ComponentName="SslConfigurationManager" X="450" Y="100" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="825" Y="125" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

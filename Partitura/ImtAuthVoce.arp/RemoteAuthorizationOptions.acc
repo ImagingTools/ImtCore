@@ -89,7 +89,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserModeRepresentation" PackageId="ImtRestPck" ComponentId="SelectionParamRepresentationController">
+        <Element Id="UserModeRepresentation" PackageId="ImtServerAppPck" ComponentId="SelectionParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">

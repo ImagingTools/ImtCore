@@ -90,7 +90,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PreferencesRepresentation" PackageId="ImtRestPck" ComponentId="ParamSetRepresentationController">
+        <Element Id="PreferencesRepresentation" PackageId="ImtServerAppPck" ComponentId="ParamSetRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">

@@ -6,8 +6,8 @@
 #include <iqt/ITranslationManager.h>
 
 // ImtCore includes
-#include <imtrest/IRepresentationController.h>
-#include <imtrest/ICommandPermissionsProvider.h>
+#include <imtserverapp/IRepresentationController.h>
+#include <imtserverapp/ICommandPermissionsProvider.h>
 #include <imtgql/IGqlRequestHandler.h>
 #include <imtauth/IPermissionChecker.h>
 

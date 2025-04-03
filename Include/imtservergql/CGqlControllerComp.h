@@ -2,8 +2,6 @@
 
 
 // ImtCore includes
-#include <imtrest/IRepresentationController.h>
-#include <imtgql/IGqlRepresentationController.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>
 
 

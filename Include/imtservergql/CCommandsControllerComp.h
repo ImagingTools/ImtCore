@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtrest/IGuiElementContainer.h>
+#include <imtserverapp/IGuiElementContainer.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Commands.h>
 
 
@@ -30,17 +30,17 @@ protected:
 	
 private:
 	bool GetRepresentationFromGuiElementContainer(
-		const imtrest::IGuiElementContainer& guiElementContainer,
+		const imtserverapp::IGuiElementContainer& guiElementContainer,
 		sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
 		const QByteArray languageId) const;
 	bool GetRepresentationFromGuiElement(
-		const imtrest::IGuiElementModel& guiElementModel,
+		const imtserverapp::IGuiElementModel& guiElementModel,
 		sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
 		const QByteArray languageId) const;
 	QString TranslateName(const QString& name, const QString& context, const QByteArray& languageId) const;
 	
 protected:
-	I_REF(imtrest::IGuiElementContainer, m_guiElementContainerCompPtr);
+	I_REF(imtserverapp::IGuiElementContainer, m_guiElementContainerCompPtr);
 	I_ATTR(QByteArray, m_typeIdAttrPtr);
 };
 

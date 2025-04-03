@@ -1,0 +1,71 @@
+#pragma once
+
+
+// ACF includes
+#include <icomp/TModelCompWrap.h>
+#include <icomp/TMakeComponentWrap.h>
+
+// ImtCore includes
+#include <imtbase/TComponentFactoryComp.h>
+#include <imtserverapp/CGuiElementModelRepresentationControllerComp.h>
+#include <imtserverapp/CGuiElementContainerRepresentationControllerComp.h>
+#include <imtserverapp/CPageGuiElementModelRepresentationControllerComp.h>
+#include <imtserverapp/CParamSetRepresentationControllerComp.h>
+#include <imtserverapp/CSelectionParamRepresentationControllerComp.h>
+#include <imtserverapp/CTextParamRepresentationControllerComp.h>
+#include <imtserverapp/CUrlParamRepresentationControllerComp.h>
+#include <imtserverapp/CDatabaseAccessSettingsRepresentationControllerComp.h>
+#include <imtserverapp/CGuiElementRepresentationControllerComp.h>
+#include <imtserverapp/CPageBasedGuiRepresentationControllerComp.h>
+#include <imtserverapp/CSingleCommandPermissionsProviderComp.h>
+#include <imtserverapp/CCommandPermissionsProviderJoinerComp.h>
+#include <imtserverapp/CTableViewParamRepresentationControllerComp.h>
+#include <imtserverapp/CFileNameParamRepresentationControllerComp.h>
+#include <imtserverapp/CBackupSettingsRepresentationControllerComp.h>
+#include <imtserverapp/CSchedulerParamsRepresentationControllerComp.h>
+#include <imtserverapp/CIntegerParamRepresentationControllerComp.h>
+#include <imtserverapp/CDoubleParamRepresentationControllerComp.h>
+#include <imtserverapp/CPasswordParamRepresentationControllerComp.h>
+#include <imtserverapp/CServerLogDataProviderComp.h>
+#include <imtserverapp/CGuiElementModelComp.h>
+#include <imtserverapp/CGuiElementContainerComp.h>
+#include <imtserverapp/CEnableableParamRepresentationControllerComp.h>
+
+
+/**
+	ImtServerAppPck package
+*/
+namespace ImtServerAppPck
+{
+
+
+typedef imtserverapp::CParamSetRepresentationControllerComp ParamSetRepresentationController;
+typedef imtserverapp::CSelectionParamRepresentationControllerComp SelectionParamRepresentationController;
+typedef imtserverapp::CTextParamRepresentationControllerComp TextParamRepresentationController;
+typedef imtserverapp::CUrlParamRepresentationControllerComp UrlParamRepresentationController;
+typedef imtserverapp::CDatabaseAccessSettingsRepresentationControllerComp DatabaseAccessSettingsRepresentationController;
+typedef imtserverapp::CPageBasedGuiRepresentationControllerComp PageBasedGuiRepresentationController;
+typedef imtserverapp::CGuiElementRepresentationControllerComp GuiElementRepresentationController;
+typedef imtserverapp::CSingleCommandPermissionsProviderComp SingleCommandPermissionsProvider;
+typedef imtserverapp::CCommandPermissionsProviderJoinerComp CommandPermissionsProviderJoiner;
+typedef imtserverapp::CTableViewParamRepresentationControllerComp TableViewParamRepresentationController;
+typedef imtserverapp::CGuiElementModelComp GuiElementModel;
+typedef imtserverapp::CGuiElementContainerComp GuiElementContainer;
+typedef imtserverapp::CGuiElementModelRepresentationControllerComp GuiElementModelRepresentationController;
+typedef imtserverapp::CGuiElementContainerRepresentationControllerComp GuiElementContainerRepresentationController;
+typedef imtserverapp::CPageGuiElementModelRepresentationControllerComp PageGuiElementModelRepresentationController;
+typedef imtserverapp::CFileNameParamRepresentationControllerComp FileNameParamRepresentationController;
+typedef imtserverapp::CBackupSettingsRepresentationControllerComp BackupSettingsRepresentationController;
+typedef imtserverapp::CSchedulerParamsRepresentationControllerComp SchedulerParamsRepresentationController;
+typedef imtserverapp::CIntegerParamRepresentationControllerComp IntegerParamRepresentationController;
+typedef imtserverapp::CDoubleParamRepresentationControllerComp DoubleParamRepresentationController;
+typedef imtserverapp::CPasswordParamRepresentationControllerComp PasswordParamRepresentationController;
+typedef imtserverapp::CServerLogDataProviderComp ServerLogDataProvider;
+typedef imtserverapp::CEnableableParamRepresentationControllerComp EnableableParamRepresentationController;
+typedef imtbase::TComponentFactoryComp<imtserverapp::IRepresentationController> RepresentationControllerFactory;
+
+
+
+} // namespace ImtServerAppPck
+
+

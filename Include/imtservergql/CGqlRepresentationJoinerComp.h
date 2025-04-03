@@ -2,9 +2,6 @@
 
 
 // ImtCore includes
-#include <imtbase/IObjectCollection.h>
-#include <imtrest/IRepresentationController.h>
-#include <imtauth/IUserSettings.h>
 #include <imtservergql/CGqlRepresentationDataControllerCompBase.h>
 
 

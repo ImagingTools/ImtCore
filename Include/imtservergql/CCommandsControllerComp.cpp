@@ -5,7 +5,7 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
-#include <imtrest/IGuiElementModel.h>
+#include <imtserverapp/IGuiElementModel.h>
 
 
 namespace imtservergql
@@ -92,7 +92,7 @@ sdl::imtbase::Commands::CGuiElementContainer CCommandsControllerComp::OnGetComma
 // private methods
 
 bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
-	const imtrest::IGuiElementContainer& guiElementContainer,
+	const imtserverapp::IGuiElementContainer& guiElementContainer,
 	sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
 	const QByteArray languageId) const
 {
@@ -101,14 +101,14 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 	QList<sdl::imtbase::Commands::CGuiElementModel::V1_0> elementList;
 	
 	for (const QByteArray& elementId : elementIds){
-		const imtrest::IGuiElementModel* guiElementPtr = guiElementContainer.GetGuiElementModel(elementId);
+		const imtserverapp::IGuiElementModel* guiElementPtr = guiElementContainer.GetGuiElementModel(elementId);
 		if (guiElementPtr != nullptr){
 			sdl::imtbase::Commands::CGuiElementModel::V1_0 element;
 			if (!GetRepresentationFromGuiElement(*guiElementPtr, element, languageId)){
 				return false;
 			}
 			
-			const imtrest::IGuiElementContainer* subElementContainerPtr = guiElementPtr->GetSubElements();
+			const imtserverapp::IGuiElementContainer* subElementContainerPtr = guiElementPtr->GetSubElements();
 			if (subElementContainerPtr != nullptr){
 				sdl::imtbase::Commands::CGuiElementContainer::V1_0 subElements;
 				if (!GetRepresentationFromGuiElementContainer(*subElementContainerPtr, subElements, languageId)){
@@ -134,7 +134,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 
 
 bool CCommandsControllerComp::GetRepresentationFromGuiElement(
-	const imtrest::IGuiElementModel& guiElementModel,
+	const imtserverapp::IGuiElementModel& guiElementModel,
 	sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
 	const QByteArray languageId) const
 {

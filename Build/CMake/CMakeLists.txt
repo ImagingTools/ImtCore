@@ -146,6 +146,8 @@ add_subdirectory("${INCLUDE_DIR}/imthttp/CMake" "${AUX_INCLUDE_DIR}/imthttp")
 add_dependencies(imthttp imtcom)
 add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
 add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
+add_subdirectory("${INCLUDE_DIR}/imtserverapp/CMake" "${AUX_INCLUDE_DIR}/imtserverapp")
+add_dependencies(imtserverapp imtbasesdl)
 
 add_subdirectory("${INCLUDE_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpay")
 add_dependencies(imtpay imtbasesdl)
@@ -283,6 +285,9 @@ endif()
 
 	add_subdirectory("${IMPL_DIR}/ImtColPck/CMake" "${AUX_INCLUDE_DIR}/ImtColPck")
 	add_dependencies(ImtColPck imtcol)
+	
+	add_subdirectory("${IMPL_DIR}/ImtServerAppPck/CMake" "${AUX_INCLUDE_DIR}/ImtServerAppPck")
+	add_dependencies(ImtServerAppPck imtserverapp)
 
 	if(NOT DEFINED USE_GEO OR USE_GEO)
 		add_subdirectory("${IMPL_DIR}/ImtGeoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGeoPck")
