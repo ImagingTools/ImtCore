@@ -1,12 +1,18 @@
 #pragma once
 
 
+// Qt includes
+#include <QtWebSockets/QWebSocket>
+#include <QtCore/QTimer>
+#include <QtCore/QReadWriteLock>
+
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <istd/TPointerVector.h>
 #include <iprm/ITextParam.h>
 #include <imod/TModelWrap.h>
 #include <ibase/TRuntimeStatusHanderCompWrap.h>
+#include <iprm/IParamsSet.h>
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
@@ -17,20 +23,31 @@
 #include <imtrest/ISender.h>
 #include <imtrest/IRequestManager.h>
 #include <imtclientgql/IGqlClient.h>
-
-// Qt includes
-#include <QtWebSockets/QWebSocket>
-#include <QtCore/QTimer>
-#include <QtCore/QReadWriteLock>
+#include <imtcom/ISslConfigurationManager.h>
 
 
 namespace imtclientgql
 {
 
 
+class CWebSocketClientCompBase:public ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase>
+{
+public:
+	typedef ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase> BaseClass;
+	
+	I_BEGIN_COMPONENT(CWebSocketClientCompBase);
+		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
+		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
+	I_END_COMPONENT;
+		
+protected:
+	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
+	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
+};
+
 class CWebSocketClientComp:
 			public QObject,
-			public ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase>,
+			public CWebSocketClientCompBase,
 			virtual public imtrest::ISender,
 			virtual public imtcom::IConnectionController,
 			virtual public imtrest::IRequestManager,
@@ -38,7 +55,7 @@ class CWebSocketClientComp:
 {
 	Q_OBJECT
 public:
-	typedef ibase::TRuntimeStatusHanderCompWrap <ilog::CLoggerComponentBase> BaseClass;
+	typedef CWebSocketClientCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CWebSocketClientComp);
 		I_REGISTER_INTERFACE(ISender)

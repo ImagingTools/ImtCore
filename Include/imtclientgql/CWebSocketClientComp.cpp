@@ -6,6 +6,12 @@
 #include <QtCore/QUrl>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QFile>
+
+// ACF includes
+#include <istd/TDelPtr.h>
+#include <iprm/IEnableableParam.h>
+#include <iprm/TParamsPtr.h>
 
 // ImtCore includes
 #include <imtgql/CGqlResponse.h>
@@ -377,12 +383,15 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 
 	QString host;
 	QString path;
+	QString scheme = "ws";
 	int port = 0;
 
 	if (m_webSocketServerAddressCompPtr.IsValid()){
-		host = m_webSocketServerAddressCompPtr->GetUrl().host();
-		port = m_webSocketServerAddressCompPtr->GetUrl().port();
-		path = m_webSocketServerAddressCompPtr->GetUrl().path();
+		QUrl url = m_webSocketServerAddressCompPtr->GetUrl();
+		host = url.host();
+		port = url.port();
+		path = url.path();
+		scheme = url.scheme();
 	}
 
 	QJsonObject authorization;
@@ -398,8 +407,20 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 	url.setHost(host);
 	url.setPath(path);
 	url.setQuery("header=" + authHeader.toBase64() + "&payload=e30=");
-	url.setScheme("ws");
+	url.setScheme(scheme);
 	url.setPort(port);
+	
+	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
+		QSslConfiguration sslConfiguration;
+		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(
+					m_sslConfigurationCompPtr.GetPtr(),
+					imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
+		if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
+			if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
+				m_webSocket.setSslConfiguration(sslConfiguration);
+			}
+		}
+	}
 
 	m_webSocket.open(url);
 }

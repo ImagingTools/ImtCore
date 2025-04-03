@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CaCertificate" X="975" Y="125" Note=""/>
+        <Element ComponentName="EnableableParamRepresentationController" X="250" Y="125" Note=""/>
+        <Element ComponentName="LocalCertificate" X="600" Y="125" Note=""/>
+        <Element ComponentName="SettingsRepresentation" X="600" Y="325" Note=""/>
+        <Element ComponentName="SslKey" X="600" Y="475" Note=""/>
+        <Element ComponentName="SslProtocolRepresentation" X="1000" Y="475" Note=""/>
+        <Element ComponentName="SslVerifyRepresentation" X="200" Y="475" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="SslKey">
+            <PositionMap>
+                <Element ComponentName="AlgorithmRepresentation" X="900" Y="225" Note=""/>
+                <Element ComponentName="PrivateKeyPathRepresentation" X="250" Y="225" Note=""/>
+                <Element ComponentName="SslEncodingRepresentation" X="750" Y="375" Note=""/>
+                <Element ComponentName="SslKeyRepresentation" X="575" Y="75" Note=""/>
+                <Element ComponentName="SslKeyTypeRepresentation" X="350" Y="375" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="SslCertificateFilePath">
+            <PositionMap>
+                <Element ComponentName="FilePath" X="250" Y="300" Note=""/>
+                <Element ComponentName="SslCertificate" X="575" Y="150" Note=""/>
+                <Element ComponentName="SslEncodingFormat" X="900" Y="300" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>
