@@ -23,7 +23,7 @@ Item {
     function getHeaders(){
         if (administrationContainer.productId === ""){
             console.error("Unable to get additional parameters. Product-ID is empty");
-            return null;
+            return {};
         }
 
         let obj = {}
@@ -71,7 +71,7 @@ Item {
             rolesModel: administrationContainer.rolesModel;
 
             function getHeaders(){
-                 return administrationContainer.getHeaders()
+                return administrationContainer.getHeaders()
             }
         }
     }
