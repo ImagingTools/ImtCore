@@ -34,6 +34,8 @@ Rectangle{
     property bool hasAddDelegInfo: false;
     property Component additionalDelegateComp: Component{Item{}}
 
+	property alias reuseItems: list.reuseItems
+
     signal requestSignal(int index);
 
     signal clicked(int index);
@@ -116,8 +118,8 @@ Rectangle{
                 id: deleg;
 
                 width: !model.Visible__ ? 0 : Math.max(list.width, list.delegateWidthFull);
-                height: model.Visible__ ? treeViewGql.delegateHeight : 0;
-                opacity: model.Visible__;
+				height: model.Visible__ == undefined ? 0 : model.Visible__ ? treeViewGql.delegateHeight : 0;
+				opacity: model.Visible__ !== undefined ?  model.Visible__ : false;
                 property bool isOpen: model.IsOpen__ == undefined ? false : model.IsOpen__;
                 property int index: model.index;
                 property bool isSelected: model.index == treeViewGql.selectedIndex;
@@ -217,8 +219,8 @@ Rectangle{
                     height: parent.height;
 
                     function openButtonClicked(){
-                        if(model.HasChildren__){
-                            if(!deleg.isOpen){
+						if(model.HasChildren__){
+							if(!model.IsOpen__){
                                 if(!model.HasBranch__){
                                     treeViewGql.model.setData("HasBranch__", true, model.index);
                                     treeViewGql.requestSignal(model.index)
@@ -232,15 +234,16 @@ Rectangle{
                                 treeViewGql.openBranch(model.index)
                                 treeViewGql.openButtonClicked(model.index);
                             }
-                            else if(deleg.isOpen){
-                                //console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
+							else if(model.IsOpen__){
+
+								//console.log(model.ChildrenCount__, treeViewGql._maxCountToClose)
                                 let count_ = treeViewGql.getVisibleCountInBranch(model.index);
                                 //let count_ = model.ChildrenCount__;
                                 if(count_ <= treeViewGql._maxCountToClose){
                                     treeViewGql.model.setData("IsOpen__", false, model.index);
                                     treeViewGql.model.setData("OpenState__", 0, model.index);
-                                    treeViewGql.setVisibleElements(false, model.index)
-                                    treeViewGql.closeBranch(model.index)
+									treeViewGql.setVisibleElements(false, model.index)
+									treeViewGql.closeBranch(model.index)
                                 }
                                 else {
                                     treeViewGql.deleteBranch(model.index);
@@ -263,7 +266,7 @@ Rectangle{
                         sourceSize.width: width;
                         sourceSize.height: height;
                         source: "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
-                        property string imageName: deleg.isOpen ? "Icons/Down" : "Icons/Right";
+						property string imageName: deleg.isOpen ? "Icons/Down" : "Icons/Right";
 
                     }
 
@@ -634,18 +637,18 @@ Rectangle{
             return;
         }
         let isForcedOpen = false;
-        if(treeViewGql.model.getData("HasChildren__", index)){
-            if(treeViewGql.model.getData("OpenState__", index) !== 1){
-                if(!treeViewGql.model.getData("HasBranch__", index)){
-                    treeViewGql.model.setData("HasBranch__", true, index);
-                    treeViewGql.requestSignal(index)
+		if(treeViewGql.model.getData("HasChildren__", index)){
+			if(treeViewGql.model.getData("OpenState__", index) !== 1){
+				if(!treeViewGql.model.getData("HasBranch__", index)){
+					treeViewGql.model.setData("HasBranch__", true, index);
+					treeViewGql.requestSignal(index)
                 }
                 else {
                     treeViewGql.setVisibleElements(true, index)
                     isForcedOpen = true;
                 }
-                treeViewGql.model.setData("IsOpen__", true, index);
-                treeViewGql.model.setData("OpenState__", 1, index);
+				treeViewGql.model.setData("IsOpen__", true, index);
+				treeViewGql.model.setData("OpenState__", 1, index);
 
                 treeViewGql.openBranch(index);
             }
@@ -660,7 +663,7 @@ Rectangle{
         if(isForcedOpen){
             treeViewGql.forcedOpen(index);
         }
-    }
+	}
 
     function moveToElement(index){
         if(index < 0 || index >= treeViewGql.model.getItemsCount()){
