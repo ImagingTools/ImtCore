@@ -5,7 +5,7 @@ BEGIN
    END IF;
 END $$;
 
-CREATE TABLE "${TableName}"
+CREATE TABLE IF NOT EXISTS "${TableName}"
 (
     "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "DocumentId" UUID NOT NULL,
