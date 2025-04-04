@@ -263,10 +263,12 @@ Item {
 				}
 			}
 			Component.onDestruction:{
-				timeInput.dialogClosed();
+				forFocus.forceActiveFocus()
 			}
 		}
 	}
+
+	Item{id: forFocus}
 
 
 }

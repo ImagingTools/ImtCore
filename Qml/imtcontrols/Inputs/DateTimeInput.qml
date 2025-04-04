@@ -199,9 +199,7 @@ Row{
 				signalPause.restart();
 			}
 		}
-		onDialogClosed: {
-			forFocus.forceActiveFocus();
-		}
+
 	}
 
 	Item{id: forFocus}
