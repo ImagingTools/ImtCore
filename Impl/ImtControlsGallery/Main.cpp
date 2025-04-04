@@ -13,6 +13,7 @@
 #include <imtqml/CRemoteFileController.h>
 #include <imtqml/CQuickApplicationComp.h>
 #include <imtqml/CGqlRequest.h>
+#include <imtqml/CQmlProcess.h>
 #include <GeneratedFiles/ImtControlsGallery/CImtControlsGallery.h>
 
 
@@ -61,6 +62,7 @@ int main(int argc, char *argv[])
 	qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");
 	qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
 	qmlRegisterType<imtqml::CGqlRequest>("Acf", 1, 0, "GqlRequest");
+	qmlRegisterType<imtqml::CQmlProcess>("Acf", 1, 0, "Process");
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 	qmlRegisterModule("QtGraphicalEffects", 1, 12);
