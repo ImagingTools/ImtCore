@@ -74,7 +74,7 @@
         <Element Id="Language" PackageId="BasePck" ComponentId="SelectionParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
+                    <AttributeInfo Id="Constraints" Type="Reference" ExportId="LanguageConstraints">
                         <Data IsEnabled="true" Value="LanguageOptions"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
