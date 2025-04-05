@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5347" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -131,7 +131,7 @@
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Database</Value>
+                                <Value>DatabaseAccessSettings</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -308,7 +308,14 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="Preferences"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="Preferences"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="Preferences"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Preferences"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Preferences"/>
+        <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="Preferences"/>
+    </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="Backup" ComponentId="Backup"/>
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>

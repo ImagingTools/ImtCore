@@ -12,9 +12,7 @@ const float CAxisShape::s_zoomFontFactor = 50.0f;
 // public methods
 
 CAxisShape::CAxisShape()
-	:m_axisLength(1.0),
-	m_axisRange(0.0, 1.0),
-	m_doUpdate(true)
+	:m_doUpdate(true)
 {
 	std::vector<imt3d::CPointCloud3d::PointXyzwRgba32> vertexes(6);
 
@@ -46,28 +44,57 @@ CAxisShape::CAxisShape()
 
 	m_indices = { 0, 1, 2, 3, 4, 5 };
 	m_pointsDataPtr = &m_data;
+
+	SetAxisLength(AT_X, 1.0);
+	SetAxisRange(AT_X, istd::CRange(0, 1.0));
+	SetAxisLineWidth(AT_X, 4);
+	SetAxisLabel(AT_X, "X");
+
+	SetAxisLength(AT_Y, 1.0);
+	SetAxisRange(AT_Y, istd::CRange(0, 1.0));
+	SetAxisLineWidth(AT_Y, 4);
+	SetAxisLabel(AT_Y, "Y");
+
+	SetAxisLength(AT_Z, 1.0);
+	SetAxisRange(AT_Z, istd::CRange(0, 1.0));
+	SetAxisLineWidth(AT_Z, 4);
+	SetAxisLabel(AT_Z, "Z");
 }
 
 
-void CAxisShape::SetAxisLength(double axisLength)
+void CAxisShape::SetAxisLength(AxisType axis, double axisLength)
 {
 	Q_ASSERT(axisLength > 0.0);
 
-	m_axisLength = axisLength;
+	m_axisConfigs[axis].axisLength = axisLength;
+
 	m_doUpdate = true;
 }
 
 
-void CAxisShape::SetAxisRange(const istd::CRange& range)
+void CAxisShape::SetAxisRange(AxisType axis, const istd::CRange& range)
 {
-	m_axisRange = range;
+	m_axisConfigs[axis].axisRange = range;
+
 	m_doUpdate = true;
 }
 
 
-// protected methods
+void CAxisShape::SetAxisLineWidth(AxisType axis, double lineWidth)
+{
+	m_axisConfigs[axis].lineWidth = lineWidth;
 
-// reimplement (imt3dgui::CShape3dBase)
+	m_doUpdate = true;
+}
+
+
+void CAxisShape::SetAxisLabel(AxisType axis, const QString& label)
+{
+	m_axisConfigs[axis].label = label;
+
+	m_doUpdate = true;
+}
+
 
 // protected methods
 
@@ -79,19 +106,34 @@ void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*chan
 		return;
 	}
 
-	for (int i = 0; i < 3; i++) {
-		imt3d::CPointCloud3d::PointXyzwRgba32* a = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(i*2);
-		a->data[i] = m_axisLength * m_axisRange.GetMinValue();
-		imt3d::CPointCloud3d::PointXyzwRgba32* b = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(i * 2 + 1);
-		b->data[i] = m_axisLength * m_axisRange.GetMaxValue();
-	}
+	// X
+	imt3d::CPointCloud3d::PointXyzwRgba32* a = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_X * 2);
+	a->data[AT_X] = m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue();
+	imt3d::CPointCloud3d::PointXyzwRgba32* b = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_X * 2 + 1);
+	b->data[AT_X] = m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue();
+
+	// Y
+	a = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_Y * 2);
+	a->data[AT_Y] = m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue();
+	b = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_Y * 2 + 1);
+	b->data[AT_Y] = m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue();
+
+	// Z
+	a = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_Z * 2);
+	a->data[AT_Z] = m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue();
+	b = (imt3d::CPointCloud3d::PointXyzwRgba32*)m_data.GetPointData(AT_Z * 2 + 1);
+	b->data[AT_Z] = m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue();
 
 	m_doUpdate = false;
 }
 
+
 void CAxisShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions& functions)
 {
-	functions.glLineWidth(2.0f);
+	double lineWidth = m_axisConfigs[AT_X].lineWidth;
+
+	functions.glLineWidth(lineWidth);
+
 	functions.glDrawElements(GL_LINES, m_indices.count(), GL_UNSIGNED_INT, 0);
 }
 
@@ -110,25 +152,28 @@ void CAxisShape::Draw(QPainter& painter)
 	painter.setPen(Qt::darkGray);
 	painter.setFont(GetAxeLabelFont());
 
-	QPoint windowCoordinate = ModelToWindow(QVector3D(m_axisLength * m_axisRange.GetMaxValue(), 0.0, 0.0));
-	painter.drawText(windowCoordinate, QString("X"));
+	QString xLabel = m_axisConfigs[AT_X].label;
+	QPoint windowCoordinate = ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMaxValue(), 0.0, 0.0));
+	painter.drawText(windowCoordinate, xLabel);
 
-	if (m_axisRange.GetMinValue() < 0.0){
-		painter.drawText(ModelToWindow(QVector3D(m_axisLength * m_axisRange.GetMinValue(), 0.0, 0.0)), QString("-X"));
+	if (m_axisConfigs[AT_X].axisRange.GetMinValue() < 0.0){
+		painter.drawText(ModelToWindow(QVector3D(m_axisConfigs[AT_X].axisLength * m_axisConfigs[AT_X].axisRange.GetMinValue(), 0.0, 0.0)), QString("-") + xLabel);
 	}
 
-	windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisLength * m_axisRange.GetMaxValue(), 0.0));
-	painter.drawText(windowCoordinate, "Y");
+	QString yLabel = m_axisConfigs[AT_Y].label;
+	windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue(), 0.0));
+	painter.drawText(windowCoordinate, yLabel);
 
-	if (m_axisRange.GetMinValue() < 0.0){
-		painter.drawText(ModelToWindow(QVector3D(0.0, m_axisLength * m_axisRange.GetMinValue(), 0.0)), QString("-Y"));
+	if (m_axisConfigs[AT_Y].axisRange.GetMinValue() < 0.0) {
+		painter.drawText(ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue(), 0.0)), QString("-") + yLabel);
 	}
 
-	windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisLength * m_axisRange.GetMaxValue()));
-	painter.drawText(windowCoordinate, "Z");
+	QString zLabel = m_axisConfigs[AT_Z].label;
+	windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue()));
+	painter.drawText(windowCoordinate, zLabel);
 
-	if (m_axisRange.GetMinValue() < 0.0){
-		painter.drawText(ModelToWindow(QVector3D(0.0, 0.0, m_axisLength * m_axisRange.GetMinValue())), QString("-Z"));
+	if (m_axisConfigs[AT_Z].axisRange.GetMinValue() < 0.0) {
+		painter.drawText(ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue())), QString("-") + zLabel);
 	}
 
 	painter.restore();

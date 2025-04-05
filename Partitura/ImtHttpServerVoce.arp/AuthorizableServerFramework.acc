@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5347" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -118,7 +118,7 @@
             </Data>
         </Element>
         <Element Id="ServerSettings" PackageId="ImtHttpServerVoce" ComponentId="ServerSettings">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
@@ -238,6 +238,7 @@
         <Component ExportedId="PumaWebSocketPort" ComponentId="ServerSettings/PumaWebSocketPort"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
         <Component ExportedId="ServerPort" ComponentId="ServerSettings/ServerPort"/>
+        <Component ExportedId="ServerSettings" ComponentId="ServerSettings"/>
         <Component ExportedId="SmtpPasswordParam" ComponentId="ServerSettings/SmtpPasswordParam"/>
         <Component ExportedId="SmtpPortParam" ComponentId="ServerSettings/SmtpPortParam"/>
         <Component ExportedId="SmtpServerAddressParam" ComponentId="ServerSettings/SmtpServerAddressParam"/>

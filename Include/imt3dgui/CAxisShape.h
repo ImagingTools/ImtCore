@@ -20,8 +20,18 @@ class CAxisShape: public CShape3dBase
 public:
 	CAxisShape();
 
-	void SetAxisLength(double axisLength);
-	void SetAxisRange(const istd::CRange& range);
+	enum AxisType
+	{
+		AT_X,
+		AT_Y,
+		AT_Z
+	};
+
+
+	void SetAxisLength(AxisType axis, double axisLength);
+	void SetAxisRange(AxisType axis, const istd::CRange& range);
+	void SetAxisLineWidth(AxisType axis, double lineWidth);
+	void SetAxisLabel(AxisType axis, const QString& label);
 
 protected:
 	// reimplement (imt3dgui::CShape3dBase)
@@ -36,8 +46,17 @@ private:
 
 private:
 	imt3d::CPointCloud3d m_data;
-	double m_axisLength;
-	istd::CRange m_axisRange;
+
+	struct AxisConfig
+	{
+		double axisLength = 1.0;
+		istd::CRange axisRange = istd::CRange(0.0, 1.0);
+		double lineWidth = 2.0;
+		QString label;
+	};
+
+	QMap<AxisType, AxisConfig> m_axisConfigs;
+
 	static const float s_zoomFontFactor;
 	bool m_doUpdate;
 };

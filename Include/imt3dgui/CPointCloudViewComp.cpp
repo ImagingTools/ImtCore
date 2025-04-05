@@ -33,7 +33,26 @@ void CPointCloudViewComp::OnGuiCreated()
 		m_gridShape.SetVisible(*m_defaultShowGridAttrPtr);
 		scenePtr->AddShapeToScene(&m_gridShape);
 
-		m_axisShape.SetAxisLength(3.0);
+		istd::CRange xAxisRange = istd::CRange(*m_xRangeMinAttrPtr, *m_xRangeMaxAttrPtr);
+		istd::CRange yAxisRange = istd::CRange(*m_yRangeMinAttrPtr, *m_yRangeMaxAttrPtr);
+		istd::CRange zAxisRange = istd::CRange(*m_zRangeMinAttrPtr, *m_zRangeMaxAttrPtr);
+
+		m_axisShape.SetAxisLength(CAxisShape::AT_X, xAxisRange.GetLength());
+		m_axisShape.SetAxisLength(CAxisShape::AT_Y, yAxisRange.GetLength());
+		m_axisShape.SetAxisLength(CAxisShape::AT_Z, zAxisRange.GetLength());
+
+		m_axisShape.SetAxisRange(CAxisShape::AT_X, xAxisRange);
+		m_axisShape.SetAxisRange(CAxisShape::AT_Y, yAxisRange);
+		m_axisShape.SetAxisRange(CAxisShape::AT_Z, zAxisRange);
+
+		m_axisShape.SetAxisLineWidth(CAxisShape::AT_X, *m_axisLineLengthAttrPtr);
+		m_axisShape.SetAxisLineWidth(CAxisShape::AT_Y, *m_axisLineLengthAttrPtr);
+		m_axisShape.SetAxisLineWidth(CAxisShape::AT_Z, *m_axisLineLengthAttrPtr);
+		
+		m_axisShape.SetAxisLabel(CAxisShape::AT_X, *m_xAxisLabelAttrPtr);
+		m_axisShape.SetAxisLabel(CAxisShape::AT_Y, *m_yAxisLabelAttrPtr);
+		m_axisShape.SetAxisLabel(CAxisShape::AT_Z, *m_zAxisLabelAttrPtr);
+
 		m_axisShape.SetVisible(*m_defaultShowAxisAttrPtr);
 		scenePtr->AddShapeToScene(&m_axisShape);
 

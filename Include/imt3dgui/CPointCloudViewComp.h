@@ -30,6 +30,16 @@ public:
 		I_ASSIGN(m_showInfoBoxAttrPtr, "ShowInfoBox", "Show info box if enabled", true, false);
 		I_ASSIGN(m_defaultShowAxisAttrPtr, "ShowAxis", "If enabled, the axes are shown", true, true);
 		I_ASSIGN(m_defaultShowGridAttrPtr, "ShowGrid", "If enabled, the grid is shown", true, true);
+		I_ASSIGN(m_xRangeMinAttrPtr, "XRangeMin", "Minimum value on the X-axis", true, 0.0);
+		I_ASSIGN(m_xRangeMaxAttrPtr, "XRangeMax", "Maximum value on the X-axis", true, 1.0);
+		I_ASSIGN(m_yRangeMinAttrPtr, "YRangeMin", "Minimum value on the Y-axis", true, 0.0);
+		I_ASSIGN(m_yRangeMaxAttrPtr, "YRangeMax", "Maximum value on the Y-axis", true, 1.0);
+		I_ASSIGN(m_zRangeMinAttrPtr, "ZRangeMin", "Minimum value on the Z-axis", true, 0.0);
+		I_ASSIGN(m_zRangeMaxAttrPtr, "ZRangeMax", "Maximum value on the Z-axis", true, 1.0);
+		I_ASSIGN(m_axisLineLengthAttrPtr, "AxisLengthWidth", "Width of the axis line", true, 4.0);
+		I_ASSIGN(m_xAxisLabelAttrPtr, "XAxisLabel", "Label of the X-axis", true, "X");
+		I_ASSIGN(m_yAxisLabelAttrPtr, "YAxisLabel", "Label of the Y-axis", true, "Y");
+		I_ASSIGN(m_zAxisLabelAttrPtr, "ZAxisLabel", "Label of the Z-axis", true, "Z");
 	I_END_COMPONENT
 
 protected:
@@ -65,6 +75,16 @@ private:
 	I_ATTR(bool, m_showInfoBoxAttrPtr);
 	I_ATTR(bool, m_defaultShowAxisAttrPtr);
 	I_ATTR(bool, m_defaultShowGridAttrPtr);
+	I_ATTR(double, m_xRangeMinAttrPtr);
+	I_ATTR(double, m_xRangeMaxAttrPtr);
+	I_ATTR(double, m_yRangeMinAttrPtr);
+	I_ATTR(double, m_yRangeMaxAttrPtr);
+	I_ATTR(double, m_zRangeMinAttrPtr);
+	I_ATTR(double, m_zRangeMaxAttrPtr);
+	I_ATTR(double, m_axisLineLengthAttrPtr);
+	I_TEXTATTR(m_xAxisLabelAttrPtr);
+	I_TEXTATTR(m_yAxisLabelAttrPtr);
+	I_TEXTATTR(m_zAxisLabelAttrPtr);
 };
 
 

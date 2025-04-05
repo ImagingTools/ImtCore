@@ -4,7 +4,6 @@ include($(ACFCONFIGDIR)/QMake/ApplicationConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
-
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liqtmeas -lAcfSlnLoc -lAcfLoc
@@ -16,6 +15,7 @@ QT += xml
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += printsupport
+greaterThan(QT_MAJOR_VERSION, 5): QT += openglwidgets
 
 # Set OS-specific build options:
 win32-msvc*{

@@ -31,7 +31,10 @@ void CMeshViewComp::OnGuiCreated()
 		m_gridShape.SetVisible(*m_defaultShowGridAttrPtr);
 		scenePtr->AddShapeToScene(&m_gridShape);
 
-		m_axisShape.SetAxisLength(3.0);
+		m_axisShape.SetAxisLength(CAxisShape::AT_X, 2.0);
+		m_axisShape.SetAxisLength(CAxisShape::AT_Y, 2.0);
+		m_axisShape.SetAxisLength(CAxisShape::AT_Z, 2.0);
+
 		m_axisShape.SetVisible(*m_defaultShowAxisAttrPtr);
 		scenePtr->AddShapeToScene(&m_axisShape);
 

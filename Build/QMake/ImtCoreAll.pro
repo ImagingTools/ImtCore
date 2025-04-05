@@ -414,6 +414,10 @@ SUBDIRS += ImtServerAppPck
 ImtServerAppPck.file = ../../Impl/ImtServerAppPck/QMake/ImtServerAppPck.pro
 ImtServerAppPck.depends = imtserverapp
 
+SUBDIRS += EagleView
+EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
+EagleView.depends = imt3dgui
+
 # SUBDIRS += ImtControlsGallery
 # ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
 # ImtControlsGallery.depends = imtgui imtqml imtstyle imtstylecontrolsqml
