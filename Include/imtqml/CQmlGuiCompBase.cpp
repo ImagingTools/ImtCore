@@ -1,6 +1,10 @@
 #include <imtqml/CQmlGuiCompBase.h>
 
 
+// Qt includes
+#include <QtQml/QQmlEngine>
+
+
 namespace imtqml
 {
 
@@ -20,7 +24,7 @@ bool CQmlGuiCompBase::IsGuiCreated() const
 }
 
 
-bool CQmlGuiCompBase::CreateGui(QWidget *parentPtr)
+bool CQmlGuiCompBase::CreateGui(QWidget* parentPtr)
 {
 	if (m_quickWidget == nullptr){
 #if QT_VERSION > 0x060000
@@ -28,18 +32,24 @@ bool CQmlGuiCompBase::CreateGui(QWidget *parentPtr)
 #endif
 		m_quickWidget = new QQuickWidget(parentPtr);
 		m_quickWidget->setContentsMargins(0, 0, 0, 0);
-		m_quickWidget->setSource(QUrl("qrc:/qml/WrapItem.qml"));
+		
+		m_quickWidget->engine()->addImportPath("qrc:/qml");
 
-		BaseClass::CreateQuickItem(m_quickWidget->rootObject());
+		m_quickWidget->setSource(QUrl(*m_pathToQmlAttrPtr));
 
 		m_quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-	}
 
-	if (parentPtr != nullptr) {
-		QLayout* layoutPtr = parentPtr->layout();
-		if (layoutPtr != nullptr) {
-			layoutPtr->addWidget(m_quickWidget);
+		if (parentPtr != nullptr) {
+			QLayout* layoutPtr = parentPtr->layout();
+			if (layoutPtr != nullptr) {
+				layoutPtr->addWidget(m_quickWidget);
+			}
 		}
+
+		OnGuiCreated();
+	}
+	else{
+		Q_ASSERT(false);
 	}
 
 	return  m_quickWidget != nullptr;
@@ -49,8 +59,6 @@ bool CQmlGuiCompBase::CreateGui(QWidget *parentPtr)
 bool CQmlGuiCompBase::DestroyGui()
 {
 	if (m_quickWidget != nullptr){
-		BaseClass::DestroyQuickItem();
-
 		m_quickWidget->deleteLater();
 
 		m_quickWidget = nullptr;
@@ -80,6 +88,11 @@ void CQmlGuiCompBase::OnTryClose(bool* ignoredPtr)
 
 // protected methods
 
+void CQmlGuiCompBase::OnGuiCreated()
+{
+}
+
+
 // reimplemented (ibase::TDesignSchemaHandlerWrap)
 
 void CQmlGuiCompBase::OnDesignSchemaChanged(const QByteArray & themeId)
@@ -92,6 +105,7 @@ void CQmlGuiCompBase::OnDesignSchemaChanged(const QByteArray & themeId)
 		m_visualStatus.m_statusIcon = GetIcon(*m_defaultStatusIconPathAttrPtr);
 	}
 }
+
 
 // reimplemented (icomp::CComponentBase)
 

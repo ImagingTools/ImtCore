@@ -6,6 +6,7 @@
 #include <QtWidgets/QVBoxLayout>
 
 // ACF includes
+#include <icomp/CComponentBase.h>
 #include <iqtgui/IVisualStatus.h>
 #include <iqtgui/IGuiObject.h>
 #include <iqtgui/TMakeIconProviderCompWrap.h>
@@ -22,11 +23,11 @@ namespace imtqml
 	Base class for IGuiObject implementation based on QML quick object.
 */
 class CQmlGuiCompBase:
-			public iqtgui::TMakeIconProviderCompWrap<CQuickObjectCompBase>,
+			public iqtgui::TMakeIconProviderCompWrap<icomp::CComponentBase>,
 			virtual public iqtgui::IGuiObject
 {
 public:
-	typedef iqtgui::TMakeIconProviderCompWrap<CQuickObjectCompBase> BaseClass;
+	typedef iqtgui::TMakeIconProviderCompWrap<icomp::CComponentBase> BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CQmlGuiCompBase);
 		I_REGISTER_INTERFACE(iqtgui::IGuiObject);
@@ -36,6 +37,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE_T(VisualStatus, imod::IModel, ExtractVisualStatus);
 		I_ASSIGN(m_defaultStatusIconPathAttrPtr, "DefaultStatusIcon", "Path of status icon used by default", false, "");
 		I_ASSIGN(m_defaultStatusTextAttrPtr, "DefaultStatusText", "Status text used by default", true, "");
+		I_ASSIGN(m_pathToQmlAttrPtr, "QmlFilePath", "This path used for load QML file", true, "");
 	I_END_COMPONENT;
 
 	CQmlGuiCompBase();
@@ -48,6 +50,8 @@ public:
 	virtual void OnTryClose(bool* ignoredPtr = NULL) override;
 	
 protected:
+	virtual void OnGuiCreated();
+
 	// reimplemented (ibase::TDesignSchemaHandlerWrap)
 	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
 
@@ -80,9 +84,12 @@ protected:
 	I_ATTR(QString, m_defaultStatusIconPathAttrPtr);
 	I_TEXTATTR(m_defaultStatusTextAttrPtr);
 
-	QQuickWidget* m_quickWidget;
+	QQuickWidget* m_quickWidget = nullptr;
 
 	imod::TModelWrap<VisualStatus> m_visualStatus;
+
+private:
+	I_ATTR(QString, m_pathToQmlAttrPtr);
 };
 
 

@@ -9,12 +9,13 @@ namespace imtqml
 
 // reimplemented (CQuickObjectCompBase)
 
-void CQmlModelEditorCompBase::OnItemCreated()
+void CQmlModelEditorCompBase::OnGuiCreated()
 {
-	Q_ASSERT(BaseClass::GetQuickItem());
+	Q_ASSERT(m_quickWidget != nullptr);
+	Q_ASSERT(m_quickWidget->rootObject() != nullptr);
 
 	bool retVal = connect(
-				BaseClass::GetQuickItem(),
+				m_quickWidget->rootObject(),
 				SIGNAL(representationChanged()),
 				this,
 				SLOT(OnRepresentationChanged()));

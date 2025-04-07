@@ -43,8 +43,8 @@ protected:
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
-	// reimplemented (CQuickObjectCompBase)
-	virtual void OnItemCreated() override;
+	// reimplemented (CQmlModelEditorCompBase)
+	virtual void OnGuiCreated() override;
 
 protected:
 	class UpdateBlocker
@@ -93,7 +93,7 @@ inline void TQmlModelEditorCompBase<ModelInterface>::OnUpdate(const istd::IChang
 	ModelInterface* objectPtr = BaseClass2::GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	QQuickItem* quickItemPtr = BaseClass::GetQuickItem();
+	QQuickItem* quickItemPtr = m_quickWidget->rootObject();
 	if (quickItemPtr != nullptr){
 		QJsonDocument jsonDoc = CreateRepresentationFromObject(*objectPtr);
 		if (jsonDoc.isObject()){
@@ -112,9 +112,9 @@ inline void TQmlModelEditorCompBase<ModelInterface>::OnUpdate(const istd::IChang
 // reimplemented (CQuickObjectCompBase)
 
 template<typename ModelInterface>
-inline void TQmlModelEditorCompBase<ModelInterface>::OnItemCreated()
+inline void TQmlModelEditorCompBase<ModelInterface>::OnGuiCreated()
 {
-	BaseClass::OnItemCreated();
+	BaseClass::OnGuiCreated();
 
 	if (m_isUpdatePending){
 		m_isUpdatePending = false;
@@ -147,7 +147,7 @@ inline void TQmlModelEditorCompBase<ModelInterface>::OnRepresentationChanged()
 	ModelInterface* objectPtr = BaseClass2::GetObservedObject();
 	Q_ASSERT(objectPtr != nullptr);
 
-	QQuickItem* quickItemPtr = BaseClass::GetQuickItem();
+	QQuickItem* quickItemPtr = m_quickWidget->rootObject();
 	if (quickItemPtr != nullptr){
 		QVariant var;
 		if (QMetaObject::invokeMethod(

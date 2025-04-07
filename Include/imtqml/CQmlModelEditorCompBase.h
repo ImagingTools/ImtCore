@@ -16,8 +16,8 @@ public:
 	typedef CQmlGuiCompBase BaseClass;
 
 protected:
-	// reimplemented (CQuickObjectCompBase)
-	virtual void OnItemCreated() override;
+	// reimplemented (CQmlGuiCompBase)
+	virtual void OnGuiCreated() override;
 
 protected Q_SLOTS:
 	virtual void OnRepresentationChanged();
