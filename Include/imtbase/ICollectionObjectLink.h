@@ -32,7 +32,7 @@ public:
 
 			dataObject.reset(objectPtr.PopPtr());
 
-			return true;
+			return (dataObject != nullptr);
 		}
 
 		return false;
