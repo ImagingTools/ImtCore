@@ -60,6 +60,7 @@ Rectangle {
 	property alias contentY: elementsListObj.contentY;
 	property alias elementsListWidth: elementsListObj.width;
 	property alias elementsCount: elementsListObj.count;
+	property alias reuseItems: elementsListObj.reuseItems
 
 	property alias headerDelegate: headersList.delegate;
 	property real headerElementWidth:  (headersList.width)/headersList.count;

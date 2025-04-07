@@ -2,62 +2,76 @@ import QtQuick 2.12
 import Acf 1.0
 
 Rectangle {
-    id: root;
+	id: root;
 
-    color: Style.backgroundColor;
+	color: Style.backgroundColor;
 
-    property int indicatorSize: 50;
+	property int indicatorSize: 50;
 
-    function start(){
-        root.visible = true;
-    }
+	function start(){
+		root.visible = true;
+	}
 
-    function stop(){
-        root.visible = false;
-    }
+	function stop(){
+		root.visible = false;
+	}
 
-    Item { // square
-        id: square;
+	Item { // square
+		id: square;
 
-        z: root.z + 1;
+		z: root.z + 1;
 
-        anchors.centerIn: parent
-        property double minimum: Math.min(root.width, root.height);
-        width: root.indicatorSize;
-        height: width;
+		anchors.centerIn: parent
+		property double minimum: Math.min(root.width, root.height);
+		width: root.indicatorSize;
+		height: width;
 
-        Repeater {
-            id: repeater;
+		Repeater {
+			id: repeater;
 
-            model: 8;
+			model: 8;
 
-            delegate: Rectangle{
-                color: Style.textColor;
+			delegate: Rectangle{
+				color: Style.textColor;
 
-                property double b: 0.1;
-                property double a: 0.25;
+				property double b: 0.1;
+				property double a: 0.25;
 
-                width: repeater.count == 0 ? square.height : ((b - a) / repeater.count * index + a) * square.height;
-                height: width;
-                radius: 0.5 * height;
+				width: repeater.count == 0 ? square.height : ((b - a) / repeater.count * index + a) * square.height;
+				height: width;
+				radius: 0.5 * height;
 
-                x: 0.5 * square.width  + 0.5 * (square.width  - width )  * Math.cos(2 * Math.PI / repeater.count * model.index) - 0.5 * width;
-                y: 0.5 * square.height - 0.5 * (square.height - height)  * Math.sin(2 * Math.PI / repeater.count * model.index) - 0.5 * height;
-            }
-        }
-    }
+				x: 0.5 * square.width  + 0.5 * (square.width  - width )  * Math.cos(2 * Math.PI / repeater.count * model.index) - 0.5 * width;
+				y: 0.5 * square.height - 0.5 * (square.height - height)  * Math.sin(2 * Math.PI / repeater.count * model.index) - 0.5 * height;
+			}
+		}
+	}
 
-    MouseArea {
-        anchors.fill: parent;
-    }
+	MouseArea {
+		anchors.fill: parent;
+		hoverEnabled: true;
+		preventStealing: true;
+		acceptedButtons: Qt.AllButtons
 
-    Timer {
-        interval: 10;
-        running: root.visible;
-        repeat:  true;
+		onWheel: {
+			wheel.accepted = true;
+		}
+		onClicked: {
+			mouse.accepted = true;
+		}
+		onReleased: {}
+		onPressAndHold: {}
+		onPressed: {}
+		onPositionChanged: {}
+	}
 
-        onTriggered: {
-            square.rotation += 2; // degrees
-        }
-    }
+	Timer {
+		interval: 10;
+		running: root.visible;
+		repeat:  true;
+
+		onTriggered: {
+			square.rotation += 2; // degrees
+		}
+	}
 }

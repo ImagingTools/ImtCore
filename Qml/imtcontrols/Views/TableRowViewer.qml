@@ -46,6 +46,10 @@ Row {
 						}
 					}
 
+					if (contentComp === dataList.rowDelegate.tableItem.cellDelegate){
+						console.log("TableRowView error!!!!")
+					}
+
 					loader.sourceComponent = contentComp;
 
 				}
