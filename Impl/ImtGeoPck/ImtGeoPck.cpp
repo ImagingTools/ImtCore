@@ -14,6 +14,14 @@ I_EXPORT_PACKAGE(
 	"Geo component package",
 	IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
+
+// models
+
+I_EXPORT_COMPONENT(
+	PositionInfo,
+	"Position",
+	"Position");
+
 I_EXPORT_COMPONENT(
 	AddressElementInfo,
 	"Address element",
@@ -28,6 +36,8 @@ I_EXPORT_COMPONENT(
 	ClusterInfo,
 	"Map cluster",
 	"Map cluster");
+
+// components
 
 I_EXPORT_COMPONENT(
 	AddressElementDatabaseDelegate,
