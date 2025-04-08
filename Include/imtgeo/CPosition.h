@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Qt includes
 #include <QtPositioning/QGeoCoordinate>
 
@@ -7,54 +8,42 @@
 #include <imtbase/TIdentifiableWrap.h>
 #include <imtgeo/IPosition.h>
 
+
 namespace imtgeo
 {
 /**
-    Class for describing the coordinates of an object with id.
+	Class for describing the coordinates of an object with id.
 */
 class CPosition: virtual public imtgeo::IPosition
 {
 public:
+	CPosition();
+	~CPosition();
 
-    CPosition();
+	// reimplemented (imtgeo::IPosition)
+	virtual double GetLatitude() const override;
+	virtual void SetLatitude(double lat) override;
+	virtual double GetLongitude() const override;
+	virtual void SetLongitude(double lon) override;
 
-    ~CPosition();
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
 
-    // reimplemented (imtgeo::IPosition)
-	/**
-        Get latitude of object.
-	*/
-    virtual double GetLatitude() const override;
-
-	/**
-        Set latitude of object.
-	*/
-    virtual void SetLatitude(double lat) override;
-
-	/**
-        Get longitude of object.
-	*/
-    virtual double GetLongitude() const override;
-
-	/**
-        Set longitude of object.
-	*/
-    virtual void SetLongitude(double lon) override;
-
-    // reimplemented (iser::ISerializable)
-    virtual bool Serialize(iser::IArchive& archive) override;
-
+	// reimplemented (istd::IChangeable)
+	virtual int GetSupportedOperations() const override;
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const override;
+	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
-
-    double m_latitude = 0.0;
-    double m_longitude = 0.0;
-
+	double m_latitude;
+	double m_longitude;
 };
+
 
 typedef imtbase::TIdentifiableWrap<CPosition> CPositionIdentifiable;
 
 
 } // namespace imtgeo
-
 
