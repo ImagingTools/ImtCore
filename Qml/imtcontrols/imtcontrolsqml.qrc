@@ -173,31 +173,33 @@
         <file alias="imtcontrols/Views/TooltipArea.qml">Views/TooltipArea.qml</file>
         <file alias="imtcontrols/Views/TableViewParams.qml">Views/TableViewParams.qml</file>
 		<file alias="imtcontrols/Views/TableRowCanvasViewer.qml">Views/TableRowCanvasViewer.qml</file>
-		<file alias="imtcontrols/Views/GraphicsView.qml">Views/GraphicsView.qml</file>
-		<file alias="imtcontrols/Views/GraphicsLayer.qml">Views/GraphicsLayer.qml</file>
-		<file alias="imtcontrols/Views/GraphicsShape.qml">Views/GraphicsShape.qml</file>
 
-		<file alias="imtcontrols/Views/GraphicsPolygonShape.qml">Views/GraphicsPolygonShape.qml</file>
-		<file alias="imtcontrols/Views/GraphicsRectangleShape.qml">Views/GraphicsRectangleShape.qml</file>
-		<file alias="imtcontrols/Views/GraphicsCircleShape.qml">Views/GraphicsCircleShape.qml</file>
-		<file alias="imtcontrols/Views/GraphicsLineShape.qml">Views/GraphicsLineShape.qml</file>
-		<file alias="imtcontrols/Views/GraphicsArcShape.qml">Views/GraphicsArcShape.qml</file>
-		<file alias="imtcontrols/Views/GraphicsBezierCurveShape.qml">Views/GraphicsBezierCurveShape.qml</file>
-		<file alias="imtcontrols/Views/GraphicsQuadraticCurveShape.qml">Views/GraphicsQuadraticCurveShape.qml</file>
-		<file alias="imtcontrols/Views/GraphicsTextShape.qml">Views/GraphicsTextShape.qml</file>
-		<file alias="imtcontrols/Views/GraphicsImageShape.qml">Views/GraphicsImageShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/GraphicsView.qml">GraphicsView/GraphicsView.qml</file>
+		<file alias="imtcontrols/GraphicsView/GraphicsLayer.qml">GraphicsView/GraphicsLayer.qml</file>
+		<file alias="imtcontrols/GraphicsView/GraphicsShape.qml">GraphicsView/GraphicsShape.qml</file>
 
-		<file alias="imtcontrols/Views/GraphicsPolygonParams.qml">Views/GraphicsPolygonParams.qml</file>
-		<file alias="imtcontrols/Views/GraphicsRectangleParams.qml">Views/GraphicsRectangleParams.qml</file>
-		<file alias="imtcontrols/Views/GraphicsCircleParams.qml">Views/GraphicsCircleParams.qml</file>
-		<file alias="imtcontrols/Views/GraphicsLineParams.qml">Views/GraphicsLineParams.qml</file>
-		<file alias="imtcontrols/Views/GraphicsArcParams.qml">Views/GraphicsArcParams.qml</file>
-		<file alias="imtcontrols/Views/GraphicsBezierCurveParams.qml">Views/GraphicsBezierCurveParams.qml</file>
-		<file alias="imtcontrols/Views/GraphicsQuadraticCurveParams.qml">Views/GraphicsQuadraticCurveParams.qml</file>
-		<file alias="imtcontrols/Views/GraphicsTextParams.qml">Views/GraphicsTextParams.qml</file>
-		<file alias="imtcontrols/Views/GraphicsImageParams.qml">Views/GraphicsImageParams.qml</file>
+		<file alias="imtcontrols/GraphicsView/PolygonShape.qml">GraphicsView/PolygonShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/RectangleShape.qml">GraphicsView/RectangleShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/CircleShape.qml">GraphicsView/CircleShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/LineShape.qml">GraphicsView/LineShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/ArcShape.qml">GraphicsView/ArcShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/BezierCurveShape.qml">GraphicsView/BezierCurveShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/QuadraticCurveShape.qml">GraphicsView/QuadraticCurveShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/TextShape.qml">GraphicsView/TextShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/ImageShape.qml">GraphicsView/ImageShape.qml</file>
 
-		<file alias="imtcontrols/Views/GraphicsComplexShape.qml">Views/GraphicsComplexShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/PolygonParams.qml">GraphicsView/PolygonParams.qml</file>
+		<file alias="imtcontrols/GraphicsView/RectangleParams.qml">GraphicsView/RectangleParams.qml</file>
+		<file alias="imtcontrols/GraphicsView/CircleParams.qml">GraphicsView/CircleParams.qml</file>
+		<file alias="imtcontrols/GraphicsView/LineParams.qml">GraphicsView/LineParams.qml</file>
+		<file alias="imtcontrols/GraphicsView/ArcParams.qml">GraphicsView/ArcParams.qml</file>
+		<file alias="imtcontrols/GraphicsView/BezierCurveParams.qml">GraphicsView/BezierCurveParams.qml</file>
+		<file alias="imtcontrols/GraphicsView/QuadraticCurveParams.qml">GraphicsView/QuadraticCurveParams.qml</file>
+		<file alias="imtcontrols/GraphicsView/TextParams.qml">GraphicsView/TextParams.qml</file>
+		<file alias="imtcontrols/GraphicsView/ImageParams.qml">GraphicsView/ImageParams.qml</file>
+
+		<file alias="imtcontrols/GraphicsView/ComplexShape.qml">GraphicsView/ComplexShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/SelectionShape.qml">GraphicsView/SelectionShape.qml</file>
 
     </qresource>
     <qresource prefix="/"/>
