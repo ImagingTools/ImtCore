@@ -120,8 +120,15 @@ class ListModel extends QtObject {
         // this.$notify()
         // this.dataChanged(index)
     }
-    move(from, to, n){
+    move(from, to, n = 1){
+        let data = this.getStatement('data').get()
+        data.splice(to, 0, ...data.splice(from, n))
 
+        for(let i = 0; i < data.length; i++){
+            data[i].index = i
+        }
+        
+        this.$emitDataChanged(from, from+n, 'move')
     }
     remove(index, count = 1){
         this.getStatement('data').get().splice(index, count)

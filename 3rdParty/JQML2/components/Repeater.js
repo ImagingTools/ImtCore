@@ -54,8 +54,24 @@ class Repeater extends Item {
                     delete this.$items[k]
                 }
             }
+        } 
+        else if(roles === 'move'){
+            for(let i = leftTop; i < bottomRight; i++){
+                let from = i
+                let to = this.$items[i].index
+
+                let fromItem = this.$items[from]
+                let toItem = this.$items[to]
+
+                let toModel = this.getPropertyValue('model').getPropertyValue('data')[from]
+                let fromModel = this.getPropertyValue('model').getPropertyValue('data')[to]
+
+                fromItem.model_ = toModel
+                if(fromItem.model instanceof QModelData) fromItem.model = toModel
+                toItem.model_ = fromModel
+                if(toItem.model instanceof QModelData) toItem.model = fromModel
+            }
         }
-        // console.log('DEBUG:::', leftTop, bottomRight, roles)
     }
     $disconnectModel(){
         if(this.$model && this.$model instanceof ListModel && this.$model.UID){

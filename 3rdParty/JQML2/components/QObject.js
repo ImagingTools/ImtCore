@@ -88,7 +88,7 @@ class QObject extends ComplexObject {
 
                 this.getStatement('model').reset(exModel)
                 this.getStatement('model_').reset(exModel)
-                this.getStatement('index').setCompute(()=>{return exModel.index})
+                this.getStatement('index').setCompute(()=>{return this.model_.index})
                 this.getStatement('index').update()
             }
             

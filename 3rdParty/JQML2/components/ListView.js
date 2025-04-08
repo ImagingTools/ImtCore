@@ -249,7 +249,7 @@ class ListView extends Flickable {
     }
 
     $transaction(sender, changeset){
-        if(changeset && sender === this.getPropertyValue('model') && sender.getPropertyValue('count') !== this.getPropertyValue('count')){
+        if(changeset && sender === this.getPropertyValue('model')){
             let model = this.getPropertyValue('model')
             let length = 0 
             if(model instanceof ListModel){     
@@ -268,39 +268,58 @@ class ListView extends Flickable {
                 let bottomRight = change[1]
                 let roles = change[2]
 
-                if(roles === 'append'){
+                if(countChanged){
+                    if(roles === 'append'){
 
-                } else if(roles === 'insert'){
+                    } else if(roles === 'insert'){
+                        for(let i = leftTop; i < bottomRight; i++){
+                            this.$items.splice(i, 0, undefined)
+                            let info = this.$getItemInfo(i)
+                            if(info.inner && !info.exist){
+                                this.$createElement(i, info)
+                            }
+                        }
+                        for(let i = bottomRight; i < this.$items.length; i++){
+                            let info = this.$getItemInfo(i)
+                            if(!info.inner && info.exist){
+                                let removed = this.$items.splice(i, this.$items.length - i)
+                                for(let item of removed){
+                                    if(item) {
+                                        this.$toCache(item)
+                                    }
+                                } 
+                                break
+                            }
+                        }
+                    } else if(roles === 'remove'){
+                        let removed = this.$items.splice(leftTop, bottomRight - leftTop)
+    
+                        if(this.$items[leftTop] && removed.length){
+                            this.$items[leftTop].getProperty('x').reset(removed[0].getPropertyValue('x'))
+                            this.$items[leftTop].getProperty('y').reset(removed[0].getPropertyValue('y'))
+                        }
+    
+                        for(let item of removed){
+                            this.$toCache(item)
+                        } 
+                    }
+                }
+                if(roles === 'move'){
                     for(let i = leftTop; i < bottomRight; i++){
-                        this.$items.splice(i, 0, undefined)
-                        let info = this.$getItemInfo(i)
-                        if(info.inner && !info.exist){
-                            this.$createElement(i, info)
-                        }
+                        let from = i
+                        let to = this.$items[i].index
+        
+                        let fromItem = this.$items[from]
+                        let toItem = this.$items[to]
+        
+                        let toModel = this.getPropertyValue('model').getPropertyValue('data')[from]
+                        let fromModel = this.getPropertyValue('model').getPropertyValue('data')[to]
+        
+                        fromItem.model_ = toModel
+                        if(fromItem.model instanceof QModelData) fromItem.model = toModel
+                        toItem.model_ = fromModel
+                        if(toItem.model instanceof QModelData) toItem.model = fromModel
                     }
-                    for(let i = bottomRight; i < this.$items.length; i++){
-                        let info = this.$getItemInfo(i)
-                        if(!info.inner && info.exist){
-                            let removed = this.$items.splice(i, this.$items.length - i)
-                            for(let item of removed){
-                                if(item) {
-                                    this.$toCache(item)
-                                }
-                            } 
-                            break
-                        }
-                    }
-                } else if(roles === 'remove'){
-                    let removed = this.$items.splice(leftTop, bottomRight - leftTop)
-
-                    if(this.$items[leftTop] && removed.length){
-                        this.$items[leftTop].getProperty('x').reset(removed[0].getPropertyValue('x'))
-                        this.$items[leftTop].getProperty('y').reset(removed[0].getPropertyValue('y'))
-                    }
-
-                    for(let item of removed){
-                        this.$toCache(item)
-                    } 
                 }
             }
 
