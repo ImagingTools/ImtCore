@@ -28,8 +28,8 @@ bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*error
 			return false;
 		}
 		
-		if (response.Exists.has_value()){
-			return *response.Exists;
+		if (response.exists.has_value()){
+			return *response.exists;
 		}
 	}
 	

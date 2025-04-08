@@ -169,7 +169,7 @@ Item {
             // doNotCorrectPosition: comboBoxContainerGql.doNotCorrectPosition; !!!!!!!!!!!!
 
 //            function getCurrentText(index){
-//                return popup.model.getData("Name",index);
+//                return popup.model.getData("name",index);
 //            }
 //            Connections{
 //                target: comboBoxContainerGql;

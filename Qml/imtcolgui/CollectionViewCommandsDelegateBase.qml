@@ -126,7 +126,7 @@ ViewCommandsDelegateBase {
 				name = mimeType;
 			}
 
-			extensionModel.append({"Id": mimeType, "Name": name})
+			extensionModel.append({"id": mimeType, "name": name})
 		}
 	}
 
@@ -194,34 +194,34 @@ ViewCommandsDelegateBase {
 			if (canEdit){
 				let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-				collectionViewCommandsDelegate.contextMenuModel.setData("Id", "Edit", index);
-				collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Edit"), index);
-				collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "Icons/Edit", index);
+				collectionViewCommandsDelegate.contextMenuModel.setData("id", "Edit", index);
+				collectionViewCommandsDelegate.contextMenuModel.setData("name", qsTr("Edit"), index);
+				collectionViewCommandsDelegate.contextMenuModel.setData("icon", "Icons/Edit", index);
 			}
 
 			if (canRemove){
 				let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-				collectionViewCommandsDelegate.contextMenuModel.setData("Id", "Remove", index);
-				collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Remove"), index);
-				collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "Icons/Delete", index);
+				collectionViewCommandsDelegate.contextMenuModel.setData("id", "Remove", index);
+				collectionViewCommandsDelegate.contextMenuModel.setData("name", qsTr("Remove"), index);
+				collectionViewCommandsDelegate.contextMenuModel.setData("icon", "Icons/Delete", index);
 			}
 
 			if (canEdit){
 				if (collectionViewCommandsDelegate.canRename){
 					let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-					collectionViewCommandsDelegate.contextMenuModel.setData("Id", "Rename", index);
-					collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Rename"), index);
-					collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "", index);
+					collectionViewCommandsDelegate.contextMenuModel.setData("id", "Rename", index);
+					collectionViewCommandsDelegate.contextMenuModel.setData("name", qsTr("Rename"), index);
+					collectionViewCommandsDelegate.contextMenuModel.setData("icon", "", index);
 				}
 
 				if (collectionViewCommandsDelegate.canSetDescription){
 					let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
 
-					collectionViewCommandsDelegate.contextMenuModel.setData("Id", "SetDescription", index);
-					collectionViewCommandsDelegate.contextMenuModel.setData("Name", qsTr("Set Description"), index);
-					collectionViewCommandsDelegate.contextMenuModel.setData("Icon", "", index);
+					collectionViewCommandsDelegate.contextMenuModel.setData("id", "SetDescription", index);
+					collectionViewCommandsDelegate.contextMenuModel.setData("name", qsTr("Set Description"), index);
+					collectionViewCommandsDelegate.contextMenuModel.setData("icon", "", index);
 				}
 			}
 
@@ -436,7 +436,7 @@ ViewCommandsDelegateBase {
 			let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
 			if (indexes.length > 0){
 				let index = indexes[0];
-				let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("Id", index);
+				let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("id", index);
 				if (selectedId !== ""){
 					collectionViewCommandsDelegate.onExportDialogResult(selectedId, mimeType);
 				}
@@ -457,7 +457,7 @@ ViewCommandsDelegateBase {
 	function onRename(){
 		let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
 		if (indexes.length > 0){
-			let selectedName = collectionViewCommandsDelegate.collectionView.table.elements.getData("Name", indexes[0]);
+			let selectedName = collectionViewCommandsDelegate.collectionView.table.elements.getData("name", indexes[0]);
 			ModalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
 		}
 	}

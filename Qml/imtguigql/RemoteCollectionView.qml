@@ -15,7 +15,7 @@ CollectionView {
 	property string gqlGetListCommandId: root.collectionId + "List";
 
 	// Invisible fields that will be requested for collection
-	property var additionalFieldIds: ["Id", "Name"]
+	property var additionalFieldIds: ["id", "name"]
 
 	commandsControllerComp: Component {
 		GqlBasedCommandsController {
@@ -113,7 +113,7 @@ CollectionView {
 		if (selection.length === 1){
 			let index = selection[0];
 			let elementsModel = root.table.elements;
-			let elementId = elementsModel.getData("Id", index);
+			let elementId = elementsModel.getData("id", index);
 			metaInfoProvider.getMetaInfo(elementId);
 		}
 	}

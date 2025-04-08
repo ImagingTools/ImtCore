@@ -34,7 +34,7 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 			QString& /*errorMessage*/) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("Headers");
+	imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("headers");
 
 	QByteArray languageId;
 
@@ -52,7 +52,7 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 
 		int index = headersModelPtr->InsertNewItem();
 
-		headersModelPtr->SetData("Id", m_headersIdsAttrPtr[i], index);
+		headersModelPtr->SetData("id", m_headersIdsAttrPtr[i], index);
 
 		QString headerName = m_headersNamesAttrPtr[i];
 
@@ -62,11 +62,11 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 			headerName = headerNameTr;
 		}
 
-		headersModelPtr->SetData("Name", headerName, index);
+		headersModelPtr->SetData("name", headerName, index);
 	}
 
 	if (m_headersSearchByFilterAttrPtr.IsValid()){
-		imtbase::CTreeItemModel* searchModel = dataModelPtr->AddTreeModel("FilterSearch");
+		imtbase::CTreeItemModel* searchModel = dataModelPtr->AddTreeModel("filterSearch");
 		for (int i = 0; i < m_headersSearchByFilterAttrPtr.GetCount(); i++){
 			QString headerId = m_headersSearchByFilterAttrPtr[i];
 			if (!CheckHeaderPermission(headerId.toUtf8(), *gqlContextPtr)){
@@ -74,7 +74,7 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 			}
 
 			int index = searchModel->InsertNewItem();
-			searchModel->SetData("Id", m_headersSearchByFilterAttrPtr[i], index);
+			searchModel->SetData("id", m_headersSearchByFilterAttrPtr[i], index);
 		}
 	}
 

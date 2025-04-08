@@ -457,13 +457,13 @@ ViewBase {
 
         let index = licensesHeaders.insertNewItem();
 
-        licensesHeaders.setData("Id", LicenseDataTypeMetaInfo.s_licenseName, index);
-        licensesHeaders.setData("Name", qsTr("License Name"), index);
+        licensesHeaders.setData("id", LicenseDataTypeMetaInfo.s_licenseName, index);
+        licensesHeaders.setData("name", qsTr("License Name"), index);
 
         index = licensesHeaders.insertNewItem();
 
-        licensesHeaders.setData("Id", LicenseDataTypeMetaInfo.s_licenseId, index);
-        licensesHeaders.setData("Name", qsTr("License-ID"), index);
+        licensesHeaders.setData("id", LicenseDataTypeMetaInfo.s_licenseId, index);
+        licensesHeaders.setData("name", qsTr("License-ID"), index);
 
         licensesHeaders.refresh();
 
@@ -475,8 +475,8 @@ ViewBase {
 
         let index = featuresHeaders.insertNewItem();
 
-        featuresHeaders.setData("Id", FeatureItemTypeMetaInfo.s_featureName, index);
-        featuresHeaders.setData("Name", qsTr("Feature Name"), index);
+        featuresHeaders.setData("id", FeatureItemTypeMetaInfo.s_featureName, index);
+        featuresHeaders.setData("name", qsTr("Feature Name"), index);
 
         featuresHeaders.refresh();
 

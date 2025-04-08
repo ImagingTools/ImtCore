@@ -49,7 +49,7 @@ QtObject {
         }
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("id", i);
             if (currentCommandId == commandId){
                 let currentIsEnabled = commandsProviderContainer.commandsModel.GetData("IsEnabled", i);
                 if (currentIsEnabled !== isEnabled){
@@ -68,9 +68,9 @@ QtObject {
         }
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("id", i);
             if (currentCommandId === commandId){
-                commandsProviderContainer.commandsModel.SetData("Icon", icon, i);
+                commandsProviderContainer.commandsModel.SetData("icon", icon, i);
                 break;
             }
         }
@@ -82,9 +82,9 @@ QtObject {
         }
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("id", i);
             if (currentCommandId === commandId){
-                commandsProviderContainer.commandsModel.SetData("Name", commandName, i);
+                commandsProviderContainer.commandsModel.SetData("name", commandName, i);
                 break;
             }
         }
@@ -96,7 +96,7 @@ QtObject {
         }
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("id", i);
             if (currentCommandId === commandId){
                 commandsProviderContainer.commandsModel.SetData("Status", notification, i);
                 break;
@@ -110,7 +110,7 @@ QtObject {
         }
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("id", i);
             let isEnabled = commandsProviderContainer.commandsModel.GetData("IsEnabled", i);
 
             if (currentCommandId == commandId){
@@ -133,7 +133,7 @@ QtObject {
         }
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("id", i);
             if (currentCommandId === commandId){
                 return i;
             }

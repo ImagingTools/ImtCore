@@ -12,20 +12,20 @@ import {
 }
 
 input RolesListInput {
-	ProductId: ID!
+	productId: ID!
 	viewParams: CollectionViewParams
 }
 
 type RoleItem {
-	TypeId: ID!
-	Id: ID!
-	RoleName: String!
-	RoleId: ID
-	ProductId: ID
-	ParentRoles: ID
-	RoleDescription: String
-	Added: String
-	LastModified: String
+	typeId: ID!
+	id: ID!
+	roleName: String!
+	roleId: ID
+	productId: ID
+	parentRoles: ID
+	roleDescription: String
+	added: String
+	lastModified: String
 }
 
 type RolesListPayload {
@@ -34,26 +34,26 @@ type RolesListPayload {
 }
 
 type RoleData {
-	Id: ID
-	Name: String
-	Description: String
-	RoleId: ID
-	ProductId: ID
-	ParentRoles: ID
-	Permissions: ID
-	IsDefault: Bool
-	IsGuest: Bool
+	id: ID
+	name: String
+	description: String
+	roleId: ID
+	productId: ID
+	parentRoles: ID
+	permissions: ID
+	isDefault: Bool
+	isGuest: Bool
 }
 
 input RoleDataInput {
-	Id: ID!
-	ProductId: ID!
-	Item: RoleData!
+	id: ID!
+	productId: ID!
+	item: RoleData!
 }
 
 input RoleItemInput {
-	Id: ID!
-	ProductId: ID!
+	id: ID!
+	productId: ID!
 }
 
 type Query {

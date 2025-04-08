@@ -41,16 +41,16 @@ ViewBase {
         productViewContainer.softwareHeadersModel.clear();
 
         let index = productViewContainer.softwareHeadersModel.insertNewItem();
-        productViewContainer.softwareHeadersModel.setData("Id", "FeatureName", index);
-        productViewContainer.softwareHeadersModel.setData("Name", qsTr("Feature Name"), index);
+        productViewContainer.softwareHeadersModel.setData("id", "FeatureName", index);
+        productViewContainer.softwareHeadersModel.setData("name", qsTr("Feature Name"), index);
 
         index = productViewContainer.softwareHeadersModel.insertNewItem();
-        productViewContainer.softwareHeadersModel.setData("Id", "FeatureId", index);
-        productViewContainer.softwareHeadersModel.setData("Name", qsTr("Feature-ID"), index);
+        productViewContainer.softwareHeadersModel.setData("id", "FeatureId", index);
+        productViewContainer.softwareHeadersModel.setData("name", qsTr("Feature-ID"), index);
 
         index = productViewContainer.softwareHeadersModel.insertNewItem();
-        productViewContainer.softwareHeadersModel.setData("Id", "FeatureDescription", index);
-        productViewContainer.softwareHeadersModel.setData("Name", qsTr("Description"), index);
+        productViewContainer.softwareHeadersModel.setData("id", "FeatureDescription", index);
+        productViewContainer.softwareHeadersModel.setData("name", qsTr("Description"), index);
 
         productViewContainer.softwareHeadersModel.refresh();
 
@@ -112,7 +112,7 @@ ViewBase {
             }
 
             for (let i = 0; i < productViewContainer.allFeaturesModel.getItemsCount(); i++){
-                let id = productViewContainer.allFeaturesModel.getData("Id", i);
+                let id = productViewContainer.allFeaturesModel.getData("id", i);
                 if (featureId === id){
                     let index = productViewContainer.productFeaturesViewModel.insertNewItem();
                     productViewContainer.productFeaturesViewModel.copyItemDataFromModel(index, productViewContainer.allFeaturesModel, i);
@@ -162,13 +162,13 @@ ViewBase {
         Component.onCompleted: {
             let index = modelCategogy.insertNewItem();
 
-            modelCategogy.setData("Id", "Software", index);
-            modelCategogy.setData("Name", "Software", index);
+            modelCategogy.setData("id", "Software", index);
+            modelCategogy.setData("name", "Software", index);
 
             index = modelCategogy.insertNewItem();
 
-            modelCategogy.setData("Id", "Hardware", index);
-            modelCategogy.setData("Name", "Hardware", index);
+            modelCategogy.setData("id", "Hardware", index);
+            modelCategogy.setData("name", "Hardware", index);
 
             categoryComboBox.model = modelCategogy;
         }
@@ -287,7 +287,7 @@ ViewBase {
                 onRootDelegateChanged: {
                     if (delegate.rootDelegate !== null){
                         let featureId = model.FeatureId;
-                        let rootFeatureUuid = delegate.rootDelegate.itemData.Id;
+                        let rootFeatureUuid = delegate.rootDelegate.itemData.id;
 
                         let id = rootFeatureUuid + "/" + featureId;
 
@@ -299,7 +299,7 @@ ViewBase {
 
                 onCheckStateChanged: {
                     let featureId = model.FeatureId;
-                    let rootFeatureUuid = delegate.rootDelegate.itemData.Id;
+                    let rootFeatureUuid = delegate.rootDelegate.itemData.id;
 
                     let id = rootFeatureUuid + "/" + featureId;
 

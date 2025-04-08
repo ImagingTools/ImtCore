@@ -23,7 +23,6 @@ CollectionViewCommandsDelegateBase {
 	property var documentValidatorsComp: [];
 	
 	Component.onCompleted: {
-		console.log("onCompleted", collectionId, documentManagerId);
 		let documentManager = MainDocumentManager.getDocumentManager(collectionViewCommandsDelegateBase.documentManagerId);
 		if (documentManager){
 			collectionViewCommandsDelegateBase.documentManager = documentManager;
@@ -112,9 +111,9 @@ CollectionViewCommandsDelegateBase {
 		let indexes = collectionViewCommandsDelegateBase.collectionView.table.getSelectedIndexes();
 		for (let i = 0; i < indexes.length; i++){
 			let index = indexes[i];
-			if (elementsModel.containsKey("Id", index)){
-				let itemId = elementsModel.getData("Id", index);
-				let typeId = elementsModel.getData("TypeId", index);
+			if (elementsModel.containsKey("id", index)){
+				let itemId = elementsModel.getData("id", index);
+				let typeId = elementsModel.getData("typeId", index);
 
 				if (documentTypeIds.length === 0){
 					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeId, viewTypeId);
@@ -142,8 +141,8 @@ CollectionViewCommandsDelegateBase {
 		let indexes = collectionViewCommandsDelegateBase.collectionView.table.getSelectedIndexes();
 		if (indexes.length > 0){
 			let index = indexes[0];
-			if (elementsModel.containsKey("Id", index)){
-				let documentId = elementsModel.getData("Id", index);
+			if (elementsModel.containsKey("id", index)){
+				let documentId = elementsModel.getData("id", index);
 				ModalDialogManager.openDialog(documentRevisionDialogComp, {"documentId": documentId});
 			}
 		}
@@ -181,14 +180,14 @@ CollectionViewCommandsDelegateBase {
 
 			Component.onCompleted: {
 				if (PermissionsController.checkPermission("RestoreRevision")){
-					buttonsModel.append({Id: Enums.save, Name:qsTr("Set this revision"), Enabled: false})
+					addButton(Enums.save, qsTr("Set this revision"), false)
 				}
 
 				if (PermissionsController.checkPermission("DeleteRevision")){
-					buttonsModel.append({Id: Enums.no, Name:qsTr("Delete revision"), Enabled: false})
+					addButton(Enums.no, qsTr("Delete revision"), false)
 				}
 
-				buttonsModel.append({Id: Enums.cancel, Name:qsTr("Close"), Enabled: true})
+				addButton(Enums.cancel, qsTr("Close"), true)
 			}
 
 			onFinished: {
@@ -365,20 +364,20 @@ CollectionViewCommandsDelegateBase {
 								id: headersModel;
 								Component.onCompleted: {
 									let index = headersModel.insertNewItem();
-									headersModel.setData("Id", "m_user", index)
-									headersModel.setData("Name", qsTr("User"), index)
+									headersModel.setData("id", "m_user", index)
+									headersModel.setData("name", qsTr("User"), index)
 
 									index = headersModel.insertNewItem();
-									headersModel.setData("Id", "m_revision", index)
-									headersModel.setData("Name", qsTr("Revision"), index)
+									headersModel.setData("id", "m_revision", index)
+									headersModel.setData("name", qsTr("Revision"), index)
 
 									index = headersModel.insertNewItem();
-									headersModel.setData("Id", "m_isActive", index)
-									headersModel.setData("Name", qsTr("Active"), index)
+									headersModel.setData("id", "m_isActive", index)
+									headersModel.setData("name", qsTr("Active"), index)
 
 									index = headersModel.insertNewItem();
-									headersModel.setData("Id", "m_timestamp", index)
-									headersModel.setData("Name", qsTr("Time"), index)
+									headersModel.setData("id", "m_timestamp", index)
+									headersModel.setData("name", qsTr("Time"), index)
 
 									table.headers = headersModel;
 								}

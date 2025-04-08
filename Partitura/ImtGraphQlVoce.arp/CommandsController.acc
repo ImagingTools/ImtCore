@@ -150,10 +150,10 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CommandsController"/>
-        <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="GuiElementContainer"/>
-        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="GuiElementContainer"/>
+        <Interface InterfaceId="imtserverapp::IGuiElementContainer" ComponentId="GuiElementContainer"/>
+        <Interface InterfaceId="imtserverapp::IRepresentationController" ComponentId="GuiElementContainer"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="GuiElementContainer"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="CommandsController"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="GuiElementContainer"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

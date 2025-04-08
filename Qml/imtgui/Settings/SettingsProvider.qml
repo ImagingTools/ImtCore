@@ -29,8 +29,8 @@ QtObject {
 		function mergeWithExternModel(externModel){
 			if (externModel != undefined && externModel != null){
 				for (let i = 0; i < externModel.getItemsCount(); i++){
-					let pageId = externModel.getData("Id", i);
-					let pageName = externModel.getData("Name", i);
+					let pageId = externModel.getData("id", i);
+					let pageName = externModel.getData("name", i);
 					let pageParameters = externModel.getData("Parameters", i);
 					
 					let index = container.private_.getPageIndexByPageId(pageId)
@@ -38,8 +38,8 @@ QtObject {
 						index = container.private_.representationModel.insertNewItem();
 					}
 					
-					container.private_.representationModel.setData("Id", pageId, index);
-					container.private_.representationModel.setData("Name", pageName, index);
+					container.private_.representationModel.setData("id", pageId, index);
+					container.private_.representationModel.setData("name", pageName, index);
 					
 					if(pageParameters !== null){
 						let parametersModel = container.private_.representationModel.addTreeModel("Parameters", index);
@@ -51,7 +51,7 @@ QtObject {
 		
 		function getPageIndexByPageId(pageId){
 			for (let i = 0; i < container.private_.representationModel.getItemsCount(); i++){
-				let id = container.private_.representationModel.getData("Id", i);
+				let id = container.private_.representationModel.getData("id", i);
 				if (String(id) === String(pageId)){
 					return i;
 				}
@@ -66,12 +66,12 @@ QtObject {
 			}
 			
 			for (let i = 0; i < container.localModel.getItemsCount(); i++){
-				let id = String(container.localModel.getData("Id", i));
+				let id = String(container.localModel.getData("id", i));
 				if (id === rootKey){
 					let parametersModel = container.localModel.getData("Parameters", i)
 					if (parametersModel){
 						for (let j = 0; j < parametersModel.getItemsCount(); j++){
-							let parameterId = String(parametersModel.getData("Id", j));
+							let parameterId = String(parametersModel.getData("id", j));
 							if (parameterId === key){
 								parametersModel.setData("Value", value, j);
 								break;
@@ -90,12 +90,12 @@ QtObject {
 			}
 			
 			for (let i = 0; i < container.serverModel.getItemsCount(); i++){
-				let id = String(container.serverModel.getData("Id", i));
+				let id = String(container.serverModel.getData("id", i));
 				if (id === rootKey){
 					let parametersModel = container.serverModel.getData("Parameters", i)
 					if (parametersModel){
 						for (let j = 0; j < parametersModel.getItemsCount(); j++){
-							let parameterId = String(parametersModel.getData("Id", j));
+							let parameterId = String(parametersModel.getData("id", j));
 							if (parameterId === key){
 								parametersModel.setData("Value", value, j);
 								break;
@@ -112,7 +112,7 @@ QtObject {
 				return null;
 			}
 			for (let i = 0; i < container.serverModel.getItemsCount(); i++){
-				let id = String(container.serverModel.getData("Id", i));
+				let id = String(container.serverModel.getData("id", i));
 				if (id === rootKey){
 					let parametersModel = container.serverModel.getData("Parameters", i)
 					
@@ -173,16 +173,16 @@ QtObject {
 		
 		if (model){
 			for (let i = 0; i < model.getItemsCount(); i++){
-				let id = String(model.getData("Id", i));
+				let id = String(model.getData("id", i));
 				if (id == String("General")){
 					let parametersModel = model.getData("Parameters", i)
 					if (parametersModel){
 						for (let j = 0; j < parametersModel.getItemsCount(); j++){
-							let parameterId = String(parametersModel.getData("Id", j));
+							let parameterId = String(parametersModel.getData("id", j));
 							if (parameterId == String("DesignSchema")){
 								let languageParametersModel = parametersModel.getData("Parameters", j);
 								for (let k = 0; k < languageParametersModel.getItemsCount(); k++){
-									let langId = languageParametersModel.getData("Id", k);
+									let langId = languageParametersModel.getData("id", k);
 									if (String(langId) == String(schema)){
 										let currentValue = parametersModel.getData("Value", j)
 										if (currentValue === k){
@@ -221,17 +221,17 @@ QtObject {
 		
 		if (model){
 			for (let i = 0; i < model.getItemsCount(); i++){
-				let id = String(model.getData("Id", i));
+				let id = String(model.getData("id", i));
 				if (id == String("General")){
 					let parametersModel = model.getData("Parameters", i)
 					if (parametersModel){
 						for (let j = 0; j < parametersModel.getItemsCount(); j++){
-							let parameterId = String(parametersModel.getData("Id", j));
+							let parameterId = String(parametersModel.getData("id", j));
 							if (parameterId == String("Language")){
 								let languageParametersModel = parametersModel.getData("Parameters", j);
 								if (languageParametersModel){
 									for (let k = 0; k < languageParametersModel.getItemsCount(); k++){
-										let langId = languageParametersModel.getData("Id", k);
+										let langId = languageParametersModel.getData("id", k);
 										if (String(langId) == String(language)){
 											let currentValue = parametersModel.getData("Value", j)
 											if (currentValue === k){
@@ -285,10 +285,10 @@ QtObject {
 		}
 		
 		for (let i = 0; i < toModel.getItemsCount(); i++){
-			let pageId = toModel.getData("Id", i);
+			let pageId = toModel.getData("id", i);
 			let index = -1;
 			for (let j = 0; j < fromModel.getItemsCount(); j++){
-				let id = fromModel.getData("Id", j);
+				let id = fromModel.getData("id", j);
 				if (id == pageId){
 					index = j;
 					
@@ -310,7 +310,7 @@ QtObject {
 	
 	function findValue(model, parameterId){
 		for (let i = 0; i < model.getItemsCount(); i++){
-			let paramId = model.getData("Id", i);
+			let paramId = model.getData("id", i);
 			if (String(paramId) === String(parameterId)){
 				return model.getData("Value", i)
 			}

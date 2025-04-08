@@ -84,15 +84,15 @@ Rectangle {
 		anchors.bottomMargin: Style.sizeMainMargin;
 		
 		Component.onCompleted: {
-			buttons.addButton({"Id":Enums.apply, "Name": qsTr("Apply"), "Enabled": false});
-			buttons.addButton({"Id":Enums.ButtonType.Close, "Name": qsTr("Close"), "Enabled": true});
+			buttons.addButton({"id":Enums.apply, "name": qsTr("Apply"), "enabled": false});
+			buttons.addButton({"id":Enums.close, "name": qsTr("Close"), "enabled": true});
 		}
 		
 		onButtonClicked: {
 			if (buttonId == Enums.apply){
 				window.saveSettings(window.paramsSet.toJson());
 			}
-			else if (buttonId == Enums.ButtonType.Close){
+			else if (buttonId == Enums.close){
 				if (preferenceDialog.modelIsDirty){
 					ModalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
 				}
@@ -108,7 +108,7 @@ Rectangle {
 		
 		MessageDialog {
 			Component.onCompleted: {
-				buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
+				addButton(Enums.cancel, qsTr("Cancel"), true)
 			}
 			
 			onFinished: {

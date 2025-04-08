@@ -9,14 +9,12 @@ TableBase {
 		TableRowDelegate {
 			tableItem: tableContainer
 			minHeight: tableContainer.itemHeight
-			
-			readOnly: tableContainer.readOnly;
+			readOnly: tableContainer.readOnly
 		}
 	}
 	
 	cellDelegate: Component {
-		TableCellTextDelegate {
-		}
+		TableCellTextDelegate {}
 	}
 	
 	headerDelegate: Component {

@@ -12,7 +12,7 @@ FocusScope{
     height: 34;
 
     property var model;
-    property string nameId: "Name";
+    property string nameId: "name";
 
     property string currentText;
 

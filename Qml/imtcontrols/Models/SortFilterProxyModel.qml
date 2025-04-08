@@ -47,7 +47,7 @@ QtObject {
 			for (let j = 0; j < filterableFields.length; j++){
 				let id = filterableFields[j];
 				if (keys.includes(id)){
-					let itemId = sourceModel.getData("Id", i)
+					let itemId = sourceModel.getData("id", i)
 					let value = sourceModel.getData(id, i)
 					if (value.toLowerCase().indexOf(textFilter.toLowerCase()) >= 0){
 						let index = filteredModel.insertNewItem();

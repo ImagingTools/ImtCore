@@ -51,7 +51,7 @@ ViewCommandsDelegateBase {
             if (selectedIndex !== null){
                 let index = selectedIndex.index;
 
-                let featureId = container.view.tableView.rowModel.getData("Id", index);
+                let featureId = container.view.tableView.rowModel.getData("id", index);
                 container.view.removeFeature(featureId);
 
                 container.view.updateFeaturesGui();
@@ -65,7 +65,7 @@ ViewCommandsDelegateBase {
                 if (selectedIndexes.length > 0){
                     container.view.productData.beginChanges();
                     for (let i = 0; i < selectedIndexes.length; i++){
-                        let featureId = tableModel.getData("Id", selectedIndexes[i]);
+                        let featureId = tableModel.getData("id", selectedIndexes[i]);
                         container.view.addFeature(featureId);
                     }
                     container.view.productData.endChanges();

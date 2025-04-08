@@ -28,7 +28,7 @@ Item {
     }
 
     function addPage(pageId, pageName, pageComp){
-        pagesModel.append({Id: pageId, Name: pageName, SourceComponent: pageComp})
+        pagesModel.append({id: pageId, name: pageName, SourceComponent: pageComp})
     }
 
     function removePage(pageId){
@@ -58,7 +58,7 @@ Item {
 
     function getIndexById(pageId){
         for (let i = 0; i < pagesModel.count; i++){
-            let id = pagesModel.get(i).Id;
+            let id = pagesModel.get(i).id;
             if (id === pageId){
                 return i;
             }
@@ -131,7 +131,7 @@ Item {
                 boundsBehavior: Flickable.StopAtBounds;
 
                 delegate: ItemDelegate {
-                    text: model.Name;
+                    text: model.name;
 
                     highlighted: mainPanelRepeater.currentIndex == model.index;
 

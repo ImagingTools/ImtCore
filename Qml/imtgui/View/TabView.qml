@@ -37,7 +37,7 @@ Item {
 			waitName = false;
 		}
 
-		tabModel.append({Id: tabId, Name: tabName, SourceComponent: tabComp, Icon: icon, Description: description, WaitName: waitName})
+		tabModel.append({id: tabId, name: tabName, sourceComponent: tabComp, icon: icon, description: description, waitName: waitName})
 	}
 
 	function removeTab(tabId){
@@ -66,7 +66,7 @@ Item {
 			return;
 		}
 
-		tabModel.setProperty(index, "Description", description);
+		tabModel.setProperty(index, "description", description);
 	}
 
 	function setTabIcon(tabId, icon){
@@ -75,7 +75,7 @@ Item {
 			return;
 		}
 
-		tabModel.setProperty(index, "Icon", icon);
+		tabModel.setProperty(index, "icon", icon);
 	}
 
 	function setTabName(tabId, name){
@@ -84,7 +84,7 @@ Item {
 			return;
 		}
 
-		tabModel.setProperty(index, "Name", name);
+		tabModel.setProperty(index, "name", name);
 	}
 
 	function getTabName(tabId){
@@ -93,7 +93,7 @@ Item {
 			return "";
 		}
 
-		return tabModel.get(index).Name;
+		return tabModel.get(index).name;
 	}
 
 	function getTabByIndex(index){
@@ -107,7 +107,7 @@ Item {
 
 	function getIndexById(tabId){
 		for (let i = 0; i < tabModel.count; i++){
-			let id = tabModel.get(i).Id;
+			let id = tabModel.get(i).id;
 			if (id === tabId){
 				return i;
 			}
@@ -121,7 +121,7 @@ Item {
 			return "";
 		}
 
-		return tabModel.get(index).Id;
+		return tabModel.get(index).id;
 	}
 
 	function onCloseTab(index){
@@ -174,11 +174,11 @@ Item {
 			delegate: Loader {
 				id: bodyLoader;
 				anchors.fill: parent;
-				sourceComponent: model.SourceComponent;
+				sourceComponent: model.sourceComponent;
 				visible: tabPanel.selectedIndex == model.index;
 
 				onLoaded: {
-					root.tabLoaded(model.index, model.Id, item);
+					root.tabLoaded(model.index, model.id, item);
 				}
 
 				onStatusChanged: {

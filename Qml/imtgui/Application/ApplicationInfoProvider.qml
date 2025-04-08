@@ -24,6 +24,7 @@ QtObject {
             } }
 
         onFinished: {
+			console.log("onFinished", sdlObject.toJson())
             root.serverApplicationInfo = sdlObject;
 
             root.updated();

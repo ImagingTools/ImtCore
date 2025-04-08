@@ -14,6 +14,25 @@ Rectangle {
 
 	property DocumentManager documentManager;
 	
+	property ObjectVisualStatusProvider visualStatusProvider: ObjectVisualStatusProvider {}
+	
+	Connections {
+		target: root.visualStatusProvider
+		
+		function onVisualStatusReceived(objectId, icon, text, description){
+			console.log("onVisualStatusReceived", objectId, icon, text, description)
+			if (text == ""){
+				text = root.documentManager.defaultDocumentName
+			}
+
+			headersModel.setHeaderName(objectId, text)
+		}
+		
+		function onVisualStatusReceiveFailed(objectId, errorMessage){
+			headersModel.setHeaderName(objectId, root.documentManager.defaultDocumentName)
+		}
+	}
+	
 	Connections {
 		id: connections;
 		target: root.documentManager;
@@ -21,23 +40,15 @@ Rectangle {
 		function onDocumentSaved(documentId){
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
 			
-			let name = root.getViewName(documentId, typeId)
-			if (name == ""){
-				name = root.documentManager.defaultDocumentName
-			}
-			
-			root.setViewName(documentId, name);
+			root.visualStatusProvider.getVisualStatus(documentId, typeId)
 		}
 
 		function onDocumentAdded(documentId){
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
 			
-			let name = root.getViewName(documentId, typeId)
-			if (name == ""){
-				name = root.documentManager.defaultDocumentName
-			}
-
-			headersModel.addHeader(documentId, name)
+			headersModel.addHeader(documentId, "")
+			
+			root.visualStatusProvider.getVisualStatus(documentId, typeId)
 
 			let documentData = root.documentManager.getDocumentDataById(documentId);
 			if (documentData){
@@ -82,14 +93,6 @@ Rectangle {
 		stackView.push(viewComp);
 		headersModel.addHeader(UuidGenerator.generateUUID(), name)
 	}
-	
-	function setViewName(id, name){
-		headersModel.setHeaderName(id, name)
-	}
-	
-	function getViewName(id, typeId){
-		return ""
-	}
 
 	Item {
 		id: buttonPanel;
@@ -116,13 +119,12 @@ Rectangle {
 		id: headersModel;
 
 		function addHeader(id, name){
-			console.log("addHeader", id, name)
-			headersModel.append({Id: id, Name: name})
+			headersModel.append({id: id, name: name})
 		}
 
 		function getIndexById(id){
 			for (let i = 0; i < headersModel.count; i++){
-				if (headersModel.get(i).Id === id){
+				if (headersModel.get(i).id === id){
 					return i;
 				}
 			}
@@ -132,7 +134,7 @@ Rectangle {
 
 		function removeHeader(id){
 			for (let i = 0; i < headersModel.count; i++){
-				if (headersModel.get(i).Id === id){
+				if (headersModel.get(i).id === id){
 					headersModel.remove(i);
 					return;
 				}
@@ -143,8 +145,8 @@ Rectangle {
 			console.log("setHeaderName", id, name)
 			
 			for (let i = 0; i < headersModel.count; i++){
-				if (headersModel.get(i).Id === id){
-					headersModel.setProperty(i, "Name", name)
+				if (headersModel.get(i).id === id){
+					headersModel.setProperty(i, "name", name)
 					return;
 				}
 			}
@@ -153,14 +155,12 @@ Rectangle {
 		function getHeaderName(id){
 			let index = getIndexById(id);
 			if (index >= 0){
-				return headersModel.get(index).Name;
+				return headersModel.get(index).name;
 			}
 
 			return "";
 		}
 	}
-	
-
 
 	ListView {
 		id: headersListView;
@@ -207,7 +207,7 @@ Rectangle {
 					font.pixelSize: Style.fontSizeXXLarge;
 					font.family: Style.fontFamily;
 					color: Style.titleColor;
-					text: model.Name;
+					text: model.name;
 				}
 			}
 

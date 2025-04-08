@@ -8,7 +8,7 @@ Item{
 	property TableBase tableItem
 	property int columnCount: tableItem ? tableItem.columnCount : 0
 	property int columnIndex: model.index
-	property string headerId: model.Id;
+	property string headerId: model.id || model.Id || "";
 
 	property bool compl: false;
 	property bool complCompl: headerDelegate.compl && headerDelegate.tableItem;
@@ -232,7 +232,7 @@ Item{
 			Qt.openUrlExternally(link)
 		}
 
-		text: model.Name;
+		text: model.name || model.Name || "";
 	}
 
 	Text {
@@ -257,7 +257,7 @@ Item{
 		width: visible ? 12 : 0;
 		height: width;
 
-		visible: headerDelegate.tableItem.currentHeaderId === model.Id && headerDelegate.tableItem.hasSort;
+		visible: headerDelegate.tableItem.currentHeaderId === headerDelegate.headerId && headerDelegate.tableItem.hasSort;
 		rotation: headerDelegate.tableItem.currentSortOrder == "ASC" ? 180 : 0
 
 		sourceSize.width: width;
@@ -292,26 +292,26 @@ Item{
 		onClicked: {
 			if(headerDelegate.tableItem.hasSort || headerDelegate.tableItem.editableHeaderParams){
 				if (mouse.button === Qt.LeftButton) {
-					if(!headerDelegate.tableItem.nonSortableColumns.includes(model.Id)){
+					if(!headerDelegate.tableItem.nonSortableColumns.includes(headerDelegate.headerId)){
 						let currentHeaderId = headerDelegate.tableItem.currentHeaderId;
 						let currentSortOrder = headerDelegate.tableItem.currentSortOrder;
 						
 						let sortOrder = currentSortOrder
 
-						if (currentHeaderId !== model.Id){
+						if (currentHeaderId !== headerDelegate.headerId){
 							sortOrder = "ASC";
 						}
 						else{
 							sortOrder = currentSortOrder == "ASC" ? "DESC" : "ASC";
 						}
 						
-						headerDelegate.tableItem.setSortingInfo(model.Id, sortOrder);
+						headerDelegate.tableItem.setSortingInfo(headerDelegate.headerId, sortOrder);
 
-						headerDelegate.tableItem.headerClicked(model.Id);
+						headerDelegate.tableItem.headerClicked(headerDelegate.headerId);
 					}
 				}
 				else if (mouse.button === Qt.RightButton){
-					headerDelegate.tableItem.headerRightMouseClicked(model.Id);
+					headerDelegate.tableItem.headerRightMouseClicked(headerDelegate.headerId);
 				}
 			}
 		}
@@ -433,7 +433,7 @@ Item{
 					}
 
 					if(prevIndex >=0){
-						let prevHeaderId = headerDelegate.tableItem.headers.getData("Id", prevIndex);
+						let prevHeaderId = headerDelegate.tableItem.headers.getData("id", prevIndex);
 						headerDelegate.tableItem.tableViewParams.setHeaderSize(prevHeaderId, prevPercent)
 					}
 

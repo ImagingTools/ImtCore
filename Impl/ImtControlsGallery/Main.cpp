@@ -15,7 +15,7 @@
 #include <imtqml/CGqlRequest.h>
 #include <imtqml/CQmlProcess.h>
 #include <GeneratedFiles/ImtControlsGallery/CImtControlsGallery.h>
-
+#include <imtqml/CNetworkEventInterceptor.h>
 
 int main(int argc, char *argv[])
 {
@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
 	qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
 	qmlRegisterType<imtqml::CGqlRequest>("Acf", 1, 0, "GqlRequest");
 	qmlRegisterType<imtqml::CQmlProcess>("Acf", 1, 0, "Process");
+	qmlRegisterSingletonInstance<imtqml::CNetworkEventInterceptor>("Acf", 1, 0, "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 	qmlRegisterModule("QtGraphicalEffects", 1, 12);

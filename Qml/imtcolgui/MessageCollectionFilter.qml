@@ -9,11 +9,11 @@ CollectionFilter {
     }
 
     Component.onCompleted: {
-        filterableHeadersModel.setData("Id", "Text")
+        filterableHeadersModel.setData("id", "Text")
         let index = filterableHeadersModel.insertNewItem()
-        filterableHeadersModel.setData("Id", "Timestamp", index)
+        filterableHeadersModel.setData("id", "Timestamp", index)
         index = filterableHeadersModel.insertNewItem()
-        filterableHeadersModel.setData("Id", "Source", index)
+        filterableHeadersModel.setData("id", "Source", index)
         setFilteringInfoIds(filterableHeadersModel)
     }
 

@@ -200,8 +200,8 @@ ViewBase {
 							headersModel2.clear();
 							
 							let index = headersModel2.insertNewItem();
-							headersModel2.setData("Id", "m_name", index)
-							headersModel2.setData("Name", qsTr("System Name"), index)
+							headersModel2.setData("id", "m_name", index)
+							headersModel2.setData("name", qsTr("System Name"), index)
 							
 							if (systemInfoTable.table){
 								systemInfoTable.table.headers = headersModel2;
@@ -310,8 +310,8 @@ ViewBase {
 						
 						headersModel.insertNewItem();
 						
-						headersModel.setData("Id", "RoleName");
-						headersModel.setData("Name", qsTr("Role Name"));
+						headersModel.setData("id", "roleName");
+						headersModel.setData("name", qsTr("Role Name"));
 						
 						headersModel.refresh();
 						
@@ -339,7 +339,7 @@ ViewBase {
 						
 						if (rolesTable.table.elements){
 							for (let i = 0; i < rolesTable.table.elements.getItemsCount(); i++){
-								let id = rolesTable.table.elements.getData("Id", i);
+								let id = rolesTable.table.elements.getData("id", i);
 								if (roleIds.includes(id)){
 									rolesTable.table.checkItem(i);
 								}
@@ -353,7 +353,7 @@ ViewBase {
 						let selectedRoleIds = []
 						let indexes = rolesTable.table.getCheckedItems();
 						for (let index of indexes){
-							let id = rolesTable.table.elements.getData("Id", index);
+							let id = rolesTable.table.elements.getData("id", index);
 							selectedRoleIds.push(id);
 						}
 						
@@ -405,13 +405,13 @@ ViewBase {
 						groupsHeadersModel.clear();
 						
 						let index = groupsHeadersModel.insertNewItem();
-						groupsHeadersModel.setData("Id", "Name", index);
-						groupsHeadersModel.setData("Name", qsTr("Group Name"), index);
+						groupsHeadersModel.setData("id", "name", index);
+						groupsHeadersModel.setData("name", qsTr("Group Name"), index);
 						
 						index = groupsHeadersModel.insertNewItem();
 						
-						groupsHeadersModel.setData("Id", "Description", index);
-						groupsHeadersModel.setData("Name", qsTr("Description"), index);
+						groupsHeadersModel.setData("id", "description", index);
+						groupsHeadersModel.setData("name", qsTr("Description"), index);
 						
 						groupsHeadersModel.refresh();
 						
@@ -438,7 +438,7 @@ ViewBase {
 						groupsTable.table.uncheckAll();
 						if (groupsTable.table.elements){
 							for (let i = 0; i < groupsTable.table.elements.getItemsCount(); i++){
-								let id = groupsTable.table.elements.getData("Id", i);
+								let id = groupsTable.table.elements.getData("id", i);
 								if (groupIds.includes(id)){
 									groupsTable.table.checkItem(i);
 								}
@@ -453,7 +453,7 @@ ViewBase {
 					if (groupsTable.table){
 						let indexes = groupsTable.table.getCheckedItems();
 						for (let index of indexes){
-							let id = groupsTable.table.elements.getData("Id", index);
+							let id = groupsTable.table.elements.getData("id", index);
 							selectedGroupIds.push(id);
 						}
 						

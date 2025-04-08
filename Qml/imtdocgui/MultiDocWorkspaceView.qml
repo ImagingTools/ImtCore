@@ -1,6 +1,5 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtguigql 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
@@ -10,23 +9,41 @@ Item {
 
 	property DocumentManager documentManager;
 	property int popupWidth: 200;
+	property ObjectVisualStatusProvider visualStatusProvider: ObjectVisualStatusProvider {}
+	
+	Connections {
+		target: workspaceView.visualStatusProvider
+		
+		function onVisualStatusReceived(objectId, icon, text, description){
+			let name = text;
+			if (name === ""){
+				name = workspaceView.documentManager.defaultDocumentName;
+			}
+
+			tabView.setTabName(objectId, name);
+			tabView.setTabDescription(objectId, description);
+			tabView.setTabIcon(objectId, icon);
+		}
+		
+		function onVisualStatusReceiveFailed(objectId, errorMessage){
+			tabView.setTabName(objectId, root.documentManager.defaultDocumentName);
+			tabView.setTabDescription(objectId, "");
+			tabView.setTabIcon(objectId, "");
+		}
+	}
 
 	Connections {
 		id: connections;
 		target: workspaceView.documentManager;
 
 		function onDocumentSaved(documentId){
-			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId);
-			objectVisualStatusInput.m_objectId = documentId
-			objectVisualStatusInput.m_typeId = typeId
-			getVisualStatusInfoRequest.send(objectVisualStatusInput)
+			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
+			workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
 		}
 
 		function onDocumentAdded(documentId){
 			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId);
-			objectVisualStatusInput.m_objectId = documentId
-			objectVisualStatusInput.m_typeId = typeId
-			getVisualStatusInfoRequest.send(objectVisualStatusInput)
+			workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
 			
 			let documentData = workspaceView.documentManager.getDocumentDataById(documentId);
 
@@ -135,34 +152,6 @@ Item {
 			tabContextMenuModel.clear();
 			tabContextMenuModel.addItem("Close", qsTr("Close document"), "", true);
 			tabContextMenuModel.addItem("CloseAll", qsTr("Close all documents"), "", true);
-		}
-	}
-
-	ObjectVisualStatusInput {
-		id: objectVisualStatusInput;
-	}
-	
-	GqlSdlRequestSender {
-		id: getVisualStatusInfoRequest;
-		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus;
-
-		sdlObjectComp: Component {
-			VisualStatus {
-				onFinished: {
-					let name = m_text;
-					if (name === ""){
-						name = workspaceView.documentManager.defaultDocumentName;
-					}
-
-					tabView.setTabName(m_objectId, name);
-					tabView.setTabDescription(m_objectId, m_description);
-					tabView.setTabIcon(m_objectId, m_icon);
-				}
-			}
-		}
-		
-		onFinished: {
-			// tabView.stopTabContentLoading();
 		}
 	}
 

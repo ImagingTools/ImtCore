@@ -77,7 +77,7 @@ Item {
 	property string backgroundColor: Style.baseColor;
 
 	// Component.onCompleted: {
-	// 	itemId = documentsData.getData("Id", model.index);
+	// 	itemId = documentsData.getData("id", model.index);
 	// 	itemName = documentsData.getData("Title", model.index);
 	// }
 
@@ -121,7 +121,7 @@ Item {
 		console.log("CollectionView selectItem", id, name, commandsId, editorPath);
 
 		if (gridCollectionViewContainer.isUsedDocumentManager){
-			// documentManagerPtr.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandId": commandsId});
+			// documentManagerPtr.addDocument({"id": id, "name": name, "Source": editorPath, "CommandId": commandsId});
 			documentManagerPtr.insertNewDocument(commandsId);
 		}
 		else{
@@ -131,7 +131,7 @@ Item {
 
 	function findIndexById(id, nameId){
 		if(nameId == undefined){
-			nameId = "Id";
+			nameId = "id";
 		}
 		let foundIndex = -1;
 		for(let i = 0; i < gridCollectionViewContainer.gridElementsModel.getItemsCount(); i++){

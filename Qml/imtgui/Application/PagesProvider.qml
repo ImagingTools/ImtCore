@@ -23,11 +23,11 @@ QtObject {
             var query = Gql.GqlRequest("query", "PagesData");
 
             var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("PageId");
-            queryFields.InsertField("Name");
-            queryFields.InsertField("Icon");
-            queryFields.InsertField("Source");
-            queryFields.InsertField("StartItem");
+            queryFields.InsertField("pageId");
+            queryFields.InsertField("name");
+            queryFields.InsertField("icon");
+            queryFields.InsertField("source");
+            queryFields.InsertField("startItem");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();

@@ -4,6 +4,7 @@ import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 import imtauthgui 1.0
+import imtauthUsersSdl 1.0
 
 Item {
 	id: application;
@@ -30,7 +31,7 @@ Item {
 	
 	property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
 	property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
-	
+
 	onAuthorizationServerConnectedChanged: {
 		application.firstModelsInit();
 	}
@@ -329,14 +330,15 @@ Item {
 		}
 		
 		function onSuperuserExistResult(exists, type, message){
+			console.log("onSuperuserExistResult", exists, type, message)
 			if (exists){
 				thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
 			}
 			else{
-				if (type === 'NotExists'){
+				if (type === CheckSuperuserErrorTypeTypeMetaInfo.s_notExists){
 					thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
 				}
-				else if (type === 'DbNotConnection'){
+				else if (type === CheckSuperuserErrorTypeTypeMetaInfo.s_dbNotConnection){
 					application.showMessagePage(message);
 				}
 			}

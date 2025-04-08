@@ -274,13 +274,13 @@ ViewBase {
 			
 			let index = headersModel.insertNewItem();
 			
-			headersModel.setData("Id", "m_name", index);
-			headersModel.setData("Name", qsTr("Name"), index);
+			headersModel.setData("id", "m_name", index);
+			headersModel.setData("name", qsTr("Name"), index);
 			
 			index = headersModel.insertNewItem();
 			
-			headersModel.setData("Id", "m_description", index);
-			headersModel.setData("Name", qsTr("Description"), index);
+			headersModel.setData("id", "m_description", index);
+			headersModel.setData("name", qsTr("Description"), index);
 			
 			headersModel.refresh();
 			

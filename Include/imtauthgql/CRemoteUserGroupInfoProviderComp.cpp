@@ -36,7 +36,8 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 	namespace groupssdl = sdl::imtauth::Groups;
 
 	groupssdl::GroupItemRequestArguments arguments;
-	arguments.input.Version_1_0->Id = QByteArray(groupId);
+	arguments.input.Version_1_0.emplace();
+	arguments.input.Version_1_0->id = QByteArray(groupId);
 
 	imtgql::CGqlRequest gqlRequest;
 	if (groupssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

@@ -60,7 +60,7 @@ Item {
 
     function getData(objectId, value){
         for (let i = 0; i < container.collectionModel.getItemsCount(); i++){
-            let objectCollectionId = container.collectionModel.getData("Id", i);
+            let objectCollectionId = container.collectionModel.getData("id", i);
             if (objectCollectionId === objectId){
                 if (container.collectionModel.containsKey(value, i)){
                     return container.collectionModel.getData(value, i);

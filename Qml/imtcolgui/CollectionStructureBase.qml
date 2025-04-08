@@ -196,18 +196,18 @@ Item {
             anchors.bottom: parent.bottom;
             hasSelection: true
             onRequestSignal: {
-                let nodeId = treeViewInternal.getData("Id", index)
+                let nodeId = treeViewInternal.getData("id", index)
                 if (nodeId === -1){
                     nodeId = ""
                 }
                 gqlModels.updateItemsModel(nodeId)
             }
             onOpenBranch: {
-                let nodeId = treeViewInternal.getData("Id", index)
+                let nodeId = treeViewInternal.getData("id", index)
                 visualControl.select(nodeId)
             }
             onCloseBranch: {
-                let nodeId = treeViewInternal.getData("Id", index)
+                let nodeId = treeViewInternal.getData("id", index)
                 visualControl.deselect(nodeId)
                 treeViewInternal.deleteBranch(index)
             }
@@ -248,7 +248,7 @@ Item {
             treeViewInternal.insertTree(index, items)
             treeViewInternal.model.setData("IsOpen", true, index);
             for (let i = 0; i < items.getItemsCount(); i++){
-                let nodeId = items.getData("Id", i)
+                let nodeId = items.getData("id", i)
                 if (visualControl.contains(nodeId)){
                     gqlModels.updateItemsModel(nodeId)
                 }

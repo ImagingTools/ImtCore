@@ -8,7 +8,7 @@ Table{
     property TreeItemModel model: TreeItemModel{};
 
     property int shift: 35;
-    property string nameId: "Name";
+    property string nameId: "name";
 
     property int delegateHeight: itemHeight;
     property int delegateWidth: 200;
@@ -54,7 +54,7 @@ Table{
     elements: tableTreeView.model;
     onHeadersChanged: {
         if(headers){
-            let nameIndex = tableTreeView.getHeaderIndex("Name");
+            let nameIndex = tableTreeView.getHeaderIndex("name");
             tableTreeView.setColumnContentComponent(nameIndex, nameComp);
         }
 
@@ -605,7 +605,7 @@ Table{
     function findIndexById(id){
         let foundIndex = -1;
         for(let i = 0; i < tableTreeView.model.getItemsCount(); i++){
-            let id_curr = tableTreeView.model.isValidData("Id", i) ? tableTreeView.model.getData("Id", i) : "";
+            let id_curr = tableTreeView.model.isValidData("id", i) ? tableTreeView.model.getData("id", i) : "";
             if(id_curr == id){
                 foundIndex = i;
                 break;

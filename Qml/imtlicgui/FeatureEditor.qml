@@ -389,8 +389,8 @@ ViewBase {
                     dependenciesHeadersModel.clear();
 
                     let index = dependenciesHeadersModel.insertNewItem();
-                    dependenciesHeadersModel.setData("Id", FeatureItemTypeMetaInfo.s_featureName, index)
-                    dependenciesHeadersModel.setData("Name", qsTr("Dependencies"), index)
+                    dependenciesHeadersModel.setData("id", FeatureItemTypeMetaInfo.s_featureName, index)
+                    dependenciesHeadersModel.setData("name", qsTr("Dependencies"), index)
 
                     dependenciesHeadersModel.refresh();
 
@@ -514,24 +514,24 @@ ViewBase {
         headersModel.clear();
 
         let index = headersModel.insertNewItem();
-        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_featureName, index);
+        headersModel.setData("id", FeatureItemTypeMetaInfo.s_featureName, index);
         headersModel.setData("Name", qsTr("Feature Name"), index);
 
         index = headersModel.insertNewItem();
-        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_featureId, index);
-        headersModel.setData("Name", qsTr("Feature-ID"), index);
+        headersModel.setData("id", FeatureItemTypeMetaInfo.s_featureId, index);
+        headersModel.setData("name", qsTr("Feature-ID"), index);
 
         index = headersModel.insertNewItem();
-        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_description, index);
-        headersModel.setData("Name", qsTr("Feature Description"), index);
+        headersModel.setData("id", FeatureItemTypeMetaInfo.s_description, index);
+        headersModel.setData("name", qsTr("Feature Description"), index);
 
         index = headersModel.insertNewItem();
-        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_optional, index);
-        headersModel.setData("Name", qsTr("Optional"), index);
+        headersModel.setData("id", FeatureItemTypeMetaInfo.s_optional, index);
+        headersModel.setData("name", qsTr("Optional"), index);
 
         index = headersModel.insertNewItem();
-        headersModel.setData("Id", FeatureItemTypeMetaInfo.s_isPermission, index);
-        headersModel.setData("Name", qsTr("Is Permission"), index);
+        headersModel.setData("id", FeatureItemTypeMetaInfo.s_isPermission, index);
+        headersModel.setData("name", qsTr("Is Permission"), index);
 
         headersModel.refresh();
 

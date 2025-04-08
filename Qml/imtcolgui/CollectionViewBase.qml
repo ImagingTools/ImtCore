@@ -73,7 +73,7 @@ ViewBase {
 		table.tableViewParams.clear();
 		
 		for (let i = 0; i < table.headers.getItemsCount(); i++){
-			let headerId = table.headers.getData("Id", i);
+			let headerId = table.headers.getData("id", i);
 			if (!table.tableViewParams.headerIsExists(headerId)){
 				table.tableViewParams.setHeaderSize(headerId, -1);
 				table.tableViewParams.setHeaderVisible(headerId, true);

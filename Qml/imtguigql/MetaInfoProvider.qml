@@ -32,12 +32,12 @@ Item {
             var query = Gql.GqlRequest("query", container.getMetaInfoGqlCommand);
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", objectId);
+            inputParams.InsertField("id", objectId);
 
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("metaInfo");
-            queryFields.InsertField("Id");
+            queryFields.InsertField("id");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();

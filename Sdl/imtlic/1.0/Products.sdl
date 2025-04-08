@@ -16,23 +16,23 @@ input ProductsListInput {
 }
 
 type LicenseData {
-	Id: ID
-	LicenseId: ID
-	LicenseName: String
+	id: ID
+	licenseId: ID
+	licenseName: String
 }
 
 type ProductItem {
-	Id: ID!
-	Name: String!
-	ProductName: String!
-	TypeId: ID!
-	ProductId: ID!
-	CategoryId: ID!
-	Description: String
-	Features: ID
-	Licenses: [LicenseData]
-	Added: String
-	TimeStamp: String
+	id: ID!
+	name: String!
+	productName: String!
+	typeId: ID!
+	productId: ID!
+	categoryId: ID!
+	description: String
+	features: ID
+	licenses: [LicenseData]
+	added: String
+	timeStamp: String
 }
 
 type ProductsListPayload {
@@ -41,22 +41,22 @@ type ProductsListPayload {
 }
 
 type ProductData {
-	Id: ID
-	Name: String
-	ProductName: String
-	Description: String
-	ProductId: ID
-	CategoryId: ID
-	Features: ID
+	id: ID
+	name: String
+	productName: String
+	description: String
+	productId: ID
+	categoryId: ID
+	features: ID
 }
 
 input ProductDataInput {
-	Id: ID!
-	Item: ProductData!
+	id: ID!
+	item: ProductData!
 }
 
 input ProductItemInput {
-	Id: ID!
+	id: ID!
 }
 
 input ProductImportInput {

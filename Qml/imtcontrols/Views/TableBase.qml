@@ -212,7 +212,7 @@ Rectangle {
 	onHeadersChanged: {
 		let keys = Object.keys(columnContentComps);
 		for (let i = 0; i < tableContainer.headers.getItemsCount(); i++){
-			let headerId = tableContainer.headers.getData("Id", i)
+			let headerId = tableContainer.headers.getData("id", i)
 			if (!keys.includes(headerId)){
 				tableContainer.columnContentComps[headerId] = null;
 			}
@@ -402,7 +402,7 @@ Rectangle {
 		}
 
 		for (let i = 0; i < tableContainer.headers.getItemsCount(); i++){
-			if (tableContainer.headers.getData("Id", i) === headerId){
+			if (tableContainer.headers.getData("id", i) === headerId){
 				return i;
 			}
 		}
@@ -416,7 +416,7 @@ Rectangle {
 
 	function setColumnContentComponent(columnIndex, comp){
 		if (tableContainer.headers && columnIndex >= 0 && columnIndex < tableContainer.headers.getItemsCount()){
-			let headerId = tableContainer.headers.getData("Id", columnIndex);
+			let headerId = tableContainer.headers.getData("id", columnIndex);
 
 			setColumnContentById(headerId, comp);
 		}
@@ -576,8 +576,8 @@ Rectangle {
 
 		let indexes = tableContainer.getSelectedIndexes();
 		for (let i = 0; i < indexes.length; i++){
-			if (elementsListObj.model.containsKey("Id", indexes[i])){
-				let id = elementsListObj.model.getData("Id", indexes[i]);
+			if (elementsListObj.model.containsKey("id", indexes[i])){
+				let id = elementsListObj.model.getData("id", indexes[i]);
 				retVal.push(id);
 			}
 		}
@@ -590,8 +590,8 @@ Rectangle {
 
 		let indexes = tableContainer.getSelectedIndexes();
 		for (let i = 0; i < indexes.length; i++){
-			if (elementsListObj.model.containsKey("Name", indexes[i])){
-				let name = elementsListObj.model.getData("Name", indexes[i]);
+			if (elementsListObj.model.containsKey("name", indexes[i])){
+				let name = elementsListObj.model.getData("name", indexes[i]);
 				retVal.push(name);
 			}
 		}
@@ -714,7 +714,7 @@ Rectangle {
 			anchors.bottom: parent.bottom;
 
 			clip: true;
-            reuseItems: true
+			reuseItems: true
 			orientation: ListView.Horizontal;
 			spacing: 0;
 			model: tableContainer.headers;
@@ -860,7 +860,7 @@ Rectangle {
 
 		if (defaultHeadersModel){
 			for (let i = 0; i < defaultHeadersModel.getItemsCount(); i++){
-				let headerId = defaultHeadersModel.getData("Id", i);
+				let headerId = defaultHeadersModel.getData("id", i);
 				tableViewParams.setHeaderSize(headerId, -1);
 				tableViewParams.setHeaderVisible(headerId, true);
 				tableViewParams.setHeaderOrder(headerId, i)
@@ -887,7 +887,7 @@ Rectangle {
 		}
 
 		for (let i = 0; i < tableContainer.widthDecorator.getItemsCount(); i++){
-			let headerId = tableContainer.headers.getData("Id", i);
+			let headerId = tableContainer.headers.getData("id", i);
 			for (let j = 0; j < tableContainer.tableViewParams.getItemsCount(); j++){
 				let id = tableContainer.tableViewParams.getData("HeaderId", j);
 				if (headerId === id){
@@ -932,7 +932,7 @@ Rectangle {
 			let width_ = tableContainer.widthDecoratorDynamic.isValidData("Width",i) ? tableContainer.widthDecoratorDynamic.getData("Width",i): -1;
 			if (width_ !== 0){
 				visibleColumnCount++;
-				let headerId__ = tableContainer.headers.getData("Id", i);
+				let headerId__ = tableContainer.headers.getData("id", i);
 				if(headerId__ == "№"){
 					rowNumberColumnWidth = width_;
 				}
@@ -958,7 +958,7 @@ Rectangle {
 
 				let percent = (defWidth/tableWidth_) * 100;
 
-				let headerId = tableContainer.headers.getData("Id", ind);
+				let headerId = tableContainer.headers.getData("id", ind);
 
 				if(headerId == "№"){
 					if(isVisibleRowNumberColumn){

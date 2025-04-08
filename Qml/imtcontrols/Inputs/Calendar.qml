@@ -381,8 +381,8 @@ Rectangle {
 		if(calendar.hasMonthCombo){
 			for(let i = 0; i < calendar.monthNames.length; i++){
 				let index = monthComboModel.insertNewItem();
-				monthComboModel.setData("Id", index, index);
-				monthComboModel.setData("Name",qsTr(calendar.monthNames[i]),index);
+				monthComboModel.setData("id", index, index);
+				monthComboModel.setData("name",qsTr(calendar.monthNames[i]),index);
 			}
 		}
 	}
@@ -391,8 +391,8 @@ Rectangle {
 		if(calendar.hasYearCombo){
 			for(let i = calendar.startYear; i <= calendar.lastYear;i++){
 				let index = yearComboModel.insertNewItem();
-				yearComboModel.setData("Id", index, index);
-				yearComboModel.setData("Name", String(i),index);
+				yearComboModel.setData("id", index, index);
+				yearComboModel.setData("name", String(i),index);
 			}
 		}
 	}

@@ -25,6 +25,7 @@ public:
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_dependentMetaInfoControllerCompPtr, "DependentMetaInfoController", "Dependent meta info controller", true, "DependentMetaInfoController");
 		I_ASSIGN(m_metaInfoIdAttrPtr, "MetaInfoId", "Meta info ID", false, "");
+		I_ASSIGN(m_isDocumentSourceAttrPtr, "IsDocumentSource", "If true, the information will be taken from the document, else from the meta information", false, true);
 		I_ASSIGN(m_dependentTableNameAttrPtr, "DependentTableName", "Dependent table name", true, "");
 		I_ASSIGN_MULTI_0(m_metaInfoNameAttrPtr, "MetaInfoNames", "Meta info names", false);
 		I_ASSIGN_MULTI_0(m_dependentMetaInfoNameAttrPtr, "DependentMetaInfoNames", "Dependent meta info names", true);
@@ -44,6 +45,7 @@ private:
 	I_REF(imtdb::IDependentMetaInfoController, m_dependentMetaInfoControllerCompPtr);
 	I_ATTR(QString, m_metaInfoIdAttrPtr);
 	I_ATTR(QString, m_dependentTableNameAttrPtr);
+	I_ATTR(bool, m_isDocumentSourceAttrPtr);
 	I_MULTIATTR(QString, m_metaInfoNameAttrPtr);
 	I_MULTIATTR(QString, m_dependentMetaInfoNameAttrPtr);
 };

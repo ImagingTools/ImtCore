@@ -49,9 +49,9 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 	QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	authsdl::AuthorizationRequestArguments arguments;
 	arguments.input.Version_1_0 = authsdl::CAuthorizationInput::V1_0();
-	arguments.input.Version_1_0->Login = QString(userName);
-	arguments.input.Version_1_0->Password = QString(password);
-	arguments.input.Version_1_0->ProductId = QByteArray(productId);
+	arguments.input.Version_1_0->login = QString(userName);
+	arguments.input.Version_1_0->password = QString(password);
+	arguments.input.Version_1_0->productId = QByteArray(productId);
 
 	imtgql::CGqlRequest gqlRequest;
 	if (authsdl::CAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -62,8 +62,8 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		m_loggedUserPassword = password.toUtf8();
 
 		QByteArray userId;
-		if (response.Version_1_0->UserId){
-			userId = *response.Version_1_0->UserId;
+		if (response.Version_1_0->userId){
+			userId = *response.Version_1_0->userId;
 		}
 		if (userId.isEmpty()){
 			return false;
@@ -74,25 +74,25 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			return false;
 		}
 
-		if (response.Version_1_0->Username){
-			m_userInfoPtr->SetId(*response.Version_1_0->Username);
+		if (response.Version_1_0->username){
+			m_userInfoPtr->SetId(*response.Version_1_0->username);
 		}
-		if (response.Version_1_0->Permissions){
-			m_userInfoPtr->SetLocalPermissions(productId, response.Version_1_0->Permissions->split(';'));
+		if (response.Version_1_0->permissions){
+			m_userInfoPtr->SetLocalPermissions(productId, response.Version_1_0->permissions->split(';'));
 		}
 
 		m_userPermissionIds = m_userInfoPtr->GetPermissions(productId);
 
-		if (response.Version_1_0->Token){
-			m_loggedUserToken = *response.Version_1_0->Token;
+		if (response.Version_1_0->token){
+			m_loggedUserToken = *response.Version_1_0->token;
 		}
 		imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);
 
-		if (response.Version_1_0->Username){
+		if (response.Version_1_0->username){
 			istd::CChangeNotifier notifier(this);
 			Q_UNUSED(notifier);
 
-			m_loggedUserId = *response.Version_1_0->Username;
+			m_loggedUserId = *response.Version_1_0->username;
 		}
 		
 		return true;

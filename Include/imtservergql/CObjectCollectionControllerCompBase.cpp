@@ -78,13 +78,13 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 	}
 	
 	QByteArray objectId;
-	if (arguments.input.Version_1_0->ObjectId){
-		objectId = *arguments.input.Version_1_0->ObjectId;
+	if (arguments.input.Version_1_0->objectId){
+		objectId = *arguments.input.Version_1_0->objectId;
 	}
 	
 	QByteArray typeId;
-	if (arguments.input.Version_1_0->TypeId){
-		typeId = *arguments.input.Version_1_0->TypeId;
+	if (arguments.input.Version_1_0->typeId){
+		typeId = *arguments.input.Version_1_0->typeId;
 	}
 
 	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
@@ -93,16 +93,16 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 	int index = m_objectTypeIdAttrPtr.FindValue(typeId);
 	if (index >= 0){
 		if (index < m_objectIconPathsAttrPtr.GetCount()){
-			response.Icon = m_objectIconPathsAttrPtr[index];
+			response.icon = m_objectIconPathsAttrPtr[index];
 		}
 	}
 	else{
 		SendCriticalMessage(0, QString("Unknown type-ID provided '%1'").arg(qPrintable(typeId)));
 	}
 
-	response.ObjectId = objectId;
-	response.Text = name;
-	response.Description = description;
+	response.objectId = objectId;
+	response.text = name;
+	response.description = description;
 
 	sdl::imtbase::ImtCollection::CVisualStatus retVal;
 	retVal.Version_1_0 = std::make_optional(response);
@@ -199,8 +199,8 @@ bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlR
 
 	if (getVisualStatusRequest.IsValid()){
 		QByteArray typeId;
-		if (arguments.input.Version_1_0->TypeId.has_value()){
-			typeId = *arguments.input.Version_1_0->TypeId;
+		if (arguments.input.Version_1_0->typeId.has_value()){
+			typeId = *arguments.input.Version_1_0->typeId;
 		}
 
 		return m_objectTypeIdAttrPtr.FindValue(typeId) >= 0;
@@ -340,8 +340,8 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 {
 	QByteArray retVal;
 
-	if (inputParams.GetFieldIds().contains(QByteArrayLiteral("Id"))){
-		retVal = inputParams.GetFieldArgumentValue(QByteArrayLiteral("Id")).toByteArray();
+	if (inputParams.GetFieldIds().contains(QByteArrayLiteral("id"))){
+		retVal = inputParams.GetFieldArgumentValue(QByteArrayLiteral("id")).toByteArray();
 	}
 	else if(inputParams.GetFieldIds().contains(QByteArrayLiteral("input"))){
 		const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr(QByteArrayLiteral("input"));
@@ -379,7 +379,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
 		return nullptr;
 	}
 
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
 	QByteArray objectTypeId = GetObjectTypeIdFromRequest(gqlRequest);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -437,7 +437,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	QByteArray objectId;
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
-		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+		objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
 	}
 
 	QByteArray objectIdFromRepresentation;
@@ -474,7 +474,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	}
 
 	sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 response;
-	response.Id = newObjectId;
+	response.id = newObjectId;
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -510,7 +510,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		return nullptr;
 	}
 
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
 	QString name = inputParamPtr->GetFieldArgumentValue("name").toString();
 
 	imtbase::IObjectCollection::DataPtr savedObjectPtr;
@@ -551,7 +551,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	}
 
 	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 response;
-	response.Id = objectId;
+	response.id = objectId;
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
@@ -606,7 +606,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 	}
 
 	for (int i = 0; i < objectIdsModel.GetItemsCount(); i++){
-		QByteArray objectId = objectIdsModel.GetData("Id", i).toByteArray();
+		QByteArray objectId = objectIdsModel.GetData("id", i).toByteArray();
 		if (!objectId.isEmpty()){
 			istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, errorMessage);
 			if (savedObjectPtr.IsValid()){
@@ -630,7 +630,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 		for(int i = 0; i < objectIdsModel.GetItemsCount(); ++i){
 			int index = notificationModel->InsertNewItem();
 			if(!objectIdsModel.ContainsKey("Failed", i)){
-				notificationModel->SetData("Id", objectIdsModel.GetData("Id", i), index);
+				notificationModel->SetData("id", objectIdsModel.GetData("id", i), index);
 			}
 		}
 
@@ -701,8 +701,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 		return nullptr;
 	}
 
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-	QString description = inputParamPtr->GetFieldArgumentValue("Description").toString();
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
+	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
 		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description, qPrintable(objectId));
@@ -714,8 +714,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-	dataModelPtr->SetData("Id", objectId);
-	dataModelPtr->SetData("Description", description);
+	dataModelPtr->SetData("id", objectId);
+	dataModelPtr->SetData("description", description);
 
 	return rootModelPtr.PopPtr();
 }
@@ -747,8 +747,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	}
 
 	if (viewParamsPtr != nullptr){
-		offset = viewParamsPtr->GetFieldArgumentValue("Offset").toInt();
-		count = viewParamsPtr->GetFieldArgumentValue("Count").toInt();
+		offset = viewParamsPtr->GetFieldArgumentValue("offset").toInt();
+		count = viewParamsPtr->GetFieldArgumentValue("count").toInt();
 
 		PrepareFilters(gqlRequest, *viewParamsPtr, filterParams);
 	}
@@ -765,8 +765,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	}
 
 	imtbase::CTreeItemModel* notificationModelPtr = dataModelPtr->AddTreeModel("notification");
-	notificationModelPtr->SetData("PagesCount", pagesCount);
-	notificationModelPtr->SetData("TotalCount", elementsCount);
+	notificationModelPtr->SetData("pagesCount", pagesCount);
+	notificationModelPtr->SetData("totalCount", elementsCount);
 
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
 				m_objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
@@ -890,7 +890,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		return nullptr;
 	}
 
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
 	if (objectId.isEmpty()){
 		errorMessage = QString("No object-ID could not be extracted from the request");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -910,7 +910,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 	}
 	
 	sdl::imtbase::ImtCollection::CRemovedNotificationPayload::V1_0 response;
-	response.Id = objectId;
+	response.id = objectId;
 	
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	
@@ -1333,23 +1333,23 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	for (const QByteArray& informationId : informationIds){
 		QVariant elementInformation;
 
-		if(informationId == QByteArray("Id")){
+		if(informationId == QByteArray("id")){
 			elementInformation = QString(collectionId);
 		}
-		else if(informationId == QByteArray("Name")){
+		else if(informationId == QByteArray("name")){
 			elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_NAME);
 		}
-		else if(informationId == QByteArray("Description")){
+		else if(informationId == QByteArray("description")){
 			elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
 		}
 		else{
 			idoc::MetaInfoPtr elementMetaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
 			if (elementMetaInfo.IsValid()){
-				if (informationId == QByteArray("Added")){
+				if (informationId == QByteArray("added")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
 							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
-				else if (informationId == QByteArray("LastModified")){
+				else if (informationId == QByteArray("lastModified")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
 							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
@@ -1396,22 +1396,22 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	for (const QByteArray& informationId : informationIds){
 		QVariant elementInformation;
 
-		if(informationId == QByteArray("Id")){
+		if(informationId == QByteArray("id")){
 			elementInformation = QString(collectionId);
 		}
-		else if(informationId == QByteArray("Name")){
+		else if(informationId == QByteArray("name")){
 			elementInformation = objectCollectionIterator->GetElementInfo("Name");
 		}
-		else if(informationId == QByteArray("Description")){
+		else if(informationId == QByteArray("description")){
 			elementInformation = objectCollectionIterator->GetElementInfo("Description");
 		}
 		else{
 			if (elementMetaInfo.IsValid()){
-				if (informationId == QByteArray("Added")){
+				if (informationId == QByteArray("added")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
 							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
-				else if (informationId == QByteArray("LastModified")){
+				else if (informationId == QByteArray("lastModified")){
 					elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
 							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
@@ -1455,13 +1455,9 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectTypeIdFromRequest(const
 {
 	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr != nullptr){
-		static const QByteArrayList possibleKeys = {"typeId", "TypeId"};
-		
-		for (const QByteArray& key : possibleKeys) {
-			QVariant typeId = gqlInputParamPtr->GetFieldArgumentValue(key);
-			if (!typeId.isNull()){
-				return typeId.toByteArray();
-			}
+		QVariant typeId = gqlInputParamPtr->GetFieldArgumentValue("typeId");
+		if (!typeId.isNull()){
+			return typeId.toByteArray();
 		}
 	}
 
@@ -1508,7 +1504,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 {
 	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
 	
-	const imtgql::CGqlObject* complexFilterModelPtr = viewParamsGql.GetFieldArgumentObjectPtr("ComplexFilterModel");
+	const imtgql::CGqlObject* complexFilterModelPtr = viewParamsGql.GetFieldArgumentObjectPtr("filterModel");
 	if (complexFilterModelPtr != nullptr){
 		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
 		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(*complexFilterModelPtr);
@@ -1522,58 +1518,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
 			}
 		}
-
-		return;
 	}
-
-	QByteArray filterBA = viewParamsGql.GetFieldArgumentValue("FilterModel").toByteArray();
-
-	imtbase::CTreeItemModel generalModel;
-	if (!generalModel.CreateFromJson(filterBA)){
-		return;
-	}
-
-	iprm::CParamsSet* objectFilterPtr = new iprm::CParamsSet();
-	imtbase::CCollectionFilter* collectionFilterPtr = new imtbase::CCollectionFilter();
-
-	imtbase::CTreeItemModel* filterIdsModelPtr = generalModel.GetTreeItemModel("FilterIds");
-	if (filterIdsModelPtr != nullptr){
-		QByteArrayList filteringInfoIds;
-		for (int i = 0; i < filterIdsModelPtr->GetItemsCount(); i++){
-			QByteArray headerId = filterIdsModelPtr->GetData("Id", i).toByteArray();
-			if (!headerId.isEmpty()){
-				filteringInfoIds << headerId;
-			}
-		}
-		collectionFilterPtr->SetFilteringInfoIds(filteringInfoIds);
-	}
-
-	QString filterText = generalModel.GetData("TextFilter").toString();
-	if (!filterText.isEmpty()){
-		collectionFilterPtr->SetTextFilter(filterText);
-	}
-
-	imtbase::CTreeItemModel* sortModelPtr = generalModel.GetTreeItemModel("Sort");
-	if (sortModelPtr != nullptr){
-		QByteArray headerId = sortModelPtr->GetData("HeaderId").toByteArray();
-		QByteArray sortOrder = sortModelPtr->GetData("SortOrder").toByteArray();
-		if (!headerId.isEmpty() && !sortOrder.isEmpty()){
-			collectionFilterPtr->SetSortingOrder(sortOrder == "ASC" ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
-			collectionFilterPtr->SetSortingInfoIds(QByteArrayList() << headerId);
-		}
-	}
-
-	if (generalModel.ContainsKey("ObjectFilter")){
-		imtbase::CTreeItemModel* objectFilterModelPtr = generalModel.GetTreeItemModel("ObjectFilter");
-		SetObjectFilter(gqlRequest, *objectFilterModelPtr, *objectFilterPtr);
-	}
-	else{
-		imtbase::CTreeItemModel objectFilterModel;
-		SetObjectFilter(gqlRequest, objectFilterModel, *objectFilterPtr);
-	}
-
-	filterParams.SetEditableParameter("Filter", collectionFilterPtr, true);
-	filterParams.SetEditableParameter("ObjectFilter", objectFilterPtr, true);
 }
 
 

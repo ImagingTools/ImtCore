@@ -11,7 +11,7 @@ Rectangle{
     property TreeItemModel model: TreeItemModel{};
 
     property int shift: 35;
-    property string nameId: "Name";
+    property string nameId: "name";
     property int delegateWidht: 200;
     property int delegateHeight: 40;
     property alias delegate: list.delegate;
@@ -739,7 +739,7 @@ Rectangle{
 
     function findIndexById(id, nameId){
         if(nameId == undefined){
-            nameId = "Id";
+            nameId = "id";
         }
         let foundIndex = -1;
         for(let i = 0; i < treeViewGql.model.getItemsCount(); i++){

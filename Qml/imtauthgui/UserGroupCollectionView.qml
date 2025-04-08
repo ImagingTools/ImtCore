@@ -34,9 +34,9 @@ RemoteCollectionView {
 			}
 		}
 	}
-	
+
 	Component.onCompleted: {
-		table.setSortingInfo("Name", "ASC");
+		table.setSortingInfo(GroupItemTypeMetaInfo.s_name, "ASC");
 		
 		if (documentManager){
 			documentManager.registerDocumentView("Group", "GroupEditor", userGroupDocumentComp);

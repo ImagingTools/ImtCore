@@ -159,8 +159,8 @@ ViewBase {
 
                             let index = groupsHeadersModel.insertNewItem();
 
-                            groupsHeadersModel.setData("Id", "Name");
-                            groupsHeadersModel.setData("Name", qsTr("Group Name"));
+                            groupsHeadersModel.setData("id", "name");
+                            groupsHeadersModel.setData("name", qsTr("Group Name"));
 
                             groupsHeadersModel.refresh();
 
@@ -192,7 +192,7 @@ ViewBase {
                     }
 
                     for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
-                        let id = container.copiedGroupsModel.getData("Id", i);
+                        let id = container.copiedGroupsModel.getData("id", i);
                         if (id === objectId || childrenIds.includes(id)){
                             removedIndexes.push(i);
                         }
@@ -210,7 +210,7 @@ ViewBase {
 
                 function getAllChildrenGroups(groupId, retVal){
                     for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
-                        let id = container.copiedGroupsModel.getData("Id", i);
+                        let id = container.copiedGroupsModel.getData("id", i);
                         let parentGroups = container.copiedGroupsModel.getData("ParentGroups", i);
                         if (parentGroups !== ""){
                             let parentGroupIds = parentGroups.split(';')
@@ -225,7 +225,7 @@ ViewBase {
 
                 function getAllParentGroupIds(groupId, retVal){
                     for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
-                        let id = container.copiedGroupsModel.getData("Id", i);
+                        let id = container.copiedGroupsModel.getData("id", i);
                         if (id === groupId){
                             let parentGroups = container.copiedGroupsModel.getData("ParentGroups", i);
                             if (parentGroups !== ""){
@@ -256,7 +256,7 @@ ViewBase {
                     parentGroupsTable.table.uncheckAll();
                     if (parentGroupsTable.table.elements){
                         for (let i = 0; i < parentGroupsTable.table.elements.getItemsCount(); i++){
-                            let id = parentGroupsTable.table.elements.getData("Id", i);
+                            let id = parentGroupsTable.table.elements.getData("id", i);
                             if (parentGroupIds.includes(id)){
                                 parentGroupsTable.table.checkItem(i);
                             }
@@ -271,7 +271,7 @@ ViewBase {
                     let selectedGroupIds = []
                     let indexes = parentGroupsTable.table.getCheckedItems();
                     for (let index of indexes){
-                        let id = parentGroupsTable.table.elements.getData("Id", index);
+                        let id = parentGroupsTable.table.elements.getData("id", index);
                         selectedGroupIds.push(id);
                     }
 
@@ -324,8 +324,8 @@ ViewBase {
 
                         headersModel.insertNewItem();
 
-                        headersModel.setData("Id", "Name");
-                        headersModel.setData("Name", qsTr("User Name"));
+                        headersModel.setData("id", "name");
+                        headersModel.setData("name", qsTr("User Name"));
 
                         headersModel.refresh();
 
@@ -349,7 +349,7 @@ ViewBase {
                     usersTable.table.uncheckAll();
                     if (usersTable.table.elements){
                         for (let i = 0; i < usersTable.table.elements.getItemsCount(); i++){
-                            let id = usersTable.table.elements.getData("Id", i);
+                            let id = usersTable.table.elements.getData("id", i);
                             if (userIds.includes(id)){
                                 usersTable.table.checkItem(i);
                             }
@@ -362,7 +362,7 @@ ViewBase {
 
                     let indexes = usersTable.table.getCheckedItems();
                     for (let index of indexes){
-                        let id = usersTable.table.elements.getData("Id", index);
+                        let id = usersTable.table.elements.getData("id", index);
                         selectedUserIds.push(id);
                     }
 
@@ -412,7 +412,7 @@ ViewBase {
 
                         rolesHeadersModel.insertNewItem();
 
-                        rolesHeadersModel.setData("Id", "RoleName");
+                        rolesHeadersModel.setData("id", "roleName");
                         rolesHeadersModel.setData("Name", qsTr("Role Name"));
 
                         rolesHeadersModel.refresh();
@@ -437,7 +437,7 @@ ViewBase {
                     rolesTable.table.uncheckAll();
                     if (rolesTable.table.elements){
                         for (let i = 0; i < rolesTable.table.elements.getItemsCount(); i++){
-                            let id = rolesTable.table.elements.getData("Id", i);
+                            let id = rolesTable.table.elements.getData("id", i);
                             if (roleIds.includes(id)){
                                 rolesTable.table.checkItem(i);
                             }
@@ -449,7 +449,7 @@ ViewBase {
                     let selectedRoleIds = []
                     let indexes = rolesTable.table.getCheckedItems();
                     for (let index of indexes){
-                        let id = rolesTable.table.elements.getData("Id", index);
+                        let id = rolesTable.table.elements.getData("id", index);
                         selectedRoleIds.push(id);
                     }
 

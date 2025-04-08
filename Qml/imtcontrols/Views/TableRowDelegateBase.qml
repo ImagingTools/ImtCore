@@ -108,7 +108,8 @@ Rectangle {
 
 	onDoubleClicked: {
 		if (tableItem){
-			tableItem.doubleClicked(model.Id, model.index)
+			let retId = model.id || model.Id || ""
+			tableItem.doubleClicked(retId, model.index)
 		}
 	}
 
@@ -172,11 +173,12 @@ Rectangle {
 	}
 
 	function getSelectedId(){
-		return model.Id;
+		let retId = model.id || model.Id || ""
+		return retId
 	}
 
 	function getSelectedName(){
-		return model.Name;
+		return model.name;
 	}
 
 	function setBorderParams(){

@@ -14,8 +14,8 @@ RemoteCollectionView {
 	
 	collectionId: "Users";
 	visibleMetaInfo: true;
-	
-	additionalFieldIds: ["SystemId"]
+
+	additionalFieldIds: [UserItemTypeMetaInfo.s_systemId]
 	filterMenu.decorator: filterDecoratorComp;
 	
 	property string productId;
@@ -137,8 +137,8 @@ RemoteCollectionView {
 	}
 	
 	Component.onCompleted: {
-		table.setSortingInfo("Name", "ASC");
-		table.nonSortableColumns = ["Roles", "Groups"]
+		table.setSortingInfo(UserItemTypeMetaInfo.s_name, "ASC");
+		table.nonSortableColumns = [UserItemTypeMetaInfo.s_roles, UserItemTypeMetaInfo.s_groups]
 		table.rowDelegate = tableRowDelegateBaseComp;
 	}
 	
@@ -154,8 +154,8 @@ RemoteCollectionView {
 	}
 	
 	onHeadersChanged: {
-		table.setColumnContentById("Roles", dataComp);
-		table.setColumnContentById("Groups", groupsContentComp);
+		table.setColumnContentById(UserItemTypeMetaInfo.s_roles, dataComp);
+		table.setColumnContentById(UserItemTypeMetaInfo.s_groups, groupsContentComp);
 	}
 	
 	Component {
@@ -173,8 +173,8 @@ RemoteCollectionView {
 					return
 				}
 				
-				let username = userCollectionViewContainer.table.elements.getData("Name", rowIndex);
-				let roles = userCollectionViewContainer.table.elements.getData("Roles", rowIndex);
+				let username = userCollectionViewContainer.table.elements.getData(UserItemTypeMetaInfo.s_name, rowIndex);
+				let roles = userCollectionViewContainer.table.elements.getData(UserItemTypeMetaInfo.s_roles, rowIndex);
 				arrowButton.visible = roles !== "";
 				if (roles !== ""){
 					let roleList = roles.split(';');
@@ -237,8 +237,8 @@ RemoteCollectionView {
 					return
 				}
 				
-				let username = userCollectionViewContainer.table.elements.getData("Name", rowIndex);
-				let groups = userCollectionViewContainer.table.elements.getData("Groups", rowIndex);
+				let username = userCollectionViewContainer.table.elements.getData(UserItemTypeMetaInfo.s_name, rowIndex);
+				let groups = userCollectionViewContainer.table.elements.getData(UserItemTypeMetaInfo.s_groups, rowIndex);
 				arrowButton.visible = groups !== "";
 				if (groups !== ""){
 					let groupList = groups.split(';');

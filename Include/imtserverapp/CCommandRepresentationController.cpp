@@ -81,15 +81,15 @@ bool CCommandRepresentationController::GetRepresentationFromDataModel(
 		elementName = elementNameTr;
 	}
 
-	representation.SetData("Id", elementId);
-	representation.SetData("Name", elementName);
-	representation.SetData("Description", elementDescription);
-	representation.SetData("IsEnabled", isEnabled);
-	representation.SetData("Visible", isVisible);
-	representation.SetData("Icon", elementPath);
-	representation.SetData("Status", elementStatus);
-	representation.SetData("Priority", priority);
-	representation.SetData("Alignment", alignment);
+	representation.SetData("id", elementId);
+	representation.SetData("name", elementName);
+	representation.SetData("description", elementDescription);
+	representation.SetData("isEnabled", isEnabled);
+	representation.SetData("visible", isVisible);
+	representation.SetData("icon", elementPath);
+	representation.SetData("status", elementStatus);
+	representation.SetData("priority", priority);
+	representation.SetData("alignment", alignment);
 
 	return true;
 }

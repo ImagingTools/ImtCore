@@ -190,14 +190,14 @@ Item {
 				}
 				
 				let notificationModel = container.dataController.notificationModel;
-				if (notificationModel.containsKey("TotalCount")){
-					let totalCount = notificationModel.getData("TotalCount")
+				if (notificationModel.containsKey("totalCount")){
+					let totalCount = notificationModel.getData("totalCount")
 					
 					container.pagination.countAllElements = totalCount;
 				}
 				
-				if (notificationModel.containsKey("PagesCount")){
-					let pagesCount = notificationModel.getData("PagesCount")
+				if (notificationModel.containsKey("pagesCount")){
+					let pagesCount = notificationModel.getData("pagesCount")
 					
 					container.pagination.pagesSize = pagesCount;
 				}
@@ -211,7 +211,7 @@ Item {
 				let filteringIds = []
 				let filteringModel = container.dataController.filterableHeadersModel;
 				for (let i = 0; i < filteringModel.getItemsCount(); i++){
-					let infoId = filteringModel.getData("Id", i);
+					let infoId = filteringModel.getData("id", i);
 					filteringIds.push(infoId)
 				}
 				

@@ -66,16 +66,20 @@ ControlBase {
 	}
 
 	function addButton(id, name, enabled){
-		buttonsModel.append({Id: id, Name:name, Enabled: enabled})
+		if (enabled == undefined){
+			enabled = true
+		}
+
+		buttonsModel.append({id: id, name:name, enabled: enabled})
 	}
 
 	function insertButton(id, name, enabled, index){
-		buttonsModel.insert(index, {Id: id, Name:name, Enabled: enabled})
+		buttonsModel.insert(index, {id: id, name:name, enabled: enabled})
 	}
 
 	function removeButton(id){
 		for(let i = 0; i < buttonsModel.count; i++){
-			let buttonId = buttonsModel.get(i).Id;
+			let buttonId = buttonsModel.get(i).id;
 			if (buttonId === id){
 				buttonsModel.remove(i);
 				break;
@@ -89,19 +93,30 @@ ControlBase {
 
 	function setButtonName(id, name){
 		for(let i = 0; i < buttonsModel.count; i++){
-			let buttonId = buttonsModel.get(i).Id;
+			let buttonId = buttonsModel.get(i).id;
 			if (buttonId === id){
-				buttonsModel.setProperty(i, "Name", name);
+				buttonsModel.setProperty(i, "name", name);
 				break;
 			}
 		}
 	}
+	
+	function buttonIsEnabled(buttonId){
+		for(let i = 0; i < buttonsModel.count; i++){
+			let id = buttonsModel.get(i).id
+			if (buttonId === id){
+				return buttonsModel.get(i).enabled
+			}
+		}
+		
+		return false
+	}
 
 	function setButtonEnabled(id, enabled){
 		for(let i = 0; i < buttonsModel.count; i++){
-			let buttonId = buttonsModel.get(i).Id;
+			let buttonId = buttonsModel.get(i).id;
 			if (buttonId === id){
-				buttonsModel.setProperty(i, "Enabled", enabled);
+				buttonsModel.setProperty(i, "enabled", enabled);
 				break;
 			}
 		}
@@ -164,7 +179,7 @@ ControlBase {
 		}
 		let buttonIds = 0;
 		for(let i = 0; i < dialogContainer.buttonsModel.count; i++){
-			let id = dialogContainer.buttonsModel.get(i).Id;
+			let id = dialogContainer.buttonsModel.get(i).id;
 			if(i == 0){
 				buttonIds = id;
 			}

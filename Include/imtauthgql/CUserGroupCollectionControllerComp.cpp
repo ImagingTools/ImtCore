@@ -28,16 +28,16 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	QByteArray productId;
-	if (groupDataRepresentation.ProductId){
-		productId = *groupDataRepresentation.ProductId;
+	if (groupDataRepresentation.productId){
+		productId = *groupDataRepresentation.productId;
 	}
 
 	QString name;
-	if (groupDataRepresentation.Name){
-		name = *groupDataRepresentation.Name;
+	if (groupDataRepresentation.name){
+		name = *groupDataRepresentation.name;
 	}
 	if (name.isEmpty()){
-		errorMessage = QString("Group Name cannot be empty");
+		errorMessage = QString("Group name cannot be empty");
 		return false;
 	}
 
@@ -60,20 +60,20 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 
 	userGroupInfoPtr->SetName(name);
 
-	if (groupDataRepresentation.Description){
-		userGroupInfoPtr->SetDescription(*groupDataRepresentation.Description);
+	if (groupDataRepresentation.description){
+		userGroupInfoPtr->SetDescription(*groupDataRepresentation.description);
 	}
 
 	QByteArrayList userIds;
-	if (groupDataRepresentation.Users){
-		userIds = groupDataRepresentation.Users->split(';');
+	if (groupDataRepresentation.users){
+		userIds = groupDataRepresentation.users->split(';');
 	}
 	userIds.removeAll("");
 	userGroupInfoPtr->SetUsers(userIds);
 
 	QByteArrayList roleIds;
-	if (groupDataRepresentation.Roles){
-		roleIds = groupDataRepresentation.Roles->split(';');
+	if (groupDataRepresentation.roles){
+		roleIds = groupDataRepresentation.roles->split(';');
 	}
 	roleIds.removeAll("");
 
@@ -84,8 +84,8 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 		userGroupInfoPtr->RemoveProduct(productId);
 	}
 
-	if (groupDataRepresentation.ParentGroups){
-		QByteArrayList groupIds = groupDataRepresentation.ParentGroups->split(';');
+	if (groupDataRepresentation.parentGroups){
+		QByteArrayList groupIds = groupDataRepresentation.parentGroups->split(';');
 		for (const QByteArray& parentGroupId : groupIds){
 			if (!parentGroupId.isEmpty()){
 				userGroupInfoPtr->AddParentGroup(parentGroupId);
@@ -112,12 +112,12 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserGroupCollectionControllerComp::O
 		languageId = gqlContextPtr->GetLanguageId();
 	}
 
-	if (response.Version_1_0->Text->isEmpty()){
-		response.Version_1_0->Text = "<no name>";
+	if (response.Version_1_0->text->isEmpty()){
+		response.Version_1_0->text = "<no name>";
 	}
 
 	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Groups")).toUtf8(), languageId, "CRoleCollectionControllerComp");
-	response.Version_1_0->Text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->Text;
+	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
 
 	return response;
 }
@@ -133,8 +133,8 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
 	QByteArray productId;
-	if (groupsListRequest.GetRequestedArguments().input.Version_1_0->ProductId){
-		productId = *groupsListRequest.GetRequestedArguments().input.Version_1_0->ProductId;
+	if (groupsListRequest.GetRequestedArguments().input.Version_1_0->productId){
+		productId = *groupsListRequest.GetRequestedArguments().input.Version_1_0->productId;
 	}
 
 	const imtauth::IUserGroupInfo* userGroupInfoPtr = nullptr;
@@ -153,27 +153,27 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Groups::GroupsListRequestInfo requestInfo = groupsListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.Id = QByteArray(objectId);
+		representationObject.id = QByteArray(objectId);
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.TypeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
 	}
 
 	if (requestInfo.items.isNameRequested){
-		representationObject.Name = QString(userGroupInfoPtr->GetName());
+		representationObject.name = QString(userGroupInfoPtr->GetName());
 	}
 
 	if (requestInfo.items.isRolesRequested){
-		representationObject.Roles = QByteArray(userGroupInfoPtr->GetRoles(productId).join(';'));
+		representationObject.roles = QByteArray(userGroupInfoPtr->GetRoles(productId).join(';'));
 	}
 
 	if (requestInfo.items.isParentGroupsRequested){
-		representationObject.ParentGroups = QByteArray(userGroupInfoPtr->GetParentGroups().join(';'));
+		representationObject.parentGroups = QByteArray(userGroupInfoPtr->GetParentGroups().join(';'));
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.Description = QString(userGroupInfoPtr->GetDescription());
+		representationObject.description = QString(userGroupInfoPtr->GetDescription());
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -181,7 +181,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.Added = QString(added);
+		representationObject.added = QString(added);
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
@@ -189,7 +189,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.LastModified = QString(lastModified);
+		representationObject.lastModified = QString(lastModified);
 	}
 
 	return true;
@@ -224,8 +224,8 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 		return nullptr;
 	}
 
-	if (groupDataRepresentation.Id){
-		newObjectId = *groupDataRepresentation.Id;
+	if (groupDataRepresentation.id){
+		newObjectId = *groupDataRepresentation.id;
 	}
 	if (newObjectId.isEmpty()){
 		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
@@ -257,25 +257,25 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Groups::GroupItemRequestArguments arguments = groupItemRequest.GetRequestedArguments();
 
 	QByteArray productId;
-	if (arguments.input.Version_1_0->ProductId){
-		productId = *arguments.input.Version_1_0->ProductId;
+	if (arguments.input.Version_1_0->productId){
+		productId = *arguments.input.Version_1_0->productId;
 	}
 
-	representationPayload.Id = QByteArray(userGroupInfoPtr->GetObjectUuid());
-	representationPayload.Name = QString(userGroupInfoPtr->GetName());
-	representationPayload.Description = QString(userGroupInfoPtr->GetDescription());
+	representationPayload.id = QByteArray(userGroupInfoPtr->GetObjectUuid());
+	representationPayload.name = QString(userGroupInfoPtr->GetName());
+	representationPayload.description = QString(userGroupInfoPtr->GetDescription());
 
 	imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
 	std::sort(userIds.begin(), userIds.end());
-	representationPayload.Users = QByteArray(userIds.join(';'));
+	representationPayload.users = QByteArray(userIds.join(';'));
 
 	imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
 	std::sort(roleIds.begin(), roleIds.end());
-	representationPayload.Roles = QByteArray(roleIds.join(';'));
+	representationPayload.roles = QByteArray(roleIds.join(';'));
 
 	imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
 	std::sort(groupIds.begin(), groupIds.end());
-	representationPayload.ParentGroups = QByteArray(groupIds.join(';'));
+	representationPayload.parentGroups = QByteArray(groupIds.join(';'));
 
 	return true;
 }
@@ -289,7 +289,7 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 
 	const imtgql::CGqlObject& params = gqlRequest.GetParams();
 
-	QByteArray productId = params.GetFieldArgumentValue("ProductId").toByteArray();
+	QByteArray productId = params.GetFieldArgumentValue("productId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -301,13 +301,13 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 		const imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 		if (userGroupInfoPtr != nullptr){
 			int index = dataModel->InsertNewItem();
-			dataModel->SetData("Name", "Parent Groups", index);
-			imtbase::CTreeItemModel* children = dataModel->AddTreeModel("Children", index);
+			dataModel->SetData("name", "Parent Groups", index);
+			imtbase::CTreeItemModel* children = dataModel->AddTreeModel("children", index);
 
 			if (m_userGroupInfoProviderCompPtr.IsValid()){
 				imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
 				if (groupIds.isEmpty()){
-					children->SetData("Value", "No parent groups");
+					children->SetData("value", "No parent groups");
 				}
 				else{
 					for (const QByteArray& groupId : groupIds){
@@ -316,20 +316,20 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 							QString groupName = parentGroupInfoPtr->GetName();
 
 							int childrenIndex = children->InsertNewItem();
-							children->SetData("Value", groupName, childrenIndex);
+							children->SetData("value", groupName, childrenIndex);
 						}
 					}
 				}
 			}
 
 			index = dataModel->InsertNewItem();
-			dataModel->SetData("Name", "Users", index);
-			children = dataModel->AddTreeModel("Children", index);
+			dataModel->SetData("name", "Users", index);
+			children = dataModel->AddTreeModel("children", index);
 
 			if (m_userInfoProviderCompPtr.IsValid()){
 				imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
 				if (userIds.isEmpty()){
-					children->SetData("Value", "No users");
+					children->SetData("value", "No users");
 				}
 				else{
 					for (const QByteArray& groupUserId : userIds){
@@ -338,20 +338,20 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 							QString userName = userInfoPtr->GetName();
 
 							int childrenIndex = children->InsertNewItem();
-							children->SetData("Value", userName, childrenIndex);
+							children->SetData("value", userName, childrenIndex);
 						}
 					}
 				}
 			}
 
 			index = dataModel->InsertNewItem();
-			dataModel->SetData("Name", "Roles", index);
-			children = dataModel->AddTreeModel("Children", index);
+			dataModel->SetData("name", "Roles", index);
+			children = dataModel->AddTreeModel("children", index);
 
 			if (m_roleInfoProviderCompPtr.IsValid()){
 				imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
 				if (roleIds.isEmpty()){
-					children->SetData("Value", "No roles");
+					children->SetData("value", "No roles");
 				}
 				else{
 					for (const QByteArray& roleId : roleIds){
@@ -360,7 +360,7 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 							QString roleName = roleInfoPtr->GetRoleName();
 
 							int childrenIndex = children->InsertNewItem();
-							children->SetData("Value", roleName, childrenIndex);
+							children->SetData("value", roleName, childrenIndex);
 						}
 					}
 				}
@@ -385,8 +385,8 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 
-	if (groupUpdateRequest.GetRequestedArguments().input.Version_1_0->Item){
-		representation.Version_1_0 = groupUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;
+	if (groupUpdateRequest.GetRequestedArguments().input.Version_1_0->item){
+		representation.Version_1_0 = groupUpdateRequest.GetRequestedArguments().input.Version_1_0->item;
 	}
 
 	imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(&object);

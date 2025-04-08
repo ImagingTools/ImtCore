@@ -7,63 +7,63 @@ schema {
 }
 
 input GetRevisionInfoListInput {
-	DocumentId: ID
-	CollectionId: ID
+	documentId: ID
+	collectionId: ID
 }
 
 input BackupRevisionInput {
-	ObjectId: ID
-	CollectionId: ID
-	Comment: String
+	objectId: ID
+	collectionId: ID
+	comment: String
 }
 
 input RestoreRevisionInput {
-	ObjectId: ID
-	CollectionId: ID
-	Revision: Integer
+	objectId: ID
+	collectionId: ID
+	revision: Integer
 }
 
 input ExportRevisionInput {
-	ObjectId: ID
-	CollectionId: ID
-	Revision: Integer
-	FilePath: String
+	objectId: ID
+	collectionId: ID
+	revision: Integer
+	filePath: String
 }
 
 input DeleteRevisionInput {
-	ObjectId: ID
-	CollectionId: ID
-	Revision: Integer
+	objectId: ID
+	collectionId: ID
+	revision: Integer
 }
 
 type RevisionItem {
-	User: String
-	Revision: Integer
-	IsActive: Boolean
-	Timestamp: String
-	Description: String
+	user: String
+	revision: Integer
+	isActive: Boolean
+	timestamp: String
+	description: String
 }
 
 type RevisionInfoList {
-	DocumentId: ID
-	ActiveRevision: Integer
-	Revisions: [RevisionItem]
+	documentId: ID
+	activeRevision: Integer
+	revisions: [RevisionItem]
 }
 
 type BackupRevisionResponse {
-	Result: Integer
+	result: Integer
 }
 
 type RestoreRevisionResponse {
-	Result: Boolean
+	result: Boolean
 }
 
 type ExportRevisionResponse {
-	Result: Boolean
+	result: Boolean
 }
 
 type DeleteRevisionResponse {
-	Result: Boolean
+	result: Boolean
 }
 
 type Query {

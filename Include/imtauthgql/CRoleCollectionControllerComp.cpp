@@ -34,8 +34,8 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	QByteArray roleId;
-	if (roleDataRepresentation.RoleId){
-		roleId = *roleDataRepresentation.RoleId;
+	if (roleDataRepresentation.roleId){
+		roleId = *roleDataRepresentation.roleId;
 	}
 
 	if (roleId.isEmpty()){
@@ -46,8 +46,8 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	roleInfoPtr->SetRoleId(roleId);
 
 	QByteArray productId;
-	if (roleDataRepresentation.ProductId){
-		productId = *roleDataRepresentation.ProductId;
+	if (roleDataRepresentation.productId){
+		productId = *roleDataRepresentation.productId;
 	}
 
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
@@ -72,20 +72,20 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	roleInfoPtr->SetProductId(productId);
 
 	QString roleName;
-	if (roleDataRepresentation.Name){
-		roleName = *roleDataRepresentation.Name;
+	if (roleDataRepresentation.name){
+		roleName = *roleDataRepresentation.name;
 	}
 	roleInfoPtr->SetRoleName(roleName);
 
 	QString roleDescription;
-	if (roleDataRepresentation.Description){
-		roleDescription = *roleDataRepresentation.Description;
+	if (roleDataRepresentation.description){
+		roleDescription = *roleDataRepresentation.description;
 	}
 	roleInfoPtr->SetRoleDescription(roleDescription);
 
 	QByteArray parentRoles;
-	if (roleDataRepresentation.ParentRoles){
-		parentRoles = *roleDataRepresentation.ParentRoles;
+	if (roleDataRepresentation.parentRoles){
+		parentRoles = *roleDataRepresentation.parentRoles;
 	}
 	if (!parentRoles.isEmpty()){
 		QByteArrayList parentRoleIds = parentRoles.split(';');
@@ -102,17 +102,17 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	QByteArray permissions;
-	if (roleDataRepresentation.Permissions){
-		permissions = *roleDataRepresentation.Permissions;
+	if (roleDataRepresentation.permissions){
+		permissions = *roleDataRepresentation.permissions;
 	}
 	QByteArrayList permissionIds = permissions.split(';');
 	permissionIds.removeAll("");
 	roleInfoPtr->SetLocalPermissions(permissionIds);
 
-	bool isGuest = bool(roleDataRepresentation.IsGuest && *roleDataRepresentation.IsGuest);
+	bool isGuest = bool(roleDataRepresentation.isGuest && *roleDataRepresentation.isGuest);
 	roleInfoPtr->SetGuest(isGuest);
 
-	bool isDefault = bool(roleDataRepresentation.IsDefault && *roleDataRepresentation.IsDefault);
+	bool isDefault = bool(roleDataRepresentation.isDefault && *roleDataRepresentation.isDefault);
 	roleInfoPtr->SetDefault(isDefault);
 
 	if (isGuest || isDefault){
@@ -149,8 +149,8 @@ sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetO
 		languageId = gqlContextPtr->GetLanguageId();
 	}
 
-	if (response.Version_1_0->Text->isEmpty()){
-		response.Version_1_0->Text = "<no name>";
+	if (response.Version_1_0->text->isEmpty()){
+		response.Version_1_0->text = "<no name>";
 	}
 
 	QString translation = iqt::GetTranslation(
@@ -158,7 +158,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetO
 		QString(QT_TR_NOOP("Roles")).toUtf8(),
 		languageId,
 		"CRoleCollectionControllerComp");
-	response.Version_1_0->Text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->Text;
+	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
 	return response;
 }
 
@@ -189,45 +189,45 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Roles::RolesListRequestInfo requestInfo = rolesListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.Id = QByteArray(objectId);
+		representationObject.id = QByteArray(objectId);
 	}
 
 	if (requestInfo.items.isRoleNameRequested){
-		representationObject.RoleName = QString(roleInfoPtr->GetRoleName());
+		representationObject.roleName = QString(roleInfoPtr->GetRoleName());
 	}
 
 	if (requestInfo.items.isRoleIdRequested){
-		representationObject.RoleId = QByteArray(roleInfoPtr->GetRoleId());
+		representationObject.roleId = QByteArray(roleInfoPtr->GetRoleId());
 	}
 
 	if (requestInfo.items.isRoleDescriptionRequested){
-		representationObject.RoleDescription = QString(roleInfoPtr->GetRoleDescription());
+		representationObject.roleDescription = QString(roleInfoPtr->GetRoleDescription());
 	}
 
 	if (requestInfo.items.isParentRolesRequested){
-		representationObject.ParentRoles = QByteArray(roleInfoPtr->GetIncludedRoles().join(';'));
+		representationObject.parentRoles = QByteArray(roleInfoPtr->GetIncludedRoles().join(';'));
 	}
 
 	if (requestInfo.items.isProductIdRequested){
-		representationObject.ProductId = QByteArray(roleInfoPtr->GetProductId());
+		representationObject.productId = QByteArray(roleInfoPtr->GetProductId());
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.TypeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
 	}
 
 	if (requestInfo.items.isAddedRequested){
 		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime().toUTC();
 		
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.Added = QString(added);
+		representationObject.added = QString(added);
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
 		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime().toUTC();
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.LastModified = QString(lastModified);
+		representationObject.lastModified = QString(lastModified);
 	}
 
 	return true;
@@ -263,8 +263,8 @@ istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation
 	}
 
 	QByteArray id;
-	if (roleDataRepresentation.Id){
-		id = *roleDataRepresentation.Id;
+	if (roleDataRepresentation.id){
+		id = *roleDataRepresentation.id;
 	}
 	if (id.isEmpty()){
 		id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
@@ -298,30 +298,30 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Roles::RoleItemRequestArguments arguments = roleItemRequest.GetRequestedArguments();
 
 	QByteArray id = roleInfoPtr->GetObjectUuid();
-	representationPayload.Id = QByteArray(id);
+	representationPayload.id = QByteArray(id);
 
 	QByteArray roleId = roleInfoPtr->GetRoleId();
-	representationPayload.RoleId = QByteArray(roleId);
+	representationPayload.roleId = QByteArray(roleId);
 
 	QByteArray productId = roleInfoPtr->GetProductId();
-	representationPayload.ProductId = QByteArray(productId);
+	representationPayload.productId = QByteArray(productId);
 
 	QString name = roleInfoPtr->GetRoleName();
-	representationPayload.Name = QString(name);
+	representationPayload.name = QString(name);
 
 	QString description = roleInfoPtr->GetRoleDescription();
-	representationPayload.Description = QString(description);
+	representationPayload.description = QString(description);
 
 	QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
 	std::sort(parentsRolesIds.begin(), parentsRolesIds.end());
-	representationPayload.ParentRoles = QByteArray(parentsRolesIds.join(';'));
+	representationPayload.parentRoles = QByteArray(parentsRolesIds.join(';'));
 
 	imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
 	std::sort(permissions.begin(), permissions.end());
-	representationPayload.Permissions = QByteArray(permissions.join(';'));
+	representationPayload.permissions = QByteArray(permissions.join(';'));
 
-	representationPayload.IsDefault = bool(roleInfoPtr->IsDefault());
-	representationPayload.IsGuest = bool(roleInfoPtr->IsGuest());
+	representationPayload.isDefault = bool(roleInfoPtr->IsDefault());
+	representationPayload.isGuest = bool(roleInfoPtr->IsGuest());
 
 	return true;
 }
@@ -336,7 +336,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 	const imtgql::CGqlObject paramsPtr = gqlRequest.GetParams();
 
 	QByteArray productId;
-	productId = paramsPtr.GetFieldArgumentValue("ProductId").toByteArray();
+	productId = paramsPtr.GetFieldArgumentValue("productId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
@@ -352,14 +352,14 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 		}
 
 		int index = dataModelPtr->InsertNewItem();
-		dataModelPtr->SetData("Id", "ParentRoles", index);
-		dataModelPtr->SetData("Name", "Parent Roles", index);
-		imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("Children", index);
+		dataModelPtr->SetData("id", "ParentRoles", index);
+		dataModelPtr->SetData("name", "Parent Roles", index);
+		imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("children", index);
 
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
 
 		if (parentRolesIds.isEmpty()){
-			children->SetData("Value", "No parent roles");
+			children->SetData("value", "No parent roles");
 		}
 		else{
 			for (const QByteArray& parentRoleId : parentRolesIds){
@@ -371,7 +371,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 
 						int childrenIndex = children->InsertNewItem();
 
-						children->SetData("Value", parentRoleName, childrenIndex);
+						children->SetData("value", parentRoleName, childrenIndex);
 					}
 				}
 			}
@@ -379,20 +379,20 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 
 		index = dataModelPtr->InsertNewItem();
 
-		dataModelPtr->SetData("Id", "Permissions", index);
-		dataModelPtr->SetData("Name", "Permissions", index);
-		children = dataModelPtr->AddTreeModel("Children", index);
+		dataModelPtr->SetData("id", "Permissions", index);
+		dataModelPtr->SetData("name", "Permissions", index);
+		children = dataModelPtr->AddTreeModel("children", index);
 
 		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetPermissions();
 
 		if (permissionsIds.isEmpty()){
-			children->SetData("Value", "No permissions");
+			children->SetData("value", "No permissions");
 		}
 		else{
 			for (const QByteArray& permissionId : permissionsIds){
 				int childrenIndex = children->InsertNewItem();
 
-				children->SetData("Value", permissionId, childrenIndex);
+				children->SetData("value", permissionId, childrenIndex);
 			}
 		}
 	}
@@ -405,14 +405,14 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 	const imtgql::CGqlRequest& gqlRequest,
 	imtbase::CComplexCollectionFilter& complexFilter) const
 {
-	QByteArray productId = GetInputArgumentFromRequest(gqlRequest, "ProductId").toByteArray();
+	QByteArray productId = GetInputArgumentFromRequest(gqlRequest, "productId").toByteArray();
 	if (productId.isEmpty()){
 		SendErrorMessage(0, "Unable to set product-ID to collection filter", "CRoleCollectionControllerComp");
 		return;
 	}
 	
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "ProductId";
+	fieldFilter.fieldId = "productId";
 	fieldFilter.filterValue = productId;
 	
 	complexFilter.AddFieldFilter(fieldFilter);
@@ -431,12 +431,12 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		return false;
 	}
 	
-	if (!arguments.input.Version_1_0->Item.has_value()){
+	if (!arguments.input.Version_1_0->item.has_value()){
 		Q_ASSERT(false);
 		return false;
 	}
 	
-	sdl::imtauth::Roles::CRoleData::V1_0 roleDataRepresentation = *roleUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;
+	sdl::imtauth::Roles::CRoleData::V1_0 roleDataRepresentation = *roleUpdateRequest.GetRequestedArguments().input.Version_1_0->item;
 	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(&object);
 	if (roleInfoPtr == nullptr){
 		errorMessage = QString("Unable to cast role instance to identifable object. Error: Invalid object");

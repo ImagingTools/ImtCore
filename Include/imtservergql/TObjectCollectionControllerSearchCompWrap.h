@@ -85,7 +85,7 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 		return nullptr;
 	}
 
-	imtbase::CTreeItemModel* filterSearchModelPtr = headersDataModelPtr->GetTreeItemModel("FilterSearch");
+	imtbase::CTreeItemModel* filterSearchModelPtr = headersDataModelPtr->GetTreeItemModel("filterSearch");
 	if (filterSearchModelPtr == nullptr){
 		return nullptr;
 	}
@@ -98,7 +98,7 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	QList<sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0> fieldList;
 	for (int i = 0; i < filterSearchModelPtr->GetItemsCount(); i++){
 		sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0 fieldFilter;
-		fieldFilter.fieldId = filterSearchModelPtr->GetData("Id", i).toByteArray();
+		fieldFilter.fieldId = filterSearchModelPtr->GetData("id", i).toByteArray();
 		fieldFilter.filterValue = text;
 		fieldFilter.filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
 		
@@ -114,22 +114,22 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 
 	imtgql::CGqlObject input;
 	imtgql::CGqlObject viewParams;
-	viewParams.InsertField("Offset", 0);
-	viewParams.InsertField("Count", -1);
+	viewParams.InsertField("offset", 0);
+	viewParams.InsertField("count", -1);
 	
 	imtgql::CGqlObject complexFilterGqlOblect;
 	if (complexFilter.WriteToGraphQlObject(complexFilterGqlOblect)){
-		viewParams.InsertField("ComplexFilterModel", complexFilterGqlOblect);
+		viewParams.InsertField("filterModel", complexFilterGqlOblect);
 	}
 	
 	input.InsertField("viewParams", viewParams);
 	gqlRequest.AddParam("input", input);
 
 	imtgql::CGqlObject items;
-	items.InsertField("Id");
-	items.InsertField("Name");
-	items.InsertField("TypeId");
-	items.InsertField("Description");
+	items.InsertField("id");
+	items.InsertField("name");
+	items.InsertField("typeId");
+	items.InsertField("description");
 	gqlRequest.AddField("items", items);
 	
 	istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = BaseClass::ListObjects(gqlRequest, errorMessage);
@@ -151,10 +151,10 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	for (int i = 0; i < itemsModelPtr->GetItemsCount(); i++){
 		imtbase::ISearchResults::SearchResult searchResult;
 
-		searchResult.contextId = itemsModelPtr->GetData("Id", i).toByteArray();
-		searchResult.resultName = itemsModelPtr->GetData("Name", i).toString();
-		searchResult.resultDescription = itemsModelPtr->GetData("Description", i).toString();
-		searchResult.contextTypeId = itemsModelPtr->GetData("TypeId", i).toByteArray();
+		searchResult.contextId = itemsModelPtr->GetData("id", i).toByteArray();
+		searchResult.resultName = itemsModelPtr->GetData("name", i).toString();
+		searchResult.resultDescription = itemsModelPtr->GetData("description", i).toString();
+		searchResult.contextTypeId = itemsModelPtr->GetData("typeId", i).toByteArray();
 
 		searchResultsPtr->AddSearchResult(searchResult);
 	}

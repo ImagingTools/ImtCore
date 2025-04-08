@@ -51,17 +51,21 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 	
 	dependentMetaInfo.objectId = elementId;
 	dependentMetaInfo.dependentKey = *m_metaInfoIdAttrPtr;
-
+	
+	bool isDocumentSource = m_isDocumentSourceAttrPtr.IsValid() ? *m_isDocumentSourceAttrPtr : true;
+	
 	for (int i = 0; i < m_metaInfoNameAttrPtr.GetCount(); i++){
 		QString metaInfoName = m_metaInfoNameAttrPtr[i];
 		QString dependentMetaInfoName = m_dependentMetaInfoNameAttrPtr[i];
 		dependentMetaInfo.metaInfoIds << metaInfoName;
-		
+
 		if (!isRemoved){
 			QString selectValue =
-				QString(R"(
-			(SELECT "DataMetaInfo"->>'%0' FROM "%1" WHERE "State" = 'Active' AND "DocumentId" = '%2' LIMIT 1)
-			)").arg(dependentMetaInfoName, *m_dependentTableNameAttrPtr, qPrintable(elementId));
+				QString(R"((SELECT "%0"->>'%1' FROM "%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
+						)").arg(isDocumentSource ? "Document" : "DataMetaInfo",
+								dependentMetaInfoName,
+								*m_dependentTableNameAttrPtr,
+								qPrintable(elementId));
 			
 			dependentMetaInfo.metaInfoValues << selectValue;
 		}

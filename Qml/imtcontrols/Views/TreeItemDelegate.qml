@@ -15,7 +15,7 @@ Item {
     property Item rootItem: null;
 
     property int state: model.State;
-    property string itemId: model.Id;
+    property string itemId: model.Id || model.id || "";
 
     property bool itemVisible: model.Visible;
     property bool itemActive: model.Active;
@@ -60,13 +60,6 @@ Item {
                 anchors.fill: parent;
 
                 onClicked: {
-                     console.log();
-                    console.log("Id", model.Id);
-                    console.log("Optional", model.Optional);
-                    console.log("State", model.State);
-                    console.log("Level", model.Level);
-                    console.log("ChildModel", model.ChildModel);
-
                     treeItemDelegate.clicked(model, model.index);
                 }
 
@@ -120,8 +113,6 @@ Item {
                     if (!model.Active){
                         return;
                     }
-                    console.log("onClicked", treeItemDelegate.itemData.Id);
-//                    treeItemDelegate.stateChanged.connect(treeView.itemStateChanged);
 
                     if (model.State == Qt.PartiallyChecked){
                         model.State = Qt.Checked;
@@ -131,10 +122,6 @@ Item {
                     }
 
                     treeItemDelegate.rootItem.itemsStateChanged(treeItemDelegate.itemData);
-
-//                    treeView.childrenStateChanged(itemData, model.State);
-//                    treeView.parentStateChanged(itemData, model.State);
-//                    treeItemDelegate.stateChanged.disconnect(treeView.itemStateChanged);
                 }
             }
 
@@ -150,7 +137,7 @@ Item {
                 font.pixelSize: Style.fontSizeNormal;
                 font.family: Style.fontFamily;
 
-                text: model.Name;
+                text: model.name;
             }
         }
     }
@@ -169,13 +156,9 @@ Item {
         Repeater {
             id: childModelRepeater;
 
-            //delegate: treeViewContainer.itemDelegate;
             delegate: treeItemDelegate.rootItem.itemDelegate;
 
-
             onItemAdded: {
-                console.log('Repeater onItemAdded',  treeItemDelegate.itemData.Level);
-
                 if (treeItemDelegate.itemData.Level >= 1){
                     item.itemData.Parent = treeItemDelegate.itemData;
                     if (!treeItemDelegate.itemData.Children){

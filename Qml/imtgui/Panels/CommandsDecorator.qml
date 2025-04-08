@@ -56,8 +56,8 @@ Item {
         if (Qt.platform.os === "web"){
             buttonModel = model;
             for (let index = 0; index < model.getItemsCount(); index++){
-                let modelIcon = model.getData("Icon",index)
-                let isEnabled = model.getData("IsEnabled",index)
+                let modelIcon = model.getData("icon",index)
+                let isEnabled = model.getData("isEnabled",index)
                 let path = modelIcon === "" ? "" : isEnabled ? Style.getIconPath(modelIcon, Icon.State.On, Icon.Mode.Normal) :
                                                                Style.getIconPath(modelIcon, Icon.State.Off, Icon.Mode.Disabled)
                 if (path !== ""){
@@ -121,34 +121,34 @@ Item {
 
                 property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
 
-                visible: model.Id !== "";
+                visible: model.id !== "";
                 Button {
                     id: topButtonDelegate;
 
                     decorator: Style.topButtonDecorator
 
-                    iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
-                                                   "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
+                    iconSource: model.icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) :
+                                                   "../../../../" + Style.getIconPath(model.icon, Icon.State.Off, Icon.Mode.Disabled);
 
-                    enabled: model.IsEnabled;
+                    enabled: model.isEnabled;
 
-                    visible: model.Visible;
+                    visible: model.visible;
 
-                    text: model.Name;
+                    text: model.name;
 
-                    checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
+                    checkable: model.isToggleable !== undefined ? model.IsToggleable : false
 
                     widthFromDecorator: true;
                     heightFromDecorator: true;
 
-                    property bool isToggled: model.IsToggled !== undefined ? model.IsToggled : false;
+                    property bool isToggled: model.isToggled !== undefined ? model.isToggled : false;
 
                     onIsToggledChanged: {
-                        checked = checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
+                        checked = checkable ? model.isToggled !== undefined ? model.isToggled : false : false;
                     }
 
                     onClicked: {
-                        Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
+                        Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.id);
                     }
                 }
             }
@@ -159,20 +159,20 @@ Item {
                 id: verticalComp;
 
                 width: 150;
-                height: isHorizontal ? -buttonPanel.verticalSpacing : model.Name == "" ? splitter.height : textButtonDelegateContainer.height;
+                height: isHorizontal ? -buttonPanel.verticalSpacing : model.name == "" ? splitter.height : textButtonDelegateContainer.height;
 
                 property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
 
                 Button {
                     id: textButtonDelegateContainer;
                     width: parent.width;
-                    visible: model.Name !== "";
-                    iconSource: model.IsEnabled !== "" ? (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) : "") :
-                                                         (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled) : "");
-                    enabled: model.IsEnabled;
-                    text: model.Name !== undefined ? model.Name : "";
-                    checked: checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
-                    checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
+                    visible: model.name !== "";
+                    iconSource: model.isEnabled !== "" ? (model.icon !== "" ? "../../../../" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) : "") :
+                                                         (model.icon !== "" ? "../../../../" + Style.getIconPath(model.icon, Icon.State.Off, Icon.Mode.Disabled) : "");
+                    enabled: model.isEnabled;
+                    text: model.name !== undefined ? model.name : "";
+                    checked: checkable ? model.isToggled !== undefined ? model.isToggled : false : false;
+                    checkable: model.isToggleable !== undefined ? model.isToggleable : false
 
                     decorator: Component {
                         ButtonDecorator {
@@ -181,10 +181,10 @@ Item {
                         }
                     }
 
-                    property string id: model.Id !== undefined ? model.Id : "";
+                    property string id: model.id !== undefined ? model.id : "";
 
                     onClicked: {
-                        Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
+                        Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.id);
                         if (buttonPanel){
                             buttonPanel.clicked(id);
                         }
@@ -197,9 +197,9 @@ Item {
                     anchors.top: parent.top;
 
                     width: verticalComp.isHorizontal ? 1 : buttonPanel.verticalMenuWidth;
-                    height: model.Name == "" && model.index == buttonPanel.horizCount ? -buttonPanel.verticalSpacing : 1;
+                    height: model.name == "" && model.index == buttonPanel.horizCount ? -buttonPanel.verticalSpacing : 1;
                     color: Style.textColor;
-                    visible: model.Name !== "" ? false : model.index == buttonPanel.horizCount ? false : model.index == (buttonPanel.buttonModel.getItemsCount() - 1) ? false : true ;
+                    visible: model.name !== "" ? false : model.index == buttonPanel.horizCount ? false : model.index == (buttonPanel.buttonModel.getItemsCount() - 1) ? false : true ;
                 }
             }
         }

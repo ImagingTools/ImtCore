@@ -125,11 +125,11 @@ Rectangle {
     }
 
     function getSelectedId(){
-        return model.Id;
+        return model.id || model.Id || "";
     }
 
     function getSelectedName(){
-        return model.Name;
+        return model.name;
     }
 
     function setBorderParams(){

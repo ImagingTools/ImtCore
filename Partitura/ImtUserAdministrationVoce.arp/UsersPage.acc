@@ -315,6 +315,30 @@
                     <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="CheckPermissionOr"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ReplaceableFilterFields" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>name</Value>
+                                <Value>mail</Value>
+                                <Value>systemName</Value>
+                                <Value>roles</Value>
+                                <Value>groups</Value>
+                                <Value>lastConnection</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ReplacementFilterFields" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Name</Value>
+                                <Value>Mail</Value>
+                                <Value>SystemName</Value>
+                                <Value>Roles</Value>
+                                <Value>Groups</Value>
+                                <Value>LastConnection</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -396,12 +420,12 @@
                     <AttributeInfo Id="HeadersIds" Type="String[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Name</Value>
-                                <Value>Mail</Value>
-                                <Value>SystemName</Value>
-                                <Value>Roles</Value>
-                                <Value>Groups</Value>
-                                <Value>LastConnection</Value>
+                                <Value>name</Value>
+                                <Value>mail</Value>
+                                <Value>systemName</Value>
+                                <Value>roles</Value>
+                                <Value>groups</Value>
+                                <Value>lastConnection</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -423,9 +447,9 @@
                     <AttributeInfo Id="SearchByFilterIds" Type="String[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Name</Value>
-                                <Value>Mail</Value>
-                                <Value>SystemName</Value>
+                                <Value>name</Value>
+                                <Value>mail</Value>
+                                <Value>systemName</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

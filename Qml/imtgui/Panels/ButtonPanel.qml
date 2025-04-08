@@ -75,10 +75,10 @@ Rectangle {
             width: buttonPanel.delegateWidth;
             height: buttonPanel.delegateHeight;
 
-            text: model.Name;
+            text: model.name;
 
             property bool active: model.Active !== undefined ? model.Active : false;
-            property string id: model.Id;
+            property string id: model.id;
             property Item rootItem: buttonPanel;
 
             onClicked:{
@@ -91,8 +91,8 @@ Rectangle {
         id: defaultDelegateVert;
 
         Item{
-            width: model.Name == "" ? splitter.width : textButtonDelegate.width;
-            height: model.Name == "" ? splitter.height : textButtonDelegate.height;
+            width: model.name == "" ? splitter.width : textButtonDelegate.width;
+            height: model.name == "" ? splitter.height : textButtonDelegate.height;
 
             TextButton{
                 id: textButtonDelegate;
@@ -100,16 +100,16 @@ Rectangle {
                 legendColor: Style.textColor;
                 indicatorColor: "transparent";
 
-                legend: model.Name !== undefined ? model.Name : "";
+                legend: model.name !== undefined ? model.name : "";
                 active: model.Active !== undefined ? model.Active : false;
                 fontFamily: Style.fontFamily;
                 fontBold: true;
                 fontPixelSize: Style.fontSizeNormal;
 
                 property Item rootItem: buttonPanel;
-                property string id: model.Id !== undefined ? model.Id : "";
+                property string id: model.id !== undefined ? model.id : "";
 
-                visible: model.Name !== "";
+                visible: model.name !== "";
 
                 onClicked: {
                     rootItem.clicked(id);
@@ -122,9 +122,9 @@ Rectangle {
                 anchors.top: parent.top;
 
                 width: buttonPanel.verticalMenuWidth;
-                height: model.Name == "" && model.index == 0 ? -buttonPanel.verticalSpacing : 2;
+                height: model.name == "" && model.index == 0 ? -buttonPanel.verticalSpacing : 2;
                 color: Style.textColor;
-                visible: model.Name !== "" ? false : model.index == 0 ? false : model.index == (buttonPanel.verticalModel.getItemsCount() - 1) ? false : true ;
+                visible: model.name !== "" ? false : model.index == 0 ? false : model.index == (buttonPanel.verticalModel.getItemsCount() - 1) ? false : true ;
             }
         }
     }
@@ -253,7 +253,7 @@ Rectangle {
                 for(var i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
                     var active = buttonPanel.buttonModel.getData("Active",i);
                     if(active){
-                        buttonPanel.activeId = buttonPanel.buttonModel.getData("Id",i);
+                        buttonPanel.activeId = buttonPanel.buttonModel.getData("id",i);
                     }
                     buttonPanel.rightOrderModel.insertNewItem()
                     buttonPanel.rightOrderModel.copyItemDataFromModel(i,buttonPanel.buttonModel,i);
@@ -281,7 +281,7 @@ Rectangle {
     function getMaxString(){
         var max = "";
         for(var i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
-            var str = buttonPanel.buttonModel.getData("Name",i);
+            var str = buttonPanel.buttonModel.getData("name",i);
             if(str.length > max.length){
                 max = str;
             }
@@ -468,7 +468,7 @@ Rectangle {
     function setActive(buttonId){
         var retval = 0;
         for(var i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
-            var id = buttonPanel.buttonModel.getData("Id",i);
+            var id = buttonPanel.buttonModel.getData("id",i);
             if(id == buttonId){
                 buttonPanel.buttonModel.setData("Active",true, i);
                 retval = i;
@@ -553,7 +553,7 @@ Rectangle {
         }
 
         for(let i = 0; i < buttonPanel.buttonModel.getItemsCount(); i++){
-            var id = buttonPanel.buttonModel.getData("Id",i);
+            var id = buttonPanel.buttonModel.getData("id",i);
             buttonPanel.buttonModel.setData("Active",(id == buttonPanel.activeId), i);
         }
 

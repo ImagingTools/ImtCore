@@ -14,19 +14,19 @@ namespace imtlicgql
 bool CFeatureMetaInfoDelegateComp::FillRepresentation(sdl::imtlic::Features::CFeatureData::V1_0& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const
 {
 	QByteArray featureId = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_ID).toByteArray();
-	metaInfoRepresentation.FeatureId = featureId;
+	metaInfoRepresentation.featureId = featureId;
 	
 	QString featureName = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_NAME).toString();
-	metaInfoRepresentation.FeatureName = featureName;
+	metaInfoRepresentation.featureName = featureName;
 	
 	QString description = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_DESCRIPTION).toString();
-	metaInfoRepresentation.Description = description;
+	metaInfoRepresentation.description = description;
 	
 	bool isOptional = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_IS_OPTIONAL).toBool();
-	metaInfoRepresentation.Optional = isOptional;
+	metaInfoRepresentation.optional = isOptional;
 	
 	bool isPermission = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_IS_PERMISSION).toBool();
-	metaInfoRepresentation.IsPermission = isPermission;
+	metaInfoRepresentation.isPermission = isPermission;
 	
 	return true;
 }
@@ -34,24 +34,24 @@ bool CFeatureMetaInfoDelegateComp::FillRepresentation(sdl::imtlic::Features::CFe
 
 bool CFeatureMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const sdl::imtlic::Features::CFeatureData::V1_0& metaInfoRepresentation) const
 {
-	if (metaInfoRepresentation.FeatureId){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_ID, *metaInfoRepresentation.FeatureId);
+	if (metaInfoRepresentation.featureId){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_ID, *metaInfoRepresentation.featureId);
 	}
 	
-	if (metaInfoRepresentation.FeatureName){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_NAME, *metaInfoRepresentation.FeatureName);
+	if (metaInfoRepresentation.featureName){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_NAME, *metaInfoRepresentation.featureName);
 	}
 	
-	if (metaInfoRepresentation.Description){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_DESCRIPTION, *metaInfoRepresentation.Description);
+	if (metaInfoRepresentation.description){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_DESCRIPTION, *metaInfoRepresentation.description);
 	}
 	
-	if (metaInfoRepresentation.Optional){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_IS_OPTIONAL, *metaInfoRepresentation.Optional);
+	if (metaInfoRepresentation.optional){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_IS_OPTIONAL, *metaInfoRepresentation.optional);
 	}
 	
-	if (metaInfoRepresentation.IsPermission){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_IS_PERMISSION, *metaInfoRepresentation.IsPermission);
+	if (metaInfoRepresentation.isPermission){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_IS_PERMISSION, *metaInfoRepresentation.isPermission);
 	}
 	
 	return true;

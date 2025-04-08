@@ -219,8 +219,8 @@ const char* substratQuery = R"(
 {"query": "query SubstratesList {
 	SubstratesList(input:
 		{viewParams:
-			{Count: 25, Offset: 0,
-				ComplexFilterModel: {
+			{count: 25, offset: 0,
+				filterModel: {
 					sortingInfo:[
 						{fieldId:\"Name\",sortingOrder:\"ASC\"}
 					],
@@ -274,10 +274,10 @@ const char* substratQuery = R"(
 					}
 				}
 			}
-	}) {items {Id Name Lab ClassDeltaE TypeId SubstrateClassName Manufacturer Article Added LastModified}}}"}
+	}) {items {id name lab classDeltaE typeId substrateClassName manufacturer article added lastModified}}}"}
 )";
 
-static const QByteArray substratQueryResult = R"({"query": "query SubstratesList {SubstratesList(input: {viewParams: {Count: 25, Offset: 0, ComplexFilterModel: {fieldsFilter: {logicalOperation: \"AND\", fieldFilters :[ ], groupFilters :[ {logicalOperation: \"OR\", fieldFilters :[ {fieldId: \"Name\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"TypeId\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"SubstrateClassName\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"Manufacturer\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"Article\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"} ], groupFilters :[ ]} ]}, timeFilter: {interpretationMode: \"\", timeUnit: \"\", unitMultiplier: 0, timeRange: {Begin: \"\", End: \"\"}}, sortingInfo :[ {fieldId: \"Name\", sortingOrder: \"ASC\"} ]}}}) {items {Id Name Lab ClassDeltaE TypeId SubstrateClassName Manufacturer Article Added LastModified}}}"})";
+static const QByteArray substratQueryResult = R"({"query": "query SubstratesList {SubstratesList(input: {viewParams: {count: 25, offset: 0, filterModel: {fieldsFilter: {logicalOperation: \"AND\", fieldFilters :[ ], groupFilters :[ {logicalOperation: \"OR\", fieldFilters :[ {fieldId: \"Name\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"TypeId\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"SubstrateClassName\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"Manufacturer\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"Article\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"} ], groupFilters :[ ]} ]}, timeFilter: {interpretationMode: \"\", timeUnit: \"\", unitMultiplier: 0, timeRange: {Begin: \"\", End: \"\"}}, sortingInfo :[ {fieldId: \"Name\", sortingOrder: \"ASC\"} ]}}}) {items {id name lab classDeltaE typeId substrateClassName manufacturer article added lastModified}}}"})";
 
 
 void CGqlRequestTest::initTestCase()

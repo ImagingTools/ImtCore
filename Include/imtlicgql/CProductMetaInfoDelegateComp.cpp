@@ -14,16 +14,16 @@ namespace imtlicgql
 bool CProductMetaInfoDelegateComp::FillRepresentation(sdl::imtlic::Products::CProductData::V1_0& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const
 {
 	QByteArray productId = metaInfo.GetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_ID).toByteArray();
-	metaInfoRepresentation.ProductId = productId;
+	metaInfoRepresentation.productId = productId;
 	
 	QString name = metaInfo.GetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_NAME).toString();
-	metaInfoRepresentation.ProductName = name;
+	metaInfoRepresentation.productName = name;
 	
 	QString description = metaInfo.GetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_DESCRIPTION).toString();
-	metaInfoRepresentation.Description = description;
+	metaInfoRepresentation.description = description;
 	
 	QByteArray category = metaInfo.GetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_CATEGORY).toByteArray();
-	metaInfoRepresentation.CategoryId = category;
+	metaInfoRepresentation.categoryId = category;
 	
 	return true;
 }
@@ -31,20 +31,20 @@ bool CProductMetaInfoDelegateComp::FillRepresentation(sdl::imtlic::Products::CPr
 
 bool CProductMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const sdl::imtlic::Products::CProductData::V1_0& metaInfoRepresentation) const
 {
-	if (metaInfoRepresentation.ProductId){
-		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_ID, *metaInfoRepresentation.ProductId);
+	if (metaInfoRepresentation.productId){
+		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_ID, *metaInfoRepresentation.productId);
 	}
 	
-	if (metaInfoRepresentation.ProductName){
-		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_NAME, *metaInfoRepresentation.ProductName);
+	if (metaInfoRepresentation.productName){
+		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_NAME, *metaInfoRepresentation.productName);
 	}
 	
-	if (metaInfoRepresentation.Description){
-		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_DESCRIPTION, *metaInfoRepresentation.Description);
+	if (metaInfoRepresentation.description){
+		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_DESCRIPTION, *metaInfoRepresentation.description);
 	}
 	
-	if (metaInfoRepresentation.CategoryId){
-		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_CATEGORY, *metaInfoRepresentation.CategoryId);
+	if (metaInfoRepresentation.categoryId){
+		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_CATEGORY, *metaInfoRepresentation.categoryId);
 	}
 	
 	return true;

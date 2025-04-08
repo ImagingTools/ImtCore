@@ -17,35 +17,6 @@ Item {
 		Events.unSubscribeEvent("GlobalSearchActivated", root.updateSearch)
 	}
 	
-	function createAllTab(){
-		let count = root.model.getItemsCount();
-		if (count > 0){
-			root.model.insertNewItem(0)
-			root.model.setData("Id", "All");
-			root.model.setData("Name", qsTr("All"));
-			
-			let allItemsModel = root.model.addTreeModel("Items");
-			
-			for (let i = 1; i < count + 1; i++){
-				let tabId = root.model.getData("Id", i);
-				let itemsModel = root.model.getData("Items", i);
-				for (let j = 0; j < itemsModel.getItemsCount(); j++){
-					let id = itemsModel.getData("Id", j);
-					let typeId = itemsModel.getData("TypeId", j);
-					let name = itemsModel.getData("Name", j);
-					let description = itemsModel.getData("Description", j);
-					
-					let index = allItemsModel.insertNewItem();
-					allItemsModel.setData("Id", id, index);
-					allItemsModel.setData("TabId", tabId, index);
-					allItemsModel.setData("TypeId", typeId, index);
-					allItemsModel.setData("Name", name, index);
-					allItemsModel.setData("Description", description, index);
-				}
-			}
-		}
-	}
-	
 	function updateSearch(text){
 		if (text == ""){
 			searchResultsView.searchResults = null;

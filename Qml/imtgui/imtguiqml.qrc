@@ -80,6 +80,9 @@
         <file alias="imtgui/View/StickerView.qml">View/StickerView.qml</file>
         <file alias="imtgui/View/PopupContainer.qml">View/PopupContainer.qml</file>
         <file alias="imtgui/View/PopupManager.qml">View/PopupManager.qml</file>
+	<file alias="imtgui/View/DataModelProvider.qml">View/DataModelProvider.qml</file>
+	<file alias="imtgui/View/DataModelController.qml">View/DataModelController.qml</file>
+	<file alias="imtgui/View/ObjectVisualStatusProvider.qml">View/ObjectVisualStatusProvider.qml</file>
         <file alias="imtgui/Params/ComposedParamsGui.qml">Params/ComposedParamsGui.qml</file>
         <file alias="imtgui/Params/TextParamEditor.qml">Params/TextParamEditor.qml</file>
         <file alias="imtgui/Params/UrlParamEditor.qml">Params/UrlParamEditor.qml</file>

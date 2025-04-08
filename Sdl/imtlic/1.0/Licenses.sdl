@@ -16,17 +16,17 @@ input LicensesListInput {
 }
 
 type LicenseItem {
-	Id: ID!
-	TypeId: ID!
-	LicenseId: ID!
-	LicenseName: String!
-	Description: String
-	ProductId: ID
-	ProductUuid: ID
-	ParentLicenses: ID
-	Features: ID
-	Added: String
-	TimeStamp: String
+	id: ID!
+	typeId: ID!
+	licenseId: ID!
+	licenseName: String!
+	description: String
+	productId: ID
+	productUuid: ID
+	parentLicenses: ID
+	features: ID
+	added: String
+	timeStamp: String
 }
 
 type LicensesListPayload {
@@ -35,22 +35,22 @@ type LicensesListPayload {
 }
 
 type LicenseDefinitionData {
-	Id: ID
-	LicenseName: String
-	Description: String
-	ProductId: ID
-	LicenseId: ID
-	Features: ID
-	ParentLicenses: ID
+	id: ID
+	licenseName: String
+	description: String
+	productId: ID
+	licenseId: ID
+	features: ID
+	parentLicenses: ID
 }
 
 input LicenseDataInput {
-	Id: ID!
-	Item: LicenseDefinitionData!
+	id: ID!
+	item: LicenseDefinitionData!
 }
 
 input LicenseItemInput {
-	Id: ID!
+	id: ID!
 }
 
 type Query {

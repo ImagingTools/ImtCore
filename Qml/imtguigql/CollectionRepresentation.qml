@@ -145,7 +145,7 @@ Item {
 			return;
 		}
 		
-		let elementId = root.elementsModel.getData("Id", elementIndex);
+		let elementId = root.elementsModel.getData("id", elementIndex);
 		
 		removeModel.send({"id":elementId})
 	}
@@ -157,7 +157,7 @@ Item {
 			return;
 		}
 		
-		let elementId = root.elementsModel.getData("Id", elementIndex);
+		let elementId = root.elementsModel.getData("id", elementIndex);
 		
 		renameQuery.send({"id": elementId, "newName": name})
 	}
@@ -169,7 +169,7 @@ Item {
 			return;
 		}
 		
-		let elementId = root.elementsModel.getData("Id", elementIndex);
+		let elementId = root.elementsModel.getData("id", elementIndex);
 		
 		setDescriptionQuery.send({"id":elementId,"description":description});
 	}
@@ -185,18 +185,18 @@ Item {
 		
 		function createQueryParams(query, params){
 			var inputParams = Gql.GqlObject("input");
-			inputParams.InsertField("Id", params["id"]);
+			inputParams.InsertField("id", params["id"]);
 			
 			query.AddParam(inputParams);
 			
 			var queryFields = Gql.GqlObject("removedNotification");
-			queryFields.InsertField("Id");
+			queryFields.InsertField("id");
 			query.AddField(queryFields);
 		}
 		
 		function onResult(data){
-			if (data.containsKey("Id")){
-				var itemId = data.getData("Id");
+			if (data.containsKey("id")){
+				var itemId = data.getData("id");
 				
 				root.removed(itemId);
 			}
@@ -242,20 +242,20 @@ Item {
 		
 		function createQueryParams(query, params){
 			var inputParams = Gql.GqlObject("input");
-			inputParams.InsertField("Id", params["id"]);
-			inputParams.InsertField("Description", params["description"]);
+			inputParams.InsertField("id", params["id"]);
+			inputParams.InsertField("description", params["description"]);
 			
 			query.AddParam(inputParams);
 			
 			var queryFields = Gql.GqlObject("setDescription");
-			queryFields.InsertField("Description");
+			queryFields.InsertField("description");
 			
 			query.AddField(queryFields);
 		}
 		
 		function onResult(data){
-			var id = data.getData("Id");
-			var description = data.getData("Description");
+			var id = data.getData("id");
+			var description = data.getData("description");
 			
 			root.descriptionSetted(id ,description);
 		}
@@ -273,22 +273,22 @@ Item {
 			query.AddParam(inputParams);
 			
 			var queryHeaders = Gql.GqlObject("headers");
-			queryHeaders.InsertField("Id");
-			queryHeaders.InsertField("Name");
+			queryHeaders.InsertField("id");
+			queryHeaders.InsertField("name");
 			query.AddField(queryHeaders);
 			
 			internal.headersUpdatingBlock = true;
 		}
 		
 		function onResult(data){
-			if (data.containsKey("FilterSearch")){
-				let filterSearchModel = data.getData("FilterSearch")
+			if (data.containsKey("filterSearch")){
+				let filterSearchModel = data.getData("filterSearch")
 				
 				root.filterableHeadersModel = filterSearchModel;
 			}
 			
-			if(data.containsKey("Headers")){
-				data = data.getData("Headers");
+			if(data.containsKey("headers")){
+				data = data.getData("headers");
 				
 				if (root.headersModel){
 					root.headersModel.destroy();
@@ -315,15 +315,10 @@ Item {
 		
 		function createQueryParams(query, params){
 			var viewParams = Gql.GqlObject("viewParams");
-			viewParams.InsertField("Count", params["count"]);
-			viewParams.InsertField("Offset", params["offset"]);
-			if (params["filterModel"].toGraphQL){
-				viewParams.InsertField("ComplexFilterModel", params["filterModel"]);
-			}
-			else{
-				viewParams.InsertField("FilterModel", params["filterModel"].toJson());
-			}
-			
+			viewParams.InsertField("count", params["count"]);
+			viewParams.InsertField("offset", params["offset"]);
+			viewParams.InsertField("filterModel", params["filterModel"]);
+
 			var inputParams = Gql.GqlObject("input");
 			inputParams.InsertFieldObject(viewParams);
 			
@@ -331,11 +326,11 @@ Item {
 			
 			var queryFields = Gql.GqlObject("items");
 			
-			queryFields.InsertField("Id");
-			queryFields.InsertField("Name");
+			queryFields.InsertField("id");
+			queryFields.InsertField("name");
 			
 			for(var i = 0; i < root.headersModel.getItemsCount(); i++){
-				let headerId = root.headersModel.getData("Id", i);
+				let headerId = root.headersModel.getData("id", i);
 				queryFields.InsertField(headerId);
 			}
 			

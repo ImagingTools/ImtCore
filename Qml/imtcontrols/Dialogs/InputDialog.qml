@@ -3,43 +3,43 @@ import Acf 1.0
 import imtcontrols 1.0
 
 Dialog {
-    id: inputDialogContainer;
-
-    width: 300;
-
-    property string message;
-    property string inputValue;
-    property int contentWidth: 300;
-
-    property string placeHolderText;
-
-    Component.onCompleted: {
-        buttonsModel.append({Id: Enums.ok, Name:qsTr("OK"), Enabled: true})
-        buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
-    }
-
-    Keys.onPressed: {
-        if (event.key === Qt.Key_Return){
-            inputDialogContainer.finished(Enums.ok);
-        }
-    }
-
-    onFinished: {
-        if (buttonId == Enums.ok){
-            inputDialogContainer.inputValue = inputDialogContainer.bodyItem.inputValue;
-        }
-    }
-
-    onLocalizationChanged: {
-        inputDialogContainer.buttonsModel.setProperty(0, "Name", qsTr("OK"));
-        inputDialogContainer.buttonsModel.setProperty(1, "Name", qsTr("Cancel"));
-    }
-
-    contentComp: Component { InputDialogBody {
-            width: inputDialogContainer.width;
-            message: inputDialogContainer.message;
-            inputValue: inputDialogContainer.inputValue;
-            placeHolderText: inputDialogContainer.placeHolderText;
-        } }
+	id: inputDialogContainer;
+	
+	width: 300;
+	
+	property string message;
+	property string inputValue;
+	property int contentWidth: 300;
+	
+	property string placeHolderText;
+	
+	Component.onCompleted: {
+		addButton(Enums.ok, qsTr("OK"), true)
+		addButton(Enums.cancel, qsTr("Cancel"), true)
+	}
+	
+	Keys.onPressed: {
+		if (event.key === Qt.Key_Return){
+			inputDialogContainer.finished(Enums.ok);
+		}
+	}
+	
+	onFinished: {
+		if (buttonId == Enums.ok){
+			inputDialogContainer.inputValue = inputDialogContainer.bodyItem.inputValue;
+		}
+	}
+	
+	onLocalizationChanged: {
+		setButtonName(Enums.ok, qsTr("OK"))
+		setButtonName(Enums.cancel, qsTr("Cancel"))
+	}
+	
+	contentComp: Component { InputDialogBody {
+			width: inputDialogContainer.width;
+			message: inputDialogContainer.message;
+			inputValue: inputDialogContainer.inputValue;
+			placeHolderText: inputDialogContainer.placeHolderText;
+		} }
 }
 

@@ -65,7 +65,6 @@ typedef imtserverapp::CEnableableParamRepresentationControllerComp EnableablePar
 typedef imtbase::TComponentFactoryComp<imtserverapp::IRepresentationController> RepresentationControllerFactory;
 
 
-
 } // namespace ImtServerAppPck
 
 

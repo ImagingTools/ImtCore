@@ -72,7 +72,7 @@ DocumentDataController {
             let subscriptionRequestId = container.subscriptionCommandId;
             var query = Gql.GqlRequest("subscription", subscriptionRequestId);
             var queryFields = Gql.GqlObject("notification");
-            queryFields.InsertField("Id");
+            queryFields.InsertField("id");
             query.AddField(queryFields);
 
             Events.sendEvent("RegisterSubscription", {"Query": query, "Client": container.subscriptionClient});
@@ -91,7 +91,7 @@ DocumentDataController {
 
         function createQueryParams(query){
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", container.documentId);
+            inputParams.InsertField("id", container.documentId);
             inputParams.InsertField ("Item", container.documentModel.toJson());
 
             let additionInputParams = container.getHeaders();
@@ -106,7 +106,7 @@ DocumentDataController {
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("updatedNotification");
-            queryFields.InsertField("Id");
+            queryFields.InsertField("id");
             query.AddField(queryFields);
         }
 
@@ -121,8 +121,8 @@ DocumentDataController {
         function onResult(data){
             let dataModelLocal = data.getData("updatedNotification");
 
-            let documentId = dataModelLocal.getData("Id");
-            let documentName = dataModelLocal.getData("Name");
+            let documentId = dataModelLocal.getData("id");
+            let documentName = dataModelLocal.getData("name");
 
             container.saved(documentId, documentName);
         }
@@ -137,7 +137,7 @@ DocumentDataController {
             query.AddField(queryFields);
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", container.documentId);
+            inputParams.InsertField("id", container.documentId);
 
             let inputObj = container.createGetInputParams();
             for (let key in inputObj){
@@ -175,7 +175,7 @@ DocumentDataController {
 
         function createQueryParams(query){
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", container.documentId);
+            inputParams.InsertField("id", container.documentId);
             inputParams.InsertField ("Item", container.documentModel.toJson());
 
             let additionInputParams = container.getHeaders();
@@ -190,7 +190,7 @@ DocumentDataController {
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("addedNotification");
-            queryFields.InsertField("Id");
+            queryFields.InsertField("id");
             query.AddField(queryFields);
         }
 
@@ -209,8 +209,8 @@ DocumentDataController {
             let documentName = ""
 
             if (dataModelLocal){
-                documentId = dataModelLocal.getData("Id");
-                documentName = dataModelLocal.getData("Name");
+                documentId = dataModelLocal.getData("id");
+                documentName = dataModelLocal.getData("name");
             }
 
             container.saved(documentId, documentName);

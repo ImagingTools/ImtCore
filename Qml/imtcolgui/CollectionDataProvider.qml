@@ -62,7 +62,7 @@ QtObject {
 
 	function getData(objectId, value){
 		for (let i = 0; i < container.collectionModel.getItemsCount(); i++){
-			let objectCollectionId = container.collectionModel.getData("Id", i);
+			let objectCollectionId = container.collectionModel.getData("id", i);
 			if (objectCollectionId === objectId){
 				if (container.collectionModel.containsKey(value, i)){
 					return container.collectionModel.getData(value, i);
@@ -85,15 +85,9 @@ QtObject {
 
 		function createQueryParams(query){
 			var viewParams = Gql.GqlObject("viewParams");
-			viewParams.InsertField("Offset", container.offset);
-			viewParams.InsertField("Count", container.count);
-
-			if (container.filter.toGraphQL){
-				viewParams.InsertField("ComplexFilterModel", container.filter);
-			}
-			else{
-				viewParams.InsertField("FilterModel", container.filter.toJson());
-			}
+			viewParams.InsertField("offset", container.offset);
+			viewParams.InsertField("count", container.count);
+			viewParams.InsertField("filterModel", container.filter);
 
 			var inputParams = Gql.GqlObject("input");
 			inputParams.InsertFieldObject(viewParams);

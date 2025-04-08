@@ -59,13 +59,13 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CDocumentRevisionControllerCom
 	}
 	
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->DocumentId){
-		documentId = *arguments.input.Version_1_0->DocumentId;
+	if (arguments.input.Version_1_0->documentId){
+		documentId = *arguments.input.Version_1_0->documentId;
 	}
 
 	QByteArray collectionId;
-	if (arguments.input.Version_1_0->CollectionId){
-		collectionId = *arguments.input.Version_1_0->CollectionId;
+	if (arguments.input.Version_1_0->collectionId){
+		collectionId = *arguments.input.Version_1_0->collectionId;
 	}
 
 	if (!IsCollectionSupported(collectionId)){
@@ -75,11 +75,11 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CDocumentRevisionControllerCom
 	const imtbase::IObjectCollection* objectCollectionPtr = FindObjectCollection(collectionId);
 	Q_ASSERT(objectCollectionPtr != nullptr);
 
-	response.DocumentId = (documentId);
+	response.documentId = (documentId);
 
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){
-		errorMessage = QString("Unable to get revision list for document '%1'. Error: Revision controller is invalid").arg(qPrintable(documentId));
+		errorMessage = QString("Unable to get revision list for document '%1'. Error: revision controller is invalid").arg(qPrintable(documentId));
 		return sdl::imtbase::DocumentRevision::CRevisionInfoList();
 	}
 
@@ -98,13 +98,13 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CDocumentRevisionControllerCom
 		sdl::imtbase::DocumentRevision::CRevisionItem::V1_0 revisionItem;
 
 		if (revisionInfo.isRevisionAvailable){
-			response.ActiveRevision = std::make_optional<int>(revisionInfo.revision);
+			response.activeRevision = std::make_optional<int>(revisionInfo.revision);
 		}
 
-		revisionItem.Revision = std::make_optional<int>(revisionInfo.revision);
-		revisionItem.User = std::make_optional<QString>(revisionInfo.user);
-		revisionItem.IsActive = (revisionInfo.isRevisionAvailable);
-		revisionItem.Timestamp = std::make_optional<QString>(revisionInfo.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
+		revisionItem.revision = std::make_optional<int>(revisionInfo.revision);
+		revisionItem.user = std::make_optional<QString>(revisionInfo.user);
+		revisionItem.isActive = (revisionInfo.isRevisionAvailable);
+		revisionItem.timestamp = std::make_optional<QString>(revisionInfo.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
 
 		if (documentChangeGeneratorPtr != nullptr){
 			imtbase::CObjectCollection changeCollection;
@@ -115,14 +115,14 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CDocumentRevisionControllerCom
 			iser::CJsonMemReadArchive archive(revisionInfo.comment.toUtf8());
 			if (changeCollection.Serialize(archive)){
 				QString operationDescription = documentChangeGeneratorPtr->GetOperationDescription(changeCollection, languageId);
-				revisionItem.Description = std::make_optional<QString>(operationDescription);
+				revisionItem.description = std::make_optional<QString>(operationDescription);
 			}
 		}
 
 		revisionItemList << revisionItem;
 	}
 
-	response.Revisions = std::make_optional<QList<sdl::imtbase::DocumentRevision::CRevisionItem::V1_0>>(revisionItemList);
+	response.revisions = std::make_optional<QList<sdl::imtbase::DocumentRevision::CRevisionItem::V1_0>>(revisionItemList);
 
 	sdl::imtbase::DocumentRevision::CRevisionInfoList retVal;
 	retVal.Version_1_0 = std::make_optional(response);
@@ -154,18 +154,18 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CDocumentRevisionContro
 	}
 	
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->ObjectId){
-		documentId = *arguments.input.Version_1_0->ObjectId;
+	if (arguments.input.Version_1_0->objectId){
+		documentId = *arguments.input.Version_1_0->objectId;
 	}
 	
 	int revisionNumber = -1;
-	if (arguments.input.Version_1_0->Revision){
-		revisionNumber = *arguments.input.Version_1_0->Revision;
+	if (arguments.input.Version_1_0->revision){
+		revisionNumber = *arguments.input.Version_1_0->revision;
 	}
 	
 	QByteArray collectionId;
-	if (arguments.input.Version_1_0->CollectionId){
-		collectionId = *arguments.input.Version_1_0->CollectionId;
+	if (arguments.input.Version_1_0->collectionId){
+		collectionId = *arguments.input.Version_1_0->collectionId;
 	}
 	
 	if (!IsCollectionSupported(collectionId)){
@@ -177,7 +177,7 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CDocumentRevisionContro
 
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){
-		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: Revision controller is invalid").arg(revisionNumber).arg(qPrintable(documentId));
+		errorMessage = QString("Unable to set revision '%1' for document '%2'. Error: revision controller is invalid").arg(revisionNumber).arg(qPrintable(documentId));
 		return sdl::imtbase::DocumentRevision::CRestoreRevisionResponse();
 	}
 
@@ -187,7 +187,7 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CDocumentRevisionContro
 		return sdl::imtbase::DocumentRevision::CRestoreRevisionResponse();
 	}
 
-	response.Result = (ok);
+	response.result = (ok);
 
 	sdl::imtbase::DocumentRevision::CRestoreRevisionResponse retVal;
 	retVal.Version_1_0 = std::make_optional(response);
@@ -231,18 +231,18 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse CDocumentRevisionControl
 	}
 	
 	QByteArray documentId;
-	if (arguments.input.Version_1_0->ObjectId){
-		documentId = *arguments.input.Version_1_0->ObjectId;
+	if (arguments.input.Version_1_0->objectId){
+		documentId = *arguments.input.Version_1_0->objectId;
 	}
 	
 	int revisionNumber = -1;
-	if (arguments.input.Version_1_0->Revision){
-		revisionNumber = *arguments.input.Version_1_0->Revision;
+	if (arguments.input.Version_1_0->revision){
+		revisionNumber = *arguments.input.Version_1_0->revision;
 	}
 	
 	QByteArray collectionId;
-	if (arguments.input.Version_1_0->CollectionId){
-		collectionId = *arguments.input.Version_1_0->CollectionId;
+	if (arguments.input.Version_1_0->collectionId){
+		collectionId = *arguments.input.Version_1_0->collectionId;
 	}
 
 	if (!IsCollectionSupported(collectionId)){
@@ -254,13 +254,13 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse CDocumentRevisionControl
 
 	const imtbase::IRevisionController* revisionControllerPtr = objectCollectionPtr->GetRevisionController();
 	if (revisionControllerPtr == nullptr){
-		errorMessage = QString("Unable to delete revision '%1' for document '%2'. Error: Revision controller is invalid").arg(revisionNumber).arg(qPrintable(documentId));
+		errorMessage = QString("Unable to delete revision '%1' for document '%2'. Error: revision controller is invalid").arg(revisionNumber).arg(qPrintable(documentId));
 		return sdl::imtbase::DocumentRevision::CDeleteRevisionResponse();
 	}
 
 	bool ok = revisionControllerPtr->DeleteRevision(*objectCollectionPtr, documentId, revisionNumber);
 
-	response.Result = (ok);
+	response.result = (ok);
 
 	sdl::imtbase::DocumentRevision::CDeleteRevisionResponse retVal;
 	retVal.Version_1_0 = std::make_optional(response);
@@ -282,8 +282,9 @@ bool CDocumentRevisionControllerComp::IsRequestSupported(const imtgql::CGqlReque
 	if (inputObjectPtr == nullptr){
 		return false;
 	}
-
-	QByteArray collectionId = inputObjectPtr->GetFieldArgumentValue("CollectionId").toByteArray();
+	
+	QByteArray collectionId = inputObjectPtr->GetFieldArgumentValue(
+												sdl::imtbase::DocumentRevision::CGetRevisionInfoListInput::V1_0::GetRevisionInfoListInputFields::CollectionId.toUtf8()).toByteArray();
 	if (collectionId.isEmpty()){
 		return false;
 	}

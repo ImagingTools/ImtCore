@@ -150,7 +150,7 @@ Item {
 			}
 		}
 
-		cellHeaderId = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex);
+		cellHeaderId = delegateContainer.rowDelegate.tableItem.headers.getData("id", delegateContainer.columnIndex);
 
 		delegateContainer.rowDelegate.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
 
@@ -287,7 +287,7 @@ Item {
 		if (delegateContainer && delegateContainer.columnIndex >= 0){
 			if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.tableItem !==null && delegateContainer.rowDelegate.dataModel != null){
 				let val
-				let key = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex)
+				let key = delegateContainer.rowDelegate.tableItem.headers.getData("id", delegateContainer.columnIndex)
 				if ("item" in delegateContainer.rowDelegate.dataModel){
 					val = delegateContainer.rowDelegate.dataModel.item[key]
 				}
@@ -311,7 +311,7 @@ Item {
 			if(rowDelegate !== null && rowDelegate.tableItem !==null){
 				let tableItem = rowDelegate.tableItem;
 				let elements = tableItem.elements;
-				let headerId = delegateContainer.rowDelegate.tableItem.headers.getData("Id", delegateContainer.columnIndex);
+				let headerId = delegateContainer.rowDelegate.tableItem.headers.getData("id", delegateContainer.columnIndex);
 				if ("item" in delegateContainer.rowDelegate.dataModel){
 					delegateContainer.rowDelegate.dataModel.item[headerId] = value;
 				}

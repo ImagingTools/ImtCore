@@ -40,7 +40,7 @@ GqlModel {
 		var inputParams = Gql.GqlObject("input");
 		query.AddParam(inputParams);
 		var queryFields = Gql.GqlObject("notification");
-		queryFields.InsertField("Id");
+		queryFields.InsertField("id");
 		query.AddField(queryFields);
 		
 		return query;

@@ -6,7 +6,7 @@ import imtauthUsersSdl 1.0
 import imtdocgui 1.0
 
 Column {
-    id: container;
+	id: container;
 	spacing: Style.sizeLargeMargin;
 
 	property UserData userData;

@@ -17,13 +17,13 @@ QtObject {
 
     function getLicenseName(productId, licenseId){
         for (let i = 0; i < provider.model.getItemsCount(); i++){
-            let id = provider.model.getData("Id", i);
+            let id = provider.model.getData("id", i);
             if (id === productId){
                 if (provider.model.containsKey("Licenses", i)){
                     let productLicensesModel = provider.model.getData("Licenses", i);
                      for (let licenseIndex = 0; licenseIndex < productLicensesModel.getItemsCount(); licenseIndex++){
-                         if (licenseId === productLicensesModel.getData("Id", licenseIndex)){
-                             return productLicensesModel.getData("Name", licenseIndex)
+                         if (licenseId === productLicensesModel.getData("id", licenseIndex)){
+                             return productLicensesModel.getData("name", licenseIndex)
                          }
                      }
                 }
@@ -37,7 +37,7 @@ QtObject {
             var query = Gql.GqlRequest("query", "Licenses");
 
             var queryFields = Gql.GqlObject("LicensesItems");
-            queryFields.InsertField("Id");
+            queryFields.InsertField("id");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();

@@ -65,10 +65,6 @@ QSet<QByteArray> CComplexCollectionFilterHelper::GetFilteringFieldIds(const ICom
 
 QString CComplexCollectionFilterHelper::GetTextFilter(const imtbase::IComplexCollectionFilter::GroupFilter& filter)
 {
-	for (const IComplexCollectionFilter::FieldFilter& fieldFilter : filter.fieldFilters){
-		return fieldFilter.filterValue.toString();
-	}
-
 	for (const IComplexCollectionFilter::GroupFilter& groupFilter : filter.groupFilters){
 		QString retVal = GetTextFilter(groupFilter);
 

@@ -126,8 +126,8 @@ Item {
 
 			for(var i = 0; i < monthCount; i++){
 				var index = monthTreeModel.insertNewItem();
-				monthTreeModel.setData("Id", index, index);
-				monthTreeModel.setData("Name",qsTr(datePicker.monthNames[i]),index);
+				monthTreeModel.setData("id", index, index);
+				monthTreeModel.setData("name",qsTr(datePicker.monthNames[i]),index);
 			}
 		}
 
@@ -148,8 +148,8 @@ Item {
 			}
 			for(let i = datePicker.startYear; i <= datePicker.lastYear;i++){
 				let index = yearTreeModel.insertNewItem();
-				yearTreeModel.setData("Id", index, index);
-				yearTreeModel.setData("Name", String(i),index);
+				yearTreeModel.setData("id", index, index);
+				yearTreeModel.setData("name", String(i),index);
 			}
 
 		}
@@ -241,8 +241,8 @@ Item {
 			}
 			if(datePicker.hasYearCombo){
 				for(let i = 0; i <  yearTreeModel.getItemsCount(); i++){
-					let id = yearTreeModel.getData("Id");
-					let name = yearTreeModel.getData("Name");
+					let id = yearTreeModel.getData("id");
+					let name = yearTreeModel.getData("name");
 					if(name == year){
 						yearComboObj.currentIndex = id;
 						break;
@@ -251,8 +251,8 @@ Item {
 			}
 			if(datePicker.hasDayCombo){
 				for(let i = 0; i <  dayTreeModel.getItemsCount(); i++){
-					let id = dayTreeModel.getData("Id");
-					let name = dayTreeModel.getData("Name");
+					let id = dayTreeModel.getData("id");
+					let name = dayTreeModel.getData("name");
 					if(name == day){
 						dayComboObj.currentIndex = id;
 						break;
@@ -283,8 +283,8 @@ Item {
 		var lastDay = datePicker.getLastDayOfMonth(datePicker.selectedIndexMonth + 1);
 		for(var i = 1; i <= lastDay; i++){
 			var index = dayTreeModel.insertNewItem();
-			dayTreeModel.setData("Id", i, index);
-			dayTreeModel.setData("Name",i,index);
+			dayTreeModel.setData("id", i, index);
+			dayTreeModel.setData("name",i,index);
 		}
 	}
 
@@ -300,8 +300,8 @@ Item {
 
 		for(var i = 0; i < monthCount; i++){
 			var index = monthTreeModel.insertNewItem();
-			monthTreeModel.setData("Id", index, index);
-			monthTreeModel.setData("Name",qsTr(datePicker.monthNames[i]),index);
+			monthTreeModel.setData("id", index, index);
+			monthTreeModel.setData("name",qsTr(datePicker.monthNames[i]),index);
 		}
 
 		if(monthComboIndexPrev > monthTreeModel.getItemsCount() - 1){

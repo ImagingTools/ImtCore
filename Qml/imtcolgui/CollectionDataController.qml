@@ -1,42 +1,65 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtcontrols 1.0
 
 QtObject {
 	id: root;
 	
 	property string collectionId;
+	
+	signal objectReceived(var object)
+	signal objectReceiveFailed(string message)
+	
+	signal objectAdded(string id)
+	signal objectAddFailed(string message)
+	
+	signal objectUpdated(string id)
+	signal objectUpdateFailed(string message)
+	
+	signal objectRemoved(string id)
+	signal objectRemoveFailed(string message)
+	
+	signal listObjectsReceived(var listObjects, var notification)
+	signal listObjectsReceiveFailed(string message)
+	
+	signal objectRenamed(string id, string newName)
+	signal objectRenameFailed(string message)
+	
+	signal objectDescriptionSetted(string id, string description)
+	signal objectSetDescriptionFailed(string message)
 
-	function insertNewObject(typeId, name, description, objectId, object){
-		return false
+	function getObject(objectId){
+		console.warn("getObject() should be implemented in a subclass")
+		objectReceived(null)
+	}
+	
+	function insertNewObject(objectId, objectData){
+		console.warn("insertNewObject() should be implemented in a subclass")
+		objectAdded(objectId)
+	}
+	
+	function updateObject(objectId, newObjectData){
+		console.warn("updateObject() should be implemented in a subclass")
+		objectUpdated(objectId)
+	}
+	
+	function getElements(count, offset, filter){
+		console.warn("getElements() should be implemented in a subclass")
+		listObjectsReceived(null, null)
 	}
 	
 	function removeObject(objectId){
-		return false
+		console.warn("removeObject() should be implemented in a subclass")
+		objectRemoved(objectId)
 	}
 	
 	function setObjectName(objectId, name){
-		return false
+		console.warn("setObjectName() should be implemented in a subclass")
+		objectRenamed(objectId, name)
 	}
-
+	
 	function setObjectDescription(objectId, description){
-		return false
-	}
-	
-	function setObject(typeId, name, description, objectId, object){
-		return false
-	}
-	
-	function getObject(objectId){
-		return false
-	}
-	
-	function getCollectionHeaders(){
-		return false
-	}
-	
-	function getElements(){
-		return false
+		console.warn("setObjectDescription() should be implemented in a subclass")
+		objectDescriptionSetted(objectId, description)
 	}
 }
 

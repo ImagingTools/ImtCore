@@ -29,16 +29,23 @@ namespace imtdb
 {
 
 
-static const QByteArray s_idColumn = QByteArrayLiteral("Id");
-static const QByteArray s_typeIdColumn = QByteArrayLiteral("TypeId");
-static const QByteArray s_documentIdColumn = QByteArrayLiteral("DocumentId");
-static const QByteArray s_nameColumn = QByteArrayLiteral("Name");
-static const QByteArray s_descriptionColumn = QByteArrayLiteral("Description");
-static const QByteArray s_documentColumn = QByteArrayLiteral("Document");
-static const QByteArray s_addedColumn = QByteArrayLiteral("Added");
-static const QByteArray s_lastModifiedColumn = QByteArrayLiteral("TimeStamp");
-
-static QSet<QString> s_filterableColumns = { s_idColumn, s_typeIdColumn, s_documentIdColumn, s_nameColumn, s_descriptionColumn, s_addedColumn, s_lastModifiedColumn};
+const QByteArray CSqlDatabaseDocumentDelegateComp::s_idColumn = QByteArrayLiteral("Id");
+const QByteArray CSqlDatabaseDocumentDelegateComp::s_typeIdColumn = QByteArrayLiteral("TypeId");
+const QByteArray CSqlDatabaseDocumentDelegateComp::s_documentIdColumn = QByteArrayLiteral("DocumentId");
+const QByteArray CSqlDatabaseDocumentDelegateComp::s_nameColumn = QByteArrayLiteral("Name");
+const QByteArray CSqlDatabaseDocumentDelegateComp::s_descriptionColumn = QByteArrayLiteral("Description");
+const QByteArray CSqlDatabaseDocumentDelegateComp::s_documentColumn = QByteArrayLiteral("Document");
+const QByteArray CSqlDatabaseDocumentDelegateComp::s_addedColumn = QByteArrayLiteral("Added");
+const QByteArray CSqlDatabaseDocumentDelegateComp::s_lastModifiedColumn = QByteArrayLiteral("TimeStamp");
+QSet<QString> CSqlDatabaseDocumentDelegateComp::s_filterableColumns = {
+	s_idColumn,
+	s_typeIdColumn,
+	s_documentIdColumn,
+	s_nameColumn,
+	s_descriptionColumn,
+	s_addedColumn,
+	s_lastModifiedColumn
+};
 
 
 // public methods
@@ -73,7 +80,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 		Q_ASSERT(fieldIds.count() < 2);
 		for (int i = 0; i < fieldIds.count(); i++){
 			QString fieldId = fieldIds[i];
-			fieldId = s_filterableColumns.contains(fieldId) ? QString("\"%1\"").arg(fieldId) : QString("\"DataMetaInfo\"->>'%1'").arg(fieldId);
+
+			fieldId = s_filterableColumns.contains(fieldId) ? QString("\"%1\"").arg(fieldId) : CreateJsonExtractSql("DataMetaInfo", fieldId);
 			
 			distinctString += i > 0 ? QString(", %1").arg(fieldId) : fieldId;
 		}
@@ -188,9 +196,17 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 	bool /*useExternDelegate*/) const
 {
 	// Get number of the revisions of the document in the database:
-	QByteArray countRevisionsQuery = QString("(SELECT MAX((\"RevisionInfo\"->>'RevisionNumber')::int) + 1 FROM \"%1\" WHERE \"%2\" = '%3')")
-										 .arg(qPrintable(*m_tableNameAttrPtr), qPrintable(s_documentIdColumn), qPrintable(objectId)).toUtf8();
+	QByteArray countRevisionsQuery = QString("(SELECT MAX(%0) + 1 FROM \"%1\" as root WHERE \"%2\" = '%3')")
+										.arg(
+											CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int),
+											qPrintable(*m_tableNameAttrPtr),
+											qPrintable(s_documentIdColumn),
+											qPrintable(objectId)
+											).toUtf8();
 	
+	RawSqlExpression sqlExpression;
+	sqlExpression.sql = countRevisionsQuery;
+
 	QByteArray retVal;
 	
 	QByteArray typeId = collection.GetObjectTypeId(objectId);
@@ -201,7 +217,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 	}
 	
 	retVal = PrepareInsertNewObjectQuery(
-		typeId, objectId, objectName, objectDescription, object, operationContextPtr, countRevisionsQuery);
+		typeId, objectId, objectName, objectDescription, object, operationContextPtr, QVariant::fromValue(sqlExpression));
 	
 	return retVal;
 }
@@ -228,8 +244,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 	const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Description\" = '%2' WHERE \"%3\" = '%4';")
-	.arg(qPrintable(*m_tableNameAttrPtr), description, qPrintable(s_documentIdColumn), qPrintable(objectId))
-		.toUtf8();
+			.arg(qPrintable(*m_tableNameAttrPtr), description, qPrintable(s_documentIdColumn), qPrintable(objectId))
+			.toUtf8();
 	
 	return retVal;
 }
@@ -239,8 +255,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionByMetaInfoQuery(
 	const QByteArray& metaInfoId,
 	const QVariant& metaInfoValue) const
 {
-	return QString(R"(SELECT * FROM "%1" WHERE ("State" = 'Active' OR "State" = 'Disabled') AND "DataMetaInfo"->>'%2' = '%3';)")
-	.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(metaInfoId), qPrintable(metaInfoValue.toByteArray())).toUtf8();
+	return QString(R"(SELECT * FROM "%1" WHERE ("State" = 'Active' OR "State" = 'Disabled') AND %2 = '%3';)")
+	.arg(qPrintable(*m_tableNameAttrPtr), CreateJsonExtractSql("DataMetaInfo", metaInfoId), qPrintable(metaInfoValue.toByteArray())).toUtf8();
 }
 
 
@@ -250,7 +266,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 	if (objectPtr == nullptr){
 		return QByteArray();
 	}
-
+	
 	QByteArray objectId = record.value(qPrintable(s_documentIdColumn)).toByteArray();
 	QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
 	
@@ -268,11 +284,11 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 			}
 		}
 	}
-
+	
 	QByteArray query = QString(R"(UPDATE "%1" SET "DataMetaInfo" = '%2' WHERE "State" = 'Active' AND "%3" = '%4';)")
-							.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(SqlEncode(metaInfoRepresentation)), qPrintable(s_documentIdColumn), qPrintable(objectId))
-							.toUtf8();
-
+						.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(SqlEncode(metaInfoRepresentation)), qPrintable(s_documentIdColumn), qPrintable(objectId))
+						.toUtf8();
+	
 	return query;
 }
 
@@ -288,7 +304,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return imtbase::IRevisionController::RevisionInfoList();
 	}
-
+	
 	iprm::CParamsSet filterParams;
 	imtcol::CDocumentCollectionFilter documentFilter;
 	documentFilter.SetDocumentId(objectId);
@@ -366,10 +382,16 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreRevision(
 	istd::CChangeNotifier changeNotifier(&collection, &changeSet);
 	
 	QByteArray query = QString("UPDATE \"%1\" SET \"State\" = 'InActive' WHERE \"%2\" = '%3';")
-							.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(s_documentIdColumn), qPrintable(objectId)).toUtf8();
+						   .arg(qPrintable(*m_tableNameAttrPtr), qPrintable(s_documentIdColumn), qPrintable(objectId)).toUtf8();
 	
-	query += QString(R"(UPDATE "%1" SET "State" = 'Active' WHERE "%2" = '%3' AND ("RevisionInfo"->>'RevisionNumber')::int = %4;)")
-				 .arg(qPrintable(*m_tableNameAttrPtr), qPrintable(s_documentIdColumn), qPrintable(objectId)).arg(revision).toUtf8();
+
+	query += QString(R"(UPDATE "%1" SET "State" = 'Active' WHERE "%2" = '%3' AND %4 = %5;)")
+				.arg(
+					qPrintable(*m_tableNameAttrPtr),
+					qPrintable(s_documentIdColumn),
+					qPrintable(objectId),
+					CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int))
+				.arg(revision).toUtf8();
 	
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
@@ -399,7 +421,7 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 	int revision) const
 {
 	QByteArray checkCurrentRevisionQuery = QString("SELECT * FROM \"%1\" WHERE \"DocumentId\" = '%2' AND \"State\" = 'InActive';")
-											.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(objectId)).toUtf8();
+	.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(objectId)).toUtf8();
 	
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkCurrentRevisionQuery, &sqlError);
@@ -425,10 +447,10 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 		return false;
 	}
 	
-	QByteArray query = QString("DELETE  FROM \"%1\" WHERE \"DocumentId\" = '%2' AND (\"RevisionInfo\"->>'RevisionNumber')::int = %3;")
-								.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(objectId))
-								.arg(revision)
-								.toUtf8();
+	QByteArray query = QString("DELETE  FROM \"%1\" WHERE \"DocumentId\" = '%2' AND %3 = %4;")
+							.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(objectId))
+							.arg(revision)
+							.toUtf8();
 	
 	sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
@@ -466,12 +488,10 @@ bool CSqlDatabaseDocumentDelegateComp::UpdateDependentMetaInfo(const DependentMe
 	QString jsonbUpdate = "\"DataMetaInfo\"";
 	
 	for (int i = 0; i < metaInfo.metaInfoIds.size(); i++) {
-		jsonbUpdate = QString("jsonb_set(%1, '{%2}', to_jsonb(%3))")
-		.arg(jsonbUpdate, metaInfo.metaInfoIds[i], metaInfo.metaInfoValues[i]);
+		jsonbUpdate = QString("jsonb_set(%1, '{%2}', to_jsonb(%3))").arg(jsonbUpdate, metaInfo.metaInfoIds[i], metaInfo.metaInfoValues[i]);
 	}
-	
-	query += jsonbUpdate + QString(" WHERE \"DataMetaInfo\"->>'%1' = '%2';")
-								.arg(metaInfo.dependentKey, metaInfo.objectId);
+
+	query += jsonbUpdate + QString(" WHERE %1 = '%2';").arg(CreateJsonExtractSql("DataMetaInfo", metaInfo.dependentKey), metaInfo.objectId);
 	
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);
@@ -500,15 +520,11 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const DependentMet
 	QString jsonbUpdate = "\"DataMetaInfo\"";
 	
 	for (const QString& metaInfoId : metaInfo.metaInfoIds){
-		jsonbUpdate = QString("jsonb_set(%1, '{%2}', to_jsonb(''::text))")
-		.arg(jsonbUpdate, metaInfoId);
+		jsonbUpdate = QString("jsonb_set(%1, '{%2}', to_jsonb(''::text))").arg(jsonbUpdate, metaInfoId);
 	}
 	
-	jsonbUpdate = QString("jsonb_set(%1, '{%2}', to_jsonb(''::text))")
-					  .arg(jsonbUpdate, metaInfo.dependentKey);
-	
-	query += jsonbUpdate + QString(" WHERE \"DataMetaInfo\"->>'%1' = '%2';")
-								.arg(metaInfo.dependentKey, metaInfo.objectId);
+	jsonbUpdate = QString("jsonb_set(%1, '{%2}', to_jsonb(''::text))").arg(jsonbUpdate, metaInfo.dependentKey);
+	query += jsonbUpdate + QString(" WHERE %1 = '%2';").arg(CreateJsonExtractSql("DataMetaInfo", metaInfo.dependentKey), metaInfo.objectId);
 	
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query.toUtf8(), &sqlError);
@@ -535,9 +551,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 	const QVariant& revisionArgument) const
 {
 	QByteArray retVal;
-	
-	Q_ASSERT(revisionArgument.typeId() == QMetaType::Int || revisionArgument.typeId() == QMetaType::QByteArray);
-	
+
 	QByteArray documentContentJson;
 	if (!WriteDataToMemory(typeId, object, documentContentJson)){
 		SendCriticalMessage(0, "Document data could not be written to the memory");
@@ -574,14 +588,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		metaInfoRepresentation = documentContentJson;
 	}
 	
-	QString revisionInfo = "jsonb_build_object('OwnerId', '', 'OwnerName', '', 'Checksum', ";
-	revisionInfo += QString::number(checksum) + ", 'RevisionNumber', %1)";
-	
-	if (revisionArgument.typeId() == QMetaType::Int){
-		revisionInfo = revisionInfo.arg(revisionArgument.toInt());
-	}
-	else{
-		revisionInfo = revisionInfo.arg(qPrintable(revisionArgument.toByteArray()));
+	QByteArray revisionInfoQuery = QByteArrayLiteral("'{}'");
+	if (operationContextPtr != nullptr){
+		revisionInfoQuery = CreateRevisionInfoQuery(*operationContextPtr, revisionArgument, checksum);
 	}
 	
 	query += QString("INSERT INTO \"%1\"(\"Id\", \"TypeId\", \"DocumentId\", \"Name\", \"Description\", \"Document\", \"DataMetaInfo\", \"RevisionInfo\", \"TimeStamp\", \"State\") VALUES('%11', '%2', '%3', '%4', '%5', '%6', '%7', %8, '%9', '%10');")
@@ -593,19 +602,13 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 					objectDescription,
 					*m_useBase64AttrPtr ? qPrintable(documentContentBase64) : QString(documentContentJson),
 					SqlEncode(metaInfoRepresentation),
-					revisionInfo,
+					qPrintable(revisionInfoQuery),
 					QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
 					"Active",
 					QUuid::createUuid().toString(QUuid::WithoutBraces)
 					);
-	
-	
+
 	retVal = query.toUtf8();
-	
-	QByteArray operationDescriptionQuery = CreateOperationDescriptionQuery(objectId, operationContextPtr);
-	if (!operationDescriptionQuery.isEmpty()){
-		retVal += operationDescriptionQuery;
-	}
 	
 	return retVal;
 }
@@ -775,6 +778,117 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& type
 }
 
 
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateRevisionInfoQuery(
+			const imtbase::IOperationContext& operationContextPtr,
+			const QVariant& revisionArgument,
+			quint32 checksum) const
+{
+	imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContextPtr.GetOperationOwnerId();
+	
+	QVariantMap paramMap;
+	paramMap["OwnerId"] = objectInfo.id;
+	paramMap["OwnerName"] = objectInfo.name;
+	paramMap["Checksum"] = QString::number(checksum);
+	paramMap["RevisionNumber"] = revisionArgument;
+
+	QByteArray json;
+
+	imtbase::IOperationContext* nonConstOperationPtr = const_cast<imtbase::IOperationContext*>(&operationContextPtr);
+	if (nonConstOperationPtr != nullptr){
+		iser::ISerializable* changeCollectionPtr = dynamic_cast<iser::ISerializable*>(nonConstOperationPtr->GetChangesCollection());
+		if (changeCollectionPtr != nullptr){
+			iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
+			if (!changeCollectionPtr->Serialize(archive)){
+				qDebug() << QString("Unable to serialize a change object collection");
+			}
+			else{
+				json = archive.GetData();
+			}
+		}
+	}
+	
+	paramMap["OperationDescription"] = json;
+	
+	QString revisionInfo = CreateJsonBuildObjectQuery(paramMap);
+
+	return revisionInfo.toUtf8();
+}
+
+
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const
+{
+	QString revisionInfo = QString(R"(jsonb_build_object()");
+	
+	QStringList keys = paramMap.keys();
+	
+	for (int i = 0; i < keys.size(); i++){
+		if (i > 0){
+			revisionInfo += ", ";
+		}
+		
+		QString key = keys[i];
+		QVariant value = paramMap[key];
+		
+		if (value.canConvert<RawSqlExpression>()) {
+			RawSqlExpression raw = value.value<RawSqlExpression>();
+			revisionInfo += QString("'%1', %2").arg(key, raw.sql);
+		}
+		else if (value.typeId() == QMetaType::QString || value.typeId() == QMetaType::QByteArray){
+			revisionInfo += QString("'%1', '%2'").arg(key, value.toString());
+		}
+		else if (value.typeId() == QMetaType::Int){
+			revisionInfo += QString("'%1', %2").arg(key).arg(value.toInt());
+		}
+		else if (value.typeId() == QMetaType::Bool){
+			revisionInfo += QString("'%1', %2").arg(key).arg(value.toBool());
+		}
+	}
+
+	revisionInfo += ")";
+	
+	return revisionInfo.toUtf8();
+}
+
+
+QString CSqlDatabaseDocumentDelegateComp::CreateJsonExtractSql(
+			const QString& jsonName,
+			const QString& key,
+			QMetaType::Type metaType,
+			const QString& tableAlias) const
+{
+	switch (metaType){
+	case QMetaType::QString:
+	case QMetaType::QByteArray:
+		return QString(R"(%0."%1"->>'%2')").arg(tableAlias, jsonName, key);
+
+	case QMetaType::Int:
+	case QMetaType::UInt:
+	case QMetaType::Short:
+	case QMetaType::UShort:
+		return QString(R"((%0."%1"->>'%2')::int)").arg(tableAlias, jsonName, key);
+
+	case QMetaType::LongLong:
+	case QMetaType::ULongLong:
+		return QString(R"((%0."%1"->>'%2')::bigint)").arg(tableAlias, jsonName, key);
+
+	case QMetaType::Double:
+	case QMetaType::Float:
+		return QString(R"((%0."%1"->>'%2')::float)").arg(tableAlias, jsonName, key);
+
+	case QMetaType::Bool:
+		return QString(R"((%0."%1"->>'%2')::boolean)").arg(tableAlias, jsonName, key);
+
+	case QMetaType::QJsonObject:
+		return QString(R"(%0."%1"->'%2')").arg(tableAlias, jsonName, key);
+
+	default:
+		qWarning() << "Unsupported meta type for JSON extract:" << metaType;
+		Q_ASSERT(false);
+		return QString();
+	}
+}
+
+
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
 QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
@@ -803,14 +917,20 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				SELECT *
 				FROM %1"%2" AS root1
 				WHERE root."DocumentId" = root1."DocumentId" 
-					AND (root1."RevisionInfo"->>'RevisionNumber')::int = 1
+					AND %0 = 1
 				ORDER BY root1."TimeStamp" DESC
 				LIMIT 1
 			) AS root1 ON true
 			%3
 			WHERE root."State" = 'Active'
 		)")
-	.arg(schema, tableName, joinTablesQuery.isEmpty() ? "" : QString::fromUtf8(joinTablesQuery), customColumns);
+		.arg(
+			CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int),
+			schema,
+			tableName,
+			joinTablesQuery.isEmpty() ? "" : QString::fromUtf8(joinTablesQuery),
+			customColumns
+		);
 	
 	return query;
 }
@@ -896,7 +1016,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectio
 			sortQuery = QString("ORDER BY root.\"%1\" %2").arg(qPrintable(columnId), qPrintable(sortOrder));
 		}
 		else{
-			sortQuery = QString("ORDER BY root.\"DataMetaInfo\"->>\'%1\' %2").arg(qPrintable(columnId), qPrintable(sortOrder));
+			sortQuery = QString("ORDER BY %1 %2").arg(CreateJsonExtractSql(R"(root."DataMetaInfo")", columnId), qPrintable(sortOrder));
 		}
 	}
 	
@@ -999,7 +1119,12 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICol
 		}
 		
 		for (int i = 0; i < filteringColumnIds.count(); ++i){
-			textFilterQuery += QString("%0\"DataMetaInfo\"->>\'%1\' ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", qPrintable(filteringColumnIds[i]), textFilter);
+			textFilterQuery += QString("%0%1 ILIKE '%%2%'")
+				.arg(
+					textFilterQuery.isEmpty() ? "" : " OR ",
+					CreateJsonExtractSql(R"(root."DataMetaInfo")", filteringColumnIds[i]),
+					textFilter
+				);
 		}
 	}
 	
@@ -1009,7 +1134,11 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICol
 
 bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
 {
-	QString addedStrQuery = QString(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE ("RevisionInfo"->>'RevisionNumber')::int = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))").arg(qPrintable(*m_tableNameAttrPtr));
+	QString addedStrQuery = QString(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))")
+								.arg(
+									qPrintable(*m_tableNameAttrPtr),
+									CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
+									);
 	
 	switch (timeFilter.GetTimeUnit()){
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
@@ -1086,7 +1215,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 		imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
 		if (!timeRange.IsNull()){
 			timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
-								.arg(addedStrQuery, timeRange.GetBeginTime().toString(Qt::ISODateWithMs), timeRange.GetEndTime().toString(Qt::ISODateWithMs));
+			.arg(addedStrQuery, timeRange.GetBeginTime().toString(Qt::ISODateWithMs), timeRange.GetEndTime().toString(Qt::ISODateWithMs));
 		}
 	}
 	
@@ -1162,7 +1291,7 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool c
 		substitute.replace("\"", "");
 		
 		if (!s_filterableColumns.contains(substitute)){
-			substitute = QString("root.\"DataMetaInfo\"%0'%1'").arg(castToStr ? "->>" : "->", substitute);
+			substitute = CreateJsonExtractSql("DataMetaInfo", substitute, castToStr ? QMetaType::QString : QMetaType::QJsonObject);
 			query.replace(item, substitute);
 		}
 		else if (substitute != s_addedColumn){
@@ -1207,8 +1336,15 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
 	
-	return QString("(SELECT * FROM %0\"%1\" WHERE (%2) AND \"%3\" = '%4') ORDER BY (\"RevisionInfo\"->>'RevisionNumber')::int DESC;")
-		.arg(schemaPrefix, qPrintable(*m_tableNameAttrPtr), stateDocumentFilter, qPrintable(s_documentIdColumn), qPrintable(objectId)).toUtf8();
+	return QString("SELECT * FROM %0\"%1\" as root WHERE (%2) AND \"%3\" = '%4' ORDER BY %5 DESC;")
+		.arg(
+			schemaPrefix,
+			qPrintable(*m_tableNameAttrPtr),
+			stateDocumentFilter,
+			qPrintable(s_documentIdColumn),
+			qPrintable(objectId),
+			CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
+		).toUtf8();
 }
 
 

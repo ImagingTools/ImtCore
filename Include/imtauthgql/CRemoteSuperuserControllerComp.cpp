@@ -25,16 +25,16 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 
 	userssdl::CreateSuperuserRequestArguments arguments;
 	arguments.input.Version_1_0 = userssdl::CCreateSuperuserInput::V1_0();
-	arguments.input.Version_1_0->Name = *m_superuserNameAttrPtr;
-	arguments.input.Version_1_0->Mail = *m_superuserMailAttrPtr;
-	arguments.input.Version_1_0->Password = password;
+	arguments.input.Version_1_0->name = *m_superuserNameAttrPtr;
+	arguments.input.Version_1_0->mail = *m_superuserMailAttrPtr;
+	arguments.input.Version_1_0->password = password;
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CCreateSuperuserGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		userssdl::CCreateSuperuserPayload::V1_0 response;
 		if (SendModelRequest<userssdl::CCreateSuperuserPayload::V1_0, userssdl::CCreateSuperuserPayload>(gqlRequest, response)){
-			if (response.Success.has_value()){
-				return *response.Success;
+			if (response.success.has_value()){
+				return *response.success;
 			}
 		}
 	}

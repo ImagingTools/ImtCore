@@ -21,3 +21,5 @@ WebSocketConnectionChecker 1.0 WebSocketConnectionChecker.qml
 GqlSdlRequestSender 1.0 GqlSdlRequestSender.qml
 XmlHttpRequestProxy 1.0 XmlHttpRequestProxy.qml
 GqlBasedCommandsController 1.0 GqlBasedCommandsController.qml
+GqlBasedCollectionDataController 1.0 GqlBasedCollectionDataController.qml
+GqlBasedObjectVisualStatusProvider 1.0 GqlBasedObjectVisualStatusProvider.qml

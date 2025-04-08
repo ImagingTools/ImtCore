@@ -22,9 +22,9 @@ Item {
 
     function setCommandVisible(commandId, visible){
         for (let i = 0; i < container.commandModel.getItemsCount(); i++){
-            let id = container.commandModel.getData("Id", i);
+            let id = container.commandModel.getData("id", i);
             if (id === commandId){
-                container.commandModel.setData("Visible", visible, i);
+                container.commandModel.setData("visible", visible, i);
                 break;
             }
         }
@@ -36,11 +36,11 @@ Item {
         }
 
         for (let i = 0; i < container.commandModel.getItemsCount(); i++){
-            let currentCommandId = container.commandModel.getData("Id", i);
+            let currentCommandId = container.commandModel.getData("id", i);
             if (currentCommandId == commandId){
-                let currentIsEnabled = container.commandModel.getData("IsEnabled", i);
+                let currentIsEnabled = container.commandModel.getData("isEnabled", i);
                 if (currentIsEnabled !== isEnabled){
-                    container.commandModel.setData("IsEnabled", isEnabled, i);
+                    container.commandModel.setData("isEnabled", isEnabled, i);
                 }
             }
         }
@@ -52,7 +52,7 @@ Item {
         }
 
         for (let i = 0; i < container.commandModel.getItemsCount(); i++){
-            let currentCommandId = container.commandModel.getData("Id", i);
+            let currentCommandId = container.commandModel.getData("id", i);
             if (currentCommandId == commandId){
                 return i;
             }
@@ -74,19 +74,19 @@ Item {
                 width: visible ? container.buttonSize : 0;
                 height: width;
 
-                iconSource: enabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal) :
-                                              "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
+                iconSource: enabled ? "../../../../" + Style.getIconPath(model.icon, Icon.State.Off, Icon.Mode.Normal) :
+                                              "../../../../" + Style.getIconPath(model.icon, Icon.State.Off, Icon.Mode.Disabled);
 
-                enabled: model.IsEnabled != undefined && model.IsEnabled != null ? model.IsEnabled : true;
+                enabled: model.isEnabled != undefined && model.isEnabled != null ? model.isEnabled : true;
 
-                visible: model.Visible != undefined && model.Visible != null ? model.Visible : true;
+                visible: model.visible != undefined && model.visible != null ? model.visible : true;
 
-                tooltipText: model.TooltipText ? model.TooltipText : "";
+                tooltipText: model.tooltipText ? model.tooltipText : "";
 
-                property string commandId: model.Id;
+                property string commandId: model.id;
 
                 onClicked: {
-                    container.commandActivated(model.Id);
+                    container.commandActivated(model.id);
                 }
             }
 

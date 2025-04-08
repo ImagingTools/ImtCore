@@ -13,8 +13,8 @@ RemoteCollectionView {
 	
 	collectionId: "Roles";
 	visibleMetaInfo: true;
-	
-	additionalFieldIds: ["ProductId", "ParentRoles"]
+
+	additionalFieldIds: [RoleItemTypeMetaInfo.s_productId, RoleItemTypeMetaInfo.s_parentRoles]
 	
 	commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
 			collectionView: roleCollectionViewContainer;

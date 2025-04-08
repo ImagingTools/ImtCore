@@ -93,31 +93,31 @@ Rectangle {
 			return;
 		}
 
-		if (!('Id' in data)){
+		if (!('id' in data)){
 			return;
 		}
-		let pageId = data["Id"];
+		let pageId = data["id"];
 
-		if ('Name' in data){
-			let pageName = data["Name"];
+		if ('name' in data){
+			let pageName = data["name"];
 
 			for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
-				let id = menuPanel.model.getData("Id", i);
+				let id = menuPanel.model.getData("id", i);
 				if (pageId == id){
-					menuPanel.model.setData("Name", pageName,  i);
+					menuPanel.model.setData("name", pageName,  i);
 
 					break;
 				}
 			}
 		}
 
-		if ('Icon' in data){
-			let pageIcon = data["Icon"];
+		if ('icon' in data){
+			let pageIcon = data["icon"];
 
 			for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
-				let id = menuPanel.model.getData("Id", i);
+				let id = menuPanel.model.getData("id", i);
 				if (pageId == id){
-					menuPanel.model.setData("Icon", pageIcon,  i);
+					menuPanel.model.setData("icon", pageIcon,  i);
 
 					break;
 				}
@@ -153,8 +153,8 @@ Rectangle {
 		menuPanel.activePageId = "";
 
 		for (let i = 0; i < model.getItemsCount(); i++){
-			if (model.containsKey("Alignment", i)){
-				let alignment = model.getData("Alignment", i);
+			if (model.containsKey("alignment", i)){
+				let alignment = model.getData("alignment", i);
 				if (alignment === 32/*Qt.AlignTop*/|| alignment === 1){
 					let index = topPagesModel.insertNewItem();
 					topPagesModel.copyItemDataFromModel(index, model, i)
@@ -171,13 +171,13 @@ Rectangle {
 		bottomAlignmentPages.model = bottomPagesModel;
 
         if (model.getItemsCount() > 0){
-            menuPanel.activePageId = model.getData("Id",0);
+            menuPanel.activePageId = model.getData("id",0);
         }
 	}
 
 	function setActivePage(pageId){
 		for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
-			let id = menuPanel.model.getData("Id", i);
+			let id = menuPanel.model.getData("id", i);
 			if (id === pageId){
 				menuPanel.activePageId = id;
 				menuPanel.activePageIndex = i;
@@ -195,18 +195,18 @@ Rectangle {
 				}
 			}
 
-			text:  model["Name"];
+			text:  model["name"];
 			textColor: Style.textColor;
 			fontName: menuPanel.fontName;
 			menuPanelRef: menuPanel;
-			iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
-													"../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
+			iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
+													"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
 
 			selected: menuPanel.activePageIndex === model.index;
-			property string pageId: model["Id"];
+			property string pageId: model["id"];
 
 			onClicked: {
-				menuPanel.setActivePage(model.Id)
+				menuPanel.setActivePage(model.id)
 			}
 
 			onWidthChanged: {
@@ -247,14 +247,14 @@ Rectangle {
 		interactive: false;
 		delegate: Component {
 			MenuPanelButton {
-				text:  model["Name"];
+				text:  model["name"];
 				textColor: Style.textColor;
 				menuPanelRef: menuPanel;
-				iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
-														"../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
+				iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
+														"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
 				selected: menuPanel.activePageIndex <= topAlignmentPages.count - 1 ? model.index === menuPanel.activePageIndex : false;
 				onClicked: {
-					menuPanel.setActivePage(model.Id)
+					menuPanel.setActivePage(model.id)
 				}
 			}
 		}
@@ -274,14 +274,14 @@ Rectangle {
 		interactive: false;
 		delegate: Component {
 			MenuPanelButton {
-				text:  model["Name"];
+				text:  model["name"];
 				textColor: Style.textColor;
 				menuPanelRef: menuPanel;
-				iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
-														"../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
+				iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
+														"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
 				selected: menuPanel.activePageIndex > topAlignmentPages.count - 1 ? menuPanel.activePageIndex - topAlignmentPages.count === model.index : false;
 				onClicked: {
-					menuPanel.setActivePage(model.Id)
+					menuPanel.setActivePage(model.id)
 				}
 			}
 		}

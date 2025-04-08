@@ -27,7 +27,7 @@ Dialog {
 				leftTable.uncheckAll();
 				if (leftTable.elements){
 					for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
-						let id = leftTable.elements.getData("Id", i)
+						let id = leftTable.elements.getData("id", i)
 
 						if (dialog.tableViewParamsCopied.headerIsVisible(id)){
 							leftTable.checkItem(i);
@@ -47,7 +47,7 @@ Dialog {
 
 			function updateHeadersOrder(){
 				for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
-					let id = leftTable.elements.getData("Id", i)
+					let id = leftTable.elements.getData("id", i)
 					dialog.tableViewParamsCopied.setHeaderOrder(id, i);
 				}
 			}
@@ -67,11 +67,11 @@ Dialog {
 						return;
 					}
 
-					dialog.buttonsModel.setProperty(0, 'Enabled', item.checkedIndexes.length > 0)
+					dialog.setButtonEnabled(Enums.apply, item.checkedIndexes.length > 0)
 					errorText.visible = item.checkedIndexes.length < 1;
 
 					for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
-						let id = leftTable.elements.getData("Id", i)
+						let id = leftTable.elements.getData("id", i)
 						let visible = item.checkedIndexes.includes(i);
 						let headerSize = dialog.tableViewParamsCopied.getHeaderSize(id)
 
@@ -142,7 +142,7 @@ Dialog {
 								item.updateHeadersOrder();
 								item.updateGui();
 
-								dialog.buttonsModel.setProperty(0, 'Enabled', true)
+								dialog.setButtonEnabled(Enums.apply, true)
 								leftTable.select(index - 1)
 							}
 						}
@@ -168,7 +168,7 @@ Dialog {
 								item.updateHeadersOrder();
 								item.updateGui();
 
-								dialog.buttonsModel.setProperty(0, 'Enabled', true)
+								dialog.setButtonEnabled(Enums.apply, true)
 
 								leftTable.select(index + 1)
 							}
@@ -221,8 +221,8 @@ Dialog {
 
 				Component.onCompleted: {
 					let index = availableHeadersModel.insertNewItem();
-					availableHeadersModel.setData("Id", "Name", index)
-					availableHeadersModel.setData("Name", qsTr("Available Columns"), index)
+					availableHeadersModel.setData("id", "name", index)
+					availableHeadersModel.setData("name", qsTr("Available Columns"), index)
 
 					item.updateModel()
 				}
@@ -231,8 +231,8 @@ Dialog {
 	}
 
 	Component.onCompleted: {
-		buttonsModel.append({Id: Enums.apply, Name:qsTr("Apply"), Enabled: false})
-		buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
+		addButton(Enums.apply, qsTr("Apply"), false)
+		addButton(Enums.cancel, qsTr("Cancel"), true)
 	}
 
 	onFinished: {

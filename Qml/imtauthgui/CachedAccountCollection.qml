@@ -7,11 +7,11 @@ import imtcolgui 1.0
 CollectionDataProvider {
     id: container;
 
-    fields: ["Id", "Name", "Description"];
+    fields: ["id", "name", "description"];
     commandId: "AccountsList";
     subscriptionCommandId: "OnAccountsCollectionChanged"
 
-    sortByField: "Name";
+    sortByField: "name";
 }
 
 

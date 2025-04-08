@@ -115,7 +115,7 @@ QtObject{
 		for(let i = prevMonthLastDay - (firstWeekDay - 1 -1) ; i <= prevMonthLastDay; i++){
 			index++;
 			let day = {};
-			day.Id = index;
+			day.id = index;
 			day.Day = i;
 			day.Month = prevMonth;
 			day.Year = prevMonth_year;
@@ -129,7 +129,7 @@ QtObject{
 		for(let i = 1; i <= lastDay; i++){
 			index++;
 			let day = {};
-			day.Id = index;
+			day.id = index;
 			day.Day = i;
 			day.Month = month;
 			day.Year = year;
@@ -147,7 +147,7 @@ QtObject{
 		for(let i = 1; i <= (42 - count); i++){
 			index++;
 			let day = {};
-			day.Id = index;
+			day.id = index;
 			day.Day = i;
 			day.Month = nextMonth;
 			day.Year = nextMonth_year;

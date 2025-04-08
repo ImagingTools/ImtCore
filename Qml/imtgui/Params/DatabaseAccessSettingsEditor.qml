@@ -95,7 +95,7 @@ ParamEditorBase {
 				
 				TextInputElementView {
 					id: databaseNameInput_
-					name: qsTr("Database Name")
+					name: qsTr("Database name")
 					text: dbEditor.databaseParams ? dbEditor.databaseParams.m_dbName : ""
 					onEditingFinished: {
 						dbEditor.databaseParams.m_dbName = text

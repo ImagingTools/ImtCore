@@ -24,7 +24,7 @@ QtObject {
     property Item pagination: null;
 
     // Поля которые запросятся для модели коллекции
-    property var fieldsData: ["Id", "Name"]
+    property var fieldsData: ["id", "name"]
 
     signal itemsInfoGqlStateChanged(string state);
 
@@ -71,8 +71,8 @@ QtObject {
             }
 
             var queryHeaders = Gql.GqlObject("headers");
-            queryHeaders.InsertField("Id");
-            queryHeaders.InsertField("Name");
+            queryHeaders.InsertField("id");
+            queryHeaders.InsertField("name");
             query.AddField(queryHeaders);
 
             var gqlData = query.GetQuery();
@@ -127,7 +127,7 @@ QtObject {
                             gqlModelBaseContainer.headers = dataModelLocal;
 
                             for(var i = 0; i < gqlModelBaseContainer.headers.getItemsCount(); i++){
-                                let headerId = gqlModelBaseContainer.headers.getData("Id", i);
+                                let headerId = gqlModelBaseContainer.headers.getData("id", i);
                                 if (!gqlModelBaseContainer.fieldsData.includes(headerId)){
                                     gqlModelBaseContainer.fieldsData.push(headerId);
                                 }
@@ -261,8 +261,8 @@ QtObject {
             }
 
             var queryFields = Gql.GqlObject("objectView");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
+            queryFields.InsertField("id");
+            queryFields.InsertField("name");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();

@@ -159,18 +159,18 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 			sdl::imtauth::Authorization::CAuthorizationInput::V1_0 inputArgument = *arguments.input.Version_1_0;
 
 			QByteArray login;
-			if (inputArgument.Login){
-				login = inputArgument.Login->toUtf8();
+			if (inputArgument.login){
+				login = inputArgument.login->toUtf8();
 			}
 			
 			QByteArray productId;
-			if (inputArgument.ProductId){
-				productId = *inputArgument.ProductId;
+			if (inputArgument.productId){
+				productId = *inputArgument.productId;
 			}
 			
 			QByteArray password;
-			if (inputArgument.Password){
-				password = inputArgument.Password->toUtf8();
+			if (inputArgument.password){
+				password = inputArgument.password->toUtf8();
 			}
 
 			QByteArray userObjectId = GetUserObjectId(login);

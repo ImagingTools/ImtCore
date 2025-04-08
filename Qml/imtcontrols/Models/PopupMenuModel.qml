@@ -4,11 +4,11 @@ ListModel {
 	id: popupMenuModel;
 
 	function addItem(id, name, icon, enabled){
-		popupMenuModel.append({"Id": id, "Name": name, "Icon": icon, "IsEnabled": enabled});
+		popupMenuModel.append({"id": id, "name": name, "icon": icon, "isEnabled": enabled});
 	}
 
 	function addSeparator(){
-		popupMenuModel.append({"Id": "", "Name": "", "Icon": "", "IsEnabled": false});
+		popupMenuModel.append({"id": "", "name": "", "icon": "", "isEnabled": false});
 	}
 }
 

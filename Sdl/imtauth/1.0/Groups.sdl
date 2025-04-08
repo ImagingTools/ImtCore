@@ -12,20 +12,20 @@ import {
 }
 
 input GroupsListInput {
-	ProductId: ID!
+	productId: ID!
 	viewParams: CollectionViewParams
 }
 
 type GroupItem {
-	Id: ID!
-	TypeId: ID!
-	Name: String!
-	Description: String
-	Roles: ID
-	Users: ID
-	ParentGroups: ID
-	Added: String
-	LastModified: String
+	id: ID!
+	typeId: ID!
+	name: String!
+	description: String
+	roles: ID
+	users: ID
+	parentGroups: ID
+	added: String
+	lastModified: String
 }
 
 type GroupsListPayload {
@@ -34,24 +34,24 @@ type GroupsListPayload {
 }
 
 type GroupData {
-	Id: ID
-	ProductId: ID
-	Name: String
-	Description: String
-	Roles: ID
-	Users: ID
-	ParentGroups: ID
+	id: ID
+	productId: ID
+	name: String
+	description: String
+	roles: ID
+	users: ID
+	parentGroups: ID
 }
 
 input GroupDataInput {
-	Id: ID!
-	ProductId: ID!
-	Item: GroupData!
+	id: ID!
+	productId: ID!
+	item: GroupData!
 }
 
 input GroupItemInput {
-	Id: ID!
-	ProductId: ID!
+	id: ID!
+	productId: ID!
 }
 
 type Query {

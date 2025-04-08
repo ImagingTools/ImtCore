@@ -1,25 +1,25 @@
 schema {
-    query: Query
-    mutation: Mutation
-    name: AuthorizationOptions
-    namespace: imtauth
-    version: 1.0
+	query: Query
+	mutation: Mutation
+	name: AuthorizationOptions
+	namespace: imtauth
+	version: 1.0
 }
 
 enum UserManagementMode {
-    NO_USER_MANAGEMENT
-    OPTIONAL_USER_MANAGEMENT
-    STRONG_USER_MANAGEMENT
+	NO_USER_MANAGEMENT
+	OPTIONAL_USER_MANAGEMENT
+	STRONG_USER_MANAGEMENT
 }
 
 type UserManagementPayload {
-    UserMode: UserManagementMode
+	userMode: UserManagementMode
 }
 
 input UserManagementInput {
-    ProductId: ID
+	productId: ID
 }
 
 type Query {
-    GetUserMode (input: UserManagementInput): UserManagementPayload!
+	GetUserMode (input: UserManagementInput): UserManagementPayload!
 }

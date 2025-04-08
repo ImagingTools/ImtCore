@@ -2,24 +2,20 @@
 
 
 // ImtCore includes
-#include <imtdb/CSqliteJsonDatabaseDelegateComp.h>
+#include <imtdb/CSqliteDatabaseDocumentDelegateComp.h>
 
 
 namespace imtauthdb
 {
 
 
-class CSqliteRoleDatabaseDelegateComp: public imtdb::CSqliteJsonDatabaseDelegateComp
+class CSqliteRoleDatabaseDelegateComp: public imtdb::CSqliteDatabaseDocumentDelegateComp
 {
 public:
-	typedef imtdb::CSqliteJsonDatabaseDelegateComp BaseClass;
+	typedef imtdb::CSqliteDatabaseDocumentDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CSqliteRoleDatabaseDelegateComp)
 	I_END_COMPONENT
-
-protected:
-	// reimplemented (imtdb::CSqliteJsonDatabaseDelegateComp)
-	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 };
 
 

@@ -11,9 +11,9 @@ ControlBase {
 	property bool autoWidth: true;
 	property bool isCloseEnable: true;
 
-	property string text: model.Name ? model.Name: "";
-	property string description: model.Description ? model.Description : "";
-	property string icon: model.Icon ? model.Icon : "";
+	property string text: model.name ? model.name: "";
+	property string description: model.description ? model.description : "";
+	property string icon: model.icon ? model.icon : "";
 	property int index: model.index;
 	property int selectedIndex:  tabPanel ? tabPanel.selectedIndex : -1;
 
@@ -32,14 +32,14 @@ ControlBase {
 	signal stopContentLoading();
 
 	Component.onCompleted: {
-		if (model.WaitName){
+		if (model.waitName){
 			startContentLoading();
 		}
 	}
 
 	onTextChanged: {
 		if (text !== ""){
-			model.WaitName = false;
+			model.waitName = false;
 			stopContentLoading();
 		}
 	}
@@ -48,13 +48,13 @@ ControlBase {
 		target: tabDelegate.tabPanel;
 
 		function onStartTabContentLoading(tabId){
-			if (model.Id === tabId){
+			if (model.id === tabId){
 				tabDelegate.startContentLoading();
 			}
 		}
 
 		function onStopTabContentLoading(tabId){
-			if (model.Id === tabId){
+			if (model.id === tabId){
 				tabDelegate.stopContentLoading();
 			}
 		}

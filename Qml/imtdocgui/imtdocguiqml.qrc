@@ -6,20 +6,19 @@
         <file alias="imtdocgui/MultiDocWorkspacePageView.qml">MultiDocWorkspacePageView.qml</file>
         <file alias="imtdocgui/MultiDocWorkspaceView.qml">MultiDocWorkspaceView.qml</file>
         <file alias="imtdocgui/SingleDocumentWorkspaceView.qml">SingleDocumentWorkspaceView.qml</file>
-	<file alias="imtdocgui/SearchPageSingleDocumentView.qml">SearchPageSingleDocumentView.qml</file>
+        <file alias="imtdocgui/SearchPageSingleDocumentView.qml">SearchPageSingleDocumentView.qml</file>
         <file alias="imtdocgui/UndoRedoManager.qml">UndoRedoManager.qml</file>
         <file alias="imtdocgui/DocumentManager.qml">DocumentManager.qml</file>
         <file alias="imtdocgui/DocumentHistoryDialog.qml">DocumentHistoryDialog.qml</file>
-        <file alias="imtdocgui/DocumentHistoryProvider.qml">DocumentHistoryProvider.qml</file>
         <file alias="imtdocgui/DocumentHistoryView.qml">DocumentHistoryView.qml</file>
         <file alias="imtdocgui/DocumentDataController.qml">DocumentDataController.qml</file>
-	<file alias="imtdocgui/DocumentCollectionViewDelegate.qml">DocumentCollectionViewDelegate.qml</file>
-	<file alias="imtdocgui/DocumentValidator.qml">DocumentValidator.qml</file>
-	<file alias="imtdocgui/DocumentWorkspacePageView.qml">DocumentWorkspacePageView.qml</file>
-	<file alias="imtdocgui/SingleDocumentWorkspacePageView.qml">SingleDocumentWorkspacePageView.qml</file>
-	<file alias="imtdocgui/DocumentHistoryPanel.qml">DocumentHistoryPanel.qml</file>
-	<file alias="imtdocgui/DocumentView.qml">DocumentView.qml</file>
-	<file alias="imtdocgui/DocumentViewBase.qml">DocumentViewBase.qml</file>
+        <file alias="imtdocgui/DocumentCollectionViewDelegate.qml">DocumentCollectionViewDelegate.qml</file>
+        <file alias="imtdocgui/DocumentValidator.qml">DocumentValidator.qml</file>
+        <file alias="imtdocgui/DocumentWorkspacePageView.qml">DocumentWorkspacePageView.qml</file>
+        <file alias="imtdocgui/SingleDocumentWorkspacePageView.qml">SingleDocumentWorkspacePageView.qml</file>
+        <file alias="imtdocgui/DocumentHistoryPanel.qml">DocumentHistoryPanel.qml</file>
+        <file alias="imtdocgui/DocumentView.qml">DocumentView.qml</file>
+        <file alias="imtdocgui/DocumentViewBase.qml">DocumentViewBase.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

@@ -55,90 +55,90 @@ Rectangle {
         property bool compl: false;
         Component.onCompleted: {
             let index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Account", index);
-            tableHeaderModel.setData("Name", qsTr("ЛС"), index);
+            tableHeaderModel.setData("id", "Account", index);
+            tableHeaderModel.setData("name", qsTr("ЛС"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "FullName", index);
-            tableHeaderModel.setData("Name", qsTr("ФИО"), index);
+            tableHeaderModel.setData("id", "FullName", index);
+            tableHeaderModel.setData("name", qsTr("ФИО"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Address", index);
-            tableHeaderModel.setData("Name", qsTr("Адрес"), index);
+            tableHeaderModel.setData("id", "Address", index);
+            tableHeaderModel.setData("name", qsTr("Адрес"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Residents", index);
-            tableHeaderModel.setData("Name", qsTr("Проживает"), index);
+            tableHeaderModel.setData("id", "Residents", index);
+            tableHeaderModel.setData("name", qsTr("Проживает"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Branch", index);
-            tableHeaderModel.setData("Name", qsTr("Филиал"), index);
+            tableHeaderModel.setData("id", "Branch", index);
+            tableHeaderModel.setData("name", qsTr("Филиал"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Type", index);
-            tableHeaderModel.setData("Name", qsTr("Тип"), index);
+            tableHeaderModel.setData("id", "Type", index);
+            tableHeaderModel.setData("name", qsTr("Тип"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Gauges", index);
-            tableHeaderModel.setData("Name", qsTr("Счетчики"), index);
-
-
-            index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Account2", index);
-            tableHeaderModel.setData("Name", qsTr("ЛС"), index);
-
-            index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "FullName2", index);
-            tableHeaderModel.setData("Name", qsTr("ФИО"), index);
-
-            index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Address2", index);
-            tableHeaderModel.setData("Name", qsTr("Адрес"), index);
-
-            index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Residents2", index);
-            tableHeaderModel.setData("Name", qsTr("Проживает"), index);
-
-            index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Branch2", index);
-            tableHeaderModel.setData("Name", qsTr("Филиал"), index);
-
-            index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Type2", index);
-            tableHeaderModel.setData("Name", qsTr("Тип"), index);
-
-            index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Gauges2", index);
-            tableHeaderModel.setData("Name", qsTr("Счетчики"), index);
+            tableHeaderModel.setData("id", "Gauges", index);
+            tableHeaderModel.setData("name", qsTr("Счетчики"), index);
 
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Account3", index);
-            tableHeaderModel.setData("Name", qsTr("ЛС"), index);
+            tableHeaderModel.setData("id", "Account2", index);
+            tableHeaderModel.setData("name", qsTr("ЛС"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "FullName3", index);
-            tableHeaderModel.setData("Name", qsTr("ФИО"), index);
+            tableHeaderModel.setData("id", "FullName2", index);
+            tableHeaderModel.setData("name", qsTr("ФИО"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Address3", index);
-            tableHeaderModel.setData("Name", qsTr("Адрес"), index);
+            tableHeaderModel.setData("id", "Address2", index);
+            tableHeaderModel.setData("name", qsTr("Адрес"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Residents3", index);
-            tableHeaderModel.setData("Name", qsTr("Проживает"), index);
+            tableHeaderModel.setData("id", "Residents2", index);
+            tableHeaderModel.setData("name", qsTr("Проживает"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Branch3", index);
-            tableHeaderModel.setData("Name", qsTr("Филиал"), index);
+            tableHeaderModel.setData("id", "Branch2", index);
+            tableHeaderModel.setData("name", qsTr("Филиал"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Type3", index);
-            tableHeaderModel.setData("Name", qsTr("Тип"), index);
+            tableHeaderModel.setData("id", "Type2", index);
+            tableHeaderModel.setData("name", qsTr("Тип"), index);
 
             index = tableHeaderModel.insertNewItem();
-            tableHeaderModel.setData("Id", "Gauges3", index);
-            tableHeaderModel.setData("Name", qsTr("Счетчики"), index);
+            tableHeaderModel.setData("id", "Gauges2", index);
+            tableHeaderModel.setData("name", qsTr("Счетчики"), index);
+
+
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("id", "Account3", index);
+            tableHeaderModel.setData("name", qsTr("ЛС"), index);
+
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("id", "FullName3", index);
+            tableHeaderModel.setData("name", qsTr("ФИО"), index);
+
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("id", "Address3", index);
+            tableHeaderModel.setData("name", qsTr("Адрес"), index);
+
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("id", "Residents3", index);
+            tableHeaderModel.setData("name", qsTr("Проживает"), index);
+
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("id", "Branch3", index);
+            tableHeaderModel.setData("name", qsTr("Филиал"), index);
+
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("id", "Type3", index);
+            tableHeaderModel.setData("name", qsTr("Тип"), index);
+
+            index = tableHeaderModel.insertNewItem();
+            tableHeaderModel.setData("id", "Gauges3", index);
+            tableHeaderModel.setData("name", qsTr("Счетчики"), index);
 
             table.headers = tableHeaderModel;
             tableDecor.headers = tableHeaderModel;

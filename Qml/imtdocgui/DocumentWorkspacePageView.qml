@@ -45,10 +45,10 @@ PageContainer {
     function onMenuModelChanged(model){
         let id = root.pageId;
         for(let i = 0; i < model.getItemsCount(); i++){
-            let curr_id = model.getData("Id",i);
-            let curr_name = model.getData("Name",i);
+            let curr_id = model.getData("id",i);
+            let curr_name = model.getData("name",i);
             if(curr_id == id && curr_name && documentManager.documentsModel){
-                documentManager.documentsModel.setProperty(0, "Name", curr_name);
+                documentManager.documentsModel.setProperty(0, "name", curr_name);
                 break;
             }
         }

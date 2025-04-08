@@ -34,8 +34,8 @@ bool CPageBasedGuiRepresentationControllerComp::SetupItemModel(
 	QString pageQmlItemFilePath = pageGuiElementPtr->GetPageQmlItemFilePath();
 	QString startSourceItem = pageGuiElementPtr->GetStartSourceItem();
 
-	representation.SetData("Source", pageQmlItemFilePath, index);
-	representation.SetData("StartItem", startSourceItem, index);
+	representation.SetData("source", pageQmlItemFilePath, index);
+	representation.SetData("startItem", startSourceItem, index);
 
 	return true;
 }

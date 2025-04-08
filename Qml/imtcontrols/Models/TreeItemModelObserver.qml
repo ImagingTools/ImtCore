@@ -61,7 +61,7 @@ QtObject {
         }
 
         for (let i = 0; i < model1.getItemsCount(); i++){
-            let dataId = model1.getData("Id", i);
+            let dataId = model1.getData("id", i);
 
             let keys = model1.getKeys(i);
             for (let j = 0; j < keys.length; j++){

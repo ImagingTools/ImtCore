@@ -104,7 +104,7 @@ Item {
     }
 
     onRenamed: {
-        //        containerBase.documentManagerPtr.setDocumentTitle({"Id": id, "Title": newName});
+        //        containerBase.documentManagerPtr.setDocumentTitle({"id": id, "Title": newName});
         if (autoUpdateAfterChanges){
             containerBase.collectionStructureBase.updateGui();
         }
@@ -148,8 +148,8 @@ Item {
 
         let index = containerBase.treeView.selectedIndex
         if (index >= 0){
-            let itemId = elementsModel.getData("Id", index);
-            let itemName = elementsModel.getData("Name", index);
+            let itemId = elementsModel.getData("id", index);
+            let itemName = elementsModel.getData("name", index);
             containerBase.collectionStructureBase.selectItem(itemId, itemName);
         }
     }
@@ -177,7 +177,7 @@ Item {
         if (containerBase.treeView.selectedIndex){
             index = containerBase.treeView.findParentIndex(containerBase.treeView.selectedIndex)
         }
-        // let selectedName = containerBase.treeView.getData("Name", index);
+        // let selectedName = containerBase.treeView.getData("name", index);
         ModalDialogManager.openDialog(newNodeDialog, {"message": qsTr("Please enter the name of the new node"), "inputValue": ""});
     }
 
@@ -188,7 +188,7 @@ Item {
         }
 
         let index = containerBase.treeView.selectedIndex
-        if (index >= 0){            let selectedName = containerBase.tableData.elements.getData("Name", index);
+        if (index >= 0){            let selectedName = containerBase.tableData.elements.getData("name", index);
             ModalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }
@@ -270,7 +270,7 @@ Item {
             onFinished: {
                 if (buttonId == "Yes"){
                     let index = containerBase.treeView.selectedIndex;
-                    let id = containerBase.treeView.getData("Id", index);
+                    let id = containerBase.treeView.getData("id", index);
                     let typeId = containerBase.treeView.getData("TypeId", index);
                     if (id !== ""){
                         removeModel.updateModel(id, typeId);
@@ -367,11 +367,11 @@ Item {
                     query = Gql.GqlRequest("mutation", containerBase.removeObjectGqlCommand);
                 }
 
-                inputParams.InsertField("Id", itemId);
+                inputParams.InsertField("id", itemId);
                 queryFields = Gql.GqlObject("removedNotification");
                 query.AddParam(inputParams);
 
-                queryFields.InsertField("Id");
+                queryFields.InsertField("id");
                 queryFields.InsertField("Successed");
 
                 query.AddField(queryFields);
@@ -420,8 +420,8 @@ Item {
 
                             containerBase.tableData.selectedIndex = -1;
 
-                            if (dataModelLocal.containsKey("Id")){
-                                var itemId = dataModelLocal.getData("Id");
+                            if (dataModelLocal.containsKey("id")){
+                                var itemId = dataModelLocal.getData("id");
 
                                 containerBase.removed(itemId);
                             }
@@ -449,7 +449,7 @@ Item {
             query = Gql.GqlRequest("mutation", containerBase.newNodeGqlCommand);
 
             let uuid = uuidGenerator.generateUUID();
-            inputParams.InsertField("Id", uuid);
+            inputParams.InsertField("id", uuid);
 
             inputParams.InsertField("NewName", newName);
 
@@ -464,7 +464,7 @@ Item {
                 }
             }
 
-            let parentNodeId = containerBase.treeView.getData("Id", parentIndex)
+            let parentNodeId = containerBase.treeView.getData("id", parentIndex)
             if (parentNodeId === undefined){
                 parentNodeId = ""
             }
@@ -515,8 +515,8 @@ Item {
                     if (dataModelLocal.containsKey(containerBase.renameGqlCommand)) {
                         dataModelLocal = dataModelLocal.getData(containerBase.renameGqlCommand);
 
-                        let oldId = dataModelLocal.getData("Id");
-                        let newName = dataModelLocal.getData("Name");
+                        let oldId = dataModelLocal.getData("id");
+                        let newName = dataModelLocal.getData("name");
 
                         containerBase.renamed(oldId, newName);
                     }
@@ -539,7 +539,7 @@ Item {
             query = Gql.GqlRequest("mutation", containerBase.renameGqlCommand);
 
             let itemIds = containerBase.tableData.getSelectedIds();
-            inputParams.InsertField("Id", itemIds[0]);
+            inputParams.InsertField("id", itemIds[0]);
 
             inputParams.InsertField("NewName", newName);
 
@@ -589,8 +589,8 @@ Item {
                     if (dataModelLocal.containsKey(containerBase.renameGqlCommand)) {
                         dataModelLocal = dataModelLocal.getData(containerBase.renameGqlCommand);
 
-                        let oldId = dataModelLocal.getData("Id");
-                        let newName = dataModelLocal.getData("Name");
+                        let oldId = dataModelLocal.getData("id");
+                        let newName = dataModelLocal.getData("name");
 
                         containerBase.renamed(oldId, newName);
                     }
@@ -612,7 +612,7 @@ Item {
             query = Gql.GqlRequest("mutation", containerBase.setDescriptionGqlCommand);
 
             let itemIds = containerBase.tableData.getSelectedIds();
-            inputParams.InsertField("Id", itemIds[0]);
+            inputParams.InsertField("id", itemIds[0]);
 
             inputParams.InsertField("Description", description);
 
@@ -667,7 +667,7 @@ Item {
 
                         dataModelLocal = dataModelLocal.getData(containerBase.setDescriptionGqlCommand);
 
-                        var id = dataModelLocal.getData("Id");
+                        var id = dataModelLocal.getData("id");
                         var description = dataModelLocal.getData("Description");
 
                         containerBase.descriptionSetted(id, description);

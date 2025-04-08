@@ -32,12 +32,6 @@ ControlBase {
 
     signal clicked;
 
-    Component.onCompleted: {
-        if (model.SubPages){
-            subPagesRepeater.model = model.SubPages;
-        }
-    }
-
     Rectangle {
         id: mainRect;
 
@@ -83,7 +77,7 @@ ControlBase {
                 height: container.height
 
                 selected: subPagesColumn.currentIndex == model.index;
-                title: model["Name"]
+                title: model["name"]
 
                 MouseArea{
                     anchors.fill: parent;

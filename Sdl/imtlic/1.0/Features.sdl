@@ -16,30 +16,30 @@ input FeaturesListInput {
 }
 
 type FeatureData {
-	Id: ID
-	FeatureId: ID
-	Name: String
-	FeatureName: String
-	Description: String
-	Optional: Bool
-	IsPermission: Bool
-	Dependencies: ID
-	SubFeatures: [FeatureData]
+	id: ID
+	featureId: ID
+	name: String
+	featureName: String
+	description: String
+	optional: Bool
+	isPermission: Bool
+	dependencies: ID
+	subFeatures: [FeatureData]
 }
 
 type FeatureItem {
-	Id: ID!
-	Name: String!
-	FeatureName: String!
-	TypeId: ID!
-	FeatureId: ID!
-	Description: String
-	Optional: Bool
-	IsPermission: Bool
-	Dependencies: ID
-	Added: String
-	TimeStamp: String
-	SubFeatures: [FeatureData]
+	id: ID!
+	name: String!
+	featureName: String!
+	typeId: ID!
+	featureId: ID!
+	description: String
+	optional: Bool
+	isPermission: Bool
+	dependencies: ID
+	added: String
+	timeStamp: String
+	subFeatures: [FeatureData]
 }
 
 type FeaturesListPayload {
@@ -48,12 +48,12 @@ type FeaturesListPayload {
 }
 
 input FeatureDataInput {
-	Id: ID!
-	Item: FeatureData!
+	id: ID!
+	item: FeatureData!
 }
 
 input FeatureItemInput {
-	Id: ID!
+	id: ID!
 }
 
 type Query {

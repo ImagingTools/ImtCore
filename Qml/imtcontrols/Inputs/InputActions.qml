@@ -33,23 +33,23 @@ Item {
         contextMenuModel.clear();
 
         if (inputActions.canCut){
-            contextMenuModel.append({"Id": "Cut", "Name": qsTr("Cut"), "IconSource": ""});
+            contextMenuModel.append({"id": "Cut", "name": qsTr("Cut"), "IconSource": ""});
         }
 
         if (inputActions.canCopy){
-            contextMenuModel.append({"Id": "Copy", "Name": qsTr("Copy"), "IconSource": ""});
+            contextMenuModel.append({"id": "Copy", "name": qsTr("Copy"), "IconSource": ""});
         }
 
         if (inputActions.canPaste){
-            contextMenuModel.append({"Id": "Paste", "Name": qsTr("Paste"), "IconSource": ""});
+            contextMenuModel.append({"id": "Paste", "name": qsTr("Paste"), "IconSource": ""});
         }
 
         if (inputActions.canRemove){
-            contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": ""});
+            contextMenuModel.append({"id": "Remove", "name": qsTr("Remove"), "IconSource": ""});
         }
 
         if (inputActions.canSelectAll){
-            contextMenuModel.append({"Id": "SelectAll", "Name": qsTr("Select All"), "IconSource": ""});
+            contextMenuModel.append({"id": "SelectAll", "name": qsTr("Select All"), "IconSource": ""});
         }
 
         ModalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});

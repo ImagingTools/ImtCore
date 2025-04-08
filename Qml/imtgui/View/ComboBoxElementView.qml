@@ -17,7 +17,7 @@ ElementView {
     property var delegate;
 
     // ID for display in combo box delegates
-    property string nameId: "Name";
+    property string nameId: "name";
 
     property ComboBox cbRef: null;
 

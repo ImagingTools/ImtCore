@@ -20,7 +20,7 @@ QtObject {
     property Item rootItem: null;
 
     // Поля которые запросятся для модели коллекции
-    property var fieldsData: ["Id", "Name"]
+    property var fieldsData: ["id", "name"]
 
     signal itemsInfoGqlStateChanged(string state);
     signal itemsReceived(var selectIndex, var items)
@@ -70,7 +70,7 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
-            // let parentNodeId = treeViewInternal.getData("Id", selectIndex)
+            // let parentNodeId = treeViewInternal.getData("id", selectIndex)
             // if (parentNodeId === undefined){
             //     parentNodeId = ""
             // }
@@ -167,8 +167,8 @@ QtObject {
             }
 
             var queryFields = Gql.GqlObject("objectView");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
+            queryFields.InsertField("id");
+            queryFields.InsertField("name");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();

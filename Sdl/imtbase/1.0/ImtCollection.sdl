@@ -9,49 +9,80 @@ import {
 	"../../imtbase/1.0/ComplexCollectionFilter.sdl"
 }
 
+type HeaderInfo {
+	id: ID!
+	name: String!
+	filterable: Boolean
+	sortable: Boolean
+}
+
+type HeadersInfo {
+	headers: [HeaderInfo]!
+}
+
 type CollectionViewParams {
-	Count: Int
-	Offset: Int
-	ComplexFilter: ComplexCollectionFilter
+	count: Int
+	offset: Int
+	complexFilter: ComplexCollectionFilter
 }
 
 type NotificationItem {
-	PagesCount: Integer!
-	TotalCount: Integer
+	pagesCount: Integer!
+	totalCount: Integer
 }
 
 type UpdatedNotificationPayload {
-	Id: ID!
+	id: ID!
 }
 
 type AddedNotificationPayload {
-	Id: ID!
+	id: ID!
 }
 
 type RemovedNotificationPayload {
-	Id: ID!
+	id: ID!
+}
+
+type RenamedNotificationPayload {
+	id: ID!
+	name: String
+}
+
+type SetDescriptionNotificationPayload {
+	id: ID!
+	description: String
 }
 
 type CollectionMetaInfo {
-	Id: ID!
+	id: ID!
 	name: String
 	description: String
 }
 
 input InputId {
-	Id: ID!
+	id: ID!
 }
 
 type VisualStatus {
-	ObjectId: ID
-	Icon: String
-	Text: String
-	Description: String
+	objectId: ID
+	icon: String
+	text: String
+	description: String
+}
+
+input RenameInput {
+	id: ID!
+	name: String!
+}
+
+input SetDescriptionInput {
+	id: ID!
+	description: String!
 }
 
 input ObjectVisualStatusInput {
-	ObjectId: ID!
-	TypeId: ID!
+	objectId: ID!
+	typeId: ID!
 }
 
 type Query {

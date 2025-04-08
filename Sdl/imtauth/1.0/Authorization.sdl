@@ -1,39 +1,39 @@
 schema {
-    query: Query
-    mutation: Mutation
-    name: Authorization
-    namespace: imtauth
-    version: 1.0
+	query: Query
+	mutation: Mutation
+	name: Authorization
+	namespace: imtauth
+	version: 1.0
 }
 
 type AuthorizationPayload {
-    UserId: ID
-    Username: ID
-    Token: ID
-    RefreshToken: ID
-    SystemId: ID
-    Permissions: ID
+	userId: ID
+	username: ID
+	token: ID
+	refreshToken: ID
+	systemId: ID
+	permissions: ID
 }
 
 input AuthorizationInput {
-    Login: String!
-    Password: String!
-    ProductId: ID
+	login: String!
+	password: String!
+	productId: ID
 }
 
 input LogoutInput {
-    AccessToken: ID!
+	accessToken: ID!
 }
 
 type LogoutPayload {
-    Ok: Boolean
+	ok: Boolean
 }
 
 type Query {
-    Authorization (input: AuthorizationInput): AuthorizationPayload!
-    UserToken (input: AuthorizationInput): AuthorizationPayload!
+	Authorization (input: AuthorizationInput): AuthorizationPayload!
+	UserToken (input: AuthorizationInput): AuthorizationPayload!
 }
 
 type Mutation {
-    Logout (input: LogoutInput): LogoutPayload!
+	Logout (input: LogoutInput): LogoutPayload!
 }

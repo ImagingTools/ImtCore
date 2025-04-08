@@ -91,15 +91,15 @@ Item {
                 anchors.fill: parent;
                 onLoaded: {
                     if (item.pageId !== undefined){
-                        item.pageId = model.Id;
+                        item.pageId = model.id;
                     }
 
                     if (item.pageName !== undefined){
-                        item.pageName = model.Name;
+                        item.pageName = model.name;
                     }
 
                     if (item.startItemSource !== undefined){
-                        item.startItemSource = model.StartItem;
+                        item.startItemSource = model.startItem;
                     }
                 }
                 onStatusChanged: {
@@ -111,7 +111,7 @@ Item {
 
             function load(){
                 if (loader && !loader.item){
-                    loader.source = model.Source;
+                    loader.source = model.source;
                 }
             }
         }

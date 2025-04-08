@@ -14,16 +14,16 @@ namespace imtlicgql
 bool CLicenseMetaInfoDelegateComp::FillRepresentation(sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const
 {
 	QByteArray licenseId = metaInfo.GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_ID).toByteArray();
-	metaInfoRepresentation.LicenseId = licenseId;
+	metaInfoRepresentation.licenseId = licenseId;
 	
 	QString licenseName = metaInfo.GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_NAME).toString();
-	metaInfoRepresentation.LicenseName = licenseName;
+	metaInfoRepresentation.licenseName = licenseName;
 	
 	QString description = metaInfo.GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_DESCRIPTION).toString();
-	metaInfoRepresentation.Description = description;
+	metaInfoRepresentation.description = description;
 	
 	QByteArray productId = metaInfo.GetMetaInfo(imtlic::ILicenseDefinition::MIT_PRODUCT_ID).toByteArray();
-	metaInfoRepresentation.ProductId = productId;
+	metaInfoRepresentation.productId = productId;
 	
 	return true;
 }
@@ -31,20 +31,20 @@ bool CLicenseMetaInfoDelegateComp::FillRepresentation(sdl::imtlic::Licenses::CLi
 
 bool CLicenseMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& metaInfoRepresentation) const
 {
-	if (metaInfoRepresentation.LicenseId){
-		metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_ID, *metaInfoRepresentation.LicenseId);
+	if (metaInfoRepresentation.licenseId){
+		metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_ID, *metaInfoRepresentation.licenseId);
 	}
 	
-	if (metaInfoRepresentation.LicenseName){
-		metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_NAME, *metaInfoRepresentation.LicenseName);
+	if (metaInfoRepresentation.licenseName){
+		metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_NAME, *metaInfoRepresentation.licenseName);
 	}
 	
-	if (metaInfoRepresentation.Description){
-		metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_DESCRIPTION, *metaInfoRepresentation.Description);
+	if (metaInfoRepresentation.description){
+		metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_DESCRIPTION, *metaInfoRepresentation.description);
 	}
 	
-	if (metaInfoRepresentation.ProductId){
-		metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_PRODUCT_ID, *metaInfoRepresentation.ProductId);
+	if (metaInfoRepresentation.productId){
+		metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_PRODUCT_ID, *metaInfoRepresentation.productId);
 	}
 	
 	return true;

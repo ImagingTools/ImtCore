@@ -195,10 +195,10 @@ Item {
 			
 			var point = button.mapToItem(null, 0, height);
 			let empty = {
-				"Id": "",
-				"Name": "",
-				"Icon": "",
-				"IsEnabled": true
+				"id": "",
+				"name": "",
+				"icon": "",
+				"isEnabled": true
 			};
 			
 			contextMenuModel.clear();
@@ -233,10 +233,10 @@ Item {
 			for (let i = 0; i < elements.length; i++){
 				if (!elements[i].visible){
 					insertNewItem({
-									  "Id": elements[i].modelData.m_elementId,
-									  "Name": elements[i].modelData.m_elementName,
-									  "Icon": elements[i].modelData.m_elementItemPath,
-									  "IsEnabled": elements[i].modelData.m_enabled
+									  "id": elements[i].modelData.m_elementId,
+									  "name": elements[i].modelData.m_elementName,
+									  "icon": elements[i].modelData.m_elementItemPath,
+									  "isEnabled": elements[i].modelData.m_enabled
 								  }
 								  );
 					result = true;

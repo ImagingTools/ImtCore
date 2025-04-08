@@ -21,8 +21,8 @@ Rectangle{
 	property string commandId: "AddressesList";
 
 	//
-	property string gettedParam: "Name";
-	property string filterId: "Name";
+	property string gettedParam: "name";
+	property string filterId: "name";
 	property string propertyId: "";
 	//
 
@@ -31,7 +31,7 @@ Rectangle{
 	property bool canSearchAnyStr: false;
 	property alias canClose: searchTextField.canClose;
 
-	property string valueName: "Name";
+	property string valueName: "name";
 	property string retValName: "";
 
 	property string externalSearchParam: "";
@@ -136,21 +136,21 @@ Rectangle{
 	function setGettedParamsModel(param){
 		searchContainer.gettedParamsModel.clear();
 		var index = searchContainer.gettedParamsModel.insertNewItem();
-		searchContainer.gettedParamsModel.setData("Name", param, index);
+		searchContainer.gettedParamsModel.setData("name", param, index);
 
 	}
 
 	function setFilterIdsModel(id){
 		searchContainer.filterIdsModel.clear();
 		var index = searchContainer.filterIdsModel.insertNewItem();
-		searchContainer.filterIdsModel.setData("Id", id, index);
+		searchContainer.filterIdsModel.setData("id", id, index);
 	}
 
 	function setPropertiesModel(id_,value_){
 		searchContainer.propertiesModel.clear();
 		if(searchContainer.hasSearchProperty){
 			var index = searchContainer.propertiesModel.insertNewItem();
-			searchContainer.propertiesModel.setData("Id", id_);
+			searchContainer.propertiesModel.setData("id", id_);
 			searchContainer.propertiesModel.setData("Value", value_);
 			searchContainer.setAdditionalFilterParams();
 		}
@@ -164,7 +164,7 @@ Rectangle{
 			let index_  = searchContainer.propertiesModel.insertNewItem();
 			let key = keys[i];
 			let value  = searchContainer.additionalFilterModel.getData(key);
-			searchContainer.propertiesModel.setData("Id", key, index_);
+			searchContainer.propertiesModel.setData("id", key, index_);
 			searchContainer.propertiesModel.setData("Value", value, index_);
 		}
 	}
@@ -204,7 +204,7 @@ Rectangle{
 			if(parentIds__ !== ""){
 				parentIds__ = parentIds__ + ",";
 			}
-			var addressId__ = modelll.getData("Id", index_);
+			var addressId__ = modelll.getData("id", index_);
 			searchContainer.parentIds = parentIds__ + addressId__;
 			searchContainer.selectedText = searchTextField.currentText;
 			setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
@@ -685,7 +685,8 @@ Rectangle{
 				selected: searchTextField.selectedIndex == model.index;
 
 				onClicked: {
-					searchTextField.finished(model.Id, model.index)
+					let resultId = model.Id || model.id || "";
+					searchTextField.finished(resultId, model.index)
 				}
 				onEntered: {
 					searchTextField.selectedIndex = model.index;

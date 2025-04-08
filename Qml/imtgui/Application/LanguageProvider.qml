@@ -8,7 +8,7 @@ QtObject {
 	id: container;
 	
 	property string typeId: "Language";
-	property string currentLanguage: context.language
+	property string currentLanguage: context ? context.language : ""
 	
 	property SelectionParam selectionParam: SelectionParam {
 		onFinished: {

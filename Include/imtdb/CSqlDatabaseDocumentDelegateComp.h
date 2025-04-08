@@ -16,6 +16,12 @@ namespace imtdb
 {
 
 
+struct RawSqlExpression
+{
+	QString sql;
+};
+
+
 class CSqlDatabaseDocumentDelegateComp:
 			public imtdb::CSqlDatabaseObjectDelegateCompBase,
 			virtual public imtbase::IRevisionController,
@@ -23,6 +29,16 @@ class CSqlDatabaseDocumentDelegateComp:
 {
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
+	
+	static const QByteArray s_idColumn;
+	static const QByteArray s_typeIdColumn;
+	static const QByteArray s_documentIdColumn;
+	static const QByteArray s_nameColumn;
+	static const QByteArray s_descriptionColumn;
+	static const QByteArray s_documentColumn;
+	static const QByteArray s_addedColumn;
+	static const QByteArray s_lastModifiedColumn;
+	static QSet<QString> s_filterableColumns;
 
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
@@ -111,6 +127,9 @@ protected:
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const;
+	virtual QByteArray CreateRevisionInfoQuery(const imtbase::IOperationContext& operationContextPtr, const QVariant& revisionArgument, quint32 checksum) const;
+	virtual QByteArray CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const;
+	virtual QString CreateJsonExtractSql(const QString& jsonName, const QString& key, QMetaType::Type metaType = QMetaType::QString, const QString& tableAlias = QString("root")) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QString GetBaseSelectionQuery() const override;
@@ -127,7 +146,7 @@ protected:
 	virtual bool CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const;
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const;
 	const ifile::IFilePersistence* FindDocumentPersistence(const QByteArray& typeId) const;
-	void SubstituteFieldIds(QString& query, bool castToStr = true) const;
+	virtual void SubstituteFieldIds(QString& query, bool castToStr = true) const;
 	virtual QByteArray GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const;
 	virtual QByteArray CreateJoinTablesQuery() const;
 	virtual QByteArray GetCustomColumnsQuery() const;
@@ -142,5 +161,8 @@ protected:
 
 
 } // namespace imtdb
+
+
+Q_DECLARE_METATYPE(imtdb::RawSqlExpression);
 
 

@@ -1,191 +1,191 @@
 schema {
-    query: Query
-    mutation: Mutation
-    subscription: Subscription
-    name: Users
-    namespace: imtauth
-    version: 1.0
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+	name: Users
+	namespace: imtauth
+	version: 1.0
 }
 
 import {
-    "../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
 }
 
 input UsersListInput {
-    ProductId: ID
-    viewParams: CollectionViewParams
+	productId: ID
+	viewParams: CollectionViewParams
 }
 
 type UserItem {
-    Id: ID!
-    TypeId: ID!
-    UserId: ID
-    Name: String
-    Description: String
-    Mail: String
-    SystemId: ID
-    SystemName: String
-    Roles: ID
-    Groups: ID
-    Added: String
-    LastModified: String
-    LastConnection: String
+	id: ID!
+	typeId: ID!
+	userId: ID
+	name: String
+	description: String
+	mail: String
+	systemId: ID
+	systemName: String
+	roles: ID
+	groups: ID
+	added: String
+	lastModified: String
+	lastConnection: String
 }
 
 type UsersListPayload {
-    items: [UserItem]
-    notification: NotificationItem
+	items: [UserItem]
+	notification: NotificationItem
 }
 
 type SystemInfo {
-    Id: ID
-    Name: String
-    Enabled: Bool
+	id: ID
+	name: String
+	enabled: Bool
 }
 
 type UserData {
-    Id: ID
-    ProductId: ID
-    Name: String
-    Username: ID
-    Password: String
-    Email: String
-    Groups: ID
-    Roles: ID
-    Permissions: ID
-    SystemInfos: [SystemInfo]
+	id: ID
+	productId: ID
+	name: String
+	username: ID
+	password: String
+	email: String
+	groups: ID
+	roles: ID
+	permissions: ID
+	systemInfos: [SystemInfo]
 }
 
 input UserDataInput {
-    Id: ID!
-    ProductId: ID!
-    Item: UserData!
+	id: ID!
+	productId: ID!
+	item: UserData!
 }
 
 input UserItemInput {
-    Id: ID!
-    ProductId: ID!
+	id: ID!
+	productId: ID!
 }
 
 input ChangePasswordInput {
-    Login: ID
-    OldPassword: String
-    NewPassword: String
+	login: ID
+	oldPassword: String
+	newPassword: String
 }
 
 input ChangePasswordPayload {
-    Success: Boolean
+	success: Boolean
 }
 
 input RegisterUserInput {
-    UserData: UserData!
-    ProductId: ID!
+	userData: UserData!
+	productId: ID!
 }
 
 input CheckEmailInput {
-    Email: String!
+	email: String!
 }
 
 type CheckEmailPayload {
-    UserName: String
-    Login: ID
-    Success: Boolean
-    Message: String
+	userName: String
+	login: ID
+	success: Boolean
+	message: String
 }
 
 type RegisterUserPayload {
-    Id: ID!
+	id: ID!
 }
 
 input SendEmailCodeInput {
-    Login: ID!
+	login: ID!
 }
 
 input CheckEmailCodeInput {
-    Login: ID!
-    Code: String!
+	login: ID!
+	code: String!
 }
 
 input CheckSuperuserInput {
-    Id: ID
+	id: ID
 }
 
 input CreateSuperuserInput {
-    Password: String!
-    Mail: String!
-    Name: String!
+	password: String!
+	mail: String!
+	name: String!
 }
 
 input RemoveUserInput {
-    Id: ID!
+	id: ID!
 }
 
 
 type CreateSuperuserPayload {
-    Message: String
-    Success: Boolean!
+	message: String
+	success: Boolean!
 }
 
 type CheckEmailCodePayload {
-    CorrectCode: Boolean!
-    Message: String
+	correctCode: Boolean!
+	message: String
 }
 
 type CheckSuperuserErrorType {
-    Unknown: String
-    NotExists: String
-    DbNotConnection: String
+	unknown: String
+	notExists: String
+	dbNotConnection: String
 }
 
 type CheckSuperuserPayload {
-    ErrorType: String
-    Exists: Boolean
-    Message: String
+	errorType: String
+	exists: Boolean
+	message: String
 }
 
 type SendEmailCodePayload {
-    Login: ID!
-    Success: Boolean!
-    Message: String
+	login: ID!
+	success: Boolean!
+	message: String
 }
 
 type RemoveUserPayload {
-    Success: Boolean
+	success: Boolean
 }
 
 type Query {
-    UsersList (input:UsersListInput): UsersListPayload!
-    UserItem (input: UserItemInput): UserData!
-    CheckEmail (input: CheckEmailInput): CheckEmailPayload!
-    SendEmailCode (input: SendEmailCodeInput): SendEmailCodePayload!
-    CheckEmailCode (input: CheckEmailCodeInput): CheckEmailCodePayload!
-    CheckSuperuserExists (input: CheckSuperuserInput): CheckSuperuserPayload!
+	UsersList (input:UsersListInput): UsersListPayload!
+	UserItem (input: UserItemInput): UserData!
+	CheckEmail (input: CheckEmailInput): CheckEmailPayload!
+	SendEmailCode (input: SendEmailCodeInput): SendEmailCodePayload!
+	CheckEmailCode (input: CheckEmailCodeInput): CheckEmailCodePayload!
+	CheckSuperuserExists (input: CheckSuperuserInput): CheckSuperuserPayload!
 }
 
 type Mutation {
-    UserUpdate (input: UserDataInput): UpdatedNotificationPayload!
-    UserAdd (input: UserDataInput): AddedNotificationPayload!
-    ChangePassword (input: ChangePasswordInput): ChangePasswordPayload!
-    RegisterUser (input: RegisterUserInput): RegisterUserPayload!
-    CreateSuperuser (input: CreateSuperuserInput): CreateSuperuserPayload!
-    UsersRemove (input: RemoveUserInput): RemoveUserPayload!
+	UserUpdate (input: UserDataInput): UpdatedNotificationPayload!
+	UserAdd (input: UserDataInput): AddedNotificationPayload!
+	ChangePassword (input: ChangePasswordInput): ChangePasswordPayload!
+	RegisterUser (input: RegisterUserInput): RegisterUserPayload!
+	CreateSuperuser (input: CreateSuperuserInput): CreateSuperuserPayload!
+	UsersRemove (input: RemoveUserInput): RemoveUserPayload!
 }
 
 collectionSchema {
-    type User {
-        ref: UserItem
-        operations {
-                list: UsersList
-        }
-        subtype User {
-            ref: UserData
-            operations {
-                get: UserItem
-                update: UserUpdate
-                insert: UserAdd
-            }
-        }
-    }
+	type User {
+		ref: UserItem
+		operations {
+				list: UsersList
+		}
+		subtype User {
+			ref: UserData
+			operations {
+				get: UserItem
+				update: UserUpdate
+				insert: UserAdd
+			}
+		}
+	}
 }
 
 

@@ -74,7 +74,7 @@ ParamEditorBase {
 							}
 
 							if (comboBox.currentIndex >= 0){
-								let id = comboBox.model.getData("Id", comboBox.currentIndex);
+								let id = comboBox.model.getData("id", comboBox.currentIndex);
 								let secondsInHour = 3600;
 		
 								let newInterval = -1;
@@ -120,16 +120,16 @@ ParamEditorBase {
 		
 					Component.onCompleted: {
 						let index = comboBoxModel.insertNewItem();
-						comboBoxModel.setData("Id", "Day", index)
-						comboBoxModel.setData("Name", qsTr("Day"), index)
+						comboBoxModel.setData("id", "Day", index)
+						comboBoxModel.setData("name", qsTr("Day"), index)
 		
 						index = comboBoxModel.insertNewItem();
-						comboBoxModel.setData("Id", "Week", index)
-						comboBoxModel.setData("Name", qsTr("Week"), index)
+						comboBoxModel.setData("id", "Week", index)
+						comboBoxModel.setData("name", qsTr("Week"), index)
 		
 						index = comboBoxModel.insertNewItem();
-						comboBoxModel.setData("Id", "Month", index)
-						comboBoxModel.setData("Name", qsTr("Month"), index)
+						comboBoxModel.setData("id", "Month", index)
+						comboBoxModel.setData("name", qsTr("Month"), index)
 					}
 				}
 			}

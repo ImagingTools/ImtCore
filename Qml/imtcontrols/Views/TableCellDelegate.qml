@@ -27,6 +27,8 @@ Item {
     property Item parent_temp: (parent == null || parent.parent == null || parent.parent.parent == null) ? null : parent.parent.parent;
 
     property bool  ready: parent_temp !==null;
+	
+	property string cellId: model.id || model.Id || ""
 
     onParent_tempChanged: {
         if(parent_temp !== null){
@@ -47,9 +49,9 @@ Item {
             let contents = delegateContainer.pTableDelegateContainer.tableItem.columnContentComps;
             let contentComp = delegateContainer.defaultContentComp;
 
-            if (Object.keys(contents).includes(model.Id)){
-                if (contents[model.Id]){
-                    contentComp = contents[model.Id];
+            if (Object.keys(contents).includes(delegateContainer.cellId)){
+                if (contents[delegateContainer.cellId]){
+                    contentComp = contents[delegateContainer.cellId];
                 }
             }
             delegateContainer.contentComp = contentComp;
@@ -245,7 +247,7 @@ Item {
         if (delegateContainer.complCompl){
             if (delegateContainer.columnIndex >= 0){
                 if(delegateContainer.pTableDelegateContainer !== null && delegateContainer.pTableDelegateContainer.dataModel !==null){
-                    return delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.getData("Id", delegateContainer.columnIndex)];
+                    return delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.cellId];
                 }
             }
         }
@@ -259,7 +261,7 @@ Item {
                 if(delegateContainer.pTableDelegateContainer !== null && delegateContainer.pTableDelegateContainer.tableItem !==null){
                     let tableItem = delegateContainer.pTableDelegateContainer.tableItem;
                     let elements = tableItem.elements;
-                    let headerId = delegateContainer.pTableDelegateContainer.headers.getData("Id", delegateContainer.columnIndex);
+                    let headerId = delegateContainer.cellId;
 
                     elements.setData(headerId, value, delegateContainer.rowIndex);
                 }
@@ -291,11 +293,7 @@ Item {
                                                                                            delegateContainer.pTableDelegateContainer.cellDecorator.getData("FontSize", delegateContainer.columnIndex) :
                                                                                            Style.fontSizeNormal : Style.fontSizeNormal;
             font.family: Style.fontFamily;
-//            font.bold: delegateContainer.pTableDelegateContainer ?
-//                           delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-//                                                                                  delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("FontBold", delegateContainer.columnIndex) ?
-//                                                                                      delegateContainer.pTableDelegateContainer.cellDecorator.getData("FontBold", delegateContainer.columnIndex) :
-//                                                                                      true: false;
+
             color: delegateContainer.pTableDelegateContainer && delegateContainer.pTableDelegateContainer.enabled ?
                        (delegateContainer.pTableDelegateContainer.emptyDecorCell ? Style.textColor :
                                                                               delegateContainer.pTableDelegateContainer.cellDecorator.isValidData("FontColor", delegateContainer.columnIndex) ?
@@ -308,8 +306,6 @@ Item {
             onLinkActivated: {
                 Qt.openUrlExternally(link);
             }
-//            text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.getData("Id", delegateContainer.columnIndex)] : "" : "";
-//            text: delegateContainer.pTableDelegateContainer.headers.getData("Id", 1)
 
             text: delegateContainer.getValue() !== undefined ? delegateContainer.getValue() : "";
             onTextChanged: {

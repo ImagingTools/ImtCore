@@ -36,8 +36,8 @@ QtObject {
 
                 let j = root.availableModel.insertNewItem();
 
-                root.availableModel.setData("Id", id, j);
-                root.availableModel.setData("Name", name, j);
+                root.availableModel.setData("id", id, j);
+                root.availableModel.setData("name", name, j);
             }
 
             return root.availableModel;
@@ -52,7 +52,7 @@ QtObject {
         }
 
         for (let i = 0; i < root.stateModel.getItemsCount(); i++){
-            let id = root.stateModel.getData("Id", i);
+            let id = root.stateModel.getData("id", i);
             if (id === statusId){
                 return i;
             }
@@ -67,9 +67,9 @@ QtObject {
         }
 
         for (let i = 0; i < root.stateModel.getItemsCount(); i++){
-            let id = root.stateModel.getData("Id", i);
+            let id = root.stateModel.getData("id", i);
             if (id === statusId){
-                let name = root.stateModel.getData("Name", i);
+                let name = root.stateModel.getData("name", i);
                 return name;
             }
         }

@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
+#include <imtbase/CComplexCollectionFilter.h>
 
 
 namespace imtauthgql
@@ -28,13 +29,13 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	}
 
 	QByteArray productId;
-	if (representation.ProductId){
-		productId = *representation.ProductId;
+	if (representation.productId){
+		productId = *representation.productId;
 	}
 
 	QByteArray username;
-	if (representation.Username){
-		username = *representation.Username;
+	if (representation.username){
+		username = *representation.username;
 	}
 
 	if (username.isEmpty()){
@@ -42,16 +43,20 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 
 		return false;
 	}
-
+	
+	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	fieldFilter.fieldId = "UserId";
+	fieldFilter.filterValue = username;
+	
+	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	groupFilter.fieldFilters << fieldFilter;
+	
+	imtbase::CComplexCollectionFilter complexFilter;
+	complexFilter.SetFieldsFilter(groupFilter);
+	
 	iprm::CParamsSet filterParam;
-	iprm::CParamsSet paramsSet;
-
-	iprm::CTextParam userIdParam;
-	userIdParam.SetText(username);
-
-	paramsSet.SetEditableParameter("Id", &userIdParam);
-	filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
-
+	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
+	
 	imtbase::IObjectCollection::Ids userIds = userCollection.GetElementIds(0, -1, &filterParam);
 	if (!userIds.isEmpty()){
 		QByteArray userObjectId = userIds[0];
@@ -63,7 +68,6 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 					QByteArray currentUsername = currentUserInfoPtr->GetId();
 					if (currentUsername.toLower() == username.toLower()){
 						errorMessage = QT_TR_NOOP("Username already exists");
-
 						return false;
 					}
 				}
@@ -74,8 +78,8 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	userInfoPtr->SetId(username);
 
 	QString name;
-	if (representation.Name){
-		name = *representation.Name;
+	if (representation.name){
+		name = *representation.name;
 	}
 
 	if (name.isEmpty()){
@@ -86,8 +90,8 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	userInfoPtr->SetName(name);
 
 	QList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
-	if (representation.SystemInfos){
-		systemInfos = *representation.SystemInfos;
+	if (representation.systemInfos){
+		systemInfos = *representation.systemInfos;
 	}
 	if (systemInfos.isEmpty()){
 		// User from internal system
@@ -97,16 +101,16 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	else{
 		for (const sdl::imtauth::Users::CSystemInfo::V1_0& sdlSystemInfo : systemInfos){
 			QByteArray systemId;
-			if (sdlSystemInfo.Id){
-				systemId = *sdlSystemInfo.Id;
+			if (sdlSystemInfo.id){
+				systemId = *sdlSystemInfo.id;
 			}
 			QString systemName;
-			if (sdlSystemInfo.Name){
-				systemName = *sdlSystemInfo.Name;
+			if (sdlSystemInfo.name){
+				systemName = *sdlSystemInfo.name;
 			}
 			bool enabled = false;
-			if (sdlSystemInfo.Enabled){
-				enabled = *sdlSystemInfo.Enabled;
+			if (sdlSystemInfo.enabled){
+				enabled = *sdlSystemInfo.enabled;
 			}
 
 			imtauth::IUserInfo::SystemInfo systemInfo;
@@ -119,21 +123,21 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	}
 
 	QString mail;
-	if (representation.Email){
-		mail = *representation.Email;
+	if (representation.email){
+		mail = *representation.email;
 	}
 	userInfoPtr->SetMail(mail);
 
 	imtauth::IUserInfo::FeatureIds permissions;
-	if (representation.Permissions){
-		permissions = representation.Permissions->split(';');
+	if (representation.permissions){
+		permissions = representation.permissions->split(';');
 	}
 	permissions.removeAll("");
 	userInfoPtr->SetLocalPermissions(productId, permissions);
 
 	QByteArrayList roleIds;
-	if (representation.Roles){
-		roleIds = representation.Roles->split(';');
+	if (representation.roles){
+		roleIds = representation.roles->split(';');
 	}
 	roleIds.removeAll("");
 	if (!roleIds.isEmpty()){
@@ -144,8 +148,8 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	}
 
 	QByteArrayList groupIds;
-	if (representation.Groups){
-		groupIds = representation.Groups->split(';');
+	if (representation.groups){
+		groupIds = representation.groups->split(';');
 	}
 	groupIds.removeAll("");
 	for (const QByteArray& groupId : groupIds){

@@ -32,13 +32,13 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	QByteArray productId;
-	if (representation.ProductId){
-		productId = *representation.ProductId;
+	if (representation.productId){
+		productId = *representation.productId;
 	}
 
 	QByteArray username;
-	if (representation.Username){
-		username = *representation.Username;
+	if (representation.username){
+		username = *representation.username;
 	}
 
 	if (username.isEmpty()){
@@ -84,8 +84,8 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	userInfoPtr->SetId(username);
 
 	QString name;
-	if (representation.Name){
-		name = *representation.Name;
+	if (representation.name){
+		name = *representation.name;
 	}
 
 	if (name.isEmpty()){
@@ -96,8 +96,8 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	userInfoPtr->SetName(name);
 
 	QList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
-	if (representation.SystemInfos){
-		systemInfos = *representation.SystemInfos;
+	if (representation.systemInfos){
+		systemInfos = *representation.systemInfos;
 	}
 	if (systemInfos.isEmpty()){
 		// User from internal system
@@ -107,16 +107,16 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	else{
 		for (const sdl::imtauth::Users::CSystemInfo::V1_0& sdlSystemInfo : systemInfos){
 			QByteArray systemId;
-			if (sdlSystemInfo.Id){
-				systemId = *sdlSystemInfo.Id;
+			if (sdlSystemInfo.id){
+				systemId = *sdlSystemInfo.id;
 			}
 			QString systemName;
-			if (sdlSystemInfo.Name){
-				systemName = *sdlSystemInfo.Name;
+			if (sdlSystemInfo.name){
+				systemName = *sdlSystemInfo.name;
 			}
 			bool enabled = false;
-			if (sdlSystemInfo.Enabled){
-				enabled = *sdlSystemInfo.Enabled;
+			if (sdlSystemInfo.enabled){
+				enabled = *sdlSystemInfo.enabled;
 			}
 
 			imtauth::IUserInfo::SystemInfo systemInfo;
@@ -129,8 +129,8 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	QString mail;
-	if (representation.Email){
-		mail = *representation.Email;
+	if (representation.email){
+		mail = *representation.email;
 	}
 
 	if (!userInfoPtr->IsAdmin()){
@@ -165,15 +165,15 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	userInfoPtr->SetMail(mail);
 
 	imtauth::IUserInfo::FeatureIds permissions;
-	if (representation.Permissions){
-		permissions = representation.Permissions->split(';');
+	if (representation.permissions){
+		permissions = representation.permissions->split(';');
 	}
 	permissions.removeAll("");
 	userInfoPtr->SetLocalPermissions(productId, permissions);
 
 	QByteArrayList roleIds;
-	if (representation.Roles){
-		roleIds = representation.Roles->split(';');
+	if (representation.roles){
+		roleIds = representation.roles->split(';');
 	}
 	roleIds.removeAll("");
 	if (!roleIds.isEmpty()){
@@ -184,8 +184,8 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	QByteArrayList groupIds;
-	if (representation.Groups){
-		groupIds = representation.Groups->split(';');
+	if (representation.groups){
+		groupIds = representation.groups->split(';');
 	}
 	groupIds.removeAll("");
 	for (const QByteArray& groupId : groupIds){
@@ -213,12 +213,12 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserCollectionControllerComp::OnGetO
 		languageId = gqlContextPtr->GetLanguageId();
 	}
 
-	if (response.Version_1_0->Text->isEmpty()){
-		response.Version_1_0->Text = "<no name>";
+	if (response.Version_1_0->text->isEmpty()){
+		response.Version_1_0->text = "<no name>";
 	}
 
 	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Users")).toUtf8(), languageId, "CRoleCollectionControllerComp");
-	response.Version_1_0->Text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->Text;
+	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
 	return response;
 }
 
@@ -249,8 +249,8 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Users::UsersListRequestArguments arguments = usersListRequest.GetRequestedArguments();
 
 	QByteArray productId;
-	if (arguments.input.Version_1_0->ProductId){
-		productId = *arguments.input.Version_1_0->ProductId;
+	if (arguments.input.Version_1_0->productId){
+		productId = *arguments.input.Version_1_0->productId;
 	}
 
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
@@ -276,27 +276,27 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtauth::Users::UsersListRequestInfo requestInfo = usersListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.Id = QByteArray(objectId);
+		representationObject.id = QByteArray(objectId);
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.TypeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
 	}
 
 	if (requestInfo.items.isUserIdRequested){
-		representationObject.UserId = QByteArray(userInfoPtr->GetId());
+		representationObject.userId = QByteArray(userInfoPtr->GetId());
 	}
 
 	if (requestInfo.items.isNameRequested){
-		representationObject.Name = QString(userInfoPtr->GetName());
+		representationObject.name = QString(userInfoPtr->GetName());
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.Description = QString(userInfoPtr->GetDescription());
+		representationObject.description = QString(userInfoPtr->GetDescription());
 	}
 
 	if (requestInfo.items.isMailRequested){
-		representationObject.Mail = QString(userInfoPtr->GetMail());
+		representationObject.mail = QString(userInfoPtr->GetMail());
 	}
 
 	if (requestInfo.items.isSystemIdRequested){
@@ -306,7 +306,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			systemIdList << systemInfo.systemId;
 		}
 
-		representationObject.SystemId = QByteArray(systemIdList.join(';'));
+		representationObject.systemId = QByteArray(systemIdList.join(';'));
 	}
 
 	if (requestInfo.items.isSystemNameRequested){
@@ -321,7 +321,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			}
 		}
 
-		representationObject.SystemName = QString(systemNameList.join(';'));
+		representationObject.systemName = QString(systemNameList.join(';'));
 	}
 
 	if (requestInfo.items.isRolesRequested){
@@ -342,7 +342,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 			}
 		}
 
-		representationObject.Roles = QByteArray(resultList.join(';'));
+		representationObject.roles = QByteArray(resultList.join(';'));
 	}
 
 	if (requestInfo.items.isGroupsRequested){
@@ -363,14 +363,14 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 				}
 			}
 		}
-		representationObject.Groups = QByteArray(resultList.join(';'));
+		representationObject.groups = QByteArray(resultList.join(';'));
 	}
 
 	if (requestInfo.items.isLastConnectionRequested){
 		QDateTime lastConnection = userInfoPtr->GetLastConnection();
 		lastConnection.setTimeSpec(Qt::UTC);
 
-		representationObject.LastConnection = QString(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
+		representationObject.lastConnection = QString(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -378,7 +378,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.Added = QString(added);
+		representationObject.added = QString(added);
 	}
 
 	if (requestInfo.items.isLastModifiedRequested){
@@ -386,7 +386,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.LastModified = QString(lastModified);
+		representationObject.lastModified = QString(lastModified);
 	}
 
 	return true;
@@ -424,8 +424,8 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 		return nullptr;
 	}
 
-	if (userDataRepresentation.Id){
-		newObjectId = *userDataRepresentation.Id;
+	if (userDataRepresentation.id){
+		newObjectId = *userDataRepresentation.id;
 	}
 	if (newObjectId.isEmpty()){
 		newObjectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
@@ -439,8 +439,8 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 	for (imtauth::IUserInfo::SystemInfo& systemInfo : userInfoPtr->GetSystemInfos()){
 		if (systemInfo.enabled && systemInfo.systemId.isEmpty()){
 			QString password;
-			if (userDataRepresentation.Password){
-				password = *userDataRepresentation.Password;
+			if (userDataRepresentation.password){
+				password = *userDataRepresentation.password;
 			}
 
 			if (password.isEmpty()) {
@@ -448,7 +448,7 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 				return nullptr;
 			}
 
-			password = m_hashCalculatorCompPtr->GenerateHash(*userDataRepresentation.Username + password.toUtf8());
+			password = m_hashCalculatorCompPtr->GenerateHash(*userDataRepresentation.username + password.toUtf8());
 
 			userInfoPtr->SetPasswordHash(password.toUtf8());
 
@@ -476,58 +476,58 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 	sdl::imtauth::Users::UserItemRequestArguments arguments = userItemRequest.GetRequestedArguments();
 	QByteArray productId;
-	if (arguments.input.Version_1_0->ProductId){
-		productId = *arguments.input.Version_1_0->ProductId;
+	if (arguments.input.Version_1_0->productId){
+		productId = *arguments.input.Version_1_0->productId;
 	}
 	
 	QByteArray objectId = userInfoPtr->GetObjectUuid();
-	representationPayload.Id = QByteArray(objectId);
+	representationPayload.id = QByteArray(objectId);
 
-	representationPayload.ProductId = QByteArray(productId);
+	representationPayload.productId = QByteArray(productId);
 
 	QByteArray userName = userInfoPtr->GetId();
-	representationPayload.Username = QByteArray(userName);
+	representationPayload.username = QByteArray(userName);
 
 	QString name = userInfoPtr->GetName();
-	representationPayload.Name = QString(name);
+	representationPayload.name = QString(name);
 
 	QByteArray password = userInfoPtr->GetPasswordHash();
-	representationPayload.Password = QString(password);
+	representationPayload.password = QString(password);
 
 	QString mail = userInfoPtr->GetMail();
-	representationPayload.Email = QString(mail);
+	representationPayload.email = QString(mail);
 
 	QByteArrayList groupList = userInfoPtr->GetGroups();
 	std::sort(groupList.begin(), groupList.end());
-	representationPayload.Groups = QByteArray(groupList.join(';'));
+	representationPayload.groups = QByteArray(groupList.join(';'));
 
 	QByteArrayList roleList = userInfoPtr->GetRoles(productId);
 	std::sort(roleList.begin(), roleList.end());
-	representationPayload.Roles = QByteArray(roleList.join(';'));
+	representationPayload.roles = QByteArray(roleList.join(';'));
 
 	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
 	std::sort(permissions.begin(), permissions.end());
-	representationPayload.Permissions = permissions.join(';');
+	representationPayload.permissions = permissions.join(';');
 
 	QList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		sdl::imtauth::Users::CSystemInfo::V1_0 info;
 
-		info.Id = QByteArray(systemInfo.systemId);
+		info.id = QByteArray(systemInfo.systemId);
 
 		if (systemInfo.systemId.isEmpty()){
-			info.Name = QString("Internal");
+			info.name = QString("Internal");
 		}
 		else{
-			info.Name = QString(systemInfo.systemName);
+			info.name = QString(systemInfo.systemName);
 		}
 
-		info.Enabled = bool(systemInfo.enabled);
+		info.enabled = bool(systemInfo.enabled);
 
 		list << info;
 	}
-	representationPayload.SystemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
+	representationPayload.systemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
 
 	return true;
 }
@@ -546,8 +546,8 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 		return nullptr;
 	}
 
-	QByteArray userId = gqlInputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-	QByteArray productId = gqlInputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+	QByteArray userId = gqlInputParamPtr->GetFieldArgumentValue("id").toByteArray();
+	QByteArray productId = gqlInputParamPtr->GetFieldArgumentValue("productId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -557,14 +557,14 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
 			int index = dataModel->InsertNewItem();
-			dataModel->SetData("Name", "Roles", index);
+			dataModel->SetData("name", "Roles", index);
 
-			imtbase::CTreeItemModel* children = dataModel->AddTreeModel("Children", index);
+			imtbase::CTreeItemModel* children = dataModel->AddTreeModel("children", index);
 
 			if (m_roleInfoProviderCompPtr.IsValid()){
 				imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles(productId);
 				if (rolesIds.isEmpty()){
-					children->SetData("Value", "No roles");
+					children->SetData("value", "No roles");
 				}
 				else{
 					for (const QByteArray& productRoleId: rolesIds){
@@ -575,21 +575,21 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 							QByteArray roleProductId = rolePtr->GetProductId();
 
 							int childrenIndex = children->InsertNewItem();
-							children->SetData("Value", roleName + " (" + roleProductId + ")", childrenIndex);
+							children->SetData("value", roleName + " (" + roleProductId + ")", childrenIndex);
 						}
 					}
 				}
 			}
 
 			index = dataModel->InsertNewItem();
-			dataModel->SetData("Name", "Groups", index);
+			dataModel->SetData("name", "Groups", index);
 
-			children = dataModel->AddTreeModel("Children", index);
+			children = dataModel->AddTreeModel("children", index);
 
 			if (m_userGroupInfoProviderCompPtr.IsValid()){
 				QByteArrayList groupIds = userInfoPtr->GetGroups();
 				if (groupIds.isEmpty()){
-					children->SetData("Value", "No groups");
+					children->SetData("value", "No groups");
 				}
 				else{
 					for (const QByteArray& groupId : groupIds){
@@ -598,7 +598,7 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 							QString groupName = userGroupInfoPtr->GetName();
 
 							int childrenIndex = children->InsertNewItem();
-							children->SetData("Value", groupName, childrenIndex);
+							children->SetData("value", groupName, childrenIndex);
 						}
 					}
 				}
@@ -616,7 +616,18 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CUserData::V1_0 userData = *userUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;
+	sdl::imtauth::Users::UserUpdateRequestArguments arguments =userUpdateRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		I_CRITICAL();
+		return false;
+	}
+	
+	if (!arguments.input.Version_1_0->item.has_value()){
+		I_CRITICAL();
+		return false;
+	}
+	
+	sdl::imtauth::Users::CUserData::V1_0 userData = *arguments.input.Version_1_0->item;
 
 	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&object);
 	if (userInfoPtr == nullptr){

@@ -105,6 +105,11 @@ I_EXPORT_COMPONENT(
 			"Dependent table meta info controller",
 			"Dependent Table Meta Info Controller");
 
+I_EXPORT_COMPONENT(
+			SQLiteDatabaseDocumentDelegate,
+			"SQLite database document delegate",
+			"SQLite Database Document Delegate");
+
 
 } // namespace ImtDatabasePck
 

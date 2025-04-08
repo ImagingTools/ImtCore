@@ -36,16 +36,16 @@ Dialog {
 	}
 	
 	function updateButtons(){
-		messageDialog.buttonsModel.clear();
-		messageDialog.buttonsModel.append({Id: Enums.apply, Name:qsTr("Apply"), Enabled: false})
-		messageDialog.buttonsModel.append({Id: Enums.cancel, Name:qsTr("Close"), Enabled: true})
+		clearButtons()
+		addButton(Enums.apply, qsTr("Apply"), false)
+		addButton(Enums.cancel, qsTr("Close"), true)
 	}
 	
 	onFinished: {
 		if (buttonId == Enums.apply){
-			messageDialog.buttons.setButtonState(Enums.apply, false);
-			messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Close"));
-			
+			setButtonEnabled(Enums.apply, false)
+			setButtonName(Enums.cancel, qsTr("Close"))
+
 			for (let key in paramIdsChanges){
 				let changes = paramIdsChanges[key]
 				
@@ -67,7 +67,7 @@ Dialog {
 			
 			onEditorModelDataChanged: {
 				messageDialog.buttons.setButtonState(Enums.apply, true);
-				messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Cancel"));
+				messageDialog.buttonsModel.setProperty(1, "name", qsTr("Cancel"));
 				
 				let changeObj = {}
 				let mainParamId = paramId

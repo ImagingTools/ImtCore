@@ -31,8 +31,8 @@ Item {
         console.log("=====================================");
         let index = model.insertNewItem();
 
-        model.setData("Id", "", index);
-        model.setData("Name", "", index);
+        model.setData("id", "", index);
+        model.setData("name", "", index);
         model.setData("Active", true, index);
         model.setData("Opened", false, index);
         model.setData("Selected", false, index);
@@ -44,7 +44,7 @@ Item {
 
         let level = 1;
         if (parentModel){
-            let id = parentModel.getData("Id");
+            let id = parentModel.getData("id");
             let parentLevel = Number(parentModel.getData("Level"));
             level = parentLevel + 1;
         }
@@ -65,7 +65,7 @@ Item {
         console.log("getSelectedItem", model);
         let count = model.getItemsCount();
         for (let i = 0; i < count; i++){
-            let id = model.getData("Id", i);
+            let id = model.getData("id", i);
             let selectedItem = model.getData("Selected", i);
 
             if (selectedItem){
@@ -111,7 +111,7 @@ Item {
                 let index = treeViewDelegate.getSelectedItemIndex(item);
 
                 if (buttonId == "Ok"){
-                    item.setData("Name", inputValue, index);
+                    item.setData("name", inputValue, index);
                 }
             }
         }
@@ -123,7 +123,7 @@ Item {
         if (commandId == "NewRoot"){
             let index = treeViewDelegate.insertNewItem(treeViewDelegate.treeViewModel);
 
-            treeViewDelegate.treeViewModel.setData("Id", "", index);
+            treeViewDelegate.treeViewModel.setData("id", "", index);
             treeViewDelegate.treeViewModel.setData("Name", "Feature Name", index);
 
             treeViewDelegate.treeViewModel.refresh();
@@ -139,7 +139,7 @@ Item {
 
             let childIndex = insertNewItem(childModel);
 
-            childModel.setData("Id", "", childIndex);
+            childModel.setData("id", "", childIndex);
             childModel.setData("Name", "Feature Name", childIndex);
 
             treeViewDelegate.treeViewModel.refresh();

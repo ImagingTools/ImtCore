@@ -53,9 +53,9 @@ QtObject {
 	function getDocumentTypeId(documentId)
 	{
 		for (let documentIndex = 0; documentIndex < documentsModel.count; documentIndex++){
-			let id = documentsModel.get(documentIndex).Id;
+			let id = documentsModel.get(documentIndex).id;
 			if (id === documentId){
-				return documentsModel.get(documentIndex).TypeId;
+				return documentsModel.get(documentIndex).typeId;
 			}
 		}
 
@@ -102,10 +102,10 @@ QtObject {
 				return false;
 			}
 
-			internal.m_registeredView[documentTypeId].push({"ViewTypeId": viewTypeId, "ViewComp": viewComp});
+			internal.m_registeredView[documentTypeId].push({"viewTypeId": viewTypeId, "viewComp": viewComp});
 		}
 		else{
-			internal.m_registeredView[documentTypeId] = [{"ViewTypeId": viewTypeId, "ViewComp": viewComp}]
+			internal.m_registeredView[documentTypeId] = [{"viewTypeId": viewTypeId, "viewComp": viewComp}]
 		}
 
 		return true;
@@ -120,7 +120,7 @@ QtObject {
 		let registeredViewList = internal.m_registeredView[documentTypeId];
 		for (let i = 0; i < registeredViewList.length; i++){
 			let registeredViewObj = registeredViewList[i];
-			if (registeredViewObj["ViewTypeId"] === viewTypeId){
+			if (registeredViewObj["viewTypeId"] === viewTypeId){
 				registeredViewList.splice(i,1)
 
 				return true;
@@ -142,8 +142,8 @@ QtObject {
 		let registeredViewList = internal.m_registeredView[documentTypeId];
 		for (let i = 0; i < registeredViewList.length; i++){
 			let registeredViewObj = registeredViewList[i];
-			if (registeredViewObj["ViewTypeId"] === viewTypeId){
-				return registeredViewObj["ViewComp"];
+			if (registeredViewObj["viewTypeId"] === viewTypeId){
+				return registeredViewObj["viewComp"];
 			}
 		}
 
@@ -154,7 +154,7 @@ QtObject {
 	function getDocumentViewCompByDocumentId(documentId)
 	{
 		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).DocumentData;
+			let documentData = documentsModel.get(i).documentData;
 			if (documentData && documentData.documentId === documentId){
 				return documentData.viewComp;
 			}
@@ -185,7 +185,7 @@ QtObject {
 			let registeredViewList = internal.m_registeredView[documentTypeId];
 			for (let i = 0; i < registeredViewList.length; i++){
 				let registeredViewObj = registeredViewList[i];
-				if (registeredViewObj["ViewTypeId"] === viewTypeId){
+				if (registeredViewObj["viewTypeId"] === viewTypeId){
 					return true;
 				}
 			}
@@ -235,12 +235,12 @@ QtObject {
 			return null;
 		}
 
-		return documentsModel.get(index).DocumentData;
+		return documentsModel.get(index).documentData;
 	}
 
 	function getDocumentDataById(documentId){
 		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).DocumentData;
+			let documentData = documentsModel.get(i).documentData;
 			if (documentData && documentData.documentId === documentId){
 				return documentData;
 			}
@@ -258,7 +258,7 @@ QtObject {
 		let registeredViewList = internal.m_registeredView[documentTypeId];
 		for (let i = 0; i < registeredViewList.length; i++){
 			let registeredViewObj = registeredViewList[i];
-			let viewTypeId = registeredViewObj["ViewTypeId"];
+			let viewTypeId = registeredViewObj["viewTypeId"];
 			result.push(viewTypeId)
 		}
 
@@ -333,11 +333,11 @@ QtObject {
 	function addDocumentToModel(documentId, documentTypeId, viewTypeId, documentData)
 	{
 		documentsModel.append({
-								"Id": documentId,
-								"TypeId": documentTypeId,
-								"ViewTypeId": viewTypeId,
-								"DocumentData": documentData,
-								"IsNew": documentData.isNew
+								"id": documentId,
+								"typeId": documentTypeId,
+								"viewTypeId": viewTypeId,
+								"documentData": documentData,
+								"isNew": documentData.isNew
 							});
 
 		documentAdded(documentId);
@@ -351,8 +351,8 @@ QtObject {
 	{
 		let index = getDocumentIndexByDocumentId(documentId);
 		if (index >= 0){
-			let isNew = documentsModel.get(index).IsNew;
-			let document = documentsModel.get(index).DocumentData;
+			let isNew = documentsModel.get(index).isNew;
+			let document = documentsModel.get(index).documentData;
 			if (document.isDirty){
 				Events.sendEvent("StartLoading");
 
@@ -393,8 +393,8 @@ QtObject {
 		let documentIndex = getDocumentIndexByDocumentId(documentId);
 		if (documentIndex >= 0){
 			let documentData = documentsModel.get(documentIndex);
-			if (documentData && documentData.IsNew){
-				documentsModel.setProperty(documentIndex, "IsNew", false);
+			if (documentData && documentData.isNew){
+				documentsModel.setProperty(documentIndex, "isNew", false);
 			}
 		}
 
@@ -405,7 +405,7 @@ QtObject {
 
 	function getDocumentIndexByDocumentId(documentId){
 		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).DocumentData;
+			let documentData = documentsModel.get(i).documentData;
 			if (documentData && documentData.documentId === documentId){
 				return i;
 			}
@@ -417,7 +417,7 @@ QtObject {
 
 	function getDocumentDataByView(view){
 		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).DocumentData;
+			let documentData = documentsModel.get(i).documentData;
 			if (documentData && documentData.view === view){
 				return documentData;
 			}
@@ -450,7 +450,7 @@ QtObject {
 			force = false;
 		}
 
-		let documentData = documentsModel.get(documentIndex).DocumentData;
+		let documentData = documentsModel.get(documentIndex).documentData;
 
 		if (documentData.isDirty && !force){
 			let callback = function(result){
@@ -513,7 +513,7 @@ QtObject {
 		let result = []
 
 		for (let i = 0; i < documentsModel.count; i++){
-			let documentData = documentsModel.get(i).DocumentData;
+			let documentData = documentsModel.get(i).documentData;
 			if (documentData && documentData.documentId){
 				result.push(documentData.documentId);
 			}
@@ -791,8 +791,7 @@ QtObject {
 	}
 
 	property Component errorDialogComp: Component {
-		ErrorDialog {
-		}
+		ErrorDialog {}
 	}
 
 	property Component saveDialog: Component {
@@ -801,7 +800,7 @@ QtObject {
 			message: qsTr("Save all changes ?")
 
 			Component.onCompleted: {
-				buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
+				addButton(Enums.cancel, qsTr("Cancel"), true)
 			}
 		}
 	}

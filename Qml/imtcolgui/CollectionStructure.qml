@@ -186,15 +186,15 @@ Item {
     function fillContextMenuModel(){
         contextMenuModel.clear();
 
-        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", "On", "Normal")});
-        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", "On", "Normal")});
-        contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
-        contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
+        contextMenuModel.append({"id": "Edit", "name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", "On", "Normal")});
+        contextMenuModel.append({"id": "Remove", "name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", "On", "Normal")});
+        contextMenuModel.append({"id": "Rename", "name": qsTr("Rename"), "IconSource": ""});
+        contextMenuModel.append({"id": "SetDescription", "name": qsTr("Set Description"), "IconSource": ""});
     }
 
     function getHeaders(){
         let additionalInputParams = {}
-        let nodeId = treeView.getData("Id", treeView.selectedIndex)
+        let nodeId = treeView.getData("id", treeView.selectedIndex)
         additionalInputParams["nodeId"] = ""
         if (nodeId !== undefined){
             additionalInputParams["nodeId"] = nodeId
@@ -451,7 +451,7 @@ Item {
                 let subscriptionRequestId = "On" + collectionStructureContainer.commandId + "BranchChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);
                 var queryFields = Gql.GqlObject("notification");
-                queryFields.InsertField("Id");
+                queryFields.InsertField("id");
                 query.AddField(queryFields);
 
                 console.log("registerSubscription", subscriptionRequestId, subscriptionId)

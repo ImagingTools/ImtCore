@@ -45,8 +45,8 @@ bool CRemoteObjectVisualStatusControllerComp::IsRequestSupported(const imtgql::C
 		}
 		
 		QByteArray typeId;
-		if (arguments.input.Version_1_0->TypeId){
-			typeId = *getVisualStatusRequest.GetRequestedArguments().input.Version_1_0->TypeId;
+		if (arguments.input.Version_1_0->typeId){
+			typeId = *getVisualStatusRequest.GetRequestedArguments().input.Version_1_0->typeId;
 		}
 
 		return m_typeIdsAttrPtr.FindValue(typeId) >= 0;

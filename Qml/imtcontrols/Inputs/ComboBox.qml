@@ -41,7 +41,7 @@ ControlBase {
 	property real contentY;
 
 	// ID for display in combo box delegates
-	property string nameId: "Name";
+	property string nameId: "name";
 
 	property bool hoverBlocked: true;
 
@@ -59,7 +59,8 @@ ControlBase {
 
 			onClicked: {
 				if (comboBoxContainer.popup){
-					comboBoxContainer.popup.finished(model.Id, model.index)
+					let resultId = model.Id || model.id || "";
+					comboBoxContainer.popup.finished(resultId, model.index)
 				}
 			}
 
@@ -109,10 +110,6 @@ ControlBase {
 		}
 
 		if (comboBoxContainer.currentIndex > -1){
-			if (comboBoxContainer.model){
-
-			}
-
 			if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
 				let name = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
 				comboBoxContainer.currentText = name;
@@ -217,12 +214,7 @@ ControlBase {
 		cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
 		onClicked: {
-			console.log("onClicked", comboBoxContainer.model);
-			console.log("comboBoxContainer", comboBoxContainer);
-
 			if (!comboBoxContainer.model || !comboBoxContainer.changeable){
-				console.log("1");
-
 				return;
 			}
 
@@ -232,9 +224,6 @@ ControlBase {
 			if (comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() > 0){
 				comboBoxContainer.openPopupMenu();
 			}
-
-			console.log("2");
-
 
 			comboBoxContainer.clicked();
 		}
@@ -279,7 +268,6 @@ ControlBase {
 			if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex > 0){
 				comboBoxContainer.currentIndex--;
 			}
-
 		}
 	}
 

@@ -79,7 +79,7 @@ Rectangle {
 		function onTryRegisterDocumentManager(typeId, callback){
 			let pageIndex = -1;
 			for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
-				let pageId = menuPanel.model.getData("Id", i);
+				let pageId = menuPanel.model.getData("id", i);
 				if (pageId === typeId){
 					pageIndex = i;
 					pagesManager.loadPageContent(i);
@@ -117,7 +117,7 @@ Rectangle {
 		
 		function onDocumentOpened(typeId, documentId, documentTypeId){
 			for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
-				let pageId = menuPanel.model.getData("Id", i);
+				let pageId = menuPanel.model.getData("id", i);
 				if (pageId === typeId){
 					menuPanel.activePageIndex = i;
 					break;
@@ -131,7 +131,7 @@ Rectangle {
 			}
 			
 			for (let i = 0; i < menuPanel.model.getItemsCount(); i++){
-				let pageId = menuPanel.model.getData("Id", i);
+				let pageId = menuPanel.model.getData("id", i);
 				if (pageId === "Search"){
 					menuPanel.activePageIndex = i;
 					break;

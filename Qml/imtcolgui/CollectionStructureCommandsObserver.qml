@@ -21,10 +21,10 @@ Item {
         let removeIsExists = root.commandsProvider.commandExists("Remove");
         if (!removeIsExists){
             for (let i = 0; i < root.commandsProvider.commandsModel.getItemsCount(); i++){
-                let currentCommandId = root.commandsProvider.commandsModel.getData("Id", i);
+                let currentCommandId = root.commandsProvider.commandsModel.getData("id", i);
                 if (currentCommandId === "Edit"){
                     let open = qsTr("Open");
-                    root.commandsProvider.commandsModel.setData("Name", open, i);
+                    root.commandsProvider.commandsModel.setData("name", open, i);
                 }
             }
         }

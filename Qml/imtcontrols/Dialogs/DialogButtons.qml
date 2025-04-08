@@ -24,9 +24,9 @@ Item {
 
     function setButtonState(buttonId, state){
         for (let i = 0; i < buttonsRepeater.model.count; i++){
-            let id = buttonsRepeater.model.get(i).Id;
+            let id = buttonsRepeater.model.get(i).id;
             if (id == buttonId){
-                buttonsRepeater.model.setProperty(i, "Enabled", state);
+                buttonsRepeater.model.setProperty(i, "enabled", state);
                 break;
             }
         }
@@ -34,9 +34,9 @@ Item {
 
     function getButtonState(buttonId){
         for (let i = 0; i < buttonsRepeater.model.count; i++){
-            let id = buttonsRepeater.model.get(i).Id;
+            let id = buttonsRepeater.model.get(i).id;
             if (id == buttonId){
-                return buttonsRepeater.model.get(i).Enabled;
+                return buttonsRepeater.model.get(i).enabled;
             }
         }
 
@@ -56,12 +56,13 @@ Item {
             delegate:
                 Button{
                 id: buttonContainer;
-                enabled: model.Enabled;
-                focus: model.Active !==undefined ? model.Active: false;
-                text: model.Name;
+                enabled: model.enabled;
+                focus: model.active !==undefined ? model.active: false;
+                text: model.name;
 				widthFromDecorator: true;
                 onClicked: {
-                    buttonsDialogContainer.buttonClicked(model.Id);
+					let retId = model.id || model.Id || ""
+                    buttonsDialogContainer.buttonClicked(retId);
                 }
             }//delegate
         }

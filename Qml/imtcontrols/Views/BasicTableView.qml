@@ -311,7 +311,7 @@ FocusScope {
                         anchors.verticalCenter: repeaterItem.verticalCenter;
 
                         Component.onCompleted: {
-                            headerText.text =  model.Name;
+                            headerText.text =  model.name;
                         }
 
                         width: parent.width;
@@ -432,7 +432,7 @@ FocusScope {
 
     function __checkColumn(columnId){
         for (let i = 0; i < columnModel.count; i++){
-            let id = columnModel.get(i).Id;
+            let id = columnModel.get(i).id;
             if (columnId == id){
                 return true;
             }

@@ -264,7 +264,7 @@ Item {
             topInset: 0;
             bottomInset: 0;
 
-            textRole: !baseElement ? "Name" : baseElement.nameId;
+            textRole: !baseElement ? "name" : baseElement.nameId;
             displayText: currentIndex >= 0 ? currentText : "ComboBox"
 
 
@@ -279,7 +279,7 @@ Item {
             }
 
             onActivated: {
-                var id = model.getData("Id", currentIndex);
+                var id = model.getData("id", currentIndex);
                 console.log("Activated", currentIndex, id)
                 if(baseElement){
                     baseElement.finished(id, currentIndex);

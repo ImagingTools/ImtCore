@@ -14,12 +14,12 @@ import imtguigql 1.0
 
         function createQueryParams(query, params){
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", params["id"]);
+            inputParams.InsertField("id", params["id"]);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("item");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
+            queryFields.InsertField("id");
+            queryFields.InsertField("name");
             query.AddField(queryFields);
         }
 

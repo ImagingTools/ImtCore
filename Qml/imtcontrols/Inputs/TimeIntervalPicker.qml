@@ -217,18 +217,18 @@ Item {
     //        Component.onCompleted: {
     //            let index = intervalModel.insertNewItem();
 
-    //            intervalModel.setData("Id", "minute", index)
-    //            intervalModel.setData("Name", "minute", index)
+    //            intervalModel.setData("id", "minute", index)
+    //            intervalModel.setData("name", "minute", index)
 
     //            index = intervalModel.insertNewItem();
 
-    //            intervalModel.setData("Id", "hour", index)
-    //            intervalModel.setData("Name", "hour", index)
+    //            intervalModel.setData("id", "hour", index)
+    //            intervalModel.setData("name", "hour", index)
 
     //            index = intervalModel.insertNewItem();
 
-    //            intervalModel.setData("Id", "day", index)
-    //            intervalModel.setData("Name", "day", index)
+    //            intervalModel.setData("id", "day", index)
+    //            intervalModel.setData("name", "day", index)
 
     //            comboBox.model = intervalModel;
     //        }
@@ -331,7 +331,7 @@ Item {
 
     //            onCurrentIndexChanged: {
     //                if (comboBox.currentIndex >= 0){
-    //                    let id = comboBox.model.getData("Id", comboBox.currentIndex);
+    //                    let id = comboBox.model.getData("id", comboBox.currentIndex);
     //                    root.type = id;
     //                }
     //            }

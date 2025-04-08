@@ -53,23 +53,23 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtlic::Licenses::LicensesListRequestInfo requestInfo = licensesListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.Id = QByteArray(objectId);
+		representationObject.id = QByteArray(objectId);
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
-		representationObject.TypeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
+		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
 	}
 
 	if (requestInfo.items.isLicenseIdRequested){
-		representationObject.LicenseId = QByteArray(licenseInfoPtr->GetLicenseId());
+		representationObject.licenseId = QByteArray(licenseInfoPtr->GetLicenseId());
 	}
 
 	if (requestInfo.items.isLicenseNameRequested){
-		representationObject.LicenseName = QString(licenseInfoPtr->GetLicenseName());
+		representationObject.licenseName = QString(licenseInfoPtr->GetLicenseName());
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.Description = QString(licenseInfoPtr->GetLicenseDescription());
+		representationObject.description = QString(licenseInfoPtr->GetLicenseDescription());
 	}
 
 	if (requestInfo.items.isProductIdRequested){
@@ -78,18 +78,18 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 			if (m_productCollectionCompPtr->GetObjectData(productUuid, dataPtr)){
 				const imtlic::IProductInfo* productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(dataPtr.GetPtr());
 				if (productInfoPtr != nullptr){
-					representationObject.ProductId = productInfoPtr->GetProductId();
+					representationObject.productId = productInfoPtr->GetProductId();
 				}
 			}
 		}
 	}
 
 	if (requestInfo.items.isProductUuidRequested){
-		representationObject.ProductUuid = QByteArray(licenseInfoPtr->GetProductId());
+		representationObject.productUuid = QByteArray(licenseInfoPtr->GetProductId());
 	}
 
 	if (requestInfo.items.isParentLicensesRequested){
-		representationObject.ParentLicenses = QByteArray(licenseInfoPtr->GetDependencies().join(';'));
+		representationObject.parentLicenses = QByteArray(licenseInfoPtr->GetDependencies().join(';'));
 	}
 
 	if (requestInfo.items.isFeaturesRequested){
@@ -99,7 +99,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 			featureIds << featureInfo.id;
 		}
 
-		representationObject.Features = QByteArray(featureIds.join(';'));
+		representationObject.features = QByteArray(featureIds.join(';'));
 	}
 
 	if (requestInfo.items.isAddedRequested){
@@ -107,7 +107,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.Added = std::make_optional<QString>(added);
+		representationObject.added = std::make_optional<QString>(added);
 	}
 
 	if (requestInfo.items.isTimeStampRequested){
@@ -115,7 +115,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.TimeStamp = std::make_optional<QString>(lastModified);
+		representationObject.timeStamp = std::make_optional<QString>(lastModified);
 	}
 
 	return true;
@@ -168,31 +168,35 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	sdl::imtlic::Licenses::LicenseItemRequestArguments arguments = licenseItemRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		I_CRITICAL();
+		return false;
+	}
 
-	if (arguments.input.Version_1_0->Id){
-		representationPayload.Id = QByteArray(*arguments.input.Version_1_0->Id);
+	if (arguments.input.Version_1_0->id){
+		representationPayload.id = QByteArray(*arguments.input.Version_1_0->id);
 	}
 
 	QString name = licenseInfoPtr->GetLicenseName();
-	representationPayload.LicenseName = QString(name);
+	representationPayload.licenseName = QString(name);
 
 	QByteArray licenseId = licenseInfoPtr->GetLicenseId();
-	representationPayload.LicenseId = std::make_optional<QByteArray>(licenseId);
+	representationPayload.licenseId = std::make_optional<QByteArray>(licenseId);
 
 	QString description = licenseInfoPtr->GetLicenseDescription();
-	representationPayload.Description = std::make_optional<QString>(description);
+	representationPayload.description = std::make_optional<QString>(description);
 
 	QByteArray productId = licenseInfoPtr->GetProductId();
-	representationPayload.ProductId = std::make_optional<QByteArray>(productId);
+	representationPayload.productId = std::make_optional<QByteArray>(productId);
 
 	QByteArrayList featureUuids;
 	for (const imtlic::ILicenseDefinition::FeatureInfo& featureInfo : licenseInfoPtr->GetFeatureInfos()){
 		featureUuids << featureInfo.id;
 	}
-	representationPayload.Features = QByteArray(featureUuids.join(';'));
+	representationPayload.features = QByteArray(featureUuids.join(';'));
 
 	QByteArray dependencies = licenseInfoPtr->GetDependencies().join(';');
-	representationPayload.ParentLicenses = std::make_optional<QByteArray>(dependencies);
+	representationPayload.parentLicenses = std::make_optional<QByteArray>(dependencies);
 
 	return true;
 }
@@ -210,11 +214,27 @@ bool CLicenseCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 		return false;
 	}
+	
+	sdl::imtlic::Licenses::LicenseUpdateRequestArguments arguments = licenseUpdateRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.has_value()){
+		I_CRITICAL();
+		return false;
+	}
+	
+	if (!arguments.input.Version_1_0->id.has_value()){
+		I_CRITICAL();
+		return false;
+	}
+	
+	if (!arguments.input.Version_1_0->item.has_value()){
+		I_CRITICAL();
+		return false;
+	}
 
 	licenseInfoPtr->ResetData();
 
-	QByteArray objectId = *licenseUpdateRequest.GetRequestedArguments().input.Version_1_0->Id;
-	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData = *licenseUpdateRequest.GetRequestedArguments().input.Version_1_0->Item;
+	QByteArray objectId = *licenseUpdateRequest.GetRequestedArguments().input.Version_1_0->id;
+	sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0 licenseData = *licenseUpdateRequest.GetRequestedArguments().input.Version_1_0->item;
 
 	if (!FillObjectFromRepresentation(licenseData, *licenseInfoPtr, objectId, errorMessage)){
 		errorMessage = QString("Unable to update object from representation. Error: '%1'").arg(errorMessage);
@@ -243,8 +263,8 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 		return false;
 	}
 
-	if (licenseDataRepresentation.Id){
-		newObjectId = *licenseDataRepresentation.Id;
+	if (licenseDataRepresentation.id){
+		newObjectId = *licenseDataRepresentation.id;
 	}
 
 	if (newObjectId.isEmpty()){
@@ -253,8 +273,8 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 	licenseInfoPtr->SetObjectUuid(newObjectId);
 
 	QByteArray licenseId;
-	if (licenseDataRepresentation.LicenseId){
-		licenseId = *licenseDataRepresentation.LicenseId;
+	if (licenseDataRepresentation.licenseId){
+		licenseId = *licenseDataRepresentation.licenseId;
 	}
 
 	if (licenseId.isEmpty()){
@@ -292,32 +312,32 @@ bool CLicenseCollectionControllerComp::FillObjectFromRepresentation(
 	QString name;
 	QString description;
 
-	if (licenseDataRepresentation.LicenseName){
-		name = *licenseDataRepresentation.LicenseName;
+	if (licenseDataRepresentation.licenseName){
+		name = *licenseDataRepresentation.licenseName;
 	}
 	licenseInfoPtr->SetLicenseName(name);
 
-	if (licenseDataRepresentation.Description){
-		description = *licenseDataRepresentation.Description;
+	if (licenseDataRepresentation.description){
+		description = *licenseDataRepresentation.description;
 	}
 	licenseInfoPtr->SetLicenseDescription(description);
 
 	QByteArray productId;
-	if (licenseDataRepresentation.ProductId){
-		productId = *licenseDataRepresentation.ProductId;
+	if (licenseDataRepresentation.productId){
+		productId = *licenseDataRepresentation.productId;
 	}
 	licenseInfoPtr->SetProductId(productId);
 
 	QByteArrayList dependencyIds;
-	if (licenseDataRepresentation.ParentLicenses){
-		dependencyIds = licenseDataRepresentation.ParentLicenses->split(';');
+	if (licenseDataRepresentation.parentLicenses){
+		dependencyIds = licenseDataRepresentation.parentLicenses->split(';');
 	}
 	dependencyIds.removeAll("");
 	licenseInfoPtr->SetDependencies(dependencyIds);
 
 	QByteArrayList featureIds;
-	if (licenseDataRepresentation.Features){
-		featureIds = licenseDataRepresentation.Features->split(';');
+	if (licenseDataRepresentation.features){
+		featureIds = licenseDataRepresentation.features->split(';');
 	}
 
 	imtlic::ILicenseDefinition::FeatureInfos featureInfos;

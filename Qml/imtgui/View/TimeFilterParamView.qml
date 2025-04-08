@@ -52,7 +52,7 @@ PopupView {
 		let mode = timeFilter.m_interpretationMode;
 		
 		for (let i = 0; i < treeModel.getItemsCount(); i++){
-			let id = treeModel.getData("Id", i);
+			let id = treeModel.getData("id", i);
 			let interpretationMode = treeModel.getData("InterpretationMode", i);
 			if (unit == id && interpretationMode == mode){
 				listView.currentIndex = i;
@@ -65,38 +65,38 @@ PopupView {
 		treeModel.clear();
 		
 		let index = treeModel.insertNewItem();
-		treeModel.setData("Id", "Hour", index);
-		treeModel.setData("Name", qsTr("Last hour"), index);
+		treeModel.setData("id", "Hour", index);
+		treeModel.setData("name", qsTr("Last hour"), index);
 		treeModel.setData("InterpretationMode", "For", index);
 		
 		index = treeModel.insertNewItem();
-		treeModel.setData("Id", "Day", index);
-		treeModel.setData("Name", qsTr("Today"), index);
+		treeModel.setData("id", "Day", index);
+		treeModel.setData("name", qsTr("Today"), index);
 		treeModel.setData("InterpretationMode", "Current", index);
 		
 		index = treeModel.insertNewItem();
-		treeModel.setData("Id", "Week", index);
-		treeModel.setData("Name", qsTr("This week"), index);
+		treeModel.setData("id", "Week", index);
+		treeModel.setData("name", qsTr("This week"), index);
 		treeModel.setData("InterpretationMode", "Current", index);
 		
 		index = treeModel.insertNewItem();
-		treeModel.setData("Id", "Month", index);
-		treeModel.setData("Name", qsTr("This month"), index);
+		treeModel.setData("id", "Month", index);
+		treeModel.setData("name", qsTr("This month"), index);
 		treeModel.setData("InterpretationMode", "Current", index);
 		
 		index = treeModel.insertNewItem();
-		treeModel.setData("Id", "Month", index);
-		treeModel.setData("Name", qsTr("Last month"), index);
+		treeModel.setData("id", "Month", index);
+		treeModel.setData("name", qsTr("Last month"), index);
 		treeModel.setData("InterpretationMode", "Last", index);
 		
 		index = treeModel.insertNewItem();
-		treeModel.setData("Id", "Year", index);
-		treeModel.setData("Name", qsTr("This year"), index);
+		treeModel.setData("id", "Year", index);
+		treeModel.setData("name", qsTr("This year"), index);
 		treeModel.setData("InterpretationMode", "Current", index);
 		
 		index = treeModel.insertNewItem();
-		treeModel.setData("Id", "Year", index);
-		treeModel.setData("Name", qsTr("Last year"), index);
+		treeModel.setData("id", "Year", index);
+		treeModel.setData("name", qsTr("Last year"), index);
 		treeModel.setData("InterpretationMode", "Last", index);
 		
 		listView.model = treeModel;
@@ -144,7 +144,7 @@ PopupView {
 				interactive: false;
 				delegate: Component {
 					PopupMenuDelegate {
-						text: model.Name;
+						text: model.name;
 						highlighted: listView.currentIndex === model.index;
 						selected: mouseArea.containsMouse;
 						
@@ -152,10 +152,10 @@ PopupView {
 							listView.currentIndex = model.index;
 							// root.model.clear();
 							
-							root.timeFilter.m_timeUnit = model.Id;
+							root.timeFilter.m_timeUnit = model.id;
 							root.timeFilter.m_interpretationMode = model.InterpretationMode;
 
-							root.accepted(model.Id, model.Name);
+							root.accepted(model.id, model.name);
 						}
 					}
 				}

@@ -19,16 +19,16 @@ Rectangle {
         Component.onCompleted: {
             var index = comboModel.insertNewItem();
 
-            comboModel.setData("Id",index, index);
-            comboModel.setData("Name", "Name 1", index);
+            comboModel.setData("id",index, index);
+            comboModel.setData("name", "name 1", index);
 
             index = comboModel.insertNewItem();
-            comboModel.setData("Id",index, index);
-            comboModel.setData("Name", "Name 2", index);
+            comboModel.setData("id",index, index);
+            comboModel.setData("name", "name 2", index);
 
             index = comboModel.insertNewItem();
-            comboModel.setData("Id",index, index);
-            comboModel.setData("Name", "Name 3", index);
+            comboModel.setData("id",index, index);
+            comboModel.setData("name", "name 3", index);
         }
     }
 

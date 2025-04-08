@@ -33,21 +33,21 @@ DocumentDataController {
 	}
 	
 	function setupGetRequestInputData(){
-		getRequestInputParam.InsertField ("Id", getDocumentId());
+		getRequestInputParam.InsertField ("id", getDocumentId());
 		getRequestInputParam.InsertField("typeId", getDocumentTypeId());
 	}
 	
 	function setupAddRequestInputData(){
-		addRequestInputParam.InsertField ("Id", getDocumentId());
-		addRequestInputParam.InsertField ("Item", getDocumentModel());
+		addRequestInputParam.InsertField ("id", getDocumentId());
+		addRequestInputParam.InsertField ("item", getDocumentModel());
 		addRequestInputParam.InsertField("typeId", getDocumentTypeId());
 		addRequestInputParam.InsertField("name", getDocumentName());
 		addRequestInputParam.InsertField("description", getDocumentDescription());
 	}
 	
 	function setupUpdateRequestInputData(){
-		updateRequestInputParam.InsertField ("Id", getDocumentId());
-		updateRequestInputParam.InsertField ("Item", getDocumentModel());
+		updateRequestInputParam.InsertField ("id", getDocumentId());
+		updateRequestInputParam.InsertField ("item", getDocumentModel());
 		updateRequestInputParam.InsertField("typeId", getDocumentTypeId());
 		updateRequestInputParam.InsertField("name", getDocumentName());
 		updateRequestInputParam.InsertField("description", getDocumentDescription());
@@ -111,7 +111,7 @@ DocumentDataController {
 			query.AddParam(container.updateRequestInputParam);
 
 			var queryFields = Gql.GqlObject("updatedNotification");
-			queryFields.InsertField("Id");
+			queryFields.InsertField("id");
 			query.AddField(queryFields);
 
 			var gqlData = query.GetQuery();
@@ -161,8 +161,8 @@ DocumentDataController {
 
 						let documentId = "";
 
-						if ("Id" in dataObject){
-							documentId = dataObject["Id"]
+						if ("id" in dataObject){
+							documentId = dataObject["id"]
 						}
 
 						container.saved(documentId, "");
@@ -248,7 +248,7 @@ DocumentDataController {
 			query.AddParam(container.addRequestInputParam);
 
 			var queryFields = Gql.GqlObject("addedNotification");
-			queryFields.InsertField("Id");
+			queryFields.InsertField("id");
 			query.AddField(queryFields);
 
 			var gqlData = query.GetQuery();
@@ -298,8 +298,8 @@ DocumentDataController {
 
 					let documentId = ""
 
-					if ("Id" in dataObject){
-						documentId = dataObject["Id"];
+					if ("id" in dataObject){
+						documentId = dataObject["id"];
 					}
 
 					container.saved(documentId, "");

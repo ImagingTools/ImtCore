@@ -25,16 +25,12 @@ QtObject {
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
 		onForbidden: {
-			console.log("onForbidden", gqlData);
-			
 			root.logoutForce();
 		}
 		
 		onUnauthorized: {
-			console.log("onUnauthorized", gqlData);
 			root.setAccessToken("");
 			let cb = function(status){
-				console.log("refreshTokenGqlSender finished", gqlData, status);
 				if (status >= 0){
 					if (gqlRequestRef){
 						gqlRequestRef.setGqlQuery(gqlData, root.getHeaders());

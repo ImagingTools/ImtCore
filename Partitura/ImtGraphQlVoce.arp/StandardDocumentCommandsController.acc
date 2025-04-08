@@ -76,9 +76,11 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="CommandsController"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CommandsController"/>
+        <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="CommandsController"/>
         <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="CommandsController"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="CommandsController"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="CommandsController"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

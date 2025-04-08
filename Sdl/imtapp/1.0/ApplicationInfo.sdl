@@ -6,20 +6,16 @@ schema {
 }
 
 type ApplicationInfo {
-	Version: String
-	CompanyName: String
-	ProductName: String
-	ApplicationId: String
-	ApplicationName: String
-	ApplicationType: String
+	version: String
+	companyName: String
+	productName: String
+	applicationId: String
+	applicationName: String
+	applicationType: String
 }
 
 input GetApplicationInfoInput {
-	ProductId: ID
-}
-
-type GetApplicationInfoPayload {
-	ApplicationInfo: ApplicationInfo
+	productId: ID
 }
 
 type Query {

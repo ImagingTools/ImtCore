@@ -23,7 +23,7 @@
                 <Element ComponentName="DatabaseUserSettings" X="600" Y="625" Note=""/>
                 <Element ComponentName="Demultiplexer" X="625" Y="100" Note=""/>
                 <Element ComponentName="SettingsController" X="250" Y="100" Note=""/>
-                <Element ComponentName="TableViewParamController" X="750" Y="376" Note=""/>
+                <Element ComponentName="TableViewParamController" X="750" Y="375" Note=""/>
                 <Element ComponentName="UserSettings" X="125" Y="375" Note=""/>
                 <Element ComponentName="UserSettingsRepresentation" X="425" Y="375" Note=""/>
             </PositionMap>

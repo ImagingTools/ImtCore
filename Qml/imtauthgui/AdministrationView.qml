@@ -43,17 +43,17 @@ Item {
     function onLocalizationChanged(language){
         let rolesIndex = multiPageView.getIndexById("Roles");
         if (rolesIndex >= 0){
-            multiPageView.pagesModel.setProperty(rolesIndex, "Name", qsTr("Roles"))
+            multiPageView.pagesModel.setProperty(rolesIndex, "name", qsTr("Roles"))
         }
 
         let usersIndex = multiPageView.getIndexById("Users");
         if (usersIndex >= 0){
-            multiPageView.pagesModel.setProperty(usersIndex, "Name", qsTr("Users"))
+            multiPageView.pagesModel.setProperty(usersIndex, "name", qsTr("Users"))
         }
 
         let groupsIndex = multiPageView.getIndexById("Groups");
         if (groupsIndex >= 0){
-            multiPageView.pagesModel.setProperty(groupsIndex, "Name", qsTr("Groups"))
+            multiPageView.pagesModel.setProperty(groupsIndex, "name", qsTr("Groups"))
         }
     }
 
