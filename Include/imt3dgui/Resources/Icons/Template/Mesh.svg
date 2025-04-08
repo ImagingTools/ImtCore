@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   enable-background="new 0 0 64 64"
+   height="512"
+   viewBox="0 0 64 64"
+   width="512"
+   version="1.1"
+   id="svg9"
+   sodipodi:docname="Mesh.svg"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs9" />
+  <sodipodi:namedview
+     id="namedview9"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.2929688"
+     inkscape:cx="255.78194"
+     inkscape:cy="256"
+     inkscape:window-width="2560"
+     inkscape:window-height="1370"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg9" />
+  <g
+     id="Layer_15"
+     style="fill:#d9d9d9;fill-opacity:1"
+     transform="matrix(0.96153846,0,0,0.96153846,1.2307693,1.2307693)">
+    <g
+       id="g9"
+       style="fill:#d9d9d9;fill-opacity:1">
+      <path
+         d="m 25.19,49.17 c -1.17,4.19 -2.38,7.5 -2.88,8.83 H 8 C 6.895,58 6,57.105 6,56 V 45.42 c 0.46,0.56 1.03,1.12 1.74,1.65 2.51,1.87 5.95,2.81 10.28,2.81 2.17,0 4.56,-0.24 7.17,-0.71 z"
+         id="path1"
+         style="fill:#d9d9d9;fill-opacity:1" />
+      <path
+         d="M 26.75,21.21 C 18.66,17.46 9.48,20.21 6,21.51 V 8 C 6,6.895 6.895,6 8,6 h 14.31 c 0.74,1.95 3,8.21 4.44,15.21 z"
+         id="path2"
+         style="fill:#d9d9d9;fill-opacity:1" />
+      <path
+         d="M 28,32 C 28,36.89 26.96,42.35 25.76,47.03 18.19,48.54 12.39,48.01 8.99,45.5 6.31,43.53 6.01,41.03 6,40.9 V 23.67 C 8.54,22.64 18.99,18.98 27.22,23.7 27.69,26.49 28,29.33 28,32 Z"
+         id="path3"
+         style="fill:#d9d9d9;fill-opacity:1" />
+      <path
+         d="m 48,32 c 0,2.74 -0.21,5.29 -0.57,7.65 -2.1,0.28 -4.23,1.24 -6.79,2.39 -3.21,1.44 -7.12,3.19 -12.68,4.5 C 29.08,41.97 30,36.77 30,32 c 0,-2.29 -0.21,-4.68 -0.56,-7.04 4.91,2.6 9.85,3.89 14.64,3.89 1.28,0 2.55,-0.09 3.8,-0.28 C 47.96,29.68 48,30.82 48,32 Z"
+         id="path4"
+         style="fill:#d9d9d9;fill-opacity:1" />
+      <path
+         d="M 47.72,26.62 C 40.56,27.74 33.99,25.32 29.03,22.45 V 22.44 C 27.74,15.32 25.48,8.77 24.46,6 H 40.5 c 1.21,1.71 6,9.08 7.22,20.62 z"
+         id="path5"
+         style="fill:#d9d9d9;fill-opacity:1" />
+      <path
+         d="m 58,8 v 14.47 c -2.81,1.9 -5.59,3.09 -8.31,3.76 C 48.61,15.99 44.85,9 42.92,6 H 56 c 1.105,0 2,0.895 2,2 z"
+         id="path6"
+         style="fill:#d9d9d9;fill-opacity:1" />
+      <path
+         d="M 58,24.85 V 44.53 C 54.6,41.21 51.97,39.83 49.47,39.6 49.8,37.25 50,34.72 50,32 50,30.69 49.95,29.42 49.86,28.2 52.67,27.56 55.4,26.44 58,24.85 Z"
+         id="path7"
+         style="fill:#d9d9d9;fill-opacity:1" />
+      <path
+         d="M 47.07,41.73 C 45.3,50.76 41.55,56.52 40.5,58 H 24.46 c 0.66,-1.79 1.84,-5.17 2.94,-9.27 6.29,-1.38 10.58,-3.31 14.06,-4.87 2.22,-0.99 3.98,-1.78 5.61,-2.13 z"
+         id="path8"
+         style="fill:#d9d9d9;fill-opacity:1" />
+      <path
+         d="M 58,47.39 V 56 c 0,1.105 -0.895,2 -2,2 H 42.92 c 1.68,-2.61 4.75,-8.25 6.23,-16.43 2.53,0.15 5.04,1.74 8.85,5.82 z"
+         id="path9"
+         style="fill:#d9d9d9;fill-opacity:1" />
+    </g>
+  </g>
+</svg>
