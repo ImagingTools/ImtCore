@@ -515,7 +515,7 @@ ViewBase {
 
         let index = headersModel.insertNewItem();
         headersModel.setData("id", FeatureItemTypeMetaInfo.s_featureName, index);
-        headersModel.setData("Name", qsTr("Feature Name"), index);
+        headersModel.setData("name", qsTr("Feature Name"), index);
 
         index = headersModel.insertNewItem();
         headersModel.setData("id", FeatureItemTypeMetaInfo.s_featureId, index);

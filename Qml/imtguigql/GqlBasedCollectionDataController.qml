@@ -12,19 +12,19 @@ CollectionDataController {
 	function getObject(objectId){
 		inputId.m_id = objectId
 		
-		getRequestSender.send(inputId)
+		// getRequestSender.send(inputId)
 	}
 	
 	function insertNewObject(objectId, objectData){
-		accountDataInput.m_id = objectId
-		accountDataInput.m_item = objectData
+		// accountDataInput.m_id = objectId
+		// accountDataInput.m_item = objectData
 		
-		addRequestSender.send(accountDataInput)
+		// addRequestSender.send(accountDataInput)
 	}
 	
 	function updateObject(objectId, newObjectData){
-		accountDataInput.m_id = objectId
-		accountDataInput.m_item = newObjectData
+		// accountDataInput.m_id = objectId
+		// accountDataInput.m_item = newObjectData
 		
 		updateRequestSender.send(accountDataInput)
 	}
@@ -34,27 +34,27 @@ CollectionDataController {
 		collectionViewParams.m_count = count
 		collectionViewParams.m_complexFilter = filter
 		
-		getListRequestSender.send(collectionViewParams)
+		// getListRequestSender.send(collectionViewParams)
 	}
 	
 	function removeObject(objectId){
 		inputId.m_id = objectId
 		
-		removeRequestSender.send(inputId)
+		// removeRequestSender.send(inputId)
 	}
 	
 	function setObjectName(objectId, name){
 		renameInput.m_id = objectId
 		renameInput.m_name = name
 		
-		setNameRequestSender.send(renameInput)
+		// setNameRequestSender.send(renameInput)
 	}
 	
 	function setObjectDescription(objectId, description){
 		setDescriptionInput.m_id = objectId
 		setDescriptionInput.m_description = description
 		
-		setDescriptionRequestSender.send(setDescriptionInput)
+		// setDescriptionRequestSender.send(setDescriptionInput)
 	}
 	
 	property RenameInput renameInput: RenameInput {}
