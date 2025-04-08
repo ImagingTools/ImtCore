@@ -925,7 +925,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 			WHERE root."State" = 'Active'
 		)")
 		.arg(
-			CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int),
+			CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int, "root1"),
 			schema,
 			tableName,
 			joinTablesQuery.isEmpty() ? "" : QString::fromUtf8(joinTablesQuery),
