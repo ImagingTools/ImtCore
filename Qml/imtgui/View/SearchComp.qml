@@ -75,7 +75,38 @@ Rectangle{
 	Component.onCompleted: {
 	}
 
+	function clearSearchFunc(){
+		console.log("clearSearchFunc")
 
+		searchContainer.propertiesModel.clear();
+		setPropertiesModel(searchContainer.propertyId, "");
+
+		searchTextField.excludeFilterPart = "";
+		searchContainer.externalSearchParam = "";
+		searchTextField.currentText = "";
+		searchTextField.filterText = "";
+		searchContainer.selectedText = "";
+		searchContainer.previousText = "";
+		searchContainer.parentIds = "";
+
+		searchContainer.accepted("");
+
+		if(searchTextField.openST){
+			var popup = ModalDialogManager.topItem;
+
+			popup.modelFilterAlias.clear();
+			popup.modelFilterAlias.addTreeModel("FilterIds");
+			popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
+			popup.modelFilterAlias.addTreeModel("Sort");
+			popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
+			searchContainer.setAdditionalFilterParamsForPopup(popup.modelFilterAlias);
+
+			popup.modelFilterAlias.setData("TextFilter", "");
+			popup.excludeFilterPart = searchContainer.currentText;
+			popup.filterText = searchContainer.currentText;
+		}
+		searchContainer.clearSignal();
+	}
 
 	function clearSearchParams(){
 		searchContainer.clearModels();
@@ -83,6 +114,7 @@ Rectangle{
 		searchTextField.excludeFilterPart = "";
 		searchContainer.externalSearchParam = ""
 		searchTextField.currentText = "";
+		searchTextField.filterText = "";
 		searchContainer.selectedText = "";
 		searchContainer.previousText = "";
 		searchContainer.parentIds = "";
@@ -147,38 +179,7 @@ Rectangle{
 		}
 	}
 
-	function clearSearchFunc(){
-		console.log("clearSearchFunc")
 
-		searchContainer.propertiesModel.clear();
-		setPropertiesModel(searchContainer.propertyId, "");
-
-		searchTextField.excludeFilterPart = "";
-		searchTextField.currentText = "";
-		searchTextField.filterText = "";
-		searchContainer.selectedText = "";
-		searchContainer.previousText = "";
-		searchContainer.parentIds = "";
-
-		searchContainer.externalSearchParam = "";
-		searchContainer.accepted("");
-
-		if(searchTextField.openST){
-			var popup = ModalDialogManager.topItem;
-
-			popup.modelFilterAlias.clear();
-			popup.modelFilterAlias.addTreeModel("FilterIds");
-			popup.modelFilterAlias.setData("FilterIds", searchContainer.filterIdsModel)
-			popup.modelFilterAlias.addTreeModel("Sort");
-			popup.modelFilterAlias.setData("ParentIds",  searchContainer.parentIds);
-			searchContainer.setAdditionalFilterParamsForPopup(popup.modelFilterAlias);
-
-			popup.modelFilterAlias.setData("TextFilter", "");
-			popup.excludeFilterPart = searchContainer.currentText;
-			popup.filterText = searchContainer.currentText;
-		}
-		searchContainer.clearSignal();
-	}
 
 	function setCurrentTextAddressFunc(modelll, index_, addStr_){
 		let noTextChanges = false;
@@ -229,7 +230,7 @@ Rectangle{
 			searchContainer.accepted(retV);
 
 			if(searchTextField.openST){
-				var popup = ModalDialogManager.topItem;
+				let popup = ModalDialogManager.topItem;
 
 				popup.modelFilterAlias.clear();
 				popup.modelFilterAlias.addTreeModel("FilterIds");
