@@ -66,10 +66,10 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		QList<imtgql::CGqlObject> inputParams;
-		inputParams.append(gqlRequest.GetParams());
-		if (inputParams.size() > 0) {
-			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
+		const imtgql::CGqlObject& inputParams = gqlRequest.GetParams();
+		const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+		if (inputObject != nullptr){
+			viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
 		}
 
 		imtbase::CCollectionFilter filter;
