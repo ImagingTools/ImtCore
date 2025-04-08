@@ -146,28 +146,59 @@ Rectangle {
             Slider{
                 anchors.verticalCenter: parent.verticalCenter;
 
-                from: 10;
+				from: 0;
                 to: 100;
-                value: 50;
+				value: 60;
+				majorTickInterval: 20;
+				minorTickInterval: 5;
+				width: 300;
 
+				hasIndicator: true;
+				hasTicks: true;
+				ticksPosition: Enums.ticksBelow
+				indicatorPosition: Enums.sliderHintAbove
+				indicatorHeight: 40
+				majorTickHeight: 20;
             }
 
-            Slider{
-                anchors.verticalCenter: parent.verticalCenter;
+			Slider{
+				visible: false;
+				anchors.verticalCenter: parent.verticalCenter;
 
-                orientation: Qt.Vertical;
-                from: 10;
-                to: 100;
+				orientation: Qt.Vertical;
+				from: 0;
+				to: 100;
+				majorTickInterval: 20;
 
-            }
+			}
 
-            RangeSlider{
-                //orientation: Qt.Vertical;
-                from: 10;
-                to: 100;
-                valueSecond: 80;
+			Item{
+				width: rangeSlider.width
+				height: 40
+				RangeSlider{
+					id: rangeSlider
+					//orientation: Qt.Vertical;
+					from: 0;
+					to: 100;
+					valueFirst: 20
+					valueSecond: 80;
+					width: inputsRepresentaitonPage.width/ 5
+					majorTickInterval: 20;
+					minorTickInterval: 5;
 
-            }
+					ticksPosition: Enums.ticksBothSides
+					indicatorPosition: Enums.sliderHintAbove
+
+					hasTicks: true;
+					hasIndicator: true;
+
+					onValueSecondChanged: {
+						//console.log("VALUE_SECOND::", valueSecond)
+					}
+
+				}
+
+			}
 
             BarControl {
                 id: barControlHoriz;

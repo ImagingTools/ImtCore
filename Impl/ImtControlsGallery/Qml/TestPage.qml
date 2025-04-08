@@ -70,4 +70,25 @@ Rectangle {
 		}
 	}
 
+	Rectangle{
+		id: rec
+
+		x: 400;
+		y: 400;
+
+		width: 100;
+		height: 100;
+
+		color: "red";
+
+		MovingItem{
+			containerItem: rec;
+			movingItem: rec;
+
+			hoverEnabled: true;
+			cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
+		}
+	}
+
+
 }
