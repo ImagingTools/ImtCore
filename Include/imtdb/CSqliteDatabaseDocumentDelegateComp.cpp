@@ -146,7 +146,9 @@ QString CSqliteDatabaseDocumentDelegateComp::CreateJsonExtractSql(
 			const QString& tableAlias) const
 {
 	QString jsonPath = QString("$.%1").arg(key);
-	QString fieldWithAlias = QString(R"(%1."%2")").arg(tableAlias, jsonName);
+	QString fieldWithAlias = tableAlias.isEmpty()
+								? QString(R"("%1")").arg(jsonName)
+								: QString(R"(%1."%2")").arg(tableAlias, jsonName);
 	
 	switch (metaType) {
 	case QMetaType::QString:

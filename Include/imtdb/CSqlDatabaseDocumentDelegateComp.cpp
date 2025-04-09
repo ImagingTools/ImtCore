@@ -420,7 +420,7 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 	const imtbase::ICollectionInfo::Id& objectId,
 	int revision) const
 {
-	QByteArray checkCurrentRevisionQuery = QString("SELECT * FROM \"%1\" WHERE \"DocumentId\" = '%2' AND \"State\" = 'InActive';")
+	QByteArray checkCurrentRevisionQuery = QString("SELECT * FROM \"%1\" WHERE \"DocumentId\" = '%2' AND \"State\" = 'Active';")
 	.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(objectId)).toUtf8();
 	
 	QSqlError sqlError;
@@ -438,10 +438,13 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 	QSqlRecord revisionRecord = sqlQuery.record();
 	
 	int currentRevision = -1;
-	if (revisionRecord.contains("RevisionNumber")){
-		currentRevision = revisionRecord.value("RevisionNumber").toInt();
-	}
 	
+	if (revisionRecord.contains("RevisionInfo")){
+		QByteArray revisionValueJson = revisionRecord.value("RevisionInfo").toByteArray();
+		QJsonObject infoData = QJsonDocument::fromJson(revisionValueJson).object();
+		currentRevision = infoData.value("RevisionNumber").toInt();
+	}
+
 	if (currentRevision == revision){
 		SendErrorMessage(0, QString("Unable to delete revision '%1' for document '%2'. Error: Revision '%1' is active").arg(revision).arg(qPrintable(objectId)), "Database collection");
 		return false;
@@ -449,6 +452,7 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 	
 	QByteArray query = QString("DELETE  FROM \"%1\" WHERE \"DocumentId\" = '%2' AND %3 = %4;")
 							.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(objectId))
+							.arg(CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int))
 							.arg(revision)
 							.toUtf8();
 	
@@ -856,31 +860,35 @@ QString CSqlDatabaseDocumentDelegateComp::CreateJsonExtractSql(
 			QMetaType::Type metaType,
 			const QString& tableAlias) const
 {
-	switch (metaType){
+	const QString prefix = tableAlias.isEmpty()
+				? QString(R"("%1")").arg(jsonName)
+				: QString(R"(%0."%1")").arg(tableAlias, jsonName);
+	
+	switch (metaType) {
 	case QMetaType::QString:
 	case QMetaType::QByteArray:
-		return QString(R"(%0."%1"->>'%2')").arg(tableAlias, jsonName, key);
-
+		return QString(R"(%1->>'%2')").arg(prefix, key);
+		
 	case QMetaType::Int:
 	case QMetaType::UInt:
 	case QMetaType::Short:
 	case QMetaType::UShort:
-		return QString(R"((%0."%1"->>'%2')::int)").arg(tableAlias, jsonName, key);
-
+		return QString(R"((%1->>'%2')::int)").arg(prefix, key);
+		
 	case QMetaType::LongLong:
 	case QMetaType::ULongLong:
-		return QString(R"((%0."%1"->>'%2')::bigint)").arg(tableAlias, jsonName, key);
-
+		return QString(R"((%1->>'%2')::bigint)").arg(prefix, key);
+		
 	case QMetaType::Double:
 	case QMetaType::Float:
-		return QString(R"((%0."%1"->>'%2')::float)").arg(tableAlias, jsonName, key);
-
+		return QString(R"((%1->>'%2')::float)").arg(prefix, key);
+		
 	case QMetaType::Bool:
-		return QString(R"((%0."%1"->>'%2')::boolean)").arg(tableAlias, jsonName, key);
-
+		return QString(R"((%1->>'%2')::boolean)").arg(prefix, key);
+		
 	case QMetaType::QJsonObject:
-		return QString(R"(%0."%1"->'%2')").arg(tableAlias, jsonName, key);
-
+		return QString(R"(%1->'%2')").arg(prefix, key);
+		
 	default:
 		qWarning() << "Unsupported meta type for JSON extract:" << metaType;
 		Q_ASSERT(false);
@@ -1291,7 +1299,7 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool c
 		substitute.replace("\"", "");
 		
 		if (!s_filterableColumns.contains(substitute)){
-			substitute = CreateJsonExtractSql("DataMetaInfo", substitute, castToStr ? QMetaType::QString : QMetaType::QJsonObject);
+			substitute = CreateJsonExtractSql("DataMetaInfo", substitute, castToStr ? QMetaType::QString : QMetaType::QJsonObject, "root");
 			query.replace(item, substitute);
 		}
 		else if (substitute != s_addedColumn){
@@ -1343,7 +1351,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 			stateDocumentFilter,
 			qPrintable(s_documentIdColumn),
 			qPrintable(objectId),
-			CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
+			CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int, "root")
 		).toUtf8();
 }
 

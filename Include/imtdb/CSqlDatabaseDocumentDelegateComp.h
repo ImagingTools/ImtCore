@@ -129,7 +129,7 @@ protected:
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const;
 	virtual QByteArray CreateRevisionInfoQuery(const imtbase::IOperationContext& operationContextPtr, const QVariant& revisionArgument, quint32 checksum) const;
 	virtual QByteArray CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const;
-	virtual QString CreateJsonExtractSql(const QString& jsonName, const QString& key, QMetaType::Type metaType = QMetaType::QString, const QString& tableAlias = QString("root")) const;
+	virtual QString CreateJsonExtractSql(const QString& jsonName, const QString& key, QMetaType::Type metaType = QMetaType::QString, const QString& tableAlias = QString()) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual QString GetBaseSelectionQuery() const override;
