@@ -40,7 +40,6 @@ CSmtpClientComp::ResponseCode CSmtpClientComp::ExtractResponseCode(const QByteAr
 
 void CSmtpClientComp::SendCommand(const QString& command)
 {
-	qDebug() << "SendCommand" << command;
 	if (m_textStreamPtr != nullptr){
 		*m_textStreamPtr << command << "\r\n";
 		m_textStreamPtr->flush();
@@ -66,6 +65,10 @@ void CSmtpClientComp::ClearData()
 
 QString CSmtpClientComp::GetHost() const
 {
+	if (m_hostParamCompPtr.IsValid()){
+		return m_hostParamCompPtr->GetText();
+	}
+	
 	if (m_hostNameAttrPtr.IsValid()){
 		return *m_hostNameAttrPtr;
 	}
@@ -76,6 +79,16 @@ QString CSmtpClientComp::GetHost() const
 
 int CSmtpClientComp::GetPort() const
 {
+	if (m_portParamCompPtr.IsValid()){
+		QString portStr = m_portParamCompPtr->GetText();
+		
+		bool ok = false;
+		int port = portStr.toInt(&ok);
+		if (ok){
+			return port;
+		}
+	}
+	
 	if (m_portAttrPtr.IsValid()){
 		return *m_portAttrPtr;
 	}
@@ -210,12 +223,31 @@ void CSmtpClientComp::OnReadyRead()
 	}
 	else if (m_currentMailSendState == MS_USER && code == RC_AUTHENTIFICATION_REQUEST)
 	{
-		SendCommand(QByteArray().append(*m_userAttrPtr).toBase64());
+		QString user;
+		
+		if (m_userAttrPtr.IsValid()){
+			user = *m_userAttrPtr;
+		}
+		
+		if (m_userParamCompPtr.IsValid()){
+			user = m_userParamCompPtr->GetText();
+		}
+		
+		SendCommand(QByteArray().append(user.toUtf8()).toBase64());
 		m_currentMailSendState = MS_PASS;
 	}
 	else if (m_currentMailSendState == MS_PASS && code == RC_AUTHENTIFICATION_REQUEST)
 	{
-		SendCommand(QByteArray().append(*m_passwordAttrPtr).toBase64());
+		QString password;
+		if (m_passwordAttrPtr.IsValid()){
+			password = *m_passwordAttrPtr;
+		}
+		
+		if (m_passwordParamCompPtr.IsValid()){
+			password = m_passwordParamCompPtr->GetText();
+		}
+
+		SendCommand(QByteArray().append(password.toUtf8()).toBase64());
 		m_currentMailSendState = MS_MAIL;
 	}
 	else if (m_currentMailSendState == MS_MAIL && code == RC_AUTHENTIFICATION_SUCCESSFUL)
