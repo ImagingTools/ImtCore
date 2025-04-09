@@ -47,7 +47,7 @@
         <Element Id="General" PackageId="BasePck" ComponentId="ComposedParamsSet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="SettingsParameters">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Design</Value>
@@ -56,7 +56,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="SettingsParametersId">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DesignSchema</Value>
@@ -153,5 +153,6 @@
         <Component ExportedId="Design" ComponentId="Design"/>
         <Component ExportedId="Language" ComponentId="Language"/>
         <Component ExportedId="LanguageOptions" ComponentId="LanguageOptions"/>
+        <Component ExportedId="PageViewParams" ComponentId="PageViewParams"/>
     </ExportedComponents>
 </Acf>

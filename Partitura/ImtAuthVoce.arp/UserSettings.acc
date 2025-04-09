@@ -38,5 +38,7 @@
         <Interface InterfaceId="istd::IChangeable" ComponentId="UserSettings"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="UserSettings"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="GeneralSettingsFactory" ComponentId="GeneralSettingsFactory"/>
+    </ExportedComponents>
 </Acf>
