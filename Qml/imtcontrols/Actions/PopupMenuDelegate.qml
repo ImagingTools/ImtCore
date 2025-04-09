@@ -9,7 +9,7 @@ ItemDelegate {
 	
 	property bool selected: false;
 
-	property bool isSeparator: String(model.Id ? model.Id : model.id ? model.id : "") === "";
+	property bool isSeparator: String(model.item ? model.item.m_id : model.Id ? model.Id : model.id ? model.id : "") === "";
 	
 	// Reference to the control in which the delegate is declared
 	property Item containerItem: null;

@@ -79,16 +79,16 @@ RemoteCollectionView {
 						systemInfoModel.clear();
 						
 						let index = systemInfoModel.insertNewItem();
-						systemInfoModel.setData("Id", "All", index)
-						systemInfoModel.setData("Name", qsTr("All systems"), index)
+						systemInfoModel.setData("id", "All", index)
+						systemInfoModel.setData("name", qsTr("All systems"), index)
 						
 						index = systemInfoModel.insertNewItem();
-						systemInfoModel.setData("Id", "Internal", index)
-						systemInfoModel.setData("Name", qsTr("Internal"), index)
+						systemInfoModel.setData("id", "Internal", index)
+						systemInfoModel.setData("name", qsTr("Internal"), index)
 						
 						index = systemInfoModel.insertNewItem();
-						systemInfoModel.setData("Id", "Ldap", index)
-						systemInfoModel.setData("Name", qsTr("LDAP"), index)
+						systemInfoModel.setData("id", "Ldap", index)
+						systemInfoModel.setData("name", qsTr("LDAP"), index)
 						
 						systemComboBox.model = systemInfoModel;
 					}
