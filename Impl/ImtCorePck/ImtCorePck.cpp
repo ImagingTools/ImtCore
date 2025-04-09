@@ -209,6 +209,11 @@ I_EXPORT_COMPONENT(
 			"Collection filter",
 			"Collection Filter");
 
+I_EXPORT_COMPONENT(
+			DelegatedParamsSet,
+			"Delegated params set",
+			"Delegated Params Set");
+
 
 } // namespace ImtCorePck
 

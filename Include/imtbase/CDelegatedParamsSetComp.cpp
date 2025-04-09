@@ -1,13 +1,6 @@
 #include <imtbase/CDelegatedParamsSetComp.h>
 
 
-// ACF includes
-#include <istd/CChangeNotifier.h>
-#include <istd/CChangeGroup.h>
-#include <iser/IArchive.h>
-#include <iser/CArchiveTag.h>
-
-
 namespace imtbase
 {
 
@@ -18,47 +11,43 @@ namespace imtbase
 
 iprm::IParamsSet::Ids CDelegatedParamsSetComp::GetParamIds(bool editableOnly) const
 {
-	iprm::IParamsSet::Ids paramIds = BaseClass::GetParamIds(editableOnly);
-
 	if (m_paramsSetCompPtr.IsValid()){
-		paramIds += m_paramsSetCompPtr->GetParamIds(editableOnly);
+		return m_paramsSetCompPtr->GetParamIds(editableOnly);
 	}
-
-	return paramIds;
+	
+	return iprm::IParamsSet::Ids();
 }
 
 
 const iser::ISerializable* CDelegatedParamsSetComp::GetParameter(const QByteArray& id) const
 {
-	const iser::ISerializable* retValPtr = BaseClass::GetParameter(id);
-	if (retValPtr == nullptr){
-		if (m_paramsSetCompPtr.IsValid()){
-			retValPtr = m_paramsSetCompPtr->GetParameter(id);
-		}
+	if (m_paramsSetCompPtr.IsValid()){
+		return m_paramsSetCompPtr->GetParameter(id);
 	}
 
-	return retValPtr;
+	return nullptr;
 }
 
 
 iser::ISerializable* CDelegatedParamsSetComp::GetEditableParameter(const QByteArray& id)
 {
-	iser::ISerializable* retValPtr = BaseClass::GetEditableParameter(id);
-	if (retValPtr == nullptr){
-		if (m_paramsSetCompPtr.IsValid()){
-			retValPtr = m_paramsSetCompPtr->GetEditableParameter(id);
-		}
+	if (m_paramsSetCompPtr.IsValid()){
+		return m_paramsSetCompPtr->GetEditableParameter(id);
 	}
 
-	return retValPtr;
+	return nullptr;
 }
 
 
 // reimplemented (iser::ISerializable)
 
-bool CDelegatedParamsSetComp::Serialize(iser::IArchive& /*archive*/)
+bool CDelegatedParamsSetComp::Serialize(iser::IArchive& archive)
 {
-	return false;
+	if (m_paramsSetCompPtr.IsValid()){
+		return false;
+	}
+	
+	return m_paramsSetCompPtr->Serialize(archive);
 }
 
 

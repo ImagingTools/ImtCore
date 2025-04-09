@@ -3,25 +3,22 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <ifile/IFileNameParam.h>
-#include <iprm/CComposedParamsSetComp.h>
-
-// ImtCore includes
-#include <imtbase/IUrlParam.h>
+#include <iprm/IParamsSet.h>
 
 
 namespace imtbase
 {
 
 
-class CDelegatedParamsSetComp: public iprm::CComposedParamsSetComp
+class CDelegatedParamsSetComp:
+			public icomp::CComponentBase,
+			virtual public iprm::IParamsSet
 
 {
 public:
-	typedef iprm::CComposedParamsSetComp BaseClass;
+	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDelegatedParamsSetComp);
-		I_REGISTER_INTERFACE(istd::IHierarchical);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(IParamsSet);
 		I_ASSIGN(m_paramsSetCompPtr, "DelegatedParamsSet", "Delegated params set", false, "DelegatedParamsSet");
