@@ -22,9 +22,11 @@ public:
 
 	// reimplemented (imtgeo::IPosition)
 	virtual double GetLatitude() const override;
-	virtual void SetLatitude(double lat) override;
+	virtual void SetLatitude(const double& lat) override;
 	virtual double GetLongitude() const override;
-	virtual void SetLongitude(double lon) override;
+	virtual void SetLongitude(const double& lon) override;
+	virtual int GetZoomLevel() const override;
+	virtual void SetZoomLevel(const double& zoom) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -39,6 +41,7 @@ public:
 private:
 	double m_latitude;
 	double m_longitude;
+	double m_zoomLevel;
 };
 
 

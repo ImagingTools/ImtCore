@@ -22,8 +22,7 @@ public:
 	/**
 		Set object latitude.
 	*/
-	virtual void SetLatitude(double lat) = 0;
-
+	virtual void SetLatitude(const double& lat) = 0;
 	/**
 		Get object longitude.
 	*/
@@ -32,7 +31,16 @@ public:
 	/**
 		Set object longitude.
 	*/
-	virtual void SetLongitude(double lon) = 0;
+	virtual void SetLongitude(const double& lon) = 0;
+	/**
+		Get object zoom level.
+	*/
+	virtual int GetZoomLevel() const = 0;
+
+	/**
+		Set object zoom level.
+	*/
+	virtual void SetZoomLevel(const double& zoom) = 0;
 };
 
 
