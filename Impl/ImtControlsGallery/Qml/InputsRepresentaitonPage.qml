@@ -155,8 +155,8 @@ Rectangle {
 
 				hasIndicator: true;
 				hasTicks: true;
-				ticksPosition: Enums.ticksBelow
-				indicatorPosition: Enums.sliderHintAbove
+				ticksPosition: RelativePosition.bottom
+				indicatorPosition: RelativePosition.top
 				indicatorHeight: 40
 				majorTickHeight: 20;
             }
@@ -186,8 +186,8 @@ Rectangle {
 					majorTickInterval: 20;
 					minorTickInterval: 5;
 
-					ticksPosition: Enums.ticksBothSides
-					indicatorPosition: Enums.sliderHintAbove
+					ticksPosition: RelativePosition.verticalCenter
+					indicatorPosition: RelativePosition.top
 
 					hasTicks: true;
 					hasIndicator: true;
