@@ -574,14 +574,14 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 	QString query = QString("UPDATE \"%1\" SET \"State\" = 'InActive' WHERE \"%2\" = '%3';")
 						.arg(qPrintable(*m_tableNameAttrPtr), qPrintable(s_documentIdColumn), qPrintable(objectId));
 	
-	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
+	QByteArray metaInfoRepresentation;
 	
 	bool ok = false;
 	if (m_metaInfoCreatorCompPtr.IsValid()){
 		idoc::MetaInfoPtr metaInfoPtr;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
 			if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
-				if (m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation)) {
+				if (m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation)){
 					ok = true;
 				}
 			}
@@ -592,7 +592,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 		metaInfoRepresentation = documentContentJson;
 	}
 	
-	QByteArray revisionInfoQuery = QByteArrayLiteral("'{}'");
+	QByteArray revisionInfoQuery;
 	if (operationContextPtr != nullptr){
 		revisionInfoQuery = CreateRevisionInfoQuery(*operationContextPtr, revisionArgument, checksum);
 	}
@@ -604,9 +604,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 					qPrintable(objectId),
 					objectName,
 					objectDescription,
-					*m_useBase64AttrPtr ? qPrintable(documentContentBase64) : QString(documentContentJson),
-					SqlEncode(metaInfoRepresentation),
-					qPrintable(revisionInfoQuery),
+					*m_useBase64AttrPtr ? SqlEncode(documentContentBase64) : SqlEncode(documentContentJson),
+					metaInfoRepresentation.isEmpty() ? "'{}'" : SqlEncode(metaInfoRepresentation),
+					revisionInfoQuery.isEmpty() ? "'{}'" : qPrintable(revisionInfoQuery),
 					QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs),
 					"Active",
 					QUuid::createUuid().toString(QUuid::WithoutBraces)
@@ -811,7 +811,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRevisionInfoQuery(
 		}
 	}
 	
-	paramMap["OperationDescription"] = json;
+	paramMap["OperationDescription"] = SqlEncode(json);
 	
 	QString revisionInfo = CreateJsonBuildObjectQuery(paramMap);
 
