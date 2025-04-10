@@ -627,9 +627,9 @@ StyleComponents {
 					id: majorTickRow;
 
 					y: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlCenterY + correction;
-					property real correction: !sliderItem.baseElement ? 0 : sliderItem.baseElement.ticksPosition == Enums.ticksBothSides ? - height/2 :
-																																		   sliderItem.baseElement.ticksPosition == Enums.ticksAbove ? - height :
-																																																	  sliderItem.baseElement.ticksPosition == Enums.ticksBelow ? 0: 0
+					property real correction: !sliderItem.baseElement ? 0 : sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? - height/2 :
+																																		   sliderItem.baseElement.ticksPosition == RelativePosition.top ? - height :
+																																																	  sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? 0: 0
 
 					height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.majorTickHeight;
 
@@ -660,9 +660,9 @@ StyleComponents {
 								BaseText{
 									id: tickTextLeft;
 
-									anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == Enums.ticksBelow ? parent.bottom : parent.top;
+									anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-									anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == Enums.ticksAbove || sliderItem.baseElement.ticksPosition == Enums.ticksBothSides)? -height : 0
+									anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
 
 									anchors.horizontalCenter: parent.horizontalCenter;
 
@@ -682,9 +682,9 @@ StyleComponents {
 								BaseText{
 									id: tickTextRight;
 
-									anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == Enums.ticksBelow ? parent.bottom : parent.top;
+									anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-									anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == Enums.ticksAbove || sliderItem.baseElement.ticksPosition == Enums.ticksBothSides)? -height : 0
+									anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
 									anchors.horizontalCenter: parent.horizontalCenter;
 
 									color: parent.color;
@@ -698,9 +698,9 @@ StyleComponents {
 				Row {
 					id: minorTickRow;
 
-					anchors.bottom: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == Enums.ticksAbove ? majorTickRow.bottom : undefined
-					anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == Enums.ticksBelow ? majorTickRow.top : undefined
-					anchors.verticalCenter: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == Enums.ticksBothSides ? majorTickRow.verticalCenter : undefined
+					anchors.bottom: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.top ? majorTickRow.bottom : undefined
+					anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? majorTickRow.top : undefined
+					anchors.verticalCenter: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? majorTickRow.verticalCenter : undefined
 
 					height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.minorTickHeight;
 
@@ -770,7 +770,7 @@ StyleComponents {
 					anchors.horizontalCenter: controlRec.horizontalCenter;
 
 					anchors.bottom: controlRec.bottom;
-					anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == Enums.sliderHintBelow ? -height + controlRec.height : 0;
+					anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRec.height : 0;
 
 					height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorHeight;
 					width: 2;
@@ -781,7 +781,7 @@ StyleComponents {
 						anchors.leftMargin:  isLeft ? - width : 0;
 
 						anchors.top:  parent.top;
-						anchors.topMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == Enums.sliderHintBelow ? parent.height - height : 0;
+						anchors.topMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
 
 						height: parent.width;
 						width: 30;
@@ -791,7 +791,7 @@ StyleComponents {
 						BaseText{
 							anchors.horizontalCenter: parent.horizontalCenter;
 							anchors.bottom: parent.bottom;
-							anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == Enums.sliderHintBelow ? - height : 0;
+							anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
 
 							text: !sliderItem.baseElement ? "" : Math.trunc(sliderItem.baseElement.value)
 						}
@@ -848,9 +848,9 @@ StyleComponents {
 					id: majorTickRow;
 
 					y: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlCenterY + correction;
-					property real correction: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.ticksPosition == Enums.ticksBothSides ? - height/2 :
-																																		   rangeSliderItem.baseElement.ticksPosition == Enums.ticksAbove ? - height :
-																																																	  rangeSliderItem.baseElement.ticksPosition == Enums.ticksBelow ? 0: 0
+					property real correction: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? - height/2 :
+																																		   rangeSliderItem.baseElement.ticksPosition == RelativePosition.top ? - height :
+																																																	  rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? 0: 0
 
 					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.majorTickHeight;
 
@@ -877,9 +877,9 @@ StyleComponents {
 								width: majorTickRow.delegateWidth;
 								color: Style.borderColor;
 								BaseText{
-									anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == Enums.ticksBelow ? parent.bottom : parent.top;
+									anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-									anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == Enums.ticksAbove || rangeSliderItem.baseElement.ticksPosition == Enums.ticksBothSides)? -height : 0
+									anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
 
 									anchors.horizontalCenter: parent.horizontalCenter;
 
@@ -897,9 +897,9 @@ StyleComponents {
 								color: Style.borderColor;
 								visible: model.index == majorTickRepeater.count -1;
 								BaseText{
-									anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == Enums.ticksBelow ? parent.bottom : parent.top;
+									anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-									anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == Enums.ticksAbove || rangeSliderItem.baseElement.ticksPosition == Enums.ticksBothSides)? -height : 0
+									anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
 
 									anchors.horizontalCenter: parent.horizontalCenter;
 
@@ -916,9 +916,9 @@ StyleComponents {
 					id: minorTickRow;
 
 
-					anchors.bottom: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == Enums.ticksAbove ? majorTickRow.bottom : undefined
-					anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == Enums.ticksBelow ? majorTickRow.top : undefined
-					anchors.verticalCenter: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == Enums.ticksBothSides ? majorTickRow.verticalCenter : undefined
+					anchors.bottom: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.top ? majorTickRow.bottom : undefined
+					anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? majorTickRow.top : undefined
+					anchors.verticalCenter: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? majorTickRow.verticalCenter : undefined
 
 					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.minorTickHeight;
 
@@ -988,7 +988,7 @@ StyleComponents {
 
 					anchors.horizontalCenter: controlRecFirst.horizontalCenter;
 					anchors.bottom: controlRecFirst.bottom;
-					anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == Enums.sliderHintBelow ? -height + controlRecFirst.height : 0;
+					anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRecFirst.height : 0;
 
 					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorHeight;
 					width: 2;
@@ -998,7 +998,7 @@ StyleComponents {
 					Rectangle{
 						anchors.right: parent.left;
 						anchors.top:  parent.top;
-						anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == Enums.sliderHintBelow ? parent.height - height : 0;
+						anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
 
 						height: parent.width;
 						width: 30;
@@ -1006,7 +1006,7 @@ StyleComponents {
 						BaseText{
 							anchors.horizontalCenter: parent.horizontalCenter;
 							anchors.bottom: parent.bottom;
-							anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == Enums.sliderHintBelow ? - height : 0;
+							anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
 
 							text: !rangeSliderItem.baseElement ? "" :  Math.trunc(rangeSliderItem.baseElement.valueFirst)
 						}
@@ -1030,7 +1030,7 @@ StyleComponents {
 
 					anchors.horizontalCenter: controlRecSecond.horizontalCenter;
 					anchors.bottom: controlRecSecond.bottom;
-					anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == Enums.sliderHintBelow ? -height + controlRecSecond.height : 0;
+					anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRecSecond.height : 0;
 
 					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorHeight;
 					width: 2;
@@ -1040,7 +1040,7 @@ StyleComponents {
 					Rectangle{
 						anchors.left: parent.right;
 						anchors.top:  parent.top;
-						anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == Enums.sliderHintBelow ? parent.height - height : 0;
+						anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
 
 						height: parent.width;
 						width: 30;
@@ -1048,7 +1048,7 @@ StyleComponents {
 						BaseText{
 							anchors.horizontalCenter: parent.horizontalCenter;
 							anchors.bottom: parent.bottom;
-							anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == Enums.sliderHintBelow ? - height : 0;
+							anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
 
 							text: !rangeSliderItem.baseElement ? "" : Math.trunc(rangeSliderItem.baseElement.valueSecond)
 						}

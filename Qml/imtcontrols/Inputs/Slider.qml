@@ -37,8 +37,8 @@ ControlBase {
 	property int minorTickHeight: majorTickHeight/2;
 	property int indicatorHeight: 60;
 
-	property int ticksPosition: Enums.ticksBothSides
-	property int indicatorPosition: Enums.sliderHintAbove
+	property int ticksPosition: RelativePosition.verticalCenter
+	property int indicatorPosition: RelativePosition.top
 	property real controlCenterY: height/2;
 	property int fontSize: Style.fontSizeNormal;
 
@@ -47,6 +47,8 @@ ControlBase {
 
 
 	Component.onCompleted: {
+		correctPositionParams();
+
 		if(!value){
 			value = from;
 		}
@@ -87,8 +89,37 @@ ControlBase {
 		controlRecX = position * (width - controlWidth)
 	}
 
+	onTicksPositionChanged: {
+		correctPositionParams();
+	}
+	onIndicatorPositionChanged: {
+		correctPositionParams();
+	}
+
 	function decoratorChangedFunc(){
 		//console.log("Slider: redefinition of base function");
+	}
+
+	function correctPositionParams(){
+		if(ticksPosition == RelativePosition.left){
+			ticksPosition = RelativePosition.top;
+		}
+		else if(ticksPosition == RelativePosition.right){
+			ticksPosition = RelativePosition.bottom;
+		}
+		else if(ticksPosition == RelativePosition.horizontalCenter){
+			ticksPosition = RelativePosition.verticalCenter;
+		}
+
+		if(indicatorPosition == RelativePosition.left){
+			indicatorPosition = RelativePosition.top;
+		}
+		else if(indicatorPosition == RelativePosition.right){
+			indicatorPosition = RelativePosition.bottom;
+		}
+		else if(indicatorPosition == RelativePosition.horizontalCenter || indicatorPosition == RelativePosition.verticalCenter){
+			indicatorPosition = RelativePosition.top;
+		}
 	}
 
 	function setSizeParams(){
@@ -97,48 +128,48 @@ ControlBase {
 			controlCenterY = controlHeight/2;
 			height = controlHeight;
 		}
-		else if(hasIndicator && !hasTicks && indicatorPosition == Enums.sliderHintBelow/*Qt.AlignBottom*/){
+		else if(hasIndicator && !hasTicks && indicatorPosition == RelativePosition.bottom){
 			controlCenterY = controlHeight/2;
 			height = controlHeight/2 + indicatorHeight;
 		}
-		else if(hasIndicator && !hasTicks && indicatorPosition == Enums.sliderHintAbove /*Qt.AlignTop*/){
+		else if(hasIndicator && !hasTicks && indicatorPosition == RelativePosition.top){
 			controlCenterY = indicatorHeight;
 			height = controlHeight/2 + indicatorHeight;
 		}
-		else if(!hasIndicator && hasTicks && ticksPosition == Enums.ticksBothSides/*Qt.AlignVCenter*/){
+		else if(!hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter){
 			controlCenterY = majorTickHeight/2
 			height = majorTickHeight;
 		}
-		else if(!hasIndicator && hasTicks && ticksPosition == Enums.ticksBelow){
+		else if(!hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom){
 			controlCenterY = controlHeight/2;
 			height = controlHeight/2 + majorTickHeight
 		}
-		else if(!hasIndicator && hasTicks && ticksPosition == Enums.ticksAbove){
+		else if(!hasIndicator && hasTicks && ticksPosition == RelativePosition.top){
 			controlCenterY = majorTickHeight;
 			height = controlHeight/2 + majorTickHeight
 		}
-		else if(hasIndicator && hasTicks && ticksPosition == Enums.ticksBelow && indicatorPosition == Enums.sliderHintBelow){
+		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom && indicatorPosition == RelativePosition.bottom){
 			controlCenterY = controlHeight/2;
 			height = controlHeight/2 + Math.max(majorTickHeight, indicatorHeight);
 		}
-		else if(hasIndicator && hasTicks && ticksPosition == Enums.ticksAbove && indicatorPosition == Enums.sliderHintAbove){
+		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.top && indicatorPosition == RelativePosition.top){
 			controlCenterY = Math.max(majorTickHeight, indicatorHeight);
 			height = controlHeight/2 + Math.max(majorTickHeight, indicatorHeight);
 		}
-		else if(hasIndicator && hasTicks && ticksPosition == Enums.ticksAbove && indicatorPosition == Enums.sliderHintBelow){
+		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.top && indicatorPosition == RelativePosition.bottom){
 			controlCenterY = majorTickHeight;
 			height = majorTickHeight + indicatorHeight;
 		}
-		else if(hasIndicator && hasTicks && ticksPosition == Enums.ticksBelow && indicatorPosition == Enums.sliderHintAbove){
+		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom && indicatorPosition == RelativePosition.top){
 			controlCenterY = indicatorHeight;
 			height = majorTickHeight + indicatorHeight;
 		}
 
-		else if(hasIndicator && hasTicks && ticksPosition == Enums.ticksBothSides && indicatorPosition == Enums.sliderHintAbove){
+		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter && indicatorPosition == RelativePosition.top){
 			controlCenterY = Math.max(indicatorHeight, majorTickHeight/2)
 			height = majorTickHeight/2 + controlCenterY;
 		}
-		else if(hasIndicator && hasTicks && ticksPosition == Enums.ticksBothSides && indicatorPosition == Enums.sliderHintBelow){
+		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter && indicatorPosition == RelativePosition.bottom){
 			controlCenterY =  majorTickHeight/2
 			height = majorTickHeight/2 + indicatorHeight;
 		}

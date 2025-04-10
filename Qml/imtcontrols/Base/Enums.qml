@@ -22,15 +22,6 @@ QtObject {
     property int ignore: 1048576
     property int noButton: 0
 
-	property int ticksAbove: 1
-	property int ticksBelow: 2
-	property int ticksBothSides: 3
-	property int ticksLeft: ticksAbove
-	property int ticksRight: ticksBelow
-
-	property int sliderHintAbove: 0;
-	property int sliderHintBelow: 1;
-
     enum ButtonType {
         Ok = 1024,
         Open = 8192,
