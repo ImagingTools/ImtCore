@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -27,14 +27,32 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="MessageDatabaseDelegate" PackageId="ImtDatabasePck" ComponentId="SqliteJsonMessageDatabaseDelegate">
+        <Element Id="Repository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumentContentColumnId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Document"/>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SQLiteDatabaseDocumentDelegate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SQLiteDatabaseDocumentDelegate" PackageId="ImtDatabasePck" ComponentId="SQLiteDatabaseDocumentDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
@@ -56,29 +74,23 @@
                     <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="DocumentId"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIdColumn" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TypeId"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Messages"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Repository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="UseDocumentBase64Encoding" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="MessageDatabaseDelegate"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -108,6 +120,10 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imod::IModel" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::IRevisionController" ComponentId="SQLiteDatabaseDocumentDelegate"/>
+        <Interface InterfaceId="imtdb::IDependentMetaInfoController" ComponentId="SQLiteDatabaseDocumentDelegate"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="SQLiteDatabaseDocumentDelegate"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Repository"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

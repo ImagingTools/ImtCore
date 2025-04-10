@@ -121,8 +121,8 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			RepresentationControllerFactory,
-			"RepresentationController factory",
-			"Processing RepresentationController Factory");
+			"Representation controller factory",
+			"Processing Representation Controller Factory");
 
 I_EXPORT_COMPONENT(
 			ServerLogDataProvider,

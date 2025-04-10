@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5210" Description="ACF"/>
-            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394753" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -27,9 +27,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseSqlFilePath" Type="String" ExportId="SqlLogFilePath">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MigrationPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="LogMigrations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathLocationType" Type="Integer" ExportId="PathLocationType">
                         <Data IsEnabled="false"/>

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5347" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for a console application with integrated SQLite log database</Description>
@@ -63,6 +63,9 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleApplicationFramework/ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathLocationType" Type="Integer" ExportId="LogLocationType">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ConsoleApplicationFramework/RuntimeStatus"/>
@@ -143,6 +146,9 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="MigrationController" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="LogMigration"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PathLocationType" Type="Integer" ExportId="PathLocationType">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>

@@ -62,7 +62,7 @@ typedef imtserverapp::CDoubleParamRepresentationControllerComp DoubleParamRepres
 typedef imtserverapp::CPasswordParamRepresentationControllerComp PasswordParamRepresentationController;
 typedef imtserverapp::CServerLogDataProviderComp ServerLogDataProvider;
 typedef imtserverapp::CEnableableParamRepresentationControllerComp EnableableParamRepresentationController;
-typedef imtbase::TComponentFactoryComp<imtserverapp::IRepresentationController> RepresentationControllerFactory;
+typedef imtbase::TComponentFactoryComp<imtserverapp::IJsonRepresentationController> RepresentationControllerFactory;
 
 
 } // namespace ImtServerAppPck

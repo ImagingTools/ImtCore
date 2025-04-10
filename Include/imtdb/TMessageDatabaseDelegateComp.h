@@ -30,16 +30,7 @@ public:
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const override;
-	virtual QByteArray CreateUpdateObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const istd::IChangeable& object,
-				const imtbase::IOperationContext* operationContextPtr,
-				bool useExternDelegate = true) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
-
-	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
-	QString GetBaseSelectionQuery() const override;
 };
 
 
@@ -75,17 +66,6 @@ istd::IChangeable* TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFromR
 	return nullptr;
 }
 
-
-template <class BaseDelegate>
-QByteArray TMessageDatabaseDelegateComp<BaseDelegate>::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const istd::IChangeable& /*object*/,
-			const imtbase::IOperationContext* /*operationContextPtr*/,
-			bool /*useExternDelegate*/) const
-{
-	return QByteArray();
-}
 
 template <class BaseDelegate>
 bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
@@ -173,16 +153,6 @@ bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const i
 	}
 
 	return true;
-}
-
-
-// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
-
-template <class BaseDelegate>
-QString TMessageDatabaseDelegateComp<BaseDelegate>::GetBaseSelectionQuery() const
-{
-	return QString("SELECT \"Id\", \"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\""
-				" FROM \"Messages\" WHERE \"IsActive\" = true");
 }
 
 

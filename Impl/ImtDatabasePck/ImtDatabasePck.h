@@ -46,7 +46,7 @@ typedef imtdb::CDatabaseAutomaticBackupComp DatabaseAutomaticBackup;
 typedef imtdb::CRestoringDatabaseControllerComp RestoringDatabaseController;
 typedef imtdb::CSqlStructureDelegateComp SqlStructureDelegate;
 typedef imtdb::CSqliteJsonDatabaseDelegateComp SqliteJsonDatabaseDelegate;
-typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqliteJsonDatabaseDelegateComp> SqliteJsonMessageDatabaseDelegate;
+typedef imtdb::TMessageDatabaseDelegateComp<imtdb::CSqliteDatabaseDocumentDelegateComp> SqliteJsonMessageDatabaseDelegate;
 typedef imtdb::CMigrationControllerComp MigrationController;
 typedef imtdb::CCompositeMigrationControllerComp CompositeMigrationController;
 typedef imtdb::CObjectCollectionMigrationControllerComp ObjectCollectionMigrationController;
