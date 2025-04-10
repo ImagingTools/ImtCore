@@ -53,7 +53,7 @@ ControlBase {
 			contentLeftMargin: comboBoxContainer.contentLeftMargin;
 
 			highlighted: comboBoxContainer.currentIndex == model.index
-			text: "item" in model ? model.item[comboBoxContainer.nameId] : model[comboBoxContainer.nameId];
+			text: model.item ? model.item[comboBoxContainer.nameId] : model[comboBoxContainer.nameId]
 
 			selected: comboBoxContainer.popup ? comboBoxContainer.popup.selectedIndex == model.index : false;
 
