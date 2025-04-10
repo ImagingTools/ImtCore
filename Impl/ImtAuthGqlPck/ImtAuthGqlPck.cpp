@@ -25,11 +25,6 @@ I_EXPORT_COMPONENT(
 		"Role Collection Controller");
 
 I_EXPORT_COMPONENT(
-		RoleController,
-		"RoleController",
-		"Role Controller");
-
-I_EXPORT_COMPONENT(
 		UserCollectionController,
 		"User collection controller",
 		"User Collection Controller");
@@ -38,11 +33,6 @@ I_EXPORT_COMPONENT(
 		UserController,
 		"UserController",
 		"User Controller");
-
-I_EXPORT_COMPONENT(
-		UserGroupController,
-		"Group of the users",
-		"User Group Controller");
 
 I_EXPORT_COMPONENT(
 		UserGroupCollectionController,
@@ -78,11 +68,6 @@ I_EXPORT_COMPONENT(
 		RemoteSuperuserController,
 		"Puma superuser controller",
 		"Puma Superuser Controller");
-
-I_EXPORT_COMPONENT(
-		CollectionUserInfoProvider,
-		"Collection user info provider",
-		"Collection UserInfo User Provider");
 
 I_EXPORT_COMPONENT(
 			SimpleLoginWrap,
