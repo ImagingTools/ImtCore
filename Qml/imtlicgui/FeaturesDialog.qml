@@ -70,7 +70,7 @@ Dialog {
 					dialogBody.headersModel.clear();
 					
 					let index = dialogBody.headersModel.insertNewItem();
-					dialogBody.headersModel.setData("id", "FeatureName", index);
+					dialogBody.headersModel.setData("id", "featureName", index);
 					dialogBody.headersModel.setData("name", qsTr("Feature Name"), index);
 					
 					dialogBody.headersModel.refresh();

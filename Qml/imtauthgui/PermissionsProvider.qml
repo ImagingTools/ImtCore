@@ -28,7 +28,7 @@ QtObject {
 
         function createQueryParams(query){
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("ProductId", permissionsProvider.productId);
+            inputParams.InsertField("productId", permissionsProvider.productId);
             query.AddParam(inputParams);
         }
 

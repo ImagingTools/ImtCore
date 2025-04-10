@@ -331,7 +331,7 @@ ViewBase {
 
             radius: 3;
 
-            nameId: "ProductName";
+            nameId: "productName";
 
             model: CachedProductCollection.collectionModel;
 

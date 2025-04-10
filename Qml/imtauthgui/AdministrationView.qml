@@ -27,7 +27,7 @@ Item {
         }
 
         let obj = {}
-        obj["ProductId"] = administrationContainer.productId;
+        obj["productId"] = administrationContainer.productId;
 
         return obj;
     }

@@ -424,7 +424,7 @@ QString CProductCollectionControllerComp::GetExportFileName(const QByteArray& ob
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		imtlic::IProductInfo* productInfoPtr = dynamic_cast<imtlic::IProductInfo*>(dataPtr.GetPtr());
 		if (productInfoPtr != nullptr){
-			return productInfoPtr->GetProductId() + "features";
+			return productInfoPtr->GetProductId() + "Features";
 		}
 	}
 

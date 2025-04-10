@@ -55,9 +55,9 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headersMap = contextPtr->GetHeaders();
 
-		QByteArray productId = headersMap.value("ProductId");
+		QByteArray productId = headersMap.value("productId");
 		if (!productId.isEmpty()){
-			networkRequest->setRawHeader("ProductId", productId);
+			networkRequest->setRawHeader("productId", productId);
 		}
 
 		QByteArray token = contextPtr->GetToken();

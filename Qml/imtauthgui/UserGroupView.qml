@@ -413,7 +413,7 @@ ViewBase {
                         rolesHeadersModel.insertNewItem();
 
                         rolesHeadersModel.setData("id", "roleName");
-                        rolesHeadersModel.setData("Name", qsTr("Role Name"));
+                        rolesHeadersModel.setData("name", qsTr("Role Name"));
 
                         rolesHeadersModel.refresh();
 

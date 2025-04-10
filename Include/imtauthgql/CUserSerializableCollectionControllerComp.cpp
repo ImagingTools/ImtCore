@@ -27,11 +27,11 @@ void CUserSerializableCollectionControllerComp::CustomProcessObject(
 
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
-		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+		productId = inputParamPtr->GetFieldArgumentValue("productId").toByteArray();
 	}
 
 	if (productId.isEmpty()){
-		productId = gqlRequest.GetHeader("ProductId");
+		productId = gqlRequest.GetHeader("productId");
 	}
 
 	imtauth::IUserInfo* objectInfoPtr = dynamic_cast<imtauth::IUserInfo*>(&object);

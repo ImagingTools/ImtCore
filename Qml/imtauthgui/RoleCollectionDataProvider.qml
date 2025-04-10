@@ -27,7 +27,7 @@ CollectionDataProvider {
         }
 
         let obj = {}
-        obj["ProductId"] = productId;
+        obj["productId"] = productId;
         return obj;
     }
 }

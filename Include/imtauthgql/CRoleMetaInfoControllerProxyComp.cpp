@@ -57,15 +57,15 @@ imtbase::CTreeItemModel* CRoleMetaInfoControllerProxyComp::CreateInternalRespons
 			if (dataModelPtr != nullptr){
 				for (int i = 0; i < dataModelPtr->GetItemsCount(); i++){
 					QByteArray id = dataModelPtr->GetData("Id", i).toByteArray();
-					if (id == QByteArray("Permissions")){
-						imtbase::CTreeItemModel* childrenModelPtr = dataModelPtr->GetTreeItemModel("Children", i);
+					if (id == QByteArray("permissions")){
+						imtbase::CTreeItemModel* childrenModelPtr = dataModelPtr->GetTreeItemModel("children", i);
 						if (childrenModelPtr != nullptr){
 							for (int j = 0; j < childrenModelPtr->GetItemsCount(); j++){
-								QByteArray permissionId = childrenModelPtr->GetData("Value", j).toByteArray();
+								QByteArray permissionId = childrenModelPtr->GetData("value", j).toByteArray();
 
 								QString permissionName = GetPermissionName(permissionId);
 								if (!permissionName.isEmpty()){
-									childrenModelPtr->SetData("Value", permissionName, j);
+									childrenModelPtr->SetData("value", permissionName, j);
 								}
 							}
 						}

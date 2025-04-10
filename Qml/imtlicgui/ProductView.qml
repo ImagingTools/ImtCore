@@ -41,15 +41,15 @@ ViewBase {
         productViewContainer.softwareHeadersModel.clear();
 
         let index = productViewContainer.softwareHeadersModel.insertNewItem();
-        productViewContainer.softwareHeadersModel.setData("id", "FeatureName", index);
+        productViewContainer.softwareHeadersModel.setData("id", "featureName", index);
         productViewContainer.softwareHeadersModel.setData("name", qsTr("Feature Name"), index);
 
         index = productViewContainer.softwareHeadersModel.insertNewItem();
-        productViewContainer.softwareHeadersModel.setData("id", "FeatureId", index);
+        productViewContainer.softwareHeadersModel.setData("id", "featureId", index);
         productViewContainer.softwareHeadersModel.setData("name", qsTr("Feature-ID"), index);
 
         index = productViewContainer.softwareHeadersModel.insertNewItem();
-        productViewContainer.softwareHeadersModel.setData("id", "FeatureDescription", index);
+        productViewContainer.softwareHeadersModel.setData("id", "featureDescription", index);
         productViewContainer.softwareHeadersModel.setData("name", qsTr("Description"), index);
 
         productViewContainer.softwareHeadersModel.refresh();

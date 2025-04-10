@@ -137,7 +137,7 @@ QtObject {
 	}
 	
 	function getHeaders(){
-		return {"ProductId": root.productId}
+		return {"productId": root.productId}
 	}
 	
 	function updateSuperuserModel(){

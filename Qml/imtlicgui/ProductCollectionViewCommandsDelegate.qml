@@ -43,7 +43,7 @@ DocumentCollectionViewDelegate {
     onSelectionChanged: {
         if (selection.length > 0){
             let index = selection[0];
-            let productId = container.collectionView.table.elements.getData("ProductId", index);
+            let productId = container.collectionView.table.elements.getData("productId", index);
             let fileName = productId + "Features"
 
             exportFileDialog.currentFile = fileName + ".xml";
@@ -88,7 +88,7 @@ DocumentCollectionViewDelegate {
     function onRename(){
         let indexes = container.collectionView.table.getSelectedIndexes();
         if (indexes.length > 0){
-            let selectedName = container.collectionView.table.elements.getData("ProductName", indexes[0]);
+            let selectedName = container.collectionView.table.elements.getData("productName", indexes[0]);
             ModalDialogManager.openDialog(renameDialogComp, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }

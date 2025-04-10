@@ -412,7 +412,7 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 	}
 	
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "productId";
+	fieldFilter.fieldId = "ProductId";
 	fieldFilter.filterValue = productId;
 	
 	complexFilter.AddFieldFilter(fieldFilter);

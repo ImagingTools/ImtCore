@@ -82,7 +82,7 @@ Item {
 	}
 	
 	function getHeaders(){
-		return {"ProductId": context.appId};
+		return {"productId": context.appId};
 	}
 	
 	property alias thumbnailDecoratorGui: thumbnailDecorator;

@@ -108,7 +108,7 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 	QByteArray productId;
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
-		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+		productId = inputParamPtr->GetFieldArgumentValue("productId").toByteArray();
 	}
 
 	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();

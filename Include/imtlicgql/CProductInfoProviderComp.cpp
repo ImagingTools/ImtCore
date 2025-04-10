@@ -22,14 +22,14 @@ imtbase::CTreeItemModel* CProductInfoProviderComp::CreateInternalResponse(const 
 	for (int i = 0; i < m_productIdsAttrPtr.GetCount(); i++){
 		int index = rootModelPtr->InsertNewItem();
 
-		rootModelPtr->SetData("Id", m_productIdsAttrPtr[i], index);
-		rootModelPtr->SetData("Name", m_productNamesAttrPtr[i], index);
+		rootModelPtr->SetData("id", m_productIdsAttrPtr[i], index);
+		rootModelPtr->SetData("name", m_productNamesAttrPtr[i], index);
 
 		imtgql::IGqlRequestHandler* representationDataProvider = m_permissionsProviderCompPtr[i];
 		if (representationDataProvider != nullptr){
 			imtbase::CTreeItemModel* permissionsModelPtr = representationDataProvider->CreateResponse(gqlRequest, errorMessage);
 			if (permissionsModelPtr != nullptr){
-				rootModelPtr->SetExternTreeModel("Permissions", permissionsModelPtr, i);
+				rootModelPtr->SetExternTreeModel("permissions", permissionsModelPtr, i);
 			}
 		}
 	}

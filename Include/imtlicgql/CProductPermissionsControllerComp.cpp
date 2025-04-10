@@ -24,7 +24,7 @@ imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalRespon
 		return nullptr;
 	}
 
-	QByteArray productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+	QByteArray productId = inputParamPtr->GetFieldArgumentValue("productId").toByteArray();
 	if (productId.isEmpty()){
 		SendErrorMessage(0, QString("Unable to get permission for product with empty ID."), "CProductPermissionsControllerComp");
 
@@ -36,9 +36,9 @@ imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalRespon
 	istd::TDelPtr<imtbase::CTreeItemModel> productsModelPtr = m_productProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
 	if (productsModelPtr != nullptr){
 		for (int i = 0; i < productsModelPtr->GetItemsCount(); i++){
-			QByteArray currentProductId = productsModelPtr->GetData("Id", i).toByteArray();
+			QByteArray currentProductId = productsModelPtr->GetData("id", i).toByteArray();
 			if (currentProductId == productId){
-				imtbase::CTreeItemModel* productPermissionsModelPtr = productsModelPtr->GetTreeItemModel("Permissions", i);
+				imtbase::CTreeItemModel* productPermissionsModelPtr = productsModelPtr->GetTreeItemModel("permissions", i);
 				if (productPermissionsModelPtr != nullptr){
 					rootModelPtr->SetExternTreeModel("data", productPermissionsModelPtr);
 				}
