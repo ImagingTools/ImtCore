@@ -1,1 +1,0 @@
-SELECT * FROM "Revisions" ORDER BY Revision DESC LIMIT 1;
