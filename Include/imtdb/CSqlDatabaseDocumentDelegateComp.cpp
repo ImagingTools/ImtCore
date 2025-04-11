@@ -602,8 +602,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 					qPrintable(*m_tableNameAttrPtr),
 					qPrintable(typeId),
 					qPrintable(objectId),
-					objectName,
-					objectDescription,
+					SqlEncode(objectName),
+					SqlEncode(objectDescription),
 					*m_useBase64AttrPtr ? SqlEncode(documentContentBase64) : SqlEncode(documentContentJson),
 					metaInfoRepresentation.isEmpty() ? "'{}'" : SqlEncode(metaInfoRepresentation),
 					revisionInfoQuery.isEmpty() ? "'{}'" : qPrintable(revisionInfoQuery),
@@ -1321,7 +1321,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 				imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
 				
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
-					stateDocumentFilter += QString("\"State\" = 'Active' OR \"State\" = 'Disabled'");
+					stateDocumentFilter += QString("\"State\" = 'Active'");
 				}
 				
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
@@ -1336,7 +1336,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 	}
 	
 	if (stateDocumentFilter.isEmpty()){
-		stateDocumentFilter = QString("\"State\" = 'Active' OR \"State\" = 'Disabled'");
+		stateDocumentFilter = QString("\"State\" = 'Active'");
 	}
 	
 	QString schemaPrefix;

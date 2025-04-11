@@ -570,7 +570,6 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 					for (const QByteArray& productRoleId: rolesIds){
 						istd::TDelPtr<const imtauth::IRole> rolePtr = m_roleInfoProviderCompPtr->GetRole(productRoleId);
 						if (rolePtr.IsValid()){
-							QByteArray roleId = rolePtr->GetRoleId();
 							QString roleName = rolePtr->GetRoleName();
 							QByteArray roleProductId = rolePtr->GetProductId();
 

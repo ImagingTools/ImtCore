@@ -42,28 +42,20 @@ ElementView {
 
     Component {
         id: datePickerComp;
-		
-		DateTimeInput {
-			hasTitle: false
-			
-			onDateChanged: {
-				
-			}
-		}
 
-        // DateTimePicker {
-        //     width: 200;
-        //     height: 30;
-        //     timeEdit: expirationEditor.timeEdit;
+        DateTimePicker {
+            width: 200;
+            height: 30;
+            timeEdit: expirationEditor.timeEdit;
 
-        //     Component.onCompleted: {
-        //         expirationEditor.datePicker = this;
-        //     }
+            Component.onCompleted: {
+                expirationEditor.datePicker = this;
+            }
 
-        //     onEditingFinished: {
-        //         expirationEditor.editingFinished();
-        //     }
-        // }
+            onEditingFinished: {
+                expirationEditor.editingFinished();
+            }
+        }
     }
 }
 

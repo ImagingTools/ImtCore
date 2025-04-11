@@ -14,16 +14,15 @@
         <Element ComponentName="HashCalculator" X="825" Y="550" Note=""/>
         <Element ComponentName="OperationContextController" X="1050" Y="200" Note=""/>
         <Element ComponentName="SerializableUserCollectionController" X="400" Y="550" Note=""/>
-        <Element ComponentName="SmtpClient" X="350" Y="200" Note=""/>
-        <Element ComponentName="SmtpMessageCreator" X="300" Y="75" Note=""/>
+        <Element ComponentName="SmtpMessageCreator" X="325" Y="200" Note=""/>
         <Element ComponentName="UserChangeGenerator" X="750" Y="200" Note=""/>
         <Element ComponentName="UserCommands" X="425" Y="300" Note=""/>
         <Element ComponentName="UserController" X="150" Y="450" Note=""/>
         <Element ComponentName="UserInfo" X="650" Y="550" Note=""/>
         <Element ComponentName="UserListController" X="1025" Y="300" Note=""/>
         <Element ComponentName="UserPermissions" X="525" Y="675" Note=""/>
-        <Element ComponentName="UserVerificationCodeSender" X="175" Y="100" Note=""/>
-        <Element ComponentName="UserVerificationController" X="150" Y="300" Note=""/>
+        <Element ComponentName="UserVerificationCodeSender" X="250" Y="750" Note=""/>
+        <Element ComponentName="UserVerificationController" X="150" Y="625" Note=""/>
         <Element ComponentName="UsersCommands" X="725" Y="300" Note=""/>
         <Element ComponentName="UsersHeadersDataProvider" X="1025" Y="450" Note=""/>
     </PositionMap>

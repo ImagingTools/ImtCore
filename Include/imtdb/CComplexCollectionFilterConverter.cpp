@@ -116,7 +116,9 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 			filterValue.prepend("%");
 			filterValue.append("%");
 		}
-		retVal = QString("\"%1\" %2 '%3'").arg(qPrintable(filter.fieldId), stringOperations[filter.filterOperation], filterValue);
+		
+		retVal = castTypes ? QString("lower((\"%1\")::text) %2 lower('%3')").arg(qPrintable(filter.fieldId), stringOperations[filter.filterOperation], filterValue)
+							: QString("lower(\"%1\") %2 lower('%3')").arg(qPrintable(filter.fieldId), stringOperations[filter.filterOperation], filterValue);
 	}
 	else if (boolTypes.contains(filter.filterValue.type()) && boolOperations.contains(filter.filterOperation)){
 		bool value = filter.filterValue.toBool();

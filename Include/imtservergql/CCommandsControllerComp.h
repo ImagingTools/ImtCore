@@ -32,7 +32,8 @@ private:
 	bool GetRepresentationFromGuiElementContainer(
 		const imtserverapp::IGuiElementContainer& guiElementContainer,
 		sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
-		const QByteArray languageId) const;
+		const QByteArray languageId,
+		const imtauth::IUserInfo* userInfoPtr) const;
 	bool GetRepresentationFromGuiElement(
 		const imtserverapp::IGuiElementModel& guiElementModel,
 		sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,

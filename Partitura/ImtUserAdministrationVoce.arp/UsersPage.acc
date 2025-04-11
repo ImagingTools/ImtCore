@@ -117,38 +117,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SmtpClient" PackageId="ImtMailPck" ComponentId="SmtpClient">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Host" Type="String" ExportId="Host">
-                        <Data IsEnabled="true" Value="smtp.gmail.com"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Password" Type="Id" ExportId="Password">
-                        <Data IsEnabled="true" Value="qqmbxszuzxnylorx"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Port" Type="Integer" ExportId="Port">
-                        <Data IsEnabled="true" Value="465"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Timeout" Type="Integer" ExportId="Timeout">
-                        <Data IsEnabled="true" Value="1000"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="User" Type="Id" ExportId="User">
-                        <Data IsEnabled="true" Value="kucherenkord@gmail.com"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="SmtpMessageCreator" PackageId="ImtMailPck" ComponentId="SmtpMessageCreator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="From" Type="String" ExportId="From">
-                        <Data IsEnabled="true" Value="kucherenkord@gmail.com"/>
+                    <AttributeInfo Id="FromParam" Type="Reference" ExportId="SmtpFromParam">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -244,7 +217,7 @@
                     <AttributeInfo Id="UserOperationContextController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="OperationContextController"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UserVerificationCodeSender" Type="Reference" ExportId="UserVerificationCodeSender">
+                    <AttributeInfo Id="UserVerificationCodeSender" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserVerificationCodeSender"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserVerificationController" Type="Reference" ExportId="">
@@ -372,8 +345,8 @@
         <Element Id="UserVerificationCodeSender" PackageId="ImtAuthPck" ComponentId="UserVerificationCodeSender">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="SmtpClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SmtpClient"/>
+                    <AttributeInfo Id="SmtpClient" Type="Reference" ExportId="SmtpClient">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SmtpMessageCreator" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SmtpMessageCreator"/>
@@ -674,7 +647,6 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="SmtpClient" ComponentId="SmtpClient"/>
         <Component ExportedId="SmtpMessageCreator" ComponentId="SmtpMessageCreator"/>
         <Component ExportedId="UserChangeGenerator" ComponentId="UserChangeGenerator"/>
     </ExportedComponents>

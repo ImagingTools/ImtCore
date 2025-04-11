@@ -9,10 +9,15 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="CenterCommands" X="625" Y="300" Note=""/>
+        <Element ComponentName="CenterCommandsPermissions" X="575" Y="600" Note=""/>
+        <Element ComponentName="CheckPermissionOr" X="250" Y="100" Note=""/>
+        <Element ComponentName="CommandPermissionsJoiner" X="350" Y="475" Note=""/>
         <Element ComponentName="CommandsController" X="600" Y="50" Note=""/>
         <Element ComponentName="GuiElementContainer" X="625" Y="150" Note=""/>
         <Element ComponentName="LeftCommands" X="225" Y="300" Note=""/>
+        <Element ComponentName="LeftCommandsPermissions" X="200" Y="600" Note=""/>
         <Element ComponentName="RightCommands" X="975" Y="300" Note=""/>
+        <Element ComponentName="RightCommandsPermissions" X="975" Y="600" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -116,16 +116,6 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 		}
 	}
 
-	if (productId.isEmpty()){
-		for (const QByteArray& id : m_permissionsMap.keys()){
-			IUserBaseInfo::FeatureIds productPermissions = m_permissionsMap.value(id);
-			allPermissions += productPermissions;
-		}
-	}
-	else if (m_permissionsMap.contains(productId)){
-		allPermissions += m_permissionsMap[productId];
-	}
-
 	return allPermissions;
 }
 

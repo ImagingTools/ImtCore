@@ -138,7 +138,7 @@ TableViewItemDelegateBase {
 					isActive: treeDelegateBase.isActive && !treeDelegateBase.root.readOnly;
 					visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && treeDelegateBase.isCheckable : false;
 					
-					onCheckStateChanged:{
+					function nextCheckState(){
 						if (treeDelegateBase.checkState === Qt.Checked){
 							treeDelegateBase.root.uncheckItem(treeDelegateBase);
 						}
