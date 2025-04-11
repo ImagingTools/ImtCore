@@ -61,8 +61,6 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 		return nullptr;
 	}
 	
-	qDebug() << "User Permissions:" << userInfoPtr->GetPermissions();
-
 	imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
 
 	gqlContextPtr->SetUserInfo(userInfoPtr);
