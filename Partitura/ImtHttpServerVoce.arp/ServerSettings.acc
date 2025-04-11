@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5347" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -31,89 +31,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Default"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ConnectionCollection" PackageId="ImtServicePck" ComponentId="ConnectionCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConnectionDescriptions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Server tcp port to be listened</Value>
-                                <Value>Server websocket port to be listened</Value>
-                                <Value>Server tcp port to be connected to Puma</Value>
-                                <Value>Server websocket port to be connected to Puma</Value>
-                                <Value>Server websocket port to be connected to Lisa</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConnectionNames" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ProLife main HTTP</Value>
-                                <Value>ProLife main WebSocket</Value>
-                                <Value>Puma main HTTP</Value>
-                                <Value>Puma main WebSocket</Value>
-                                <Value>Lisa main HTTP</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConnectionServiceTypeNames" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ProLife</Value>
-                                <Value>ProLife</Value>
-                                <Value>Puma</Value>
-                                <Value>Puma</Value>
-                                <Value>Lisa</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConnectionTypes" Type="Integer[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>0</Value>
-                                <Value>0</Value>
-                                <Value>1</Value>
-                                <Value>1</Value>
-                                <Value>1</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConnectionUrlListCompPtr" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ServerConnectionParams/ServerPort</Value>
-                                <Value>ServerConnectionParams/WebSocketServerPort</Value>
-                                <Value>ServerConnectionParams/PumaUrl</Value>
-                                <Value>ServerConnectionParams/PumaWebSocketPort</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ConnectionUsageIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ProLifeUrlTcp</Value>
-                                <Value>ProLifeUrlWs</Value>
-                                <Value>PumaUrlTcp</Value>
-                                <Value>PumaUrlWs</Value>
-                                <Value>LisaUrlTcp</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServiceTypeName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ProLife"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LoggingParams/TracingConfiguration"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -201,9 +118,6 @@
         <Element Id="FileNameParam" PackageId="FilePck" ComponentId="FileNameParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="C:/Users/Public/ImagingTools/Backups"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="PathType" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="2"/>
                     </AttributeInfo>
