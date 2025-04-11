@@ -192,7 +192,7 @@ Item {
 		}
 
 		onLoaded: {
-			commandsLoader.item.commandId = gridCollectionViewBase.commandsId;
+			// commandsLoader.item.commandId = gridCollectionViewBase.commandsId;
 			// commandsLoader.item.tableData = gridCollectionViewBase.grid;
 			// commandsLoader.item.documentManagerPtr = gridCollectionViewBase.documentManagerPtr;
 		}
