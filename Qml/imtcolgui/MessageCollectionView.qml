@@ -3,7 +3,6 @@ import Acf 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 
-
 RemoteCollectionView {
 	id: log;
 	
@@ -12,37 +11,7 @@ RemoteCollectionView {
 	
 	commandsControllerComp: null
 	table.enableAlternating: false
-	
-	TreeItemModel {
-		id: collectionHeadersModel;
-		
-		Component.onCompleted: {
-			log.updateHeaders();
-		}
-	}
-	
-	onDataControllerChanged: {
-		if (dataController){
-			dataController.headersModel  = collectionHeadersModel;
-		}
-	}
-	
-	function updateHeaders(){
-		collectionHeadersModel.clear();
-		
-		let index = collectionHeadersModel.insertNewItem();
-		collectionHeadersModel.setData("id", "Text", index);
-		collectionHeadersModel.setData("name", qsTr("Description"), index);
-		
-		index = collectionHeadersModel.insertNewItem();
-		collectionHeadersModel.setData("id", "LastModified", index);
-		collectionHeadersModel.setData("name", qsTr("Time"), index);
-		
-		index = collectionHeadersModel.insertNewItem();
-		collectionHeadersModel.setData("id", "Source", index);
-		collectionHeadersModel.setData("name", qsTr("Source"), index);
-	}
-	
+
 	onHeadersChanged: {
 		if (log.table.headers.getItemsCount() > 0){
 			log.table.tableDecorator = logTableDecoratorModel
@@ -51,36 +20,19 @@ RemoteCollectionView {
 	}
 	
 	Component.onCompleted: {
-		table.setSortingInfo("LastModified", "DESC")
+		table.setSortingInfo("timeStamp", "DESC")
 		filterMenu.decorator = messageCollectionFilterComp;
 	}
-	
-	function onFilterChanged(filterId, filterValue) {
-		if (filterId === "TextFilter"){
-			collectionFilter.setTextFilter(filterValue);
-		}
-		else{
-			collectionFilter.setMessageStatusFilter(filterId, filterValue);
-		}
-		
-		log.doUpdateGui();
-	}
-	
+
 	function getHeaders(){
 		return {};
 	}
 	
 	dataControllerComp: Component { CollectionRepresentation {
-			id: messageCollectionRepresentation
-			additionalFieldIds: ["id", "name", "category"]
-			
+			collectionId: log.collectionId
+			gqlGetListCommandId: log.gqlGetListCommandId
 			function getHeaders(){
 				return log.getHeaders()
-			}
-			
-			function updateModel(){
-				console.log("Collection representation updateModel");
-				log.doUpdateGui()
 			}
 		} }
 	
@@ -105,7 +57,9 @@ RemoteCollectionView {
 	Component {
 		id: messageCollectionFilterComp;
 		
-		MessageCollectionFilterDecorator {}
+		MessageCollectionFilterDecorator {
+			complexFilter: log.collectionFilter
+		}
 	}
 	
 	Component {
@@ -114,7 +68,7 @@ RemoteCollectionView {
 			id: cellDelegate
 			onReused: {
 				if (rowIndex >= 0){
-					let category = rowDelegate.tableItem.elements.getData("Category", rowIndex);
+					let category = rowDelegate.tableItem.elements.getData("category", rowIndex);
 					if (category === 0){
 						icon.source = "../../../../" + Style.getIconPath("Icons/Diagnostics", Icon.State.On, Icon.Mode.Normal);
 					}
