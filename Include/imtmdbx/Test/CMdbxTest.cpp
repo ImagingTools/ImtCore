@@ -55,7 +55,7 @@ void initialize()
 	for (int i = 0; i < 256; i++)
 	{
 		BitsSetTable256[i] = (i & 1) +
-				BitsSetTable256[i / 2];
+							 BitsSetTable256[i / 2];
 	}
 }
 
@@ -98,14 +98,205 @@ CMdbxTest::~CMdbxTest()
 
 }
 
+
+void CMdbxTest::test_delete_append()
+{
+	qDebug() << "TEST_DELETE_APPEND";
+	std::string path = "TEST_DELETE_APPEND.mdb";
+
+	//removing test mdbx database file
+	QString filePath = QString::fromStdString(path);
+	QFile file(filePath);
+	if(file.exists()){
+		file.remove();
+	}
+
+	mdbx::env::operate_parameters operateParameters(100,10);
+	mdbx::env_managed::create_parameters createParameters;
+
+	mdbx::env_managed env(path, createParameters, operateParameters);
+
+	//MAIN PARAMS
+	int multiCoeff = 3;//DEFAULT: = 1
+	int count = 1000;
+	int maxLength = QString::number(count).length();
+	int updateInterval = 100;//10
+	bool commitEveryTime = false;
+	bool commitAfterEveryDeletion = false;
+
+	//WRITING:
+	if(1){
+		mdbx::txn_managed txn = env.start_write();
+		imtmdbx::CDocumentTable testTable("Test",
+										  txn,
+										  mdbx::key_mode::usual,
+										  mdbx::value_mode::multi,
+										  true);
+
+		int writeCount = 0;
+		for(int i = 0; i < count; i++){
+			QString str = QString::number(i+1);
+
+			for(int j = 0; j < multiCoeff; j++){//for multi value
+				int length = str.length();
+				for(int k = 0; k < maxLength - length; k++){
+					str = str.prepend("0");
+				}
+				QString key = str;
+				QString doc = QString("Doc_") + str;
+				if(j > 0){
+					QString add = "_" + QString::number(j);
+					doc = doc.append(add);
+				}
+				testTable.AddDocument(key.toLocal8Bit(), doc.toLocal8Bit());
+				writeCount++;
+			}
+		}
+		txn.commit();
+		qDebug() << "WRITE_COUNT:: " << writeCount;
+	}
+
+	//UPDATING:
+	if(!commitAfterEveryDeletion){//do not commit after deletion
+		mdbx::txn_managed txn = env.start_write();
+		imtmdbx::CDocumentTable* testTable = new imtmdbx::CDocumentTable("Test",
+																		 txn,
+																		 mdbx::key_mode::usual,
+																		 mdbx::value_mode::multi,
+																		 true);
+
+		for(int i = 0; i < count; i++){
+
+			if((i+1) % updateInterval == 0){
+				QString str = QString::number(i+1);
+
+				int length = str.length();
+				for(int j = 0; j < maxLength - length; j++){
+					str = str.prepend("0");
+				}
+				QString doc = QString("Doc_") + str;
+				if(multiCoeff > 1){//for multi value
+					doc = doc.append("_1");
+				}
+
+				QString new_key = QString("_") + str;
+
+				testTable->MoveToValue(doc.toLocal8Bit());
+				testTable->RemoveDocument();
+				testTable->AddDocument(new_key.toLocal8Bit(), doc.toLocal8Bit());
+
+				if(commitEveryTime){
+					delete testTable;
+					txn.commit();
+					txn = env.start_write();
+					testTable = new imtmdbx::CDocumentTable("Test",
+															txn,
+															mdbx::key_mode::usual,
+															mdbx::value_mode::multi,
+															true);
+
+				}
+
+			}
+		}
+		delete testTable;
+		txn.commit();
+	}
+
+	//UPDATING: 2
+	if(commitAfterEveryDeletion){//commit after deletion
+		mdbx::txn_managed txn = env.start_write();
+		imtmdbx::CDocumentTable* testTable = new imtmdbx::CDocumentTable("Test",
+																		 txn,
+																		 mdbx::key_mode::usual,
+																		 mdbx::value_mode::multi,
+																		 true);
+
+		for(int i = 0; i < count; i++){//deletion
+			if((i+1) % updateInterval == 0){
+				QString str = QString::number(i+1);
+
+				int length = str.length();
+				for(int j = 0; j < maxLength - length; j++){
+					str = str.prepend("0");
+				}
+				QString doc = QString("Doc_") + str;
+				if(multiCoeff > 1){//for multi value
+					doc = doc.append("_1");
+				}
+
+				testTable->MoveToValue(doc.toLocal8Bit());
+				testTable->RemoveDocument();
+
+				delete testTable;
+				txn.commit();
+				txn = env.start_write();
+				testTable = new imtmdbx::CDocumentTable("Test",
+														txn,
+														mdbx::key_mode::usual,
+														mdbx::value_mode::multi,
+														true);
+
+			}
+		}//deletion
+
+		for(int i = 0; i < count; i++){//add document
+			if((i+1) % updateInterval == 0){
+				QString str = QString::number(i+1);
+
+				int length = str.length();
+				for(int j = 0; j < maxLength - length; j++){
+					str = str.prepend("0");
+				}
+				QString doc = QString("Doc_") + str;
+				if(multiCoeff > 1){//for multi value
+					doc = doc.append("_1");
+				}
+
+				QString new_key = str.prepend("_");
+				testTable->AddDocument(new_key.toLocal8Bit(), doc.toLocal8Bit());
+			}
+		}//add document
+
+		delete testTable;
+		txn.commit();
+	}
+
+	//READING:
+	if(1){
+		int readCount = 0;
+		mdbx::txn_managed txn = env.start_write();
+		imtmdbx::CDocumentTable testTable("Test",
+										  txn,
+										  mdbx::key_mode::usual,
+										  mdbx::value_mode::multi,
+										  true);
+
+		bool isReady = testTable.MoveToFirst();
+		while(isReady){
+			readCount++;
+			QByteArray key = testTable.GetKeyBA();
+			QByteArray doc = testTable.GetDocument();
+			//qDebug() << "TEST_:: " << "Key:: " << key << "doc::" << doc;
+			std::cout << "TEST_:: " << " Key:: " << key.data() << " doc::" << doc.data() << "\n";
+			isReady = testTable.MoveToNext();
+		}
+		std::cout << "READ_COUNT:: " << readCount << "\n";
+	}
+
+
+	std::cout << "TEST_DELETE_APPEND::FINISHED!";
+}
+
+
 void CMdbxTest::initTestCase()
 {
-	qDebug("Called before everything else.");
+	//qDebug("Called before everything else.");
 }
 
 void CMdbxTest::cleanupTestCase()
 {
-	qDebug("Called after myFirstTest and mySecondTest.");
+	//qDebug("Called after myFirstTest and mySecondTest.");
 }
 
 void CMdbxTest::test_int()
@@ -175,17 +366,17 @@ void CMdbxTest::test_mdbxfind()
 	mdbx::env_managed::create_parameters createParameters;
 	std::string path = "example.mdb";
 	{
-	mdbx::env_managed env2(path, createParameters, operateParameters);
-	mdbx::txn_managed txn2 = env2.start_write(false);
-	mdbx::map_handle testHandle2 = txn2.create_map("fap1", mdbx::key_mode::reverse, mdbx::value_mode::single);
-	txn2.commit();
+		mdbx::env_managed env2(path, createParameters, operateParameters);
+		mdbx::txn_managed txn2 = env2.start_write(false);
+		mdbx::map_handle testHandle2 = txn2.create_map("fap1", mdbx::key_mode::reverse, mdbx::value_mode::single);
+		txn2.commit();
 	}
 	mdbx::env_managed env(path, createParameters, operateParameters);
 	mdbx::txn_managed txn = env.start_write(false);
 	mdbx::map_handle testHandle = txn.create_map("fap1", mdbx::key_mode::usual, mdbx::value_mode::single);
 
 
-//	return;
+	//	return;
 
 	quint64 key = 5;
 	mdbx::slice keySlice(&key, 8);
@@ -308,8 +499,8 @@ void CMdbxTest::test_mdbxcursor()
 	cursor = txn.open_cursor(testHandle);
 
 	mdbx::cursor::move_result result = cursor.to_first();
-    std::string resKey;
-    resKey = result.key.as_string();
+	std::string resKey;
+	resKey = result.key.as_string();
 
 	result = cursor.to_next();
 	resKey = result.key.as_string();
@@ -596,7 +787,7 @@ void CMdbxTest::test_write_units(){
 
 	time.start();
 
-//	documentTable.StartWriteProcess();
+	//	documentTable.StartWriteProcess();
 
 	for (quint64 i = 1; i < 1000000; i++){
 		QString data = "unit";
@@ -607,7 +798,7 @@ void CMdbxTest::test_write_units(){
 		}
 	}
 	txn.commit();
-//	documentTable.EndWriteProcess();
+	//	documentTable.EndWriteProcess();
 
 	qDebug() << "map finish";
 	qDebug() << "Time make elapsed:" << time.elapsed();
@@ -627,7 +818,7 @@ void CMdbxTest::test_write_10units(){
 	imtmdbx::CDocumentTable documentTable = imtmdbx::CDocumentTable("Units10", txn);
 
 
-//		documentTable.StartWriteProcess();
+	//		documentTable.StartWriteProcess();
 
 	for (quint64 i = 1; i < 11; i++){
 		QString data = "unit";
@@ -636,7 +827,7 @@ void CMdbxTest::test_write_10units(){
 
 	}
 	txn.commit();
-//		documentTable.EndWriteProcess();
+	//		documentTable.EndWriteProcess();
 
 }
 
@@ -897,7 +1088,7 @@ void CMdbxTest::test_write_masks(){
 
 	std::cout << "TEST_WRITE_MASKS!!!";
 
-    // return;
+	// return;
 
 	/*************************************************************/
 	QString tableName = "Masks";
@@ -913,9 +1104,9 @@ void CMdbxTest::test_write_masks(){
 		QElapsedTimer time;
 		time.start();
 		for(int i = 0; i < 1000000; i++){
-            if ((i < 250000 || i > 750000)){
+			if ((i < 250000 || i > 750000)){
 				mask1mln.SetUnit(i,true);
-            }
+			}
 			if (i%10000 == 0){
 				std::cout << "Write i: " << i / 10000 << " " << time.elapsed() << std::endl;
 			}
@@ -930,7 +1121,7 @@ void CMdbxTest::test_write_masks(){
 		QElapsedTimer time;
 		time.start();
 		for(int i = 0; i < 1000000; i++){
-            if (i%1000 == 0){
+			if (i%1000 == 0){
 				mask1000.SetUnit(i,true);
 			}
 			if (i%10000 == 0){
@@ -967,12 +1158,12 @@ void CMdbxTest::test_write_masks(){
 		imtmdbx::CMask mask1mln(maskNameMln, txn);
 		imtmdbx::CMask mask1000(maskName1000, txn);
 		imtmdbx::CDoubleMask doubleMask(doubleMaskName + QString::number(6), txn, 6);
-//		quint64 unit =  mask1mln.GetUnit(2);
+		//		quint64 unit =  mask1mln.GetUnit(2);
 		bool unit = doubleMask.GetUnit(5);
 
-        imtmdbx::CMaskContainer container(imtmdbx::CMaskContainer::OT_OR);
+		imtmdbx::CMaskContainer container(imtmdbx::CMaskContainer::OT_OR);
 		container.AddMask(&mask1mln, false);
-//		container.AddMask(&doubleMask, false);
+		//		container.AddMask(&doubleMask, false);
 		container.AddMask(&mask1000, false);
 
 		QElapsedTimer time;
@@ -1027,12 +1218,12 @@ void CMdbxTest::test_cursor()
 	if(result.done){
 		qDebug() << "Found!" << result.key.as_int32();
 	}
-//	if(cursor.seek(keySlice)){
-//		mdbx::cursor::move_result result = cursor.current();
-//		if (result.done){
-//			qDebug() << "Found!";
-//		}
-//	}
+	//	if(cursor.seek(keySlice)){
+	//		mdbx::cursor::move_result result = cursor.current();
+	//		if (result.done){
+	//			qDebug() << "Found!";
+	//		}
+	//	}
 
 }
 

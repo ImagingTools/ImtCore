@@ -48,9 +48,10 @@ public:
 	void cleanupTestCase();
 	// void test_mdbxcursor();
     void test_cursor();
+	void test_write_masks();
 
 private slots:
-    void test_write_masks();
+	void test_delete_append();
 };
 
 
