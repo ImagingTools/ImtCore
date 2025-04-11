@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IComplexCollectionFilter.h>
+#include <imtdb/CComplexCollectionFilterConverter.h>
 
 
 namespace imtdb
@@ -193,8 +194,100 @@ bool CSqliteDatabaseDocumentDelegateComp::CreatePaginationQuery(int offset, int 
 }
 
 
-bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/) const
+bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
 {
+	QString addedStrQuery = QString(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))")
+	.arg(
+		qPrintable(*m_tableNameAttrPtr),
+		CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
+		);
+	
+	switch (timeFilter.GetTimeUnit()) {
+	case imtbase::ITimeFilterParam::TU_CUSTOM:
+		break;
+	case imtbase::ITimeFilterParam::TU_HOUR:
+		switch (timeFilter.GetInterpretationMode()) {
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', 'now')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', datetime('now', '-1 hour'))))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 hour') AND %1 <= datetime('now')))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_DAY:
+		switch (timeFilter.GetInterpretationMode()) {
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"((date(%1) = date('now')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"((date(%1) = date('now', '-1 day')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 day') AND %1 <= datetime('now')))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_WEEK:
+		switch (timeFilter.GetInterpretationMode()) {
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', 'now'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', datetime('now', '-7 days')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= datetime('now', '-7 days') AND %1 <= datetime('now')))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_MONTH:
+		switch (timeFilter.GetInterpretationMode()) {
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', 'now'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', datetime('now', '-1 month')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 month') AND %1 <= datetime('now')))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_YEAR:
+		switch (timeFilter.GetInterpretationMode()) {
+		case imtbase::ITimeFilterParam::IM_CURRENT:
+			timeFilterQuery += QString(R"(strftime('%Y', %1) = strftime('%Y', 'now'))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_LAST:
+			timeFilterQuery += QString(R"(strftime('%Y', %1) = strftime('%Y', datetime('now', '-1 year')))").arg(addedStrQuery);
+			break;
+		case imtbase::ITimeFilterParam::IM_FOR:
+			timeFilterQuery += QString(R"((%1 >= datetime('now', '-1 year') AND %1 <= datetime('now')))").arg(addedStrQuery);
+			break;
+		}
+		break;
+	}
+	
+	if (timeFilterQuery.isEmpty()) {
+		imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
+		if (!timeRange.IsNull()) {
+			timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
+			.arg(addedStrQuery, timeRange.GetBeginTime().toString(Qt::ISODate), timeRange.GetEndTime().toString(Qt::ISODate));
+		}
+	}
+	
+	return true;
+}
+
+
+bool CSqliteDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
+{
+	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, false);
+	
 	return true;
 }
 
