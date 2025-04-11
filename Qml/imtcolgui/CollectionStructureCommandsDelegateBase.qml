@@ -271,7 +271,7 @@ Item {
                 if (buttonId == "Yes"){
                     let index = containerBase.treeView.selectedIndex;
                     let id = containerBase.treeView.getData("id", index);
-                    let typeId = containerBase.treeView.getData("TypeId", index);
+                    let typeId = containerBase.treeView.getData("typeId", index);
                     if (id !== ""){
                         removeModel.updateModel(id, typeId);
                     }
@@ -456,7 +456,7 @@ Item {
             let parentIndex = -1
             let selectedIndex = containerBase.treeView.selectedIndex
             if (containerBase.treeView.selectedIndex > -1){
-                if (containerBase.treeView.getData("TypeId", selectedIndex) === "Node"){
+                if (containerBase.treeView.getData("typeId", selectedIndex) === "Node"){
                     parentIndex = selectedIndex
                 }
                 else{

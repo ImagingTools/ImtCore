@@ -135,7 +135,7 @@ Item {
 		//console.log("_____________PROPERTIES_CHANGED_____________")
 		
 		for (var item = 0; item < popupMenuContainer.properties.getItemsCount(); item++){
-			modelFilter.setData(popupMenuContainer.properties.getData("Id", item),  popupMenuContainer.properties.getData("Value", item));
+			modelFilter.setData(popupMenuContainer.properties.getData("id", item),  popupMenuContainer.properties.getData("Value", item));
 		}
 		if(!notSetProperties){
 			propertiesChangedSignal();
