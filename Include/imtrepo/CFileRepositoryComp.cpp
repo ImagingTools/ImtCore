@@ -146,7 +146,7 @@ QByteArray CFileRepositoryComp::InsertFile(
 	// Generate unique file-ID accroding to \c proposedObjectId variable provided by caller:
 	QByteArray fileId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
 
-	// Generate teraget absolute file path for the data file:
+	// Generate target absolute file path for the data file:
 	QString targetFilePath = CalculateTargetFilePath(localFilePath, objectName, typeId);
 	if (targetFilePath.isEmpty()){
 		return emptyId;
@@ -202,25 +202,15 @@ QByteArray CFileRepositoryComp::InsertFile(
 				}
 			}
 
-			bool metaInfoCreated = WriteFileMetaInfo(*metaInfoPtr);
-			if (metaInfoCreated){
-				collectionItem.SetContentsMetaInfo(metaInfoPtr);
+			collectionItem.SetContentsMetaInfo(metaInfoPtr);
 
-				// Inserting new item into collection if the structure was created successfully:
-				bool success = WriteItemInfo(collectionItem);
-				if (success){
-					if (FinishInsertFileTransaction(workingPath, targetFileInfo.dir().absolutePath(), fileId, collectionItem)){
-						QDir(workingPath).removeRecursively();
+			if (FinishInsertFileTransaction(workingPath, targetFileInfo.dir().absolutePath(), fileId, collectionItem)){
+				QDir(workingPath).removeRecursively();
 
-						return fileId;
-					}
-					else{
-						SendErrorMessage(0, QT_TR_NOOP("File could not be inserted into the repository"));
-					}
-				}
+				return fileId;
 			}
-			else{
-				SendErrorMessage(0, QT_TR_NOOP(QString("Meta-information for the file '%1' could not be created").arg(workingFilePath)));
+			else {
+				SendErrorMessage(0, QT_TR_NOOP("File could not be inserted into the repository"));
 			}
 		}
 		else{
@@ -241,6 +231,10 @@ bool CFileRepositoryComp::UpdateFile(
 			const QString& localFilePath,
 			const QByteArray& objectId)
 {
+	if (!m_documentInfoCollectionCompPtr.IsValid()) {
+		return false;
+	}
+
 	{
 		QWriteLocker cacheLocker(&m_objectCacheLock);
 
@@ -275,19 +269,13 @@ bool CFileRepositoryComp::UpdateFile(
 		changes.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
-		if (!WriteItemInfo(fileItemInfo)){
-			SendErrorMessage(0, QT_TR_NOOP(QString("Meta information of the file '%1' could not be updated").arg(targetFilePath)));
+		bool indexUpdated = m_documentInfoCollectionCompPtr->SetObjectData(objectId, fileItemInfo);
+		if (indexUpdated) {
+			// TODO; Implement rollback logic!
+			SendErrorMessage(0, QT_TR_NOOP(QString("File meta info could not be updated")));
 
 			return false;
 		}
-
-		if (!WriteFileMetaInfo(*fileItemInfo.GetContentsMetaInfo())){
-			SendErrorMessage(0, QT_TR_NOOP(QString("Meta information of the file '%1' could not be updated").arg(targetFilePath)));
-
-			return false;
-		}
-
-		return true;
 	}
 
 	SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be copied to %2").arg(localFilePath).arg(targetFilePath)));
@@ -370,14 +358,48 @@ QByteArray CFileRepositoryComp::InsertNewObject(
 }
 
 
-bool CFileRepositoryComp::RemoveElement(const Id& /*elementId*/, const imtbase::IOperationContext* /*operationContextPtr*/)
+bool CFileRepositoryComp::RemoveElement(const Id& elementId, const imtbase::IOperationContext* /*operationContextPtr*/)
 {
+	if (!m_documentInfoCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	{
+		QWriteLocker cacheLocker(&m_objectCacheLock);
+
+		if (m_objectCache.contains(elementId)){
+			m_objectCache.remove(elementId);
+		}
+	}
+
+	CFileCollectionItem fileItemInfo;
+	if (!GetFileInfo(elementId, fileItemInfo)) {
+		return false;
+	}
+
+	bool indexUpdated = m_documentInfoCollectionCompPtr->RemoveElement(elementId);
+	if (indexUpdated){
+		SendErrorMessage(0, QT_TR_NOOP(QString("File meta info could not be updated")));
+
+		return false;
+	}
+
+	QString targetFilePath = fileItemInfo.GetFilePath();
+
+	static ChangeSet changes(imtbase::ICollectionInfo::CF_REMOVED);
+	changes.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
+	istd::CChangeNotifier changeNotifier(this, &changes);
+
+	SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be removed").arg(targetFilePath)));
+
 	return false;
 }
 
 
 const istd::IChangeable* CFileRepositoryComp::GetObjectPtr(const QByteArray& /*objectId*/) const
 {
+	Q_ASSERT_X(false, __func__, "Access to the raw object pointer is not supported by this implementation");
+
 	return nullptr;
 }
 
@@ -760,18 +782,6 @@ CFileRepositoryComp::DataPtr CFileRepositoryComp::CreateObjectFromFile(const QSt
 }
 
 
-bool CFileRepositoryComp::WriteItemInfo(const CFileCollectionItem& /*repositoryItem*/) const
-{
-	return false;
-}
-
-
-bool CFileRepositoryComp::WriteFileMetaInfo(const idoc::IDocumentMetaInfo& /*metaInfo*/) const
-{
-	return false;
-}
-
-
 bool CFileRepositoryComp::IsPathInsideRepository(const QString& filePath) const
 {
 	QString cleanFileDir = QDir::cleanPath(QFileInfo(filePath).absolutePath());
@@ -942,7 +952,7 @@ bool CFileRepositoryComp::FinishInsertFileTransaction(
 				istd::CChangeNotifier changeNotifier(this, &changes);
 
 				QByteArray documentId = m_documentInfoCollectionCompPtr->InsertNewObject(
-							"FileItemInfo",
+							*m_infoItemTypeIdAttrPtr,
 							collectionItem.GetName(),
 							"",
 							DataPtr(&collectionItem),

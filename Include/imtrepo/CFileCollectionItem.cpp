@@ -47,6 +47,7 @@ bool CFileCollectionItem::SetCollectionMetaInfo(int metaInfoType, const QVariant
 	return m_metaInfo.SetMetaInfo(metaInfoType, value);
 }
 
+
 bool CFileCollectionItem::SetContentsMetaInfo(idoc::MetaInfoPtr metaInfoPtr)
 {
 	m_contentsMetaInfoPtr = metaInfoPtr;
@@ -115,6 +116,7 @@ idoc::MetaInfoPtr CFileCollectionItem::GetContentsMetaInfo() const
 {
 	return m_contentsMetaInfoPtr;
 }
+
 
 int CFileCollectionItem::GetRepositoryRevision() const
 {

@@ -63,7 +63,8 @@ public:
 		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
 		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreatorList", "List of meta-info creators related to the object types", false);
 		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data object instance creation", false);
-		I_ASSIGN(m_documentInfoCollectionCompPtr, "DocumentInfoCollection", "Collection containing information about the document list", true, "DocumentInfoCollection");
+		I_ASSIGN(m_documentInfoCollectionCompPtr, "DocumentInfoCollection", "Collection's table of contents", true, "DocumentInfoCollection");
+		I_ASSIGN(m_infoItemTypeIdAttrPtr, "InfoTypeId", "Type-ID of the file info item", true, "FileItemInfo");
 	I_END_COMPONENT;
 
 public:
@@ -186,17 +187,6 @@ protected:
 	virtual DataPtr CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const;
 
 	/**
-		Write a file collection item to the collection's meta-info system.
-	*/
-	bool WriteItemInfo(const CFileCollectionItem& repositoryItem) const;
-
-	/**
-		Write file's meta info into the collection's meta-info system.
-		\return \c true of the operation was sucessfull, or \c false otherwise.
-	*/
-	virtual bool WriteFileMetaInfo(const idoc::IDocumentMetaInfo& metaInfo) const;
-
-	/**
 		Check if the path to the file is inside of repository folder.
 	*/
 	bool IsPathInsideRepository(const QString& filePath) const;
@@ -280,7 +270,15 @@ protected:
 	*/
 	I_MULTIFACT(istd::IChangeable, m_objectFactoryListCompPtr);
 
+	/**
+		Repository's table of contents.
+	*/
 	I_REF(imtbase::IObjectCollection, m_documentInfoCollectionCompPtr);
+
+	/**
+		ID of the file item info type.
+	*/
+	I_ATTR(QByteArray, m_infoItemTypeIdAttrPtr);
 
 private:
 	typedef QMap<QByteArray, DataPtr> ObjectCache;
