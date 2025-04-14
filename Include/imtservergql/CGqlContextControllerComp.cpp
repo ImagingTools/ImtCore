@@ -55,7 +55,7 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	}
 
 	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User with ID '%2' was not found.").arg(qPrintable(token)).arg(qPrintable(userObjectId));
+		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User with ID '%2' was not found.").arg(qPrintable(token), qPrintable(userObjectId));
 		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
 
 		return nullptr;
