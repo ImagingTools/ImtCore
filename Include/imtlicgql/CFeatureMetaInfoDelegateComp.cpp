@@ -1,6 +1,9 @@
 #include <imtlicgql/CFeatureMetaInfoDelegateComp.h>
 
 
+// Qt includes
+#include <QJsonObject>
+
 // ImtCore includes
 #include <imtlic/IFeatureInfo.h>
 
@@ -11,47 +14,47 @@ namespace imtlicgql
 
 // protected methods
 
-bool CFeatureMetaInfoDelegateComp::FillRepresentation(sdl::imtlic::Features::CFeatureData::V1_0& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const
+bool CFeatureMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const
 {
 	QByteArray featureId = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_ID).toByteArray();
-	metaInfoRepresentation.featureId = featureId;
+	representation["FeatureId"] = QString(featureId);
 	
 	QString featureName = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_NAME).toString();
-	metaInfoRepresentation.featureName = featureName;
+	representation["FeatureName"] = QString(featureName);
 	
 	QString description = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_DESCRIPTION).toString();
-	metaInfoRepresentation.description = description;
+	representation["Description"] = QString(description);
 	
 	bool isOptional = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_IS_OPTIONAL).toBool();
-	metaInfoRepresentation.optional = isOptional;
-	
+	representation["IsOptional"] = isOptional;
+
 	bool isPermission = metaInfo.GetMetaInfo(imtlic::IFeatureInfo::MIT_IS_PERMISSION).toBool();
-	metaInfoRepresentation.isPermission = isPermission;
+	representation["IsPermission"] = isPermission;
 	
 	return true;
 }
 
 
-bool CFeatureMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const sdl::imtlic::Features::CFeatureData::V1_0& metaInfoRepresentation) const
+bool CFeatureMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const
 {
-	if (metaInfoRepresentation.featureId){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_ID, *metaInfoRepresentation.featureId);
+	if (representation.contains("FeatureId")){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_ID, representation.value("FeatureId"));
 	}
 	
-	if (metaInfoRepresentation.featureName){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_NAME, *metaInfoRepresentation.featureName);
+	if (representation.contains("FeatureName")){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_NAME, representation.value("FeatureName"));
 	}
 	
-	if (metaInfoRepresentation.description){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_DESCRIPTION, *metaInfoRepresentation.description);
+	if (representation.contains("Description")){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_FEATURE_DESCRIPTION, representation.value("Description"));
 	}
 	
-	if (metaInfoRepresentation.optional){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_IS_OPTIONAL, *metaInfoRepresentation.optional);
+	if (representation.contains("IsOptional")){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_IS_OPTIONAL, representation.value("IsOptional"));
 	}
 	
-	if (metaInfoRepresentation.isPermission){
-		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_IS_PERMISSION, *metaInfoRepresentation.isPermission);
+	if (representation.contains("IsPermission")){
+		metaInfo.SetMetaInfo(imtlic::IFeatureInfo::MIT_IS_PERMISSION, representation.value("IsPermission"));
 	}
 	
 	return true;

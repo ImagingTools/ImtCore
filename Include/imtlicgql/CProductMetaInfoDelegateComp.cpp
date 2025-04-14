@@ -1,6 +1,9 @@
 #include <imtlicgql/CProductMetaInfoDelegateComp.h>
 
 
+// Qt includes
+#include <QJsonObject>
+
 // ImtCore includes
 #include <imtlic/IProductInfo.h>
 
@@ -11,40 +14,40 @@ namespace imtlicgql
 
 // protected methods
 
-bool CProductMetaInfoDelegateComp::FillRepresentation(sdl::imtlic::Products::CProductData::V1_0& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const
+bool CProductMetaInfoDelegateComp::FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const
 {
 	QByteArray productId = metaInfo.GetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_ID).toByteArray();
-	metaInfoRepresentation.productId = productId;
+	representation["ProductId"] = QString(productId);
 	
 	QString name = metaInfo.GetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_NAME).toString();
-	metaInfoRepresentation.productName = name;
+	representation["ProductName"] = QString(name);
 	
 	QString description = metaInfo.GetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_DESCRIPTION).toString();
-	metaInfoRepresentation.description = description;
+	representation["Description"] = QString(description);
 	
 	QByteArray category = metaInfo.GetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_CATEGORY).toByteArray();
-	metaInfoRepresentation.categoryId = category;
-	
+	representation["Category"] = QString(category);
+
 	return true;
 }
 
 
-bool CProductMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const sdl::imtlic::Products::CProductData::V1_0& metaInfoRepresentation) const
+bool CProductMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const
 {
-	if (metaInfoRepresentation.productId){
-		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_ID, *metaInfoRepresentation.productId);
+	if (representation.contains("ProductId")){
+		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_ID, representation.value("ProductId"));
 	}
 	
-	if (metaInfoRepresentation.productName){
-		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_NAME, *metaInfoRepresentation.productName);
+	if (representation.contains("ProductName")){
+		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_NAME, representation.value("ProductName"));
 	}
 	
-	if (metaInfoRepresentation.description){
-		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_DESCRIPTION, *metaInfoRepresentation.description);
+	if (representation.contains("Description")){
+		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_DESCRIPTION, representation.value("Description"));
 	}
 	
-	if (metaInfoRepresentation.categoryId){
-		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_CATEGORY, *metaInfoRepresentation.categoryId);
+	if (representation.contains("Category")){
+		metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_CATEGORY, representation.value("Category"));
 	}
 	
 	return true;

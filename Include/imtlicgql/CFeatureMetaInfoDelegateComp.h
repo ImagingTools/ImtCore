@@ -1,32 +1,25 @@
 #pragma once
 
 
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
-
 // ImtCore includes
-#include <imtdbgql/TSdlBasedMetaInfoDelegate.h>
-#include <GeneratedFiles/imtlicsdl/SDL/1.0/CPP/Features.h>
+#include <imtdb/CJsonBasedMetaInfoDelegateComp.h>
 
 
 namespace imtlicgql
 {
 
 
-class CFeatureMetaInfoDelegateComp:
-									public ilog::CLoggerComponentBase,
-									public imtdbgql::TSdlBasedMetaInfoDelegate<sdl::imtlic::Features::CFeatureData::V1_0>
+class CFeatureMetaInfoDelegateComp: public imtdb::CJsonBasedMetaInfoDelegateComp
 {
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef imtdb::CJsonBasedMetaInfoDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CFeatureMetaInfoDelegateComp);
-		I_REGISTER_INTERFACE(imtdb::IJsonBasedMetaInfoDelegate);
 	I_END_COMPONENT;
 
 protected:
-	virtual bool FillRepresentation(sdl::imtlic::Features::CFeatureData::V1_0& metaInfoRepresentation, const idoc::IDocumentMetaInfo& metaInfo) const override;
-	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const sdl::imtlic::Features::CFeatureData::V1_0& metaInfoRepresentation) const override;
+	virtual bool FillRepresentation(QJsonObject& representation, const idoc::IDocumentMetaInfo& metaInfo) const override;
+	virtual bool FillMetaInfo(idoc::IDocumentMetaInfo& metaInfo, const QJsonObject& representation) const override;
 };
 
 
