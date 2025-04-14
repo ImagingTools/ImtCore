@@ -127,7 +127,7 @@ protected:
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const;
-	virtual QByteArray CreateRevisionInfoQuery(const imtbase::IOperationContext& operationContextPtr, const QVariant& revisionArgument, quint32 checksum) const;
+	virtual QByteArray CreateRevisionInfoQuery(const imtbase::IOperationContext* operationContextPtr, const QVariant& revisionArgument, quint32 checksum) const;
 	virtual QByteArray CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const;
 	virtual QString CreateJsonExtractSql(const QString& jsonName, const QString& key, QMetaType::Type metaType = QMetaType::QString, const QString& tableAlias = QString()) const;
 

@@ -593,10 +593,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 	}
 	
 	QByteArray revisionInfoQuery;
-	if (operationContextPtr != nullptr){
-		revisionInfoQuery = CreateRevisionInfoQuery(*operationContextPtr, revisionArgument, checksum);
-	}
-	
+	revisionInfoQuery = CreateRevisionInfoQuery(operationContextPtr, revisionArgument, checksum);
+
 	query += QString("INSERT INTO \"%1\"(\"Id\", \"TypeId\", \"DocumentId\", \"Name\", \"Description\", \"Document\", \"DataMetaInfo\", \"RevisionInfo\", \"TimeStamp\", \"State\") VALUES('%11', '%2', '%3', '%4', '%5', '%6', '%7', %8, '%9', '%10');")
 				 .arg(
 					qPrintable(*m_tableNameAttrPtr),
@@ -783,36 +781,38 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& type
 
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateRevisionInfoQuery(
-			const imtbase::IOperationContext& operationContextPtr,
+			const imtbase::IOperationContext* operationContextPtr,
 			const QVariant& revisionArgument,
 			quint32 checksum) const
 {
-	imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContextPtr.GetOperationOwnerId();
-	
 	QVariantMap paramMap;
-	paramMap["OwnerId"] = objectInfo.id;
-	paramMap["OwnerName"] = objectInfo.name;
 	paramMap["Checksum"] = QString::number(checksum);
 	paramMap["RevisionNumber"] = revisionArgument;
-
-	QByteArray json;
-
-	imtbase::IOperationContext* nonConstOperationPtr = const_cast<imtbase::IOperationContext*>(&operationContextPtr);
-	if (nonConstOperationPtr != nullptr){
-		iser::ISerializable* changeCollectionPtr = dynamic_cast<iser::ISerializable*>(nonConstOperationPtr->GetChangesCollection());
-		if (changeCollectionPtr != nullptr){
-			iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
-			if (!changeCollectionPtr->Serialize(archive)){
-				qDebug() << QString("Unable to serialize a change object collection");
-			}
-			else{
-				json = archive.GetData();
+	
+	if (operationContextPtr != nullptr){
+		imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContextPtr->GetOperationOwnerId();
+		paramMap["OwnerId"] = objectInfo.id;
+		paramMap["OwnerName"] = objectInfo.name;
+		
+		QByteArray json;
+		
+		imtbase::IOperationContext* nonConstOperationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
+		if (nonConstOperationPtr != nullptr){
+			iser::ISerializable* changeCollectionPtr = dynamic_cast<iser::ISerializable*>(nonConstOperationPtr->GetChangesCollection());
+			if (changeCollectionPtr != nullptr){
+				iser::CJsonMemWriteArchive archive(m_versionInfoCompPtr.GetPtr());
+				if (!changeCollectionPtr->Serialize(archive)){
+					qDebug() << QString("Unable to serialize a change object collection");
+				}
+				else{
+					json = archive.GetData();
+				}
 			}
 		}
+		
+		paramMap["OperationDescription"] = SqlEncode(json);
 	}
-	
-	paramMap["OperationDescription"] = SqlEncode(json);
-	
+
 	QString revisionInfo = CreateJsonBuildObjectQuery(paramMap);
 
 	return revisionInfo.toUtf8();
