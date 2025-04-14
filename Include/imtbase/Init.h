@@ -17,6 +17,7 @@
 #include <imtqml/CFileIO.h>
 #include <imtqml/CNetworkEventInterceptor.h>
 #include <imtqml/CQmlProcess.h>
+#include <imtqml/CQmlObjectCollectionIterator.h>
 
 
 class DefaultImtCoreQmlInitializer
@@ -74,6 +75,7 @@ public:
 		Q_INIT_RESOURCE(imtdocguiqml);
 		Q_INIT_RESOURCE(imtguigqlqml);
 		Q_INIT_RESOURCE(imtauthguiqml);
+		Q_INIT_RESOURCE(imtlicguiqml);
 
 		qmlRegisterType<imtbase::CTreeItemModel>("Acf", 1, 0, "TreeItemModel");
 		qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");
@@ -81,6 +83,7 @@ public:
 		qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
 		qmlRegisterType<imtqml::FileIO>("Acf", 1, 0, "FileIO");
 		qmlRegisterType<imtqml::CQmlProcess>("Acf", 1, 0, "Process");
+		qmlRegisterType<imtqml::CQmlObjectCollectionIterator>("Acf", 1, 0, "QmlCollectionIterator");
 		qmlRegisterSingletonInstance<imtqml::CNetworkEventInterceptor>("Acf", 1, 0, "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
 
 	#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -117,8 +120,6 @@ public:
 		Q_INIT_RESOURCE(imtstylelight);
 		Q_INIT_RESOURCE(imtstyledark);
 
-
-
 		Q_INIT_RESOURCE(imtdb);
 	}
 
@@ -129,7 +130,6 @@ public:
 		imtStylePtr->SetStyleType(imtstyle::CImtStyle::ST_IMAGINGTOOLS);
 	
 		imtStylePtr->setBaseStyle(QStyleFactory::create("fusion"));
-		QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 		QApplication::setStyle(imtStylePtr);
 
 		QCoreApplication* appPtr = QCoreApplication::instance();
