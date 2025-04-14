@@ -35,6 +35,10 @@ QtObject {
 	}
 
 	function singleSelect(index){
+		if (selectedIndexes.length == 1 && isSelected(index)){
+			return
+		}
+
 		selectedIndexes = []
 		toggleSelect(index);
 	}
