@@ -15,16 +15,6 @@ namespace imtauth
 
 // public methods
 
-void CUserInfo::SetLastConnection(const QDateTime& lastConnection)
-{
-	if (m_lastConnection != lastConnection){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_lastConnection = lastConnection;
-	}
-}
-
-
 // reimplemented (iser::IUserInfo)
 
 QByteArray CUserInfo::GetPasswordHash() const
@@ -131,12 +121,6 @@ IUserBaseInfo::FeatureIds CUserInfo::GetPermissions(const QByteArray& productId)
 }
 
 
-QDateTime CUserInfo::GetLastConnection() const
-{
-	return m_lastConnection;
-}
-
-
 IUserInfo::SystemInfoList CUserInfo::GetSystemInfos() const
 {
 	return m_systemInfos;
@@ -200,7 +184,7 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_groupIds, "Groups", "Group");
 
-	if (imtCoreVersion > 9867){
+	if (imtCoreVersion > 9867 && imtCoreVersion <= 13561){
 		iser::CArchiveTag lastConnectionTag("LastConnection", "LastConnection", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(lastConnectionTag);
 		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_lastConnection);

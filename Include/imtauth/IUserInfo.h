@@ -112,11 +112,6 @@ public:
 	virtual bool RemoveFromGroup(const QByteArray& groupId) = 0;
 
 	/**
-		Get last connection of the user.
-	*/
-	virtual QDateTime GetLastConnection() const = 0;
-
-	/**
 		Get information about the system in which this user is located.
 	*/
 	virtual SystemInfoList GetSystemInfos() const = 0;

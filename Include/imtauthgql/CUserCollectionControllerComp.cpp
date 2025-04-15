@@ -367,7 +367,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isLastConnectionRequested){
-		QDateTime lastConnection = userInfoPtr->GetLastConnection();
+		QDateTime lastConnection = objectCollectionIterator.GetElementInfo("LastConnection").toDateTime();
 		lastConnection.setTimeSpec(Qt::UTC);
 
 		representationObject.lastConnection = QString(lastConnection.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));

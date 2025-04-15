@@ -44,6 +44,7 @@
 #include <imtauth/CSessionMetaInfoCreatorComp.h>
 #include <imtauth/CUserMetaInfoCreatorComp.h>
 #include <imtauth/CGroupMetaInfoCreatorComp.h>
+#include <imtauth/CUserConnectionInfo.h>
 
 
 namespace ImtAuthPck
@@ -116,6 +117,12 @@ typedef imtauth::CJwtSessionControllerComp JwtSessionController;
 typedef imtauth::CSessionMetaInfoCreatorComp SessionMetaInfoCreator;
 typedef imtauth::CUserMetaInfoCreatorComp UserMetaInfoCreator;
 typedef imtauth::CGroupMetaInfoCreatorComp GroupMetaInfoCreator;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtauth::CUserConnectionInfo,
+						imtauth::IUserConnectionInfo,
+						iser::ISerializable,
+						istd::IChangeable>> UserConnectionInfo;
 
 
 } // namespace ImtAuthPck

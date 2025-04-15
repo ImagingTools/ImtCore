@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/CUserInfo.h>
+#include <imtauth/CUserConnectionInfo.h>
 
 
 namespace imtauthgql
@@ -126,11 +127,41 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		}
 	}
 
-	userInfo.SetLastConnection(QDateTime::currentDateTimeUtc());
-
-	if (!m_userCollectionCompPtr->SetObjectData(objectId, userInfo)){
-		errorMessage = QString("Unable to set last connection info for user with login: '%1'").arg(qPrintable(login));
-		SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+	if (m_userConnectionCollectionCompPtr.IsValid()){
+		istd::TDelPtr<imtauth::CUserConnectionInfo> userConnectionInfoPtr;
+		userConnectionInfoPtr.SetPtr(new imtauth::CUserConnectionInfo);
+		
+		userConnectionInfoPtr->SetUserId(objectId);
+		userConnectionInfoPtr->SetLastConnection(QDateTime::currentDateTimeUtc());
+		
+		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+		fieldFilter.fieldId = "DocumentId";
+		fieldFilter.filterValue = objectId;
+		
+		imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+		groupFilter.fieldFilters << fieldFilter;
+		
+		imtbase::CComplexCollectionFilter complexFilter;
+		complexFilter.SetFieldsFilter(groupFilter);
+		
+		iprm::CParamsSet filterParam;
+		filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
+		
+		imtbase::ICollectionInfo::Ids ids = m_userConnectionCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+		if (ids.isEmpty()){
+			QByteArray typeId = userConnectionInfoPtr->GetFactoryId();
+			QByteArray result = m_userConnectionCollectionCompPtr->InsertNewObject(typeId, "", "", userConnectionInfoPtr.GetPtr(), objectId);
+			if (result.isEmpty()){
+				errorMessage = QString("Unable to insert last connection info for user with login: '%1'").arg(qPrintable(login));
+				SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+			}
+		}
+		else{
+			if (!m_userConnectionCollectionCompPtr->SetObjectData(objectId, *userConnectionInfoPtr.GetPtr())){
+				errorMessage = QString("Unable to set last connection info for user with login: '%1'").arg(qPrintable(login));
+				SendWarningMessage(0, errorMessage, "imtgql::CAuthorizationControllerComp");
+			}
+		}
 	}
 
 	return payload;

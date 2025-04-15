@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/qdatetime.h>
+#include <QtCore/QDateTime>
 
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
@@ -19,8 +19,6 @@ class CUserInfo: virtual public IUserInfo, public CUserBaseInfo
 public:
 	typedef CUserBaseInfo BaseClass;
 
-	void SetLastConnection(const QDateTime& lastConnection);
-
 	// reimplemented (iser::IUserInfo)
 	virtual QByteArray GetPasswordHash() const override;
 	virtual void SetPasswordHash(const QByteArray& passwordHash) override;
@@ -32,7 +30,6 @@ public:
 	virtual bool RemoveFromGroup(const QByteArray& groupId) override;
 	virtual RoleIds GetRoles(const QByteArray& productId) const override;
 	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
-	virtual QDateTime GetLastConnection() const override;
 	virtual SystemInfoList GetSystemInfos() const override;
 	virtual bool AddToSystem(SystemInfo systemInfo) override;
 	virtual bool RemoveFromSystem(const QByteArray& systemId) override;

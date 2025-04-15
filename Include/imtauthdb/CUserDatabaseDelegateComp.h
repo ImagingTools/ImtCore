@@ -39,7 +39,9 @@ public:
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const override;
-
+	virtual QByteArray CreateJoinTablesQuery() const override;
+	virtual QByteArray GetCustomColumnsQuery() const override;
+	
 private:
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userGroupDatabaseDelegateCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);

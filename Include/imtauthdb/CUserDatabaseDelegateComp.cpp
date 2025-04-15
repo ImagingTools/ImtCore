@@ -139,14 +139,6 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 	}
 
-	QDateTime oldDateTime = oldObjectPtr->GetLastConnection();
-	QDateTime newDateTime = userInfoPtr->GetLastConnection();
-
-	if (!oldDateTime.isNull() && !newDateTime.isNull() && oldDateTime != newDateTime){
-		retVal += QString(R"(UPDATE "Users" SET "Document" = jsonb_set("Document", '{LastConnection}', '"%1"', true) WHERE "DocumentId" ='%2' AND "State" = 'Active';)")
-				.arg(userInfoPtr->GetLastConnection().toString(Qt::ISODate), qPrintable(objectId)).toUtf8();
-	}
-
 	return retVal;
 }
 
@@ -210,6 +202,24 @@ bool CUserDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollectionFilter
 	}
 
 	return true;
+}
+
+
+QByteArray CUserDatabaseDelegateComp::CreateJoinTablesQuery() const
+{
+	return QByteArray(R"(
+			LEFT JOIN "UserConnections" AS conn
+				ON conn."DocumentId" = root."DocumentId"
+				AND conn."State" = 'Active'
+	)");
+}
+
+
+QByteArray CUserDatabaseDelegateComp::GetCustomColumnsQuery() const
+{
+	return QByteArray(R"(
+			conn."Document"->>'LastConnection' as "LastConnection"
+	)");
 }
 
 

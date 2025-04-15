@@ -194,6 +194,11 @@ I_EXPORT_COMPONENT(
 			"Group meta info creator",
 			"Group Meta Info Creator");
 
+I_EXPORT_COMPONENT(
+			UserConnectionInfo,
+			"User connection info",
+			"User Connection Info");
+
 
 } // namespace ImtAuthPck
 
