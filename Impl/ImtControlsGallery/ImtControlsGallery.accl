@@ -2,14 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5349" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ClientApplication" X="525" Y="400" Note=""/>
         <Element ComponentName="ControlsGalleryServer" X="350" Y="175" Note=""/>
+        <Element ComponentName="ImtCoreQmlInitializer" X="375" Y="500" Note=""/>
         <Element ComponentName="LocalSettings" X="725" Y="175" Note=""/>
         <Element ComponentName="VersionInfo" X="1025" Y="175" Note=""/>
     </PositionMap>

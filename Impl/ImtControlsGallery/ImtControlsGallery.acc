@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5349" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -28,6 +28,15 @@
                                 <Value>ControlsGalleryServer</Value>
                                 <Value>ClientApplication/ObserverQml</Value>
                                 <Value>ControlsGalleryServer</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToPreInitialize" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ImtCoreQmlInitializer/StaticQmlBaseTypeRegistrator</Value>
+                                <Value>ImtCoreQmlInitializer/StaticQmlModuleRegistrator</Value>
+                                <Value>ImtCoreQmlInitializer/StaticQmlTypeRegistrator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -62,6 +71,11 @@
                         <Data IsEnabled="true" Value="LocalSettings/ServerUrl"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ImtCoreQmlInitializer" PackageId="ImtCoreVoce" ComponentId="ImtCoreQmlInitializer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="LocalSettings" PackageId="ImtCoreVoce" ComponentId="LocalSettings">
