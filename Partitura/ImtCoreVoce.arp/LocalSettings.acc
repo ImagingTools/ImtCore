@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5349" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -123,7 +123,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IJsonRepresentationController" ComponentId="SettingsRepresentation"/>
+        <Interface InterfaceId="imtserverapp::IJsonRepresentationController" ComponentId="GeneralPageRepresentation"/>
         <Interface InterfaceId="iprm::IParamsSet" ComponentId="Settings"/>
         <Interface InterfaceId="iser::ISerializable" ComponentId="Settings"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SettingsRepresentation"/>
