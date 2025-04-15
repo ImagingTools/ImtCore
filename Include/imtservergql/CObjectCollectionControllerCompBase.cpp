@@ -451,9 +451,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	if (!objectIdFromRepresentation.isEmpty()){
 		objectId = objectIdFromRepresentation;
 	}
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+	
+	QByteArrayList elementIds = m_objectCollectionCompPtr->GetElementIds();
+	if (elementIds.contains(objectId)){
 		errorMessage = QString("Object with ID: '%1' already exists").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 

@@ -15,7 +15,8 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 		return;
 	}
 	
-	if (!changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED) &&
+	if (!changeSet.Contains(imtbase::ICollectionInfo::CF_ADDED) &&
+		!changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED) &&
 		!changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_RENAMED) &&
 		!changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_STATE) &&
 		!changeSet.Contains(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED) &&
@@ -25,7 +26,10 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 	
 	bool isRemoved = false;
 	QByteArray elementId;
-	if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED)){
+	if (changeSet.Contains(imtbase::ICollectionInfo::CF_ADDED)){
+		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED).toByteArray();
+	}
+	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED)){
 		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_DESCRIPTION_CHANGED).toByteArray();
 	}
 	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_RENAMED)){
