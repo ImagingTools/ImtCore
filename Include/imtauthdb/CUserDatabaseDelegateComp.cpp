@@ -6,6 +6,7 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/IUserInfo.h>
 
 
@@ -186,16 +187,12 @@ bool CUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 }
 
 
-bool CUserDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const
+bool CUserDatabaseDelegateComp::CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const
 {
-	QByteArrayList infoIds = collectionFilter.GetSortingInfoIds();
-	imtbase::ICollectionFilter::SortingOrder sortingOrder = collectionFilter.GetSortingOrder();
-	if (infoIds.contains("SystemName")){
-		sortQuery = QString(R"(ORDER BY CASE
-					WHEN (NOT root."Document" ? 'SystemInfos') THEN 0
-					WHEN root."Document"->'SystemInfos'->0->>'SystemId' = '' THEN 1
-					WHEN root."Document"->'SystemInfos'->0->>'SystemId' != '' THEN 2
-					ELSE 3 END %1)").arg(sortingOrder == imtbase::ICollectionFilter::SO_ASC ? "ASC" : "DESC");
+	QByteArrayList infoIds = imtbase::CComplexCollectionFilterHelper::GetSortingFieldIds(collectionFilter).values();
+	imtbase::IComplexCollectionFilter::SortingOrder sortingOrder = imtbase::CComplexCollectionFilterHelper::GetSortingOrder(collectionFilter, infoIds);
+	if (infoIds.contains("LastConnection")){
+		sortQuery = QString(R"(ORDER BY "LastConnection" %1)").arg(sortingOrder == imtbase::IComplexCollectionFilter::SO_ASC ? "ASC" : "DESC");
 	}
 	else{
 		return BaseClass::CreateSortQuery(collectionFilter, sortQuery);
