@@ -54,6 +54,11 @@ I_EXPORT_COMPONENT(
 			"Qml Object Collection",
 			"Qml Object Collection");
 
+I_EXPORT_COMPONENT(
+			StaticQmlTypeRegistrator,
+			"This component registrates all types of the imtqml module for QQmlEngine.",
+			"QML Type Registrator QQmlEngine" IM_AUTHOR("Sergey Zastrovnyh"));
+
 } // namespace ImtQmlPck
 
 

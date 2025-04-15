@@ -1,0 +1,55 @@
+#include <imtqml/CStaticQmlTypeRegistratorComp.h>
+
+
+// Qt includes
+#include<QtQml/qqml.h>
+
+// ImtCore includes
+#include <imtqml/CGqlModel.h>
+#include <imtqml/CGqlRequest.h>
+#include <imtqml/CRemoteFileController.h>
+#include <imtqml/CFileIO.h>
+#include <imtqml/CNetworkEventInterceptor.h>
+#include <imtqml/CQmlProcess.h>
+
+
+namespace imtqml
+{
+
+
+// protected methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CStaticQmlTypeRegistratorComp::OnComponentCreated()
+{
+	static void* iPtr = nullptr;
+	Q_ASSERT_X(iPtr == nullptr, __func__, "You are attempting to create a new instance of the component, however, another instance already exists!");
+	iPtr = this;
+
+	BaseClass::OnComponentCreated();
+
+	if (!m_registerCGqlModelAttrPtr.IsValid() || *m_registerCGqlModelAttrPtr){
+		qmlRegisterType<imtqml::CGqlModel>("com.imtcore.imtqml", 1, 0, "GqlModel");
+	}
+	if (!m_registerCGqlRequestAttrPtr.IsValid() || *m_registerCGqlRequestAttrPtr){
+		qmlRegisterType<imtqml::CGqlRequest>("com.imtcore.imtqml", 1, 0, "GqlRequest");
+	}
+	if (!m_registerCRemoteFileControllerAttrPtr.IsValid() || *m_registerCRemoteFileControllerAttrPtr){
+		qmlRegisterType<imtqml::CRemoteFileController>("com.imtcore.imtqml", 1, 0, "RemoteFileController");
+	}
+	if (!m_registerFileIOAttrPtr.IsValid() || *m_registerFileIOAttrPtr){
+		qmlRegisterType<imtqml::FileIO>("com.imtcore.imtqml", 1, 0, "FileIO");
+	}
+	if (!m_registerCQmlProcessAttrPtr.IsValid() || *m_registerCQmlProcessAttrPtr){
+		qmlRegisterType<imtqml::CQmlProcess>("com.imtcore.imtqml", 1, 0, "Process");
+	}
+	if (!m_registerCNetworkEventInterceptorAttrPtr.IsValid() || *m_registerCNetworkEventInterceptorAttrPtr){
+		qmlRegisterSingletonInstance<imtqml::CNetworkEventInterceptor>("com.imtcore.imtqml", 1, 0, "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
+	}
+}
+
+
+} // namespace imtqml
+
+
