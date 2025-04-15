@@ -24,28 +24,28 @@ public:
 	CPointsBasedObject();
 
 	// reimplemented (imt3d::IPointsBasedObject)
-	PointFormat GetPointFormat() const override;
-	int GetPointsCount() const override;
-	const void* GetPointData(int pointIndex) const override;
-	void* GetPointData(int pointIndex) override;
+	virtual PointFormat GetPointFormat() const override;
+	virtual int GetPointsCount() const override;
+	virtual const void* GetPointData(int pointIndex) const override;
+	virtual void* GetPointData(int pointIndex) override;
 	virtual void* GetData() override;
 	virtual const void* GetData() const override;
 	virtual int GetPointBytesSize() const override;
 
 
 	// reimplemented (imt3d::IObject3d)
-	bool IsEmpty() const override;
-	i3d::CVector3d GetCenter() const override;
-	void MoveCenterTo(const i3d::CVector3d& position) override;
-	CCuboid GetBoundingCuboid() const override;
+	virtual bool IsEmpty() const override;
+	virtual i3d::CVector3d GetCenter() const override;
+	virtual void MoveCenterTo(const i3d::CVector3d& position) override;
+	virtual CCuboid GetBoundingCuboid() const override;
 
 	// reimplemented (iser::ISerializable)
-	bool Serialize(iser::IArchive& archive) override;
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual bool IsEqual(const IChangeable& object) const;
+	virtual bool IsEqual(const IChangeable& object) const override;
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
@@ -68,7 +68,7 @@ protected:
 	template <typename PointType> void GetBoundingRanges(istd::CRange& xRange, istd::CRange& yRange, istd::CRange& zRange) const;
 
 	// reimplemented (istd::IChangeable)
-	void OnEndChanges(const ChangeSet& changes) override;
+	virtual void OnEndChanges(const ChangeSet& changes) override;
 
 protected:
 	static int GetPointBytesSize(PointFormat pointFormat);

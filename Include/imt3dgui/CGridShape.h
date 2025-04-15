@@ -22,11 +22,11 @@ public:
 
 protected:
 	// reimplement (imt3dgui::CShape3dBase)
-	void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
-	void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
+	virtual void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
 
 	// reimplement (imt3dgui::IShape3d)
-	QVector3D GetColor() const { return QVector3D(0.5, 0.5, 0.5); }
+	virtual QVector3D GetColor() const override { return QVector3D(0.5, 0.5, 0.5); }
 
 private:
 	double m_gridValue;

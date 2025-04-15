@@ -21,8 +21,8 @@ public:
 
 protected:
 	// reimplemented (iqtui::CGuiComponentBase)
-	void OnGuiCreated() override;
-	void OnGuiDestroyed() override;
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
 
 private:
 	I_MULTIREF(IShape3d, m_shapesCompPtr);

@@ -63,7 +63,7 @@ public:
 	bool ComputeDepthRange(const i2d::IObject2d* aoi, istd::CRange& depthRange) const;
 
 	// reimplemented (IDepthBitmap)
-	istd::CRange GetDepthRange() const override;
+	virtual istd::CRange GetDepthRange() const override;
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
 	virtual const IImage3dCalibration* GetCalibration3d() const override;
 	virtual const iimg::IBitmap* GetReferenceBitmap() const override;
@@ -77,12 +77,12 @@ public:
 	virtual void SetCalibration(const i2d::ICalibration2d* calibrationPtr, bool releaseFlag) override;
 
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive);
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual bool IsEqual(const IChangeable& object) const;
+	virtual bool IsEqual(const IChangeable& object) const override;
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 

@@ -95,17 +95,17 @@ public:
 
 protected:
 	// reimplemented (QOpenGLWidget)
-	void initializeGL() override;
-	void resizeGL(int w, int h) override;
-	void paintGL() override;
+	virtual void initializeGL() override;
+	virtual void resizeGL(int w, int h) override;
+	virtual void paintGL() override;
 
 	// reimplemented (QWidget)
-	void mousePressEvent(QMouseEvent *e) override;
-	void mouseReleaseEvent(QMouseEvent* event) override;
-	void mouseMoveEvent(QMouseEvent *e) override;
-	void closeEvent(QCloseEvent* event) override;
-	void wheelEvent(QWheelEvent* event) override;
-	void keyPressEvent(QKeyEvent* e) override;
+	virtual void mousePressEvent(QMouseEvent *e) override;
+	virtual void mouseReleaseEvent(QMouseEvent* event) override;
+	virtual void mouseMoveEvent(QMouseEvent *e) override;
+	virtual void closeEvent(QCloseEvent* event) override;
+	virtual void wheelEvent(QWheelEvent* event) override;
+	virtual void keyPressEvent(QKeyEvent* e) override;
 
 private Q_SLOTS:
 	void OnZoomIn();

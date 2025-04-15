@@ -25,9 +25,9 @@ public:
 
 protected:
 	// reimplemented (imt3dgui::CShape3dBase)
-	void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
-	void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
-	void Draw(QPainter& painter) override;
+	virtual void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
+	virtual void Draw(QPainter& painter) override;
 
 private:
 	const CShape3dBase* m_slaveShapePtr;

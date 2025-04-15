@@ -23,9 +23,9 @@ public:
 	typedef idoc::CStandardDocumentMetaInfo BaseClass;
 
 	// reimplemented (idoc::IDocumentMetaInfo)
-	virtual QByteArray GetMetaInfoId(int metaInfoType) const;
-	virtual QString GetMetaInfoName(int metaInfoType) const;
-	virtual QString GetMetaInfoDescription(int metaInfoType) const;
+	virtual QByteArray GetMetaInfoId(int metaInfoType) const override;
+	virtual QString GetMetaInfoName(int metaInfoType) const override;
+	virtual QString GetMetaInfoDescription(int metaInfoType) const override;
 };
 
 

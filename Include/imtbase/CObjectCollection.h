@@ -29,7 +29,7 @@ public:
 	void SetOperationFlags(int flags, const QByteArray& objectId = QByteArray());
 
 	// reimplemented (imtbase::IObjectCollection)
-	int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
+	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;

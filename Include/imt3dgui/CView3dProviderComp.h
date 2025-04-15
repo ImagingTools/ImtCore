@@ -172,35 +172,35 @@ public:
 	CView3dProviderComp();
 
 	// reimplemented (imt3dgui::ISceneEventHandler)
-	void OnShowGrid(bool show) override;
-	void OnShowAxis(bool show) override;
-	void OnShowRuler(bool show) override;
-	void OnPointSelection(const QPoint& point, bool clearPreviousSelection) override;
-	void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) override;
-	void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) override;
-	void OnClearSelection() override;
-	void OnAllSelection() override;
-	void OnInvertSelection() override;
-	void OnDeleteSelection() override;
-	bool OnMousePress(QMouseEvent& e) override;
-	bool OnMouseMove(QMouseEvent& e) override;
-	bool OnMouseRelease(QMouseEvent& e) override;
+	virtual void OnShowGrid(bool show) override;
+	virtual void OnShowAxis(bool show) override;
+	virtual void OnShowRuler(bool show) override;
+	virtual void OnPointSelection(const QPoint& point, bool clearPreviousSelection) override;
+	virtual void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) override;
+	virtual void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) override;
+	virtual void OnClearSelection() override;
+	virtual void OnAllSelection() override;
+	virtual void OnInvertSelection() override;
+	virtual void OnDeleteSelection() override;
+	virtual bool OnMousePress(QMouseEvent& e) override;
+	virtual bool OnMouseMove(QMouseEvent& e) override;
+	virtual bool OnMouseRelease(QMouseEvent& e) override;
 
 	// reimplemented (imt3dview::IScene3dProvider)
-	imt3dview::IScene3d* GetScene() const override;
+	virtual imt3dview::IScene3d* GetScene() const override;
 
 	// reimplemented (ibase::ICommandsProvider)
-	const ibase::IHierarchicalCommand* GetCommands() const override;
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 protected:
 	// reimplemented (iqtgui::TRestorableGuiWrap)
-	void OnRestoreSettings(const QSettings& settings) override;
-	void OnSaveSettings(QSettings& settings) const override;
+	virtual void OnRestoreSettings(const QSettings& settings) override;
+	virtual void OnSaveSettings(QSettings& settings) const override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	void OnGuiCreated() override;
-	void OnGuiRetranslate() override;
-	void OnGuiDesignChanged() override;
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiRetranslate() override;
+	virtual void OnGuiDesignChanged() override;
 
 protected:
 	iqtgui::CHierarchicalCommand& GetShowGridCommand();

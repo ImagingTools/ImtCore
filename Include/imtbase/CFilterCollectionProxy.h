@@ -29,7 +29,7 @@ public:
 	void SetOperationFlags(int flags, const QByteArray& objectId = QByteArray());
 
 	// reimplemented (imtbase::IObjectCollection)
-	int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
+	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
 	virtual Id InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,

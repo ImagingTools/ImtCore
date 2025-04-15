@@ -35,11 +35,11 @@ public:
 
 protected:
 	// reimplement (imt3dgui::CShape3dBase)
-	void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
-	void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
+	virtual void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
 
 	// reimplement (imt3dgui::IDrawable)
-	void Draw(QPainter& painter) override;
+	virtual void Draw(QPainter& painter) override;
 
 private:
 	QFont GetAxeLabelFont() const;

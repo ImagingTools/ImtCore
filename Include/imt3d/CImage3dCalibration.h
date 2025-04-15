@@ -29,9 +29,9 @@ public:
 	virtual bool Transform(IPointsBasedObject::PointXyz32& result, const i2d::CVector2d& pixelPosition) const override;
 
 	// reimplemented (istd::IChangeable)
-	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
-	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS);
-	virtual bool IsEqual(const IChangeable& object) const;
+	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const override;
 
 	// reimplemented (istd::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

@@ -37,7 +37,7 @@ public:
 				const istd::IChangeable& object,
 				const imtbase::IOperationContext* operationContextPtr,
 				bool useExternDelegate = true) const override;
-	QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
+	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual QByteArray CreateDeleteObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,

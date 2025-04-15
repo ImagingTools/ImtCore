@@ -41,28 +41,28 @@ public:
 	int FindVertex(const QPoint& point, bool limitDistance, QVector3D* positionPtr = nullptr) const;
 
 	// reimplement (imt3dgui::IShape3d)
-	bool IsValid() const override;
-	bool IsVisible() const override;
-	void SetVisible(bool isVisible) override;
+	virtual bool IsValid() const override;
+	virtual bool IsVisible() const override;
+	virtual void SetVisible(bool isVisible) override;
 
 	// reimplement (imt3dview::IScene3dItem)
-	void SetCamera(const imt3dview::IScene3dCamera* cameraPtr) override;
-	void SetProjection(const QMatrix4x4& projection) override;
-	void SetViewPort(const QRect& viewPort) override;
+	virtual void SetCamera(const imt3dview::IScene3dCamera* cameraPtr) override;
+	virtual void SetProjection(const QMatrix4x4& projection) override;
+	virtual void SetViewPort(const QRect& viewPort) override;
 
-	const QVector3D& GetPosition() const override;
-	void SetPosition(const QVector3D& position) override;
+	virtual const QVector3D& GetPosition() const override;
+	virtual void SetPosition(const QVector3D& position) override;
 
-	const QQuaternion& GetRotation() const override;
-	void SetRotation(const QQuaternion& rotation) override;
+	virtual const QQuaternion& GetRotation() const override;
+	virtual void SetRotation(const QQuaternion& rotation) override;
 
-	float GetScale() const override;
-	void SetScale(float scale) override;
+	virtual float GetScale() const override;
+	virtual void SetScale(float scale) override;
 
 	// reimplement (imt3dview::IDrawable)
-	void SetContext(QOpenGLContext* contextPtr) override;
-	void DrawGl(QOpenGLShaderProgram& program) override;
-	void Draw(QPainter& /*painter*/) override;
+	virtual void SetContext(QOpenGLContext* contextPtr) override;
+	virtual void DrawGl(QOpenGLShaderProgram& program) override;
+	virtual void Draw(QPainter& /*painter*/) override;
 
 protected:
 	// reimplement (IShape3d)
@@ -83,7 +83,7 @@ protected:
 	void RefreshGeometry();
 
 	// reimplemented (imod::CSingleModelObserverBase)
-	void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
 	const imt3d::IPointsBasedObject* m_pointsDataPtr;

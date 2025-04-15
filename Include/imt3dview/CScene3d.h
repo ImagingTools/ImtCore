@@ -22,19 +22,19 @@ public:
 	CScene3d();
 
 	// reimplemented (IScene3d)
-	void SetCamera(IScene3dCamera* cameraPtr) override;
-	void SetProjection(const QMatrix4x4& projection) override;
-	void SetViewPort(const QRect& viewPort) override;
-	imt3d::CCuboid GetBoundingCuboid() const override;
-	QByteArrayList GetShapeIds() const override;
-	imt3dview::IScene3dItem* GetShapePtr(const QByteArray& id) const override;
-	QByteArray AddShapeToScene(imt3dview::IScene3dItem* objectPtr, int itemFlags = SF_NONE) override;
-	void RemoveShapeFromScene(imt3dview::IScene3dItem* objectPtr) override;
+	virtual void SetCamera(IScene3dCamera* cameraPtr) override;
+	virtual void SetProjection(const QMatrix4x4& projection) override;
+	virtual void SetViewPort(const QRect& viewPort) override;
+	virtual imt3d::CCuboid GetBoundingCuboid() const override;
+	virtual QByteArrayList GetShapeIds() const override;
+	virtual imt3dview::IScene3dItem* GetShapePtr(const QByteArray& id) const override;
+	virtual QByteArray AddShapeToScene(imt3dview::IScene3dItem* objectPtr, int itemFlags = SF_NONE) override;
+	virtual void RemoveShapeFromScene(imt3dview::IScene3dItem* objectPtr) override;
 
 	// reimplemented (imt3dview::IDrawable)
-	void SetContext(QOpenGLContext* contextPtr) override;
-	void DrawGl(QOpenGLShaderProgram& program);
-	void Draw(QPainter& painter);
+	virtual void SetContext(QOpenGLContext* contextPtr) override;
+	virtual void DrawGl(QOpenGLShaderProgram& program) override;
+	virtual void Draw(QPainter& painter) override;
 
 private:
 	struct ShapeInfo

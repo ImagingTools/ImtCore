@@ -44,27 +44,27 @@ public:
 
 protected:
 	// reimplemented (iqtui::CGuiComponentBase)
-	void OnGuiCreated() override;
-	void OnGuiDestroyed() override;
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
 
 	// reimplemented (imt3dgui::ISceneEventHandler)
-	void OnShowGrid(bool show) override;
-	void OnShowAxis(bool show) override;
-	void OnShowRuler(bool show) override;
-	void OnPointSelection(const QPoint& point, bool clearPreviousSelection) override;
-	void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) override;
-	void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) override;
-	void OnClearSelection() override;
-	void OnAllSelection() override;
-	void OnInvertSelection() override;
-	void OnDeleteSelection() override;
-	bool OnMousePress(QMouseEvent& e) override;
-	bool OnMouseMove(QMouseEvent& e) override;
-	bool OnMouseRelease(QMouseEvent& e) override;
+	virtual void OnShowGrid(bool show) override;
+	virtual void OnShowAxis(bool show) override;
+	virtual void OnShowRuler(bool show) override;
+	virtual void OnPointSelection(const QPoint& point, bool clearPreviousSelection) override;
+	virtual void OnBoxSelection(const QRect& rect, bool clearPreviousSelection) override;
+	virtual void OnCircleSelection(const QRect& rect, bool clearPreviousSelection) override;
+	virtual void OnClearSelection() override;
+	virtual void OnAllSelection() override;
+	virtual void OnInvertSelection() override;
+	virtual void OnDeleteSelection() override;
+	virtual bool OnMousePress(QMouseEvent& e) override;
+	virtual bool OnMouseMove(QMouseEvent& e) override;
+	virtual bool OnMouseRelease(QMouseEvent& e) override;
 
 	// reimplemented (iqtgui::TRestorableGuiWrap)
-	void OnRestoreSettings(const QSettings& settings) override;
-	void OnSaveSettings(QSettings& settings) const override;
+	virtual void OnRestoreSettings(const QSettings& settings) override;
+	virtual void OnSaveSettings(QSettings& settings) const override;
 
 private:
 	CGridShape m_gridShape;

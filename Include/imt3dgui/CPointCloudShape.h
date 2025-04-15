@@ -39,14 +39,14 @@ public:
 
 protected:
 	// reimplemented (imt3dview::CShape3dBase)
-	void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
-	void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
+	virtual void UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet) override;
+	virtual void DrawShapeGl(QOpenGLShaderProgram& program, QOpenGLFunctions& functions) override;
 
 	// reimplemented (imt3dview::IDrawable)
-	void Draw(QPainter& painter) override;
+	virtual void Draw(QPainter& painter) override;
 
 	// reimplemented (imt3dgui::IShape3d)
-	QVector3D GetColor() const override;
+	virtual QVector3D GetColor() const override;
 
 private:
 	void SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection);
