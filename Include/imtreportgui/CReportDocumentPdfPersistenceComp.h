@@ -40,8 +40,8 @@ public:
 				ibase::IProgressManager* progressManagerPtr = NULL) const override;
 
 	// reimplemented (ifile::IFileTypeInfo)
-	bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = NULL, int flags = -1, bool doAppend = false) const override;
-	QString GetTypeDescription(const QString* extensionPtr = NULL) const override;
+	virtual bool GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr = NULL, int flags = -1, bool doAppend = false) const override;
+	virtual QString GetTypeDescription(const QString* extensionPtr = NULL) const override;
 
 private:
 	I_ATTR(int, m_resolutionDpiAttrPtr);

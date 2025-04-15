@@ -46,23 +46,23 @@ public:
 	QByteArrayList GetArgumentValueMulti(AvailableArguments argument) const;
 
 	// reimplemented (IDesignTokenArgumentsParser)
-	void SetArguments(int argc, char**argv) override;
-	bool IsHelpRequested() const override;
-	bool IsSplitModeRequired() const override;
-	bool IsErrorsIgnoreRequested() const override;
-	bool IsCopyDesignTokenFileRequired() const override;
-	bool IsWebGenerateResourceRequired() const override;
-	bool IsCommonGenerateResourceRequired() const override;
-	bool IsQmlGenerateRequired() const override;
+	virtual void SetArguments(int argc, char**argv) override;
+	virtual bool IsHelpRequested() const override;
+	virtual bool IsSplitModeRequired() const override;
+	virtual bool IsErrorsIgnoreRequested() const override;
+	virtual bool IsCopyDesignTokenFileRequired() const override;
+	virtual bool IsWebGenerateResourceRequired() const override;
+	virtual bool IsCommonGenerateResourceRequired() const override;
+	virtual bool IsQmlGenerateRequired() const override;
 
-	QByteArray GetDesignTokenFilePath() const override;
-	QByteArrayList GetDesignTokenFileMultiPath() const override;
-	QByteArray GetImagesInputDirectoryPath() const override;
-	QByteArrayList GetImagesInputDirectoryMultiPath() const override;
-	QByteArray GetStyleSheetsInputDirectoryPath() const override;
-	QByteArray GetOutputDirectoryPath() const override;
-	QByteArray GetOutputFilePath() const override;
-	QByteArray GetProjectName() const override;
+	virtual QByteArray GetDesignTokenFilePath() const override;
+	virtual QByteArrayList GetDesignTokenFileMultiPath() const override;
+	virtual QByteArray GetImagesInputDirectoryPath() const override;
+	virtual QByteArrayList GetImagesInputDirectoryMultiPath() const override;
+	virtual QByteArray GetStyleSheetsInputDirectoryPath() const override;
+	virtual QByteArray GetOutputDirectoryPath() const override;
+	virtual QByteArray GetOutputFilePath() const override;
+	virtual QByteArray GetProjectName() const override;
 
 
 private:

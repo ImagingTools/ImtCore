@@ -43,7 +43,7 @@ public:
 	const LoginEventInfo& GetLoginEventInfo() const;
 
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive);
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;

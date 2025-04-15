@@ -31,7 +31,7 @@ public:
 
 protected:
 	// reimplemented (imtsdlgen::CSdlGeneralManagerComp)
-	bool CreateCode() override;
+	virtual bool CreateCode() override;
 
 private:
 	I_REF(imtsdlgenv2::ISdlProcessArgumentsParser, m_sdlArgumentParserV2CompPtr);

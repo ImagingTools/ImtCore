@@ -110,7 +110,7 @@ private Q_SLOTS:
 protected:
 	// reimplemented (QObject)
 	virtual bool eventFilter(QObject* watched, QEvent* event) override;
-	virtual void timerEvent(QTimerEvent* event);
+	virtual void timerEvent(QTimerEvent* event) override;
 
 	// reimplemented (QWidget)
 #if QT_VERSION < 0x060000

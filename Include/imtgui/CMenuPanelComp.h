@@ -104,7 +104,7 @@ private:
 		explicit PageSubselectionObserver(CMenuPanelComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CMenuPanelComp& m_parent;
@@ -116,7 +116,7 @@ private:
 		explicit PageVisualStatusObserver(CMenuPanelComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CMenuPanelComp& m_parent;

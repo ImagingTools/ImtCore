@@ -31,8 +31,8 @@ public:
 
 
 	// reimplemented (IDesignTokenProcessor)
-	int Exec() override;
-	QByteArray GetHelpString() const override;
+	virtual int Exec() override;
+	virtual QByteArray GetHelpString() const override;
 
 
 private:

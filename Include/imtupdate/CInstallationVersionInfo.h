@@ -21,7 +21,7 @@ public:
 	void SetVersionFromString(const QString& versionString);
 
 	// reimplemented (istd::IChangable)
-	bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 	// reimplimented (IVersionInfo)
 	virtual VersionIds GetVersionIds() const override;

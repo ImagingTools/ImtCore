@@ -39,7 +39,7 @@ public:
 	const ISender* GetSender(const QByteArray& requestId);
 
 	//reimplemented (QThread)
-	void run() override;
+	virtual void run() override;
 
 Q_SIGNALS:
 	void StartProcess(const IRequest* request, const QByteArray& subCommandId);

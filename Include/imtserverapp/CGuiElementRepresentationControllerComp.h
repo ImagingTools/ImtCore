@@ -30,7 +30,7 @@ protected:
 	virtual bool GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const override;
 
 	// reimplemented (icomp::CComponentBase)
-	void OnComponentCreated() override;
+	virtual void OnComponentCreated() override;
 
 private:
 	istd::TSmartPtr<imtserverapp::CCommandRepresentationController> m_commandRepresentationControllerPtr;

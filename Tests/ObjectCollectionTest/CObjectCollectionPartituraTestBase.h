@@ -64,7 +64,7 @@ template <const char* partituraPath>
 class CObjectCollectionPartituraTestBaseRegister : public CObjectCollectionPartituraTestBase
 {
 protected:
-	virtual void initTestCase(){
+	virtual void initTestCase() override{
 		// paths to test component accessor and config for him
 		m_imtCorePath = qEnvironmentVariable("IMTCOREDIR");
 		m_registryFile = m_imtCorePath + QString("/Tests/ObjectCollectionTest/Partitura/%1.acc").arg(partituraPath);

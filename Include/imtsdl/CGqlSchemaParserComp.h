@@ -76,7 +76,7 @@ protected:
 
 	// reimplemented (CGqlExtSchemaParser)
 	virtual bool ProcessSchemaImports() override;
-	bool ValidateSchema() override;
+	virtual bool ValidateSchema() override;
 
 
 private:

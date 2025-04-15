@@ -24,7 +24,7 @@ public:
 
 	// reimplemented (imtlic::ILicenseInstance)
 	virtual QDateTime GetExpiration() const override;
-	void SetExpiration(const QDateTime& expirationTime) override;
+	virtual void SetExpiration(const QDateTime& expirationTime) override;
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;

@@ -38,8 +38,8 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtservice::IConnectionCollection)
-	QString GetServiceVersion() const override;
-	QString GetServiceTypeName() const override;
+	virtual QString GetServiceVersion() const override;
+	virtual QString GetServiceTypeName() const override;
 	virtual bool SetServiceTypeName(const QString& serviceTypeName) const override;
 	virtual const imtbase::ICollectionInfo* GetUrlList() const override;
 	virtual const QUrl* GetUrl(const QByteArray& id) const override;

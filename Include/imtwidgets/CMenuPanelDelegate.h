@@ -15,19 +15,19 @@ public:
 	explicit CMenuPanelDelegate(QTreeView* menuPanelPtr = nullptr);
 	
 	// reimplemented (IMenuPanelDelegate)
-	int GetMinimumWidth() override;
+	virtual int GetMinimumWidth() override;
 
-	void SetFont(const QFont& font) override;
+	virtual void SetFont(const QFont& font) override;
 
-	void SetIndent(int indent) override;
-	void SetItemHeight(int height) override;
-	void SetIconSizeRatio(double ratio) override;
-	void SetIconSizeHoverRatio(double ratio) override;
+	virtual void SetIndent(int indent) override;
+	virtual void SetItemHeight(int height) override;
+	virtual void SetIconSizeRatio(double ratio) override;
+	virtual void SetIconSizeHoverRatio(double ratio) override;
 
-	void SetTopPadding(int padding) override;
-	void SetLeftPadding(int padding) override;
-	void SetRightPadding(int padding) override;
-	void SetIconToTextPadding(int padding) override;
+	virtual void SetTopPadding(int padding) override;
+	virtual void SetLeftPadding(int padding) override;
+	virtual void SetRightPadding(int padding) override;
+	virtual void SetIconToTextPadding(int padding) override;
 
 protected:
 	// reimplemented (QItemDelegate)

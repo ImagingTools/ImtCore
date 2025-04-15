@@ -21,7 +21,7 @@ public:
 	void SetColumnId(const QByteArray &columnId);
 
 	// reimplemented (QStyledItemDelegate)
-	void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
+	virtual void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
 
 private:
 	const ICollectionViewDelegate* m_collectionViewDelegate;

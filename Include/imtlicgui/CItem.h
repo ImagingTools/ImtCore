@@ -41,11 +41,11 @@ public:
 	virtual IItemTree* GetChild(int index) const override;
 
 	// reimplemented (istd::IChangeable)
-	virtual int GetSupportedOperations() const;
-	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
-	virtual bool IsEqual(const istd::IChangeable& object) const;
-	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const;
-	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS);
+	virtual int GetSupportedOperations() const override;
+	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const istd::IChangeable& object) const override;
+	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
 	QByteArray m_id;

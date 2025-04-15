@@ -35,7 +35,7 @@ public:
 	void SetFontFlags(int fontFlags);
 
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive);
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented istd::IChangeable
 	virtual int GetSupportedOperations() const override;

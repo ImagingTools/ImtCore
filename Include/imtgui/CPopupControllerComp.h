@@ -62,8 +62,8 @@ public:
 	virtual void AddMessage(const MessagePtr& messagePtr) override;
 
 	// reimplemented (icomp::CComponentBase)
-	void OnComponentCreated() override;
-	void OnComponentDestroyed() override;
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private Q_SLOTS:
 	void OnPrimaryScreenChanged();

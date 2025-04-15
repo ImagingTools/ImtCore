@@ -37,15 +37,15 @@ public:
 	virtual bool GetPreviosItemOffset(quint64& offset, quint64 startOffset = 0xffffffffffffff) override;
 
 	// reimplemented (imtmdbx::IMaskContainer)
-	void AddMask(IMask* mask, bool isInversion = false) override;
-	void Clear() override;
-	bool RemoveLastMask(bool isInversion = false) override;
-	bool RemoveMask(int index, int n = 1, bool isInversion = false) override;
-	int GetMaskCount(bool isInversion = false) override;
-	void SetDocumentTable(IDocumentTable* documentTable) override;
-	quint64 GetUnitCount() override;
-	QList<quint64> GetUnitPositions(quint64 offset = 0, quint64 limit = -1) override;
-	QList<QByteArray> GetDocuments(quint64 offset = 0, quint64 limit = -1) override;
+	virtual void AddMask(IMask* mask, bool isInversion = false) override;
+	virtual void Clear() override;
+	virtual bool RemoveLastMask(bool isInversion = false) override;
+	virtual bool RemoveMask(int index, int n = 1, bool isInversion = false) override;
+	virtual int GetMaskCount(bool isInversion = false) override;
+	virtual void SetDocumentTable(IDocumentTable* documentTable) override;
+	virtual quint64 GetUnitCount() override;
+	virtual QList<quint64> GetUnitPositions(quint64 offset = 0, quint64 limit = -1) override;
+	virtual QList<QByteArray> GetDocuments(quint64 offset = 0, quint64 limit = -1) override;
 
 	void Erase();
 	bool isEmpty();

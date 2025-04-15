@@ -65,8 +65,8 @@ protected:
 	virtual QString CreateSpecificationName(const istd::IChangeable* specPtr) = 0;
 
 	// reimplemented (imod::IObserver)
-	bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;
-	bool OnModelDetached(imod::IModel* modelPtr) override;
+	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;
+	virtual bool OnModelDetached(imod::IModel* modelPtr) override;
 
 private:
 	void OnSpecificationCollectionChanged(

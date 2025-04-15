@@ -48,8 +48,8 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
-	void OnGuiCreated() override;
-	void OnGuiRetranslate() override;
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiRetranslate() override;
 
 private Q_SLOTS:
 	void OnCheckBoxStateChanged(int checkState);

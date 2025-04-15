@@ -24,7 +24,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (ibase::ICommandsProvider)
-	const ibase::IHierarchicalCommand* GetCommands() const override;
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 private:
 	I_REF(ibase::ICommandsProvider, m_slaveCommandsProviderCompPtr);

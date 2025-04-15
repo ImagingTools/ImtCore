@@ -66,7 +66,7 @@ public:
 	virtual RequestState GetState() const override;
 	virtual QByteArray GetCommandId() const override;
 	virtual CommandParams GetCommandParams() const override;
-	QByteArray GetBody() const override;
+	virtual QByteArray GetBody() const override;
 	virtual QByteArray GetRequestId() const override;
 	virtual bool ParseDeviceData(QIODevice& device) override;
 

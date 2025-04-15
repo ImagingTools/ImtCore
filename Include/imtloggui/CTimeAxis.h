@@ -54,10 +54,10 @@ public:
 	// reimplemented (IEventScenePositionProvider)
 	virtual double GetScenePositionFromTime(const QDateTime& time) const override;
 	virtual QDateTime GetTimeFromScenePosition(double position) const override;
-	virtual QDateTime GetBeginTime() const;
-	virtual QDateTime GetEndTime() const;
-	virtual QDateTime GetVisibleBeginTime() const;
-	virtual QDateTime GetVisibleEndTime() const;
+	virtual QDateTime GetBeginTime() const override;
+	virtual QDateTime GetEndTime() const override;
+	virtual QDateTime GetVisibleBeginTime() const override;
+	virtual QDateTime GetVisibleEndTime() const override;
 
 Q_SIGNALS:
 	void EmitAxisPosChanged(const QPointF& oldPos, const QPointF& newPos);

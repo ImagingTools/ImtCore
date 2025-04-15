@@ -72,7 +72,7 @@ protected:
 	qintptr PopSocketDescriptor();
 
 	// reimplemented (QTcpServer)
-	void incomingConnection(qintptr socketDescriptor) override;
+	virtual void incomingConnection(qintptr socketDescriptor) override;
 
 protected:
 	QList<QPointer<CSocketThread>> m_threadSocketList;

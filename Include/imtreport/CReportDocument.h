@@ -23,13 +23,13 @@ public:
 	typedef idoc::TMultiPageDocumentWrap<IReportDocument> BaseClass;
 
 	// reimplemented (IReportDocument)
-	virtual const IReportPage* GetReportPage(int pageIndex) const;
+	virtual const IReportPage* GetReportPage(int pageIndex) const override;
 
 	// reimplemented (idoc::IMultiPageDocument)
 	virtual istd::IChangeable* InsertPage(
 				const idoc::IDocumentMetaInfo* pageMetaInfoPtr = NULL,
 				const iprm::IParamsSet* pageParameterPtr = NULL,
-				int position = -1);
+				int position = -1) override;
 };
 
 

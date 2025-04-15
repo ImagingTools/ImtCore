@@ -34,14 +34,14 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDesignTokenProcessor)
-	int Exec() override;
-	QByteArray GetHelpString()const override;
+	virtual int Exec() override;
+	virtual QByteArray GetHelpString()const override;
 
 	// reimplemented (IDesignTokenQrcUpdater)
-	bool CreateQrc(const QString& prefix, const QString& path, const QFileInfoList& files, const QByteArray& outputFileName) const override;
-	bool CreateQrcForDirs(const QStringList& inputDirNames, const QByteArray& outputFileName) const override;
-	bool CreateQrcRecursivly(const QString& inputDirName, const QByteArray& outputFileName) const override;
-	bool ModifyQrc(const QString& prefix, const QString& path, const QFileInfoList& files, const QByteArray& outputFileName) const override;
+	virtual bool CreateQrc(const QString& prefix, const QString& path, const QFileInfoList& files, const QByteArray& outputFileName) const override;
+	virtual bool CreateQrcForDirs(const QStringList& inputDirNames, const QByteArray& outputFileName) const override;
+	virtual bool CreateQrcRecursivly(const QString& inputDirName, const QByteArray& outputFileName) const override;
+	virtual bool ModifyQrc(const QString& prefix, const QString& path, const QFileInfoList& files, const QByteArray& outputFileName) const override;
 
 
 private:

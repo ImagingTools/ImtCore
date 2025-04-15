@@ -62,7 +62,7 @@ public:
 	void EnableSecureConnection(bool isSecureConnection = true);
 
 	// reimplemented (QThread)
-	void run() override;
+	virtual void run() override;
 
 public Q_SLOTS:
 	void OnWebSocketTextMessage(const QString& textMessage);

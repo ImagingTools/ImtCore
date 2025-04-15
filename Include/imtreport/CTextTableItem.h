@@ -52,7 +52,7 @@ public:
 	bool operator!=(const CTextTableItem &object) const;
 
 	// reimplemented (iser::ISerializable)
-	bool Serialize(iser::IArchive& archive) override;
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented istd::IChangeable
 	virtual int GetSupportedOperations() const override;

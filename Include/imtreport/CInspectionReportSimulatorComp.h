@@ -25,7 +25,7 @@ public:
 
 protected:
 	// reimplemented (icomp::CComponentBase)
-	void OnComponentCreated() override;
+	virtual void OnComponentCreated() override;
 
 private:
 	void PrepareReportInputData(IInspectionReportBuilder::ReportInputData& reportData) const;

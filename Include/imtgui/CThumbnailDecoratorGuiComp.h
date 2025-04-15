@@ -288,7 +288,7 @@ private:
 		explicit CommandsObserver(CThumbnailDecoratorGuiComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CThumbnailDecoratorGuiComp& m_parent;
@@ -302,7 +302,7 @@ private:
 		explicit AdditionalCommandsObserver(CThumbnailDecoratorGuiComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CThumbnailDecoratorGuiComp& m_parent;
@@ -315,7 +315,7 @@ private:
 		explicit PageModelObserver(CThumbnailDecoratorGuiComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CThumbnailDecoratorGuiComp& m_parent;
@@ -328,7 +328,7 @@ private:
 		explicit LoginObserver(CThumbnailDecoratorGuiComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CThumbnailDecoratorGuiComp& m_parent;
@@ -341,7 +341,7 @@ private:
 		explicit PageVisualStatusObserver(CThumbnailDecoratorGuiComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CThumbnailDecoratorGuiComp& m_parent;
@@ -354,7 +354,7 @@ private:
 		explicit AdditionalCommendActivatorsObserver(CThumbnailDecoratorGuiComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CThumbnailDecoratorGuiComp& m_parent;

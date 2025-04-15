@@ -54,7 +54,7 @@ protected:
 		explicit PageSubselectionObserver(CPageNavigationControllerComp& parent);
 
 		// reimplemented (imod::CMultiModelDispatcherBase)
-		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+		virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	private:
 		CPageNavigationControllerComp& m_parent;

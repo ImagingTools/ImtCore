@@ -34,7 +34,7 @@ public:
 	CEnableableLayoutFittableEditorGui(QObject* parentPtr = nullptr);
 
 	// reimplemented (ILayoutFittableWidget)
-	bool PlaceWidgetToGridLayout(QGridLayout& layout, int rowIndex = -1, int columnIndex = 1) override;
+	virtual bool PlaceWidgetToGridLayout(QGridLayout& layout, int rowIndex = -1, int columnIndex = 1) override;
 
 	// reimplemented (imod::IObserver)
 	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;

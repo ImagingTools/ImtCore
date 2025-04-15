@@ -51,7 +51,7 @@ public:
 	virtual void SetAlignment(const Qt::Alignment alignment);
 
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive);
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented istd::IChangeable
 	virtual int GetSupportedOperations() const override;

@@ -48,7 +48,7 @@ public:
 	static QByteArray GetTypeName(){ return "TextTable"; }
 
 	// reimplemented (iser::ISerializable)
-	bool Serialize(iser::IArchive& archive) override;
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented istd::IChangeable
 	virtual int GetSupportedOperations() const override;

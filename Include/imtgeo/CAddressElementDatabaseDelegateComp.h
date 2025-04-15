@@ -54,12 +54,12 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
-    virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
+	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual QByteArray GetObjectTypeId(
 			const QByteArray& objectId) const override;
-    virtual bool CreateTextFilterQuery(
-                const imtbase::ICollectionFilter& collectionFilter,
-                QString& textFilterQuery) const override;
+	virtual bool CreateTextFilterQuery(
+				const imtbase::ICollectionFilter& collectionFilter,
+				QString& textFilterQuery) const override;
 
 private:
     I_FACT(imtgeo::IAddressElementInfo, m_adrElementInfoFactCompPtr);

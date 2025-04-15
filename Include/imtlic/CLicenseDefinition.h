@@ -24,9 +24,9 @@ public:
 
 	// reimplemented (imtlic::ILicenseDefinition)
 	virtual QString GetLicenseName() const override;
-	void SetLicenseName(const QString& licenseName) override;
+	virtual void SetLicenseName(const QString& licenseName) override;
 	virtual QByteArray GetLicenseId() const override;
-	void SetLicenseId(const QByteArray& licenseId) override;
+	virtual void SetLicenseId(const QByteArray& licenseId) override;
 	virtual QString GetLicenseDescription() const override;
 	virtual void SetLicenseDescription(const QString& licenseDescription) override;
 	virtual QByteArray GetProductId() const override;

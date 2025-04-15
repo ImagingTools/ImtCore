@@ -31,14 +31,14 @@ public:
 	static QByteArray GetTypeName();
 
 	// reimplemented (iser::IObject)
-	virtual QByteArray GetFactoryId() const;
+	virtual QByteArray GetFactoryId() const override;
 
 	// reimplemented (iser::ISerializeable)
-	virtual bool Serialize(iser::IArchive& archive);
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
-	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS);
-	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const;
+	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 };
 
 

@@ -28,10 +28,10 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (istd::TIFactory)
-	ObjectInterface* CreateInstance(const QByteArray& keyId = "") const override;
+	virtual ObjectInterface* CreateInstance(const QByteArray& keyId = "") const override;
 
 	// reimplemented (istd::IFactoryInfo)
-	istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
+	virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
 
 private:
 	I_TFACT(ObjectInterface, m_factCompPtr);

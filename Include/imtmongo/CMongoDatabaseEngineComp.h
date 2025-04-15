@@ -62,7 +62,7 @@ public:
 	static void DrectBindValueInsertDefault(QByteArray* string, const QByteArray& what);
 	static void DrectBindValueUpdateDefault(QByteArray* string, const QByteArray& what);
 
-	mongocxx::database* GetDatabase() override;
+	virtual mongocxx::database* GetDatabase() override;
 
 protected:
 

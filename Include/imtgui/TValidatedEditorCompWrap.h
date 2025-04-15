@@ -20,7 +20,7 @@ public:
 	I_BEGIN_COMPONENT(Editor);
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_ASSIGN_MULTI_0(m_validationMessageIdAttrPtr, "ValidationMessageIds", "Validation message ids", false);
-		I_ASSIGN_MULTI_0(m_validationMessageWidgetPropertyAttrPtr, "ValidationMessageWidget«roperties", "Properties for identifying the validation message widgets", false);
+		I_ASSIGN_MULTI_0(m_validationMessageWidgetPropertyAttrPtr, "ValidationMessageWidget properties", "Properties for identifying the validation message widgets", false);
 	I_END_COMPONENT;
 
 protected:

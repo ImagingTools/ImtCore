@@ -24,11 +24,11 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtreport::IInspectionReportBuilder)
-	bool CreateReport(const ReportInputData& inputData, IReportDocument& reportDocument, const iprm::IParamsSet* paramsPtr = nullptr) const override;
+	virtual bool CreateReport(const ReportInputData& inputData, IReportDocument& reportDocument, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
-	void OnComponentCreated() override;
+	virtual void OnComponentCreated() override;
 
 private:
 	static QString GetStatusText(istd::IInformationProvider::InformationCategory status);

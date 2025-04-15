@@ -36,7 +36,7 @@ public:
 	virtual void AddMessage(const IMessageConsumer::MessagePtr& messagePtr) override;
 
 	// reimplemented (iser::ISerializable)
-	bool Serialize(iser::IArchive & archive) override;
+	virtual bool Serialize(iser::IArchive & archive) override;
 
 private:
 	mutable QMutex m_mutex;
