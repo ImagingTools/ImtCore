@@ -76,24 +76,6 @@ public:
 		Q_INIT_RESOURCE(imtguigqlqml);
 		Q_INIT_RESOURCE(imtauthguiqml);
 		Q_INIT_RESOURCE(imtlicguiqml);
-
-		qmlRegisterType<imtbase::CTreeItemModel>("Acf", 1, 0, "TreeItemModel");
-		qmlRegisterType<imtqml::CGqlModel>("Acf", 1, 0, "GqlModel");
-		qmlRegisterType<imtqml::CGqlRequest>("Acf", 1, 0, "GqlRequest");
-		qmlRegisterType<imtqml::CRemoteFileController>("Acf", 1, 0, "RemoteFileController");
-		qmlRegisterType<imtqml::FileIO>("Acf", 1, 0, "FileIO");
-		qmlRegisterType<imtqml::CQmlProcess>("Acf", 1, 0, "Process");
-		qmlRegisterType<imtqml::CQmlObjectCollectionIterator>("Acf", 1, 0, "QmlCollectionIterator");
-		qmlRegisterSingletonInstance<imtqml::CNetworkEventInterceptor>("Acf", 1, 0, "NetworkEventInterceptor", imtqml::CNetworkEventInterceptor::Instance());
-
-	#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-		qmlRegisterModule("QtGraphicalEffects", 1, 12);
-		qmlRegisterModule("QtGraphicalEffects", 1, 0);
-		qmlRegisterModule("QtQuick.Dialogs", 1, 3);
-	#else
-		qmlRegisterModule("QtQuick.Dialogs", 6, 2);
-		qmlRegisterModule("Qt5Compat.GraphicalEffects", 6, 0);
-	#endif
 	}
 
 	static void InitTheme()
