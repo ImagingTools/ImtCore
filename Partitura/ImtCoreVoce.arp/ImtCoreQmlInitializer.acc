@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5349" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>This component registrates all types of the ImtCore modules for QQmlEngine.</Description>
+    <Keywords>&quot;QML Module Type Registrator QQmlEngine&quot; Author='&quot;Sergey Zastrovnyh&quot;'</Keywords>
+    <ElementsList>
+        <Element Id="StaticQmlBaseTypeRegistrator" PackageId="ImtCorePck" ComponentId="StaticQmlTypeRegistrator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="StaticQmlModuleRegistrator" PackageId="ImtCorePck" ComponentId="StaticQmlModuleRegistrator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="StaticQmlTypeRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlTypeRegistrator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RegisterCGqlModel" Type="Boolean" ExportId="RegisterCGqlModel">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RegisterCGqlRequest" Type="Boolean" ExportId="RegisterCGqlRequest">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RegisterCNetworkEventInterceptor" Type="Boolean" ExportId="RegisterCNetworkEventInterceptor">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RegisterCQmlProcess" Type="Boolean" ExportId="RegisterCQmlProcess">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RegisterCRemoteFileController" Type="Boolean" ExportId="RegisterCRemoteFileController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RegisterFileIO" Type="Boolean" ExportId="RegisterFileIO">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces/>
+    <ExportedComponents>
+        <Component ExportedId="StaticQmlBaseTypeRegistrator" ComponentId="StaticQmlBaseTypeRegistrator"/>
+        <Component ExportedId="StaticQmlModuleRegistrator" ComponentId="StaticQmlModuleRegistrator"/>
+        <Component ExportedId="StaticQmlTypeRegistrator" ComponentId="StaticQmlTypeRegistrator"/>
+    </ExportedComponents>
+</Acf>

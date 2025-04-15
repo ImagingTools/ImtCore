@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5349" Description="ACF"/>
+            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="StaticQmlBaseTypeRegistrator" X="600" Y="325" Note=""/>
+        <Element ComponentName="StaticQmlModuleRegistrator" X="509" Y="233" Note=""/>
+        <Element ComponentName="StaticQmlTypeRegistrator" X="350" Y="325" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
