@@ -43,6 +43,7 @@ public:
 		I_ASSIGN(m_iconPathAttrPtr, "IconPath", "file path for the application icon", true, ":/Icons/AcfLogo");
 		I_ASSIGN(m_titleFormatAttrPtr, "TitleFormat", "Describe format of title bar, tags:\n\t$(CompanyName) - name of company\n\t$(ProductName) - product name\n\t$(AppName) - application name\n\t$(AppSubName) - application sub name\n\t$(AppType) - type of application\n\t$(Version) - main application version", true, "$(AppName)");
 		I_ASSIGN_MULTI_0(m_componentsToInitializeCompPtr, "ComponentsToInitialize", "List of components to be initialized after creation of the application instance (QCoreApplication)", false);
+		I_ASSIGN_MULTI_0(m_componentsToPreInitializeCompPtr, "ComponentsToPreInitialize", "List of components to be initialized after creation of the application instance (QCoreApplication) but before the loop was started", false);
 	I_END_COMPONENT;
 
 	CQuickApplicationCompBase();
@@ -94,6 +95,7 @@ private:
 	I_ATTR(QString, m_iconPathAttrPtr);
 	I_ATTR(QString, m_titleFormatAttrPtr);
 	I_MULTIREF(istd::IPolymorphic, m_componentsToInitializeCompPtr);
+	I_MULTIREF(istd::IPolymorphic, m_componentsToPreInitializeCompPtr);
 
 	bool m_useSplashScreen;
 	istd::CGeneralTimeStamp m_splashScreenTimer;

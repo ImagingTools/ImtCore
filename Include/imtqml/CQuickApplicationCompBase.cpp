@@ -162,6 +162,11 @@ void CQuickApplicationCompBase::InitializeComponentApplication()
 	if (m_translationManagerCompPtr.IsValid() && (m_translationManagerCompPtr->GetCurrentLanguageIndex() < 0)){
 		m_translationManagerCompPtr->SetSystemLanguage();
 	}
+
+	for (int i = 0; i < m_componentsToPreInitializeCompPtr.GetCount(); ++i){
+		istd::IPolymorphic* componentPtr = m_componentsToPreInitializeCompPtr[i];
+		Q_UNUSED(componentPtr);
+	}
 }
 
 
