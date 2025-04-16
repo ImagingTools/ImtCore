@@ -9,7 +9,9 @@ Item {
     property ListModel dialogsModel: ModalDialogManager.modalDialogModels;
 
     Component.onCompleted: {
-        ModalDialogManager.activeView = container;
+		if(visible){
+			ModalDialogManager.activeView = container;
+		}
     }
 
     Repeater {
