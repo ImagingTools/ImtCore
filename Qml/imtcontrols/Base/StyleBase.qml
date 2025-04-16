@@ -210,7 +210,7 @@ StyleComponents {
 	property bool enableHoverEffect: true
 
 
-	function getIconPath(iconName, state, mode){
+	function getIconPath(iconName, state, mode, extention /* = '.svg'*/){
 		if(iconName == undefined){
 			return;
 		}
@@ -233,7 +233,12 @@ StyleComponents {
 			iconPath += "_" + mode;
 		}
 
-		iconPath += ".svg";
+		if (typeof extention !== 'string'){
+			iconPath += ".svg";
+		}
+		else {
+			iconPath += extention
+		}
 
 		return iconPath;
 	}
