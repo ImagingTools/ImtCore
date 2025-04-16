@@ -34,7 +34,10 @@ Item {
 	property alias elementsCount: container.elementsCount;
 	property alias pagination: container.pagination;
 	property alias metaInfoView: collectionMetaInfo;
-	
+	property alias tableRowDelegate: container.tableRowDelegate;
+	property alias scrollbarItem: container.scrollbarItem
+	property alias scrollbarItemHoriz: container.scrollbarItemHoriz
+
 	property bool visibleMetaInfo: false;
 	property int metaInfoWidth: 200;
 	

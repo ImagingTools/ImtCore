@@ -22,7 +22,10 @@ ViewBase {
 	property alias filterMenuVisible: filterMenu_.visible;
 	property alias pagination: pagination_;
 	property alias elementsCount: tableInternal.elementsCount;
-	
+	property alias tableRowDelegate: tableInternal.rowDelegate
+	property alias scrollbarItem: tableInternal.scrollbarItem
+	property alias scrollbarItemHoriz: tableInternal.scrollbarItemHoriz
+
 	property CollectionFilter collectionFilter: CollectionFilter {}
 	
 	signal selectedIndexChanged(int index);
