@@ -24,7 +24,7 @@ public:
 	CQmlObjectCollectionIterator(imtbase::IObjectCollectionIterator* iterator);
 	Q_INVOKABLE virtual bool next();
 	Q_INVOKABLE virtual bool previous();
-	Q_INVOKABLE virtual QString getData(QString fieldName);
+	Q_INVOKABLE virtual QString getData(const QByteArray& fieldName);
 
 private:
 	imtbase::IObjectCollectionIterator* m_objectCollectionIterator;

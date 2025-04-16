@@ -1,10 +1,6 @@
 #include <imtqml/CQmlObjectCollectionIterator.h>
 
 
-// ImtCore includes
-#include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
-
-
 namespace imtqml
 {
 
@@ -37,16 +33,12 @@ bool CQmlObjectCollectionIterator::previous()
 }
 
 
-QString CQmlObjectCollectionIterator::getData(QString fieldName)
+QString CQmlObjectCollectionIterator::getData(const QByteArray& fieldName)
 {
-	imtdb::CSqlDatabaseObjectCollectionIterator* sqlIterator = dynamic_cast<imtdb::CSqlDatabaseObjectCollectionIterator*>(m_objectCollectionIterator);
-	if (sqlIterator != nullptr) {
-		QSqlRecord record = sqlIterator->GetRecord();
-		if (!record.isEmpty() && record.contains(fieldName)) {
-			QString fieldData = record.value(fieldName).toString();
-			return fieldData;
-		}
+	if (m_objectCollectionIterator != nullptr) {
+		return m_objectCollectionIterator->GetElementInfo(fieldName).toString();
 	}
+
 	return QString();
 }
 
