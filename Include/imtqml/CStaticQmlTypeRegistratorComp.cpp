@@ -16,6 +16,7 @@
 namespace imtqml
 {
 
+bool CStaticQmlTypeRegistratorComp::s_isInitialized = false;
 
 // protected methods
 
@@ -23,11 +24,15 @@ namespace imtqml
 
 void CStaticQmlTypeRegistratorComp::OnComponentCreated()
 {
-	static void* iPtr = nullptr;
-	Q_ASSERT_X(iPtr == nullptr, __func__, "You are attempting to create a new instance of the component, however, another instance already exists!");
-	iPtr = this;
-
 	BaseClass::OnComponentCreated();
+
+	if(s_isInitialized){
+		I_IF_DEBUG(qWarning() << __func__ << "Another instance of registrator already exists.");
+
+		return;
+	}
+
+	s_isInitialized = true;
 
 	if (!m_registerCGqlModelAttrPtr.IsValid() || *m_registerCGqlModelAttrPtr){
 		qmlRegisterType<imtqml::CGqlModel>("com.imtcore.imtqml", 1, 0, "GqlModel");

@@ -28,8 +28,9 @@ namespace imtqml
 	\sa imtqml::CQmlProcess
 	\sa imtqml::CNetworkEventInterceptor
 	\sa imtqml::CNetworkEventInterceptor::Instance()
-	\warning There MUST be exactly ONE instance of the component per application! Otherwise.the operation of the application will be unpredictable!
-	\note This component SHOULD be initialized before application loop will starts. I.e. BEFORE \c qApp->exec();
+
+	\note It is not appropriate to create multiple instances. Modules will be initialized only after first instance of this component has been created.
+	\note This component MUST be initialized \b before application loop will starts. I.e. BEFORE \c qApp->exec();
 	\note if you using \c iqtgui:CApplicationCompBase you MUST add this component to \b ComponentsToPreInitialize property
 */
 class CStaticQmlTypeRegistratorComp: public icomp::CComponentBase
@@ -58,6 +59,8 @@ private:
 	I_ATTR(bool, m_registerFileIOAttrPtr);
 	I_ATTR(bool, m_registerCQmlProcessAttrPtr);
 	I_ATTR(bool, m_registerCNetworkEventInterceptorAttrPtr);
+
+	static bool s_isInitialized;
 
 };
 

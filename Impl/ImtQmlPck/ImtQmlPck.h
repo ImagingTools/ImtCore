@@ -15,6 +15,8 @@
 #include <imtqml/CCommandsObserverQmlComp.h>
 #include <imtqml/CQmlObjectCollectionComp.h>
 #include <imtqml/CStaticQmlTypeRegistratorComp.h>
+#include <imtqml/CStaticQmlBaseTypeRegistratorComp.h>
+#include <imtqml/CStaticQmlModuleRegistratorComp.h>
 
 
 /**
@@ -33,6 +35,8 @@ typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
 typedef icomp::TModelCompWrap<imtqml::CCommandsObserverQmlComp> CommandsObserverQml;
 typedef imtqml::CQmlObjectCollectionComp QmlObjectCollection;
 typedef imtqml::CStaticQmlTypeRegistratorComp StaticQmlTypeRegistrator;
+typedef imtqml::CStaticQmlModuleRegistratorComp StaticQmlModuleRegistrator;
+typedef	imtqml::CStaticQmlBaseTypeRegistratorComp StaticQmlBaseTypeRegistrator;
 
 
 } // namespace ImtQmlPck

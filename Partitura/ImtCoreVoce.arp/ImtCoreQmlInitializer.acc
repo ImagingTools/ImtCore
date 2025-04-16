@@ -10,12 +10,12 @@
     <Description>This component registrates all types of the ImtCore modules for QQmlEngine.</Description>
     <Keywords>&quot;QML Module Type Registrator QQmlEngine&quot; Author='&quot;Sergey Zastrovnyh&quot;'</Keywords>
     <ElementsList>
-        <Element Id="StaticQmlBaseTypeRegistrator" PackageId="ImtCorePck" ComponentId="StaticQmlTypeRegistrator">
+        <Element Id="StaticQmlBaseTypeRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlBaseTypeRegistrator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="StaticQmlModuleRegistrator" PackageId="ImtCorePck" ComponentId="StaticQmlModuleRegistrator">
+        <Element Id="StaticQmlModuleRegistrator" PackageId="ImtQmlPck" ComponentId="StaticQmlModuleRegistrator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>

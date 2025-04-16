@@ -59,6 +59,18 @@ I_EXPORT_COMPONENT(
 			"This component registrates all types of the imtqml module for QQmlEngine.",
 			"QML Type Registrator QQmlEngine" IM_AUTHOR("Sergey Zastrovnyh"));
 
+
+I_EXPORT_COMPONENT(
+			StaticQmlModuleRegistrator,
+			"This component registers dummy Qt modules in order to ensure QML compatibility with Qt5 and Qt6 applications simultaneously.",
+			"QML Module Registrator QQmlEngine" IM_AUTHOR("Sergey Zastrovnyh"));
+
+
+I_EXPORT_COMPONENT(
+			StaticQmlBaseTypeRegistrator,
+			"This component registrates all types of the imtbase module for QQmlEngine.",
+			"QML Type Registrator QQmlEngine" IM_AUTHOR("Sergey Zastrovnyh"));
+
 } // namespace ImtQmlPck
 
 
