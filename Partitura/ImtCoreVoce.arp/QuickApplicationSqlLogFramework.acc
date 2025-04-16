@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5303" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="0" Number="5350" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for a console application</Description>
@@ -53,6 +53,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="ComponentsToInitialize">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToPreInitialize" Type="Reference[]" ExportId="ComponentsToPreInitialize">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LogLocationType" Type="Integer" ExportId="LogLocationType">
