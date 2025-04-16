@@ -36,7 +36,17 @@ public:
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
+private:
+	struct Initializer
+	{
+		Initializer();
+	};
+
+	std::shared_ptr<Initializer> m_initializerPtr;
+
+	static Initializer* s_initializerPtr;
 };
 
 

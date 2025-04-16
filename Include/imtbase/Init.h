@@ -10,14 +10,6 @@
 
 // ImtCore includes
 #include <imtstyle/CImtStyle.h>
-#include <imtbase/CTreeItemModel.h>
-#include <imtqml/CGqlModel.h>
-#include <imtqml/CGqlRequest.h>
-#include <imtqml/CRemoteFileController.h>
-#include <imtqml/CFileIO.h>
-#include <imtqml/CNetworkEventInterceptor.h>
-#include <imtqml/CQmlProcess.h>
-#include <imtqml/CQmlObjectCollectionIterator.h>
 
 
 class DefaultImtCoreQmlInitializer
