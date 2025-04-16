@@ -9,7 +9,7 @@ from conan.tools.env import Environment, VirtualBuildEnv, VirtualRunEnv
 from conan.tools.build import can_run
 from conan.tools.files import collect_libs, patch, rmdir, update_conandata, move_folder_contents
 from conan.tools.scm import Git
-from conan.errors import ConanInvalidConfiguration
+from conan.errors import ConanInvalidConfiguration, ConanException
 from conans.tools import SVN  # TODO: no svn in conan v2
 import os
 import sys
@@ -57,10 +57,14 @@ class ImtCoreConan(ConanFile):
             self.output.warning(f'Version overriden')
             return self.version
         git = Git(self)
-        self.version = 'git.' + git.get_commit()[:8]
-        if git.is_dirty():
-            self.version += '-dirty'
-        self.output.info(f'Detected version {self.version}')
+        try:
+            self.version = 'git.' + git.get_commit()[:8]
+            if git.is_dirty():
+                self.version += '-dirty'
+            self.output.info(f'Detected version {self.version}')
+        except ConanException:
+            self.output.error('Unable to detect version')
+            self.version = 'unknown'
 
     def export(self):
         git = Git(self)
@@ -319,20 +323,20 @@ class ImtCoreConan(ConanFile):
         self.cpp.build.includedirs = [os.path.join("AuxInclude", self._include_folder_suffix())]
         self.cpp.build.libdirs = self.cpp_info.libdirs
 
-        self.cpp_info.build_modules["cmake_find_package"] = [
+        cmakeModules = [
             "Config/CMake/ImtCoreDesign.cmake",
             "Config/CMake/ImtCoreDesignWeb.cmake",
             "Config/CMake/WebCompiler.cmake",
             "Config/CMake/ImtSdlConfig.cmake",
             "Config/CMake/ImtCoreSdlCustomConfig.cmake",
             "Config/CMake/DdlCreator.cmake"]
-        self.cpp_info.build_modules["cmake_find_package_multi"] = [
-            "Config/CMake/ImtCoreDesign.cmake",
-            "Config/CMake/ImtCoreDesignWeb.cmake",
-            "Config/CMake/WebCompiler.cmake",
-            "Config/CMake/ImtSdlConfig.cmake",
-            "Config/CMake/ImtCoreSdlCustomConfig.cmake",
-            "Config/CMake/DdlCreator.cmake"]
+        # modern v2 approach
+        self.cpp.package.set_property("cmake_build_modules", cmakeModules)
+        self.cpp.source.set_property("cmake_build_modules", cmakeModules)
+        # old v1 approach
+        self.cpp_info.build_modules["cmake_find_package"] = cmakeModules
+        self.cpp_info.build_modules["cmake_find_package_multi"] = cmakeModules
+
         self.cpp_info.requires = ['quazip::quazip', 'openssl::openssl', 'AcfPublic::AcfPublic']
 
         qt_components = self.deps_cpp_info["qt"].components.keys()
