@@ -19,15 +19,15 @@ Rectangle {
         Component.onCompleted: {
             var index = comboModel.insertNewItem();
 
-            comboModel.setData("id",index, index);
+			comboModel.setData("id", String(index), index);
             comboModel.setData("name", "name 1", index);
 
             index = comboModel.insertNewItem();
-            comboModel.setData("id",index, index);
+			comboModel.setData("id", String(index), index);
             comboModel.setData("name", "name 2", index);
 
             index = comboModel.insertNewItem();
-            comboModel.setData("id",index, index);
+			comboModel.setData("id", String(index), index);
             comboModel.setData("name", "name 3", index);
         }
     }
