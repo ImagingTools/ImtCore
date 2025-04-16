@@ -104,8 +104,8 @@ void CGqlPublisherCompBase::OnRequestDestroyed(imtrest::IRequest* request)
 // protected methods
 
 bool CGqlPublisherCompBase::PushDataToSubscriber(
-		const QByteArray& id,
 		const QByteArray& subscriptionId,
+		const QByteArray& commandId,
 		const QByteArray& data,
 		const imtrest::IRequest& networkRequest)
 {
@@ -115,8 +115,8 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 	}
 
 	QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": %3}}})")
-			.arg(qPrintable(id))
 			.arg(qPrintable(subscriptionId))
+			.arg(qPrintable(commandId))
 			.arg(qPrintable(data)).toUtf8();
 
 	QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
@@ -147,15 +147,15 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 }
 
 
-bool CGqlPublisherCompBase::PublishData(const QByteArray& subscriptionId, const QByteArray& data)
+bool CGqlPublisherCompBase::PublishData(const QByteArray& commandId, const QByteArray& data)
 {
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
 			if (networkRequestPtr != nullptr){
-				bool retVal = PushDataToSubscriber(id, subscriptionId, data, *networkRequestPtr);
+				bool retVal = PushDataToSubscriber(id, commandId, data, *networkRequestPtr);
 				if (!retVal){
-					QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(subscriptionId)).arg(qPrintable(data));
+					QString message = QString("Unable to notify subscriber about the changes. Subscription-ID: '%1', '%2'").arg(qPrintable(commandId)).arg(qPrintable(data));
 	
 					SendErrorMessage(0, message, "CGqlPublisherCompBase");
 				}

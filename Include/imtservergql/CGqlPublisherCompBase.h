@@ -43,8 +43,8 @@ public:
 	virtual void OnRequestDestroyed(imtrest::IRequest* request) override;
 
 protected:
-	virtual bool PushDataToSubscriber(const QByteArray& id, const QByteArray& subscriptionId, const QByteArray& data, const imtrest::IRequest& networkRequest);
-	virtual bool PublishData(const QByteArray& subscriptionId, const QByteArray& data);
+	virtual bool PushDataToSubscriber(const QByteArray& subscriptionId, const QByteArray& commandId, const QByteArray& data, const imtrest::IRequest& networkRequest);
+	virtual bool PublishData(const QByteArray& commandId, const QByteArray& data);
 
 protected:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
