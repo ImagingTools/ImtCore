@@ -22,6 +22,7 @@ Item {
 	property bool emptyDecorCell: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem.emptyDecorCell : true;
 
 	property string cellHeaderId;
+	property string sdlVarPrefix: "m_"
 
 	property bool widthIsCalculated: false;
 	property bool compl: false;
@@ -100,7 +101,7 @@ Item {
 		}
 	}
 
-	onReadyChanged:  {
+	onReadyChanged: {
 		if(!ready){
 			return;
 		}
@@ -158,7 +159,7 @@ Item {
 	}
 
 	function refreshModelData(rowIndex_, modelRole_){
-		if(rowIndex_ == delegateContainer.rowIndex && modelRole_ == delegateContainer.cellHeaderId){
+		if(rowIndex_ === delegateContainer.rowIndex && modelRole_ === delegateContainer.cellHeaderId){
 			reused();
 		}
 	}
@@ -195,7 +196,6 @@ Item {
 
 			height: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.visibleBottomBorderLast ? delegateContainer.rowDelegate.horizontalBorderSize : 0 : 0;
 			color:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorHorizontal : "transparent";
-
 		}
 	}
 
@@ -207,8 +207,8 @@ Item {
 			anchors.bottom: parent.bottom;
 			z: -1;
 
-			width : !delegateContainer.rowDelegate ? 0 : delegateContainer.rowDelegate.verticalBorderSize;
-			color:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorVertical : "transparent";
+			width: !delegateContainer.rowDelegate ? 0 : delegateContainer.rowDelegate.verticalBorderSize;
+			color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.borderColorVertical : "transparent";
 		}
 	}
 
@@ -289,7 +289,7 @@ Item {
 				let val
 				let key = delegateContainer.rowDelegate.tableItem.headers.getData("id", delegateContainer.columnIndex)
 				if ("item" in delegateContainer.rowDelegate.dataModel){
-					val = delegateContainer.rowDelegate.dataModel.item[key]
+					val = delegateContainer.rowDelegate.dataModel.item[delegateContainer.sdlVarPrefix + key]
 				}
 				else if(delegateContainer.rowDelegate.modelData){
 					val = delegateContainer.rowDelegate.modelData[key];
@@ -297,7 +297,6 @@ Item {
 				else {
 					val = delegateContainer.rowDelegate.dataModel[key];
 				}
-
 
 				return val !== undefined ? val : "";
 			}
@@ -313,7 +312,7 @@ Item {
 				let elements = tableItem.elements;
 				let headerId = delegateContainer.rowDelegate.tableItem.headers.getData("id", delegateContainer.columnIndex);
 				if ("item" in delegateContainer.rowDelegate.dataModel){
-					delegateContainer.rowDelegate.dataModel.item[headerId] = value;
+					delegateContainer.rowDelegate.dataModel.item[delegateContainer.sdlVarPrefix + headerId] = value;
 				}
 				else{
 					elements.setData(headerId, value, delegateContainer.rowIndex);
@@ -328,9 +327,7 @@ Item {
 		}
 
 		let isFlickableTable = delegateContainer.rowDelegate.tableItem.isFlickable;
-
 		let defaultWidth = isFlickableTable ? delegateContainer.rowDelegate.tableItem.defaultColumnWidth : delegateContainer.columnCount == 0 ? 0 : delegateContainer.rowDelegate.width/delegateContainer.columnCount;
-
 
 		if(!delegateContainer.rowDelegate.tableItem.widthDecoratorDynamic.getItemsCount()){
 			delegateContainer.width = defaultWidth;
@@ -346,11 +343,6 @@ Item {
 				delegateContainer.width = defaultWidth;
 			}
 		}
-
 	}
-
-
-
-
 }//delegate
 

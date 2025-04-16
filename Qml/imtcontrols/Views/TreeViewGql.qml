@@ -219,7 +219,7 @@ Rectangle{
                     height: parent.height;
 
                     function openButtonClicked(){
-						if(model.HasChildren__){
+						if(model.hasChildren__){
 							if(!model.IsOpen__){
                                 if(!model.HasBranch__){
                                     treeViewGql.model.setData("HasBranch__", true, model.index);
@@ -260,7 +260,7 @@ Rectangle{
                         anchors.left: parent.left;
                         anchors.leftMargin: 8;
 
-                        visible: model.HasChildren__ == undefined ? false : model.HasChildren__;
+						visible: model.hasChildren__ == undefined ? false : model.hasChildren__;
                         width: 16;
                         height: width;
                         sourceSize.width: width;
@@ -277,20 +277,20 @@ Rectangle{
                         anchors.left: openButton.right;
                         anchors.leftMargin: 8;
 
-                        visible: model.TypeId__ !== undefined;
+						visible: model.typeId__ !== undefined;
                         width: 16;
                         height: width;
                         sourceSize.width: width;
                         sourceSize.height: height;
-                        source: model.TypeId__ == undefined ? "" : treeViewGql.getIcon(model.TypeId__, deleg.isOpen);
+						source: model.typeId__ == undefined ? "" : treeViewGql.getIcon(model.typeId__, deleg.isOpen);
                     }
 
                     Text{
                         id: nameText;
 
                         anchors.verticalCenter: parent.verticalCenter;
-                        anchors.left: model.TypeId__ == undefined ? folderImage.left : folderImage.right;
-                        anchors.leftMargin: model.TypeId__ == undefined ? 0 : 16;
+						anchors.left: model.typeId__ == undefined ? folderImage.left : folderImage.right;
+						anchors.leftMargin: model.typeId__ == undefined ? 0 : 16;
 
                         width: deleg.width - parent.x - x - 20 - deleg.addItemWidth;
 

@@ -342,7 +342,6 @@ Item {
 		}
 		
 		function onResult(data){
-			console.log("elements onResult", data);
 			if (data.containsKey("notification")){
 				root.notificationModel = data.getData("notification");
 			}

@@ -6,6 +6,7 @@ TableRowDelegateBase {
 	id: tableDelegateContainer
 
 	width: tableRow.width //+ tableRow.anchors.leftMargin;
+	property alias tableRowViewer: tableRow
 
 	TableRowViewer {
 		id: tableRow

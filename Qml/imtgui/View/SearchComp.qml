@@ -151,7 +151,7 @@ Rectangle{
 		if(searchContainer.hasSearchProperty){
 			var index = searchContainer.propertiesModel.insertNewItem();
 			searchContainer.propertiesModel.setData("id", id_);
-			searchContainer.propertiesModel.setData("Value", value_);
+			searchContainer.propertiesModel.setData("value", value_);
 			searchContainer.setAdditionalFilterParams();
 		}
 
@@ -165,7 +165,7 @@ Rectangle{
 			let key = keys[i];
 			let value  = searchContainer.additionalFilterModel.getData(key);
 			searchContainer.propertiesModel.setData("id", key, index_);
-			searchContainer.propertiesModel.setData("Value", value, index_);
+			searchContainer.propertiesModel.setData("value", value, index_);
 		}
 	}
 
@@ -190,17 +190,17 @@ Rectangle{
 			var addStrNew = addStr_ !== undefined ? addStr_ : "";
 
 			var tempStr = searchTextField.currentText = modelll.getData(searchContainer.valueName, index_) + addStrNew
-			//            if(tempStr[tempStr.length - 1] == ","){
-			//                tempStr = tempStr.slice(0, tempStr.length - 1);
-			//            }
+			// if(tempStr[tempStr.length - 1] == ","){
+			// 	tempStr = tempStr.slice(0, tempStr.length - 1);
+			// }
 
-			if(searchTextField.currentText == tempStr){
+			if(searchTextField.currentText === tempStr){
 				noTextChanges = true;
 			}
 			searchTextField.currentText = tempStr;//modelll.getData(searchContainer.valueName, index_) + addStrNew;
 
 
-			var parentIds__ = modelll.getData("ParentIds",index_) !== undefined ? modelll.getData("ParentIds", index_) : "";
+			var parentIds__ = modelll.getData("parentIds",index_) !== undefined ? modelll.getData("parentIds", index_) : "";
 			if(parentIds__ !== ""){
 				parentIds__ = parentIds__ + ",";
 			}
@@ -323,16 +323,13 @@ Rectangle{
 						}
 
 						//updatePause.restart();
-
 					}
-
-
 				}
 
 				else {//isTextIncrease
 					var modelCount = popup.model.getItemsCount();
 					if(modelCount){
-						if(filterText[filterText.length -1] == ","){
+						if(filterText[filterText.length -1] === ","){
 							let str = filterText.slice(0,-1);
 							var strArrCount = searchContainer.arraySize(str);
 							//var newAddress = searchContainer.keepNElements(popup.model.getData(searchContainer.valueName),strArrCount)//;
@@ -340,19 +337,14 @@ Rectangle{
 							str = str.replace(/ +/g, '');
 							newAddress = newAddress.replace(/ +/g, '');
 							//console.log("ЗАПЯТАЯ " , "str: ", str, "newAddress: ", newAddress);
-							if(str.toLowerCase() == newAddress.toLowerCase()){
+							if(str.toLowerCase() === newAddress.toLowerCase()){
 								searchContainer.setCurrentTextAddressFunc(popup.model,0, ",");
 							}
-
 						}
 					}
-
 				}
-
 			}
-
 		}
-
 	}
 
 
@@ -363,9 +355,9 @@ Rectangle{
 			searchContainer.accepted("");
 		}
 		else if(!searchTextField.openST && searchTextField.currentText !== ""){
-			//            if(searchContainer.canClose){
-			//                searchContainer.accepted(searchTextField.currentText);
-			//            }
+			// if(searchContainer.canClose){
+			// 	searchContainer.accepted(searchTextField.currentText);
+			// }
 		}
 	}
 
@@ -378,22 +370,22 @@ Rectangle{
 		}
 		else if(!searchTextField.openST && searchTextField.currentText !== ""){
 			if(searchContainer.isAddressSearch){
-				if(searchTextField.currentText[searchTextField.currentText.length - 1] == ","){
+				if(searchTextField.currentText[searchTextField.currentText.length - 1] === ","){
 					searchTextField.currentText = searchTextField.currentText.slice(0, searchTextField.currentText.length - 1);
 				}
 
 				var textArraySize = searchContainer.arraySize(searchTextField.currentText);
 				var parentIdsArraySize = searchContainer.arraySize(searchContainer.parentIds);
 				searchTextField.excludeFilterPart = searchContainer.removeLastElement(searchTextField.currentText);
-				if(textArraySize == parentIdsArraySize){
+				if(textArraySize === parentIdsArraySize){
 					searchContainer.parentIds = searchContainer.removeLastElement(searchContainer.parentIds);
 				}
 				setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
-				//searchContainer.externalSearchParam = searchContainer.parentIds;
-				//searchTextField.excludeFilterPart = searchTextField.currentText;
-				//                setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
+				// searchContainer.externalSearchParam = searchContainer.parentIds;
+				// searchTextField.excludeFilterPart = searchTextField.currentText;
+				// setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
 
-				//console.log("secondSearch:: ", "parentIds:: " ,searchContainer.parentIds)
+				// console.log("secondSearch:: ", "parentIds:: " ,searchContainer.parentIds)
 			}
 
 		}
@@ -404,7 +396,7 @@ Rectangle{
 		var textArraySize = searchContainer.arraySize(searchTextField.currentText);
 		var parentIdsArraySize = searchContainer.arraySize(searchContainer.parentIds);
 		searchTextField.excludeFilterPart = searchContainer.removeLastElement(searchTextField.currentText);
-		if(textArraySize == parentIdsArraySize){
+		if(textArraySize === parentIdsArraySize){
 			searchContainer.parentIds = searchContainer.removeLastElement(searchContainer.parentIds);
 		}
 		setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
@@ -498,7 +490,7 @@ Rectangle{
 	}
 
 	function keepNElements(str, N){
-		if(str == ""){
+		if(str === ""){
 			return "";
 		}
 		var arr  = str.split(",");
@@ -520,7 +512,7 @@ Rectangle{
 	}
 
 	function arraySize(str){
-		if(str == ""){
+		if(str === ""){
 			return 0;
 		}
 		var arr  = str.split(",");
@@ -655,7 +647,7 @@ Rectangle{
 					var str_form = str.replace(/ +/g, '');
 					var newAddress_form = newAddress.replace(/ +/g, '');
 
-					if(str_form == newAddress_form || modelCount == 1){
+					if(str_form === newAddress_form || modelCount === 1){
 						searchContainer.setCurrentTextAddressFunc(model_,0);
 					}
 					else if(searchContainer.canSearchAnyStr){
@@ -678,14 +670,14 @@ Rectangle{
 
 				width: searchTextField.width;
 				height: visible ? searchTextField.itemHeight : 0;
-				//textSize: searchTextField.textSize;
+				// textSize: searchTextField.textSize;
 				text: "";
 				clip: true;
 				rootItem: searchTextField;
-				selected: searchTextField.selectedIndex == model.index;
+				selected: searchTextField.selectedIndex === model.index;
 
 				onClicked: {
-					let resultId = model.Id || model.id || "";
+					let resultId = model.id || model.id || "";
 					searchTextField.finished(resultId, model.index)
 				}
 				onEntered: {
@@ -713,19 +705,11 @@ Rectangle{
 					z:20;
 
 					text: model[searchContainer.valueName] !== undefined ?
-							  model[searchContainer.valueName]: "нет данных";
-
+							model[searchContainer.valueName]: "нет данных";
 				}
-
-
-
-
-
-			}}//delegate
-
-
+			}
+		} // delegate
 	}
-
 
 	Text {
 		id: placeHolder;
@@ -741,10 +725,9 @@ Rectangle{
 		font.pixelSize: searchContainer.textSize;
 		color: "gray";
 		visible: (!searchTextField.openST && searchTextField.currentText == "") ? true :
-																				  (!searchTextField.openST && searchTextField.currentText !== "") ? false :
-																																					(searchTextField.openST && searchTextField.currentText !== "") ? false : false;
+						(!searchTextField.openST && searchTextField.currentText !== "") ? false :
+							(searchTextField.openST && searchTextField.currentText !== "") ? false : false;
 		text: qsTr("Search");
-
 	}
 
 	Button{
@@ -767,7 +750,6 @@ Rectangle{
 		onClicked: {
 			searchContainer.clearSearchFunc();
 		}
-
 	}
 
 	function setAddressFromOutside(address, parentIds){
@@ -777,8 +759,6 @@ Rectangle{
 		setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
 		searchContainer.externalSearchParam = searchContainer.parentIds;
 		searchTextField.excludeFilterPart = searchContainer.removeLastElement(searchTextField.currentText);
-
 	}
-
 }
 

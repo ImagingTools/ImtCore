@@ -933,7 +933,7 @@ Rectangle {
 			if (width_ !== 0){
 				visibleColumnCount++;
 				let headerId__ = tableContainer.headers.getData("id", i);
-				if(headerId__ == "№"){
+				if(headerId__ == "n"){
 					rowNumberColumnWidth = width_;
 				}
 			}
@@ -960,7 +960,7 @@ Rectangle {
 
 				let headerId = tableContainer.headers.getData("id", ind);
 
-				if(headerId == "№"){
+				if(headerId == "n"){
 					if(isVisibleRowNumberColumn){
 						rowNumberColumnWidth  = isGeneralWidthForNumberColumn ? tableWidth_/visibleColumnCount : rowNumberColumnWidth;
 						rowNumberColumnPercent = (rowNumberColumnWidth/tableWidth_) * 100;
