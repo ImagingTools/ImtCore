@@ -193,15 +193,19 @@ Item {
 				}
 				
 				let notificationModel = container.dataController.notificationModel;
+				if (!notificationModel){
+					container.pagination.countAllElements = 0
+					container.pagination.pagesSize = 1
+					return
+				}
+				
 				if (notificationModel.containsKey("totalCount")){
 					let totalCount = notificationModel.getData("totalCount")
-					
 					container.pagination.countAllElements = totalCount;
 				}
 				
 				if (notificationModel.containsKey("pagesCount")){
 					let pagesCount = notificationModel.getData("pagesCount")
-					
 					container.pagination.pagesSize = pagesCount;
 				}
 			}

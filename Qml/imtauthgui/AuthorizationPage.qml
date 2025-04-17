@@ -18,6 +18,9 @@ Rectangle {
 	property bool canRegisterUser: true;
 
 	property string appName: context.appName
+	
+	signal login(string login, string password)
+	signal registerUser(var userData)
 
 	Component.onCompleted: {
 		decoratorPause.start();
@@ -416,7 +419,7 @@ Rectangle {
 					text: qsTr("Login");
 
 					onClicked: {
-						AuthorizationController.login(loginTextInput.text, passwordTextInput.text);
+						authPageContainer.login(loginTextInput.text, passwordTextInput.text)
 					}
 				}
 			}//
@@ -494,7 +497,7 @@ Rectangle {
 
 			onFinished: {
 				if (buttonId === Enums.save){
-					AuthorizationController.registerUser(userDataModel);
+					authPageContainer.registerUser(userDataModel)
 				}
 			}
 		}

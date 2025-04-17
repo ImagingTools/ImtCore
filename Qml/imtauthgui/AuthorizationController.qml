@@ -191,11 +191,15 @@ QtObject {
 	}
 	
 	function setAccessToken(token){
-		userTokenProvider.authorizationGqlModel.SetGlobalAccessToken(token);
+		if (userTokenProvider.isTokenGlobal){
+			userTokenProvider.authorizationGqlModel.SetGlobalAccessToken(token);
+		}
 	}
 	
 	function setRefreshToken(token){
-		userTokenProvider.authorizationGqlModel.SetRefreshToken(token);
+		if (userTokenProvider.isTokenGlobal){
+			userTokenProvider.authorizationGqlModel.SetRefreshToken(token);
+		}
 	}
 	
 	function login(login, password){

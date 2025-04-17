@@ -121,6 +121,13 @@ Item {
 		elementsGqlModel.send({"count":count, "offset":offset,"filterModel":filterModel})
 	}
 	
+	function clearElements(){
+		root.elementsModel.clear()
+		root.elementsModel = 0
+		root.notificationModel.clear()
+		root.notificationModel = 0
+	}
+	
 	function getElementsRepresentation(){
 		return root.elementsModel;
 	}

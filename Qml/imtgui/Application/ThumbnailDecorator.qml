@@ -224,6 +224,14 @@ Rectangle {
 			Component.onCompleted: {
 				Events.sendEvent("SetUserPanelEnabled", false);
 			}
+			
+			onRegisterUser: {
+				AuthorizationController.registerUser(userData);
+			}
+			
+			onLogin: {
+				AuthorizationController.login(login, password);
+			}
 		}
 	}
 	
