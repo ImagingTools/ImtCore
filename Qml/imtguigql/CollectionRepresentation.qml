@@ -20,13 +20,11 @@ Item {
 	property TreeItemModel elementsModel: TreeItemModel {}
 	property TreeItemModel headersModel: TreeItemModel {}
 	property TreeItemModel objectEditorInfoModel: TreeItemModel {}
-	
 	property TreeItemModel notificationModel: TreeItemModel {}
-	
 	property TreeItemModel filterableHeadersModel: TreeItemModel {}
 	
 	property var additionalFieldIds: []
-	
+
 	signal removed(string objectId);
 	signal renamed(string objectId, string newName);
 	signal imported(string objectId);
@@ -87,6 +85,10 @@ Item {
 
 		property bool elementsUpdatingBlock: false;
 		property bool headersUpdatingBlock: false;
+	}
+
+	function addAdditionalInputParams(inputParams){
+		// override for derived implementations
 	}
 	
 	function updateModel(){
@@ -329,7 +331,8 @@ Item {
 
 			var inputParams = Gql.GqlObject("input");
 			inputParams.InsertFieldObject(viewParams);
-			
+
+			root.addAdditionalInputParams(inputParams)
 			query.AddParam(inputParams);
 			
 			var queryFields = Gql.GqlObject("items");
