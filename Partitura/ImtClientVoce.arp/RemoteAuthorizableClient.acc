@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="0" Number="5302" Description="ACF"/>
             <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="1023" Number="331532" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -14,9 +14,6 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SuperuserId" Type="Id" ExportId="">
@@ -110,7 +107,13 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketUrlParam">
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketServerAddress" Type="Reference" ExportId="WebSocketPort">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -127,8 +130,5 @@
         <Interface InterfaceId="istd::IChangeable" ComponentId="Rights"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Rights"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="RemoteSuperuserController" ComponentId="Rights/RemoteSuperuserController"/>
-        <Component ExportedId="RemoteSuperuserProvider" ComponentId="Rights/RemoteSuperuserProvider"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>
