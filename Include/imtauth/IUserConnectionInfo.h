@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore/QDateTime.h>
+#include <QtCore/QDateTime>
 
 // ACF includes
 #include <iser/IObject.h>
