@@ -25,6 +25,8 @@
 #include <imtdb/CDatabaseConnectorComp.h>
 #include <imtdb/CDependentTableMetaInfoControllerComp.h>
 #include <imtdb/CSqliteDatabaseDocumentDelegateComp.h>
+#include <imtdb/CPostgresXPathExtractorComp.h>
+#include <imtdb/CSqliteXPathExtractorComp.h>
 
 
 /**
@@ -53,6 +55,8 @@ typedef imtdb::CObjectCollectionMigrationControllerComp ObjectCollectionMigratio
 typedef imtdb::CDatabaseConnectorComp DatabaseConnector;
 typedef imtdb::CDependentTableMetaInfoControllerComp DependentTableMetaInfoController;
 typedef imtdb::CSqliteDatabaseDocumentDelegateComp SQLiteDatabaseDocumentDelegate;
+typedef imtdb::CPostgresXPathExtractorComp PostgresXPathExtractor;
+typedef imtdb::CSqliteXPathExtractorComp SqliteXPathExtractor;
 
 
 } // namespace ImtDatabasePck

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5332" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="PostgresXPathExtractor" PackageId="ImtDatabasePck" ComponentId="PostgresXPathExtractor">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="Repository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionDataController" Type="Reference" ExportId="CollectionDataController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FilteringParams" Type="Reference" ExportId="FilteringParams">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="MetaInfoCreator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollectionFactory" Type="Factory" ExportId="ObjectCollectionFactory">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SqlDatabaseDocumentDelegate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SqlDatabaseDocumentDelegate" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseDocumentDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="DocumentFactories">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="JsonBasedMetaInfoDelegate" Type="Reference" ExportId="JsonBasedMetaInfoDelegate">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="MetaInfoCreator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="DocumentId"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIdColumn" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TypeId"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Types"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PostgresXPathExtractor"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableName" Type="Id" ExportId="TableName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableSchema" Type="Id" ExportId="TableSchema">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseDataMetaInfo" Type="Boolean" ExportId="UseDataMetaInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="TypeIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="TypeNames">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::IRevisionController" ComponentId="SqlDatabaseDocumentDelegate"/>
+        <Interface InterfaceId="imtdb::IDependentMetaInfoController" ComponentId="SqlDatabaseDocumentDelegate"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="SqlDatabaseDocumentDelegate"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Repository"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Repository"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="SqlDatabaseDocumentDelegate" ComponentId="SqlDatabaseDocumentDelegate"/>
+    </ExportedComponents>
+</Acf>

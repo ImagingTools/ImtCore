@@ -110,6 +110,16 @@ I_EXPORT_COMPONENT(
 			"SQLite database document delegate",
 			"SQLite Database Document Delegate");
 
+I_EXPORT_COMPONENT(
+			PostgresXPathExtractor,
+			"Postgres X-Path extractor",
+			"Postgres XPath Extractor");
+
+I_EXPORT_COMPONENT(
+			SqliteXPathExtractor,
+			"SQLite X-Path extractor",
+			"SQLite XPath Extractor");
+
 
 } // namespace ImtDatabasePck
 
