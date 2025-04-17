@@ -211,7 +211,7 @@ Rectangle {
 			}
 
 			onWidthChanged: {
-				menuPanel.buttonWidth = width;
+				menuPanel.buttonWidth = Math.max(menuPanel.buttonWidth, width);
 			}
 
 			onHeightChanged: {
@@ -220,20 +220,32 @@ Rectangle {
 		}
 	}
 
-	ListView {
-		id: allPages;
+	Flickable{
+		id: allPagesFlick;
 
 		anchors.top: menuPanel.top;
 		anchors.left: menuPanel.left;
 		anchors.right: menuPanel.right;
 		anchors.bottom: menuPanel.bottom;
+
 		boundsBehavior: Flickable.StopAtBounds;
-		delegate: menuPanel.delegate;
-		visible: topAlignmentPages.y + topAlignmentPages.height > bottomAlignmentPages.y;
+		clip: true;
+		contentWidth: allPagesColumn.width;
+		contentHeight:  allPagesColumn.height;
+
+		visible: topAlignmentColumn.y + topAlignmentColumn.height > bottomAlignmentColumn.y;
+
+		Column{
+			id: allPagesColumn;
+			Repeater{
+				id: allPages;
+				delegate: menuPanel.delegate
+			}
+		}
 	}
 
-	ListView {
-		id: topAlignmentPages;
+	Column{
+		id: topAlignmentColumn;
 
 		anchors.top: menuPanel.top;
 		anchors.left: menuPanel.left;
@@ -241,51 +253,54 @@ Rectangle {
 
 		anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin : !menuPanel.centered ? 0 : parent.height - bottomAlignmentPages.height - contentHeight > 0 ? (parent.height - bottomAlignmentPages.height - contentHeight)/2 : 0 ;
 
-		height: count * menuPanel.buttonHeight;
+		visible: !allPagesFlick.visible;
 
-		visible: !allPages.visible;
-		boundsBehavior: Flickable.StopAtBounds;
-		interactive: false;
-		delegate: Component {
-			MenuPanelButton {
-				text:  model["name"];
-				textColor: Style.textColor;
-				menuPanelRef: menuPanel;
-				iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
-														"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
-				selected: menuPanel.activePageIndex <= topAlignmentPages.count - 1 ? model.index === menuPanel.activePageIndex : false;
-				onClicked: {
-					menuPanel.setActivePage(model.id)
+		Repeater{
+			id: topAlignmentPages;
+
+			delegate: Component {
+				MenuPanelButton {
+					text:  model["name"];
+					textColor: Style.textColor;
+					menuPanelRef: menuPanel;
+					iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
+															"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
+					selected: menuPanel.activePageIndex <= topAlignmentPages.count - 1 ? model.index === menuPanel.activePageIndex : false;
+					onClicked: {
+						menuPanel.setActivePage(model.id)
+					}
 				}
 			}
 		}
 	}
 
-	ListView {
-		id: bottomAlignmentPages;
+	Column{
+		id: bottomAlignmentColumn;
 
 		anchors.left: menuPanel.left;
 		anchors.right: menuPanel.right;
 		anchors.bottom: menuPanel.bottom;
 
-		height: count * menuPanel.buttonHeight;
+		visible: !allPagesFlick.visible;
 
-		visible: !allPages.visible;
-		boundsBehavior: Flickable.StopAtBounds;
-		interactive: false;
-		delegate: Component {
-			MenuPanelButton {
-				text:  model["name"];
-				textColor: Style.textColor;
-				menuPanelRef: menuPanel;
-				iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
-														"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
-				selected: menuPanel.activePageIndex > topAlignmentPages.count - 1 ? menuPanel.activePageIndex - topAlignmentPages.count === model.index : false;
-				onClicked: {
-					menuPanel.setActivePage(model.id)
+		Repeater{
+			id: bottomAlignmentPages;
+
+			delegate: Component {
+				MenuPanelButton {
+					text:  model["name"];
+					textColor: Style.textColor;
+					menuPanelRef: menuPanel;
+					iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["icon"], "On", "Selected"):
+															"../../../" + Style.getIconPath(model["icon"], "On", "Normal");
+					selected: menuPanel.activePageIndex > topAlignmentPages.count - 1 ? menuPanel.activePageIndex - topAlignmentPages.count === model.index : false;
+					onClicked: {
+						menuPanel.setActivePage(model.id)
+					}
 				}
 			}
 		}
+
 	}
 
 }
