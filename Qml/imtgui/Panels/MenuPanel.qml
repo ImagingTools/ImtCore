@@ -251,9 +251,7 @@ Rectangle {
 		anchors.left: menuPanel.left;
 		anchors.right: menuPanel.right;
 
-		anchors.topMargin: Style.menuPanelTopMargin !== undefined ? Style.menuPanelTopMargin :
-									!menuPanel.centered ? 0 : parent.height - bottomAlignmentPages.height - allPagesFlick.contentHeight > 0 ?
-											(parent.height - bottomAlignmentPages.height - allPagesFlick.contentHeight)/2 : 0 ;
+		anchors.topMargin: Style.menuPanelTopMargin !==undefined ? Style.menuPanelTopMargin : !menuPanel.centered ? 0 : parent.height - bottomAlignmentColumn.height - height > 0 ? (parent.height - bottomAlignmentColumn.height - height)/2 : 0 ;
 
 		visible: !allPagesFlick.visible;
 
