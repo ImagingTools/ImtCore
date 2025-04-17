@@ -3,6 +3,7 @@ import QtGraphicalEffects 1.12
 import Qt5Compat.GraphicalEffects
 
 import Acf 1.0
+import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 

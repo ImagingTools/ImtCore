@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import Acf 1.0
+import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 import imtauthUsersSdl 1.0

@@ -1,5 +1,6 @@
 import QtQuick
 import Acf 1.0
+import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 
 Rectangle {
