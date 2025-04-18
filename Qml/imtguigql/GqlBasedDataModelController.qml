@@ -1,58 +1,52 @@
 import QtQuick 2.12
 import Acf 1.0
-import com.imtcore.imtqml 1.0
+import imtcontrols 1.0
 import imtguigql 1.0
-import imtgui 1.0
 
 DataModelController {
 	id: root
-	
-	property string setCommandId
-	property string getCommandId
-	
-	property GqlBasedDataModelProvider dataModelProvider: GqlBasedDataModelProvider {
-		getCommandId: root.getCommandId
-		dataModel: root.dataModel
-		
-		onDataModelReady: {
-			root.dataModelReady(params)
-		}
-		
-		onDataModelLoadFailed: {
-			root.dataModelLoadFailed(errorMessage)
-		}
-		
-		function getHeaders(){
-			return root.getHeaders()
-		}
-	}
 
-	function loadDataModel(paramsObj){
-		dataModelProvider.loadDataModel(paramsObj)
-	}
-	
-	function updateDataModel(paramsObj){
-		var query = Gql.GqlRequest("mutation", setCommandId)
-		
+	property string gqlCommandId
+	property var responseModel
+	property var inputModel
+
+	function saveDataModel(paramsObj){
+		var query = Gql.GqlRequest("mutation", gqlCommandId)
+
 		let inputObject = Gql.GqlObject("input")
-		if (paramsObj.toGraphQL !== undefined){
-			inputObject.fromObject(paramsObj)
+
+		let inputParams = paramsObj
+		if (inputModel){
+			inputParams = prepareInputModel(paramsObj)
 		}
-		else if (typeof paramsObj == "object"){
+
+		if (inputParams && inputParams.toGraphQL !== undefined){
+			inputObject.fromObject(inputParams)
+		}
+		else if (typeof inputParams == "object"){
 			let keys = Object.keys(paramsObj)
 			for (let key in paramsObj){
 				inputObject.InsertField(key, paramsObj[key])
 			}
 		}
-		
+
 		query.AddParam(inputObject)
+
 		gqlRequest.setGqlQuery(query.GetQuery(), root.getHeaders())
 	}
-	
+
+	function prepareInputModel(paramsObj){
+		return paramsObj
+	}
+
 	function getHeaders(){
 		return {}
 	}
-	
+
+	function prepareResultModel(){
+
+	}
+
 	property GqlRequest gqlRequest: GqlRequest {
 		onStateChanged: {
 			if (state === "Ready"){
@@ -61,20 +55,40 @@ DataModelController {
 					responseObj = JSON.parse(json)
 				}
 				catch(e){
-					root.dataModelUpdateFailed("Json convertation failed")
+					root.dataModelLoadFailed("Json convertation failed")
 					return
 				}
-				
+
 				if ("data" in responseObj){
-					root.dataModelUpdated(root.dataModel)
+					let dataObject = responseObj["data"]
+					if (root.gqlCommandId in dataObject){
+						dataObject = dataObject[root.gqlCommandId]
+					}
+
+					let responseModel = root.resultModel
+					if (root.responseModel){
+						responseModel = root.responseModel
+					}
+
+					if (!responseModel){
+						root.dataModelLoadFailed("Unable to create data model from json. Error: Result model is invalid")
+						return
+					}
+
+					responseModel.fromObject(dataObject)
+
+					root.prepareResultModel()
+
+					root.resultModelReady(root.dataModel)
+
 					return
 				}
-				
+
 				let message = ""
 				if ("errors" in responseObj){
 					let errorsObject = responseObj["errors"]
-					if (root.setCommandId in errorsObject){
-						errorsObject = errorsObject[root.setCommandId]
+					if (root.gqlCommandId in errorsObject){
+						errorsObject = errorsObject[root.gqlCommandId]
 					}
 
 					if ("message" in errorsObject){
@@ -82,10 +96,10 @@ DataModelController {
 					}
 				}
 
-				root.dataModelUpdateFailed(message)
+				root.dataModelSaveFailed(message)
 			}
 			else if (state === "Error"){
-				root.dataModelUpdateFailed(qsTr("Network error"))
+				root.dataModelSaveFailed(qsTr("Network error"))
 			}
 		}
 	}

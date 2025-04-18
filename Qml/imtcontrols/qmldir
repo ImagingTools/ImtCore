@@ -107,6 +107,9 @@ MacAddressValidator 1.0 Models/MacAddressValidator.qml
 PopupMenuModel 1.0 Models/PopupMenuModel.qml
 MailRegExpValidator 1.0 Models/MailRegExpValidator.qml
 SortFilterProxyModel 1.0 Models/SortFilterProxyModel.qml
+DataModelController 1.0 Models/DataModelController.qml
+DataModelProvider 1.0 Models/DataModelProvider.qml
+OptionManager 1.0 Models/OptionManager.qml
 
 Table 1.0 ./Views/Table.qml
 TableBase 1.0 ./Views/TableBase.qml

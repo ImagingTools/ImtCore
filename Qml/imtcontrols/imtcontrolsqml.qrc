@@ -108,6 +108,10 @@
 	<file alias="imtcontrols/Models/MailRegExpValidator.qml">Models/MailRegExpValidator.qml</file>
 	<file alias="imtcontrols/Models/SortFilterProxyModel.qml">Models/SortFilterProxyModel.qml</file>
 
+	<file alias="imtcontrols/Models/DataModelProvider.qml">Models/DataModelProvider.qml</file>
+	<file alias="imtcontrols/Models/DataModelController.qml">Models/DataModelController.qml</file>
+	<file alias="imtcontrols/Models/OptionManager.qml">Models/OptionManager.qml</file>
+
         <file alias="imtcontrols/Views/TableRowViewer.qml">Views/TableRowViewer.qml</file>
         <file alias="imtcontrols/Views/TableRowDelegateBase.qml">Views/TableRowDelegateBase.qml</file>
         <file alias="imtcontrols/Views/TablePainterRowDelegateBase.qml">Views/TablePainterRowDelegateBase.qml</file>
@@ -118,6 +122,7 @@
         <file alias="imtcontrols/Views/TableBase.qml">Views/TableBase.qml</file>
         <file alias="imtcontrols/Views/TableCellDelegate.qml">Views/TableCellDelegate.qml</file>
         <file alias="imtcontrols/Views/TableCellDelegateBase.qml">Views/TableCellDelegateBase.qml</file>
+		<file alias="imtcontrols/Views/TableCellDelegateSimple.qml">Views/TableCellDelegateSimple.qml</file>
         <file alias="imtcontrols/Views/TableCellTextDelegate.qml">Views/TableCellTextDelegate.qml</file>
         <file alias="imtcontrols/Views/TableCellTextWithTooltipDelegate.qml">Views/TableCellTextWithTooltipDelegate.qml</file>
 		<file alias="imtcontrols/Views/TableCellRowNumberDelegate.qml">Views/TableCellRowNumberDelegate.qml</file>

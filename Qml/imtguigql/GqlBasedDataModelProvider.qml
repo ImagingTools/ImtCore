@@ -1,23 +1,29 @@
 import QtQuick 2.12
 import Acf 1.0
-import com.imtcore.imtqml 1.0
-import imtguigql 1.0
-import imtgui 1.0
+import imtcontrols 1.0
 
 // Provider for SDL object
 DataModelProvider {
 	id: root
 	
 	property string getCommandId
+	property var responseModel
+	property var inputModel
 	
-	function loadDataModel(paramsObj){
+	function requestDataModel(paramsObj){
 		var query = Gql.GqlRequest("query", getCommandId)
 		
 		let inputObject = Gql.GqlObject("input")
-		if (paramsObj.toGraphQL !== undefined){
-			inputObject.fromObject(paramsObj)
+
+		let inputParams = paramsObj
+		if (inputModel){
+			inputParams = prepareInputModel(paramsObj)
 		}
-		else if (typeof paramsObj == "object"){
+
+		if (inputParams && inputParams.toGraphQL !== undefined){
+			inputObject.fromObject(inputParams)
+		}
+		else if (typeof inputParams == "object"){
 			let keys = Object.keys(paramsObj)
 			for (let key in paramsObj){
 				inputObject.InsertField(key, paramsObj[key])
@@ -27,6 +33,14 @@ DataModelProvider {
 		query.AddParam(inputObject)
 		
 		gqlRequest.setGqlQuery(query.GetQuery(), root.getHeaders())
+	}
+
+	function prepareInputModel(paramsObj){
+		return paramsObj
+	}
+
+	function prepareDataModel(){
+
 	}
 	
 	function getHeaders(){
@@ -51,12 +65,19 @@ DataModelProvider {
 						dataObject = dataObject[root.getCommandId]
 					}
 
-					if (!root.dataModel){
+					let responseModel = root.dataModel
+					if (root.responseModel){
+						responseModel = root.responseModel
+					}
+
+					if (!responseModel){
 						root.dataModelLoadFailed("Unable to create data model from json. Error: Data model is invalid")
 						return
 					}
-					
-					root.dataModel.fromObject(dataObject)
+
+					responseModel.fromObject(dataObject)
+
+					root.prepareDataModel()
 
 					root.dataModelReady(root.dataModel)
 					

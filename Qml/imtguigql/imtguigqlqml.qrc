@@ -26,5 +26,6 @@
 	<file alias="imtguigql/GqlBasedObjectVisualStatusProvider.qml">GqlBasedObjectVisualStatusProvider.qml</file>
 	<file alias="imtguigql/GqlBasedDataModelProvider.qml">GqlBasedDataModelProvider.qml</file>
 	<file alias="imtguigql/GqlBasedDataModelController.qml">GqlBasedDataModelController.qml</file>
+	<file alias="imtguigql/GqlBasedOptionManager.qml">GqlBasedOptionManager.qml</file>
     </qresource>
 </RCC>
