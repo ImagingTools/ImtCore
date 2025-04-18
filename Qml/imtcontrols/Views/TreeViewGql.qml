@@ -638,7 +638,7 @@ Rectangle{
             return;
         }
         let isForcedOpen = false;
-		if(treeViewGql.model.getData("HasChildren__", index)){
+		if(treeViewGql.model.getData("hasChildren__", index)){
 			if(treeViewGql.model.getData("OpenState__", index) !== 1){
 				if(!treeViewGql.model.getData("HasBranch__", index)){
 					treeViewGql.model.setData("HasBranch__", true, index);
@@ -714,7 +714,7 @@ Rectangle{
     }
 
     function checkHasChildren(index){
-        return model.getData("HasChildren__", index);
+		return model.getData("hasChildren__", index);
     }
 
 
