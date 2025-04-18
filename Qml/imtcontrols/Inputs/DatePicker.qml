@@ -127,7 +127,7 @@ Item {
 
 			for(var i = 0; i < monthCount; i++){
 				var index = monthTreeModel.insertNewItem();
-				monthTreeModel.setData("id", index, index);
+				monthTreeModel.setData("id", String(index), index);
 				monthTreeModel.setData("name",qsTr(datePicker.monthNames[i]),index);
 			}
 		}
@@ -149,7 +149,7 @@ Item {
 			}
 			for(let i = datePicker.startYear; i <= datePicker.lastYear;i++){
 				let index = yearTreeModel.insertNewItem();
-				yearTreeModel.setData("id", index, index);
+				yearTreeModel.setData("id", String(index), index);
 				yearTreeModel.setData("name", String(i),index);
 			}
 
@@ -284,7 +284,7 @@ Item {
 		var lastDay = datePicker.getLastDayOfMonth(datePicker.selectedIndexMonth + 1);
 		for(var i = 1; i <= lastDay; i++){
 			var index = dayTreeModel.insertNewItem();
-			dayTreeModel.setData("id", i, index);
+			dayTreeModel.setData("id", String(i), index);
 			dayTreeModel.setData("name",i,index);
 		}
 	}
@@ -301,7 +301,7 @@ Item {
 
 		for(var i = 0; i < monthCount; i++){
 			var index = monthTreeModel.insertNewItem();
-			monthTreeModel.setData("id", index, index);
+			monthTreeModel.setData("id", String(index), index);
 			monthTreeModel.setData("name",qsTr(datePicker.monthNames[i]),index);
 		}
 

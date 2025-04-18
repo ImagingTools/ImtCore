@@ -382,7 +382,7 @@ Rectangle {
 		if(calendar.hasMonthCombo){
 			for(let i = 0; i < calendar.monthNames.length; i++){
 				let index = monthComboModel.insertNewItem();
-				monthComboModel.setData("id", index, index);
+				monthComboModel.setData("id", String(index), index);
 				monthComboModel.setData("name",qsTr(calendar.monthNames[i]),index);
 			}
 		}
@@ -392,7 +392,7 @@ Rectangle {
 		if(calendar.hasYearCombo){
 			for(let i = calendar.startYear; i <= calendar.lastYear;i++){
 				let index = yearComboModel.insertNewItem();
-				yearComboModel.setData("id", index, index);
+				yearComboModel.setData("id", String(index), index);
 				yearComboModel.setData("name", String(i),index);
 			}
 		}
