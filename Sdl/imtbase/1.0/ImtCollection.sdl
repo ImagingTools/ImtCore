@@ -23,7 +23,7 @@ type HeadersInfo {
 type CollectionViewParams {
 	count: Int
 	offset: Int
-	complexFilter: ComplexCollectionFilter
+	filterModel: ComplexCollectionFilter
 }
 
 type NotificationItem {

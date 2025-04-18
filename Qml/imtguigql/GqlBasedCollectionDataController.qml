@@ -33,7 +33,7 @@ CollectionDataController {
 	function getElements(count, offset, filter){
 		collectionViewParams.m_offset = offset
 		collectionViewParams.m_count = count
-		collectionViewParams.m_complexFilter = filter
+		collectionViewParams.m_filterModel = filter
 		
 		// getListRequestSender.send(collectionViewParams)
 	}
