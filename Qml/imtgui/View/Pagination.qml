@@ -14,6 +14,8 @@ Row {
 	property int currentValue: currentIndex + 1;
 	property int currentIndex: 0;
 
+	property color color: Style.baseColor;
+
 	// The number of elements on the page
 	property int countElements: 25;
 

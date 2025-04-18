@@ -297,7 +297,7 @@ ViewBase {
 		width: parent.width;
 		height: collectionViewBaseContainer.hasPagination ? 30: 0;
 		
-		color: Style.baseColor;
+		color: pagination_.color;
 		
 		Pagination {
 			id: pagination_;
@@ -308,7 +308,7 @@ ViewBase {
 			pagesSize: 1;
 			
 			visible: collectionViewBaseContainer.hasPagination /*&& pagesSize > 1*/;
-			
+
 			onCurrentIndexChanged: {
 				tableInternal.resetSelection();
 				
