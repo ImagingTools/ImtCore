@@ -52,7 +52,7 @@ public:
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_REGISTER_INTERFACE(imtdb::IDependentMetaInfoController);
-		I_ASSIGN(m_useDataMetaInfoAttrPtr, "UseDataMetaInfo", "If true - documents will be searched and sorted by the 'DataMetaInfo' column,\n else - otherwise according to the contents of the 'Document' column", true, true);
+		I_ASSIGN(m_useDataMetaInfoAttrPtr, "UseDataMetaInfo", "If true - documents will be searched and sorted by the 'DataMetaInfo' column,\n else - otherwise according to the contents of the 'Document' column", true, false);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", false);
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");

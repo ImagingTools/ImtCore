@@ -1218,7 +1218,7 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool c
 #endif
 	list.removeDuplicates();
 	
-	bool useDataMeta = m_useDataMetaInfoAttrPtr.IsValid() ? *m_useDataMetaInfoAttrPtr : true;
+	bool useDataMeta = m_useDataMetaInfoAttrPtr.IsValid() ? *m_useDataMetaInfoAttrPtr : false;
 	QString jsonKey = useDataMeta ? s_dataMetaInfoColumn : s_documentColumn;
 	
 	for (const QString& item : list){
