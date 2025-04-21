@@ -20,7 +20,7 @@ bool CSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
 {
 	if (m_userCollectionCompPtr.IsValid()) {
 		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-		fieldFilter.fieldId = "UserId";
+		fieldFilter.fieldId = "Id";
 		fieldFilter.filterValue = *m_superuserIdAttrPtr;
 		
 		imtbase::IComplexCollectionFilter::GroupFilter groupFilter;

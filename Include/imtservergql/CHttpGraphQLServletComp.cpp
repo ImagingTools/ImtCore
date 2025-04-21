@@ -81,8 +81,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			SendCriticalMessage(
 						0,
 						QString("Unable to get a GraphQL context for the access token '%1' for Command-ID: '%2'")
-									.arg(qPrintable(accessToken))
-									.arg(qPrintable(gqlCommand)),
+									.arg(qPrintable(accessToken), qPrintable(gqlCommand)),
 						"GraphQL - servlet");
 
 			return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR, "Request incorrected", request);
@@ -94,7 +93,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			gqlContextImplPtr->SetHeaders(headers);
 			m_lastRequest.SetGqlContext(gqlContextImplPtr);
 		}
-		QString message = QString("There is no authentication token in the HTTP headers. Info: Command: '%1'").arg(qPrintable(gqlCommand));
 	}
 
 	QByteArray responseData;

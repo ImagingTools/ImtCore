@@ -64,6 +64,11 @@ I_EXPORT_COMPONENT(
 			"Role object json delegate for SQLite table",
 			"SQL SQLite JSON Role Delegate");
 
+I_EXPORT_COMPONENT(
+			UsersSqlPathExtractor,
+			"Users sql path extractor",
+			"Users Sql Path Extractor");
+
 
 } // namespace ImtAuthDbPck
 

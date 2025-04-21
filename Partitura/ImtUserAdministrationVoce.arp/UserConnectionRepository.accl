@@ -8,11 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="JsonSerializer" X="175" Y="350" Note=""/>
-        <Element ComponentName="Repository" X="550" Y="550" Note=""/>
-        <Element ComponentName="SqlDatabaseDocumentDelegate" X="575" Y="350" Note=""/>
-        <Element ComponentName="Types" X="550" Y="125" Note=""/>
-        <Element ComponentName="UserConnectionInfo" X="950" Y="350" Note=""/>
+        <Element ComponentName="PostgresDatabaseObjectCollection" X="575" Y="200" Note=""/>
+        <Element ComponentName="UserConnectionInfo" X="575" Y="425" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

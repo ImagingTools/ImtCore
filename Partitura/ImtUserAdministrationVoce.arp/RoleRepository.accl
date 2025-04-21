@@ -8,14 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="JsonSerializer" X="300" Y="100" Note=""/>
-        <Element ComponentName="Repository" X="575" Y="475" Note=""/>
-        <Element ComponentName="Role" X="925" Y="325" Note=""/>
-        <Element ComponentName="RoleCollectionAdapter" X="950" Y="475" Note=""/>
-        <Element ComponentName="RoleMetaInfoCreator" X="325" Y="475" Note=""/>
-        <Element ComponentName="RoleMetaInfoDelegate" X="175" Y="325" Note=""/>
-        <Element ComponentName="SqlDatabaseDocumentDelegate" X="575" Y="325" Note=""/>
-        <Element ComponentName="Types" X="875" Y="100" Note=""/>
+        <Element ComponentName="PostgresDatabaseObjectCollection" X="600" Y="125" Note=""/>
+        <Element ComponentName="Role" X="300" Y="325" Note=""/>
+        <Element ComponentName="RoleCollectionAdapter" X="800" Y="325" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

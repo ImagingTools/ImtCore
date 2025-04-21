@@ -8,9 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CompactXmlFileSerializer" X="225" Y="550" Note=""/>
-        <Element ComponentName="GroupMetaInfoCreator" X="875" Y="125" Note=""/>
-        <Element ComponentName="GroupMetaInfoDelegate" X="200" Y="125" Note=""/>
+        <Element ComponentName="JsonSerializer" X="225" Y="550" Note=""/>
+        <Element ComponentName="PostgresXPathExtractor" X="125" Y="325" Note=""/>
         <Element ComponentName="Repository" X="575" Y="550" Note=""/>
         <Element ComponentName="SqlDatabaseDocumentDelegate" X="575" Y="325" Note=""/>
         <Element ComponentName="Types" X="575" Y="125" Note=""/>

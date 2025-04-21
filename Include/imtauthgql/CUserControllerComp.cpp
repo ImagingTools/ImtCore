@@ -608,7 +608,7 @@ const imtauth::IUserInfo* CUserControllerComp::GetUserInfoByLogin(const QByteArr
 const QByteArray CUserControllerComp::GetUserIdByLogin(const QByteArray& login) const
 {
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "UserId";
+	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = login;
 	
 	imtbase::CComplexCollectionFilter complexFilter;
@@ -634,7 +634,7 @@ const QByteArray CUserControllerComp::GetUserIdByEmail(const QString& email) con
 	}
 
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "email";
+	fieldFilter.fieldId = "Mail";
 	fieldFilter.filterValue = email;
 
 	imtbase::CComplexCollectionFilter complexFilter;

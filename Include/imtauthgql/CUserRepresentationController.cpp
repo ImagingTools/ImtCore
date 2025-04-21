@@ -45,7 +45,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	}
 	
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "UserId";
+	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = username;
 	
 	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;

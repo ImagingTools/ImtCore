@@ -105,15 +105,28 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserGroupCollectionControllerComp::O
 			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CVisualStatus response = BaseClass::OnGetObjectVisualStatus(getObjectVisualStatusRequest, gqlRequest, errorMessage);
-
+	if (!errorMessage.isEmpty()){
+		return sdl::imtbase::ImtCollection::CVisualStatus();
+	}
+	
+	if (!response.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+	
+	if (!response.Version_1_0->text.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+	
+	if (response.Version_1_0->text->isEmpty()){
+		response.Version_1_0->text = "<no name>";
+	}
+	
 	QByteArray languageId;
 	const imtgql::IGqlContext* gqlContextPtr = getObjectVisualStatusRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		languageId = gqlContextPtr->GetLanguageId();
-	}
-
-	if (response.Version_1_0->text->isEmpty()){
-		response.Version_1_0->text = "<no name>";
 	}
 
 	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Groups")).toUtf8(), languageId, "CRoleCollectionControllerComp");

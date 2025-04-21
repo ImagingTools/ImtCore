@@ -128,7 +128,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces/>
     <ExportedComponents>
-        <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository/RoleRepository"/>
+        <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository"/>
         <Component ExportedId="UserGroupRepository" ComponentId="UserGroupSqlRepository"/>
         <Component ExportedId="UserRepository" ComponentId="UserSqlRepository/UserRepository"/>
         <Component ExportedId="UserSessionsRepository" ComponentId="UserSessionsSqlRepository"/>

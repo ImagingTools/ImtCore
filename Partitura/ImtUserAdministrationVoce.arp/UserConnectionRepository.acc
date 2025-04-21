@@ -10,37 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="JsonSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Repository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SqlDatabaseDocumentDelegate"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SqlDatabaseDocumentDelegate" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseDocumentDelegate">
+        <Element Id="PostgresDatabaseObjectCollection" PackageId="ImtDatabaseVoce" ComponentId="PostgresDatabaseObjectCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
@@ -53,21 +23,8 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumentPersistenceList" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>JsonSerializer</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="DocumentId"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="UserConnections"/>
@@ -75,31 +32,25 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UseDocumentBase64Encoding" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>UserConnection</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
+                    <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>User Connection</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseDataMetaInfo" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -112,13 +63,15 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imod::IModel" ComponentId="Repository"/>
-        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="Repository"/>
-        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
-        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="Repository"/>
-        <Interface InterfaceId="imtbase::IRevisionController" ComponentId="SqlDatabaseDocumentDelegate"/>
-        <Interface InterfaceId="imtdb::IDependentMetaInfoController" ComponentId="SqlDatabaseDocumentDelegate"/>
-        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="SqlDatabaseDocumentDelegate"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="PostgresDatabaseObjectCollection"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="PostgresDatabaseObjectCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="PostgresDatabaseObjectCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="PostgresDatabaseObjectCollection"/>
+        <Interface InterfaceId="imtbase::IRevisionController" ComponentId="PostgresDatabaseObjectCollection"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="PostgresDatabaseObjectCollection"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="PostgresDatabaseObjectCollection"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="UserConnectionDatabaseDelegate" ComponentId="PostgresDatabaseObjectCollection/SqlDatabaseDocumentDelegate"/>
+    </ExportedComponents>
 </Acf>

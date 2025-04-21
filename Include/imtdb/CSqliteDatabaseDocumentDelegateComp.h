@@ -25,11 +25,6 @@ public:
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual QString GetBaseSelectionQuery() const override;
 	virtual QByteArray CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const override;
-	virtual QString CreateJsonExtractSql(
-				const QString& jsonName,
-				const QString& key,
-				QMetaType::Type metaType = QMetaType::QString,
-				const QString& tableAlias = QString()) const override;
 	virtual bool CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const override;
 	virtual bool CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const override;

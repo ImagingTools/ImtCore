@@ -8,11 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="JsonSerializer" X="325" Y="75" Note=""/>
-        <Element ComponentName="MessageComp" X="925" Y="300" Note=""/>
-        <Element ComponentName="Repository" X="575" Y="475" Note=""/>
-        <Element ComponentName="SQLiteDatabaseDocumentDelegate" X="575" Y="300" Note=""/>
-        <Element ComponentName="Types" X="825" Y="75" Note=""/>
+        <Element ComponentName="MessageComp" X="575" Y="375" Note=""/>
+        <Element ComponentName="SqliteDatabaseObjectCollection" X="575" Y="150" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

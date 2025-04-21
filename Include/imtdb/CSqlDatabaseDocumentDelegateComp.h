@@ -10,6 +10,7 @@
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtdb/IJsonBasedMetaInfoDelegate.h>
 #include <imtdb/IDependentMetaInfoController.h>
+#include <imtdb/ISqlJsonXPathExtractor.h>
 
 
 namespace imtdb
@@ -36,18 +37,27 @@ public:
 	static const QByteArray s_nameColumn;
 	static const QByteArray s_descriptionColumn;
 	static const QByteArray s_documentColumn;
+	static const QByteArray s_dataMetaInfoColumn;
 	static const QByteArray s_addedColumn;
 	static const QByteArray s_lastModifiedColumn;
+	static const QByteArray s_stateColumn;
+	static const QByteArray s_revisionInfoColumn;
+	static const QByteArray s_ownerIdKey;
+	static const QByteArray s_ownerNameKey;
+	static const QByteArray s_operationDescriptionKey;
+	static const QByteArray s_revisionNumberKey;
+	static const QByteArray s_checksumKey;
 	static QSet<QString> s_filterableColumns;
 
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
 		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_REGISTER_INTERFACE(imtdb::IDependentMetaInfoController);
-		I_ASSIGN(m_useBase64AttrPtr, "UseDocumentBase64Encoding", "", true, true);
+		I_ASSIGN(m_useDataMetaInfoAttrPtr, "UseDataMetaInfo", "If true - documents will be searched and sorted by the 'DataMetaInfo' column,\n else - otherwise according to the contents of the 'Document' column", true, true);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
-		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", true);
+		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", false);
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of metainformation of object data", false, "MetaInfoCreator");
 		I_ASSIGN(m_jsonBasedMetaInfoDelegateCompPtr, "JsonBasedMetaInfoDelegate", "Delegate for converting document metainfo to JSON representation", false, "JsonBasedMetaInfoDelegate");
+		I_ASSIGN(m_sqlJsonXPathExtractorCompPtr, "SqlJsonXPathExtractor", "SQL json X-Path extractor", false, "SqlJsonXPathExtractor");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -123,7 +133,6 @@ protected:
 				const istd::IChangeable& object,
 				const imtbase::IOperationContext* operationContextPtr,
 				const QVariant& revisionArgument) const;
-	virtual QByteArray CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const;
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const;
@@ -152,11 +161,12 @@ protected:
 	virtual QByteArray GetCustomColumnsQuery() const;
 
 protected:
-	I_ATTR(bool, m_useBase64AttrPtr);
+	I_ATTR(bool, m_useDataMetaInfoAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_documentPersistenceListCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_REF(imtdb::IJsonBasedMetaInfoDelegate, m_jsonBasedMetaInfoDelegateCompPtr);
+	I_REF(imtdb::ISqlJsonXPathExtractor, m_sqlJsonXPathExtractorCompPtr);
 };
 
 

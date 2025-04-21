@@ -19,6 +19,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -36,6 +39,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RoleRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserRepository"/>
@@ -63,6 +69,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RoleRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserGroupRepository"/>
@@ -108,11 +117,11 @@
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleMetaInfoCreator"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="RoleDatabaseDelegate"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -158,14 +167,8 @@
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
-                                <AttributeInfo Id="JsonBasedMetaInfoDelegate" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleMetaInfoDelegate"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleMetaInfoCreator"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="DocumentId"/>
@@ -173,34 +176,24 @@
                                 <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="Types"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SqliteXPathExtractor"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="TableName" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Roles"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="RoleMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="RoleMetaInfoCreator">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="Role"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="RoleMetaInfoDelegate" PackageId="ImtAuthGqlPck" ComponentId="RoleMetaInfoDelegate">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                             </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="SqliteXPathExtractor" PackageId="ImtDatabasePck" ComponentId="SqliteXPathExtractor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
                         </Data>
                     </Element>
                     <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
@@ -250,33 +243,6 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="GroupMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="GroupMetaInfoCreator">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="Group"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="GroupMetaInfoDelegate" PackageId="ImtAuthGqlPck" ComponentId="GroupMetaInfoDelegate">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
                     <Element Id="Repository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -292,7 +258,15 @@
                                 <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="UserGroupDatabaseDelegate"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                             </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="SqliteXPathExtractor" PackageId="ImtDatabasePck" ComponentId="SqliteXPathExtractor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
                         </Data>
                     </Element>
                     <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
@@ -335,20 +309,17 @@
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
-                                <AttributeInfo Id="JsonBasedMetaInfoDelegate" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="GroupMetaInfoDelegate"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="GroupMetaInfoCreator"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="DocumentId"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="Types"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SqliteXPathExtractor"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TableName" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="UserGroups"/>
@@ -433,7 +404,15 @@
                                 <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="UserDatabaseDelegate"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                             </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="SqliteXPathExtractor" PackageId="ImtDatabasePck" ComponentId="SqliteXPathExtractor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
                         </Data>
                     </Element>
                     <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
@@ -485,14 +464,8 @@
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
-                                <AttributeInfo Id="JsonBasedMetaInfoDelegate" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="UserMetaInfoDelegate"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="UserMetaInfoCreator"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="DocumentId"/>
@@ -500,8 +473,14 @@
                                 <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="Types"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SqliteXPathExtractor"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="TableName" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Users"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UseDataMetaInfo" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupCollection">
                                     <Data IsEnabled="false"/>
@@ -525,33 +504,6 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="UserGroupProvider">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="UserMetaInfoCreator">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="User"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserMetaInfoDelegate" PackageId="ImtAuthGqlPck" ComponentId="UserMetaInfoDelegate">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>

@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="CompactXmlFileSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
+        <Element Id="JsonSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
@@ -22,31 +22,9 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GroupMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="GroupMetaInfoCreator">
+        <Element Id="PostgresXPathExtractor" PackageId="ImtDatabasePck" ComponentId="PostgresXPathExtractor">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Group"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="GroupMetaInfoDelegate" PackageId="ImtAuthGqlPck" ComponentId="GroupMetaInfoDelegate">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="Repository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
@@ -83,18 +61,12 @@
                     <AttributeInfo Id="DocumentPersistenceList" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>CompactXmlFileSerializer</Value>
+                                <Value>JsonSerializer</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="JsonBasedMetaInfoDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GroupMetaInfoDelegate"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GroupMetaInfoCreator"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="DocumentId"/>
@@ -102,13 +74,16 @@
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PostgresXPathExtractor"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="UserGroups"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UseDocumentBase64Encoding" Type="Boolean" ExportId="">
+                    <AttributeInfo Id="UseDataMetaInfo" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">

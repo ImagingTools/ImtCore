@@ -32,7 +32,7 @@ bool CCredentialControllerComp::CheckCredential(const QByteArray& login, const Q
 	imtbase::CComplexCollectionFilter complexFilter;
 	
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "UserId";
+	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = login;
 	complexFilter.AddFieldFilter(fieldFilter);
 	

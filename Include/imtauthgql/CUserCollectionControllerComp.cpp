@@ -49,7 +49,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "UserId";
+	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = username;
 	
 	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
@@ -206,18 +206,31 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserCollectionControllerComp::OnGetO
 			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CVisualStatus response = BaseClass::OnGetObjectVisualStatus(getObjectVisualStatusRequest, gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
+		return sdl::imtbase::ImtCollection::CVisualStatus();
+	}
 
 	QByteArray languageId;
 	const imtgql::IGqlContext* gqlContextPtr = getObjectVisualStatusRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		languageId = gqlContextPtr->GetLanguageId();
 	}
+	
+	if (!response.Version_1_0.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
+	
+	if (!response.Version_1_0->text.has_value()){
+		Q_ASSERT(false);
+		return response;
+	}
 
 	if (response.Version_1_0->text->isEmpty()){
 		response.Version_1_0->text = "<no name>";
 	}
 
-	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Users")).toUtf8(), languageId, "CRoleCollectionControllerComp");
+	QString translation = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), QString(QT_TR_NOOP("Users")).toUtf8(), languageId, "CUserCollectionControllerComp");
 	response.Version_1_0->text = translation + QByteArrayLiteral(" / ") + *response.Version_1_0->text;
 	return response;
 }

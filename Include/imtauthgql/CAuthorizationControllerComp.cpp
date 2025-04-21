@@ -38,7 +38,7 @@ bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
 QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login) const
 {
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-	fieldFilter.fieldId = "UserId";
+	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = login;
 	
 	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;

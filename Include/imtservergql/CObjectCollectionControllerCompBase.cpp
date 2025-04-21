@@ -68,7 +68,7 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
 			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response;
 	
@@ -85,6 +85,12 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 	QByteArray typeId;
 	if (arguments.input.Version_1_0->typeId){
 		typeId = *arguments.input.Version_1_0->typeId;
+	}
+	
+	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+	if (!elementIds.contains(objectId)){
+		errorMessage = QString("Unable to get object visual status. Error: Object with ID: '%1' does not exist").arg(qPrintable(objectId));
+		return sdl::imtbase::ImtCollection::CVisualStatus();
 	}
 
 	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();

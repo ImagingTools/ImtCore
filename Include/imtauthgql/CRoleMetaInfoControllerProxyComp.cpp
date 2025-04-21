@@ -56,7 +56,7 @@ imtbase::CTreeItemModel* CRoleMetaInfoControllerProxyComp::CreateInternalRespons
 			imtbase::CTreeItemModel* dataModelPtr = responseModelPtr->GetTreeItemModel("data");
 			if (dataModelPtr != nullptr){
 				for (int i = 0; i < dataModelPtr->GetItemsCount(); i++){
-					QByteArray id = dataModelPtr->GetData("Id", i).toByteArray();
+					QByteArray id = dataModelPtr->GetData("id", i).toByteArray();
 					if (id == QByteArray("permissions")){
 						imtbase::CTreeItemModel* childrenModelPtr = dataModelPtr->GetTreeItemModel("children", i);
 						if (childrenModelPtr != nullptr){

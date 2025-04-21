@@ -60,14 +60,8 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="JsonBasedMetaInfoDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserMetaInfoDelegate"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserMetaInfoCreator"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="DocumentId"/>
@@ -75,13 +69,16 @@
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UsersSqlPathExtractor"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Users"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UseDocumentBase64Encoding" Type="Boolean" ExportId="">
+                    <AttributeInfo Id="UseDataMetaInfo" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupCollection">
@@ -140,31 +137,9 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="UserMetaInfoCreator">
+        <Element Id="UsersSqlPathExtractor" PackageId="ImtAuthDbPck" ComponentId="UsersSqlPathExtractor">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="User"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserMetaInfoDelegate" PackageId="ImtAuthGqlPck" ComponentId="UserMetaInfoDelegate">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
+                <AttributeInfoMap/>
             </Data>
         </Element>
     </ElementsList>
@@ -174,6 +149,8 @@
         <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="Repository"/>
+        <Interface InterfaceId="imtdb::IDependentMetaInfoController" ComponentId="SqlDatabaseDocumentDelegate"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="SqlDatabaseDocumentDelegate"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Repository"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Repository"/>
     </ExportedInterfaces>
