@@ -50,37 +50,6 @@ I_EXPORT_COMPONENT(
 			"Schema Definition Language SDL QML Generator")
 
 I_EXPORT_COMPONENT(
-			SdlClassTreeModelModificator,
-			"The C++ class modificator, adds saving and loading generated SDL types to TreeItemModel",
-			"Schema Definition Language SDL Class Generator Tree Item Model")
-
-I_EXPORT_COMPONENT(
-			SdlClassJsonModificator,
-			"The C++ class modificator, adds loading generated SDL types from JSON value",
-			"Schema Definition Language SDL Class Generator JSON")
-
-I_EXPORT_COMPONENT(
-			SdlClassGqlModificator,
-			"The C++ class modificator, adds loading generated SDL types from GraphQL request",
-			"Schema Definition Language SDL Class Generator GraphQL GQL")
-
-I_EXPORT_COMPONENT(
-			GqlWrapClassCodeGenerator,
-			"The C++ class generator of GraphQL wrap for SDL requests",
-			"Schema Definition Language SDL Class Generator GraphQL GQL")
-
-I_EXPORT_COMPONENT(
-			GqlHandlerBaseClassGenerator,
-			"A C++ class generator of GraphQL handlers for SDL requests",
-			"Schema Definition Language SDL Class Generator JSON GraphQL GQL Request")
-
-I_EXPORT_COMPONENT(
-			GqlCollectionControllerBaseClassGenerator,
-			"A C++ class generator of GraphQL Collection controllers for SDL requests",
-			"Schema Definition Language SDL Class Generator JSON GraphQL GQL Request")
-
-
-I_EXPORT_COMPONENT(
 			QmldirFilePersistence,
 			"A qmldir file persistence",
 			"Qmldir QT QML File Persistence")

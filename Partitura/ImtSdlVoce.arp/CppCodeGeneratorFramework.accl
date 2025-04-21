@@ -2,14 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5302" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331532" Description="Qt Framework"/>
+            <Version Id="0" Number="5351" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="SdlClassCodeGenerator" X="550" Y="425" Note=""/>
-        <Element ComponentName="SdlGqlCodeGeneratorFramework" X="550" Y="700" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
