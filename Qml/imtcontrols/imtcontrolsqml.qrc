@@ -10,6 +10,7 @@
         <file alias="imtcontrols/Base/DecoratorsQt.qml">Base/DecoratorsQt.qml</file>
         <file alias="imtcontrols/Base/Decorators.qml">Base/Decorators.qml</file>
         <file alias="imtcontrols/Base/Events.qml">Base/Events.qml</file>
+	<file alias="imtcontrols/Base/EventManager.qml">Base/EventManager.qml</file>
         <file alias="imtcontrols/Base/Enums.qml">Base/Enums.qml</file>
 		<file alias="imtcontrols/Base/Functions.qml">Base/Functions.qml</file>
 		<file alias="imtcontrols/Base/RelativePosition.qml">Base/RelativePosition.qml</file>

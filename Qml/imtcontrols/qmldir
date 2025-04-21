@@ -1,6 +1,7 @@
 module imtcontrols
 
 singleton Events 1.0 ./Base/Events.qml
+singleton EventManager 1.0 ./Base/EventManager.qml
 singleton Enums 1.0 ./Base/Enums.qml
 singleton Functions 1.0 ./Base/Functions.qml
 singleton RelativePosition 1.0 ./Base/RelativePosition.qml
