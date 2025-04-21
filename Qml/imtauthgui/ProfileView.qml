@@ -27,6 +27,7 @@ ViewBase {
 	}
 	
 	function updateGui(){
+		console.log("updateGui", profileData)
 		usernameView.text = profileData.m_username;
 		nameInput.text = profileData.m_name;
 		mailInput.text = profileData.m_email;
@@ -275,12 +276,12 @@ ViewBase {
 			
 			let index = headersModel.insertNewItem();
 			
-			headersModel.setData("id", "m_name", index);
+			headersModel.setData("id", "name", index);
 			headersModel.setData("name", qsTr("Name"), index);
 			
 			index = headersModel.insertNewItem();
 			
-			headersModel.setData("id", "m_description", index);
+			headersModel.setData("id", "description", index);
 			headersModel.setData("name", qsTr("Description"), index);
 			
 			headersModel.refresh();

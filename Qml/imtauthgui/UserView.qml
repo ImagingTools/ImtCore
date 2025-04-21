@@ -201,7 +201,7 @@ ViewBase {
 							headersModel2.clear();
 							
 							let index = headersModel2.insertNewItem();
-							headersModel2.setData("id", "m_name", index)
+							headersModel2.setData("id", "name", index)
 							headersModel2.setData("name", qsTr("System Name"), index)
 							
 							if (systemInfoTable.table){

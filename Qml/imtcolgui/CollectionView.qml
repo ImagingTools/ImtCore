@@ -306,8 +306,7 @@ Item {
 			if (container.commandsDelegate){
 				let contextMenuModel = container.commandsDelegate.getContextMenuModel();
 				let count = contextMenuModel.getItemsCount();
-				console.log("count", count)
-				
+
 				if (count > 0){
 					let offset = 30 * count;
 					ModalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});

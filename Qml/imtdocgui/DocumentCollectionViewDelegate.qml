@@ -365,19 +365,19 @@ CollectionViewCommandsDelegateBase {
 								id: headersModel;
 								Component.onCompleted: {
 									let index = headersModel.insertNewItem();
-									headersModel.setData("id", "m_user", index)
+									headersModel.setData("id", "user", index)
 									headersModel.setData("name", qsTr("User"), index)
 
 									index = headersModel.insertNewItem();
-									headersModel.setData("id", "m_revision", index)
+									headersModel.setData("id", "revision", index)
 									headersModel.setData("name", qsTr("Revision"), index)
 
 									index = headersModel.insertNewItem();
-									headersModel.setData("id", "m_isActive", index)
+									headersModel.setData("id", "isActive", index)
 									headersModel.setData("name", qsTr("Active"), index)
 
 									index = headersModel.insertNewItem();
-									headersModel.setData("id", "m_timestamp", index)
+									headersModel.setData("id", "timestamp", index)
 									headersModel.setData("name", qsTr("Time"), index)
 
 									table.headers = headersModel;
