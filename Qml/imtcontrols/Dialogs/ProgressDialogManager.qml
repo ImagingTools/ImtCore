@@ -93,7 +93,8 @@ Dialog {
 		id: body;
 		Item{
 			width: progressDialog.width;
-			height: subtaskColumn.y + subtaskColumn.height + 40;
+			height: subtaskColumn.y + subtaskColumn.height + (subtaskColumn.height > 0) * 40;
+
 
 			ProgressBar{
 				id: mainProgressBar;
@@ -137,7 +138,7 @@ Dialog {
 					Repeater{
 						id: subtaskRepeater;
 
-						model: 3;
+						model: progressDialog.subtaskModel;
 
 						delegate:
 							Item{
