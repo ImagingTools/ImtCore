@@ -1233,12 +1233,14 @@ StyleComponents {
 			width: 300;
 			height: progressContainer.y + progressContainer.height;
 
+			clip: true;
+
 			property int barHeight: !baseElement ? 30 : baseElement.barHeight;
 
 			property bool hasText: !baseElement ? true : baseElement.hasText;
 			property bool hasTitle: !baseElement ? true : baseElement.hasTitle;
 
-			property string title: !baseElement ? qsTr("Прогресс:") : baseElement.title;
+			property string title: !baseElement ? qsTr("Progress:") : baseElement.title;
 			property string text: !baseElement ? "" : baseElement.text;
 
 			property int percent: !baseElement ? 0 : baseElement.percent;
@@ -1254,6 +1256,7 @@ StyleComponents {
 			property Gradient gradient: !baseElement ? null : baseElement.gradient;
 			property string borderColor: !baseElement ? "lightgrey" : baseElement.borderColor;
 			property string backgroundColor: !baseElement ? "#ffffff" : baseElement.backgroundColor;
+			property int fontSize: !baseElement ? Style.fontSizeLarge : baseElement.fontSize;
 
 			property var baseElement: null;
 
@@ -1297,9 +1300,9 @@ StyleComponents {
 
 				anchors.top: progressBar.top;
 
-				color: Style.color_text_common !==undefined ? Style.color_text_common : "#000000";
+				color: Style.textColor !==undefined ? Style.textColor : "#000000";
 				font.family: Style.fontFamily;
-				font.pixelSize: Style.fontSizeXLarge;
+				font.pixelSize: progressBar.fontSize;
 				visible: !progressBar.hasTitle ? false : !progressBar.title ? false : true;
 
 				text: qsTr(progressBar.title);
@@ -1312,13 +1315,13 @@ StyleComponents {
 				anchors.top: progressBar.top;
 				anchors.topMargin: mainTitle.visible * (mainTitle.height + 10);
 
-				color: Style.color_text_common !==undefined ? Style.color_text_common : "#000000";
+				color: Style.textColor !==undefined ? Style.textColor : "#000000";
 				font.family: Style.fontFamily;
-				font.pixelSize: Style.fontSizeXLarge;
+				font.pixelSize: progressBar.fontSize;
 				visible: !progressBar.hasText ? false : !progressBar.text ? false : true;
 
-				text: !progressBar.text ? "" : !progressBar.indeterminate ? qsTr("Выполнено") + ": " + progressBar.text :
-																			qsTr("Выполнено") + "...";
+				text: !progressBar.text ? "" : !progressBar.indeterminate ? qsTr("Completed") + ": " + progressBar.text :
+																			qsTr("Completed") + "...";
 
 			}
 
@@ -1442,12 +1445,6 @@ StyleComponents {
 				duration: animX.duration/4;
 				from: barIndeterminate1.maxWidth;
 				to: 0;
-
-				onFinished: {
-					if(progressBar.indeterminate){
-						animX2.start();
-					}
-				}
 
 			}
 

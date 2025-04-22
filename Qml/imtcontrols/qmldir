@@ -57,6 +57,8 @@ InputDialog 1.0 ./Dialogs/InputDialog.qml
 InputDialogBody 1.0 ./Dialogs/InputDialogBody.qml
 MessageDialog 1.0 ./Dialogs/MessageDialog.qml
 MessageDialogBody 1.0 ./Dialogs/MessageDialogBody.qml
+MessagePopup 1.0 ./Dialogs/MessagePopup.qml
+ProgressDialogManager 1.0 ./Dialogs/ProgressDialogManager.qml
 PopupMenuDialog 1.0 ./Dialogs/PopupMenuDialog.qml
 PopupDecorator 1.0 ./Dialogs/PopupDecorator.qml
 PopupItemDelegateDecorator 1.0 ./Dialogs/PopupItemDelegateDecorator.qml

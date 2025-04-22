@@ -54,6 +54,8 @@
         <file alias="imtcontrols/Dialogs/InputDialogBody.qml">Dialogs/InputDialogBody.qml</file>
         <file alias="imtcontrols/Dialogs/MessageDialog.qml">Dialogs/MessageDialog.qml</file>
         <file alias="imtcontrols/Dialogs/MessageDialogBody.qml">Dialogs/MessageDialogBody.qml</file>
+		<file alias="imtcontrols/Dialogs/MessagePopup.qml">Dialogs/MessagePopup.qml</file>
+		<file alias="imtcontrols/Dialogs/ProgressDialogManager.qml">Dialogs/ProgressDialogManager.qml</file>
         <file alias="imtcontrols/Dialogs/ModalDialogManager.qml">Dialogs/ModalDialogManager.qml</file>
         <file alias="imtcontrols/Dialogs/PopupMenuDialog.qml">Dialogs/PopupMenuDialog.qml</file>
         <file alias="imtcontrols/Dialogs/PopupDecorator.qml">Dialogs/PopupDecorator.qml</file>

@@ -128,10 +128,14 @@ ControlBase {
 	}
 
 	onRootChanged: {
-		if (root && root.backgroundItem){
-			root.backgroundItem.opacity = 0.4;
+		if (root){
+			if(root.backgroundItem){
+				root.backgroundItem.opacity = 0.4;
+			}
 			if(dialogContainer.closeAfterPause){
-				closeAnim.start();
+				if(!closeAnim.running){
+					closeAnim.start();
+				}
 			}
 		}
 	}
@@ -208,8 +212,11 @@ ControlBase {
 			if(dialogContainer.root){
 				dialogContainer.closed()
 				dialogContainer.root.closeDialog();
+
 			}
 		}
+
+
 	}
 
 	ResizeItem{

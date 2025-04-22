@@ -9,6 +9,7 @@ Rectangle {
 
 	width: 300;
 	height: 40;
+	radius: 2;
 
 	color: Style.baseColor;
 
@@ -18,6 +19,7 @@ Rectangle {
 	property color titleTextColor: Style.textColor;
 
 	property bool hasIcon: true;
+	property bool canClose: true;
 	property string iconSource: "../../../../" + Style.getIconPath("Icons/AppIcon", Icon.State.On, Icon.Mode.Normal);
 	property string closeButtonIconSource: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
@@ -68,6 +70,8 @@ Rectangle {
 
 		width: 20;
 		height: 20;
+
+		visible: topPanelDialogContainer.canClose;
 
 		iconSource: topPanelDialogContainer.closeButtonIconSource;
 

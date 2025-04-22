@@ -13,10 +13,10 @@ ControlBase {
     property bool hasText: true;
     property bool hasTitle: true;
 
-    property string title: qsTr("Прогресс:");
+	property string title: qsTr("Progress:");
     property string text: ""; //+ progressBar.percent + "%";
 
-    property int percent: position * 100;
+	property int percent: position > 1 ? 100 :  Math.round(position * 100);
     property real from: 0.0;
     property real to: 1.0;
     property real value: 0.0;
@@ -27,5 +27,6 @@ ControlBase {
     property string borderColor: "lightgrey";
     property string backgroundColor: "#ffffff";
     property Gradient gradient: Gradient{};
+	property int fontSize: Style.fontSizeLarge;
 }
 
