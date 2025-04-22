@@ -201,6 +201,12 @@ imtclientgql.depends = imtbasesdl imtappsdl
 SUBDIRS += imtservice
 imtservice.file = ../../Include/imtservice/QMake/imtservice.pro
 
+SUBDIRS += imthype
+imthype.file = ../../Include/imthype/QMake/imthype.pro
+
+SUBDIRS += imthypegui
+imthypegui.file = ../../Include/imthypegui/QMake/imthypegui.pro
+
 # GUI libraries
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
@@ -417,6 +423,14 @@ ImtServerAppPck.depends = imtserverapp
 SUBDIRS += EagleView
 EagleView.file = ../../Impl/EagleView/QMake/EagleView.pro
 EagleView.depends = imt3dgui
+
+SUBDIRS += ImtHypePck
+ImtHypePck.file = ../../Impl/ImtHypePck/QMake/ImtHypePck.pro
+ImtHypePck.depends = imthype
+
+SUBDIRS += ImtHypeGuiPck
+ImtHypeGuiPck.file = ../../Impl/ImtHypeGuiPck/QMake/ImtHypeGuiPck.pro
+ImtHypeGuiPck.depends = imthypegui imthype
 
 # SUBDIRS += ImtControlsGallery
 # ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro

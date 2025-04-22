@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CTaskSettingsDialog</class>
+ <widget class="QDialog" name="CTaskSettingsDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>426</width>
+    <height>170</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Task Settings</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QCheckBox" name="ActiveCheck">
+     <property name="text">
+      <string>Active</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Task Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="TaskNameEdit"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>User-ID</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="TaskUserIdEdit"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="inputIDLabel">
+     <property name="text">
+      <string>Input-ID</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QStackedWidget" name="InputPageStack">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="page">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QComboBox" name="InputSelector"/>
+       </item>
+       <item>
+        <widget class="QToolButton" name="ShowAcquisitionManagerButton">
+         <property name="text">
+          <string>Edit</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../../ImtCore/Include/imtgui/imtgui.qrc">
+           <normaloff>:/Icons/Edit</normaloff>:/Icons/Edit</iconset>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_2">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLineEdit" name="InputIdEdit"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Description</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="TaskDescriptionEdit"/>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QDialogButtonBox" name="DialogButtons">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>ActiveCheck</tabstop>
+  <tabstop>TaskNameEdit</tabstop>
+  <tabstop>TaskUserIdEdit</tabstop>
+  <tabstop>InputIdEdit</tabstop>
+  <tabstop>TaskDescriptionEdit</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../../ImtCore/Include/imtgui/imtgui.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>DialogButtons</sender>
+   <signal>accepted()</signal>
+   <receiver>CTaskSettingsDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DialogButtons</sender>
+   <signal>rejected()</signal>
+   <receiver>CTaskSettingsDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>325</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -1,0 +1,60 @@
+#pragma once
+
+
+// ImtCore includes
+#include <imtbase/IReferenceCollection.h>
+
+// Acula includes
+#include <imthype/IProcessingInfo.h>
+#include <imthype/IJobQueueManager.h>
+
+
+namespace imthype
+{
+
+
+class IJobTicket: virtual public iser::ISerializable
+{
+public:
+	enum MetaInfoTypes
+	{
+		MIT_TYPE_ID,
+		MIT_UUID,
+		MIT_JOB_NAME,
+		MIT_CONTEXT_ID,
+		MIT_PROGRESS,
+		MIT_PROCESSING_STATUS
+	};
+
+	virtual QByteArray GetTypeId() const = 0;
+	virtual void SetTypeId(const QByteArray& typeId) = 0;
+
+	virtual QByteArray GetUuid() const = 0;
+	virtual void SetUuid(const QByteArray& uuid) = 0;
+
+	virtual QString GetJobName() const = 0;
+	virtual void SetJobName(const QString& name) = 0;
+
+	virtual QByteArray GetContextId() const = 0;
+	virtual void SetContextId(const QByteArray& contextId) = 0;
+
+	virtual const iprm::IParamsSet* GetParams() const = 0;
+	virtual void SetParams(iprm::IParamsSet* paramsPtr) = 0;
+
+	virtual imthype::IJobQueueManager::ProcessingStatus GetProcessingStatus() const = 0;
+	virtual void SetProcessingStatus(imthype::IJobQueueManager::ProcessingStatus status) = 0;
+
+	virtual double GetProgress() const = 0;
+	virtual void SetProgress(double progress) = 0;
+
+	virtual const imthype::IJobOutput* GetResults() const = 0;
+	virtual void SetResults(const imthype::IJobOutput& results) = 0;
+
+	virtual const imtbase::IReferenceCollection* GetInput() const = 0;
+	virtual void SetInput(const imtbase::IReferenceCollection& input) = 0;
+};
+
+
+} // namespace imthype
+
+

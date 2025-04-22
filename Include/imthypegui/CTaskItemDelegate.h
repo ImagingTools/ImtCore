@@ -1,0 +1,47 @@
+#pragma once
+
+
+// Qt includes
+#include <QtWidgets/QItemDelegate>
+
+// ACF includes
+#include <iqtgui/TMakeIconProviderCompWrap.h>
+
+
+namespace imthypegui
+{
+
+
+class CTaskItemDelegate: public iqtgui::TMakeIconProviderCompWrap<QItemDelegate>
+{
+public:
+	typedef QItemDelegate BaseClass;
+
+	enum DataRole
+	{
+		DR_TASK_UUID = Qt::UserRole,
+		DR_TYPE_ID,
+		DR_TYPE_NAME,
+		DR_TASK_NAME,
+		DR_TASK_USERID,
+		DR_TASK_INPUTID,
+		DR_TASK_PREVIEW_OBJECT,
+		DR_TASK_PROCESSING_STATE,
+		DR_TASK_PROCESSING_STATE_ICON,
+		DR_TASK_ENABLED,
+		DR_LAST = DR_TASK_ENABLED
+	};
+
+	CTaskItemDelegate(QObject* parent = nullptr);
+
+protected:
+	// reimplemented (QItemDelegate)
+	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+	virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+};
+
+
+} // namespace imthypegui
+
+
