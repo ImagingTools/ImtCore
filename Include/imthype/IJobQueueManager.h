@@ -6,7 +6,6 @@
 #include <QtCore/QList>
 
 // ACF includes
-#include <istd/IChangeable.h>
 #include <istd/TSmartPtr.h>
 
 // ImtCore includes
@@ -38,6 +37,7 @@ class IJobOutput;
 
 /**
 	Interface for controlling the job processing queue.
+	Job list itself is described by imtbase::ICollectionInfo interface.
 */
 class IJobQueueManager: virtual public imtbase::ICollectionInfo
 {
@@ -120,7 +120,7 @@ public:
 	virtual const iprm::IOptionsList* GetSupportedTasks() const = 0;
 
 	/**
-		Get the type-ID of the job task.
+		Get the type-ID of the given job task.
 	*/
 	virtual QByteArray GetTaskTypeId(const QByteArray& jobId) const = 0;
 
@@ -136,6 +136,12 @@ public:
 		Insert processing job into the processing queue.
 		If the operation was successful, the method will return the UUID of the created job or an empty value otherwise.
 		You can use the returned UUID for controlling the job execution and retrieving results.
+		\param contextId					ID of the job context.
+		\param typeId						Type-ID for the job. Will be used for pairing the corresponding job worker.
+		\param input						List of job inputs given as a collection of object links. Each input object should be persistency placed into a storage (IObjectCollection) bevor call this method.
+		\param jobProcessingParamsPtr		Processing parameters for the job (so called job ticket).
+		\param schedulerParamsPtr			Parameters of the job scheduler (optional).
+		\param logPtr						Job related log.
 	*/
 	virtual QByteArray InsertNewJobIntoQueue(
 				const QByteArray& contextId,

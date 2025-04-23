@@ -39,7 +39,7 @@ public:
 	I_DECLARE_ENUM(ProcessingOutputType, POT_RESULT, POT_ARTIFACT);
 
 	/**
-		Set proceassing report.
+		Set processing report.
 	*/
 	virtual void SetProcessingReport(
 				const ilog::IMessageContainer& processingLog,
