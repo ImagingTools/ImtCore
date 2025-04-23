@@ -17,9 +17,9 @@ GraphicsView{
 
 		let layer = scheme.createLayer("test");
 
-		layer.addShape(rec);
-		layer.addShape(rec);
-		layer.addShape(rec);
+		layer.addShape(rec1);
+		layer.addShape(rec2);
+		layer.addShape(rec3);
 
 		// layer.addShape(polygon);
 
@@ -33,46 +33,105 @@ GraphicsView{
 
 		// layer.addShape(text);
 
+		//Rectangle
+		drawModel.push({"point": Qt.point(300, 300), "width": 100, "height": 100, "color": "red"})
+		drawModel.push({"point": Qt.point(600, 300), "width": 100, "height": 100, "color": "green"})
+		drawModel.push({"point": Qt.point(600, 600), "width": 100, "height": 100, "color": "blue"})
+
+		//Polygon
+		// drawModel.push({"points": [Qt.point(300, 300), Qt.point(600, 300),  Qt.point(600, 600)], "color": "red"})
+
+		//Circle
+		// drawModel.push({"point": Qt.point(300, 300), "color": "red", "radius": 100})
+		// drawModel.push({"point": Qt.point(600, 300), "color": "green", "radius": 100})
+		// drawModel.push({"point": Qt.point(600, 600), "color": "violet", "radius": 100})
+
+		//line
+		// drawModel.push({"points": [Qt.point(300, 300), Qt.point(600, 300),  Qt.point(600, 600)], "color": "red"})
+
+		//Arc
+		//drawModel.push({"point": Qt.point(300, 300), "color": "red", "radius": 100, "startAngle": 0, "endAngle": Math.PI, "anticlockwise": true})
+
+		//Text
+		//drawModel.push({"point": Qt.point(300, 300), "color": "red", "fontSize": 20, "text": "TEXT"})
 
 		scheme.requestPaint();
+
 		//TEST
 	}
 
-	RectangleParams{
-		id: recParams;
-	}
 
 	Component{
 		id: selectedRecComp;
 		SelectionShape{
 		}
 	}
+
+	RectangleParams{
+		id: recParams1;
+	}
 	RectangleShape{
-		id: rec;
+		id: rec1;
 		selectionComp: selectedRecComp;
 
 		Component.onCompleted: {
-			drawModel.push({"point": Qt.point(300, 300), "width": 100, "height": 100, "color": "red"})
-			drawModel.push({"point": Qt.point(600, 300), "width": 100, "height": 100, "color": "green"})
-			drawModel.push({"point": Qt.point(600, 600), "width": 100, "height": 100, "color": "blue"})
-		}
-
-		function getSelectedObject(){
-			return selectedRec;
 		}
 
 
-		function getParams(layerId, index){
-			let item = drawModel[index];
+		function getParams(layerId){
+			let item = drawModel[0];
 
-			recParams.point = item.point;
-			recParams.width = item.width;
-			recParams.height = item.height;
-			recParams.radius = item.radius !== undefined ? item.radius : 0;
-			recParams.color = item.color;
+			recParams1.point = item.point;
+			recParams1.width = item.width;
+			recParams1.height = item.height;
+			recParams1.radius = item.radius !== undefined ? item.radius : 0;
+			recParams1.color = item.color;
 
-			return recParams;
-			// return item;
+			return recParams1;
+		}
+	}
+	RectangleParams{
+		id: recParams2;
+	}
+	RectangleShape{
+		id: rec2;
+		selectionComp: selectedRecComp;
+
+		Component.onCompleted: {
+		}
+
+		function getParams(layerId){
+			let item = drawModel[1];
+
+			recParams2.point = item.point;
+			recParams2.width = item.width;
+			recParams2.height = item.height;
+			recParams2.radius = item.radius !== undefined ? item.radius : 0;
+			recParams2.color = item.color;
+
+			return recParams2;
+		}
+	}
+	RectangleParams{
+		id: recParams3;
+	}
+	RectangleShape{
+		id: rec3;
+		selectionComp: selectedRecComp;
+
+		Component.onCompleted: {
+		}
+
+		function getParams(layerId){
+			let item = drawModel[2];
+
+			recParams3.point = item.point;
+			recParams3.width = item.width;
+			recParams3.height = item.height;
+			recParams3.radius = item.radius !== undefined ? item.radius : 0;
+			recParams3.color = item.color;
+
+			return recParams3;
 		}
 	}
 
@@ -83,15 +142,11 @@ GraphicsView{
 	PolygonShape{
 		id: polygon;
 
-		property var drawModel: []
-
-
 		Component.onCompleted: {
-			drawModel.push({"points": [Qt.point(300, 300), Qt.point(600, 300),  Qt.point(600, 600)], "color": "red"})
 		}
 
-		function getParams(layerId, index){
-			return drawModel[index];
+		function getParams(layerId){
+			return drawModel[0];
 		}
 	}
 
@@ -101,17 +156,11 @@ GraphicsView{
 	CircleShape{
 		id: circle;
 
-		property var drawModel: []
-
-
 		Component.onCompleted: {
-			drawModel.push({"point": Qt.point(300, 300), "color": "red", "radius": 100})
-			drawModel.push({"point": Qt.point(600, 300), "color": "green", "radius": 100})
-			drawModel.push({"point": Qt.point(600, 600), "color": "violet", "radius": 100})
 		}
 
-		function getParams(layerId, index){
-			return drawModel[index];
+		function getParams(layerId){
+			return drawModel[0];
 		}
 	}
 
@@ -121,16 +170,11 @@ GraphicsView{
 	LineShape{
 		id: line;
 
-		property var drawModel: []
-
-
 		Component.onCompleted: {
-			drawModel.push({"points": [Qt.point(300, 300), Qt.point(600, 300),  Qt.point(600, 600)], "color": "red"})
-
 		}
 
-		function getParams(layerId, index){
-			return drawModel[index];
+		function getParams(layerId){
+			return drawModel[0];
 		}
 	}
 
@@ -139,16 +183,11 @@ GraphicsView{
 	ArcShape{
 		id: arc;
 
-		property var drawModel: []
-
-
 		Component.onCompleted: {
-			drawModel.push({"point": Qt.point(300, 300), "color": "red", "radius": 100, "startAngle": 0, "endAngle": Math.PI, "anticlockwise": true})
-
 		}
 
-		function getParams(layerId, index){
-			return drawModel[index];
+		function getParams(layerId){
+			return drawModel[0];
 		}
 	}
 
@@ -158,16 +197,11 @@ GraphicsView{
 	TextShape{
 		id: text;
 
-		property var drawModel: []
-
-
 		Component.onCompleted: {
-			drawModel.push({"point": Qt.point(300, 300), "color": "red", "fontSize": 20, "text": "TEXT"})
-
 		}
 
-		function getParams(layerId, index){
-			return drawModel[index];
+		function getParams(layerId){
+			return drawModel[0];
 		}
 	}
 
@@ -175,15 +209,12 @@ GraphicsView{
 	ComplexShape{
 
 		PolygonShape{
-
 		}
 
 		TextShape{
-
 		}
 
 	}
-
 
 
     onCopySignal: {
