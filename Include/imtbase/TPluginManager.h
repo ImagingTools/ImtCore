@@ -13,7 +13,8 @@
 #endif
 
 // ACF includes
-#include <ilog/TLoggerCompWrap.h>
+#include <istd/TDelPtr.h>
+#include <ilog/CLoggerBase.h>
 
 // ImtCore includes
 #include <imtbase/IPluginStatusMonitor.h>
@@ -24,7 +25,7 @@ namespace imtbase
 
 
 template <class PluginInterface, typename CreateFunction, typename DestroyFunction>
-class TPluginManager: public ilog::CLoggerBase
+class TPluginManager: virtual public ilog::ILoggable
 {
 public:
 	TPluginManager()
@@ -38,6 +39,11 @@ public:
 				const QByteArray& pluginExtension,
 				const QByteArray& pluginTypeId);
 
+	// reimplemented (ilog::ILoggable)
+	virtual void SetLogPtr(ilog::IMessageConsumer* logPtr) override;
+	virtual ilog::IMessageConsumer* GetLogPtr() const override;
+
+public:
 	struct PluginInfo
 	{
 		PluginInfo()
@@ -64,9 +70,58 @@ protected:
 	virtual bool InitializePlugin(PluginInterface* pluginPtr);
 
 protected:
+	class Logger : public ilog::CLoggerBase
+	{
+	public:
+		typedef ilog::CLoggerBase BaseClass;
+
+		bool SendInfoMessage(
+			int id,
+			const QString& message,
+			const QString& messageSource = QString(),
+			int flags = 0) const;
+		bool SendWarningMessage(
+			int id,
+			const QString& message,
+			const QString& messageSource = QString(),
+			int flags = 0) const;
+		bool SendErrorMessage(
+			int id,
+			const QString& message,
+			const QString& messageSource = QString(),
+			int flags = 0) const;
+		bool SendCriticalMessage(
+			int id,
+			const QString& message,
+			const QString& messageSource = QString(),
+			int flags = 0) const;
+		bool SendInfoMessageOnce(
+			int id,
+			const QString& message,
+			const QString& messageSource = QString(),
+			int flags = 0) const;
+		bool SendWarningMessageOnce(
+			int id,
+			const QString& message,
+			const QString& messageSource = QString(),
+			int flags = 0) const;
+		bool SendErrorMessageOnce(
+			int id,
+			const QString& message,
+			const QString& messageSource = QString(),
+			int flags = 0) const;
+		bool SendCriticalMessageOnce(
+			int id,
+			const QString& message,
+			const QString& messageSource = QString(),
+			int flags = 0) const;
+	};
+
+protected:
 	QByteArray m_createMethodName;
 	QByteArray m_destroyMethodName;
 	imtbase::IPluginStatusMonitor* m_pluginStatusMonitorPtr;
+	Logger m_logger;
 };
 
 
@@ -80,6 +135,24 @@ TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::TPluginManager
 {
 	Q_ASSERT(!createMethodName.isEmpty());
 	Q_ASSERT(!destroyMethodName.isEmpty());
+}
+
+
+// public methods
+
+// reimplemented (ilog::ILoggable)
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline void TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::SetLogPtr(ilog::IMessageConsumer* logPtr)
+{
+	m_logger.SetLogPtr(logPtr);
+}
+
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline ilog::IMessageConsumer* TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::GetLogPtr() const
+{
+	return m_logger.GetLogPtr();
 }
 
 
@@ -98,7 +171,7 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 			const QByteArray& pluginExtension,
 			const QByteArray& pluginTypeId)
 {
-	ilog::CLoggerBase::SendInfoMessage(0, QString("Looking for the plug-ins in '%1'").arg(pluginDirectoryPath));
+	m_logger.SendInfoMessage(0, QString("Looking for the plug-ins in '%1'").arg(pluginDirectoryPath));
 
 	if (!pluginDirectoryPath.isEmpty() && QFileInfo(pluginDirectoryPath).exists()){
 		QDir pluginsDirectory(pluginDirectoryPath);
@@ -109,7 +182,7 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 #ifdef Q_OS_WIN
 			SetDllDirectory(pluginPath.absolutePath().toStdWString().c_str());
 #endif
-			ilog::CLoggerBase::SendInfoMessage(0, QString("Load: '%1'").arg(pluginPath.canonicalFilePath()));
+			m_logger.SendInfoMessage(0, QString("Load: '%1'").arg(pluginPath.canonicalFilePath()));
 
 			QString pluginName;
 			QByteArray instanceTypeId;
@@ -138,7 +211,7 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 								statusMessage = QObject::tr("Plug-in loaded");
 							}
 							else{
-								ilog::CLoggerBase::SendInfoMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
+								m_logger.SendInfoMessage(0, QString("Plug-in initialization failed for: '%1'").arg(pluginPath.canonicalFilePath()));
 
 								category = istd::IInformationProvider::IC_ERROR;
 								statusMessage = QObject::tr("Plug-in initialization failed");
@@ -164,14 +237,14 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 					}
 				}
 				else{
-					ilog::CLoggerBase::SendErrorMessage(0, QString("Plug-in entry point was not found: '%1'. %2").arg(pluginPath.canonicalFilePath()).arg(library.errorString()));
+					m_logger.SendErrorMessage(0, QString("Plug-in entry point was not found: '%1'. %2").arg(pluginPath.canonicalFilePath()).arg(library.errorString()));
 
 					category = istd::IInformationProvider::IC_ERROR;
 					statusMessage = QObject::tr("Plug-in entry point was not found: '%1'").arg(library.errorString());
 				}
 			}
 			else{
-				ilog::CLoggerBase::SendErrorMessage(0, QString("%1").arg(library.errorString()));
+				m_logger.SendErrorMessage(0, QString("%1").arg(library.errorString()));
 
 				category = istd::IInformationProvider::IC_ERROR;
 				statusMessage = QObject::tr("%1").arg(library.errorString());
@@ -191,6 +264,64 @@ inline bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::In
 	Q_UNUSED(pluginPtr);
 
 	return true;
+}
+
+
+// public methods of the embedded class Logger
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::Logger::SendInfoMessage(int id, const QString& message, const QString& messageSource, int flags) const
+{
+	return BaseClass::SendInfoMessage(id, message, messageSource, flags);
+}
+
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::Logger::SendWarningMessage(int id, const QString& message, const QString& messageSource, int flags) const
+{
+	return BaseClass::SendWarningMessage(id, message, messageSource, flags);
+}
+
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::Logger::SendErrorMessage(int id, const QString& message, const QString& messageSource, int flags) const
+{
+	return BaseClass::SendErrorMessage(id, message, messageSource, flags);
+}
+
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::Logger::SendCriticalMessage(int id, const QString& message, const QString& messageSource, int flags) const
+{
+	return BaseClass::SendCriticalMessage(id, message, messageSource, flags);
+}
+
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::Logger::SendInfoMessageOnce(int id, const QString& message, const QString& messageSource, int flags) const
+{
+	return BaseClass::SendInfoMessageOnce(id, message, messageSource, flags);
+}
+
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::Logger::SendWarningMessageOnce(int id, const QString& message, const QString& messageSource, int flags) const
+{
+	return BaseClass::SendWarningMessageOnce(id, message, messageSource, flags);
+}
+
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::Logger::SendErrorMessageOnce(int id, const QString& message, const QString& messageSource, int flags) const
+{
+	return BaseClass::SendErrorMessageOnce(id, message, messageSource, flags);
+}
+
+
+template<class PluginInterface, typename CreateFunction, typename DestroyFunction>
+inline bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::Logger::SendCriticalMessageOnce(int id, const QString& message, const QString& messageSource, int flags) const
+{
+	return BaseClass::SendCriticalMessageOnce(id, message, messageSource, flags);
 }
 
 

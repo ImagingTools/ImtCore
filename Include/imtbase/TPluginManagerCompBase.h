@@ -9,6 +9,7 @@
 #include <iprm/IOptionsList.h>
 #include <iprm/IParamsManager.h>
 #include <iprm/TParamsPtr.h>
+#include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtbase/TPluginManager.h>
@@ -38,6 +39,10 @@ public:
 	I_END_COMPONENT;
 
 	TPluginManagerCompBase(const QByteArray& createMethodName, const QByteArray& destroyMethodName);
+
+	// reimplemented (ilog::ILoggable)
+	virtual void SetLogPtr(ilog::IMessageConsumer* logPtr) override;
+	virtual ilog::IMessageConsumer* GetLogPtr() const override;
 
 protected:
 	virtual void LoadPlugins();
@@ -89,6 +94,23 @@ TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseCom
 	:BaseClass2(createMethodName, destroyMethodName, nullptr),
 	m_settingsObserver(*this)
 {
+}
+
+
+// reimplemented (ilog::ILoggable)
+
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+void TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::SetLogPtr(ilog::IMessageConsumer* logPtr)
+{
+	BaseClass::SetLogPtr(logPtr);
+	BaseClass2::SetLogPtr(logPtr);
+}
+
+
+template <class PluginInterface, typename CreateFunction, typename DestroyFunction, typename BaseComponentClass>
+ilog::IMessageConsumer* TPluginManagerCompBase<PluginInterface, CreateFunction, DestroyFunction, BaseComponentClass>::GetLogPtr() const
+{
+	return BaseClass::GetLogPtr();
 }
 
 

@@ -72,16 +72,6 @@ void CPluginBasedJobExecutionComp::OnPluginsCreated()
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CPluginBasedJobExecutionComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	TPluginManager::SetLogPtr(CJobExecutionControllerCompBase::GetLogPtr());
-}
-
-
 } // namespace imthype
 
 

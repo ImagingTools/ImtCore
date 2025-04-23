@@ -55,9 +55,6 @@ protected:
 	// reimplemented (TPluginManagerCompBase)
 	virtual void OnPluginsCreated();
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 private:
 	typedef QMap<QByteArray, imthype::ITaskPlugin*> PluginsMap;
 	PluginsMap m_pluginsMap;

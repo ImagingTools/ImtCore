@@ -89,16 +89,6 @@ void CPluginBasedJobQueueManagerComp::OnPluginsCreated()
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CPluginBasedJobQueueManagerComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	TPluginManager::SetLogPtr(CJobQueueManagerCompBase::GetLogPtr());
-}
-
-
 } // namespace imthype
 
 
