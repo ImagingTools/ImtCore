@@ -193,9 +193,9 @@ Item {
 
 	function getDate(){
 		let date = new Date(datePicker.selectedYear, datePicker.selectedIndexMonth, Number(datePicker.selectedDay));
-		let ok1 = date.getFullYear() == datePicker.selectedYear &&
+		let ok1 = date.getFullYear() === Number(datePicker.selectedYear) &&
 			date.getMonth() == datePicker.selectedIndexMonth &&
-			date.getDate() == Number(datePicker.selectedDay);
+			date.getDate() === Number(datePicker.selectedDay);
 
 		if (!ok1){
 			return null;
@@ -226,39 +226,91 @@ Item {
 	function checkDate(year, month, day){
 		let date = new Date(year, month, day);
 
-		return date.getFullYear() == year &&
-				date.getMonth() == month &&
-				date.getDate() == day;
+		return  date.getFullYear() === year &&
+				date.getMonth() === month &&
+				date.getDate() === day;
+	}
+
+	function findIndexByValue(treeModel, fieldId, targetValue){
+		if(treeModel === undefined || typeof treeModel.getItemsCount !== 'function'){
+			return
+		}
+
+		let modelCount = treeModel.getItemsCount()
+		for(let i = 0; i < modelCount; i++){
+			let gottenValue = yearTreeModel.getData(fieldId, i)
+			if(gottenValue === targetValue){
+				return i
+			}
+		}
+
+		return -1
+	}
+
+	function setDateFromDateObject(dateObj){
+		if(!dateObj){
+			return
+		}
+
+		let isValid = dateObj instanceof Date && !isNaN(dateObj.getTime())
+		if(!isValid){
+			console.error("Object is not Date typed or is invalid")
+
+			return
+		}
+
+		let year	= dateObj.getFullYear()
+		let month	= dateObj.getMonth()
+		let day		= dateObj.getDate()
+
+		yearField.text = year
+		datePicker.selectedIndexMonth = month
+		dayField.text = day
+
+		if(datePicker.hasMonthCombo){
+			monthComboObj.currentIndex = month
+		}
+
+		if(datePicker.hasYearCombo){
+			let modelIndex = findIndexByValue(yearTreeModel, "name", year)
+			if(modelIndex >= 0){
+				let id = yearTreeModel.getData("id", modelIndex)
+				yearComboObj.currentIndex = id
+			}
+		}
+
+		if(datePicker.hasDayCombo){
+			let modelIndex_ = findIndexByValue(dayTreeModel, "name", day)
+			if(modelIndex_ >= 0){
+				let id = dayTreeModel.getData("id", modelIndex_)
+				dayComboObj.currentIndex = id
+			}
+		}
 	}
 
 	function setDate(year, month, day){
 		if (datePicker.checkDate(year, month, day)){
-			yearField.text = year;
-			datePicker.selectedIndexMonth = month;
-			dayField.text = day;
+			return
+		}
+		yearField.text = year;
+		datePicker.selectedIndexMonth = month;
+		dayField.text = day;
 
-			if(datePicker.hasMonthCombo){
-				monthComboObj.currentIndex = month;
+		if(datePicker.hasMonthCombo){
+			monthComboObj.currentIndex = month;
+		}
+		if(datePicker.hasYearCombo){
+			let modelIndex = findIndexByValue(yearTreeModel, "name", year)
+			if(modelIndex >= 0){
+				let id = yearTreeModel.getData("id", modelIndex);
+				yearComboObj.currentIndex = id;
 			}
-			if(datePicker.hasYearCombo){
-				for(let i = 0; i <  yearTreeModel.getItemsCount(); i++){
-					let id = yearTreeModel.getData("id");
-					let name = yearTreeModel.getData("name");
-					if(name == year){
-						yearComboObj.currentIndex = id;
-						break;
-					}
-				}
-			}
-			if(datePicker.hasDayCombo){
-				for(let i = 0; i <  dayTreeModel.getItemsCount(); i++){
-					let id = dayTreeModel.getData("id");
-					let name = dayTreeModel.getData("name");
-					if(name == day){
-						dayComboObj.currentIndex = id;
-						break;
-					}
-				}
+		}
+		if(datePicker.hasDayCombo){
+			let modelIndex_ = findIndexByValue(dayTreeModel, "name", day)
+			if(modelIndex_ >= 0){
+				let id = dayTreeModel.getData("id", modelIndex_);
+				dayComboObj.currentIndex = id;
 			}
 		}
 	}
@@ -267,10 +319,10 @@ Item {
 		var year = stringDate.slice(0,4);
 		var month = stringDate.slice(5,7);
 		var day = stringDate.slice(8);
-		if(day[0] == "0"){
+		if(day[0] === "0"){
 			day = day.slice(1);
 		}
-		if(month[0] == "0"){
+		if(month[0] === "0"){
 			month = month.slice(1);
 		}
 
