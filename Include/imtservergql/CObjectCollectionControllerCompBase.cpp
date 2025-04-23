@@ -903,6 +903,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		return nullptr;
 	}
 	
+	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+	if (!elementIds.contains(objectId)){
+		errorMessage = QString("Unable to delete object. Object with ID '%1' does not exists").arg(QString(objectId));
+		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		return nullptr;
+	}
+	
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectId);

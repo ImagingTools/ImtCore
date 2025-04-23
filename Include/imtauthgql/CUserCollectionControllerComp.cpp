@@ -140,7 +140,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		}
 		
 		imtbase::IComplexCollectionFilter::FieldFilter mailFieldFilter;
-		mailFieldFilter.fieldId = "Email";
+		mailFieldFilter.fieldId = "Mail";
 		mailFieldFilter.filterValue = mail;
 		
 		imtbase::IComplexCollectionFilter::GroupFilter mailGroupFilter;
