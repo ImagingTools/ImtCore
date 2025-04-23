@@ -187,6 +187,8 @@ protected:
 	typedef QVector<Task> TaskList;
 
 protected:
+	I_REF(imtbase::IObjectCollection, m_taskInputsCompPtr);
+
 	TaskList m_tasks;
 	typedef QMap<QByteArray, TaskList::Iterator> TaskIdMap;
 
@@ -199,7 +201,6 @@ private:
 	I_MULTIATTR(QByteArray, m_fixedTaskTypeIdsAttrPtr);
 	I_MULTITEXTATTR(m_fixedTaskTypeNamesAttrPtr);
 	I_MULTITEXTATTR(m_fixedTaskUserIdsAttrPtr);
-	I_REF(imtbase::IObjectCollection, m_taskInputsCompPtr);
 	I_REF(imod::IModel, m_taskInputsModelCompPtr);
 	I_ATTR(bool, m_allowAddTasksAttrPtr);
 
