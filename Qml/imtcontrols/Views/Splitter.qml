@@ -4,50 +4,50 @@ import com.imtcore.imtqml 1.0;
 import imtcontrols 1.0
 
 Rectangle {
-    id: splitterContainer;
+	id: splitterContainer;
 
-    color: Style.backgroundColor;
+	color: Style.backgroundColor;
 
-    property int type: 0x1;
-    property bool isPressed: false;
-    property int leftLimit: 0;
-    property int rightLimit: 1000000;
+	property int type: 0x1;
+	property bool isPressed: false;
+	property int leftLimit: 0;
+	property int rightLimit: 1000000;
 
 	property bool isClickMode: false;
 
 	signal clicked();
 
-    MouseArea {
-        id: splitterMA;
+	MouseArea {
+		id: splitterMA;
 
-        anchors.fill: parent;
+		anchors.fill: parent;
 
-        enabled: parent.enabled
-        hoverEnabled: enabled;
-        acceptedButtons: Qt.LeftButton;
+		enabled: parent.enabled
+		hoverEnabled: enabled;
+		acceptedButtons: Qt.LeftButton;
 		cursorShape: splitterContainer.isClickMode ? Qt.PointingHandCursor : Qt.SplitHCursor;
 
-        onPressed: {
-            splitterContainer.isPressed = true;
-        }
-        onReleased: {
-            splitterContainer.isPressed = false;
+		onPressed: {
+			splitterContainer.isPressed = true;
+		}
+		onReleased: {
+			splitterContainer.isPressed = false;
 			splitterContainer.clicked();
-        }
+		}
 
-        onMouseXChanged: {
+		onMouseXChanged: {
 			if (splitterContainer.type !== 0x1 || splitterContainer.isClickMode){
-                return;
-            }
+				return;
+			}
 
-            if (splitterContainer.isPressed){
-                let newX = splitterContainer.x + mouseX;
-                if((newX > splitterContainer.x && newX < splitterContainer.rightLimit)||
-                        (newX < splitterContainer.x && newX > splitterContainer.leftLimit)){
+			if (splitterContainer.isPressed){
+				let newX = splitterContainer.x + mouseX;
+				if((newX > splitterContainer.x && newX < splitterContainer.rightLimit)||
+						(newX < splitterContainer.x && newX > splitterContainer.leftLimit)){
 
-                    splitterContainer.x += mouseX;
-                }
-            }
-        }
-    }
+					splitterContainer.x += mouseX;
+				}
+			}
+		}
+	}
 }
