@@ -289,9 +289,10 @@ Item {
 	}
 
 	function setDate(year, month, day){
-		if (datePicker.checkDate(year, month, day)){
+		if (!datePicker.checkDate(year, month, day)){
 			return
 		}
+
 		yearField.text = year;
 		datePicker.selectedIndexMonth = month;
 		dayField.text = day;
