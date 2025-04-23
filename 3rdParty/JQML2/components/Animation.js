@@ -46,8 +46,7 @@ class Animation extends QtObject {
         this.getProperty('paused').reset(true)
     }
     start() {
-        this.restart()
-
+        if(!this.getPropertyValue('running')) this.restart()
     }
     stop() {
         this.getProperty('running').reset(false)

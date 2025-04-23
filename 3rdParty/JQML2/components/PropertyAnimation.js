@@ -30,10 +30,10 @@ class PropertyAnimation extends Animation {
                 
                 let increment = (this.getPropertyValue('to') - this.getPropertyValue('from')) / (this.getPropertyValue('duration') / (1000 / 60))
      
-                this.getPropertyValue('target').getProperty(prop).reset(this.getPropertyValue('target').getPropertyValue(prop) + increment)
-     
+                
+                let value = this.getPropertyValue('target').getPropertyValue(prop) + increment
 
-                if(this.getPropertyValue('to') >= this.getPropertyValue('from') && this.getPropertyValue('target').getPropertyValue(prop) >= this.getPropertyValue('to')) {
+                if(this.getPropertyValue('to') >= this.getPropertyValue('from') && value >= this.getPropertyValue('to')) {
                     this.getPropertyValue('target').getProperty(prop).reset(this.getPropertyValue('to'))
                     let loops = this.$loops + 1
                     if(loops < this.getPropertyValue('loops') || this.getPropertyValue('loops') === Animation.Infinite){
@@ -45,7 +45,7 @@ class PropertyAnimation extends Animation {
                         if(this.$signals.stopped) this.$signals.stopped()
                         if(this.$signals.finished) this.$signals.finished()
                     }
-                } else if(this.getPropertyValue('to') <= this.getPropertyValue('from') && this.getPropertyValue('target').getPropertyValue(prop) <= this.getPropertyValue('to')) {
+                } else if(this.getPropertyValue('to') <= this.getPropertyValue('from') && value <= this.getPropertyValue('to')) {
                     this.getPropertyValue('target').getProperty(prop).reset(this.getPropertyValue('to'))
                     let loops = this.$loops + 1
                     if(loops < this.getPropertyValue('loops') || this.getPropertyValue('loops') === Animation.Infinite){
@@ -57,6 +57,8 @@ class PropertyAnimation extends Animation {
                         if(this.$signals.stopped) this.$signals.stopped()
                         if(this.$signals.finished) this.$signals.finished()
                     }
+                } else {
+                    this.getPropertyValue('target').getProperty(prop).reset(value)
                 }
                 // this.target.$p[prop].getSignal()()
 

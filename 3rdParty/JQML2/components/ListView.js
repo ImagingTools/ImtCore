@@ -582,37 +582,76 @@ class ListView extends Flickable {
         this.middleHeight = middleHeight
 
         if(this.getPropertyValue('orientation') === ListView.Horizontal){
-            this.getStatement('contentWidth').reset(visibleContentWidth + Math.round(middleWidth)*(length-visibleCount) + this.getPropertyValue('spacing') * (length-1))
+            let contentWidth = visibleContentWidth + Math.round(middleWidth)*(length-visibleCount) + this.getPropertyValue('spacing') * (length-1)
+
+            let contentWidthProperty = this.getProperty('contentWidth')
+            if(contentWidthProperty.value != contentWidth){
+                contentWidthProperty.value = contentWidth
+                contentWidthProperty.getNotify()()
+            }
+
             let originX = (minX - firstIndex*(Math.round(middleWidth+this.getPropertyValue('spacing'))))
             if(originX !== Infinity && originX !== -Infinity) this.getStatement('originX').reset(originX)
 
-            this.getProperty('contentHeight').reset(maxHeight)
+            // this.getProperty('contentHeight').reset(maxHeight)
         } else {
-            this.getStatement('contentHeight').reset(visibleContentHeight + Math.round(middleHeight)*(length-visibleCount) + this.getPropertyValue('spacing') * (length-1))
+            let contentHeight = visibleContentHeight + Math.round(middleHeight)*(length-visibleCount) + this.getPropertyValue('spacing') * (length-1)
+
+            let contentHeightProperty = this.getProperty('contentHeight')
+            if(contentHeightProperty.value != contentHeight){
+                contentHeightProperty.value = contentHeight
+                contentHeightProperty.getNotify()()
+            }
+
             let originY = (minY - firstIndex*(Math.round(middleHeight+this.getPropertyValue('spacing'))))
             if(originY !== Infinity && originY !== -Infinity) this.getStatement('originY').reset(originY)
 
-            this.getProperty('contentWidth').reset(maxWidth)
+            // this.getProperty('contentWidth').reset(maxWidth)
         }  
     }
 
     $orientationChanged(){
-        for(let i = 0; i < this.$items.length; i++){
+        if(this.getPropertyValue('orientation') === ListView.Horizontal){
+            this.getProperty('originY').reset(0)
+
+            let contentHeightProperty = this.getProperty('contentHeight')
+            if(contentHeightProperty.value != -1){
+                contentHeightProperty.value = -1
+                contentHeightProperty.getNotify()()
+            }
+        } else {
+            this.getProperty('originX').reset(0)
+
+            let contentWidthProperty = this.getProperty('contentWidth')
+            if(contentWidthProperty.value != -1){
+                contentWidthProperty.value = -1
+                contentWidthProperty.getNotify()()
+            }
+        }
+
+        let temp = this.$items
+        this.$items = []
+
+        for(let i = 0; i < temp.length; i++){
             let info = this.$getItemInfo(i)
 
-            if(info.exist){
+            if(info.inner){
                 if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                    this.getProperty('originY').reset(0)
+    
                 } else {
-                    this.getProperty('originX').reset(0)
+
                 }
 
-                this.$items[i].getProperty('x').reset(info.x)
-                this.$items[i].getProperty('y').reset(info.y)
+                temp[i].getProperty('x').reset(info.x)
+                temp[i].getProperty('y').reset(info.y)
             }
             
         }
+
+        this.$items = temp
+
         this.$updateView()
+        this.$updateGeometry()
     }
 
     $contentXChanged(){
