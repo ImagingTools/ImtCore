@@ -34,14 +34,14 @@ iprm::IParamsSet* CPluginBasedJobQueueManagerComp::CreateJobParameters(
 			istd::TDelPtr<iprm::IParamsSet> newParamsPtr(paramsFactoryPtr->CreateInstance(taskTypeId));
 			if (newParamsPtr.IsValid()){
 				if (newParamsPtr->GetFactoryId() != taskTypeId){
-					ilog::CLoggerBase::SendCriticalMessage(0, "Job parameter were created, but they have a wrong type. Please check the parameter registration");
+					SendCriticalMessage(0, "Job parameter were created, but they have a wrong type. Please check the parameter registration");
 
 					return nullptr;
 				}
 
 				if (defaultParamPtr != nullptr) {
 					if (!newParamsPtr->CopyFrom(*defaultParamPtr)) {
-						ilog::CLoggerBase::SendCriticalMessage(0, "Job parameter could not be initialized");
+						SendCriticalMessage(0, "Job parameter could not be initialized");
 
 						return nullptr;
 					}
@@ -50,7 +50,7 @@ iprm::IParamsSet* CPluginBasedJobQueueManagerComp::CreateJobParameters(
 				return newParamsPtr.PopPtr();
 			}
 			else {
-				ilog::CLoggerBase::SendCriticalMessage(0, "Job parameter could not be created");
+				SendCriticalMessage(0, "Job parameter could not be created");
 			}
 
 			return paramsFactoryPtr->CreateInstance(taskTypeId);
@@ -86,6 +86,16 @@ void CPluginBasedJobQueueManagerComp::OnPluginsCreated()
 	for (PluginsMap::ConstIterator iter = m_pluginsMap.constBegin(); iter != m_pluginsMap.constEnd(); ++iter){
 		m_taskParamsFactories.InsertOption(iter.value()->GetPluginName(), iter.key());
 	}
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CPluginBasedJobQueueManagerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	TPluginManager::SetLogPtr(CJobQueueManagerCompBase::GetLogPtr());
 }
 
 

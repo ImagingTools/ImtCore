@@ -78,6 +78,16 @@ void CPluginBasedTaskCollectionComp::OnPluginsCreated()
 }
 
 
+// reimplemented (icomp::CComponentBase)
+
+void CPluginBasedTaskCollectionComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	TPluginManager::SetLogPtr(CTaskCollectionCompBase::GetLogPtr());
+}
+
+
 } // namespace imthype
 
 

@@ -29,7 +29,7 @@ const IJobProcessor* CPluginBasedJobExecutionComp::GetTaskProcessor(const QByteA
 			istd::TDelPtr<IJobProcessor> processorPtr(jobProcessorFactoryPtr->CreateInstance(workerTypeId));
 			if (processorPtr.IsValid()){
 				if (processorPtr->GetTaskTypeId() != workerTypeId){
-					ilog::CLoggerBase::SendCriticalMessage(0, "Job processor were created, but they have a wrong type. Please check the processor component registration");
+					SendCriticalMessage(0, "Job processor were created, but they have a wrong type. Please check the processor component registration");
 
 					return nullptr;
 				}
@@ -39,7 +39,7 @@ const IJobProcessor* CPluginBasedJobExecutionComp::GetTaskProcessor(const QByteA
 				return m_jobProcessorMap[workerTypeId].get();
 			}
 			else {
-				ilog::CLoggerBase::SendCriticalMessage(0, "Job processor could not be created");
+				SendCriticalMessage(0, "Job processor could not be created");
 			}
 		}
 	}
@@ -69,6 +69,16 @@ void CPluginBasedJobExecutionComp::OnPluginsCreated()
 			}
 		}
 	}
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CPluginBasedJobExecutionComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	TPluginManager::SetLogPtr(CJobExecutionControllerCompBase::GetLogPtr());
 }
 
 

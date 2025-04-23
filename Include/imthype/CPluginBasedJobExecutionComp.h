@@ -27,6 +27,7 @@ class CPluginBasedJobExecutionComp:
 						IMT_DESTROY_PLUGIN_FUNCTION(JobProcessor),
 						CJobExecutionControllerCompBase>
 {
+	using CJobExecutionControllerCompBase::SendCriticalMessage;
 public:
 	typedef imtbase::TPluginManagerCompBase<
 				imthype::IJobProcessorPlugin,
@@ -35,7 +36,6 @@ public:
 				CJobExecutionControllerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CPluginBasedJobExecutionComp);
-		I_ASSIGN(m_logCompPtr, "Log", "Job execution log", false, "Log");
 	I_END_COMPONENT;
 
 	CPluginBasedJobExecutionComp();
@@ -47,9 +47,10 @@ protected:
 	// reimplemented (TPluginManagerCompBase)
 	virtual void OnPluginsCreated();
 
-private:
-	I_REF(ilog::IMessageConsumer, m_logCompPtr);
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
+private:
 	typedef QMap<QByteArray, imthype::IJobProcessorPlugin*> PluginsMap;
 	PluginsMap m_pluginsMap;
 

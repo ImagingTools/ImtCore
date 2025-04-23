@@ -31,6 +31,7 @@ class CPluginBasedJobQueueManagerComp:
 						IMT_DESTROY_PLUGIN_FUNCTION(TaskParamSet),
 						CJobQueueManagerCompBase>
 {
+	using CJobQueueManagerCompBase::SendCriticalMessage;
 public:
 	typedef imtbase::TPluginManagerCompBase<
 				imthype::ITaskParamsPlugin,
@@ -39,7 +40,6 @@ public:
 				CJobQueueManagerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CPluginBasedJobQueueManagerComp);
-		I_ASSIGN(m_logCompPtr, "JobManagerLog", "Job management log", false, "JobManagerLog");
 	I_END_COMPONENT;
 
 	CPluginBasedJobQueueManagerComp();
@@ -55,9 +55,10 @@ protected:
 	// reimplemented (TPluginManagerCompBase)
 	virtual void OnPluginsCreated();
 
-private:
-	I_REF(ilog::IMessageConsumer, m_logCompPtr);
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
+private:
 	typedef QMap<QByteArray, imthype::ITaskParamsPlugin*> PluginsMap;
 	PluginsMap m_pluginsMap;
 

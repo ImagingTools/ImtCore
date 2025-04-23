@@ -28,6 +28,7 @@ class CPluginBasedTaskCollectionComp:
 						CTaskCollectionCompBase>,
 			virtual public imthype::ITaskCollection
 {
+	using CTaskCollectionCompBase::SendCriticalMessage;
 public:
 	typedef imtbase::TPluginManagerCompBase<
 				imthype::ITaskPlugin,
@@ -37,7 +38,6 @@ public:
 
 	I_BEGIN_COMPONENT(CPluginBasedTaskCollectionComp);
 		I_REGISTER_INTERFACE(imthype::ITaskCollection);
-		I_ASSIGN(m_logCompPtr, "TaskLog", "Task log", false, "TaskLog");
 	I_END_COMPONENT;
 
 	CPluginBasedTaskCollectionComp();
@@ -55,9 +55,10 @@ protected:
 	// reimplemented (TPluginManagerCompBase)
 	virtual void OnPluginsCreated();
 
-private:
-	I_REF(ilog::IMessageConsumer, m_logCompPtr);
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
+private:
 	typedef QMap<QByteArray, imthype::ITaskPlugin*> PluginsMap;
 	PluginsMap m_pluginsMap;
 
