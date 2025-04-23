@@ -5,17 +5,16 @@ import com.imtcore.imtqml 1.0
 GraphicsShape {
 
 	property QtObject source: null;
-	property int sourceIndex: 0;
 	property var coordinate
 
-	function draw(ctx, layerId, index){
-		drawSelection(ctx, layerId, index);
-		drawBorderPoints(ctx, layerId, index)
+	function draw(ctx, layerId){
+		drawSelection(ctx, layerId);
+		drawBorderPoints(ctx, layerId)
 	}
 
-	function drawSelection(ctx, layerId, index){
+	function drawSelection(ctx, layerId){
 		let params_;
-		params_ = source.getParams(layerId, index)
+		params_ = source.getParams(layerId)
 
 		ctx.fillStyle = "transparent";
 		ctx.strokeStyle = "yellow";
@@ -42,9 +41,9 @@ GraphicsShape {
 
 	}
 
-	function drawBorderPoints(ctx, layerId, index){
+	function drawBorderPoints(ctx, layerId){
 		let params_;
-		params_ = source.getParams(layerId, index)
+		params_ = source.getParams(layerId)
 		let point = getPoint(params_);
 		let width = params_.width;
 		let height = params_.height;

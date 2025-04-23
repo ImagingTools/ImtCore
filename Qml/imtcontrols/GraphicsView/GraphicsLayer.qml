@@ -27,13 +27,7 @@ QtObject {
 
 	function draw(ctx){
 		for(let i = 0; i < shapeModel.length; i++){
-			shapeModel[i].draw(ctx, layerId, i);
-		}
-	}
-
-	function drawSelection(ctx, selectedIndexes){
-		for(let i = 0; i < shapeModel.length; i++){
-			shapeModel[i].draw(ctx, layerId, selectedIndexes[i]);
+			shapeModel[i].draw(ctx, layerId);
 		}
 	}
 

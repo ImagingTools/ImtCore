@@ -4,8 +4,8 @@ import com.imtcore.imtqml 1.0
 
 GraphicsShape {
 
-	function draw(ctx, layerId, index){
-		let params = getParams(layerId, index)
+	function draw(ctx, layerId){
+		let params = getParams(layerId)
 		ctx.fillStyle = params.color !== undefined ? params.color : "transparent";
 		ctx.strokeStyle = params.borderColor !== undefined ? params.borderColor : "transparent";
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 0

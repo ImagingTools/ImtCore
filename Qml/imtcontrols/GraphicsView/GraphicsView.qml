@@ -69,7 +69,6 @@ Rectangle {
 	}
 
 	property var layerModel: []
-	property var selectedIndexes: []
 
 	function createLayer(layerId){
 		let layer = layerComp.createObject(this);
@@ -212,7 +211,7 @@ Rectangle {
 			let shapeModel = layer.shapeModel;
 			for(let j = 0; j < shapeModel.length; j++){
 				let shape = shapeModel[j];
-				let params = shape.getParams(layer.layerId, j);
+				let params = shape.getParams(layer.layerId);
 				let point = params.point;
 				let width_ = params.width * canvas.scaleCoeff;
 				let height_ = params.height * canvas.scaleCoeff;
@@ -224,7 +223,6 @@ Rectangle {
 					&& mouseY > y_
 					&& mouseY < y_ + height_
 				if(isInside){
-					canvasPage.selectedIndexes.push(j)
 					console.log("COLOR::", params.color, j)
 					return shape;
 				}
@@ -241,7 +239,6 @@ Rectangle {
 		let layer = layerComp.createObject(this);
 		layer.layerId = "selection";
 		layerModel.push(layer);
-		selectedIndexes = []
 	}
 
 
@@ -277,7 +274,7 @@ Rectangle {
 				let shape = canvasPage.findObject(mouse.x, mouse.y)
 				let selectionLayer = canvasPage.getLayer("selection");
 				if(shape !== null){
-					let selection = shape.createSelection(canvasPage.selectedIndexes[canvasPage.selectedIndexes.length -1])
+					let selection = shape.createSelection()
 					selectionLayer.addShape(selection);
 				}
 				else {
@@ -650,8 +647,7 @@ Rectangle {
 						layer.draw(ctx);
 					}
 					else {
-						layer.drawSelection(ctx, canvasPage.selectedIndexes);
-						// layer.drawBorderPoints(ctx, canvasPage.selectedIndexes);
+						layer.draw(ctx);
 					}
 				}
 

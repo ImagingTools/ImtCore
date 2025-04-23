@@ -6,10 +6,10 @@ QtObject {
 
 	property Component selectionComp: null;
 
-	function draw (ctx, layerId, index){
+	function draw (ctx, layerId){
 	}
 
-	function getParams(layerId, index){
+	function getParams(layerId){
 		return [];
 	}
 
@@ -17,9 +17,9 @@ QtObject {
 		return []
 	}
 
-	function createSelection(index){
+	function createSelection(){
 		if(selectionComp){
-			return selectionComp.createObject(this, {"source": this, "sourceIndex" : index})
+			return selectionComp.createObject(this, {"source": this})
 		}
 	}
 

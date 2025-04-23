@@ -3,8 +3,8 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 
 GraphicsShape {
-	function draw(ctx, layerId, index){
-		let params = getParams(layerId, index)
+	function draw(ctx, layerId){
+		let params = getParams(layerId)
 		ctx.strokeStyle = params.color !== undefined ? params.color : "transparent";
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 0
 		let radius = params.radius !== undefined ? params.radius : 0
