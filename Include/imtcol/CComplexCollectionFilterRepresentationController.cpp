@@ -279,8 +279,8 @@ bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRe
 				endRange = *timeRangeSdl.End;
 			}
 			timeFilter.SetTimeRange(imtbase::CTimeRange(
-				QDateTime::fromString(startRange, "dd.MM.yyyy hh:mm:ss"),
-				QDateTime::fromString(endRange, "dd.MM.yyyy hh:mm:ss")));
+				QDateTime::fromString(startRange, Qt::ISODateWithMs),
+				QDateTime::fromString(endRange, Qt::ISODateWithMs)));
 		}
 
 		imtbase::ITimeFilterParam::TimeUnit timeUnit = imtbase::ITimeFilterParam::TU_CUSTOM;
