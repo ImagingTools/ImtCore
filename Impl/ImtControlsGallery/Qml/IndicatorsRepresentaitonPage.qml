@@ -46,7 +46,7 @@ Rectangle {
 
                 from: 10; to: 110;
                 value: 60;
-                indeterminate: true;
+				indeterminate: true;
                 text: percent + " %";
             }
 
@@ -87,6 +87,29 @@ Rectangle {
                     }
                 }
             }
+
+			Button{
+				id: showProgressDialogButton;
+
+				anchors.verticalCenter: parent.verticalCenter;
+				text: "Show progress dialog"
+				onClicked: {
+					indicatorsRepresentaitonPage.percent = 0
+					// let description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc finibus "
+					// 	+ "in est quis laoreet. Interdum et malesuada fames ac ante ipsum primis "
+					// 	+ "in faucibus. Curabitur eget justo sollicitudin enim faucibus bibendum. "
+					// 	+ "Suspendisse potenti. Vestibulum cursus consequat mauris id sollicitudin. "
+					// 	+ "Duis facilisis hendrerit consectetur. Curabitur sapien tortor, efficitur "
+					// 	+ "id auctor nec, efficitur et nisl. Ut venenatis eros in nunc placerat, "
+					// 	+ "eu aliquam enim suscipit.";
+					let description = "Showing progress test task"
+					let taskId = "1";
+					let param = {"title": "Showing progress test task", "description": description, "taskId" : taskId}
+					ModalDialogManager.openDialog(proggressDialog, param)
+					progressDialogAnim.start();
+
+				}
+			}
         }//progressBarRow
 
         Row{
@@ -154,6 +177,7 @@ Rectangle {
 
             }
 
+
         }//indicatorsRow
 
         Row{
@@ -189,7 +213,7 @@ Rectangle {
 
 
                     delegate: Rectangle{
-                        width: listVert.width - (scrollVert.width + 2);
+						width: listVert.width - 10;
                         height: 50;
                         radius: 2;
                         color: "lightblue";
@@ -243,7 +267,7 @@ Rectangle {
                     model: 10;
                     delegate: Rectangle{
                         width: 50;
-                        height: listHoriz.height - (scrollHoriz.height + 2);
+						height: listHoriz.height - 10;
                         radius: 2;
                         color: "lightblue";
                         Text{
@@ -275,15 +299,15 @@ Rectangle {
     }//Column
 
     Timer{
-        id: timer;
+		id: timer;
 
-        running: true;
-        triggeredOnStart: true;
-        onTriggered: {
-            roundIndicatorAnim.start();
-        }
-        interval: 4000;
-        repeat: true;
+		running: true;
+		triggeredOnStart: true;
+		onTriggered: {
+			roundIndicatorAnim.start();
+		}
+		interval: 4000;
+		repeat: true;
     }
 
 
@@ -295,6 +319,43 @@ Rectangle {
         duration: 3000;
         from: 0; to: 100;
     }
+
+	NumberAnimation {
+		id: progressDialogAnim;
+
+		target: indicatorsRepresentaitonPage;
+		property: "percent";
+		duration: 3000;
+		from: 0; to: 100;
+
+	}
+
+	property real percent: 0;
+
+
+
+	Component {
+		id: proggressDialog;
+
+		ProgressDialogManager{
+			value: indicatorsRepresentaitonPage.percent/100;
+			onTaskComleted: {
+				let text_ = description + " "  + qsTr("completed")
+				let param = {"text": text_}
+				ModalDialogManager.openDialog(messageComp, param)
+			}
+		}
+
+
+	}
+
+	Component{
+		id: messageComp;
+		MessagePopup {
+			id: message;
+		}
+	}
+
 
 }
 

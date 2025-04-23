@@ -85,9 +85,10 @@ Rectangle {
 				
 				anchors.verticalCenter:  parent.verticalCenter;
 				
+				visible: false;
 				text: "Open new dialog";
 				onClicked: {
-					dialog_new.open();
+					//dialog_new.open();
 				}
 			}
 			
@@ -99,8 +100,8 @@ Rectangle {
 				visible: Style.styleId == "StyleQt";
 				text: "window style";
 				onClicked: {
-					//var parameters = {"title": "Confirmation(window)", "modality": Qt.WindowModal};
-					var parameters = {"title": "Confirmation(window)"};
+					//let parameters = {"title": "Confirmation(window)", "modality": Qt.WindowModal};
+					let parameters = {"title": "Confirmation(window)"};
 					ModalDialogManager.openDialog(confirmationDialogComp, parameters, "External");
 				}
 			}
@@ -180,7 +181,9 @@ Rectangle {
 					Text {
 						id: confirmationText;
 						
-						width: parent.width - 10;
+						anchors.horizontalCenter: parent.horizontalCenter;
+
+						width: parent.width - 2 * Style.sizeMainMargin;
 						
 						text: "The document has been modified.\nDo you want to save your changes?";
 						font.pixelSize: 18;
@@ -191,6 +194,7 @@ Rectangle {
 						id: checkBox;
 						
 						anchors.top: confirmationText.bottom;
+						anchors.left: confirmationText.left;
 						anchors.topMargin: 50;
 						
 						text: "Do not ask again";
@@ -198,12 +202,11 @@ Rectangle {
 					}
 					
 				}}
-			
-			buttonsModel: ListModel{
-				ListElement{id: Enums.ButtonType.Yes; name:qsTr("Yes"); enabled: true}
-				ListElement{id: Enums.ButtonType.No; name:qsTr("No"); enabled: true}
+
+			Component.onCompleted: {
+				addButton(Enums.yes, qsTr("Yes"), true)
+				addButton(Enums.no, qsTr("No"), true)
 			}
-			
 			
 			backgroundColor: "white";
 			radius: 2;
@@ -251,8 +254,8 @@ Rectangle {
 					}
 				}}
 			
-			buttonsModel: ListModel{
-				ListElement{id: Enums.ButtonType.Close; name:qsTr("Close"); enabled: true}
+			Component.onCompleted: {
+				addButton(Enums.close, qsTr("Close"), true)
 			}
 			
 			backgroundColor: "white";
@@ -296,7 +299,7 @@ Rectangle {
 						
 						anchors.centerIn: parent;
 						
-						width: parent.width;
+						width: parent.width - 2*Style.sizeMainMargin;
 						
 						spacing: 30;
 						
@@ -338,27 +341,29 @@ Rectangle {
 	
 	
 	/*************************new Dialog******************************/
-	DialogNew{
-		id: dialog_new;
+	// DialogNew{
+	// 	id: dialog_new;
 		
-		title: "Заголовок";
+	// 	title: "Заголовок";
 		
-		buttonsModel: buttonsModelTest;
-		contentComp: contentTest;
+	// 	buttonsModel: buttonsModelTest;
+	// 	contentComp: contentTest;
 		
-		backgroundColor: "white";
-		radius: 2;
+	// 	backgroundColor: "white";
+	// 	radius: 2;
+
+
 		
-		onFinished: {
-			if(buttonId == Enums.cancel || buttonId == Enums.no){
-				console.log("Cancel!!!");
-			}
-			else if(buttonId == Enums.ok || buttonId == Enums.yes){
-				console.log("Ok!!!");
-			}
-		}
+	// 	onFinished: {
+	// 		if(buttonId == Enums.cancel || buttonId == Enums.no){
+	// 			console.log("Cancel!!!");
+	// 		}
+	// 		else if(buttonId == Enums.ok || buttonId == Enums.yes){
+	// 			console.log("Ok!!!");
+	// 		}
+	// 	}
 		
-	}//DialogNew
+	// }//DialogNew
 	
 	
 	//TEST DATA//
@@ -390,12 +395,12 @@ Rectangle {
 			}
 		}
 	}
-	
-	ListModel{
-		id: buttonsModelTest;
+
+	// ListModel{
+	// 	id: buttonsModelTest;
 		
-		ListElement{id: Enums.ButtonType.Yes; name:qsTr("Yes"); enabled: true}
-		ListElement{id: Enums.ButtonType.No; name:qsTr("No"); enabled: true}
-	}
+	// 	ListElement{id: Enums.ButtonType.Yes; name:qsTr("Yes"); enabled: true}
+	// 	ListElement{id: Enums.ButtonType.No; name:qsTr("No"); enabled: true}
+	// }
 }
 
