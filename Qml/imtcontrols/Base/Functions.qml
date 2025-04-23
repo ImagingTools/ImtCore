@@ -144,4 +144,91 @@ QtObject {
 
 		return retVal
 	}
+
+
+	// Supports UTF-8 encoded text. Works in both web and QML (only God knows how)
+	function stringToHex(str, delimiter) {
+		var utf8 = [];
+
+		for (var i = 0; i < str.length; i++) {
+			var code = str.charCodeAt(i);
+
+			// vodoo magic
+			if (code < 0x80) {
+				utf8.push(code);
+			} else if (code < 0x800) {
+				utf8.push(0xc0 | (code >> 6));
+				utf8.push(0x80 | (code & 0x3f));
+			} else if (code < 0xd800 || code >= 0xe000) {
+				utf8.push(0xe0 | (code >> 12));
+				utf8.push(0x80 | ((code >> 6) & 0x3f));
+				utf8.push(0x80 | (code & 0x3f));
+			} else {
+				// Surrogate pair
+				i++;
+				code = 0x10000 + (((code & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
+				utf8.push(0xf0 | (code >> 18));
+				utf8.push(0x80 | ((code >> 12) & 0x3f));
+				utf8.push(0x80 | ((code >> 6) & 0x3f));
+				utf8.push(0x80 | (code & 0x3f));
+			}
+		}
+
+		// Convert bytes to hex
+		var hex = [];
+		for (var j = 0; j < utf8.length; j++) {
+			hex.push(utf8[j].toString(16).padStart(2, '0'));
+		}
+
+		return delimiter ? hex.join(delimiter) : hex.join('');
+	}
+
+	// Supports UTF-8 encoded text. Works in both web and QML (only God knows how)
+	function hexToString(hex, delimiter) {
+		var bytes = [];
+		var step = delimiter ? 2 + delimiter.length : 2;
+
+		for (var i = 0; i < hex.length; i += step) {
+			bytes.push(parseInt(hex.slice(i, i + 2), 16));
+		}
+
+		let str = '';
+		i = 0;
+		while (i < bytes.length) {
+			var byte1 = bytes[i++];
+
+			// vodoo magic
+			if (byte1 < 0x80) {
+				str += String.fromCharCode(byte1);
+			} else if (byte1 < 0xe0) {
+				let byte2 = bytes[i++];
+				str += String.fromCharCode(((byte1 & 0x1f) << 6) | (byte2 & 0x3f));
+			} else if (byte1 < 0xf0) {
+				let byte2 = bytes[i++];
+				let byte3 = bytes[i++];
+				str += String.fromCharCode(
+					((byte1 & 0x0f) << 12) |
+					((byte2 & 0x3f) << 6) |
+					(byte3 & 0x3f)
+				);
+			} else {
+				// 4-byte UTF-8 → surrogate pair
+				let byte2 = bytes[i++];
+				let byte3 = bytes[i++];
+				let byte4 = bytes[i++];
+				let codepoint = ((byte1 & 0x07) << 18) |
+					((byte2 & 0x3f) << 12) |
+					((byte3 & 0x3f) << 6) |
+					(byte4 & 0x3f);
+
+				codepoint -= 0x10000;
+				str += String.fromCharCode(
+					0xd800 + (codepoint >> 10),
+					0xdc00 + (codepoint & 0x3ff)
+				);
+			}
+		}
+
+		return str;
+	}
 }
