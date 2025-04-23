@@ -16,6 +16,10 @@ Dialog {
 	forceFocus: true;
 	contentComp: body;
 
+	property bool hiddenBackground: false;
+	property bool noMouseArea: false;
+	property real backgroundOpacity: 0.4;
+
 	property string taskId: "";
 	property string description: "";
 	property real value: 0;
@@ -27,6 +31,14 @@ Dialog {
 	signal taskComleted(string id);
 	signal taskCanceled(string id);
 	signal subtaskCanceled(string id);
+
+	onRootChanged: {
+		if (root){
+			if(root.backgroundItem){
+				root.backgroundItem.opacity = backgroundOpacity;
+			}
+		}
+	}
 
 	function addSubtask(id, description, value, isCancellable){
 		let index = subtaskModel.insertNewItem();
