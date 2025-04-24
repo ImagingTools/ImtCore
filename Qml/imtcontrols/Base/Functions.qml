@@ -24,11 +24,7 @@ QtObject {
 		}
 
 		if(decimalRoundupPrecision){
-			if(!decimalRoundupPrecision || Number(decimalRoundupPrecision) < 0){
-				decimalRoundupPrecision = 2
-			}
-
-			decimalRoundupPrecision = parseInt(decimalRoundupPrecision, 10)
+			decimalRoundupPrecision = Math.abs(parseInt(decimalRoundupPrecision, 10))
 			let precisionDivider = Math.pow(10, decimalRoundupPrecision)
 			number__ = Math.round(number__ * precisionDivider) / precisionDivider
 		}
