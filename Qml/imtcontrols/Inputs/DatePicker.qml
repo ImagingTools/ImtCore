@@ -115,7 +115,6 @@ Item {
 			yearField.text = currentDate.getFullYear();
 			selectedIndexMonth = currentDate.getMonth();
 			dayField.text = "1";
-
 		}
 
 		if(datePicker.hasMonthCombo){
@@ -238,8 +237,8 @@ Item {
 
 		let modelCount = treeModel.getItemsCount()
 		for(let i = 0; i < modelCount; i++){
-			let gottenValue = yearTreeModel.getData(fieldId, i)
-			if(gottenValue === targetValue){
+			let gottenValue = treeModel.getData(fieldId, i)
+			if(Number(gottenValue) === Number(targetValue)){
 				return i
 			}
 		}
@@ -337,7 +336,7 @@ Item {
 		var lastDay = datePicker.getLastDayOfMonth(datePicker.selectedIndexMonth + 1);
 		for(var i = 1; i <= lastDay; i++){
 			var index = dayTreeModel.insertNewItem();
-			dayTreeModel.setData("id", String(i), index);
+			dayTreeModel.setData("id", String(i - 1), index);
 			dayTreeModel.setData("name",i,index);
 		}
 	}
