@@ -546,7 +546,7 @@ Item {
 
 							let newYear = String(selectedYear + 1);
 
-							if (datePicker.checkDate(newYear, datePicker.selectedIndexMonth, Number(dayField.text))){
+							if (datePicker.checkDate(Number(newYear), datePicker.selectedIndexMonth, Number(dayField.text))){
 								yearField.text = newYear;
 							}
 						}
@@ -580,7 +580,7 @@ Item {
 
 							let newYear = String(selectedYear - 1);
 
-							if (datePicker.checkDate(newYear, datePicker.selectedIndexMonth, Number(dayField.text))){
+							if (datePicker.checkDate(Number(newYear), datePicker.selectedIndexMonth, Number(dayField.text))){
 								yearField.text = newYear;
 							}
 						}
@@ -615,7 +615,7 @@ Item {
 						if(yearComboObj.currentIndex >=0){
 							let selectedYear = yearComboObj.currentText;
 
-							if (datePicker.checkDate(selectedYear, datePicker.selectedIndexMonth, Number(dayField.text))){
+							if (datePicker.checkDate(Number(selectedYear), datePicker.selectedIndexMonth, Number(dayField.text))){
 								yearField.text = selectedYear;
 							}
 							else{
@@ -985,7 +985,7 @@ Item {
 						if(dayComboObj.currentIndex >=0){
 							let selectedDay = dayComboObj.currentText;
 
-							if (datePicker.checkDate(datePicker.selectedYear, datePicker.selectedIndexMonth, Number(selectedDay))){
+							if (datePicker.checkDate(Number(datePicker.selectedYear), datePicker.selectedIndexMonth, Number(selectedDay))){
 								dayField.text = selectedDay;
 							}
 							else{
