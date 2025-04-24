@@ -427,8 +427,9 @@ Rectangle {
 		}//bodyColumn
 	}
 
-	PasswordRecoveryDialog {
+	Component{
 		id: passwordRecoveryDialogComp;
+		PasswordRecoveryDialog {}
 	}
 
 	Component {
