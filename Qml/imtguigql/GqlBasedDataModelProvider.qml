@@ -11,14 +11,16 @@ DataModelProvider {
 	property var inputModel
 	
 	function requestDataModel(paramsObj){
+		console.log("requestDataModel")
 		var query = Gql.GqlRequest("query", getCommandId)
 		
 		let inputObject = Gql.GqlObject("input")
 
 		let inputParams = paramsObj
-		if (inputModel){
-			inputParams = prepareInputModel(paramsObj)
+		if (!inputParams){
+			inputParams = inputModel
 		}
+		inputParams = prepareInputModel(inputParams)
 
 		if (inputParams && inputParams.toGraphQL !== undefined){
 			inputObject.fromObject(inputParams)

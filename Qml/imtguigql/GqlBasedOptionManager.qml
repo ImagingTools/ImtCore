@@ -16,7 +16,8 @@ OptionManager {
 	optionModel: dataModelProvider.dataModel
 
 	function requestDataModel(params){
-		dataModelProvider.requestDataModel(params)
+		dataModelProvider.inputModel = params
+		dataModelProvider.requestDataModel()
 	}
 
 	GqlBasedDataModelProvider {
