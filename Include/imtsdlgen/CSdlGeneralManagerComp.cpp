@@ -7,6 +7,7 @@
 // Qt includes
 #include <QtCore/QFileInfo>
 #include <QtCore/QLockFile>
+#include <QtCore/QThread>
 
 // ACF includes
 #include <istd/CSystem.h>
@@ -30,6 +31,7 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 
 	Q_ASSERT(m_sdlParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlArgumentParserCompPtr.IsValid());
+	Q_ASSERT(m_sdlModuleManaerCompPtr.IsValid());
 	Q_ASSERT(m_sdlSchemaDependenciesCollectorCompPtr.IsValid());
 
 	if (m_sdlArgumentParserCompPtr->IsSchemaDependencyModeEnabled()){
@@ -69,12 +71,39 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 		::exit(2);
 	}
 
+	QElapsedTimer timer;
+	timer.start();
 	QLockFile lockFile(outputDirPath + QStringLiteral("/lock"));
-	const bool isLocked = lockFile.lock();
+
+	/// \todo think about to remove lock
+	bool isLockRequired = true;
+
+	while (isLockRequired){
+		isLockRequired = !lockFile.tryLock(500);
+		QThread::currentThread()->msleep(100);
+		if (timer.elapsed() >= 30000){
+			break;
+		}
+	}
+
+	const bool isLocked = !isLockRequired || lockFile.lock();
 	if (!isLocked){
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 		SendErrorMessage(0, QString("Unable to lock file '%1'. Perhaps you don't have permissions").arg(lockFile.fileName()));
 #endif
+	}
+	qDebug() << qApp->applicationPid() << "processing" << timer.elapsed();
+	timer.restart();
+
+	QStringList modulesPathList = m_sdlArgumentParserCompPtr->GetModuleIncludePaths();
+	if (!modulesPathList.contains(m_sdlArgumentParserCompPtr->GetOutputDirectoryPath())){
+		modulesPathList << m_sdlArgumentParserCompPtr->GetOutputDirectoryPath();
+	}
+	const bool isModulesInitialized = m_sdlModuleManaerCompPtr->Initialize(modulesPathList);
+	if (!isModulesInitialized){
+		SendErrorMessage(0, "Unable to initialize modules");
+
+		::exit(3);
 	}
 
 	// parse schema
@@ -83,18 +112,30 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 	if (parsingResult != iproc::IProcessor::TS_OK){
 		SendErrorMessage(0, QString("Unable to parse schema '%1'").arg(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath()).absoluteFilePath()));
 
-		::exit(3);
+		::exit(4);
+	}
+
+	// create module
+	if (m_sdlArgumentParserCompPtr->IsModileGenerateEnabled()){
+		if (!m_sdlModuleManaerCompPtr->CreateModuleFile()){
+			SendErrorMessage(0, QString("Unable to create module for schema '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
+
+			::exit(5);
+		}
 	}
 
 	const bool isCodeCreated = CreateCode();
 	lockFile.unlock();
 
 	if (!isCodeCreated){
-		::exit(4);
+		::exit(6);
 	}
+
+	qDebug() << qApp->applicationPid() << "processing finished" << timer.elapsed();
 
 	::exit(0);
 }
+
 
 bool CSdlGeneralManagerComp::CreateCode()
 {

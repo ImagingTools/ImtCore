@@ -36,7 +36,8 @@ protected:
 	// reimplemented (CObjectModificatorCompBase)
 	virtual QString GetContainerObjectClassName() const override;
 	virtual QString GetContainerObjectVariableName() const override;
-	virtual QString GetArrayContainerObjectClassName() const override;
+	virtual QString GetScalarArrayContainerObjectClassName() const override;
+	virtual QString GetCustomArrayContainerObjectClassName() const override;
 	virtual QString GetArrayContainerObjectVariableName() const override;
 	virtual bool AddFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, uint horizontalIndents) const override;
 	virtual bool AddObjectValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, uint horizontalIndents) const override;

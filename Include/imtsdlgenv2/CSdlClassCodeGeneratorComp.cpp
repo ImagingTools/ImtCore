@@ -359,7 +359,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 				}
 
 				if (foundType->IsExternal()){
-					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths(), false);
+					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
 					if (resolvedPath.isEmpty()){
 						QString foundTypeName;
 						imtsdl::CSdlType* typePtr = dynamic_cast<imtsdl::CSdlType*>(foundType.get());

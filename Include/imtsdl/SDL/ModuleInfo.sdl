@@ -19,5 +19,6 @@ type Entity {
 type Module {
 	Types: [Entity!]
 	Enums: [Entity!]
+	Unions: [Entity!]
 	Params: SchemaParams!
 }

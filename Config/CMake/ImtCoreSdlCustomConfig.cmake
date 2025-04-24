@@ -1,9 +1,9 @@
 include (${CMAKE_CURRENT_LIST_DIR}/ImtSdlConfig.cmake)
 set(IMT_CONFIG_CMAKE_PATH "${CMAKE_CURRENT_LIST_DIR}/..")
 
-#! \PARAM GET_SCHEMA_DEPS - \DEPRECATED NEWER USE IT! \TODO After adapting all the projects, remove it.
+
 macro(ImtCoreGetSdlDeps)
-	set(booleanArgs GET_SCHEMA_DEPS)
+	set(booleanArgs)
 	set(oneValueArgs INPUT OUT_DIR RESULT_VARIABLE)
 	set(multiValueArgs MODIFICATORS)
 	cmake_parse_arguments(ARG "${booleanArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -20,23 +20,9 @@ macro(ImtCoreGetSdlDeps)
 		endif()
 	endif()
 
-	if (ARG_GET_SCHEMA_DEPS)
-		MESSAGE(FATAL_ERROR " DEPRECATED Argument provided DO NOT USE 'GET_SCHEMA_DEPS' argument")
-		# unreachable code!
-		set(SDL_DEPS_GENERATION_COMMAND ${SDL_GENERATOR_EXE_PATH} -S ${ARG_INPUT} --schema-dependencies --auto-link=2)
+	set(SDL_DEPS_GENERATION_COMMAND ${PYTHONEXE} ${IMT_CONFIG_CMAKE_PATH}/Python/SdlFileNameExtractor.py -S ${ARG_INPUT} -O ${ARG_OUT_DIR} ${ARG_MODIFICATORS})
+	set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL__DependsList_errors.txt")
 
-		list(LENGTH GLOBAL_SDL_SCHEMA_SEARCH_PATHS SDL_SCHEMA_PATHS_COUNT)
-		if (SDL_SCHEMA_PATHS_COUNT GREATER 0 )
-			foreach(SDL_SEARCH_PATH ${GLOBAL_SDL_SCHEMA_SEARCH_PATHS})
-				list(APPEND SDL_DEPS_GENERATION_COMMAND "-I${SDL_SEARCH_PATH}")
-			endforeach()
-		endif()
-
-		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL_SCHEMA__DependsList_errors.txt")
-	else()
-		set(SDL_DEPS_GENERATION_COMMAND ${PYTHONEXE} ${IMT_CONFIG_CMAKE_PATH}/Python/SdlFileNameExtractor.py -S ${ARG_INPUT} -O ${ARG_OUT_DIR} ${ARG_MODIFICATORS})
-		set(SDL_ERRORS_FILE_PATH "${ARG_OUT_DIR}/__SDL__DependsList_errors.txt")
-	endif()
 
 	file(MAKE_DIRECTORY ${ARG_OUT_DIR})
 
@@ -85,8 +71,33 @@ macro(ImtCoreGetSdlDeps)
 
 endmacro()
 
-# TODO Rename it to ImtCoreAddSdlHeaderIncludePath
+
+#  TODO remove it later
 function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
+	message(FATAL_ERROR "Outdated function call. Use 'ImtCoreAddSdlHeaderIncludePath'")
+endfunction()
+
+
+function(ImtCoreAddSdlModulesPath ARG_SDL_PATH)
+	if (NOT GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS)
+		set(GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS ${ARG_SDL_PATH}
+			CACHE
+			STRING "List of directories to search for SDL modules, used by SDL code generator"
+			FORCE
+		)
+	else()
+		list(APPEND GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS ${ARG_SDL_PATH})
+		list(REMOVE_DUPLICATES GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS)
+		set(GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS ${GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS}
+			CACHE
+			STRING "List of directories to search for SDL modules, used by SDL code generator"
+			FORCE
+		)
+	endif()
+endfunction()
+
+
+function(ImtCoreAddSdlHeaderIncludePath ARG_SDL_PATH)
 	if (NOT GLOBAL_SDL_SEARCH_PATHS)
 		set(GLOBAL_SDL_SEARCH_PATHS ${ARG_SDL_PATH}
 			CACHE
@@ -104,6 +115,7 @@ function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
 		)
 	endif()
 endfunction()
+
 
 function(ImtCoreAddSchemaSearchPath ARG_SDL_PATH)
 	if (NOT GLOBAL_SDL_SCHEMA_SEARCH_PATHS)
@@ -142,10 +154,10 @@ macro (ImtCoreCustomConfigureSdlCpp)
 		set (SDL_OUTPUT_ROOT_DIRECTORY "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}")
 	endif()
 
+	ImtCoreAddSdlModulesPath(${SDL_OUTPUT_ROOT_DIRECTORY})
 	set(SDL_OUTPUT_DIRECTORY "${SDL_OUTPUT_ROOT_DIRECTORY}")
 	set(SDL_CPP_OUTPUT_DIRECTORY "${SDL_OUTPUT_ROOT_DIRECTORY}/${ARG_VERSION}/CPP")
 	set(DEP_FILE_PATH "${SDL_CPP_OUTPUT_DIRECTORY}/${SCHEMA_NAME}.depfile")
-
 
 	set(CUSTOM_MODIFICATORS)
 	list(APPEND CUSTOM_MODIFICATORS "--GG=2") ##< Compile, using a new version of code generator.
@@ -156,6 +168,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
 	list(APPEND CUSTOM_MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
 	list(APPEND CUSTOM_MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
+	list(APPEND CUSTOM_MODIFICATORS "--generate-module") ##< add .jsmi module
 
 	if (ARG_SOURCE_NAME)
 		list(APPEND CUSTOM_MODIFICATORS "-JCPP=${SDL_CPP_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.cpp")
@@ -170,13 +183,20 @@ macro (ImtCoreCustomConfigureSdlCpp)
 			list(APPEND CUSTOM_MODIFICATORS "-H${SDL_SEARCH_PATH}")
 		endforeach()
 	else()
-		message(FATAL_ERROR "SDL PATHS is empty!!!!")
+		message(FATAL_ERROR "SDL PATHS is empty! Did you forget add it? Use 'ImtCoreAddSdlHeaderIncludePath' function.")
 	endif()
 
 	list(LENGTH GLOBAL_SDL_SCHEMA_SEARCH_PATHS SDL_SCHEMA_PATHS_COUNT)
 	if (SDL_SCHEMA_PATHS_COUNT GREATER 0 )
 		foreach(SDL_SEARCH_PATH ${GLOBAL_SDL_SCHEMA_SEARCH_PATHS})
 			list(APPEND CUSTOM_MODIFICATORS "-I${SDL_SEARCH_PATH}")
+		endforeach()
+	endif()
+
+	list(LENGTH GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS_COUNT)
+	if (GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS_COUNT GREATER 0)
+		foreach(SDL_SEARCH_PATH ${GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS})
+			list(APPEND CUSTOM_MODIFICATORS "-E${SDL_SEARCH_PATH}")
 		endforeach()
 	endif()
 
@@ -306,6 +326,7 @@ endmacro()
 #! CPP+QML+GQL \NOTE this function enables ALL modificators
 #! \param SCHEMA_PATH		- The absolute path to the schema file to be compiled.
 #! \param QML_NAME			- \DEPRECATED \WARNING NEVER USE IT! set \param 'QML' instead (boolean) \TODO After adapting all the projects, remove it.
+#! \TODO think about \param SCHEMA_PATH as multi value
 macro (ImtCoreCustomConfigureSdlCppQml)
 	set(oneValueArgs
 		SCHEMA_PATH
@@ -326,8 +347,8 @@ macro (ImtCoreCustomConfigureSdlCppQml)
 	endif()
 
 	if (ARG_QML_NAME)
-		# \TODO use FATAL_ERROR for it
-		message(WARNING "DEPRECATED argument provided! replace 'QML_NAME MyQmlSdl' to 'QML' ")
+		# \TODO REMOVE IT later
+		message(FATAL_ERROR "DEPRECATED argument provided! replace 'QML_NAME MyQmlSdl' to 'QML' ")
 
 		# unreachable code!
 		message(VERBOSE "Additing SDL for QML compile source '${ARG_SCHEMA_PATH}' for ${PROJECT_NAME}")

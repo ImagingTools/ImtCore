@@ -15,6 +15,21 @@
 namespace imtsdlgen
 {
 
+// static helpers
+void MakePathAbsolute(QString& path)
+{
+	QFileInfo fileInfo(path);
+	path = fileInfo.absoluteFilePath();
+}
+
+
+void MakePathAbsolute(QStringList& paths)
+{
+	for (QString& path: paths){
+		MakePathAbsolute(path);
+	}
+}
+
 
 // public methods
 
@@ -29,7 +44,8 @@ CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
 	m_schemaDependencyModeEnabled(false),
 	m_generatorType(GT_CMAKE),
 	m_autoJoinEnabled(false),
-	m_autolinkLevel(ALL_NONE)
+	m_autolinkLevel(ALL_NONE),
+	m_isModuleGenerationEnabled(false)
 {
 }
 
@@ -65,9 +81,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutoLink", "0");
 	QCommandLineOption includeHeadersOption({"H","include-headers"}, "List of directories to search for generated header files", "HeadersIncludes");
 	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single.");
-	QCommandLineOption cacheOption({"C", "cache"}, "Specifies the file location where the cache will be created.", "CacheFile");
-	QCommandLineOption cacheListOption({"CC", "additional-cache"}, "Specifies additional location where other cache(s) was created. \nNote: all files MUST exist.", "AdditionalCacheFileList");
+	QCommandLineOption moduleIncludePathsOption({"E", "extend", "add-module-path"}, "Specifies the file locations where the modules could be found.", "ExternalModulePaths");
 	QCommandLineOption depFileParhOption("DEPFILE", "Depfile, used by CMake to collect dependencies. MUST be a valid file path if 'generator' option is 'DEPFILE'. If the file exsists it will be overwritten!", "DEPFILE");
+	QCommandLineOption moduleOutFilePathOption("module-out-path", "Defines a path where a module file should ble created. NOTE: this option enables 'generate-module' option");
 
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
@@ -77,6 +93,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 				"Schema dependency collection mode: This mode displays a list of all schemas that affect the generated code. "
 						"Only the 'generator', 'include' and 'schema-file (S)' options SHOULD be used in conjunction with this mode. "
 						"You MUST NOT use other options, in this case, the behavior is undefined!");
+
+	QCommandLineOption moduleGenerationOption("generate-module", "Enables module generation");
 
 
 	QList<QCommandLineOption> allOptions = PrepareCommandLineOptions();
@@ -100,9 +118,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 				generatorOption,
 				autoLinkOption,
 				includeHeadersOption,
-				cacheOption,
-				cacheListOption,
-				depFileParhOption
+				moduleIncludePathsOption,
+				depFileParhOption,
+				moduleOutFilePathOption,
+				moduleGenerationOption
 	});
 
 	bool isOptionsAcceptable = true;
@@ -148,9 +167,11 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 
 	if (commandLineParser.isSet(schemaFilePathOption)){
 		m_schemaFilePath = commandLineParser.value(schemaFilePathOption);
+		MakePathAbsolute(m_schemaFilePath);
 	}
 	if (commandLineParser.isSet(outputDirectoryPathOption)){
 		m_outputDirectoryPath = commandLineParser.value(outputDirectoryPathOption);
+		MakePathAbsolute(m_outputDirectoryPath);
 	}
 	if (commandLineParser.isSet(namespaceOption)){
 		m_namespace = commandLineParser.value(namespaceOption);
@@ -213,12 +234,14 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 			}
 
 			QString destinationPath = joinRule.split('=')[1];
+			MakePathAbsolute(destinationPath);
 			m_joinRules.insert(fileType, destinationPath);
 		}
 	}
 
 	if (commandLineParser.isSet(includePathOption)){
 		m_includePaths = commandLineParser.values(includePathOption);
+		MakePathAbsolute(m_includePaths);
 	}
 
 	m_autoJoinEnabled = commandLineParser.isSet(autoJoinOption);
@@ -234,7 +257,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 			return false;
 		}
 
-		const QList<int> acceptableValues = QList<int>({ALL_NONE, ALL_SAME_NAMESPACE, ALL_ONLY_FILE});
+		const QList<int> acceptableValues = QList<int>({ALL_NONE, ALL_ONLY_FILE});
 		if (!acceptableValues.contains(autoLinkLevel)){
 			SendErrorMessage(0, QString("Unexpected auto link [%1] argument value '%2'. See help for details").arg(autoLinkOption.names().join('|'), autoLinkLevelString));
 
@@ -274,18 +297,21 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 
 	if (commandLineParser.isSet(includeHeadersOption)){
 		m_headersIncludePaths = commandLineParser.values(includeHeadersOption);
+		MakePathAbsolute(m_headersIncludePaths);
 	}
 
-	if (commandLineParser.isSet(cacheOption)){
-		m_cachePath = commandLineParser.value(cacheOption);
-	}
-
-	if (commandLineParser.isSet(cacheListOption)){
-		m_additionalCacheList = commandLineParser.values(cacheListOption);
+	if (commandLineParser.isSet(moduleIncludePathsOption)){
+		m_moduleIncludePathList = commandLineParser.values(moduleIncludePathsOption);
+		MakePathAbsolute(m_moduleIncludePathList);
 	}
 
 	if (commandLineParser.isSet(depFileParhOption)){
 		m_depFilePath = commandLineParser.value(depFileParhOption);
+		MakePathAbsolute(m_depFilePath);
+	}
+	if (commandLineParser.isSet(moduleOutFilePathOption)){
+		m_moduleOutputFilePath = commandLineParser.value(moduleOutFilePathOption);
+		m_isModuleGenerationEnabled = true;
 	}
 
 	// special modes
@@ -296,6 +322,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_cppEnabled = isCppInParams || (!isQmlInParams && !isGqlInParams);
 	m_qmlEnabled = isQmlInParams;
 	m_gqlEnabled = isGqlInParams;
+
+	if (commandLineParser.isSet(moduleGenerationOption)){
+		m_isModuleGenerationEnabled = true;
+	}
 
 	// schema dependency mode - is a special mode. Cleanup all unnecessary values
 	if (commandLineParser.isSet(schemaDependencyOption)){
@@ -491,21 +521,27 @@ bool CSdlProcessArgumentsParserComp::ProcessCommandLineOptions(const QCommandLin
 }
 
 
-QString CSdlProcessArgumentsParserComp::GetCachePath()
+QStringList CSdlProcessArgumentsParserComp::GetModuleIncludePaths() const
 {
-	return m_cachePath;
+	return m_moduleIncludePathList;
 }
 
 
-QStringList CSdlProcessArgumentsParserComp::GetAdditionalCachePaths()
-{
-	return m_additionalCacheList;
-}
-
-
-QString CSdlProcessArgumentsParserComp::GetDepFilePath()
+QString CSdlProcessArgumentsParserComp::GetDepFilePath() const
 {
 	return m_depFilePath;
+}
+
+
+QString CSdlProcessArgumentsParserComp::GetModuleOutputFilePath() const
+{
+	return m_moduleOutputFilePath;
+}
+
+
+bool CSdlProcessArgumentsParserComp::IsModileGenerateEnabled() const
+{
+	return m_isModuleGenerationEnabled;
 }
 
 

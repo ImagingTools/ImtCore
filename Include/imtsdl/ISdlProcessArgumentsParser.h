@@ -30,7 +30,7 @@ public:
 	enum AutoLinkLevel
 	{
 		ALL_NONE = 0,					///< Dasabled. ALL files and deps will be compiled
-		ALL_SAME_NAMESPACE = 1,			///< Compile only files with same namespace
+		ALL_SAME_NAMESPACE [[deprecated]] = 1,
 		ALL_ONLY_FILE = 2,				///< Compile only input file
 	};
 
@@ -48,14 +48,16 @@ public:
 	virtual bool IsSchemaDependencyModeEnabled() const = 0;
 	virtual QMap<QString/*class name*/, QString/*include directive*/> GetBaseClassList() const = 0;
 	virtual QMap<QString/*File extention*/, QString/*Destination path*/> GetJoinRules() const = 0;
+	/// \returns paths where schemas should be loacted
 	virtual QStringList GetIncludePaths() const = 0;
 	virtual GeneratorType GetGeneratorType() const = 0;
 	virtual bool IsAutoJoinEnabled() const = 0;
 	virtual AutoLinkLevel GetAutoLinkLevel() const = 0;
 	virtual QStringList GetHeadersIncludePaths() const = 0;
-	[[deprecated]]virtual QString GetCachePath() = 0;
-	virtual QStringList GetAdditionalCachePaths() = 0;
-	virtual QString GetDepFilePath() = 0;
+	virtual QStringList GetModuleIncludePaths() const = 0;
+	virtual QString GetDepFilePath() const = 0;
+	virtual QString GetModuleOutputFilePath() const = 0;
+	virtual bool IsModileGenerateEnabled() const = 0;
 };
 
 

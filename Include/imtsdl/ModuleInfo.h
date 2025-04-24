@@ -61,6 +61,7 @@ class CModule: public virtual istd::IPolymorphic
 public:
 	std::optional<QList<CEntity>> Types;
 	std::optional<QList<CEntity>> Enums;
+	std::optional<QList<CEntity>> Unions;
 	std::optional<CSchemaParams> Params;
 
 	// serialize methods

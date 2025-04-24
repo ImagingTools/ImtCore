@@ -25,11 +25,6 @@ I_EXPORT_COMPONENT(
 			"Schema Definition Language SDL Argument Parser")
 
 I_EXPORT_COMPONENT(
-			SdlClassCodeGenerator,
-			"The C++ class generator of SDL types",
-			"Schema Definition Language SDL Class Generator")
-
-I_EXPORT_COMPONENT(
 			BaseClassExtender,
 			"The C++ class extender adds inheritance to class files",
 			"Schema Definition Language Class Generator Base Class")

@@ -900,7 +900,7 @@ void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream
 				continue;
 			}
 
-			QString resolvedPath = ResolveRelativeHeaderFileForType(*foundEntryPtr, m_argumentParserCompPtr->GetHeadersIncludePaths(), false);
+			QString resolvedPath = ResolveRelativeHeaderFileForType(*foundEntryPtr, m_argumentParserCompPtr->GetHeadersIncludePaths());
 			if (resolvedPath.isEmpty()){
 				SendErrorMessage(0, QString("Unable to find header for %1 of %2").arg(field.GetId(), sdlRequest.GetName()));
 

@@ -54,9 +54,10 @@ public:
 	virtual bool IsAutoJoinEnabled() const override;
 	virtual AutoLinkLevel GetAutoLinkLevel() const override;
 	virtual QStringList GetHeadersIncludePaths() const override;
-	virtual QString GetCachePath() override;
-	virtual QStringList GetAdditionalCachePaths() override;
-	virtual QString GetDepFilePath() override;
+	virtual QStringList GetModuleIncludePaths() const override;
+	virtual QString GetDepFilePath() const override;
+	virtual QString GetModuleOutputFilePath() const override;
+	virtual bool IsModileGenerateEnabled() const override;
 
 protected:
 	/**
@@ -97,9 +98,10 @@ private:
 	bool m_autoJoinEnabled;
 	AutoLinkLevel m_autolinkLevel;
 	QStringList m_headersIncludePaths;
-	QString m_cachePath;
-	QStringList m_additionalCacheList;
+	QStringList m_moduleIncludePathList;
 	QString m_depFilePath;
+	QString m_moduleOutputFilePath;
+	bool m_isModuleGenerationEnabled;
 };
 
 

@@ -92,21 +92,14 @@ public:
 	[[nodiscard]] static bool IsTypeHasFundamentalTypes(const CSdlRequest& sdlRequest, QSet<QString>* foundTypesPtr =  nullptr);
 	[[nodiscard]] static bool IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr);
 	[[nodiscard]] static bool IsTypeHasNonFundamentalTypes(const CSdlRequest& sdlRequest, QSet<QString>* foundTypesPtr =  nullptr);
-
-	/// \deprecated \todo REMOVE IT! (later))
 	[[nodiscard]] static QString GetFromVariantConversionString(const CSdlField& sdlField);
 
 	[[nodiscard]] static QString GetFromVariantConversionStringExt(const CSdlField& sdlField, bool singleValue = false);
-	[[nodiscard]] static QString FromInternalMapCheckString(const CSdlField& sdlField);
 	[[nodiscard]] static bool EnsureFieldHasValidType(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
 	[[nodiscard]] static bool GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType);
 	[[nodiscard]] static bool GetSdlEnumForField(const CSdlField& sdlField, const SdlEnumList& enumList, CSdlEnum& sdlEnum);
 	[[nodiscard]] static bool GetSdlUnionForField(const CSdlField& sdlField, const SdlUnionList& unionList, CSdlUnion& sdlEnum);
 	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> GetSdlTypeOrEnumOrUnionForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
-
-	static void AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
-	static void AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
-	static void AddArrayInternalChecksFail(QTextStream& stream, const CSdlField& field, bool checkEmpty = false, uint hIndents = 1);
 
 	[[nodiscard]] static QString GetNamespaceAcceptableString(const QString& originalText);
 	[[nodiscard]] static QString GetFileSystemAcceptableEntryPath(const QString& originalText);
@@ -123,12 +116,6 @@ public:
 	/// \sa imtsdlgen::ISdlProcessArgumentsParser::s_headerFileType imtsdlgen::ISdlProcessArgumentsParser::s_sourceFileType
 	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
 	[[nodiscard]] static bool UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* schemaParamsPtr, const imtsdl::ISdlProcessArgumentsParser* argumentParamsPtr);
-
-	[[nodiscard]] static bool FindHeaderForEntry(
-				CSdlEntryBase& sdlEntry,
-				const QStringList& icludePaths,
-				const QString& outputDirPath = QString(),
-				const QString& currentSchemaPath = QString());
 
 	[[nodiscard]] static QStringList GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
 	[[nodiscard]] static QString GetQmlModuleNameFromParamsOrArguments(
@@ -149,7 +136,7 @@ public:
 	static void PrintFiles(std::ostream& outStream, const QStringList& files, imtsdl::ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = imtsdl::ISdlProcessArgumentsParser::GT_CMAKE);
 
 	/// \todo remove \param rawLookup - V1 fallback use ONLY for V1 generation!!!!!
-	[[nodiscard]] static QString ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths, bool rawLookup = true);
+	[[nodiscard]] static QString ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths);
 	[[nodiscard]] static QString GetTypeVersion(const CSdlEntryBase& sdlType);
 
 	[[nodiscard]] static IncludeDirective CreateCxxDirective(const QString& path);

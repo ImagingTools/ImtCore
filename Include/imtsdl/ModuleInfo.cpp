@@ -117,6 +117,18 @@ bool CModule::WriteToJsonObject(QJsonObject& jsonObject) const
 		jsonObject["Enums"] = newEnumsArray;
 	}
 
+	if (Unions){
+		QJsonArray newUnionsArray;
+		for (qsizetype unionsIndex = 0; unionsIndex < Unions->size(); ++unionsIndex){
+			QJsonObject newUnionsJsonObject;
+			if (!Unions->at(unionsIndex).WriteToJsonObject(newUnionsJsonObject)){
+				return false;
+			}
+			newUnionsArray << newUnionsJsonObject;
+		}
+		jsonObject["Unions"] = newUnionsArray;
+	}
+
 	if (!Params){
 		return false;
 	}
@@ -151,18 +163,34 @@ bool CModule::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("Enums") && jsonObject["Enums"].isArray()){
-		const QJsonArray enumsjsonArray = jsonObject["Enums"].toArray();
-		const qsizetype enumsArrayCount = enumsjsonArray.size();
+		const QJsonArray enumsJsonArray = jsonObject["Enums"].toArray();
+		const qsizetype enumsArrayCount = enumsJsonArray.size();
 		if (enumsArrayCount <= 0){
 			return false;
 		}
 		Enums.emplace();
 		for (qsizetype enumsIndex = 0; enumsIndex < enumsArrayCount; ++enumsIndex){
 			CEntity tempEnum;
-			if (!tempEnum.ReadFromJsonObject(enumsjsonArray[enumsIndex].toObject())){
+			if (!tempEnum.ReadFromJsonObject(enumsJsonArray[enumsIndex].toObject())){
 				return false;
 			}
 			Enums->append(tempEnum);
+		}
+	}
+
+	if (jsonObject.contains("Unions") && jsonObject["Unions"].isArray()){
+		const QJsonArray unionsJsonArray = jsonObject["Unions"].toArray();
+		const qsizetype unionsArrayCount = unionsJsonArray.size();
+		if (unionsArrayCount <= 0){
+			return false;
+		}
+		Unions.emplace();
+		for (qsizetype unionsIndex = 0; unionsIndex < unionsArrayCount; ++unionsIndex){
+			CEntity tempEnum;
+			if (!tempEnum.ReadFromJsonObject(unionsJsonArray[unionsIndex].toObject())){
+				return false;
+			}
+			Unions->append(tempEnum);
 		}
 	}
 

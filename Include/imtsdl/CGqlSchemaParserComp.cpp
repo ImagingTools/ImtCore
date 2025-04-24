@@ -3,7 +3,10 @@
 
 // Qt includes
 #include <QtCore/QDir>
+#include <QtCore/QList>
 #include <QtCore/QRegularExpression>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
 
 // ACF includes
 #include <iprm/CParamsSet.h>
@@ -14,6 +17,7 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlTools.h>
+#include <imtsdl/ModuleInfo.h>
 
 
 namespace imtsdl
@@ -57,6 +61,8 @@ int CGqlSchemaParserComp::DoProcessing(
 
 		return TS_INVALID;
 	}
+
+	Q_ASSERT(m_sdlModuleManaerCompPtr.IsValid());
 
 	// initialize output params
 	iprm::CParamsSet* outputParamsSetPtr = dynamic_cast<iprm::CParamsSet*>(outputPtr);
@@ -641,6 +647,7 @@ bool CGqlSchemaParserComp::ProcessSchemaImports()
 	return ProcessJavaStyleImports();
 }
 
+
 bool CGqlSchemaParserComp::ValidateSchema()
 {
 	if (!BaseClass::ValidateSchema()){
@@ -677,18 +684,6 @@ bool CGqlSchemaParserComp::ValidateSchema()
 					sdlType.SetTargetHeaderFilePath(headerFilePath);
 				}
 			}
-			else if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_SAME_NAMESPACE){
-				const QString typeNamespace = sdlType.GetNamespace();
-				if (!typeNamespace.isEmpty()){
-					const QString namespacePrefix = m_argumentParserCompPtr->GetNamespacePrefix();
-					QString currentNamespace;
-					if (!namespacePrefix.isEmpty()){
-						currentNamespace = namespacePrefix + QStringLiteral("::");
-					}
-					currentNamespace += BuildNamespaceFromParams(*m_schemaParamsPtr);
-					isExternal = bool(currentNamespace != typeNamespace);
-				}
-			}
 
 			sdlType.SetExternal(isExternal);
 			if (!isExternal){
@@ -712,17 +707,24 @@ bool CGqlSchemaParserComp::ValidateSchema()
 				}
 			}
 			else {
-				// Upgrade external types. Set header files from schema. Only when generation mode. Because when deps generating, they might not exsist.
-				if (m_argumentParserCompPtr->IsGenerateMode() && m_argumentParserCompPtr->IsCppEnabled()){
-					const bool isFound = FindHeaderForEntry(
-						sdlType,
-						m_argumentParserCompPtr->GetHeadersIncludePaths(),
-						m_argumentParserCompPtr->GetOutputDirectoryPath(),
-						m_currentSchemaFilePath);
-					if (!isFound){
-						SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlType.GetName(), m_currentSchemaFilePath));
+				// update target header path
+				const QString targetPath = sdlType.GetTargetHeaderFilePath();
+				const QString typeSchemaPath = sdlType.GetSchemaFilePath();
+				const QString processingSchemaPath = m_argumentParserCompPtr->GetSchemaFilePath();
+				// fallback for parallel automatic generation. In this case, it is expected that all target files with schemas from the same folder will have the same output folder.
+				if (targetPath.isEmpty() || (QFileInfo(typeSchemaPath).absoluteDir().absolutePath() != QFileInfo(processingSchemaPath).absoluteDir().absolutePath())){
+					if (m_argumentParserCompPtr->IsGenerateMode() && m_argumentParserCompPtr->IsCppEnabled()){
+						IModuleManager::ItemInfo info = m_sdlModuleManaerCompPtr->GetItemInfo(sdlType);
+						sdlType.SetTargetHeaderFilePath(info.TargerHeaderFilePath);
+						// MUST NOT be empty!!!
+						if (info.TargerHeaderFilePath.isEmpty()){
+							SendErrorMessage(0, QString("Missing header for %1. Perhaps data for schema %2 is not generated").arg(sdlType.GetName(), typeSchemaPath));
+							SendErrorMessage(0, QString("targetPath: %1").arg(targetPath));
+							SendErrorMessage(0, QString("typeSchemaPath:%1").arg(typeSchemaPath));
+							SendErrorMessage(0, QString("processingSchemaPath:%1").arg(processingSchemaPath));
 
-						return false;
+							return false;
+						}
 					}
 				}
 			}

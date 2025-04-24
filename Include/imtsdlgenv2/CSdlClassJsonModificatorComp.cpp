@@ -45,7 +45,13 @@ QString CSdlClassJsonModificatorComp::GetContainerObjectVariableName() const
 }
 
 
-QString CSdlClassJsonModificatorComp::GetArrayContainerObjectClassName() const
+QString CSdlClassJsonModificatorComp::GetScalarArrayContainerObjectClassName() const
+{
+	return QStringLiteral("QJsonArray");
+}
+
+
+QString CSdlClassJsonModificatorComp::GetCustomArrayContainerObjectClassName() const
 {
 	return QStringLiteral("QJsonArray");
 }
@@ -87,7 +93,7 @@ bool CSdlClassJsonModificatorComp::AddObjectValueWriteToObject(QTextStream& stre
 
 QString CSdlClassJsonModificatorComp::AddCreationOfTemporaryArray(QTextStream& stream, const imtsdl::CSdlField& field) const
 {
-	stream << GetArrayContainerObjectClassName();
+	stream << GetScalarArrayContainerObjectClassName();
 	stream << ' ' << QStringLiteral("new");
 	stream << GetCapitalizedValue(field.GetId());
 	stream << QStringLiteral("Array;");
@@ -152,7 +158,8 @@ bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStr
 		stream << '!';
 	}
 
-	stream << QStringLiteral("jsonObject.contains(\"");
+	stream << GetContainerObjectVariableName();
+	stream << QStringLiteral(".contains(\"");
 	stream << field.GetId();
 	stream << QStringLiteral("\") ");
 	if(!expected){
@@ -162,7 +169,8 @@ bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStr
 		stream << '&' << '&';
 	}
 
-	stream << QStringLiteral(" jsonObject[\"");
+	stream << ' ' << GetContainerObjectVariableName();
+	stream << QStringLiteral("[\"");
 	stream << field.GetId();
 	stream << QStringLiteral("\"].is");
 

@@ -7,7 +7,6 @@
 // ImtCore includes
 #include <imtsdlgen/CSdlGeneralManagerComp.h>
 #include <imtsdlgen/CSdlProcessArgumentsParserComp.h>
-#include <imtsdlgen/CSdlClassCodeGeneratorComp.h>
 #include <imtsdlgen/CBaseClassExtenderComp.h>
 #include <imtsdlgen/CQmlCodeGeneratorComp.h>
 #include <imtsdlgen/CQmlCodeMetaGeneratorComp.h>
@@ -27,7 +26,6 @@ namespace ImtSdlGenPck
 
 typedef imtsdlgen::CSdlGeneralManagerComp SdlGeneralManager;
 typedef imtsdlgen::CSdlProcessArgumentsParserComp SdlProcessArgumentsParser;
-typedef imtsdlgen::CSdlClassCodeGeneratorComp SdlClassCodeGenerator;
 typedef imtsdlgen::CBaseClassExtenderComp BaseClassExtender;
 typedef imtsdlgen::CQmlCodeGeneratorComp QmlCodeGenerator;
 typedef imtsdlgen::CQmlCodeMetaGeneratorComp QmlCodeMetaGenerator;

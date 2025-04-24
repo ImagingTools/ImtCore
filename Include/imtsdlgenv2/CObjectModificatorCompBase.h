@@ -72,15 +72,23 @@ protected:
 		\example jsonObject
 		\returns an object container class variable name
 	 */
-	virtual QString GetContainerObjectVariableName() const = 0;	
+	virtual QString GetContainerObjectVariableName() const = 0;
 
 	/*!
-		\brief Same as \c GetContainerObjectClassName, but only for arrays/lists
+		\brief Same as \c GetContainerObjectClassName, but only for arrays/lists (sclar types only)
 		\example QJsonArray
 		\note it could be the same as \c GetContainerObjectClassName
 		\sa GetContainerObjectClassName
 	 */
-	virtual QString GetArrayContainerObjectClassName() const = 0;
+	virtual QString GetScalarArrayContainerObjectClassName() const = 0;
+
+	/*!
+		\brief Same as \c GetScalarArrayContainerObjectClassName, but for custom types only
+		\example QJsonArray
+		\note it could be the same as \c GetScalarArrayContainerObjectClassName
+		\sa GetScalarArrayContainerObjectClassName
+	 */
+	virtual QString GetCustomArrayContainerObjectClassName() const = 0;
 
 	/*!
 		\brief Same as \c GetContainerObjectVariableName, but only for arrays/lists

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5345" Description="ACF"/>
-            <Version Id="1" Number="2235" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5351" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -40,7 +40,49 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ModuleManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ModuleManager"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ModuleManager" PackageId="ImtSdlPck" ComponentId="ModuleManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SchemaParams" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlSchemaParser/SchemaCustomParams"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlSchemaParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlSchemaParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlSchemaParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlSchemaParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlSchemaParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -60,6 +102,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ModuleManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ModuleManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SdlProcessorList" Type="Reference[]" ExportId="SdlProcessorList">
                         <Data IsEnabled="false"/>
@@ -100,8 +145,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtsdl::ICacheController" ComponentId="CacheMultiManager/CacheController"/>
-        <Interface InterfaceId="imtsdl::ICacheMultiManager" ComponentId="CacheMultiManager/CacheMultiManager"/>
+        <Interface InterfaceId="imtsdl::IModuleManager" ComponentId="ModuleManager"/>
         <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="imtsdl::ISdlEnumListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>
