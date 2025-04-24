@@ -37,7 +37,9 @@ ComplexCollectionFilter {
 	signal filterChanged()
 	
 	Component.onCompleted: {
-		m_fieldsFilter.m_logicalOperation = logicalOperation.AND
+		if(m_fieldsFilter){
+			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
+		}
 	}
 	
 	function createBaseModel(){

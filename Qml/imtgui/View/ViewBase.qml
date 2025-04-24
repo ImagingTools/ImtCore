@@ -154,7 +154,7 @@ Item {
 		onLocalizationChanged: {
 			internal.cacheCommandsState();
 			
-			if (viewBase.visible){
+			if (viewBase.visible && viewBase.commandsController){
 				viewBase.commandsController.getCommands();
 			}
 			else{
