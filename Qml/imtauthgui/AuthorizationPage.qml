@@ -18,7 +18,7 @@ Rectangle {
 	property bool canRecoveryPassword: true;
 	property bool canRegisterUser: true;
 
-	property string appName: context.appName
+	property string appName: context ? context.appName : ""
 	
 	signal login(string login, string password)
 	signal registerUser(var userData)

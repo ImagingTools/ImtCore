@@ -14,7 +14,7 @@ Item {
     property alias multiPageView: multiPageView;
     signal multiPageUpdated();
 
-    property string productId: context.appId;
+	property string productId: context ? context.appId : "";
     property var documentManager: MainDocumentManager.getDocumentManager("Administration");
 
     property TreeItemModel rolesModel;
