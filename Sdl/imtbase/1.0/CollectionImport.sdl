@@ -1,0 +1,57 @@
+schema 
+{
+	name: CollectionImport
+	namespace: imtbase
+	version: 1.0
+	query: Query
+}
+
+
+type FileInfo {
+	fileId: ID!
+	fileName: String!
+	fileSize: Int!
+	objectTypeId: ID!
+}
+
+type ImportParams {
+	collectionId: ID!
+	fileList: [FileInfo!]!
+}
+
+type TransactionId {
+	transactionId: ID!
+}
+
+enum Status {
+	Accepted
+	Upload
+	Processing
+	Interrupted
+	CancellationPending
+	Canceled
+	Finished
+}
+
+type TransactionStatus{
+	status: Status!
+}
+
+type TransactionInfo {
+	id: ID!
+	status: Status!
+}
+
+type TransactionList {
+	transactionList: [TransactionInfo]!
+}
+
+type Query {
+	GetCollectionImportTransactionList: TransactionList
+	BeginCollectionImportTransaction(input: ImportParams): TransactionId
+	GetCollectionImportTransactionStatus(input: TransactionId): TransactionStatus
+	ResumeCollectionImportTransaction(input: TransactionId): TransactionStatus
+	CancelCollectionImportTransaction(input: TransactionId): TransactionStatus
+	EndCollectionImportTransaction(input: TransactionId): TransactionStatus
+}
+
