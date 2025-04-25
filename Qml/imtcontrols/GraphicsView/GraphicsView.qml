@@ -203,6 +203,30 @@ Rectangle {
 		}
 	}
 
+	function findSelectionIndex(mouseX, mouseY){
+		let selectionIndex = -1;
+		let layer = canvasPage.layerModel[canvasPage.layerModel.length - 1];
+		let shapeModel = layer.shapeModel;
+		for(let j = 0; j < shapeModel.length; j++){
+			let shape = shapeModel[j];
+			let params = shape.source.getParams(layer.layerId);
+			let point = params.point;
+			let width_ = params.width * canvas.scaleCoeff;
+			let height_ = params.height * canvas.scaleCoeff;
+			let x_ = point.x * canvas.scaleCoeff + canvas.deltaX;
+			let y_ = point.y * canvas.scaleCoeff + canvas.deltaY;
+			let isInside =
+				mouseX > x_
+				&& mouseX < x_ + width_
+				&& mouseY > y_
+				&& mouseY < y_ + height_
+			if(isInside){
+				return j;
+			}
+		}
+		return selectionIndex
+	}
+
 	function findObject(mouseX, mouseY){
 		//console.log("findObject", mouseX, mouseY)
 
@@ -223,7 +247,7 @@ Rectangle {
 					&& mouseY > y_
 					&& mouseY < y_ + height_
 				if(isInside){
-					console.log("COLOR::", params.color, j)
+					//console.log("COLOR::", params.color, j)
 					return shape;
 				}
 			}
@@ -268,20 +292,20 @@ Rectangle {
 			id: controlArea;
 
 			anchors.fill: parent;
-			cursorShape: Qt.OpenHandCursor;
+			cursorShape: Qt.ArrowCursor//Qt.OpenHandCursor;
 
 			onClicked: {
-				let shape = canvasPage.findObject(mouse.x, mouse.y)
-				let selectionLayer = canvasPage.getLayer("selection");
-				if(shape !== null){
-					let selection = shape.createSelection()
-					selectionLayer.addShape(selection);
-				}
-				else {
-					canvasPage.clearSelection()
-					//selectionLayer.clear();
-				}
-				canvas.requestPaint();
+				// let shape = canvasPage.findObject(mouse.x, mouse.y)
+				// let selectionLayer = canvasPage.getLayer("selection");
+				// if(shape !== null){
+				// 	let selection = shape.createSelection()
+				// 	selectionLayer.addShape(selection);
+				// }
+				// else {
+				// 	canvasPage.clearSelection()
+				// 	//selectionLayer.clear();
+				// }
+				// canvas.requestPaint();
 
 				// if(!wasMoving){
 				// 	if(canvas.selectedIndex >= 0){
@@ -301,38 +325,75 @@ Rectangle {
 			}
 
 			onPressed: {
-				canvas.selectedIndex = -1;
-				for(let i = 0; i < canvasPage.objectsModel.count; i++){
-					let item = canvasPage.objectsModel.get(i).item;
-					let x_ = item.m_x;
-					let y_ = item.m_y;
+				//canvas.selectedIndex = -1;
+				// for(let i = 0; i < canvasPage.objectsModel.count; i++){
+				// 	let item = canvasPage.objectsModel.get(i).item;
+				// 	let x_ = item.m_x;
+				// 	let y_ = item.m_y;
 
-					let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
-					let height_ = canvas.mainRec_height;
+				// 	let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
+				// 	let height_ = canvas.mainRec_height;
 
-					x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
-					y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
-					width_ = width_ * canvas.scaleCoeff;
-					height_ = height_  * canvas.scaleCoeff;
+				// 	x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
+				// 	y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
+				// 	width_ = width_ * canvas.scaleCoeff;
+				// 	height_ = height_  * canvas.scaleCoeff;
 
-					let ok = checkInsideMovingItem(x_, y_, width_, height_);
+				// 	let ok = checkInsideMovingItem(x_, y_, width_, height_);
 
-					if(ok){
-						canvas.selectedIndex = i;
+				// 	if(ok){
+				// 		canvas.selectedIndex = i;
+				// 	}
+				// }
+				// if(canvas.selectedIndex == -1){
+				// 	controlArea.cursorShape = Qt.ClosedHandCursor;
+				// }
+
+				let shape = canvasPage.findObject(mouse.x, mouse.y)
+				let selectionLayer = canvasPage.getLayer("selection");
+				if(shape !== null){
+					let selectionIndex = canvasPage.findSelectionIndex(mouse.x, mouse.y);
+					if(selectionIndex < 0){
+						let selection = shape.createSelection()
+						selectionLayer.addShape(selection);
+					}
+					else {
+						//selectionLayer.removeShape(selectionIndex);
 					}
 				}
-				if(canvas.selectedIndex == -1){
-					controlArea.cursorShape = Qt.ClosedHandCursor;
+				else {
+					canvasPage.clearSelection()
 				}
+				canvas.requestPaint();
 			}
 
 			onReleased: {
-				if(canvas.selectedIndex >= 0){
-					controlArea.cursorShape = Qt.ArrowCursor;
+				// if(canvas.selectedIndex >= 0){
+				// 	controlArea.cursorShape = Qt.ArrowCursor;
+				// }
+				// else {
+				// 	controlArea.cursorShape = Qt.OpenHandCursor
+				// }
+
+				let selectionLayer = canvasPage.getLayer("selection");
+
+				//DESELECT
+				// let selectionIndex = findSelectionIndex(mouse.x, mouse.y);
+				// if(selectionIndex > -1){
+				// 	console.log("findSelectionIndex:: ", selectionIndex)
+				// 	let foundSelection = selectionLayer.shapeModel[selectionIndex];
+				// 	let coord = foundSelection.coordinate
+				// 	let sourceCoord = foundSelection.source.getParams("selection").point
+				// 	if(Math.abs(coord.x - sourceCoord.x) < 0.0001 && Math.abs(coord.y - sourceCoord.y) < 0.0001){
+				// 		selectionLayer.removeShape(selectionIndex);
+				// 	}
+				// }
+
+				for (let i = 0; i < selectionLayer.shapeModel.length; i++){
+					let obj = selectionLayer.shapeModel[i];
+					obj.source.setCoordinate(obj.coordinate)
 				}
-				else {
-					controlArea.cursorShape = Qt.OpenHandCursor
-				}
+				canvas.requestPaint();
 			}
 
 			onDoubleClicked: {
@@ -355,9 +416,9 @@ Rectangle {
 					point.x += delta.x
 					point.y += delta.y
 					obj.coordinate = point;
-					canvas.requestPaint();
-				}
 
+				}
+				canvas.requestPaint();
 				// if(canvas.selectedIndex < 0){
 				// 	canvasPage.autoFit = false;
 
@@ -492,12 +553,12 @@ Rectangle {
 					}
 				}
 				if(canvas.hoverIndex >=0){
-					controlArea.cursorShape = Qt.ArrowCursor;
+					//controlArea.cursorShape = Qt.ArrowCursor;
 					canvas.linkSelected = true;
 					canvas.requestPaint();
 				}
 				else {
-					controlArea.cursorShape = Qt.OpenHandCursor;
+					//controlArea.cursorShape = Qt.OpenHandCursor;
 					if(canvas.linkSelected){
 						canvas.linkSelected = false;
 						canvas.requestPaint();

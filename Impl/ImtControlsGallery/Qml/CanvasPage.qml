@@ -32,47 +32,47 @@ SchemeView{
 		linkModel3.setData("ObjectId", "03", index_link3);
 		//
 
-		let index = objectModel.insertNewItem();
-		objectModel.setData("Id", "01", index);
-		objectModel.setData("X", 300, index);
-		objectModel.setData("Y", 300, index);
-		objectModel.setData("MainText", "Main text Main text Main text", index);
-		objectModel.setData("SecondText", "Second text", index);
-		objectModel.setExternTreeModel("Links", linkModel, index);
+		// let index = objectModel.insertNewItem();
+		// objectModel.setData("Id", "01", index);
+		// objectModel.setData("X", 300, index);
+		// objectModel.setData("Y", 300, index);
+		// objectModel.setData("MainText", "Main text Main text Main text", index);
+		// objectModel.setData("SecondText", "Second text", index);
+		// objectModel.setExternTreeModel("Links", linkModel, index);
 
-		index = objectModel.insertNewItem();
-		objectModel.setData("Id", "02", index);
-		objectModel.setData("X", 600, index);
-		objectModel.setData("Y", 600, index);
-		objectModel.setData("MainText", "Main text 2", index);
-		objectModel.setData("SecondText", "Second text 2", index);
-		objectModel.setData("HasError", true, index);
+		// index = objectModel.insertNewItem();
+		// objectModel.setData("Id", "02", index);
+		// objectModel.setData("X", 600, index);
+		// objectModel.setData("Y", 600, index);
+		// objectModel.setData("MainText", "Main text 2", index);
+		// objectModel.setData("SecondText", "Second text 2", index);
+		// objectModel.setData("HasError", true, index);
 
-		index = objectModel.insertNewItem();
-		objectModel.setData("Id", "03", index);
-		objectModel.setData("X", 100, index);
-		objectModel.setData("Y", 100, index);
-		objectModel.setData("MainText", "Main text 3", index);
-		objectModel.setData("SecondText", "Second text 3", index);
-		objectModel.setData("IsComposite", true, index);
+		// index = objectModel.insertNewItem();
+		// objectModel.setData("Id", "03", index);
+		// objectModel.setData("X", 100, index);
+		// objectModel.setData("Y", 100, index);
+		// objectModel.setData("MainText", "Main text 3", index);
+		// objectModel.setData("SecondText", "Second text 3", index);
+		// objectModel.setData("IsComposite", true, index);
 
-		index = objectModel.insertNewItem();
-		objectModel.setData("Id", "04", index);
-		objectModel.setData("X", 600, index);
-		objectModel.setData("Y", 100, index);
-		objectModel.setData("MainText", "Main text 4", index);
-		objectModel.setData("SecondText", "Second text 4", index);
-		objectModel.setExternTreeModel("Links", linkModel3, index);
+		// index = objectModel.insertNewItem();
+		// objectModel.setData("Id", "04", index);
+		// objectModel.setData("X", 600, index);
+		// objectModel.setData("Y", 100, index);
+		// objectModel.setData("MainText", "Main text 4", index);
+		// objectModel.setData("SecondText", "Second text 4", index);
+		// objectModel.setExternTreeModel("Links", linkModel3, index);
 
-		index = objectModel.insertNewItem();
-		objectModel.setData("Id", "05", index);
-		objectModel.setData("X", 100, index);
-		objectModel.setData("Y", 600, index);
-		objectModel.setData("MainText", "Main text 5", index);
-		objectModel.setData("SecondText", "Second text 5", index);
-		objectModel.setExternTreeModel("Links", linkModel2, index);
+		// index = objectModel.insertNewItem();
+		// objectModel.setData("Id", "05", index);
+		// objectModel.setData("X", 100, index);
+		// objectModel.setData("Y", 600, index);
+		// objectModel.setData("MainText", "Main text 5", index);
+		// objectModel.setData("SecondText", "Second text 5", index);
+		// objectModel.setExternTreeModel("Links", linkModel2, index);
 
-		scheme.requestPaint();
+		//scheme.requestPaint();
 		//TEST
 	}
 

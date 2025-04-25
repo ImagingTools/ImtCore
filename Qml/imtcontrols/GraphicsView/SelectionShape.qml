@@ -8,7 +8,6 @@ GraphicsShape {
 	property var coordinate
 
 	function draw(ctx, layerId){
-		console.log("SELECTION::DRAW")
 		drawSelection(ctx, layerId);
 		drawBorderPoints(ctx, layerId)
 	}
@@ -70,7 +69,10 @@ GraphicsShape {
 
 	function getPoint(params_){
 		if(coordinate == undefined){
-			coordinate = params_.point
+			coordinate = {}
+			coordinate.x = params_.point.x
+			coordinate.y = params_.point.y
+			//coordinate = params_.point
 			return coordinate
 		}
 		else {

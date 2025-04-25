@@ -17,9 +17,15 @@ QtObject {
 		return []
 	}
 
+	function setCoordinate(coord){
+
+	}
+
 	function createSelection(){
 		if(selectionComp){
-			return selectionComp.createObject(this, {"source": this})
+			let selection = selectionComp.createObject(this)
+			selection.source = this;
+			return selection;
 		}
 	}
 

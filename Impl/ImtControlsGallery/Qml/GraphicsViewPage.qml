@@ -77,6 +77,11 @@ GraphicsView{
 		Component.onCompleted: {
 		}
 
+		function setCoordinate(coord){
+			let item = scheme.drawModel[0];
+			item.point.x = coord.x;
+			item.point.y = coord.y;
+		}
 
 		function getParams(layerId){
 			let item = scheme.drawModel[0];
@@ -100,6 +105,12 @@ GraphicsView{
 		Component.onCompleted: {
 		}
 
+		function setCoordinate(coord){
+			let item = scheme.drawModel[1];
+			item.point.x = coord.x;
+			item.point.y = coord.y;
+		}
+
 		function getParams(layerId){
 			let item = scheme.drawModel[1];
 
@@ -120,6 +131,12 @@ GraphicsView{
 		selectionComp: selectedRecComp;
 
 		Component.onCompleted: {
+		}
+
+		function setCoordinate(coord){
+			let item = scheme.drawModel[2];
+			item.point.x = coord.x;
+			item.point.y = coord.y;
 		}
 
 		function getParams(layerId){
