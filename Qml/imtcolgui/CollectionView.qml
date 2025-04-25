@@ -45,6 +45,7 @@ Item {
 	signal selectedIndexChanged(int index);
 	signal elementsChanged();
 	signal headersChanged();
+	signal tableDecoratorChanged()
 	signal selectionChanged(var selection);
 	signal checkedItemsChanged();
 	signal rightButtonMouseClicked(int mouseX, int mouseY);
@@ -133,6 +134,10 @@ Item {
 		
 		function onHeadersChanged(){
 			root.headersChanged();
+		}
+
+		function onTableDecoratorChanged(){
+			root.tableDecoratorChanged()
 		}
 		
 		function onSelectionChanged(selection){

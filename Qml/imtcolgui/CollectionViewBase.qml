@@ -34,7 +34,8 @@ ViewBase {
 	
 	signal elementsChanged();
 	signal headersChanged();
-	
+	signal tableDecoratorChanged()
+
 	signal filterChanged(string filterId, var filterValue);
 	
 	signal selectionChanged(var selection);
@@ -137,7 +138,8 @@ ViewBase {
 							headers.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Headers"));
 							cells.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("Cells"));
 							//cellWidth.copyItemDataFromModel(i,tableDecorator.getTreeItemModel("CellWidth"));
-							var widthVal = tableDecorator.getTreeItemModel("CellWidth").isValidData("Width",i) ? tableDecorator.getTreeItemModel("CellWidth").getData("Width",i) : -1;
+							var widthVal = tableDecorator.getTreeItemModel("CellWidth").isValidData("Width",i) ?
+										tableDecorator.getTreeItemModel("CellWidth").getData("Width",i) : -1;
 							cellWidth.setData("Width", widthVal,i);
 							
 						}
@@ -202,6 +204,10 @@ ViewBase {
 				if(tableInternal.headers.getItemsCount()){
 					tableInternal.headersCompl = true;
 				}
+			}
+
+			onTableDecoratorChanged: {
+				collectionViewBaseContainer.tableDecoratorChanged();
 			}
 			
 			onHeaderRightMouseClicked: {
