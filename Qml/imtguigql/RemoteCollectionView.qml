@@ -18,6 +18,8 @@ CollectionView {
 	// Invisible fields that will be requested for collection
 	property var additionalFieldIds: ["id", "name"]
 
+	signal removed(string objectId)
+
 	commandsControllerComp: Component {
 		GqlBasedCommandsController {
 			typeId: root.collectionId;
@@ -83,6 +85,11 @@ CollectionView {
 			gqlGetListCommandId: root.gqlGetListCommandId
 
 			additionalFieldIds: root.additionalFieldIds;
+
+			onRemoved: {
+				root.removed(objectId)
+			}
+
 
 			function getHeaders(){
 				return root.getHeaders();
