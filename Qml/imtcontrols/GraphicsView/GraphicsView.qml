@@ -643,12 +643,7 @@ Rectangle {
 
 				for(let i = 0; i < canvasPage.layerModel.length; i++){
 					let layer = canvasPage.layerModel[i];
-					if(layer.layerId !== "selection"){
-						layer.draw(ctx);
-					}
-					else {
-						layer.draw(ctx);
-					}
+					layer.draw(ctx);
 				}
 
 				//width calculation

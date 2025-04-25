@@ -79,7 +79,7 @@ GraphicsView{
 
 
 		function getParams(layerId){
-			let item = drawModel[0];
+			let item = scheme.drawModel[0];
 
 			recParams1.point = item.point;
 			recParams1.width = item.width;
@@ -101,7 +101,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			let item = drawModel[1];
+			let item = scheme.drawModel[1];
 
 			recParams2.point = item.point;
 			recParams2.width = item.width;
@@ -123,7 +123,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			let item = drawModel[2];
+			let item = scheme.drawModel[2];
 
 			recParams3.point = item.point;
 			recParams3.width = item.width;
@@ -146,7 +146,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return drawModel[0];
+			return scheme.drawModel[0];
 		}
 	}
 
@@ -160,7 +160,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return drawModel[0];
+			return scheme.drawModel[0];
 		}
 	}
 
@@ -174,7 +174,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return drawModel[0];
+			return scheme.drawModel[0];
 		}
 	}
 
@@ -187,7 +187,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return drawModel[0];
+			return scheme.drawModel[0];
 		}
 	}
 
@@ -201,7 +201,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return drawModel[0];
+			return scheme.drawModel[0];
 		}
 	}
 

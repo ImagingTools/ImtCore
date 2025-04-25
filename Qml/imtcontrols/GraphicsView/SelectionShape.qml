@@ -8,6 +8,7 @@ GraphicsShape {
 	property var coordinate
 
 	function draw(ctx, layerId){
+		console.log("SELECTION::DRAW")
 		drawSelection(ctx, layerId);
 		drawBorderPoints(ctx, layerId)
 	}
@@ -30,16 +31,6 @@ GraphicsShape {
 		ctx.closePath();
 	}
 
-	function getPoint(params_){
-		if(coordinate == undefined){
-			coordinate = params_.point
-			return coordinate
-		}
-		else {
-			return coordinate
-		}
-
-	}
 
 	function drawBorderPoints(ctx, layerId){
 		let params_;
@@ -74,6 +65,17 @@ GraphicsShape {
 		ctx.stroke();
 		ctx.fill();
 		ctx.closePath();
+
+	}
+
+	function getPoint(params_){
+		if(coordinate == undefined){
+			coordinate = params_.point
+			return coordinate
+		}
+		else {
+			return coordinate
+		}
 
 	}
 }

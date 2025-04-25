@@ -6,186 +6,95 @@ import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 
-GraphicsView{
-    id: scheme;
+SchemeView{
+	id: scheme;
 
-	property var drawModel: []
-
-	GraphicsRectangleParams{
-		id: recParams;
-	}
-	GraphicsRectangleShape{
-		id: rec;
-
-		Component.onCompleted: {
-			drawModel.push({"point": Qt.point(300, 300), "width": 100, "height": 100, "color": "red"})
-			drawModel.push({"point": Qt.point(600, 300), "width": 100, "height": 100, "color": "green"})
-			drawModel.push({"point": Qt.point(600, 600), "width": 100, "height": 100, "color": "blue"})
-		}
-
-		function getParams(layerId, index){
-			let item = drawModel[index];
-
-			recParams.point = item.point;
-			recParams.width = item.width;
-			recParams.height = item.height;
-			recParams.radius = item.radius !== undefined ? item.radius : 0;
-			recParams.color = item.color;
-
-			return recParams;
-			// return item;
-		}
-	}
-
-
-	GraphicsPolygonParams{
-		id: polygonParams
-	}
-	GraphicsPolygonShape{
-		id: polygon;
-
-		property var drawModel: []
-
-
-		Component.onCompleted: {
-			drawModel.push({"points": [Qt.point(300, 300), Qt.point(600, 300),  Qt.point(600, 600)], "color": "red"})
-		}
-
-		function getParams(layerId, index){
-			return drawModel[index];
-		}
-	}
-
-	GraphicsCircleParams{
-		id: circleParams
-	}
-	GraphicsCircleShape{
-		id: circle;
-
-		property var drawModel: []
-
-
-		Component.onCompleted: {
-			drawModel.push({"point": Qt.point(300, 300), "color": "red", "radius": 100})
-			drawModel.push({"point": Qt.point(600, 300), "color": "green", "radius": 100})
-			drawModel.push({"point": Qt.point(600, 600), "color": "violet", "radius": 100})
-		}
-
-		function getParams(layerId, index){
-			return drawModel[index];
-		}
-	}
-
-	GraphicsLineParams{
-		id: lineParams;
-	}
-	GraphicsLineShape{
-		id: line;
-
-		property var drawModel: []
-
-
-		Component.onCompleted: {
-			drawModel.push({"points": [Qt.point(300, 300), Qt.point(600, 300),  Qt.point(600, 600)], "color": "red"})
-
-		}
-
-		function getParams(layerId, index){
-			return drawModel[index];
-		}
-	}
-
-	GraphicsArcParams{
-	}
-	GraphicsArcShape{
-		id: arc;
-
-		property var drawModel: []
-
-
-		Component.onCompleted: {
-			drawModel.push({"point": Qt.point(300, 300), "color": "red", "radius": 100, "startAngle": 0, "endAngle": Math.PI, "anticlockwise": true})
-
-		}
-
-		function getParams(layerId, index){
-			return drawModel[index];
-		}
-	}
-
-	GraphicsTextParams{
-		id: textParams;
-	}
-	GraphicsTextShape{
-		id: text;
-
-		property var drawModel: []
-
-
-		Component.onCompleted: {
-			drawModel.push({"point": Qt.point(300, 300), "color": "red", "fontSize": 20, "text": "TEXT"})
-
-		}
-
-		function getParams(layerId, index){
-			return drawModel[index];
-		}
-	}
-
-
-	GraphicsComplexShape{
-
-		GraphicsPolygonShape{
-
-		}
-
-		GraphicsTextShape{
-
-		}
-
-	}
-
-    Component.onCompleted: {
+	Component.onCompleted: {
 		//TEST
+		//links for test
+		let index_link = linkModel.insertNewItem();
+		linkModel.setData("ObjectId", "02", index_link);
+		index_link = linkModel.insertNewItem();
+		linkModel.setData("ObjectId", "03", index_link);
+		index_link = linkModel.insertNewItem();
+		linkModel.setData("ObjectId", "04", index_link);
+		index_link = linkModel.insertNewItem();
+		linkModel.setData("ObjectId", "05", index_link);
 
-		let layer = scheme.createLayer("test");
+		let index_link2 = linkModel2.insertNewItem();
+		linkModel2.setData("ObjectId", "02", index_link2);
+		index_link2 = linkModel2.insertNewItem();
+		linkModel2.setData("ObjectId", "03", index_link2);
 
-		layer.addShape(rec);
-		layer.addShape(rec);
-		layer.addShape(rec);
+		let index_link3 = linkModel3.insertNewItem();
+		linkModel3.setData("ObjectId", "02", index_link3);
+		index_link3 = linkModel3.insertNewItem();
+		linkModel3.setData("ObjectId", "03", index_link3);
+		//
 
-		// layer.addShape(polygon);
+		let index = objectModel.insertNewItem();
+		objectModel.setData("Id", "01", index);
+		objectModel.setData("X", 300, index);
+		objectModel.setData("Y", 300, index);
+		objectModel.setData("MainText", "Main text Main text Main text", index);
+		objectModel.setData("SecondText", "Second text", index);
+		objectModel.setExternTreeModel("Links", linkModel, index);
 
-		// layer.addShape(circle);
-		// layer.addShape(circle);
-		// layer.addShape(circle);
+		index = objectModel.insertNewItem();
+		objectModel.setData("Id", "02", index);
+		objectModel.setData("X", 600, index);
+		objectModel.setData("Y", 600, index);
+		objectModel.setData("MainText", "Main text 2", index);
+		objectModel.setData("SecondText", "Second text 2", index);
+		objectModel.setData("HasError", true, index);
 
-		 //layer.addShape(line);
+		index = objectModel.insertNewItem();
+		objectModel.setData("Id", "03", index);
+		objectModel.setData("X", 100, index);
+		objectModel.setData("Y", 100, index);
+		objectModel.setData("MainText", "Main text 3", index);
+		objectModel.setData("SecondText", "Second text 3", index);
+		objectModel.setData("IsComposite", true, index);
 
-		//layer.addShape(arc);
+		index = objectModel.insertNewItem();
+		objectModel.setData("Id", "04", index);
+		objectModel.setData("X", 600, index);
+		objectModel.setData("Y", 100, index);
+		objectModel.setData("MainText", "Main text 4", index);
+		objectModel.setData("SecondText", "Second text 4", index);
+		objectModel.setExternTreeModel("Links", linkModel3, index);
 
-		// layer.addShape(text);
-
+		index = objectModel.insertNewItem();
+		objectModel.setData("Id", "05", index);
+		objectModel.setData("X", 100, index);
+		objectModel.setData("Y", 600, index);
+		objectModel.setData("MainText", "Main text 5", index);
+		objectModel.setData("SecondText", "Second text 5", index);
+		objectModel.setExternTreeModel("Links", linkModel2, index);
 
 		scheme.requestPaint();
-        //TEST
-    }
+		//TEST
+	}
 
-    onCopySignal: {
-        if(scheme.selectedIndex >=0){
-            scheme.copyObjectFunc(scheme.selectedIndex);
-        }
-    }
-    onPasteSignal: {
-        if(scheme.selectedIndex >=0){
-            scheme.pasteObjectFunc();
-        }
-    }
-    onDeleteSignal: {
-        if(scheme.selectedIndex >=0){
-            scheme.deleteObjectFunc(scheme.selectedIndex);
-        }
-    }
+	TreeItemModel {id: linkModel;/*for test*/}
+	TreeItemModel {id: linkModel2;/*for test*/}
+	TreeItemModel {id: linkModel3;/*for test*/}
+
+	onCopySignal: {
+		if(scheme.selectedIndex >=0){
+			scheme.copyObjectFunc(scheme.selectedIndex);
+		}
+	}
+	onPasteSignal: {
+		if(scheme.selectedIndex >=0){
+			scheme.pasteObjectFunc();
+		}
+	}
+	onDeleteSignal: {
+		if(scheme.selectedIndex >=0){
+			scheme.deleteObjectFunc(scheme.selectedIndex);
+		}
+	}
 }
 
 
