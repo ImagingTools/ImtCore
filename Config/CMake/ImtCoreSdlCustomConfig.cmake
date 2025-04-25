@@ -77,6 +77,10 @@ function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
 	message(FATAL_ERROR "Outdated function call. Use 'ImtCoreAddSdlHeaderIncludePath'")
 endfunction()
 
+function(ImtCoreAddModuleWithHeaders ARG_SDL_PATH)
+	ImtCoreAddSdlModulesPath(${ARG_SDL_PATH})
+	ImtCoreAddSdlHeaderIncludePath(${ARG_SDL_PATH})
+endfunction()
 
 function(ImtCoreAddSdlModulesPath ARG_SDL_PATH)
 	if (NOT GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS)
