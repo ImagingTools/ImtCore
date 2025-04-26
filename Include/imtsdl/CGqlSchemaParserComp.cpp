@@ -140,7 +140,7 @@ int CGqlSchemaParserComp::DoProcessing(
 	}
 
 	if (processedFilesPtr != nullptr){
-		processedFilesPtr->InsertOption(QFileInfo(inputFile).canonicalFilePath(), QByteArray::number(processedFilesPtr->GetOptionsCount()));
+		processedFilesPtr->InsertOption(QFileInfo(inputFile).absoluteFilePath(), QByteArray::number(processedFilesPtr->GetOptionsCount()));
 	}
 
 	m_includePathList = m_argumentParserCompPtr->GetIncludePaths();
@@ -290,7 +290,7 @@ QString CGqlSchemaParserComp::FindFileInList(const QString& relativePath, const 
 		QDir baseDir(searchPath);
 		QFileInfo foundFile(baseDir.absoluteFilePath(relativePath));
 		if (foundFile.exists() && foundFile.isFile()){
-			return foundFile.canonicalFilePath();
+			return foundFile.absoluteFilePath();
 		}
 	}
 
@@ -304,11 +304,11 @@ QStringList CGqlSchemaParserComp::FindFilesFromDir(const QString& relativeDirPat
 		const QDir baseDir(searchPath);
 		const QFileInfo foundDir(baseDir.absoluteFilePath(relativeDirPath));
 		if (foundDir.exists() && foundDir.isDir()){
-			const QDir moduleDir(foundDir.canonicalFilePath());
+			const QDir moduleDir(foundDir.absoluteFilePath());
 			const QFileInfoList infoList = moduleDir.entryInfoList(QStringList({QStringLiteral("*.sdl")}), QDir::Files | QDir::Readable);
 			QStringList retVal;
 			for (const QFileInfo& fileInfo: infoList){
-				retVal << fileInfo.canonicalFilePath();
+				retVal << fileInfo.absoluteFilePath();
 			}
 
 			return retVal;
@@ -474,7 +474,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 						return false;
 					}
 				}
-				
+
 				CSdlEnum copiedType(*sdlEnumParam);
 				// it is ok if it already imported from another scheme
 				if (!m_enums.contains(copiedType)){
@@ -499,10 +499,10 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 				for (const CSdlUnion& sdlUnion : std::as_const(m_unions)){
 					if (sdlUnion.GetName() == sdlUnionName && sdlUnion != *sdlUnionParam){
 						SendErrorMessage(0, QString("Redifinition of '%1' in '%2'. alreadty defined at %3 and %4").arg(
-							sdlUnionName,
-							schemaPath,
-							sdlUnion.GetSchemaFilePath(),
-							sdlUnionParam->GetSchemaFilePath()));
+												sdlUnionName,
+												schemaPath,
+												sdlUnion.GetSchemaFilePath(),
+												sdlUnionParam->GetSchemaFilePath()));
 
 						return false;
 					}
@@ -589,7 +589,7 @@ bool CGqlSchemaParserComp::ProcessFilesImports()
 			const QString absolutePath = includeDirectory.absoluteFilePath(importFileName);
 
 			if (QFile::exists(absolutePath)){
-				foundSchemaFiles << QFileInfo(absolutePath).canonicalFilePath();
+				foundSchemaFiles << QFileInfo(absolutePath).absoluteFilePath();
 				importsIterator.remove();
 			}
 		}
