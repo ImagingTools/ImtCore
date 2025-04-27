@@ -7,7 +7,7 @@ import imtbaseImtCollectionSdl 1.0
 import imtbaseImtBaseTypesSdl 1.0
 
 OptionManager {
-	id: dataProvider
+	id: container
 
 	property alias inputModel: dataModelProvider.inputModel
 	property alias responseModel: dataModelProvider.responseModel
@@ -28,11 +28,17 @@ OptionManager {
 		responseModel: OptionsList { id: optionsListModel }
 
 		onDataModelReady: {
-			dataProvider.dataModelReady(params)
+			container.dataModelReady(params)
 		}
 
 		onDataModelLoadFailed: {
-			dataProvider.dataModelLoadFailed(errorMessage)
+			container.dataModelLoadFailed(errorMessage)
+		}
+
+		onRequestStarted: {
+			console.log("GqlBasedOptionManager onRequestStarted")
+
+			container.requestStarted(params)
 		}
 	}
 }

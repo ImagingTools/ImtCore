@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
-import com.imtcore.imtqml 1.0
+// import com.imtcore.imtqml 1.0
 
 Rectangle {
 	id: root;
@@ -32,18 +32,22 @@ Rectangle {
 
 			model: 8;
 
-			delegate: Rectangle{
-				color: Style.textColor;
+			delegate: loadingDelegate
+			Component {
+				id: loadingDelegate
+				Rectangle {
+					color: Style.textColor;
 
-				property double b: 0.1;
-				property double a: 0.25;
+					property double b: 0.1;
+					property double a: 0.25;
 
-				width: repeater.count == 0 ? square.height : ((b - a) / repeater.count * index + a) * square.height;
-				height: width;
-				radius: 0.5 * height;
+					width: repeater.count == 0 ? square.height : ((b - a) / repeater.count * index + a) * square.height;
+					height: width;
+					radius: 0.5 * height;
 
-				x: 0.5 * square.width  + 0.5 * (square.width  - width )  * Math.cos(2 * Math.PI / repeater.count * model.index) - 0.5 * width;
-				y: 0.5 * square.height - 0.5 * (square.height - height)  * Math.sin(2 * Math.PI / repeater.count * model.index) - 0.5 * height;
+					x: 0.5 * square.width  + 0.5 * (square.width  - width )  * Math.cos(2 * Math.PI / repeater.count * model.index) - 0.5 * width;
+					y: 0.5 * square.height - 0.5 * (square.height - height)  * Math.sin(2 * Math.PI / repeater.count * model.index) - 0.5 * height;
+				}
 			}
 		}
 	}

@@ -21,12 +21,20 @@ QtObject {
 		updated by subclasses when new data is loaded.
 	*/
 	property var optionModel
+
+	/*!
+		\qmlsignal OptionManager::requestStarted(var params)
+		\brief Emitted when data is successfully loaded.
+
+		The \a params argument contains any parameters passed when requesting the data.
+	*/
+	signal requestStarted(var params)
 	
 	/*!
-		\qmlsignal OptionManager::dataModelReady(var params)
+		\qmlsignal OptionManager::dataModelReady(var optionModel)
 		\brief Emitted when data is successfully loaded.
 		
-		The \a params argument contains any parameters passed when requesting the data.
+		The \a optionModel argument contains model when new data is loaded.
 	*/
 	signal dataModelReady(var optionModel)
 	
@@ -122,7 +130,7 @@ QtObject {
 	*/
 	function requestDataModel(params){
 		console.warn("requestDataModel() should be implemented in a subclass")
-		
+		requestStarted(params)
 		optionModelReady(params)
 	}
 }
