@@ -176,16 +176,13 @@ Item {
 		let toShowErr = dateInput.isError || dateInput.isMonthError || dateInput.isDayError
 
 
-		if(toShowErr){
+		if(toShowErr && !tooltip.openST){
 			let errorString_ = dateInput.isError ? dateInput.errorString :
 													   dateInput.isMonthError ? dateInput.errorStringMonth :
 																	 dateInput.isDayError ? dateInput.errorStringDay: ""
 
 			tooltip.text = errorString_;
-
-			let point = dateInput.mapToItem(null, 0, -8 - tooltip.componentHeight)
-			tooltip.openTooltipWithCoord(point.x,point.y)
-			closeTooltipPause.restart();
+			openTooltipPause.restart();
 		}
 
 		return ok;
@@ -416,6 +413,17 @@ Item {
 		duration: 2000
 		onFinished: {
 			tooltip.hide();
+		}
+	}
+
+	PauseAnimation {
+		id: openTooltipPause;
+
+		duration: 50;
+		onFinished: {
+			let point = dateInput.mapToItem(null, 0, -8 - tooltip.componentHeight)
+			tooltip.openTooltipWithCoord(point.x,point.y)
+			closeTooltipPause.restart();
 		}
 	}
 

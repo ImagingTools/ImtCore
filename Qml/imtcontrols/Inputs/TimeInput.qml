@@ -50,9 +50,7 @@ Item {
 		timeInput.isError = str.match(timeInput.timeRegExpFull) === null;
 
 		if(timeInput.isError){
-			let point = timeInput.mapToItem(null, 0, -8 - tooltip.componentHeight)
-			tooltip.openTooltipWithCoord(point.x,point.y)
-			closeTooltipPause.restart();
+			openTooltipPause.restart();
 		}
 		return !timeInput.isError;
 	}
@@ -250,6 +248,17 @@ Item {
 		duration: 2000
 		onFinished: {
 			tooltip.hide();
+		}
+	}
+
+	PauseAnimation {
+		id: openTooltipPause;
+
+		duration: 50;
+		onFinished: {
+			let point = timeInput.mapToItem(null, 0, -8 - tooltip.componentHeight)
+			tooltip.openTooltipWithCoord(point.x,point.y)
+			closeTooltipPause.restart();
 		}
 	}
 
