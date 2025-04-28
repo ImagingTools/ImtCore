@@ -86,12 +86,6 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 	if (arguments.input.Version_1_0->typeId){
 		typeId = *arguments.input.Version_1_0->typeId;
 	}
-	
-	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
-	if (!elementIds.contains(objectId)){
-		errorMessage = QString("Unable to get object visual status. Error: Object with ID: '%1' does not exist").arg(qPrintable(objectId));
-		return sdl::imtbase::ImtCollection::CVisualStatus();
-	}
 
 	QString name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 	QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
