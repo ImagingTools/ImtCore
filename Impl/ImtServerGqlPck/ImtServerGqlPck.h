@@ -32,6 +32,8 @@
 #include <imtservergql/CDocumentRevisionControllerComp.h>
 #include <imtservergql/CCommandsControllerComp.h>
 #include <imtservergql/CSettingsControllerComp.h>
+#include <imtservergql/CProgressManagerPublisherComp.h>
+#include <imtservergql/CGqlCollectionImportControllerComp.h>
 
 
 /**
@@ -67,6 +69,8 @@ typedef imtservergql::CHeadersDataProviderComp HeadersDataProvider;
 typedef imtservergql::CDocumentRevisionControllerComp DocumentRevisionController;
 typedef imtservergql::CCommandsControllerComp CommandsController;
 typedef imtservergql::CSettingsControllerComp SettingsController;
+typedef imtservergql::CProgressManagerPublisherComp ProgressManagerPublisher;
+typedef imtservergql::CGqlCollectionImportControllerComp GqlCollectionImportController;
 
 
 } // namespace ImtServerGqlPck

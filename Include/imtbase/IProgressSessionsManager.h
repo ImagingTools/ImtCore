@@ -1,0 +1,33 @@
+#pragma once
+
+
+// ACF includes
+#include <ibase/IProgressManager.h>
+
+
+namespace imtbase
+{
+
+
+/**
+	Common interface for managing progress sessions
+*/
+class IProgressSessionsManager : virtual public istd::IPolymorphic
+{
+public:
+	/**
+		Create a progress manager session and return a pointer to it
+		The pointer remains valid until EndProgressSession is called with given session ID
+	*/
+	virtual ibase::IProgressManager* BeginProgressSession(const QByteArray& sessionId, const QString& description) = 0;
+
+	/**
+		End progress session with given ID
+	*/
+	virtual bool EndProgressSession(const QByteArray& sessionId) = 0;
+};
+
+
+} // namespace imtbase
+
+

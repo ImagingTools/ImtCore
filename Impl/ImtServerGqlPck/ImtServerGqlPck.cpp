@@ -144,6 +144,16 @@ I_EXPORT_COMPONENT(
 			"Settings controller",
 			"Settings Controller");
 
+I_EXPORT_COMPONENT(
+			ProgressManagerPublisher,
+			"GraphQL Progress manager publisher",
+			"GraphQL Progress Publisher");
+
+I_EXPORT_COMPONENT(
+			GqlCollectionImportController,
+			"GraphQL Collection import controller",
+			"GraphQL Collection Import Controller");
+
 
 } // namespace ImtServerGqlPck
 

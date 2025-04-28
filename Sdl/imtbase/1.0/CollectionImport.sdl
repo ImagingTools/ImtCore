@@ -15,6 +15,7 @@ type FileInfo {
 }
 
 type ImportParams {
+	transactionId: ID!
 	collectionId: ID!
 	fileList: [FileInfo!]!
 }
@@ -24,34 +25,18 @@ type TransactionId {
 }
 
 enum Status {
-	Accepted
-	Upload
-	Processing
-	Interrupted
-	CancellationPending
-	Canceled
-	Finished
+	Success
+	Failed
 }
 
 type TransactionStatus{
 	status: Status!
 }
 
-type TransactionInfo {
-	id: ID!
-	status: Status!
-}
-
-type TransactionList {
-	transactionList: [TransactionInfo]!
-}
 
 type Query {
-	GetCollectionImportTransactionList: TransactionList
-	BeginCollectionImportTransaction(input: ImportParams): TransactionId
-	GetCollectionImportTransactionStatus(input: TransactionId): TransactionStatus
-	ResumeCollectionImportTransaction(input: TransactionId): TransactionStatus
+	BeginCollectionImportTransaction(input: ImportParams): TransactionStatus
 	CancelCollectionImportTransaction(input: TransactionId): TransactionStatus
-	EndCollectionImportTransaction(input: TransactionId): TransactionStatus
 }
+
 

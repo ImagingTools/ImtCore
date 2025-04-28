@@ -1,0 +1,33 @@
+schema {
+	name: ProgressManager
+	namespace: imtbase
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+	subscription: Subscription
+}
+
+
+type TaskProgress {
+	id: ID!
+	description: String
+	isCancellable: Bool
+	isCanceled: Bool
+
+	subTaskList: [TaskProgress]
+
+	progress: Double
+	totalProgress: Double!
+}
+
+type SessionId {
+	sessionId: ID!
+}
+
+
+type Query {
+	GetProgressManager(input: SessionId): TaskProgress
+}
+
+
