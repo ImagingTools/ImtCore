@@ -147,7 +147,7 @@ Item {
 			id: titleText;
 
 			font.family: Style.fontFamily;
-			font.pixelSize: Style.fontSizeXLarge;
+			font.pixelSize: timeInput.fontSize;
 			color: Style.textColor;
 
 			visible: timeInput.hasTitle;

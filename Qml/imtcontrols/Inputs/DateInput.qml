@@ -259,7 +259,7 @@ Item {
 			id: titleText;
 
 			font.family: Style.fontFamily;
-			font.pixelSize: Style.fontSizeXLarge;
+			font.pixelSize: dateInput.fontSize;
 			color: Style.textColor;
 
 			visible: dateInput.hasTitle;
