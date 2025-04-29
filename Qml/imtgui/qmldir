@@ -9,7 +9,6 @@ DesignSchemaProvider 1.0 ./Application/DesignSchemaProvider.qml
 LanguageProvider 1.0 ./Application/LanguageProvider.qml
 PagesManager 1.0 ./Application/PagesManager.qml
 PagesProvider 1.0 ./Application/PagesProvider.qml
-ShortcutManager 1.0 ./Application/ShortcutManager.qml
 ThumbnailDecorator 1.0 ./Application/ThumbnailDecorator.qml
 ApplicationEvents 1.0 ./Application/ApplicationEvents.qml
 ClientSettingsController 1.0 ./Application/ClientSettingsController.qml

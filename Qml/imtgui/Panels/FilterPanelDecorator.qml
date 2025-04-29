@@ -54,6 +54,14 @@ DecoratorBase {
 	
 	TimeFilter {
 		id: timeFilter;
+		
+		function clear(){
+			m_timeRange.m_begin = ""
+			m_timeRange.m_end = ""
+			m_timeUnit = ""
+			m_interpretationMode = ""
+			m_unitMultiplier = 0
+		}
 	}
 	
 	Row {
@@ -111,6 +119,7 @@ DecoratorBase {
 						onClicked: {
 							rect.filterEnabled = false;
 							buttonText.text = qsTr("Date");
+							timeFilter.clear();
 							
 							if (filterPanelDecorator.complexFilter){
 								filterPanelDecorator.complexFilter.clearTimeFilter();

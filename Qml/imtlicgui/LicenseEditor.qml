@@ -23,12 +23,13 @@ ViewBase {
         CachedFeatureCollection.updateModel();
         CachedProductCollection.updateModel();
         CachedLicenseCollection.updateModel();
-        Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
     }
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
-    }
+	LocalizationEvent {
+		onLocalizationChanged: {
+			root.onLocalizationChanged(langId)
+		}
+	}
 
     function onLocalizationChanged(language){
         updateLicensesHeaders();

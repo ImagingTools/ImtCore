@@ -57,13 +57,11 @@ ControlBase {
 	signal canceled();
 	signal applied();
 	signal closed();
-
-	Component.onCompleted: {
-		Events.subscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
-	}
-
-	Component.onDestruction: {
-		Events.unSubscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
+	
+	LocalizationEvent {
+		onLocalizationChanged: {
+			dialogContainer.onLocalizationChanged(langId)
+		}
 	}
 
 	function addButton(id, name, enabled){

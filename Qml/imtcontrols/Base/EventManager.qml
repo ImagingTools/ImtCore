@@ -112,7 +112,6 @@ QtObject {
 		}
 	}
 	
-	
 	/*!
 		\qmlmethod void eventsContainer::unSubscribeEvent(string key, QtObject object, string method)
 		\brief Unsubscribes a specific method of an object from a named event.

@@ -66,21 +66,6 @@ CollectionView {
 		CollectionRepresentation {
 			property bool isReady: false;
 
-			Component.onCompleted: {
-				Events.subscribeEvent("CommandsGuiReady", commandsIsReady);
-			}
-
-			Component.onDestruction: {
-				Events.unSubscribeEvent("CommandsGuiReady", commandsIsReady);
-			}
-
-			function commandsIsReady(){
-				isReady = true;
-
-				Events.unSubscribeEvent("CommandsGuiReady", commandsIsReady);
-			}
-
-			//            collectionId: isReady ? root.collectionId : "";
 			collectionId: root.collectionId;
 			gqlGetListCommandId: root.gqlGetListCommandId
 

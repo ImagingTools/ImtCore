@@ -3,6 +3,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 
 import imtcontrols 1.0
+import imtgui 1.0
 
 
 Rectangle {
@@ -37,14 +38,18 @@ Rectangle {
 	signal revertSignal();
 	signal modelDataChanged();
 	
-	Component.onCompleted: {
-		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
-		Events.subscribeEvent("AppSizeChanged", appSizeChanged)
-	}
-	
-	Component.onDestruction: {
-		Events.unSubscribeEvent("DesignSchemeChanged", designSchemeChanged);
-		Events.unSubscribeEvent("AppSizeChanged", appSizeChanged)
+	ApplicationEvents {
+		onDesignSchemeChanged: {
+			canvasPage.designSchemeChanged(scheme)
+		}
+		
+		onAppWidthChanged: {
+			canvasPage.appSizeChanged(width)
+		}
+		
+		onAppHeightChanged: {
+			canvasPage.appSizeChanged(height)
+		}
 	}
 	
 	onContentXChanged: {

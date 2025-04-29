@@ -19,14 +19,12 @@ DecoratorBase {
     property string topPanelSource: baseElement ? baseElement.topPanelSource : "";
     property bool baseElementFocus: baseElement ? baseElement.focus : false;
     property Component topPanelComp : !baseElement ? undefined : baseElement.topPanelComp;
-
-    Component.onCompleted: {
-        Events.subscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
-    }
+	
+	LocalizationEvent {
+		onLocalizationChanged: {
+			dialogContainer.onLocalizationChanged(langId)
+		}
+	}
 
     function onLocalizationChanged(language){
         if(loaderTopPanel.item){

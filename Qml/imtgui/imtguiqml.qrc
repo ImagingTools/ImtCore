@@ -10,7 +10,6 @@
         <file alias="imtgui/Application/LanguageProvider.qml">Application/LanguageProvider.qml</file>
         <file alias="imtgui/Application/PagesManager.qml">Application/PagesManager.qml</file>
         <file alias="imtgui/Application/PagesProvider.qml">Application/PagesProvider.qml</file>
-        <file alias="imtgui/Application/ShortcutManager.qml">Application/ShortcutManager.qml</file>
         <file alias="imtgui/Application/ThumbnailDecorator.qml">Application/ThumbnailDecorator.qml</file>
         <file alias="imtgui/Application/ApplicationEvents.qml">Application/ApplicationEvents.qml</file>
 	<file alias="imtgui/Application/ClientSettingsController.qml">Application/ClientSettingsController.qml</file>

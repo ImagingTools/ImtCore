@@ -22,13 +22,17 @@ ViewBase {
         CachedFeatureCollection.updateModel();
 
         CachedFeatureCollection.modelUpdated.connect(productViewContainer.onFeaturesChanged);
-        Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
     }
 
     Component.onDestruction: {
         CachedFeatureCollection.modelUpdated.disconnect(productViewContainer.onFeaturesChanged);
-        Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
     }
+	
+	LocalizationEvent {
+		onLocalizationChanged: {
+			productViewContainer.onLocalizationChanged(langId)
+		}
+	}
 
     function onLocalizationChanged(language){
         updateHeaders();

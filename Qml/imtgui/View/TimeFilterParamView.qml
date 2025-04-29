@@ -285,9 +285,8 @@ PopupView {
 						text: qsTr("Apply");
 						enabled: fromDateItem.visible;
 						onClicked: {
-
-							root.timeFilter.m_timeRange.m_begin = root.formatDate(fromDatePicker.getDate());
-							root.timeFilter.m_timeRange.m_end = root.formatDate(toDatePicker.getDate());
+							root.timeFilter.m_timeRange.m_begin = fromDatePicker.getDate().toISOString()
+							root.timeFilter.m_timeRange.m_end = toDatePicker.getDate().toISOString()
 							
 							root.accepted("TimeRange", fromDatePicker.getDateAsString() + " -> " + toDatePicker.getDateAsString());
 						}
