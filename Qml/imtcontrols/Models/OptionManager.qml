@@ -31,20 +31,20 @@ QtObject {
 	signal requestStarted(var params)
 	
 	/*!
-		\qmlsignal OptionManager::dataModelReady(var optionModel)
+		\qmlsignal OptionManager::optionModelReady(var optionModel)
 		\brief Emitted when data is successfully loaded.
 		
 		The \a optionModel argument contains model when new data is loaded.
 	*/
-	signal dataModelReady(var optionModel)
+	signal optionModelReady(var optionModel)
 	
 	/*!
-		\qmlsignal OptionManager::dataModelLoadFailed(string errorMessage)
+		\qmlsignal OptionManager::optionModelLoadFailed(string errorMessage)
 		\brief Emitted when data loading fails.
 		
 		The \a errorMessage argument provides details about the failure.
 	*/
-	signal dataModelLoadFailed(string errorMessage)
+	signal optionModelLoadFailed(string errorMessage)
 	
 	/*!
 		\qmlmethod void OptionManager::insertOption(id, name, description, index)

@@ -11,6 +11,8 @@ DataModelController {
 	property var inputModel
 
 	function saveDataModel(paramsObj){
+		root.requestStarted(paramsObj)
+
 		var query = Gql.GqlRequest("mutation", gqlCommandId)
 
 		let inputObject = Gql.GqlObject("input")

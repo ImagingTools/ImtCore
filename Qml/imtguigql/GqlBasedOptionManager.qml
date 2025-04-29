@@ -28,11 +28,11 @@ OptionManager {
 		responseModel: OptionsList { id: optionsListModel }
 
 		onDataModelReady: {
-			container.dataModelReady(params)
+			container.optionModelReady(params)
 		}
 
 		onDataModelLoadFailed: {
-			container.dataModelLoadFailed(errorMessage)
+			container.optionModelLoadFailed(errorMessage)
 		}
 
 		onRequestStarted: {

@@ -1,11 +1,11 @@
 import QtQuick 2.12
 
 /*!
-	\qmltype DataController
+	\qmltype DataModelController
 	\inqmlmodule Custom
 	\brief Base class for loading model data.
 
-	The DataController is an abstract base class that defines an interface for
+	The DataModelController is an abstract base class that defines an interface for
 	loading data. It provides signals to indicate successful or failed data retrieval.
 	Subclasses should override the \l saveDataModel() method to implement specific
 	data-fetching logic.
@@ -13,7 +13,7 @@ import QtQuick 2.12
 QtObject {
 
 	/*!
-		\qmlproperty var DataController::resultModel
+		\qmlproperty var DataModelController::resultModel
 		\brief Holds the model data used in QML components.
 
 		This property stores the data retrieved by the provider. It should be
@@ -22,7 +22,15 @@ QtObject {
 	property var resultModel
 
 	/*!
-		\qmlsignal DataController::resultModelReady(var params)
+		\qmlsignal DataModelController::requestStarted(var params)
+		\brief Emitted when data is successfully loaded.
+
+		The \a params argument contains any parameters passed when requesting the data.
+	*/
+	signal requestStarted(var params)
+
+	/*!
+		\qmlsignal DataModelController::resultModelReady(var params)
 		\brief Emitted when data is successfully loaded.
 
 		The \a params argument contains any parameters passed when requesting the data.
@@ -30,7 +38,7 @@ QtObject {
 	signal resultModelReady(var resultModel)
 
 	/*!
-		\qmlsignal DataController::dataModelLoadFailed(string errorMessage)
+		\qmlsignal DataModelController::dataModelLoadFailed(string errorMessage)
 		\brief Emitted when data loading fails.
 
 		The \a errorMessage argument provides details about the failure.
@@ -38,7 +46,7 @@ QtObject {
 	signal dataModelSaveFailed(string errorMessage)
 
 	/*!
-		\qmlmethod void DataController::saveDataModel(var params)
+		\qmlmethod void DataModelController::saveDataModel(var params)
 		\brief Loads model data.
 
 		This method should be overridden in subclasses to fetch data from a static

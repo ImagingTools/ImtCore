@@ -17,8 +17,6 @@ Rectangle {
 
     color: Style.baseColor;
 
-    clip: true;
-
     property alias name: textName.text;
     property alias description: textDescription.text;
 
@@ -114,9 +112,6 @@ Rectangle {
 
         anchors.right: parent.right;
         anchors.rightMargin: Style.sizeLargeMargin;
-
-        clip: true;
-
         spacing: Style.sizeMainMargin;
 
         Loader {
