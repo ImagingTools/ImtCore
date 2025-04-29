@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/qml">
 	<file alias="web/GraphQLRequest.js">../web/GraphQLRequest.js</file>
+	<file alias="web/FileUploader.js">../web/FileUploader.js</file>
 	<file alias="imtguigql/qmldir">qmldir</file>
 	<file alias="imtguigql/GqlDocumentDataController.qml">GqlDocumentDataController.qml</file>
 	<file alias="imtguigql/ComboBoxGql.qml">ComboBoxGql.qml</file>
