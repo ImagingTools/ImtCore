@@ -21,6 +21,8 @@ ViewCommandsDelegateBase {
 
 	property TreeItemModel contextMenuModel: TreeItemModel {}
 
+	property bool loadingInParts: false;
+
 	property alias renameDialogComp: renameDialog;
 	property alias removeDialogComp: removeDialog;
 	property alias importFileDialog: importFileDialog_;
@@ -40,6 +42,7 @@ ViewCommandsDelegateBase {
 	signal descriptionSetted(string id, string description);
 	signal removed(string id);
 	signal selectionChanged(var selection)
+	signal beginImport(string fileName, string filePath, int fileSize);
 
 	Component.onDestruction: {
 		if (collectionViewCommandsDelegate.collectionView){
@@ -318,10 +321,12 @@ ViewCommandsDelegateBase {
 
 		onAccepted: {
 			let filePath;
+			let fileSize = 0;
 			if (Qt.platform.os == "web"){
 				filePath = importFileDialog_.file.toString()
+				fileSize = filePath.size;
 			}
-			else{
+			else {
 				filePath = importFileDialog_.file.toString()
 			}
 
@@ -329,61 +334,77 @@ ViewCommandsDelegateBase {
 
 			let mimeType = ""
 			if (Qt.platform.os == "web"){
-				let reader = new FileReader()
-
-				reader.readAsDataURL(filePath)
-
-				reader.onload = function(){
-					let encodedContentWithHeader = reader.result
-					let encodedContent = encodedContentWithHeader.replace(/^.{0,}base64,/, '')
-
-					let fileName = filePath.name
-					let data = filePath.name.split('.')
-					let ext = "";
-					if (data.length > 1){
-						fileName = data[0]
-						ext = data[1]
+				let fileName = filePath.name
+				let fileNameWithExt = fileName;
+				let data = filePath.name.split('.')
+				let ext = "";
+				if (data.length > 0){
+					ext = data[data.length -1]
+					fileName = data[0]
+					for(let i = 1; i < (data.length - 1); i++){
+						fileName = "." + data[i]
 					}
+				}
+				if (!collectionViewCommandsDelegate.loadingInParts){
+					let reader = new FileReader()
 
-					let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(importFileDialog_.nameFilters, ext)
-					if (index < 0){
-						console.error("Extension not found in name filters");
-						return;
-					}
+					reader.readAsDataURL(filePath)
 
-					mimeType = mimeTypes[index]
+					reader.onload = function(){
+						let encodedContentWithHeader = reader.result
+						let encodedContent = encodedContentWithHeader.replace(/^.{0,}base64,/, '')
 
-					collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedContent, mimeType);
-				}.bind(this)
-			}
+						let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(importFileDialog_.nameFilters, ext)
+						if (index < 0){
+							console.error("Extension not found in name filters");
+							return;
+						}
+
+						mimeType = mimeTypes[index]
+
+						collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedContent, mimeType);
+					}.bind(this)
+
+				}
+				else {
+					collectionViewCommandsDelegate.beginImport(fileNameWithExt, filePath, fileSize);
+				}
+			}//web
 			else {
-				fileIO.source = filePath
-				let fileData = fileIO.read()
-				let encodedData = Qt.btoa(fileData);
-
 				let fileName = filePath
-
+				let fileNameWithExt = fileName;
 				let parts = filePath.split('/')
 				if (parts.length > 0){
+					fileNameWithExt = parts[parts.length - 1];
 					let data = parts[parts.length - 1].split('.')
 					let ext = "";
 					if (data.length > 0){
+						ext = data[data.length - 1]
 						fileName = data[0]
-						ext = data[1]
+						for(let i = 1; i < (data.length - 1); i++){
+							fileName = "." + data[i]
+						}
 					}
 				}
-
-				let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(importFileDialog_.nameFilters, ext)
-				if (index < 0){
-					console.error("Extension not found in namefilters");
-					return;
+				if(!collectionViewCommandsDelegate.loadingInParts){
+					fileIO.source = filePath
+					let fileData = fileIO.read()
+					fileSize = fileData.length;
+					let encodedData = Qt.btoa(fileData);
+					let index = collectionViewCommandsDelegate.getDialogNameFilterIndex(importFileDialog_.nameFilters, ext)
+					if (index < 0){
+						console.error("Extension not found in namefilters");
+						return;
+					}
+					mimeType = mimeTypes[index]
+					collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedData, mimeType);
 				}
-
-				mimeType = mimeTypes[index]
-
-				collectionViewCommandsDelegate.onImportDialogResult(fileName, encodedData, mimeType);
+				else {
+					//fileSize =
+					//collectionViewCommandsDelegate.beginImport(fileNameWithExt, filePath, fileSize)
+				}
 			}
-		}
+		}//onAccepted
 
 		FileIO {
 			id: fileIO
@@ -492,7 +513,7 @@ ViewCommandsDelegateBase {
 
 		let commandIsEnabled = commandsController.commandIsEnabled(commandId);
 		console.log("commandIsEnabled", commandIsEnabled);
-		
+
 		if (commandIsEnabled){
 			if (commandId === "New"){
 				collectionViewCommandsDelegate.onNew();
