@@ -17,8 +17,6 @@ Rectangle {
 	
 	color: Style.baseColor;
 	
-	clip: true;
-	
 	property int contentHeight: -1;
 	
 	function calcHeight(){

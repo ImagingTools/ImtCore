@@ -13,7 +13,6 @@ DecoratorBase {
 
 	property int maxTextWidth: 200;
 	property int minTextWidth: 20;
-	property int iconSize: Style.sizeMainMargin;
 	property int contentSpacing: Style.sizeMainMargin;
 	property int contentLeftMargin: Style.sizeMainMargin;
 	property alias contentWidth: content.width;
