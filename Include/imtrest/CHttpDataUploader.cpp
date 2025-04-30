@@ -43,6 +43,8 @@ bool CHttpDataUploader::InitializeDeviceFromFile(const QString& filePath)
 
 	QFile* filePtr = new QFile(filePath, this);
 	if (!filePtr->open(QIODevice::ReadOnly)){
+		qWarning() << "Unable to open file" << filePtr->fileName() << filePtr->error() << filePtr->errorString();
+
 		return false;
 	}
 
