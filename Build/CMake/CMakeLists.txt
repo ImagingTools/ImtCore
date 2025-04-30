@@ -90,6 +90,7 @@ add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/Oas
 
 
 
+if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 #-------- Sdl --------
 if(NOT DEFINED USE_SDL OR USE_SDL)
 	include("${IMTCOREDIR}/Config/CMake/ImtCoreSdlCustomConfig.cmake")
@@ -110,7 +111,6 @@ if(NOT DEFINED USE_SDL OR USE_SDL)
 	add_dependencies(imtappsdl imtbasesdl)
 endif()
 
-if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 #-------- Libraries --------
 add_subdirectory("${INCLUDE_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtapp")
 add_subdirectory("${INCLUDE_DIR}/imtmail/CMake" "${AUX_INCLUDE_DIR}/imtmail")
