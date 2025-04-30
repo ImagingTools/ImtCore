@@ -17,6 +17,10 @@ DocumentWorkspacePageView {
 		}
 	}
 	
+	function setDocumentName(documentId, name){
+		documentManagerView_.setDocumentName(documentId, name)
+	}
+	
 	MultiDocWorkspaceView {
 		id: documentManagerView_
 		anchors.fill: parent

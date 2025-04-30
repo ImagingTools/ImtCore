@@ -212,7 +212,7 @@ ViewBase {
                 function getAllChildrenGroups(groupId, retVal){
                     for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
                         let id = container.copiedGroupsModel.getData("id", i);
-                        let parentGroups = container.copiedGroupsModel.getData("ParentGroups", i);
+                        let parentGroups = container.copiedGroupsModel.getData("parentGroups", i);
                         if (parentGroups !== ""){
                             let parentGroupIds = parentGroups.split(';')
                             if (parentGroupIds.includes(groupId)){
@@ -228,7 +228,7 @@ ViewBase {
                     for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
                         let id = container.copiedGroupsModel.getData("id", i);
                         if (id === groupId){
-                            let parentGroups = container.copiedGroupsModel.getData("ParentGroups", i);
+                            let parentGroups = container.copiedGroupsModel.getData("parentGroups", i);
                             if (parentGroups !== ""){
                                 let parentGroupsIds = parentGroups.split(';');
                                 for (let j = 0; j < parentGroupsIds.length; j++){

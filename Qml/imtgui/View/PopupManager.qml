@@ -33,6 +33,10 @@ QtObject {
 	}
 
 	function closeMessage(id){
+		if (!popupContainer){
+			return
+		}
+
 		let index = getIndexByMessageId(id);
 		if (index >= 0){
 			popupContainer.removeMessage(index);
@@ -40,7 +44,7 @@ QtObject {
 	}
 
 	function getIndexByMessageId(id){
-		if (!id || id === ""){
+		if (!id || id === "" || !popupContainer){
 			return -1;
 		}
 

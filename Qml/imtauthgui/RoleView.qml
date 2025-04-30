@@ -273,7 +273,7 @@ ViewBase {
                     for (let i = 0; i < rolesModel.getItemsCount(); i++){
                         let id = rolesModel.getData("id", i);
                         if (id === roleId){
-                            let parentRoles = rolesModel.getData("ParentRoles", i);
+                            let parentRoles = rolesModel.getData("parentRoles", i);
                             let parentRolesIds = parentRoles.split(';');
                             for (let j = 0; j < parentRolesIds.length; j++){
                                 retVal.push(parentRolesIds[j])
@@ -287,7 +287,7 @@ ViewBase {
                     for (let i = 0; i < rolesModel.getItemsCount(); i++){
                         let id = rolesModel.getData("id", i);
 
-                        let parentRoles = rolesModel.getData("ParentRoles", i);
+                        let parentRoles = rolesModel.getData("parentRoles", i);
                         if (parentRoles !== ""){
                             let parentRolesIds = parentRoles.split(';');
                             if (parentRolesIds.includes(roleId)){

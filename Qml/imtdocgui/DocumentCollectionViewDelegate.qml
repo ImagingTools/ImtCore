@@ -338,7 +338,7 @@ CollectionViewCommandsDelegateBase {
 							}
 
 							onHeadersChanged: {
-								setColumnContentById("m_isActive", isActiveColumnDelegateComp);
+								setColumnContentById("isActive", isActiveColumnDelegateComp);
 							}
 
 							onSelectionChanged: {
@@ -385,10 +385,12 @@ CollectionViewCommandsDelegateBase {
 							}
 						}
 
-						Item {
+						Rectangle {
 							id: descriptionItem;
 							width: parent.width;
 							height: 200;
+							clip: true
+							color: Style.backgroundColor2
 
 							Text {
 								id: descriptionTitle;

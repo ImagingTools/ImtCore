@@ -86,6 +86,10 @@ Item {
 			}
 		}
 	}
+	
+	function setDocumentName(documentId, name){
+		tabView.setTabName(documentId, name);
+	}
 
 	function addFixedView(viewComp, name, id, forceFocus){
 		if (!forceFocus){
