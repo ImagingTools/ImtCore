@@ -36,15 +36,21 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 
 	if (m_sdlArgumentParserCompPtr->IsSchemaDependencyModeEnabled()){
 		iprm::CParamsSet outputParams;
-		int collectionResult = m_sdlSchemaDependenciesCollectorCompPtr->DoProcessing(nullptr, nullptr, &outputParams);
-		if (collectionResult != iproc::IProcessor::TS_OK){
-			SendErrorMessage(0, QString("Unable to collect dependencies for schema: '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
+		int collectionResult =
+			m_sdlSchemaDependenciesCollectorCompPtr->DoProcessing(nullptr, nullptr, &outputParams);
+		if (collectionResult != iproc::IProcessor::TS_OK) {
+			SendErrorMessage(
+				0, QString("Unable to collect dependencies for schema: '%1'")
+					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
 			::exit(1);
 		}
-		iprm::TParamsPtr<iprm::IOptionsManager> processedFilesPtr(&outputParams, QByteArrayLiteral("ProcessedFiles"), true);
-		if (!processedFilesPtr.IsValid()){
-			SendCriticalMessage(0, QString("Unexpected dependencies list for schema: '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
+		iprm::TParamsPtr<iprm::IOptionsManager> processedFilesPtr(
+			&outputParams, QByteArrayLiteral("ProcessedFiles"), true);
+		if (!processedFilesPtr.IsValid()) {
+			SendCriticalMessage(
+				0, QString("Unexpected dependencies list for schema: '%1'")
+					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
 			::exit(1);
 		}
@@ -55,51 +61,69 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 			cumulatedFiles << processedFilesPtr->GetOptionName(i);
 		}
 		cumulatedFiles.removeDuplicates();
-		//remove input schema
-		cumulatedFiles.removeAll(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath()).canonicalFilePath());
 
-		imtsdl::CSdlTools::PrintFiles(std::cout, cumulatedFiles, m_sdlArgumentParserCompPtr->GetGeneratorType());
+		//remove input schema
+		cumulatedFiles.removeAll(
+			QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath())
+				.canonicalFilePath());
+
+		imtsdl::CSdlTools::PrintFiles(
+			std::cout, cumulatedFiles,
+			m_sdlArgumentParserCompPtr->GetGeneratorType());
 
 		::exit(0);
 	}
 
-	const QString outputDirPath = m_sdlArgumentParserCompPtr->GetOutputDirectoryPath();
-	const bool isOutputDirExsists = istd::CSystem::EnsurePathExists(outputDirPath);
+	const QString outputDirPath =
+		m_sdlArgumentParserCompPtr->GetOutputDirectoryPath();
+	const bool isOutputDirExsists =
+		istd::CSystem::EnsurePathExists(outputDirPath);
 	if (!isOutputDirExsists){
-		SendErrorMessage(0, QString("Unable to create output directory '%1'").arg(outputDirPath));
+		SendErrorMessage(
+			0,
+			QString("Unable to create output directory '%1'").arg(outputDirPath));
 
 		::exit(2);
 	}
 
 	QElapsedTimer timer;
 	timer.start();
-	QLockFile lockFile(outputDirPath + QStringLiteral("/lock"));
-
 	/// \todo think about to remove lock
-	bool isLockRequired = true;
+	QLockFile lockFile(outputDirPath + QStringLiteral("/lock"));
+	if (m_sdlArgumentParserCompPtr->IsGenerateMode()){
+		bool isLockRequired = true;
+		while (isLockRequired) {
+			isLockRequired = !lockFile.tryLock(500);
+			QThread::currentThread()->msleep(100);
+			if (timer.elapsed() >= 30000) {
+				break;
+			}
+		}
 
-	while (isLockRequired){
-		isLockRequired = !lockFile.tryLock(500);
-		QThread::currentThread()->msleep(100);
-		if (timer.elapsed() >= 30000){
-			break;
+		const bool isLocked = !isLockRequired || lockFile.lock();
+		if (!isLocked){
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+			SendErrorMessage(
+				0, QString(
+					"Unable to lock file '%1'. Perhaps you don't have permissions")
+					.arg(lockFile.fileName()));
+#endif
+		}
+		if (IsVerboseEnabled()){
+			qDebug() << qApp->applicationPid() << "processing [wait]" << timer.elapsed();
 		}
 	}
 
-	const bool isLocked = !isLockRequired || lockFile.lock();
-	if (!isLocked){
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-		SendErrorMessage(0, QString("Unable to lock file '%1'. Perhaps you don't have permissions").arg(lockFile.fileName()));
-#endif
-	}
-	qDebug() << qApp->applicationPid() << "processing" << timer.elapsed();
 	timer.restart();
 
-	QStringList modulesPathList = m_sdlArgumentParserCompPtr->GetModuleIncludePaths();
-	if (!modulesPathList.contains(m_sdlArgumentParserCompPtr->GetOutputDirectoryPath())){
+	QStringList modulesPathList =
+		m_sdlArgumentParserCompPtr->GetModuleIncludePaths();
+	if (!modulesPathList.contains(
+			m_sdlArgumentParserCompPtr->GetOutputDirectoryPath())){
 		modulesPathList << m_sdlArgumentParserCompPtr->GetOutputDirectoryPath();
 	}
-	const bool isModulesInitialized = m_sdlModuleManaerCompPtr->Initialize(modulesPathList);
+	const bool isModulesInitialized =
+		m_sdlModuleManaerCompPtr->Initialize(modulesPathList);
 	if (!isModulesInitialized){
 		SendErrorMessage(0, "Unable to initialize modules");
 
@@ -108,9 +132,13 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 
 	// parse schema
 	iprm::CParamsSet outputParamsSet;
-	int parsingResult = m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, &outputParamsSet);
+	int parsingResult =
+		m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, &outputParamsSet);
 	if (parsingResult != iproc::IProcessor::TS_OK){
-		SendErrorMessage(0, QString("Unable to parse schema '%1'").arg(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath()).absoluteFilePath()));
+		SendErrorMessage(
+			0, QString("Unable to parse schema '%1'")
+				.arg(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath())
+						 .absoluteFilePath()));
 
 		::exit(4);
 	}
@@ -118,7 +146,9 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 	// create module
 	if (m_sdlArgumentParserCompPtr->IsModileGenerateEnabled()){
 		if (!m_sdlModuleManaerCompPtr->CreateModuleFile()){
-			SendErrorMessage(0, QString("Unable to create module for schema '%1'").arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
+			SendErrorMessage(
+				0, QString("Unable to create module for schema '%1'")
+					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
 			::exit(5);
 		}
@@ -131,7 +161,9 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 		::exit(6);
 	}
 
-	qDebug() << qApp->applicationPid() << "processing finished" << timer.elapsed();
+	if (IsVerboseEnabled()){
+		qDebug() << qApp->applicationPid() << "processing finished [creation]" << timer.elapsed();
+	}
 
 	::exit(0);
 }
