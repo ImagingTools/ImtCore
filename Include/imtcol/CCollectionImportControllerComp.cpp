@@ -6,6 +6,10 @@
 
 // ACF includes
 #include <istd/TDelPtr.h>
+#include <iprm/TParamsPtr.h>
+#include <iprm/IParamsManager.h>
+#include <iprm/IIdParam.h>
+#include <ifile/IFileNameParam.h>
 
 // ImtCore includes
 #include <imtbase/CSimpleReferenceCollection.h>
@@ -71,12 +75,6 @@ bool CCollectionImportControllerComp::BeginCollectionImportTransaction(const ICo
 		}
 	}
 
-	//imtbase::CSimpleReferenceCollection refCollection;
-
-	//if (m_jobQueueManagerCompPtr->InsertNewJobIntoQueue(transactionInfo.transactionId, "CharacterizationImport", refCollection, ).isEmpty()){
-
-	//}
-
 	return true;
 }
 
@@ -136,12 +134,11 @@ bool CCollectionImportControllerComp::PrepareProgressManager(TransactionInfo& tr
 {
 	transaction.mainProgressManagerPtr = m_progressSessionManagerCompPtr->BeginProgressSession(transaction.transactionId, tr("Import files to the collection"));
 	transaction.uploadProgressManagerPtr = transaction.mainProgressManagerPtr->CreateSubtaskManager("uploading", tr("Uploading files to the server"), 0.2);
-	transaction.fileProcessingProgressManagerPtr = transaction.mainProgressManagerPtr->CreateSubtaskManager("processing", tr("Processing files on the server"), 0.4);
-	transaction.insertionProgressManagerPtr = transaction.mainProgressManagerPtr->CreateSubtaskManager("insertion", tr("Inserting objects to the collection"), 0.4);
+	transaction.fileProcessingProgressManagerPtr = transaction.mainProgressManagerPtr->CreateSubtaskManager("processing", tr("Processing files on the server"), 0.8);
 
 	for (FileInfo& fileInfo: transaction.files){
 		fileInfo.uploadProgressLoggerPtr->progressManagerPtr =
-			transaction.uploadProgressManagerPtr->CreateSubtaskManager(fileInfo.id, fileInfo.name, 1. /transaction.files.size());
+			transaction.uploadProgressManagerPtr->CreateSubtaskManager(fileInfo.id, fileInfo.name, 1./transaction.files.size());
 		if (fileInfo.uploadProgressLoggerPtr->progressManagerPtr == nullptr){
 			return false;
 		}
@@ -180,6 +177,49 @@ void CCollectionImportControllerComp::UploadProgressChanged(QByteArray transacti
 
 bool CCollectionImportControllerComp::StartImportJob(TransactionInfo& transaction)
 {
+	imtbase::CSimpleReferenceCollection refCollection;
+
+	istd::TDelPtr<iprm::IParamsSet> jobParamsPtr;
+	jobParamsPtr.SetCastedOrRemove(m_jobParamsFactPtr.CreateInstance());
+	if (!jobParamsPtr.IsValid()){
+		return false;
+	}
+
+	iprm::TEditableParamsPtr<iprm::IParamsManager> fileParamsListPtr(jobParamsPtr.GetPtr(), "FileParamsList");
+	Q_ASSERT(fileParamsListPtr.IsValid());
+
+	QByteArrayList ids = transaction.files.keys();
+	for (const QByteArray& id: ids){
+		int index = fileParamsListPtr->InsertParamsSet();
+		if (index < 0){
+			return false;
+		}
+
+		iprm::IParamsSet* fileParamsPtr = fileParamsListPtr->GetParamsSet(index);
+		Q_ASSERT(fileParamsPtr != nullptr);
+
+		iprm::TEditableParamsPtr<ifile::IFileNameParam> filePathPtr(fileParamsPtr, "FilePath");
+		iprm::TEditableParamsPtr<iprm::IIdParam> objectTypeIdPtr(fileParamsPtr, "ObjectTypeId");
+		iprm::TEditableParamsPtr<iprm::IIdParam> collectionIdPtr(fileParamsPtr, "CollectionId");
+		iprm::TEditableParamsPtr<iprm::IIdParam> proposedIdPtr(fileParamsPtr, "ProposedId");
+		Q_ASSERT(
+			filePathPtr.IsValid() &&
+			objectTypeIdPtr.IsValid() &&
+			collectionIdPtr.IsValid() &&
+			proposedIdPtr.IsValid());
+
+		filePathPtr->SetPath(m_tempFileManagerCompPtr->GetPath(transaction.transactionId, id));
+		objectTypeIdPtr->SetId(transaction.files[id].objectTypeId);
+		collectionIdPtr->SetId(transaction.collectionId);
+	}
+
+	if (m_jobQueueManagerCompPtr->InsertNewJobIntoQueue(
+		transaction.transactionId,
+		"CharacterizationImport",
+		refCollection,
+		jobParamsPtr.GetPtr()).isEmpty()){
+	}
+
 	return false;
 }
 
@@ -244,7 +284,7 @@ ibase::IProgressLogger* CCollectionImportControllerComp::UploadProgressLoggerPro
 	QMutexLocker locker(&m_parentPtr->m_mutex);
 	for (const QByteArray transactionId : m_parentPtr->m_transactions.keys()){
 		if (m_parentPtr->m_transactions[transactionId]->files.contains(progressLoggerId)){
-			return m_parentPtr->m_transactions[transactionId]->files[progressLoggerId].uploadProgressLoggerPtr->progressLoggerPtr.get();
+			return m_parentPtr->m_transactions[transactionId]->files[progressLoggerId].uploadProgressLoggerPtr.get();
 		}
 	}
 

@@ -5,7 +5,7 @@
 #include <icomp/CComponentBase.h>
 #include <imod/TModelWrap.h>
 #include <ifile/ITempFileManager.h>
-#include <iprm/IParamsManager.h>
+#include <iprm/IParamsSet.h>
 
 // ImtCore includes
 #include <imtbase/IProgressSessionsManager.h>
@@ -48,7 +48,7 @@ protected:
 	void OnComponentCreated() override;
 
 private:
-	class ProgressLogger: ibase::IProgressLogger
+	class ProgressLogger: public ibase::IProgressLogger
 	{
 	public:
 		void SetParent(CCollectionImportControllerComp& parent);
@@ -84,7 +84,6 @@ private:
 		ibase::IProgressManager* mainProgressManagerPtr = nullptr;
 		std::unique_ptr<ibase::IProgressManager> uploadProgressManagerPtr;
 		std::unique_ptr<ibase::IProgressManager> fileProcessingProgressManagerPtr;
-		std::unique_ptr<ibase::IProgressManager> insertionProgressManagerPtr;
 	};
 
 	class UploadProgressLoggerProvider : virtual public imtbase::IProgressLoggerProvider
@@ -115,7 +114,7 @@ private:
 	I_REF(ifile::ITempFileManager, m_tempFileManagerCompPtr);
 	I_REF(imtbase::IProgressSessionsManager, m_progressSessionManagerCompPtr);
 	I_REF(imthype::IJobQueueManager, m_jobQueueManagerCompPtr);
-	I_FACT(iprm::IParamsManager, m_jobParamsFactPtr);
+	I_FACT(iprm::IParamsSet, m_jobParamsFactPtr);
 
 	QMap<QByteArray, std::shared_ptr<TransactionInfo>> m_transactions;
 

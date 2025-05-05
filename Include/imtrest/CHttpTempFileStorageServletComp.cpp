@@ -224,7 +224,7 @@ CHttpTempFileStorageServletComp::ProcessingStatus CHttpTempFileStorageServletCom
 		return PS_FAILED_TO_WRITE;
 	}
 
-	if (range.GetMinValue() < 0 || range.GetMaxValue() >= fileSize){
+	if (range.GetMinValue() < 0 || range.GetMaxValue() > fileSize){
 		return PS_CHUNK_OUT_OF_RANGE;
 	}
 
