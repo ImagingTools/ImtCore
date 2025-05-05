@@ -5,13 +5,10 @@
 #include <QtCore/QTimer>
 #include <QtCore/QThreadPool>
 #include <QtCore/QRunnable>
-#include <QtCore/QMutex>
 #include <QtCore/QMap>
 
 // ACF includes
-#include <istd/TSmartPtr.h>
-#include <imod/TModelWrap.h>
-#include <ilog/CMessage.h>
+#include <ibase/CCumulatedProgressManagerBase.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
 
@@ -67,7 +64,22 @@ protected:
 		istd::TSmartPtr<imtbase::IReferenceCollection> m_inputPtr;
 		istd::TSmartPtr<iprm::IParamsSet> m_paramsPtr;
 	};
-	
+
+	class JobProgressManager : public ibase::CCumulatedProgressManagerBase
+	{
+	public:
+		JobProgressManager(CJobExecutionControllerCompBase& parent, const QByteArray& jobId);
+
+	protected:
+		virtual void OnProgressChanged(double cumulatedValue) override;
+
+	private:
+		CJobExecutionControllerCompBase& m_parent;
+		QByteArray m_jobId;
+	};
+
+	typedef std::shared_ptr<JobProgressManager> JobProgressManagerPtr;
+
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated();
@@ -79,9 +91,11 @@ protected Q_SLOTS:
 	*/
 	void OnJobPolling();
 	void OnJobFinished(const QByteArray& jobId, const imthype::CStandardJobOutput& results);
+	void OnJobProgressChanged(const QByteArray& jobId, double progress);
 
 Q_SIGNALS:
 	void EmitJobFinished(const QByteArray& jobId, const imthype::CStandardJobOutput& results);
+	void EmitJobProgressChanged(const QByteArray& jobId, double progress);
 
 protected:
 	/**

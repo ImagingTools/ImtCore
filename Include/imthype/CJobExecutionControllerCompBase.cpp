@@ -1,14 +1,6 @@
 #include <imthype/CJobExecutionControllerCompBase.h>
 
 
-// Qt includes
-#include <QtCore/QStringList>
-#include <QtCore/QFileInfo>
-#include <QtCore/QElapsedTimer>
-
-// ACF includes
-#include <istd/CChangeGroup.h>
-
 // ImtCore includes
 #include <imtbase/CSimpleReferenceCollection.h>
 
@@ -25,6 +17,7 @@ CJobExecutionControllerCompBase::CJobExecutionControllerCompBase()
 	qRegisterMetaType<imthype::CStandardJobOutput>("imthype::CStandardJobOutput");
 
 	connect(this, &CJobExecutionControllerCompBase::EmitJobFinished, this, &CJobExecutionControllerCompBase::OnJobFinished, Qt::QueuedConnection);
+	connect(this, &CJobExecutionControllerCompBase::EmitJobProgressChanged, this, &CJobExecutionControllerCompBase::OnJobProgressChanged, Qt::QueuedConnection);
 }
 
 
@@ -131,6 +124,14 @@ void CJobExecutionControllerCompBase::OnJobFinished(const QByteArray& jobId, con
 }
 
 
+void CJobExecutionControllerCompBase::OnJobProgressChanged(const QByteArray& jobId, double progress)
+{
+	Q_ASSERT(m_jobQueueManagerCompPtr.IsValid());
+
+	m_jobQueueManagerCompPtr->SetProgress(jobId, progress);
+}
+
+
 // public methods of the embedded class Task
 
 CJobExecutionControllerCompBase::Task::Task(
@@ -159,7 +160,9 @@ void CJobExecutionControllerCompBase::Task::run()
 
 	m_jobOutput.SetStartTime(QDateTime::currentDateTime());
 
-	int processingState = m_taskProcessor.ExecuteTask(*m_inputPtr, *m_paramsPtr, m_jobOutput);
+	JobProgressManagerPtr progressPtr(new JobProgressManager(m_parent, m_jobId));
+
+	int processingState = m_taskProcessor.ExecuteTask(*m_inputPtr, *m_paramsPtr, m_jobOutput, progressPtr.get());
 	if (processingState == iproc::IProcessor::TS_CANCELED){
 		jobStatus = IJobQueueManager::PS_CANCELED;
 	}
@@ -191,6 +194,23 @@ void CJobExecutionControllerCompBase::Task::run()
 	m_jobOutput.SetResultCategory(result);
 
 	m_parent.EmitJobFinished(m_jobId, m_jobOutput);
+}
+
+
+// public methods of the embedded class JobProgressManager
+
+CJobExecutionControllerCompBase::JobProgressManager::JobProgressManager(
+	CJobExecutionControllerCompBase& parent,
+	const QByteArray& jobId)
+	:m_parent(parent),
+	m_jobId(jobId)
+{
+}
+
+
+void CJobExecutionControllerCompBase::JobProgressManager::OnProgressChanged(double cumulatedValue)
+{
+	m_parent.EmitJobProgressChanged(m_jobId, cumulatedValue);
 }
 
 
