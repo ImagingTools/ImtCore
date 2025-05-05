@@ -14,7 +14,7 @@ collectionImport::CTransactionStatus CGqlCollectionImportControllerComp::OnBegin
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	Q_ASSERT(!m_collectionImportControllerCompPtr.IsValid());
+	Q_ASSERT(m_collectionImportControllerCompPtr.IsValid());
 
 	collectionImport::CTransactionStatus retVal;
 	retVal.Version_1_0.emplace();

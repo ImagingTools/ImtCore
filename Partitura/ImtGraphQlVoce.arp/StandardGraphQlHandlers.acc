@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5346" Description="ACF"/>
+            <Version Id="0" Number="5347" Description="ACF"/>
             <Version Id="1" Number="2236" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Server framework for GraphQL-based implementations</Description>
@@ -14,6 +14,18 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="SlaveBinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ExternalHttpRequestHandler" PackageId="ImtRestPck" ComponentId="DelegatedServlet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="ExternalHttpRequestHandlers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -153,6 +165,7 @@
                                 <Value>GraphQlRoot</Value>
                                 <Value>FileAccess</Value>
                                 <Value>HttpRedirect</Value>
+                                <Value>ExternalHttpRequestHandler</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

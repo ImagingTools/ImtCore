@@ -182,6 +182,7 @@ IResponse* CHttpProtocolEngineComp::CreateResponse(
 			httpResponsePtr->SetHeaders(responseHeaders);
 		}
 	}
+
 	return httpResponsePtr;
 }
 

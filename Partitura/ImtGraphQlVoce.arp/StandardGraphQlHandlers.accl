@@ -2,13 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5346" Description="ACF"/>
+            <Version Id="0" Number="5347" Description="ACF"/>
             <Version Id="1" Number="2236" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="DelegatedBinaryDataProviders" X="650" Y="550" Note=""/>
+        <Element ComponentName="ExternalHttpRequestHandler" X="450" Y="475" Note=""/>
         <Element ComponentName="FileAccess" X="1050" Y="550" Note=""/>
         <Element ComponentName="GqlContextController" X="125" Y="250" Note=""/>
         <Element ComponentName="GraphQlRoot" X="150" Y="525" Note="Handler/Servlet for all GraphQL requests"/>

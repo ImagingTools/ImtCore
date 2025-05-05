@@ -23,6 +23,7 @@
 #include <imtrest/CDelegatedBinaryDataProviderComp.h>
 #include <imtrest/CBinaryDataProviderComp.h>
 #include <imtrest/CIconDataProviderComp.h>
+#include <imtrest/CHttpTempFileStorageServletComp.h>
 
 
 /**
@@ -48,6 +49,7 @@ typedef imtrest::CDelegatedServletComp DelegatedServlet;
 typedef imtrest::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;
 typedef imtrest::CBinaryDataProviderComp BinaryDataProvider;
 typedef imtrest::CIconDataProviderComp IconDataProvider;
+typedef imtrest::CHttpTempFileStorageServletComp HttpTempFileStorageServlet;
 
 
 } // namespace ImtRestPck

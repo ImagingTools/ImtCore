@@ -2,9 +2,10 @@
 
 
 // ACF includes
-#include <ifile/ITempFileManager.h>
-#include <imod/TModelWrap.h>
 #include <icomp/CComponentBase.h>
+#include <imod/TModelWrap.h>
+#include <ifile/ITempFileManager.h>
+#include <iprm/IParamsManager.h>
 
 // ImtCore includes
 #include <imtbase/IProgressSessionsManager.h>
@@ -29,10 +30,14 @@ public:
 	I_BEGIN_COMPONENT(CCollectionImportControllerComp);
 		I_REGISTER_SUBELEMENT(UploadProgressLoggerProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(UploadProgressLoggerProvider, imtbase::IProgressLoggerProvider, ExtractProgressLoggerProvider);
+		I_REGISTER_INTERFACE(ICollectionImportController)
 		I_ASSIGN(m_tempFileManagerCompPtr, "TempFileManager", "Temporary file manager for uploaded files", true, "TempFileManager");
 		I_ASSIGN(m_progressSessionManagerCompPtr, "ProgressSessionManager", "ProgressSessionManager", true, "ProgressSessionManager");
 		I_ASSIGN(m_jobQueueManagerCompPtr, "JobQueueManager", "Job queue manager", true, "JobQueueManager");
+		I_ASSIGN(m_jobParamsFactPtr, "JobParamsFactory", "Job params", true, "JobParams");
 	I_END_COMPONENT;
+
+	CCollectionImportControllerComp();
 
 	// reimplemented (imtcol::ICollectionImportController)
 	virtual bool BeginCollectionImportTransaction(const ICollectionImportController::TransactionInfo& transactionInfo, QString& errorMessage) override;
@@ -110,6 +115,7 @@ private:
 	I_REF(ifile::ITempFileManager, m_tempFileManagerCompPtr);
 	I_REF(imtbase::IProgressSessionsManager, m_progressSessionManagerCompPtr);
 	I_REF(imthype::IJobQueueManager, m_jobQueueManagerCompPtr);
+	I_FACT(iprm::IParamsManager, m_jobParamsFactPtr);
 
 	QMap<QByteArray, std::shared_ptr<TransactionInfo>> m_transactions;
 

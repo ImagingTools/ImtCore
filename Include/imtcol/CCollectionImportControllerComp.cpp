@@ -4,12 +4,24 @@
 // Qt includes
 #include <QtCore/QMutexLocker>
 
+// ACF includes
+#include <istd/TDelPtr.h>
+
+// ImtCore includes
+#include <imtbase/CSimpleReferenceCollection.h>
+
 
 namespace imtcol
 {
 
 
 // public methods
+
+CCollectionImportControllerComp::CCollectionImportControllerComp()
+{
+	m_progressLoggerProvider.SetParent(*this);
+}
+
 
 // reimplemented (imtbase::IProgressLoggerProvider)
 
@@ -19,16 +31,25 @@ bool CCollectionImportControllerComp::BeginCollectionImportTransaction(const ICo
 	transactionPtr->transactionId = transactionInfo.transactionId;
 	transactionPtr->collectionId = transactionInfo.collectionId;
 
-	transactionPtr->tempFileSessionId = m_tempFileManagerCompPtr->BeginSession(transactionPtr->transactionId);
+	transactionPtr->tempFileSessionId = m_tempFileManagerCompPtr->BeginSession(QString(), transactionPtr->transactionId);
+
+	istd::TDelPtr<iprm::IParamsManager> paramsPtr;
+	paramsPtr.SetCastedOrRemove(m_jobParamsFactPtr.CreateInstance());
 
 	for (const ICollectionImportController::FileInfo& fileInfo : transactionInfo.files){
 		FileInfo file;
 
 		static_cast<ICollectionImportController::FileInfo>(file) = fileInfo;
 
+		file.id = fileInfo.id;
+		file.name = fileInfo.name;
+		file.objectTypeId = fileInfo.objectTypeId;
+		file.size = fileInfo.size;
+		file.uploadProgressLoggerPtr.reset(new ProgressLogger);
+		file.uploadProgressLoggerPtr->SetParent(*this);
 		file.uploadProgressLoggerPtr->transactionId = transactionPtr->transactionId;
 		file.uploadProgressLoggerPtr->fileId = fileInfo.id;
-		file.tempFileId = m_tempFileManagerCompPtr->AddFileItem(transactionPtr->tempFileSessionId, fileInfo.name);
+		file.tempFileId = m_tempFileManagerCompPtr->AddFileItem(transactionPtr->tempFileSessionId, fileInfo.name, fileInfo.id);
 
 		transactionPtr->files[file.id] = file;
 
@@ -50,6 +71,12 @@ bool CCollectionImportControllerComp::BeginCollectionImportTransaction(const ICo
 		}
 	}
 
+	//imtbase::CSimpleReferenceCollection refCollection;
+
+	//if (m_jobQueueManagerCompPtr->InsertNewJobIntoQueue(transactionInfo.transactionId, "CharacterizationImport", refCollection, ).isEmpty()){
+
+	//}
+
 	return true;
 }
 
@@ -63,7 +90,6 @@ bool CCollectionImportControllerComp::CancelCollectionImportTransaction(const QB
 
 		isTransactionActive = m_transactions.contains(transactionId);
 	}
-
 
 	if (isTransactionActive){
 		m_jobQueueManagerCompPtr->RemoveJob(transactionId);
@@ -95,7 +121,8 @@ void CCollectionImportControllerComp::OnComponentCreated()
 	Q_ASSERT(
 		m_tempFileManagerCompPtr.IsValid() &&
 		m_progressSessionManagerCompPtr.IsValid() &&
-		m_jobQueueManagerCompPtr.IsValid());
+		m_jobQueueManagerCompPtr.IsValid() &&
+		m_jobParamsFactPtr.IsValid());
 
 	if (m_tempFileManagerCompPtr.IsValid()){
 		m_tempFileManagerCompPtr->ResetAllSessions();
@@ -107,14 +134,12 @@ void CCollectionImportControllerComp::OnComponentCreated()
 
 bool CCollectionImportControllerComp::PrepareProgressManager(TransactionInfo& transaction)
 {
-	transaction.mainProgressManagerPtr = m_progressSessionManagerCompPtr->BeginProgressSession("main", tr("Import files to the collection"));
+	transaction.mainProgressManagerPtr = m_progressSessionManagerCompPtr->BeginProgressSession(transaction.transactionId, tr("Import files to the collection"));
 	transaction.uploadProgressManagerPtr = transaction.mainProgressManagerPtr->CreateSubtaskManager("uploading", tr("Uploading files to the server"), 0.2);
 	transaction.fileProcessingProgressManagerPtr = transaction.mainProgressManagerPtr->CreateSubtaskManager("processing", tr("Processing files on the server"), 0.4);
 	transaction.insertionProgressManagerPtr = transaction.mainProgressManagerPtr->CreateSubtaskManager("insertion", tr("Inserting objects to the collection"), 0.4);
 
 	for (FileInfo& fileInfo: transaction.files){
-		fileInfo.uploadProgressLoggerPtr.reset(new ProgressLogger);
-
 		fileInfo.uploadProgressLoggerPtr->progressManagerPtr =
 			transaction.uploadProgressManagerPtr->CreateSubtaskManager(fileInfo.id, fileInfo.name, 1. /transaction.files.size());
 		if (fileInfo.uploadProgressLoggerPtr->progressManagerPtr == nullptr){
@@ -160,6 +185,12 @@ bool CCollectionImportControllerComp::StartImportJob(TransactionInfo& transactio
 
 
 // public methods of the embedded class ProgressLogger
+
+void CCollectionImportControllerComp::ProgressLogger::SetParent(CCollectionImportControllerComp& parent)
+{
+	parentPtr = &parent;
+}
+
 
 // reimplamanted (ibase::IProgressLogger)
 
@@ -213,7 +244,7 @@ ibase::IProgressLogger* CCollectionImportControllerComp::UploadProgressLoggerPro
 	QMutexLocker locker(&m_parentPtr->m_mutex);
 	for (const QByteArray transactionId : m_parentPtr->m_transactions.keys()){
 		if (m_parentPtr->m_transactions[transactionId]->files.contains(progressLoggerId)){
-			m_parentPtr->m_transactions[transactionId]->files[progressLoggerId].uploadProgressLoggerPtr->progressLoggerPtr;
+			return m_parentPtr->m_transactions[transactionId]->files[progressLoggerId].uploadProgressLoggerPtr->progressLoggerPtr.get();
 		}
 	}
 

@@ -97,7 +97,10 @@ I_EXPORT_COMPONENT(
 			"Delegated provider of a slave data provider",
 			"Delegator Data Binary Provider");
 
-
+I_EXPORT_COMPONENT(
+			HttpTempFileStorageServlet,
+			"Http temp file storage servlet",
+			"Http Servlet File");
 
 
 } // namespace ImtRestPck
