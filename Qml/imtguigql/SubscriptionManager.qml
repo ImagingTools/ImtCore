@@ -6,30 +6,30 @@ import imtcontrols 1.0
 
 WebSocket {
 	id: container;
-	
+
 	active: true
-	
+
 	property TreeItemModel socketModel: TreeItemModel {}
-	
+
 	property var subscriptionModel: []
-	
+
 	Component.onCompleted: {
 		Events.subscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
 		Events.subscribeEvent("UnregisterSubscription", container.unRegisterSubscription);
 	}
-	
+
 	Component.onDestruction: {
 		Events.unSubscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
 		Events.unSubscribeEvent("UnregisterSubscription", container.unRegisterSubscription);
 	}
-	
+
 	onStatusChanged: {
 		if (status == WebSocket.Error){
 			console.error("SubscriptionManager ERROR", errorString)
 		}
 		else if (status == WebSocket.Open){
 			sendTextMessage("{ \"type\": \"connection_init\" }")
-			
+
 			registerSubscriptionToServer();
 		}
 		else if (status == WebSocket.Closed){
@@ -38,29 +38,29 @@ WebSocket {
 			}
 		}
 	}
-	
+
 	function reconnect(){
 		active = false;
 		active = true;
 	}
-	
+
 	property Timer timer: Timer{
 		id: timer;
-		
+
 		interval: 4000;
-		
+
 		repeat: true;
 		running: container.status == WebSocket.Closed ||
 				 container.status == WebSocket.Error;
-		
+
 		onTriggered: {
 			container.reconnect()
 		}
 	}
-	
+
 	onTextMessageReceived:{
 		let ok = socketModel.createFromJson(message)
-		
+
 		if (socketModel.getData("type") === "connection_ask"){
 			registerSubscriptionToServer()
 		}
@@ -80,33 +80,33 @@ WebSocket {
 					if (!subscription || subscription === undefined){
 						continue;
 					}
-					
+
 					subscription.state = "Processing"
 					let dataModelLocal = socketModel.getData("payload");
-					
+
 					if (subscription && dataModelLocal){
 						subscription.copy(dataModelLocal)
 						subscription.state = "Ready"
 					}
-					
+
 					return;
 				}
 			}
 		}
 	}
-	
+
 	function registerSubscriptionEvent(parameters){
 		let query = parameters["Query"];
 		let client = parameters["Client"];
 		let headers = parameters["Headers"];
-		
+
 		registerSubscription(query, client, headers);
 	}
-	
+
 	function clear(){
 		container.subscriptionModel = []
 	}
-	
+
 	function registerSubscriptionToServer(){
 		if (container.status != WebSocket.Open){
 			return;
@@ -122,14 +122,14 @@ WebSocket {
 				let query = subscriptionModel[index]["query"]
 				payload["data"] = query.GetQuery()
 				request["payload"] = payload
-				
+
 				subscriptionModel[index]["status"] = "waiting";
 
 				container.sendTextMessage(JSON.stringify(request))
 			}
 		}
 	}
-	
+
 	function registerSubscription(query, subscriptionClient, headers){
 		let commandId = query.GetCommandId()
 		if (commandId === ""){
@@ -142,7 +142,7 @@ WebSocket {
 				return;
 			}
 		}
-		
+
 		subscriptionModel.push(
 					{
 						"commandId": commandId,
@@ -153,10 +153,10 @@ WebSocket {
 						"headers": headers
 					}
 					)
-		
+
 		registerSubscriptionToServer()
 	}
-	
+
 	function unRegisterSubscription(subscriptionClient){
 		let index
 		for (index = 0; index < subscriptionModel.length; index++){
@@ -167,12 +167,12 @@ WebSocket {
 				request["type"] = "stop"
 				let payload = {}
 				request["payload"] = payload
-				
+
 				subscriptionModel[index]["status"] = "waiting";
 				container.sendTextMessage(JSON.stringify(request))
-				
+
 				subscriptionModel.splice(index, 1)
-				
+
 				return;
 			}
 		}
