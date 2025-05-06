@@ -12,7 +12,7 @@ namespace imtcom
 // public methods
 
 
-std::unique_ptr<QNetworkAccessManager> CRequestSender::s_networkManagerPtr;
+thread_local std::unique_ptr<QNetworkAccessManager> CRequestSender::s_networkManagerPtr;
 
 
 QNetworkReply* CRequestSender::DoSyncGet(const QNetworkRequest& request, int timeout)

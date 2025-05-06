@@ -37,7 +37,7 @@ private:
 		QTimer timer;
 	};
 
-	static std::unique_ptr<QNetworkAccessManager> s_networkManagerPtr;
+	static thread_local std::unique_ptr<QNetworkAccessManager> s_networkManagerPtr;
 };
 
 
