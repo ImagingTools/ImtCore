@@ -98,6 +98,21 @@ public:
 
 	I_DECLARE_ENUM(ProcessingStatus, PS_NONE, PS_WAITING_FOR_ACCEPTING, PS_WAITING_FOR_PROCESSING, PS_RUNNING, PS_CANCELING, PS_RETRIEVING_RESULTS, PS_CANCELED, PS_REJECTED, PS_FINISHED);
 
+	struct JobStatusInfo: public NotifierInfo
+	{
+		ProcessingStatus status;
+	};
+	static const QByteArray CN_JOB_STATUS_CHANGED;
+
+	struct JobProgressInfo : public NotifierInfo
+	{
+		double progress;
+	};
+	static const QByteArray CN_JOB_PROGRESS_CHANGED;
+
+	static const QByteArray CN_JOB_RESULT_CHANGED;
+	typedef NotifierInfo JobResultInfo;
+
 	/**
 		Operational flags for a single job or the whole job queue.
 	*/
@@ -220,4 +235,7 @@ public:
 
 } // namespace imthype
 
+
+Q_DECLARE_METATYPE(imthype::IJobQueueManager::JobStatusInfo);
+Q_DECLARE_METATYPE(imthype::IJobQueueManager::JobProgressInfo);
 
