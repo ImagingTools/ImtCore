@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import imtcontrols 1.0
+import Acf 1.0
 
 MouseArea{
     id: moving;
@@ -13,6 +14,7 @@ MouseArea{
     property Item containerItem: null;
     property Item movingItem: null;
 
+	property int mainMargin : Style.sizeMainMargin;
     property int alwaysVisibleSize: 150;
     property var coord: mapToItem(this,0,0);
 	property bool isPressed: false;
@@ -38,10 +40,10 @@ MouseArea{
             checkCoord.x -= mouse.x
             checkCoord.y -= mouse.y
 
-            var ok = checkCoord.x + deltaX > Math.min(moving.alwaysVisibleSize - moving.movingItem.width, 10)
-                    && checkCoord.y + deltaY > 10
-                    && checkCoord.x + deltaX < moving.globalParent.width - Math.min(moving.alwaysVisibleSize, moving.movingItem.width + 10)
-                    && checkCoord.y + deltaY < moving.globalParent.height - Math.min(moving.alwaysVisibleSize, moving.movingItem.height + 10) ;
+			var ok = checkCoord.x + deltaX > Math.min(moving.alwaysVisibleSize - moving.movingItem.width, moving.mainMargin)
+					&& checkCoord.y + deltaY > moving.mainMargin
+					&& checkCoord.x + deltaX < moving.globalParent.width - Math.min(moving.alwaysVisibleSize, moving.movingItem.width + moving.mainMargin)
+					&& checkCoord.y + deltaY < moving.globalParent.height - Math.min(moving.alwaysVisibleSize, moving.movingItem.height + moving.mainMargin) ;
 
             if(ok){
                 moving.movingItem.x = newX;

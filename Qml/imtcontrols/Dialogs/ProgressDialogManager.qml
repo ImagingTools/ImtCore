@@ -15,6 +15,7 @@ Dialog {
 	canMove: true;
 	forceFocus: true;
 	contentComp: body;
+	notClosingButtons: closeByCancel ? 0 : Enums.cancel;
 
 	property bool hiddenBackground: false;
 	property bool noMouseArea: false;
@@ -23,6 +24,9 @@ Dialog {
 	property string taskId: "";
 	property string description: "";
 	property real value: 0;
+
+	property bool closeByCancel: false;
+	property bool isCancelling: false;
 
 	property TreeItemModel subtaskModel: TreeItemModel{}
 
@@ -38,6 +42,11 @@ Dialog {
 				root.backgroundItem.opacity = backgroundOpacity;
 			}
 		}
+	}
+
+	onIsCancellingChanged: {
+		setButtonEnabled(Enums.cancel, !isCancelling)
+		buttons.visible = !isCancelling;
 	}
 
 	function addSubtask(id, description, value, isCancellable){
@@ -78,7 +87,8 @@ Dialog {
 
 	onFinished: {
 		if(buttonId == Enums.cancel){
-			console.log("TASK_CANCELED ", taskId)
+			//console.log("TASK_CANCELED ", taskId)
+			progressDialog.isCancelling = true;
 			taskCanceled(taskId);
 		}
 
@@ -204,6 +214,19 @@ Dialog {
 					color: Style.backgroundColor;
 				}
 		}
+	}
+
+	BaseText{
+		id: canceling
+
+		anchors.bottom: parent.bottom;
+		anchors.right: parent.right;
+		anchors.bottomMargin: Style.sizeMainMargin + progressDialog.buttons.height/2 - height/2;
+		anchors.rightMargin:  Style.sizeMainMargin;
+
+		visible: progressDialog.isCancelling;
+
+		text: qsTr("Cancelling") + "...";
 	}
 
 	Component{

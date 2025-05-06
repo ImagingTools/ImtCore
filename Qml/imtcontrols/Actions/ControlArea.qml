@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 
 MouseArea{
     id: controlArea;
@@ -14,6 +15,7 @@ MouseArea{
 
     property bool hasWheelControl: true;
     property real scaleStep: 0.1;
+	property int mainMargin: Style.sizeMainMargin;
 
     property bool wasMoving: false;
     property bool isPressed: false;
@@ -123,10 +125,10 @@ MouseArea{
     function withinBorders(delta, x_, y_, width_, height_){
         let ok = false
              ok =
-             x_ + delta.x > 10
-             && y_ + delta.y > 10
-             && x_ + delta.x < controlArea.width - width_ - 10
-             && y_ + delta.y < controlArea.height - height_ - 10;
+			 x_ + delta.x > controlArea.mainMargin
+			 && y_ + delta.y > controlArea.mainMargin
+			 && x_ + delta.x < controlArea.width - width_ - controlArea.mainMargin
+			 && y_ + delta.y < controlArea.height - height_ - controlArea.mainMargin;
         return ok
     }
 
