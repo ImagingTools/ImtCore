@@ -5,7 +5,9 @@ include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtbase imthype)
+target_link_libraries(${PROJECT_NAME}
+	imthype
+	imtbase)
 
 ADD_DEFINITIONS(-DUNICODE)
 ADD_DEFINITIONS(-D_UNICODE)
