@@ -3,9 +3,10 @@
 
 // ACF includes
 #include <istd/IPolymorphic.h>
+#include <istd/TRange.h>
 
 
-namespace imtcol
+namespace imtservergql
 {
 
 
@@ -20,18 +21,18 @@ public:
 		QByteArray objectTypeId;
 	};
 
-	struct TransactionInfo
+	struct SessionInfo
 	{
-		QByteArray transactionId;
+		QByteArray sessionId;
 		QByteArray collectionId;
 		std::vector<FileInfo> files;
 	};
 
-	virtual bool BeginCollectionImportTransaction(const TransactionInfo& transactionInfo, QString& errorMessage) = 0;
-	virtual bool CancelCollectionImportTransaction(const QByteArray& transactionId, QString& errorMessage) = 0;
+	virtual bool BeginCollectionImportSession(const SessionInfo& sessionInfo, QString& errorMessage) = 0;
+	virtual bool CancelCollectionImportSession(const QByteArray& sessionId, QString& errorMessage) = 0;
 };
 
 
-} // namespace imtcol
+} // namespace imtservergql
 
 

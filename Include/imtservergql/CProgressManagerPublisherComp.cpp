@@ -45,6 +45,21 @@ bool CProgressManagerPublisherComp::EndProgressSession(const QByteArray& session
 }
 
 
+bool CProgressManagerPublisherComp::CancelProgressSession(const QByteArray& sessionId)
+{
+	QMutexLocker locker(&m_mutex);
+	if (m_progressSessions.contains(sessionId)){
+		m_progressSessions[sessionId]->SetCanceled(true);
+
+		PublishSession(sessionId);
+
+		return true;
+	}
+
+	return false;
+}
+
+
 // private methods
 
 bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)

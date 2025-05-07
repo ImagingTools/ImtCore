@@ -13,6 +13,7 @@
 #include <iprm/IParamsSet.h>
 
 // Acula includes
+#include <imtbase/TModelUpdateBinder.h>
 #include <imthype/IJobProcessor.h>
 #include <imthype/IJobQueueManager.h>
 #include <imthype/CStandardJobOutput.h>
@@ -43,28 +44,6 @@ public:
 protected:
 	virtual void ShutdownAllTasks();
 
-	class Task: public QRunnable
-	{
-	public:
-		Task(
-					CJobExecutionControllerCompBase& parent,
-					const QByteArray& jobId,
-					const IJobProcessor& taskProcessor,
-					const imtbase::IReferenceCollection& input,
-					const istd::TSmartPtr<iprm::IParamsSet>& paramsPtr);
-
-		// reimplemented (QRunnable)
-		virtual void run();
-
-	private:
-		const IJobProcessor& m_taskProcessor;
-		CJobExecutionControllerCompBase& m_parent;
-		QByteArray m_jobId;
-		CStandardJobOutput m_jobOutput;
-		istd::TSmartPtr<imtbase::IReferenceCollection> m_inputPtr;
-		istd::TSmartPtr<iprm::IParamsSet> m_paramsPtr;
-	};
-
 	class JobProgressManager : public ibase::CCumulatedProgressManagerBase
 	{
 	public:
@@ -79,6 +58,30 @@ protected:
 	};
 
 	typedef std::shared_ptr<JobProgressManager> JobProgressManagerPtr;
+
+	class Task: public QRunnable
+	{
+	public:
+		Task(
+					CJobExecutionControllerCompBase& parent,
+					const QByteArray& jobId,
+					const IJobProcessor& taskProcessor,
+					const imtbase::IReferenceCollection& input,
+					const istd::TSmartPtr<iprm::IParamsSet>& paramsPtr,
+					JobProgressManager* progressPtr);
+
+		// reimplemented (QRunnable)
+		virtual void run();
+
+	private:
+		const IJobProcessor& m_taskProcessor;
+		CJobExecutionControllerCompBase& m_parent;
+		QByteArray m_jobId;
+		CStandardJobOutput m_jobOutput;
+		istd::TSmartPtr<imtbase::IReferenceCollection> m_inputPtr;
+		istd::TSmartPtr<iprm::IParamsSet> m_paramsPtr;
+		JobProgressManager* m_progressPtr;
+	};
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -98,6 +101,8 @@ Q_SIGNALS:
 	void EmitJobProgressChanged(const QByteArray& jobId, double progress);
 
 protected:
+	void OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr);
+
 	/**
 		Get job processor instance for a given worker type.
 	*/
@@ -128,6 +133,10 @@ private:
 		Thread pool used for processing the job queue.
 	*/
 	QThreadPool m_threadPool;
+
+	QMap<QByteArray, JobProgressManagerPtr> m_jobProgressList;
+
+	imtbase::TModelUpdateBinder<imthype::IJobQueueManager, CJobExecutionControllerCompBase> m_jobQueueObserver;
 };
 
 

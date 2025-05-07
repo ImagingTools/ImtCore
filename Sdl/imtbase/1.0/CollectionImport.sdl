@@ -15,13 +15,13 @@ type FileInfo {
 }
 
 type ImportParams {
-	transactionId: ID!
+	sessionId: ID!
 	collectionId: ID!
 	fileList: [FileInfo!]!
 }
 
-type TransactionId {
-	transactionId: ID!
+type SessionId {
+	sessionId: ID!
 }
 
 enum Status {
@@ -29,14 +29,14 @@ enum Status {
 	Failed
 }
 
-type TransactionStatus{
+type SessionStatus{
 	status: Status!
 }
 
 
 type Query {
-	BeginCollectionImportTransaction(input: ImportParams): TransactionStatus
-	CancelCollectionImportTransaction(input: TransactionId): TransactionStatus
+	BeginCollectionImportSession(input: ImportParams): SessionStatus
+	CancelCollectionImportSession(input: SessionId): SessionStatus
 }
 
 

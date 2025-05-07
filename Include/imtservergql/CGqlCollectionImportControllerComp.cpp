@@ -9,14 +9,20 @@ namespace imtservergql
 
 // reimplemented (sdl::imtbase::CollectionImport::CGraphQlHandlerCompBase)
 
-collectionImport::CTransactionStatus CGqlCollectionImportControllerComp::OnBeginCollectionImportTransaction(
-	const collectionImport::CBeginCollectionImportTransactionGqlRequest& request,
+collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnBeginCollectionImportSession(
+	const collectionImport::CBeginCollectionImportSessionGqlRequest& request,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	Q_ASSERT(m_collectionImportControllerCompPtr.IsValid());
+	collectionImport::CSessionStatus retVal;
 
-	collectionImport::CTransactionStatus retVal;
+	Q_ASSERT(m_collectionImportControllerCompPtr.IsValid());
+	if (!m_collectionImportControllerCompPtr.IsValid()){
+		errorMessage = tr("Collection import controller unavailable");
+
+		return retVal;
+	}
+
 	retVal.Version_1_0.emplace();
 	retVal.Version_1_0->status = collectionImport::Status::Failed;
 
@@ -24,20 +30,20 @@ collectionImport::CTransactionStatus CGqlCollectionImportControllerComp::OnBegin
 	if (sdlImportParams.Version_1_0){
 		collectionImport::CImportParams::V1_0 sdlImportParamsV1_0 = *sdlImportParams.Version_1_0;
 
-		if (sdlImportParamsV1_0.transactionId && sdlImportParamsV1_0.collectionId && sdlImportParamsV1_0.fileList && sdlImportParamsV1_0.fileList->count() > 0){
-			imtcol::ICollectionImportController::TransactionInfo transaction;
-			transaction.transactionId = *sdlImportParamsV1_0.transactionId;
-			transaction.collectionId = *sdlImportParamsV1_0.collectionId;
+		if (sdlImportParamsV1_0.sessionId && sdlImportParamsV1_0.collectionId && sdlImportParamsV1_0.fileList && sdlImportParamsV1_0.fileList->count() > 0){
+			imtservergql::ICollectionImportController::SessionInfo session;
+			session.sessionId = *sdlImportParamsV1_0.sessionId;
+			session.collectionId = *sdlImportParamsV1_0.collectionId;
 
 			retVal.Version_1_0->status = collectionImport::Status::Success;
 
 			for (const collectionImport::CFileInfo::V1_0& fileInfo : *sdlImportParamsV1_0.fileList){
 				if (fileInfo.fileId && fileInfo.fileName && fileInfo.fileSize && fileInfo.objectTypeId){
-					transaction.files.emplace_back();
-					transaction.files.back().id = *fileInfo.fileId;
-					transaction.files.back().name = *fileInfo.fileName;
-					transaction.files.back().size = *fileInfo.fileSize;
-					transaction.files.back().objectTypeId = *fileInfo.objectTypeId;
+					session.files.emplace_back();
+					session.files.back().id = *fileInfo.fileId;
+					session.files.back().name = *fileInfo.fileName;
+					session.files.back().size = *fileInfo.fileSize;
+					session.files.back().objectTypeId = *fileInfo.objectTypeId;
 				}
 				else{
 					retVal.Version_1_0->status = collectionImport::Status::Failed;
@@ -48,8 +54,8 @@ collectionImport::CTransactionStatus CGqlCollectionImportControllerComp::OnBegin
 				}
 			}
 
-			if (transaction.files.size() == sdlImportParamsV1_0.fileList->count()){
-				if (!m_collectionImportControllerCompPtr->BeginCollectionImportTransaction(transaction, errorMessage)){
+			if (session.files.size() == sdlImportParamsV1_0.fileList->count()){
+				if (!m_collectionImportControllerCompPtr->BeginCollectionImportSession(session, errorMessage)){
 					retVal.Version_1_0->status = collectionImport::Status::Failed;
 				}
 			}
@@ -66,22 +72,22 @@ collectionImport::CTransactionStatus CGqlCollectionImportControllerComp::OnBegin
 }
 
 
-collectionImport::CTransactionStatus CGqlCollectionImportControllerComp::OnCancelCollectionImportTransaction(
-	const collectionImport::CCancelCollectionImportTransactionGqlRequest& request,
+collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnCancelCollectionImportSession(
+	const collectionImport::CCancelCollectionImportSessionGqlRequest& request,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
 	Q_ASSERT(m_collectionImportControllerCompPtr.IsValid());
 
-	collectionImport::CTransactionStatus retVal;
+	collectionImport::CSessionStatus retVal;
 	retVal.Version_1_0.emplace();
 	retVal.Version_1_0->status = collectionImport::Status::Failed;
 
-	collectionImport::CTransactionId sdlTransactionId = request.GetRequestedArguments().input;
-	if (sdlTransactionId.Version_1_0 && sdlTransactionId.Version_1_0->transactionId){
-		QByteArray transactionId = *sdlTransactionId.Version_1_0->transactionId;
+	collectionImport::CSessionId sdlSessionId = request.GetRequestedArguments().input;
+	if (sdlSessionId.Version_1_0 && sdlSessionId.Version_1_0->sessionId){
+		QByteArray sessionId = *sdlSessionId.Version_1_0->sessionId;
 
-		if (m_collectionImportControllerCompPtr->CancelCollectionImportTransaction(transactionId, errorMessage)){
+		if (m_collectionImportControllerCompPtr->CancelCollectionImportSession(sessionId, errorMessage)){
 			retVal.Version_1_0->status = collectionImport::Status::Success;
 		}
 	}

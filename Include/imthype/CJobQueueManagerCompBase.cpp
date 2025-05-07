@@ -73,7 +73,7 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 		}
 	}
 
-	istd::IChangeable::ChangeSet changeSet;
+	istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 	imtbase::ICollectionInfo::NotifierInfo info;
 	info.elementId = jobItem.uuid;
 	changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(info));
@@ -103,7 +103,7 @@ bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 		JobItem& item = m_jobItems[index];
 
 		if (item.processingStatus < PS_RUNNING){
-			istd::IChangeable::ChangeSet changeSet;
+			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 			JobStatusInfo info;
 			info.elementId = jobId;
 			info.status = PS_CANCELED;
@@ -116,7 +116,7 @@ bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 		}
 
 		if (item.processingStatus == PS_RUNNING){
-			istd::IChangeable::ChangeSet changeSet;
+			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 			JobStatusInfo info;
 			info.elementId = jobId;
 			info.status = PS_CANCELING;
@@ -152,7 +152,7 @@ bool CJobQueueManagerCompBase::ResumeJob(const QByteArray & jobId)
 		JobItem& item = m_jobItems[index];
 
 		if ((item.processingStatus == PS_CANCELED) || (item.processingStatus == PS_FINISHED)){
-			istd::IChangeable::ChangeSet changeSet;
+			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 			JobStatusInfo info;
 			info.elementId = jobId;
 			info.status = PS_WAITING_FOR_PROCESSING;
@@ -195,7 +195,7 @@ bool CJobQueueManagerCompBase::RemoveJob(const QByteArray& jobId)
 			}
 		}
 
-		istd::IChangeable::ChangeSet changeSet;
+		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 		imtbase::ICollectionInfo::ElementRemoveInfo info;
 		info.elementId = jobId;
 
@@ -264,7 +264,7 @@ bool CJobQueueManagerCompBase::SetProcessingStatus(const QByteArray & jobId, Pro
 	if (index >= 0){
 		JobItem& item = m_jobItems[index];
 
-		istd::IChangeable::ChangeSet changeSet;
+		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 		JobStatusInfo info;
 		info.elementId = jobId;
 		info.status = status;
@@ -303,8 +303,8 @@ bool CJobQueueManagerCompBase::SetProgress(const QByteArray& jobId, double progr
 	if (index >= 0){
 		JobItem& item = m_jobItems[index];
 
-		if (qFuzzyCompare(item.progress, progress) != 0){
-			istd::IChangeable::ChangeSet changeSet;
+		if (!qFuzzyCompare(item.progress, progress)){
+			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 			JobProgressInfo info;
 			info.elementId = jobId;
 			info.progress = progress;
@@ -345,7 +345,7 @@ bool CJobQueueManagerCompBase::SetJobResult(const QByteArray& jobId, const IJobO
 		JobItem& item = m_jobItems[index];
 
 		if (!result.IsEqual(item.results)){
-			istd::IChangeable::ChangeSet changeSet;
+			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 			JobResultInfo info;
 			info.elementId = jobId;
 

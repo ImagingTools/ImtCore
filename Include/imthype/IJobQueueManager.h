@@ -110,8 +110,8 @@ public:
 	};
 	static const QByteArray CN_JOB_PROGRESS_CHANGED;
 
-	static const QByteArray CN_JOB_RESULT_CHANGED;
 	typedef NotifierInfo JobResultInfo;
+	static const QByteArray CN_JOB_RESULT_CHANGED;
 
 	/**
 		Operational flags for a single job or the whole job queue.

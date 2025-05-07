@@ -1,8 +1,12 @@
 #pragma once
 
 
+// ACF includes
+#include <ifile/ITempFileManager.h>
+
 // ImtCore includes
-#include <imtcol/ICollectionImportController.h>
+#include <imtservergql/ICollectionImportController.h>
+#include <imthype/IJobQueueManager.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/CollectionImport.h>
 
 
@@ -20,22 +24,22 @@ public:
 	typedef collectionImport::CGraphQlHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlCollectionImportControllerComp);
-		I_ASSIGN(m_collectionImportControllerCompPtr, "CollectionImportController", "Collection import controller", true, "CollectionImportController");
+		I_ASSIGN(m_collectionImportControllerCompPtr, "CollectionImportController", "Collection import controller", false, "CollectionImportController");
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (sdl::imtbase::CollectionImport::CGraphQlHandlerCompBase)
-	virtual collectionImport::CTransactionStatus OnBeginCollectionImportTransaction(
-		const collectionImport::CBeginCollectionImportTransactionGqlRequest& request,
+	virtual collectionImport::CSessionStatus OnBeginCollectionImportSession(
+		const collectionImport::CBeginCollectionImportSessionGqlRequest& request,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	virtual collectionImport::CTransactionStatus OnCancelCollectionImportTransaction(
-		const collectionImport::CCancelCollectionImportTransactionGqlRequest& request,
+	virtual collectionImport::CSessionStatus OnCancelCollectionImportSession(
+		const collectionImport::CCancelCollectionImportSessionGqlRequest& request,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 
 private:
-	I_REF(imtcol::ICollectionImportController, m_collectionImportControllerCompPtr);
+	I_REF(imtservergql::ICollectionImportController, m_collectionImportControllerCompPtr);
 };
 
 

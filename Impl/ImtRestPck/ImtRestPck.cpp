@@ -98,7 +98,7 @@ I_EXPORT_COMPONENT(
 			"Delegator Data Binary Provider");
 
 I_EXPORT_COMPONENT(
-			HttpTempFileStorageServlet,
+			HttpFileUploadServlet,
 			"Http temp file storage servlet",
 			"Http Servlet File");
 

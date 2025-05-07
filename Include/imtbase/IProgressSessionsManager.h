@@ -22,9 +22,14 @@ public:
 	virtual ibase::IProgressManager* BeginProgressSession(const QByteArray& sessionId, const QString& description) = 0;
 
 	/**
-		End progress session with given ID
+		End progress session with given ID normally
 	*/
 	virtual bool EndProgressSession(const QByteArray& sessionId) = 0;
+
+	/**
+		Cancel progress session with given ID
+	*/
+	virtual bool CancelProgressSession(const QByteArray& sessionId) = 0;
 };
 
 

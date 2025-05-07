@@ -24,8 +24,9 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IProgressSessionsManager)
-	ibase::IProgressManager* BeginProgressSession(const QByteArray& sessionId, const QString& description) override;
-	bool EndProgressSession(const QByteArray& sessionId) override;
+	virtual ibase::IProgressManager* BeginProgressSession(const QByteArray& sessionId, const QString& description) override;
+	virtual bool EndProgressSession(const QByteArray& sessionId) override;
+	virtual bool CancelProgressSession(const QByteArray& sessionId) override;
 
 private:
 	bool PublishSession(const QByteArray& sessionId);
@@ -52,7 +53,7 @@ private:
 	typedef std::shared_ptr<ProgressManagerSession> ProgressManagerSessionPtr;
 
 private:
-	QMutex m_mutex;
+	QRecursiveMutex m_mutex;
 
 	QMap<QByteArray, ProgressManagerSessionPtr> m_progressSessions;
 };

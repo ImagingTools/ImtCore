@@ -6,32 +6,33 @@
 #include <imod/TModelWrap.h>
 #include <ifile/ITempFileManager.h>
 #include <iprm/IParamsSet.h>
+#include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
 #include <imtbase/IProgressSessionsManager.h>
-#include <imtbase/IProgressLoggerProvider.h>
-#include <imtcol/ICollectionImportController.h>
+#include <imtservergql/ICollectionImportController.h>
+#include <imtservergql/IFileUploadHandler.h>
 #include <imthype/IJobQueueManager.h>
 #include <imtbase/TModelUpdateBinder.h>
 
 
-namespace imtcol
+namespace imtservergql
 {
 
 
 class CCollectionImportControllerComp:
 	public icomp::CComponentBase,
-	virtual public ICollectionImportController
+	virtual public ICollectionImportController,
+	virtual public IFileUploadHandler
 {
 	Q_DECLARE_TR_FUNCTIONS(CCollectionImportControllerComp)
 public:
 	typedef CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionImportControllerComp);
-		I_REGISTER_SUBELEMENT(UploadProgressLoggerProvider);
-		I_REGISTER_SUBELEMENT_INTERFACE(UploadProgressLoggerProvider, imtbase::IProgressLoggerProvider, ExtractProgressLoggerProvider);
 		I_REGISTER_INTERFACE(ICollectionImportController)
-		I_ASSIGN(m_tempFileManagerCompPtr, "TempFileManager", "Temporary file manager for uploaded files", true, "TempFileManager");
+		I_REGISTER_INTERFACE(IFileUploadHandler)
+		I_ASSIGN(m_fileManagerCompPtr, "TempFileManager", "Temporary file manager for uploaded files", true, "TempFileManager");
 		I_ASSIGN(m_progressSessionManagerCompPtr, "ProgressSessionManager", "ProgressSessionManager", true, "ProgressSessionManager");
 		I_ASSIGN(m_jobQueueManagerCompPtr, "JobQueueManager", "Job queue manager", true, "JobQueueManager");
 		I_ASSIGN(m_jobParamsFactPtr, "JobParamsFactory", "Job params", true, "JobParams");
@@ -39,13 +40,20 @@ public:
 
 	CCollectionImportControllerComp();
 
-	// reimplemented (imtcol::ICollectionImportController)
-	virtual bool BeginCollectionImportTransaction(const ICollectionImportController::TransactionInfo& transactionInfo, QString& errorMessage) override;
-	virtual bool CancelCollectionImportTransaction(const QByteArray& transactionId, QString& errorMessage) override;
+	// reimplemented (imtservergql::ICollectionImportController)
+	virtual bool BeginCollectionImportSession(const SessionInfo& sessionInfo, QString& errorMessage) override;
+	virtual bool CancelCollectionImportSession(const QByteArray& sessionId, QString& errorMessage) override;
+
+	// reimplemented (imtservergql::IFileUploadHandler)
+	virtual FilelUploadStatus ReceiveFileChunk(
+		const QByteArray& fileId,
+		const istd::CIntRange& range,
+		const QByteArray& data) override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
 	void OnComponentCreated() override;
+	void OnComponentDestroyed() override;
 
 private:
 	class ProgressLogger: public ibase::IProgressLogger
@@ -58,7 +66,7 @@ private:
 		virtual bool IsCanceled() const override;
 
 	public:
-		QByteArray transactionId;
+		QByteArray sessionId;
 		QByteArray fileId;
 		std::unique_ptr<ibase::IProgressManager> progressManagerPtr;
 		std::unique_ptr<ibase::IProgressLogger> progressLoggerPtr;
@@ -68,62 +76,55 @@ private:
 	};
 	typedef std::shared_ptr<ProgressLogger> ProgressLoggerPtr;
 
-	struct FileInfo: ICollectionImportController::FileInfo
+	struct FileInfo: public ICollectionImportController::FileInfo
 	{
 		QByteArray tempFileId;
 		ProgressLoggerPtr uploadProgressLoggerPtr;
+		QVector<istd::CIntRange> uploadedChunks;
 	};
 
-	struct TransactionInfo
+	struct SessionInfo
 	{
-		QByteArray transactionId;
+		QByteArray sessionId;
 		QByteArray collectionId;
 		QMap<QByteArray, FileInfo> files;
+		QByteArray jobId;
 
 		QByteArray tempFileSessionId;
 		ibase::IProgressManager* mainProgressManagerPtr = nullptr;
 		std::unique_ptr<ibase::IProgressManager> uploadProgressManagerPtr;
 		std::unique_ptr<ibase::IProgressManager> fileProcessingProgressManagerPtr;
+		std::unique_ptr<ibase::IProgressLogger> fileProcessingProgressLoggerPtr;
 	};
 
-	class UploadProgressLoggerProvider : virtual public imtbase::IProgressLoggerProvider
-	{
-	public:
-		void SetParent(CCollectionImportControllerComp& parent);
-
-		// reimplamanted (imtbase::IProgressLoggerProvider)
-		virtual QByteArrayList GetProgressLoggerIds() const override;
-		virtual ibase::IProgressLogger* GetProgressLogger(const QByteArray& progressLoggerId) const override;
-
-	private:
-		CCollectionImportControllerComp* m_parentPtr = nullptr;
-	};
+	typedef std::shared_ptr<SessionInfo> SessionInfoPtr;
 
 private:
-	template <typename Interface>
-	static Interface* ExtractProgressLoggerProvider(CCollectionImportControllerComp& component)
-	{
-		return &component.m_progressLoggerProvider;
-	}
+	bool PrepareProgressManager(SessionInfo& session);
+	void UploadProgressChanged(QByteArray sessionId, QByteArray fileId);
+	bool StartImportJob(SessionInfo& session);
+	void OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr);
 
-	bool PrepareProgressManager(TransactionInfo& transaction);
-	void UploadProgressChanged(QByteArray transactionId, QByteArray fileId);
-	bool StartImportJob(TransactionInfo& transaction);
+	QByteArray FindSession(const QByteArray& fileId) const;
+	FileInfo* FindFileInfo(const QByteArray& fileId);
+	FilelUploadStatus AddFileChunk(const QByteArray& fileId, const istd::CIntRange& range);
+	double GetFileProgress(const QByteArray& fileId);
+	void UpdateUploadProgress(const QByteArray& fileId);
 
 private:
-	I_REF(ifile::ITempFileManager, m_tempFileManagerCompPtr);
+	I_REF(ifile::ITempFileManager, m_fileManagerCompPtr);
 	I_REF(imtbase::IProgressSessionsManager, m_progressSessionManagerCompPtr);
 	I_REF(imthype::IJobQueueManager, m_jobQueueManagerCompPtr);
 	I_FACT(iprm::IParamsSet, m_jobParamsFactPtr);
 
-	QMap<QByteArray, std::shared_ptr<TransactionInfo>> m_transactions;
-
-	UploadProgressLoggerProvider m_progressLoggerProvider;
+	QMap<QByteArray, SessionInfoPtr> m_sessions;
 
 	QMutex m_mutex;
+
+	imtbase::TModelUpdateBinder<imthype::IJobQueueManager, CCollectionImportControllerComp> m_jobQueueObserver;
 };
 
 
-} // namespace imtcol
+} // namespace imtservergql
 
 

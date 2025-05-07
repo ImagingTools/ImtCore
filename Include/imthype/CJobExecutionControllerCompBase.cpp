@@ -12,7 +12,8 @@ namespace imthype
 // public methods
 
 CJobExecutionControllerCompBase::CJobExecutionControllerCompBase()
-	:m_stopAllTasks(false)
+	:m_stopAllTasks(false),
+	m_jobQueueObserver(*this)
 {
 	qRegisterMetaType<imthype::CStandardJobOutput>("imthype::CStandardJobOutput");
 
@@ -46,11 +47,17 @@ void CJobExecutionControllerCompBase::OnComponentCreated()
 	connect(&m_updateJobQueueTimer, SIGNAL(timeout()), this, SLOT(OnJobPolling()));
 
 	m_updateJobQueueTimer.start(1000);
+
+	if (m_jobQueueManagerCompPtr.IsValid()){
+		m_jobQueueObserver.RegisterObject(m_jobQueueManagerCompPtr.GetPtr(), &CJobExecutionControllerCompBase::OnJobQueueChanged);
+	}
 }
 
 
 void CJobExecutionControllerCompBase::OnComponentDestroyed()
 {
+	m_jobQueueObserver.UnregisterAllObjects();
+
 	ShutdownAllTasks();
 
 	m_threadPool.waitForDone();
@@ -94,10 +101,14 @@ void CJobExecutionControllerCompBase::OnJobPolling()
 				imtbase::CSimpleReferenceCollection inputs;
 				imthype::IJobQueueManager::ParamsPtr processingParamsPtr;
 				if (m_jobQueueManagerCompPtr->GetJobConfiguration(jobId, processingParamsPtr, inputs)){
-					Task* runnablePtr = new Task(*this, jobId, *taskProcessorPtr, inputs, processingParamsPtr);
+					m_jobProgressList[jobId].reset(new JobProgressManager(*this, jobId));
+
+					Task* runnablePtr = new Task(*this, jobId, *taskProcessorPtr, inputs, processingParamsPtr, m_jobProgressList[jobId].get());
 					runnablePtr->setAutoDelete(true);
 
 					if (!m_threadPool.tryStart(runnablePtr)){
+						m_jobProgressList.remove(jobId);
+
 						m_jobQueueManagerCompPtr->SetProcessingStatus(jobId, IJobQueueManager::PS_WAITING_FOR_PROCESSING);
 
 						SendErrorMessage(0, QString("Job failed to start: %1").arg(jobId.constData()));
@@ -120,6 +131,8 @@ void CJobExecutionControllerCompBase::OnJobFinished(const QByteArray& jobId, con
 
 	m_jobQueueManagerCompPtr->SetProcessingStatus(jobId, IJobQueueManager::PS_FINISHED);
 
+	m_jobProgressList.remove(jobId);
+
 	SendVerboseMessage(QString("Job finished: %1").arg(jobId.constData()));
 }
 
@@ -132,6 +145,21 @@ void CJobExecutionControllerCompBase::OnJobProgressChanged(const QByteArray& job
 }
 
 
+// protected methods
+
+void CJobExecutionControllerCompBase::OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr)
+{
+	if (changeset.GetChangeInfoMap().contains(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED)){
+		QVariant value = changeset.GetChangeInfoMap().value(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED);
+		imthype::IJobQueueManager::JobStatusInfo info = value.value<imthype::IJobQueueManager::JobStatusInfo>();
+
+		if (m_jobProgressList.contains(info.elementId) && info.status == imthype::IJobQueueManager::PS_CANCELING) {
+			m_jobProgressList[info.elementId]->SetCanceled(true);
+		}
+	}
+}
+
+
 // public methods of the embedded class Task
 
 CJobExecutionControllerCompBase::Task::Task(
@@ -139,10 +167,12 @@ CJobExecutionControllerCompBase::Task::Task(
 			const QByteArray& jobId,
 			const IJobProcessor& taskProcessor,
 			const imtbase::IReferenceCollection& input,
-			const istd::TSmartPtr<iprm::IParamsSet>& paramsPtr)
+			const istd::TSmartPtr<iprm::IParamsSet>& paramsPtr,
+			JobProgressManager* progressPtr)
 	:m_taskProcessor(taskProcessor),
 	m_parent(parent),
-	m_jobId(jobId)
+	m_jobId(jobId),
+	m_progressPtr(progressPtr)
 {
 	m_inputPtr.SetCastedOrRemove(input.CloneMe());
 
@@ -160,9 +190,7 @@ void CJobExecutionControllerCompBase::Task::run()
 
 	m_jobOutput.SetStartTime(QDateTime::currentDateTime());
 
-	JobProgressManagerPtr progressPtr(new JobProgressManager(m_parent, m_jobId));
-
-	int processingState = m_taskProcessor.ExecuteTask(*m_inputPtr, *m_paramsPtr, m_jobOutput, progressPtr.get());
+	int processingState = m_taskProcessor.ExecuteTask(*m_inputPtr, *m_paramsPtr, m_jobOutput, m_progressPtr);
 	if (processingState == iproc::IProcessor::TS_CANCELED){
 		jobStatus = IJobQueueManager::PS_CANCELED;
 	}

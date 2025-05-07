@@ -154,6 +154,11 @@ I_EXPORT_COMPONENT(
 			"GraphQL Collection import controller",
 			"GraphQL Collection Import Controller");
 
+I_EXPORT_COMPONENT(
+			CollectionImportController,
+			"Collection import controller",
+			"Collection Import Controller");
+
 
 } // namespace ImtServerGqlPck
 

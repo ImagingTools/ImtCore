@@ -24,11 +24,6 @@ I_EXPORT_COMPONENT(
 			"Text filter",
 			"Text Filter");
 
-I_EXPORT_COMPONENT(
-			CollectionImportController,
-			"Collection import controller",
-			"Collection Import Controller");
-
 
 } // namespace ImtColPck
 
