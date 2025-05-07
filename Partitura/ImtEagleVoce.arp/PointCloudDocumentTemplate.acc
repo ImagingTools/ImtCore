@@ -23,9 +23,6 @@
         <Element Id="PointCloudView" PackageId="" ComponentId="PointCloudView">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DocumentManager" Type="Reference" ExportId="DocumentManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -114,14 +111,74 @@
                                 <AttributeInfo Id="ShowEditCommands" Type="Boolean" ExportId="ShowEditCommands">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="ShowFreeRotationCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowInfoBox" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowInvertSelectionCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowPointSelectionCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowResetViewCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowRotationAroundXCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowRotationAroundYCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowRotationAroundZCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowRotationModeCommands" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowSelectionModeCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowSetViewFromBackCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowSetViewFromBottomCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowSetViewFromLeftCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowSetViewFromRightCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowSetViewFromTopCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ShowShowAxisCommands" Type="Boolean" ExportId="ShowShowAxisCommands">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ShowShowGridCommand" Type="Boolean" ExportId="ShowShowGridCommand">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="ShowShowRulerCommands" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowShowZoomInCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowShowZoomOutCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ShowViewCommands" Type="Boolean" ExportId="ShowViewCommands">
                                     <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowViewModeCommand" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowViewModeCommands" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ShowZoomCommands" Type="Boolean" ExportId="ShowZoomCommands">
                                     <Data IsEnabled="false"/>
@@ -163,7 +220,6 @@
                     <Interface InterfaceId="imod::IModelEditor" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="imod::IObserver" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="imt3dview::IScene3dProvider" ComponentId="PointCloudView"/>
-                    <Interface InterfaceId="imt3dview::ITargetPointer" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="PointCloudView"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="PointCloudView"/>
                 </ExportedInterfaces>

@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imt3dgui/CGridShape.h>
 
 
@@ -9,7 +29,7 @@ namespace imt3dgui
 
 CGridShape::CGridShape()
 	:m_gridValue(0.2),
-	m_count(15),
+	m_count(50),
 	m_doUpdate(true)
 {
 	m_pointsDataPtr = &m_data;
@@ -33,6 +53,32 @@ void CGridShape::SetCount(int count)
 	m_doUpdate = true;
 }
 
+void CGridShape::SetPlanePositionX(double position)
+{
+	m_planePositionX.emplace();
+	*m_planePositionX = position;
+
+	m_doUpdate = true;
+}
+
+
+void CGridShape::SetPlanePositionY(double position)
+{
+	m_planePositionY.emplace();
+	*m_planePositionY = position;
+
+	m_doUpdate = true;
+}
+
+
+void CGridShape::SetPlanePositionZ(double position)
+{
+	m_planePositionZ.emplace();
+	*m_planePositionZ = position;
+
+	m_doUpdate = true;
+}
+
 
 // protected methods
 
@@ -44,34 +90,109 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 		return;
 	}
 
-	std::vector<imt3d::CPointCloud3d::PointXyz32> vertices;
-	vertices.reserve(m_count * 2 + 1);
+	double xPlanePosition = m_gridValue * m_count;
+	if (m_planePositionX.has_value()) {
+		xPlanePosition = *m_planePositionX;
+	}
 
+	double yPlanePosition = m_gridValue * m_count;
+	if (m_planePositionY.has_value()) {
+		yPlanePosition = *m_planePositionY;
+	}
+
+	double zPlanePosition = m_gridValue * m_count;
+	if (m_planePositionZ.has_value()) {
+		zPlanePosition = *m_planePositionZ;
+	}
+
+	std::vector<imt3d::CPointCloud3d::PointXyz32> vertices;
+	vertices.reserve(3 * (m_count * 2 + 1));
+
+	// Draw XY-plane
 	for(int i = -m_count; i <= m_count; ++i){
 		imt3d::CPointCloud3d::PointXyz32 a;
-		a.data[0] = m_gridValue * i;
+		a.data[0] = -m_gridValue * i;
 		a.data[1] = -m_gridValue * m_count;
-		a.data[2] = 0.0;
+		a.data[2] = -zPlanePosition;
 		vertices.emplace_back(a);
 
 		imt3d::CPointCloud3d::PointXyz32 b;
-		b.data[0] = m_gridValue * i;
+		b.data[0] = -m_gridValue * i;
 		b.data[1] = m_gridValue * m_count;
-		b.data[2] = 0.0;
+		b.data[2] = -zPlanePosition;
 		vertices.emplace_back(b);
 	}
 
 	for(int i = -m_count; i <= m_count; ++i){
 		imt3d::CPointCloud3d::PointXyz32 a;
 		a.data[0] = -m_gridValue * m_count;
-		a.data[1] = m_gridValue * i;
-		a.data[2] = 0.0;
+		a.data[1] = -m_gridValue * i;
+		a.data[2] = -zPlanePosition;
 		vertices.emplace_back(a);
 
 		imt3d::CPointCloud3d::PointXyz32 b;
 		b.data[0] = m_gridValue * m_count;
-		b.data[1] = m_gridValue * i;
-		b.data[2] = 0.0;
+		b.data[1] = -m_gridValue * i;
+		b.data[2] = -zPlanePosition;
+		vertices.emplace_back(b);
+	}
+
+	//// Draw YZ-plane
+	for(int i = -m_count; i <= m_count; ++i){
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = -xPlanePosition;
+		a.data[1] = -m_gridValue * m_count;
+		a.data[2] = -m_gridValue * i;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = -xPlanePosition;
+		b.data[1] = m_gridValue * m_count;
+		b.data[2] = -m_gridValue * i;
+		vertices.emplace_back(b);
+	}
+
+	for(int i = -m_count; i <= m_count; ++i){
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = -xPlanePosition;
+		a.data[1] = -m_gridValue * i;
+		a.data[2] = -m_gridValue * m_count;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = -xPlanePosition;
+		b.data[1] = -m_gridValue * i;
+		b.data[2] = m_gridValue * m_count;
+		vertices.emplace_back(b);
+	}
+
+
+	// Draw XZ-plane:
+	for (int i = -m_count; i <= m_count; ++i) {
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = -m_gridValue * i;
+		a.data[1] = -yPlanePosition;
+		a.data[2] = -m_gridValue * m_count;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = -m_gridValue * i;
+		b.data[1] = -yPlanePosition;
+		b.data[2] = m_gridValue * m_count;
+		vertices.emplace_back(b);
+	}
+
+	for (int i = -m_count; i <= m_count; ++i) {
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = -m_gridValue * m_count;
+		a.data[1] = -yPlanePosition;
+		a.data[2] = -m_gridValue * i;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = m_gridValue * m_count;
+		b.data[1] = -yPlanePosition;
+		b.data[2] = -m_gridValue * i;
 		vertices.emplace_back(b);
 	}
 

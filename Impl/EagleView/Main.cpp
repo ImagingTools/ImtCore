@@ -17,6 +17,8 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imt3dgui);
 	Q_INIT_RESOURCE(imt3dguilight);
 	Q_INIT_RESOURCE(imt3dguidark);
+	Q_INIT_RESOURCE(imtguilight);
+	Q_INIT_RESOURCE(imtguidark);
 
 	CEagleView instance;
 

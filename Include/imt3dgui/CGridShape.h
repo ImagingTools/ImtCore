@@ -19,6 +19,9 @@ public:
 
 	void SetGridValue(double gridValue);
 	void SetCount(int count);
+	void SetPlanePositionX(double position);
+	void SetPlanePositionY(double position);
+	void SetPlanePositionZ(double position);
 
 protected:
 	// reimplement (imt3dgui::CShape3dBase)
@@ -29,10 +32,14 @@ protected:
 	virtual QVector3D GetColor() const override { return QVector3D(0.5, 0.5, 0.5); }
 
 private:
-	double m_gridValue;
-	int m_count;
+	double m_gridValue = 10;
+	int m_count = 10;
 	imt3d::CPointCloud3d m_data;
-	bool m_doUpdate;
+	bool m_doUpdate = false;
+
+	std::optional<double> m_planePositionX;
+	std::optional<double> m_planePositionY;
+	std::optional<double> m_planePositionZ;
 };
 
 

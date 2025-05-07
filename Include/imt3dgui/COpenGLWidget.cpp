@@ -163,7 +163,7 @@ void COpenGLWidget::SetCameraView(COpenGLWidget::ViewDirection viewDirection, bo
 
 	switch (viewDirection){
 	case VD_DEFAULT:
-		newRotation = QQuaternion::fromAxisAndAngle(0.0, 1.0, 0.0, -45.0) * QQuaternion::fromAxisAndAngle(1.0, 0.0, -1.0, 45.0);
+		newRotation = QQuaternion::fromAxisAndAngle(1.0, 0.0, 0.0, -80.0) * QQuaternion::fromAxisAndAngle(0.0, 0.0, 1.0, -120) * QQuaternion::fromAxisAndAngle(0.0, 1.0, 0.0, 10);
 		break;
 
 	case VD_RIGHT:

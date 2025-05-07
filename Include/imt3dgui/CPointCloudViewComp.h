@@ -66,6 +66,11 @@ protected:
 	virtual void OnRestoreSettings(const QSettings& settings) override;
 	virtual void OnSaveSettings(QSettings& settings) const override;
 
+protected:
+	virtual void SetupGridShape(CGridShape& gridShape) const;
+	virtual void SetupAxisShape(CAxisShape& axisShape) const;
+	virtual void SetupRulerShape(CRulerShape& rulerShape) const;
+
 private:
 	CGridShape m_gridShape;
 	CAxisShape m_axisShape;
