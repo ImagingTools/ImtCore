@@ -216,6 +216,7 @@ Rectangle{
         visible: scrollContainer.visible;
         enabled: visible;
         hoverEnabled: enabled;
+		preventStealing: true
         property int delta: 40;
 
         onClicked: {
@@ -375,6 +376,7 @@ Rectangle{
             visible: scrollContainer.visible;
             enabled: visible;
             hoverEnabled: enabled;
+			preventStealing: true
 
             property bool dragEnabled: false;
 
