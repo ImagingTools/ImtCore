@@ -90,7 +90,7 @@ IUserBaseInfo::RoleIds CUserInfo::GetRoles(const QByteArray& productId) const
 		for (const QByteArray& parentGroupId : m_groupIds){
 			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr.IsValid()){
-				QByteArrayList groupRoleIds = parentGroupPtr->GetRoles(productId);
+				const QByteArrayList groupRoleIds = parentGroupPtr->GetRoles(productId);
 				for (const QByteArray& roleId : groupRoleIds){
 					if (!retVal.contains(roleId)){
 						retVal << roleId;
@@ -143,7 +143,7 @@ bool CUserInfo::AddToSystem(SystemInfo systemInfo)
 
 bool CUserInfo::RemoveFromSystem(const QByteArray& systemId)
 {
-	for (const SystemInfo& systemInfo : m_systemInfos){
+	for (const SystemInfo& systemInfo : std::as_const(m_systemInfos)){
 		if (systemInfo.systemId == systemId){
 			istd::CChangeNotifier changeNotifier(this);
 			m_systemInfos.removeOne(systemInfo);
