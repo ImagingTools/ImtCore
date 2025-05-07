@@ -16,7 +16,9 @@ OptionManager {
 	optionModel: dataModelProvider.dataModel
 
 	function requestDataModel(params){
-		dataModelProvider.inputModel = params
+		if (params){
+			dataModelProvider.inputModel = params
+		}
 		dataModelProvider.requestDataModel()
 	}
 

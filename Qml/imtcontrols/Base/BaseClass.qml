@@ -209,6 +209,10 @@ QtObject {
 		let json = '{'
 		for(let i = 0; i < list.length; i++){
 			let key = list[i]
+			if (this[key] === undefined){
+				continue
+			}
+
 			if(typeof this[key] === 'object'){
 				if (Array.isArray(this[key])){
 					if(i > 0){
@@ -245,9 +249,6 @@ QtObject {
 				}
 			} else {
 				let value = this[key]
-				if (value === undefined){
-					value = null
-				}
 				let safeValue = this[key]
 				if (typeof safeValue === 'string'){
 					safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
@@ -271,6 +272,10 @@ QtObject {
 		let graphQL = '{'
 		for(let i = 0; i < list.length; i++){
 			let key = list[i]
+			if (this[key] === undefined){
+				continue
+			}
+
 			if(typeof this[key] === 'object'){
 				if (Array.isArray(this[key])){
 					graphQL +=  this.getJSONKeyForProperty(key) + ':'
