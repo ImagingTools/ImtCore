@@ -128,6 +128,7 @@ TableRowDelegate 1.0 ./Views/TableRowDelegate.qml
 SimpleTableDelegate 1.0 ./Views/SimpleTableDelegate.qml
 TableRowViewer 1.0 ./Views/TableRowViewer.qml
 TableCellText 1.0 ./Views/TableCellText.qml
+Arrowhead 1.0 ./Views/Arrowhead.qml
 
 TableHeaderParamComp 1.0 ./Views/TableHeaderParamComp.qml
 

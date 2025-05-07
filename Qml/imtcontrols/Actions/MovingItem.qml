@@ -15,7 +15,7 @@ MouseArea{
     property Item movingItem: null;
 
 	property int mainMargin : Style.sizeMainMargin;
-    property int alwaysVisibleSize: 150;
+	property int alwaysVisibleSize: 2000;
     property var coord: mapToItem(this,0,0);
 	property bool isPressed: false;
     onPressed: {
@@ -41,7 +41,7 @@ MouseArea{
             checkCoord.y -= mouse.y
 
 			var ok = checkCoord.x + deltaX > Math.min(moving.alwaysVisibleSize - moving.movingItem.width, moving.mainMargin)
-					&& checkCoord.y + deltaY > moving.mainMargin
+					&& checkCoord.y + deltaY > Math.min(moving.alwaysVisibleSize - moving.movingItem.height, moving.mainMargin)
 					&& checkCoord.x + deltaX < moving.globalParent.width - Math.min(moving.alwaysVisibleSize, moving.movingItem.width + moving.mainMargin)
 					&& checkCoord.y + deltaY < moving.globalParent.height - Math.min(moving.alwaysVisibleSize, moving.movingItem.height + moving.mainMargin) ;
 

@@ -23,7 +23,7 @@ Dialog {
 
 	contentComp: Component{ Rectangle{
 			width: message.contentWidth;
-			height: messageText.height + 20;
+			height: messageText.height + Style.sizeLargeMargin;
 
 			color: "transparent";
 

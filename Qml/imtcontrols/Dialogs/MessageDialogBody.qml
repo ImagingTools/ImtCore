@@ -17,8 +17,8 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter;
         anchors.right: parent.right;
         anchors.left: parent.left;
-        anchors.rightMargin: 20;
-        anchors.leftMargin: 20;
+		anchors.rightMargin: Style.sizeLargeMargin;
+		anchors.leftMargin: Style.sizeLargeMargin;
 
         width: inputDialogBodyContainer.width;
 

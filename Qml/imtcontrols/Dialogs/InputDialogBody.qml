@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Item {
     id: inputDialogBodyContainer;
 
-    height: columnBody.height + 40;
+	height: columnBody.height + 2*Style.sizeLargeMargin;
 
     property string message;
     property string inputValue: "";
