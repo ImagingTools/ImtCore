@@ -1573,6 +1573,13 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QByte
 }
 
 
+QMap<int, QByteArray> CObjectCollectionControllerCompBase::GetSupportedCommandIds() const
+{
+	static QMap<int, QByteArray> map;
+	return map;
+}
+
+
 bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			istd::IChangeable& object,

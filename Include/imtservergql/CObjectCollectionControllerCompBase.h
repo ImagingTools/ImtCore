@@ -191,6 +191,8 @@ protected:
 	virtual void OnComponentCreated() override;
 
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
+	
+	virtual QMap<int, QByteArray> GetSupportedCommandIds() const;
 
 private:
 	virtual bool DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& newObjectId, QString& errorMessage) const;
