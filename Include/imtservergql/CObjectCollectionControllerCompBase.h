@@ -70,6 +70,8 @@ public:
 		OT_OBJECT_TYPE_ID
 	};
 
+	virtual QMap<int, QByteArray> GetSupportedCommandIds() const;
+
 	// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
 	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
 				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
@@ -82,6 +84,7 @@ public:
 
 	// reimplemented (imtgql::IGqlRequestExtractor)
 	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
+
 
 protected:
 	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;
@@ -189,10 +192,7 @@ protected:
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
-
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
-	
-	virtual QMap<int, QByteArray> GetSupportedCommandIds() const;
 
 private:
 	virtual bool DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& newObjectId, QString& errorMessage) const;

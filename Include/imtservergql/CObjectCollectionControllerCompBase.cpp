@@ -39,6 +39,16 @@ namespace imtservergql
 {
 
 
+// public methods
+
+QMap<int, QByteArray> CObjectCollectionControllerCompBase::GetSupportedCommandIds() const
+{
+	static QMap<int, QByteArray> retVal;
+
+	return retVal;
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CObjectCollectionControllerCompBase::OnComponentCreated()
@@ -1570,13 +1580,6 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QByte
 	}
 
 	return nullptr;
-}
-
-
-QMap<int, QByteArray> CObjectCollectionControllerCompBase::GetSupportedCommandIds() const
-{
-	static QMap<int, QByteArray> map;
-	return map;
 }
 
 
