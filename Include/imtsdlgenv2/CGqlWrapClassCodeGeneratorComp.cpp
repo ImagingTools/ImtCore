@@ -448,8 +448,9 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 
 	// GetRequestedArguments
 	FeedStream(ifStream, 2, false);
+	ifStream << QStringLiteral("const ");
 	ifStream << GetCapitalizedValue(sdlRequest.GetName());
-	ifStream << QStringLiteral("RequestArguments ");
+	ifStream << QStringLiteral("RequestArguments& ");
 	ifStream << className << ':' << ':' ;
 	ifStream << QStringLiteral("GetRequestedArguments() const");
 	FeedStream(ifStream, 1, false);
@@ -1016,8 +1017,9 @@ void CGqlWrapClassCodeGeneratorComp::AddMethodDeclarations(QTextStream& stream, 
 
 	// GetRequestedArguments method
 	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("const ");
 	stream << GetCapitalizedValue(sdlRequest.GetName());
-	stream << QStringLiteral("RequestArguments GetRequestedArguments() const;");
+	stream << QStringLiteral("RequestArguments& GetRequestedArguments() const;");
 	FeedStream(stream, 1, false);
 
 	// GetRequestInfo method
