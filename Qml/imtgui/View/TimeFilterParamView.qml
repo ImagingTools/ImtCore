@@ -14,6 +14,8 @@ PopupView {
 	height: content.height + 2 * Style.sizeMainMargin;
 		
 	property TimeFilter timeFilter: TimeFilter {}
+	property alias listView: listView;
+	property alias treeModel: treeModel;
 	
 	signal accepted(string id, string name);
 	signal cancelled();
