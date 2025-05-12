@@ -97,7 +97,13 @@ class FileDialog extends Item {
     $nameFiltersChanged(){
         let nameFilters = this.getPropertyValue('nameFilters')
         if(nameFilters.length){
-            this.$input.accept = nameFilters.join(',').match(/\.\w+/g).join(',')
+            let matchResult = nameFilters.join(',').match(/\.\w+/g)
+            if(matchResult){
+                this.$input.accept = matchResult.join(',')
+            } else {
+                this.$input.accept = ''
+            }
+            
         } else {
             this.$input.accept = ''
         }
