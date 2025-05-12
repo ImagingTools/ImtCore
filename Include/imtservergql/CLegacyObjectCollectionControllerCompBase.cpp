@@ -1454,7 +1454,7 @@ void CLegacyObjectCollectionControllerCompBase::PrepareFilters(
 	if (filterIdsModelPtr != nullptr){
 		QByteArrayList filteringInfoIds;
 		for (int i = 0; i < filterIdsModelPtr->GetItemsCount(); i++){
-			QByteArray headerId = filterIdsModelPtr->GetData("Id", i).toByteArray();
+			QByteArray headerId = filterIdsModelPtr->GetData("id", i).toByteArray();
 			if (!headerId.isEmpty()){
 				filteringInfoIds << headerId;
 			}

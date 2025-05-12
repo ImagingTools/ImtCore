@@ -138,7 +138,6 @@ Rectangle{
 		searchContainer.gettedParamsModel.clear();
 		var index = searchContainer.gettedParamsModel.insertNewItem();
 		searchContainer.gettedParamsModel.setData("name", param, index);
-
 	}
 
 	function setFilterIdsModel(id){
