@@ -2,16 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5352" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CommandsController" X="350" Y="300" Note=""/>
         <Element ComponentName="Demultiplexer" X="625" Y="125" Note=""/>
-        <Element ComponentName="ProfileController" X="875" Y="300" Note=""/>
-        <Element ComponentName="StandardDocumentCommands" X="375" Y="525" Note=""/>
+        <Element ComponentName="ProfileController" X="625" Y="325" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
