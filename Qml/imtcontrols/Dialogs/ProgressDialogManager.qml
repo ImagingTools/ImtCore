@@ -26,7 +26,9 @@ Dialog {
 	property real value: 0;
 
 	property bool closeByCancel: false;
+	property bool closeWhenFinished: false;
 	property bool isCancelling: false;
+	property bool isFailed: false;
 
 	property TreeItemModel subtaskModel: TreeItemModel{}
 
@@ -34,6 +36,7 @@ Dialog {
 
 	signal taskComleted(string id);
 	signal taskCanceled(string id);
+	signal taskClosed();
 	signal subtaskCanceled(string id);
 
 	onRootChanged: {
@@ -47,6 +50,13 @@ Dialog {
 	onIsCancellingChanged: {
 		setButtonEnabled(Enums.cancel, !isCancelling)
 		buttons.visible = !isCancelling;
+	}
+
+	onIsFailedChanged: {
+		if(isFailed){
+			removeButton(Enums.cancel);
+			addButton(Enums.ok, qsTr("Ok"), true);
+		}
 	}
 
 	function addSubtask(id, description, value, isCancellable){
@@ -91,11 +101,14 @@ Dialog {
 			progressDialog.isCancelling = true;
 			taskCanceled(taskId);
 		}
+		if(buttonId == Enums.ok){
+			taskClosed();
+		}
 
 	}
 	
 	onValueChanged: {
-		if(value >= 1){
+		if(value >= 1 && closeWhenFinished){
 
 			// if(taskId !== "" && value >=1 && !messageOpened){
 			// 	let text_ = description + " "  + qsTr("completed")
