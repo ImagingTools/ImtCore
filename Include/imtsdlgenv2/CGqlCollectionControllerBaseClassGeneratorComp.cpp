@@ -39,6 +39,25 @@ const QMap<imtsdl::CSdlDocumentType::OperationType, QString> CGqlCollectionContr
 	std::make_pair(imtsdl::CSdlDocumentType::OT_GET_VIEW,				"")
 };
 
+static QMap<imtsdl::CSdlDocumentType::OperationType, QString> s_operationsAliasList({
+	std::make_pair(imtsdl::CSdlDocumentType::OT_GET,					QStringLiteral("OT_GET")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_INSERT,					QStringLiteral("OT_NEW")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_UPDATE,					QStringLiteral("OT_UPDATE")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_LIST,					QStringLiteral("OT_LIST")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_UPDATE_COLLECTION,		QStringLiteral("OT_UPDATE_COLLECTION")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_RENAME,					QStringLiteral("OT_RENAME")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION,		QStringLiteral("OT_SET_DESCRIPTION")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_HEADERS,				QStringLiteral("OT_HEADERS")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_INFO,					QStringLiteral("OT_INFO")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_METAINFO,				QStringLiteral("OT_METAINFO")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_DATAMETAINFO,			QStringLiteral("OT_DATAMETAINFO")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT,			QStringLiteral("OT_ELEMENTS_COUNT")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENT_IDS,			QStringLiteral("OT_ELEMENT_IDS")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY,		QStringLiteral("OT_ELEMENT_HISTORY")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_IMPORT,					QStringLiteral("OT_IMPORT")),
+	std::make_pair(imtsdl::CSdlDocumentType::OT_EXPORT,					QStringLiteral("OT_EXPORT"))
+});
+
 
 // public methods
 
@@ -337,6 +356,9 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	/// \todo fix it
 	ifStream << QStringLiteral("public:");
 	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("virtual QMap<int, QByteArray> GetSupportedCommandIds() const override;");
+	FeedStream(ifStream, 2, false);
 
 	// protected section (base)
 	ifStream << QStringLiteral("protected:");
@@ -467,6 +489,38 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(cons
 		FeedStream(ifStream, 3, false);
 	}
 
+	// GetSupportedCommandIds method
+	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
+
+	ifStream << QStringLiteral("QMap<int, QByteArray> ");
+	ifStream << className;
+	ifStream << QStringLiteral("::GetSupportedCommandIds() const");
+	FeedStream(ifStream, 1, false);
+
+	ifStream << '{';
+	FeedStream(ifStream, 1, false);
+
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("static QMap<int, QByteArray> retVal = {");
+	FeedStream(ifStream, 1, false);
+
+	AddOperationMapPairs(ifStream, sdlDocumentType);
+	for (const imtsdl::CSdlDocumentType& subtype: sdlDocumentType.GetSubtypes()){
+		AddOperationMapPairs(ifStream, subtype);
+	}
+
+	FeedStreamHorizontally(ifStream);
+	ifStream << '}' << ';';
+	FeedStream(ifStream, 2, false);
+
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("return retVal;");
+	FeedStream(ifStream, 1, false);
+
+	ifStream << '}';
+	FeedStream(ifStream, 3, false);
+
+	// operations
 	AddOperationRequestMethodImplForDocument(ifStream, sdlDocumentType);
 
 	bool isCorrect = AddCollectionMethodsImplForDocument(ifStream, sdlDocumentType);
@@ -559,7 +613,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddBaseMethodDeclarationFor
 	if (operationType == imtsdl::CSdlDocumentType::OT_GET_VIEW){
 		stream << QStringLiteral("CreateInternalResponse");
 	}
-	else{
+	else {
 		stream << s_nonTrivialOperationMethodsMap[operationType];
 	}
 	stream << QStringLiteral("(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
@@ -962,6 +1016,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 			}
 		}
 	}
+
 	GenerateIsRequestSupportedMethodImpl(stream, requestList, className);
 	FeedStream(stream, 2, false);
 
@@ -994,28 +1049,8 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 }
 
 
-
 void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
 {
-	static QMap<imtsdl::CSdlDocumentType::OperationType, QString> operationsALiasList({
-		std::make_pair(imtsdl::CSdlDocumentType::OT_GET,					QStringLiteral("OT_GET")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_INSERT,					QStringLiteral("OT_NEW")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_UPDATE,					QStringLiteral("OT_UPDATE")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_LIST,					QStringLiteral("OT_LIST")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_UPDATE_COLLECTION,		QStringLiteral("OT_UPDATE_COLLECTION")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_RENAME,					QStringLiteral("OT_RENAME")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION,		QStringLiteral("OT_SET_DESCRIPTION")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_HEADERS,				QStringLiteral("OT_HEADERS")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_INFO,					QStringLiteral("OT_INFO")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_METAINFO,				QStringLiteral("OT_METAINFO")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_DATAMETAINFO,			QStringLiteral("OT_DATAMETAINFO")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT,			QStringLiteral("OT_ELEMENTS_COUNT")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENT_IDS,			QStringLiteral("OT_ELEMENT_IDS")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY,		QStringLiteral("OT_ELEMENT_HISTORY")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_IMPORT,					QStringLiteral("OT_IMPORT")),
-		std::make_pair(imtsdl::CSdlDocumentType::OT_EXPORT,					QStringLiteral("OT_EXPORT"))
-	});
-
 	QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
 
 	for (auto operationsIter = operations.cbegin(); operationsIter != operations.cend(); ++operationsIter){
@@ -1027,10 +1062,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QT
 		stream << QStringLiteral("::GetCommandId()){");
 		FeedStream(stream, 1, false);
 
-		if (!operationsALiasList[operationsIter.key()].isEmpty()){
+		if (!s_operationsAliasList[operationsIter.key()].isEmpty()){
 			FeedStreamHorizontally(stream, 2);
 			stream << QStringLiteral("operationType =  ");
-			stream << operationsALiasList[operationsIter.key()];
+			stream << s_operationsAliasList[operationsIter.key()];
 			stream << ';';
 			FeedStream(stream, 2, false);
 		}
@@ -1042,6 +1077,32 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QT
 		FeedStreamHorizontally(stream);
 		stream << '}';
 		FeedStream(stream, 2, false);
+	}
+}
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationMapPairs(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
+{
+	QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
+
+	for (auto operationsIter = operations.cbegin(); operationsIter != operations.cend(); ++operationsIter){
+
+		if (	!s_operationsAliasList.contains(operationsIter.key()) ||
+				s_operationsAliasList[operationsIter.key()].isEmpty())
+		{
+			continue;
+		}
+
+		const QString requestClassName = operationsIter->GetName() + QStringLiteral("GqlRequest");
+
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("qMakePair(");
+		stream << s_operationsAliasList[operationsIter.key()];
+
+		stream << QStringLiteral(", C");
+		stream << requestClassName;
+		stream << QStringLiteral("::GetCommandId()),");
+		FeedStream(stream, 1, false);
 	}
 }
 

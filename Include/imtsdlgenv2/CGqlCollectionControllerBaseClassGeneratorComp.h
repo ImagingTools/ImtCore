@@ -78,8 +78,6 @@ private:
 	bool ProcessSourceClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, bool addSelfHeaderInclude);
 	void AbortCurrentProcessing();
 
-
-
 	// comfort methods
 	void AddRequiredIncludesForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
 	void AddMethodsForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
@@ -90,9 +88,10 @@ private:
 
 	/**
 		Creates method implementations for all document's (and subtype's) operation types
-	 */
+	*/
 	void AddOperationRequestMethodImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
 	void AddOperationRequestCheck(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
+	void AddOperationMapPairs(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
 	bool AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
 	bool AddImplCodeForRequests(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
 	bool AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
