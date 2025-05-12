@@ -19,6 +19,8 @@ Rectangle {
 	
 	property int contentHeight: -1;
 	
+	clip: true // is obligatory !
+	
 	function calcHeight(){
 		let h = 0;
 		
