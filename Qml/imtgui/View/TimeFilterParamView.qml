@@ -16,6 +16,12 @@ PopupView {
 	property TimeFilter timeFilter: TimeFilter {}
 	property alias listView: listView;
 	property alias treeModel: treeModel;
+	property Component buttonDecorator: ButtonDecorator {
+				color: Style.backgroundColor2;
+			}
+
+	property int fontSize: Style.fontSizeNormal;
+	property var datePickerParams;
 	
 	signal accepted(string id, string name);
 	signal cancelled();
@@ -150,6 +156,8 @@ PopupView {
 						text: model.name;
 						highlighted: listView.currentIndex === model.index;
 						selected: mouseArea.containsMouse;
+
+						font.pixelSize: root.fontSize
 						
 						onClicked: {
 							listView.currentIndex = model.index;
@@ -174,6 +182,7 @@ PopupView {
 			BaseText {
 				text: qsTr("From");
 				width: parent.width;
+				font.pixelSize: root.fontSize
 			}
 			
 			Item {
@@ -191,11 +200,7 @@ PopupView {
 						toDatePicker.setCurrentDay();
 					}
 					
-					decorator: Component {
-						ButtonDecorator {
-							color: Style.backgroundColor2;
-						}
-					}
+					decorator: root.buttonDecorator;
 				}
 			}
 			
@@ -214,6 +219,10 @@ PopupView {
 					hasMonthCombo: false;
 					hasYearCombo: false;
 					mainMargin: Style.sizeMainMargin;
+
+					Component.onCompleted: {
+						params = root.datePickerParams
+					}
 					
 					function checkDate(year, month, day){
 						let date = new Date(year, month, day);
@@ -237,6 +246,7 @@ PopupView {
 			BaseText {
 				text: qsTr("To");
 				width: parent.width;
+				font.pixelSize: root.fontSize;
 			}
 			
 			Item {
@@ -253,6 +263,10 @@ PopupView {
 					hasYearCombo: false;
 					startWithCurrentDay: true;
 					mainMargin: Style.sizeMainMargin;
+
+					Component.onCompleted: {
+						params = root.datePickerParams
+					}
 					
 					function checkDate(year, month, day){
 						let date = new Date(year, month, day);
@@ -293,11 +307,7 @@ PopupView {
 							root.accepted("TimeRange", fromDatePicker.getDateAsString() + " -> " + toDatePicker.getDateAsString());
 						}
 						
-						decorator: Component {
-							ButtonDecorator {
-								color: Style.backgroundColor2;
-							}
-						}
+						decorator: root.buttonDecorator;
 					}
 					
 					Button {
@@ -313,11 +323,8 @@ PopupView {
 							root.cancelled();
 						}
 						
-						decorator: Component {
-							ButtonDecorator {
-								color: Style.backgroundColor2;
-							}
-						}
+						decorator: root.buttonDecorator;
+
 					}
 				}
 			}

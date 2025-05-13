@@ -90,6 +90,8 @@ Item {
 	property TreeItemModel monthTreeModel: TreeItemModel{}
 	property TreeItemModel dayTreeModel: TreeItemModel{}
 
+	property var params;
+
 	// signals
 	signal dateChanged();
 
@@ -168,6 +170,16 @@ Item {
 		}
 		if(datePicker.hasDayCombo && datePicker.completed){
 			datePicker.fillDayModel();
+		}
+	}
+
+	onParamsChanged: {
+		if(params){
+			for (let key in params) {
+				if(datePicker[key] !== undefined){
+					datePicker[key] = params[key];
+				}
+			}
 		}
 	}
 
