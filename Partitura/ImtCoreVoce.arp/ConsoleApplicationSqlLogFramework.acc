@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5351" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -117,17 +117,11 @@
                     <Element Id="LogMigration" PackageId="ImtDatabaseVoce" ComponentId="SqlScriptBasedMigration">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="From" Type="Integer" ExportId="">
                                     <Data IsEnabled="true" Value="0"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="MigrationPath" Type="String" ExportId="">
-                                    <Data IsEnabled="true" Value="LogMigrations"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="To" Type="Integer" ExportId="">
                                     <Data IsEnabled="true" Value="1"/>

@@ -78,6 +78,7 @@ public:
 
 	static void InitImtCoreResources()
 	{
+		Q_INIT_RESOURCE(imtbase);
 		Q_INIT_RESOURCE(imtstylecontrolsqml);
 
 		Q_INIT_RESOURCE(imtauthguilight);

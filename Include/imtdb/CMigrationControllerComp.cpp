@@ -21,10 +21,14 @@ bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CInt
 	resultRevision = -1;
 
 	if (!m_databaseEngineCompPtr.IsValid()){
+		qCritical() << __func__ << "Unable to migrate. Database engine component is not set";
+
 		return false;
 	}
 
 	if (!m_migrationFolderPathCompPtr.IsValid()){
+		qCritical() << __func__ << "Unable to migrate. Migration folder path component is not set";
+
 		return false;
 	}
 
@@ -32,11 +36,15 @@ bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CInt
 	int max = m_range.GetMaxValue();
 
 	if (subRange.IsValid() && !m_range.Contains(subRange)){
+		qWarning() << __func__ << "Unable to migrate. Unexpected range provided";
+
 		return false;
 	}
 
 	QDir folder(m_migrationFolderPathCompPtr->GetPath());
 	if (!folder.exists()){
+		qWarning() << __func__ << "Unable to migrate. Migration dir is not exists" << folder.absolutePath() << m_migrationFolderPathCompPtr->GetPath();
+
 		return false;
 	}
 
