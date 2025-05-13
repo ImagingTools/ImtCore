@@ -22,7 +22,7 @@ public:
 
 	I_BEGIN_COMPONENT(CCommandPermissionsProviderJoinerComp);
 		I_REGISTER_INTERFACE(imtserverapp::ICommandPermissionsProvider);
-		I_ASSIGN_MULTI_0(m_commandPermissionsProviderCompPtr, "CommandPermissionsProvider", "List of command permission providers", true);
+		I_ASSIGN_MULTI_0(m_commandPermissionsProviderCompPtr, "CommandPermissionsProvider", "List of command permission providers", false);
 	I_END_COMPONENT;
 
 	// reimplemented (imtserverapp::ICommandPermissionsProvider)

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5352" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,9 +13,6 @@
         <Element Id="CommandsController" PackageId="ImtGraphQlVoce" ComponentId="CommandsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="CommandPermissions">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="LeftAlignmentCommands" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -26,9 +23,6 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="PermissionChecker">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -77,8 +71,8 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CommandsController"/>
-        <Interface InterfaceId="imtrest::IGuiElementContainer" ComponentId="CommandsController"/>
-        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="CommandsController"/>
+        <Interface InterfaceId="imtserverapp::IGuiElementContainer" ComponentId="CommandsController"/>
+        <Interface InterfaceId="imtserverapp::IRepresentationController" ComponentId="CommandsController"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="CommandsController"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="CommandsController"/>
     </ExportedInterfaces>
