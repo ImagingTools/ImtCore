@@ -100,7 +100,7 @@ private:
 	typedef std::shared_ptr<SessionInfo> SessionInfoPtr;
 
 private:
-	bool PrepareProgressManager(SessionInfo& session);
+	bool PrepareProgressManager(SessionInfo& session) const;
 	void UploadProgressChanged(QByteArray sessionId, QByteArray fileId);
 	bool StartImportJob(SessionInfo& session);
 	void OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr);

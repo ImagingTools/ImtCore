@@ -22,6 +22,7 @@ ibase::IProgressManager* CProgressManagerPublisherComp::BeginProgressSession(
 	ProgressManagerSessionPtr retVal;
 
 	QMutexLocker locker(&m_mutex);
+
 	if (!m_progressSessions.contains(sessionId)) {
 		retVal.reset(new ProgressManagerSession(*this, sessionId, description));
 
@@ -35,6 +36,7 @@ ibase::IProgressManager* CProgressManagerPublisherComp::BeginProgressSession(
 bool CProgressManagerPublisherComp::EndProgressSession(const QByteArray& sessionId)
 {
 	QMutexLocker locker(&m_mutex);
+
 	if (m_progressSessions.contains(sessionId)) {
 		m_progressSessions[sessionId]->m_isCompleted = true;
 
@@ -52,6 +54,7 @@ bool CProgressManagerPublisherComp::EndProgressSession(const QByteArray& session
 bool CProgressManagerPublisherComp::CancelProgressSession(const QByteArray& sessionId, const QString& description, bool isFailed)
 {
 	QMutexLocker locker(&m_mutex);
+
 	if (m_progressSessions.contains(sessionId)){
 		m_progressSessions[sessionId]->SetCanceled(!isFailed);
 		m_progressSessions[sessionId]->m_isFailed = isFailed;
@@ -88,17 +91,22 @@ bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)
 		return false;
 	}
 
-	if (!m_progressSessions.contains(sessionId)) {
-		return false;
+	{
+		QMutexLocker locker(&m_mutex);
+
+		if (!m_progressSessions.contains(sessionId)){
+			return false;
+		}
+
+		mainTask.id = sessionId;
+		mainTask.description = m_progressSessions[sessionId]->m_description;
+		mainTask.isCancellable = m_progressSessions[sessionId]->IsCancelable();
+		mainTask.isCancelled = m_progressSessions[sessionId]->IsCanceled();
+		mainTask.isFailed = m_progressSessions[sessionId]->m_isFailed;
+		mainTask.isCompleted = m_progressSessions[sessionId]->m_isCompleted;
+		mainTask.progress = m_progressSessions[sessionId]->GetCumulatedProgress();
+		mainTask.totalProgress = m_progressSessions[sessionId]->GetCumulatedProgress();
 	}
-	mainTask.id = sessionId;
-	mainTask.description = m_progressSessions[sessionId]->m_description;
-	mainTask.isCancellable = m_progressSessions[sessionId]->IsCancelable();
-	mainTask.isCancelled = m_progressSessions[sessionId]->IsCanceled();
-	mainTask.isFailed = m_progressSessions[sessionId]->m_isFailed;
-	mainTask.isCompleted = m_progressSessions[sessionId]->m_isCompleted;
-	mainTask.progress = m_progressSessions[sessionId]->GetCumulatedProgress();
-	mainTask.totalProgress = m_progressSessions[sessionId]->GetCumulatedProgress();
 
 	QJsonObject jsonObject;
 	if (!mainTask.WriteToJsonObject(jsonObject)) {
@@ -126,15 +134,6 @@ CProgressManagerPublisherComp::ProgressManagerSession::ProgressManagerSession(
 	  m_isFailed(false),
 	  m_isCompleted(false)
 {
-}
-
-
-// protected methods of the embedded class ProgressManagerSession
-
-void CProgressManagerPublisherComp::ProgressManagerSession::SetFailed(const QString& description)
-{
-	m_isFailed = true;
-	m_description = description;
 }
 
 

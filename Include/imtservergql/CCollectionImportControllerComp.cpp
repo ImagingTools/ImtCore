@@ -83,16 +83,9 @@ bool CCollectionImportControllerComp::BeginCollectionImportSession(const ICollec
 
 bool CCollectionImportControllerComp::CancelCollectionImportSession(const QByteArray& sessionId, QString& errorMessage)
 {
-	bool retVal = true;
-	bool isSessionActive = false;
-	
-	{
-		QMutexLocker locker(&m_mutex);
+	QMutexLocker locker(&m_mutex);
 
-		isSessionActive = m_sessions.contains(sessionId);
-	}
-
-	if (isSessionActive){
+	if (m_sessions.contains(sessionId)){
 		QByteArray jobId = m_sessions[sessionId]->jobId;
 
 		if (!jobId.isEmpty()){
@@ -104,12 +97,12 @@ bool CCollectionImportControllerComp::CancelCollectionImportSession(const QByteA
 		}
 	}
 	else{
-		errorMessage = tr("Session not found");
+		errorMessage = tr("Collection import session not found");
 
-		return true;
+		return false;
 	}
 
-	return retVal;
+	return true;
 }
 
 
@@ -193,7 +186,7 @@ void CCollectionImportControllerComp::OnComponentDestroyed()
 
 // private methods
 
-bool CCollectionImportControllerComp::PrepareProgressManager(SessionInfo& session)
+bool CCollectionImportControllerComp::PrepareProgressManager(SessionInfo& session) const
 {
 	session.mainProgressManagerPtr = m_progressSessionManagerCompPtr->BeginProgressSession(session.sessionId, tr("Import files to the collection"));
 	session.uploadProgressManagerPtr = session.mainProgressManagerPtr->CreateSubtaskManager("uploading", tr("Uploading files to the server"), 0.2);
@@ -221,6 +214,7 @@ bool CCollectionImportControllerComp::PrepareProgressManager(SessionInfo& sessio
 void CCollectionImportControllerComp::UploadProgressChanged(QByteArray sessionId, QByteArray fileId)
 {
 	QMutexLocker locker(&m_mutex);
+
 	if (m_sessions.contains(sessionId)){
 		bool uploadingFinished = true;
 
@@ -293,6 +287,8 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 		QVariant value = changeset.GetChangeInfoMap().value(imthype::IJobQueueManager::CN_JOB_PROGRESS_CHANGED);
 		imthype::IJobQueueManager::JobProgressInfo info = value.value<imthype::IJobQueueManager::JobProgressInfo>();
 
+		QMutexLocker locker(&m_mutex);
+
 		for (std::shared_ptr<SessionInfo>& session : m_sessions){
 			if (session->jobId == info.elementId){
 				session->fileProcessingProgressLoggerPtr->OnProgress(info.progress);
@@ -309,6 +305,8 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 		imthype::IJobQueueManager::JobStatusInfo info = value.value<imthype::IJobQueueManager::JobStatusInfo>();
 
 		if (info.status == imthype::IJobQueueManager::PS_FINISHED || info.status == imthype::IJobQueueManager::PS_CANCELED){
+			QMutexLocker locker(&m_mutex);
+
 			if (!m_sessions.isEmpty()){
 				for (std::shared_ptr<SessionInfo>& session : m_sessions){
 					if (session->jobId == info.elementId){
@@ -376,6 +374,8 @@ CCollectionImportControllerComp::FileInfo* CCollectionImportControllerComp::Find
 
 CCollectionImportControllerComp::FilelUploadStatus CCollectionImportControllerComp::AddFileChunk(const QByteArray& fileId, const istd::CIntRange& range)
 {
+	QMutexLocker locker(&m_mutex);
+
 	FileInfo* fileInfoPtr = FindFileInfo(fileId);
 	Q_ASSERT(fileInfoPtr != nullptr);
 
@@ -405,6 +405,8 @@ CCollectionImportControllerComp::FilelUploadStatus CCollectionImportControllerCo
 
 double CCollectionImportControllerComp::GetFileProgress(const QByteArray& fileId)
 {
+	QMutexLocker locker(&m_mutex);
+
 	FileInfo* fileInfoPtr = FindFileInfo(fileId);
 	Q_ASSERT(fileInfoPtr != nullptr);
 
@@ -423,6 +425,8 @@ double CCollectionImportControllerComp::GetFileProgress(const QByteArray& fileId
 
 void CCollectionImportControllerComp::UpdateUploadProgress(const QByteArray& fileId)
 {
+	QMutexLocker locker(&m_mutex);
+
 	FileInfo* fileInfoPtr = FindFileInfo(fileId);
 	Q_ASSERT(fileInfoPtr != nullptr);
 

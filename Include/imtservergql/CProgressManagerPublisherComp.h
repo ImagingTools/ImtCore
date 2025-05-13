@@ -41,8 +41,6 @@ private:
 			CProgressManagerPublisherComp& parent, const QByteArray& sessionId, const QString& description);
 
 	protected:
-		void SetFailed(const QString& description);
-
 		// reimplemented (CCumulatedProgressManagerBase)
 		void OnProgressChanged(double cumulatedValue) override;
 
