@@ -29,15 +29,11 @@ public:
 
 	I_BEGIN_COMPONENT(TObjectCollectionControllerSearchCompWrap);
 		I_REGISTER_INTERFACE(imtbase::ISearchController);
-		I_ASSIGN(m_listObjectCommandAttrPtr, "ListObjectCommand", "The command-ID for getting a list of objects", false, "");
 	I_END_COMPONENT;
 
 	// reimplemented (ISearchController)
 	virtual QByteArray GetControllerId() const override;
 	virtual const imtbase::ISearchResults* Search(const QString& text) const override;
-
-protected:
-	I_ATTR(QByteArray, m_listObjectCommandAttrPtr);
 };
 
 
@@ -53,7 +49,14 @@ QByteArray TObjectCollectionControllerSearchCompWrap<ObjectCollection>::GetContr
 template<class CollectionController>
 const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<CollectionController>::Search(const QString& text) const
 {
-	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, m_listObjectCommandAttrPtr.IsValid() ? m_listObjectCommandAttrPtr->GetValue() : QByteArray());
+	QMap<int, QByteArray> commandIds = BaseClass::GetSupportedCommandIds();
+	QByteArray listCommandId = commandIds.value(BaseClass::OperationType::OT_LIST);
+	if (listCommandId.isEmpty()){
+		Q_ASSERT(false);
+		return nullptr;
+	}
+	
+	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, listCommandId);
 
 	imtgql::IGqlRequestProvider* gqlRequestProviderPtr = QueryInterface<imtgql::IGqlRequestProvider>(const_cast<TObjectCollectionControllerSearchCompWrap<CollectionController>*>(this));
 	if (gqlRequestProviderPtr != nullptr){
