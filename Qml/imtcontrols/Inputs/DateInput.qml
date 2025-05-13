@@ -66,7 +66,7 @@ Item {
 	}
 
 	function setDateAsString(str){
-		//console.log("Set date", str)
+		console.log("setDateAsString", str)
 		str = correctDateFormat(str);
 		if(!dateInput.checkDateFormat(str)){
 			return false;
@@ -94,6 +94,11 @@ Item {
 		dateInput.dateChanged(dateInput.dateStr);
 
 		return true;
+	}
+	
+	// "dd.MM.yyyy" format
+	function getDateAsString(){
+		return dateInput.dateStr
 	}
 
 	function showCurrentDate(){

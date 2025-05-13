@@ -9,7 +9,7 @@ Item {
 	id: commandsItem;
 	height: 30;
 
-	signal commandActivated(string commandId);
+	signal commandActivated(string commandId, var params);
 	
 	function getCommandData(commandId, key){
 		let result = leftCommands.getCommandData(commandId, key);
@@ -137,7 +137,7 @@ Item {
 						   centerCommands.x :
 						   rightCommands.commandsCount > 0 ? rightCommands.x : commandsItem.width) - button.width - leftCommands.anchors.leftMargin;
 		onCommandActivated: {
-			commandsItem.commandActivated(commandId);
+			commandsItem.commandActivated(commandId, params);
 		}
 		
 		onCommandsCountChanged: {
@@ -152,7 +152,7 @@ Item {
 						   rightCommands.x - centerCommands.x - (button.visible ? button.width : 0):
 						   commandsItem.width - centerCommands.x) - button.width;
 		onCommandActivated: {
-			commandsItem.commandActivated(commandId);
+			commandsItem.commandActivated(commandId, params);
 		}
 		
 		onCommandsCountChanged: {
@@ -167,7 +167,7 @@ Item {
 		maximumWidth: (commandsItem.width - (centerCommands.x + centerCommands.contentWidth)) - button.width;
 		
 		onCommandActivated: {
-			commandsItem.commandActivated(commandId);
+			commandsItem.commandActivated(commandId, params);
 		}
 		
 		onCommandsCountChanged: {

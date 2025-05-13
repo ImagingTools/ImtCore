@@ -35,7 +35,10 @@ Item {
 	
 	property int commandsCount: 0;
 	
-	signal commandActivated(string commandId);
+	// params["x"] = X coord click
+	// params["y"] = Y coord click
+	// params["target"] = button reference
+	signal commandActivated(string commandId, var params);
 	
 	function setCommandData(commandId, key, value){
 		if (!commandsModel){
@@ -193,7 +196,11 @@ Item {
 									visible: !element || priority < 0 ? false : element.m_visible;
 									
 									onClicked: {
-										commandsItem.commandActivated(element.m_elementId);
+										let params = {}
+										params["x"] = mouseArea.mouseX
+										params["y"] = mouseArea.mouseY
+										params["target"] = button
+										commandsItem.commandActivated(element.m_elementId, params);
 									}
 									
 									onWidthChanged: {

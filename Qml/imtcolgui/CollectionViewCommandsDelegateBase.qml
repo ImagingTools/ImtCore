@@ -28,6 +28,8 @@ ViewCommandsDelegateBase {
 	property alias importFileDialog: importFileDialog_;
 	property alias exportFileDialog: fileDialogSave;
 	property alias setDescriptionDialogComp: setDescriptionDialog;
+	
+	property int exportContextMenuWidth: 300
 
 	property string importObjectTypeId;
 
@@ -237,9 +239,8 @@ ViewCommandsDelegateBase {
 		id: extensionsPopupMenuDialog;
 
 		PopupMenuDialog {
-			itemWidth: 350;
-			// centered: true;
-			// hiddenBackground: false;
+			itemWidth: collectionViewCommandsDelegate.exportContextMenuWidth;
+			hiddenBackground: false
 			onFinished: {
 				if (index >= 0){
 					fileDialogSave.fileExt = collectionViewCommandsDelegate.getExtensionFromNameFilter(fileDialogSave.nameFilters, index);
@@ -257,7 +258,7 @@ ViewCommandsDelegateBase {
 		importFileDialog_.open();
 	}
 
-	function onExport(){
+	function onExport(params){
 		if (Qt.platform.os == "web"){
 			setupExtensionsModel();
 
@@ -267,7 +268,13 @@ ViewCommandsDelegateBase {
 				fileDialogSave.open();
 			}
 			else{
-				ModalDialogManager.openDialog(extensionsPopupMenuDialog, {"x": ModalDialogManager.activeView.width / 2, "y": ModalDialogManager.activeView.height / 2, "model": extensionModel});
+				let target = params["target"]
+				let mX = params["x"]
+				let mY = params["y"]
+				
+				let point = target.mapToItem(null, 0, target.height)
+
+				ModalDialogManager.openDialog(extensionsPopupMenuDialog, {"x": point.x - collectionViewCommandsDelegate.exportContextMenuWidth, "y": point.y, "model": extensionModel});
 			}
 		}
 		else{
@@ -499,8 +506,8 @@ ViewCommandsDelegateBase {
 		}
 	}
 
-	function commandHandle(commandId){
-		console.log("CollectionViewCommandsDelegateBase commandHandle", commandId);
+	function commandHandle(commandId, params){
+		console.log("CollectionViewCommandsDelegateBase commandHandle", commandId, params);
 
 		if (!collectionViewCommandsDelegate.collectionView){
 			return;
@@ -516,32 +523,32 @@ ViewCommandsDelegateBase {
 
 		if (commandIsEnabled){
 			if (commandId === "New"){
-				collectionViewCommandsDelegate.onNew();
+				collectionViewCommandsDelegate.onNew(params);
 			}
 			else if (commandId === "Remove"){
-				collectionViewCommandsDelegate.onRemove();
+				collectionViewCommandsDelegate.onRemove(params);
 			}
 			else if (commandId === "Edit"){
-				collectionViewCommandsDelegate.onEdit();
+				collectionViewCommandsDelegate.onEdit(params);
 			}
 			else if (commandId === "Import"){
-				collectionViewCommandsDelegate.onImport();
+				collectionViewCommandsDelegate.onImport(params);
 			}
 			else if (commandId === "Export"){
-				collectionViewCommandsDelegate.onExport();
+				collectionViewCommandsDelegate.onExport(params);
 			}
 			else if (commandId === "Revision"){
-				collectionViewCommandsDelegate.onRevision();
+				collectionViewCommandsDelegate.onRevision(params);
 			}
 		}
 
 		let editIsEnabled = commandsController.commandIsEnabled("Edit");
 		if (editIsEnabled){
 			if (commandId === "Rename"){
-				collectionViewCommandsDelegate.onRename();
+				collectionViewCommandsDelegate.onRename(params);
 			}
 			else if (commandId === "SetDescription"){
-				collectionViewCommandsDelegate.onSetDescription();
+				collectionViewCommandsDelegate.onSetDescription(params);
 			}
 		}
 

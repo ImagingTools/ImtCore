@@ -9,7 +9,7 @@ Item {
 
     signal commandActivated(string commandId);
 
-    function commandHandle(commandId){
+    function commandHandle(commandId, params){
         commandActivated(commandId);
     }
 

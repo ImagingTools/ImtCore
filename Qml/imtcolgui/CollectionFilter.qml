@@ -52,15 +52,17 @@ ComplexCollectionFilter {
 
 	function setTextFilter(filter){
 		m_fieldsFilter.m_groupFilters.clear();
-		
 		let fieldsModel = createBaseModel();
-		for (let i = 0; i < textFilteringInfoIds.length; i++){
-			let infoId = textFilteringInfoIds[i];
-			let fieldObj = createFieldFilter(infoId, filter, valueType.STRING, [filterOperation.CONTAINS]);
-			
-			fieldsModel.addElement(fieldObj);
-		}
 		
+		if (filter !== ""){
+			for (let i = 0; i < textFilteringInfoIds.length; i++){
+				let infoId = textFilteringInfoIds[i];
+				let fieldObj = createFieldFilter(infoId, filter, valueType.STRING, [filterOperation.CONTAINS]);
+				
+				fieldsModel.addElement(fieldObj);
+			}
+		}
+
 		let textGroupFilter = createGroupFilter(logicalOperation.OR, fieldsModel);
 		
 		addGroupFilter(textGroupFilter);

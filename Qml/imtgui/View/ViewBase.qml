@@ -42,7 +42,7 @@ Item {
 		CommandsPanel {
 			onCommandActivated: {
 				if (viewBase.commandsDelegate){
-					viewBase.commandsDelegate.commandHandle(commandId);
+					viewBase.commandsDelegate.commandHandle(commandId, params);
 				}
 			}
 		}
