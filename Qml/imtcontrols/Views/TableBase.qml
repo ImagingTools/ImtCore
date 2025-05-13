@@ -823,7 +823,7 @@ Rectangle {
 		anchors.bottom: parent.bottom;
 		anchors.bottomMargin: scrollHoriz.visible ? scrollHoriz.secondSize + scrollHoriz.anchors.topMargin : 0;
 
-        boundsBehavior: Flickable.StopAtBounds;
+		boundsBehavior: Flickable.StopAtBounds;
 		reuseItems: true
 
 		// cacheBuffer: elementsListObj.count * tableContainer.itemHeight;

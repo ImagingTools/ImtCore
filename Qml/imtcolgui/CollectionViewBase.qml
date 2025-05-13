@@ -181,7 +181,7 @@ ViewBase {
 			
 			canMoveColumns: true;
 			
-			scrollbarRightMargin: -20;
+			scrollbarRightMargin: collectionViewBaseContainer.hasFilter ? -20 : 0;
 			verticalBorderHeight: headerHeight / 2;
 			verticalBorderSize: 1;
 			visibleLeftBorderFirst: false;
