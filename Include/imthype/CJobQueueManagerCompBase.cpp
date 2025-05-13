@@ -102,28 +102,29 @@ bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 	if (index >= 0){
 		JobItem& item = m_jobItems[index];
 
+		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
+		std::unique_ptr<istd::CChangeNotifier> notifierPtr;
+
 		if (item.processingStatus < PS_RUNNING){
-			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 			JobStatusInfo info;
 			info.elementId = jobId;
 			info.status = PS_CANCELED;
 
 			changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_STATUS_CHANGED, QVariant::fromValue(info));
 
-			istd::CChangeNotifier changeNotifier(this, &changeSet);
+			notifierPtr.reset(new istd::CChangeNotifier(this, &changeSet));
 
 			item.processingStatus = PS_CANCELED;
 		}
 
 		if (item.processingStatus == PS_RUNNING){
-			istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
 			JobStatusInfo info;
 			info.elementId = jobId;
 			info.status = PS_CANCELING;
 
 			changeSet.SetChangeInfo(IJobQueueManager::CN_JOB_STATUS_CHANGED, QVariant::fromValue(info));
 
-			istd::CChangeNotifier changeNotifier(this, &changeSet);
+			notifierPtr.reset(new istd::CChangeNotifier(this, &changeSet));
 
 			item.processingStatus = PS_CANCELING;
 		}
@@ -134,8 +135,6 @@ bool CJobQueueManagerCompBase::CancelJob(const QByteArray & jobId)
 
 		return true;
 	}
-
-	lock.unlock();
 
 	return false;
 }

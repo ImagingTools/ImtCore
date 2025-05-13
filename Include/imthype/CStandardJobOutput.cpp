@@ -274,8 +274,8 @@ bool CStandardJobOutput::CopyFrom(const istd::IChangeable& object, Compatibility
 	if (sourcePtr != NULL){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_processingInfo.CopyFrom(*sourcePtr);
-		m_results.CopyFrom(*sourcePtr);
+		m_processingInfo.CopyFrom(sourcePtr->m_processingInfo);
+		m_results.CopyFrom(sourcePtr->m_results);
 
 		m_jobName = sourcePtr->m_jobName;
 		m_outputTypeMap = sourcePtr->m_outputTypeMap;
