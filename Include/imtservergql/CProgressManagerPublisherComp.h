@@ -26,7 +26,7 @@ public:
 	// reimplemented (imtbase::IProgressSessionsManager)
 	virtual ibase::IProgressManager* BeginProgressSession(const QByteArray& sessionId, const QString& description) override;
 	virtual bool EndProgressSession(const QByteArray& sessionId) override;
-	virtual bool CancelProgressSession(const QByteArray& sessionId) override;
+	virtual bool CancelProgressSession(const QByteArray& sessionId, const QString& description = QString(), bool isFailed = false) override;
 
 private:
 	bool PublishSession(const QByteArray& sessionId);
@@ -41,13 +41,17 @@ private:
 			CProgressManagerPublisherComp& parent, const QByteArray& sessionId, const QString& description);
 
 	protected:
+		void SetFailed(const QString& description);
+
 		// reimplemented (CCumulatedProgressManagerBase)
 		void OnProgressChanged(double cumulatedValue) override;
 
 	protected:
 		CProgressManagerPublisherComp& m_parent;
 		const QByteArray m_sessionId;
-		const QString m_description;
+		QString m_description;
+		bool m_isFailed;
+		bool m_isCompleted;
 	};
 
 	typedef std::shared_ptr<ProgressManagerSession> ProgressManagerSessionPtr;

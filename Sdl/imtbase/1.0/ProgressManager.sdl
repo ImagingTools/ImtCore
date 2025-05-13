@@ -11,13 +11,15 @@ schema {
 
 type TaskProgress {
 	id: ID!
-	description: String
-	isCancellable: Bool
-	isCanceled: Bool
+	description: String!
+	isCancellable: Bool!
+	isCancelled: Bool!
+	isFailed: Bool!
+	isCompleted: Bool!
 
 	subTaskList: [TaskProgress]
 
-	progress: Double
+	progress: Double!
 	totalProgress: Double!
 }
 

@@ -14,6 +14,7 @@
 
 // ImtCore includes
 #include <imtbase/CSimpleReferenceCollection.h>
+#include <imthype/CStandardJobOutput.h>
 
 
 namespace imtservergql
@@ -99,7 +100,7 @@ bool CCollectionImportControllerComp::CancelCollectionImportSession(const QByteA
 		}
 		else{
 			m_fileManagerCompPtr->FinishSession(sessionId);
-			m_progressSessionManagerCompPtr->CancelProgressSession(sessionId);
+			m_progressSessionManagerCompPtr->CancelProgressSession(sessionId, tr("Collection import cancelled"));
 		}
 	}
 	else{
@@ -118,6 +119,10 @@ IFileUploadHandler::FilelUploadStatus CCollectionImportControllerComp::ReceiveFi
 	const QByteArray& data)
 {
 	QByteArray sessionId = FindSession(fileId);
+
+	if (!m_fileManagerCompPtr.IsValid()){
+		return FUS_FAILED_TO_OPEN;
+	}
 
 	QString filePath = m_fileManagerCompPtr->GetPath(sessionId, fileId);
 	if (filePath.isEmpty()){
@@ -296,6 +301,10 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 	}
 
 	if (changeset.GetChangeInfoMap().contains(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED)){
+		if (changeset.GetChangeInfoMap().contains(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED)){
+			return;
+		}
+
 		QVariant value = changeset.GetChangeInfoMap().value(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED);
 		imthype::IJobQueueManager::JobStatusInfo info = value.value<imthype::IJobQueueManager::JobStatusInfo>();
 
@@ -305,9 +314,24 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 					if (session->jobId == info.elementId){
 						QByteArray sessionId = session->sessionId;
 
+						imthype::CStandardJobOutput jobOutput;
+						m_jobQueueManagerCompPtr->GetJobResult(session->jobId, jobOutput);
+						istd::IInformationProvider::InformationCategory category = jobOutput.GetInformationCategory();
+
 						m_jobQueueManagerCompPtr->RemoveJob(session->jobId);
 						m_fileManagerCompPtr->FinishSession(sessionId);
-						m_progressSessionManagerCompPtr->EndProgressSession(sessionId);
+
+						if (info.status == imthype::IJobQueueManager::PS_CANCELED){
+							m_progressSessionManagerCompPtr->CancelProgressSession(sessionId, tr("Collection import cancelled"));
+						}
+						else{
+							if (category == istd::IInformationProvider::IC_ERROR){
+								m_progressSessionManagerCompPtr->CancelProgressSession(sessionId, tr("An error occurred during collection import"), true);
+							}
+							else{
+								m_progressSessionManagerCompPtr->EndProgressSession(sessionId);
+							}
+						}
 
 						QMutexLocker locker(&m_mutex);
 
@@ -324,6 +348,8 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 
 QByteArray CCollectionImportControllerComp::FindSession(const QByteArray& fileId) const
 {
+	QMutexLocker locker(&m_mutex);
+
 	for (const QByteArray& sessionId : m_sessions.keys()){
 		if (m_sessions[sessionId]->files.contains(fileId)){
 			return sessionId;
@@ -336,6 +362,8 @@ QByteArray CCollectionImportControllerComp::FindSession(const QByteArray& fileId
 
 CCollectionImportControllerComp::FileInfo* CCollectionImportControllerComp::FindFileInfo(const QByteArray& fileId)
 {
+	QMutexLocker locker(&m_mutex);
+
 	for (const SessionInfoPtr& sessionInfoPtr : m_sessions){
 		if (sessionInfoPtr->files.contains(fileId)){
 			return &sessionInfoPtr->files[fileId];

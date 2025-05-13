@@ -36,6 +36,10 @@ bool CProgressManagerPublisherComp::EndProgressSession(const QByteArray& session
 {
 	QMutexLocker locker(&m_mutex);
 	if (m_progressSessions.contains(sessionId)) {
+		m_progressSessions[sessionId]->m_isCompleted = true;
+
+		PublishSession(sessionId);
+
 		m_progressSessions.remove(sessionId);
 
 		return true;
@@ -45,13 +49,17 @@ bool CProgressManagerPublisherComp::EndProgressSession(const QByteArray& session
 }
 
 
-bool CProgressManagerPublisherComp::CancelProgressSession(const QByteArray& sessionId)
+bool CProgressManagerPublisherComp::CancelProgressSession(const QByteArray& sessionId, const QString& description, bool isFailed)
 {
 	QMutexLocker locker(&m_mutex);
 	if (m_progressSessions.contains(sessionId)){
-		m_progressSessions[sessionId]->SetCanceled(true);
+		m_progressSessions[sessionId]->SetCanceled(!isFailed);
+		m_progressSessions[sessionId]->m_isFailed = isFailed;
+		m_progressSessions[sessionId]->m_description = description;
 
 		PublishSession(sessionId);
+
+		m_progressSessions.remove(sessionId);
 
 		return true;
 	}
@@ -86,7 +94,9 @@ bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)
 	mainTask.id = sessionId;
 	mainTask.description = m_progressSessions[sessionId]->m_description;
 	mainTask.isCancellable = m_progressSessions[sessionId]->IsCancelable();
-	mainTask.isCanceled = m_progressSessions[sessionId]->IsCanceled();
+	mainTask.isCancelled = m_progressSessions[sessionId]->IsCanceled();
+	mainTask.isFailed = m_progressSessions[sessionId]->m_isFailed;
+	mainTask.isCompleted = m_progressSessions[sessionId]->m_isCompleted;
 	mainTask.progress = m_progressSessions[sessionId]->GetCumulatedProgress();
 	mainTask.totalProgress = m_progressSessions[sessionId]->GetCumulatedProgress();
 
@@ -112,12 +122,21 @@ CProgressManagerPublisherComp::ProgressManagerSession::ProgressManagerSession(
 	CProgressManagerPublisherComp& parent, const QByteArray& sessionId, const QString& description)
 	: m_parent(parent),
 	  m_sessionId(sessionId),
-	  m_description(description)
+	  m_description(description),
+	  m_isFailed(false),
+	  m_isCompleted(false)
 {
 }
 
 
 // protected methods of the embedded class ProgressManagerSession
+
+void CProgressManagerPublisherComp::ProgressManagerSession::SetFailed(const QString& description)
+{
+	m_isFailed = true;
+	m_description = description;
+}
+
 
 // reimplemented (CCumulatedProgressManagerBase)
 

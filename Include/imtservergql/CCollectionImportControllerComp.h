@@ -119,7 +119,7 @@ private:
 
 	QMap<QByteArray, SessionInfoPtr> m_sessions;
 
-	QMutex m_mutex;
+	mutable QRecursiveMutex m_mutex;
 
 	imtbase::TModelUpdateBinder<imthype::IJobQueueManager, CCollectionImportControllerComp> m_jobQueueObserver;
 };
