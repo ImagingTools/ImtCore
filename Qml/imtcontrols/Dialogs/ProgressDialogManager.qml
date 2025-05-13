@@ -5,13 +5,14 @@ import imtcontrols 1.0
 
 Dialog {
 	id: progressDialog;
-	
+
 	width: 500;
-	
+
 	title:  qsTr("Progress manager");
-	
+
 	property string message;
-	
+	property string totalProgressTitle: qsTr("Total progress");
+
 	canMove: true;
 	forceFocus: true;
 	contentComp: body;
@@ -85,12 +86,11 @@ Dialog {
 	topPanelComp :Component{
 		TopPanelDialog{canClose: false}
 	}
-	
+
 	Component.onCompleted: {
 		addButton(Enums.cancel, qsTr("Cancel"), true)
 	}
-	
-	
+
 	onLocalizationChanged: {
 		setButtonName(Enums.cancel, qsTr("Cancel"))
 	}
@@ -101,12 +101,12 @@ Dialog {
 			progressDialog.isCancelling = true;
 			taskCanceled(taskId);
 		}
+
 		if(buttonId == Enums.ok){
 			taskClosed();
 		}
-
 	}
-	
+
 	onValueChanged: {
 		if(value >= 1 && closeWhenFinished){
 
@@ -122,14 +122,11 @@ Dialog {
 		}
 	}
 
-
-
 	Component{
 		id: body;
 		Item{
 			width: progressDialog.width;
 			height: subtaskColumn.y + subtaskColumn.height + (subtaskColumn.height > 0) * 40;
-
 
 			ProgressBar{
 				id: mainProgressBar;
@@ -141,7 +138,7 @@ Dialog {
 				anchors.leftMargin: Style.sizeMainMargin;
 				anchors.rightMargin: Style.sizeMainMargin;
 
-				title: qsTr("Total progress");
+				title: progressDialog.totalProgressTitle;
 				text:  percent + "%"
 
 				value: progressDialog.value;
@@ -160,72 +157,71 @@ Dialog {
 				visible: subtaskColumn.height;
 			}
 
-				Column{
-					id: subtaskColumn;
+			Column{
+				id: subtaskColumn;
 
-					anchors.top: subtaskTitle.bottom;
-					anchors.left: subtaskTitle.left;
-					anchors.right: parent.right;
-					anchors.topMargin: Style.sizeMainMargin;
-					anchors.leftMargin: Style.sizeMainMargin;
-					anchors.rightMargin: Style.sizeMainMargin;
-					spacing: Style.sizeMainMargin;
-					Repeater{
-						id: subtaskRepeater;
+				anchors.top: subtaskTitle.bottom;
+				anchors.left: subtaskTitle.left;
+				anchors.right: parent.right;
+				anchors.topMargin: Style.sizeMainMargin;
+				anchors.leftMargin: Style.sizeMainMargin;
+				anchors.rightMargin: Style.sizeMainMargin;
+				spacing: Style.sizeMainMargin;
+				Repeater{
+					id: subtaskRepeater;
 
-						model: progressDialog.subtaskModel;
+					model: progressDialog.subtaskModel;
 
-						delegate:
-							Item{
+					delegate:
+						Item{
+						width: subtaskColumn.width;
+						height: subtaskProgressBar.height;
+
+						ProgressBar{
+							id: subtaskProgressBar;
+
+							anchors.verticalCenter: parent.verticalCenter;
+							anchors.left: parent.left
+							anchors.right: cancelButton.left;
+							anchors.rightMargin: Style.sizeMainMargin;
+
 							width: subtaskColumn.width;
-							height: subtaskProgressBar.height;
 
-							ProgressBar{
-								id: subtaskProgressBar;
+							fontSize: Style.fontSizeNormal;
 
-								anchors.verticalCenter: parent.verticalCenter;
-								anchors.left: parent.left
-								anchors.right: cancelButton.left;
-								anchors.rightMargin: Style.sizeMainMargin;
+							title: model.description !==undefined ? model.description : "";
+							text:  percent + "%"
 
-								width: subtaskColumn.width;
+							value: model.value !==undefined ? model.value : 0;
+						}
+						Button{
+							id: cancelButton;
 
-								fontSize: Style.fontSizeNormal;
-
-								title: model.description !==undefined ? model.description : "";
-								text:  percent + "%"
-
-								value: model.value !==undefined ? model.value : 0;
-							}
-							Button{
-								id: cancelButton;
-
-								anchors.right: parent.right;
-								anchors.bottom: parent.bottom;
-								height: 20;
-								text: qsTr("Cancel");
-								visible: model.isCancellable !==undefined ? model.isCancellable : true;
-								onClicked: {
-									progressDialog.subtaskCanceled(model.id)
-									parent.visible = false;
-								}
+							anchors.right: parent.right;
+							anchors.bottom: parent.bottom;
+							height: 20;
+							text: qsTr("Cancel");
+							visible: model.isCancellable !==undefined ? model.isCancellable : true;
+							onClicked: {
+								progressDialog.subtaskCanceled(model.id)
+								parent.visible = false;
 							}
 						}
-
 					}
-
 				}
-				Rectangle{
-					anchors.bottom: parent.bottom;
-					anchors.left: parent.left;
-					anchors.right: parent.right;
-					anchors.bottomMargin: Style.sizeMainMargin;
-					anchors.leftMargin: 2*Style.sizeMainMargin;
-					anchors.rightMargin: Style.sizeMainMargin;
+			}
 
-					height: 1;
-					color: Style.backgroundColor;
-				}
+			Rectangle{
+				anchors.bottom: parent.bottom;
+				anchors.left: parent.left;
+				anchors.right: parent.right;
+				anchors.bottomMargin: Style.sizeMainMargin;
+				anchors.leftMargin: 2*Style.sizeMainMargin;
+				anchors.rightMargin: Style.sizeMainMargin;
+
+				height: 1;
+				color: Style.backgroundColor;
+			}
 		}
 	}
 
