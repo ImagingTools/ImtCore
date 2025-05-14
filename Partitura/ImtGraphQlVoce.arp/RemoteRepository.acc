@@ -2,23 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5352" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="CachedRemoteCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RemoteRepository"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ObjectCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
@@ -94,13 +85,14 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imod::IModel" ComponentId="CachedRemoteCollection"/>
-        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="CachedRemoteCollection"/>
-        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="CachedRemoteCollection"/>
-        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="CachedRemoteCollection"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="RemoteRepository"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="RemoteRepository"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="RemoteRepository"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="RemoteRepository"/>
+        <Interface InterfaceId="imtclientgql::IGqlSubscriptionClient" ComponentId="RemoteRepository"/>
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="ObjectCollectionChangeNotifier"/>
-        <Interface InterfaceId="istd::IChangeable" ComponentId="CachedRemoteCollection"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="CachedRemoteCollection"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="RemoteRepository"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="RemoteRepository"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>
