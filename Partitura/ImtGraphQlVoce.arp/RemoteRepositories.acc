@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5352" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -80,6 +80,15 @@
         <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="RoleCollectionAdapter" PackageId="ImtAuthPck" ComponentId="RoleCollectionAdapter">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleRemoteRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="RoleRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
@@ -181,11 +190,26 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="UserGroupInfoProvider" PackageId="ImtAuthPck" ComponentId="UserGroupInfoProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GroupRemoteRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AdminId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="su"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleCollectionAdapter"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupInfoProvider"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

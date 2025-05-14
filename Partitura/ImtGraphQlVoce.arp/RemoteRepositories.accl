@@ -2,18 +2,20 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5352" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="GroupRemoteRepository" X="925" Y="400" Note=""/>
         <Element ComponentName="Role" X="200" Y="575" Note=""/>
+        <Element ComponentName="RoleCollectionAdapter" X="225" Y="225" Note=""/>
         <Element ComponentName="RoleRemoteRepository" X="200" Y="400" Note=""/>
         <Element ComponentName="SessionInfo" X="550" Y="750" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="550" Y="400" Note=""/>
         <Element ComponentName="UserGroupInfo" X="950" Y="575" Note=""/>
+        <Element ComponentName="UserGroupInfoProvider" X="943" Y="204" Note=""/>
         <Element ComponentName="UserInfo" X="550" Y="75" Note=""/>
         <Element ComponentName="UserRemoteRepository" X="550" Y="225" Note=""/>
         <Element ComponentName="UserSessionRemoteRepository" X="575" Y="575" Note=""/>
