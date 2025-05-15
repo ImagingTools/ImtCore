@@ -114,17 +114,41 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="LogMigration" PackageId="ImtDatabaseVoce" ComponentId="SqlScriptBasedMigration">
+                    <Element Id="MigrationController" PackageId="ImtDatabasePck" ComponentId="MigrationController">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                                     <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="From" Type="Integer" ExportId="">
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="From" Type="Integer" ExportId="From">
                                     <Data IsEnabled="true" Value="0"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="To" Type="Integer" ExportId="">
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RelativeFileNameParam"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="To" Type="Integer" ExportId="To">
                                     <Data IsEnabled="true" Value="1"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RelativeFileNameParam" PackageId="FilePck" ComponentId="FileNameParam">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DefaultPath" Type="String" ExportId="MigrationPath">
+                                    <Data IsEnabled="true" Value=":/imtbase/LogMigrations"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="2"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -139,7 +163,7 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="MigrationController" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="LogMigration"/>
+                                    <Data IsEnabled="true" Value="MigrationController"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="PathLocationType" Type="Integer" ExportId="PathLocationType">
                                     <Data IsEnabled="false"/>

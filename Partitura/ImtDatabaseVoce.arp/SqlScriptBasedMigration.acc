@@ -37,14 +37,29 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RelativeFileNameParam" PackageId="FilePck" ComponentId="FileNameParam">
+        <Element Id="RelativeFileNameParam" PackageId="FilePck" ComponentId="RelativeFileNameParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value=":/imtbase/LogMigrations"/>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="MigrationPath">
+                        <Data IsEnabled="true" Value="Migrations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathType" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="2"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SystemLocation"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SystemLocation" PackageId="FilePck" ComponentId="SystemLocation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="101"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

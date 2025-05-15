@@ -9,14 +9,15 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ConsoleApplicationFramework" X="325" Y="150" Note=""/>
-        <Element ComponentName="LogDatabase" X="900" Y="500" Note=""/>
+        <Element ComponentName="LogDatabase" X="925" Y="500" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="LogDatabase">
             <PositionMap>
                 <Element ComponentName="Log" X="550" Y="700" Note=""/>
                 <Element ComponentName="LogDatabase" X="575" Y="525" Note=""/>
-                <Element ComponentName="LogMigration" X="650" Y="150" Note=""/>
+                <Element ComponentName="MigrationController" X="475" Y="150" Note=""/>
+                <Element ComponentName="RelativeFileNameParam" X="150" Y="150" Note=""/>
                 <Element ComponentName="SqLiteDatabaseEngine" X="1025" Y="325" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>

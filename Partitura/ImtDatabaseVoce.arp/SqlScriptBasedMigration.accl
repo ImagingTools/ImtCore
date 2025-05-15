@@ -10,6 +10,7 @@
     <PositionMap>
         <Element ComponentName="MigrationController" X="600" Y="200" Note=""/>
         <Element ComponentName="RelativeFileNameParam" X="600" Y="350" Note=""/>
+        <Element ComponentName="SystemLocation" X="600" Y="500" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
