@@ -183,13 +183,23 @@ function qmlpropdef(meta, instructions){
         })
     } else {
         let type = meta[3][0].toUpperCase()+meta[3].slice(1)
+
+        if(meta[2] === '_testId'){
+            console.log(meta[2], meta[4])
+            instructions.properties.push({
+                name: meta[2],
+                val: meta[4],
+            })
+        } else {
+            instructions.properties.push({
+                name: meta[2],
+                type: listProperties['Q'+type] ? 'Q'+type : components[type] ? type : 'null', //temp
+                val: meta[4],
+                command: 'create'
+            })
+        }
         
-        instructions.properties.push({
-            name: meta[2],
-            type: listProperties['Q'+type] ? 'Q'+type : components[type] ? type : 'null', //temp
-            val: meta[4],
-            command: 'create'
-        })
+        
     }
     
 }

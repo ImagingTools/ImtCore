@@ -1,5 +1,5 @@
 const { ComplexObject } = require('../utils/base')
-const { QVar, QReal, QList } = require('../utils/properties')
+const { QVar, QReal, QList, QString } = require('../utils/properties')
 const { QSignal } = require('../utils/signal')
 const { Qt } = require('../utils/Qt')
 
@@ -19,6 +19,8 @@ class QObject extends ComplexObject {
         children: { type: QList, changed: '$childrenChanged' },
         resources: { type: QList, changed: '$resourcesChanged' },
         data: { type: QList, changed: '$dataChanged' },
+
+        _testId: { type: QString, changed: '$_testIdChanged' },
     }
 
     static defaultSignals = {
@@ -105,6 +107,10 @@ class QObject extends ComplexObject {
         //     }
         // }
 
+    }
+
+    $_testIdChanged(){
+        
     }
 
     $complete(){

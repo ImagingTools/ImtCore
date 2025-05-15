@@ -114,6 +114,10 @@ class Item extends QtObject {
         }
     }
 
+    $_testIdChanged(){
+        if(this.$dom) this.$dom.setAttribute('_testId', this._testId)
+    }
+
     $complete(){
         super.$complete()
         this.$anchorsUpdate()
@@ -129,6 +133,7 @@ class Item extends QtObject {
         this.$dom = document.createElement(tag)
         this.setStyle(style)
         this.$dom.id = this.UID
+        this.$dom.setAttribute('_testId', this._testId)
         // this.$dom.classList.add(this.constructor.name)
 
         if(this.getProperty('parent').get() && this.getProperty('parent').get().$dom){
