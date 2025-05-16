@@ -35,12 +35,16 @@ ListModel {
 		let json = '['
 		for(let i = 0; i < count; i++){
 			let item = get(i).item
-			let list = getProperties(item)
 
+			let list = getProperties(item)
 			json += '{'
 			for(let j = 0; j < list.length; j++){
 				let key = list[j]
-				if(typeof item[key] === 'object'){
+
+				if (item[key] == null){
+					json += '"' + item.getJSONKeyForProperty(key) + '": null'
+				}
+				else if(typeof item[key] === 'object'){
 					if (Array.isArray(item[key])){
 						json += '"' + item.getJSONKeyForProperty(key) + '":'
 
@@ -179,6 +183,23 @@ ListModel {
 
 		return true;
 	}
+	
+	function copyMe(){
+		console.log("BaseModel copyMe")
+		let retVal = Qt.createComponent('BaseModel.qml').createObject()
+		if (!retVal){
+			console.debug("Unable to create copy for BaseModel. Error: Creating component is failed")
+			return null
+		}
+		
+		for(let i = 0; i < count; i++){
+			let item = get(i).item
+			console.log("item", item)
+			retVal.addElement(item.copyMe())
+		}
+		
+		return retVal
+	}
 
 	function addElement(element){
 		element.owner = this.owner
@@ -222,6 +243,13 @@ ListModel {
 		}
 
 		return this.get(index).item[key];
+	}
+	
+	function setProperty(index, propName, value){
+		let item = get(index).item
+		if (item[propName] !== value){
+			item[propName] = value
+		}
 	}
 }
 

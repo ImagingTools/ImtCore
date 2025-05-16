@@ -64,7 +64,13 @@ QtObject {
 
 	onModelChanged: {
 		if(owner && owner.enableNotifications && owner.modelChanged){
-			owner.modelChanged(changeSet)
+			if (owner._internal.isTransaction){
+				owner._internal.changeList.concat(changeSet)
+				owner._internal.countChanges++
+			}
+			else{
+				owner.modelChanged(changeSet)
+			}
 		}
 	}
 
@@ -249,6 +255,9 @@ QtObject {
 				}
 			} else {
 				let value = this[key]
+				if (value === undefined){
+					value = null
+				}
 				let safeValue = this[key]
 				if (typeof safeValue === 'string'){
 					safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
@@ -366,7 +375,10 @@ QtObject {
 
 		for(let key in sourceObject){
 			let _key = "m_" + key[0].toLowerCase() + key.slice(1,key.length)
-			if(typeof sourceObject[key] === "object"){
+			if (sourceObject[key] === null){
+				this[_key] = null
+			}
+			else if(typeof sourceObject[key] === "object"){
 				if(Array.isArray(sourceObject[key])){
 					let component = createComponent(_key)
 

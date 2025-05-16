@@ -106,7 +106,13 @@ class BaseClass extends QtObject {
 
 	$onModelChanged(changeSet){
 		if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
-			this.owner.modelChanged(changeSet)
+			if (this.owner._internal.isTransaction){
+				this.owner._internal.changeList.concat(changeSet)
+				this.owner._internal.countChanges++
+			}
+			else{
+				this.owner.modelChanged(changeSet)
+			}
 		}
 	}
 
