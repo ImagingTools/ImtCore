@@ -71,7 +71,7 @@ bool CTreeItemModel::Copy(const CTreeItemModel* object)
 		QList<QByteArray> keys;
 		sourceItem->GetKeys(keys);
 
-		for (const QByteArray& key : keys){
+		for (const QByteArray& key : std::as_const(keys)){
 			QVariant value = sourceItem->Value(key);
 
 			CTreeItemModel* treeItemModelPtr = nullptr;
@@ -83,6 +83,8 @@ bool CTreeItemModel::Copy(const CTreeItemModel* object)
 				CTreeItemModel* subModelPtr = new CTreeItemModel();
 				
 				if (!subModelPtr->Copy(treeItemModelPtr)){
+					delete item;
+					delete subModelPtr;
 					endResetModel();
 
 					return false;
@@ -148,7 +150,7 @@ bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 			return false;
 		}
 
-		for (const QByteArray& key : keys){
+		for (const QByteArray& key : std::as_const(keys)){
 			if (!itemKeys.contains(key)){
 				return false;
 			}
@@ -269,9 +271,9 @@ int CTreeItemModel::InsertNewItem()
 
 	endInsertRows();
 
-    if(m_isUpdateEnabled){
-        OnModelChanged();
-    }
+	if(m_isUpdateEnabled){
+		OnModelChanged();
+	}
 
 	return index;
 }
@@ -293,9 +295,9 @@ int CTreeItemModel::InsertNewItem(int index)
 
 	endInsertRows();
 
-    if(m_isUpdateEnabled){
-        OnModelChanged();
-    }
+	if(m_isUpdateEnabled){
+		OnModelChanged();
+	}
 
 	return index;
 }
@@ -310,7 +312,6 @@ int CTreeItemModel::RemoveItem(int index)
 	beginRemoveRows(QModelIndex(), index, index);
 
 	Item* item = m_items.takeAt(index);
-	QList<QByteArray> keys;
 	delete item;
 
 	endRemoveRows();
@@ -422,7 +423,7 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel* exte
 	bool retVal = true;
 	QList<QByteArray> keys;
 	externTreeModel->GetKeys(keys, externIndex);
-	for (QByteArray key : keys){
+	for (const QByteArray& key : std::as_const(keys)){
 		QVariant value = externTreeModel->GetData(key, externIndex);
 
 		CTreeItemModel* treeItemModelPtr = nullptr;
@@ -455,11 +456,11 @@ bool CTreeItemModel::CopyItemDataToModel(int index, CTreeItemModel* externTreeMo
 	QList<QByteArray> keys;
 	this->GetKeys(keys, index);
 
-	for (QByteArray key : keys){
+	for (const QByteArray& key : std::as_const(keys)){
 		QVariant value = GetData(key, index);
 		retVal = externTreeModel->SetData(key, value, externIndex);
 
-		if (retVal == false){
+		if (!retVal){
 			break;
 		}
 	}
@@ -473,50 +474,50 @@ bool CTreeItemModel::SetData(
 		const QVariant& value,
 		int index)
 {
-    if(m_isUpdateEnabled){
-        BeginChanges();
-    }
+	if(m_isUpdateEnabled){
+		BeginChanges();
+	}
 
 	if (m_items.isEmpty() && index == 0){
 		InsertNewItem();
 	}
 
 	if (index < 0 || index > m_items.count() - 1){
-        if(m_isUpdateEnabled){
-            EndChanges();
-        }
+		if(m_isUpdateEnabled){
+			EndChanges();
+		}
 		return false;
 	}
 
-    QList<QByteArray> roles = m_roleNames.values();
-    if (!roles.contains(key)){
-        m_roleNames.insert(Qt::UserRole + 1 + m_roleNames.count(), key);
-    }
+	QList<QByteArray> roles = m_roleNames.values();
+	if (!roles.contains(key)){
+		m_roleNames.insert(Qt::UserRole + 1 + m_roleNames.count(), key);
+	}
 
 	Item* item = m_items[index];
 
 	if (item->Value(key) == value){
-        if(m_isUpdateEnabled){
-            EndChanges();
-        }
+		if(m_isUpdateEnabled){
+			EndChanges();
+		}
 		return true;
 	}
 
 	item->SetValue(key, value);
 
-    if(m_isUpdateEnabled){
-        int keyRole = GetKeyRole(key);
-        if (keyRole > -1){
-            QVector<int> keyRoles;
-            keyRoles.append(keyRole);
+	if(m_isUpdateEnabled){
+		int keyRole = GetKeyRole(key);
+		if (keyRole > -1){
+			QVector<int> keyRoles;
+			keyRoles.append(keyRole);
 
-            Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), keyRoles);
-        }
+			Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), keyRoles);
+		}
 
-        OnModelChanged();
+		OnModelChanged();
 
-        EndChanges();
-    }
+		EndChanges();
+	}
 
 	return true;
 }
@@ -637,7 +638,7 @@ QList<QString> CTreeItemModel::GetKeys(int index) const
 	}
 
 	QList<QString> keys2;
-	for (const QByteArray& key : keys){
+	for (const QByteArray& key : std::as_const(keys)){
 		keys2.append(key);
 	}
 
@@ -679,7 +680,7 @@ bool CTreeItemModel::CreateFromJson(const QByteArray& jsonContent)
 
 	QJsonDocument document = QJsonDocument::fromJson(jsonContent, &error);
 	if (error.error != QJsonParseError::NoError){
-		qCritical()  << "Error during parsing JSON document:" << error.errorString() << "content:" << jsonContent;
+		qCritical() << "Error during parsing JSON document:" << error.errorString() << "content:" << jsonContent;
 		EndChanges();
 
 		return false;
@@ -687,9 +688,9 @@ bool CTreeItemModel::CreateFromJson(const QByteArray& jsonContent)
 
 	bool retVal = true;
 	if (document.isArray()){
-		QJsonArray jsonArray = document.array();
+		const QJsonArray jsonArray = document.array();
 		int index;
-		for (auto v : jsonArray){
+		for (const auto& v : jsonArray){
 			index = InsertNewItem();
 			QJsonObject element = v.toObject();
 			retVal = retVal && ParseRecursive(element, index);
@@ -802,7 +803,7 @@ int CTreeItemModel::rowCount(const QModelIndex& /*parent*/) const
 
 QVariant CTreeItemModel::data(const QModelIndex& index, int role) const
 {
-	if (m_roleNames.contains(role) == false){
+	if (!m_roleNames.contains(role)){
 		return QVariant();
 	}
 
@@ -841,7 +842,7 @@ bool CTreeItemModel::SerializeModel(iser::IArchive& archive)
 		Clear();
 	}
 
-	return SerializeRecursive(archive, "");
+	return SerializeRecursive(archive, QByteArray());
 }
 
 
@@ -875,14 +876,14 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArra
 {
 	bool retVal = true;
 	int countSize = m_items.count();
-	iser::CArchiveTag arrayTag(tagName, "array items", iser::CArchiveTag::TT_MULTIPLE);
-	iser::CArchiveTag subArrayTag("Item", "array item", iser::CArchiveTag::TT_GROUP, &arrayTag);
-	iser::CArchiveTag objectTag(tagName, "key", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag arrayTag(tagName, QByteArrayLiteral("array items"), iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag subArrayTag(QByteArrayLiteral("Item"), QByteArrayLiteral("array item"), iser::CArchiveTag::TT_GROUP, &arrayTag);
+	iser::CArchiveTag objectTag(tagName, QByteArrayLiteral("key"), iser::CArchiveTag::TT_GROUP);
 	bool isMultiTag = false;
 
 	QList<QByteArray> keys = m_roleNames.values();
-	if (keys.size() == 1 && keys[0] == ""){
-		subArrayTag = iser::CArchiveTag("Item", "array item", iser::CArchiveTag::TT_LEAF, &arrayTag);
+	if (keys.size() == 1 && keys[0].isEmpty()){
+		subArrayTag = iser::CArchiveTag(QByteArrayLiteral("Item"), QByteArrayLiteral("array item"), iser::CArchiveTag::TT_LEAF, &arrayTag);
 	}
 
 	if (m_isArray || countSize > 1){
@@ -902,10 +903,10 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArra
 		Item* item = m_items[i];
 		QList<QByteArray> itemKeys;
 		item->GetKeys(itemKeys);
-		if (isMultiTag == true && !itemKeys.isEmpty() && itemKeys[0] != ""){
+		if (isMultiTag && !itemKeys.isEmpty() && !itemKeys[0].isEmpty()){
 			retVal = retVal && archive.BeginTag(subArrayTag);
 		}
-		for (const QByteArray& key: itemKeys){
+		for (const QByteArray& key: std::as_const(itemKeys)){
 			CTreeItemModel* treeItemModelPtr = nullptr;
 			QVariant v = item->Value(key);
 			if (v.isValid()){
@@ -915,7 +916,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArra
 				treeItemModelPtr->SerializeRecursive(archive, key);
 			}
 			else{
-				iser::CArchiveTag keyTag(key, "key", iser::CArchiveTag::TT_LEAF);
+				iser::CArchiveTag keyTag(key, QByteArrayLiteral("key"), iser::CArchiveTag::TT_LEAF);
 				retVal = retVal && archive.BeginTag(keyTag);
 				QVariant value = item->Value(key);
 #if QT_VERSION < 0x060000
@@ -983,18 +984,18 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArra
 					retVal = retVal && archive.Process(strVal);
 				}
 				else {
-					QByteArray baVal = "null";
+					QByteArray baVal = QByteArrayLiteral("null");
 					retVal = retVal && archive.Process(baVal);
 				}
 				retVal = retVal && archive.EndTag(keyTag);
 			}
 		}
-		if (isMultiTag == true && !itemKeys.isEmpty() && itemKeys[0] != ""){
+		if (isMultiTag && !itemKeys.isEmpty() && !itemKeys[0].isEmpty()){
 			retVal = retVal && archive.EndTag(subArrayTag);
 		}
 	}
 
-	if (isMultiTag == false){
+	if (!isMultiTag){
 		if (!tagName.isEmpty()){
 			retVal = retVal && archive.EndTag(objectTag);
 		}
@@ -1009,7 +1010,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive& archive, const QByteArra
 
 int CTreeItemModel::GetKeyRole(const QByteArray& key) const
 {
-	QList<int> keys = m_roleNames.keys();
+	const QList<int> keys = m_roleNames.keys();
 	for (int i : keys){
 		if (m_roleNames[i] == key){
 			return i;
@@ -1041,7 +1042,7 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 				}
 				else{
 					int i = treeItemModel->InsertNewItem();
-					treeItemModel->SetData("", jsonValue.toVariant(), i);
+					treeItemModel->SetData(QByteArray(), jsonValue.toVariant(), i);
 				}
 
 				arrayIterator++;
