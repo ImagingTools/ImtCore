@@ -31,6 +31,11 @@ GqlModel {
 		if (container.state === "Ready"){
 			if (container.containsKey("data")){
 				let dataModelLocal = container.getData("data")
+				
+				if (dataModelLocal.containsKey(gqlCommandId)){
+					dataModelLocal = dataModelLocal.getData(gqlCommandId)
+				}
+
 				container.messageReceived(dataModelLocal);
 			}
 		}

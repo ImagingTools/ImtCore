@@ -1,35 +1,35 @@
 import QtQuick 2.12
 import Acf 1.0
-import com.imtcore.imtqml 1.0;
+import com.imtcore.imtqml 1.0
 
 Item {
-	id: undoRedoManager;
+	id: undoRedoManager
 	
-	property bool autoTracking: true; // automatic tracking of model changes
+	property bool autoTracking: true // automatic tracking of model changes
 	
-	signal modelChanged();
-	signal undo();
-	signal redo();
+	signal modelChanged()
+	signal undo()
+	signal redo()
 	
 	function getCurrentStateModel()
 	{
 		if (internal.m_undoStack.length > 0){
-			return internal.m_undoStack[internal.m_undoStack.length - 1];
+			return internal.m_undoStack[internal.m_undoStack.length - 1]
 		}
 		
-		return null;
+		return null
 	}
 	
 	
 	function getAvailableUndoSteps()
 	{
-		return internal.m_undoStack.length;
+		return internal.m_undoStack.length
 	}
 	
 	
 	function getAvailableRedoSteps()
 	{
-		return internal.m_redoStack.length;
+		return internal.m_redoStack.length
 	}
 	
 	
@@ -38,79 +38,80 @@ Item {
 		internal.m_undoStack = []
 		internal.m_redoStack = []
 		
-		modelChanged();
+		modelChanged()
 	}
 	
 	
 	function doUndo()
 	{
+		console.log("doUndo", internal.m_observedModel)
 		if (!modelIsRegistered()){
-			return;
+			return
 		}
 		
-		internal.m_isBlocked = true;
+		internal.m_isBlocked = true
 		
-		internal.m_redoStack.push(internal.m_observedModel.toJson());
+		internal.m_redoStack.push(internal.m_observedModel.toJson())
 		
-		let prevStateModel = internal.m_undoStack.pop();
+		let prevStateModel = internal.m_undoStack.pop()
 	
 		internal.m_observedModel.createFromJson(prevStateModel)
 		
-		internal.m_beginStateModel = prevStateModel;
+		internal.m_beginStateModel = prevStateModel
 		
-		modelChanged();
-		undo();
+		modelChanged()
+		undo()
 		
-		internal.m_isBlocked = false;
+		internal.m_isBlocked = false
 	}
 	
 	
 	function doRedo(steps)
 	{
 		if (!modelIsRegistered()){
-			return;
+			return
 		}
 		
-		internal.m_isBlocked = true;
+		internal.m_isBlocked = true
 		
-		internal.m_undoStack.push(internal.m_observedModel.toJson());
+		internal.m_undoStack.push(internal.m_observedModel.toJson())
 		
-		let nextStateModel = internal.m_redoStack.pop();
+		let nextStateModel = internal.m_redoStack.pop()
 		internal.m_observedModel.createFromJson(nextStateModel)
 		
-		internal.m_beginStateModel = internal.m_observedModel.toJson();
+		internal.m_beginStateModel = internal.m_observedModel.toJson()
 		
-		modelChanged();
-		redo();
+		modelChanged()
+		redo()
 		
-		internal.m_isBlocked = false;
+		internal.m_isBlocked = false
 	}
 	
 	
 	function doListShift(steps, fromList, toList)
 	{
 		if (internal.m_isBlocked){
-			return;
+			return
 		}
 		
 		if ((steps > 0) && (fromList.length >= steps)){
-			internal.m_isBlocked = true;
+			internal.m_isBlocked = true
 			
-			let stateModel = fromList[fromList.length - steps];
+			let stateModel = fromList[fromList.length - steps]
 			if (internal.m_observedModel.copy(stateModel)){
-				internal.m_observedModel.refresh();
+				internal.m_observedModel.refresh()
 			}
 			else{
-				console.warn("Unable to copy observer model from current state model");
+				console.warn("Unable to copy observer model from current state model")
 			}
 			
 			for (let i = 0; i < steps; ++i){
 				toList.push(fromList.pop())
 			}
 			
-			modelChanged();
+			modelChanged()
 			
-			internal.m_isBlocked = false;
+			internal.m_isBlocked = false
 		}
 	}
 	
@@ -118,102 +119,102 @@ Item {
 	function registerModel(model)
 	{
 		if (modelIsRegistered()){
-			console.warn("Model is already registered in the undo manager");
+			console.warn("Model is already registered in the undo manager")
 			
-			unregisterModel();
+			unregisterModel()
 		}
 		
-		resetUndo();
+		resetUndo()
 		
-		internal.m_beginStateModel = model.toJson();
+		internal.m_beginStateModel = model.toJson()
 		
-		internal.m_observedModel = model;
+		internal.m_observedModel = model
 		
 		if (autoTracking){
-			internal.m_observedModel.modelChanged.connect(onModelChanged);
+			internal.m_observedModel.modelChanged.connect(onModelChanged)
 		}
 		
-		setStandardModel(model);
+		setStandardModel(model)
 	}
 	
 	
 	function unregisterModel()
 	{
 		if (autoTracking){
-			internal.m_observedModel.modelChanged.disconnect(onModelChanged);
+			internal.m_observedModel.modelChanged.disconnect(onModelChanged)
 		}
 		
-		internal.m_observedModel = null;
-		resetUndo();
+		internal.m_observedModel = null
+		resetUndo()
 	}
 	
 	
 	function modelIsRegistered()
 	{
-		return internal.m_observedModel != null;
+		return internal.m_observedModel != null
 	}
 	
 	
 	function isTransaction(){
-		return internal.m_isBlocked;
+		return internal.m_isBlocked
 	}
 	
 	
 	function beginChanges()
 	{
 		if (!modelIsRegistered()){
-			console.error("Unable to begin changes. Model is not registered");
+			console.error("Unable to begin changes. Model is not registered")
 			
-			return;
+			return
 		}
 		
 		if (internal.m_isBlocked){
-			console.error("The changes in the undo manager have already started");
+			console.error("The changes in the undo manager have already started")
 			
-			return;
+			return
 		}
 		
-		internal.m_beginStateModel = internal.m_observedModel.toJson();
+		internal.m_beginStateModel = internal.m_observedModel.toJson()
 		
-		internal.m_isBlocked = true;
+		internal.m_isBlocked = true
 	}
 	
 	
 	function endChanges()
 	{
 		if (!internal.m_isBlocked){
-			console.error("The changes in the undo manager have not started");
+			console.error("The changes in the undo manager have not started")
 			
-			return;
+			return
 		}
 		
-		makeChanges();
+		makeChanges()
 		
-		internal.m_isBlocked = false;
+		internal.m_isBlocked = false
 	}
 	
 	
 	function makeChanges()
 	{
 		if (!modelIsRegistered()){
-			console.error("Unable to make changes. Model is not registered");
+			console.error("Unable to make changes. Model is not registered")
 			
-			return;
+			return
 		}
 		
 		if (internal.m_beginStateModel != ""){
 			internal.m_undoStack.push(internal.m_beginStateModel)
 			internal.m_redoStack = []
 			
-			console.log("UndoRedoManager.qml makeChanges", internal.m_undoStack)
+			console.log("UndoRedoManager.qml makeChanges")
 			
-			modelChanged();
+			modelChanged()
 		}
 	}
 	
 	
 	function setBlockingUpdateModel(blockingUpdateModel){
-		internal.m_isBlocked = blockingUpdateModel;
+		internal.m_isBlocked = blockingUpdateModel
 	}
 	
 	
@@ -223,7 +224,7 @@ Item {
 			doUndo()
 		}
 		else if (commandId === "Redo"){
-			doRedo();
+			doRedo()
 		}
 	}
 	
@@ -231,9 +232,9 @@ Item {
 	function setStandardModel(model)
 	{
 		if (!modelIsRegistered()){
-			console.error("Unable to set standard model. Model is not registered");
+			console.error("Unable to set standard model. Model is not registered")
 			
-			return;
+			return
 		}
 		
 		internal.setDefaultStateModel(model)
@@ -244,21 +245,21 @@ Item {
 	
 	function getStandardModel()
 	{
-		return internal.m_defaultStateModel;
+		return internal.m_defaultStateModel
 	}
 	
 	
 	QtObject {
-		id: internal;
+		id: internal
 		
-		property bool m_isBlocked: false;
+		property bool m_isBlocked: false
 		
-		property var m_observedModel: null;
-		property string m_beginStateModel;
-		property var m_defaultStateModel: null;
+		property var m_observedModel: null
+		property string m_beginStateModel
+		property var m_defaultStateModel: null
 		
-		property var m_undoStack: [];
-		property var m_redoStack: [];
+		property var m_undoStack: []
+		property var m_redoStack: []
 		
 		function setDefaultStateModel(model){
 			removeDefaultModel()
@@ -279,33 +280,33 @@ Item {
 	
 	function onModelChanged(){
 		if (internal.m_isBlocked){
-			return;
+			return
 		}
 		
-		undoRedoManager.makeChanges();
+		undoRedoManager.makeChanges()
 		
-		internal.m_beginStateModel = internal.m_observedModel.toJson();
+		internal.m_beginStateModel = internal.m_observedModel.toJson()
 	}
 	
 	Shortcut {
-		sequence: "Ctrl+Z";
-		enabled: true;
+		sequence: "Ctrl+Z"
+		enabled: true
 		onActivated: {
-			let undoSteps = undoRedoManager.getAvailableUndoSteps();
+			let undoSteps = undoRedoManager.getAvailableUndoSteps()
 			
 			if (undoSteps > 0){
-				undoRedoManager.commandHandle("Undo");
+				undoRedoManager.commandHandle("Undo")
 			}
 		}
 	}
 	
 	Shortcut {
-		sequence: "Ctrl+Shift+Z";
-		enabled: true;
+		sequence: "Ctrl+Shift+Z"
+		enabled: true
 		onActivated: {
-			let redoSteps = undoRedoManager.getAvailableRedoSteps();
+			let redoSteps = undoRedoManager.getAvailableRedoSteps()
 			if (redoSteps > 0){
-				undoRedoManager.commandHandle("Redo");
+				undoRedoManager.commandHandle("Redo")
 			}
 		}
 	}

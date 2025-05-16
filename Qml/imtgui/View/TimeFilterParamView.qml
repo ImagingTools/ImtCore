@@ -16,6 +16,7 @@ PopupView {
 	property TimeFilter timeFilter: TimeFilter {}
 	property alias listView: listView;
 	property alias treeModel: treeModel;
+	
 	property Component buttonDecorator: ButtonDecorator {
 				color: Style.backgroundColor2;
 			}
@@ -42,17 +43,21 @@ PopupView {
 			fromDateItem.visible = true;
 			
 			let beginDate = timeFilter.m_timeRange.m_begin;
+			let fromDate = new Date();
+			if (beginDate !== ""){
+				fromDate = new Date(beginDate)
+			}
 			
-			let dateStr = beginDate.split(" ")[0];
-			let data = dateStr.split(".");
-			
-			fromDatePicker.setDate(Number(data[2]), Number(data[1]) - 1, Number(data[0]));
+			fromDatePicker.setDate(fromDate);
 
 			let endDate = timeFilter.m_timeRange.m_end;
-			dateStr = endDate.split(" ")[0];
-			data = dateStr.split(".");
 			
-			toDatePicker.setDate(Number(data[2]), Number(data[1]) - 1, Number(data[0]));
+			let toDate = new Date();
+			if (endDate !== ""){
+				toDate = new Date(endDate)
+			}
+
+			toDatePicker.setDate(toDate);
 		}
 		
 		listView.currentIndex = -1;
@@ -156,9 +161,7 @@ PopupView {
 						text: model.name;
 						highlighted: listView.currentIndex === model.index;
 						selected: mouseArea.containsMouse;
-
 						font.pixelSize: root.fontSize
-						
 						onClicked: {
 							listView.currentIndex = model.index;
 							// root.model.clear();
@@ -209,81 +212,30 @@ PopupView {
 				width: parent.width;
 				height: 30;
 				visible: false;
-				
-				DatePicker {
+
+				DateInput {
 					id: fromDatePicker;
 					anchors.horizontalCenter: parent.horizontalCenter;
-					width: contentWidth;
-					height: parent.height;
-					hasDayCombo: false;
-					hasMonthCombo: false;
-					hasYearCombo: false;
-					mainMargin: Style.sizeMainMargin;
-
-					Component.onCompleted: {
-						params = root.datePickerParams
-					}
-					
-					function checkDate(year, month, day){
-						let date = new Date(year, month, day);
-						
-						let ok1 = date.getFullYear() == year &&
-							date.getMonth() == month &&
-							date.getDate() == day;
-						let ok2 = false;
-						if (ok1){
-							let toDate = toDatePicker.getDate();
-							if (date.getTime() <= toDate.getTime()){
-								ok2 = true;
-							}
-						}
-						
-						return ok1 && ok2;
-					}
+					hasTitle: false
+					width: parent.width;
 				}
 			}
 			
 			BaseText {
 				text: qsTr("To");
 				width: parent.width;
-				font.pixelSize: root.fontSize;
+				font.pixelSize: root.fontSize
 			}
 			
 			Item {
 				width: parent.width;
 				height: 30;
 				
-				DatePicker {
+				DateInput {
 					id: toDatePicker;
 					anchors.horizontalCenter: parent.horizontalCenter;
-					width: contentWidth;
-					height: parent.height;
-					hasDayCombo: false;
-					hasMonthCombo: false;
-					hasYearCombo: false;
-					startWithCurrentDay: true;
-					mainMargin: Style.sizeMainMargin;
-
-					Component.onCompleted: {
-						params = root.datePickerParams
-					}
-					
-					function checkDate(year, month, day){
-						let date = new Date(year, month, day);
-						
-						let ok1 = date.getFullYear() == year &&
-							date.getMonth() == month &&
-							date.getDate() == day;
-						let ok2 = false;
-						if (ok1){
-							let fromDate = fromDatePicker.getDate();
-							if (date.getTime() >= fromDate.getTime()){
-								ok2 = true;
-							}
-						}
-						
-						return ok1 && ok2;
-					}
+					hasTitle: false
+					width: parent.width;
 				}
 			}
 			
@@ -301,8 +253,8 @@ PopupView {
 						text: qsTr("Apply");
 						enabled: fromDateItem.visible;
 						onClicked: {
-							root.timeFilter.m_timeRange.m_begin = fromDatePicker.getDate().toISOString()
-							root.timeFilter.m_timeRange.m_end = toDatePicker.getDate().toISOString()
+							root.timeFilter.m_timeRange.m_begin = fromDatePicker.selectedDate.toISOString()
+							root.timeFilter.m_timeRange.m_end = toDatePicker.selectedDate.toISOString()
 							
 							root.accepted("TimeRange", fromDatePicker.getDateAsString() + " -> " + toDatePicker.getDateAsString());
 						}
@@ -316,15 +268,14 @@ PopupView {
 						enabled: fromDateItem.visible;
 						onClicked: {
 							fromDateItem.visible = false;
-							fromDatePicker.setCurrentDay();
-							toDatePicker.setCurrentDay();
+							fromDatePicker.showCurrentDate();
+							toDatePicker.showCurrentDate();
 							listView.currentIndex = -1;
 							
 							root.cancelled();
 						}
 						
 						decorator: root.buttonDecorator;
-
 					}
 				}
 			}

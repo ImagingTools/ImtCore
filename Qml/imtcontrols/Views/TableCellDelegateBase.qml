@@ -156,7 +156,14 @@ Item {
 
 		delegateContainer.rowDelegate.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
 
-
+		if (delegateContainer && delegateContainer.rowDelegate){
+			if ("item" in delegateContainer.rowDelegate.dataModel){
+				let funcChanged = delegateContainer.rowDelegate.dataModel.item[delegateContainer.sdlVarPrefix + cellHeaderId + 'Changed']
+				if (funcChanged){
+					funcChanged.connect(reused)
+				}
+			}
+		}
 	}
 
 	function refreshModelData(rowIndex_, modelRole_){

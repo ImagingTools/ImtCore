@@ -556,6 +556,29 @@ QtObject {
 
 		return false;
 	}
+	
+	function setBlockUndoManager(documentId, isBlock){
+		let documentIndex = getDocumentIndexByDocumentId(documentId);
+		if (documentIndex >= 0){
+			let documentData = documentsModel.get(documentIndex).documentData;
+			if (documentData.undoManager){
+				documentData.undoManager.setBlockingUpdateModel(isBlock)
+			}
+		}
+	}
+	
+	function clearUndoManager(documentId){
+		let documentIndex = getDocumentIndexByDocumentId(documentId);
+		if (documentIndex >= 0){
+			let documentData = documentsModel.get(documentIndex).documentData;
+			if (documentData.undoManager){
+				documentData.undoManager.resetUndo()
+				return true
+			}
+		}
+		
+		return false
+	}
 
 	property Component singleDocumentDataComp: Component{
 		QtObject {
@@ -659,7 +682,7 @@ QtObject {
 
 						return;
 					}
-
+					
 					let documentModel = singleDocumentData.documentDataController.documentModel;
 
 					singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
@@ -708,7 +731,6 @@ QtObject {
 					if (singleDocumentData.undoManager && singleDocumentData.undoManager.isTransaction()){
 						return;
 					}
-
 					singleDocumentData.isDirty = documentManager.documentIsValid(singleDocumentData);
 				}
 			}

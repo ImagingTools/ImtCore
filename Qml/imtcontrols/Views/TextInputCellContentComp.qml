@@ -6,6 +6,8 @@ import imtcontrols 1.0
 TableCellDelegateBase {
 	id: tableCellDelegateBase;
 	
+	signal editingFinished(string text)
+	
 	onReused: {
 		if (rowIndex >= 0){
 			let valueModel = getValue();
@@ -43,10 +45,11 @@ TableCellDelegateBase {
 		visible: false;
 		
 		onEditingFinished: {
-			let data = textInput.text
 			textInput.visible = false;
 			textLabel.text = textInput.text;
 			tableCellDelegateBase.setValue(textInput.text);
+			
+			tableCellDelegateBase.editingFinished(textInput.text)
 		}
 	}
 	

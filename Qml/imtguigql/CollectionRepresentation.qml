@@ -125,10 +125,15 @@ Item {
 	}
 	
 	function clearElements(){
-		root.elementsModel.clear()
-		root.elementsModel = 0
-		root.notificationModel.clear()
-		root.notificationModel = 0
+		if (elementsModel){
+			elementsModel.clear()
+			elementsModel = null
+		}
+		
+		if (notificationModel){
+			notificationModel.clear()
+			notificationModel = null
+		}
 	}
 	
 	function getElementsRepresentation(){

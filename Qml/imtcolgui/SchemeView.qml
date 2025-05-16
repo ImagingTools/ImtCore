@@ -301,55 +301,45 @@ Rectangle {
 						return;
 					}
 					
-					let x_ = item.m_x;
-					let y_ = item.m_y;
 					let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
 					let height_ = canvas.mainRec_height;
 					
-					x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
-					y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
 					width_ = width_ * canvas.scaleCoeff;
 					height_ = height_  * canvas.scaleCoeff;
 					
-					let withinBorders_ = true;
-					if(withinBorders_){
-						if (canvas.scaleCoeff < 0.0000001){
-							return;
-						}
-						
-						let newX = (item.m_x + delta.x / canvas.scaleCoeff);
-						let newY = (item.m_y + delta.y / canvas.scaleCoeff);
-						
-						//fit to borders
-						let margin_ = 10;
-						if(newX < margin_){
-							newX = margin_;
-						}
-						if(newY < margin_){
-							newY = margin_;
-						}
-						
-						if (canvas.scaleCoeff - margin_ === 0){
-							return;
-						}
-						
-						if(newX > (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_){
-							newX = (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_
-						}
-						if(newY > (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_){
-							newY = (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_
-						}
-						
-						item.m_x = newX;
-						item.m_y = newY;
-						
-						// canvasPage.objectsModel.set(canvas.selectedIndex, item)
-
-						canvas.requestPaint();
-						
-						canvasPage.modelDataChanged()
-						
+					if (canvas.scaleCoeff < 0.0000001){
+						return;
 					}
+					
+					let newX = (item.m_x + delta.x / canvas.scaleCoeff);
+					let newY = (item.m_y + delta.y / canvas.scaleCoeff);
+
+					// fit to borders
+					let margin_ = 10;
+					if(newX < margin_){
+						newX = margin_;
+					}
+					if(newY < margin_){
+						newY = margin_;
+					}
+					
+					if (canvas.scaleCoeff - margin_ === 0){
+						return;
+					}
+					
+					if(newX > (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_){
+						newX = (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_
+					}
+					if(newY > (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_){
+						newY = (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_
+					}
+					
+					item.m_x = newX;
+					item.m_y = newY;
+					
+					canvas.requestPaint();
+					
+					canvasPage.modelDataChanged()
 				}
 				
 			}
@@ -646,7 +636,7 @@ Rectangle {
 			
 			function drawObject(ctx, index){
 				let item = canvasPage.objectsModel.get(index).item;
-
+				
 				let x_  = item.m_x
 				let y_  = item.m_y
 				let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
@@ -770,7 +760,7 @@ Rectangle {
 				let y1 = fromItem.m_y;
 				let x2 = toItem.m_x;
 				let y2 = toItem.m_y;
-
+				
 				let width1 = fromItem.m_width ? fromItem.m_width : canvas.mainRec_width;
 				let width2 = toItem.m_width ? toItem.m_width : canvas.mainRec_width;
 				

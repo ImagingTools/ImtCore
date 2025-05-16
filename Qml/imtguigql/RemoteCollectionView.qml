@@ -241,7 +241,6 @@ CollectionView {
 		}
 
 		onMessageReceived: {
-			console.debug("RemoteCollectionView.qml onMessageReceived", data.toJson());
 			root.handleSubscription(data);
 		}
 	}

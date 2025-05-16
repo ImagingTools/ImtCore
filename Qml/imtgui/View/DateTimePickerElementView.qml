@@ -5,59 +5,58 @@ import imtgui 1.0
 import imtcontrols 1.0
 
 ElementView {
-    id: expirationEditor;
+	id: expirationEditor;
+	
+	controlComp: datePickerComp;
+	
+	property bool readOnly: false;
+	property bool timeEdit: false;
+	property DateInput datePicker: null;
+	
+	signal editingFinished();
+	
+	onReadOnlyChanged: {
+		if (datePicker){
+			datePicker.readOnly = readOnly;
+		}
+	}
+	
+	function setDateAsString(dateStr){
+		if (datePicker){
+			datePicker.setDateAsString(dateStr);
+		}
+	}
+	
+	function getDateAsString(){
+		if (datePicker){
+			return datePicker.getDateAsString();
+		}
+		
+		return "";
+	}
+	
+	function setDate(date){
+		if (datePicker){
+			datePicker.setDate(date);
+		}
+	}
+	
+	Component {
+		id: datePickerComp;
+		
+		DateInput {
+			width: 200;
+			hasTitle: false
 
-    controlComp: datePickerComp;
-
-    property bool readOnly: false;
-    property bool timeEdit: false;
-    property DateTimePicker datePicker: null;
-
-    signal editingFinished();
-
-    onReadOnlyChanged: {
-        if (datePicker){
-            datePicker.readOnly = readOnly;
-        }
-    }
-
-    function setDateAsString(dateStr){
-        if (datePicker){
-            datePicker.setDateAsString(dateStr);
-        }
-    }
-
-    function getDateAsString(){
-        if (datePicker){
-            return datePicker.getDateAsString();
-        }
-
-        return "";
-    }
-
-    function setDate(date){
-        if (datePicker){
-            datePicker.setDate(date);
-        }
-    }
-
-    Component {
-        id: datePickerComp;
-
-        DateTimePicker {
-            width: 200;
-            height: 30;
-            timeEdit: expirationEditor.timeEdit;
-
-            Component.onCompleted: {
-                expirationEditor.datePicker = this;
-            }
-
-            onEditingFinished: {
-                expirationEditor.editingFinished();
-            }
-        }
-    }
+			Component.onCompleted: {
+				expirationEditor.datePicker = this;
+			}
+			
+			onDateChanged: {
+				expirationEditor.editingFinished();
+			}
+		}
+	}
 }
 
 
