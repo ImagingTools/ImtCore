@@ -29,16 +29,18 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	m_lastRequest.ResetData();
 
 	int errorPosition = -1;
-	QByteArray requestBody = request.GetBody();
+	const QByteArray requestBody = request.GetBody();
 	if (!m_lastRequest.ParseQuery(requestBody, errorPosition)){
-		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: '%1'; Error position: '%2'")
-		.arg(qPrintable(request.GetBody()))
-			.arg(errorPosition);
+		qCritical() << __FILE__ << __LINE__ << QStringLiteral("Error when parsing request: '%1'; Error position: '%2'")
+														.arg(QString(request.GetBody()),
+															 QString::number(errorPosition));
+
+		return GenerateError(StatusCode::SC_BAD_REQUEST, QStringLiteral("Request is incorrect"), request);
 	}
 
-	QByteArray gqlCommand = m_lastRequest.GetCommandId();
+	const QByteArray gqlCommand = m_lastRequest.GetCommandId();
 
-	//set a protocol version to gql object
+	// set a protocol version to gql object
 	for (HeadersMap::const_iterator headerIter = headers.cbegin(); headerIter != headers.cend(); ++headerIter){
 		// find header. compare with lowercase. RFC 2616: 4.2
 		if (headerIter.key().toLower() == imtbase::s_protocolVersionHeaderId.toLower()){
@@ -54,15 +56,16 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	bool isSuccessful = false;
 
 	imtgql::IGqlContext* gqlContextPtr = nullptr;
-	QByteArray accessToken = headers.value("x-authentication-token");
+	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
 
 	if (!accessToken.isEmpty() && m_jwtSessionControllerCompPtr.IsValid()){
-		imtauth::IJwtSessionController::JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
-		if (state == imtauth::IJwtSessionController::JS_EXPIRED){
-			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_UNAUTHORIZED, "", request);
+		using JwtState = imtauth::IJwtSessionController::JwtState;
+		JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(accessToken);
+		if (state == JwtState::JS_EXPIRED){
+			return CreateResponse(StatusCode::SC_UNAUTHORIZED, QByteArray(), request);
 		}
-		else if (state == imtauth::IJwtSessionController::JS_INVALID){
-			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_FORBIDDEN, "", request);
+		else if (state == JwtState::JS_INVALID){
+			return CreateResponse(StatusCode::SC_FORBIDDEN, QByteArray(), request);
 		}
 	}
 
@@ -80,19 +83,17 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		else{
 			SendCriticalMessage(
 						0,
-						QString("Unable to get a GraphQL context for the access token '%1' for Command-ID: '%2'")
-									.arg(qPrintable(accessToken), qPrintable(gqlCommand)),
-						"GraphQL - servlet");
+						QStringLiteral("Unable to get a GraphQL context for the access token '%1' for Command-ID: '%2'")
+											.arg(QString(accessToken), QString(gqlCommand)),
+						QStringLiteral("GraphQL - servlet"));
 
-			return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR, "Request incorrected", request);
+			return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request context is invalid"), request);
 		}
 	}
-	else{
-		if (!headers.isEmpty()){
-			imtgql::CGqlContext* gqlContextImplPtr = new imtgql::CGqlContext();
-			gqlContextImplPtr->SetHeaders(headers);
-			m_lastRequest.SetGqlContext(gqlContextImplPtr);
-		}
+	else if (!headers.isEmpty()){
+		imtgql::CGqlContext* gqlContextImplPtr = new imtgql::CGqlContext();
+		gqlContextImplPtr->SetHeaders(headers);
+		m_lastRequest.SetGqlContext(gqlContextImplPtr);
 	}
 
 	QByteArray responseData;
@@ -104,79 +105,81 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			continue;
 		}
 
-		if (requestHandlerPtr->IsRequestSupported(m_lastRequest)){
-			isSuccessful = true;
+		isSuccessful = requestHandlerPtr->IsRequestSupported(m_lastRequest);
+		// unsupported request
+		if (!isSuccessful){
+			continue;
+		}
 
-			QString errorMessage;
-			QString errorType = "Warning";
-			istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr;
-			sourceItemModelPtr.SetPtr(requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage));
+		QString errorMessage;
+		QString errorType = QStringLiteral("Warning");
+		istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr;
+		sourceItemModelPtr.SetPtr(requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage));
 
-			bool isError = false;
-			imtbase::CTreeItemModel rootModel;
-			if(sourceItemModelPtr.IsValid()){
-				imtbase::CTreeItemModel* errorsModelPtr = sourceItemModelPtr->GetTreeItemModel("errors");
-				if (errorsModelPtr != nullptr){
-					if (errorsModelPtr->ContainsKey("message")){
-						errorMessage = errorsModelPtr->GetData("message").toString();
-					}
+		bool isError = false;
+		imtbase::CTreeItemModel rootModel;
 
-					if (errorsModelPtr->ContainsKey("type")){
-						errorType = errorsModelPtr->GetData("type").toString();
-					}
-
-					isError = true;
-				}
-				else{
-					imtbase::CTreeItemModel* dataModelPtr = rootModel.AddTreeModel("data");
-
-					imtbase::CTreeItemModel* sourceDataModelPtr = sourceItemModelPtr->GetTreeItemModel("data");
-					if (sourceDataModelPtr != nullptr){
-						dataModelPtr->SetExternTreeModel(gqlCommand, sourceDataModelPtr->CopyMe());
-					}
-					else{
-						dataModelPtr->SetExternTreeModel(gqlCommand, sourceItemModelPtr->CopyMe());
-					}
-				}
-			}
-			else{
-				isError = true;
-			}
+		isError = !sourceItemModelPtr.IsValid();
+		if(!isError){
+			imtbase::CTreeItemModel* errorsModelPtr = sourceItemModelPtr->GetTreeItemModel(QByteArrayLiteral("errors"));
+			isError = errorsModelPtr != nullptr;
 
 			if (isError){
-				imtbase::CTreeItemModel* errorsModelPtr = rootModel.AddTreeModel("errors");
-				imtbase::CTreeItemModel* errorItemModelPtr = errorsModelPtr->AddTreeModel(gqlCommand);
+				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("message"))){
+					errorMessage = errorsModelPtr->GetData(QByteArrayLiteral("message")).toString();
+				}
 
-				errorItemModelPtr->SetData("message", errorMessage);
-				errorItemModelPtr->SetData("type", errorType);
-			}
-
-			iser::CJsonMemWriteArchive archive(nullptr, false);
-			if (rootModel.SerializeModel(archive)){
-				responseData = archive.GetData();
+				if (errorsModelPtr->ContainsKey(QByteArrayLiteral("type"))){
+					errorType = errorsModelPtr->GetData(QByteArrayLiteral("type")).toString();
+				}
 			}
 			else{
-				isSuccessful = false;
-			}
+				imtbase::CTreeItemModel* dataModelPtr = rootModel.AddTreeModel(QByteArrayLiteral("data"));
 
-			break;
+				imtbase::CTreeItemModel* sourceDataModelPtr = sourceItemModelPtr->GetTreeItemModel(QByteArrayLiteral("data"));
+				if (sourceDataModelPtr != nullptr){
+					dataModelPtr->SetExternTreeModel(gqlCommand, sourceDataModelPtr->CopyMe());
+				}
+				else{
+					dataModelPtr->SetExternTreeModel(gqlCommand, sourceItemModelPtr->CopyMe());
+				}
+			}
 		}
+
+		if (isError){
+			imtbase::CTreeItemModel* errorsModelPtr = rootModel.AddTreeModel(QByteArrayLiteral("errors"));
+			imtbase::CTreeItemModel* errorItemModelPtr = errorsModelPtr->AddTreeModel(gqlCommand);
+
+			errorItemModelPtr->SetData(QByteArrayLiteral("message"), errorMessage);
+			errorItemModelPtr->SetData(QByteArrayLiteral("type"), errorType);
+		}
+
+		iser::CJsonMemWriteArchive archive(nullptr, false);
+
+		isSuccessful = rootModel.SerializeModel(archive);
+		if (isSuccessful){
+			responseData = archive.GetData();
+		}
+
+		break;
 	}
 
 	if (!isSuccessful){
-		SendErrorMessage(0, QString("Invalid command request:'%1'").arg(qPrintable(gqlCommand)), "GraphQL - servlet");
+		SendErrorMessage(0, QStringLiteral("Invalid command request:'%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
 
-		return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_BAD_REQUEST, responseData, request);
+		return CreateResponse(StatusCode::SC_BAD_REQUEST, responseData, request);
 	}
-	else{
-		if (!responseData.isEmpty()){
-			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, responseData, request, "application/json; charset=utf-8");
-		}
+	else if (!responseData.isEmpty()){
+		return CreateResponse(
+			StatusCode::SC_OK,
+			responseData,
+			request,
+			QByteArrayLiteral("application/json; charset=utf-8"));
 	}
 
-	SendErrorMessage(0, QString("Internal server error for command '%1'").arg(qPrintable(gqlCommand)), "GraphQL - servlet");
+	SendErrorMessage(0, QStringLiteral("Internal server error for command '%1'").arg(QString(gqlCommand)), QStringLiteral("GraphQL - servlet"));
 
-	return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR, "Request incorrected", request);
+	return GenerateError(StatusCode::SC_INTERNAL_SERVER_ERROR, QStringLiteral("Request is incorrect"), request);
 }
 
 
@@ -191,7 +194,7 @@ const imtgql::IGqlRequest* CHttpGraphQLServletComp::GetGqlRequest() const
 // private methods
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
-	const imtrest::IProtocolEngine::StatusCode& statusCode,
+	const StatusCode& statusCode,
 	const QByteArray& payload,
 	const imtrest::IRequest& request,
 	const QByteArray& contentTypeId) const
@@ -201,7 +204,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
 
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
-	const imtrest::IProtocolEngine::StatusCode& errorCode,
+	const StatusCode& errorCode,
 	const QString& /*errorString*/,
 	const imtrest::CHttpRequest& request) const
 {
@@ -217,7 +220,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
 			request,
 			errorCode,
 			responseJson,
-			QByteArray("application/json;charset=utf-8")));
+			QByteArrayLiteral("application/json;charset=utf-8")));
 }
 
 
