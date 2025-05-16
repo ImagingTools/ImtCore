@@ -24,6 +24,10 @@ RemoteCollectionView {
 			documentViewsComp: [roleDocumentComp];
 			documentDataControllersComp: [dataControllerComp];
 			documentValidatorsComp: [];
+			
+			function getHeaders(){
+				return roleCollectionViewContainer.getHeaders()
+			}
 		}
 	}
 	

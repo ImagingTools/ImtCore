@@ -111,6 +111,14 @@ Rectangle {
 		// visible: historyPanel.width !== 0;
 		visible: historyPanel.width == historyPanel.contentWidth;
 		documentId: historyPanel.documentId;
+		
+		function getHeaders(){
+			return historyPanel.getHeaders();
+		}
+	}
+	
+	function getHeaders(){
+		return {};
 	}
 }
 

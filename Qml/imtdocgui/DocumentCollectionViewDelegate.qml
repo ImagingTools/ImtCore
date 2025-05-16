@@ -68,6 +68,10 @@ CollectionViewCommandsDelegateBase {
 
 		return -1;
 	}
+	
+	function getHeaders(){
+		return {};
+	}
 
 	QtObject {
 		id: internal;
@@ -217,6 +221,10 @@ CollectionViewCommandsDelegateBase {
 						}
 					}
 				}
+				
+				function getHeaders(){
+					return collectionViewCommandsDelegateBase.getHeaders();
+				}
 			}
 
 			GqlSdlRequestSender {
@@ -236,6 +244,10 @@ CollectionViewCommandsDelegateBase {
 							ModalDialogManager.showInfoDialog(qsTr("The document revision has been successfully delete"));
 						}
 					}
+				}
+				
+				function getHeaders(){
+					return collectionViewCommandsDelegateBase.getHeaders();
 				}
 			}
 
@@ -257,6 +269,10 @@ CollectionViewCommandsDelegateBase {
 							ModalDialogManager.showInfoDialog(qsTr("The document revision has been successfully set"));
 						}
 					}
+				}
+				
+				function getHeaders(){
+					return collectionViewCommandsDelegateBase.getHeaders();
 				}
 			}
 

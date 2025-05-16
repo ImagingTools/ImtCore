@@ -45,6 +45,10 @@ RemoteCollectionView {
 					commandsController.setCommandIsEnabled("Revision", selection.length === 1);
 				}
 			}
+			
+			function getHeaders(){
+				return userCollectionViewContainer.getHeaders()
+			}
 		}
 	}
 	
@@ -374,6 +378,10 @@ RemoteCollectionView {
 				if (userEditor){
 					userEditor.checkChangePasswordLogic();
 				}
+			}
+			
+			function getHeaders(){
+				return userCollectionViewContainer.getHeaders()
 			}
 		}
 	}

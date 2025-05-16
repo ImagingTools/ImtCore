@@ -36,6 +36,10 @@ ViewBase {
 		userData.m_productId = container.productId;
 	}
 	
+	function getHeaders(){
+		return {}
+	}
+	
 	onUserDataChanged: {
 		if (!userData){
 			return;
@@ -97,6 +101,10 @@ ViewBase {
 		documentId: container.userData ? container.userData.m_id : "";
 		collectionId: "Users";
 		editorFlickable: flickable;
+		
+		function getHeaders(){
+			return container.getHeaders()
+		}
 	}
 	
 	CustomScrollbar {

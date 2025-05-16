@@ -48,6 +48,10 @@ Rectangle {
 			request.send();
 		}
 	}
+	
+	function getHeaders(){
+		return {};
+	}
 
 	GqlSdlRequestSender {
 		id: request;
@@ -69,6 +73,10 @@ Rectangle {
 
 		onStateChanged: {
 			loading.visible = (state === "Loading");
+		}
+		
+		function getHeaders(){
+			return container.getHeaders();
 		}
 	}
 

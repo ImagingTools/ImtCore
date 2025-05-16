@@ -33,6 +33,10 @@ RemoteCollectionView {
 					commandsController.setCommandIsEnabled("Revision", selection.length === 1);
 				}
 			}
+			
+			function getHeaders(){
+				return userGroupCollectionViewContainer.getHeaders()
+			}
 		}
 	}
 
@@ -68,6 +72,10 @@ RemoteCollectionView {
 			commandsControllerComp: Component {GqlBasedCommandsController {
 					typeId: "Group";
 				}
+			}
+			
+			function getHeaders(){
+				return userGroupCollectionViewContainer.getHeaders()
 			}
 		}
 	}
