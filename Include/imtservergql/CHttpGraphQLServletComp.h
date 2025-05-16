@@ -18,7 +18,7 @@ namespace imtservergql
 class CHttpGraphQLServletComp: public imtrest::CHttpServletCompBase, virtual public imtgql::IGqlRequestProvider
 {
 public:
-	using BaseClass = imtrest::CHttpServletCompBase ;
+	using BaseClass = imtrest::CHttpServletCompBase;
 	using StatusCode = imtrest::IProtocolEngine::StatusCode;
 
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
