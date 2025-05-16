@@ -39,11 +39,12 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 	
 	arguments.input.Version_1_0->id = QByteArray(roleId);
 	arguments.input.Version_1_0->productId = QByteArray(productId);
-
+	
+	QString errorMessage;
 	imtgql::CGqlRequest gqlRequest;
 	if (rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		rolessdl::CRoleData::V1_0 response;
-		if (!SendModelRequest<rolessdl::CRoleData::V1_0, rolessdl::CRoleData>(gqlRequest, response)){
+		if (!SendModelRequest<rolessdl::CRoleData::V1_0, rolessdl::CRoleData>(gqlRequest, response, errorMessage)){
 			return nullptr;
 		}
 

@@ -42,8 +42,9 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 	imtgql::CGqlRequest gqlRequest;
 	if (groupssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		groupssdl::CGroupData::V1_0 response;
-
-		if (!SendModelRequest<groupssdl::CGroupData::V1_0, groupssdl::CGroupData>(gqlRequest, response)){
+		
+		QString errorMessage;
+		if (!SendModelRequest<groupssdl::CGroupData::V1_0, groupssdl::CGroupData>(gqlRequest, response, errorMessage)){
 			return nullptr;
 		}
 

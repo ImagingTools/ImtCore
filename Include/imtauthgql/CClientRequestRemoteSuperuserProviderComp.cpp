@@ -14,7 +14,7 @@ namespace imtauthgql
 
 // reimplemented (imtauth::ISuperuserProvider)
 
-bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
+bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& errorMessage) const
 {
 	namespace userssdl = sdl::imtauth::Users;
 	
@@ -24,7 +24,7 @@ bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& /*error
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CCheckSuperuserExistsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		userssdl::CCheckSuperuserPayload::V1_0 response;
-		if (!SendModelRequest<userssdl::CCheckSuperuserPayload::V1_0, userssdl::CCheckSuperuserPayload>(gqlRequest, response)){
+		if (!SendModelRequest<userssdl::CCheckSuperuserPayload::V1_0, userssdl::CCheckSuperuserPayload>(gqlRequest, response, errorMessage)){
 			return false;
 		}
 		

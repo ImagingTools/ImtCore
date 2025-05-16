@@ -31,17 +31,21 @@ bool CHeadersDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gql
 
 imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("headers");
-
 	QByteArray languageId;
-
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if(gqlContextPtr != nullptr){
 		languageId =  gqlContextPtr->GetLanguageId();
 	}
+	
+	if (gqlContextPtr == nullptr){
+		errorMessage = QString("Unable to create response. Error: GraphQL context is invalid");
+		return nullptr;
+	}
+	
+	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("headers");
 
 	for (int i = 0; i < m_headersIdsAttrPtr.GetCount(); i++){
 		QString headerId = m_headersIdsAttrPtr[i];

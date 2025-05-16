@@ -29,14 +29,16 @@ public:
 	
 protected:
 	template<class SdlClass, class SdlReader = SdlClass>
-	bool SendModelRequest(const imtgql::IGqlRequest& request, SdlClass& responseModel) const
+	bool SendModelRequest(const imtgql::IGqlRequest& request, SdlClass& responseModel, QString& errorMessage) const
 	{
 		if (!m_apiClientCompPtr.IsValid()){
+			Q_ASSERT(false);
 			return false;
 		}
 		
 		imtclientgql::IGqlClient::GqlRequestPtr requestPtr(dynamic_cast<imtgql::IGqlRequest*>(request.CloneMe()));
 		if (requestPtr.isNull()){
+			errorMessage = QString("Request is invalid");
 			return false;
 		}
 		
@@ -48,6 +50,7 @@ protected:
 			
 			QJsonDocument document = QJsonDocument::fromJson(responseData);
 			if (document.isObject()){
+				bool isError = false;
 				QJsonObject object = document.object();
 				
 				if (object.contains("payload")){
@@ -56,6 +59,7 @@ protected:
 				
 				if (object.contains("errors")){
 					object = object.value("errors").toObject();
+					isError = true;
 				}
 				else if (object.contains("data")){
 					object = object.value("data").toObject();
@@ -65,9 +69,16 @@ protected:
 					object = object.value(request.GetCommandId()).toObject();
 				}
 				
+				if (isError){
+					errorMessage = object.value("message").toString();
+					return false;
+				}
+				
 				return responseModel.ReadFromJsonObject(object);
 			}
 		}
+		
+		errorMessage = QString("Response is invalid");
 		
 		return false;
 	}
@@ -80,7 +91,8 @@ protected:
 		bool ok = Request::SetupGqlRequest(gqlRequest, arguments);
 		if (ok){
 			ResponseData response;
-			if (!SendModelRequest<ResponseData, ResponseData>(gqlRequest, response)){
+			QString errorMessage;
+			if (!SendModelRequest<ResponseData, ResponseData>(gqlRequest, response, errorMessage)){
 				return;
 			}
 			

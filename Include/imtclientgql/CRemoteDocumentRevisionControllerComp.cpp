@@ -16,8 +16,8 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CRemoteDocumentRevisionControl
 {
 	sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 response;
 
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0, sdl::imtbase::DocumentRevision::CRevisionInfoList>(gqlRequest, response)){
-		errorMessage = QString("Unable to get remote revision info list. Error: Sending request is failed");
+	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0, sdl::imtbase::DocumentRevision::CRevisionInfoList>(gqlRequest, response, errorMessage)){
+		errorMessage = QString("Unable to get remote revision info list. Error: %1").arg(errorMessage);
 
 		return sdl::imtbase::DocumentRevision::CRevisionInfoList();
 	}
@@ -36,8 +36,8 @@ sdl::imtbase::DocumentRevision::CBackupRevisionResponse CRemoteDocumentRevisionC
 {
 	sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0 response;
 
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CBackupRevisionResponse>(gqlRequest, response)){
-		errorMessage = QString("Unable to remote backup revision. Error: Sending request is failed");
+	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CBackupRevisionResponse>(gqlRequest, response, errorMessage)){
+		errorMessage = QString("Unable to remote backup revision. Error: %1").arg(errorMessage);
 
 		return sdl::imtbase::DocumentRevision::CBackupRevisionResponse();
 	}
@@ -56,8 +56,8 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CRemoteDocumentRevision
 {
 	sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 response;
 
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CRestoreRevisionResponse>(gqlRequest, response)){
-		errorMessage = QString("Unable to remote restore revision. Error: Sending request is failed");
+	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CRestoreRevisionResponse>(gqlRequest, response, errorMessage)){
+		errorMessage = QString("Unable to remote restore revision. Error: %1").arg(errorMessage);
 
 		return sdl::imtbase::DocumentRevision::CRestoreRevisionResponse();
 	}
@@ -76,8 +76,8 @@ sdl::imtbase::DocumentRevision::CExportRevisionResponse CRemoteDocumentRevisionC
 {
 	sdl::imtbase::DocumentRevision::CExportRevisionResponse::V1_0 response;
 
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CExportRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CExportRevisionResponse>(gqlRequest, response)){
-		errorMessage = QString("Unable to remote export revision. Error: Sending request is failed");
+	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CExportRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CExportRevisionResponse>(gqlRequest, response, errorMessage)){
+		errorMessage = QString("Unable to remote export revision. Error: %1").arg(errorMessage);
 		return sdl::imtbase::DocumentRevision::CExportRevisionResponse();
 	}
 
@@ -95,8 +95,8 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse CRemoteDocumentRevisionC
 {
 	sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0 response;
 
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CDeleteRevisionResponse>(gqlRequest, response)){
-		errorMessage = QString("Unable to remote delete revision. Error: Sending request is failed");
+	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CDeleteRevisionResponse>(gqlRequest, response, errorMessage)){
+		errorMessage = QString("Unable to remote delete revision. Error: %1").arg(errorMessage);
 
 		return sdl::imtbase::DocumentRevision::CDeleteRevisionResponse();
 	}
@@ -124,7 +124,7 @@ bool CRemoteDocumentRevisionControllerComp::IsRequestSupported(const imtgql::CGq
 	}
 
 	QByteArray collectionId = inputObjectPtr->GetFieldArgumentValue(
-												sdl::imtbase::DocumentRevision::CGetRevisionInfoListInput::V1_0::GetRevisionInfoListInputFields::CollectionId.toUtf8()).toByteArray();
+				sdl::imtbase::DocumentRevision::CGetRevisionInfoListInput::V1_0::GetRevisionInfoListInputFields::CollectionId.toUtf8()).toByteArray();
 	if (collectionId.isEmpty()){
 		return false;
 	}

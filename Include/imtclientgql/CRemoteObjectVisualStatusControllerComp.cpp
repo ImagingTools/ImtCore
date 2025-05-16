@@ -15,8 +15,8 @@ sdl::imtbase::ImtCollection::CVisualStatus CRemoteObjectVisualStatusControllerCo
 			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response;
-	if (!SendModelRequest<sdl::imtbase::ImtCollection::CVisualStatus::V1_0, sdl::imtbase::ImtCollection::CVisualStatus>(gqlRequest, response)){
-		errorMessage = QString("Unable to get remote object visual status. Error: Sending request is failed");
+	if (!SendModelRequest<sdl::imtbase::ImtCollection::CVisualStatus::V1_0, sdl::imtbase::ImtCollection::CVisualStatus>(gqlRequest, response, errorMessage)){
+		errorMessage = QString("Unable to get remote object visual status. Error: %1").arg(errorMessage);
 
 		return sdl::imtbase::ImtCollection::CVisualStatus();
 	}

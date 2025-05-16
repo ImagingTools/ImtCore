@@ -32,7 +32,8 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CCreateSuperuserGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		userssdl::CCreateSuperuserPayload::V1_0 response;
-		if (SendModelRequest<userssdl::CCreateSuperuserPayload::V1_0, userssdl::CCreateSuperuserPayload>(gqlRequest, response)){
+		QString errorMessage;
+		if (SendModelRequest<userssdl::CCreateSuperuserPayload::V1_0, userssdl::CCreateSuperuserPayload>(gqlRequest, response, errorMessage)){
 			if (response.success.has_value()){
 				return *response.success;
 			}
