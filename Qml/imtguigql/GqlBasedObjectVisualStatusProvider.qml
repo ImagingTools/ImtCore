@@ -17,6 +17,10 @@ ObjectVisualStatusProvider {
 		getVisualStatusInfoRequest.send(objectVisualStatusInput)
 	}
 	
+	function getHeaders(){
+		return {}
+	}
+	
 	property GqlSdlRequestSender getVisualStatusInfoRequest: GqlSdlRequestSender {
 		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_getObjectVisualStatus
 		sdlObjectComp: Component {
@@ -29,6 +33,10 @@ ObjectVisualStatusProvider {
 		
 		function onError(message, type){
 			root.visualStatusReceiveFailed(message)
+		}
+		
+		function getHeaders(){
+			return root.getHeaders()
 		}
 	}
 }

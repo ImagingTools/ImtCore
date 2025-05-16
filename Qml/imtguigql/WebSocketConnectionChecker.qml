@@ -40,18 +40,15 @@ SubscriptionClient {
 	onMessageReceived: {
 		console.log("onMessageReceived", data.toJson())
 		let ok = false
-		if (data.containsKey(gqlCommandId)){
-			data = data.getData(gqlCommandId)
-			if (data.containsKey("status")){
-				let status = data.getData("status")
-				if (status === "Disconnected"){
-					pumaSub.status = 2;
-					ok = true
-				}
-				else if (status === "Connected"){
-					pumaSub.status = 1;
-					ok = true
-				}
+		if (data.containsKey("status")){
+			let status = data.getData("status")
+			if (status === "Disconnected"){
+				pumaSub.status = 2;
+				ok = true
+			}
+			else if (status === "Connected"){
+				pumaSub.status = 1;
+				ok = true
 			}
 		}
 		
