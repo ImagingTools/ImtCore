@@ -18,7 +18,8 @@ namespace imtservergql
 class CHttpGraphQLServletComp: public imtrest::CHttpServletCompBase, virtual public imtgql::IGqlRequestProvider
 {
 public:
-	typedef imtrest::CHttpServletCompBase BaseClass;
+	using BaseClass = imtrest::CHttpServletCompBase ;
+	using StatusCode = imtrest::IProtocolEngine::StatusCode;
 
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestProvider);
@@ -36,12 +37,12 @@ protected:
 
 private:
 	imtrest::ConstResponsePtr CreateResponse(
-				const imtrest::IProtocolEngine::StatusCode& statusCode,
+				const StatusCode& statusCode,
 				const QByteArray& payload,
 				const imtrest::IRequest& request,
 				const QByteArray& contentTypeId = "text/plain; charset=utf-8") const;
 	imtrest::ConstResponsePtr GenerateError(
-				const imtrest::IProtocolEngine::StatusCode& errorCode,
+				const StatusCode& errorCode,
 				const QString& errorString,
 				const imtrest::CHttpRequest& request) const;
 
