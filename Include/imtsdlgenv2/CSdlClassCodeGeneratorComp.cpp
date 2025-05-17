@@ -552,9 +552,40 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 
 	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
 		FeedStreamHorizontally(stream, 4);
-		stream << sdlField.GetId();
-		stream << QStringLiteral(" == other.");
-		stream << sdlField.GetId();
+		const QString fieldType = sdlField.GetType();
+
+		// use fuzzy compare for double and float
+		if (	!sdlField.IsArray() &&(
+					fieldType == QStringLiteral("Double") ||
+					fieldType == QStringLiteral("Float")))
+		{
+			stream << sdlField.GetId();
+			stream << QStringLiteral(".has_value() == other.");
+			stream << sdlField.GetId();
+			stream << QStringLiteral(".has_value() &&");
+			FeedStream(stream);
+
+			FeedStreamHorizontally(stream, 4);
+			stream << '(' << '(';
+			stream << sdlField.GetId();
+			stream << QStringLiteral(".has_value() && other.");
+			stream << sdlField.GetId();
+			stream << QStringLiteral(".has_value()) ?");
+			FeedStream(stream);
+
+			FeedStreamHorizontally(stream, 5);
+			stream << QStringLiteral("qFuzzyCompare(*");
+			stream << sdlField.GetId();
+			stream << QStringLiteral(", *other.");
+			stream << sdlField.GetId();
+			stream << QStringLiteral(") : true)");
+		}
+		else {
+			stream << sdlField.GetId();
+			stream << QStringLiteral(" == other.");
+			stream << sdlField.GetId();
+		}
+
 		stream << QStringLiteral(" &&");
 		FeedStream(stream, 1, true);
 	}
