@@ -132,6 +132,11 @@ GqlRequest {
 		else{
 			createQueryParams(query);
 		}
+
+		let requestedFields = getRequestedFields();
+		if(requestedFields !== null){
+			query.AddField(requestedFields);
+		}
 		
 		root.setGqlQuery(query.GetQuery(), root.getHeaders());
 	}
@@ -140,6 +145,10 @@ GqlRequest {
 		query.AddParam(inputParams);
 	}
 	
+	function getRequestedFields(){
+		return null;
+	}
+
 	onStateChanged: {
 		if (state === "Error"){
 			root.onError(qsTr("Network error"), "Critical");
