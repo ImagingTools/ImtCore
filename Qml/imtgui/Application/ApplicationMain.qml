@@ -32,6 +32,7 @@ Item {
 	
 	property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
 	property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
+	property alias webSocketPortProvider: webSocketPortProvider
 
 	onAuthorizationServerConnectedChanged: {
 		application.firstModelsInit();
@@ -214,25 +215,25 @@ Item {
 	function getWebSocketUrl(serverUrl){
 		try {
 			let url = new URL(serverUrl);
-			
+
 			let protocol = "ws";
 			if (url.protocol === "https:"){
 				protocol = "wss";
 			}
-			
+
 			url.protocol = protocol
-			
+
 			if (webSocketPortProvider.port >= 0){
 				url.port = webSocketPortProvider.port;
 			}
 			else{
 				console.error("WebSocket port provider has invalid port!");
 			}
-			
+
 			if (context.appId && context.appId !== ""){
 				url.pathname = "/" + context.appId + "/wssub";
 			}
-			
+
 			return String(url)
 		}
 		catch(error){
