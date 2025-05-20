@@ -510,6 +510,10 @@ bool CJobQueueManagerCompBase::SerializeJobItem(JobItem& item, iser::IArchive& a
 
 QString CJobQueueManagerCompBase::SaveJobItem(const JobItem& jobItem) const
 {
+	if (!m_dataFolderCompPtr.IsValid()){
+		return QString();
+	}
+
 	QString rootFolder = m_dataFolderCompPtr->GetPath();
 	istd::CSystem::EnsurePathExists(rootFolder);
 
@@ -529,6 +533,10 @@ QString CJobQueueManagerCompBase::SaveJobItem(const JobItem& jobItem) const
 
 QString CJobQueueManagerCompBase::GetJobItemPath(const QByteArray& jobId) const
 {
+	if (!m_dataFolderCompPtr.IsValid()){
+		return QString();
+	}
+
 	QString rootFolder = m_dataFolderCompPtr->GetPath();
 
 	QString itemFilePath = rootFolder + "/" + jobId + ".xml";
@@ -605,6 +613,10 @@ void CJobQueueManagerCompBase::OnComponentDestroyed()
 void CJobQueueManagerCompBase::ReadJobItems(JobItems& items) const
 {
 	items.clear();
+
+	if (!m_dataFolderCompPtr.IsValid()) {
+		return;
+	}
 
 	QString rootFolder = m_dataFolderCompPtr->GetPath();
 	QDir itemsDir(rootFolder);

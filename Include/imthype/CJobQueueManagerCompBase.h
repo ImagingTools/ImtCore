@@ -116,8 +116,8 @@ protected:
 	int FindItemById(const QByteArray& itemId) const;
 
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
-	virtual void OnComponentDestroyed();
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
 	void ReadJobItems(JobItems& items) const;
