@@ -48,11 +48,11 @@ public:
 	TJobControllerCompBase();
 
 	// reimplemented (imthype::TIJobController)
-	virtual IJobController::RequestStatus BeginJob(const QByteArray& jobId, const JobParams& jobParams) override;
+	virtual typename IJobController::RequestStatus BeginJob(const QByteArray& jobId, const JobParams& jobParams) override;
 	virtual JobResultPtr GetJobResult(const QByteArray& jobId) const override;
-	virtual IJobController::JobStatus GetJobStatus(const QByteArray& jobId) const override;
-	virtual IJobController::RequestStatus CancelJob(const QByteArray& jobId) override;
-	virtual IJobController::RequestStatus RemoveJob(const QByteArray& jobId) override;
+	virtual typename IJobController::JobStatus GetJobStatus(const QByteArray& jobId) const override;
+	virtual typename IJobController::RequestStatus CancelJob(const QByteArray& jobId) override;
+	virtual typename IJobController::RequestStatus RemoveJob(const QByteArray& jobId) override;
 
 protected:
 	struct JobInfo
