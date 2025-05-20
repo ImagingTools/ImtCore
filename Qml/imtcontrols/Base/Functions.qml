@@ -179,21 +179,21 @@ QtObject {
 		}
 
 		let str = '';
-		i = 0;
-		while (i < bytes.length) {
-			let byte1 = bytes[i++];
+		let iter = 0;
+		while (iter < bytes.length) {
+			let byte1 = bytes[iter++];
 
 			// Voodoo magic
 			if (byte1 < 0x80) {
 				str += String.fromCharCode(byte1);
 			}
 			else if (byte1 < 0xe0) {
-				let byte2 = bytes[i++];
+				let byte2 = bytes[iter++];
 				str += String.fromCharCode(((byte1 & 0x1f) << 6) | (byte2 & 0x3f));
 			}
 			else if (byte1 < 0xf0) {
-				let byte2 = bytes[i++];
-				let byte3 = bytes[i++];
+				let byte2 = bytes[iter++];
+				let byte3 = bytes[iter++];
 				str += String.fromCharCode(
 					((byte1 & 0x0f) << 12) |
 					((byte2 & 0x3f) << 6) |
@@ -202,9 +202,9 @@ QtObject {
 			}
 			else {
 				// 4-byte UTF-8 → surrogate pair
-				let byte2 = bytes[i++];
-				let byte3 = bytes[i++];
-				let byte4 = bytes[i++];
+				let byte2 = bytes[iter++];
+				let byte3 = bytes[iter++];
+				let byte4 = bytes[iter++];
 				let codepoint = ((byte1 & 0x07) << 18) |
 					((byte2 & 0x3f) << 12) |
 					((byte3 & 0x3f) << 6) |
