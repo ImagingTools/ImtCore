@@ -42,7 +42,7 @@ public:
 	/**
 		Begin new job with given params
 	*/
-	virtual QByteArray BeginJob(const JobParams& jobParams) = 0;
+	virtual RequestStatus BeginJob(const QByteArray& jobId, const JobParams& jobParams) = 0;
 
 	/**
 		Get the result of the job execution with given ID. Non-null if the job was successfully completed
