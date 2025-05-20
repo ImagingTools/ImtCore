@@ -160,6 +160,14 @@ Item {
 							model: itemDelegate.dataModel.m_subElements;
 							delegate: Component { Button {
 									id: button;
+									
+									Connections {
+										target: model.item
+										function onModelChanged(){
+											button.checked = model.item.m_toggled
+										}
+									}
+
 									property GuiElementModel element: model.item;
 									
 									enabled: element ? element.m_enabled: false;
