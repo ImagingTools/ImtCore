@@ -136,9 +136,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			locker.unlock();
 			return CreateErrorResponse(errorMessage, request);
 		}
-
+		
 		QJsonObject rootObject = jsonDocument.object();
-
+		
 		switch (webSocketRequest->GetMethodType())
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_ASK:
@@ -154,7 +154,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 				}
 			}
 		break;
-
+		
 		case imtrest::CWebSocketRequest::MT_START_ASK:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
 			if (m_registeredClients.contains(subscriptionId)){
@@ -277,7 +277,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 	}
 
 	int resultCode = 0;
-	for (int i = 0; i < 100; i++){
+	for (int i = 0; i < 1000; i++){
 		networkOperation.timer.start();
 		resultCode = networkOperation.connectionLoop.exec();
 		QCoreApplication::processEvents();
@@ -340,7 +340,7 @@ void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 	QJsonObject payload;
 	payload["data"] = QString(subscriptionRequest.GetQuery());
 	payload["extensions"] = extensions;
-
+	
 	QJsonObject registerSubscription;
 	registerSubscription["id"] = QString(subscriptionId);
 	registerSubscription["type"] = "start";
