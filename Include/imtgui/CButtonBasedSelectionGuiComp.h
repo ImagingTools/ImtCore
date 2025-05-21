@@ -45,7 +45,7 @@ public:
 
 protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
-	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet);
+	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
 	virtual void OnGuiModelDetached() override;
 
