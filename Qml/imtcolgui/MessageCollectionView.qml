@@ -16,7 +16,7 @@ RemoteCollectionView {
 	onHeadersChanged: {
 		if (log.table.headers.getItemsCount() > 0){
 			log.table.tableDecorator = logTableDecoratorModel
-			log.table.setColumnContentComponent(0, messageColumnContentComp);
+			// log.table.setColumnContentComponent(0, messageColumnContentComp);
 		}
 	}
 	
@@ -113,7 +113,6 @@ RemoteCollectionView {
 		id: messageDialogComp;
 		MessageDialog {
 			title: "Message";
-			
 			Component.onCompleted: {
 				clearButtons()
 				addButton(Enums.cancel, qsTr("Cancel"), true)

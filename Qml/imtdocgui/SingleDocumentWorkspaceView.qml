@@ -21,7 +21,6 @@ Rectangle {
 		target: root.visualStatusProvider
 		
 		function onVisualStatusReceived(objectId, icon, text, description){
-			console.log("onVisualStatusReceived", objectId, icon, text, description)
 			if (text == ""){
 				text = root.documentManager.defaultDocumentName
 			}
@@ -39,9 +38,18 @@ Rectangle {
 		target: root.documentManager;
 
 		function onDocumentSaved(documentId){
+			Events.sendEvent("StopLoading")
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
 			
 			root.visualStatusProvider.getVisualStatus(documentId, typeId)
+		}
+		
+		function onDocumentSavingStarted(documentId){
+			Events.sendEvent("StartLoading")
+		}
+		
+		function onDocumentSavingFailed(documentId, message){
+			root.openErrorDialog(message)
 		}
 
 		function onDocumentAdded(documentId){
@@ -83,6 +91,42 @@ Rectangle {
 				}
 			}
 		}
+		
+		function onDocumentOpened(documentId){
+			Events.sendEvent("StopLoading")
+		}
+		
+		function onDocumentOpeningStarted(documentId){
+			Events.sendEvent("StartLoading")
+		}
+		
+		function onDocumentOpeningFailed(documentId, message){
+			Events.sendEvent("StopLoading")
+			root.openErrorDialog(message)
+		}
+		
+		function onTryCloseDirtyDocument(documentId, callback){
+			let dialogCallback = function(result){
+				if (result == Enums.yes){
+					callback(true)
+				}
+				else if (result == Enums.no){
+					callback(false)
+				}
+				else{
+					callback(undefined)
+				}
+			}
+
+			ModalDialogManager.showConfirmationDialog(
+						qsTr("Save document"),
+						qsTr("Save all changes ?"),
+						dialogCallback)
+		}
+	}
+	
+	function openErrorDialog(message){
+		ModalDialogManager.showErrorDialog(message)
 	}
 
 	function addInitialItem(viewComp, name){
@@ -143,8 +187,6 @@ Rectangle {
 		}
 
 		function setHeaderName(id, name){
-			console.log("setHeaderName", id, name)
-			
 			for (let i = 0; i < headersModel.count; i++){
 				if (headersModel.get(i).id === id){
 					headersModel.setProperty(i, "name", name)

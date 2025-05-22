@@ -5,13 +5,12 @@ import imtcontrols 1.0
 import imtgui 1.0
 import imtguivars 1.0
 
-ApplicationMain{
+ApplicationMain {
     id: window;
 
     Component {
         id: topPanelDecoratorCustom
-        TopPanelDecoratorCustom {
-        }
+        TopPanelDecoratorCustom {}
     }
 
     Decorators {
@@ -20,10 +19,6 @@ ApplicationMain{
 
     DecoratorsQt {
         id: decoratorsQt
-    }
-
-    Component.onCompleted: {
-        firstModelsInit();
     }
 
     function updateAllModels(){

@@ -1,55 +1,55 @@
 import QtQuick 2.12
 import Acf 1.0
-import com.imtcore.imtqml 1.0
 import imtgui 1.0
-import imtcontrols 1.0
 
 QtObject {
-	id: documentManager;
+	id: documentManager
 
-	property string defaultDocumentName: qsTr("<no name>");
-	property int documentsCount: documentsModel.count;
-	property Item activeView;
+	property string defaultDocumentName: qsTr("<no name>")
+	property int documentsCount: documentsModel.count
+	property Item activeView
 
 	property ListModel documentsModel: ListModel {
-		dynamicRoles: true;
+		dynamicRoles: true
 	}
 
 	/*!
 		This signal is committed when the user closes the document. The corresponding handler is
 		\c onDocumentClosed.
 	*/
-	signal documentClosed(string documentId);
+	signal documentClosed(string documentId)
 
 	/*!
 		This signal is detected when the user opens or creates a new document. The corresponding handler is
 		\c onDocumentAdded.
 	*/
-	signal documentAdded(string documentId);
+	signal documentAdded(string documentId)
 
 	/*!
 		This signal is detected when the user saves the document. The corresponding handler is
 		\c onDocumentSaved.
 	*/
-	signal documentSaved(string documentId);
-
+	signal documentSaved(string documentId)
+	signal documentSavingStarted(string documentId)
+	signal documentSavingFailed(string documentId, string message)
+	
 	/*!
 		This signal is detected when the document becomes modified. The corresponding handler is
 		\c onDocumentIsDirtyChanged.
 	*/
-	signal documentIsDirtyChanged(string documentId, bool isDirty);
-
-
-	function openErrorDialog(message){
-		ModalDialogManager.openDialog(errorDialogComp, {"message": message});
-	}
-
-
+	signal documentIsDirtyChanged(string documentId, bool isDirty)
+	
+	signal documentOpeningStarted(string documentId)
+	signal documentOpened(string documentId)
+	signal documentOpeningFailed(string documentId, string message)
+	
+	// callback(undefined) - cancel, callback(false) - close, callback(true) - save and close
+	signal tryCloseDirtyDocument(string documentId, var callback)
+	
 	function getActiveView()
 	{
 		return activeView;
 	}
-
 
 	function getDocumentTypeId(documentId)
 	{
@@ -305,7 +305,7 @@ QtObject {
 			return;
 		}
 
-		Events.sendEvent("StartLoading");
+		documentOpeningStarted(documentId, documentTypeId, viewTypeId)
 
 		let documentData = createTemplateDocument(documentId, documentTypeId, viewTypeId);
 		if (!documentData){
@@ -325,7 +325,7 @@ QtObject {
 			documentData.documentDataController.updateDocumentModel();
 		}
 		else{
-			Events.sendEvent("StopLoading");
+			documentOpeningFailed(documentId, qsTr("Unable to get a model for document. Error: Document data controller is invalid"))
 		}
 
 		return true;
@@ -355,7 +355,7 @@ QtObject {
 			let isNew = documentsModel.get(index).isNew;
 			let document = documentsModel.get(index).documentData;
 			if (document.isDirty){
-				Events.sendEvent("StartLoading");
+				documentSavingStarted(documentId)
 
 				if (document.view){
 					if (!document.view.readOnly){
@@ -366,8 +366,7 @@ QtObject {
 				let data = {}
 				let documentIsValid = documentManager.documentIsValid(document, data);
 				if (!documentIsValid){
-					openErrorDialog(data.message);
-					Events.sendEvent("StopLoading");
+					documentSavingFailed(documentId, data.message)
 
 					return;
 				}
@@ -400,7 +399,6 @@ QtObject {
 		}
 
 		documentManager.documentSaved(documentId);
-		Events.sendEvent("StopLoading");
 	}
 
 
@@ -455,20 +453,20 @@ QtObject {
 
 		if (documentData.isDirty && !force){
 			let callback = function(result){
-				console.log("callback", result);
-
-				if (result === Enums.yes){
+				if (result === true){
 					internal.m_closingDocuments.push(documentData.documentId);
 					documentManager.saveDocument(documentData.documentId);
 				}
-				else if (result === Enums.no){
+				else if (result === false){
 					documentData.isDirty = false;
 
 					documentManager.closeDocumentByIndex(documentIndex);
 				}
 			}
+			
+			tryCloseDirtyDocument(documentData.documentId, callback)
 
-			ModalDialogManager.openDialog(saveDialog, {}, "", callback);
+			// ModalDialogManager.openDialog(saveDialog, {}, "", callback);
 		}
 		else{
 			let index = internal.m_closingDocuments.indexOf(documentData.documentId);
@@ -631,7 +629,6 @@ QtObject {
 			}
 
 			onViewChanged: {
-				console.log("onViewChanged", view)
 				let documentModel = documentDataController.documentModel;
 				view.model = documentModel;
 				blockingUpdateModel = true;
@@ -678,8 +675,7 @@ QtObject {
 
 				function onModelChanged(){
 					if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
-						Events.sendEvent("StopLoading");
-
+						documentManager.documentOpeningFailed(singleDocumentData.documentId, qsTr("Internal error"))
 						return;
 					}
 					
@@ -711,12 +707,12 @@ QtObject {
 
 					singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel
 					singleDocumentData.modelConnections.enabled = true;
-
-					Events.sendEvent("StopLoading");
+					
+					documentManager.documentOpened(singleDocumentData.documentId)
 				}
 
 				function onError(){
-					Events.sendEvent("StopLoading");
+					documentManager.documentOpeningFailed(singleDocumentData.documentId, qsTr("Internal error"))
 				}
 			}
 
@@ -753,8 +749,6 @@ QtObject {
 			}
 
 			onIsDirtyChanged: {
-				console.log("onIsDirtyChanged", isDirty, view)
-
 				if (view){
 					if (view.commandsController){
 						view.commandsController.setCommandIsEnabled("Save", isDirty);
@@ -811,20 +805,5 @@ QtObject {
 		property var m_registeredDataControllers: ({});
 		property var m_registeredValidators: ({});
 		property var m_closingDocuments: [];
-	}
-
-	property Component errorDialogComp: Component {
-		ErrorDialog {}
-	}
-
-	property Component saveDialog: Component {
-		MessageDialog {
-			title: qsTr("Save document");
-			message: qsTr("Save all changes ?")
-
-			Component.onCompleted: {
-				addButton(Enums.cancel, qsTr("Cancel"), true)
-			}
-		}
 	}
 }

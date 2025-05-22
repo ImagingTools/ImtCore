@@ -7,6 +7,7 @@ import imtcontrols 1.0
 import imtauthgui 1.0
 import imtauthUsersSdl 1.0
 
+
 Item {
 	id: application;
 	
@@ -17,15 +18,12 @@ Item {
 	property alias localSettings: clientSettingsController.json
 	
 	property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
-	
-	property string applicationId;
-	property var applicationInfo;
-	
-	property bool serverReady: true;
+
+	property bool serverReady: true; // [deprecated]
 	property bool authorizationServerConnected: false;
 	property bool useWebSocketSubscription: false;
 	
-	property bool firstModelsIsInit: true;
+	property bool firstModelsIsInit: false;
 	property bool serverConnected: subscriptionManager_.status == 1;
 	
 	property alias subscriptionManager: subscriptionManager_;
@@ -34,8 +32,119 @@ Item {
 	property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
 	property alias webSocketPortProvider: webSocketPortProvider
 
-	onAuthorizationServerConnectedChanged: {
-		application.firstModelsInit();
+	property alias authConnectionState: connectionState.authConnectionState
+	
+	// TODO: ConnectionStateMachine.qml
+	QtObject {
+		id: connectionState
+
+		property int totalStatus: -1
+		
+		property var status : ({
+			TRY_CONNECTING_TO_AUTH_SERVER: 0,
+			AUTH_SERVER_CONNECTION_ERROR: 1,
+			TRY_CONNECTING_TO_APP_SERVER: 2,
+			APP_SERVER_CONNECTION_ERROR: 3,
+			CONNECTION_SUCCESFUL: 4
+		})
+		
+		// 0 - WebSocket.Connecting, 1 - WebSocket.Open, 2 - WebSocket.Closing, 3 - WebSocket.Closed, 4 - WebSocket.Error
+		property int appConnectionState: application.useWebSocketSubscription ? subscriptionManager_.status : 1
+		property int authConnectionState: 1 // -1 - Unknown, 0 - Connecting, 1 - Connected, 2 - Disconnected
+
+		onAppConnectionStateChanged: {
+			checkState()
+		}
+		
+		onAuthConnectionStateChanged: {
+			checkState()
+		}
+		
+		function checkState(){
+			console.log("checkState", appConnectionState, authConnectionState)
+			
+			if (authConnectionState == 1 && appConnectionState == 1){
+				totalStatus = status.CONNECTION_SUCCESFUL
+			}
+			else if (appConnectionState == 0){
+				totalStatus = status.TRY_CONNECTING_TO_APP_SERVER
+			}
+			else if (appConnectionState == 4 || appConnectionState == 3){
+				totalStatus = status.APP_SERVER_CONNECTION_ERROR
+			}
+			else if (authConnectionState == 0){
+				totalStatus = status.TRY_CONNECTING_TO_AUTH_SERVER
+			}
+			else if (authConnectionState == 2){
+				totalStatus = status.AUTH_SERVER_CONNECTION_ERROR
+			}
+		}
+		
+		onTotalStatusChanged: {
+			console.log("Test: onTotalStatusChanged", totalStatus)
+			
+			if (totalStatus == status.TRY_CONNECTING_TO_AUTH_SERVER){
+				internal.errorMessage = qsTr("Try connecting to authorization server ...")
+				internal.loadingVisible = true
+			}
+			else if (totalStatus == status.AUTH_SERVER_CONNECTION_ERROR){
+				internal.errorMessage = qsTr("Authorization server connection error")
+				internal.loadingVisible = false
+			}
+			else if (totalStatus == status.TRY_CONNECTING_TO_APP_SERVER){
+				internal.errorMessage = qsTr("Try connecting to ") + application.getServerUrl() + " ..."
+				internal.loadingVisible = true
+			}
+			else if (totalStatus == status.APP_SERVER_CONNECTION_ERROR){
+				internal.errorMessage = qsTr("Server connection error")
+				internal.loadingVisible = false
+			}
+			else if (totalStatus == status.CONNECTION_SUCCESFUL){
+				thumbnailDecorator.stackView.clear();
+				statusTimer.stop()
+				Events.sendEvent("SearchVisible", true);
+				Events.sendEvent("SetUserPanelEnabled", true);
+				
+				application.firstModelsInit()
+				
+				return
+			}
+
+			statusTimer.restart()
+		}
+	}
+	
+	Timer {
+		id: statusTimer
+		interval: 1000
+		repeat: false
+		onTriggered: {
+			thumbnailDecorator.stackView.clear();
+			
+			Events.sendEvent("SearchVisible", false);
+			Events.sendEvent("SetUserPanelEnabled", false);
+			
+			application.showMessagePage(internal.errorMessage, internal.loadingVisible)
+		}
+	}
+	
+	QtObject {
+		id: internal
+		property string errorMessage: "";
+		property bool loadingVisible: false;
+	}
+
+	function showMessagePage(message, loadingVisible){
+		if (!loadingVisible){
+			loadingVisible = false
+		}
+
+		console.log("Test: showMessagePage", message, loadingVisible)
+		
+		internal.errorMessage = message;
+		internal.loadingVisible = loadingVisible;
+		
+		thumbnailDecorator.stackView.push(messagePageComp);
 	}
 	
 	signal saveSettings(string json);
@@ -148,50 +257,7 @@ Item {
 	
 	SubscriptionManager {
 		id: subscriptionManager_;
-		
 		active: application.useWebSocketSubscription;
-		
-		onStatusChanged: {
-			application.checkStatus(status)
-			
-			if (status == 1){
-				application.firstModelsInit();
-			}
-		}
-	}
-	
-	function checkStatus(status){
-		thumbnailDecorator.stackView.clear();
-		
-		//	0 - WebSocket.Connecting
-		//	1 - WebSocket.Open
-		//	2 - WebSocket.Closing
-		//	3 - WebSocket.Closed
-		//	4 - WebSocket.Error
-		//	5 - Authorization Error
-		
-		Events.sendEvent("SearchVisible", false);
-		Events.sendEvent("SetUserPanelEnabled", false);
-		
-		if (status === 0){
-			showMessagePage(qsTr("Try connecting to ") + application.getServerUrl() + " ...");
-		}
-		else if (status === 4 || status === 3){
-			showMessagePage(qsTr("Server connection error"));
-		}
-		else if (status === 1){
-			Events.sendEvent("SearchVisible", true);
-			Events.sendEvent("SetUserPanelEnabled", true);
-		}
-		else if (status === 5){
-			showMessagePage(qsTr("Authorization server connection error"));
-		}
-	}
-	
-	function showMessagePage(message){
-		application.errorMessage = message;
-		
-		thumbnailDecorator.stackView.push(messagePageComp);
 	}
 	
 	property Component messagePageComp: Component {
@@ -199,8 +265,8 @@ Item {
 			z: 5;
 			anchors.fill: parent;
 			anchors.topMargin: thumbnailDecorator.topPanel.height;
-			loadingVisible: false;
-			text: application.errorMessage;
+			loadingVisible: internal.loadingVisible;
+			text: internal.errorMessage;
 		}
 	}
 	
@@ -279,23 +345,20 @@ Item {
 	function onStrongUserManagement(){
 		let loggedUserId = AuthorizationController.getLoggedUserId();
 		if (loggedUserId === ""){
-			if (!authorizationServerConnected){
-				checkStatus(5);
-				return;
-			}
-			
 			AuthorizationController.updateSuperuserModel();
 		}
 	}
 	
-	function firstModelsInit(){
-		if (AuthorizationController.isStrongUserManagement() && !authorizationServerConnected){
-			checkStatus(5);
-			
-			return;
+	function firstModelsInit(force){
+		console.log("firstModelsInit", force)
+		
+		if (!force){
+			force = false
 		}
 		
-		checkStatus(1);
+		if (!force && firstModelsIsInit){
+			return
+		}
 		
 		let loggedUserId = AuthorizationController.getLoggedUserId();
 		if (loggedUserId === ""){
@@ -316,8 +379,6 @@ Item {
 		subscriptionManager_.url = webSocketServerUrl;
 		subscriptionManager_.active = true;
 	}
-	
-	property string errorMessage: "";
 	
 	Connections {
 		target: AuthorizationController;
@@ -355,7 +416,7 @@ Item {
 		
 		function onLoggedOut(){
 			thumbnailDecorator.stopLoading();
-			application.firstModelsInit();
+			application.firstModelsInit(true);
 			NavigationController.clear();
 			subscriptionManager_.clear();
 		}
@@ -375,8 +436,6 @@ Item {
 			}
 			
 			if (webSocketPortProvider.port == -1){
-				application.checkStatus(4)
-				
 				webSocketPortProvider.updateModel();
 			}
 		}

@@ -25,14 +25,19 @@ WebSocket {
 
 	onStatusChanged: {
 		if (status == WebSocket.Error){
+			timer.restart()
 			console.error("SubscriptionManager ERROR", errorString)
 		}
 		else if (status == WebSocket.Open){
+			timer.stop()
+			
 			sendTextMessage("{ \"type\": \"connection_init\" }")
 
 			registerSubscriptionToServer();
 		}
 		else if (status == WebSocket.Closed){
+			timer.restart()
+			
 			for (let index = 0; index < subscriptionModel.length; index++){
 				subscriptionModel[index]["status"] = "unregistered"
 			}
@@ -45,21 +50,17 @@ WebSocket {
 	}
 
 	property Timer timer: Timer{
-		id: timer;
-
 		interval: 4000;
-
-		repeat: true;
-		running: container.status == WebSocket.Closed ||
-				 container.status == WebSocket.Error;
-
 		onTriggered: {
 			container.reconnect()
 		}
 	}
 
 	onTextMessageReceived:{
-		let ok = socketModel.createFromJson(message)
+		if (!socketModel.createFromJson(message)){
+			console.error("SubscriptionManager: Create model from JSON failed. Json: ", message)
+			return
+		}
 
 		if (socketModel.getData("type") === "connection_ask"){
 			registerSubscriptionToServer()

@@ -5,54 +5,66 @@ import imtgui 1.0
 import imtcontrols 1.0
 
 Rectangle {
-    id: container;
-
-    color: Style.backgroundColor;
-
-    property alias text: textNoConnection.text;
-    property alias loadingVisible: loading.visible;
-
-    Column {
-        id: content;
-
-        anchors.centerIn: parent;
-
-        width: parent.width - 100;
-
-        spacing: Style.sizeMainMargin;
-
-        Text {
-            id: textNoConnection;
-
-            anchors.horizontalCenter: parent.horizontalCenter;
-
-            horizontalAlignment: Text.AlignHCenter;
-
-            color: Style.textColor;
-            font.pixelSize: Style.fontSizeXXLarge;
-            font.family: Style.fontFamily;
-
-            wrapMode: Text.Wrap;
-        }
-
-        Loading {
-            id: loading;
-
-            anchors.horizontalCenter: parent.horizontalCenter;
-
-            width: 100;
-            height: 100;
-
-            visible: false;
-        }
-    }
-
-    MouseArea {
-        anchors.fill: parent;
-
-        hoverEnabled: true
-
-        onWheel: {}
-        onClicked: {}
-    }
+	id: container;
+	
+	color: Style.backgroundColor;
+	
+	property alias text: textNoConnection.text;
+	property alias loadingVisible: loading.visible;
+	
+	Component.onCompleted: {
+		console.log("ServerNoConnectionView.qml onCompleted")
+		console.log("loading.visible", loading.visible)
+		if (loading.visible){
+			timer.start()
+		}
+		
+		textNoConnection.visible = !loading.visible
+		console.log("textNoConnection.visible", textNoConnection.visible)
+		
+	}
+	
+	Timer {
+		id: timer
+		interval: 2000
+		repeat: false
+		onTriggered: {
+			console.log("onTriggered", textNoConnection.visible)
+			
+			textNoConnection.visible = true
+		}
+	}
+	
+	Column {
+		id: content;
+		anchors.centerIn: parent;
+		width: parent.width - 100;
+		spacing: Style.sizeMainMargin;
+		
+		Text {
+			id: textNoConnection;
+			anchors.horizontalCenter: parent.horizontalCenter;
+			horizontalAlignment: Text.AlignHCenter;
+			color: Style.textColor;
+			font.pixelSize: Style.fontSizeXXLarge;
+			font.family: Style.fontFamily;
+			wrapMode: Text.Wrap;
+			visible: false
+		}
+		
+		Loading {
+			id: loading;
+			anchors.horizontalCenter: parent.horizontalCenter;
+			width: 100;
+			height: 100;
+			visible: false;
+		}
+	}
+	
+	MouseArea {
+		anchors.fill: parent;
+		hoverEnabled: true
+		onWheel: {}
+		onClicked: {}
+	}
 }

@@ -75,7 +75,6 @@ CollectionView {
 				root.removed(objectId)
 			}
 
-
 			function getHeaders(){
 				return root.getHeaders();
 			}
