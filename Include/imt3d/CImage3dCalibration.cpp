@@ -93,9 +93,10 @@ bool CImage3dCalibration::Transform(IPointsBasedObject::PointXyz32 & result, con
 	return true;
 }
 
+
 // reimplemented (istd::IChangeable)
 
-bool CImage3dCalibration::CopyFrom(const istd::IChangeable & object, CompatibilityMode mode)
+bool CImage3dCalibration::CopyFrom(const istd::IChangeable& object, CompatibilityMode mode)
 {
 	const CImage3dCalibration* sourcePtr = dynamic_cast<const CImage3dCalibration*>(&object);
 	if (sourcePtr != NULL){

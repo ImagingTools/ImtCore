@@ -279,7 +279,7 @@ bool CDepthBitmap::Serialize(iser::IArchive& archive)
 			iser::CMemoryReadArchive calibration3dArchive(data, data.size());
 			CImage3dCalibration calibration3d;
 			if (calibration3d.Serialize(calibration3dArchive)){
-				m_calibration3d.CopyFrom(calibration3d);
+				m_calibration3d.CopyFrom(calibration3d, CM_WITH_REFS);
 			}
 			else{
 				m_calibration3d.ResetData();
@@ -327,11 +327,11 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 
 		m_depthRange = sourcePtr->m_depthRange;
 		m_colorMapType = sourcePtr->m_colorMapType;
-		if (!m_calibration3d.CopyFrom(sourcePtr->m_calibration3d)){
+		if (!m_calibration3d.CopyFrom(sourcePtr->m_calibration3d, mode)) {
 			m_calibration3d.ResetData();
 		}
 
-		if (!m_referenceBitmap.CopyFrom(sourcePtr->m_referenceBitmap)){
+		if (!m_referenceBitmap.CopyFrom(sourcePtr->m_referenceBitmap, mode)) {
 			m_referenceBitmap.ResetImage();
 		}
 

@@ -39,6 +39,9 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IPointCloud3d> IPointCloud3dPtr;
+
+
 } // namespace imt3d
 
 
