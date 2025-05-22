@@ -15,7 +15,7 @@ TreeItemModel {
 
         //headers
         headers.setData("Color","#E5E5E5");
-        headers.setData("FontSize",16);
+		headers.setData("FontSize",Style.fontSizeLarge);
         headers.setData("FontBold", false);
         headers.setData("FontColor","#686671");
         headers.setData("TextPosition",Text.AlignHCenter);
@@ -42,7 +42,7 @@ TreeItemModel {
 
         //cells
         cells.setData("Color","#FFFFFF");
-        cells.setData("FontSize",18);
+		cells.setData("FontSize",Style.fontSizeXLarge);
         cells.setData("FontBold",false);
         cells.setData("FontColor","#686671");
         cells.setData("TextPosition",Text.AlignHCenter);

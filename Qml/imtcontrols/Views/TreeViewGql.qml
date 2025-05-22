@@ -761,7 +761,7 @@ Rectangle{
         visible: false;
 
         font.family: Style.fontFamily;
-        font.pixelSize: Style.fontSizeXLarge !==undefined ? Style.fontSizeXLarge : 18;
+		font.pixelSize: Style.fontSizeXLarge;
         color: Style.textColor;
 
         property real sourceWidth: 0;

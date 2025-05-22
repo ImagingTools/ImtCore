@@ -214,7 +214,7 @@ RemoteCollectionView {
 				
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.left: name.right;
-				anchors.leftMargin: 5;
+				anchors.leftMargin: Style.sizeSmallMargin;
 				
 				width: 15;
 				height: width;

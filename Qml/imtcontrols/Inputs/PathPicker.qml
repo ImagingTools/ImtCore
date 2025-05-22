@@ -33,7 +33,7 @@ Item {
 
             anchors.left: parent.left;
             anchors.right: button.left;
-            anchors.rightMargin: 10;
+			anchors.rightMargin: Style.sizeMainMargin;
             anchors.verticalCenter: parent.verticalCenter;
 
             height: parent.height;

@@ -64,7 +64,7 @@ Item {
 
                 anchors.centerIn: parent;
 
-                width: parent.width - 10;
+				width: parent.width - Style.sizeMainMargin;
                 height: parent.height - 2*mainRec.border.width;
                 fontColor: spinBox.fontColor;
                 textSize: spinBox.fontSize;

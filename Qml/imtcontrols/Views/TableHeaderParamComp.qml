@@ -16,7 +16,7 @@ Dialog {
 		Column {
 			id: item;
 
-			width: 300;
+			width: dialog.width;
 
 			property var checkedIndexes: [];
 			property bool block: true;
@@ -125,8 +125,8 @@ Dialog {
 					ToolButton {
 						id: upButton;
 						enabled: false;
-						width: 25;
-						height: 25;
+						width: buttonRow.height;
+						height: width;
 						iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal):
 											  "../../../" + Style.getIconPath("Icons/Up", Icon.State.Off, Icon.Mode.Disabled)
 
@@ -152,8 +152,8 @@ Dialog {
 					ToolButton {
 						id: downButton;
 						enabled: false;
-						width: 25;
-						height: 25;
+						width: buttonRow.height;
+						height: width;
 						iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal):
 											  "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
 						onClicked: {
@@ -179,8 +179,8 @@ Dialog {
 					ToolButton {
 						id: resetButton;
 						enabled: true;
-						width: 25;
-						height: 25;
+						width: buttonRow.height;
+						height: width;
 						iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal):
 											  "../../../" + Style.getIconPath("Icons/Restore", Icon.State.Off, Icon.Mode.Disabled)
 						onClicked: {
@@ -202,8 +202,8 @@ Dialog {
 					visible: !dialog.tableItem ? false : dialog.tableItem.isFlickable;
 
 					enabled: visible;
-					width: 25;
-					height: 25;
+					width: buttonRow.height;
+					height: width;
 
 					iconSource: enabled ? "../../../" + Style.getIconPath("Icons/FitToWidth", Icon.State.On, Icon.Mode.Normal):
 										  "../../../" + Style.getIconPath("Icons/FitToWidth", Icon.State.Off, Icon.Mode.Disabled)

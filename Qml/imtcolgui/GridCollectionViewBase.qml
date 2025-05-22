@@ -266,7 +266,7 @@ Item {
 		id: scrollBar;
 
 		anchors.right: parent.right;
-		anchors.rightMargin: 10;
+		anchors.rightMargin: Style.sizeMainMargin;
 		anchors.bottom: backgroundTable.bottom;
 
 		targetItem: gridFrame;
@@ -448,7 +448,7 @@ Item {
 		id: paginationObj;
 
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: 10;
+		anchors.bottomMargin: Style.sizeMainMargin;
 		anchors.horizontalCenter: parent.horizontalCenter;
 
 		pagesSize: 1;

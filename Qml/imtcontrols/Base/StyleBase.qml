@@ -126,6 +126,7 @@ StyleComponents {
 	//Colors
 		//main
 	property string baseColor: "white";
+	property string baseColorInverted: "black";
 	property string mainColor: "#e6e6e8";
 	property string firstColor: mainColor
 	property string secondColor: "#F18C16";

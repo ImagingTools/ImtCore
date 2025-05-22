@@ -104,7 +104,7 @@ TableViewItemDelegateBase {
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.horizontalCenter: parent.horizontalCenter;
 					
-					width: 15;
+					width: parent.width;
 					height: width;
 					
 					visible: treeDelegateBase.hasChild;

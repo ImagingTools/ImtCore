@@ -520,7 +520,7 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: icon.right;
-                anchors.leftMargin: 10;
+				anchors.leftMargin: Style.sizeMainMargin;
                 anchors.right: updateButton.left;
 
                 text: qsTr("This table has been modified from another computer");
@@ -531,7 +531,7 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.right: parent.right;
-                anchors.rightMargin: 10;
+				anchors.rightMargin: Style.sizeMainMargin;
 
                 width: 70;
                 height: 30;

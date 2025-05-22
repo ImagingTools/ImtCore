@@ -126,18 +126,12 @@ Rectangle {
 	property string cellColor: "#ffffff";
 	property string selectColor: "#4682B4";
 	property string topPanelColor: "#4682B4";
-	property string buttonColor: "#4682B4";
 	property string highlightColor: "#B0C4DE";
 	property string fontColor_title: "#ffffff";
 	property string fontColor_cell: "#000000";
-	property string fontColor_button: "#ffffff";
 	property int fontSize_cell: 12;
 	property int fontSize_title: 20;
-	property int fontSize_button: 14;
 	property bool fontBold_title: false;
-	property int buttonWidth: 100;
-	property int buttonHeight: 35;
-	property int buttonRadius: 6;
 	property int weekDayListHeight: 50;
 	property alias leftImageSource: leftButton.iconSource;
 	property alias rightImageSource: rightButton.iconSource;

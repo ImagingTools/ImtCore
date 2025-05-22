@@ -103,7 +103,7 @@ Item {
                 id: checkBox;
 
                 anchors.left: iconArrow.right;
-                anchors.leftMargin: 5;
+				anchors.leftMargin: Style.sizeSmallMargin;
                 anchors.verticalCenter: parent.verticalCenter;
 
                 checkState: model.State;
@@ -130,7 +130,7 @@ Item {
                 id: title;
 
                 anchors.left: checkBox.visible ? checkBox.right : iconArrow.right;
-                anchors.leftMargin: 10;
+				anchors.leftMargin: Style.sizeMainMargin;
                 anchors.verticalCenter: parent.verticalCenter;
 
                 color: model.Active ? Style.textColor : Style.inactiveTextColor;
@@ -150,7 +150,7 @@ Item {
         anchors.top: viewDelegateLoader.bottom;
         anchors.right: parent.right;
 
-        width: treeItemDelegate.width - 20;
+		width: treeItemDelegate.width - 2*Style.sizeMainMargin;
 
         visible: model.Opened && model.Visible;
 

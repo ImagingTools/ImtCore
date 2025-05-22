@@ -228,7 +228,7 @@ Item {
 		
 		anchors.right: filterField.right;
 		anchors.verticalCenter: filterField.verticalCenter;
-		anchors.rightMargin: 5;
+		anchors.rightMargin: Style.sizeSmallMargin;
 		
 		z: filterField.z +1;
 		

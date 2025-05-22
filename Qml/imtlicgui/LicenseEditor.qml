@@ -418,7 +418,7 @@ ViewBase {
             id: licensesTable;
 
             anchors.top: dependenciesTitle.bottom;
-            anchors.topMargin: 7;
+			anchors.topMargin: Style.sizeSmallMargin;
             anchors.bottom: parent.bottom;
 
             width: parent.width;

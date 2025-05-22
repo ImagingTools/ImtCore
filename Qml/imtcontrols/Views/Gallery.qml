@@ -7,7 +7,7 @@ import imtcontrols 1.0
 Rectangle {
     id: gallery;
 
-    color: "#000000";
+	color: Style.baseColorInverted;
 
     property TreeItemModel model: TreeItemModel{};
     property string nameId: "Source";
@@ -84,7 +84,7 @@ Rectangle {
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSizeXXLarge;
 
-            text: "Галерея";
+			text: qsTr("Gallery");
 
         }
 
@@ -139,7 +139,7 @@ Rectangle {
         anchors.bottom: listContainer.top;
         anchors.bottomMargin: gallery.isFullScreen ? - 5 : 5;
         height: 1;
-        color: "gray";
+		color: Style.grayColor;
         opacity: 0.2;
         visible: false;
     }
@@ -156,7 +156,7 @@ Rectangle {
 
         z: 20;
 
-        color: "#000000";
+		color: Style.baseColorInverted;
 
         MouseArea{
             anchors.fill: parent;
@@ -233,7 +233,7 @@ Rectangle {
         anchors.top: listContainer.bottom;
         anchors.topMargin: gallery.isFullScreen ? - 5 : 5;
         height: 1;
-        color: "gray";
+		color: Style.grayColor;
         opacity: 0.2;
     }
 
@@ -324,7 +324,7 @@ Rectangle {
                     onPositionChanged: {
                         let delta = startX - mouse.x;
                         lastDeltaX = delta;
-                        //console.log(delta); //влево +, вправо -
+						//console.log(delta); //left +, right -
                         if(delta > 0){
                             let ok  = (listPreview.addToMargin + delta) < (listPreview.selectedIndex + 1) * listPreview.delegateWidth && (listPreview.selectedIndex + 1) < listPreview.count;
                             if(ok){
@@ -378,7 +378,7 @@ Rectangle {
             radius:8;
 
             topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
-            title: qsTr("Удалить фото");
+			title: qsTr("Delete photo");
 
             Text {
                 id: titleDialogText;
@@ -393,7 +393,7 @@ Rectangle {
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSizeXXLarge;
 
-                text: "Вы уверены, что хотите удалить фото?";
+				text: qsTr("Are you sure you want to delete the photo?");
 
             }
 
@@ -408,7 +408,7 @@ Rectangle {
                 width: (parent.width - 3 * Style.sizeSmallMargin)/2;
                 height: Style.size_ButtonHeight;
 
-                text: "Ок";
+				text: qsTr("Ok");
 
                 onClicked:{
                     confirmation.finished("Ok");
@@ -427,7 +427,7 @@ Rectangle {
                 width: (parent.width - 3 * Style.sizeSmallMargin)/2;
                 height: Style.size_ButtonHeight;
 
-                text: "Отмена";
+				text: qsTr("Cancel");
 
                 onClicked:{
                     confirmation.finished("Cancel");
@@ -451,7 +451,7 @@ Rectangle {
     //        anchors.bottom: parent.bottom;
     //        anchors.horizontalCenter: parent.horizontalCenter;
     //        width: 1;
-    //        color: "gray";
+	//        color: Style.grayColor;
     //    }
 
 }

@@ -24,12 +24,12 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.left: parent.left;
-        anchors.leftMargin: 10;
+		anchors.leftMargin: Style.sizeMainMargin;
 
         width: 8;
         height: width;
 
-        radius: 8;
+		radius: width;
 
         color: Style.iconColorOnSelected;
         visible: parent.selected;

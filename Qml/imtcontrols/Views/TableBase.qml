@@ -24,7 +24,7 @@ Rectangle {
 	property bool showHeaders: true;
 
 	property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null) ? Style.enableAlternating : false;
-	property color alternatingColor: Style.alternatingColor ? Style.alternatingColor : '#000';
+	property color alternatingColor: Style.alternatingColor ? Style.alternatingColor : Style.baseColorInverted;
 	property color alternatingCellColor: 'transparent';
 	property real alternatingOpacity: Style.alternatingOpacity ? Style.alternatingOpacity : 0.05;
 	property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
@@ -78,7 +78,7 @@ Rectangle {
 
 	//
 	property string borderColorHorizontal: "transparent";
-	property string borderColorVertical: "black";
+	property string borderColorVertical: Style.baseColorInverted;
 	property int horizontalBorderSize: 0;
 	property int verticalBorderSize: 0;
 	property int verticalBorderHeight: -1;

@@ -86,7 +86,7 @@ FocusScope{
         checkBoxMenu.finished();
         checkBoxMenu.isOpen = false;
         checkBoxMenu.focus = false;
-        ModalDialogManager.closeDialog();
+		ModalDialogManager.closeByComp(popupMenu);
     }
 
     function createMenuItem(){
@@ -128,7 +128,7 @@ FocusScope{
         Item{
             id: popupMenuContainer;
 
-            width: 400;
+			width: checkBoxMenu.width;
             height: checkBoxMenu.menuHeight;
 
             property Item root: null;
@@ -271,24 +271,19 @@ FocusScope{
                 CheckBox{
                     id: checkBoxAll;
 
-                    // anchors.top: body.top
-                    // anchors.topMargin: 50
                     anchors.left: parent.left;
                     anchors.leftMargin: Style.sizeMainMargin;
                     anchors.verticalCenter: searchBlock.verticalCenter;
 
                     width: 20;
                     height: 20;
-                    //radius: 5
                     mainMargin: 16;
 					borderColor:Style.grayColor;
-                    //borderWidth: 2;
                     visible: checkBoxMenu.hasAllSelection;
                     enabled: visible;
 
-                    text: checkBoxMenu.hasSearch ? "" : qsTr("All0");
+					text: checkBoxMenu.hasSearch ? "" : qsTr("All");
 
-                    //imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
 
 					function nextCheckState() {
                         if(!enabled){
@@ -316,7 +311,7 @@ FocusScope{
                     anchors.right: parent.right;
                     anchors.leftMargin: Style.sizeMainMargin;
                     anchors.rightMargin: Style.sizeMainMargin;
-                    anchors.topMargin: 10;
+					anchors.topMargin: Style.sizeMainMargin;
 
                     width: parent.width;
                     height: Style.size_TextFieldHeight;
@@ -332,7 +327,7 @@ FocusScope{
                         anchors.horizontalCenter: parent.horizontalCenter;
                         anchors.verticalCenter: parent.verticalCenter;
 
-                        width: parent.width - 10;
+						width: parent.width - Style.sizeMainMargin;
                         height: parent.height - 2*parent.border.width;
                         radius: parent.radius;
                         color: "#ffffff";
@@ -438,9 +433,9 @@ FocusScope{
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
-            anchors.leftMargin: 10;
+			anchors.leftMargin: Style.sizeMainMargin;
             anchors.right: cbArrowIcon.left;
-            anchors.rightMargin: 10;
+			anchors.rightMargin: Style.sizeMainMargin;
 
             color: checkBoxMenu.fontColorTitle;
             font.family: Style.fontFamily;

@@ -323,7 +323,7 @@ Item {
 
 			anchors.right: cbMainRect.right;
 			anchors.verticalCenter: cbMainRect.verticalCenter;
-			anchors.rightMargin: 5;
+			anchors.rightMargin: Style.sizeSmallMargin;
 
 			width: 12;
 			height: 10;

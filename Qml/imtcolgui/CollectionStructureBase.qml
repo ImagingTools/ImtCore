@@ -151,7 +151,7 @@ Item {
 
             anchors.top: parent.top;
             anchors.right: parent.right;
-            anchors.rightMargin: 5;
+			anchors.rightMargin: Style.sizeSmallMargin;
             anchors.bottom: parent.bottom;
 
             width: collectionStructureBaseContainer.hasFilter ? 35 : 10;

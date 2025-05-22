@@ -412,7 +412,7 @@ Item {
 		anchors.bottom: axeY.bottom;
 		anchors.left: axeY.right;
 		anchors.right: legendXTextRight.left;
-		anchors.rightMargin: 10;
+		anchors.rightMargin: Style.sizeMainMargin;
 
 		height: 2;
 		visible: diagram.visibleAxeX;
@@ -477,7 +477,7 @@ Item {
 		anchors.top: axeYValuesContainer.top;
 		anchors.left: axeY.right;
 		anchors.right: legendXTextRight.left;
-		anchors.rightMargin: 10;
+		anchors.rightMargin: Style.sizeMainMargin;
 		anchors.bottom: axeX.top;
 		//width: barsList.width + barsList.anchors.leftMargin
 		color: diagram.backgroundColor;
@@ -703,7 +703,7 @@ Item {
 
 				color: diagram.valueColor;
 				font.family: Style.fontFamily;
-				font.pixelSize: 10;
+				font.pixelSize: Style.fontXSizeSmall;
 
 				rotation: diagram.xElementRotation;
 

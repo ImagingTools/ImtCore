@@ -57,7 +57,7 @@ Item {
 		id: usernameText;
 		anchors.verticalCenter: root.verticalCenter;
 		anchors.right: loginButton.left;
-		anchors.rightMargin: 5;
+		anchors.rightMargin: Style.sizeSmallMargin;
 		color: Style.textColor;
 		font.family: Style.fontFamily;
 		font.pixelSize: Style.fontSizeNormal;
