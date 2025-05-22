@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5352" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -128,6 +128,9 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces/>
     <ExportedComponents>
+        <Component ExportedId="CachedGroupCollection" ComponentId="UserGroupSqlRepository/CachedGroupCollection"/>
+        <Component ExportedId="CachedRoleCollection" ComponentId="RoleDocumentSqlRepository/CachedRoleCollection"/>
+        <Component ExportedId="CachedUserCollection" ComponentId="UserSqlRepository/CachedUserCollection"/>
         <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository"/>
         <Component ExportedId="UserGroupRepository" ComponentId="UserGroupSqlRepository"/>
         <Component ExportedId="UserRepository" ComponentId="UserSqlRepository/UserRepository"/>

@@ -2,12 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5352" Description="ACF"/>
+            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="CachedObjectCollection" X="550" Y="675" Note=""/>
         <Element ComponentName="JsonSerializer" X="175" Y="350" Note=""/>
         <Element ComponentName="Repository" X="550" Y="550" Note=""/>
         <Element ComponentName="SqlDatabaseDocumentDelegate" X="575" Y="350" Note=""/>
