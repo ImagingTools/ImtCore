@@ -17,11 +17,24 @@ namespace imtgql
 {
 
 
+const QHash<QByteArray, imtgql::IGqlRequest::RequestType> CGqlRequest::s_requestNameMap = {
+	{ QByteArrayLiteral("query"), imtgql::IGqlRequest::RT_QUERY },
+	{ QByteArrayLiteral("mutation"), imtgql::IGqlRequest::RT_MUTATION },
+	{ QByteArrayLiteral("subscription"), imtgql::IGqlRequest::RT_SUBSCRIPTION },
+};
+
+
 // public methods
 
 imtgql::CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& commandId)
 	:m_commandId(commandId),
 	m_requestType(requestType),
+	m_startKey(false),
+	m_startValue(false),
+	m_startParams(false),
+	m_startFields(false),
+	m_startArrayPrimitives(false),
+	m_textString(false),
 	m_activeGqlObjectPtr(nullptr),
 	m_gqlContextPtr(nullptr)
 {
@@ -78,6 +91,7 @@ QByteArray CGqlRequest::GetHeader(QByteArray headerId) const
 	const IGqlContext* gqlContext = GetRequestContext();
 	if (gqlContext != nullptr){
 		IGqlContext::Headers headers = gqlContext->GetHeaders();
+
 		return headers.value(headerId.toLower());
 	}
 
@@ -144,29 +158,29 @@ QByteArray CGqlRequest::GetQuery() const
 	QByteArray fields = CreateQueryFields();
 	QByteArray params = CreateQueryParams();
 
-	QByteArray type = "";
+	QByteArray type;
 	switch (m_requestType)
 	{
 	case imtgql::IGqlRequest::RT_QUERY:
-		type = "query";
+		type = QByteArrayLiteral("query");
 		break;
 	case imtgql::IGqlRequest::RT_MUTATION:
-		type = "mutation";
+		type = QByteArrayLiteral("mutation");
 		break;
 	case imtgql::IGqlRequest::RT_SUBSCRIPTION:
-		type = "subscription";
+		type = QByteArrayLiteral("subscription");
 		break;
 	default:
 		Q_ASSERT(false);
+
 		return QByteArray();
 	}
 
 	if (!params.isEmpty()) {
-		params.prepend("(");
-		params.append(")");
+		params.prepend('(').append(')');
 	}
 
-	QByteArray queryData = "{\"query\": \"" + type + " " + m_commandId + " {" + m_commandId + params + fields + "}\"}";
+	QByteArray queryData = QByteArrayLiteral("{\"query\": \"") + type + ' ' + m_commandId + ' ' + '{' + m_commandId + params + fields + QByteArrayLiteral("}\"}");
 
 	return queryData;
 }
@@ -184,65 +198,77 @@ QByteArray CGqlRequest::GetProtocolVersion() const
 }
 
 
-bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
+bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 {
-	QJsonDocument document = QJsonDocument::fromJson(query);
-	QByteArray body = document.object().value("query").toString().toUtf8();
-	int index = body.indexOf("{");
-	QByteArray header = body.left(index);
-	QList<QByteArray> headersData = header.split(' ');
-	QByteArray type;
-	bool endParams = false;
-	bool startText = false;
-	bool startBigText = false;
-	bool startBackSlash = false;
-	// QByteArray key;
-	// QByteArray value;
-	QByteArray text;
+	if(query.isEmpty()){
+		return false;
+	}
 
-	for (int i = 0; i < headersData.count(); ++i){
-		if (!headersData[i].isEmpty()){
-			type = headersData[i];
+	const QJsonDocument document = QJsonDocument::fromJson(query);
+	if(document.isNull() || !document.isObject()){
+		return false;
+	}
+
+	QByteArray body = document.object().value(QStringLiteral("query")).toString().toUtf8();
+	if (body.isEmpty()){
+		return false;
+	}
+
+	int index = body.indexOf('{');
+	if (index == -1){
+		return false;
+	}
+
+	const QByteArray header = body.left(index);
+	const QList<QByteArray> headersData = header.split(' ');
+
+	QByteArray type;
+	for (const QByteArray& header : headersData){
+		if (!header.isEmpty()){
+			type = header;
+
 			break;
 		}
 	}
 
-	if (type == "query"){
-		m_requestType = imtgql::IGqlRequest::RT_QUERY;
-	}
-	else if (type == "mutation"){
-		m_requestType = imtgql::IGqlRequest::RT_MUTATION;
-	}
-	else if (type == "subscription"){
-		m_requestType = imtgql::IGqlRequest::RT_SUBSCRIPTION;
-	}
-	else{
+	if (!CGqlRequest::s_requestNameMap.contains(type)){
 		return false;
 	}
 
+	m_requestType = CGqlRequest::s_requestNameMap[type];
+
 	body = body.mid(index + 1);
-	index = body.lastIndexOf("}");
+	index = body.lastIndexOf('}');
+	if (index == -1){
+		return false;
+	}
+
 	body = body.left(index);
 
-	index = body.indexOf("(");
+	bool endParams = false;
+	bool startText = false;
+	bool startBigText = false;
+	bool startBackSlash = false;
+
+	index = body.indexOf('(');
 	if (index > -1){
 		m_commandId = body.left(index);
 		m_startParams = false;
 	}
 	else{
-		index = body.indexOf("{");
+		index = body.indexOf('{');
 		m_commandId = body.left(index);
 		m_startParams = endParams = true;
 	}
-	m_commandId = m_commandId.replace(" ","");
-	m_commandId = m_commandId.replace("\n","");
-	m_commandId = m_commandId.replace("\t","");
-	body = body.remove(0,index);
+
+	m_commandId = m_commandId.simplified().replace(' ', "");
+	body = body.remove(0, index);
 	m_activeGqlObjectPtr = nullptr;
 	m_startFields = false;
 	m_startArrayPrimitives = false;
 	m_textString = false;
 
+	QByteArray text;
 	for (int i = 0; i < body.length() ; ++i){
 		char chr = body[i];
 		switch (chr){
@@ -294,7 +320,6 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				m_startArrayPrimitives = false;
 				if (m_startParams && endParams && !m_startFields){
 					m_startFields = true;
-					// m_activeGqlObjectPtr = nullptr;
 					m_activeGqlObjectPtr = &m_fields;
 				}
 			}
@@ -314,7 +339,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 					m_activeGqlObjectPtr = m_activeGqlObjectPtr->GetParentObject();
 				}
 				if (m_activeGqlObjectPtr == nullptr){
-					if (m_startFields == true){
+					if (m_startFields){
 						if (!text.isEmpty()){
 							SetParseObject(text);
 						}
@@ -408,7 +433,6 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				}
 				if (!CloseArray()){
 					errorPosition = i + index;
-
 					return false;
 				}
 				m_startArrayPrimitives = false;
@@ -552,7 +576,7 @@ QByteArray CGqlRequest::CreateQueryFields() const
 	QByteArray retVal;
 	retVal = AddObjectFieldPart(m_fields);
 	if (retVal.isEmpty()){
-		retVal = "{}";
+		retVal = QByteArrayLiteral("{}");
 	}
 
 	return retVal;
@@ -572,9 +596,9 @@ QByteArray CGqlRequest::AddObjectFieldPart(const CGqlObject &gqlObject) const
 {
 	QByteArray retVal;
 
-	QByteArrayList fieldIds = gqlObject.GetFieldIds();
+	const QByteArrayList fieldIds = gqlObject.GetFieldIds();
 	if (!fieldIds.isEmpty()){
-		retVal += " {";
+		retVal.append(' ').append('{');
 
 		for (int i = 0; i < fieldIds.count(); ++i){
 			const QByteArray& fieldId = fieldIds[i];
@@ -583,11 +607,11 @@ QByteArray CGqlRequest::AddObjectFieldPart(const CGqlObject &gqlObject) const
 				retVal += AddObjectFieldPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
 			}
 			if (i < fieldIds.count() - 1){
-				retVal += " ";
+				retVal += ' ';
 			}
 		}
 
-		retVal += "}";
+		retVal += '}';
 	}
 
 	return retVal;
@@ -598,41 +622,40 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 {
 	QByteArray retVal;
 
-
 	QByteArrayList fieldIds = gqlObject.GetFieldIds();
 	for (int i = 0; i < fieldIds.count(); ++i) {
 		const QByteArray& fieldId = fieldIds[i];
 
 		if (gqlObject.IsObject(fieldId)) {
 			retVal += fieldId;
-			retVal += ": {";
+			retVal += QByteArrayLiteral(": {");
 			retVal += AddObjectParamPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
-			retVal += "}";
+			retVal += '}';
 		}
 		else if (gqlObject.IsObjectList(fieldId)){
-			retVal += fieldId + " :[";
+			retVal += fieldId + QByteArrayLiteral(" :[");
 			int objectsCount = gqlObject.GetObjectsCount(fieldId);
 			for (int objectIndex = 0; objectIndex < objectsCount; objectIndex++){
 				if (objectIndex > 0){
-					retVal += ",";
+					retVal += ',';
 				}
-				retVal += " {";
+				retVal.append(' ').append('{');
 				const CGqlObject* paramsObject = gqlObject.GetFieldArgumentObjectPtr(fieldId, objectIndex);
 				if (paramsObject != nullptr){
 					retVal += AddObjectParamPart(*paramsObject);
 				}
-				retVal += "}";
+				retVal += '}';
 			}
-			retVal += " ]";
+			retVal.append(' ').append(']');
 		}
 		else {
 			retVal += fieldId;
-			retVal += ": ";
+			retVal.append(':').append(' ');
 			QVariant value = gqlObject.GetFieldArgumentValue(fieldId);
 			retVal += AddObjectParamValue(value);
 		}
 		if (i < fieldIds.count() - 1){
-			retVal += ", ";
+			retVal.append(',').append(' ');
 		}
 	}
 
@@ -654,44 +677,44 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 		retVal += "[";
 		for (int i = 0; i < variantList.count(); i++){
 			if (i > 0){
-				retVal += ", ";
+				retVal.append(',').append(' ');
 			}
 			retVal += AddObjectParamValue(variantList.value(i));
 		}
-		retVal += "]";
+		retVal += ']';
 	}
 	else if (valueType == QMetaType::QString || valueType == QMetaType::QByteArray){
-		retVal += "\\\"";
+		retVal += QByteArrayLiteral("\\\"");
 		QByteArray data = value.toByteArray();
 		data = data.replace("\\", "\\\\\\\\");
 		data = data.replace("\"", "\\\\\\\"");
-		data = data.replace("\n", "\\\\\\\n");
-		data = data.replace("\r", "\\\\\\\r");
-		data = data.replace("\t", "\\\\\\\t");
+		data = data.replace('\n', "\\\\\\\n");
+		data = data.replace('\r', "\\\\\\\r");
+		data = data.replace('\t', "\\\\\\\t");
 		retVal += data;
-		retVal += "\\\"";
+		retVal += QByteArrayLiteral("\\\"");
 	}
 	else if (value.canConvert<QStringList>()){
 		QStringList stringList = value.value<QStringList>();
-		retVal += "[";
+		retVal += '[';
 		for (int i = 0; i < stringList.count(); i++){
 			if (i > 0){
-				retVal += ", ";
+				retVal.append(',').append(' ');
 			}
 			retVal += AddObjectParamValue(stringList.value(i));
 		}
-		retVal += "]";
+		retVal += ']';
 	}
 	else if (value.canConvert<QList<QString>>()){
 		QList<QString> stringList = value.value<QList<QString>>();
-		retVal += "[";
+		retVal += '[';
 		for (int i = 0; i < stringList.count(); i++){
 			if (i > 0){
-				retVal += ", ";
+				retVal.append(',').append(' ');
 			}
 			retVal += AddObjectParamValue(stringList.value(i));
 		}
-		retVal += "]";
+		retVal += ']';
 	}
 	else if (value.canConvert<imtgql::CGqlEnum>()){
 		retVal += value.value<imtgql::CGqlEnum>().GetValue();
@@ -708,7 +731,7 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 void CGqlRequest::ParceObjectFieldPart(CGqlObject &gqlObject, const QJsonObject &object) const
 {
 	QStringList keys = object.keys();
-	for (const QString& key: keys){
+	for (const QString& key: std::as_const(keys)){
 		if (object.value(key).isObject()){
 			CGqlObject* slaveGqlObjectPtr = gqlObject.CreateFieldObject(key.toUtf8());
 			ParceObjectParamPart(*slaveGqlObjectPtr, object.value(key).toObject());
@@ -723,7 +746,7 @@ void CGqlRequest::ParceObjectFieldPart(CGqlObject &gqlObject, const QJsonObject 
 void CGqlRequest::ParceObjectParamPart(CGqlObject &gqlObject, const QJsonObject &object) const
 {
 	QStringList keys = object.keys();
-	for (const QString& key : keys){
+	for (const QString& key : std::as_const(keys)){
 		if (object.value(key).isObject()){
 			CGqlObject* slaveGqlObjectPtr = gqlObject.CreateFieldObject(key.toUtf8());
 			ParceObjectParamPart(*slaveGqlObjectPtr, object.value(key).toObject());
@@ -782,7 +805,7 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 }
 
 
-void CGqlRequest::SetParseText(const QByteArray &text)
+void CGqlRequest::SetParseText(const QByteArray& text)
 {
 	if (m_activeGqlObjectPtr == nullptr){
 		SetParseObject(text);
@@ -804,10 +827,10 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 			QString stringValue = text;
 			variantList.append(stringValue);
 		}
-		else if (text == "true"){
+		else if (text == QByteArrayLiteral("true")){
 			variantList.append(QVariant(true));
 		}
-		else if (text == "false"){
+		else if (text == QByteArrayLiteral("false")){
 			variantList.append(QVariant(false));
 		}
 		else {
@@ -841,10 +864,10 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 			QString stringValue = text;
 			value = stringValue;
 		}
-		else if (text == "true"){
+		else if (text == QByteArrayLiteral("true")){
 			value = true;
 		}
-		else if (text == "false"){
+		else if (text == QByteArrayLiteral("false")){
 			value = false;
 		}
 		else {

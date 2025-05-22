@@ -91,6 +91,8 @@ protected:
 	QList<CGqlObject*> m_objectArrayList;
 	std::shared_ptr<imtgql::IGqlContext> m_gqlContextPtr;
 	QList<QByteArray> m_activeArrayIds;
+
+	static const QHash<QByteArray, imtgql::IGqlRequest::RequestType> s_requestNameMap;
 };
 
 
