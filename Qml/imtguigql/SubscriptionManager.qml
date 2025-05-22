@@ -57,10 +57,7 @@ WebSocket {
 	}
 
 	onTextMessageReceived:{
-		if (!socketModel.createFromJson(message)){
-			console.error("SubscriptionManager: Create model from JSON failed. Json: ", message)
-			return
-		}
+		socketModel.createFromJson(message)
 
 		if (socketModel.getData("type") === "connection_ask"){
 			registerSubscriptionToServer()
