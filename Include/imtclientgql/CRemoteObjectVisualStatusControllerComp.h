@@ -25,6 +25,7 @@ protected:
 				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+
 	// reimplemented (imtgql::IGqlRequestHandler)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 

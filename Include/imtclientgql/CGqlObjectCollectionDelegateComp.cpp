@@ -719,6 +719,10 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 	imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
 	if (!requestPtr.isNull()){
 		data.commandId = requestPtr->GetCommandId();
+
+		if (!data.data.contains(data.commandId)) {
+			SendErrorMessage(0, "GqlResponse data don't contains " + data.commandId);
+		}
 	}
 
 	QJsonDocument document = QJsonDocument::fromJson(response.GetResponseData());
