@@ -67,7 +67,7 @@ protected:
 					const QByteArray& jobId,
 					const IJobProcessor& taskProcessor,
 					const imtbase::IReferenceCollection& input,
-					const istd::TSmartPtr<iprm::IParamsSet>& paramsPtr,
+					iprm::IParamsSetSharedPtr paramsPtr);
 					JobProgressManager* progressPtr);
 
 		// reimplemented (QRunnable)
@@ -78,8 +78,8 @@ protected:
 		CJobExecutionControllerCompBase& m_parent;
 		QByteArray m_jobId;
 		CStandardJobOutput m_jobOutput;
-		istd::TSmartPtr<imtbase::IReferenceCollection> m_inputPtr;
-		istd::TSmartPtr<iprm::IParamsSet> m_paramsPtr;
+		imtbase::IReferenceCollectionSharedPtr m_inputPtr;
+		iprm::IParamsSetSharedPtr m_paramsPtr;
 		JobProgressManager* m_progressPtr;
 	};
 

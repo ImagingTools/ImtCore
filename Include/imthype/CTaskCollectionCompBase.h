@@ -6,7 +6,7 @@
 #include <QtCore/QUuid>
 
 // ACF includes
-#include <istd/TOptDelPtr.h>
+#include <istd/TOptInterfacePtr.h>
 #include <iser/IObject.h>
 #include <imod/TModelWrap.h>
 #include <imod/CModelUpdateBridge.h>
@@ -74,7 +74,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				DataPtr defaultValuePtr = DataPtr(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
@@ -89,7 +89,7 @@ public:
 				const istd::IChangeable& object,
 				CompatibilityMode mode = CM_WITHOUT_REFS,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual imtbase::IObjectCollection* CreateSubCollection(
+	virtual imtbase::IObjectCollectionUniquePtr CreateSubCollection(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
@@ -131,7 +131,7 @@ public:
 	virtual bool Serialize(iser::IArchive& archive);
 
 protected:
-	virtual iinsp::ISupplier* CreateTaskInstance(const QByteArray& taskTypeId) const = 0;
+	virtual iinsp::ISupplierUniquePtr CreateTaskInstance(const QByteArray& taskTypeId) const = 0;
 	virtual void OnTaskCreated(iinsp::ISupplier& task);
 	virtual void OnTaskRemoved(const QByteArray& taskId);
 
@@ -149,6 +149,8 @@ protected:
 	virtual void OnComponentDestroyed();
 
 protected:
+	typedef istd::TOptInterfacePtr<iinsp::ISupplier> OptionalTaskPtr;
+
 	struct Task
 	{
 		Task()
@@ -160,7 +162,7 @@ protected:
 
 		Task(const Task& task)
 		{
-			this->taskPtr.TakeOver(const_cast<Task&>(task).taskPtr);
+			this->taskPtr = taskPtr;
 
 			this->uuid = task.uuid;
 			this->typeId = task.typeId;
@@ -175,7 +177,7 @@ protected:
 		QByteArray uuid;
 		QByteArray typeId;
 		QString typeName;
-		istd::TOptDelPtr<iinsp::ISupplier> taskPtr;
+		OptionalTaskPtr taskPtr;
 		QString name;
 		bool isEnabled;
 		int taskFlags;
@@ -187,8 +189,6 @@ protected:
 	typedef QVector<Task> TaskList;
 
 protected:
-	I_REF(imtbase::IObjectCollection, m_taskInputsCompPtr);
-
 	TaskList m_tasks;
 	typedef QMap<QByteArray, TaskList::Iterator> TaskIdMap;
 
@@ -201,6 +201,7 @@ private:
 	I_MULTIATTR(QByteArray, m_fixedTaskTypeIdsAttrPtr);
 	I_MULTITEXTATTR(m_fixedTaskTypeNamesAttrPtr);
 	I_MULTITEXTATTR(m_fixedTaskUserIdsAttrPtr);
+	I_REF(imtbase::IObjectCollection, m_taskInputsCompPtr);
 	I_REF(imod::IModel, m_taskInputsModelCompPtr);
 	I_ATTR(bool, m_allowAddTasksAttrPtr);
 

@@ -167,14 +167,16 @@ CJobExecutionControllerCompBase::Task::Task(
 			const QByteArray& jobId,
 			const IJobProcessor& taskProcessor,
 			const imtbase::IReferenceCollection& input,
-			const istd::TSmartPtr<iprm::IParamsSet>& paramsPtr,
+			iprm::IParamsSetSharedPtr paramsPtr)
 			JobProgressManager* progressPtr)
 	:m_taskProcessor(taskProcessor),
 	m_parent(parent),
 	m_jobId(jobId),
 	m_progressPtr(progressPtr)
 {
-	m_inputPtr.SetCastedOrRemove(input.CloneMe());
+	istd::IChangeableSharedPtr inputClonePtr(input.CloneMe());
+
+	m_inputPtr.SetCastedPtr<istd::IChangeable>(inputClonePtr);
 
 	m_paramsPtr = paramsPtr;
 }

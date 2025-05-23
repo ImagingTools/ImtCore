@@ -26,7 +26,7 @@ const IJobProcessor* CPluginBasedJobExecutionComp::GetTaskProcessor(const QByteA
 	if (m_pluginsMap.contains(workerTypeId)){
 		const imthype::IJobProcessorFactory* jobProcessorFactoryPtr = m_pluginsMap[workerTypeId]->GetJobProcessorFactory();
 		if (jobProcessorFactoryPtr != nullptr){
-			istd::TDelPtr<IJobProcessor> processorPtr(jobProcessorFactoryPtr->CreateInstance(workerTypeId));
+			IJobProcessorUniquePtr processorPtr(jobProcessorFactoryPtr->CreateInstance(workerTypeId));
 			if (processorPtr.IsValid()){
 				if (processorPtr->GetTaskTypeId() != workerTypeId){
 					SendCriticalMessage(0, "Job processor were created, but they have a wrong type. Please check the processor component registration");
@@ -34,9 +34,9 @@ const IJobProcessor* CPluginBasedJobExecutionComp::GetTaskProcessor(const QByteA
 					return nullptr;
 				}
 
-				m_jobProcessorMap[workerTypeId] = JobProcessorPtr(processorPtr.PopPtr());
+				m_jobProcessorMap[workerTypeId].FromUnique(processorPtr);
 
-				return m_jobProcessorMap[workerTypeId].get();
+				return m_jobProcessorMap[workerTypeId].GetPtr();
 			}
 			else {
 				SendCriticalMessage(0, "Job processor could not be created");

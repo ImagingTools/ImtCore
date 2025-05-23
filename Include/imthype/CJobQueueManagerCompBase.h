@@ -98,7 +98,7 @@ protected:
 		QByteArray uuid;
 		QString name;
 		QByteArray contextId;
-		istd::TSmartPtr<iprm::IParamsSet> paramsPtr;
+		iprm::IParamsSetSharedPtr paramsPtr;
 		ProcessingStatus processingStatus;
 		double progress;
 

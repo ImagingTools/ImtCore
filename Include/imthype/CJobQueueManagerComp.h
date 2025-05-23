@@ -26,7 +26,7 @@ public:
 
 	// reimplemented (IJobQueueManager)
 	virtual const iprm::IOptionsList* GetSupportedTasks() const override;
-	virtual iprm::IParamsSet* CreateJobParameters(
+	virtual iprm::IParamsSetUniquePtr CreateJobParameters(
 				const QByteArray& contextId,
 				const QByteArray& taskTypeId,
 				const iprm::IParamsSet* defaultParamPtr) const override;

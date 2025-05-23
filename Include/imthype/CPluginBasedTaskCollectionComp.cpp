@@ -37,7 +37,7 @@ const iprm::IOptionsList* CPluginBasedTaskCollectionComp::GetObjectTypesInfo() c
 
 // reimplemented (CTaskCollectionCompBase)
 
-iinsp::ISupplier* CPluginBasedTaskCollectionComp::CreateTaskInstance(const QByteArray& taskTypeId) const
+iinsp::ISupplierUniquePtr CPluginBasedTaskCollectionComp::CreateTaskInstance(const QByteArray& taskTypeId) const
 {
 	if (m_pluginsMap.contains(taskTypeId)){
 		const ITaskPlugin::ISupplierFactory* taskFactoryPtr = m_pluginsMap[taskTypeId]->GetTaskFactory();

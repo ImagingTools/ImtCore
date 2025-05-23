@@ -25,7 +25,7 @@ const iprm::IOptionsList* CJobQueueManagerComp::GetSupportedTasks() const
 }
 
 
-iprm::IParamsSet* CJobQueueManagerComp::CreateJobParameters(
+iprm::IParamsSetUniquePtr CJobQueueManagerComp::CreateJobParameters(
 			const QByteArray& /*contextId*/,
 			const QByteArray& taskTypeId,
 			const iprm::IParamsSet* defaultParamPtr) const
@@ -33,7 +33,7 @@ iprm::IParamsSet* CJobQueueManagerComp::CreateJobParameters(
 	if (m_taskInfoListCompPtr.IsValid() && m_taskParamsFactoriesCompPtr.IsValid()){
 		int factoryIndex = iprm::FindOptionIndexById(taskTypeId, *m_taskInfoListCompPtr.GetPtr());
 		if ((factoryIndex >= 0) && (factoryIndex < m_taskParamsFactoriesCompPtr.GetCount())){
-			istd::TDelPtr<iprm::IParamsSet> newParamsPtr(m_taskParamsFactoriesCompPtr.CreateInstance(factoryIndex));
+			iprm::IParamsSetUniquePtr newParamsPtr = m_taskParamsFactoriesCompPtr.CreateInstance(factoryIndex);
 			if (newParamsPtr.IsValid()){
 				if (newParamsPtr->GetFactoryId() != taskTypeId){
 					SendCriticalMessage(0, "Job parameter were created, but they have a wrong type. Please check the parameter registration");
@@ -49,7 +49,7 @@ iprm::IParamsSet* CJobQueueManagerComp::CreateJobParameters(
 					}
 				}
 
-				return newParamsPtr.PopPtr();
+				return newParamsPtr;
 			}
 			else{
 				SendCriticalMessage(0, "Job parameter could not be created");

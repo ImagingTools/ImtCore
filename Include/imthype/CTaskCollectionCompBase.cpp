@@ -141,7 +141,7 @@ const ITaskResultCollection* CTaskCollectionCompBase::GetTaskResults(const QByte
 {
 	for (const Task& task : m_tasks){
 		if (task.uuid == taskId){
-			ITaskResultCollection* resultsPtr = CompCastPtr<ITaskResultCollection>(task.taskPtr.GetPtr());
+			ITaskResultCollection* resultsPtr = CompCastPtr<ITaskResultCollection>(const_cast<iinsp::ISupplier*>(task.taskPtr.GetPtr()));
 
 			return resultsPtr;
 		}
@@ -228,15 +228,15 @@ QByteArray CTaskCollectionCompBase::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			DataPtr defaultValuePtr,
+			const istd::IChangeable* defaultValuePtr,
 			const Id& proposedObjectId,
 			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
 			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/,
 			const imtbase::IOperationContext* /*operationContextPtr*/)
 {
-	istd::TDelPtr<iinsp::ISupplier> newTaskPtr(CreateTaskInstance(typeId));
+	iinsp::ISupplierUniquePtr newTaskPtr(CreateTaskInstance(typeId));
 	if (newTaskPtr.IsValid()){
-		if (defaultValuePtr.IsValid()){
+		if (defaultValuePtr != nullptr){
 			if (!newTaskPtr->CopyFrom(*defaultValuePtr)){
 				return QByteArray();
 			}
@@ -261,7 +261,7 @@ QByteArray CTaskCollectionCompBase::InsertNewObject(
 			workingName = newName + QString(" - %1").arg(nameCounter++);
 		}
 
-		newTask.taskPtr.SetPtr(newTaskPtr.PopPtr(), true);
+		newTask.taskPtr.SetPtr(newTaskPtr);
 		newTask.typeId = typeId;
 		newTask.name = workingName;
 		newTask.description = description;
@@ -322,10 +322,10 @@ bool CTaskCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 	for (const Task& task : m_tasks){
 		if ((task.uuid == objectId) && task.taskPtr.IsValid()){
 			if (!dataPtr.IsValid()){
-				istd::IChangeable* newInstancePtr = CreateTaskInstance(task.typeId);
-				if (newInstancePtr != nullptr){
+				iinsp::ISupplierUniquePtr newInstancePtr = CreateTaskInstance(task.typeId);
+				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*task.taskPtr)){
-						dataPtr = DataPtr(DataPtr::RootObjectPtr(newInstancePtr), [newInstancePtr](){return newInstancePtr; });
+						dataPtr.MoveCastedPtr(newInstancePtr);
 
 						return true;
 					}
@@ -362,7 +362,7 @@ bool CTaskCollectionCompBase::SetObjectData(
 }
 
 
-imtbase::IObjectCollection* CTaskCollectionCompBase::CreateSubCollection(
+imtbase::IObjectCollectionUniquePtr CTaskCollectionCompBase::CreateSubCollection(
 			int /*offset*/,
 			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
@@ -576,7 +576,7 @@ bool CTaskCollectionCompBase::CopyFrom(const IChangeable& object, CompatibilityM
 			const Task& sourceTask = sourceTaskIterator.next();
 
 			Task newTask;
-			istd::TDelPtr<iinsp::ISupplier> newTaskPtr(CreateTaskInstance(sourceTask.typeId));
+			iinsp::ISupplierUniquePtr newTaskPtr = CreateTaskInstance(sourceTask.typeId);
 			if (newTaskPtr.IsValid()){
 				OnTaskCreated(*newTaskPtr);
 
@@ -589,7 +589,7 @@ bool CTaskCollectionCompBase::CopyFrom(const IChangeable& object, CompatibilityM
 				newTask.userDefinedTaskId = sourceTask.userDefinedTaskId;
 				newTask.inputId = sourceTask.inputId;
 
-				newTask.taskPtr.SetPtr(newTaskPtr.PopPtr(), true);
+				newTask.taskPtr.SetPtr(newTaskPtr);
 				if (!newTask.taskPtr->CopyFrom(*sourceTask.taskPtr)){
 					return false;
 				}
@@ -706,7 +706,7 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 			if (existingTaskIter != taskIdMap.end()){
 				Task& existingTask = *existingTaskIter.value();
 
-				task.taskPtr.TakeOver(existingTask.taskPtr);
+				task.taskPtr = existingTask.taskPtr;
 
 				serializablePtr = dynamic_cast<iser::ISerializable*>(task.taskPtr.GetPtr());
 
@@ -717,12 +717,12 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 				}
 			}
 			else{
-				istd::TDelPtr<iinsp::ISupplier> newTaskPtr(CreateTaskInstance(task.typeId));
+				iinsp::ISupplierUniquePtr newTaskPtr = CreateTaskInstance(task.typeId);
 				if (newTaskPtr.IsValid()){
 					OnTaskCreated(*newTaskPtr);
 
 					serializablePtr = dynamic_cast<iser::ISerializable*>(newTaskPtr.GetPtr());
-					task.taskPtr.SetPtr(newTaskPtr.PopPtr(), true);
+					task.taskPtr.SetPtr(newTaskPtr);
 
 					imthype::ITaskCollectionContext* contextPtr = QueryInterface<imthype::ITaskCollectionContext>(task.taskPtr.GetPtr());
 					if (contextPtr != nullptr){
@@ -779,7 +779,7 @@ void CTaskCollectionCompBase::OnTaskRemoved(const QByteArray& taskId)
 {
 	for (int i = 0; i < m_tasks.count(); ++i){
 		if (m_tasks[i].uuid == taskId){
-			Q_ASSERT(m_tasks[i].taskPtr != nullptr);
+			Q_ASSERT(m_tasks[i].taskPtr.IsValid());
 
 			imod::IModel* taskModelPtr = dynamic_cast<imod::IModel*>(m_tasks[i].taskPtr->GetModelParametersSet());
 			if (taskModelPtr != nullptr){
@@ -832,7 +832,7 @@ void CTaskCollectionCompBase::OnComponentCreated()
 			task.isEnabled = true;
 			task.name = name;
 			task.taskFlags = OF_ALL & ~OF_SUPPORT_DELETE;
-			task.taskPtr.SetPtr(supplierPtr, false);
+			task.taskPtr.SetOptionalPtr(supplierPtr);
 			task.typeId = typeId;
 			task.typeName = typeName;
 			task.uuid = uuid;

@@ -51,7 +51,7 @@ private:
 	typedef QMap<QByteArray, imthype::IJobProcessorPlugin*> PluginsMap;
 	PluginsMap m_pluginsMap;
 
-	typedef std::shared_ptr<const IJobProcessor> JobProcessorPtr;
+	typedef IJobProcessorSharedPtr JobProcessorPtr;
 	typedef QMap<QByteArray, JobProcessorPtr> JobProcessorMap;
 
 	mutable JobProcessorMap m_jobProcessorMap;

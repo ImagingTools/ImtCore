@@ -41,7 +41,7 @@ TTaskParamsPluginComponentImpl<ComponentClass>::TTaskParamsPluginComponentImpl(c
 template <class ComponentClass>
 const imthype::ITaskParamsPlugin::IParamSetFactory* TTaskParamsPluginComponentImpl<ComponentClass>::GetTaskParamsFactory() const
 {
-	return BaseClass::m_component.GetInterface<imthype::ITaskParamsPlugin::IParamSetFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<imthype::ITaskParamsPlugin::IParamSetFactory>(QByteArray());
 }
 
 

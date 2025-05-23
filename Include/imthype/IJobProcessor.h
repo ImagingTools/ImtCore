@@ -44,6 +44,8 @@ public:
 
 
 typedef istd::TIFactory<IJobProcessor> IJobProcessorFactory;
+typedef istd::TUniqueInterfacePtr<IJobProcessor> IJobProcessorUniquePtr;
+typedef istd::TSharedInterfacePtr<IJobProcessor> IJobProcessorSharedPtr;
 
 
 } // namespace imthype

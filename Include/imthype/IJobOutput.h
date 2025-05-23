@@ -58,6 +58,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IJobOutput> IJobOutputUniquePtr;
+typedef istd::TSharedInterfacePtr<IJobOutput> IJobOutputSharedPtr;
+
+
 } // namespace imthype
 
 

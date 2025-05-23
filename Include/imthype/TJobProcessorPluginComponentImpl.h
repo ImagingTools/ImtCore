@@ -41,7 +41,7 @@ TJobProcessorPluginComponentImpl<ComponentClass>::TJobProcessorPluginComponentIm
 template <class ComponentClass>
 const imthype::IJobProcessorFactory* TJobProcessorPluginComponentImpl<ComponentClass>::GetJobProcessorFactory() const
 {
-	return BaseClass::m_component.GetInterface<imthype::IJobProcessorFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<imthype::IJobProcessorFactory>(QByteArray());
 }
 
 

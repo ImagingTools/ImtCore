@@ -65,7 +65,7 @@ QByteArray CJobQueueManagerCompBase::InsertNewJobIntoQueue(
 	}
 
 	if (jobProcessingParamsPtr != nullptr){
-		jobItem.paramsPtr.SetPtr(CreateJobParameters(contextId, typeId, jobProcessingParamsPtr));
+		jobItem.paramsPtr.FromUnique(CreateJobParameters(contextId, typeId, jobProcessingParamsPtr));
 		if (!jobItem.paramsPtr.IsValid()){
 			SendErrorMessage(0, "Job parameters could not be created");
 
@@ -230,7 +230,7 @@ bool CJobQueueManagerCompBase::GetJobConfiguration(
 		
 		if (input.CopyFrom(jobItem.input)){
 			if (jobItem.paramsPtr.IsValid()){
-				processingParamsPtr.SetPtr(CreateJobParameters(jobItem.contextId, jobItem.typeId, nullptr));
+				processingParamsPtr.FromUnique(CreateJobParameters(jobItem.contextId, jobItem.typeId, nullptr));
 				if (processingParamsPtr.IsValid()){
 					return processingParamsPtr->CopyFrom(*jobItem.paramsPtr);
 				}
@@ -489,7 +489,7 @@ bool CJobQueueManagerCompBase::SerializeJobItem(JobItem& item, iser::IArchive& a
 	retVal = retVal && archive.EndTag(progressTag);
 
 	if (retVal && !archive.IsStoring()){
-		item.paramsPtr.SetPtr(CreateJobParameters(item.contextId, item.typeId, nullptr));
+		item.paramsPtr.FromUnique(CreateJobParameters(item.contextId, item.typeId, nullptr));
 	}
 
 	if (item.paramsPtr.IsValid()){
@@ -614,7 +614,7 @@ void CJobQueueManagerCompBase::ReadJobItems(JobItems& items) const
 {
 	items.clear();
 
-	if (!m_dataFolderCompPtr.IsValid()) {
+	if (!m_dataFolderCompPtr.IsValid()){
 		return;
 	}
 

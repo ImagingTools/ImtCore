@@ -42,7 +42,7 @@ class IJobOutput;
 class IJobQueueManager: virtual public imtbase::ICollectionInfo
 {
 public:
-	typedef istd::TSmartPtr<iprm::IParamsSet> ParamsPtr;
+	typedef iprm::IParamsSetSharedPtr ParamsPtr;
 
 	/**
 		Processing status of a single job in the queue.
@@ -142,7 +142,7 @@ public:
 	/**
 		Create processing parameters of the given type for the job.
 	*/
-	virtual iprm::IParamsSet* CreateJobParameters(
+	virtual iprm::IParamsSetUniquePtr CreateJobParameters(
 				const QByteArray& contextId,
 				const QByteArray& taskTypeId,
 				const iprm::IParamsSet* defaultParamPtr) const = 0;

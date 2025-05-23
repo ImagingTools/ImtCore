@@ -36,14 +36,11 @@ const iprm::IOptionsList* CTaskCollectionComp::GetObjectTypesInfo() const
 
 // reimplemented (CTaskCollectionCompBase)
 
-iinsp::ISupplier* CTaskCollectionComp::CreateTaskInstance(const QByteArray& taskTypeId) const
+iinsp::ISupplierUniquePtr CTaskCollectionComp::CreateTaskInstance(const QByteArray& taskTypeId) const
 {
 	int index = m_taskTypeIdsAttrPtr.FindValue(taskTypeId);
 	if ((index >= 0) && (index < m_taskFactCompPtr.GetCount()) && (index < m_taskTypeIdsAttrPtr.GetCount())){
-		iinsp::ISupplier* taskPtr = m_taskFactCompPtr.CreateInstance(index);
-		if (taskPtr != nullptr){
-			return taskPtr;
-		}
+		return m_taskFactCompPtr.CreateInstance(index);
 	}
 
 	return nullptr;

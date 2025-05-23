@@ -50,7 +50,7 @@ public:
 
 protected:
 	// reimplemented (CTaskCollectionCompBase)
-	virtual iinsp::ISupplier* CreateTaskInstance(const QByteArray& taskTypeId) const override;
+	virtual iinsp::ISupplierUniquePtr CreateTaskInstance(const QByteArray& taskTypeId) const override;
 
 	// reimplemented (TPluginManagerCompBase)
 	virtual void OnPluginsCreated();
