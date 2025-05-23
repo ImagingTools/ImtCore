@@ -198,7 +198,7 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 				}
 
 				if (foundType->IsExternal()){
-					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths(), false);
+					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
 					if (resolvedPath.isEmpty()){
 						SendErrorMessage(0, QString("Unable to find header file for type of '%1'").arg(sdlType));
 					}
