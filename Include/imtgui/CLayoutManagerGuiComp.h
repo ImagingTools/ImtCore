@@ -135,7 +135,7 @@ private:
 
 	iprm::COptionsManager m_guiViewOptionsManager;
 
-	typedef istd::TSmartPtr<iqtgui::IGuiObject> GuiObjectPtr;
+	typedef iqtgui::IGuiObjectSharedPtr GuiObjectPtr;
 	typedef QVector<GuiObjectPtr> GuiObjects;
 
 	GuiObjects m_guiObjects;

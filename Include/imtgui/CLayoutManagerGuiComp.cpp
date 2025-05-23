@@ -76,12 +76,12 @@ QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		if (!viewId.isEmpty()){
 			int index = m_guiViewIdMultiAttrPtr.FindValue(viewId);
 			if (index >= 0){
-				istd::TSmartPtr<iqtgui::IGuiObject> guiPtr(m_guiViewMultiFactCompPtr.CreateInstance(index));
+				iqtgui::IGuiObjectUniquePtr guiPtr = m_guiViewMultiFactCompPtr.CreateInstance(index);
 				if (guiPtr->CreateGui(nullptr)){
 					customLayoutWidgetPtr->SetWidget(guiPtr->GetWidget());
 					customLayoutWidgetPtr->SetViewId(viewId);
 
-					m_guiObjects.push_back(guiPtr);
+					m_guiObjects.push_back(iqtgui::IGuiObjectSharedPtr::CreateFromUnique(guiPtr));
 				}
 			}
 		}

@@ -176,7 +176,7 @@ int TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::GetDocumentIndexFrom
 					++viewIter){
 			const ViewInfo& viewInfo = *viewIter;
 
-			iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewInfo.viewPtr.GetPtr());
+			iqtgui::IGuiObject* guiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(const_cast<istd::IPolymorphic*>(viewInfo.viewPtr.GetPtr()));
 			if (guiObjectPtr != nullptr){
 				if (guiObjectPtr->GetWidget() == &widget){
 					return documentIndex;

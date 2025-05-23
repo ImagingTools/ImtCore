@@ -72,6 +72,8 @@ public:
 
 protected:
 	virtual bool RenameObjectOnSave() const;
+	// callback from the proxy (to reimplement)
+	virtual QString CommentDocumentChanges(int revision) const;
 
 	/**
 		The persistence proxy is needed for the document manager for saving resources,

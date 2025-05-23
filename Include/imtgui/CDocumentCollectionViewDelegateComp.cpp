@@ -106,7 +106,8 @@ QByteArray CDocumentCollectionViewDelegateComp::ImportObject(const QByteArray& t
 	if ((m_collectionPtr != nullptr) && m_objectImportPersistenceCompPtr.IsValid()){
 		const imtbase::IObjectCollection::IDataFactory* objectFactorPtr = dynamic_cast<const imtbase::IObjectCollection::IDataFactory*>(m_collectionPtr);
 		if (objectFactorPtr != nullptr){
-			imtbase::IObjectCollection::DataPtr documentPtr = objectFactorPtr->CreateInstance(typeId);
+			imtbase::IObjectCollection::DataPtr documentPtr;
+			documentPtr.FromUnique(objectFactorPtr->CreateInstance(typeId));
 			if (documentPtr.IsValid()){
 				int state = m_objectImportPersistenceCompPtr->LoadFromFile(*documentPtr, sourcePath);
 				if (state == ifile::IFilePersistence::OS_OK){
@@ -376,6 +377,18 @@ iqtgui::IGuiObject* CDocumentCollectionViewDelegateComp::GetInformationView() co
 bool CDocumentCollectionViewDelegateComp::RenameObjectOnSave() const
 {
 	return false;
+}
+
+
+QString CDocumentCollectionViewDelegateComp::CommentDocumentChanges(int revision) const
+{
+	QString comment = QInputDialog::getText(
+		nullptr,
+		tr("Comment your changes"),
+		tr("Please enter comment for your changes"),
+		QLineEdit::Normal);
+
+	return comment;
 }
 
 
@@ -681,14 +694,7 @@ void CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::CreateBackup(c
 			comment = tr("Initial Revision");
 		}
 		else {
-			bool isOk;
-			comment = QInputDialog::getText(
-						nullptr,
-						tr("Comment your changes"),
-						tr("Please enter comment for your changes"),
-						QLineEdit::Normal,
-						"",
-						&isOk);
+			comment = m_parent.CommentDocumentChanges(revision);
 		}
 
 		revisionControllerPtr->BackupRevision(*m_parent.m_collectionPtr, objectId, comment);
