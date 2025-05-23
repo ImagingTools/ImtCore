@@ -6,19 +6,15 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
-#include <ilog/TLoggerCompWrap.h>
 #include <istd/TIFactory.h>
 
 // ImtCore includes
 #include <imtdev/IDeviceConfigurationManager.h>
+#include <imtdev/IDeviceController.h>
 
 
 namespace imtdev
 {
-
-
-class IDeviceController;
-class IDeviceStaticInfo;
 
 
 class CDeviceIdBasedConfigurationManagerComp:
@@ -59,7 +55,7 @@ private:
 	};
 
 private:
-	const IDeviceStaticInfo* FindDeviceStaticInfo(const QByteArray& deviceId) const;
+	DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const;
 	ConfigurationFactory* FindConfigurationFactory(const QByteArray& deviceTypeId) const;
 
 private:

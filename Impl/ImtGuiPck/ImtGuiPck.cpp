@@ -197,6 +197,11 @@ I_EXPORT_COMPONENT(
 			"Page decorator",
 			"Page Decorator");
 
+I_EXPORT_COMPONENT(
+			SimpleAttributeManagerView,
+			"Simple attributes viewer",
+			"Attribute Manager View Gui");
+
 
 } // namespace ImtGuiPck
 

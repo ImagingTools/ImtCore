@@ -29,6 +29,16 @@ I_EXPORT_COMPONENT(
 			"Device ID based configuration manager",
 			"Device Configuration Manager");
 
+I_EXPORT_COMPONENT(
+			DeviceIdBasedConfiguration,
+			"Device ID based configuration",
+			"Device Configuration");
+
+I_EXPORT_COMPONENT(
+			DeviceIdBasedAttributes,
+			"Device ID based attributes",
+			"Device Attributes");
+
 
 } // namespace ImtDevPck
 

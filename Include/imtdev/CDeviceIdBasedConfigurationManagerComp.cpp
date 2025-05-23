@@ -6,7 +6,6 @@
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
-#include <imtdev/IDeviceController.h>
 #include <imtdev/IDeviceStaticInfo.h>
 
 
@@ -25,12 +24,17 @@ DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfigur
 	DeviceConfigurationPtr configurationPtr;
 
 	if (!deviceId.isEmpty() && !deviceTypeId.isEmpty()){
-		const IDeviceStaticInfo* staticInfoPtr = FindDeviceStaticInfo(deviceId);
-		if (staticInfoPtr == nullptr){
-			staticInfoPtr = m_deviceControllerCompPtr->GetDeviceStaticInfo(deviceTypeId);
+		DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
+		
+		QByteArray typeId;
+		if (instanceInfoPtr != nullptr){
+			typeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
 		}
 
-		if (staticInfoPtr != nullptr && staticInfoPtr->GetTypeId() == deviceTypeId){
+		if (!typeId.isEmpty() && deviceTypeId == typeId){
+			const IDeviceStaticInfo* staticInfoPtr = m_deviceControllerCompPtr->GetDeviceStaticInfo(typeId);
+			Q_ASSERT(staticInfoPtr != nullptr);
+
 			if (m_configurations.contains(deviceId) && m_configurations[deviceId].deviceTypeId == deviceTypeId){
 				if (staticInfoPtr->AreConfigurationAccepted(*m_configurations[deviceId].configurationPtr.data())) {
 					configurationPtr.reset(new iprm::CParamsSet());
@@ -55,7 +59,18 @@ bool CDeviceIdBasedConfigurationManagerComp::SetDeviceConfiguration(
 			const iprm::IParamsSet& configuration)
 {
 	if (!deviceId.isEmpty() && !deviceTypeId.isEmpty()){
-		const IDeviceStaticInfo* staticInfoPtr = FindDeviceStaticInfo(deviceId);
+		DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
+
+		QByteArray typeId;
+		if (instanceInfoPtr != nullptr){
+			typeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
+		}
+
+		const IDeviceStaticInfo* staticInfoPtr = nullptr;
+		if (!typeId.isEmpty()){
+			m_deviceControllerCompPtr->GetDeviceStaticInfo(typeId);
+		}
+
 		if (staticInfoPtr == nullptr){
 			staticInfoPtr = m_deviceControllerCompPtr->GetDeviceStaticInfo(deviceTypeId);
 		}
@@ -159,16 +174,18 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 
 // private methods
 
-const IDeviceStaticInfo* CDeviceIdBasedConfigurationManagerComp::FindDeviceStaticInfo(const QByteArray& deviceId) const
+DeviceInstanceInfoPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
 {
 	if (!deviceId.isEmpty() && m_deviceControllerCompPtr.IsValid()){
 		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_deviceControllerCompPtr->GetDeviceInstanceInfo("", deviceId);
 		if (deviceInstanceInfoPtr != nullptr){
-			return &deviceInstanceInfoPtr->GetStaticInfo();
+			return deviceInstanceInfoPtr;
 		}
+
+		return m_deviceControllerCompPtr->GetDeviceInstanceInfo(deviceId, "");
 	}
 
-	return nullptr;
+	return DeviceInstanceInfoPtr();
 }
 
 

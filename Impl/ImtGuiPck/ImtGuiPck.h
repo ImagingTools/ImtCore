@@ -43,6 +43,7 @@
 #include <imtgui/CMultiSelectionEditorComp.h>
 #include <imtgui/CButtonBasedSelectionGuiComp.h>
 #include <imtgui/CPageDecoratorComp.h>
+#include <imtgui/CSimpleAttributeManagerViewComp.h>
 
 
 /**
@@ -89,6 +90,8 @@ typedef imtgui::CMultiParamsSetGuiComp MultiParamsSetGui;
 typedef imtgui::CMultiSelectionEditorComp MultiSelectionEditor;
 typedef imtgui::CButtonBasedSelectionGuiComp ButtonBasedSelectionGui;
 typedef imtgui::CPageDecoratorComp PageDecorator;
+typedef imtgui::CSimpleAttributeManagerViewComp SimpleAttributeManagerView;
+
 
 } // namespace ImtGuiPck
 
