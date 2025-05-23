@@ -5,6 +5,9 @@
 #include <iprm/ISelectionParam.h>
 #include <iprm/IOptionsList.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 namespace imtbase
 {
@@ -16,6 +19,7 @@ namespace imtbase
 
 bool CSelectionParamSummaryRepresentationControllerComp::CreateSummaryRepresentation(const istd::IChangeable& param, QString& textRepresentation) const
 {
+
 	const iprm::ISelectionParam* selectionParamPtr = dynamic_cast<const iprm::ISelectionParam*>(&param);
 	Q_ASSERT(selectionParamPtr != nullptr);
 	int selectedIndex = selectionParamPtr->GetSelectedOptionIndex();
@@ -23,7 +27,6 @@ bool CSelectionParamSummaryRepresentationControllerComp::CreateSummaryRepresenta
 		const iprm::IOptionsList* optionListPtr = selectionParamPtr->GetSelectionConstraints();
 		if (optionListPtr != nullptr){
 			QString optionName = optionListPtr->GetOptionName(selectedIndex);
-
 			textRepresentation = optionName;
 		}
 

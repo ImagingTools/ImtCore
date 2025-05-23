@@ -44,7 +44,7 @@ private:
 template<typename ObjectInterface>
 ObjectInterface* TComponentFactoryComp<ObjectInterface>::CreateInstance(const QByteArray& /*keyId*/) const
 {
-	return m_factCompPtr.CreateInstance();
+	return dynamic_cast<ObjectInterface*>(m_factCompPtr.CreateInstance().PopPtr());
 }
 
 

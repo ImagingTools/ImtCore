@@ -19,7 +19,7 @@ void CStaticObjectCollection::SetObject(const QByteArray& objectId, DataPtr obje
 {
 	ObjectInfo* objectInfoPtr = GetObjectInfo(objectId);
 	if (objectInfoPtr != nullptr){
-		objectInfoPtr->objectPtr = objectPtr;
+		objectInfoPtr->dataPtr = objectPtr;
 	}
 }
 
@@ -33,7 +33,7 @@ QByteArray CStaticObjectCollection::RegisterObject(
 {
 	ObjectInfo info;
 
-	info.objectPtr = objectPtr;
+	info.dataPtr = objectPtr;
 	info.description = description;
 	info.name = name;
 	info.typeId = typeId;
@@ -68,7 +68,7 @@ QByteArray CStaticObjectCollection::InsertNewObject(
 			const QByteArray& /*typeId*/,
 			const QString& /*name*/,
 			const QString& /*description*/,
-			DataPtr /*defaultValuePtr*/,
+			const istd::IChangeable* /*defaultValuePtr*/ ,
 			const QByteArray& /*proposedObjectId*/,
 			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
 			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/,
@@ -99,7 +99,7 @@ istd::IChangeable* CStaticObjectCollection::CloneMe(CompatibilityMode mode) cons
 
 // protected methods
 
-CStaticObjectCollection::DataPtr CStaticObjectCollection::CreateObjectInstance(const QByteArray& /*typeId*/) const
+istd::IChangeableUniquePtr CStaticObjectCollection::CreateObjectInstance(const QByteArray& /*typeId*/) const
 {
 	return nullptr;
 }

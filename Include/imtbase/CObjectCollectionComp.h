@@ -48,7 +48,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IObjectCollection::IDataFactory)
-	virtual DataPtr CreateInstance(const QByteArray& keyId = "") const override;
+	virtual istd::IChangeableUniquePtr CreateInstance(const QByteArray& keyId = "") const override;
 	virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
 
 	// reimplemented (IObjectCollectionInfo)
@@ -62,7 +62,7 @@ public:
 
 protected:
 	// reimplemented (CObjectCollectionBase)
-	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const override;
+	virtual istd::IChangeableUniquePtr CreateObjectInstance(const QByteArray& typeId) const override;
 	virtual IObjectCollection* GetObjectStorage(const QByteArray& typeId, const istd::IChangeable* objectPtr) const override;
 
 	// reimplemented (icomp::CComponentBase)

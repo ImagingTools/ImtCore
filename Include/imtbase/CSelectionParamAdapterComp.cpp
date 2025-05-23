@@ -74,15 +74,15 @@ void CSelectionParamAdapterComp::OnConstraintsChanged()
 {
 	istd::CChangeNotifier notifier1(&m_constraints);
 
-	static istd::IChangeable::ChangeSet changeSet(ISelection::CF_CONSTRAINTS_CHANGED);
-	istd::CChangeNotifier notifier2(this, &changeSet);
+	istd::IChangeable::ChangeSet(CF_CONSTRAINTS_CHANGED);
+	istd::CChangeNotifier notifier2(this);
 }
 
 
 void CSelectionParamAdapterComp::OnSelectionChanged()
 {
-	static istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
-	istd::CChangeNotifier notifier(this, &changeSet);
+	istd::IChangeable::ChangeSet(CF_SELECTION_CHANGED);
+	istd::CChangeNotifier notifier(this);
 }
 
 

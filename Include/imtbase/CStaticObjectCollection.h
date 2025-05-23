@@ -40,7 +40,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				DataPtr defaultValuePtr = DataPtr(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
@@ -52,7 +52,7 @@ public:
 
 protected:
 	// reimplemented (CObjectCollectionBase)
-	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const override;
+	virtual istd::IChangeableUniquePtr CreateObjectInstance(const QByteArray& typeId) const override;
 	virtual IObjectCollection* CreateSubCollectionInstance() const override;
 };
 

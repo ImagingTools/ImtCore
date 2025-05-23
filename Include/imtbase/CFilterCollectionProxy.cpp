@@ -57,7 +57,7 @@ ICollectionInfo::Id CFilterCollectionProxy::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			DataPtr defaultValuePtr,
+			const istd::IChangeable* defaultValuePtr,
 			const Id& proposedElementId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
@@ -151,10 +151,10 @@ istd::IChangeable* CFilterCollectionProxy::CloneMe(CompatibilityMode mode) const
 
 // protected methods
 
-CFilterCollectionProxy::DataPtr CFilterCollectionProxy::CreateObjectInstance(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CFilterCollectionProxy::CreateObjectInstance(const QByteArray& typeId) const
 {
 	istd::IChangeable* objPtr = BaseClass2::CreateInstance(typeId);
-	return DataPtr(DataPtr::RootObjectPtr(objPtr), [objPtr](){
+	return istd::IChangeableUniquePtr(objPtr, [objPtr](){
 		return objPtr;
 	});
 }
@@ -168,7 +168,7 @@ IObjectCollection* CFilterCollectionProxy::CreateSubCollectionInstance() const
 
 bool CFilterCollectionProxy::InsertObjectIntoCollection(ObjectInfo info)
 {
-	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.objectPtr.GetPtr());
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.dataPtr.GetPtr());
 	if (modelPtr != nullptr){
 		if (!modelPtr->AttachObserver(&m_modelUpdateBridge)){
 			qDebug("CObjectCollectionBase::InsertObjectIntoCollection: Attaching object's model to the internal observer failed");

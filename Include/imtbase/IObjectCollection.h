@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <istd/TIFactory.h>
+#include <istd/TInterfacePtr.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
@@ -27,6 +28,8 @@ class IHierarchicalStructure;
 class IObjectCollection: virtual public IObjectCollectionInfo
 {
 public:
+	typedef istd::IChangeableSharedPtr DataPtr;
+
 	static const QByteArray CN_OBJECT_DATA_CHANGED;
 	typedef NotifierInfo ObjectDataChanged;
 
@@ -78,82 +81,10 @@ public:
 
 	I_DECLARE_FLAGS(OperationalFlags, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_EDIT, OF_SUPPORT_USING, OF_SUPPORT_PAGINATION, OF_ALL);
 
-	class DataPtr
-	{
-	public:
-		typedef std::shared_ptr<istd::IPolymorphic> RootObjectPtr;
-		typedef std::function<istd::IChangeable*()> ExtractInterfaceFunc;
-
-		DataPtr()
-			:m_objectPtr(nullptr)
-		{
-		}
-
-		DataPtr(const istd::IChangeable* ptr)
-			:m_objectPtr(ptr)
-		{
-		}
-
-		DataPtr(const RootObjectPtr& rootObjPtr, const ExtractInterfaceFunc& extractInterface)
-			:m_rootPtr(rootObjPtr),
-			m_objectPtr(extractInterface())
-		{
-		}
-
-		bool IsValid() const
-		{
-			return m_objectPtr != nullptr;
-		}
-
-		template<typename Interface = istd::IChangeable>
-		const Interface* GetPtr() const
-		{
-			return dynamic_cast<const Interface*>(m_objectPtr);
-		}
-
-		const istd::IChangeable* operator->() const
-		{
-			Q_ASSERT(m_objectPtr != nullptr);
-
-			return m_objectPtr;
-		}
-
-		const istd::IChangeable& operator*() const
-		{
-			Q_ASSERT(m_objectPtr != nullptr);
-
-			return *m_objectPtr;
-		}
-
-		template<typename Interface = istd::IChangeable>
-		Interface* GetPtr()
-		{
-			return dynamic_cast<Interface*>(const_cast<istd::IChangeable*>(m_objectPtr));
-		}
-
-		istd::IChangeable& operator*()
-		{
-			Q_ASSERT(m_objectPtr != nullptr);
-
-			return *const_cast<istd::IChangeable*>(m_objectPtr);
-		}
-
-		istd::IChangeable* operator->()
-		{
-			Q_ASSERT(m_objectPtr != nullptr);
-
-			return const_cast<istd::IChangeable*>(m_objectPtr);
-		}
-
-	private:
-		RootObjectPtr m_rootPtr;
-		const istd::IChangeable* m_objectPtr;
-	};
-
 	class IDataFactory
 	{
 	public:
-		virtual DataPtr CreateInstance(const QByteArray& keyId = QByteArray()) const = 0;
+		virtual istd::IChangeableUniquePtr CreateInstance(const QByteArray& keyId = QByteArray()) const = 0;
 		virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const = 0;
 	};
 
@@ -190,7 +121,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				DataPtr defaultValuePtr = DataPtr(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
@@ -240,7 +171,7 @@ public:
 		\param count				[optional] If positive, the number of elements should be returned.
 		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering elements.
 	*/
-	virtual imtbase::IObjectCollection* CreateSubCollection(
+	virtual istd::TUniqueInterfacePtr<IObjectCollection> CreateSubCollection(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
@@ -271,6 +202,10 @@ inline void IObjectCollection::ResetObjectIds()
 {
 	Q_ASSERT_X(false, "IObjectCollection::ResetObjectIds", "Method not implemented");
 }
+
+
+typedef istd::TUniqueInterfacePtr<IObjectCollection> IObjectCollectionUniquePtr;
+typedef istd::TSharedInterfacePtr<IObjectCollection> IObjectCollectionSharedPtr;
 
 
 } // namespace imtbase

@@ -7,7 +7,7 @@ namespace imtbase
 
 // reimplemented (IObjectCollection::IDataFactory)
 
-IObjectCollection::DataPtr CObjectCollectionComp::CreateInstance(const QByteArray& keyId) const
+istd::IChangeableUniquePtr CObjectCollectionComp::CreateInstance(const QByteArray& keyId) const
 {
 	return CreateObjectInstance(keyId);
 }
@@ -74,13 +74,13 @@ bool CObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 
 // protected methods
 
-CObjectCollectionComp::DataPtr CObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
 {
 	int factoryIndex = m_typeIdsAttrPtr.FindValue(typeId);
 	if (factoryIndex >= 0){
 		if (factoryIndex < m_objectFactoriesCompPtr.GetCount()){
 			icomp::IComponent* compPtr = m_objectFactoriesCompPtr.CreateComponent(factoryIndex);
-			return DataPtr(DataPtr::RootObjectPtr(compPtr), [compPtr, this](){
+			return istd::IChangeableUniquePtr(compPtr, [compPtr, this](){
 				return m_objectFactoriesCompPtr.ExtractInterface(compPtr);
 			});
 		}
@@ -140,7 +140,7 @@ void CObjectCollectionComp::OnComponentCreated()
 			object.isEnabled = true;
 			object.name = objectName;
 			object.flags = OF_ALL & ~OF_SUPPORT_DELETE & ~OF_SUPPORT_PAGINATION;
-			object.objectPtr = objectPtr;
+			object.dataPtr.SetOptionalPtr(objectPtr);
 			object.typeId = typeId;
 			object.id = uuid;
 

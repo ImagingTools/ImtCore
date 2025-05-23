@@ -7,6 +7,7 @@
 #include <ifile/IFilePersistence.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtbase/ICollectionDataController.h>
 
 
@@ -43,7 +44,7 @@ public:
 				const QString& objectName = QString()) const override;
 
 protected:
-	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
+	virtual istd::IChangeableUniquePtr CreateObjectInstance(const QByteArray& typeId) const;
 
 protected:
 	/**

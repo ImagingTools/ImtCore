@@ -62,7 +62,7 @@ QByteArray CCollectionDataControllerComp::ImportFile(
 {
 	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 	if (persistencePtr != nullptr){
-		imtbase::IObjectCollection::DataPtr dataPtr(CreateObjectInstance(typeId));
+		istd::IChangeableUniquePtr dataPtr(CreateObjectInstance(typeId));
 		if (dataPtr.IsValid()){
 			int state = persistencePtr->LoadFromFile(*dataPtr, sourceFilePath);
 			if (state == ifile::IFilePersistence::OS_OK){
@@ -70,7 +70,7 @@ QByteArray CCollectionDataControllerComp::ImportFile(
 
 				QString targetName = objectName.isEmpty() ? fileInfo.completeBaseName() : objectName;
 
-				return collection.InsertNewObject(typeId, targetName, QString(QObject::tr("Import from %1").arg(sourceFilePath)), dataPtr);
+				return collection.InsertNewObject(typeId, targetName, QString(QObject::tr("Import from %1").arg(sourceFilePath)), dataPtr.GetPtr());
 			}
 		}
 	}
@@ -81,7 +81,7 @@ QByteArray CCollectionDataControllerComp::ImportFile(
 
 // protected methods
 
-istd::IChangeable* CCollectionDataControllerComp::CreateObjectInstance(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CCollectionDataControllerComp::CreateObjectInstance(const QByteArray& typeId) const
 {
 	int factoryIndex = -1;
 

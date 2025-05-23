@@ -90,7 +90,7 @@ iprm::IParamsSet* CParamsManagerAdapterComp::GetParamsSet(int index) const
 }
 
 
-iprm::IParamsSet* CParamsManagerAdapterComp::CreateParameterSet(int /*typeIndex*/, int /*index*/) const
+iprm::IParamsSetUniquePtr CParamsManagerAdapterComp::CreateParameterSet(int /*typeIndex*/, int /*index*/) const
 {
 	return nullptr;
 }

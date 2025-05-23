@@ -87,7 +87,7 @@ ICollectionInfo::Id CCachedObjectCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			DataPtr defaultValuePtr,
+			const istd::IChangeable* defaultValuePtr,
 			const Id& proposedElementId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
@@ -213,7 +213,7 @@ bool CCachedObjectCollectionComp::SetObjectData(
 }
 
 
-IObjectCollection* CCachedObjectCollectionComp::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const
+IObjectCollectionUniquePtr CCachedObjectCollectionComp::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const
 {
 	FilteredCollection* collectionChacheItemPtr = GetFilteredCollection(offset, count, selectionParamsPtr);
 	if (collectionChacheItemPtr != nullptr){
@@ -451,8 +451,8 @@ CCachedObjectCollectionComp::FilteredCollection* CCachedObjectCollectionComp::Ge
 
 	m_lock.unlock();
 
-	IObjectCollection* subCollectionPtr = m_objectCollectionCompPtr->CreateSubCollection(offset, count, selectionParamsPtr);
-	if (subCollectionPtr == nullptr){
+	IObjectCollectionUniquePtr subCollectionPtr = m_objectCollectionCompPtr->CreateSubCollection(offset, count, selectionParamsPtr);
+	if (!subCollectionPtr.IsValid()){
 		return nullptr;
 	}
 
@@ -464,7 +464,7 @@ CCachedObjectCollectionComp::FilteredCollection* CCachedObjectCollectionComp::Ge
 		}
 	}
 
-	m_cachedCollections.PushBack(new FilteredCollection(offset, count, data, subCollectionPtr));
+	m_cachedCollections.PushBack(new FilteredCollection(offset, count, data, std::move(subCollectionPtr)));
 
 	return m_cachedCollections.GetAt(m_cachedCollections.GetCount() - 1);
 }

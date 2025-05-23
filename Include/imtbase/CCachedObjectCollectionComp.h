@@ -59,7 +59,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				DataPtr defaultValuePtr = DataPtr(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
@@ -68,7 +68,7 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
-	virtual IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
+	virtual IObjectCollectionUniquePtr CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
@@ -104,17 +104,17 @@ public:
 protected:
 	struct FilteredCollection
 	{
-		FilteredCollection(int aOffset, int aCount, const QByteArray& aSelectionParamsData, IObjectCollection* aCachePtr)
+		FilteredCollection(int aOffset, int aCount, const QByteArray& aSelectionParamsData, IObjectCollectionUniquePtr&& aCachePtr)
 			:offset(aOffset),
 			count(aCount),
 			selectionParamsData(aSelectionParamsData),
-			cachePtr(aCachePtr)
+			cachePtr(std::move(aCachePtr))
 		{
 		}
 		int offset;
 		int count;
 		QByteArray selectionParamsData;
-		istd::TDelPtr<IObjectCollection> cachePtr;
+		imtbase::IObjectCollectionUniquePtr cachePtr;
 	};
 
 	FilteredCollection* GetFilteredCollection(
@@ -135,7 +135,7 @@ private:
 
 	struct CacheItem
 	{
-		DataPtr dataPtr;
+		istd::IChangeableSharedPtr dataPtr;
 		qint64 timestamp = 0;
 	};
 

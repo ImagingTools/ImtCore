@@ -49,7 +49,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				DataPtr defaultValuePtr = DataPtr(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
@@ -58,7 +58,7 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
-	virtual imtbase::IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
+	virtual imtbase::IObjectCollectionUniquePtr CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
@@ -169,7 +169,7 @@ inline QByteArray TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::In
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			DataPtr defaultValuePtr,
+			const istd::IChangeable* defaultValuePtr,
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
@@ -222,7 +222,7 @@ inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjec
 
 
 template<class BaseInterface, class ObjectImpl>
-inline imtbase::IObjectCollection* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateSubCollection(
+inline imtbase::IObjectCollectionUniquePtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateSubCollection(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const

@@ -47,7 +47,7 @@ public:
 	virtual bool RemoveParamsSet(int index) override;
 	virtual bool SwapParamsSet(int index1, int index2) override;
 	virtual iprm::IParamsSet* GetParamsSet(int index) const override;
-	virtual iprm::IParamsSet* CreateParameterSet(int typeIndex = -1, int index = -1) const override;
+	virtual iprm::IParamsSetUniquePtr CreateParameterSet(int typeIndex = -1, int index = -1) const override;
 	virtual QString GetParamsSetName(int index) const override;
 	virtual bool SetParamsSetName(int index, const QString& name) override;
 	virtual QString GetParamsSetDescription(int index) const override;

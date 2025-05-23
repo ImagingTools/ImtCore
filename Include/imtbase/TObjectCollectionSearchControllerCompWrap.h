@@ -65,7 +65,7 @@ const imtbase::ISearchResults* TObjectCollectionSearchControllerCompWrap<ObjectC
 	iprm::CParamsSet paramsSet;
 	paramsSet.SetEditableParameter("Filter", &collectionFilter);
 
-	imtbase::CSearchResults* searchResultsPtr = new imtbase::CSearchResults();
+	istd::TDelPtr<imtbase::CSearchResults> searchResultsPtr = new imtbase::CSearchResults();
 
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(BaseClass::CreateObjectCollectionIterator(QByteArray(), 0, -1, &paramsSet));
 	if (objectCollectionIterator != nullptr){
@@ -88,7 +88,7 @@ const imtbase::ISearchResults* TObjectCollectionSearchControllerCompWrap<ObjectC
 		}
 	}
 
-	return searchResultsPtr;
+	return searchResultsPtr.PopPtr();
 }
 
 

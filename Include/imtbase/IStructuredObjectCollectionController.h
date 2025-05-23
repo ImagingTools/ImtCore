@@ -27,7 +27,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				IObjectCollection::DataPtr defaultValuePtr = IObjectCollection::DataPtr(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,

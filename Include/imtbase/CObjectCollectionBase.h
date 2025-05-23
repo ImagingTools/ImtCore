@@ -7,7 +7,7 @@
 #include <QtCore/QReadWriteLock>
 
 // ACF includes
-#include <istd/TOptDelPtr.h>
+#include <istd/TOptInterfacePtr.h>
 #include <imod/CModelUpdateBridge.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <imod/CSingleModelObserverBase.h>
@@ -57,7 +57,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				DataPtr defaultValuePtr = DataPtr(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
@@ -70,7 +70,7 @@ public:
 				const istd::IChangeable& object,
 				CompatibilityMode mode = CM_WITHOUT_REFS,
 				const IOperationContext* operationContextPtr = nullptr) override;
-	virtual IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
+	virtual IObjectCollectionUniquePtr CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
@@ -157,7 +157,7 @@ protected:
 
 		ObjectInfo(const ObjectInfo& object)
 		{
-			this->objectPtr = object.objectPtr;
+			this->dataPtr = object.dataPtr;
 			this->copyMode = object.copyMode;
 
 			this->id = object.id;
@@ -171,7 +171,7 @@ protected:
 		}
 
 		bool isEnabled;
-		DataPtr objectPtr;
+		istd::TOptInterfacePtr<IChangeable> dataPtr;
 		QString name;
 		QString description;
 		QByteArray id;
@@ -196,7 +196,7 @@ protected:
 	/**
 		Create object instance of the given type.
 	*/
-	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const = 0;
+	virtual istd::IChangeableUniquePtr CreateObjectInstance(const QByteArray& typeId) const = 0;
 
 protected:
 	/**
@@ -217,7 +217,7 @@ protected:
 	virtual void RemoveAllObjects();
 
 private:
-	DataPtr CreateDataObject(const QByteArray& typeId) const;
+	istd::IChangeableUniquePtr CreateDataObject(const QByteArray& typeId) const;
 
 protected:
 	imod::CModelUpdateBridge m_modelUpdateBridge;

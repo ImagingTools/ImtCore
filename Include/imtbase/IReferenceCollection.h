@@ -45,6 +45,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IReferenceCollection> IReferenceCollectionUniquePtr;
+typedef istd::TSharedInterfacePtr<IReferenceCollection> IReferenceCollectionSharedPtr;
+
+
 } // namespace imtbase
 
 
