@@ -2,8 +2,10 @@
 
 
 // ImtCore includes
-#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtauth/IUserGroupInfo.h>
+#include <imtauth/IUserInfoProvider.h>
+#include <imtauth/IUserGroupInfoProvider.h>
+#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
@@ -42,7 +44,7 @@ protected:
 				const sdl::imtauth::Groups::CGroupsListGqlRequest& groupsListRequest,
 				sdl::imtauth::Groups::CGroupItem::V1_0& representationObject,
 				QString& errorMessage) const override;
-	virtual istd::IChangeable* CreateObjectFromRepresentation(
+	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtauth::Groups::CGroupData::V1_0& groupDataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;

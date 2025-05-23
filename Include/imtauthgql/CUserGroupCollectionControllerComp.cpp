@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
+#include <imtauth/IUserInfoProvider.h>
 
 
 namespace imtauthgql
@@ -209,7 +210,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 }
 
 
-istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresentation(
+istd::IChangeableUniquePtr CUserGroupCollectionControllerComp::CreateObjectFromRepresentation(
 			const sdl::imtauth::Groups::CGroupData::V1_0& groupDataRepresentation,
 			QByteArray& newObjectId,
 			QString& errorMessage) const
@@ -221,7 +222,7 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtauth::IUserGroupInfo> userGroupInstancePtr = m_userGroupInfoFactCompPtr.CreateInstance();
+	imtauth::IUserGroupInfoUniquePtr userGroupInstancePtr = m_userGroupInfoFactCompPtr.CreateInstance();
 	if (!userGroupInstancePtr.IsValid()){
 		errorMessage = QString("Unable to create group instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserGroupCollectionControllerComp");
@@ -249,7 +250,10 @@ istd::IChangeable* CUserGroupCollectionControllerComp::CreateObjectFromRepresent
 		return nullptr;
 	}
 
-	return userGroupInstancePtr.PopPtr();
+	istd::IChangeableUniquePtr retVal;
+	retVal.MoveCastedPtr<imtauth::IUserGroupInfo>(userGroupInstancePtr);
+
+	return retVal;
 }
 
 
@@ -324,7 +328,7 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 				}
 				else{
 					for (const QByteArray& groupId : groupIds){
-						istd::TDelPtr<const imtauth::IUserGroupInfo> parentGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+						imtauth::IUserGroupInfoSharedPtr parentGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
 						if (parentGroupInfoPtr.IsValid()){
 							QString groupName = parentGroupInfoPtr->GetName();
 

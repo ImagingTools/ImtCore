@@ -97,7 +97,7 @@ sdl::imtauth::Sessions::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSe
 		sessionId = *arguments.input.Version_1_0->sessionId;
 	}
 
-	istd::TDelPtr<const imtauth::ISession> sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
+	imtauth::ISessionSharedPtr sessionInfoPtr = m_jwtSessionControllerCompPtr->GetSession(sessionId);
 
 	istd::TDelPtr<iser::CMemoryWriteArchive> archivePtr;
 	if (m_versionInfoCompPtr.IsValid()){
@@ -107,10 +107,7 @@ sdl::imtauth::Sessions::CGetSessionPayload CGqlJwtSessionControllerComp::OnGetSe
 		archivePtr.SetPtr(new iser::CMemoryWriteArchive());
 	}
 
-	imtauth::ISession* sessionInfoPtrNotConst = const_cast<imtauth::ISession*>(sessionInfoPtr.GetPtr());
-	Q_ASSERT(sessionInfoPtrNotConst != nullptr);
-
-	if (!sessionInfoPtrNotConst->Serialize(*archivePtr.GetPtr())){
+	if (!sessionInfoPtr->Serialize(*archivePtr.GetPtr())){
 		SendErrorMessage(0, QString("Unable to serialize object. Error: Serialization failed"));
 		return response;
 	}

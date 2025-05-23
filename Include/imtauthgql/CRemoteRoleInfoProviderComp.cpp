@@ -48,8 +48,7 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 			return nullptr;
 		}
 
-		istd::TDelPtr<imtauth::IRole> roleInfoPtr;
-		roleInfoPtr.SetPtr(m_roleInfoFactCompPtr.CreateInstance());
+		imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoFactCompPtr.CreateInstance();
 		if (!roleInfoPtr.IsValid()){
 			return nullptr;
 		}
@@ -72,7 +71,7 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 			roleInfoPtr->SetRoleName(*response.name);
 		}
 
-		return roleInfoPtr.PopPtr();
+		return dynamic_cast<imtauth::IRole*>(roleInfoPtr.PopPtr());
 	}
 
 	return nullptr;

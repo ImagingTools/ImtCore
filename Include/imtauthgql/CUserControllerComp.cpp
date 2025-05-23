@@ -5,7 +5,6 @@
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
-#include <imtauth/CUserInfo.h>
 #include <imtauth/CUserVerification.h>
 
 
@@ -174,9 +173,15 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		productId = *arguments.input.Version_1_0->productId;
 	}
 
-	istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
-	userInfoPtr.SetCastedOrRemove(m_userFactoryCompPtr.CreateInstance());
+	imtauth::IUserInfoUniquePtr userInfoPtr = m_userFactoryCompPtr.CreateInstance();
 	if (!userInfoPtr.IsValid()){
+		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
+
+		return sdl::imtauth::Users::CRegisterUserPayload();
+	}
+
+	imtbase::IIdentifiable* userIdentifierPtr = dynamic_cast<imtbase::IIdentifiable*>(userInfoPtr.GetPtr());
+	if (userIdentifierPtr == nullptr){
 		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
 
 		return sdl::imtauth::Users::CRegisterUserPayload();
@@ -189,7 +194,7 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		userId = *arguments.input.Version_1_0->userData->id;
 	}
 
-	userInfoPtr->SetObjectUuid(userId);
+	userIdentifierPtr->SetObjectUuid(userId);
 
 	if (!m_userRepresentationController.FillUserInfoFromRepresentation(userData, *userInfoPtr, *m_userCollectionCompPtr, userId, errorMessage)){
 		errorMessage = QString("Unable to register user. Error: '%1'").arg(errorMessage);
@@ -297,10 +302,10 @@ sdl::imtauth::Users::CCheckEmailPayload CUserControllerComp::OnCheckEmail(
 
 	QByteArray userId = GetUserIdByEmail(email);
 
-	const imtauth::CUserInfo* userInfoPtr = nullptr;
+	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		userInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 	}
 
 	if (userInfoPtr == nullptr){
@@ -345,7 +350,7 @@ sdl::imtauth::Users::CSendEmailCodePayload CUserControllerComp::OnSendEmailCode(
 	response.success = false;
 
 	QByteArray objectId = GetUserIdByLogin(login);
-	istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr = GetUserInfoByLogin(login);
+	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin(login);
 	if (!userInfoPtr.IsValid()){
 		response.message = QString("Unable to send email code. Error: User is invalid");
 	}
@@ -434,7 +439,7 @@ sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuse
 		}
 	}
 
-	istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr = GetUserInfoByLogin("su");
+	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin("su");
 	if (!userInfoPtr.IsValid()){
 		response.errorType = sdl::imtauth::Users::CCheckSuperuserErrorType::V1_0::CheckSuperuserErrorTypeFields::NotExists;
 
@@ -471,7 +476,7 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 	response.success = false;
 	response.message = "";
 
-	istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr = GetUserInfoByLogin("su");
+	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin("su");
 	if (userInfoPtr.IsValid()){
 		response.message = QString("Superuser already exists");
 
@@ -514,19 +519,30 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 		return retVal;
 	}
 
-	istd::TDelPtr<imtauth::CIdentifiableUserInfo> superuserInfoPtr;
-	superuserInfoPtr.SetCastedOrRemove(m_userFactoryCompPtr.CreateInstance());
+	imtauth::IUserInfoUniquePtr superuserInfoPtr = m_userFactoryCompPtr.CreateInstance();
 	if (!superuserInfoPtr.IsValid()){
 		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
 		return retVal;
 	}
 	
-	QByteArray objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	if (!superuserInfoPtr.IsValid()){
+		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
+		return retVal;
+	}
 
+	imtbase::IIdentifiable* userIdentifierPtr = dynamic_cast<imtbase::IIdentifiable*>(superuserInfoPtr.GetPtr());
+	if (userIdentifierPtr == nullptr){
+		Q_ASSERT_X(false, "User instance is invalid", "CUserControllerComp");
+
+		return retVal;
+	}
+
+	QByteArray objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	QByteArray login = "su";
 
 	QString passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password.toUtf8());
-	superuserInfoPtr->SetObjectUuid(objectId);
+
+	userIdentifierPtr->SetObjectUuid(objectId);
 	superuserInfoPtr->SetId(login);
 	superuserInfoPtr->SetName(name);
 	superuserInfoPtr->SetMail(mail);
@@ -586,22 +602,22 @@ bool CUserControllerComp::SendUserCode(const QByteArray& userId, const imtauth::
 }
 
 
-const imtauth::IUserInfo* CUserControllerComp::GetUserInfoByLogin(const QByteArray& login) const
+imtauth::IUserInfoSharedPtr CUserControllerComp::GetUserInfoByLogin(const QByteArray& login) const
 {
 	QByteArray userObjectId = GetUserIdByLogin(login);
 	if (userObjectId.isEmpty()){
 		return nullptr;
 	}
 
-	istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr;
+	imtauth::IUserInfoSharedPtr userInfoPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 		if (dataPtr.IsValid()){
-			userInfoPtr.SetCastedOrRemove(dataPtr->CloneMe());
+			userInfoPtr.SetCastedPtr<istd::IChangeable>(dataPtr);
 		}
 	}
 
-	return userInfoPtr.PopPtr();
+	return userInfoPtr;
 }
 
 

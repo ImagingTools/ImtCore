@@ -4,8 +4,8 @@
 // ImtCore includes
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtcrypt/IHashGenerator.h>
+#include <imtauth/IUserGroupInfoProvider.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
-
 
 namespace imtauthgql
 {
@@ -42,7 +42,7 @@ protected:
 				const sdl::imtauth::Users::CUsersListGqlRequest& usersListRequest,
 				sdl::imtauth::Users::CUserItem::V1_0& representationObject,
 				QString& errorMessage) const override;
-	virtual istd::IChangeable* CreateObjectFromRepresentation(
+	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtauth::Users::CUserData::V1_0& userDataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;

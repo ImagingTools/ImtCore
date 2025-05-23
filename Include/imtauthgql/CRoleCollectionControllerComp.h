@@ -42,7 +42,7 @@ protected:
 				const sdl::imtauth::Roles::CRolesListGqlRequest& rolesListRequest,
 				sdl::imtauth::Roles::CRoleItem::V1_0& representationObject,
 				QString& errorMessage) const override;
-	virtual istd::IChangeable* CreateObjectFromRepresentation(
+	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtauth::Roles::CRoleData::V1_0& roleDataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;

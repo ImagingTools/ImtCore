@@ -247,7 +247,7 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 }
 
 
-istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation(
+istd::IChangeableUniquePtr CRoleCollectionControllerComp::CreateObjectFromRepresentation(
 			const sdl::imtauth::Roles::CRoleData::V1_0& roleDataRepresentation,
 			QByteArray& newObjectId,
 			QString& errorMessage) const
@@ -259,7 +259,7 @@ istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtauth::IRole> roleInstancePtr = m_roleInfoFactCompPtr.CreateInstance();
+	imtauth::IRoleUniquePtr roleInstancePtr = m_roleInfoFactCompPtr.CreateInstance();
 	if (!roleInstancePtr.IsValid()){
 		errorMessage = QString("Unable to create role instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CRoleCollectionControllerComp");
@@ -290,7 +290,10 @@ istd::IChangeable* CRoleCollectionControllerComp::CreateObjectFromRepresentation
 		return nullptr;
 	}
 
-	return roleInstancePtr.PopPtr();
+	istd::IChangeableUniquePtr retVal;
+	retVal.MoveCastedPtr<imtauth::IRole>(roleInstancePtr);
+
+	return retVal;
 }
 
 

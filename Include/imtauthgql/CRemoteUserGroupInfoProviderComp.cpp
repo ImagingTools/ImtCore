@@ -27,7 +27,7 @@ const imtbase::ICollectionInfo& CRemoteUserGroupInfoProviderComp::GetUserGroupLi
 }
 
 
-const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(const QByteArray& groupId) const
+imtauth::IUserGroupInfoSharedPtr CRemoteUserGroupInfoProviderComp::GetUserGroup(const QByteArray& groupId) const
 {
 	if (!m_userGroupInfoFactCompPtr.IsValid()){
 		return nullptr;
@@ -48,8 +48,7 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 			return nullptr;
 		}
 
-		istd::TDelPtr<imtauth::IUserGroupInfo> groupInfoPtr;
-		groupInfoPtr.SetPtr(m_userGroupInfoFactCompPtr.CreateInstance());
+		imtauth::IUserGroupInfoSharedPtr groupInfoPtr = m_userGroupInfoFactCompPtr.CreateInstance();
 		if (!groupInfoPtr.IsValid()){
 			return nullptr;
 		}
@@ -69,7 +68,7 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 			return nullptr;
 		}
 
-		return groupInfoPtr.PopPtr();
+		return groupInfoPtr;
 	}
 
 	return nullptr;

@@ -70,7 +70,7 @@ protected:
 
 private:
 	bool SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const;
-	const imtauth::IUserInfo* GetUserInfoByLogin(const QByteArray& login) const;
+	imtauth::IUserInfoSharedPtr GetUserInfoByLogin(const QByteArray& login) const;
 	const QByteArray GetUserIdByLogin(const QByteArray& login) const;
 	const QByteArray GetUserIdByEmail(const QString& email) const;
 

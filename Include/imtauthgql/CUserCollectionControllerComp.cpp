@@ -362,7 +362,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		QByteArrayList resultList;
 		if (m_userGroupInfoProviderCompPtr.IsValid()){
 			for (const QByteArray& groupId: userInfoPtr->GetGroups()){
-				istd::TDelPtr<const imtauth::IUserGroupInfo> userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+				imtauth::IUserGroupInfoSharedPtr userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
 				if (userGroupInfoPtr.IsValid()){
 					QString groupName = userGroupInfoPtr->GetName();
 					QString groupDescription = userGroupInfoPtr->GetDescription();
@@ -406,7 +406,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 }
 
 
-istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation(
+istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepresentation(
 	const sdl::imtauth::Users::CUserData::V1_0& userDataRepresentation,
 	QByteArray& newObjectId,
 	QString& errorMessage) const
@@ -421,7 +421,7 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtauth::IUserInfo> userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
+	imtauth::IUserInfoUniquePtr userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
 	if (!userInstancePtr.IsValid()){
 		errorMessage = QString("Unable to create user instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CUserCollectionControllerComp");
@@ -468,8 +468,10 @@ istd::IChangeable* CUserCollectionControllerComp::CreateObjectFromRepresentation
 			break;
 		}
 	}
+	istd::IChangeableUniquePtr retVal;
+	retVal.MoveCastedPtr<imtauth::IUserInfo>(userInstancePtr);
 
-	return userInstancePtr.PopPtr();
+	return retVal;
 }
 
 
@@ -605,7 +607,7 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 				}
 				else{
 					for (const QByteArray& groupId : groupIds){
-						istd::TDelPtr<const imtauth::IUserGroupInfo> userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+						imtauth::IUserGroupInfoSharedPtr userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
 						if (userGroupInfoPtr.IsValid()){
 							QString groupName = userGroupInfoPtr->GetName();
 

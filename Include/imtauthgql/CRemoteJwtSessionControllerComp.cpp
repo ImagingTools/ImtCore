@@ -183,7 +183,7 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 }
 
 
-const imtauth::ISession* CRemoteJwtSessionControllerComp::GetSession(const QByteArray& sessionId) const
+imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QByteArray& sessionId) const
 {
 	namespace sessionsdl = sdl::imtauth::Sessions;
 
@@ -209,7 +209,7 @@ const imtauth::ISession* CRemoteJwtSessionControllerComp::GetSession(const QByte
 	if (response.Version_1_0->sessionData.has_value() && m_sessionFactCompPtr.IsValid()){
 		QByteArray sessionData = *response.Version_1_0->sessionData;
 
-		istd::TDelPtr<imtauth::ISession> sessionInfoPtr = m_sessionFactCompPtr.CreateInstance();
+		imtauth::ISessionUniquePtr sessionInfoPtr = m_sessionFactCompPtr.CreateInstance();
 
 		iser::CMemoryReadArchive archive(sessionData.data(), sessionData.length());
 		if (!sessionInfoPtr->Serialize(archive)){
@@ -218,7 +218,7 @@ const imtauth::ISession* CRemoteJwtSessionControllerComp::GetSession(const QByte
 			return nullptr;
 		}
 
-		return sessionInfoPtr.PopPtr();
+		return imtauth::ISessionSharedPtr::CreateFromUnique(sessionInfoPtr);
 	}
 
 	return nullptr;

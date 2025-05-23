@@ -55,16 +55,17 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 	languageIdParamPtr->SetId(languageId);
 	paramsPtr->SetEditableParameter("LanguageParam", languageIdParamPtr, true);
 
-	istd::TOptDelPtr<imtauth::IUserSettings> userSettingsPtr;
+	imtauth::IUserSettingsUniquePtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!userId.isEmpty()){
 		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-			userSettingsPtr.SetPtr(dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr()), false);
+			istd::IChangeableUniquePtr uniqueDataPtr = dataPtr.GetPtr();
+			userSettingsPtr.MoveCastedPtr<istd::IChangeable>(uniqueDataPtr);
 		}
 	}
 
 	if (!userSettingsPtr.IsValid()){
-		userSettingsPtr.SetPtr(m_userSettingsInfoFactCompPtr.CreateInstance(), true);
+		userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
 		Q_ASSERT(userSettingsPtr.IsValid());
 		if (!userSettingsPtr.IsValid()){
 			errorMessage = QString("Unable to create representation for user settings. Error: User settings is invalid.");
@@ -135,14 +136,16 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
-	istd::TOptDelPtr<imtauth::IUserSettings> userSettingsPtr;
+	imtauth::IUserSettingsUniquePtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		userSettingsPtr.SetPtr(dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr()), false);
+		istd::IChangeableUniquePtr uniqueDataPtr = dataPtr.GetPtr();
+		userSettingsPtr.MoveCastedPtr<istd::IChangeable>(uniqueDataPtr);
 	}
 
 	if (!userSettingsPtr.IsValid()){
-		userSettingsPtr.SetPtr(m_userSettingsInfoFactCompPtr.CreateInstance(), true);
+		userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
+
 		userSettingsPtr->SetUserId(userId);
 	}
 

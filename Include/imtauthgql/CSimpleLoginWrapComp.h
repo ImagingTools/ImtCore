@@ -66,7 +66,7 @@ private:
 	QByteArray m_loggedUserPassword;
 	QByteArray m_loggedUserToken;
 	QByteArrayList m_userPermissionIds;
-	istd::TSmartPtr<imtauth::IUserInfo> m_userInfoPtr;
+	imtauth::IUserInfoSharedPtr m_userInfoPtr;
 
 protected:
 	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);

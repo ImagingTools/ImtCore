@@ -71,7 +71,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			return false;
 		}
 
-		m_userInfoPtr.SetPtr(m_userInfoFactCompPtr.CreateInstance());
+		m_userInfoPtr.FromUnique(m_userInfoFactCompPtr.CreateInstance());
 		if (!m_userInfoPtr.IsValid()){
 			return false;
 		}
