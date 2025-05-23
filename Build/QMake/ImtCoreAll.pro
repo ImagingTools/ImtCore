@@ -167,6 +167,7 @@ imthttp.file = ../../Include/imthttp/QMake/imthttp.pro
 
 SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
+imtqml.depends = imtbasesdl
 
 SUBDIRS += imtlic
 imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
