@@ -193,7 +193,7 @@ ConstResponsePtr CHttpFileUploadServletComp::CreateResponse(
 		request,
 		statusCode,
 		data,
-		dataTypeId));
+		dataTypeId).PopInterfacePtr());
 
 	CHttpResponse* httpResponsePtr = const_cast<CHttpResponse*>(dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr()));
 	Q_ASSERT(httpResponsePtr != nullptr);

@@ -7,15 +7,14 @@
 // ACF includes
 #include <iser/IVersionInfo.h>
 
+// ImtCore includes
+#include <imtrest/IRequest.h>
+#include <imtrest/IRequestServlet.h>
+#include <imtrest/ISender.h>
+#include <imtrest/IResponse.h>
 
 namespace imtrest
 {
-
-
-class IRequest;
-class IRequestServlet;
-class IResponse;
-class ISender;
 
 
 /**
@@ -154,14 +153,14 @@ public:
 		\param socketPtr		Socket instance for reading the incommming data
 		\param requestHandler	Instance to process the request after all data has been read.
 	*/
-	virtual IRequest* CreateRequest(const IRequestServlet& requestHandler) const = 0;
+	virtual imtrest::IRequestUniquePtr CreateRequest(const IRequestServlet& requestHandler) const = 0;
 
 	/**
 		Create request for sending data.
 		\param data		The response data.
 		\param request	Related request.
 	*/
-	virtual IRequest* CreateRequestForSend(
+	virtual imtrest::IRequestUniquePtr CreateRequestForSend(
 				const IRequestServlet& requestHandler,
 				int statusCode,
 				const QByteArray& data,
@@ -172,12 +171,11 @@ public:
 		\param data		The response data.
 		\param request	Related request.
 	*/
-	virtual IResponse* CreateResponse(
+	virtual imtrest::IResponseUniquePtr CreateResponse(
 				const IRequest& request,
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const = 0;
-
 };
 
 

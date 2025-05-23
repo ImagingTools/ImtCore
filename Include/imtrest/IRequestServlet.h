@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <istd/TSmartPtr.h>
+#include <istd/TInterfacePtr.h>
 
 // ImtCore includes
 #include <imtrest/IResponse.h>
@@ -29,6 +29,9 @@ public:
 	*/
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request, const QByteArray& subCommandId = QByteArray()) const = 0;
 };
+
+
+typedef istd::TUniqueInterfacePtr<IRequestServlet> IRequestServletPtr;
 
 
 } // namespace imtrest

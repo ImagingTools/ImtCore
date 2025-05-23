@@ -37,6 +37,7 @@ void CSocketThread::SetSocketDescriptor(qintptr socketDescriptor)
 	m_socketDescriptor = socketDescriptor;
 }
 
+
 qintptr CSocketThread::GetSocketDescriptor()
 {
 	return m_socketDescriptor;
@@ -81,17 +82,34 @@ void CSocketThread::EnableSecureConnection(bool isSecureConnection)
 }
 
 
+imtrest::IRequestUniquePtr CSocketThread::CreateRequest() const
+{
+	if (m_enginePtr == nullptr){
+		return nullptr;
+	}
+
+	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*this);
+	if (newRequestPtr.IsValid()){
+		m_requestId = newRequestPtr->GetRequestId();
+	}
+
+	return newRequestPtr;
+}
+
+
+// reimplemented (QThread)
+
 void CSocketThread::run()
 {
 	if (m_server == nullptr){
 		return;
 	}
 
-	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
-	m_socket.SetPtr(new CSocket(this, newRequestPtr, m_isSecureConnection, m_sslConfiguration, m_socketDescriptor));
-
-
+	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*this);
+	Q_ASSERT(newRequestPtr.IsValid());
 	m_requestId = newRequestPtr->GetRequestId();
+
+	m_socket.SetPtr(new CSocket(this, newRequestPtr.PopInterfacePtr(), m_isSecureConnection, m_sslConfiguration, m_socketDescriptor));
 
 	qDebug() << m_socketDescriptor << connect(this, &CSocketThread::OnSendResponse, m_socket.GetPtr(), &CSocket::OnSendResponse, Qt::QueuedConnection);
 	qDebug() << m_socketDescriptor << connect(this, &CSocketThread::Abort, m_socket.GetPtr(), &CSocket::Abort, Qt::QueuedConnection);
@@ -129,20 +147,6 @@ bool CSocketThread::SendResponse(ConstResponsePtr& response) const
 bool CSocketThread::SendRequest(ConstRequestPtr& /*reguest*/) const
 {
 	return false;
-}
-
-
-IRequest* CSocketThread::CreateRequest()
-{
-	if (m_enginePtr == nullptr){
-		return nullptr;
-	}
-	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
-	if (newRequestPtr != nullptr){
-		m_requestId = newRequestPtr->GetRequestId();
-	}
-
-	return newRequestPtr;
 }
 
 

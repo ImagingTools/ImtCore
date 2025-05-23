@@ -1,12 +1,14 @@
 #pragma once
 
+
 // Qt includes
 #include <QtCore/QIODevice>
 
 // ACF includes
 #include <istd/TSmartPtr.h>
+#include <istd/TInterfacePtr.h>
 
-// ACF includes
+// ImtCore includes
 #include <imtrest/INetworkObject.h>
 
 
@@ -46,6 +48,7 @@ public:
 
 
 typedef istd::TSmartPtr<const imtrest::IRequest> ConstRequestPtr;
+typedef istd::TUniqueInterfacePtr<imtrest::IRequest> IRequestUniquePtr;
 
 
 } // namespace imtrest

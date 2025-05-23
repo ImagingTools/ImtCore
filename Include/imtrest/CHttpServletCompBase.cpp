@@ -252,7 +252,7 @@ ConstResponsePtr CHttpServletCompBase::CreateDefaultErrorResponse(const QByteArr
 				request,
 				imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
 				errorString,
-				QByteArray("text/plain; charset=utf-8")));
+				QByteArray("text/plain; charset=utf-8")).PopInterfacePtr());
 
 	return retVal;
 }

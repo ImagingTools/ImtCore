@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <istd/TSmartPtr.h>
+#include <istd/TInterfacePtr.h>
 
 // ImtCore includes
 #include <imtrest/INetworkObject.h>
@@ -49,10 +50,16 @@ public:
 	virtual Headers GetHeaders() const = 0;
 };
 
+
 typedef istd::TSmartPtr<const imtrest::IResponse> ConstResponsePtr;
+typedef istd::TUniqueInterfacePtr<imtrest::IResponse> IResponseUniquePtr;
+typedef istd::TSharedInterfacePtr<imtrest::IResponse> IResponseSharedPtr;
+
 
 } // namespace imtrest
 
+
 Q_DECLARE_METATYPE(imtrest::ConstResponsePtr)
+Q_DECLARE_METATYPE(imtrest::IResponseSharedPtr)
 
 

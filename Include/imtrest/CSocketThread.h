@@ -41,6 +41,8 @@ public:
 	[[nodiscard]] bool IsSecureConnection() const;
 	void EnableSecureConnection(bool isSecureConnection = true);
 
+	virtual imtrest::IRequestUniquePtr CreateRequest() const;
+
 	// reimplemented (QThread)
 	virtual void run() override;
 
@@ -52,8 +54,6 @@ public:
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
 	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
 
-	virtual IRequest* CreateRequest();
-
 Q_SIGNALS:
 	void Error(QTcpSocket::SocketError socketerror);
 	void SocketDisconnected(QByteArray requestId);
@@ -63,7 +63,7 @@ Q_SIGNALS:
 private:
 	CMultiThreadServer* m_server;
 	qintptr m_socketDescriptor;
-	imtrest::IProtocolEngine* m_enginePtr;
+	const imtrest::IProtocolEngine* m_enginePtr;
 	imtrest::IRequestServlet* m_requestHandlerPtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
@@ -72,7 +72,7 @@ private:
 	bool m_isSecureConnection;
 	const QSslConfiguration& m_sslConfiguration;
 
-	QByteArray m_requestId;
+	mutable QByteArray m_requestId;
 };
 
 

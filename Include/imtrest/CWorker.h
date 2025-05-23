@@ -19,7 +19,7 @@ class CWorker: public QObject
 {
 	Q_OBJECT
 public:
-	CWorker(const imtrest::IRequestServlet* requestServletPtr, CWorkerThread* workerThread);
+	CWorker(imtrest::IRequestServletPtr&& requestServletPtr, CWorkerThread* workerThread);
 
 Q_SIGNALS:
 	void FinishProcess(const IRequest* request, const QByteArray& subCommandId);
@@ -28,7 +28,7 @@ public Q_SLOTS:
 	void ProcessRequest(const IRequest* request, const QByteArray& subCommandId);
 
 private:
-	const imtrest::IRequestServlet* m_requestServletPtr;
+	IRequestServletPtr m_requestServletPtr;
 	mutable QMutex m_processMutex;
 
 	CWorkerThread* m_workerThread;

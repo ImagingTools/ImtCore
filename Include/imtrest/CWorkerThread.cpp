@@ -57,14 +57,14 @@ const ISender* CWorkerThread::GetSender(const QByteArray& requestId)
 
 void CWorkerThread::run()
 {
-	m_requestServletPtr = m_workerManager->CreateServlet();
-	if (m_requestServletPtr == nullptr){
+	imtrest::IRequestServletPtr requestServletPtr = m_workerManager->CreateServlet();
+	if (!requestServletPtr.IsValid()){
 		Q_ASSERT(false);
 
 		return;
 	}
 
-	m_workerPtr.SetPtr(new CWorker(m_requestServletPtr, this));
+	m_workerPtr.SetPtr(new CWorker(std::move(requestServletPtr), this));
 
 	connect(this, &CWorkerThread::StartProcess, m_workerPtr.GetPtr(), &CWorker::ProcessRequest); //, Qt::QueuedConnection
 	connect(m_workerPtr.GetPtr(), &CWorker::FinishProcess, this, &CWorkerThread::OnFinishProcess, Qt::DirectConnection); //, Qt::QueuedConnection

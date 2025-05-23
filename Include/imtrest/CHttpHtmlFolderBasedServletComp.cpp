@@ -223,14 +223,14 @@ ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const IRequest&
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId));
+	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 
 	auto generateErrorResponsePtr = [&request, &engine, reponseTypeId](QByteArray errorBody){
 		qCritical() << __FILE__ << __LINE__ << "Error occurred" << errorBody;
 		QByteArray generatedErrorBody = "<html><head><title>Error</title></head><body><p>";
 		generatedErrorBody.append(errorBody);
 		generatedErrorBody.append("</p></body></html>");
-		return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_INTERNAL_ERROR, generatedErrorBody, reponseTypeId));
+		return ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_INTERNAL_ERROR, generatedErrorBody, reponseTypeId).PopInterfacePtr());
 	};
 
 	QByteArray body;
@@ -299,7 +299,7 @@ ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessRequest(const IRequest&
 		destinationFile.close();
 	}
 
-	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
+	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
 
 	return responsePtr;
 }

@@ -93,7 +93,7 @@ void CSocket::HandleReadyRead()
 	}
 
 	if (!m_requestPtr.IsValid()){
-		m_requestPtr.SetPtr(m_rootSocket->CreateRequest());
+		m_requestPtr.SetPtr(m_rootSocket->CreateRequest().PopInterfacePtr());
 	}
 
 	if (!m_socket->isOpen()){

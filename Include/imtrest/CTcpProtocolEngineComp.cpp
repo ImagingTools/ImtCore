@@ -150,13 +150,13 @@ bool CTcpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protocol
 }
 
 
-IRequest* CTcpProtocolEngineComp::CreateRequest(const IRequestServlet& requestHandler) const
+imtrest::IRequestUniquePtr CTcpProtocolEngineComp::CreateRequest(const IRequestServlet& requestHandler) const
 {
 	return new CTcpRequest(requestHandler, *this);
 }
 
 
-IRequest* CTcpProtocolEngineComp::CreateRequestForSend(
+imtrest::IRequestUniquePtr CTcpProtocolEngineComp::CreateRequestForSend(
 			const IRequestServlet& requestHandler,
 			int /*statusCode*/,
 			const QByteArray& /*data*/,
@@ -166,7 +166,7 @@ IRequest* CTcpProtocolEngineComp::CreateRequestForSend(
 }
 
 
-IResponse* CTcpProtocolEngineComp::CreateResponse(
+imtrest::IResponseUniquePtr CTcpProtocolEngineComp::CreateResponse(
 			const IRequest& /*request*/,
 			int statusCode,
 			const QByteArray& data,

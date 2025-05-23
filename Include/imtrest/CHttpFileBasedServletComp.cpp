@@ -29,7 +29,7 @@ ConstResponsePtr CHttpFileBasedServletComp::ProcessRequest(const IRequest& reque
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId));
+	ConstResponsePtr errorResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_RESOURCE_NOT_AVAILABLE, errorBody, reponseTypeId).PopInterfacePtr());
 
 	if (!m_fileTemplatePathCompPtr.IsValid()){
 		return errorResponsePtr;
@@ -47,7 +47,7 @@ ConstResponsePtr CHttpFileBasedServletComp::ProcessRequest(const IRequest& reque
 
 	QByteArray body = templateFile.readAll();
 
-	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
+	ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
 
 	return responsePtr;
 }

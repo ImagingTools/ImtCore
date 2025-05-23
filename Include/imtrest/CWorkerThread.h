@@ -50,7 +50,6 @@ protected Q_SLOTS:
 	void OnFinishProcess(const IRequest* request, const QByteArray& subCommandId);
 
 private:
-	imtrest::IRequestServlet* m_requestServletPtr;
 	Status m_status;
 	mutable CWorkerManagerComp* m_workerManager;
 	istd::TDelPtr<CWorker> m_workerPtr;

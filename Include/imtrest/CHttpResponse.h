@@ -12,9 +12,8 @@ namespace imtrest
 {
 
 
-class CHttpResponse: public QObject, virtual public IResponse
+class CHttpResponse: virtual public IResponse
 {
-	Q_OBJECT
 public:
 	CHttpResponse(
 			int statusCode,

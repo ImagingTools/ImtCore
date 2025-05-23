@@ -41,7 +41,7 @@ ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request, cons
 				request,
 				IProtocolEngine::SC_MOVED_PERMANENTLY,
 				body,
-				"text/html; charset=UTF-8"));
+				"text/html; charset=UTF-8").PopInterfacePtr());
 
 		return retval;
 	}
@@ -51,7 +51,7 @@ ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request, cons
 			request,
 			IProtocolEngine::SC_NOT_FOUND,
 			QByteArray(),
-			"text/html; charset=UTF-8"));
+			"text/html; charset=UTF-8").PopInterfacePtr());
 
 	return retval;
 }

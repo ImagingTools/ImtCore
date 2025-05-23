@@ -19,7 +19,7 @@ CWorkerManagerComp::CWorkerManagerComp()
 }
 
 
-IRequestServlet* CWorkerManagerComp::CreateServlet()
+IRequestServletPtr CWorkerManagerComp::CreateServlet()
 {
 	if (m_requestHandlerCompPtr.IsValid()){
 		return m_requestHandlerCompPtr.CreateInstance();

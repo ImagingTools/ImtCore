@@ -138,7 +138,7 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 	qDebug() << "OnWebSocketTextMessage" << message;
 	m_server->SendVerboseMessage(message, "CWebSocketServerComp");
 
-	istd::TDelPtr<IRequest> newRequestPtr = m_enginePtr->CreateRequest(*m_requestServerHandlerPtr);
+	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*m_requestServerHandlerPtr);
 	if (newRequestPtr.IsValid()){
 		CWebSocketRequest* webSocketRequest = dynamic_cast<CWebSocketRequest*>(newRequestPtr.GetPtr());
 		if (webSocketRequest == nullptr){
@@ -179,8 +179,8 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 			}
 
 			if (methodType == CWebSocketRequest::MT_QUERY){
-				IRequest* requestPtr = m_httpEnginePtr->CreateRequest(*m_requestServerHandlerPtr);
-				CHttpRequest* newHttpRequestPtr = dynamic_cast<CHttpRequest*>(requestPtr);
+				imtrest::IRequestUniquePtr requestPtr = m_httpEnginePtr->CreateRequest(*m_requestServerHandlerPtr);
+				CHttpRequest* newHttpRequestPtr = dynamic_cast<CHttpRequest*>(requestPtr.GetPtr());
 				if (newHttpRequestPtr != nullptr){
 					if (!clientId.isEmpty()){
 						m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);

@@ -150,13 +150,13 @@ bool CHttpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protoco
 }
 
 
-IRequest* CHttpProtocolEngineComp::CreateRequest(const IRequestServlet& requestHandler) const
+imtrest::IRequestUniquePtr CHttpProtocolEngineComp::CreateRequest(const IRequestServlet& requestHandler) const
 {
 	return new CHttpRequest(requestHandler, *this);
 }
 
 
-IRequest* CHttpProtocolEngineComp::CreateRequestForSend(
+imtrest::IRequestUniquePtr CHttpProtocolEngineComp::CreateRequestForSend(
 			const IRequestServlet& requestHandler,
 			int /*statusCode*/,
 			const QByteArray& /*data*/,
@@ -166,7 +166,7 @@ IRequest* CHttpProtocolEngineComp::CreateRequestForSend(
 }
 
 
-IResponse* CHttpProtocolEngineComp::CreateResponse(
+imtrest::IResponseUniquePtr CHttpProtocolEngineComp::CreateResponse(
 			const IRequest& request,
 			int statusCode,
 			const QByteArray& data,
@@ -182,7 +182,6 @@ IResponse* CHttpProtocolEngineComp::CreateResponse(
 			httpResponsePtr->SetHeaders(responseHeaders);
 		}
 	}
-
 	return httpResponsePtr;
 }
 

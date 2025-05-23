@@ -17,8 +17,8 @@ namespace imtrest
 {
 
 
-CWorker::CWorker(const imtrest::IRequestServlet* requestServletPtr, CWorkerThread* workerThread)
-	:m_requestServletPtr(requestServletPtr),
+CWorker::CWorker(imtrest::IRequestServletPtr&& requestServletPtr, CWorkerThread* workerThread)
+	:m_requestServletPtr(std::move(requestServletPtr)),
 	m_workerThread(workerThread)
 {
 }
@@ -28,7 +28,7 @@ void CWorker::ProcessRequest(const IRequest* request, const QByteArray& subComma
 {
 	m_workerThread->SetStatus(CWorkerThread::ST_PROCESS);
 
-	if (m_requestServletPtr != nullptr && request != nullptr){
+	if (m_requestServletPtr.IsValid() && request != nullptr){
 		QMutexLocker lock(&m_processMutex);
 
 		QByteArray body = request->GetBody();

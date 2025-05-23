@@ -36,7 +36,7 @@ public:
 
 	CWorkerManagerComp();
 
-	IRequestServlet* CreateServlet();
+	IRequestServletPtr CreateServlet();
 	const ISender* GetSender(const QByteArray& requestId);
 
 	// reimplemented (imtrest::IRequestServlet)
