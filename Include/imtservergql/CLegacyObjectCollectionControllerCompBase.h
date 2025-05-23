@@ -71,8 +71,9 @@ public:
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
 	// reimplemented (imtgql::IGqlRequestExtractor)
-	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
+	virtual istd::IChangeableUniquePtr ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
 
 protected:
 	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;
@@ -155,7 +156,7 @@ protected:
 	/**
 		Create object from the GraphQL
 	*/
-	virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;
 
 	/**
 		Prepare filters from the GraphQL
@@ -175,7 +176,7 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
-	virtual istd::IChangeable* CreateObject(const QByteArray& typeId);
+	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId);
 
 protected:
 	QMap<QByteArray, QByteArray> m_fieldReplacementMap;

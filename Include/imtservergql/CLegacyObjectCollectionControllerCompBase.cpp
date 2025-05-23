@@ -127,7 +127,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::CreateIntern
 
 // reimplemented (imtgql::IGqlRequestExtractor)
 
-istd::IChangeable* CLegacyObjectCollectionControllerCompBase::ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const
+istd::IChangeableUniquePtr CLegacyObjectCollectionControllerCompBase::ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const
 {
 	QString name;
 	QString description;
@@ -352,7 +352,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::InsertObject
 	}
 
 	QByteArray objectId;
-	istd::TDelPtr<istd::IChangeable> newObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
+	istd::IChangeableUniquePtr newObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 	if (!newObjectPtr.IsValid()){
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
@@ -418,8 +418,8 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::UpdateObject
 	QString name = inputParamPtr->GetFieldArgumentValue("name").toString();
 	QString description = inputParamPtr->GetFieldArgumentValue("description").toString();
 
-	istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
-	if (savedObjectPtr == nullptr){
+	istd::IChangeableUniquePtr savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
+	if (!savedObjectPtr.IsValid()){
 		if (errorMessage.isEmpty()){
 			errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
 		}
@@ -497,7 +497,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::UpdateCollec
 			QString name;
 			QString description;
 
-			istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
+			istd::IChangeableUniquePtr savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, name, description, errorMessage);
 			if (savedObjectPtr.IsValid()){
 				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr)){
 					errorMessage += QString("Could not update object: '%1'; ").arg(qPrintable(objectId));
@@ -1013,7 +1013,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ImportObject
 		return nullptr;
 	}
 
-	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
+	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
@@ -1068,7 +1068,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ImportObject
 	int typeIdIndex = GetObjectTypeIdIndex(typeId);
 	Q_ASSERT_X(typeIdIndex >= 0, "Type ID is invalid", "CLegacyObjectCollectionControllerCompBase");
 
-	istd::TDelPtr<istd::IChangeable> collectionObjectInstancePtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
+	istd::IChangeableUniquePtr collectionObjectInstancePtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!collectionObjectInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
@@ -1156,7 +1156,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::ExportObject
 	QString fileName = objectName + "." + extension;
 	QString filePathTmp = tempDir.path() + "/" + fileName;
 
-	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
+	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
@@ -1403,7 +1403,7 @@ istd::IChangeable* CLegacyObjectCollectionControllerCompBase::CreateObjectFromIn
 }
 
 
-istd::IChangeable* CLegacyObjectCollectionControllerCompBase::CreateObjectFromRequest(
+istd::IChangeableUniquePtr CLegacyObjectCollectionControllerCompBase::CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& newObjectId,
 		QString& name,
@@ -1528,7 +1528,7 @@ void CLegacyObjectCollectionControllerCompBase::SetObjectFilter(
 }
 
 
-istd::IChangeable* CLegacyObjectCollectionControllerCompBase::CreateObject(const QByteArray& typeId)
+istd::IChangeableUniquePtr CLegacyObjectCollectionControllerCompBase::CreateObject(const QByteArray& typeId)
 {
 	int index = GetObjectTypeIdIndex(typeId);
 	if (m_objectFactCompPtr.IsValid() && index < m_objectFactCompPtr.GetCount()){

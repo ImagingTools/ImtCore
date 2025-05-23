@@ -46,7 +46,7 @@ protected:
 				QString& errorMessage) const override;
 	
 private:
-	imtauth::IUserSettings* GetOrCreateUserSettings(const QByteArray& userId) const;
+	imtauth::IUserSettingsSharedPtr GetOrCreateUserSettings(const QByteArray& userId) const;
 	bool SetUserSettings(const QByteArray& userId, const imtauth::IUserSettings& userSettings) const;
 	
 protected:

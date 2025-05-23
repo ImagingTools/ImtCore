@@ -58,14 +58,15 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 
 	QByteArray tableId = gqlInputParamPtr->GetFieldArgumentValue("TableId").toByteArray();
 
-	istd::TOptDelPtr<imtauth::IUserSettings> userSettingsPtr;
+	imtauth::IUserSettingsSharedPtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		userSettingsPtr.SetPtr(dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr()), false);
+		userSettingsPtr.SetCastedPtr(dataPtr);
 	}
 
 	if (!userSettingsPtr.IsValid()){
-		userSettingsPtr.SetPtr(m_userSettingsFactCompPtr.CreateInstance(), true);
+		userSettingsPtr.FromUnique(m_userSettingsFactCompPtr.CreateInstance());
+
 		userSettingsPtr->SetUserId(userId);
 	}
 
@@ -85,17 +86,17 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 
 	Q_ASSERT(pageViewParamCollectionPtr != nullptr);
 
-	iprm::IParamsSet* paramSetPtr = nullptr;
+	iprm::IParamsSetSharedPtr paramSetPtr;
 	imtbase::IObjectCollection::DataPtr paramSetDataPtr;
 	if (pageViewParamCollectionPtr->GetObjectData(tableId, paramSetDataPtr)){
-		paramSetPtr = dynamic_cast<iprm::IParamsSet*>(paramSetDataPtr.GetPtr());
+		paramSetPtr.SetCastedPtr(paramSetDataPtr);
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 	if (gqlRequest.GetRequestType() == imtgql::IGqlRequest::RT_QUERY){
-		if (paramSetPtr == nullptr){
+		if (!paramSetPtr.IsValid()){
 			return nullptr;
 		}
 
@@ -119,8 +120,8 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 			return nullptr;
 		}
 
-		if (paramSetPtr == nullptr){
-			paramSetPtr = m_paramSetFactCompPtr.CreateInstance();
+		if (!paramSetPtr.IsValid()){
+			paramSetPtr.FromUnique(m_paramSetFactCompPtr.CreateInstance());
 		}
 
 		imtbase::ITableViewParam* tableViewParamPtr = dynamic_cast<imtbase::ITableViewParam*>(paramSetPtr->GetEditableParameter("TableViewParam"));
@@ -149,7 +150,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 			}
 		}
 		else{
-			pageViewParamCollectionPtr->InsertNewObject("PageViewParam", "", "", paramSetPtr, tableId);
+			pageViewParamCollectionPtr->InsertNewObject("PageViewParam", "", "", paramSetPtr.GetPtr(), tableId);
 		}
 
 		if (m_userSettingsCollectionCompPtr->GetElementIds().contains(userId)){

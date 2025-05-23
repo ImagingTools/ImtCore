@@ -71,7 +71,7 @@ protected:
 	[[nodiscard]]virtual bool SetObjectDataFromRepresentation(istd::IChangeable& object, const _CreateRepresentation& representation, QString& errorMessage) const = 0;
 
 	// reimplemented (_Base)
-	istd::IChangeable* CreateObjectFromRepresentation(
+	istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const _CreateRepresentation& representation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;
@@ -88,7 +88,7 @@ protected:
 
 // reimplemented (_Base)
 template<class _CreateRepresentation, class _UpdateRequest, class _Base, const char* _OID>
-istd::IChangeable* TCreateUpdateCollectionWrap<_CreateRepresentation, _UpdateRequest, _Base, _OID>::CreateObjectFromRepresentation(
+istd::IChangeableUniquePtr TCreateUpdateCollectionWrap<_CreateRepresentation, _UpdateRequest, _Base, _OID>::CreateObjectFromRepresentation(
 	const _CreateRepresentation& representation,
 	QByteArray& /*newObjectId*/,
 	QString& errorMessage) const

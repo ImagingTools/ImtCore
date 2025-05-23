@@ -199,7 +199,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
 	const imtrest::IRequest& request,
 	const QByteArray& contentTypeId) const
 {
-	return imtrest::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
+	return imtrest::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId).PopInterfacePtr());
 }
 
 
@@ -220,7 +220,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
 			request,
 			errorCode,
 			responseJson,
-			QByteArrayLiteral("application/json;charset=utf-8")));
+			QByteArray("application/json;charset=utf-8")).PopInterfacePtr());
 }
 
 

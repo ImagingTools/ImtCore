@@ -47,7 +47,7 @@ sdl::imtbase::Settings::CSetSettingsPayload CSettingsControllerComp::OnSetSettin
 	response.Version_1_0.emplace();
 	response.Version_1_0->ok = false;
 
-	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = GetOrCreateUserSettings(userId);
+	imtauth::IUserSettingsSharedPtr userSettingsPtr = GetOrCreateUserSettings(userId);
 	if (!userSettingsPtr.IsValid()){
 		errorMessage = QString("Unable to set settings for user '%1'. Error: User settings is invalid");
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
@@ -132,7 +132,7 @@ sdl::imtbase::ImtBaseTypes::CParamsSet CSettingsControllerComp::OnGetSettings(
 	languageParam.SetId(languageId);
 	paramsSet.SetEditableParameter("LanguageParam", &languageParam);
 	
-	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = GetOrCreateUserSettings(userId);
+	imtauth::IUserSettingsSharedPtr userSettingsPtr = GetOrCreateUserSettings(userId);
 	if (!userSettingsPtr.IsValid()){
 		errorMessage = QString("Unable to get settings for user '%1'. Error: User settings is invalid").arg(qPrintable(userId));
 		SendErrorMessage(0, errorMessage, "CSettingsControllerComp");
@@ -236,7 +236,7 @@ sdl::imtbase::ImtBaseTypes::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl
 
 // private methods
 
-imtauth::IUserSettings* CSettingsControllerComp::GetOrCreateUserSettings(const QByteArray& userId) const
+imtauth::IUserSettingsSharedPtr CSettingsControllerComp::GetOrCreateUserSettings(const QByteArray& userId) const
 {
 	if (!m_userSettingsCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'UserSettingsCollection' was not set", "CSettingsControllerComp");
@@ -248,16 +248,16 @@ imtauth::IUserSettings* CSettingsControllerComp::GetOrCreateUserSettings(const Q
 		return nullptr;
 	}
 	
-	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr;
+	imtauth::IUserSettingsSharedPtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!userId.isEmpty()){
 		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-			userSettingsPtr.SetPtr(dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr()->CloneMe()));
+			userSettingsPtr.SetCastedPtr(dataPtr);
 		}
 	}
 	
 	if (!userSettingsPtr.IsValid()){
-		userSettingsPtr.SetPtr(m_userSettingsInfoFactCompPtr.CreateInstance());
+		userSettingsPtr.FromUnique(m_userSettingsInfoFactCompPtr.CreateInstance());
 		Q_ASSERT(userSettingsPtr.IsValid());
 		if (!userSettingsPtr.IsValid()){
 			return nullptr;
@@ -271,7 +271,7 @@ imtauth::IUserSettings* CSettingsControllerComp::GetOrCreateUserSettings(const Q
 		}
 	}
 	
-	return userSettingsPtr.PopPtr();
+	return userSettingsPtr;
 }
 
 

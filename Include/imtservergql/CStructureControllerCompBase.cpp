@@ -324,8 +324,8 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 		typeId = "DocumentInfo";
 	}
 
-	istd::IChangeable* newObjectPtr = m_gqlRequestExtractorCompPtr->ExtractObject(gqlRequest, objectId, errorMessage);
-	if (newObjectPtr == nullptr){
+	istd::IChangeableUniquePtr newObjectPtr = m_gqlRequestExtractorCompPtr->ExtractObject(gqlRequest, objectId, errorMessage);
+	if (!newObjectPtr.IsValid()){
 		SendErrorMessage(0, "Unable to create object from gql request", "Object collection controller");
 
 		return nullptr;
@@ -334,7 +334,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, newObjectPtr));
+		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, newObjectPtr.GetPtr()));
 	}
 
 	imtbase::IStructuredObjectCollectionController* collectionStructureController = nullptr; // connect via I_REF 
@@ -342,7 +342,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 		return nullptr;
 	}
 
-	QByteArray newObjectId =  collectionStructureController->InsertNewObjectIntoCollection(m_objectCollectionCompPtr.GetPtr(), nodeId, typeId, name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr.GetPtr());
+	QByteArray newObjectId =  collectionStructureController->InsertNewObjectIntoCollection(m_objectCollectionCompPtr.GetPtr(), nodeId, typeId, name, description, newObjectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
 		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
 		SendErrorMessage(0, QString("Can not insert object: %1").arg(qPrintable(objectId)), "Object collection controller");

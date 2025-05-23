@@ -267,7 +267,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 }
 
 
-istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObjectFromRequest(
+istd::IChangeableUniquePtr CSerializableObjectCollectionControllerComp::CreateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& /*objectId*/,
 			QString& errorMessage) const
@@ -301,8 +301,8 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObjectFrom
 		return nullptr;
 	}
 
-	istd::TDelPtr<istd::IChangeable> objectPtr(m_objectFactCompPtr.CreateInstance(index));
-	if (objectPtr == nullptr){
+	istd::IChangeableUniquePtr objectPtr = m_objectFactCompPtr.CreateInstance(index);
+	if (!objectPtr.IsValid()){
 		errorMessage = QString("Unable to create object from request. Error: Object is invalid");
 		SendErrorMessage(0, errorMessage);
 
@@ -310,7 +310,7 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObjectFrom
 	}
 
 	if (DeSerializeObject(objectPtr.GetPtr(), objectData)){
-		return objectPtr.PopPtr();
+		return objectPtr;
 	}
 
 	return nullptr;
@@ -375,9 +375,9 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		data = viewParamsGql->GetFieldArgumentValue("selectionParams").toByteArray();
 	}
 
-	istd::TDelPtr<iprm::IParamsSet> filterParamsPtr;
+	iprm::IParamsSetUniquePtr filterParamsPtr;
 	if (m_paramsSetFactCompPtr.IsValid()){
-		filterParamsPtr.SetPtr(m_paramsSetFactCompPtr.CreateInstance());
+		filterParamsPtr = m_paramsSetFactCompPtr.CreateInstance();
 	}
 
 	if (filterParamsPtr.IsValid() && !data.isEmpty()){
@@ -523,9 +523,9 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 
 	QByteArray data = inputObjectPtr->GetFieldArgumentValue("selectionParams").toByteArray();
 
-	istd::TDelPtr<iprm::IParamsSet> filterParamsPtr;
+	iprm::IParamsSetUniquePtr filterParamsPtr;
 	if (m_paramsSetFactCompPtr.IsValid()){
-		filterParamsPtr.SetPtr(m_paramsSetFactCompPtr.CreateInstance());
+		filterParamsPtr = m_paramsSetFactCompPtr.CreateInstance();
 	}
 	
 	if (filterParamsPtr.IsValid() && !data.isEmpty()){
@@ -566,9 +566,9 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 
 	QByteArray data = inputParamPtr->GetFieldArgumentValue("selectionParams").toByteArray();
 
-	istd::TDelPtr<iprm::IParamsSet> filterParamsPtr;
+	iprm::IParamsSetUniquePtr filterParamsPtr;
 	if (m_paramsSetFactCompPtr.IsValid()){
-		filterParamsPtr.SetPtr(m_paramsSetFactCompPtr.CreateInstance());
+		filterParamsPtr = m_paramsSetFactCompPtr.CreateInstance();
 	}
 	
 	if (filterParamsPtr.IsValid() && !data.isEmpty()){

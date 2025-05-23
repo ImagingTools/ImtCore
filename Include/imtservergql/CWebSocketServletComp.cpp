@@ -217,7 +217,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(QByteArray d
 							request,
 							imtrest::IProtocolEngine::SC_OK,
 							data,
-							reponseTypeId));
+							reponseTypeId).PopInterfacePtr());
 
 	return responsePtr;
 }
@@ -242,7 +242,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(QByteArray 
 			request,
 			imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
 			body.toUtf8(),
-			reponseTypeId));
+			reponseTypeId).PopInterfacePtr());
 
 	SendErrorMessage(0, QString(errorMessage));
 
