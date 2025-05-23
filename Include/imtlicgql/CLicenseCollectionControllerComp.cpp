@@ -19,10 +19,10 @@ namespace imtlicgql
 // reimplemented (sdl::imtlic::Licenses::CLicenseCollectionControllerCompBase)
 
 bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
-	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-	const sdl::imtlic::Licenses::CLicensesListGqlRequest& licensesListRequest,
-	sdl::imtlic::Licenses::CLicenseItem::V1_0& representationObject,
-	QString& errorMessage) const
+			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+			const sdl::imtlic::Licenses::CLicensesListGqlRequest& licensesListRequest,
+			sdl::imtlic::Licenses::CLicenseItem::V1_0& representationObject,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
@@ -122,10 +122,10 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 }
 
 
-istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentation(
-	const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& licenseDataRepresentation,
-	QByteArray& newObjectId,
-	QString& errorMessage) const
+istd::IChangeableUniquePtr CLicenseCollectionControllerComp::CreateObjectFromRepresentation(
+			const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& licenseDataRepresentation,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
 {
 	if (!m_licenseInfoFactCompPtr.IsValid()){
 		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_licenseInfoFactCompPtr' was not set");
@@ -134,7 +134,7 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtlic::ILicenseDefinition> licenseInstancePtr = m_licenseInfoFactCompPtr.CreateInstance();
+	imtlic::ILicenseDefinitionUniquePtr licenseInstancePtr = m_licenseInfoFactCompPtr.CreateInstance();
 	if (!licenseInstancePtr.IsValid()){
 		errorMessage = QString("Unable to create license instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CLicenseCollectionControllerComp");
@@ -149,7 +149,10 @@ istd::IChangeable* CLicenseCollectionControllerComp::CreateObjectFromRepresentat
 		return nullptr;
 	}
 
-	return licenseInstancePtr.PopPtr();
+	istd::IChangeableUniquePtr retVal;
+	retVal.MoveCastedPtr<imtlic::ILicenseDefinition>(licenseInstancePtr);
+
+	return retVal;
 }
 
 

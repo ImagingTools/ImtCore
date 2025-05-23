@@ -37,7 +37,7 @@ protected:
 				const sdl::imtlic::Features::CFeaturesListGqlRequest& featuresListRequest,
 				sdl::imtlic::Features::CFeatureItem::V1_0& representationObject,
 				QString& errorMessage) const override;
-	virtual istd::IChangeable* CreateObjectFromRepresentation(
+	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtlic::Features::CFeatureData::V1_0& featureDataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;

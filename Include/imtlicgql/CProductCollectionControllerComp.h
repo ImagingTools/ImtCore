@@ -29,7 +29,7 @@ protected:
 				const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
 				sdl::imtlic::Products::CProductItem::V1_0& representationObject,
 				QString& errorMessage) const override;
-	virtual istd::IChangeable* CreateObjectFromRepresentation(
+	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;

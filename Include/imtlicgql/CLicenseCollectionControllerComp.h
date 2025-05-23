@@ -28,7 +28,7 @@ protected:
 				const sdl::imtlic::Licenses::CLicensesListGqlRequest& licensesListRequest,
 				sdl::imtlic::Licenses::CLicenseItem::V1_0& representationObject,
 				QString& errorMessage) const override;
-	virtual istd::IChangeable* CreateObjectFromRepresentation(
+	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtlic::Licenses::CLicenseDefinitionData::V1_0& licenseDataRepresentation,
 				QByteArray& newObjectId,
 				QString& errorMessage) const override;

@@ -13,7 +13,7 @@ namespace imtlicgql
 {
 
 
-istd::IChangeable* CLicenseControllerComp::CreateObjectFromRequest(
+istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& objectId,
 			QString& errorMessage) const

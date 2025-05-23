@@ -252,7 +252,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 }
 
 
-istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentation(
+istd::IChangeableUniquePtr CFeatureCollectionControllerComp::CreateObjectFromRepresentation(
 			const sdl::imtlic::Features::CFeatureData::V1_0& featureDataRepresentation,
 			QByteArray& newObjectId,
 			QString& errorMessage) const
@@ -264,7 +264,7 @@ istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentat
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtlic::IFeatureInfo> featureInstancePtr = m_featureInfoFactCompPtr.CreateInstance();
+	imtlic::IFeatureInfoUniquePtr featureInstancePtr = m_featureInfoFactCompPtr.CreateInstance();
 	if (!featureInstancePtr.IsValid()){
 		errorMessage = QString("Unable to create feature instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CFeatureCollectionControllerComp");
@@ -308,7 +308,10 @@ istd::IChangeable* CFeatureCollectionControllerComp::CreateObjectFromRepresentat
 		return nullptr;
 	}
 
-	return featureInstancePtr.PopPtr();
+	istd::IChangeableUniquePtr retVal;
+	retVal.MoveCastedPtr<imtlic::IFeatureInfo>(featureInstancePtr);
+
+	return retVal;
 }
 
 

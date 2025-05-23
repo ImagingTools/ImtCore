@@ -141,7 +141,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 }
 
 
-istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentation(
+istd::IChangeableUniquePtr CProductCollectionControllerComp::CreateObjectFromRepresentation(
 	const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
 	QByteArray& newObjectId,
 	QString& errorMessage) const
@@ -153,7 +153,7 @@ istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentat
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtlic::IProductInfo> productInstancePtr = m_productInfoFactCompPtr.CreateInstance();
+	imtlic::IProductInfoUniquePtr productInstancePtr = m_productInfoFactCompPtr.CreateInstance();
 	if (!productInstancePtr.IsValid()){
 		errorMessage = QString("Unable to create product instance. Error: Invalid object");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
@@ -168,7 +168,10 @@ istd::IChangeable* CProductCollectionControllerComp::CreateObjectFromRepresentat
 		return nullptr;
 	}
 
-	return productInstancePtr.PopPtr();
+	istd::IChangeableUniquePtr retVal;
+	retVal.MoveCastedPtr<imtlic::IProductInfo>(productInstancePtr);
+
+	return retVal;
 }
 
 

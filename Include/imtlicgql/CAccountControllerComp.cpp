@@ -79,7 +79,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 }
 
 
-istd::IChangeable* CAccountControllerComp::CreateObjectFromInputParams(
+istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 			const QList<imtgql::CGqlObject>& inputParams,
 			QByteArray& objectId,
 			QString& errorMessage) const
@@ -100,15 +100,15 @@ istd::IChangeable* CAccountControllerComp::CreateObjectFromInputParams(
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		imtauth::ICompanyInfo* companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
-		if (companyInstancePtr == nullptr){
+		istd::TUniqueInterfacePtr<imtauth::ICompanyInfo> companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
+		if (!companyInstancePtr.IsValid()){
 			errorMessage = QString("Unable to create an instance of the company object.");
 			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 			return nullptr;
 		}
 
-		imtauth::CIdentifiableCompanyInfo* companyInfoPtr = dynamic_cast<imtauth::CIdentifiableCompanyInfo*>(companyInstancePtr);
+		imtauth::CIdentifiableCompanyInfo* companyInfoPtr = dynamic_cast<imtauth::CIdentifiableCompanyInfo*>(companyInstancePtr.GetPtr());
 		if (companyInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an account info!");
 			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
