@@ -36,7 +36,7 @@ Item {
         id: buttonDecoratorComp
 
         Button{
-            width: 160;
+			width: 160;
             height: 40;
             text: !baseElement ? "" : baseElement.text;
             icon.source: !baseElement ? "" : baseElement.iconSource;
@@ -296,7 +296,7 @@ Item {
         CheckBox{
             height: 30;
 
-            indicator.width: height - 10;
+			indicator.width: height - 10;
             indicator.height: height - 10;
 
             text: !baseElement ? "" : baseElement.text;

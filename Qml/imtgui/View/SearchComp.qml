@@ -692,9 +692,9 @@ Rectangle{
 
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: parent.left;
-					anchors.leftMargin: 10;
+					anchors.leftMargin: Style.sizeMainMargin;
 					anchors.right: parent.right;
-					anchors.rightMargin: 10;
+					anchors.rightMargin: Style.sizeMainMargin;
 
 					wrapMode: Text.WordWrap;
 
@@ -716,14 +716,14 @@ Rectangle{
 
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.left: parent.left;
-		anchors.leftMargin: 10;
+		anchors.leftMargin: Style.sizeMainMargin;
 		anchors.right: parent.right;
-		anchors.rightMargin: 20;
+		anchors.rightMargin: 2*Style.sizeMainMargin;
 		clip: true;
 
 		font.family: Style.fontFamily;
 		font.pixelSize: searchContainer.textSize;
-		color: "gray";
+		color: Style.placeHolderTextColor;
 		visible: (!searchTextField.openST && searchTextField.currentText == "") ? true :
 						(!searchTextField.openST && searchTextField.currentText !== "") ? false :
 							(searchTextField.openST && searchTextField.currentText !== "") ? false : false;
@@ -735,7 +735,7 @@ Rectangle{
 
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.right: parent.right;
-		anchors.rightMargin: 6;
+		anchors.rightMargin: Style.sizeSmallMargin;
 
 		width: height;
 		height: 12;//Math.max(parent.height/2, 16);

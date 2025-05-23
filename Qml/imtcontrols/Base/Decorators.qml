@@ -545,7 +545,7 @@ StyleComponents {
 			property int mainMargin: !baseElement ? 0 : 8;
 			property string text: !baseElement ? "" : baseElement.text == undefined ? "" : baseElement.text;
 			property string borderColor: !baseElement ? "" : baseElement.borderColor == undefined ? "" : baseElement.borderColor;
-			property int fontPixelSize: !baseElement ? 10 : baseElement.fontPixelSize == undefined ? 10 : baseElement.fontPixelSize;
+			property int fontPixelSize: !baseElement ? Style.fontSizeXSmall : baseElement.fontPixelSize == undefined ? 10 : baseElement.fontPixelSize;
 			property bool fontBold: !baseElement ? false : baseElement.fontBold == undefined ? false : baseElement.fontBold;
 
 			property real backgroundWidth: !baseElement ? 0 : baseElement.backgroundWidth;
@@ -1113,7 +1113,7 @@ StyleComponents {
 					radius: width;
 					border.color: Style.borderColor;
 					border.width: 1;
-					color: "lightgrey";
+					color: Style.grayColor;
 
 					Rectangle{
 						id: selectCircle
@@ -1139,7 +1139,7 @@ StyleComponents {
 
 				color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.enabled ? Style.buttonTextColor : Style.buttonInactiveTextColor;
 
-				font.pixelSize: !radioButtonItem.baseElement ? 8 : radioButtonItem.baseElement.fontPixelSize;
+				font.pixelSize: !radioButtonItem.baseElement ? Style.fontSizeXXSmall : radioButtonItem.baseElement.fontPixelSize;
 				font.family: Style.fontFamily;
 				font.bold: !radioButtonItem.baseElement ? false : radioButtonItem.baseElement.fontBold;
 
@@ -1300,7 +1300,7 @@ StyleComponents {
 
 				anchors.top: progressBar.top;
 
-				color: Style.textColor !==undefined ? Style.textColor : "#000000";
+				color: Style.textColor;
 				font.family: Style.fontFamily;
 				font.pixelSize: progressBar.fontSize;
 				visible: !progressBar.hasTitle ? false : !progressBar.title ? false : true;
@@ -1315,7 +1315,7 @@ StyleComponents {
 				anchors.top: progressBar.top;
 				anchors.topMargin: mainTitle.visible * (mainTitle.height + 10);
 
-				color: Style.textColor !==undefined ? Style.textColor : "#000000";
+				color: Style.textColor;
 				font.family: Style.fontFamily;
 				font.pixelSize: progressBar.fontSize;
 				visible: !progressBar.hasText ? false : !progressBar.text ? false : true;
@@ -1529,7 +1529,7 @@ StyleComponents {
 				anchors.centerIn: busyIndicatorItem
 				property double minimum: Math.min(busyIndicatorItem.width, busyIndicatorItem.height);
 				width: 50;
-				height: 50;
+				height: width;
 
 				Repeater {
 					id: repeater;

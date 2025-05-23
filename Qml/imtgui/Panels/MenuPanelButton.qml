@@ -10,7 +10,7 @@ ControlBase {
 
     property string text: "";
     property string iconSource: "";
-    property string textColor: "#335777";//"#191970"
+	property string textColor: Style.textColor;
     property string fontName: "";
 
     property bool enabled:  true;
@@ -19,7 +19,7 @@ ControlBase {
 
     property real imageDecrease: 0.63;
     property real imageSelectedCoeff: 0.73;
-    property real fontSize: 11;
+	property real fontSize: Style.fontSizeSmall;
 
     property int contentWidth: 80;
     property int contentHeight: 80;
