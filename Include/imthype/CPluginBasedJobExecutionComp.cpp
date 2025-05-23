@@ -20,7 +20,7 @@ CPluginBasedJobExecutionComp::CPluginBasedJobExecutionComp()
 const IJobProcessor* CPluginBasedJobExecutionComp::GetTaskProcessor(const QByteArray& workerTypeId) const
 {
 	if (m_jobProcessorMap.contains(workerTypeId)) {
-		return m_jobProcessorMap[workerTypeId].get();
+		return m_jobProcessorMap[workerTypeId].GetPtr();
 	}
 
 	if (m_pluginsMap.contains(workerTypeId)){

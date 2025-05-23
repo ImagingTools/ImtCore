@@ -67,7 +67,7 @@ protected:
 					const QByteArray& jobId,
 					const IJobProcessor& taskProcessor,
 					const imtbase::IReferenceCollection& input,
-					iprm::IParamsSetSharedPtr paramsPtr);
+					iprm::IParamsSetSharedPtr paramsPtr,
 					JobProgressManager* progressPtr);
 
 		// reimplemented (QRunnable)

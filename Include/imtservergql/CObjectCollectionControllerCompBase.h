@@ -83,8 +83,7 @@ public:
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
 	// reimplemented (imtgql::IGqlRequestExtractor)
-	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
-
+	virtual istd::IChangeableUniquePtr ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;
 
 protected:
 	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;
@@ -166,12 +165,12 @@ protected:
 	/**
 		Create object from the GraphQL
 	*/
-	[[deprecated]] virtual istd::IChangeable* CreateObjectFromInputParams(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString& errorMessage) const;
+	[[deprecated]] virtual istd::IChangeableUniquePtr CreateObjectFromInputParams(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString& errorMessage) const;
 
 	/**
 		Create object from the GraphQL
 	*/
-	virtual istd::IChangeable* CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const;
 
 	/**
 		Prepare filters from the GraphQL
@@ -190,9 +189,10 @@ protected:
 	*/
 	virtual void SetObjectFilter(const imtgql::CGqlRequest& gqlRequest, const imtbase::CTreeItemModel& objectFilterModel, iprm::CParamsSet& filterParams) const;
 
+	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
-	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 
 private:
 	virtual bool DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& newObjectId, QString& errorMessage) const;

@@ -147,7 +147,7 @@ void CJobExecutionControllerCompBase::OnJobProgressChanged(const QByteArray& job
 
 // protected methods
 
-void CJobExecutionControllerCompBase::OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr)
+void CJobExecutionControllerCompBase::OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* /*modelPtr*/)
 {
 	if (changeset.GetChangeInfoMap().contains(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED)){
 		QVariant value = changeset.GetChangeInfoMap().value(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED);
@@ -167,7 +167,7 @@ CJobExecutionControllerCompBase::Task::Task(
 			const QByteArray& jobId,
 			const IJobProcessor& taskProcessor,
 			const imtbase::IReferenceCollection& input,
-			iprm::IParamsSetSharedPtr paramsPtr)
+			iprm::IParamsSetSharedPtr paramsPtr,
 			JobProgressManager* progressPtr)
 	:m_taskProcessor(taskProcessor),
 	m_parent(parent),

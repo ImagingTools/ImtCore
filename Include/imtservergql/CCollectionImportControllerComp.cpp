@@ -39,9 +39,6 @@ bool CCollectionImportControllerComp::BeginCollectionImportSession(const ICollec
 
 	sessionPtr->tempFileSessionId = m_fileManagerCompPtr->BeginSession(QString(), sessionPtr->sessionId);
 
-	istd::TDelPtr<iprm::IParamsManager> paramsPtr;
-	paramsPtr.SetCastedOrRemove(m_jobParamsFactPtr.CreateInstance());
-
 	for (const ICollectionImportController::FileInfo& fileInfo : sessionInfo.files){
 		FileInfo file;
 
@@ -219,7 +216,7 @@ void CCollectionImportControllerComp::UploadProgressChanged(QByteArray sessionId
 		bool uploadingFinished = true;
 
 		for (const FileInfo& fileInfo : m_sessions[sessionId]->files){
-			if (m_sessions[sessionId]->files[fileId].uploadProgressLoggerPtr->m_progress < 1.0){
+			if (fileInfo.uploadProgressLoggerPtr->m_progress < 1.0){
 				uploadingFinished = false;
 
 				break;
@@ -237,8 +234,7 @@ bool CCollectionImportControllerComp::StartImportJob(SessionInfo& session)
 {
 	imtbase::CSimpleReferenceCollection refCollection;
 
-	istd::TDelPtr<iprm::IParamsSet> jobParamsPtr;
-	jobParamsPtr.SetCastedOrRemove(m_jobParamsFactPtr.CreateInstance());
+	iprm::IParamsSetUniquePtr jobParamsPtr = m_jobParamsFactPtr.CreateInstance();
 	if (!jobParamsPtr.IsValid()){
 		return false;
 	}
@@ -281,7 +277,7 @@ bool CCollectionImportControllerComp::StartImportJob(SessionInfo& session)
 }
 
 
-void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr)
+void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* /*modelPtr*/)
 {
 	if (changeset.GetChangeInfoMap().contains(imthype::IJobQueueManager::CN_JOB_PROGRESS_CHANGED)){
 		QVariant value = changeset.GetChangeInfoMap().value(imthype::IJobQueueManager::CN_JOB_PROGRESS_CHANGED);
@@ -331,8 +327,6 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 							}
 						}
 
-						QMutexLocker locker(&m_mutex);
-
 						m_sessions.remove(sessionId);
 
 						break;
@@ -354,7 +348,7 @@ QByteArray CCollectionImportControllerComp::FindSession(const QByteArray& fileId
 		}
 	}
 
-	QByteArray();
+	return QByteArray();
 }
 
 
@@ -368,7 +362,7 @@ CCollectionImportControllerComp::FileInfo* CCollectionImportControllerComp::Find
 		}
 	}
 
-	nullptr;
+	return nullptr;
 }
 
 

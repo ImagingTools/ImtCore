@@ -78,7 +78,7 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
 			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	sdl::imtbase::ImtCollection::CVisualStatus::V1_0 response;
 	
@@ -222,7 +222,7 @@ bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlR
 
 // reimplemented (imtgql::IGqlRequestExtractor)
 
-istd::IChangeable* CObjectCollectionControllerCompBase::ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const
+istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const
 {
 	return CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
 }
@@ -451,7 +451,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	}
 
 	QByteArray objectIdFromRepresentation;
-	istd::TDelPtr<istd::IChangeable> newObjectPtr = CreateObjectFromRequest(gqlRequest, objectIdFromRepresentation, errorMessage);
+	istd::IChangeableUniquePtr newObjectPtr = CreateObjectFromRequest(gqlRequest, objectIdFromRepresentation, errorMessage);
 	if (!newObjectPtr.IsValid()){
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
@@ -618,7 +618,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 	for (int i = 0; i < objectIdsModel.GetItemsCount(); i++){
 		QByteArray objectId = objectIdsModel.GetData("id", i).toByteArray();
 		if (!objectId.isEmpty()){
-			istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, errorMessage);
+			istd::IChangeableUniquePtr savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, errorMessage);
 			if (savedObjectPtr.IsValid()){
 				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObjectPtr)){
 					errorMessage += QString("Could not update object: '%1'; ").arg(qPrintable(objectId));
@@ -1079,7 +1079,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		return nullptr;
 	}
 
-	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
+	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1134,7 +1134,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 	int typeIdIndex = GetObjectTypeIdIndex(typeId);
 	Q_ASSERT_X(typeIdIndex >= 0, "Type ID is invalid", "CObjectCollectionControllerCompBase");
 
-	istd::TDelPtr<istd::IChangeable> collectionObjectInstancePtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
+	istd::IChangeableUniquePtr collectionObjectInstancePtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!collectionObjectInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1224,7 +1224,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 	QString fileName = objectName + "." + extension;
 	QString filePathTmp = tempDir.path() + "/" + fileName;
 
-	istd::TDelPtr<istd::IChangeable> objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
+	istd::IChangeableUniquePtr objectPersistenceInstancePtr = m_importExportObjectFactCompPtr.CreateInstance(index);
 	if (!objectPersistenceInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object persistence instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1493,7 +1493,7 @@ bool CObjectCollectionControllerCompBase::CreateRepresentationFromObject(
 }
 
 
-istd::IChangeable* CObjectCollectionControllerCompBase::CreateObjectFromInputParams(
+istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateObjectFromInputParams(
 		const QList<imtgql::CGqlObject>& /*inputParams*/,
 		QByteArray& /*objectId*/,
 		QString& /*errorMessage*/) const
@@ -1502,7 +1502,7 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObjectFromInputPar
 }
 
 
-istd::IChangeable* CObjectCollectionControllerCompBase::CreateObjectFromRequest(
+istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& newObjectId,
 		QString& errorMessage) const
@@ -1572,7 +1572,7 @@ void CObjectCollectionControllerCompBase::SetObjectFilter(
 }
 
 
-istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateObject(const QByteArray& typeId) const
 {
 	int index = GetObjectTypeIdIndex(typeId);
 	if (m_objectFactCompPtr.IsValid() && index < m_objectFactCompPtr.GetCount()){
@@ -1602,8 +1602,8 @@ bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(
 	}
 
 	QString createErrorMessage;
-	istd::TDelPtr<istd::IChangeable> savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, createErrorMessage);
-	if (savedObjectPtr == nullptr){
+	istd::IChangeableUniquePtr savedObjectPtr = CreateObjectFromRequest(gqlRequest, objectId, createErrorMessage);
+	if (!savedObjectPtr.IsValid()){
 		if (errorMessage.isEmpty()){
 			errorMessage = QString("Can not create object for update: '%1'").arg(qPrintable(objectId));
 		}
