@@ -41,13 +41,16 @@ QByteArray CUsersSettingsDatabaseDelegateComp::GetSelectionQuery(
 }
 
 
-istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid() || !m_userSettingsInfoFactCompPtr.IsValid()){
 		return nullptr;
 	}
 	
-	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
+	imtauth::IUserSettingsUniquePtr userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
+	if (!userSettingsPtr.IsValid()){
+		return nullptr;
+	}
 
 	QByteArray userId;
 	if (record.contains("UserId")){
@@ -71,7 +74,10 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 		}
 	}
 
-	return userSettingsPtr.PopPtr();
+	istd::IChangeableUniquePtr retVal;
+	retVal.MoveCastedPtr(userSettingsPtr);
+
+	return retVal;
 }
 
 

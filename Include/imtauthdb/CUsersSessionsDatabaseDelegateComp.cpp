@@ -40,16 +40,19 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 }
 
 
-istd::IChangeable* CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr;
-	sessionInfoPtr.SetCastedOrRemove(CreateObject("Session"));
+	istd::IChangeableUniquePtr sessionDataPtr = CreateObject("Session");
+	if (!sessionDataPtr.IsValid()){
+		return nullptr;
+	}
 
-	if (!sessionInfoPtr.IsValid()){
+	imtauth::CSessionInfo* sessionInfoPtr = dynamic_cast<imtauth::CSessionInfo*>(sessionDataPtr.GetPtr());
+	if (sessionInfoPtr == nullptr){
 		return nullptr;
 	}
 
@@ -73,7 +76,7 @@ istd::IChangeable* CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(co
 		sessionInfoPtr->SetExpirationDate(expirationDate);
 	}
 
-	return sessionInfoPtr.PopPtr();
+	return sessionDataPtr;
 }
 
 
