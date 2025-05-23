@@ -45,7 +45,7 @@ public:
 	I_END_COMPONENT
 
 	//reimplemented(iproc::IProcessor)
-	virtual int DoProcessing(
+	virtual TaskState DoProcessing(
 				const iprm::IParamsSet* paramsPtr,
 				const istd::IPolymorphic* inputPtr,
 				istd::IChangeable* outputPtr,

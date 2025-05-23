@@ -29,7 +29,7 @@ const static inline QString s_typePlaceholder = QStringLiteral("$(Type)");
 const static inline QString s_subtypePlaceholder = QStringLiteral("$(Subtype)");
 
 
-int CQmlCodeMetaGeneratorComp::DoProcessing(
+iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,

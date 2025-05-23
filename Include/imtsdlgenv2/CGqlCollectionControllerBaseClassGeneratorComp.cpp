@@ -63,7 +63,7 @@ static QMap<imtsdl::CSdlDocumentType::OperationType, QString> s_operationsAliasL
 
 // reimplemented(iproc::IProcessor)
 
-int CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
+iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
@@ -405,7 +405,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 
 	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_INSERT)){
 		FeedStreamHorizontally(ifStream, 1);
-		ifStream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;");
+		ifStream << QStringLiteral("virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const ::imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& errorMessage) const override;");
 		FeedStream(ifStream, 1, false);
 		operationsList.removeAll(imtsdl::CSdlDocumentType::OT_INSERT);
 	}
@@ -613,7 +613,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddBaseMethodDeclarationFor
 	if (operationType == imtsdl::CSdlDocumentType::OT_GET_VIEW){
 		stream << QStringLiteral("CreateInternalResponse");
 	}
-	else {
+	else{
 		stream << s_nonTrivialOperationMethodsMap[operationType];
 	}
 	stream << QStringLiteral("(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const");
@@ -653,7 +653,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 	const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operationsList = sdlDocumentType.GetOperationsList();
 
 	QList<imtsdl::CSdlRequest> implementedGetRequests;
+#if QT_VERSION >= 0x050500 && QT_VERSION < 0x060000
+	QMapIterator operationsIter(operationsList);
+#else
 	QMultiMapIterator operationsIter(operationsList);
+#endif
 	while (operationsIter.hasNext()){
 		auto operation = operationsIter.next();
 		imtsdl::CSdlRequest sdlRequest = operation.value();
@@ -763,7 +767,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 	}
 	else if (operationType == imtsdl::CSdlDocumentType::OT_INSERT){
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("virtual istd::IChangeable* CreateObjectFromRepresentation(");
+		stream << QStringLiteral("virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(");
 		FeedStream(stream, 1, false);
 
 		imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
@@ -996,7 +1000,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 	for (const imtsdl::CSdlDocumentType &documentType : sdlDocumentTypeList){
 		const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
 
+#if QT_VERSION >= 0x050500 && QT_VERSION < 0x060000
+		QMapIterator operationIter(operations);
+#else
 		QMultiMapIterator operationIter(operations);
+#endif
 		while(operationIter.hasNext()){
 			auto operationIterValue = operationIter.next();
 			if (!requestList.contains(*operationIterValue)){
@@ -1007,7 +1015,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 		imtsdl::SdlDocumentTypeList subtypes = documentType.GetSubtypes();
 		for (const imtsdl::CSdlDocumentType& documentSubtype: subtypes){
 			const QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> suboperations = documentSubtype.GetOperationsList();
+#if QT_VERSION >= 0x050500 && QT_VERSION < 0x060000
+			QMapIterator suboperationIter(suboperations);
+#else
 			QMultiMapIterator suboperationIter(suboperations);
+#endif			
 			while(suboperationIter.hasNext()){
 				auto suboperationIterValue = suboperationIter.next();
 				if (!requestList.contains(*suboperationIterValue)){
@@ -1096,7 +1108,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationMapPairs(QTextS
 		const QString requestClassName = operationsIter->GetName() + QStringLiteral("GqlRequest");
 
 		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("qMakePair(");
+		stream << QStringLiteral("std::make_pair(");
 		stream << s_operationsAliasList[operationsIter.key()];
 
 		stream << QStringLiteral(", C");
@@ -1164,7 +1176,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		break;
 	case imtsdl::CSdlDocumentType::OT_INSERT:
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("istd::IChangeable* ");
+		stream << QStringLiteral("istd::IChangeableUniquePtr ");
 		break;
 	case imtsdl::CSdlDocumentType::OT_DELETE:
 	case imtsdl::CSdlDocumentType::OT_ELEMENT_IDS:

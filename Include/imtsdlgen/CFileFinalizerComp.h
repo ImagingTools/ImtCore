@@ -30,14 +30,14 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (iproc::IProcessor)
-	virtual int DoProcessing(
+	virtual iproc::IProcessor::TaskState DoProcessing(
 				const iprm::IParamsSet* paramsPtr,
 				const istd::IPolymorphic* inputPtr,
 				istd::IChangeable* outputPtr,
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
 
 private:
-	int CleanupFile(const QString& filePath);
+	iproc::IProcessor::TaskState CleanupFile(const QString& filePath);
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);

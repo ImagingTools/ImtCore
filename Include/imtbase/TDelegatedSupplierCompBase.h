@@ -38,13 +38,13 @@ public:
 	TDelegatedSupplierCompBase();
 
 	// reimplemented (iinsp::ISupplier)
-	virtual int GetWorkStatus() const override;
+	virtual WorkStatus GetWorkStatus() const override;
 	virtual imod::IModel* GetWorkStatusModel() const override;
 	virtual void InvalidateSupplier() override;
 	virtual void EnsureWorkInitialized() override;
 	virtual void EnsureWorkFinished() override;
 	virtual void ClearWorkResults() override;
-	virtual const ilog::IMessageContainer* GetWorkMessages(int containerType) const override;
+	virtual const ilog::IMessageContainer* GetWorkMessages(MessageContainerType containerType) const override;
 	virtual iprm::IParamsSet* GetModelParametersSet() const override;
 
 protected:
@@ -74,7 +74,7 @@ TDelegatedSupplierCompBase<ProviderInterface, ObjectInterface>::TDelegatedSuppli
 // reimplemented (iinsp::ISupplier)
 
 template <class ProviderInterface, class ObjectInterface>
-int TDelegatedSupplierCompBase<ProviderInterface, ObjectInterface>::GetWorkStatus() const
+iinsp::ISupplier::WorkStatus TDelegatedSupplierCompBase<ProviderInterface, ObjectInterface>::GetWorkStatus() const
 {
 	if (m_objectSupplierCompPtr.IsValid()){
 		return m_objectSupplierCompPtr->GetWorkStatus();
@@ -136,7 +136,7 @@ void TDelegatedSupplierCompBase<ProviderInterface, ObjectInterface>::ClearWorkRe
 
 
 template <class ProviderInterface, class ObjectInterface>
-const ilog::IMessageContainer* TDelegatedSupplierCompBase<ProviderInterface, ObjectInterface>::GetWorkMessages(int containerType) const
+const ilog::IMessageContainer* TDelegatedSupplierCompBase<ProviderInterface, ObjectInterface>::GetWorkMessages(MessageContainerType containerType) const
 {
 	if (m_objectSupplierCompPtr.IsValid()){
 		return m_objectSupplierCompPtr->GetWorkMessages(containerType);

@@ -27,7 +27,7 @@ bool CConstVarCreatorProcessorCompBase::OpenFile(const QString filePath, QFile& 
 	QFileInfo fileInfo(filePath);
 
 	if (!istd::CSystem::EnsurePathExists(fileInfo.dir().absolutePath())){
-		SendErrorMessage(__LINE__, QObject::tr("Cannot create path to file") + ": " + filePath);
+		SendErrorMessage(__LINE__, QT_TR_NOOP(QString("Cannot create path to file %1").arg(filePath)));
 
 		return false;
 	}
@@ -35,7 +35,7 @@ bool CConstVarCreatorProcessorCompBase::OpenFile(const QString filePath, QFile& 
 	file.setFileName(filePath);
 
 	if (!file.open(openMode)){
-		SendErrorMessage(__LINE__, QString("Cannot read file '%1'; Error: '%2'").arg(file.fileName(), file.errorString()));
+		SendErrorMessage(__LINE__, QT_TR_NOOP(QString("Cannot read file '%1'; Error: '%2'").arg(file.fileName(), file.errorString())));
 
 		return false;
 	}
@@ -56,7 +56,7 @@ QString CConstVarCreatorProcessorCompBase::GetTemplateDirPath(const iprm::IParam
 	iprm::TParamsPtr<iprm::ITextParam> dirPathParamPtr(paramsPtr, "TemplateDirPath");
 
 	if (!dirPathParamPtr.IsValid()){
-		SendErrorMessage(__LINE__, QString("Template directory path is invalid"));
+		SendErrorMessage(__LINE__, QT_TR_NOOP("Template directory path is invalid"));
 
 		return QString();
 	}
@@ -70,7 +70,7 @@ QString CConstVarCreatorProcessorCompBase::GetCppDirPath(const iprm::IParamsSet 
 	iprm::TParamsPtr<iprm::ITextParam> dirPathParamPtr(paramsPtr, "CppDirPath");
 
 	if (!dirPathParamPtr.IsValid()){
-		SendErrorMessage(__LINE__, QString("Cpp directory path is invalid"));
+		SendErrorMessage(__LINE__, QT_TR_NOOP("Cpp directory path is invalid"));
 
 		return QString();
 	}
@@ -84,7 +84,7 @@ QString CConstVarCreatorProcessorCompBase::GetQmlDirPath(const iprm::IParamsSet 
 	iprm::TParamsPtr<iprm::ITextParam> dirPathParamPtr(paramsPtr, "QmlDirPath");
 
 	if (!dirPathParamPtr.IsValid()){
-		SendErrorMessage(__LINE__, QString("Qml directory path is invalid"));
+		SendErrorMessage(__LINE__, QT_TR_NOOP("Qml directory path is invalid"));
 
 		return QString();
 	}
@@ -107,7 +107,7 @@ bool CConstVarCreatorProcessorCompBase::CreateBody(const QString moduleName, con
 
 // reimplemented (iproc::IProcessor)
 
-int CConstVarCreatorProcessorCompBase::DoProcessing(
+iproc::IProcessor::TaskState CConstVarCreatorProcessorCompBase::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
@@ -116,14 +116,14 @@ int CConstVarCreatorProcessorCompBase::DoProcessing(
 	QString moduleName = GetModuleName(paramsPtr);
 
 	if (moduleName.isEmpty()){
-		SendErrorMessage(__LINE__, QString("The module name is invalid"));
+		SendErrorMessage(__LINE__, QT_TR_NOOP("The module name is invalid"));
 
 		return TS_INVALID;
 	}
 
 	iprm::TParamsPtr<iprm::ITextParam> templateDirPathParamPtr(paramsPtr, "TemplateDirPath");
 	if (!templateDirPathParamPtr.IsValid()){
-		SendErrorMessage(__LINE__, QString("The template dir path is invalid"));
+		SendErrorMessage(__LINE__, QT_TR_NOOP("The template dir path is invalid"));
 
 		return TS_INVALID;
 	}
@@ -141,7 +141,7 @@ int CConstVarCreatorProcessorCompBase::DoProcessing(
 		QFile templateFile(fileInfo.filePath());
 
 		if (!templateFile.open(QFile::ReadOnly)){
-			SendErrorMessage(__LINE__, QString("Cannot read file '%1'; Error: '%2'").arg(templateFile.fileName(), templateFile.errorString()));
+			SendErrorMessage(__LINE__, QT_TR_NOOP(QString("Cannot read file '%1'; Error: '%2'").arg(templateFile.fileName(), templateFile.errorString())));
 
 			return TS_INVALID;
 		}
@@ -151,7 +151,7 @@ int CConstVarCreatorProcessorCompBase::DoProcessing(
 		QJsonDocument templateDocument = QJsonDocument::fromJson(fileData, &jsonParseError);
 
 		if (jsonParseError.error != QJsonParseError::NoError){
-			SendErrorMessage(__LINE__, QString("The document template is invalid. Error: '%1'").arg(jsonParseError.errorString()));
+			SendErrorMessage(__LINE__, QT_TR_NOOP(QString("The document template is invalid. Error: '%1'").arg(jsonParseError.errorString())));
 
 			return TS_INVALID;
 		}

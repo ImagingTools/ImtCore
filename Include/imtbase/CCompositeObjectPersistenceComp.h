@@ -49,10 +49,10 @@ public:
 				const QString* filePathPtr = NULL,
 				int flags = -1,
 				bool beQuiet = true) const override;
-	virtual int LoadFromFile(istd::IChangeable& data,
+	virtual OperationState LoadFromFile(istd::IChangeable& data,
 				const QString& filePath = QString(),
 				ibase::IProgressManager* progressManagerPtr = NULL) const override;
-	virtual int SaveToFile(const istd::IChangeable& data,
+	virtual OperationState SaveToFile(const istd::IChangeable& data,
 				const QString& filePath = QString(),
 				ibase::IProgressManager* progressManagerPtr = NULL) const override;
 
@@ -72,7 +72,7 @@ protected:
 
 protected:
 	const ifile::IFilePersistence* GetFilePersistenceForTypeId(const QByteArray& typeId) const;
-	bool SerializeBundleMetaInfo(QVector<BundleElementInfo>& contentMetaInfo, iser::IArchive& archive) const;
+	virtual bool SerializeBundleMetaInfo(QVector<BundleElementInfo>& contentMetaInfo, iser::IArchive& archive) const;
 
 	virtual bool LoadAdditionalData(istd::IChangeable& data, const QString& path) const;
 	virtual bool SaveAdditionalData(const istd::IChangeable& data, const QString& path) const;

@@ -23,7 +23,7 @@ namespace imtsdlgenv2
 {
 
 
-int CSdlUnionGeneratorComp::DoProcessing(
+iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
@@ -78,6 +78,7 @@ int CSdlUnionGeneratorComp::DoProcessing(
 			for (const imtsdl::CSdlUnion& sdlUnion: sdlUnionList){
 				if (!joinHeaders){
 					cumulatedFiles << QString(outputDirectoryPath + "/" + sdlUnion.GetName() + ".h");
+					cumulatedFiles << QString(outputDirectoryPath + "/" + sdlUnion.GetName() + "_ImplClass.h");
 				}
 				PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
 				PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
@@ -87,15 +88,47 @@ int CSdlUnionGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	for (const imtsdl::CSdlUnion& sdlUnion: sdlUnionList){
+	for (imtsdl::CSdlUnion& sdlUnion: sdlUnionList){
 		QFile unionFile(QString(outputDirectoryPath + "/" + sdlUnion.GetName() + ".h"));
 		if (!unionFile.open(QIODevice::WriteOnly)){
 			SendErrorMessage(0, QString("Unable to open file '%1'. Error: %2").arg(unionFile.fileName(), unionFile.errorString()));
 
 			return TS_INVALID;
 		}
+		{
+			QTextStream stream(&unionFile);
 
-		QTextStream stream(&unionFile);
+			stream << QStringLiteral("#pragma once");
+			FeedStream(stream, 2, false);
+
+			// namespace begin
+			QString sdlNamespace = GetNamespaceFromSchemaParams(sdlUnion.GetSchemaParams());
+
+			stream << QStringLiteral("namespace ");
+			stream << sdlNamespace;
+			stream << QStringLiteral("\n{");
+			FeedStream(stream, 2, false);
+
+			// union forward declaration create
+			stream << QStringLiteral("class ");
+			stream << sdlUnion.GetName();
+			stream << QStringLiteral(";");
+			FeedStream(stream, 2, false);
+
+			// end of namespace
+			stream << QStringLiteral("} // namespace ");
+			stream << sdlNamespace;
+			FeedStream(stream, 2, true);
+		}
+
+		QFile unionImplFile(QString(outputDirectoryPath + "/" + sdlUnion.GetName() + "_ClassDef.h"));
+		if (!unionImplFile.open(QIODevice::WriteOnly)){
+			SendErrorMessage(0, QString("Unable to open file '%1'. Error: %2").arg(unionImplFile.fileName(), unionImplFile.errorString()));
+
+			return TS_INVALID;
+		}
+
+		QTextStream stream(&unionImplFile);
 
 		stream << QStringLiteral("#pragma once");
 		FeedStream(stream, 2, false);
@@ -104,10 +137,30 @@ int CSdlUnionGeneratorComp::DoProcessing(
 		stream << QStringLiteral("#include <variant>");
 		FeedStream(stream, 2, false);
 
+		QList<QString> customIncludeList;
+		QList<QString> convertedTypeList;
 		bool isQtCommentAdded = false;
 		for (const auto& sdlType : sdlUnion.GetTypes()){
+			imtsdl::CSdlField field;
+			field.SetType(sdlType);
+			bool isCustom = false;
+			QString convertedType = OptListConvertTypeWithNamespaceStruct(
+				field,
+				GetNamespaceFromSchemaParams(sdlUnion.GetSchemaParams()),
+				*m_sdlTypeListCompPtr,
+				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr,
+				true,
+				&isCustom,
+				nullptr,
+				nullptr,
+				nullptr,
+				nullptr,
+				false);
+			convertedTypeList << convertedType;
+
 			// Add Qt types
-			if (sdlType.first.contains(QStringLiteral("QByteArray"))){
+			if (convertedType.contains(QStringLiteral("QByteArray"))){
 				if (!isQtCommentAdded){
 					stream << QStringLiteral("// Qt includes");
 					FeedStream(stream, 1, false);
@@ -116,7 +169,7 @@ int CSdlUnionGeneratorComp::DoProcessing(
 				stream << QStringLiteral("#include <QtCore/QByteArray>");
 				FeedStream(stream, 1, false);
 			}
-			if (sdlType.first.contains(QStringLiteral("QString"))){
+			if (convertedType.contains(QStringLiteral("QString"))){
 				if (!isQtCommentAdded){
 					stream << QStringLiteral("// Qt includes");
 					FeedStream(stream, 1, false);
@@ -125,7 +178,7 @@ int CSdlUnionGeneratorComp::DoProcessing(
 				stream << QStringLiteral("#include <QtCore/QString>");
 				FeedStream(stream, 1, false);
 			}
-			if (sdlType.first.contains(QStringLiteral("QList"))){
+			if (convertedType.contains(QStringLiteral("QList"))){
 				if (!isQtCommentAdded){
 					stream << QStringLiteral("// Qt includes");
 					FeedStream(stream, 1, false);
@@ -135,28 +188,33 @@ int CSdlUnionGeneratorComp::DoProcessing(
 				FeedStream(stream, 1, false);
 			}
 
-			if (sdlType.second){
-				stream << QStringLiteral("// ") << GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) << QStringLiteral(" includes");
-				FeedStream(stream, 1, false);
-				stream << QStringLiteral("#include \"") << sdlType.first << QStringLiteral(".h\"");
-				FeedStream(stream, 1, false);
+			if (isCustom){
+				imtsdl::CSdlField field;
+				field.SetType(sdlType);
+				std::shared_ptr<imtsdl::CSdlEntryBase> foundType = GetSdlTypeOrEnumOrUnionForField(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
+				if (!foundType){
+					SendCriticalMessage(0, QString("Unable to find type %1").arg(sdlType));
+					I_CRITICAL();
+				}
+
+				if (foundType->IsExternal()){
+					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths(), false);
+					if (resolvedPath.isEmpty()){
+						SendErrorMessage(0, QString("Unable to find header file for type of '%1'").arg(sdlType));
+					}
+
+					const QString relativeIncludePath = '<' + resolvedPath + '>';
+					if (!resolvedPath.isEmpty() && !customIncludeList.contains(relativeIncludePath)){
+						customIncludeList << relativeIncludePath;
+					}
+				}
 			}
 
-			//// Add user's custom types
-			//if (addDependenciesInclude){
-			//	// first add include comment
-			//	if (!complexTypeList.isEmpty()){
-			//		stream << QStringLiteral("// ") << GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) << QStringLiteral(" includes");
-			//		FeedStream(stream, 1, false);
-			//	}
-
-			//	// then add inclides
-			//	for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
-			//		const QString& complexTypeName = *complexIter;
-			//		stream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
-			//		FeedStream(stream, 1, false);
-			//	}
-			//}
+			for (const QString& customInclude : customIncludeList){
+				stream << QStringLiteral("#include ");
+				stream << customInclude;
+				FeedStream(stream, 1, false);
+			}
 		}
 
 		FeedStream(stream, 2, false);
@@ -169,22 +227,52 @@ int CSdlUnionGeneratorComp::DoProcessing(
 		stream << QStringLiteral("\n{");
 		FeedStream(stream, 3, false);
 
-		// enum create
-		stream << QStringLiteral("typedef std::variant<");
+		// union class create
+		stream << QStringLiteral("class ") << sdlUnion.GetName() << QStringLiteral(": public");
+		stream << QStringLiteral(" std::variant<");
 
 		// add all union types
-		int countTypes = sdlUnion.GetTypes().count();
+		int countTypes = convertedTypeList.count();
 		for (int i = 0; i < countTypes; ++i){
-			stream << sdlUnion.GetTypes()[i].first;
+			stream << convertedTypeList[i];
 			if (i < countTypes - 1){
 				stream << QStringLiteral(", ");
 			}
 		}
-
 		stream << QStringLiteral("> ");
-		stream << sdlUnion.GetName();
-		stream << QStringLiteral(";");
+		stream << QStringLiteral("{");
 		FeedStream(stream, 2, false);
+		
+		stream << QStringLiteral("public:");
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("typedef std::variant<");
+
+		// add all union types
+		for (int i = 0; i < countTypes; ++i){
+			stream << convertedTypeList[i];
+			if (i < countTypes - 1){
+				stream << QStringLiteral(", ");
+			}
+		}
+		stream << QStringLiteral("> BaseClass;");
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << sdlUnion.GetName() << QStringLiteral("(){};");
+		FeedStream(stream, 1, false);
+
+		for (int i = 0; i < countTypes; ++i){
+			FeedStreamHorizontally(stream, 1);
+			stream << sdlUnion.GetName() << QStringLiteral("(const ") << convertedTypeList[i] << QStringLiteral("& ref)");
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral(": BaseClass(ref){};");
+			FeedStream(stream, 2, false);
+		}
+		stream << QStringLiteral("};");
+		FeedStream(stream, 1, false);
 
 		// end of namespace
 		stream << QStringLiteral("} // namespace ");

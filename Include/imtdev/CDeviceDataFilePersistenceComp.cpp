@@ -30,7 +30,7 @@ bool CDeviceDataFilePersistenceComp::IsOperationSupported(
 }
 
 
-int CDeviceDataFilePersistenceComp::LoadFromFile(
+ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::LoadFromFile(
 			istd::IChangeable& data,
 			const QString& /*filePath*/,
 			ibase::IProgressManager* progressManagerPtr) const
@@ -43,14 +43,14 @@ int CDeviceDataFilePersistenceComp::LoadFromFile(
 
 	imtdev::IDeviceDataProvider* dataProviderPtr = dynamic_cast<imtdev::IDeviceDataProvider*>(&data);
 	if (dataProviderPtr == nullptr){
-		SendCriticalMessage(0, tr("Wrong data object type"));
+		SendCriticalMessage(0, QT_TR_NOOP("Wrong data object type"));
 
 		return OS_FAILED;
 	}
 
 	iser::ISerializable* serializablePtr = dynamic_cast<iser::ISerializable*>(&data);
 	if (serializablePtr == nullptr){
-		SendCriticalMessage(0, tr("Wrong data object type. Serialization is not supported"));
+		SendCriticalMessage(0, QT_TR_NOOP("Wrong data object type. Serialization is not supported"));
 
 		return OS_FAILED;
 	}
@@ -58,7 +58,7 @@ int CDeviceDataFilePersistenceComp::LoadFromFile(
 	QByteArray deviceDataBuffer;
 	bool retVal = m_deviceDataPersistenceCompPtr->ReadDataFromStorage(deviceDataBuffer, imtdev::IDeviceDataPersistence::ST_EEPROM, progressManagerPtr);
 	if (!retVal){
-		SendErrorMessage(0, tr("Reading of the device data failed"));
+		SendErrorMessage(0, QT_TR_NOOP("Reading of the device data failed"));
 
 		return OS_FAILED;
 	}
@@ -68,7 +68,7 @@ int CDeviceDataFilePersistenceComp::LoadFromFile(
 
 		retVal = serializablePtr->Serialize(dataArchive);
 		if (!retVal){
-			SendErrorMessage(0, tr("Reading of the device data during deserialization failed"));
+			SendErrorMessage(0, QT_TR_NOOP("Reading of the device data during deserialization failed"));
 
 			return OS_FAILED;
 		}
@@ -78,7 +78,7 @@ int CDeviceDataFilePersistenceComp::LoadFromFile(
 	if (metaInfoPtr != nullptr){
 		retVal = retVal && m_deviceDataPersistenceCompPtr->ReadDeviceMetaInfo(*metaInfoPtr);
 		if (!retVal){
-			SendErrorMessage(0, tr("Reading of the device meta-data failed"));
+			SendErrorMessage(0, QT_TR_NOOP("Reading of the device meta-data failed"));
 
 			return OS_FAILED;
 		}
@@ -88,7 +88,7 @@ int CDeviceDataFilePersistenceComp::LoadFromFile(
 }
 
 
-int CDeviceDataFilePersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& /*filePath*/, ibase::IProgressManager* progressManagerPtr) const
+ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& /*filePath*/, ibase::IProgressManager* progressManagerPtr) const
 {
 	if (!m_deviceDataPersistenceCompPtr.IsValid()){
 		return OS_FAILED;

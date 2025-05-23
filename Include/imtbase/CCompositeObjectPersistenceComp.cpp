@@ -39,7 +39,7 @@ bool CCompositeObjectPersistenceComp::IsOperationSupported(
 }
 
 
-int CCompositeObjectPersistenceComp::LoadFromFile(
+ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::LoadFromFile(
 			istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -162,7 +162,7 @@ int CCompositeObjectPersistenceComp::LoadFromFile(
 }
 
 
-int CCompositeObjectPersistenceComp::SaveToFile(
+ifile::IFilePersistence::OperationState CCompositeObjectPersistenceComp::SaveToFile(
 			const istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const

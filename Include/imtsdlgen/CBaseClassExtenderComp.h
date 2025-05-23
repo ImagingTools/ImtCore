@@ -50,7 +50,7 @@ public:
 		\param outputPtr - unused
 		\param progressManagerPtr - unused
 	 */
-	virtual int DoProcessing(
+	virtual iproc::IProcessor::TaskState DoProcessing(
 				const iprm::IParamsSet* paramsPtr,
 				const istd::IPolymorphic* inputPtr,
 				istd::IChangeable* outputPtr,

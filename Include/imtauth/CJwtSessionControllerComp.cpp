@@ -71,7 +71,7 @@ imtauth::IJwtSessionController::JwtState CJwtSessionControllerComp::ValidateJwt(
 		return imtauth::IJwtSessionController::JS_INVALID;
 	}
 
-	qint64 exp = payloadObj["exp"].toInteger();
+	qint64 exp = payloadObj["exp"].toInt();
 	if (exp < QDateTime::currentSecsSinceEpoch()){
 		qWarning() << "JWT token has expired!";
 		return imtauth::IJwtSessionController::JS_EXPIRED;

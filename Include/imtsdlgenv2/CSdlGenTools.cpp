@@ -185,6 +185,9 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 			if (!namespaceCleaned && !retVal.startsWith(QStringLiteral("::"))){
 				retVal.prepend(QStringLiteral("::"));
 			}
+			if (sdlUnionPtr != nullptr){
+				retVal = QStringLiteral("std::shared_ptr<") + retVal + QStringLiteral(">");
+			}
 		}
 	}
 
@@ -274,7 +277,8 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(
 	bool* isComplexPtr,
 	bool* isArrayPtr,
 	bool* isEnumPtr,
-	bool* isUnionPtr)
+	bool* isUnionPtr,
+	const bool& addVersion)
 {
 	bool _isCustom = false;
 	QString retVal = imtsdl::CSdlTools::ConvertTypeOrEnumOrUnion(sdlField, enumlistProvider.GetEnums(false), unionlistProvider.GetUnions(false), &_isCustom, isComplexPtr, isArrayPtr, isEnumPtr, isUnionPtr);
@@ -295,7 +299,7 @@ QString CSdlGenTools::OptListConvertTypeWithNamespaceStruct(
 	}
 
 	CStructNamespaceConverter converter(sdlField, relatedNamespace, listProvider, enumlistProvider, unionlistProvider, listWrap);
-	converter.addVersion = true;
+	converter.addVersion = addVersion;
 
 	return converter.GetString();
 }

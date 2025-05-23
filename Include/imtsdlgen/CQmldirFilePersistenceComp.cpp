@@ -28,7 +28,7 @@ bool CQmldirFilePersistenceComp::IsOperationSupported(
 	const istd::IChangeable* dataObjectPtr,
 	const QString* filePathPtr,
 	int flags,
-	bool beQuiet) const
+	bool /*beQuiet*/) const
 {
 	if (filePathPtr != nullptr && !filePathPtr->isEmpty()){
 		if (flags & QF_LOAD && !QFile(*filePathPtr).isReadable()){
@@ -49,7 +49,7 @@ bool CQmldirFilePersistenceComp::IsOperationSupported(
 }
 
 
-int CQmldirFilePersistenceComp::LoadFromFile(
+ifile::IFilePersistence::OperationState CQmldirFilePersistenceComp::LoadFromFile(
 	istd::IChangeable& data,
 	const QString& filePath,
 	ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -60,7 +60,7 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 		iprm::CParamsSet& paramsSetRef = dynamic_cast<iprm::CParamsSet&>(data);
 		paramsSetPtr = &paramsSetRef;
 	}
-	catch (std::bad_cast& ex){
+	catch (std::bad_cast&){
 		SendCriticalMessage(0, "Unexpected input data", __func__);
 		I_CRITICAL();
 
@@ -77,8 +77,7 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 
 	QTextStream fileStream(&loadFile);
 
-	iprm::IParamsManager* objectEntriesManagerPtr(m_paramsManagerFactComp.CreateInstance());
-	paramsSetPtr->SetEditableParameter(QmldirModelParamIds::Objects, objectEntriesManagerPtr, true);
+	iprm::IParamsManagerUniquePtr objectEntriesManagerPtr(m_paramsManagerFactComp.CreateInstance());
 	quint64 lastReadLine = 0;
 	while(!fileStream.atEnd()){
 		QString readLine = fileStream.readLine();
@@ -153,13 +152,18 @@ int CQmldirFilePersistenceComp::LoadFromFile(
 		}
 	}
 
+	iser::ISerializableUniquePtr objectParamPtr;
+	objectParamPtr.MoveCastedPtr<iprm::IParamsManager>(objectEntriesManagerPtr);
+
+	paramsSetPtr->SetEditableParameter(QmldirModelParamIds::Objects, objectParamPtr);
+
 	return OS_OK;
 }
 
 
 // reimplemented (ifile::IFileTypeInfo)
 
-int CQmldirFilePersistenceComp::SaveToFile(
+ifile::IFilePersistence::OperationState CQmldirFilePersistenceComp::SaveToFile(
 	const istd::IChangeable& data,
 	const QString& filePath,
 	ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -262,7 +266,7 @@ int CQmldirFilePersistenceComp::SaveToFile(
 
 bool CQmldirFilePersistenceComp::GetFileExtensions(
 	QStringList& result,
-	const istd::IChangeable* dataObjectPtr,
+	const istd::IChangeable* /*dataObjectPtr*/,
 	int /*flags*/,
 	bool doAppend) const
 {

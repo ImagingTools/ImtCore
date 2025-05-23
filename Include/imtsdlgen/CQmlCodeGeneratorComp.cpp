@@ -21,7 +21,7 @@ namespace imtsdlgen
 {
 
 
-int CQmlCodeGeneratorComp::DoProcessing(
+iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* inputPtr,
 			istd::IChangeable* outputPtr,
@@ -32,7 +32,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	int retVal = TS_OK;
+	iproc::IProcessor::TaskState retVal = TS_OK;
 
 	if (!m_argumentParserCompPtr->IsQmlEnabled()){
 		return retVal;
@@ -111,7 +111,7 @@ int CQmlCodeGeneratorComp::DoProcessing(
 		iproc::IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
 		Q_ASSERT(extenderPtr != nullptr);
 
-		int extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
+		iproc::IProcessor::TaskState extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
 		if (extenderResult != TS_OK){
 			return extenderResult;
 		}

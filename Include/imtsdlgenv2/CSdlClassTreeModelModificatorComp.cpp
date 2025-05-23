@@ -204,11 +204,19 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			WriteConversionFromUnion(stream, foundUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), 2);
-
-			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
-			stream << unionConvertedVarName;
+			WriteConversionFromUnion(stream,
+				foundUnion,
+				unionSourceVarName,
+				unionConvertedVarName,
+				m_originalSchemaNamespaceCompPtr->GetText(),
+				field.GetId(),
+				"modelIndex",
+				*m_sdlTypeListCompPtr,
+				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr,
+				2,
+				imtsdl::CSdlUnionConverter::ConversionType::CT_MODEL_SCALAR,
+				"model.SetData(");
 		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
@@ -219,7 +227,9 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 				stream << QStringLiteral("*") << field.GetId();
 			}
 		}
-		stream << QStringLiteral(", modelIndex);");
+		if (!isUnion){
+			stream << QStringLiteral(", modelIndex);");
+		}
 	}
 	else {
 		stream << QStringLiteral("if (");
@@ -263,11 +273,19 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			WriteConversionFromUnion(stream, foundUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), 2);
-
-			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
-			stream << unionConvertedVarName;
+			WriteConversionFromUnion(stream,
+				foundUnion,
+				unionSourceVarName,
+				unionConvertedVarName,
+				m_originalSchemaNamespaceCompPtr->GetText(),
+				field.GetId(),
+				"modelIndex",
+				*m_sdlTypeListCompPtr,
+				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr,
+				2,
+				imtsdl::CSdlUnionConverter::ConversionType::CT_MODEL_SCALAR,
+				"model.SetData(");
 		}
 		else {
 			stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
@@ -278,7 +296,12 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 				stream << QStringLiteral("*") << field.GetId();
 			}
 		}
-		stream << QStringLiteral(", modelIndex);\n\t}");
+		if (!isUnion){
+			stream << QStringLiteral(", modelIndex);\n\t}");
+		}
+		else{
+			stream << QStringLiteral("\n\t}");
+		}
 	}
 
 	FeedStream(stream, 1, false);
@@ -359,7 +382,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
 			Q_ASSERT(found);
 
-			WriteEnumConversionFromString(stream, foundEnum, enumSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText());
+			WriteEnumConversionFromString(stream,
+				foundEnum,
+				enumSourceVarName,
+				field.GetId(),
+				m_originalSchemaNamespaceCompPtr->GetText());
 		}
 		else if (isUnion){
 			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
@@ -367,7 +394,15 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			WriteUnionConversionFromString(stream, foundUnion, dataVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText());
+			WriteUnionConversionFromString(stream,
+				foundUnion,
+				dataVarName,
+				field.GetId(),
+				m_originalSchemaNamespaceCompPtr->GetText(),
+				"modelIndex",
+				*m_sdlTypeListCompPtr,
+				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr);
 		}
 		else {
 			stream << GetSettingValueString(
@@ -409,7 +444,16 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			WriteUnionConversionFromString(stream, foundUnion, dataVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), 2);
+			WriteUnionConversionFromString(stream,
+				foundUnion,
+				dataVarName,
+				field.GetId(),
+				m_originalSchemaNamespaceCompPtr->GetText(),
+				"modelIndex",
+				*m_sdlTypeListCompPtr,
+				*m_sdlEnumListCompPtr,
+				*m_sdlUnionListCompPtr,
+				2);
 		}
 		else{
 			FeedStreamHorizontally(stream, 2);
@@ -684,29 +728,39 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		Q_ASSERT(found);
 
-		WriteConversionFromUnion(stream, foundUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+		WriteConversionFromUnion(stream, foundUnion,
+			unionSourceVarName,
+			unionConvertedVarName,
+			m_originalSchemaNamespaceCompPtr->GetText(),
+			newTreeModelVarName,
+			treeModelIndexVarName,
+			*m_sdlTypeListCompPtr,
+			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
+			hIndents + 1,
+			imtsdl::CSdlUnionConverter::ConversionType::CT_MODEL_ARRAY,
+			newTreeModelVarName + QString("->SetData(QByteArray(), "));
 	}
 
-	// inLoop: insert ien item to model
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << newTreeModelVarName << QStringLiteral("->InsertNewItem();");
-	FeedStream(stream, 1, false);
+	if (!isUnion){
+		// inLoop: insert ien item to model
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << newTreeModelVarName << QStringLiteral("->InsertNewItem();");
+		FeedStream(stream, 1, false);
 
-	// inLoop: add item and check
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << newTreeModelVarName << QStringLiteral("->SetData(QByteArray(), ");
-	if (isEnum){
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("StringValue");
+		// inLoop: add item and check
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << newTreeModelVarName << QStringLiteral("->SetData(QByteArray(), ");
+		if (isEnum){
+			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("StringValue");
+		}
+		else{
+			stream << field.GetId();
+			stream << QStringLiteral("->at(") << treeModelIndexVarName << ')';
+		}
+		stream << ',' << ' ' << treeModelIndexVarName << ')' << ';';
+		FeedStream(stream, 1, false);
 	}
-	else if (isUnion){
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("VariantValue");
-	}
-	else{
-		stream << field.GetId();
-		stream << QStringLiteral("->at(") << treeModelIndexVarName << ')';
-	}
-	stream << ',' << ' ' << treeModelIndexVarName << ')' << ';';
-	FeedStream(stream, 1, false);
 
 	// end of loop
 	FeedStreamHorizontally(stream, hIndents);
@@ -857,7 +911,18 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 		imtsdl::CSdlUnion foundUnion;
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-		WriteUnionConversionFromString(stream, foundUnion, unionSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+		WriteUnionConversionFromString(stream,
+			foundUnion,
+			unionSourceVarName,
+			dataVarName,
+			m_originalSchemaNamespaceCompPtr->GetText(),
+			indexVariableName,
+			*m_sdlTypeListCompPtr,
+			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
+			hIndents + 1,
+			imtsdl::CSdlUnionConverter::ConversionType::CT_MODEL_ARRAY,
+			field.GetId());
 	}
 	else{
 		stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);

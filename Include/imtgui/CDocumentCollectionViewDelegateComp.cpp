@@ -554,7 +554,7 @@ bool CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::IsOperationSup
 }
 
 
-int CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::LoadFromFile(
+ifile::IFilePersistence::OperationState CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::LoadFromFile(
 			istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* progressManagerPtr) const
@@ -573,7 +573,7 @@ int CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::LoadFromFile(
 }
 
 
-int CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::SaveToFile(
+ifile::IFilePersistence::OperationState CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::SaveToFile(
 			const istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const

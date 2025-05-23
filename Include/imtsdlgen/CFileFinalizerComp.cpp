@@ -29,7 +29,7 @@ namespace imtsdlgen
 
 // reimplemented (iproc::IProcessor)
 
-int CFileFinalizerComp::DoProcessing(
+iproc::IProcessor::TaskState CFileFinalizerComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
@@ -57,7 +57,7 @@ int CFileFinalizerComp::DoProcessing(
 	const QString joinedHeaderFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
 	const QString joinedSourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
 
-	int retVal = TS_OK;
+	iproc::IProcessor::TaskState retVal = TS_OK;
 
 	if (!joinedHeaderFilePath.isEmpty()){
 		const QFileInfo joinedHeaderFileInfo(joinedHeaderFilePath);
@@ -89,7 +89,7 @@ int CFileFinalizerComp::DoProcessing(
 }
 
 
-int CFileFinalizerComp::CleanupFile(const QString& filePath)
+iproc::IProcessor::TaskState CFileFinalizerComp::CleanupFile(const QString& filePath)
 {
 	if (!m_filesCleanupProcessorComp.IsValid() ||
 		filePath.isEmpty())
@@ -110,7 +110,7 @@ int CFileFinalizerComp::CleanupFile(const QString& filePath)
 	regExpList.InsertOption(QStringLiteral("^\\s*\\#\\s*pragma\\s+once$"), "3");
 	regExpList.InsertOption(QStringLiteral("^.*includes\\s*$"), "4");
 
-	int result = m_filesCleanupProcessorComp->DoProcessing(&params, &regExpList, nullptr);
+	iproc::IProcessor::TaskState result = m_filesCleanupProcessorComp->DoProcessing(&params, &regExpList, nullptr);
 
 	return result;
 }

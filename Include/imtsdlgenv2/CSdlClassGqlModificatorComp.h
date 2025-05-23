@@ -47,9 +47,9 @@ private:
 	// write methods
 	void AddFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
 	void AddScalarFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
-	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool isUnion, bool optional, uint hIndents);
-	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
-	void AddCustomListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents);
+	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool optional, uint hIndents);
+	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isUnion, uint hIndents);
+	void AddCustomListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isUnion, uint hIndents);
 
 	// general help methods for scalar
 	void AddExtractValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents = 1);

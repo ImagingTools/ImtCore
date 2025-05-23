@@ -37,6 +37,8 @@ public:
 
 	I_BEGIN_COMPONENT(CSdlUnionGeneratorComp)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
+		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
+		I_ASSIGN(m_sdlEnumListCompPtr, "SdlEnumListProvider", "SDL enums used to create a code", true, "SdlEnumListProvider")
 		I_ASSIGN(m_sdlUnionListCompPtr, "SdlUnionListProvider", "SDL unioins used to create a code", true, "SdlUnionListProvider")
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
 		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
@@ -45,7 +47,7 @@ public:
 	I_END_COMPONENT
 
 	//reimplemented(iproc::IProcessor)
-	virtual int DoProcessing(
+	virtual TaskState DoProcessing(
 				const iprm::IParamsSet* paramsPtr,
 				const istd::IPolymorphic* inputPtr,
 				istd::IChangeable* outputPtr,
@@ -53,6 +55,8 @@ public:
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
+	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);
+	I_REF(imtsdl::ISdlEnumListProvider, m_sdlEnumListCompPtr);
 	I_REF(imtsdl::ISdlUnionListProvider, m_sdlUnionListCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);

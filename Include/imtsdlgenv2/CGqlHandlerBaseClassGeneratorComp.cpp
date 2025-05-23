@@ -24,7 +24,7 @@ namespace imtsdlgenv2
 {
 
 
-int CGqlHandlerBaseClassGeneratorComp::DoProcessing(
+iproc::IProcessor::TaskState CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,

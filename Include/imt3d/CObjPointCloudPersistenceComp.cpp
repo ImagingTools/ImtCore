@@ -43,7 +43,7 @@ bool CObjPointCloudPersistenceComp::IsOperationSupported(
 }
 
 
-int CObjPointCloudPersistenceComp::LoadFromFile(
+ifile::IFilePersistence::OperationState CObjPointCloudPersistenceComp::LoadFromFile(
 			istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -112,7 +112,7 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 }
 
 
-int CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
+ifile::IFilePersistence::OperationState CObjPointCloudPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	const CPointCloud3d* documentPtr = dynamic_cast<const CPointCloud3d*>(&data);
 	if (documentPtr == NULL){

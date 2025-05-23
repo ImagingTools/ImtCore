@@ -24,7 +24,7 @@ public:
 	imtbase::CTimeRange GetTimeRange() const;
 
 	// reimplemented (ilog::IMessageContainer)
-	virtual int GetWorstCategory() const override;
+	virtual istd::IInformationProvider::InformationCategory GetWorstCategory() const override;
 	virtual Messages GetMessages() const override;
 	virtual void ClearMessages() override;
 

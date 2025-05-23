@@ -26,7 +26,7 @@ namespace imtsdlgenv2
 {
 
 
-int CGqlWrapClassCodeGeneratorComp::DoProcessing(
+iproc::IProcessor::TaskState CGqlWrapClassCodeGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,

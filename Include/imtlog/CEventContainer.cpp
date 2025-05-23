@@ -28,7 +28,7 @@ imtbase::CTimeRange CEventContainer::GetTimeRange() const
 
 // reimplemented (ilog::IMessageContainer)
 
-int CEventContainer::GetWorstCategory() const
+istd::IInformationProvider::InformationCategory CEventContainer::GetWorstCategory() const
 {
 	QMutexLocker locker(&m_mutex);
 

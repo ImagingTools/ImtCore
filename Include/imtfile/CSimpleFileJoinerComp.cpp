@@ -33,7 +33,7 @@ const QString CSimpleFileJoinerComp::s_filePathVariable = QStringLiteral("$(File
 
 // reimplemented (iproc::IProcessor)
 
-int CSimpleFileJoinerComp::DoProcessing(
+iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 		const iprm::IParamsSet* paramsPtr,
 		const istd::IPolymorphic* inputPtr,
 		istd::IChangeable* /*outputPtr*/,

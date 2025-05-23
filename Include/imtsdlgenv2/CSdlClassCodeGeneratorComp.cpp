@@ -23,7 +23,7 @@ namespace imtsdlgenv2
 {
 
 
-int CSdlClassCodeGeneratorComp::DoProcessing(
+iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* inputPtr,
 			istd::IChangeable* outputPtr,
@@ -155,7 +155,7 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 				baseClassDirectivesList.InsertOption(iter.value(), iter.key().toUtf8());
 			}
 
-			int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
+			TaskState extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
 			if (extendResult != TS_OK){
 				SendErrorMessage(0, QString("Unable to extend file: '%1'").arg(filePath));
 				I_CRITICAL();
@@ -185,7 +185,8 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 					filterParams.InsertOption(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
 					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
-				// then join unions
+
+				// then join unions forward declarations
 				const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(true);
 				for (const imtsdl::CSdlUnion& sdlUnion : unionList){
 					filterParams.InsertOption(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
@@ -197,6 +198,13 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 					filterParams.InsertOption("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
 					SendVerboseMessage(QString("Add join file '%1'. Total: %2").arg("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
+
+				// then join unions class definitions
+				for (const imtsdl::CSdlUnion& sdlUnion : unionList){
+					filterParams.InsertOption(sdlUnion.GetName() + "_ClassDef.h", QByteArray::number(filterParams.GetOptionsCount()));
+					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
+				}
+
 
 				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
@@ -671,6 +679,15 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 	headerStream << 'C' << sdlType.GetName();
 	headerStream << ':' << ':';
 	headerStream << GetSdlEntryVersion(sdlType);
+	headerStream << QStringLiteral(");");
+
+	FeedStream(headerStream, 1, false);
+	headerStream << QStringLiteral("Q_DECLARE_METATYPE(");
+	if (sdlNamespace.length() > 0){
+		headerStream << sdlNamespace;
+		headerStream << ':' << ':';
+	}
+	headerStream << 'C' << sdlType.GetName();
 	headerStream << QStringLiteral(");");
 
 	FeedStream(headerStream, 3, true);

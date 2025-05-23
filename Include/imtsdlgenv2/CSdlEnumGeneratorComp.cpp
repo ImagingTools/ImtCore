@@ -23,7 +23,7 @@ namespace imtsdlgenv2
 {
 
 
-int CSdlEnumGeneratorComp::DoProcessing(
+iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,

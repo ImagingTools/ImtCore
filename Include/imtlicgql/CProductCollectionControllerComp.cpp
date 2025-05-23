@@ -81,7 +81,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isFeaturesRequested){
-		representationObject.features = QByteArray(productInfoPtr->GetFeatures()->GetElementIds().join(';'));
+		representationObject.features = QByteArray(productInfoPtr->GetFeatures()->GetElementIds().toList().join(';'));
 	}
 
 	if (requestInfo.items.isLicensesRequested){
@@ -207,7 +207,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	QByteArray categoryId = productInfoPtr->GetCategoryId();
 	representationPayload.categoryId = QByteArray((categoryId));
 
-	representationPayload.features = QByteArray((productInfoPtr->GetFeatures()->GetElementIds().join(';')));
+	representationPayload.features = QByteArray((productInfoPtr->GetFeatures()->GetElementIds().toList().join(';')));
 
 	return true;
 }

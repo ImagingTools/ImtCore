@@ -25,7 +25,7 @@ namespace imtsdlgen
 {
 
 
-int CQmlCodeCommandIdGeneratorComp::DoProcessing(
+iproc::IProcessor::TaskState CQmlCodeCommandIdGeneratorComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
@@ -140,8 +140,8 @@ int CQmlCodeCommandIdGeneratorComp::DoProcessing(
 	}
 
 	// and finally update a QRC file
-	istd::TDelPtr<iprm::IParamsManager> qrcParamsPtr(m_paramsFactComp.CreateInstance());
-	Q_ASSERT(qrcParamsPtr != nullptr);
+	iprm::IParamsManagerUniquePtr qrcParamsPtr(m_paramsFactComp.CreateInstance());
+	Q_ASSERT(qrcParamsPtr.IsValid());
 
 	const QString qmlModuleName = GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr);
 	const int qrcLoadStatus = m_qrcFilePersistanceCompPtr->LoadFromFile(*qrcParamsPtr, outputDirectoryPath + '/' + qmlModuleName + QStringLiteral(".qrc"));

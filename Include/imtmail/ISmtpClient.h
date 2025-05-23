@@ -12,7 +12,6 @@ namespace imtmail
 {
 
 
-// TODO: GetHost, GetPort -> ISmtpServerConfig
 class ISmtpClient: virtual public istd::IPolymorphic
 {
 public:

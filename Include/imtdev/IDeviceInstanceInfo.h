@@ -1,6 +1,9 @@
 #pragma once
 
 
+// STL includes
+#include <memory>
+
 // ACF includes
 #include <iattr/IAttributesProvider.h>
 #include <iser/IVersionInfo.h>

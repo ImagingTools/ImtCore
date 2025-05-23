@@ -32,14 +32,14 @@ protected:
 	virtual bool CreateBody(const QString moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet* paramsPtr);
 
 	// reimplemented (iproc::IProcessor)
-	virtual int DoProcessing(
+	virtual TaskState DoProcessing(
 		const iprm::IParamsSet* paramsPtr,
 		const istd::IPolymorphic* inputPtr,
 		istd::IChangeable* outputPtr,
 		ibase::IProgressManager* progressManagerPtr = NULL) override;
 
 protected:
-//	I_REF(IDdlCodeCreatorArgumentsParser, m_argumentParserCompPtr);
+//	I_REF(IDdlCodeCreatorArgumentsParser, m_argumentParserAttrPtr);
 };
 
 

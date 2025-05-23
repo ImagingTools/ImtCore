@@ -308,8 +308,8 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 	}
 
 	const quint16 hIndents = 1 + quint16(!isStrict);
-	FeedStreamHorizontally(stream, hIndents);
 	if (isEnum){
+		FeedStreamHorizontally(stream, hIndents);
 		const QString enumSourceVarName = '*' + field.GetId();
 		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
 
@@ -329,24 +329,28 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 	}
 	else if (isUnion){
 		const QString unionSourceVarName = '*' + field.GetId();
-		const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
-
-		// declare target value, to store value
-		stream << QStringLiteral("QVariant ");
-		stream << unionConvertedVarName << ';';
-		FeedStream(stream, 1, false);
-
 		imtsdl::CSdlUnion foundUnion;
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		Q_ASSERT(found);
 
-		WriteConversionFromUnion(stream, foundUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents);
+		WriteConversionFromUnion(stream,
+			foundUnion,
+			unionSourceVarName,
+			field.GetId(),
+			m_originalSchemaNamespaceCompPtr->GetText(),
+			field.GetId(),
+			QString(),
+			*m_sdlTypeListCompPtr,
+			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
+			hIndents,
+			imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_SCALAR);
 
 		FeedStreamHorizontally(stream, hIndents);
-		AddFieldValueWriteToObject(stream, field, unionConvertedVarName, hIndents);
 
 	}
 	else{
+		FeedStreamHorizontally(stream, hIndents);
 		AddFieldValueWriteToObject(stream, field, QStringLiteral("*") + field.GetId(), hIndents);
 	}
 
@@ -521,27 +525,31 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), sdlUnion);
 
 		const QString unionSourceVarName = variableName;
-		const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
-		variableName = unionConvertedVarName;
 
-		// declare target value, to store value
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("QVariant ");
-		stream << unionConvertedVarName << ';';
-		FeedStream(stream, 1, false);
-
-		WriteConversionFromUnion(stream, sdlUnion, unionSourceVarName, unionConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+		WriteConversionFromUnion(stream, sdlUnion,
+			unionSourceVarName,
+			newObjectArrayVarName,
+			m_originalSchemaNamespaceCompPtr->GetText(),
+			field.GetId(),
+			dataIndexVarName,
+			*m_sdlTypeListCompPtr,
+			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
+			hIndents + 1,
+			imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_ARRAY);
 	}
 
 	// inLoop: add item
-	FeedStreamHorizontally(stream, hIndents + 1);
-	AddFieldValueAppendToObjectArray(
-				stream,
-				field,
-				newObjectArrayVarName,
-				variableName,
-				hIndents);
-	FeedStream(stream, 1, false);
+	if (!isUnion){
+		FeedStreamHorizontally(stream, hIndents + 1);
+		AddFieldValueAppendToObjectArray(
+			stream,
+			field,
+			newObjectArrayVarName,
+			variableName,
+			hIndents);
+		FeedStream(stream, 1, false);
+	}
 
 	// end of loop
 	FeedStreamHorizontally(stream, hIndents);
@@ -700,7 +708,17 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		Q_ASSERT(found);
 
-		WriteUnionConversionFromString(stream, foundUnion, unionSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), hhIndents);
+		WriteUnionConversionFromString(stream,
+			foundUnion,
+			unionSourceVarName,
+			field.GetId(),
+			m_originalSchemaNamespaceCompPtr->GetText(),
+			"modelIndex",
+			*m_sdlTypeListCompPtr,
+			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
+			hhIndents,
+			imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_SCALAR);
 	}
 
 
@@ -928,11 +946,27 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		Q_ASSERT(found);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
-		stream << ' ' << dataVarName << ';';
+		stream << QStringLiteral("std::shared_ptr<");
+		stream << OptListConvertTypeWithNamespace(field,
+			m_originalSchemaNamespaceCompPtr->GetText(),
+			*m_sdlTypeListCompPtr,
+			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr);
+		stream << QStringLiteral("> ") << dataVarName << QStringLiteral(";");
 		FeedStream(stream, 1, false);
 
-		WriteUnionConversionFromString(stream, foundUnion, unionSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
+		WriteUnionConversionFromString(stream,
+			foundUnion,
+			unionSourceVarName,
+			dataVarName,
+			m_originalSchemaNamespaceCompPtr->GetText(),
+			indexVariableName,
+			*m_sdlTypeListCompPtr,
+			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
+			hIndents + 1,
+			imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_ARRAY,
+			GetDecapitalizedValue(field.GetId()) + QStringLiteral("jsonArray"));
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << field.GetId();

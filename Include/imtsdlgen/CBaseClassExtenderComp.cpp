@@ -131,7 +131,7 @@ void RemoveDirectivesByRemark(QMap<QString, QString>& direciveIncludeMap, const 
 
 //reimplemented(iproc::IProcessor)
 
-int CBaseClassExtenderComp::DoProcessing(
+iproc::IProcessor::TaskState CBaseClassExtenderComp::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* inputPtr,
 			istd::IChangeable* /*outputPtr*/,

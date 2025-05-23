@@ -35,7 +35,7 @@ bool CObjectCollectionBasedPersistenceComp::IsOperationSupported(
 }
 
 
-int CObjectCollectionBasedPersistenceComp::LoadFromFile(
+ifile::IFilePersistence::OperationState CObjectCollectionBasedPersistenceComp::LoadFromFile(
 			istd::IChangeable& /*data*/,
 			const QString& /*filePath*/,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -66,7 +66,7 @@ int CObjectCollectionBasedPersistenceComp::LoadFromFile(
 }
 
 
-int CObjectCollectionBasedPersistenceComp::SaveToFile(
+ifile::IFilePersistence::OperationState CObjectCollectionBasedPersistenceComp::SaveToFile(
 			const istd::IChangeable& /*data*/,
 			const QString& /*filePath*/,
 			ibase::IProgressManager* /*progressManagerPtr*/) const

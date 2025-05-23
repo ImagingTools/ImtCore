@@ -43,7 +43,7 @@ bool CStlMeshPersistenceComp::IsOperationSupported(
 }
 
 
-int CStlMeshPersistenceComp::LoadFromFile(
+ifile::IFilePersistence::OperationState CStlMeshPersistenceComp::LoadFromFile(
 			istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -64,7 +64,7 @@ int CStlMeshPersistenceComp::LoadFromFile(
 }
 
 
-int CStlMeshPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
+ifile::IFilePersistence::OperationState CStlMeshPersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	const CMesh3d* documentPtr = dynamic_cast<const CMesh3d*>(&data);
 	if (documentPtr == NULL){

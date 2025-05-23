@@ -29,7 +29,7 @@ const QByteArray CFileCleanupProcessorComp:: s_targetFilePathParamId = QByteArra
 
 // reimplemented (iproc::IProcessor)
 
-int CFileCleanupProcessorComp::DoProcessing(
+iproc::IProcessor::TaskState CFileCleanupProcessorComp::DoProcessing(
 			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* inputPtr,
 			istd::IChangeable* /*outputPtr*/,

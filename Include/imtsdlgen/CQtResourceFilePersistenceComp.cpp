@@ -28,7 +28,7 @@ bool CQtResourceFilePersistenceComp::IsOperationSupported(
 	const istd::IChangeable* dataObjectPtr,
 	const QString* filePathPtr,
 	int flags,
-	bool beQuiet) const
+	bool /*beQuiet*/) const
 {
 	if (filePathPtr != nullptr && !filePathPtr->isEmpty()){
 		if (flags & QF_LOAD && !QFile(*filePathPtr).isReadable()){
@@ -51,7 +51,7 @@ bool CQtResourceFilePersistenceComp::IsOperationSupported(
 }
 
 
-int CQtResourceFilePersistenceComp::LoadFromFile(
+ifile::IFilePersistence::OperationState CQtResourceFilePersistenceComp::LoadFromFile(
 	istd::IChangeable& data,
 	const QString& filePath,
 	ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -62,7 +62,7 @@ int CQtResourceFilePersistenceComp::LoadFromFile(
 		iprm::IParamsManager& paramsSetRef = dynamic_cast<iprm::IParamsManager&>(data);
 		prefixParamsPtr = &paramsSetRef;
 	}
-	catch (std::bad_cast& ex){
+	catch (std::bad_cast&){
 		SendCriticalMessage(0, "Unexpected input data", __func__);
 		I_CRITICAL();
 
@@ -163,7 +163,7 @@ int CQtResourceFilePersistenceComp::LoadFromFile(
 
 // reimplemented (ifile::IFileTypeInfo)
 
-int CQtResourceFilePersistenceComp::SaveToFile(
+ifile::IFilePersistence::OperationState CQtResourceFilePersistenceComp::SaveToFile(
 	const istd::IChangeable& data,
 	const QString& filePath,
 	ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -174,7 +174,7 @@ int CQtResourceFilePersistenceComp::SaveToFile(
 		const iprm::IParamsManager& paramsSetRef = dynamic_cast<const iprm::IParamsManager&>(data);
 		prefixParamsPtr = &paramsSetRef;
 	}
-	catch (std::bad_cast& ex){
+	catch (std::bad_cast&){
 		SendCriticalMessage(0, "Unexpected input data", __func__);
 		I_CRITICAL();
 
@@ -272,7 +272,7 @@ int CQtResourceFilePersistenceComp::SaveToFile(
 
 bool CQtResourceFilePersistenceComp::GetFileExtensions(
 	QStringList& result,
-	const istd::IChangeable* dataObjectPtr,
+	const istd::IChangeable* /*dataObjectPtr*/,
 	int /*flags*/,
 	bool doAppend) const
 {

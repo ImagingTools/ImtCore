@@ -40,14 +40,14 @@ TParamsSetPluginComponentImpl<ComponentClass>::TParamsSetPluginComponentImpl(con
 template <class ComponentClass>
 const imtbase::IParamsSetPlugin::IParamsSetFactory* TParamsSetPluginComponentImpl<ComponentClass>::GetParamsSetFactory() const
 {
-	return BaseClass::m_component.GetInterface<imtbase::IParamsSetPlugin::IParamsSetFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<imtbase::IParamsSetPlugin::IParamsSetFactory>(QByteArray());
 }
 
 
 template <class ComponentClass>
 const imtbase::IParamsSetPlugin::IRepresentationControllerFactory* TParamsSetPluginComponentImpl<ComponentClass>::GetRepresentationControllerFactory() const
 {
-	return BaseClass::m_component.GetInterface<imtbase::IParamsSetPlugin::IRepresentationControllerFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<imtbase::IParamsSetPlugin::IRepresentationControllerFactory>(QByteArray());
 }
 
 

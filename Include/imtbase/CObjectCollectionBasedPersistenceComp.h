@@ -40,11 +40,11 @@ public:
 				const QString* filePathPtr = nullptr,
 				int flags = -1,
 				bool beQuiet = true) const override;
-	virtual int LoadFromFile(
+	virtual OperationState LoadFromFile(
 				istd::IChangeable& data,
 				const QString& filePath = QString(),
 				ibase::IProgressManager* progressManagerPtr = nullptr) const override;
-	virtual int SaveToFile(
+	virtual OperationState SaveToFile(
 				const istd::IChangeable& data,
 				const QString& filePath = QString(),
 				ibase::IProgressManager* progressManagerPtr = nullptr) const override;

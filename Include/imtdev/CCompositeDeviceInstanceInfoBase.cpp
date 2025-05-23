@@ -225,7 +225,7 @@ imtbase::ICollectionInfo::Ids CCompositeDeviceInstanceInfoBase::SubDeviceCollect
 	const iprm::IParamsSet* /*selectionParamsPtr*/,
 	ilog::IMessageConsumer* /*logPtr*/) const
 {
-	return m_parentPtr->m_subDeviceMap.keys();
+	return m_parentPtr->m_subDeviceMap.keys().toVector();
 }
 
 
