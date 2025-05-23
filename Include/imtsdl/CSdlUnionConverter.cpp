@@ -15,115 +15,20 @@ namespace imtsdl
 {
 
 
-// static variables
-CSdlUnionConverter::ConversionType CSdlUnionConverter::s_defaultConversionType = CSdlUnionConverter::CT_AS_IS;
-
-
-// public methods
-
-//QString CSdlUnionConverter::ConvertUnionToStringEquivalent(const QString& unionValue, ConversionType conversionType)
-//{
-//	if (conversionType == CT_AS_IS){
-//		return unionValue;
-//	}
-//
-//	char separator = ' ';
-//	if (unionValue.contains('-')){
-//		separator = '-';
-//	}
-//	else if (unionValue.contains('_')){
-//		separator = '_';
-//	}
-//
-//	// check if a single word in upper case
-//	bool isAllUpper = true;
-//	for (int index = 0; index < unionValue.length(); ++index){
-//		QChar symbol = unionValue[index];
-//		if (!symbol.isUpper()){
-//			isAllUpper = false;
-//			break;
-//		}
-//	}
-//
-//
-//	// split string into words
-//	QStringList parts;
-//	if (separator == ' ' && !isAllUpper){
-//		int position = 0;
-//		for (int index = 0; index < unionValue.length(); ++index){
-//			QChar symbol = unionValue[index];
-//			if(symbol.isUpper() && index != 0){
-//				parts << unionValue.mid(position, index - position);
-//				position = index;
-//			}
-//		}
-//		// add last word
-//		parts << unionValue.mid(position, -1);
-//	}
-//	else {
-//		parts = unionValue.split(separator);
-//	}
-//
-//	// if a single string
-//	if (parts.isEmpty()){
-//		parts << unionValue;
-//	}
-//
-//	// case correction
-//	QMutableListIterator partsIter(parts);
-//	while(partsIter.hasNext()){
-//		QString& currentString = partsIter.next();
-//		switch (conversionType) {
-//		case CT_UPPER_SNAKE_CASE:
-//		case CT_UPPER_KEBAB_CASE:
-//			currentString = currentString.toUpper();
-//			break;
-//		case CT_LOWER_SNAKE_CASE:
-//		case CT_LOWER_KEBAB_CASE:
-//			currentString = currentString.toLower();
-//			break;
-//		case CT_UPPER_CAMEL_CASE:
-//		case CT_LOWER_CAMEL_CASE:
-//			currentString = currentString.toLower();
-//			currentString[0] = currentString[0].toUpper();
-//			break;
-//		default:
-//			Q_ASSERT(false);
-//			break;
-//		}
-//	}
-//
-//	// and join into a single string
-//	QString retVal;
-//	switch (conversionType) {
-//	case CT_UPPER_SNAKE_CASE:
-//	case CT_LOWER_SNAKE_CASE:
-//		retVal = parts.join('_');
-//		break;
-//	case CT_LOWER_KEBAB_CASE:
-//	case CT_UPPER_KEBAB_CASE:
-//		retVal = parts.join('-');
-//		break;
-//	default:
-//		retVal = parts.join("");
-//		break;
-//	}
-//
-//	if (conversionType == CT_LOWER_CAMEL_CASE){
-//		retVal[0] = retVal[0].toLower();
-//	}
-//
-//	return retVal;
-//}
-
-
 void CSdlUnionConverter::WriteConversionFromUnion(
 			QTextStream& stream,
 			const CSdlUnion& sdlUnion,
 			const QString& sourceVariableName,
 			const QString& targetVariableName,
 			const QString& relatedNamespace,
-			uint hIndents)
+			const QString& targetName,
+			const QString& modelIndex,
+			const imtsdl::ISdlTypeListProvider& listProvider,
+			const imtsdl::ISdlEnumListProvider& enumlistProvider,
+			const imtsdl::ISdlUnionListProvider& unionlistProvider,
+			uint hIndents,
+			const ConversionType& conversionType,
+			const QString& addCommand)
 {
 	QString typeNamespace = CSdlTools::BuildNamespaceFromParams(sdlUnion.GetSchemaParams(), false, true);
 	if (typeNamespace != relatedNamespace){
@@ -142,20 +47,196 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 
 	bool isFirstIteration = true;
 	for (const auto& sdlType : sdlUnion.GetTypes()){
-		// ToDo Handle complex datatypes?
+		imtsdl::CSdlField field;
+		field.SetType(sdlType);
+		bool isCustom = false;
+		QString convertedType = imtsdlgenv2::CSdlGenTools::OptListConvertTypeWithNamespaceStruct(
+			field,
+			relatedNamespace,
+			listProvider,
+			enumlistProvider,
+			unionlistProvider,
+			true,
+			&isCustom,
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr,
+			false);
+
 		CSdlTools::FeedStreamHorizontally(stream, hIndents);
 		if (!isFirstIteration){
 			stream << QStringLiteral("else ");
 		}
-		stream << QStringLiteral("if (const ") << sdlType.first << QStringLiteral("* val = std::get_if<") << sdlType.first << QStringLiteral(">(&(");
+		stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">((");
 		stream << sourceVariableName;
-		stream << QStringLiteral("))){");
+		stream << QStringLiteral(").get())){");
 		CSdlTools::FeedStream(stream, 1, false);
+		if (conversionType == CT_MODEL_ARRAY){
+			CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+			stream << targetName;
+			stream << QStringLiteral("->InsertNewItem();");
+			CSdlTools::FeedStream(stream, 1, false);
 
-		CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
-		stream << targetVariableName;
-		stream << QStringLiteral(" = *val;");
-		CSdlTools::FeedStream(stream, 1, false);
+		}
+
+		if (isCustom){
+			if (conversionType == CT_MODEL_ARRAY){
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if(!val->WriteToModel(*");
+				stream << targetName;
+				stream << QStringLiteral(", ") << modelIndex << QStringLiteral(")){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+			else if (conversionType == CT_MODEL_SCALAR){
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if (!val->WriteToModel(*");
+				stream << QStringLiteral("(model.AddTreeModel(\"") << targetName << QStringLiteral("\", ") << modelIndex << QStringLiteral(")), 0)){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+			else if (conversionType == CT_GQL_SCALAR){
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if (!val->WriteToGraphQlObject(") << targetVariableName << QStringLiteral(")){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+			else if (conversionType == CT_JSON_SCALAR){
+				QString jsonVariable = targetName + QString("JsonObject");
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("QJsonObject ") << jsonVariable << QStringLiteral(";");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				QString isAddedVariableName = QString("is") + targetVariableName + QString("Added");
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("const bool ") << isAddedVariableName << QStringLiteral(" = ");
+				stream << QStringLiteral("val->WriteToJsonObject(") << jsonVariable << QStringLiteral(");");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if (!") << isAddedVariableName << QStringLiteral("){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("jsonObject[\"") << targetVariableName << QStringLiteral("\"] = ") << jsonVariable << QStringLiteral(";");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+			else if (conversionType == CT_JSON_ARRAY){
+				QString jsonVariable = targetName + QString("JsonObject");
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("QJsonObject ") << jsonVariable << QStringLiteral(";");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				QString isAddedVariableName = QString("is") + targetName + QString("Added");
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("const bool ") << isAddedVariableName << QStringLiteral(" = ");
+				stream << QStringLiteral("val->WriteToJsonObject(") << jsonVariable << QStringLiteral(");");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if (!") << isAddedVariableName << QStringLiteral("){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << targetVariableName << QStringLiteral(" << ") << jsonVariable << QStringLiteral(";");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+		}
+		else{
+			if (conversionType == CT_GQL_SCALAR){
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << targetVariableName;
+				stream << QStringLiteral(".InsertField(\"") << targetName << QStringLiteral("\", *val);");
+				CSdlTools::FeedStream(stream, 1, false);
+
+			}
+			else if (conversionType == CT_JSON_SCALAR){
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if (!") << targetName << QStringLiteral("){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("jsonObject[\"") << targetName << QStringLiteral("\"] = QJsonValue::fromVariant(*val);");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+			else if (conversionType == CT_JSON_ARRAY){
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if (!") << targetName << QStringLiteral("){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << targetVariableName << QStringLiteral(" << QJsonValue::fromVariant(*val);");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+			else{
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << targetVariableName;
+				stream << QStringLiteral(" = *val;");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+
+			if (!addCommand.isEmpty()){
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << addCommand << QStringLiteral("\"") << targetName;
+				stream << QStringLiteral("\", ") << targetVariableName << QStringLiteral(", ");
+				stream << modelIndex << QStringLiteral(");");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+		}
 
 		CSdlTools::FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("}");
@@ -172,21 +253,159 @@ void CSdlUnionConverter::WriteUnionConversionFromString(
 			const QString& sourceVariableName,
 			const QString& targetVariableName,
 			const QString& relatedNamespace,
-			uint hIndents)
+			const QString& modelIndex,
+			const imtsdl::ISdlTypeListProvider& listProvider,
+			const imtsdl::ISdlEnumListProvider& enumlistProvider,
+			const imtsdl::ISdlUnionListProvider& unionlistProvider,
+			uint hIndents,
+			const ConversionType& conversionType,
+			const QString& targetName)
 {
 	bool isFirstIteration = true;
 	for (const auto& sdlType : sdlUnion.GetTypes()){
+		imtsdl::CSdlField field;
+		field.SetType(sdlType);
+		bool isCustom = false;
+		QString convertedType = imtsdlgenv2::CSdlGenTools::OptListConvertTypeWithNamespaceStruct(
+			field,
+			relatedNamespace,
+			listProvider,
+			enumlistProvider,
+			unionlistProvider,
+			true,
+			&isCustom,
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr,
+			false);
+
 		CSdlTools::FeedStreamHorizontally(stream, hIndents);
 		if (!isFirstIteration){
 			stream << QStringLiteral("else ");
 		}
-		stream << QStringLiteral("if (") << sourceVariableName << QStringLiteral(".canConvert<") << sdlType.first << QStringLiteral(">()){");
+
+		stream << QStringLiteral("if (") << sourceVariableName << QStringLiteral(".canConvert<") << convertedType << QStringLiteral(">()){");
 		CSdlTools::FeedStream(stream, 1, false);
 
-		CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
-		stream << targetVariableName;
-		stream << QStringLiteral(" = ") << sourceVariableName << QStringLiteral(".value<") << sdlType.first << QStringLiteral(">();");
-		CSdlTools::FeedStream(stream, 1, false);
+		if (isCustom){
+			CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+			QString tempVar = targetVariableName + QStringLiteral("Convert");
+			stream << convertedType << QStringLiteral(" ") << tempVar << QStringLiteral(";");
+			CSdlTools::FeedStream(stream, 1, false);
+
+			if (conversionType == CT_MODEL_ARRAY || conversionType == CT_MODEL_SCALAR){
+				QString readVariable = QString("is") + targetVariableName + QString("Read");
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
+				stream << tempVar << QStringLiteral(".ReadFromModel(*model.GetTreeItemModel(\"");
+				if (conversionType == CT_MODEL_SCALAR){
+					stream << targetVariableName;
+				}
+				else{
+					stream << targetName;
+				}
+				stream << QStringLiteral("\", ");
+				stream << modelIndex << QStringLiteral(")); ");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if (!") << readVariable << QStringLiteral("){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << targetVariableName << QStringLiteral(" = ");
+				stream << QStringLiteral("std::make_shared<") << sdlUnion.GetName() << QStringLiteral(">(");
+				stream << tempVar << QStringLiteral(");");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+			else if (conversionType == CT_JSON_SCALAR || conversionType == CT_JSON_ARRAY){
+				QString readVariable = QString("is") + targetVariableName + QString("Read");
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
+				stream << tempVar<< QStringLiteral(".ReadFromJsonObject(");
+				if (conversionType == CT_JSON_SCALAR){
+					stream << QStringLiteral("jsonObject[\"") << targetVariableName << QStringLiteral("\"");
+				}
+				else{
+					stream << targetName << QStringLiteral("[") << modelIndex;
+				}
+				stream << QStringLiteral("].toObject());");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if (!") << readVariable << QStringLiteral("){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << targetVariableName << QStringLiteral(" = ");
+				stream << QStringLiteral("std::make_shared<") << sdlUnion.GetName() << QStringLiteral(">(");
+				stream << tempVar << QStringLiteral(");");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+			else{
+				QString gqlVariable = targetName + QString("DataObjectPtr");
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("const ::imtgql::CGqlObject* ") << gqlVariable;
+				stream << QStringLiteral(" = request.GetFieldArgumentObjectPtr(\"");
+				if (conversionType == CT_GQL_SCALAR){
+					stream << targetVariableName;
+				}
+				else{
+					stream << targetName;
+				}
+				stream << QStringLiteral("\");");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				QString readVariable = QString("is") + targetName + QString("Read");
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
+				stream << tempVar << QStringLiteral(".ReadFromGraphQlObject(*") << gqlVariable << QStringLiteral(");");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("if (!") << readVariable << QStringLiteral("){");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 2);
+				stream << QStringLiteral("return false;");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << QStringLiteral("}");
+				CSdlTools::FeedStream(stream, 1, false);
+
+				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+				stream << targetVariableName << QStringLiteral(" = ");
+				stream << QStringLiteral("std::make_shared<") << sdlUnion.GetName() << QStringLiteral(">(");
+				stream << tempVar << QStringLiteral(");");
+				CSdlTools::FeedStream(stream, 1, false);
+			}
+		}
+		else{
+			CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+			stream << targetVariableName;
+			stream << QStringLiteral(" = ");
+			stream << QStringLiteral("std::make_shared<") << sdlUnion.GetName() << QStringLiteral(">(");
+			stream << sourceVariableName << QStringLiteral(".value<") << convertedType << QStringLiteral(">());");
+			CSdlTools::FeedStream(stream, 1, false);
+		}
 
 
 		CSdlTools::FeedStreamHorizontally(stream, hIndents);
@@ -194,6 +413,22 @@ void CSdlUnionConverter::WriteUnionConversionFromString(
 		CSdlTools::FeedStream(stream, 1, false);
 
 		isFirstIteration = false;
+	}
+
+	if (conversionType == CT_MODEL_ARRAY 
+		|| conversionType == CT_JSON_ARRAY
+		|| conversionType == CT_GQL_ARRAY){
+		CSdlTools::FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("else{");
+		CSdlTools::FeedStream(stream, 1, false);
+
+		CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return false;");
+		CSdlTools::FeedStream(stream, 1, false);
+
+		CSdlTools::FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("}");
+		CSdlTools::FeedStream(stream, 1, false);
 	}
 }
 

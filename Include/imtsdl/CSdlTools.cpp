@@ -127,6 +127,10 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 			if (!retVal.startsWith(QStringLiteral("::")) && !isUnion && !isEnum){
 				retVal.prepend(QStringLiteral("::"));
 			}
+			// add pointer to union, if it is needed
+			if (isUnion && listWrap){
+				retVal = QStringLiteral("std::shared_ptr<") + retVal + QStringLiteral(">");
+			}
 		}
 	}
 

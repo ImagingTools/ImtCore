@@ -39,13 +39,14 @@ void CSdlUnion::SetName(const QString& name)
 }
 
 
-QList<QPair<QString, bool>> CSdlUnion::GetTypes() const
+QList<QString> CSdlUnion::GetTypes() const
 {
 	return m_types;
 }
 
 
-void CSdlUnion::SetTypes(const QList<QPair<QString, bool>>& types)
+
+void CSdlUnion::SetTypes(const QList<QString>& types)
 {
 	if (types != m_types){
 		istd::CChangeNotifier notifier(this);
@@ -53,28 +54,14 @@ void CSdlUnion::SetTypes(const QList<QPair<QString, bool>>& types)
 	}
 }
 
-void CSdlUnion::AddType(const QPair<QString, bool>& value)
+void CSdlUnion::AddType(const QString& type)
 {
 	istd::CChangeNotifier notifier(this);
 
-	auto foundIter = std::find_if(m_types.begin(), m_types.end(), [&value](const QPair<QString, bool>& lookup){
-		return (value.first == lookup.first);
-	});
-
-	if (foundIter == m_types.end()){
-		m_types << value;
+	if (!m_types.contains(type)){
+		m_types << type;
 	}
 }
-
-bool CSdlUnion::HasContainsCustom() const
-{
-	bool retVal = false;
-	for (const auto& typeIter : m_types){
-		retVal = retVal && typeIter.second;
-	}
-	return retVal;
-}
-
 
 QString CSdlUnion::GetNamespace() const
 {
@@ -132,7 +119,6 @@ bool CSdlUnion::Serialize(iser::IArchive& archive)
 
 	iser::CArchiveTag elementsTag("Types", "List of elements", iser::CArchiveTag::TT_MULTIPLE);
 	iser::CArchiveTag elementNameTag("TypeName", "Single element", iser::CArchiveTag::TT_LEAF, &elementsTag);
-	iser::CArchiveTag elementCustomTag("TypeComplex", "Single element", iser::CArchiveTag::TT_LEAF, &elementsTag);
 
 	int elementsCount = m_types.count();
 	bool isStoring = archive.IsStoring();
@@ -148,26 +134,19 @@ bool CSdlUnion::Serialize(iser::IArchive& archive)
 			auto sdlType = m_types[i];
 
 			retVal = retVal && archive.BeginTag(elementNameTag);
-			retVal = retVal && archive.Process(sdlType.first);
+			retVal = retVal && archive.Process(sdlType);
 			retVal = retVal && archive.EndTag(elementNameTag);
 
-			retVal = retVal && archive.BeginTag(elementCustomTag);
-			retVal = retVal && archive.Process(sdlType.second);
-			retVal = retVal && archive.EndTag(elementCustomTag);
 		}
 	}
 	else{
 		m_types.clear();
 
 		for (int i = 0; i > elementsCount; ++i){
-			QPair<QString, bool> sdlType;
+			QString sdlType;
 			retVal = retVal && archive.BeginTag(elementNameTag);
-			retVal = retVal && archive.Process(sdlType.first);
+			retVal = retVal && archive.Process(sdlType);
 			retVal = retVal && archive.EndTag(elementNameTag);
-
-			retVal = retVal && archive.BeginTag(elementCustomTag);
-			retVal = retVal && archive.Process(sdlType.second);
-			retVal = retVal && archive.EndTag(elementCustomTag);
 
 			if (retVal){
 				m_types.push_back(sdlType);

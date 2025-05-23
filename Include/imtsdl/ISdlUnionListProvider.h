@@ -14,6 +14,7 @@ namespace imtsdl
 
 class ISdlUnionListProvider: virtual public istd::IPolymorphic
 {
+
 public:
 	/**
 	   \returns available enums

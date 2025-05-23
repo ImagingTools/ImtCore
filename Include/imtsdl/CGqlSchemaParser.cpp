@@ -362,13 +362,7 @@ bool CGqlSchemaParser::ProcessUnion()
 			atEnd = bool(!retVal || foundDelimeter == '\n');
 			continue;
 		}
-		bool isComplex = false;
-		bool isCustom = false;
-
-		QString convertedUnionValue = CSdlTools::ConvertType(unionValue, &isCustom, &isComplex);;
-
-		currentUnion.AddType(QPair<QString, bool>(convertedUnionValue, isCustom));
-
+		currentUnion.AddType(unionValue);
 		atEnd = bool(!retVal || foundDelimeter == '\n');
 	}
 

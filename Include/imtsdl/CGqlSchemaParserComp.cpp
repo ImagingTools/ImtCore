@@ -38,7 +38,7 @@ const QByteArray CGqlSchemaParserComp::s_unionListParamId = QByteArrayLiteral("U
 
 // reimplemented(iproc::IProcessor)
 
-int CGqlSchemaParserComp::DoProcessing(
+iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 			const iprm::IParamsSet* /*paramsPtr*/,
 			const istd::IPolymorphic* inputPtr,
 			istd::IChangeable* outputPtr,
@@ -323,7 +323,7 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 {
 	// process found files
 	for (const QString& schemaPath: std::as_const(importFilesList)){
-		istd::TDelPtr<iproc::IProcessor> newSchemaProcessor(m_fileSchemaParserCompFactPtr.CreateInstance());
+		iproc::IProcessorPtr newSchemaProcessor(m_fileSchemaParserCompFactPtr.CreateInstance());
 		ifile::CFileNameParam schemaFilePathParam;
 		schemaFilePathParam.SetPath(schemaPath);
 		iprm::CParamsSet outputParams;
@@ -331,14 +331,14 @@ bool CGqlSchemaParserComp::ExtractTypesFromImport(const QStringList& importFiles
 
 		// Add types to the slave parser in order to prevent incorrect parsing if a schema with a 'known' type has already been processed.
 		if (!m_sdlTypes.isEmpty()){
-			CGqlSchemaParserComp* castedParserPtr = newSchemaProcessor.Cast<CGqlSchemaParserComp*>();
+			CGqlSchemaParserComp* castedParserPtr = dynamic_cast<CGqlSchemaParserComp*>(newSchemaProcessor.GetPtr());
 			if (castedParserPtr != nullptr){
 				castedParserPtr->m_sdlTypes = m_sdlTypes;
 			}
 		}
 
 		if (!m_enums.isEmpty()){
-			CGqlSchemaParserComp* castedParserPtr = newSchemaProcessor.Cast<CGqlSchemaParserComp*>();
+			CGqlSchemaParserComp* castedParserPtr = dynamic_cast<CGqlSchemaParserComp*>(newSchemaProcessor.GetPtr());
 			if (castedParserPtr != nullptr){
 				castedParserPtr->m_enums = m_enums;
 			}

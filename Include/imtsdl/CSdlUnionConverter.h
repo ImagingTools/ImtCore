@@ -11,6 +11,7 @@
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
 #include <imtsdl/CSdlUnion.h>
+#include <imtsdlgenv2/CSdlGenTools.h>
 
 
 namespace imtsdl
@@ -20,28 +21,16 @@ namespace imtsdl
 class CSdlUnionConverter
 {
 
-
 public:
 	enum ConversionType
 	{
-		CT_AS_IS,
-		CT_UPPER_CAMEL_CASE,	///< \brief aka Pascal \example UpperCamelCase
-		CT_LOWER_CAMEL_CASE,	///< \example lowerCamelCase
-		CT_UPPER_SNAKE_CASE,	///< \example UPPER_SNAKE_CASE
-		CT_LOWER_SNAKE_CASE,	///< \example lower_snake_case
-		CT_UPPER_KEBAB_CASE,	///< \example UPPER-KEBAB-CASE
-		CT_LOWER_KEBAB_CASE		///< \example lower-kebab-case
+		CT_MODEL_SCALAR = 2,
+		CT_MODEL_ARRAY = 3,
+		CT_GQL_SCALAR = 8,
+		CT_GQL_ARRAY = 12,
+		CT_JSON_SCALAR = 32,
+		CT_JSON_ARRAY = 48
 	};
-
-	// static variables
-	/**
-		\brief Defines a default type to conversion.
-		\warning If a change is required, it MUST ONLY be made during the process of parsing the scheme.
-	*/
-	static ConversionType s_defaultConversionType;
-
-	// conversion methods
-	//[[nodiscard]] static QString ConvertUnionToStringEquivalent(const QString& unionValue, ConversionType conversionType = s_defaultConversionType);
 
 	// generate methods
 	static void WriteConversionFromUnion(
@@ -50,14 +39,27 @@ public:
 				const QString& sourceVariableName,
 				const QString& targetVariableName,
 				const QString& relatedNamespace,
-				uint hIndents = 1);
+				const QString& targetName,
+				const QString& modelIndex,
+				const imtsdl::ISdlTypeListProvider& listProvider,
+				const imtsdl::ISdlEnumListProvider& enumlistProvider,
+				const imtsdl::ISdlUnionListProvider& unionlistProvider,
+				uint hIndents = 1,
+				const ConversionType& conversionType = CT_MODEL_SCALAR,
+				const QString& addCommand = QString());
 	static void WriteUnionConversionFromString(
 				QTextStream& stream,
 				const CSdlUnion& sdlUnion,
 				const QString& sourceVariableName,
 				const QString& targetVariableName,
 				const QString& relatedNamespace,
-				uint hIndents = 1);
+				const QString& modelIndex,
+				const imtsdl::ISdlTypeListProvider& listProvider,
+				const imtsdl::ISdlEnumListProvider& enumlistProvider,
+				const imtsdl::ISdlUnionListProvider& unionlistProvider,
+				uint hIndents = 1,
+				const ConversionType& conversionType = CT_MODEL_SCALAR,
+				const QString& targetName = QString());
 };
 
 

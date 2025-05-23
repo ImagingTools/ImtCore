@@ -31,11 +31,9 @@ public:
 	[[nodiscard]] QString GetName() const;
 	void SetName(const QString& name);
 
-	[[nodiscard]] QList<QPair<QString, bool>> GetTypes() const;
-	void SetTypes(const QList<QPair<QString, bool>>& types);
-	void AddType(const QPair<QString, bool>& value);
-
-	bool HasContainsCustom() const;
+	[[nodiscard]] QList<QString> GetTypes() const;
+	void SetTypes(const QList<QString>& types);
+	void AddType(const QString& type);
 
 	/// \todo remove it \deprecated. Build namespace from \c m_schemaParamsPtr instead. \sa GetSchemaParams
 	[[nodiscard]] QString GetNamespace() const;
@@ -50,7 +48,7 @@ public:
 
 private:
 	QString m_name;
-	QList<QPair<QString /*name*/, bool /*isCustom*/>> m_types;
+	QList<QString> m_types;
 	QString m_namespace;
 };
 

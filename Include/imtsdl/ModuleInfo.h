@@ -1,6 +1,9 @@
 #pragma once
 
 
+// STL includes
+#include <optional>
+
 // ACF includes
 #include<istd/IPolymorphic.h>
 
