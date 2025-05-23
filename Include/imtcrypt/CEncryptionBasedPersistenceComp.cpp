@@ -17,11 +17,11 @@ namespace imtcrypt
 {
 
 
-// protected methods
+// public methods
 
 // reimplemented (imtcrypt::IEncryptedFilePersistence)
 
-int CEncryptionBasedPersistenceComp::LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& /*data*/) const
+tate CEncryptionBasedPersistenceComp::LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& data) const
 {
 	if (!filePath.isEmpty() &&
 		m_encryptionKeysProviderCompPtr.IsValid() &&
@@ -37,7 +37,7 @@ int CEncryptionBasedPersistenceComp::LoadFromEncryptedFile(const QByteArray& key
 			imtcrypt::IEncryption::EncryptionAlgorithm encryptionAlgorithm = imtcrypt::IEncryption::EA_AES;
 			if (m_encryptionAlgorithm.IsValid()){
 				switch (*m_encryptionAlgorithm){
-				case 0:
+				case imtcrypt::IEncryption::EA_RSA:
 					encryptionAlgorithm = imtcrypt::IEncryption::EA_RSA;
 					localKeyProvider = LocalKeyProvider(encryptionAlgorithm,
 								m_encryptionKeysProviderCompPtr->GetEncryptionKey(IEncryptionKeysProvider::KT_PUBLIC),
@@ -51,7 +51,7 @@ int CEncryptionBasedPersistenceComp::LoadFromEncryptedFile(const QByteArray& key
 				}
 			}
 
-			if (!m_encryptionCompPtr->DecryptData(encryptedData,encryptionAlgorithm, *m_encryptionKeysProviderCompPtr, decryptedData)){
+			if (!m_encryptionCompPtr->DecryptData(encryptedData,encryptionAlgorithm, localKeyProvider, decryptedData)){
 				file.close();
 				return OS_FAILED;
 			}
@@ -82,7 +82,10 @@ bool CEncryptionBasedPersistenceComp::IsOperationSupported(
 }
 
 
-int CEncryptionBasedPersistenceComp::LoadFromFile(istd::IChangeable& data, const QString& filePath, ibase::IProgressManager* progressManagerPtr) const
+ifile::IFilePersistence::OperationState CEncryptionBasedPersistenceComp::LoadFromFile(
+			istd::IChangeable& data,
+			const QString& filePath,
+			ibase::IProgressManager* progressManagerPtr) const
 {
 	if (		m_basePersistenceCompPtr.IsValid() &&
 				!filePath.isEmpty() &&
@@ -130,7 +133,7 @@ int CEncryptionBasedPersistenceComp::LoadFromFile(istd::IChangeable& data, const
 }
 
 
-int CEncryptionBasedPersistenceComp::SaveToFile(
+ifile::IFilePersistence::OperationState CEncryptionBasedPersistenceComp::SaveToFile(
 			const istd::IChangeable& data,
 			const QString & filePath,
 			ibase::IProgressManager* progressManagerPtr) const

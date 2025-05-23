@@ -39,7 +39,8 @@ public:
 
 protected:
 	// reimplemented (imtcrypt::IEncryptedFilePersistence)
-	virtual int LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& data) const override;
+	virtual ifile::IFilePersistence::OperationState LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& data) const override;
+
 
 	// reimplemented (ifile::IFilePersistence)
 	virtual bool IsOperationSupported(
@@ -47,11 +48,11 @@ protected:
 			const QString* filePathPtr = NULL,
 			int flags = -1,
 			bool beQuiet = true) const override;
-	virtual int LoadFromFile(
+	virtual OperationState LoadFromFile(
 			istd::IChangeable& data,
 			const QString& filePath = QString(),
 			ibase::IProgressManager* progressManagerPtr = NULL) const override;
-	virtual int SaveToFile(
+	virtual OperationState SaveToFile(
 			const istd::IChangeable& data,
 			const QString& filePath = QString(),
 			ibase::IProgressManager* progressManagerPtr = NULL) const override;

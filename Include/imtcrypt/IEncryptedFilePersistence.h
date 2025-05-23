@@ -24,10 +24,10 @@ public:
 		Get the key data according to specified type.
 		\sa KeyType
 	*/
-	virtual int LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& data) const = 0;
+	virtual ifile::IFilePersistence::OperationState LoadFromEncryptedFile(const QByteArray& key, const QString& filePath, istd::IChangeable& data) const = 0;
 };
 
 
-} // namespace imtcrypt
+} //namespace imtcrypt
 
 

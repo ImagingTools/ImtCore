@@ -21,7 +21,7 @@ class IEncryption: virtual public istd::IPolymorphic
 public:
 	enum EncryptionAlgorithm
 	{
-		EA_RSA,
+		EA_RSA = 0,
 		EA_AES
 	};
 
