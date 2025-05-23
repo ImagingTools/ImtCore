@@ -22,7 +22,7 @@ public:
 
 	// reimplemented (imtdev::IDeviceInstanceInfoEditor)
 	virtual bool SetIdentifier(IdentifierTypes idType, const QByteArray& id) override;
-	bool SetVersion(
+	virtual bool SetVersion(
 		int versionId,
 		quint32 version,
 		const QString& name,
