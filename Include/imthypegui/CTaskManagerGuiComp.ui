@@ -77,22 +77,28 @@
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <property name="spacing">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="leftMargin">
-            <number>0</number>
+            <number>3</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>3</number>
            </property>
            <property name="rightMargin">
-            <number>0</number>
+            <number>3</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>3</number>
            </property>
            <item>
             <widget class="QToolButton" name="AddButton">
+             <property name="minimumSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="text">
               <string>Add</string>
              </property>
@@ -100,19 +106,14 @@
               <iconset>
                <normaloff>:/Icons/Add</normaloff>:/Icons/Add</iconset>
              </property>
-             <property name="autoRaise">
-              <bool>true</bool>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
              </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="RemoveButton">
-             <property name="text">
-              <string>Remove</string>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/Icons/Delete</normaloff>:/Icons/Delete</iconset>
+             <property name="popupMode">
+              <enum>QToolButton::MenuButtonPopup</enum>
              </property>
              <property name="autoRaise">
               <bool>true</bool>
@@ -121,6 +122,15 @@
            </item>
            <item>
             <widget class="QToolButton" name="DuplicateButton">
+             <property name="minimumSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Duplicate current inspection</string>
+             </property>
              <property name="text">
               <string>Duplicate</string>
              </property>
@@ -128,13 +138,48 @@
               <iconset>
                <normaloff>:/Icons/Duplicate</normaloff>:/Icons/Duplicate</iconset>
              </property>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
              <property name="autoRaise">
               <bool>true</bool>
              </property>
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer">
+            <widget class="QToolButton" name="RemoveButton">
+             <property name="minimumSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Remove current inspection</string>
+             </property>
+             <property name="text">
+              <string>Remove</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/Icons/Delete</normaloff>:/Icons/Delete</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -147,19 +192,57 @@
             </spacer>
            </item>
            <item>
-            <widget class="QToolButton" name="ExecuteAllButton">
+            <widget class="QToolButton" name="HideListButton">
+             <property name="minimumSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
              <property name="toolTip">
-              <string>Test Product</string>
+              <string>Hide inspections list</string>
              </property>
              <property name="text">
-              <string>Execute</string>
+              <string>Hide</string>
+             </property>
+             <property name="icon">
+              <iconset>
+               <normaloff>:/Icons/Duplicate</normaloff>:/Icons/Duplicate</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="ExecuteAllButton">
+             <property name="minimumSize">
+              <size>
+               <width>32</width>
+               <height>32</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Run all inspections</string>
+             </property>
+             <property name="text">
+              <string>Test Product</string>
              </property>
              <property name="icon">
               <iconset>
                <normaloff>:/Icons/Play</normaloff>:/Icons/Play</iconset>
              </property>
-             <property name="autoRaise">
-              <bool>true</bool>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
              </property>
             </widget>
            </item>
@@ -172,7 +255,7 @@
            <enum>QFrame::NoFrame</enum>
           </property>
           <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarAlwaysOff</enum>
+           <enum>Qt::ScrollBarAsNeeded</enum>
           </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -185,6 +268,120 @@
           </property>
           <property name="verticalScrollMode">
            <enum>QAbstractItemView::ScrollPerPixel</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFrame" name="SideFrame">
+       <property name="minimumSize">
+        <size>
+         <width>26</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>3</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QToolButton" name="ShowListButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Show inspections list</string>
+          </property>
+          <property name="text">
+           <string>Show</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>:/Icons/Duplicate</normaloff>:/Icons/Duplicate</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>20</width>
+            <height>20</height>
+           </size>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::MenuButtonPopup</enum>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListView" name="MicroTaskList">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>32</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="verticalScrollMode">
+           <enum>QAbstractItemView::ScrollPerPixel</enum>
+          </property>
+          <property name="uniformItemSizes">
+           <bool>true</bool>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="selectionRectVisible">
+           <bool>true</bool>
+          </property>
+          <property name="itemAlignment">
+           <set>Qt::AlignTop</set>
           </property>
          </widget>
         </item>

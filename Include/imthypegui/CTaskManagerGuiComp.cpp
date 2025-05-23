@@ -1,6 +1,10 @@
 #include <imthypegui/CTaskManagerGuiComp.h>
 
 
+// Qt includes
+#include <QtWidgets/QMenu>
+
+
 namespace imthypegui
 {
 
@@ -26,16 +30,29 @@ void CTaskManagerGuiComp::OnToggleTaskList(bool toggled)
 {
 	if (IsGuiCreated()){
 		LeftFrame->setVisible(toggled);
+		SideFrame->setVisible(!toggled);
+
 		istd::CChangeNotifier notifier(&m_commandsProvider);
 		m_commands.ResetChilds();
 		m_commands.InsertChild(&m_showTaskListCommand);
 		m_commands.InsertChild(&m_showInputsManagerCommand);
+
 		if (toggled){
 			m_commands.InsertChild(&m_executeAllTasksCommand);
 			m_commands.InsertChild(&m_addCommand);
 			m_commands.InsertChild(&m_deleteCommand);
 			m_commands.InsertChild(&m_duplicateCommand);
 		}
+		else {
+			if (ShowListButton->menu() == nullptr) {
+				auto listMenu = new QMenu(ShowListButton);
+				listMenu->addActions(AddButton->actions());
+				listMenu->addAction(&m_executeAllTasksCommand);
+				ShowListButton->setMenu(listMenu);
+			}
+		}
+
+		TaskActionFrame->setVisible(toggled);
 	}
 }
 
@@ -91,6 +108,14 @@ void CTaskManagerGuiComp::OnAddMenuOptionClicked(QAction* action)
 void CTaskManagerGuiComp::OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
 	OnTaskSelectionChanged(selected, deselected);
+
+	MicroTaskList->selectionModel()->select(selected, QItemSelectionModel::ClearAndSelect);
+}
+
+
+void CTaskManagerGuiComp::OnMicroSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+{
+	TaskList->selectionModel()->select(selected, QItemSelectionModel::ClearAndSelect);
 }
 
 
@@ -100,10 +125,16 @@ void CTaskManagerGuiComp::on_TaskList_doubleClicked(const QModelIndex& index)
 }
 
 
-void CTaskManagerGuiComp::OnItemContextMenu(const QPoint& position)
+void CTaskManagerGuiComp::on_MicroTaskList_doubleClicked(const QModelIndex& index)
 {
-	const QModelIndex index = TaskList->indexAt(position);
-	if (index.isValid()){
+	EditTask(index);
+}
+
+
+void CTaskManagerGuiComp::ShowContextMenu(const QPoint& position, QListView& list)
+{
+	QModelIndex index = list.indexAt(position);
+	if (index.isValid()) {
 		bool isEnabled = index.data(CTaskItemDelegate::DR_TASK_ENABLED).toBool();
 
 		QString actionText = isEnabled ? tr("Disable") : tr("Enable");
@@ -112,7 +143,7 @@ void CTaskManagerGuiComp::OnItemContextMenu(const QPoint& position)
 		itemMenu.addAction(actionText, this, SLOT(OnToggleTask()));
 		itemMenu.addSeparator();
 
-		itemMenu.addAction(QIcon(":/Icons/Edit"), tr("Rename"), this, SLOT(OnRenameTask()), QKeySequence(Qt::Key_F2));
+		itemMenu.addAction(GetIcon(":/Icons/Edit"), tr("Rename"), this, SLOT(OnRenameTask()), QKeySequence(Qt::Key_F2));
 
 		if (*m_allowAddTasksAttrPtr) {
 			itemMenu.addAction(m_duplicateCommand.icon(), tr("Duplicate"), this, SLOT(OnDuplicateTask()));
@@ -125,12 +156,24 @@ void CTaskManagerGuiComp::OnItemContextMenu(const QPoint& position)
 		}
 
 		if (m_taskSettingsGuiCompPtr.IsValid()) {
-			QAction* settingsAction = itemMenu.addAction(QIcon(":/Icons/Settings"), tr("Settings"));
+			QAction* settingsAction = itemMenu.addAction(GetIcon(":/Icons/Settings"), tr("Settings"));
 			connect(settingsAction, &QAction::triggered, [this, index]() { on_TaskList_doubleClicked(index); });
 		}
 
-		itemMenu.exec(TaskList->mapToGlobal(position));
+		itemMenu.exec(list.mapToGlobal(position));
 	}
+}
+
+
+void CTaskManagerGuiComp::OnMicroItemContextMenu(const QPoint& position)
+{
+	ShowContextMenu(position, *MicroTaskList);
+}
+
+
+void CTaskManagerGuiComp::OnItemContextMenu(const QPoint& position)
+{
+	ShowContextMenu(position, *TaskList);
 }
 
 
@@ -184,11 +227,11 @@ void CTaskManagerGuiComp::UpdateCommands()
 	ExecuteAllButton->setVisible(*m_showAllExecuteButtonAttrPtr && m_executeAllTasksCommand.isVisible());
 	ExecuteAllButton->setEnabled(*m_showAllExecuteButtonAttrPtr && m_executeAllTasksCommand.isEnabled());
 
-	TaskActionFrame->setVisible(
-				AddButton->isVisible() ||
-				RemoveButton->isVisible() ||
-				DuplicateButton->isVisible() ||
-				ExecuteAllButton->isVisible());
+	//TaskActionFrame->setVisible(
+	//			AddButton->isVisible() ||
+	//			RemoveButton->isVisible() ||
+	//			DuplicateButton->isVisible() ||
+	//			ExecuteAllButton->isVisible());
 }
 
 
@@ -240,6 +283,14 @@ void CTaskManagerGuiComp::OnGuiCreated()
 	connect(TaskList->selectionModel(), &QItemSelectionModel::selectionChanged, this, &CTaskManagerGuiComp::OnSelectionChanged);
 	connect(TaskList, &QWidget::customContextMenuRequested, this, &CTaskManagerGuiComp::OnItemContextMenu);
 
+
+	MicroTaskList->setModel(&m_itemModel);
+	MicroTaskList->setItemDelegate(new CMicroTaskItemDelegate(this));
+	MicroTaskList->setContextMenuPolicy(Qt::CustomContextMenu);
+	connect(MicroTaskList->selectionModel(), &QItemSelectionModel::selectionChanged, this, &CTaskManagerGuiComp::OnMicroSelectionChanged);
+	connect(MicroTaskList, &QWidget::customContextMenuRequested, this, &CTaskManagerGuiComp::OnItemContextMenu);
+
+
 	const Qt::ConnectionType uniqueQueued = static_cast<Qt::ConnectionType>(Qt::QueuedConnection | Qt::UniqueConnection);
 	AddButton->setDefaultAction(&m_addCommand);
 	connect(RemoveButton, &QToolButton::clicked, this, &CTaskManagerGuiComp::OnDeleteTask, uniqueQueued);
@@ -247,6 +298,15 @@ void CTaskManagerGuiComp::OnGuiCreated()
 	connect(ExecuteAllButton, &QToolButton::clicked, this, &CTaskManagerGuiComp::OnTestAll, uniqueQueued);
 
 	m_showInputsManagerCommand.setVisible(m_taskInputManagerGuiCompPtr.IsValid() && m_taskInputManagerObserverCompPtr.IsValid());
+
+
+	AddButton->setPopupMode(QToolButton::InstantPopup);
+
+	HideListButton->setIcon(GetIcon(":/Icons/Menu"));
+	connect(HideListButton, &QToolButton::clicked, [=]() {m_showTaskListCommand.toggle(); });
+	ShowListButton->setIcon(GetIcon(":/Icons/Menu"));
+	connect(ShowListButton, &QToolButton::clicked, [=]() {m_showTaskListCommand.toggle(); });
+	SideFrame->hide();
 }
 
 
@@ -294,6 +354,11 @@ void CTaskManagerGuiComp::OnGuiDesignChanged()
 	m_deleteCommand.setIcon(GetIcon(":/Icons/Delete"));
 	m_duplicateCommand.setIcon(GetIcon(":/Icons/Duplicate"));
 	m_showInputsManagerCommand.setIcon(GetIcon(":/Icons/Import"));
+
+	AddButton->setIcon(GetIcon(":/Icons/Add"));
+	DuplicateButton->setIcon(GetIcon(":/Icons/Duplicate"));
+	ExecuteAllButton->setIcon(GetIcon(":/Icons/Play"));
+	RemoveButton->setIcon(GetIcon(":/Icons/Delete"));
 }
 
 

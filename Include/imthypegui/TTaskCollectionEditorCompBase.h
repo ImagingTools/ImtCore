@@ -19,6 +19,7 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/CHierarchicalCommand.h>
 #include <iqtgui/CGuiComponentDialog.h>
+#include <iqtgui/TMakeStateIconWrapper.h>
 #include <imod/IModel.h>
 #include <iprm/IOptionsList.h>
 #include <istd/CChangeGroup.h>
@@ -44,15 +45,17 @@ namespace imthypegui
 
 template <class UI>
 class TTaskCollectionEditorCompBase:
-			public iqtgui::TDesignerGuiObserverCompBase<
+	public iqtgui::StateIconWrapper< 
+			iqtgui::TDesignerGuiObserverCompBase<
 							UI,
-							imthype::ITaskCollection>,
-			protected imod::CMultiModelDispatcherBase,
-			virtual public ibase::ICommandsProvider
+							imthype::ITaskCollection> >,
+	protected imod::CMultiModelDispatcherBase,
+	virtual public ibase::ICommandsProvider
 {
 	Q_DECLARE_TR_FUNCTIONS(TTaskCollectionEditorCompBase)
+
 public:
-	typedef iqtgui::TDesignerGuiObserverCompBase<UI, imthype::ITaskCollection> BaseClass;
+	typedef iqtgui::StateIconWrapper< iqtgui::TDesignerGuiObserverCompBase<UI, imthype::ITaskCollection> > BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_BASE_COMPONENT(TTaskCollectionEditorCompBase);
@@ -127,17 +130,18 @@ private:
 		virtual void SetUserTaskId(const QByteArray& userTaskId) override;
 		virtual QByteArray GetTaskInputId() const override;
 		virtual void SetTaskInputId(const QByteArray& inputId) override;
-
 		virtual const imtbase::IObjectCollection* GetTaskInputs() const override;
+
 	private:
+		TTaskCollectionEditorCompBase* m_parentPtr = nullptr;
+
 		QString m_taskName;
 		QString m_taskDescription;
-		bool m_isEnabled;
+		bool m_isEnabled = false;
 		QByteArray m_userTaskId;
 		QByteArray m_inputId;
-
-		TTaskCollectionEditorCompBase* m_parentPtr;
 	};
+
 	template <typename InterfaceType>
 	static InterfaceType* ExtractTaskSettings(TTaskCollectionEditorCompBase& component)
 	{
@@ -157,8 +161,9 @@ private:
 		virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 	private:
-		TTaskCollectionEditorCompBase* m_parentPtr;
+		TTaskCollectionEditorCompBase* m_parentPtr = nullptr;
 	};
+
 	template <typename InterfaceType>
 	static InterfaceType* ExtractCommands(TTaskCollectionEditorCompBase& component)
 	{
@@ -179,7 +184,7 @@ protected:
 
 	QMenu m_startVariableMenus;
 
-	int m_currentSelectedIndex;
+	int m_currentSelectedIndex = -1;
 
 	iqtgui::CHierarchicalCommand m_rootCommands;
 	iqtgui::CHierarchicalCommand m_commands;
@@ -193,7 +198,7 @@ protected:
 	imod::TModelWrap<Commands> m_commandsProvider;
 
 	imod::TModelWrap<TaskSettings> m_taskSettings;
-	bool m_isTaskSettingsUpdating;
+	bool m_isTaskSettingsUpdating = false;
 	QByteArray m_selectedTaskId;
 
 	imtbase::TModelUpdateBinder<imthype::ITaskSettings, TTaskCollectionEditorCompBase<UI>> m_taskSettingsObserver;
@@ -290,6 +295,9 @@ void TTaskCollectionEditorCompBase<UI>::AddTask(const QByteArray& typeId, bool i
 		workingTypeId = taskTypesPtr->GetOptionId(0);
 	}
 
+	istd::CChangeGroup changeGroup(objectPtr);
+	Q_UNUSED(changeGroup);
+
 	QByteArray taskId = objectPtr->InsertNewObject(workingTypeId, QString(), QString());
 
 	if (taskId.isEmpty()){
@@ -304,6 +312,12 @@ void TTaskCollectionEditorCompBase<UI>::AddTask(const QByteArray& typeId, bool i
 			objectPtr->SetUserTaskId(taskId, QByteArray(QString::number(lastUserId + 1).toUtf8()));
 		}
 	}
+
+	// select the recent task
+	QItemSelectionModel* selectionModelPtr = GetTaskSelectionModel();
+	int lastRow = selectionModelPtr->model()->rowCount() - 1;
+	m_currentSelectedIndex = lastRow;
+	selectionModelPtr->setCurrentIndex(selectionModelPtr->model()->index(lastRow, 0), QItemSelectionModel::SelectCurrent);
 }
 
 
@@ -335,7 +349,7 @@ void TTaskCollectionEditorCompBase<UI>::DeleteTask()
 		m_currentSelectedIndex = selectionIndex > 0 ? selectionIndex - 1 : 0;
 	}
 
-	const QModelIndex& index = indexes[0];
+	const QModelIndex index = indexes[0];
 
 	QByteArray taskId = index.data(CTaskItemDelegate::DR_TASK_UUID).toByteArray();
 
@@ -366,6 +380,9 @@ void TTaskCollectionEditorCompBase<UI>::DuplicateTask()
 		QByteArray taskTypeId = index.data(CTaskItemDelegate::DR_TYPE_ID).toByteArray();
 		QString sourceTaskName = index.data(CTaskItemDelegate::DR_TASK_NAME).toString();
 
+		istd::CChangeGroup changeGroup(objectPtr);
+		Q_UNUSED(changeGroup);
+
 		QByteArray newTaskId = objectPtr->InsertNewObject(taskTypeId, QString("Copy of %1").arg(sourceTaskName), "", objectPtr->GetObjectPtr(taskId));
 		if (newTaskId.isEmpty()){
 			QMessageBox::critical(BaseClass::GetWidget(), QObject::tr("Task Error"), QObject::tr("Task could not be duplicated!"));
@@ -374,12 +391,16 @@ void TTaskCollectionEditorCompBase<UI>::DuplicateTask()
 
 		if (!objectPtr->GetUserTaskId(taskId).isEmpty()){
 			int lastUserId = GetLastNumberedUserId();
-
 			if (lastUserId >= 0){
 				objectPtr->SetUserTaskId(newTaskId, QByteArray(QString::number(lastUserId + 1).toUtf8()));
 			}
 		}
 	}
+
+	// select the recent task
+	int lastRow = selectionModelPtr->model()->rowCount() - 1;
+	m_currentSelectedIndex = lastRow;
+	selectionModelPtr->setCurrentIndex(selectionModelPtr->model()->index(lastRow, 0), QItemSelectionModel::SelectCurrent);
 }
 
 
@@ -395,19 +416,18 @@ void TTaskCollectionEditorCompBase<UI>::OnTaskSelectionChanged(const QItemSelect
 	imthype::ITaskCollection* objectPtr = BaseClass::GetObjectPtr();
 	if (objectPtr != nullptr){
 		imod::IModel* taskModelPtr = GetTaskModelFromSelection(deselected);
-		if (taskModelPtr != nullptr){
-			imod::IObserver* observerPtr = GetTaskModelObserverFromSelection(deselected);
-			if (observerPtr != nullptr){
+		imod::IObserver* observerPtr = GetTaskModelObserverFromSelection(deselected);
+		if (taskModelPtr != nullptr && observerPtr != nullptr){
 				taskModelPtr->DetachObserver(observerPtr);
-			}
 		}
 
 		const QModelIndexList selectedIndexes = selected.indexes();
 		if (!selectedIndexes.isEmpty()){
-			const QModelIndex& index = selectedIndexes[0];
+			const QModelIndex index = selectedIndexes[0];
 
-			QStandardItem* itemPtr = m_itemModel.itemFromIndex(index);
-			Q_ASSERT(itemPtr != nullptr);
+			if (QStandardItem* itemPtr = m_itemModel.itemFromIndex(index))
+			{
+				//Q_ASSERT(itemPtr != nullptr);
 
 			m_currentSelectedIndex = itemPtr->row();
 
@@ -424,6 +444,7 @@ void TTaskCollectionEditorCompBase<UI>::OnTaskSelectionChanged(const QItemSelect
 				}
 			}
 		}
+	}
 	}
 
 	BaseClass::TaskEditorStack->setCurrentIndex(pageIndex);
@@ -462,7 +483,7 @@ void TTaskCollectionEditorCompBase<UI>::ToggleTask()
 		const QModelIndexList selectedIndexes = currentSelection.indexes();
 
 		if (!selectedIndexes.isEmpty()){
-			const QModelIndex& index = selectedIndexes[0];
+			const QModelIndex index = selectedIndexes[0];
 
 			QByteArray taskId = index.data(CTaskItemDelegate::DR_TASK_UUID).toByteArray();
 			bool isEnabled = index.data(CTaskItemDelegate::DR_TASK_ENABLED).toBool();
@@ -487,7 +508,7 @@ void TTaskCollectionEditorCompBase<UI>::RenameTask(bool autoRename)
 		const QModelIndexList selectedIndexes = currentSelection.indexes();
 
 		if (!selectedIndexes.isEmpty()){
-			const QModelIndex& index = selectedIndexes[0];
+			const QModelIndex index = selectedIndexes[0];
 
 			QString currentTaskName = index.data(CTaskItemDelegate::DR_TASK_NAME).toString();
 
@@ -638,6 +659,7 @@ void TTaskCollectionEditorCompBase<UI>::UpdateCommands()
 	}
 }
 
+
 template <class UI>
 void TTaskCollectionEditorCompBase<UI>::InfoToTaskSettings()
 {
@@ -689,7 +711,6 @@ void TTaskCollectionEditorCompBase<UI>::InfoFromTaskSettings()
 			taskCollectionPtr->SetElementName(m_selectedTaskId, name);
 			taskCollectionPtr->SetElementDescription(m_selectedTaskId, description);
 			taskCollectionPtr->SetElementEnabled(m_selectedTaskId, isEnabled);
-			taskCollectionPtr->SetUserTaskId(m_selectedTaskId, userTaskId);
 			taskCollectionPtr->SetTaskInputId(m_selectedTaskId, inputId);
 			if (!taskCollectionPtr->SetUserTaskId(m_selectedTaskId, userTaskId)){
 				QByteArray userId = taskCollectionPtr->GetUserTaskId(m_selectedTaskId);
@@ -699,7 +720,6 @@ void TTaskCollectionEditorCompBase<UI>::InfoFromTaskSettings()
 		}
 	}
 }
-
 
 
 template <class UI>
@@ -717,6 +737,7 @@ void TTaskCollectionEditorCompBase<UI>::UpdateTaskItemState(const QModelIndex& i
 	const iinsp::ISupplier* taskPtr = objectPtr->GetTask(taskId);
 	if (taskPtr == nullptr){
 		m_itemModel.setData(index, taskState, CTaskItemDelegate::DR_TASK_PROCESSING_STATE);
+		m_itemModel.setData(index, this->GetCategoryPixmap(taskState), CTaskItemDelegate::DR_TASK_PROCESSING_STATE_ICON);
 		return;
 	}
 
@@ -730,14 +751,21 @@ void TTaskCollectionEditorCompBase<UI>::UpdateTaskItemState(const QModelIndex& i
 		// \todo Call the rendering processor for preview generation at this place. Input is the artifact object, output is a bitmap!
 		const iimg::IBitmap* inputBitmapPtr = dynamic_cast<const iimg::IBitmap*>(taskResultsProviderPtr->GetObjectPtr(*m_previewArtifactIdAttrPtr));
 		if (inputBitmapPtr != nullptr){
-			iimg::CBitmap previewBitmap;
-			previewBitmap.CopyFrom(*inputBitmapPtr, istd::IChangeable::CM_CONVERT);
+			// check if this is already QImage, to avoid extra copying
+			if (auto imagePtr = dynamic_cast<const iimg::CBitmap*>(inputBitmapPtr)) {
+				m_itemModel.setData(index, imagePtr->GetQImage(), CTaskItemDelegate::DR_TASK_PREVIEW_OBJECT);
+			}
+			else { // na ja, then copy it to QImage
+				iimg::CBitmap previewBitmap;
+				previewBitmap.CopyFrom(*inputBitmapPtr, istd::IChangeable::CM_CONVERT);
 
-			m_itemModel.setData(index, previewBitmap.GetQImage(), CTaskItemDelegate::DR_TASK_PREVIEW_OBJECT);
+				m_itemModel.setData(index, previewBitmap.GetQImage(), CTaskItemDelegate::DR_TASK_PREVIEW_OBJECT);
+			}
 		}
 	}
 
 	m_itemModel.setData(index, taskState, CTaskItemDelegate::DR_TASK_PROCESSING_STATE);
+	m_itemModel.setData(index, this->GetCategoryPixmap(taskState), CTaskItemDelegate::DR_TASK_PROCESSING_STATE_ICON);
 }
 
 
@@ -754,13 +782,13 @@ imod::IModel* TTaskCollectionEditorCompBase<UI>::GetTaskModelFromSelection(const
 		return nullptr;
 	}
 
-	const QModelIndex& index = indexes[0];
+	const QModelIndex index = indexes[0];
 
 	QByteArray taskId = index.data(CTaskItemDelegate::DR_TASK_UUID).toByteArray();
 
 	const iinsp::ISupplier* supplierPtr = objectPtr->GetTask(taskId);
 
-	return const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(supplierPtr));
+	return dynamic_cast<imod::IModel*>(const_cast<iinsp::ISupplier*>(supplierPtr));
 }
 
 
@@ -771,12 +799,13 @@ imod::IObserver* TTaskCollectionEditorCompBase<UI>::GetTaskModelObserverFromSele
 	if (objectPtr == nullptr){
 		return nullptr;
 	}
+
 	const QModelIndexList indexes = itemSelection.indexes();
 	if (indexes.isEmpty()){
 		return nullptr;
 	}
 
-	const QModelIndex& index = indexes[0];
+	const QModelIndex index = indexes[0];
 
 	const QStandardItem* itemPtr = m_itemModel.itemFromIndex(index);
 	Q_ASSERT(itemPtr != nullptr);

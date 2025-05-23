@@ -12,7 +12,7 @@ namespace imthypegui
 {
 
 
-class CTaskItemDelegate: public iqtgui::TMakeIconProviderCompWrap<QItemDelegate>
+class CTaskItemDelegate: public QItemDelegate
 {
 public:
 	typedef QItemDelegate BaseClass;
@@ -39,6 +39,19 @@ protected:
 	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+};
+
+
+class CMicroTaskItemDelegate : public CTaskItemDelegate
+{
+public:
+	typedef CTaskItemDelegate BaseClass;
+
+	CMicroTaskItemDelegate(QObject* parent = nullptr);
+
+protected:
+	// reimplemented (QItemDelegate)
+	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
 

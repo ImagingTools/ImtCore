@@ -1,7 +1,10 @@
 #pragma once
 
 
-// Acula includes
+// ACF includes
+#include <iqtgui/TMakeStateIconWrapper.h>
+
+// ImtCore includes
 #include <imthypegui/TTaskCollectionEditorCompBase.h>
 #include <GeneratedFiles/imthypegui/ui_CTaskManagerGuiComp.h>
 
@@ -13,6 +16,7 @@ namespace imthypegui
 class CTaskManagerGuiComp: public TTaskCollectionEditorCompBase<Ui::CTaskManagerGuiComp>
 {
 	Q_OBJECT
+
 public:
 	typedef TTaskCollectionEditorCompBase<Ui::CTaskManagerGuiComp> BaseClass;
 
@@ -34,9 +38,12 @@ protected Q_SLOTS:
 	void OnDeleteTask();
 	void OnDuplicateTask();
 	void OnAddMenuOptionClicked(QAction* action);
-	void OnSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
+	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
+	void OnMicroSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 	void on_TaskList_doubleClicked(const QModelIndex& index);
+	void on_MicroTaskList_doubleClicked(const QModelIndex& index);
 	void OnItemContextMenu(const QPoint& position);
+	void OnMicroItemContextMenu(const QPoint& position);
 	void OnToggleTask();
 	void OnRenameTask();
 	void OnShowInputsManager();
@@ -51,6 +58,9 @@ protected:
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
 	virtual void OnGuiDesignChanged() override;
+
+private:
+	void ShowContextMenu(const QPoint& position, QListView& list);
 
 private:
 	I_ATTR(bool, m_autoAssignUserIdAttrPtr);

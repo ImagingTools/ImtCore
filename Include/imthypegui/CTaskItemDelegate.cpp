@@ -10,6 +10,7 @@
 
 // ACF includes
 #include <istd/IInformationProvider.h>
+#include <iqtgui/iqtgui.h>
 
 
 namespace imthypegui
@@ -19,12 +20,14 @@ namespace imthypegui
 // public methods
 
 CTaskItemDelegate::CTaskItemDelegate(QObject* parent)
+	:BaseClass(parent)
 {
-	BaseClass::setParent(parent);
 }
 
 
 // protected methods
+
+// reimplemented (QItemDelegate)
 
 QSize CTaskItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& /*index*/) const
 {
@@ -112,39 +115,10 @@ void CTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
 					typeText);
 
 	// Draw icon:
-	QPixmap stateIcon = index.data(DR_TASK_PROCESSING_STATE_ICON).value<QPixmap>();
-	if (stateIcon.isNull()){
-		istd::IInformationProvider::InformationCategory inspectionState = istd::IInformationProvider::InformationCategory(index.data(DR_TASK_PROCESSING_STATE).toInt());
-		switch (inspectionState){
-		case istd::IInformationProvider::IC_NONE:
-			stateIcon.load(GetIconPath(":/Icons/StateUnknown"));
-			break;
-
-		case istd::IInformationProvider::IC_INFO:
-			stateIcon.load(GetIconPath(":/Icons/StateOk"));
-			break;
-
-		case istd::IInformationProvider::IC_WARNING:
-			stateIcon.load(GetIconPath(":/Icons/StateWarning"));
-			break;
-
-		case istd::IInformationProvider::IC_ERROR:
-			stateIcon.load(GetIconPath(":/Icons/Error"));
-			break;
-
-		case istd::IInformationProvider::IC_CRITICAL:
-			stateIcon.load(GetIconPath(":/Icons/StateInvalid"));
-			break;
-
-		default:
-			stateIcon.load(GetIconPath(":/Icons/StateUnknown"));
-			break;
-		}
-	}
-
 	bool isTaskEnabled = index.data(DR_TASK_ENABLED).toBool();
 
-	stateIcon.scaledToHeight(iconSize, Qt::SmoothTransformation);
+	QPixmap stateIcon = index.data(DR_TASK_PROCESSING_STATE_ICON).value<QPixmap>()
+		.scaledToHeight(iconSize, Qt::SmoothTransformation);
 	stateIcon = QIcon(stateIcon).pixmap(iconSize, iconSize, isTaskEnabled ? QIcon::Normal : QIcon::Disabled);
 
 	QRect iconRect(mainRect.left() + textPadding, mainRect.top() + textPadding, iconSize, iconSize);
@@ -216,6 +190,68 @@ void CTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
 QWidget* CTaskItemDelegate::createEditor(QWidget* /*parent*/, const QStyleOptionViewItem& /*option*/, const QModelIndex& /*index*/) const
 {
 	return NULL;
+}
+
+
+// Micro UI
+
+CMicroTaskItemDelegate::CMicroTaskItemDelegate(QObject* parent)
+	:BaseClass(parent)
+{
+}
+
+
+void CMicroTaskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+	bool isTaskSelected = option.state & QStyle::State_Selected;
+	bool isTaskEnabled = index.data(DR_TASK_ENABLED).toBool();
+
+	QPalette palette = qApp->palette();
+	
+	QRect mainRect = option.rect.adjusted(1, 1, -2, -2);
+
+	painter->save();
+
+	// background
+	if (isTaskEnabled) {
+		painter->setBrush(palette.color(QPalette::Base));
+	}
+	else {
+		QColor disableCurtainColor(200, 200, 200, 50);
+		QBrush disableCurtainBrush(disableCurtainColor, Qt::BDiagPattern);
+		painter->setBrush(disableCurtainBrush);
+	}
+
+	painter->setPen(QPen(palette.color(isTaskSelected ? QPalette::Highlight : QPalette::Shadow), isTaskSelected ? 2 : 1));
+	painter->drawRect(mainRect);
+
+
+	// Draw icon
+	QPixmap stateIcon = index.data(DR_TASK_PROCESSING_STATE_ICON).value<QPixmap>()
+		.scaledToHeight(28, Qt::SmoothTransformation);
+	stateIcon = QIcon(stateIcon).pixmap(28, 28, isTaskEnabled ? QIcon::Normal : QIcon::Disabled);
+
+	QRect iconRect(mainRect.left() + 2, mainRect.top() + 2, 28, 28);
+	painter->drawPixmap(iconRect, stateIcon);
+
+
+	// Draw text
+	painter->setPen(palette.color(isTaskEnabled ? QPalette::Text : QPalette::Light));
+
+	QString taskText = index.data(DR_TASK_NAME).toString();
+	QRect textRect = mainRect.adjusted(4, 36, -4, -2);
+
+	QFont smallFont;
+	smallFont.setPointSize(8);
+	//smallFont.setBold(isTaskSelected);
+	//smallFont.setItalic(!isTaskEnabled);
+	painter->setFont(smallFont);
+
+	QTextOption to;
+	to.setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+	painter->drawText(textRect, taskText, to);
+
+	painter->restore();
 }
 
 
