@@ -44,7 +44,7 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::GetSelectionQuery(
 }
 
 
-istd::IChangeable* CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectFromRecord", "No database engine was registered");
@@ -60,7 +60,7 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectFromRecor
 
 	QByteArray typeId = GetObjectTypeId(GetObjectIdFromRecord(record));
 
-	istd::TDelPtr<istd::IChangeable> documentPtr = CreateObject(typeId);
+	istd::IChangeableUniquePtr documentPtr = CreateObject(typeId);
 	if (!documentPtr.IsValid()){
 		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectFromRecord", qPrintable(QString("Document instance could not be created for the type: '%1'").arg(qPrintable(typeId))));
 
@@ -73,7 +73,7 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateLegacyComp::CreateObjectFromRecor
 		documentContent = QByteArray::fromBase64(documentContent);
 
 		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
-			return documentPtr.PopPtr();
+			return documentPtr;
 		}
 	}
 
@@ -92,6 +92,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 	NewObjectQuery retVal;
 
 	istd::TOptDelPtr<const istd::IChangeable> workingDocumentPtr;
+	istd::IChangeableUniquePtr documentInstancePtr;
 
 	// If the document value is not null, use this for saving into the database. This is the use case 'Insert an existing document into the database':
 	if (valuePtr != nullptr){
@@ -99,7 +100,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 	}
 	// Otherwise create a new document instance of the related type:
 	else{
-		workingDocumentPtr.SetPtr(CreateObject(typeId));
+		documentInstancePtr = CreateObject(typeId);
+
+		workingDocumentPtr.SetPtr(documentInstancePtr.GetPtr(), false);
 	}
 
 	quint32 checksum = 0;
@@ -499,7 +502,7 @@ bool CSqlDatabaseDocumentDelegateLegacyComp::DeleteRevision(
 
 // protected methods
 
-istd::IChangeable* CSqlDatabaseDocumentDelegateLegacyComp::CreateObject(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateLegacyComp::CreateObject(const QByteArray& typeId) const
 {
 	if (!m_typesCompPtr.IsValid()){
 		return nullptr;

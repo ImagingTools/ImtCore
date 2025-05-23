@@ -105,7 +105,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 }
 
 
-istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", "No database engine was registered");
@@ -121,7 +121,7 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(cons
 	
 	QByteArray typeId = GetObjectTypeId(GetObjectIdFromRecord(record));
 	
-	istd::TDelPtr<istd::IChangeable> documentPtr = CreateObject(typeId);
+	istd::IChangeableUniquePtr documentPtr = CreateObject(typeId);
 	if (!documentPtr.IsValid()){
 		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", qPrintable(QString("Document instance could not be created for the type: '%1'").arg(qPrintable(typeId))));
 		
@@ -131,7 +131,7 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(cons
 	if (record.contains(s_documentColumn)){
 		QByteArray documentContent = record.value(qPrintable(s_documentColumn)).toByteArray();
 		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
-			return documentPtr.PopPtr();
+			return documentPtr;
 		}
 	}
 	
@@ -148,6 +148,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 	const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
+
+	istd::IChangeableUniquePtr documentInstancePtr;
 	
 	istd::TOptDelPtr<const istd::IChangeable> workingDocumentPtr;
 	
@@ -157,7 +159,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 	}
 	// Otherwise create a new document instance of the related type:
 	else{
-		workingDocumentPtr.SetPtr(CreateObject(typeId), true);
+		documentInstancePtr = CreateObject(typeId);
+
+		workingDocumentPtr.SetPtr(documentInstancePtr.GetPtr(), false);
 	}
 	
 	if (!workingDocumentPtr.IsValid()){
@@ -287,8 +291,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionByMetaInfoQuery(
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSqlRecord& record) const
 {
-	istd::TDelPtr<istd::IChangeable> objectPtr = CreateObjectFromRecord(record);
-	if (objectPtr == nullptr){
+	istd::IChangeableUniquePtr objectPtr = CreateObjectFromRecord(record);
+	if (!objectPtr.IsValid()){
 		return QByteArray();
 	}
 	
@@ -670,7 +674,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 }
 
 
-istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObject(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObject(const QByteArray& typeId) const
 {
 	if (!m_typesCompPtr.IsValid()){
 		return nullptr;

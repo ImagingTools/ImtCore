@@ -29,7 +29,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const override;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(const QSqlRecord& record) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 };
 
@@ -39,7 +39,7 @@ public:
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 template <class BaseDelegate>
-istd::IChangeable* TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!this->m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -49,7 +49,7 @@ istd::IChangeable* TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFromR
 		return nullptr;
 	}
 
-	istd::TDelPtr<istd::IChangeable> documentPtr;
+	istd::IChangeableUniquePtr documentPtr;
 	documentPtr.SetPtr(new ilog::CMessage());
 	if (!documentPtr.IsValid()){
 		return nullptr;
@@ -59,7 +59,7 @@ istd::IChangeable* TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFromR
 		QByteArray documentContent = record.value(qPrintable("Document")).toByteArray();
 
 		if (BaseDelegate::ReadDataFromMemory("MessageInfo", documentContent, *documentPtr)){
-			return documentPtr.PopPtr();
+			return documentPtr;
 		}
 	}
 

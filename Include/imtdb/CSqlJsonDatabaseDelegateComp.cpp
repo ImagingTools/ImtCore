@@ -27,7 +27,7 @@ namespace imtdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -37,7 +37,7 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 		return nullptr;
 	}
 
-	istd::TDelPtr<istd::IChangeable> documentPtr;
+	istd::IChangeableUniquePtr documentPtr;
 
 	int index = 0;
 	QByteArray typeId = "DocumentInfo";
@@ -62,7 +62,7 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 	}
 
 	if (m_documentFactoriesCompPtr.GetCount() > 0 && index >= 0){
-		documentPtr.SetPtr(m_documentFactoriesCompPtr.CreateInstance(index));
+		documentPtr = m_documentFactoriesCompPtr.CreateInstance(index);
 	}
 
 	if (!documentPtr.IsValid()){
@@ -73,7 +73,7 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 		QByteArray documentContent = record.value(qPrintable("Document")).toByteArray();
 
 		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
-			return documentPtr.PopPtr();
+			return documentPtr;
 		}
 	}
 

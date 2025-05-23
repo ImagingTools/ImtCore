@@ -58,7 +58,7 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 	const QByteArray& typeId,
 	const QString& name,
 	const QString& description,
-	DataPtr defaultValuePtr,
+	const istd::IChangeable* defaultValuePtr,
 	const QByteArray& proposedObjectId,
 	const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 	const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
@@ -80,12 +80,12 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 	}
 	
 	imtdb::IDatabaseObjectDelegate::NewObjectQuery objectQuery = m_objectDelegateCompPtr->CreateNewObjectQuery(
-		typeId,
-		objectId,
-		name,
-		description,
-		defaultValuePtr.GetPtr(),
-		operationContextPtr);
+				typeId,
+				objectId,
+				name,
+				description,
+				defaultValuePtr,
+				operationContextPtr);
 	if (objectQuery.query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 		
@@ -217,10 +217,8 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 	
-	istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
-	dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
-		return dataObjPtr;
-	});
+	istd::IChangeableUniquePtr objectPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
+	dataPtr.FromUnique(objectPtr);
 	
 	return dataPtr.IsValid();
 }
@@ -263,7 +261,7 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 }
 
 
-imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollection(
+imtbase::IObjectCollectionUniquePtr CSqlDatabaseObjectCollectionComp::CreateSubCollection(
 	int offset,
 	int count,
 	const iprm::IParamsSet* selectionParamsPtr) const
@@ -278,7 +276,7 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 		return 0;
 	}
 	
-	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
+	imtbase::IObjectCollectionUniquePtr collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 	
 	if (m_objectDelegateCompPtr.IsValid()){
@@ -291,17 +289,12 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
 		
 		while (sqlQuery.next()){
-			istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
-			DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
-				return dataObjPtr;
-			});
+			istd::IChangeableUniquePtr dataPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
 			
 			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(sqlQuery.record());
-			
 			QByteArray typeId = m_objectDelegateCompPtr->GetObjectTypeId(objectId);
-			
-			if (collectionPtr != nullptr){
-				collectionPtr->InsertNewObject(typeId, "", "", dataPtr, objectId);
+			if (collectionPtr.IsValid()){
+				collectionPtr->InsertNewObject(typeId, "", "", dataPtr.GetPtr(), objectId);
 			}
 		}
 	}

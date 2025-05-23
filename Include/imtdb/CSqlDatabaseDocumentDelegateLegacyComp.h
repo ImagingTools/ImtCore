@@ -37,7 +37,7 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
-	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const override;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(const QSqlRecord& record) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,
@@ -89,7 +89,7 @@ public:
 				int revision) const override;
 
 protected:
-	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
+	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const;
 

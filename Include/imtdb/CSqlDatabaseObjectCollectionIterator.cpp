@@ -87,10 +87,7 @@ bool imtdb::CSqlDatabaseObjectCollectionIterator::GetObjectData(imtbase::IObject
 		return false;
 	}
 
-	istd::IChangeable* dataObjPtr = m_databaseDelegate->CreateObjectFromRecord(m_records[m_currentIndex]);
-	dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
-		return dataObjPtr;
-	});
+	dataPtr.FromUnique(m_databaseDelegate->CreateObjectFromRecord(m_records[m_currentIndex]));
 
 	return dataPtr.IsValid();
 }
