@@ -7,12 +7,13 @@
 // ImtCore includes
 #include <imtauth/IRole.h>
 #include <imtauth/IRoleInfoProvider.h>
-#include <imtauth/IUserGroupInfoProvider.h>
 
 
 namespace imtauth
 {
 
+
+class IUserGroupInfoProvider;
 
 /**
 	Interface for describing.

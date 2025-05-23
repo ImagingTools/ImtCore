@@ -38,7 +38,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	istd::TDelPtr<iprm::IParamsSet> m_settingsPtr;
+	iprm::IParamsSetSharedPtr m_settingsPtr;
 	QByteArray m_userId;
 };
 

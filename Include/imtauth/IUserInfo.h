@@ -128,6 +128,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IUserInfo> IUserInfoUniquePtr;
+typedef istd::TSharedInterfacePtr<IUserInfo> IUserInfoSharedPtr;
+
+
 } // namespace imtauth
 
 

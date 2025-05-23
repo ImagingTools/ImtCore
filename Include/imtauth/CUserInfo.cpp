@@ -8,6 +8,9 @@
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 
+// ImtCore includes
+#include <imtauth/IUserGroupInfoProvider.h>
+
 
 namespace imtauth
 {
@@ -88,9 +91,9 @@ IUserBaseInfo::RoleIds CUserInfo::GetRoles(const QByteArray& productId) const
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_groupIds){
-			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr.IsValid()){
-				const QByteArrayList groupRoleIds = parentGroupPtr->GetRoles(productId);
+				QByteArrayList groupRoleIds = parentGroupPtr->GetRoles(productId);
 				for (const QByteArray& roleId : groupRoleIds){
 					if (!retVal.contains(roleId)){
 						retVal << roleId;
@@ -110,7 +113,7 @@ IUserBaseInfo::FeatureIds CUserInfo::GetPermissions(const QByteArray& productId)
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_groupIds){
-			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr.IsValid()){
 				allPermissions += parentGroupPtr->GetPermissions(productId);
 			}
@@ -143,7 +146,7 @@ bool CUserInfo::AddToSystem(SystemInfo systemInfo)
 
 bool CUserInfo::RemoveFromSystem(const QByteArray& systemId)
 {
-	for (const SystemInfo& systemInfo : std::as_const(m_systemInfos)){
+	for (const SystemInfo& systemInfo : m_systemInfos){
 		if (systemInfo.systemId == systemId){
 			istd::CChangeNotifier changeNotifier(this);
 			m_systemInfos.removeOne(systemInfo);

@@ -1,17 +1,17 @@
 #pragma once
 
 
-// ACF includes
-#include <istd/TPointerVector.h>
-
-//ImtCore includes
+// ImtCore includes
 #include <imtauth/IUserBaseInfo.h>
-#include <imtauth/IUserInfoProvider.h>
-#include <imtauth/IUserGroupInfoProvider.h>
+
 
 
 namespace imtauth
 {
+
+
+
+class IUserInfoProvider;
 
 
 /**
@@ -64,6 +64,10 @@ public:
 	*/
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const = 0;
 };
+
+
+typedef istd::TUniqueInterfacePtr<IUserGroupInfo> IUserGroupInfoUniquePtr;
+typedef istd::TSharedInterfacePtr<IUserGroupInfo> IUserGroupInfoSharedPtr;
 
 
 } // namespace imtauth

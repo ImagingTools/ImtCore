@@ -35,6 +35,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IUserSettings> IUserSettingsUniquePtr;
+typedef istd::TSharedInterfacePtr<IUserSettings> IUserSettingsSharedPtr;
+
+
 } // namespace imtauth
 
 

@@ -25,7 +25,7 @@ public:
 
 	// reimplemented (IUserGroupInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetUserGroupList() const override;
-	virtual const imtauth::IUserGroupInfo* GetUserGroup(const QByteArray& groupId) const override;
+	virtual imtauth::IUserGroupInfoSharedPtr GetUserGroup(const QByteArray& groupId) const override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);

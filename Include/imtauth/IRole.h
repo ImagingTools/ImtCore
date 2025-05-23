@@ -138,6 +138,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IRole> IRoleUniquePtr;
+typedef istd::TSharedInterfacePtr<IRole> IRoleSharedPtr;
+
+
 } // namespace imtauth
 
 

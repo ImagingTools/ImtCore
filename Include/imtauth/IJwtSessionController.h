@@ -34,7 +34,7 @@ public:
 	virtual JwtState ValidateJwt(const QByteArray& jwt) const = 0;
 	virtual bool RefreshToken(const QByteArray& refreshToken, UserSession& outputData) const = 0;
 	virtual bool CreateNewSession(const QByteArray& userId, UserSession& outputData) const = 0;
-	virtual const imtauth::ISession* GetSession(const QByteArray& sessionId) const = 0;
+	virtual ISessionSharedPtr GetSession(const QByteArray& sessionId) const = 0;
 	virtual bool RemoveSession(const QByteArray& sessionId) const = 0;
 	virtual QByteArray GetUserFromJwt(const QByteArray& jwt) const = 0;
 	virtual QByteArray GetSessionFromJwt(const QByteArray& jwt) const = 0;

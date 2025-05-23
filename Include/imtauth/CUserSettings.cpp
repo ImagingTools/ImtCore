@@ -48,7 +48,7 @@ void imtauth::CUserSettings::SetUserId(const QByteArray& userId)
 
 iprm::IParamsSet* CUserSettings::GetSettings() const
 {
-	return m_settingsPtr.GetPtr();
+	return const_cast<iprm::IParamsSet*>(m_settingsPtr.GetPtr());
 }
 
 
@@ -113,7 +113,8 @@ bool imtauth::CUserSettings::CopyFrom(const IChangeable& object, CompatibilityMo
 		m_userId = sourcePtr->m_userId;
 
 		if (!m_settingsPtr.IsValid() && sourcePtr->m_settingsPtr.IsValid()){
-			m_settingsPtr.SetCastedOrRemove(sourcePtr->m_settingsPtr->CloneMe());
+			istd::IChangeableSharedPtr dataPtr = sourcePtr->m_settingsPtr->CloneMe();
+			m_settingsPtr.SetCastedPtr(dataPtr);
 
 			if (!m_settingsPtr.IsValid()){
 				return false;

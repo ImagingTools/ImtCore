@@ -8,6 +8,9 @@
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 
+// ImtCore includes
+#include <imtauth/IUserGroupInfoProvider.h>
+
 
 namespace imtauth
 {
@@ -31,7 +34,7 @@ IUserGroupInfo::UserIds CUserGroupInfo::GetUsers() const
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			imtauth::IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr.IsValid()){
 				for (const QByteArray& userId : parentGroupPtr->GetUsers()){
 					if (!retVal.contains(userId)){
@@ -127,7 +130,7 @@ imtauth::IUserBaseInfo::RoleIds CUserGroupInfo::GetRoles(const QByteArray& produ
 	IUserBaseInfo::RoleIds retVal = BaseClass::GetRoles(productId);
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr.IsValid()){
 				for (const QByteArray& roleId : parentGroupPtr->GetRoles(productId)){
 					if (!retVal.contains(roleId)){
@@ -148,7 +151,7 @@ IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& produ
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr.IsValid()){
 				allPermissions += parentGroupPtr->GetPermissions(productId);
 			}
@@ -221,8 +224,8 @@ QByteArrayList CUserGroupInfo::GetParentGroups(const QByteArray& groupId) const
 {
 	QByteArrayList retVal;
 	if (m_userGroupInfoProviderPtr != nullptr){
-		const istd::TDelPtr<IUserGroupInfo> groupPtr(const_cast<IUserGroupInfo*>(m_userGroupInfoProviderPtr->GetUserGroup(groupId)));
-		if (groupPtr != nullptr){
+		IUserGroupInfoSharedPtr groupPtr(m_userGroupInfoProviderPtr->GetUserGroup(groupId));
+		if (groupPtr.IsValid()){
 			GetParentGroupList(*groupPtr, retVal);
 		}
 	}
@@ -238,8 +241,8 @@ void CUserGroupInfo::GetParentGroupList(const IUserGroupInfo& userGroupInfo, QBy
 	groupList += parentGroups;
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& groupId : parentGroups){
-			const istd::TDelPtr<IUserGroupInfo> groupPtr(const_cast<IUserGroupInfo*>(m_userGroupInfoProviderPtr->GetUserGroup(groupId)));
-			if (groupPtr != nullptr){
+			IUserGroupInfoSharedPtr groupPtr(m_userGroupInfoProviderPtr->GetUserGroup(groupId));
+			if (groupPtr.IsValid()){
 				GetParentGroupList(*groupPtr, groupList);
 			}
 		}

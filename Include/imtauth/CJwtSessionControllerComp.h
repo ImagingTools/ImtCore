@@ -37,7 +37,7 @@ protected:
 	virtual JwtState ValidateJwt(const QByteArray& jwt) const override;
 	virtual bool RefreshToken(const QByteArray& refreshToken, UserSession& outputData) const override;
 	virtual bool CreateNewSession(const QByteArray& userId, UserSession& outputData) const override;
-	virtual const ISession* GetSession(const QByteArray& sessionId) const override;
+	virtual ISessionSharedPtr GetSession(const QByteArray& sessionId) const override;
 	virtual bool RemoveSession(const QByteArray& sessionId) const override;
 	virtual QByteArray GetUserFromJwt(const QByteArray& jwt) const override;
 	virtual QByteArray GetSessionFromJwt(const QByteArray& jwt) const override;

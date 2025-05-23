@@ -26,7 +26,7 @@ namespace imtauth
 
 bool CJwtSessionControllerComp::ValidateSession(const QByteArray& sessionId) const
 {
-	istd::TDelPtr<const imtauth::ISession> sessionInfoPtr = GetSession(sessionId);
+	ISessionSharedPtr sessionInfoPtr = GetSession(sessionId);
 	if (!sessionInfoPtr.IsValid()){
 		return false;
 	}
@@ -91,7 +91,7 @@ bool CJwtSessionControllerComp::RefreshToken(
 	}
 
 	QByteArray sessionId = GetSessionIdByRefreshToken(refreshToken);
-	istd::TDelPtr<const imtauth::ISession> sessionInfoPtr = GetSession(sessionId);
+	ISessionSharedPtr sessionInfoPtr = GetSession(sessionId);
 	if (!sessionInfoPtr.IsValid()){
 		return false;
 	}
@@ -144,7 +144,7 @@ bool CJwtSessionControllerComp::CreateNewSession(
 		return false;
 	}
 
-	istd::TDelPtr<imtauth::ISession> sessionInfoPtr = m_sessionFactoryCompPtr.CreateInstance();
+	imtauth::ISessionUniquePtr sessionInfoPtr = m_sessionFactoryCompPtr.CreateInstance();
 
 	QDateTime creationDate = QDateTime::currentDateTimeUtc();
 	sessionInfoPtr->SetCreationDate(creationDate);
@@ -178,20 +178,20 @@ bool CJwtSessionControllerComp::CreateNewSession(
 }
 
 
-const ISession* CJwtSessionControllerComp::GetSession(const QByteArray& sessionId) const
+ISessionSharedPtr CJwtSessionControllerComp::GetSession(const QByteArray& sessionId) const
 {
 	if (!m_sessionCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'SessionCollection' was not set", "CJwtSessionControllerComp");
 		return nullptr;
 	}
 
-	istd::TDelPtr<const imtauth::ISession> sessionInfoPtr;
+	ISessionSharedPtr sessionInfoPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_sessionCollectionCompPtr->GetObjectData(sessionId, dataPtr)){
-		sessionInfoPtr.SetCastedOrRemove(dataPtr.GetPtr()->CloneMe());
+		sessionInfoPtr.SetCastedPtr<istd::IChangeable>(dataPtr);
 	}
 
-	return sessionInfoPtr.PopPtr();
+	return sessionInfoPtr;
 }
 
 

@@ -5,8 +5,10 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtauth/CUserInfo.h>
 #include <imtauth/IRoleInfoProvider.h>
+#include <imtauth/IUserInfoProvider.h>
+#include <imtauth/IUserGroupInfoProvider.h>
+#include <imtauth/CUserInfo.h>
 
 
 namespace imtauth

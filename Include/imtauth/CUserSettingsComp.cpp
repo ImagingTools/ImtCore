@@ -14,7 +14,7 @@ void CUserSettingsComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if(m_settingsFactCompPtr.IsValid()){
-		m_settingsPtr = m_settingsFactCompPtr.CreateInstance();
+		m_settingsPtr.FromUnique(m_settingsFactCompPtr.CreateInstance());
 	}
 }
 

@@ -68,6 +68,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<ISession> ISessionUniquePtr;
+typedef istd::TSharedInterfacePtr<ISession> ISessionSharedPtr;
+
+
 } // namespace imtauth
 
 
