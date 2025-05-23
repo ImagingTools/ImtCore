@@ -123,13 +123,13 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(cons
 	
 	istd::TDelPtr<istd::IChangeable> documentPtr = CreateObject(typeId);
 	if (!documentPtr.IsValid()){
-		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", qPrintable(QString("Document instance could not be created for the type: '%1'").arg(typeId)));
+		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", qPrintable(QString("Document instance could not be created for the type: '%1'").arg(qPrintable(typeId))));
 		
 		return nullptr;
 	}
 	
 	if (record.contains(s_documentColumn)){
-		QByteArray documentContent = record.value(s_documentColumn).toByteArray();
+		QByteArray documentContent = record.value(qPrintable(s_documentColumn)).toByteArray();
 		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
 			return documentPtr.PopPtr();
 		}
@@ -188,10 +188,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"%2\" = 'Disabled' WHERE \"%3\" = '%4';")
 				.arg(
-						*m_tableNameAttrPtr,
-						s_stateColumn,
-						s_documentIdColumn,
-						objectId
+						qPrintable(*m_tableNameAttrPtr),
+						qPrintable(s_stateColumn),
+						qPrintable(s_documentIdColumn),
+						qPrintable(objectId)
 					).toUtf8();
 	
 	return retVal;
@@ -209,9 +209,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 	QByteArray countRevisionsQuery = QString("(SELECT MAX(%0) + 1 FROM \"%1\" as root WHERE \"%2\" = '%3')")
 										.arg(
 											CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
-											*m_tableNameAttrPtr,
-											s_documentIdColumn,
-											objectId
+											qPrintable(*m_tableNameAttrPtr),
+											qPrintable(s_documentIdColumn),
+											qPrintable(objectId)
 											).toUtf8();
 	
 	RawSqlExpression sqlExpression;
@@ -241,11 +241,11 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"%2\" = '%3' WHERE \"%4\" = '%5';")
 				.arg(
-						*m_tableNameAttrPtr,
-						s_nameColumn,
+						qPrintable(*m_tableNameAttrPtr),
+						qPrintable(s_nameColumn),
 						newObjectName,
-						s_documentIdColumn,
-						objectId
+						qPrintable(s_documentIdColumn),
+						qPrintable(objectId)
 					).toUtf8();
 	
 	return retVal;
@@ -260,11 +260,11 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"%2\" = '%3' WHERE \"%4\" = '%5';")
 				.arg(
-						*m_tableNameAttrPtr,
-						s_descriptionColumn,
+						qPrintable(*m_tableNameAttrPtr),
+						qPrintable(s_descriptionColumn),
 						description,
-						s_documentIdColumn,
-						objectId
+						qPrintable(s_documentIdColumn),
+						qPrintable(objectId)
 					).toUtf8();
 
 	return retVal;
@@ -277,10 +277,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionByMetaInfoQuery(
 {
 	return QString(R"(SELECT * FROM "%1" WHERE ("%2" = 'Active') AND %3 = '%4';)")
 				.arg(
-					*m_tableNameAttrPtr,
-					s_stateColumn,
+					qPrintable(*m_tableNameAttrPtr),
+					qPrintable(s_stateColumn),
 					CreateJsonExtractSql(s_dataMetaInfoColumn, metaInfoId),
-					metaInfoValue.toByteArray()
+					qPrintable(metaInfoValue.toByteArray())
 				).toUtf8();
 }
 
@@ -292,8 +292,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 		return QByteArray();
 	}
 	
-	QByteArray objectId = record.value(s_documentIdColumn).toByteArray();
-	QByteArray typeId = record.value(s_typeIdColumn).toByteArray();
+	QByteArray objectId = record.value(qPrintable(s_documentIdColumn)).toByteArray();
+	QByteArray typeId = record.value(qPrintable(s_typeIdColumn)).toByteArray();
 	
 	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
 	
@@ -312,12 +312,12 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 	
 	QByteArray query = QString(R"(UPDATE "%1" SET "%2" = '%3' WHERE "%4" = 'Active' AND "%5" = '%6';)")
 						.arg(
-								*m_tableNameAttrPtr,
-								s_dataMetaInfoColumn,
-								SqlEncode(metaInfoRepresentation),
-								s_stateColumn,
-								s_documentIdColumn,
-								objectId
+								qPrintable(*m_tableNameAttrPtr),
+								qPrintable(s_dataMetaInfoColumn),
+								qPrintable(SqlEncode(metaInfoRepresentation)),
+								qPrintable(s_stateColumn),
+								qPrintable(s_documentIdColumn),
+								qPrintable(objectId)
 							)
 						.toUtf8();
 	
@@ -359,7 +359,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 		RevisionInfo revisionInfo;
 		
 		if (revisionRecord.contains(s_revisionInfoColumn)){
-			QByteArray revisionValueJson = revisionRecord.value(s_revisionInfoColumn).toByteArray();
+			QByteArray revisionValueJson = revisionRecord.value(qPrintable(s_revisionInfoColumn)).toByteArray();
 			QJsonObject infoData = QJsonDocument::fromJson(revisionValueJson).object();
 			revisionInfo.revision = infoData.value(s_revisionNumberKey).toInt();
 			revisionInfo.user = infoData.value(s_ownerNameKey).toString();
@@ -376,11 +376,11 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 		}
 		
 		if (revisionRecord.contains(s_lastModifiedColumn)){
-			revisionInfo.timestamp = revisionRecord.value(s_lastModifiedColumn).toDateTime();
+			revisionInfo.timestamp = revisionRecord.value(qPrintable(s_lastModifiedColumn)).toDateTime();
 		}
 		
 		if (revisionRecord.contains(s_stateColumn)){
-			revisionInfo.isRevisionAvailable = (revisionRecord.value(s_stateColumn).toString() == "Active" || revisionRecord.value(s_stateColumn).toString() == "Disabled");
+			revisionInfo.isRevisionAvailable = (revisionRecord.value(qPrintable(s_stateColumn)).toString() == "Active" || revisionRecord.value(qPrintable(s_stateColumn)).toString() == "Disabled");
 		}
 		
 		revisionInfoList.push_back(revisionInfo);
@@ -415,19 +415,19 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreRevision(
 	
 	QByteArray query = QString("UPDATE \"%1\" SET \"%2\" = 'InActive' WHERE \"%3\" = '%4';")
 				.arg(
-						*m_tableNameAttrPtr,
-						s_stateColumn,
-						s_documentIdColumn,
-						objectId
+						qPrintable(*m_tableNameAttrPtr),
+						qPrintable(s_stateColumn),
+						qPrintable(s_documentIdColumn),
+						qPrintable(objectId)
 					).toUtf8();
 	
 
 	query += QString(R"(UPDATE "%1" SET "%2" = 'Active' WHERE "%3" = '%4' AND %5 = %6;)")
 				.arg(
-						*m_tableNameAttrPtr,
-						s_stateColumn,
-						s_documentIdColumn,
-						objectId,
+						qPrintable(*m_tableNameAttrPtr),
+						qPrintable(s_stateColumn),
+						qPrintable(s_documentIdColumn),
+						qPrintable(objectId),
 						CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int)
 					)
 				.arg(revision).toUtf8();
@@ -461,10 +461,10 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 {
 	QByteArray checkCurrentRevisionQuery = QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3' AND \"%4\" = 'Active';")
 			.arg(
-					*m_tableNameAttrPtr,
-					s_documentIdColumn,
-					objectId,
-					s_stateColumn
+					qPrintable(*m_tableNameAttrPtr),
+					qPrintable(s_documentIdColumn),
+					qPrintable(objectId),
+					qPrintable(s_stateColumn)
 				).toUtf8();
 	
 	QSqlError sqlError;
@@ -484,21 +484,21 @@ bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
 	int currentRevision = -1;
 	
 	if (revisionRecord.contains(s_revisionInfoColumn)){
-		QByteArray revisionValueJson = revisionRecord.value(s_revisionInfoColumn).toByteArray();
+		QByteArray revisionValueJson = revisionRecord.value(qPrintable(s_revisionInfoColumn)).toByteArray();
 		QJsonObject infoData = QJsonDocument::fromJson(revisionValueJson).object();
 		currentRevision = infoData.value(s_revisionNumberKey).toInt();
 	}
 
 	if (currentRevision == revision){
-		SendErrorMessage(0, QString("Unable to delete revision '%1' for document '%2'. Error: Revision '%1' is active").arg(revision).arg(objectId), "Database collection");
+		SendErrorMessage(0, QString("Unable to delete revision '%1' for document '%2'. Error: Revision '%1' is active").arg(revision).arg(qPrintable(objectId)), "Database collection");
 		return false;
 	}
 	
 	QByteArray query = QString("DELETE  FROM \"%1\" WHERE \"%2\" = '%3' AND %4 = %5;")
 				.arg(
-					*m_tableNameAttrPtr,
-					s_documentIdColumn,
-					objectId,
+					qPrintable(*m_tableNameAttrPtr),
+					qPrintable(s_documentIdColumn),
+					qPrintable(objectId),
 					CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int)
 					)
 				.arg(revision)
@@ -535,9 +535,9 @@ bool CSqlDatabaseDocumentDelegateComp::UpdateDependentMetaInfo(const DependentMe
 	
 	QString tableName = GetTableName();
 	
-	QString query = QString("UPDATE \"%1\" SET \"%2\" = ").arg(tableName, s_dataMetaInfoColumn);
+	QString query = QString("UPDATE \"%1\" SET \"%2\" = ").arg(tableName, qPrintable(s_dataMetaInfoColumn));
 	
-	QString jsonbUpdate = QString("\"%1\"").arg(s_dataMetaInfoColumn);
+	QString jsonbUpdate = QString("\"%1\"").arg(qPrintable(s_dataMetaInfoColumn));
 	
 	for (int i = 0; i < metaInfo.metaInfoIds.size(); i++) {
 		jsonbUpdate = QString("jsonb_set(%1, '{%2}', to_jsonb(%3))").arg(jsonbUpdate, metaInfo.metaInfoIds[i], metaInfo.metaInfoValues[i]);
@@ -567,9 +567,9 @@ bool CSqlDatabaseDocumentDelegateComp::ClearDependentMetaInfo(const DependentMet
 	
 	QString tableName = GetTableName();
 	
-	QString query = QString("UPDATE \"%1\" SET \"%2\" = ").arg(tableName, s_dataMetaInfoColumn);
+	QString query = QString("UPDATE \"%1\" SET \"%2\" = ").arg(tableName, qPrintable(s_dataMetaInfoColumn));
 	
-	QString jsonbUpdate = QString("\"%1\"").arg(s_dataMetaInfoColumn);
+	QString jsonbUpdate = QString("\"%1\"").arg(qPrintable(s_dataMetaInfoColumn));
 	
 	for (const QString& metaInfoId : metaInfo.metaInfoIds){
 		jsonbUpdate = QString("jsonb_set(%1, '{%2}', to_jsonb(''::text))").arg(jsonbUpdate, metaInfoId);
@@ -616,10 +616,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 	// Insert new entry into the document list table:
 	QString query = QString("UPDATE \"%1\" SET \"%2\" = 'InActive' WHERE \"%3\" = '%4';")
 						.arg(
-								*m_tableNameAttrPtr,
-								s_stateColumn,
-								s_documentIdColumn,
-								objectId
+								qPrintable(*m_tableNameAttrPtr),
+								qPrintable(s_stateColumn),
+								qPrintable(s_documentIdColumn),
+								qPrintable(objectId)
 							);
 	
 	QByteArray metaInfoRepresentation;
@@ -641,20 +641,20 @@ QByteArray CSqlDatabaseDocumentDelegateComp::PrepareInsertNewObjectQuery(
 
 	query += QString("INSERT INTO \"%1\"(\"%2\", \"%3\", \"%4\", \"%5\", \"%6\", \"%7\", \"%8\", \"%9\", \"%10\", \"%11\") VALUES('%12', '%13', '%14', %15, %16, '%17', %18, %19, '%20', '%21');")
 				.arg(
-					*m_tableNameAttrPtr,
-					s_idColumn,
-					s_typeIdColumn,
-					s_documentIdColumn,
-					s_nameColumn,
-					s_descriptionColumn,
-					s_documentColumn,
-					s_dataMetaInfoColumn,
-					s_revisionInfoColumn,
-					s_lastModifiedColumn,
-					s_stateColumn,
+					qPrintable(*m_tableNameAttrPtr),
+					qPrintable(s_idColumn),
+					qPrintable(s_typeIdColumn),
+					qPrintable(s_documentIdColumn),
+					qPrintable(s_nameColumn),
+					qPrintable(s_descriptionColumn),
+					qPrintable(s_documentColumn),
+					qPrintable(s_dataMetaInfoColumn),
+					qPrintable(s_revisionInfoColumn),
+					qPrintable(s_lastModifiedColumn),
+					qPrintable(s_stateColumn),
 					QUuid::createUuid().toString(QUuid::WithoutBraces),
-					typeId,
-					objectId,
+					qPrintable(typeId),
+					qPrintable(objectId),
 					objectName.isEmpty() ? nullDataLiteral : SqlEncode(objectName).append('\'').prepend('\''),
 					objectDescription.isEmpty() ? nullDataLiteral : SqlEncode(objectDescription).append('\'').prepend('\''),
 					SqlEncode(documentContentJson),
@@ -689,7 +689,7 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObject(const QByteArr
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const
+bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const QByteArray& /*typeId*/, const istd::IChangeable& object, QByteArray& data) const
 {
 	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
 	if (serializableObjectPtr == nullptr){
@@ -709,7 +709,7 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const QByteArray& typeI
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const
+bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& /*typeId*/, const QByteArray& data, istd::IChangeable& object) const
 {
 	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
 	if (serializableObjectPtr == nullptr){
@@ -785,13 +785,13 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QV
 			RawSqlExpression raw = value.value<RawSqlExpression>();
 			revisionInfo += QString("'%1', %2").arg(key, raw.sql);
 		}
-		else if (value.typeId() == QMetaType::QString || value.typeId() == QMetaType::QByteArray){
+		else if (value.type() == QMetaType::QString || value.type() == QMetaType::QByteArray){
 			revisionInfo += QString("'%1', '%2'").arg(key, value.toString());
 		}
-		else if (value.typeId() == QMetaType::Int){
+		else if (value.type() == QMetaType::Int){
 			revisionInfo += QString("'%1', %2").arg(key).arg(value.toInt());
 		}
-		else if (value.typeId() == QMetaType::Bool){
+		else if (value.type() == QMetaType::Bool){
 			revisionInfo += QString("'%1', %2").arg(key).arg(value.toBool());
 		}
 	}
@@ -857,10 +857,10 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				tableName,
 				joinTablesQuery.isEmpty() ? "" : QString::fromUtf8(joinTablesQuery),
 				customColumns,
-				s_lastModifiedColumn,
-				s_addedColumn,
-				s_documentIdColumn,
-				s_stateColumn
+				qPrintable(s_lastModifiedColumn),
+				qPrintable(s_addedColumn),
+				qPrintable(s_documentIdColumn),
+				qPrintable(s_stateColumn)
 			);
 	
 	return query;
@@ -896,7 +896,7 @@ idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const Q
 bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
 	if (record.contains(s_dataMetaInfoColumn)){
-		QByteArray metaInfoRepresentation = record.value(s_dataMetaInfoColumn).toByteArray();
+		QByteArray metaInfoRepresentation = record.value(qPrintable(s_dataMetaInfoColumn)).toByteArray();
 		if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
 			return m_jsonBasedMetaInfoDelegateCompPtr->FromJsonRepresentation(metaInfoRepresentation, metaInfo);
 		}
@@ -914,7 +914,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IPara
 	if (collectionFilterParamPtr.IsValid()){
 		QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
 		if (!typeId.isEmpty()){
-			filterQuery = QString("\"%0\" = '%1'").arg(s_typeIdColumn, typeId).toUtf8();
+			filterQuery = QString("\"%0\" = '%1'").arg(qPrintable(s_typeIdColumn), qPrintable(typeId)).toUtf8();
 		}
 	}
 	
@@ -944,10 +944,10 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::ICollectio
 	
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
 		if (columnId == s_lastModifiedColumn || columnId == s_addedColumn || columnId == s_nameColumn || columnId == s_descriptionColumn || columnId == s_typeIdColumn){
-			sortQuery = QString("ORDER BY root.\"%1\" %2").arg(columnId, sortOrder);
+			sortQuery = QString("ORDER BY root.\"%1\" %2").arg(qPrintable(columnId), qPrintable(sortOrder));
 		}
 		else{
-			sortQuery = QString("ORDER BY %1 %2").arg(CreateJsonExtractSql(QString(R"(root."%1")").arg(s_dataMetaInfoColumn), columnId), sortOrder);
+			sortQuery = QString("ORDER BY %1 %2").arg(CreateJsonExtractSql(QString(R"(root."%1")").arg(qPrintable(s_dataMetaInfoColumn)), columnId), qPrintable(sortOrder));
 		}
 	}
 	
@@ -980,7 +980,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		if (objectTypeIdFilterPtr.IsValid()){
 			QByteArray objectTypeId = objectTypeIdFilterPtr->GetObjectTypeId();
 			if (!objectTypeId.isEmpty()){
-				objectTypeIdQuery = QString("\"%0\" = '%1'").arg(s_typeIdColumn, objectTypeId).toUtf8();
+				objectTypeIdQuery = QString("\"%0\" = '%1'").arg(qPrintable(s_typeIdColumn), qPrintable(objectTypeId)).toUtf8();
 			}
 		}
 	}
@@ -1035,17 +1035,17 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICol
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
 		if (filteringColumnIds.contains(s_typeIdColumn)){
-			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", s_typeIdColumn, textFilter);
+			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", qPrintable(s_typeIdColumn), textFilter);
 			filteringColumnIds.removeOne(s_typeIdColumn);
 		}
 		
 		if (filteringColumnIds.contains(s_nameColumn)){
-			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", s_nameColumn, textFilter);
+			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", qPrintable(s_nameColumn), textFilter);
 			filteringColumnIds.removeOne(s_nameColumn);
 		}
 		
 		if (filteringColumnIds.contains(s_descriptionColumn)){
-			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", s_descriptionColumn, textFilter);
+			textFilterQuery += QString("%0\"%1\" ILIKE '%%2%'").arg(textFilterQuery.isEmpty() ? "" : " OR ", qPrintable(s_descriptionColumn), textFilter);
 			filteringColumnIds.removeOne(s_descriptionColumn);
 		}
 		
@@ -1053,7 +1053,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICol
 			textFilterQuery += QString("%0%1 ILIKE '%%2%'")
 				.arg(
 					textFilterQuery.isEmpty() ? "" : " OR ",
-									   CreateJsonExtractSql(QString(R"(root."%1")").arg(s_dataMetaInfoColumn), filteringColumnIds[i]),
+									   CreateJsonExtractSql(QString(R"(root."%1")").arg(qPrintable(s_dataMetaInfoColumn)), filteringColumnIds[i]),
 					textFilter
 				);
 		}
@@ -1067,10 +1067,10 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 {
 	QString addedStrQuery = QString(R"((SELECT "%1" FROM "%2" as temp WHERE %3 = 1 AND root."%4" = temp."%4" LIMIT 1))")
 				.arg(
-						s_lastModifiedColumn,
-						*m_tableNameAttrPtr,
+						qPrintable(s_lastModifiedColumn),
+						qPrintable(*m_tableNameAttrPtr),
 						CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
-						s_documentIdColumn
+						qPrintable(s_documentIdColumn)
 					);
 	
 	switch (timeFilter.GetTimeUnit()){
@@ -1249,7 +1249,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 				imtcol::IDocumentCollectionFilter::DocumentStates states = documentFilterParamPtr->GetDocumentStates();
 				
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
-					stateDocumentFilter += QString("\"%1\" = 'Active'").arg(s_stateColumn);
+					stateDocumentFilter += QString("\"%1\" = 'Active'").arg(qPrintable(s_stateColumn));
 				}
 				
 				if (states.contains(imtcol::IDocumentCollectionFilter::DS_INACTIVE)){
@@ -1257,28 +1257,28 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 						stateDocumentFilter += QString(" OR ");
 					}
 					
-					stateDocumentFilter += QString("\"%1\" = 'InActive'").arg(s_stateColumn);
+					stateDocumentFilter += QString("\"%1\" = 'InActive'").arg(qPrintable(s_stateColumn));
 				}
 			}
 		}
 	}
 	
 	if (stateDocumentFilter.isEmpty()){
-		stateDocumentFilter = QString("\"%1\" = 'Active'").arg(s_stateColumn);
+		stateDocumentFilter = QString("\"%1\" = 'Active'").arg(qPrintable(s_stateColumn));
 	}
 	
 	QString schemaPrefix;
 	if (m_tableSchemaAttrPtr.IsValid()){
-		schemaPrefix = QString("%1.").arg(*m_tableSchemaAttrPtr);
+		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
 	
 	return QString("SELECT * FROM %0\"%1\" as root WHERE (%2) AND \"%3\" = '%4' ORDER BY %5 DESC;")
 		.arg(
 			schemaPrefix,
-			*m_tableNameAttrPtr,
+			qPrintable(*m_tableNameAttrPtr),
 			stateDocumentFilter,
-			s_documentIdColumn,
-			objectId,
+			qPrintable(s_documentIdColumn),
+			qPrintable(objectId),
 			CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, "root")
 		).toUtf8();
 }

@@ -123,13 +123,13 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const
 			RawSqlExpression raw = value.value<RawSqlExpression>();
 			revisionInfo += QString("'%1', %2").arg(key, raw.sql);
 		}
-		else if (value.typeId() == QMetaType::QString || value.typeId() == QMetaType::QByteArray){
+		else if (value.type() == QMetaType::QString || value.type() == QMetaType::QByteArray){
 			revisionInfo += QString("'%1', '%2'").arg(key, value.toString());
 		}
-		else if (value.typeId() == QMetaType::Int){
+		else if (value.type() == QMetaType::Int){
 			revisionInfo += QString("'%1', %2").arg(key).arg(value.toInt());
 		}
-		else if (value.typeId() == QMetaType::Bool){
+		else if (value.type() == QMetaType::Bool){
 			revisionInfo += QString("'%1', %2").arg(key).arg(value.toBool());
 		}
 	}

@@ -295,7 +295,6 @@ idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateCollectionIte
 }
 
 
-// TODO: Why idoc::IDocumentMetaInfo ?
 bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
 	if (record.contains("Name")){
