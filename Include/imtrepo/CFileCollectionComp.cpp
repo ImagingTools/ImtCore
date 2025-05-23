@@ -719,7 +719,7 @@ QByteArray CFileCollectionComp::ImportFile(
 		}
 	}
 	else if (!IsPathInsideRepository(sourceFilePath)){
-		DataPtr dataObjectPtr = CreateObjectFromFile(sourceFilePath, typeId);
+		istd::IChangeableUniquePtr dataObjectPtr = CreateObjectFromFile(sourceFilePath, typeId);
 		if (dataObjectPtr.IsValid()){
 			QByteArray objectId = (const_cast<CFileCollectionComp*>(this))->InsertFile(sourceFilePath, typeId, QFileInfo(sourceFilePath).completeBaseName());
 

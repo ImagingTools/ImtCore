@@ -289,10 +289,12 @@ bool CFileCollectionCompBase::UpdateFile(
 			const QByteArray& objectId)
 {
 	{
-		QWriteLocker cacheLocker(&m_objectCacheLock);
+		if (m_isCacheEnabled){
+			QWriteLocker cacheLocker(&m_objectCacheLock);
 
-		if (m_objectCache.contains(objectId)){
-			m_objectCache.remove(objectId);
+			if (m_objectCache.contains(objectId)){
+				m_objectCache.remove(objectId);
+			}
 		}
 	}
 
@@ -428,7 +430,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			DataPtr defaultValuePtr,
+			const istd::IChangeable* defaultValuePtr,
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
@@ -436,14 +438,17 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 {
 	DataPtr newObjectPtr;
 
-	if (defaultValuePtr.IsValid()){
-		newObjectPtr = defaultValuePtr;
+	const istd::IChangeable* workingDataPtr = nullptr;
+	if (defaultValuePtr != nullptr){
+		workingDataPtr = defaultValuePtr;
 	}
 	else{
-		newObjectPtr = CreateDataObject(typeId);
+		newObjectPtr.FromUnique(CreateDataObject(typeId));
+
+		workingDataPtr = newObjectPtr.GetPtr();
 	}
 
-	if (newObjectPtr.IsValid()){
+	if (workingDataPtr != nullptr){
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 		if (persistencePtr != nullptr){
 			imtbase::CTempDir tempDir("ImtCore");
@@ -457,15 +462,15 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 
 			QString workingExt = GetWorkingExt(
 						persistencePtr,
-						newObjectPtr.GetPtr(),
+						workingDataPtr,
 						tempFileBaseName);
 
 			QString tempFilePath = tempFileBaseName;
 			tempFilePath += workingExt.isEmpty() ? "" : "." + workingExt;
 
-			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
-
+			if (persistencePtr->SaveToFile(*workingDataPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
 				QByteArray retval = InsertFile(tempFilePath, typeId, name, description, proposedObjectId, dataMetaInfoPtr, elementMetaInfoPtr);
+
 				return retval;
 			}
 			else{
@@ -502,47 +507,53 @@ bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 			Q_ASSERT(dataObjectPtr.IsValid());
 
 			if (!dataPtr.IsValid()){
-				DataPtr newInstancePtr = CreateDataObject(typeId);
+				istd::IChangeableUniquePtr newInstancePtr = CreateDataObject(typeId);
 				if (newInstancePtr.IsValid()){
-					if (newInstancePtr->CopyFrom(*dataObjectPtr)){
-						dataPtr = newInstancePtr;
+					if (newInstancePtr->CopyFrom(*dataObjectPtr, CM_WITH_REFS)){
+						dataPtr.FromUnique(newInstancePtr);
 
 						return true;
 					}
 				}
 			}
 			else{
-				return dataPtr->CopyFrom(*dataObjectPtr.GetPtr());
+				return dataPtr->CopyFrom(*dataObjectPtr.GetPtr(), CM_WITH_REFS);
 			}
 		}
 	}
 
 	CFileCollectionItem item;
 	if (GetFileInfo(objectId, item)){
-		DataPtr dataObjectPtr = CreateObjectFromFile(item.GetFilePath(), typeId);
+		DataPtr dataObjectPtr;
+		dataObjectPtr.FromUnique(CreateObjectFromFile(item.GetFilePath(), typeId));
 		if (!dataObjectPtr.IsValid()){
 			return false;
 		}
 
 		if (!dataPtr.IsValid()){
-			DataPtr newInstancePtr = CreateDataObject(typeId);
+			DataPtr newInstancePtr;
+			newInstancePtr.FromUnique(CreateDataObject(typeId));
 			if (newInstancePtr.IsValid()){
-				if (newInstancePtr->CopyFrom(*dataObjectPtr)){
+				if (newInstancePtr->CopyFrom(*dataObjectPtr, CM_WITH_REFS)){
 					dataPtr = newInstancePtr;
 
-					QWriteLocker lockCache(&m_objectCacheLock);
+					if (m_isCacheEnabled){
+						QWriteLocker lockCache(&m_objectCacheLock);
 
-					m_objectCache[objectId] = dataPtr;
+						m_objectCache[objectId] = dataPtr;
+					}
 
 					return true;
 				}
 			}
 		}
 		else{
-			if (dataPtr->CopyFrom(*dataObjectPtr)){
-				QWriteLocker lockCache(&m_objectCacheLock);
+			if (dataPtr->CopyFrom(*dataObjectPtr, CM_WITH_REFS)){
+				if (m_isCacheEnabled){
+					QWriteLocker lockCache(&m_objectCacheLock);
 
-				m_objectCache[objectId] = dataPtr;
+					m_objectCache[objectId] = dataPtr;
+				}
 
 				return true;
 			}
@@ -592,12 +603,12 @@ bool CFileCollectionCompBase::SetObjectData(
 }
 
 
-imtbase::IObjectCollection* CFileCollectionCompBase::CreateSubCollection(
+imtbase::IObjectCollectionUniquePtr CFileCollectionCompBase::CreateSubCollection(
 			int offset,
 			int count,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
-	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
+	imtbase::IObjectCollectionUniquePtr collectionPtr(new imtbase::CObjectCollection);
 	m_filesLock.lockForRead();
 
 	int objectsCount = count >= 0 ? qMin(count, m_files.count()) : m_files.count();
@@ -807,7 +818,7 @@ bool CFileCollectionCompBase::SetElementEnabled(const Id& /*elementId*/, bool /*
 
 // reimplemented (IObjectCollection::IDataFactory)
 
-CFileCollectionCompBase::DataPtr CFileCollectionCompBase::CreateInstance(const QByteArray& keyId) const
+istd::IChangeableUniquePtr CFileCollectionCompBase::CreateInstance(const QByteArray& keyId) const
 {
 	return CreateDataObject(keyId);
 }
@@ -884,7 +895,7 @@ QString CFileCollectionCompBase::GetWorkingExt(
 }
 
 
-CFileCollectionCompBase::DataPtr CFileCollectionCompBase::CreateDataObject(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CFileCollectionCompBase::CreateDataObject(const QByteArray& typeId) const
 {
 	int factoryIndex = -1;
 
@@ -899,20 +910,20 @@ CFileCollectionCompBase::DataPtr CFileCollectionCompBase::CreateDataObject(const
 
 	if ((factoryIndex >= 0) && factoryIndex < m_objectFactoryListCompPtr.GetCount()){
 		icomp::IComponent* compPtr = m_objectFactoryListCompPtr.CreateComponent(factoryIndex);
-		return DataPtr(
-			DataPtr::RootObjectPtr(compPtr),
-			[this, compPtr]() {
-				return m_objectFactoryListCompPtr.ExtractInterface(compPtr);
-			});
+		return istd::IChangeableUniquePtr(
+					compPtr,
+					[this, compPtr]() {
+						return m_objectFactoryListCompPtr.ExtractInterface(compPtr);
+					});
 	}
 
-	return DataPtr();
+	return istd::IChangeableUniquePtr();
 }
 
 
-CFileCollectionCompBase::DataPtr CFileCollectionCompBase::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
+istd::IChangeableUniquePtr CFileCollectionCompBase::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
 {
-	CFileCollectionCompBase::DataPtr retVal = CreateDataObject(typeId);
+	istd::IChangeableUniquePtr retVal = CreateDataObject(typeId);
 	if (retVal.IsValid()){
 		const ifile::IFilePersistence* filePersistenceCompPtr = GetPersistenceForObjectType(typeId);
 		if (filePersistenceCompPtr != nullptr){
@@ -923,7 +934,7 @@ CFileCollectionCompBase::DataPtr CFileCollectionCompBase::CreateObjectFromFile(c
 		}
 	}
 
-	return CFileCollectionCompBase::DataPtr();
+	return istd::IChangeableUniquePtr();
 }
 
 
@@ -1086,7 +1097,8 @@ idoc::MetaInfoPtr CFileCollectionCompBase::CreateItemMetaInfo(
 	QFileInfo fileInfo(dataObjectFilePath);
 	if (fileInfo.exists()){
 		if (m_metaInfoCreatorMap.contains(typeId)){
-			DataPtr dataObjectPtr = CreateObjectFromFile(dataObjectFilePath, typeId);
+			DataPtr dataObjectPtr;
+			dataObjectPtr.FromUnique(CreateObjectFromFile(dataObjectFilePath, typeId));
 			if (!dataObjectPtr.IsValid()){
 				return retVal;
 			}
@@ -1329,6 +1341,8 @@ bool CFileCollectionCompBase::FinishInsertFileTransaction(
 void CFileCollectionCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	m_isCacheEnabled = *m_enableCacheAttrPtr;
 
 	m_itemInfoProvider.UpdateItems();
 

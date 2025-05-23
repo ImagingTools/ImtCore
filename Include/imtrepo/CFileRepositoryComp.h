@@ -97,7 +97,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				DataPtr defaultValuePtr = DataPtr(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
@@ -106,7 +106,7 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual imtbase::IObjectCollection* CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+	virtual imtbase::IObjectCollectionUniquePtr CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
@@ -140,7 +140,7 @@ public:
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	// reimplemented (IObjectCollection::IDataFactory)
-	virtual DataPtr CreateInstance(const QByteArray& keyId = "") const override;
+	virtual istd::IChangeableUniquePtr CreateInstance(const QByteArray& keyId = "") const override;
 	virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
 
 protected:
@@ -179,12 +179,12 @@ protected:
 	/**
 		Create data object for the given type.
 	*/
-	virtual DataPtr CreateDataObject(const QByteArray& typeId) const;
+	virtual istd::IChangeableUniquePtr CreateDataObject(const QByteArray& typeId) const;
 
 	/**
 		Create object data from the file.
 	*/
-	virtual DataPtr CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const;
+	virtual istd::IChangeableUniquePtr CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const;
 
 	/**
 		Check if the path to the file is inside of repository folder.

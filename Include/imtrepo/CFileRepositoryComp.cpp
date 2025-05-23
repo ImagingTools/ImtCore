@@ -308,22 +308,23 @@ QByteArray CFileRepositoryComp::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			DataPtr defaultValuePtr,
+			const istd::IChangeable* defaultValuePtr,
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/)
 {
-	DataPtr newObjectPtr;
-
-	if (defaultValuePtr.IsValid()){
-		newObjectPtr = defaultValuePtr;
-	}
-	else{
-		newObjectPtr = CreateDataObject(typeId);
-	}
+	istd::IChangeableUniquePtr newObjectPtr = CreateDataObject(typeId);
 
 	if (newObjectPtr.IsValid()){
+		if (defaultValuePtr != nullptr){
+			if (!newObjectPtr->CopyFrom(*defaultValuePtr)){
+				SendErrorMessage(0, QT_TR_NOOP("Initial value could not be set"));
+
+				return QByteArray();
+			}
+		}
+
 		const ifile::IFilePersistence* persistencePtr = GetObjectPersistence(typeId);
 		if (persistencePtr != nullptr){
 			imtbase::CTempDir tempDir("ImtCore");
@@ -416,7 +417,8 @@ bool CFileRepositoryComp::GetObjectData(const QByteArray& objectId, DataPtr& dat
 			Q_ASSERT(dataObjectPtr.IsValid());
 
 			if (!dataPtr.IsValid()){
-				DataPtr newInstancePtr = CreateDataObject(typeId);
+				DataPtr newInstancePtr;
+				newInstancePtr.FromUnique(CreateDataObject(typeId));
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*dataObjectPtr)){
 						dataPtr = newInstancePtr;
@@ -438,13 +440,14 @@ bool CFileRepositoryComp::GetObjectData(const QByteArray& objectId, DataPtr& dat
 
 
 	if (!fileItemInfo.GetFilePath().isEmpty()){
-		DataPtr dataObjectPtr = CreateObjectFromFile(fileItemInfo.GetFilePath(), typeId);
+		istd::IChangeableUniquePtr dataObjectPtr = CreateObjectFromFile(fileItemInfo.GetFilePath(), typeId);
 		if (!dataObjectPtr.IsValid()){
 			return false;
 		}
 
 		if (!dataPtr.IsValid()){
-			DataPtr newInstancePtr = CreateDataObject(typeId);
+			DataPtr newInstancePtr;
+			newInstancePtr.FromUnique(CreateDataObject(typeId));
 			if (newInstancePtr.IsValid()){
 				if (newInstancePtr->CopyFrom(*dataObjectPtr)){
 					dataPtr = newInstancePtr;
@@ -511,7 +514,7 @@ bool CFileRepositoryComp::SetObjectData(
 }
 
 
-imtbase::IObjectCollection* CFileRepositoryComp::CreateSubCollection(
+imtbase::IObjectCollectionUniquePtr CFileRepositoryComp::CreateSubCollection(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -663,7 +666,7 @@ bool CFileRepositoryComp::SetElementEnabled(const Id& /*elementId*/, bool /*isEn
 
 // reimplemented (IObjectCollection::IDataFactory)
 
-CFileRepositoryComp::DataPtr CFileRepositoryComp::CreateInstance(const QByteArray& keyId) const
+istd::IChangeableUniquePtr CFileRepositoryComp::CreateInstance(const QByteArray& keyId) const
 {
 	return CreateDataObject(keyId);
 }
@@ -739,7 +742,7 @@ QString CFileRepositoryComp::GetWorkingExt(
 }
 
 
-CFileRepositoryComp::DataPtr CFileRepositoryComp::CreateDataObject(const QByteArray& typeId) const
+istd::IChangeableUniquePtr CFileRepositoryComp::CreateDataObject(const QByteArray& typeId) const
 {
 	int factoryIndex = -1;
 
@@ -754,20 +757,20 @@ CFileRepositoryComp::DataPtr CFileRepositoryComp::CreateDataObject(const QByteAr
 
 	if ((factoryIndex >= 0) && factoryIndex < m_objectFactoryListCompPtr.GetCount()){
 		icomp::IComponent* compPtr = m_objectFactoryListCompPtr.CreateComponent(factoryIndex);
-		return DataPtr(
-			DataPtr::RootObjectPtr(compPtr),
+		return istd::IChangeableUniquePtr(
+			compPtr,
 			[this, compPtr]() {
 				return m_objectFactoryListCompPtr.ExtractInterface(compPtr);
 			});
 	}
 
-	return DataPtr();
+	return istd::IChangeableUniquePtr();
 }
 
 
-CFileRepositoryComp::DataPtr CFileRepositoryComp::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
+istd::IChangeableUniquePtr CFileRepositoryComp::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
 {
-	CFileRepositoryComp::DataPtr retVal = CreateDataObject(typeId);
+	istd::IChangeableUniquePtr retVal = CreateDataObject(typeId);
 	if (retVal.IsValid()){
 		const ifile::IFilePersistence* filePersistenceCompPtr = GetObjectPersistence(typeId);
 		if (filePersistenceCompPtr != nullptr){
@@ -778,7 +781,7 @@ CFileRepositoryComp::DataPtr CFileRepositoryComp::CreateObjectFromFile(const QSt
 		}
 	}
 
-	return CFileRepositoryComp::DataPtr();
+	return istd::IChangeableUniquePtr();
 }
 
 
@@ -800,7 +803,8 @@ idoc::MetaInfoPtr CFileRepositoryComp::CreateItemMetaInfo(
 	QFileInfo fileInfo(dataObjectFilePath);
 	if (fileInfo.exists()){
 		if (m_metaInfoCreatorMap.contains(typeId)){
-			DataPtr dataObjectPtr = CreateObjectFromFile(dataObjectFilePath, typeId);
+			DataPtr dataObjectPtr;
+			dataObjectPtr.FromUnique(CreateObjectFromFile(dataObjectFilePath, typeId));
 			if (!dataObjectPtr.IsValid()){
 				return retVal;
 			}
@@ -955,7 +959,7 @@ bool CFileRepositoryComp::FinishInsertFileTransaction(
 							*m_infoItemTypeIdAttrPtr,
 							collectionItem.GetName(),
 							"",
-							DataPtr(&collectionItem),
+							&collectionItem,
 							fileId);
 
 				Q_ASSERT(documentId == fileId);

@@ -106,6 +106,7 @@ public:
 		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
 		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreatorList", "List of meta-info creators related to the object types", false);
 		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data object instance creation", false);
+		I_ASSIGN(m_enableCacheAttrPtr, "EnableCache", "If enabled, the data objects will be placed into the cache to improve performance of the data reading", true, false);
 	I_END_COMPONENT;
 
 public:
@@ -153,7 +154,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				DataPtr defaultValuePtr = DataPtr(),
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
@@ -162,7 +163,7 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual imtbase::IObjectCollection* CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+	virtual imtbase::IObjectCollectionUniquePtr CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
@@ -196,7 +197,7 @@ public:
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	// reimplemented (IObjectCollection::IDataFactory)
-	virtual DataPtr CreateInstance(const QByteArray& keyId = "") const override;
+	virtual istd::IChangeableUniquePtr CreateInstance(const QByteArray& keyId = "") const override;
 	virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
 
 protected:
@@ -322,12 +323,12 @@ protected:
 	/**
 		Create data object for the given type.
 	*/
-	virtual DataPtr CreateDataObject(const QByteArray& typeId) const;
+	virtual istd::IChangeableUniquePtr CreateDataObject(const QByteArray& typeId) const;
 
 	/**
 		Create object data from the file.
 	*/
-	virtual DataPtr CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const;
+	virtual istd::IChangeableUniquePtr CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const;
 
 	/**
 		Write a file collection item to file system.
@@ -447,7 +448,6 @@ protected:
 	mutable ObjectCache m_objectCache;
 	mutable QReadWriteLock m_objectCacheLock;
 
-
 protected:
 	/**
 		Provider of the logged user.
@@ -497,13 +497,14 @@ protected:
 	I_MULTIREF(imtbase::IMetaInfoCreator, m_metaInfoCreatorListCompPtr);
 
 	/**
-		Event handlers
-	*/
-
-	/**
 		List of data object factories related to registered resource types.
 	*/
 	I_MULTIFACT(istd::IChangeable, m_objectFactoryListCompPtr);
+
+	/**
+		Provider of the logged user.
+	*/
+	I_ATTR(bool, m_enableCacheAttrPtr);
 
 private:
 	class ReaderThread: public QThread
@@ -531,6 +532,8 @@ private:
 	QMutex m_lockedObjectInfoMutex;
 
 	RepositoryItemInfoProvider m_itemInfoProvider;
+
+	std::atomic<bool> m_isCacheEnabled;
 };
 
 
