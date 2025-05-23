@@ -39,7 +39,7 @@ bool CReportDocumentPdfPersistenceComp::IsOperationSupported(
 }
 
 
-int CReportDocumentPdfPersistenceComp::LoadFromFile(
+ifile::IFilePersistence::OperationState CReportDocumentPdfPersistenceComp::LoadFromFile(
 			istd::IChangeable& /*data*/,
 			const QString& /*filePath*/,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -48,7 +48,7 @@ int CReportDocumentPdfPersistenceComp::LoadFromFile(
 }
 
 
-int CReportDocumentPdfPersistenceComp::SaveToFile(
+ifile::IFilePersistence::OperationState CReportDocumentPdfPersistenceComp::SaveToFile(
 			const istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const

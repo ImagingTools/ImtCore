@@ -39,7 +39,7 @@ bool CReportDocumentTiffPersistenceComp::IsOperationSupported(
 }
 
 
-int CReportDocumentTiffPersistenceComp::LoadFromFile(
+ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::LoadFromFile(
 			istd::IChangeable& /*data*/,
 			const QString& /*filePath*/,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
@@ -48,7 +48,7 @@ int CReportDocumentTiffPersistenceComp::LoadFromFile(
 }
 
 
-int CReportDocumentTiffPersistenceComp::SaveToFile(
+ifile::IFilePersistence::OperationState CReportDocumentTiffPersistenceComp::SaveToFile(
 			const istd::IChangeable& data,
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
