@@ -19,77 +19,80 @@ QByteArray CAddressElementDatabaseDelegateComp::GetObjectTypeId(const QByteArray
 	return "Address";
 }
 
-istd::IChangeable* CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
 	}
 
-    if (!m_adrElementInfoFactCompPtr.IsValid()){
+	if (!m_adrElementInfoFactCompPtr.IsValid()){
 		return nullptr;
 	}
 
-    istd::TDelPtr<IAddressElementInfo> adrElementInfoPtr = m_adrElementInfoFactCompPtr.CreateInstance();
-    if (!adrElementInfoPtr.IsValid()){
-        return nullptr;
-    }
-
-    if(record.contains("Id")){
-        CPositionIdentifiable* adrElementIdentifiableInfoPtr = dynamic_cast<CPositionIdentifiable*>(adrElementInfoPtr.GetPtr());
-        if(adrElementIdentifiableInfoPtr !=nullptr){
-            QByteArray id = record.value("Id").toByteArray();
-            adrElementIdentifiableInfoPtr->SetObjectUuid(id);
-        }
-    }
-
-    if(record.contains("ParentIds")){
-        QByteArray dataIndexes = record.value("ParentIds").toByteArray();
-		QJsonDocument documentIndexes = QJsonDocument::fromJson(dataIndexes);
-		QJsonArray jsonIndexes = documentIndexes.array();
-        QList<QByteArray> parentIds;
-		for(int index = 0; index < jsonIndexes.size(); index++){
-			QByteArray parentId = jsonIndexes[index].toVariant().toByteArray();
-            parentIds.append(parentId);
-		}
-        adrElementInfoPtr->SetParentIds(parentIds);
+	IAddressElementInfoUniquePtr adrElementInfoPtr = m_adrElementInfoFactCompPtr.CreateInstance();
+	if (!adrElementInfoPtr.IsValid()){
+		return nullptr;
 	}
 
-	if(record.contains("Type")){
+	if (record.contains("Id")){
+		CPositionIdentifiable* adrElementIdentifiableInfoPtr = dynamic_cast<CPositionIdentifiable*>(adrElementInfoPtr.GetPtr());
+		if (adrElementIdentifiableInfoPtr != nullptr){
+			QByteArray id = record.value("Id").toByteArray();
+			adrElementIdentifiableInfoPtr->SetObjectUuid(id);
+		}
+	}
+
+	if (record.contains("ParentIds")){
+		QByteArray dataIndexes = record.value("ParentIds").toByteArray();
+		QJsonDocument documentIndexes = QJsonDocument::fromJson(dataIndexes);
+		QJsonArray jsonIndexes = documentIndexes.array();
+		QList<QByteArray> parentIds;
+		for (int index = 0; index < jsonIndexes.size(); index++){
+			QByteArray parentId = jsonIndexes[index].toVariant().toByteArray();
+			parentIds.append(parentId);
+		}
+		adrElementInfoPtr->SetParentIds(parentIds);
+	}
+
+	if (record.contains("Type")){
 		QByteArray typeId = record.value("Type").toByteArray();
 		adrElementInfoPtr->SetAddressTypeId(typeId);
 	}
 
-    if(record.contains("Name")){
-        QString name = record.value("Name").toByteArray();
-        adrElementInfoPtr->SetName(name);
-    }
+	if (record.contains("Name")){
+		QString name = record.value("Name").toByteArray();
+		adrElementInfoPtr->SetName(name);
+	}
 
-    if(record.contains("Description")){
-        QString description = record.value("Description").toByteArray();
-        adrElementInfoPtr->SetDescription(description);
-    }
+	if (record.contains("Description")){
+		QString description = record.value("Description").toByteArray();
+		adrElementInfoPtr->SetDescription(description);
+	}
 
-	if(record.contains("FullAddress")){
+	if (record.contains("FullAddress")){
 		QString address = record.value("FullAddress").toString();
 		adrElementInfoPtr->SetAddress(address);
 	}
 
-    if(record.contains("HasChildren")){
-        bool hasChildren = record.value("HasChildren").toBool();
-        adrElementInfoPtr->SetHasChildren(hasChildren);
-    }
+	if (record.contains("HasChildren")){
+		bool hasChildren = record.value("HasChildren").toBool();
+		adrElementInfoPtr->SetHasChildren(hasChildren);
+	}
 
-	if(record.contains("Latitude")){
+	if (record.contains("Latitude")){
 		double lat = record.value("Latitude").toDouble();
 		adrElementInfoPtr->SetLatitude(lat);
 	}
 
-	if(record.contains("Longitude")){
+	if (record.contains("Longitude")){
 		double lon = record.value("Longitude").toDouble();
 		adrElementInfoPtr->SetLongitude(lon);
 	}
 
-    return adrElementInfoPtr.PopPtr();
+	istd::IChangeableUniquePtr retVal;
+	retVal.MoveCastedPtr<IAddressElementInfo>(adrElementInfoPtr);
+
+	return retVal;
 }
 
 
@@ -98,20 +101,20 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 			const QByteArray& proposedObjectId,
 			const QString& /*objectName*/,
 			const QString& /*objectDescription*/,
-            const istd::IChangeable* valuePtr,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+	const istd::IChangeable* valuePtr,
+	const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(valuePtr);
-    if (adrInfoPtr == nullptr){
-        return NewObjectQuery();
-    }
+	if (adrInfoPtr == nullptr){
+		return NewObjectQuery();
+	}
 
-    QString name = adrInfoPtr->GetName();
-    QString description = adrInfoPtr->GetDescription();
+	QString name = adrInfoPtr->GetName();
+	QString description = adrInfoPtr->GetDescription();
 
-    QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
+	QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
 	QJsonArray json;
-    for (QByteArray parentId: parentIds){
+	for (QByteArray parentId : parentIds){
 		json.append(QJsonValue(QString(parentId)));
 	}
 	QJsonDocument document = QJsonDocument(json);
@@ -124,14 +127,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 
 	NewObjectQuery retVal;
 	retVal.query = QString("INSERT INTO \"AddressElements\"(\"Id\", \"ParentIds\", \"Type\", \"Name\", \"Description\", \"Latitude\", \"Longitude\")  VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
-				.arg(qPrintable(proposedObjectId))
-				.arg(qPrintable(parents))
-				.arg(qPrintable(typeId))
-				.arg(name)
-				.arg(description)
-				.arg(lat)
-				.arg(lon)
-				.toUtf8();
+		.arg(qPrintable(proposedObjectId))
+		.arg(qPrintable(parents))
+		.arg(qPrintable(typeId))
+		.arg(name)
+		.arg(description)
+		.arg(lat)
+		.arg(lon)
+		.toUtf8();
 
 	retVal.objectName = name;
 
@@ -151,18 +154,18 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId,
+	const imtbase::IObjectCollection& /*collection*/,
+	const QByteArray& objectId,
 	const istd::IChangeable& object,
 	const imtbase::IOperationContext* /*operationContextPtr*/,
 	bool /*useExternDelegate*/) const
 {
 	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(&object);
-    const CPositionIdentifiable* positionInfoPtr = dynamic_cast<const CPositionIdentifiable*>(&object);
+	const CPositionIdentifiable* positionInfoPtr = dynamic_cast<const CPositionIdentifiable*>(&object);
 	if (adrInfoPtr == nullptr || objectId.isEmpty()){
 		return QByteArray();
 	}
-    QByteArray adrId = positionInfoPtr->GetObjectUuid();
+	QByteArray adrId = positionInfoPtr->GetObjectUuid();
 	QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
 	QJsonArray json;
 	for (QByteArray parentId : parentIds){

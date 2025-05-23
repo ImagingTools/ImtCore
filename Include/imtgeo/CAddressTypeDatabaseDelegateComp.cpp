@@ -15,7 +15,7 @@ QByteArray CAddressTypeDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /
 }
 
 
-istd::IChangeable* CAddressTypeDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CAddressTypeDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -25,7 +25,7 @@ istd::IChangeable* CAddressTypeDatabaseDelegateComp::CreateObjectFromRecord(cons
 		return nullptr;
 	}
 
-	istd::TDelPtr<IAddressTypeInfo> adrTypeInfoPtr = m_adrTypeInfoFactCompPtr.CreateInstance();
+	imtgeo::IAddressTypeInfoUniquePtr adrTypeInfoPtr = m_adrTypeInfoFactCompPtr.CreateInstance();
 	if (!adrTypeInfoPtr.IsValid()){
 		return nullptr;
 	}
@@ -50,8 +50,10 @@ istd::IChangeable* CAddressTypeDatabaseDelegateComp::CreateObjectFromRecord(cons
 		adrTypeInfoPtr->SetDescription(description);
 	}
 
+	istd::IChangeableUniquePtr retVal;
+	retVal.MoveCastedPtr<IAddressTypeInfo>(adrTypeInfoPtr);
 
-	return adrTypeInfoPtr.PopPtr();
+	return retVal;
 }
 
 

@@ -113,10 +113,9 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 	else{
 		QByteArray objectId;
 
-		istd::IChangeable* newObject = CreateObjectFromRequest(gqlRequest, objectId, errorMessage);
-
-		if (newObject != nullptr){
-			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
+		istd::IChangeableUniquePtr newObject = CreateObjectFromRequest(gqlRequest, objectId, errorMessage);
+		if (newObject.IsValid()){
+			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject.GetPtr(), objectId);
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			m_objectCollectionCompPtr->GetObjectData(newObjectId, dataPtr);
 			CAddressElementInfo addressElementInfo;
@@ -147,7 +146,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 }
 
 
-istd::IChangeable* CAddressControllerComp::CreateObjectFromRequest(
+istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& objectId,
 			QString& errorMessage) const
@@ -267,8 +266,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 			filteringOnSerialIdInfoIds << "Indexes";
 			filterOnSerialId.SetFilteringInfoIds(filteringOnSerialIdInfoIds);
 
-			istd::IChangeable* savedObject = CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
-			if (savedObject != nullptr){
+			istd::IChangeableUniquePtr savedObject = CreateObjectFromRequest(gqlRequest, newObjectId, errorMessage);
+			if (savedObject.IsValid()){
 				if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
 					errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);
 				}
@@ -276,8 +275,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 					imtbase::IObjectCollection::DataPtr newDataPtr;
 					m_objectCollectionCompPtr->GetObjectData(oldObjectId, newDataPtr);
 					const IAddressElementInfo* newAddressInfoPtr = dynamic_cast<const IAddressElementInfo*>(newDataPtr.GetPtr());
-					QString newName = newAddressInfoPtr->GetName();
 
+					QString newName = newAddressInfoPtr->GetName();
 				}
 			}
 			else{

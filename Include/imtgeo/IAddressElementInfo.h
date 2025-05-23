@@ -78,6 +78,8 @@ public:
 	virtual void SetHasChildren(const bool& hasChildren) = 0;
 };
 
+typedef istd::TUniqueInterfacePtr<IAddressElementInfo> IAddressElementInfoUniquePtr;
+typedef istd::TSharedInterfacePtr<IAddressElementInfo> IAddressElementInfoSharedPtr;
 
 } // namespace imtgeo
 

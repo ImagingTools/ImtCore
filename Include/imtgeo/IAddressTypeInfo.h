@@ -59,6 +59,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IAddressTypeInfo> IAddressTypeInfoUniquePtr;
+typedef istd::TSharedInterfacePtr<IAddressTypeInfo> IAddressTypeInfoSharedPtr;
+
+
 } // namespace imtgeo
 
 

@@ -25,7 +25,7 @@ public:
 protected:
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual istd::IChangeable* CreateObjectFromRequest(
+	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
 		QByteArray& objectId,
 		QString& errorMessage) const override;

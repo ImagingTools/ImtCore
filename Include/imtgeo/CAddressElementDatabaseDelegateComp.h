@@ -20,7 +20,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-	virtual istd::IChangeable* CreateObjectFromRecord(
+	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
 				const QSqlRecord& record) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
@@ -31,7 +31,7 @@ public:
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateDeleteObjectQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
+				const QByteArray& objectId, 
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
