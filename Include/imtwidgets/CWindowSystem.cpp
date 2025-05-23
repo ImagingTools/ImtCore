@@ -169,11 +169,11 @@ bool CWindowSystem::RaiseWindowByProcessId(qint64 processId)
 	if (windowHandle){
 		::SetForegroundWindow(windowHandle);
 		ok = ::ShowWindow(windowHandle, SW_RESTORE);
-		::ShowWindow(windowHandle, SW_NORMAL);
+		::ShowWindow(windowHandle, SW_SHOW);
 		
 		if (::IsIconic(lastActiveWindowHandle) && (windowHandle != lastActiveWindowHandle)) {
 			::ShowWindow(lastActiveWindowHandle, SW_RESTORE);
-			::ShowWindow(lastActiveWindowHandle, SW_NORMAL);
+			::ShowWindow(lastActiveWindowHandle, SW_SHOW);
 		}
 	}
 #endif
@@ -194,12 +194,12 @@ bool CWindowSystem::RaiseWindowByTitle(const QString& title)
 	if (lastActiveWindowHandle != nullptr){
 		bool ok = ::SetForegroundWindow(mainWindowHandle);
 		::ShowWindow(mainWindowHandle, SW_RESTORE);
-		::ShowWindow(mainWindowHandle, SW_SHOWNORMAL);
+		::ShowWindow(mainWindowHandle, SW_SHOW);
 
 		if ((lastActiveWindowHandle!= mainWindowHandle) && (::IsIconic(lastActiveWindowHandle))){
 			ok = ::SetForegroundWindow(lastActiveWindowHandle);
 			::ShowWindow(lastActiveWindowHandle, SW_RESTORE);
-			::ShowWindow(lastActiveWindowHandle, SW_SHOWNORMAL);
+			::ShowWindow(lastActiveWindowHandle, SW_SHOW);
 			return ok;
 		}
 
