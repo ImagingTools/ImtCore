@@ -126,6 +126,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<ILicenseDefinition> ILicenseDefinitionUniquePtr;
+typedef istd::TSharedInterfacePtr<ILicenseDefinition> ILicenseDefinitionSharedPtr;
+
+
 } // namespace imtlic
 
 

@@ -95,6 +95,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IProductInfo> IProductInfoUniquePtr;
+typedef istd::TSharedInterfacePtr<IProductInfo> IProductInfoSharedPtr;
+
+
 } // namespace imtlic
 
 

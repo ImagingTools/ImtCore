@@ -96,6 +96,8 @@ public:
 
 
 typedef istd::TPointerVector<const IFeatureInfo> FeatureInfoList;
+typedef istd::TUniqueInterfacePtr<IFeatureInfo> IFeatureInfoUniquePtr;
+typedef istd::TSharedInterfacePtr<IFeatureInfo> IFeatureInfoSharedPtr;
 
 
 } // namespace imtlic
