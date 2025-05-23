@@ -55,7 +55,7 @@ imtbase::ICollectionInfo::Id CRemoteGqlCollectionController::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			DataPtr defaultValuePtr,
+			const istd::IChangeable* defaultValuePtr,
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
@@ -71,7 +71,7 @@ imtbase::ICollectionInfo::Id CRemoteGqlCollectionController::InsertNewObject(
 				typeId,
 				name,
 				description,
-				defaultValuePtr.GetPtr(),
+				defaultValuePtr,
 				"", // uploadUrl
 				proposedObjectId,
 				"", // nodeId,
@@ -196,7 +196,7 @@ bool CRemoteGqlCollectionController::SetObjectData(
 }
 
 
-imtbase::IObjectCollection* CRemoteGqlCollectionController::CreateSubCollection(
+imtbase::IObjectCollectionUniquePtr CRemoteGqlCollectionController::CreateSubCollection(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -457,7 +457,7 @@ bool CRemoteGqlCollectionController::SetElementEnabled(const Id& /*elementId*/, 
 imtbase::IObjectCollection::DataPtr CRemoteGqlCollectionController::CreateObjectInstance(const QByteArray& typeId) const
 {
 	istd::IChangeable* objPtr = BaseClass::CreateInstance(typeId);
-	return DataPtr(DataPtr::RootObjectPtr(objPtr), [objPtr](){
+	return DataPtr(objPtr, [objPtr](){
 		return objPtr;
 	});
 }

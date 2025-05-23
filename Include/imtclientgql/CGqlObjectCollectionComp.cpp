@@ -31,7 +31,7 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::CreateObjectInstan
 	for (int i = 0; i < m_typeIdsAttrPtr.GetCount(); i++){
 		if (m_typeIdsAttrPtr[i] == typeId){
 			icomp::IComponent* compPtr = m_objectFactoriesCompPtr.CreateComponent(i);
-			return DataPtr(DataPtr::RootObjectPtr(compPtr), [compPtr, this](){
+			return DataPtr(compPtr, [compPtr, this](){
 				return m_objectFactoriesCompPtr.ExtractInterface(compPtr);
 			});
 		}

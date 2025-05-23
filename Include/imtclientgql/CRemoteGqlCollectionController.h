@@ -39,7 +39,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				DataPtr defaultValuePtr = nullptr,
+				const istd::IChangeable* defaultValuePtr = nullptr,
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
@@ -48,7 +48,7 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual imtbase::IObjectCollection* CreateSubCollection(
+	virtual imtbase::IObjectCollectionUniquePtr CreateSubCollection(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;

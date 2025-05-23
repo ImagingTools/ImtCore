@@ -313,8 +313,8 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 	}
 	else{
 		if (methodType == imtrest::CWebSocketRequest::MT_QUERY && m_httpProtocolEngineCompPtr.IsValid() && m_serverRequestHandlerCompPtr.IsValid()){
-			imtrest::IRequest* requestPtr = m_httpProtocolEngineCompPtr->CreateRequest(*m_serverRequestHandlerCompPtr);
-			imtrest::CHttpRequest* newHttpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(requestPtr);
+			imtrest::IRequestUniquePtr requestPtr = m_httpProtocolEngineCompPtr->CreateRequest(*m_serverRequestHandlerCompPtr);
+			imtrest::CHttpRequest* newHttpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(requestPtr.GetPtr());
 			if (newHttpRequestPtr != nullptr){
 				QByteArray clientId = webSocketRequest->GetClientId();
 

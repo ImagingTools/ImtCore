@@ -136,9 +136,9 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			locker.unlock();
 			return CreateErrorResponse(errorMessage, request);
 		}
-		
+
 		QJsonObject rootObject = jsonDocument.object();
-		
+
 		switch (webSocketRequest->GetMethodType())
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_ASK:
@@ -154,7 +154,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 				}
 			}
 		break;
-		
+
 		case imtrest::CWebSocketRequest::MT_START_ASK:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
 			if (m_registeredClients.contains(subscriptionId)){
@@ -264,7 +264,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 
 	QByteArray queryData = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
 
-	imtrest::ConstRequestPtr constRequestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, ""));
+	imtrest::ConstRequestPtr constRequestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
 
 	NetworkOperation networkOperation(100, this);
 
@@ -340,7 +340,7 @@ void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 	QJsonObject payload;
 	payload["data"] = QString(subscriptionRequest.GetQuery());
 	payload["extensions"] = extensions;
-	
+
 	QJsonObject registerSubscription;
 	registerSubscription["id"] = QString(subscriptionId);
 	registerSubscription["type"] = "start";
@@ -360,7 +360,7 @@ void CSubscriptionManagerComp::SubscriptionRegister(const imtgql::CGqlRequest& s
 
 	QByteArray queryData = QJsonDocument(registerSubscription).toJson(QJsonDocument::Compact);
 
-	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, ""));
+	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, "").PopInterfacePtr());
 
 	SendRequestInternal(subscriptionRequest, requestPtr);
 }
@@ -422,7 +422,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(QByteArr
 							request,
 							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
 							body.toUtf8(),
-							reponseTypeId));
+							reponseTypeId).PopInterfacePtr());
 
 	SendErrorMessage(0, QString(errorMessage));
 
