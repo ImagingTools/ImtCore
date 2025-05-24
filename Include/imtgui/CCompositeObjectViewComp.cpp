@@ -127,7 +127,7 @@ void CCompositeObjectViewComp::CreateView()
 						for (QByteArray currentObjectId : objectIds){
 							if (objectFromExtendId == currentObjectId){
 								objectFromExtendPtr = objectProviderPtr->GetObjectPtr(objectFromExtendId);
-								if (objectFromExtendPtr != nullptr) {
+								if (objectFromExtendPtr != nullptr){
 									icomp::IComponent* viewExtenderComponentPtr = m_viewExtendersCompPtr.CreateComponent(extenderCounter);
 									imtgui::IViewExtender* viewExtenderPtr = dynamic_cast<imtgui::IViewExtender*>(viewExtenderComponentPtr);
 									Q_ASSERT(viewExtenderPtr != nullptr);

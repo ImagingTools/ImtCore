@@ -47,14 +47,14 @@ ParamEditorBase {
 				}
 			}
 			
-			function formatUrl() {
+			function formatUrl(){
 				let parts = text.match(/^([a-zA-Z0-9+.-]+)(:\/{0,2})?(.*)/);
-				if (parts) {
+				if (parts){
 					let protocol = parts[1];
 					let slashes = parts[2] || "://";
 					let rest = parts[3];
 					
-					if (!parts[2] && rest.length > 0) {
+					if (!parts[2] && rest.length > 0){
 						text = protocol + "://" + rest;
 					}
 				}
@@ -71,7 +71,7 @@ ParamEditorBase {
 				
 				let hostPart = parts[1].split("/")[0];
 				
-				if (hostPart.indexOf(":") !== -1) {
+				if (hostPart.indexOf(":") !== -1){
 					let hostParts = hostPart.split(":");
 					urlParam.m_host = hostParts[0];
 					urlParam.m_port = hostParts[1];

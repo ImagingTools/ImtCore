@@ -62,14 +62,14 @@ ControlBase {
         if (containerTextArea.activeFocus){
             console.log("TextArea onPressed");
 
-            if (event.key == Qt.Key_Escape) {
+            if (event.key == Qt.Key_Escape){
                 console.log("Key_Escape");
                 containerTextArea.cancelled();
             }
         }
     }
 
-    function setFocus(value) {
+    function setFocus(value){
         //textArea.focus = value;
         focus = value;
         if(decorator_.z < 0){
@@ -218,7 +218,7 @@ ControlBase {
 
             }
 
-            function setHeight () {
+            function setHeight (){
                 if(containerTextArea.isDinamicHeight  && containerTextArea.decorator_ && containerTextArea.decorator_.z < 0){
                     var newHeigth = textArea.height + 2*containerTextArea.margin;
                     if(newHeigth !== containerTextArea.height){

@@ -195,7 +195,7 @@ protected:
 private:
 	void OnTaskInputsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IObjectCollection* objectCollectionPtr);
 
-private:
+protected:
 	I_MULTIREF(iinsp::ISupplier, m_fixedTasksCompPtr);
 	I_MULTIATTR(QByteArray, m_fixedTaskIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_fixedTaskTypeIdsAttrPtr);

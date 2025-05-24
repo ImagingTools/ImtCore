@@ -164,7 +164,7 @@ Item {
 		let obj = windowComp.createObject(container);
 		obj.parameters = parameters;
 		obj.sourceComponent = comp;
-		for (let key in parameters) {
+		for (let key in parameters){
 			if(key == "modality"){
 				obj[key] = parameters[key];
 			}
@@ -219,7 +219,7 @@ Item {
 					windowObj.width = item.width;
 					windowObj.height = item.height;
 					
-					for (let key in windowObj.parameters) {
+					for (let key in windowObj.parameters){
 						if(item[key] !== undefined){
 							item[key] = windowObj.parameters[key];
 						}

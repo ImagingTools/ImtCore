@@ -24,7 +24,7 @@ void CMultiSelectionEditorComp::OnModelChanged(int /*modelId*/, const istd::ICha
 {
 	Q_ASSERT(IsGuiCreated());
 
-	if (!IsUpdateBlocked() && IsModelAttached()) {
+	if (!IsUpdateBlocked() && IsModelAttached()){
 		UpdateBlocker updateBlocker(this);
 
 		UpdateGui(istd::IChangeable::GetAllChanges());
@@ -39,11 +39,11 @@ void CMultiSelectionEditorComp::OnGuiModelAttached()
 	BaseClass::OnGuiModelAttached();
 
 	imtbase::ISelection* selectionParamsPtr = GetObservedObject();
-	if (selectionParamsPtr != NULL) {
+	if (selectionParamsPtr != NULL){
 		const imtbase::ICollectionInfo* constraintsPtr = selectionParamsPtr->GetSelectionConstraints();
-		if (constraintsPtr != NULL) {
+		if (constraintsPtr != NULL){
 			const imod::IModel* constraintsModelPtr = dynamic_cast<const imod::IModel*>(constraintsPtr);
-			if (constraintsModelPtr != NULL) {
+			if (constraintsModelPtr != NULL){
 				RegisterModel(const_cast<imod::IModel*>(constraintsModelPtr));
 			}
 		}
@@ -75,10 +75,10 @@ void CMultiSelectionEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 	Q_ASSERT(objectPtr != nullptr);
 
 	const imtbase::ICollectionInfo* collectionInfoPtr = objectPtr->GetSelectionConstraints();
-	if (collectionInfoPtr != nullptr) {
+	if (collectionInfoPtr != nullptr){
 		imtbase::ISelection::Ids selectedOptions = objectPtr->GetSelectedIds();
 		imtbase::ICollectionInfo::Ids optionIds = collectionInfoPtr->GetElementIds();
-		for (const imtbase::ICollectionInfo::Id& optionId : optionIds) {
+		for (const imtbase::ICollectionInfo::Id& optionId : optionIds){
 			QString optionName = collectionInfoPtr->GetElementInfo(optionId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 			QCheckBox* optionCheckPtr = new QCheckBox(SelectorFrame);
@@ -141,13 +141,13 @@ void CMultiSelectionEditorComp::OnCheckBoxStateChanged(int checkState)
 		Q_ASSERT(objectPtr != nullptr);
 
 		const imtbase::ICollectionInfo* collectionInfoPtr = objectPtr->GetSelectionConstraints();
-		if (collectionInfoPtr == nullptr) {
+		if (collectionInfoPtr == nullptr){
 			return;
 		}
 
 		imtbase::ISelection::Ids selectedOptions = objectPtr->GetSelectedIds();
 
-		switch (checkState) {
+		switch (checkState){
 		case Qt::Checked:
 			if (!selectedOptions.contains(checkBoxOptionId)){
 				selectedOptions << checkBoxOptionId;
@@ -207,9 +207,9 @@ void CMultiSelectionEditorComp::on_InvertButton_clicked()
 	imtbase::ISelection::Ids selectedIds = objectPtr->GetSelectedIds();
 
 	const imtbase::ICollectionInfo* collectionInfoPtr = objectPtr->GetSelectionConstraints();
-	if (collectionInfoPtr != nullptr) {
+	if (collectionInfoPtr != nullptr){
 		imtbase::ICollectionInfo::Ids optionIds = collectionInfoPtr->GetElementIds();
-		for (const imtbase::ICollectionInfo::Id& optionId : optionIds) {
+		for (const imtbase::ICollectionInfo::Id& optionId : optionIds){
 			if (!selectedIds.contains(optionId)){
 				invertedIds.insert(optionId);
 			}

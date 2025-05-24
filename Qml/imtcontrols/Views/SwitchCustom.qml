@@ -171,11 +171,11 @@ ControlBase {
 		\param checkedVal The desired state of the switch (true for checked, false for unchecked).
 		\param animate If true, the state transition will be animated; otherwise, it will switch immediately.
 	*/
-	function setChecked(checkedVal, animate) {
+	function setChecked(checkedVal, animate){
 		if (checkedVal === switchCustom.checked)
 			return;
 		
-		if (animate) {
+		if (animate){
 			xAnim.from = switchCustom.controlRecX;
 			xAnim.to = checkedVal
 					? (switchCustom.backgroundWidth - switchCustom.controlWidth)
@@ -188,7 +188,7 @@ ControlBase {
 	}
 	
 	onCheckedChanged: {
-		if (tooltip.text !== "") {
+		if (tooltip.text !== ""){
 			tooltip.hide();
 		}
 		

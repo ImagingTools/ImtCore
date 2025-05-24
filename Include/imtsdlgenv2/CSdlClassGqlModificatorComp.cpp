@@ -891,7 +891,7 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(".");
 
-	if (optional) {
+	if (optional){
 		stream << QStringLiteral("Opt");
 	}
 

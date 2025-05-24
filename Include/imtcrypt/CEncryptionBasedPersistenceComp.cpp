@@ -105,7 +105,7 @@ ifile::IFilePersistence::OperationState CEncryptionBasedPersistenceComp::LoadFro
 			QByteArray encryptedData = file.readAll();
 			imtcrypt::IEncryption::EncryptionAlgorithm encryptionAlgorithm = imtcrypt::IEncryption::EA_AES;
 			if (m_encryptionAlgorithm.IsValid()){
-				switch (*m_encryptionAlgorithm) {
+				switch (*m_encryptionAlgorithm){
 				case 0:
 					encryptionAlgorithm = imtcrypt::IEncryption::EA_RSA;
 					break;
@@ -163,7 +163,7 @@ ifile::IFilePersistence::OperationState CEncryptionBasedPersistenceComp::SaveToF
 				if (!xmlData.isEmpty() && m_encryptionKeysProviderCompPtr.IsValid() && file.open(QIODevice::WriteOnly)){
 					imtcrypt::IEncryption::EncryptionAlgorithm encryptionAlgorithm = imtcrypt::IEncryption::EA_AES;
 					if (m_encryptionAlgorithm.IsValid()){
-						switch (*m_encryptionAlgorithm) {
+						switch (*m_encryptionAlgorithm){
 						case 0:
 							encryptionAlgorithm = imtcrypt::IEncryption::EA_RSA;
 							break;

@@ -176,7 +176,7 @@ QByteArray CGqlRequest::GetQuery() const
 		return QByteArray();
 	}
 
-	if (!params.isEmpty()) {
+	if (!params.isEmpty()){
 		params.prepend('(').append(')');
 	}
 
@@ -288,7 +288,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
-				if (!text.isEmpty()) {
+				if (!text.isEmpty()){
 					SetParseText(text);
 					text.clear();
 					startText = false;
@@ -311,7 +311,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
-				if (!text.isEmpty()) {
+				if (!text.isEmpty()){
 					SetParseObject(text);
 					text.clear();
 					startText = false;
@@ -330,7 +330,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
-				if (!text.isEmpty()) {
+				if (!text.isEmpty()){
 					SetParseText(text);
 					text.clear();
 					startText = false;
@@ -358,7 +358,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
-				if (!text.isEmpty()) {
+				if (!text.isEmpty()){
 					SetParseText(text);
 					text.clear();
 					startText = false;
@@ -412,7 +412,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
-				if (!text.isEmpty()) {
+				if (!text.isEmpty()){
 					StartArray(text);
 					text.clear();
 				}
@@ -427,7 +427,7 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
-				if (!text.isEmpty()) {
+				if (!text.isEmpty()){
 					SetParseText(text);
 					text.clear();
 				}
@@ -447,8 +447,8 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 				break;
 			}
 
-			if(!startText) {
-				if (!text.isEmpty()) {
+			if(!startText){
+				if (!text.isEmpty()){
 					SetParseText(text);
 					text.clear();
 				}
@@ -623,10 +623,10 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 	QByteArray retVal;
 
 	QByteArrayList fieldIds = gqlObject.GetFieldIds();
-	for (int i = 0; i < fieldIds.count(); ++i) {
+	for (int i = 0; i < fieldIds.count(); ++i){
 		const QByteArray& fieldId = fieldIds[i];
 
-		if (gqlObject.IsObject(fieldId)) {
+		if (gqlObject.IsObject(fieldId)){
 			retVal += fieldId;
 			retVal += QByteArrayLiteral(": {");
 			retVal += AddObjectParamPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));

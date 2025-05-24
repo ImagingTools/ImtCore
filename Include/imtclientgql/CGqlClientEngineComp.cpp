@@ -94,7 +94,7 @@ void CGqlClientEngineComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_urlParamCompPtr.IsValid()) {
+	if (m_urlParamCompPtr.IsValid()){
 		m_urlParamObserver.RegisterObject(m_urlParamCompPtr.GetPtr(), &CGqlClientEngineComp::OnUrlParamChanged);
 
 		m_workingUrl = m_urlParamCompPtr->GetUrl();

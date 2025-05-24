@@ -23,7 +23,7 @@ void CSimpleAttributeManagerViewComp::UpdateGui(const istd::IChangeable::ChangeS
 
 	iattr::IAttributesProvider* objectPtr = GetObservedObject();
 	iattr::IAttributesProvider::AttributeIds ids = objectPtr->GetAttributeIds();
-	for (const QByteArray& id : ids) {
+	for (const QByteArray& id : ids){
 		iser::IObject* attrObjectPtr = objectPtr->GetAttribute(id);
 
 		iattr::CIdAttribute* idAttrPtr = dynamic_cast<iattr::CIdAttribute*>(attrObjectPtr);
@@ -34,19 +34,19 @@ void CSimpleAttributeManagerViewComp::UpdateGui(const istd::IChangeable::ChangeS
 
 		QString info = id + ":";
 
-		if (idAttrPtr != nullptr) {
+		if (idAttrPtr != nullptr){
 			info += " " + idAttrPtr->GetValue();
 		}
-		else if (strAttrPtr != nullptr) {
+		else if (strAttrPtr != nullptr){
 			info += " " + strAttrPtr->GetValue();
 		}
-		else if (intAttrPtr != nullptr) {
+		else if (intAttrPtr != nullptr){
 			info += " " + QString::number(intAttrPtr->GetValue());
 		}
-		else if (realAttrPtr != nullptr) {
+		else if (realAttrPtr != nullptr){
 			info += " " + QString::number(realAttrPtr->GetValue());
 		}
-		else if (boolAttrPtr != nullptr) {
+		else if (boolAttrPtr != nullptr){
 			info += " " + QVariant(boolAttrPtr->GetValue()).toString();
 		}
 		else {

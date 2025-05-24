@@ -65,7 +65,7 @@ QString imtsdl::CSdlEntryBase::GetQmlImportDeclaration() const
 
 void imtsdl::CSdlEntryBase::SetQmlImportDeclaration(const QString& qmlImportDeclaration)
 {
-	if (m_qmlImportDeclaration != qmlImportDeclaration) {
+	if (m_qmlImportDeclaration != qmlImportDeclaration){
 		istd::CChangeNotifier notifier(this);
 		m_qmlImportDeclaration = qmlImportDeclaration;
 	}

@@ -393,7 +393,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodeIds(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
-	if (!m_collectionStructureCompPtr.IsValid()) {
+	if (!m_collectionStructureCompPtr.IsValid()){
 		return nullptr;
 	}
 
@@ -421,7 +421,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	if (!m_collectionStructureCompPtr.IsValid()) {
+	if (!m_collectionStructureCompPtr.IsValid()){
 		errorMessage = QString("Unable to list nodes. Component reference 'CollectionStructure' was not set");
 
 		SendCriticalMessage(0, errorMessage);
@@ -437,7 +437,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-	if (!errorMessage.isEmpty()) {
+	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}

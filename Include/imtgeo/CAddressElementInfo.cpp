@@ -14,32 +14,32 @@ namespace imtgeo
 
 // static tag wrappers
 
-const iser::CArchiveTag& s_idTag() {
+const iser::CArchiveTag& s_idTag(){
 	static const iser::CArchiveTag tag(QByteArrayLiteral("Id"), QByteArrayLiteral("Address element id"), iser::CArchiveTag::TT_LEAF);
 
 	return tag;
 }
 
-const iser::CArchiveTag& s_adrTypeTag() {
+const iser::CArchiveTag& s_adrTypeTag(){
 	static const iser::CArchiveTag tag(QByteArrayLiteral("AddressTypeId"), QByteArrayLiteral("Type address id"), iser::CArchiveTag::TT_LEAF);
 
 	return tag;
 }
 
 
-const iser::CArchiveTag& s_nameTag() {
+const iser::CArchiveTag& s_nameTag(){
 	static const iser::CArchiveTag tag(QByteArrayLiteral("Name"), QByteArrayLiteral("Name"), iser::CArchiveTag::TT_LEAF);
 
 	return tag;
 }
 
-const iser::CArchiveTag& s_descriptionTag() {
+const iser::CArchiveTag& s_descriptionTag(){
 	static const iser::CArchiveTag tag(QByteArrayLiteral("Description"), QByteArrayLiteral("Description"), iser::CArchiveTag::TT_LEAF);
 
 	return tag;
 }
 
-const iser::CArchiveTag& s_fullAddressTag() {
+const iser::CArchiveTag& s_fullAddressTag(){
 	static const iser::CArchiveTag tag(QByteArrayLiteral("FullAddress"), QByteArrayLiteral("String of the full address"), iser::CArchiveTag::TT_LEAF);
 
 	return tag;
@@ -49,9 +49,9 @@ const iser::CArchiveTag& s_fullAddressTag() {
 // public methods
 
 CAddressElementInfo::CAddressElementInfo():
-	m_hasChildren(false) {}
+	m_hasChildren(false){}
 
-CAddressElementInfo::~CAddressElementInfo() {}
+CAddressElementInfo::~CAddressElementInfo(){}
 
 
 // reimplemented (imtgeo::IAddressElementInfo)

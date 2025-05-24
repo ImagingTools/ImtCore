@@ -87,17 +87,17 @@ QByteArray CDocumentCollectionViewDelegateComp::ImportObject(const QByteArray& t
 	QStringList allExt;
 
 	// add extensions by default importer
-	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo(typeId, FOT_IMPORT)) {
+	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo(typeId, FOT_IMPORT)){
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
 	}
 
 	// zip
-	if (IsBundlePersistenceSupported(ifile::IFileTypeInfo::QF_LOAD)) {
+	if (IsBundlePersistenceSupported(ifile::IFileTypeInfo::QF_LOAD)){
 		allExt += "zip";
 	}
 
 	// older product -> import it "classically"
-	for (const auto& it : allExt) {
+	for (const auto& it : allExt){
 		if (sourcePath.endsWith(it))
 			return BaseClass2::ImportObject(typeId, sourcePath);
 	}
@@ -146,10 +146,10 @@ bool CDocumentCollectionViewDelegateComp::ExportObject(const QByteArray& objectI
 		
 		if (m_collectionPtr->GetObjectData(objectId, objectDataPtr)){
 			if (m_objectExportPersistenceCompPtr->IsOperationSupported(
-					objectDataPtr.GetPtr(), &targetPath, ifile::IFileTypeInfo::QF_SAVE | ifile::IFileTypeInfo::QF_FILE, false)) {
+					objectDataPtr.GetPtr(), &targetPath, ifile::IFileTypeInfo::QF_SAVE | ifile::IFileTypeInfo::QF_FILE, false)){
 
 				int state = m_objectExportPersistenceCompPtr->SaveToFile(*objectDataPtr, targetPath);
-				if (state != ifile::IFilePersistence::OS_OK) {
+				if (state != ifile::IFilePersistence::OS_OK){
 					QMessageBox::critical(nullptr, "", tr("File \"%1\" could not be exported").arg(targetPath));
 
 					return false;
@@ -429,17 +429,17 @@ void CDocumentCollectionViewDelegateComp::AfterRestore(const QByteArray& objectI
 
 const ifile::IFileTypeInfo* CDocumentCollectionViewDelegateComp::FindFileInfo(const QByteArray& typeId, FileOperationType operationType) const
 {
-	if (typeId.isEmpty()) {
+	if (typeId.isEmpty()){
 
-		switch (operationType) {
+		switch (operationType){
 		case FOT_EXPORT:
-			if (m_objectExportPersistenceCompPtr.IsValid()) {
+			if (m_objectExportPersistenceCompPtr.IsValid()){
 				return m_objectExportPersistenceCompPtr.GetPtr();
 			}
 			break;
 		
 		case FOT_IMPORT:
-			if (m_objectImportPersistenceCompPtr.IsValid()) {
+			if (m_objectImportPersistenceCompPtr.IsValid()){
 				return m_objectImportPersistenceCompPtr.GetPtr();
 			}
 			break;

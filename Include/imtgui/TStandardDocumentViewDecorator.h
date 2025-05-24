@@ -194,22 +194,22 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	istd::IChangeable* documentPtr = m_parentPtr->GetDocumentFromView(*viewPtr);
 	Q_ASSERT(documentPtr != nullptr);
 
-	if (configuration.commandOptions & CO_SHOW_NEW) {
+	if (configuration.commandOptions & CO_SHOW_NEW){
 		m_commands.InsertChild(&m_newCommand);
 	}
 
-	if (configuration.commandOptions & CO_SHOW_OPEN) {
+	if (configuration.commandOptions & CO_SHOW_OPEN){
 		m_commands.InsertChild(&m_openCommand);
 	}
 
 	m_commands.InsertChild(&m_undoCommand);
 	m_commands.InsertChild(&m_redoCommand);
 
-	if (configuration.commandOptions & CO_SHOW_SAVE) {
+	if (configuration.commandOptions & CO_SHOW_SAVE){
 		m_commands.InsertChild(&m_saveCommand);
 	}
 
-	if (configuration.commandOptions & CO_SHOW_SAVE_AS) {
+	if (configuration.commandOptions & CO_SHOW_SAVE_AS){
 		m_commands.InsertChild(&m_saveAsCommand);
 	}
 

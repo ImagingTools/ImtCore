@@ -34,7 +34,7 @@ QtObject {
     }
 
     property GqlModel licensesModel: GqlModel {
-        function updateModel() {
+        function updateModel(){
             var query = Gql.GqlRequest("query", "Licenses");
 
             var queryFields = Gql.GqlObject("LicensesItems");

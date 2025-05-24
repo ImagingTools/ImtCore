@@ -110,7 +110,7 @@ void CHttpRequest::SetHeader(const QByteArray& headerId, const QByteArray& value
 void CHttpRequest::SetMethodType(const MethodType& methodType)
 {
 	int method = 0;
-	switch (methodType) {
+	switch (methodType){
 	case MT_POST:
 		method = 3;
 		break;

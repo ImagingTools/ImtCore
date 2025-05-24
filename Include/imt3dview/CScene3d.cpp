@@ -67,7 +67,7 @@ void CScene3d::SetViewPort(const QRect& viewPort)
 
 imt3d::CCuboid CScene3d::GetBoundingCuboid() const
 {
-	if (m_cameraPtr != nullptr) {
+	if (m_cameraPtr != nullptr){
 		return m_cameraPtr->GetBoundingCuboid();
 	}
 
@@ -198,7 +198,7 @@ void CScene3d::UpdateBoundingCuboid()
 void CScene3d::UpdateBoundingCuboid(const imt3dview::IScene3dItem* objectPtr)
 {
 	imt3d::CCuboid objectCuboid = GetItemBoundingCuboid(objectPtr);
-	if (m_cameraPtr != nullptr) {
+	if (m_cameraPtr != nullptr){
 		m_cameraPtr->SetBoundingCuboid(objectCuboid);
 	}
 }
@@ -229,7 +229,7 @@ void CScene3d::UpdateItemScale(IScene3dItem& scene3dItem)
 	maxBound = qMax(maxBound, qAbs(sceneBoundingCuboid.GetNear()));
 	maxBound = qMax(maxBound, qAbs(sceneBoundingCuboid.GetFar()));
 
-	if (!qFuzzyIsNull(maxBound)) {
+	if (!qFuzzyIsNull(maxBound)){
 		float scale = 1.0f / static_cast<float>(maxBound);
 		scene3dItem.SetScale(scale);
 	}

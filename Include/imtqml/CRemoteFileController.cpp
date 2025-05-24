@@ -47,47 +47,47 @@ bool CRemoteFileController::OpenFile(const QString& filePath) const
 	}
 #ifdef Q_OS_ANDROID
 	QString type = "*/*";
-	if (filePath.contains(".doc") || filePath.contains(".docx")) {
+	if (filePath.contains(".doc") || filePath.contains(".docx")){
 		// Word document
 		type = "application/msword";
 	}
-	else if (filePath.contains(".pdf")) {
+	else if (filePath.contains(".pdf")){
 		// PDF file
 		type = "application/pdf";
 	}
-	else if (filePath.contains(".ppt") || filePath.contains(".pptx")) {
+	else if (filePath.contains(".ppt") || filePath.contains(".pptx")){
 		// Powerpoint file
 		type = "application/vnd.ms-powerpoint";
 	}
-	else if (filePath.contains(".xls") || filePath.contains(".xlsx")) {
+	else if (filePath.contains(".xls") || filePath.contains(".xlsx")){
 		// Excel file
 		type = "application/vnd.ms-excel";
 	}
-	else if (filePath.contains(".zip") || filePath.contains(".rar")) {
+	else if (filePath.contains(".zip") || filePath.contains(".rar")){
 		// WAV audio file
 		type = "application/x-wav";
 	}
-	else if (filePath.contains(".rtf")) {
+	else if (filePath.contains(".rtf")){
 		// RTF file
 		type = "application/rtf";
 	}
-	else if (filePath.contains(".wav") || filePath.contains(".mp3")) {
+	else if (filePath.contains(".wav") || filePath.contains(".mp3")){
 		// WAV audio file
 		type = "audio/x-wav";
 	}
-	else if (filePath.contains(".gif")) {
+	else if (filePath.contains(".gif")){
 		// GIF file
 		type = "image/gif";
 	}
-	else if (filePath.contains(".jpg") || filePath.contains(".jpeg") || filePath.contains(".png")) {
+	else if (filePath.contains(".jpg") || filePath.contains(".jpeg") || filePath.contains(".png")){
 		// JPG file
 		type = "image/jpeg";
 	}
-	else if (filePath.contains(".txt")) {
+	else if (filePath.contains(".txt")){
 		// Text file
 		type = "text/plain";
 	}
-	else if (filePath.contains(".3gp") || filePath.contains(".mpg") || filePath.contains(".mpeg") || filePath.contains(".mpe") || filePath.contains(".mp4") || filePath.contains(".avi")) {
+	else if (filePath.contains(".3gp") || filePath.contains(".mpg") || filePath.contains(".mpeg") || filePath.contains(".mpe") || filePath.contains(".mp4") || filePath.contains(".avi")){
 		// Video files
 		type = "video/*";
 	}

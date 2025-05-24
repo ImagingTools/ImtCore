@@ -493,7 +493,7 @@ Item {
 	GqlModel {
 		id: itemsModel;
 		
-		function updateModel(offsetVar) {
+		function updateModel(offsetVar){
 			//console.log("______UPDATE_MODEL_____", offsetVar);
 			var query = Gql.GqlRequest("query", popupMenuContainer.commandId);
 			

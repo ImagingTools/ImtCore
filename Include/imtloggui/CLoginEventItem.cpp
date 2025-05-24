@@ -63,7 +63,7 @@ QVariant CLoginEventItem::GetMetaInfo(int metaInfoType) const
 
 QByteArray CLoginEventItem::GetMetaInfoId(int metaInfoType) const
 {
-	switch (metaInfoType) {
+	switch (metaInfoType){
 	case MIT_ACTION:
 		return ("Action");
 	case MIT_USER_NAME:

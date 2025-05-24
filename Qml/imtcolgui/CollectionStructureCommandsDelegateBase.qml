@@ -353,7 +353,7 @@ Item {
     GqlModel {
         id: removeModel;
 
-        function updateModel(itemId, typeId) {
+        function updateModel(itemId, typeId){
             console.log( "updateModel removeModel", itemId, typeId);
 
             let query;
@@ -440,7 +440,7 @@ Item {
     GqlModel {
         id: newNodeQuery;
 
-        function newNode(newName) {
+        function newNode(newName){
             console.log( "CollectionStructure newNodeQuery");
 
             var query;
@@ -513,7 +513,7 @@ Item {
                 if (renameQuery.containsKey("data")){
                     dataModelLocal = renameQuery.getData("data");
 
-                    if (dataModelLocal.containsKey(containerBase.renameGqlCommand)) {
+                    if (dataModelLocal.containsKey(containerBase.renameGqlCommand)){
                         dataModelLocal = dataModelLocal.getData(containerBase.renameGqlCommand);
 
                         let oldId = dataModelLocal.getData("id");
@@ -530,7 +530,7 @@ Item {
     GqlModel {
         id: renameQuery;
 
-        function rename(newName) {
+        function rename(newName){
             console.log( "CollectionStructure renameQuery rename");
 
             var query;
@@ -587,7 +587,7 @@ Item {
                 if (renameQuery.containsKey("data")){
                     dataModelLocal = renameQuery.getData("data");
 
-                    if (dataModelLocal.containsKey(containerBase.renameGqlCommand)) {
+                    if (dataModelLocal.containsKey(containerBase.renameGqlCommand)){
                         dataModelLocal = dataModelLocal.getData(containerBase.renameGqlCommand);
 
                         let oldId = dataModelLocal.getData("id");
@@ -664,7 +664,7 @@ Item {
                 if (setDescriptionQuery.containsKey("data")){
                     dataModelLocal = setDescriptionQuery.getData("data");
 
-                    if (dataModelLocal.containsKey(containerBase.setDescriptionGqlCommand)) {
+                    if (dataModelLocal.containsKey(containerBase.setDescriptionGqlCommand)){
 
                         dataModelLocal = dataModelLocal.getData(containerBase.setDescriptionGqlCommand);
 

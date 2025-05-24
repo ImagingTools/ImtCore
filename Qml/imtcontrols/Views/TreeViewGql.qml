@@ -327,7 +327,7 @@ Rectangle{
                                 }
                                 treeViewGql.clicked(model.index);
 
-                                if (mouse.button === Qt.RightButton) {
+                                if (mouse.button === Qt.RightButton){
                                     console.log("TreeViewGqlDelegate onRightButtonMouseClicked");
 
                                     var point = mapToItem(null, this.mouseX, this.mouseY);

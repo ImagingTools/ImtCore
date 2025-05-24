@@ -78,12 +78,12 @@ void TDesignerGuiDialogBase<UI>::SetDialogGeometry(double screenFactorX, double 
 template<class UI>
 void TDesignerGuiDialogBase<UI>::SetTitlePanel(QWidget* titlePanelPtr)
 {
-	if (m_titlePanelPtr != nullptr) {
+	if (m_titlePanelPtr != nullptr){
 		m_titlePanelPtr->removeEventFilter(this);
 	}
 
 	m_titlePanelPtr = titlePanelPtr;
-	if (m_titlePanelPtr != nullptr) {
+	if (m_titlePanelPtr != nullptr){
 		m_titlePanelPtr->installEventFilter(this);
 	}
 }
@@ -98,7 +98,7 @@ void TDesignerGuiDialogBase<UI>::showEvent(QShowEvent* eventPtr)
 {
 	BaseClass::showEvent(eventPtr);
 
-	if (!eventPtr->spontaneous()) {
+	if (!eventPtr->spontaneous()){
 		ApplyGeometry();
 	}
 }
@@ -109,10 +109,10 @@ void TDesignerGuiDialogBase<UI>::showEvent(QShowEvent* eventPtr)
 template<class UI>
 bool TDesignerGuiDialogBase<UI>::eventFilter(QObject* watched, QEvent* event)
 {
-	if (watched == m_titlePanelPtr) {
+	if (watched == m_titlePanelPtr){
 		QMouseEvent* eventPtr = dynamic_cast<QMouseEvent*>(event);
-		if (eventPtr != nullptr) {
-			switch (event->type()) {
+		if (eventPtr != nullptr){
+			switch (event->type()){
 			case QEvent::MouseButtonPress:
 				m_cursorLocked = true;
 				m_pos = eventPtr->globalPos();
@@ -121,7 +121,7 @@ bool TDesignerGuiDialogBase<UI>::eventFilter(QObject* watched, QEvent* event)
 				m_cursorLocked = false;
 				break;
 			case QEvent::MouseMove:
-				if (m_cursorLocked) {
+				if (m_cursorLocked){
 					move(pos() + (eventPtr->globalPos() - m_pos));
 					m_pos = eventPtr->globalPos();
 				}
@@ -154,7 +154,7 @@ void TDesignerGuiDialogBase<UI>::ApplyGeometry()
 	screenRect = desktopPtr->screenGeometry();
 #endif
 
-	if (m_screenFactorX > 0 && m_screenFactorY > 0) {
+	if (m_screenFactorX > 0 && m_screenFactorY > 0){
 		double screenFactorX = qMin(0.99, m_screenFactorX);
 		double screenFactorY = qMin(0.99, m_screenFactorY);
 
@@ -164,7 +164,7 @@ void TDesignerGuiDialogBase<UI>::ApplyGeometry()
 		BaseClass::resize(sizeHint());
 	}
 
-	if (m_screenPosition.isNull()) {
+	if (m_screenPosition.isNull()){
 		QSize dialogHalfSize = size() / 2;
 
 		BaseClass::move(screenRect.center() - QPoint(dialogHalfSize.width(), dialogHalfSize.height()));

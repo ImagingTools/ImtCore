@@ -16,7 +16,7 @@ namespace imtserverapp
 bool CPageGuiElementModelRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtqml::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&dataModel);
-	if (guiElementPtr != nullptr) {
+	if (guiElementPtr != nullptr){
 		return true;
 	}
 
@@ -32,7 +32,7 @@ bool CPageGuiElementModelRepresentationControllerComp::GetRepresentationFromData
 	Q_ASSERT(IsModelSupported(dataModel));
 
 	const imtqml::IPageGuiElementModel* guiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(&dataModel);
-	if (guiElementPtr == nullptr) {
+	if (guiElementPtr == nullptr){
 		return false;
 	}
 

@@ -418,7 +418,7 @@ ViewCommandsDelegateBase {
 		}
 	}
 
-	function getFormatFromMimeType(mimeType) {
+	function getFormatFromMimeType(mimeType){
 		return mimeType.split('/').pop();
 	}
 

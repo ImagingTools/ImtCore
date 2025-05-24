@@ -58,7 +58,7 @@ QtObject {
     }
 
     property GqlModel headerInfoModel: GqlModel {
-        function updateModel() {
+        function updateModel(){
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.getHeadersGqlCommand);
 
             if (Object.keys(gqlModelBaseContainer.additionInputParams).length > 0){
@@ -143,7 +143,7 @@ QtObject {
     }
 
     property GqlModel itemsInfoModel: GqlModel {
-        function updateModel() {
+        function updateModel(){
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.getItemsGqlCommand);
             let count = gqlModelBaseContainer.pagination.countElements;
             let offset = (gqlModelBaseContainer.pagination.currentIndex) * count;

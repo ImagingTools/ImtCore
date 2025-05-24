@@ -71,7 +71,7 @@ void CConnectionStatusSubscriberControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_connectionStatusModelCompPtr.IsValid()) {
+	if (m_connectionStatusModelCompPtr.IsValid()){
 		m_connectionStatusModelCompPtr->AttachObserver(this);
 	}
 }

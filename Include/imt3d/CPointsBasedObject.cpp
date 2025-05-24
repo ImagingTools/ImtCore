@@ -281,14 +281,14 @@ PointType* CPointsBasedObject::TGetPointData(int pointIndex, bool validOnly)
 {
 	Q_ASSERT(pointIndex >= 0 && pointIndex < m_pointsCount);
 
-	if (m_data.empty()) {
+	if (m_data.empty()){
 		return nullptr;
 	}
 
 	PointType* typedDataPtr = reinterpret_cast<PointType*>(m_data.data());
 	typedDataPtr += pointIndex;
 
-	if (validOnly && !TIsPointValid<PointType>(*typedDataPtr)) {
+	if (validOnly && !TIsPointValid<PointType>(*typedDataPtr)){
 		return nullptr;
 	}
 
@@ -308,7 +308,7 @@ bool CPointsBasedObject::Create(PointFormat pointFormat, int pointsCount, const 
 {
 	bool retval = Create(pointFormat);
 
-	if (pointsCount > 0) {
+	if (pointsCount > 0){
 		retval = retval && Append(pointsCount, dataPtr);
 	}
 
@@ -328,7 +328,7 @@ bool CPointsBasedObject::Append(int pointsCount, const void* dataPtr)
 	try {
 		m_data.insert(m_data.end(), bytesPtr, bytesPtr + appendSize);
 	}
-	catch (const std::bad_alloc&) {
+	catch (const std::bad_alloc&){
 		m_data.clear();
 		m_pointsCount = 0;
 		return false;
@@ -435,21 +435,21 @@ void CPointsBasedObject::EnsureCuboidCalculated() const
 template <typename PointType>
 void CPointsBasedObject::TEnsureCuboidCalculated() const
 {
-	if (!IsEmpty() && !m_isCuboidCalculationValid) {
+	if (!IsEmpty() && !m_isCuboidCalculationValid){
 		istd::CRange xRange, yRange, zRange;
 		GetBoundingRanges<PointType>(xRange, yRange, zRange);
 
-		if (xRange.GetLength() < std::numeric_limits<float>::epsilon()) {
+		if (xRange.GetLength() < std::numeric_limits<float>::epsilon()){
 			xRange.SetMinValue(xRange.GetMinValue() - 0.5);
 			xRange.SetMaxValue(xRange.GetMaxValue() + 0.5);
 		}
 
-		if (yRange.GetLength() < std::numeric_limits<float>::epsilon()) {
+		if (yRange.GetLength() < std::numeric_limits<float>::epsilon()){
 			yRange.SetMinValue(yRange.GetMinValue() - 0.5);
 			yRange.SetMaxValue(yRange.GetMaxValue() + 0.5);
 		}
 
-		if (zRange.GetLength() < std::numeric_limits<float>::epsilon()) {
+		if (zRange.GetLength() < std::numeric_limits<float>::epsilon()){
 			zRange.SetMinValue(zRange.GetMinValue() - 0.5);
 			zRange.SetMaxValue(zRange.GetMaxValue() + 0.5);
 		}
@@ -553,7 +553,7 @@ void CPointsBasedObject::OnEndChanges(const ChangeSet& /*changes*/)
 
 int CPointsBasedObject::GetPointBytesSize(PointFormat pointFormat)
 {
-	switch (pointFormat) {
+	switch (pointFormat){
 	case IPointsBasedObject::PF_XYZ_32:
 		return sizeof(PointXyz32);
 	case IPointsBasedObject::PF_XYZ_64:

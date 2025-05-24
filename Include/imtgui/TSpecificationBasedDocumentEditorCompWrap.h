@@ -109,11 +109,11 @@ inline QByteArray TSpecificationBasedDocumentEditorCompWrap<BaseClass>::CreateNe
 
 	std::unique_ptr<istd::IChangeable> specPtr(m_specFactPtr.CreateInstance());
 	imod::IModel* specModelPtr = dynamic_cast<imod::IModel*>(specPtr.get());
-	if (specModelPtr != nullptr) {
-		if (specModelPtr->AttachObserver(m_specObserverCompPtr.GetPtr())) {
-			if (m_specDialogCompPtr->ExecuteDialog(this) == QDialog::Accepted) {
+	if (specModelPtr != nullptr){
+		if (specModelPtr->AttachObserver(m_specObserverCompPtr.GetPtr())){
+			if (m_specDialogCompPtr->ExecuteDialog(this) == QDialog::Accepted){
 				QString name = CreateSpecificationName(specPtr.get());
-				if (!name.isEmpty()) {
+				if (!name.isEmpty()){
 					retVal =
 						m_specCollectionCompPtr->InsertNewObject(*m_specObjectTypeIdAttrPtr, name, "", specPtr.get());
 				}
@@ -135,7 +135,7 @@ inline bool TSpecificationBasedDocumentEditorCompWrap<BaseClass>::OnModelAttache
 {
 	bool retVal = BaseClass::OnModelAttached(modelPtr, changeMask);
 
-	if (retVal && m_specCollectionCompPtr.IsValid()) {
+	if (retVal && m_specCollectionCompPtr.IsValid()){
 		m_collectionObserver.RegisterObject(
 			m_specCollectionCompPtr.GetPtr(), &TSpecificationBasedDocumentEditorCompWrap::OnSpecificationCollectionChanged);
 	}
@@ -161,19 +161,19 @@ inline void TSpecificationBasedDocumentEditorCompWrap<BaseClass>::OnSpecificatio
 {
 	Q_ASSERT(collectionPtr != nullptr);
 
-	if (m_collectionFilterFactPtr.IsValid()) {
+	if (m_collectionFilterFactPtr.IsValid()){
 		std::unique_ptr<iprm::IParamsSet> filterPtr(m_collectionFilterFactPtr.CreateInstance());
 		Q_ASSERT(filterPtr != nullptr);
 
 		iprm::TEditableParamsPtr<imtcol::IObjectTypeIdFilter> objectTypeIdFilter(filterPtr.get(), "ObjectTypeIdFilter");
 		Q_ASSERT(objectTypeIdFilter.IsValid());
 
-		if (PrepareSpecificationCollectionFilter(*filterPtr)) {
+		if (PrepareSpecificationCollectionFilter(*filterPtr)){
 			QByteArrayList ids = collectionPtr->GetElementIds(0, -1, filterPtr.get());
 
 			SpecificationList specList;
 
-			for (const QByteArray& id : ids) {
+			for (const QByteArray& id : ids){
 				QString name = collectionPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 				specList.append({id, name});

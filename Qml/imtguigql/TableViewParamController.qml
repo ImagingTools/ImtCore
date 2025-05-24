@@ -42,7 +42,7 @@ QtObject {
         }
 
         onStateChanged: {
-            if (this.state === "Ready") {
+            if (this.state === "Ready"){
                 var dataModelLocal;
 
                 if (container.getModelQuery.containsKey("errors")){
@@ -76,7 +76,7 @@ QtObject {
         }
 
         onStateChanged: {
-            if (this.state === "Ready") {
+            if (this.state === "Ready"){
                 if (this.containsKey("errors")){
                     return;
                 }

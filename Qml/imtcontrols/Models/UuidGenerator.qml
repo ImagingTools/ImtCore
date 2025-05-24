@@ -5,10 +5,10 @@ import QtQuick 2.12
 QtObject {
     id: generator;
 
-    function generateUUID() {
+    function generateUUID(){
         var d = new Date().getTime();
         var d2 = ((typeof performance !== 'undefined') && performance.now && (performance.now()*1000)) || 0;
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
             var r = Math.random() * 16;
             if(d > 0){
                 r = (d + r)%16 | 0;

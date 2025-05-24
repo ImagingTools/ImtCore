@@ -13,6 +13,6 @@ Shortcut {
     signal triggered(QtObject source);
     signal toggled(QtObject source);
 
-    function toggle(source) { toggled(source) }
-    function trigger(source) { triggered(source) }
+    function toggle(source){ toggled(source) }
+    function trigger(source){ triggered(source) }
 }

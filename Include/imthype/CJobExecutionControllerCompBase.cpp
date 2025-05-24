@@ -153,7 +153,7 @@ void CJobExecutionControllerCompBase::OnJobQueueChanged(const istd::IChangeable:
 		QVariant value = changeset.GetChangeInfoMap().value(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED);
 		imthype::IJobQueueManager::JobStatusInfo info = value.value<imthype::IJobQueueManager::JobStatusInfo>();
 
-		if (m_jobProgressList.contains(info.elementId) && info.status == imthype::IJobQueueManager::PS_CANCELING) {
+		if (m_jobProgressList.contains(info.elementId) && info.status == imthype::IJobQueueManager::PS_CANCELING){
 			m_jobProgressList[info.elementId]->SetCanceled(true);
 		}
 	}

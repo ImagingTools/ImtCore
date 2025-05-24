@@ -38,7 +38,7 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 		iprm::CParamsSet outputParams;
 		int collectionResult =
 			m_sdlSchemaDependenciesCollectorCompPtr->DoProcessing(nullptr, nullptr, &outputParams);
-		if (collectionResult != iproc::IProcessor::TS_OK) {
+		if (collectionResult != iproc::IProcessor::TS_OK){
 			SendErrorMessage(
 				0, QString("Unable to collect dependencies for schema: '%1'")
 					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
@@ -47,7 +47,7 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 		}
 		iprm::TParamsPtr<iprm::IOptionsManager> processedFilesPtr(
 			&outputParams, QByteArrayLiteral("ProcessedFiles"), true);
-		if (!processedFilesPtr.IsValid()) {
+		if (!processedFilesPtr.IsValid()){
 			SendCriticalMessage(
 				0, QString("Unexpected dependencies list for schema: '%1'")
 					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
@@ -92,10 +92,10 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 	QLockFile lockFile(outputDirPath + QStringLiteral("/lock"));
 	if (m_sdlArgumentParserCompPtr->IsGenerateMode()){
 		bool isLockRequired = true;
-		while (isLockRequired) {
+		while (isLockRequired){
 			isLockRequired = !lockFile.tryLock(500);
 			QThread::currentThread()->msleep(100);
-			if (timer.elapsed() >= 30000) {
+			if (timer.elapsed() >= 30000){
 				break;
 			}
 		}

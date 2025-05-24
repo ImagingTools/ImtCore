@@ -42,7 +42,7 @@ Flickable{
         if(orientation == Qt.Horizontal){
             //console.log("contentX:: ", contentX);
             let coeff = contentX - _movementStartContentX >= 0 ? 1 : -1;
-            if(coeff * (contentX - ((currentIndex + coeff * 1) * height )) >= 0) {
+            if(coeff * (contentX - ((currentIndex + coeff * 1) * height )) >= 0){
                 contentX = (currentIndex + coeff * 1) * height;
             }
         }
@@ -52,7 +52,7 @@ Flickable{
         if(orientation == Qt.Vertical){
             //console.log("contentY:: ", contentY);
             let coeff = contentY - _movementStartContentY >= 0 ? 1 : -1;
-            if(coeff * (contentY - ((currentIndex + coeff * 1) * width )) >= 0) {
+            if(coeff * (contentY - ((currentIndex + coeff * 1) * width )) >= 0){
                 contentY = (currentIndex + coeff * 1) * width;
             }
         }

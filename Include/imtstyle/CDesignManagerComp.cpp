@@ -171,7 +171,7 @@ void CDesignManagerComp::DesignList::UpdateDesignList()
 	if (m_parentPtr->m_paletteProviderCompPtr.IsValid()){
 		const imtbase::ICollectionInfo& themeList = m_parentPtr->m_paletteProviderCompPtr->GetDesignSchemaList();
 
-		for (const QByteArray& themeId : themeList.GetElementIds()) {
+		for (const QByteArray& themeId : themeList.GetElementIds()){
 			DesignInfo designInfo;
 			designInfo.id = themeId;
 			designInfo.name = themeList.GetElementInfo(themeId, imtbase::ICollectionInfo::EIT_NAME).toString();

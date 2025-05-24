@@ -18,7 +18,7 @@ void CStructureSubscriberControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_modelCompPtr.IsValid()) {
+	if (m_modelCompPtr.IsValid()){
 		m_modelCompPtr->AttachObserver(this);
 	}
 }

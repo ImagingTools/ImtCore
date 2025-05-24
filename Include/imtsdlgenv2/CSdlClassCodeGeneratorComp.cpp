@@ -867,7 +867,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodDefinition(
 	}
 
 	// optional?
-	switch (methodType) {
+	switch (methodType){
 	case MT_OPT_READ:
 	case MT_OPT_WRITE:
 		stream << QStringLiteral("Opt");
@@ -877,7 +877,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodDefinition(
 	}
 
 	// name
-	switch (methodType) {
+	switch (methodType){
 	case MT_OPT_READ:
 	case MT_READ:
 		stream << modifier.GetReadMethodName();
@@ -896,7 +896,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodDefinition(
 	Q_ASSERT(!argumentList.isEmpty());
 
 	// container argument
-	switch (methodType) {
+	switch (methodType){
 	case MT_OPT_READ:
 	case MT_READ:
 		stream << QStringLiteral("const ");
@@ -918,7 +918,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodDefinition(
 
 	stream << QStringLiteral(", ProtocolVersion version");
 	if (forHeader){
-		switch (methodType) {
+		switch (methodType){
 			case MT_WRITE:
 			case MT_OPT_WRITE:
 				stream << QStringLiteral(" = PV_AUTO");
@@ -931,7 +931,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodDefinition(
 	stream << ')';
 
 	// const modifier
-	switch (methodType) {
+	switch (methodType){
 	case MT_WRITE:
 	case MT_OPT_WRITE:
 		stream << QStringLiteral(" const");
@@ -984,7 +984,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodImplementation(
 	FeedStream(stream, 1, false);
 
 	// auto version check
-	switch (methodType) {
+	switch (methodType){
 		case MT_WRITE:
 		case MT_OPT_WRITE:
 			FeedStreamHorizontally(stream);
@@ -1063,7 +1063,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodImplementation(
 	FeedStream(stream, 1, false);
 
 	// auto-init(for read) and checks(for write)
-	switch (methodType) {
+	switch (methodType){
 		case MT_READ:
 		case MT_OPT_READ:
 			FeedStreamHorizontally(stream, 2);
@@ -1146,7 +1146,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodCall(
 			imtsdlgen::ICxxModifier& modifier)
 {
 	// optional?
-	switch (methodType) {
+	switch (methodType){
 	case MT_OPT_READ:
 	case MT_OPT_WRITE:
 		stream << QStringLiteral("Opt");
@@ -1156,7 +1156,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodCall(
 	}
 
 	// name
-	switch (methodType) {
+	switch (methodType){
 	case MT_OPT_READ:
 	case MT_READ:
 		stream << modifier.GetReadMethodName();

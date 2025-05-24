@@ -30,7 +30,7 @@ void CObjectModificatorCompBase::WriteMethodCall(QTextStream& stream, MetdodType
 		}
 	}
 
-	switch (type) {
+	switch (type){
 	case MT_OPT_READ:
 		stream << QStringLiteral("Opt");
 	case MT_READ:
@@ -722,7 +722,7 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 	}
 
 
-	if(!isStrict) {
+	if(!isStrict){
 		FeedStreamHorizontally(stream, 1);
 		stream << '}';
 		FeedStream(stream, 1, false);

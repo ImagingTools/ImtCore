@@ -331,19 +331,19 @@ CustomTextField {
         }
     }
 
-    function validateDateFormat(dateString) {
+    function validateDateFormat(dateString){
         let formatWithTime = /^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}$/; // dd.MM.yyyy HH:mm
         let formatWithoutTime = /^\d{2}\.\d{2}\.\d{4}$/;          // dd.MM.yyyy
 
-        if (formatWithTime.test(dateString)) {
+        if (formatWithTime.test(dateString)){
             return isValidDate(dateString, true); // Проверяем дату с временем
-        } else if (formatWithoutTime.test(dateString)) {
+        } else if (formatWithoutTime.test(dateString)){
             return isValidDate(dateString, false); // Проверяем дату без времени
         }
         return false; // Строка не соответствует ни одному из форматов
     }
 
-    function isValidDate(dateString, hasTime) {
+    function isValidDate(dateString, hasTime){
         let parts = dateString.split(/[\s.:]/); // Разделяем по пробелу, точке и двоеточию
         let day = parts[0];
         let month = parts[1];

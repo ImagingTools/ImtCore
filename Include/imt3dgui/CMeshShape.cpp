@@ -160,7 +160,7 @@ void CMeshShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 {
 	const imt3d::IMesh3d* meshPtr = dynamic_cast<imt3d::IMesh3d*>(GetObservedModel());
 
-	if (meshPtr == nullptr || meshPtr->IsEmpty()) {
+	if (meshPtr == nullptr || meshPtr->IsEmpty()){
 		m_indices.clear();
 		return;
 	}
@@ -172,10 +172,10 @@ void CMeshShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 	m_indices.clear();
 
 	// update indices
-	for (size_t i = 0; i < indices.size(); ++i) {
+	for (size_t i = 0; i < indices.size(); ++i){
 		const std::vector<uint32_t>& index = indices[i];
 
-		for (size_t j = 0; j < index.size(); ++j) {
+		for (size_t j = 0; j < index.size(); ++j){
 			m_indices.push_back(index[j]);
 		}
 	}

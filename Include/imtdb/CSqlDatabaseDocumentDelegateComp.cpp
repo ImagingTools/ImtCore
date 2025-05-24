@@ -543,7 +543,7 @@ bool CSqlDatabaseDocumentDelegateComp::UpdateDependentMetaInfo(const DependentMe
 	
 	QString jsonbUpdate = QString("\"%1\"").arg(qPrintable(s_dataMetaInfoColumn));
 	
-	for (int i = 0; i < metaInfo.metaInfoIds.size(); i++) {
+	for (int i = 0; i < metaInfo.metaInfoIds.size(); i++){
 		jsonbUpdate = QString("jsonb_set(%1, '{%2}', to_jsonb(%3))").arg(jsonbUpdate, metaInfo.metaInfoIds[i], metaInfo.metaInfoValues[i]);
 	}
 
@@ -785,7 +785,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QV
 		QString key = keys[i];
 		QVariant value = paramMap[key];
 		
-		if (value.canConvert<RawSqlExpression>()) {
+		if (value.canConvert<RawSqlExpression>()){
 			RawSqlExpression raw = value.value<RawSqlExpression>();
 			revisionInfo += QString("'%1', %2").arg(key, raw.sql);
 		}
@@ -825,7 +825,7 @@ QString CSqlDatabaseDocumentDelegateComp::CreateJsonExtractSql(
 QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 {
 	QString schema;
-	if (m_tableSchemaAttrPtr.IsValid()) {
+	if (m_tableSchemaAttrPtr.IsValid()){
 		schema = *m_tableSchemaAttrPtr + ".";
 	}
 	
@@ -835,7 +835,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 	QByteArray joinTablesQuery = CreateJoinTablesQuery();
 	
 	QString customColumns = GetCustomColumnsQuery();
-	if (!customColumns.isEmpty()) {
+	if (!customColumns.isEmpty()){
 		customColumns = ", " + customColumns;
 	}
 	

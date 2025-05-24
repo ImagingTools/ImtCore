@@ -81,7 +81,7 @@ TableViewItemDelegateBase {
 	}
 	
 	onSelectedChanged: {
-		if(treeDelegateBase.rowBodyItem) {
+		if(treeDelegateBase.rowBodyItem){
 			treeDelegateBase.rowBodyItem.forceActiveFocus();
 		}
 	}
@@ -177,12 +177,12 @@ TableViewItemDelegateBase {
 				
 				onItemRemoved: {
 					let index = treeDelegateBase.childrenDelegates.indexOf(item);
-					if (index > -1) {
+					if (index > -1){
 						treeDelegateBase.childrenDelegates.splice(index, 1);
 					}
 					
 					index = treeDelegateBase.modelIndex.childModel.indexOf(item.modelIndex);
-					if (index > -1) {
+					if (index > -1){
 						treeDelegateBase.modelIndex.childModel.splice(index, 1);
 					}
 				}

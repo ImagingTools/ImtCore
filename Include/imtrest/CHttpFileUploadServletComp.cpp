@@ -20,7 +20,11 @@ QByteArray CHttpFileUploadServletComp::s_octetStreamTypeId = QByteArrayLiteral("
 
 // reimplemented (CHttpServletCompBase)
 
-ConstResponsePtr CHttpFileUploadServletComp::OnPut(const QByteArray& commandId, const IRequest::CommandParams& commandParams, const HeadersMap& headers, const CHttpRequest& request) const
+ConstResponsePtr CHttpFileUploadServletComp::OnPut(
+			const QByteArray& /*commandId*/,
+			const IRequest::CommandParams& /*commandParams*/,
+			const HeadersMap& headers,
+			const CHttpRequest& request) const
 {
 	Q_ASSERT(m_fileUploadHandlerPtr.IsValid());
 
@@ -28,11 +32,11 @@ ConstResponsePtr CHttpFileUploadServletComp::OnPut(const QByteArray& commandId, 
 
 	if (!m_fileUploadHandlerPtr.IsValid()){
 		retVal = CreateResponse(
-			request,
-			IProtocolEngine::SC_INTERNAL_SERVER_ERROR,
-			{},
-			"File upload handler unavailable",
-			s_plainTextReponseTypeId);
+					request,
+					IProtocolEngine::SC_INTERNAL_SERVER_ERROR,
+					{},
+					"File upload handler unavailable",
+					s_plainTextReponseTypeId);
 
 		return retVal;
 	}
@@ -72,15 +76,14 @@ ConstResponsePtr CHttpFileUploadServletComp::OnPut(const QByteArray& commandId, 
 
 	CHttpResponse::Headers responseHeaders = GetRequestHeaders(request);
 
-	if (length == 0
-		|| range.GetMaxValue() < 0
-		|| range.GetLength() != length
-		|| sessionId.isEmpty()
-		|| fileId.isEmpty()
-		|| fileSize <= 0
-		|| fileName.isEmpty()
-		|| fileData.size() != length){
-
+	if (		length == 0 ||
+				range.GetMaxValue() < 0 ||
+				range.GetLength() != length ||
+				sessionId.isEmpty() ||
+				fileId.isEmpty() ||
+				fileSize <= 0 ||
+				fileName.isEmpty() ||
+				fileData.size() != length){
 		retVal = CreateResponse(request, IProtocolEngine::SC_BAD_REQUEST, responseHeaders, "Invalid request params", s_plainTextReponseTypeId);
 
 		return retVal;
@@ -120,11 +123,11 @@ ConstResponsePtr CHttpFileUploadServletComp::OnPut(const QByteArray& commandId, 
 
 	IProtocolEngine::StatusCode statusCode = status > imtservergql::IFileUploadHandler::FUS_OK_COMPLETE ? IProtocolEngine::SC_CREATED : IProtocolEngine::SC_PARTIAL_CONTENT;
 	retVal = CreateResponse(
-		request,
-		statusCode,
-		{},
-		"OK",
-		s_plainTextReponseTypeId);
+				request,
+				statusCode,
+				{},
+				"OK",
+				s_plainTextReponseTypeId);
 
 	return retVal;
 }
@@ -181,11 +184,11 @@ CHttpResponse::Headers CHttpFileUploadServletComp::GetRequestHeaders(const CHttp
 
 
 ConstResponsePtr CHttpFileUploadServletComp::CreateResponse(
-	const IRequest& request,
-	int statusCode,
-	const CHttpResponse::Headers& headers,
-	const QByteArray& data,
-	const QByteArray& dataTypeId) const
+			const IRequest& request,
+			int statusCode,
+			const CHttpResponse::Headers& headers,
+			const QByteArray& data,
+			const QByteArray& dataTypeId) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 

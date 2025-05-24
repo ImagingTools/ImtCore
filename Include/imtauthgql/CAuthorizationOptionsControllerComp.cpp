@@ -24,7 +24,7 @@ sdl::imtauth::AuthorizationOptions::CUserManagementPayload CAuthorizationOptions
 
 	sdl::imtauth::AuthorizationOptions::UserManagementMode userMode =
 		sdl::imtauth::AuthorizationOptions::UserManagementMode::STRONG_USER_MANAGEMENT;
-	switch (index) {
+	switch (index){
 	case UM_NO_USER_MANAGEMENT:
 		userMode = sdl::imtauth::AuthorizationOptions::UserManagementMode::NO_USER_MANAGEMENT;
 		break;

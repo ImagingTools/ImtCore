@@ -35,7 +35,7 @@ ParamEditorBase {
 			
 			function checkWidth(){
 				let newWidth = Math.min(rootWidth, contentWidth);
-				if (width !== newWidth) {
+				if (width !== newWidth){
 					width = newWidth;
 				}
 			}

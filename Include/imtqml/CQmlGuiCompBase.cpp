@@ -39,9 +39,9 @@ bool CQmlGuiCompBase::CreateGui(QWidget* parentPtr)
 
 		m_quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
-		if (parentPtr != nullptr) {
+		if (parentPtr != nullptr){
 			QLayout* layoutPtr = parentPtr->layout();
-			if (layoutPtr != nullptr) {
+			if (layoutPtr != nullptr){
 				layoutPtr->addWidget(m_quickWidget);
 			}
 		}
@@ -79,7 +79,7 @@ void CQmlGuiCompBase::OnTryClose(bool* ignoredPtr)
 	if (m_quickWidget != nullptr){
 		m_quickWidget->close();
 
-		if (ignoredPtr != nullptr) {
+		if (ignoredPtr != nullptr){
 			*ignoredPtr = false;
 		}
 	}

@@ -73,7 +73,7 @@ QString CSdlEnumConverter::ConvertEnumValueToStringEquivalent(const QString& enu
 	QMutableListIterator partsIter(parts);
 	while(partsIter.hasNext()){
 		QString& currentString = partsIter.next();
-		switch (conversionType) {
+		switch (conversionType){
 		case CT_UPPER_SNAKE_CASE:
 		case CT_UPPER_KEBAB_CASE:
 			currentString = currentString.toUpper();
@@ -95,7 +95,7 @@ QString CSdlEnumConverter::ConvertEnumValueToStringEquivalent(const QString& enu
 
 	// and join into a single string
 	QString retVal;
-	switch (conversionType) {
+	switch (conversionType){
 	case CT_UPPER_SNAKE_CASE:
 	case CT_LOWER_SNAKE_CASE:
 		retVal = parts.join('_');

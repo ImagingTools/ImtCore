@@ -576,14 +576,14 @@ void TTaskCollectionEditorCompBase<UI>::RenameTask(bool autoRename)
 template<class UI>
 void TTaskCollectionEditorCompBase<UI>::ShowInputsManager()
 {
-	if (m_taskInputManagerGuiCompPtr.IsValid() && m_taskInputManagerObserverCompPtr.IsValid()) {
+	if (m_taskInputManagerGuiCompPtr.IsValid() && m_taskInputManagerObserverCompPtr.IsValid()){
 		imthype::ITaskCollection* objectPtr = BaseClass::GetObjectPtr();
-		if (objectPtr != nullptr) {
+		if (objectPtr != nullptr){
 			const imtbase::IObjectCollection* taskInputsPtr = objectPtr->GetTaskInputs();
-			if (taskInputsPtr != nullptr) {
+			if (taskInputsPtr != nullptr){
 				const imod::IModel* taskInputsModelPtr = dynamic_cast<const imod::IModel*>(taskInputsPtr);
-				if (taskInputsModelPtr != nullptr) {
-					if ((const_cast<imod::IModel*>(taskInputsModelPtr))->AttachObserver(m_taskInputManagerObserverCompPtr.GetPtr())) {
+				if (taskInputsModelPtr != nullptr){
+					if ((const_cast<imod::IModel*>(taskInputsModelPtr))->AttachObserver(m_taskInputManagerObserverCompPtr.GetPtr())){
 						iqtgui::CGuiComponentDialog dialog(m_taskInputManagerGuiCompPtr.GetPtr(), QDialogButtonBox::Close, false, BaseClass::GetWidget());
 						dialog.SetDialogGeometry(0.5);
 						dialog.setWindowTitle(tr("Task Input Manager"));
@@ -672,7 +672,7 @@ void TTaskCollectionEditorCompBase<UI>::InfoToTaskSettings()
 	QByteArray inputId;
 
 	imthype::ITaskCollection* objectPtr = BaseClass::GetObservedObject();
-	if (objectPtr != nullptr && objectPtr->GetElementIds().contains(m_selectedTaskId)) {
+	if (objectPtr != nullptr && objectPtr->GetElementIds().contains(m_selectedTaskId)){
 		name = objectPtr->GetElementInfo(m_selectedTaskId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		description = objectPtr->GetElementInfo(m_selectedTaskId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 		isEnabled = objectPtr->GetElementInfo(m_selectedTaskId, imtbase::ICollectionInfo::EIT_ENABLED).toBool();
@@ -705,7 +705,7 @@ void TTaskCollectionEditorCompBase<UI>::InfoFromTaskSettings()
 		QByteArray inputId = m_taskSettings.GetTaskInputId();
 
 		imthype::ITaskCollection* taskCollectionPtr = BaseClass::GetObservedObject();
-		if (taskCollectionPtr != nullptr && taskCollectionPtr->GetElementIds().contains(m_selectedTaskId)) {
+		if (taskCollectionPtr != nullptr && taskCollectionPtr->GetElementIds().contains(m_selectedTaskId)){
 			istd::CChangeGroup group(taskCollectionPtr);
 
 			taskCollectionPtr->SetElementName(m_selectedTaskId, name);
@@ -1021,7 +1021,7 @@ QString TTaskCollectionEditorCompBase<UI>::TaskSettings::GetTaskName() const
 template <class UI>
 void TTaskCollectionEditorCompBase<UI>::TaskSettings::SetTaskName(const QString& taskName)
 {
-	if (m_taskName != taskName) {
+	if (m_taskName != taskName){
 		istd::CChangeNotifier notifier(this);
 
 		m_taskName = taskName;
@@ -1039,7 +1039,7 @@ QString TTaskCollectionEditorCompBase<UI>::TaskSettings::GetTaskDescription() co
 template <class UI>
 void TTaskCollectionEditorCompBase<UI>::TaskSettings::SetTaskDescription(const QString& taskDescription)
 {
-	if (m_taskDescription != taskDescription) {
+	if (m_taskDescription != taskDescription){
 		istd::CChangeNotifier notifier(this);
 
 		m_taskDescription = taskDescription;
@@ -1057,7 +1057,7 @@ bool TTaskCollectionEditorCompBase<UI>::TaskSettings::GetTaskEnabled() const
 template <class UI>
 void TTaskCollectionEditorCompBase<UI>::TaskSettings::SetTaskEnabled(bool isEnabled)
 {
-	if (m_isEnabled!= isEnabled) {
+	if (m_isEnabled!= isEnabled){
 		istd::CChangeNotifier notifier(this);
 
 		m_isEnabled = isEnabled;
@@ -1075,7 +1075,7 @@ QByteArray TTaskCollectionEditorCompBase<UI>::TaskSettings::GetUserTaskId() cons
 template <class UI>
 void TTaskCollectionEditorCompBase<UI>::TaskSettings::SetUserTaskId(const QByteArray& userTaskId)
 {
-	if (m_userTaskId != userTaskId) {
+	if (m_userTaskId != userTaskId){
 		istd::CChangeNotifier notifier(this);
 
 		m_userTaskId = userTaskId;
@@ -1093,7 +1093,7 @@ QByteArray TTaskCollectionEditorCompBase<UI>::TaskSettings::GetTaskInputId() con
 template <class UI>
 void TTaskCollectionEditorCompBase<UI>::TaskSettings::SetTaskInputId(const QByteArray& inputId)
 {
-	if (m_inputId != inputId) {
+	if (m_inputId != inputId){
 		istd::CChangeNotifier notifier(this);
 
 		m_inputId = inputId;
@@ -1107,7 +1107,7 @@ const imtbase::IObjectCollection* TTaskCollectionEditorCompBase<UI>::TaskSetting
 	Q_ASSERT(m_parentPtr != nullptr);
 
 	imthype::ITaskCollection* taskCollectionPtr = m_parentPtr->GetObservedObject();
-	if (taskCollectionPtr != nullptr) {
+	if (taskCollectionPtr != nullptr){
 		return taskCollectionPtr->GetTaskInputs();
 	}
 

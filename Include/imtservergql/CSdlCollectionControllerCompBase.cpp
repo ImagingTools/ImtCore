@@ -15,7 +15,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()) {
+	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Unable to list objects. Component reference 'ObjectCollection' was not set");
 
 		SendCriticalMessage(0, errorMessage);
@@ -29,7 +29,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 	const imtgql::CGqlObject* viewParamsGql = nullptr;
 	QList<imtgql::CGqlObject> inputParams;
 	inputParams.append(gqlRequest.GetParams());
-	if (inputParams.size() > 0) {
+	if (inputParams.size() > 0){
 		viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
 	}
 
@@ -44,7 +44,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
 	int pagesCount = std::ceil(elementsCount / (double)count);
-	if (pagesCount <= 0) {
+	if (pagesCount <= 0){
 		pagesCount = 1;
 	}
 
@@ -93,7 +93,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()) {
+	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Internal error: Object collection component was not set or resolved");
 
 		SendCriticalMessage(0, errorMessage, "CSdlCollectionControllerCompBase");
@@ -109,7 +109,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)) {
+	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 

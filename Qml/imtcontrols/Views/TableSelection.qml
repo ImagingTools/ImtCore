@@ -44,12 +44,12 @@ QtObject {
 		toggleSelect(index);
 	}
 
-	function rangeSelect(fromIndex, toIndex) {
+	function rangeSelect(fromIndex, toIndex){
 		let range = [];
 		let start = Math.min(fromIndex, toIndex);
 		let end = Math.max(fromIndex, toIndex);
 
-		for (let i = start; i <= end; i++) {
+		for (let i = start; i <= end; i++){
 			range.push(i);
 		}
 

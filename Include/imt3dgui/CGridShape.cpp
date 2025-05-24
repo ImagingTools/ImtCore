@@ -86,22 +86,22 @@ void CGridShape::SetPlanePositionZ(double position)
 
 void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	if (!m_doUpdate) {
+	if (!m_doUpdate){
 		return;
 	}
 
 	double xPlanePosition = m_gridValue * m_count;
-	if (m_planePositionX.has_value()) {
+	if (m_planePositionX.has_value()){
 		xPlanePosition = *m_planePositionX;
 	}
 
 	double yPlanePosition = m_gridValue * m_count;
-	if (m_planePositionY.has_value()) {
+	if (m_planePositionY.has_value()){
 		yPlanePosition = *m_planePositionY;
 	}
 
 	double zPlanePosition = m_gridValue * m_count;
-	if (m_planePositionZ.has_value()) {
+	if (m_planePositionZ.has_value()){
 		zPlanePosition = *m_planePositionZ;
 	}
 
@@ -168,7 +168,7 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 
 
 	// Draw XZ-plane:
-	for (int i = -m_count; i <= m_count; ++i) {
+	for (int i = -m_count; i <= m_count; ++i){
 		imt3d::CPointCloud3d::PointXyz32 a;
 		a.data[0] = -m_gridValue * i;
 		a.data[1] = -yPlanePosition;
@@ -182,7 +182,7 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 		vertices.emplace_back(b);
 	}
 
-	for (int i = -m_count; i <= m_count; ++i) {
+	for (int i = -m_count; i <= m_count; ++i){
 		imt3d::CPointCloud3d::PointXyz32 a;
 		a.data[0] = -m_gridValue * m_count;
 		a.data[1] = -yPlanePosition;

@@ -31,7 +31,7 @@ Dialog {
 	onRootWidthChanged: {
 		let newWidth = Math.min(rootWidth - 2 * Style.sizeMainMargin, 1000);
 		
-		if (messageDialog.width !== newWidth) {
+		if (messageDialog.width !== newWidth){
 			messageDialog.width = newWidth;
 		}
 	}

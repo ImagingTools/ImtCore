@@ -22,30 +22,30 @@ QtObject {
 			var originalXHROpen = XMLHttpRequest.prototype.open;
 			var originalXHRSend = XMLHttpRequest.prototype.send;
 
-			XMLHttpRequest.prototype.open = function(method, url) {
+			XMLHttpRequest.prototype.open = function(method, url){
 				this._method = method;
 				this._url = url;
 				originalXHROpen.apply(this, arguments);
 			};
 
-			XMLHttpRequest.prototype.send = function(data) {
+			XMLHttpRequest.prototype.send = function(data){
 				let gqlBody = data;
 
 				var xhr = this;
 				var originalOnReadyStateChange = xhr.onreadystatechange;
 				var gqlRequestRef = xhr.gqlRequest;
 
-				xhr.onreadystatechange = function() {
-					if (xhr.readyState === XMLHttpRequest.DONE) {
+				xhr.onreadystatechange = function(){
+					if (xhr.readyState === XMLHttpRequest.DONE){
 						handleResponse(gqlBody, xhr, gqlRequestRef);
 					}
 
-					if (originalOnReadyStateChange) {
+					if (originalOnReadyStateChange){
 						originalOnReadyStateChange.apply(xhr, arguments);
 					}
 				};
 
-				xhr.addEventListener("loadend", function() {
+				xhr.addEventListener("loadend", function(){
 					handleResponse(gqlBody, xhr, gqlRequestRef);
 				});
 
@@ -59,8 +59,8 @@ QtObject {
 		}
 	}
 
-	function handleResponse(gqlBody, xhr, gqlRequestRef) {
-		switch(xhr.status) {
+	function handleResponse(gqlBody, xhr, gqlRequestRef){
+		switch(xhr.status){
 			case 200:
 				ok(gqlBody, gqlRequestRef);
 				break;

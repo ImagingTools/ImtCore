@@ -710,9 +710,9 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 	int eventType = event->type();
 
 	// #10702
-	if (eventType == QEvent::KeyPress) {
+	if (eventType == QEvent::KeyPress){
 		auto keyEvent = dynamic_cast<QKeyEvent*>(event);
-		if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab) {
+		if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab){
 			return true;
 		}
 		return QObject::eventFilter(watched, event);
@@ -728,10 +728,10 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 		return QObject::eventFilter(watched, event);
 	}
 
-	if (watched == PageTree) {
-		if (eventType == QEvent::HoverMove) {
+	if (watched == PageTree){
+		if (eventType == QEvent::HoverMove){
 			QHoverEvent* hoverEvent = dynamic_cast<QHoverEvent*>(event);
-			if (hoverEvent != nullptr) {
+			if (hoverEvent != nullptr){
 				HoverMoveEvent(hoverEvent);
 			}
 		}
@@ -749,10 +749,10 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 		return QObject::eventFilter(watched, event);
 	}
 
-	if (watched == BottomPageTree) {
-		if (eventType == QEvent::HoverMove) {
+	if (watched == BottomPageTree){
+		if (eventType == QEvent::HoverMove){
 			QHoverEvent* hoverEvent = dynamic_cast<QHoverEvent*>(event);
-			if (hoverEvent != nullptr) {
+			if (hoverEvent != nullptr){
 				HoverMoveEvent(hoverEvent);
 			}
 		}
@@ -840,15 +840,15 @@ void CMenuPanel::resizeEvent(QResizeEvent* event)
 
 void CMenuPanel::HoverMoveEvent(QHoverEvent* event)
 {
-	if (!PageTree->currentIndex().isValid()) {
+	if (!PageTree->currentIndex().isValid()){
 		return;
 	}
 
 	int dx = event->oldPos().x() - event->pos().x();
 	int dy = event->oldPos().y() - event->pos().y();
 
-	if (dx > 2 || dx < -2 || dy > 2 || dy < -2) {
-		if (m_animationWidth.state() == QPropertyAnimation::Stopped) {
+	if (dx > 2 || dx < -2 || dy > 2 || dy < -2){
+		if (m_animationWidth.state() == QPropertyAnimation::Stopped){
 			StartTimer();
 		}
 	}

@@ -210,7 +210,7 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		password = *userData.password;
 	}
 
-	if (password.isEmpty()) {
+	if (password.isEmpty()){
 		errorMessage = QString("Unable to register user. Error: password cannot be empty");
 
 		return sdl::imtauth::Users::CRegisterUserPayload();

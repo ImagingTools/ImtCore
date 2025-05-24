@@ -347,7 +347,7 @@ Rectangle {
 			clickCount++;
 
 			if (ma.clickCount == 1){
-				if (mouse.button === Qt.RightButton) {
+				if (mouse.button === Qt.RightButton){
 					tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
 				}
 				tableDelegateContainer.clicked();
@@ -356,7 +356,7 @@ Rectangle {
 			}
 
 			if (ma.clickCount == 2){
-				if (mouse.button === Qt.RightButton) {
+				if (mouse.button === Qt.RightButton){
 					return;
 				}
 

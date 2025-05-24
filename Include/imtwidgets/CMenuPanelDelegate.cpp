@@ -123,7 +123,7 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 {
 	QSize size;
 
-	if (index.row() == 0 && !index.parent().isValid()) {
+	if (index.row() == 0 && !index.parent().isValid()){
 		size.setHeight(m_height + m_topPadding);
 	}
 	else{

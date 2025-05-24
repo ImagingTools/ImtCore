@@ -75,7 +75,7 @@ Item {
     }
 
     property GqlModel itemsInfoModel: GqlModel {
-        function updateModel(externInputParams, fields) {
+        function updateModel(externInputParams, fields){
             console.log( "gqlModelBaseContainer updateModel", container.commandId + "List");
             var query = Gql.GqlRequest("query", container.commandId + "List");
 

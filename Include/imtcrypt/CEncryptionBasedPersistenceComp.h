@@ -70,7 +70,7 @@ protected:
 		* RSA: keyFirst = KT_PUBLIC, keySecond = KT_PRIVATE
 		*/
 		LocalKeyProvider(const imtcrypt::IEncryption::EncryptionAlgorithm& algorithm, const QByteArray& keyFirst, const QByteArray& keySecond);
-		LocalKeyProvider() {};
+		LocalKeyProvider(){};
 
 		// reimplemented (imtcrypt::IEncryptionKeysProvider)
 		virtual QByteArray GetEncryptionKey(KeyType type) const;

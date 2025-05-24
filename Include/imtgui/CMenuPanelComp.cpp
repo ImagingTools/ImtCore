@@ -219,14 +219,14 @@ void CMenuPanelComp::UpdateSelection(const iprm::ISelectionParam& selection, con
 			panelPtr->SetPageEnabled(pageId, isPageEnabled);
 
 			const iqtgui::IVisualStatus* visualStatusPtr = visualStatusProviderPtr->GetVisualStatus(pageIndex);
-			if (visualStatusPtr != nullptr) {
+			if (visualStatusPtr != nullptr){
 				QIcon icon = visualStatusPtr->GetStatusIcon();
 
 				panelPtr->SetPageIcon(pageId, icon);
 			}
 
 			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
-			if (subSelectionPtr != nullptr) {
+			if (subSelectionPtr != nullptr){
 				UpdateSelection(*subSelectionPtr, pageId);
 			}
 		}

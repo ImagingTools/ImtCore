@@ -62,10 +62,10 @@ void CTaskSettingsGuiComp::OnGuiModelDetached()
 void CTaskSettingsGuiComp::UpdateModel() const
 {
 	imthype::ITaskSettings* taskSettingsPtr = GetObservedObject();
-	if (taskSettingsPtr != nullptr) {
+	if (taskSettingsPtr != nullptr){
 		int pos = 0;
 		QString taskName = TaskNameEdit->text().trimmed();
-		if (m_taskNameValidator.validate(taskName, pos) == QValidator::Acceptable) {
+		if (m_taskNameValidator.validate(taskName, pos) == QValidator::Acceptable){
 			taskSettingsPtr->SetTaskName(taskName);
 		}
 
@@ -97,15 +97,15 @@ void CTaskSettingsGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chang
 		int oldIndex = InputSelector->currentIndex();
 		InputSelector->blockSignals(true);
 		InputSelector->setCurrentIndex(-1);
-		for (int i = 0; i < InputSelector->count(); i++) {
-			if (InputSelector->itemText(i) == taskSettingsPtr->GetTaskInputId()) {
+		for (int i = 0; i < InputSelector->count(); i++){
+			if (InputSelector->itemText(i) == taskSettingsPtr->GetTaskInputId()){
 				InputSelector->setCurrentIndex(i);
 				break;
 			}
 		}
 		InputSelector->blockSignals(false);
 
-		if (oldIndex != InputSelector->currentIndex()) {
+		if (oldIndex != InputSelector->currentIndex()){
 			taskSettingsPtr->SetTaskInputId(InputSelector->currentText().toUtf8());
 		}
 	}
@@ -136,10 +136,10 @@ void CTaskSettingsGuiComp::OnGuiDesignChanged()
 
 void CTaskSettingsGuiComp::OnTryClose(bool* ignoredPtr)
 {
-	if (ignoredPtr != nullptr) {
+	if (ignoredPtr != nullptr){
 		int pos;
 		QString name = TaskNameEdit->text().trimmed();
-		if (m_taskNameValidator.validate(name, pos) != QValidator::Acceptable) {
+		if (m_taskNameValidator.validate(name, pos) != QValidator::Acceptable){
 			QMessageBox::critical(NULL, tr("Error"), tr("The task name contains some not allowed characters"));
 
 			*ignoredPtr = true;
@@ -222,13 +222,13 @@ void CTaskSettingsGuiComp::ShowInputsManager()
 {
 	if (m_taskInputManagerGuiCompPtr.IsValid() && m_taskInputManagerObserverCompPtr.IsValid()){
 		imthype::ITaskSettings* taskSettingsPtr = GetObservedObject();
-		if (taskSettingsPtr != nullptr) {
+		if (taskSettingsPtr != nullptr){
 			const imtbase::IObjectCollection* collectionPtr = taskSettingsPtr->GetTaskInputs();
 			const imod::IModel* modelPtr = dynamic_cast<const imod::IModel*>(collectionPtr);
 
 			if (collectionPtr != nullptr && modelPtr != nullptr){
 				if (m_taskInputManagerGuiCompPtr.IsValid()){
-					if ((const_cast<imod::IModel*>(modelPtr))->AttachObserver(m_taskInputManagerObserverCompPtr.GetPtr())) {
+					if ((const_cast<imod::IModel*>(modelPtr))->AttachObserver(m_taskInputManagerObserverCompPtr.GetPtr())){
 						iqtgui::CGuiComponentDialog dialog(m_taskInputManagerGuiCompPtr.GetPtr(), QDialogButtonBox::Close, false, GetWidget());
 						dialog.SetDialogGeometry(0.5);
 						dialog.setWindowTitle(tr("Task Input Manager"));

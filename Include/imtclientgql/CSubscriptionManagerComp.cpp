@@ -39,7 +39,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	QByteArray clientId;
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
-	if (requestImplPtr != nullptr) {
+	if (requestImplPtr != nullptr){
 		clientId = requestImplPtr->GetHeader("clientid");
 	}
 

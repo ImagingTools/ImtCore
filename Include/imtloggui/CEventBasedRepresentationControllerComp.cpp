@@ -26,7 +26,7 @@ void CEventBasedRepresentationControllerComp::BuildRepresentation(
 		if (containerPtr.IsValid()){
 			ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
 
-			for (ilog::IMessageContainer::Messages::reverse_iterator it = messages.rbegin(); it != messages.rend(); it++) {
+			for (ilog::IMessageContainer::Messages::reverse_iterator it = messages.rbegin(); it != messages.rend(); it++){
 				representationModelPtr->AddMessage(*it);
 			}
 		}

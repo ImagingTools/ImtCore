@@ -109,8 +109,8 @@ Text {
 
     onTextChanged: {
         // Multiline fit in one line
-        if (wrapMode == Text.NoWrap) {
-            if (name.text.includes('\n')) {
+        if (wrapMode == Text.NoWrap){
+            if (name.text.includes('\n')){
                 let result = name.text.split('\n')
                 name.text = result[0] + "..."
             }
@@ -118,10 +118,10 @@ Text {
     }
     onHeightChanged: {
         if (!rowDelegate || !rowDelegate.tableItem
-                || !rowDelegate.tableItem.canFitHeight) {
+                || !rowDelegate.tableItem.canFitHeight){
             return
         }
-        if (wrapMode !== Text.NoWrap && rowDelegate) {
+        if (wrapMode !== Text.NoWrap && rowDelegate){
             var height_ = name.height + 2 * rowDelegate.textMarginVer
             rowDelegate.setHeightModelElememt(name.columnIndex, height_)
         }

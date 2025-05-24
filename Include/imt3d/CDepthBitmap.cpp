@@ -327,11 +327,11 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 
 		m_depthRange = sourcePtr->m_depthRange;
 		m_colorMapType = sourcePtr->m_colorMapType;
-		if (!m_calibration3d.CopyFrom(sourcePtr->m_calibration3d, mode)) {
+		if (!m_calibration3d.CopyFrom(sourcePtr->m_calibration3d, mode)){
 			m_calibration3d.ResetData();
 		}
 
-		if (!m_referenceBitmap.CopyFrom(sourcePtr->m_referenceBitmap, mode)) {
+		if (!m_referenceBitmap.CopyFrom(sourcePtr->m_referenceBitmap, mode)){
 			m_referenceBitmap.ResetImage();
 		}
 

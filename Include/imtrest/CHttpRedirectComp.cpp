@@ -22,15 +22,15 @@ bool CHttpRedirectComp::IsCommandSupported(const QByteArray& commandId) const
 ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request, const QByteArray& /*subCommandId*/) const
 {
 	QByteArray commandId = request.GetCommandId();
-	if (commandId.startsWith('/')) {
+	if (commandId.startsWith('/')){
 		commandId = commandId.remove(0, 1);
 	}
 
-	if (commandId.endsWith('/')) {
+	if (commandId.endsWith('/')){
 		commandId = commandId.remove(commandId.length() - 1, 1);
 	}
 
-	if (commandId.isEmpty()) {
+	if (commandId.isEmpty()){
 		QByteArray body;
 		body = R"(<head> <meta http-equiv="refresh" content="0; URL=)";
 		body.append(*m_redirectToCommandIdAttrPtr);

@@ -720,7 +720,7 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 	if (!requestPtr.isNull()){
 		data.commandId = requestPtr->GetCommandId();
 
-		if (!data.data.contains(data.commandId)) {
+		if (!data.data.contains(data.commandId)){
 			SendErrorMessage(0, "GqlResponse data don't contains " + data.commandId);
 		}
 	}

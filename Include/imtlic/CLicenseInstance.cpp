@@ -83,10 +83,10 @@ bool CLicenseInstance::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 	}
 	else {
 		const imtlic::ILicenseDefinition* interfacePtr = dynamic_cast<const imtlic::ILicenseDefinition*>(&object);
-		if (interfacePtr != nullptr) {
+		if (interfacePtr != nullptr){
 			istd::CChangeNotifier changeNotifier(this);
 
-			if (BaseClass::CopyFrom(object)) {
+			if (BaseClass::CopyFrom(object)){
 				m_expirationTime = QDateTime();
 
 				return true;

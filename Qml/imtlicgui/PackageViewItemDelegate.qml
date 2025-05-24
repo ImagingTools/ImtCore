@@ -231,7 +231,7 @@ TreeViewItemDelegateBase {
                     isActive: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : true;
                     visible: !packageTreeItemDelegate.hasChild;
 
-					function nextCheckState() {
+					function nextCheckState(){
                         packageTreeItemDelegate.featureData.m_optional = !packageTreeItemDelegate.featureData.m_optional;
                     }
                 }
@@ -252,7 +252,7 @@ TreeViewItemDelegateBase {
                     isActive: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : true;
                     visible: !packageTreeItemDelegate.hasChild;
 
-					function nextCheckState() {
+					function nextCheckState(){
                         packageTreeItemDelegate.featureData.m_isPermission = !packageTreeItemDelegate.featureData.m_isPermission;
                     }
                 }
@@ -283,12 +283,12 @@ TreeViewItemDelegateBase {
 
                 onItemRemoved: {
                     let index = packageTreeItemDelegate.childrenDelegates.indexOf(item);
-                    if (index > -1) {
+                    if (index > -1){
                         packageTreeItemDelegate.childrenDelegates.splice(index, 1);
                     }
 
                     index = packageTreeItemDelegate.modelIndex.childModel.indexOf(item.modelIndex);
-                    if (index > -1) {
+                    if (index > -1){
                         packageTreeItemDelegate.modelIndex.childModel.splice(index, 1);
                     }
                 }

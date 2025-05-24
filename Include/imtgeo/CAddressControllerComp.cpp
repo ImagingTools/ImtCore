@@ -27,11 +27,11 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 	QByteArray addressId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(addressId, dataPtr)) {
+	if (m_objectCollectionCompPtr->GetObjectData(addressId, dataPtr)){
 		const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
 		const CPositionIdentifiable* addressPosition = dynamic_cast<const CPositionIdentifiable*>(dataPtr.GetPtr());
 
-		if (addressInfoPtr == nullptr) {
+		if (addressInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an address info");
 			return nullptr;
 		}

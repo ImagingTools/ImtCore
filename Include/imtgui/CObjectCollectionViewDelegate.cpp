@@ -718,18 +718,18 @@ QString CObjectCollectionViewDelegate::CreateFileImportFilter(bool useBundle) co
 	QStringList allExt;
 
 	// add extensions by default importer
-	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo("", FOT_IMPORT)) {
+	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo("", FOT_IMPORT)){
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
 	}
 
 	// #11467 - allow older export formats to load
 
 	// add extensions by typeId
-	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo(m_selectedTypeId, FOT_IMPORT)) {
+	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo(m_selectedTypeId, FOT_IMPORT)){
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
 	}
 
-	if (useBundle) {
+	if (useBundle){
 		filters.append(tr("Compressed item folder (*.zip)"));
 		allExt.append("zip");
 	}
@@ -748,7 +748,7 @@ QString CObjectCollectionViewDelegate::CreateFileExportFilter(const QByteArray& 
 	QStringList allExt;
 
 	// add extensions by default exporter
-	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo("", FOT_EXPORT)) {
+	if (const ifile::IFileTypeInfo* fileTypeInfoPtr = FindFileInfo("", FOT_EXPORT)){
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
 	}
 	

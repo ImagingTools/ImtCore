@@ -179,11 +179,11 @@ protected:
 		\note this method MUST Depending on the type, generate a different result, even if it is complex type
 
 		\code // example of C++ generated code if \c expected == true
-			if (jsonObject.contains("value") && jsonObject["value"].isString()) {
+			if (jsonObject.contains("value") && jsonObject["value"].isString()){
 		\endcode
 
 		\code // example of C++ generated code if \c expected == false
-			if (!jsonObject.contains("value") || !jsonObject["value"].isString()) {
+			if (!jsonObject.contains("value") || !jsonObject["value"].isString()){
 		\endcode
 	 */
 	virtual bool AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) = 0;

@@ -152,7 +152,7 @@ int CFileCollectionComp::BackupRevision(
 						}
 					}
 
-					if (m_versionInfoCompPtr.IsValid()) {
+					if (m_versionInfoCompPtr.IsValid()){
 						quint32 versionNummer = 0;
 						int versionId = *m_productVersionIdAttrPtr;
 						m_versionInfoCompPtr->GetVersionNumber(versionId, versionNummer);
@@ -1178,9 +1178,9 @@ bool CFileCollectionComp::RevisionsContents::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(repositoryFileNameTag);
 
 		static iser::CArchiveTag appVersionTag("AppVersion", "AppVersion");
-		if (!archive.IsStoring()) {
+		if (!archive.IsStoring()){
 			bool isOk = archive.BeginTag(appVersionTag);
-			if (isOk) {
+			if (isOk){
 				retVal = retVal && archive.Process(revisionsContentsItem.softwareVersion);
 				retVal = retVal && archive.EndTag(appVersionTag);
 			}
@@ -1194,7 +1194,7 @@ bool CFileCollectionComp::RevisionsContents::Serialize(iser::IArchive& archive)
 			retVal = retVal && archive.EndTag(appVersionTag);
 		}
 
-		if (retVal && !archive.IsStoring()) {
+		if (retVal && !archive.IsStoring()){
 			insert(revisionsContentsItem.revision, revisionsContentsItem);
 		}
 

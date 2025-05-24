@@ -41,21 +41,21 @@ QByteArray CCompositeDeviceInstanceInfoBase::AddSubDevice(
 {
 	istd::TDelPtr<imtdev::IDeviceInstanceInfo> deviceInstancePtr;
 	deviceInstancePtr.SetCastedOrRemove(CreateDeviceInstanceInfo(deviceTypeId));
-	if (deviceInstancePtr == nullptr) {
+	if (deviceInstancePtr == nullptr){
 		return QByteArray();
 	}
 
-	if (defaultValuePtr != nullptr && !deviceInstancePtr->CopyFrom(*defaultValuePtr)) {
+	if (defaultValuePtr != nullptr && !deviceInstancePtr->CopyFrom(*defaultValuePtr)){
 		return QByteArray();
 	}
 
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(deviceInstancePtr.GetPtr());
-	if (modelPtr != nullptr) {
+	if (modelPtr != nullptr){
 		modelPtr->AttachObserver(&m_updateBridge);
 	}
 
 	QByteArray id = proposedId;
-	if (id.isEmpty() || m_subDeviceMap.contains(id)) {
+	if (id.isEmpty() || m_subDeviceMap.contains(id)){
 		id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
@@ -71,11 +71,11 @@ QByteArray CCompositeDeviceInstanceInfoBase::AddSubDevice(
 
 bool CCompositeDeviceInstanceInfoBase::RemoveSubDevice(const QByteArray& id)
 {
-	if (m_subDeviceMap.contains(id)) {
+	if (m_subDeviceMap.contains(id)){
 		istd::CChangeNotifier notifier(this);
 
 		imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_subDeviceMap[id].instanceInfoPtr.get());
-		if (modelPtr != nullptr && modelPtr->IsAttached(&m_updateBridge)) {
+		if (modelPtr != nullptr && modelPtr->IsAttached(&m_updateBridge)){
 			modelPtr->DetachObserver(&m_updateBridge);
 		}
 
@@ -111,7 +111,7 @@ const imtbase::ICollectionInfo& CCompositeDeviceInstanceInfoBase::GetSubDeviceLi
 const IDeviceInstanceInfo* CCompositeDeviceInstanceInfoBase::GetSubDeviceInstanceInfo(
 	const QByteArray& subDeviceId) const
 {
-	if (m_subDeviceMap.contains(subDeviceId)) {
+	if (m_subDeviceMap.contains(subDeviceId)){
 		return m_subDeviceMap[subDeviceId].instanceInfoPtr.get();
 	}
 
@@ -130,7 +130,7 @@ int CCompositeDeviceInstanceInfoBase::GetSupportedOperations() const
 bool CCompositeDeviceInstanceInfoBase::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	const CCompositeDeviceInstanceInfoBase* sourcePtr = dynamic_cast<const CCompositeDeviceInstanceInfoBase*>(&object);
-	if (sourcePtr != nullptr) {
+	if (sourcePtr != nullptr){
 		if (GetStaticInfo().GetTypeId() != sourcePtr->GetStaticInfo().GetTypeId()){
 			return false;
 		}
@@ -177,7 +177,7 @@ bool CCompositeDeviceInstanceInfoBase::ResetData(CompatibilityMode mode)
 
 // protected methods
 
-IDeviceInstanceInfo* CCompositeDeviceInstanceInfoBase::CreateDeviceInstanceInfo(const QByteArray& deviceTypeId) const
+IDeviceInstanceInfo* CCompositeDeviceInstanceInfoBase::CreateDeviceInstanceInfo(const QByteArray& /*deviceTypeId*/) const
 {
 	return nullptr;
 }
@@ -213,41 +213,44 @@ void CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::SetParent(CCompo
 // reimpolemented (imtbase::ICollectionInfo)
 
 int CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::GetElementsCount(
-	const iprm::IParamsSet* selectionParamsPtr, ilog::IMessageConsumer* logPtr) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return m_parentPtr->m_subDeviceMap.count();
 }
 
 
 imtbase::ICollectionInfo::Ids CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::GetElementIds(
-	int /*offset*/,
-	int /*count*/,
-	const iprm::IParamsSet* /*selectionParamsPtr*/,
-	ilog::IMessageConsumer* /*logPtr*/) const
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return m_parentPtr->m_subDeviceMap.keys().toVector();
 }
 
 
 bool CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::GetSubsetInfo(
-	ICollectionInfo& subsetInfo,
-	int /*offset*/,
-	int /*count*/,
-	const iprm::IParamsSet* /*selectionParamsPtr*/,
-	ilog::IMessageConsumer* /*logPtr*/) const
+			ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
 QVariant CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::GetElementInfo(
-	const Id& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
+			const Id& elementId,
+			int infoType,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
-	if (!m_parentPtr->m_subDeviceMap.contains(elementId)) {
+	if (!m_parentPtr->m_subDeviceMap.contains(elementId)){
 		return QVariant();
 	}
 
-	switch (infoType) {
+	switch (infoType){
 	case EIT_NAME:
 		return m_parentPtr->m_subDeviceMap[elementId].name;
 	case EIT_DESCRIPTION:
@@ -261,31 +264,40 @@ QVariant CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::GetElementIn
 
 
 idoc::MetaInfoPtr CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::GetElementMetaInfo(
-	const Id& /*elementId*/, ilog::IMessageConsumer* /*logPtr*/) const
+			const Id& /*elementId*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return idoc::MetaInfoPtr();
 }
 
 
 bool CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::SetElementName(
-	const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
+			const Id& /*elementId*/,
+			const QString& /*name*/,
+			ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
 bool CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::SetElementDescription(
-	const Id& /*elementId*/, const QString& /*description*/, ilog::IMessageConsumer* /*logPtr*/)
+			const Id& /*elementId*/,
+			const QString& /*description*/,
+			ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
 bool CCompositeDeviceInstanceInfoBase::SubDeviceCollectionInfo::SetElementEnabled(
-	const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
+			const Id& /*elementId*/,
+			bool /*isEnabled*/,
+			ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
 } // namespace imtdev
+
+

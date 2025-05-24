@@ -67,7 +67,7 @@ ComboBoxElementView {
 						cb.currentIndex = root.currentIndex;
 					}
 
-					function onSourceModelChanged() {
+					function onSourceModelChanged(){
 						cb.sourceModel = root.sourceModel;
 					}
 

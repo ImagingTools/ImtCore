@@ -253,17 +253,17 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 	}
 	
 	QByteArray login;
-	if (inputArgument.Version_1_0->login) {
+	if (inputArgument.Version_1_0->login){
 		login = inputArgument.Version_1_0->login->toUtf8();
 	}
 	
 	QByteArray productId;
-	if (inputArgument.Version_1_0->productId) {
+	if (inputArgument.Version_1_0->productId){
 		productId = *inputArgument.Version_1_0->productId;
 	}
 	
 	QByteArray password;
-	if (inputArgument.Version_1_0->password) {
+	if (inputArgument.Version_1_0->password){
 		password = inputArgument.Version_1_0->password->toUtf8();
 	}
 

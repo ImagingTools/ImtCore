@@ -22,7 +22,7 @@ void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 		ilog::IMessageContainer::Messages messages = representationObjectPtr->GetMessages();
 
 		if (m_eventItemFactoryCompPtr.IsValid() && m_positionProviderCompPtr.IsValid()){
-			for (ilog::IMessageContainer::Messages::iterator it = messages.begin(); it != messages.end(); it++) {
+			for (ilog::IMessageContainer::Messages::iterator it = messages.begin(); it != messages.end(); it++){
 				IEventItem* itemPtr = nullptr;
 				QDateTime messageTimeStamp = (*it)->GetInformationTimeStamp();
 

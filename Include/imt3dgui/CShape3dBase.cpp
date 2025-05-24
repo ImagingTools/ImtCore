@@ -228,11 +228,11 @@ void CShape3dBase::SetContext(QOpenGLContext* contextPtr)
 
 		{
 			QMutexLocker lock(&m_bufferMutex);
-			if (!m_vertexBuffer.isCreated()) {
+			if (!m_vertexBuffer.isCreated()){
 				m_vertexBuffer.create();
 			}
 
-			if (!m_indexBuffer.isCreated()) {
+			if (!m_indexBuffer.isCreated()){
 				m_indexBuffer.create();
 			}
 

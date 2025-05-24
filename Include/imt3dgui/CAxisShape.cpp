@@ -102,7 +102,7 @@ void CAxisShape::SetAxisLabel(AxisType axis, const QString& label)
 
 void CAxisShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet & /*changeSet*/)
 {
-	if (!m_doUpdate) {
+	if (!m_doUpdate){
 		return;
 	}
 
@@ -164,7 +164,7 @@ void CAxisShape::Draw(QPainter& painter)
 	windowCoordinate = ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMaxValue(), 0.0));
 	painter.drawText(windowCoordinate, yLabel);
 
-	if (m_axisConfigs[AT_Y].axisRange.GetMinValue() < 0.0) {
+	if (m_axisConfigs[AT_Y].axisRange.GetMinValue() < 0.0){
 		painter.drawText(ModelToWindow(QVector3D(0.0, m_axisConfigs[AT_Y].axisLength * m_axisConfigs[AT_Y].axisRange.GetMinValue(), 0.0)), QString("-") + yLabel);
 	}
 
@@ -172,7 +172,7 @@ void CAxisShape::Draw(QPainter& painter)
 	windowCoordinate = ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMaxValue()));
 	painter.drawText(windowCoordinate, zLabel);
 
-	if (m_axisConfigs[AT_Z].axisRange.GetMinValue() < 0.0) {
+	if (m_axisConfigs[AT_Z].axisRange.GetMinValue() < 0.0){
 		painter.drawText(ModelToWindow(QVector3D(0.0, 0.0, m_axisConfigs[AT_Z].axisLength * m_axisConfigs[AT_Z].axisRange.GetMinValue())), QString("-") + zLabel);
 	}
 

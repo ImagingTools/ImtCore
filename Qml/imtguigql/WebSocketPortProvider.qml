@@ -10,7 +10,7 @@ QtObject {
 	id: root
 	property int port: -1;
 	
-	function updateModel() {
+	function updateModel(){
 		gqlSender.send();
 	}
 	

@@ -55,7 +55,7 @@ QByteArray CTaskCollectionContextDemultiplexerComp::GetTaskInputId() const
 
 	if (m_outputsCompPtr.IsValid() && m_outputsCompPtr.GetCount()){
 		ITaskCollectionContext* contextPtr = m_outputsCompPtr[0];
-		if (contextPtr != nullptr) {
+		if (contextPtr != nullptr){
 			return contextPtr->GetTaskInputId();
 		}
 	}

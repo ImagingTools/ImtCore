@@ -142,7 +142,7 @@ FocusScope {
 
     function _removeItem(item){
         var index = tableViewRoot.itemsList.indexOf(item);
-        if (index !== -1) {
+        if (index !== -1){
             tableViewRoot.itemsList.splice(index, 1);
         }
     }
@@ -380,7 +380,7 @@ FocusScope {
         return insertRow(rowModel.count, row);
     }
 
-    function addColumn(column) {
+    function addColumn(column){
         return tableViewRoot.insertColumn(columnModel.count, column);
     }
 
@@ -412,7 +412,7 @@ FocusScope {
     }
 
     function removeColumn(index){
-        if (index < 0 || index >= columnCount) {
+        if (index < 0 || index >= columnCount){
             console.warn("TableView::removeColumn(): invalid argument")
             return
         }
@@ -421,7 +421,7 @@ FocusScope {
     }
 
     function removeRow(index){
-        if (index < 0 || index >= rowCount) {
+        if (index < 0 || index >= rowCount){
             console.warn("TableView::removeRow(): invalid argument")
             return
         }

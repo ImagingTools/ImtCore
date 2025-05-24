@@ -20,7 +20,7 @@ QString CSqliteXPathExtractorComp::ExtractXPath(
 								 ? QString(R"("%1")").arg(jsonName)
 								 : QString(R"(%1."%2")").arg(tableAlias, jsonName);
 	
-	switch (metaType) {
+	switch (metaType){
 	case QMetaType::QString:
 	case QMetaType::QByteArray:
 		return QString(R"(json_extract(%1, '%2'))").arg(fieldWithAlias, jsonPath);

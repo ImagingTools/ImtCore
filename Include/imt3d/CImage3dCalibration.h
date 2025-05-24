@@ -22,7 +22,7 @@ namespace imt3d
 class CImage3dCalibration: virtual public IImage3dCalibration, virtual public iser::ISerializable
 {
 public:
-	CImage3dCalibration() {}
+	CImage3dCalibration(){}
 	CImage3dCalibration(const iimg::CGeneralBitmap& xyzBitmap);
 
 	// reimplemented (imt3d::IImage3dCalibration)

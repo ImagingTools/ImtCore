@@ -488,7 +488,7 @@ Table{
         }
 
         let tableWidth = Math.max(tableTreeView.width, tableTreeView.contentWidth);
-        if(maxWidth < tableWidth - restWidth) {
+        if(maxWidth < tableWidth - restWidth){
 
             maxWidth =  tableWidth - restWidth;
         }

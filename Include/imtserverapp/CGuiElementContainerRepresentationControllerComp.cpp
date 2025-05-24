@@ -49,7 +49,7 @@ QByteArray CGuiElementContainerRepresentationControllerComp::GetModelId() const
 bool CGuiElementContainerRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtserverapp::IGuiElementContainer* guiElementPtr = dynamic_cast<const imtserverapp::IGuiElementContainer*>(&dataModel);
-	if (guiElementPtr != nullptr) {
+	if (guiElementPtr != nullptr){
 		return true;
 	}
 
@@ -65,7 +65,7 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 	Q_ASSERT(IsModelSupported(dataModel));
 
 	const imtserverapp::IGuiElementContainer* guiElementContainerPtr = dynamic_cast<const imtserverapp::IGuiElementContainer*>(&dataModel);
-	if (guiElementContainerPtr == nullptr) {
+	if (guiElementContainerPtr == nullptr){
 		return false;
 	}
 

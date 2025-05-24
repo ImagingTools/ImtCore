@@ -15,8 +15,8 @@ void CTaskResultCollectionComp::SetArtifactType(const QByteArray& artifactId, Ar
 {
 	bool wasChanged = false;
 
-	if (m_resultInfoMap.contains(artifactId)) {
-		if (m_resultInfoMap[artifactId].artifactType != artifactType) {
+	if (m_resultInfoMap.contains(artifactId)){
+		if (m_resultInfoMap[artifactId].artifactType != artifactType){
 			wasChanged = true;
 		}
 	}
@@ -34,8 +34,8 @@ void CTaskResultCollectionComp::SetArtifactStatus(const QByteArray& artifactId, 
 {
 	bool wasChanged = false;
 
-	if (m_resultInfoMap.contains(artifactId)) {
-		if (m_resultInfoMap[artifactId].status != status) {
+	if (m_resultInfoMap.contains(artifactId)){
+		if (m_resultInfoMap[artifactId].status != status){
 			wasChanged = true;
 		}
 	}
@@ -89,7 +89,7 @@ ITaskMetaInfo::ArtifactType CTaskResultCollectionComp::GetArtifactType(const QBy
 
 QByteArray CTaskResultCollectionComp::GetArtifactDataTypeId(const QByteArray& artifactId) const
 {
-	if (m_resultInfoMap.contains(artifactId)) {
+	if (m_resultInfoMap.contains(artifactId)){
 		return m_resultInfoMap[artifactId].dataTypeId;
 	}
 

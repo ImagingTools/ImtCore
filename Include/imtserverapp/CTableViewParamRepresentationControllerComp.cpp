@@ -60,14 +60,14 @@ bool CTableViewParamRepresentationControllerComp::GetRepresentationFromDataModel
 		for (int j = 0; j < headerList.size() - (i + 1); j++){
 			imtbase::ITableViewParam::HeaderInfo headerInfo1 = tableViewParamPtr->GetHeaderInfo(headerList[j]);
 			imtbase::ITableViewParam::HeaderInfo headerInfo2 = tableViewParamPtr->GetHeaderInfo(headerList[j + 1]);
-			if (headerInfo1.order > headerInfo2.order) {
+			if (headerInfo1.order > headerInfo2.order){
 				flag = false;
 
 				headerList.swapItemsAt(j, j + 1);
 			}
 		}
 
-		if (flag) {
+		if (flag){
 			break;
 		}
 	}

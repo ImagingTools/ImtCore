@@ -69,13 +69,13 @@ bool CTaskCollectionUpdateEvent::CopyFrom(const IChangeable& object, Compatibili
 			m_updateType = sourcePtr->m_updateType;
 		}
 
-		if (m_oldValue != sourcePtr->m_oldValue) {
+		if (m_oldValue != sourcePtr->m_oldValue){
 			istd::CChangeNotifier notifier(this);
 
 			m_oldValue = sourcePtr->m_oldValue;
 		}
 
-		if (m_newValue != sourcePtr->m_newValue) {
+		if (m_newValue != sourcePtr->m_newValue){
 			istd::CChangeNotifier notifier(this);
 
 			m_newValue = sourcePtr->m_newValue;

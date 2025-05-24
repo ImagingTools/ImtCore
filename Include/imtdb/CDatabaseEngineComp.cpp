@@ -97,7 +97,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 
 	retVal.exec();
 
-	if (sqlError) {
+	if (sqlError){
 		*sqlError = databaseConnection.lastError().type() ? databaseConnection.lastError() : retVal.lastError();
 	}
 

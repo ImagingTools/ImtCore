@@ -115,28 +115,28 @@ QMatrix4x4 CTrackballCameraComp::GetViewMatrix() const
 
 void CTrackballCameraComp::SetBoundingCuboid(const imt3d::CCuboid & cuboid)
 {
-	if (cuboid.IsValid()) {
-		if (cuboid.GetBottom() < m_sceneBoundingCuboid.GetBottom()) {
+	if (cuboid.IsValid()){
+		if (cuboid.GetBottom() < m_sceneBoundingCuboid.GetBottom()){
 			m_sceneBoundingCuboid.SetBottom(cuboid.GetBottom());
 		}
 
-		if (cuboid.GetTop() > m_sceneBoundingCuboid.GetTop()) {
+		if (cuboid.GetTop() > m_sceneBoundingCuboid.GetTop()){
 			m_sceneBoundingCuboid.SetTop(cuboid.GetTop());
 		}
 
-		if (cuboid.GetLeft() < m_sceneBoundingCuboid.GetLeft()) {
+		if (cuboid.GetLeft() < m_sceneBoundingCuboid.GetLeft()){
 			m_sceneBoundingCuboid.SetLeft(cuboid.GetLeft());
 		}
 
-		if (cuboid.GetRight() > m_sceneBoundingCuboid.GetRight()) {
+		if (cuboid.GetRight() > m_sceneBoundingCuboid.GetRight()){
 			m_sceneBoundingCuboid.SetRight(cuboid.GetRight());
 		}
 
-		if (cuboid.GetFar() < m_sceneBoundingCuboid.GetFar()) {
+		if (cuboid.GetFar() < m_sceneBoundingCuboid.GetFar()){
 			m_sceneBoundingCuboid.SetFar(cuboid.GetFar());
 		}
 
-		if (cuboid.GetNear() > m_sceneBoundingCuboid.GetNear()) {
+		if (cuboid.GetNear() > m_sceneBoundingCuboid.GetNear()){
 			m_sceneBoundingCuboid.SetNear(cuboid.GetNear());
 		}
 	}

@@ -41,7 +41,7 @@ void CTimeFilterParamEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /
 		}
 		break;
 	case imtbase::ITimeFilterParam::TU_DAY:
-		switch (multiplier) {
+		switch (multiplier){
 		case 1:
 			TimeCombo->setCurrentIndex(4);
 			break;

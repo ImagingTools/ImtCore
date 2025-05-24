@@ -480,7 +480,7 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 				int metaInfoType = 0;
 				QString result;
 				
-				switch (infoType) {
+				switch (infoType){
 				case EIT_NAME:
 					metaInfoType = idoc::IDocumentMetaInfo::MIT_TITLE;
 					break;

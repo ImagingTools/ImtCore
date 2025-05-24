@@ -39,8 +39,8 @@ iprm::IParamsSetUniquePtr CPluginBasedJobQueueManagerComp::CreateJobParameters(
 					return nullptr;
 				}
 
-				if (defaultParamPtr != nullptr) {
-					if (!newParamsPtr->CopyFrom(*defaultParamPtr)) {
+				if (defaultParamPtr != nullptr){
+					if (!newParamsPtr->CopyFrom(*defaultParamPtr)){
 						SendCriticalMessage(0, "Job parameter could not be initialized");
 
 						return nullptr;

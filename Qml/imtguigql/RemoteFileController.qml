@@ -37,7 +37,7 @@ QtObject {
         }.bind(this)
 
         xhr.onreadystatechange = function(){
-            if (xhr.readyState === xhr.DONE && xhr.status === 409) {
+            if (xhr.readyState === xhr.DONE && xhr.status === 409){
                 var existingHash = xhr.responseXML.getElementsByTagName("p")[2].innerHTML;
                 this.json = existingHash;
                 this.fileExists(fileUrl)
@@ -55,7 +55,7 @@ QtObject {
 
     }
 
-    function getFile(fileHash, fileName) {
+    function getFile(fileHash, fileName){
         if (this.prefix == ""){
             this.prefix = "files"
         }

@@ -19,7 +19,7 @@ QString CPostgresXPathExtractorComp::ExtractXPath(
 	? QString(R"("%1")").arg(jsonKey)
 	: QString(R"(%0."%1")").arg(tableAlias, jsonKey);
 	
-	switch (metaType) {
+	switch (metaType){
 	case QMetaType::QString:
 	case QMetaType::QByteArray:
 		return QString(R"(%1->>'%2')").arg(prefix, key);

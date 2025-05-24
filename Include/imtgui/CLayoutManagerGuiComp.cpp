@@ -463,7 +463,7 @@ void CLayoutManagerGuiComp::OnRemoveIcon(const QByteArray& id)
 	Q_ASSERT(rootLayoutPtr != nullptr);
 
 		ILayout* childLayoutPtr = rootLayoutPtr->FindChild(id);
-		if (childLayoutPtr != nullptr) {
+		if (childLayoutPtr != nullptr){
 			childLayoutPtr->SetIcon(QPixmap());
 		}
 }

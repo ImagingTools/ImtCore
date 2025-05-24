@@ -12,7 +12,7 @@ Item {
 
     function createStartItemComp(){
         startItemSourceComp = Qt.createComponent(startItemSource)
-        if (startItemSourceComp && startItemSourceComp.status !== Component.Ready) {
+        if (startItemSourceComp && startItemSourceComp.status !== Component.Ready){
             console.error("Unable to create start item component. Error: ", startItemSourceComp.errorString());
         }
     }

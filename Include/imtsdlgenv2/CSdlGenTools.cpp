@@ -167,10 +167,10 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 				// lookup for same parts from begin
 				relatedNamespacePartsIter.toFront();
 				typeNamespacePartsIter.toFront();
-				while (relatedNamespacePartsIter.hasNext() && typeNamespacePartsIter.hasNext()) {
+				while (relatedNamespacePartsIter.hasNext() && typeNamespacePartsIter.hasNext()){
 					QString relatedNamespacePart = relatedNamespacePartsIter.next();
 					QString typeNamespacePart = typeNamespacePartsIter.next();
-					if (relatedNamespacePart != typeNamespacePart) {
+					if (relatedNamespacePart != typeNamespacePart){
 						// ALL parts in same order MUST be equal
 						break;
 					}

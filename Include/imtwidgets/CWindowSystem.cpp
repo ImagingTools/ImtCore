@@ -171,7 +171,7 @@ bool CWindowSystem::RaiseWindowByProcessId(qint64 processId)
 		ok = ::ShowWindow(windowHandle, SW_RESTORE);
 		::ShowWindow(windowHandle, SW_SHOW);
 		
-		if (::IsIconic(lastActiveWindowHandle) && (windowHandle != lastActiveWindowHandle)) {
+		if (::IsIconic(lastActiveWindowHandle) && (windowHandle != lastActiveWindowHandle)){
 			::ShowWindow(lastActiveWindowHandle, SW_RESTORE);
 			::ShowWindow(lastActiveWindowHandle, SW_SHOW);
 		}

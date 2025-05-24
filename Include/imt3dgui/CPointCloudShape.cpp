@@ -174,7 +174,7 @@ void CPointCloudShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& c
 {
 	m_pointsDataPtr = dynamic_cast<imt3d::IPointsBasedObject*>(GetObservedModel());
 
-	if (m_pointsDataPtr == nullptr || m_pointsDataPtr->GetData() == nullptr) {
+	if (m_pointsDataPtr == nullptr || m_pointsDataPtr->GetData() == nullptr){
 		m_indices.clear();
 		return;
 	}
@@ -182,20 +182,20 @@ void CPointCloudShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& c
 	bool appendData = changeSet.ContainsExplicit(imt3d::IPointsBasedObject::CF_APPEND);
 	int lastIndex = m_indices.size();
 
-	if (!appendData) {
+	if (!appendData){
 		m_indices.clear();
 
 		lastIndex = 0;
 	}
 
 	int pointCloudSize = m_pointsDataPtr->GetPointsCount();
-	if (pointCloudSize < 1) {
+	if (pointCloudSize < 1){
 		m_indices.clear();
 		return;
 	}
 
 	// update indeces
-	for (int i = lastIndex; i < pointCloudSize; i++) {
+	for (int i = lastIndex; i < pointCloudSize; i++){
 		m_indices.push_back(i);
 	}
 }

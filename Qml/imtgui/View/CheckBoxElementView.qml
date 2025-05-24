@@ -34,7 +34,7 @@ ElementView {
             checkState: checkBoxElementView.checkState;
             text: checkBoxElementView.text;
 
-			function nextCheckState() {
+			function nextCheckState(){
                 checkBoxElementView.clicked();
             }
         }

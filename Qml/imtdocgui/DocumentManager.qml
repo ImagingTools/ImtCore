@@ -470,7 +470,7 @@ QtObject {
 		}
 		else{
 			let index = internal.m_closingDocuments.indexOf(documentData.documentId);
-			if (index !== -1) {
+			if (index !== -1){
 				internal.m_closingDocuments.splice(index, 1);
 			}
 

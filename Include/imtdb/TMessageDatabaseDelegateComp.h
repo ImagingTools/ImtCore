@@ -102,19 +102,19 @@ bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const i
 					filterQuery += QString("json_extract(\"Document\",'$.Category') != 1");
 				}
 				else if (key == "WarningFilter" && value == "false"){
-					if (!filterQuery.isEmpty()) {
+					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
 					filterQuery += QString("json_extract(\"Document\",'$.Category') != 2");
 				}
 				else if (key == "ErrorFilter" && value == "false"){
-					if (!filterQuery.isEmpty()) {
+					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
 					filterQuery += QString("json_extract(\"Document\",'$.Category') != 3");
 				}
 				else if (key == "CriticalFilter" && value == "false"){
-					if (!filterQuery.isEmpty()) {
+					if (!filterQuery.isEmpty()){
 						filterQuery += " AND ";
 					}
 					filterQuery += QString("json_extract(\"Document\",'$.Category') != 4");

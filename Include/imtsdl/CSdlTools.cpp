@@ -112,7 +112,7 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 		if (isType){
 			typeNamespace = typeForField.GetNamespace();
 		}
-		else if (isEnum) {
+		else if (isEnum){
 			typeNamespace = BuildNamespaceFromParams(enumForField.GetSchemaParams(), false);
 		}
 		else if (isUnion){

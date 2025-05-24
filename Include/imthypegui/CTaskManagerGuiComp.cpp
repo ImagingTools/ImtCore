@@ -97,7 +97,7 @@ void CTaskManagerGuiComp::OnAddMenuOptionClicked(QAction* action)
 
 	bool autoAssignUserId = false;
 
-	if (m_autoAssignUserIdAttrPtr.IsValid()) {
+	if (m_autoAssignUserIdAttrPtr.IsValid()){
 		autoAssignUserId = *m_autoAssignUserIdAttrPtr;
 	}
 
@@ -145,19 +145,19 @@ void CTaskManagerGuiComp::ShowContextMenu(const QPoint& position, QListView& lis
 
 		itemMenu.addAction(GetIcon(":/Icons/Edit"), tr("Rename"), this, SLOT(OnRenameTask()), QKeySequence(Qt::Key_F2));
 
-		if (*m_allowAddTasksAttrPtr) {
+		if (*m_allowAddTasksAttrPtr){
 			itemMenu.addAction(m_duplicateCommand.icon(), tr("Duplicate"), this, SLOT(OnDuplicateTask()));
 			itemMenu.addAction(m_deleteCommand.icon(), tr("Delete"), this, SLOT(OnDeleteTask()), QKeySequence(Qt::Key_Delete));
 		}
 
 		const imtbase::IObjectCollection* inputsCollectionPtr = GetObservedObject()->GetTaskInputs();
-		if (inputsCollectionPtr != nullptr) {
+		if (inputsCollectionPtr != nullptr){
 			itemMenu.addAction(m_showInputsManagerCommand.icon(), tr("Show Input Manager..."), this, SLOT(OnShowInputsManager()));
 		}
 
-		if (m_taskSettingsGuiCompPtr.IsValid()) {
+		if (m_taskSettingsGuiCompPtr.IsValid()){
 			QAction* settingsAction = itemMenu.addAction(GetIcon(":/Icons/Settings"), tr("Settings"));
-			connect(settingsAction, &QAction::triggered, [this, index]() { on_TaskList_doubleClicked(index); });
+			connect(settingsAction, &QAction::triggered, [this, index](){ on_TaskList_doubleClicked(index); });
 		}
 
 		itemMenu.exec(list.mapToGlobal(position));

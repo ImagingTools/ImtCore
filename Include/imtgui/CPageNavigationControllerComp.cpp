@@ -86,9 +86,9 @@ void CPageNavigationControllerComp::OnPageSelectionChanged()
 			const iprm::ISelectionParam* subSelectionPtr = m_pageSelectionCompPtr->GetSubselection(selectedIndex);
 			if (subSelectionPtr != nullptr){
 				int subPageIndex = subSelectionPtr->GetSelectedOptionIndex();
-				if (subPageIndex >= 0) {
+				if (subPageIndex >= 0){
 					const iprm::IOptionsList* subPageListPtr = subSelectionPtr->GetSelectionConstraints();
-					if (subPageListPtr != nullptr) {
+					if (subPageListPtr != nullptr){
 						QByteArray subPageId = subPageListPtr->GetOptionId(subPageIndex);
 
 						selectedPageId += "/" + subPageId;

@@ -8,7 +8,7 @@ void CPointCloudShapeComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_isInfoBoxEnabledAttrPtr.IsValid()) {
+	if (m_isInfoBoxEnabledAttrPtr.IsValid()){
 		SetInfoBoxEnabled(*m_isInfoBoxEnabledAttrPtr);
 	}
 }

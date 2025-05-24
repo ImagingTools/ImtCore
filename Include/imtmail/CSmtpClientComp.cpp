@@ -19,7 +19,7 @@ CSmtpClientComp::CSmtpClientComp()
 CSmtpClientComp::ResponseCode CSmtpClientComp::ExtractResponseCode(const QByteArray& response)
 {
 	int code = response.left(3).toInt();
-	switch (code) {
+	switch (code){
 	case 220:
 		return RC_SERVICE_READY;
 	case 250:

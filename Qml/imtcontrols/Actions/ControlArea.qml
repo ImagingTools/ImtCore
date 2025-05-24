@@ -145,7 +145,7 @@ MouseArea{
         }
     }
 
-	function withinWheelTargetItem () {
+	function withinWheelTargetItem (){
 		let ok = false;
 		let scaleOffsetX = (wheelTargetItem.width - wheelTargetItem.width * wheelTargetItem.scale)/2
 		let scaleOffsetY = (wheelTargetItem.height - wheelTargetItem.height * wheelTargetItem.scale)/2

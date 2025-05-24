@@ -62,14 +62,14 @@ ControlBase {
         if (containerTextEdit.activeFocus){
             console.log("CustomTextEdit onPressed");
 
-            if (event.key == Qt.Key_Escape) {
+            if (event.key == Qt.Key_Escape){
                 console.log("Key_Escape");
                 containerTextEdit.cancelled();
             }
         }
     }
 
-    function setFocus(value) {
+    function setFocus(value){
         //textEdit.focus = value;
         focus = value;
         if(decorator_.z < 0){
@@ -218,7 +218,7 @@ ControlBase {
 
             }
 
-            function setHeight () {
+            function setHeight (){
                 if(containerTextEdit.isDinamicHeight  && containerTextEdit.decorator_ && containerTextEdit.decorator_.z < 0){
                     var newHeigth = textEdit.height + 2*containerTextEdit.margin;
                     if(newHeigth !== containerTextEdit.height){

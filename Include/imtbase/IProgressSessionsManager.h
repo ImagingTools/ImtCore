@@ -19,7 +19,9 @@ public:
 		Create a progress manager session and return a pointer to it
 		The pointer remains valid until EndProgressSession or CancelProgressSession is called with given session ID
 	*/
-	virtual ibase::IProgressManager* BeginProgressSession(const QByteArray& sessionId, const QString& description) = 0;
+	virtual ibase::IProgressManager* BeginProgressSession(
+				const QByteArray& sessionId,
+				const QString& description) = 0;
 
 	/**
 		End progress session with given ID normally
@@ -29,7 +31,10 @@ public:
 	/**
 		Cancel progress session with given ID
 	*/
-	virtual bool CancelProgressSession(const QByteArray& sessionId, const QString& description = QString(), bool isFailed = false) = 0;
+	virtual bool CancelProgressSession(
+				const QByteArray& sessionId,
+				const QString& description = QString(),
+				bool isFailed = false) = 0;
 };
 
 

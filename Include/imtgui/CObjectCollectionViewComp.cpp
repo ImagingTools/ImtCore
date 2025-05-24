@@ -1518,8 +1518,8 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 			imtbase::ICollectionInfo::Ids fetchedIds;
 
 			// iterator can be null here -> avoid crash
-			if (collectionIterator.IsValid()) {
-				while (collectionIterator->Next()) {
+			if (collectionIterator.IsValid()){
+				while (collectionIterator->Next()){
 					++fetchedCount;
 					fetchedIds += collectionIterator->GetObjectId();
 				}

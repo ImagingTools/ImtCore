@@ -59,14 +59,14 @@ ControlBase {
         if (containerTextField.activeFocus){
             console.log("CustomTextField onPressed");
 
-            if (event.key == Qt.Key_Escape) {
+            if (event.key == Qt.Key_Escape){
                 console.log("Key_Escape");
                 containerTextField.cancelled();
             }
         }
     }
 
-    function setFocus(value) {
+    function setFocus(value){
 
         //textField.focus = value;
         focus = value;
@@ -84,7 +84,7 @@ ControlBase {
         }
     }
 
-    function ensureVisible(pos) {
+    function ensureVisible(pos){
         textField.ensureVisible(pos);
     }
 

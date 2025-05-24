@@ -292,7 +292,7 @@ Item{
 
 		onClicked: {
 			if(headerDelegate.tableItem.hasSort || headerDelegate.tableItem.editableHeaderParams){
-				if (mouse.button === Qt.LeftButton) {
+				if (mouse.button === Qt.LeftButton){
 					if(!headerDelegate.tableItem.nonSortableColumns.includes(headerDelegate.headerId)){
 						let currentHeaderId = headerDelegate.tableItem.currentHeaderId;
 						let currentSortOrder = headerDelegate.tableItem.currentSortOrder;

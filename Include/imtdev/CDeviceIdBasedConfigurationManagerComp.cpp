@@ -36,7 +36,7 @@ DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfigur
 			Q_ASSERT(staticInfoPtr != nullptr);
 
 			if (m_configurations.contains(deviceId) && m_configurations[deviceId].deviceTypeId == deviceTypeId){
-				if (staticInfoPtr->AreConfigurationAccepted(*m_configurations[deviceId].configurationPtr.data())) {
+				if (staticInfoPtr->AreConfigurationAccepted(*m_configurations[deviceId].configurationPtr.data())){
 					configurationPtr.reset(new iprm::CParamsSet());
 					configurationPtr->CopyFrom(*m_configurations[deviceId].configurationPtr.data());
 				}

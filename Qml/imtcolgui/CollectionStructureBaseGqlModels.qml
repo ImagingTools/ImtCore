@@ -55,7 +55,7 @@ QtObject {
 
 
     property GqlModel itemsInfoModel: GqlModel {
-        function updateModel(selectIndex) {
+        function updateModel(selectIndex){
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.getItemsGqlCommand);
             let count = -1;
             let offset = 0;

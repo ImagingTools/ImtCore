@@ -23,11 +23,11 @@ QVariant CAddressCollectionControllerComp::GetObjectInformation(
 			const QByteArray& objectId) const
 {
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
-	if (metaInfo.IsValid()) {
-		if (informationId == QByteArray("Added")) {
+	if (metaInfo.IsValid()){
+		if (informationId == QByteArray("Added")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
 		}
-		else if (informationId == QByteArray("LastModified")) {
+		else if (informationId == QByteArray("LastModified")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
 		}
 	}
@@ -52,11 +52,11 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-	if (!m_objectCollectionCompPtr.IsValid()) {
+	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 	}
 
-	if (!errorMessage.isEmpty()) {
+	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
@@ -81,13 +81,13 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 		QString parentIds = "";
 		QString filterText = "";
 		QString typeId = "";
-		if (viewParamsGql != nullptr) {
+		if (viewParamsGql != nullptr){
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
 			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
 
 			QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
 			//qDebug() << "filterBA:: " << filterBA;
-			if (!filterBA.isEmpty()) {
+			if (!filterBA.isEmpty()){
 				imtbase::CTreeItemModel generalModel;
 				generalModel.CreateFromJson(filterBA);
 
@@ -96,11 +96,11 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 				parentIds = generalModel.GetData("ParentIds").toString();
 				//qDebug()<< "filter::: parentIds::: " << parentIds;
 
-				if (!parentIds.isEmpty()) {
+				if (!parentIds.isEmpty()){
 					QStringList parentIdList = parentIds.split(",");
 					QJsonArray jsonArray;
 					QJsonDocument json_document;
-					for (int i = 0; i < parentIdList.count(); i++) {
+					for (int i = 0; i < parentIdList.count(); i++){
 						jsonArray.append(parentIdList.at(i));
 					}
 					json_document = QJsonDocument(jsonArray);
@@ -123,7 +123,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 
 				typeId = generalModel.GetData("TypeId").toString();
 
-				if (!typeId.isEmpty()) {
+				if (!typeId.isEmpty()){
 					QByteArrayList filteringOnTypeIdInfoIds;
 					filteringOnTypeIdInfoIds << "TypeId";
 					filterOnTypeId.SetFilteringInfoIds(filteringOnTypeIdInfoIds);
@@ -131,11 +131,11 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 				}
 
 				imtbase::CTreeItemModel* filterModel = generalModel.GetTreeItemModel("FilterIds");
-				if (filterModel != nullptr) {
+				if (filterModel != nullptr){
 					QByteArrayList filteringInfoIds;
-					for (int i = 0; i < filterModel->GetItemsCount(); i++) {
+					for (int i = 0; i < filterModel->GetItemsCount(); i++){
 						QByteArray headerId = filterModel->GetData("Id", i).toByteArray();
-						if (!headerId.isEmpty()) {
+						if (!headerId.isEmpty()){
 							filteringInfoIds << headerId;
 						}
 					}
@@ -143,14 +143,14 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 				}
 
 				filterText = generalModel.GetData("TextFilter").toString();
-				if (!filterText.isEmpty()) {
+				if (!filterText.isEmpty()){
 
 					filterText = filterText.trimmed();
-					if (filterText.startsWith(",")) {
+					if (filterText.startsWith(",")){
 						filterText = filterText.replace(0, 1, "");
 						filterText = filterText.trimmed();
 					}
-					if (filterText.endsWith(",")) {
+					if (filterText.endsWith(",")){
 						filterText = filterText.replace(filterText.length() - 1, 1, "");
 						filterText = filterText.trimmed();
 					}
@@ -159,10 +159,10 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 					filter.SetTextFilter(filterText);
 				}
 				imtbase::CTreeItemModel* sortModel = generalModel.GetTreeItemModel("Sort");
-				if (sortModel != nullptr) {
+				if (sortModel != nullptr){
 					QByteArray headerId = sortModel->GetData("HeaderId").toByteArray();
 					QByteArray sortOrder = sortModel->GetData("SortOrder").toByteArray();
-					if (!headerId.isEmpty() && !sortOrder.isEmpty()) {
+					if (!headerId.isEmpty() && !sortOrder.isEmpty()){
 						filter.SetSortingOrder(sortOrder == "ASC" ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
 						filter.SetSortingInfoIds(QByteArrayList() << headerId);
 					}
@@ -175,7 +175,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 		filterParams.SetEditableParameter("TypeId", &filterOnTypeId);
 
 		int pagesCount = std::ceil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
-		if (pagesCount < 0) {
+		if (pagesCount < 0){
 			pagesCount = 1;
 		}
 
@@ -183,7 +183,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 
 
 		imtdb::CSqlDatabaseObjectCollectionComp* objectCollectionCompPtr = dynamic_cast<imtdb::CSqlDatabaseObjectCollectionComp*>(m_objectCollectionCompPtr.GetPtr());
-		if (objectCollectionCompPtr == nullptr) {
+		if (objectCollectionCompPtr == nullptr){
 			return nullptr;
 
 		}
@@ -195,13 +195,13 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 		istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(
 					objectCollectionCompPtr->CreateObjectCollectionIterator(QByteArray(), offset, count, &filterParams));
 
-		if (objectCollectionIterator != nullptr) {
+		if (objectCollectionIterator != nullptr){
 			int whileCount = 0;
-			while (objectCollectionIterator->Next()) {
+			while (objectCollectionIterator->Next()){
 				imtbase::IObjectCollection::DataPtr objectDataPtr;
-				if (objectCollectionIterator->GetObjectData(objectDataPtr)) {
+				if (objectCollectionIterator->GetObjectData(objectDataPtr)){
 					int itemIndex = itemsModel->InsertNewItem();
-					if (itemIndex >= 0) {
+					if (itemIndex >= 0){
 
 						const imtgeo::IAddressElementInfo* addressElementInfoPtr = nullptr;
 						const imtgeo::CPositionIdentifiable* addressPosition = nullptr;
@@ -217,9 +217,9 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 						QString parentsStr = QString();
 						double lat = addressElementInfoPtr->GetLatitude();
 						double lon = addressElementInfoPtr->GetLongitude();
-						for (int i = 0; i < parentsList.count(); i++) {
+						for (int i = 0; i < parentsList.count(); i++){
 							parentsStr.append(QString(parentsList.at(i)));
-							if (i < parentsList.count() - 1) {
+							if (i < parentsList.count() - 1){
 								parentsStr.append(",");
 							}
 						}
@@ -252,7 +252,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 
 		}//ITERATOR
 
-		if (!itemsModel->GetItemsCount() && !parentIds.isEmpty() && filterText.isEmpty()) {
+		if (!itemsModel->GetItemsCount() && !parentIds.isEmpty() && filterText.isEmpty()){
 			notificationModel->SetData("Close", true);
 		}
 

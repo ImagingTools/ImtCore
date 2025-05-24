@@ -66,7 +66,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressTypeDatabaseDelegateComp:
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const IAddressTypeInfo* adrInfoPtr = dynamic_cast<const IAddressTypeInfo*>(valuePtr);
-	if (adrInfoPtr == nullptr) {
+	if (adrInfoPtr == nullptr){
 		return NewObjectQuery();
 	}
 
@@ -106,7 +106,7 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateUpdateObjectQuery(
 			bool /*useExternDelegate*/) const
 {
 	const IAddressTypeInfo* adrInfoPtr = dynamic_cast<const IAddressTypeInfo*>(&object);
-	if (adrInfoPtr == nullptr || objectId.isEmpty()) {
+	if (adrInfoPtr == nullptr || objectId.isEmpty()){
 		return QByteArray();
 	}
 	QByteArray adrId = adrInfoPtr->GetId();
@@ -114,10 +114,10 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QString shortName = adrInfoPtr->GetShortName();
 	QString description = adrInfoPtr->GetDescription();
 
-	if (adrId.isEmpty() && !objectId.isEmpty()) {
+	if (adrId.isEmpty() && !objectId.isEmpty()){
 		adrId = objectId;
 	}
-	if (adrId.isEmpty()) {
+	if (adrId.isEmpty()){
 		return QByteArray();
 	}
 

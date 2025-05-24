@@ -175,7 +175,7 @@ Item {
 
 	onParamsChanged: {
 		if(params){
-			for (let key in params) {
+			for (let key in params){
 				if(datePicker[key] !== undefined){
 					datePicker[key] = params[key];
 				}
@@ -350,7 +350,7 @@ Item {
 	}
 
 	function getLastDayOfMonth(month){
-		if (month < 1 || month > 12) {
+		if (month < 1 || month > 12){
 			console.log("getLastDayOfMonth(): invalid parameters (month < 1 || month > 12)");
 			return "";
 		}
@@ -361,7 +361,7 @@ Item {
 		return new Date(year, month, 0).getDate();
 	}
 
-	function isLeapYearFun(year) {
+	function isLeapYearFun(year){
 		return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
 	}
 

@@ -343,7 +343,7 @@ QtObject {
 		let obj;
 		try {
 			obj = JSON.parse(escapeSpecialChars(json));
-		} catch (e) {
+		} catch (e){
 			console.error(e);
 			return false;
 		}

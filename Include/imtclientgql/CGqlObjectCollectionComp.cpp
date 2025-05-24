@@ -71,7 +71,7 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 
 			if (i < m_metaInfoCreatorListCompPtr.GetCount()){
 				imtbase::IMetaInfoCreator* metaInfoCreatorPtr = m_metaInfoCreatorListCompPtr[i];
-				if (metaInfoCreatorPtr != nullptr) {
+				if (metaInfoCreatorPtr != nullptr){
 					m_metaInfoCreatorMap[typeId] = metaInfoCreatorPtr;
 				}
 			}

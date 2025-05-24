@@ -18,7 +18,7 @@ namespace imtauthdb
 
 bool CSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
 {
-	if (m_userCollectionCompPtr.IsValid()) {
+	if (m_userCollectionCompPtr.IsValid()){
 		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 		fieldFilter.fieldId = "Id";
 		fieldFilter.filterValue = *m_superuserIdAttrPtr;

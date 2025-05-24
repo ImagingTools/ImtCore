@@ -99,7 +99,7 @@ Item {
         height: container.height
         spacing: container.spacing
 
-        function setup() {
+        function setup(){
             for (let index = 0; index < children.length; index++){
 
                 container.setDecorator(index)

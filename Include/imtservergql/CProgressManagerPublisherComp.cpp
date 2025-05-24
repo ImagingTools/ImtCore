@@ -1,7 +1,7 @@
 #include <imtservergql/CProgressManagerPublisherComp.h>
 
 
-// Qt include
+// Qt includes
 #include <QtCore/QMutexLocker>
 
 // ImtCore includes
@@ -23,7 +23,7 @@ ibase::IProgressManager* CProgressManagerPublisherComp::BeginProgressSession(
 
 	QMutexLocker locker(&m_mutex);
 
-	if (!m_progressSessions.contains(sessionId)) {
+	if (!m_progressSessions.contains(sessionId)){
 		retVal.reset(new ProgressManagerSession(*this, sessionId, description));
 
 		m_progressSessions[sessionId] = retVal;
@@ -37,7 +37,7 @@ bool CProgressManagerPublisherComp::EndProgressSession(const QByteArray& session
 {
 	QMutexLocker locker(&m_mutex);
 
-	if (m_progressSessions.contains(sessionId)) {
+	if (m_progressSessions.contains(sessionId)){
 		m_progressSessions[sessionId]->m_isCompleted = true;
 
 		PublishSession(sessionId);
@@ -80,14 +80,14 @@ bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)
 	QByteArray commandId;
 	const imtrest::IRequest* requestPtr = nullptr;
 
-	for (const RequestNetworks& networkRequest : m_registeredSubscribers) {
-		if (networkRequest.networkRequests.contains(sessionId)) {
+	for (const RequestNetworks& networkRequest : m_registeredSubscribers){
+		if (networkRequest.networkRequests.contains(sessionId)){
 			commandId = networkRequest.gqlRequest.GetCommandId();
 			requestPtr = networkRequest.networkRequests[sessionId];
 		}
 	}
 
-	if (commandId.isEmpty() || requestPtr == nullptr) {
+	if (commandId.isEmpty() || requestPtr == nullptr){
 		return false;
 	}
 
@@ -109,7 +109,7 @@ bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)
 	}
 
 	QJsonObject jsonObject;
-	if (!mainTask.WriteToJsonObject(jsonObject)) {
+	if (!mainTask.WriteToJsonObject(jsonObject)){
 		Q_ASSERT(false);
 
 		return false;
@@ -127,19 +127,21 @@ bool CProgressManagerPublisherComp::PublishSession(const QByteArray& sessionId)
 // public methods of the embedded class ProgressManagerSession
 
 CProgressManagerPublisherComp::ProgressManagerSession::ProgressManagerSession(
-	CProgressManagerPublisherComp& parent, const QByteArray& sessionId, const QString& description)
-	: m_parent(parent),
-	  m_sessionId(sessionId),
-	  m_description(description),
-	  m_isFailed(false),
-	  m_isCompleted(false)
+			CProgressManagerPublisherComp& parent,
+			const QByteArray& sessionId,
+			const QString& description)
+	:m_parent(parent),
+	m_sessionId(sessionId),
+	m_description(description),
+	m_isFailed(false),
+	m_isCompleted(false)
 {
 }
 
 
 // reimplemented (CCumulatedProgressManagerBase)
 
-void CProgressManagerPublisherComp::ProgressManagerSession::OnProgressChanged(double cumulatedValue)
+void CProgressManagerPublisherComp::ProgressManagerSession::OnProgressChanged(double /*cumulatedValue*/)
 {
 	m_parent.PublishSession(m_sessionId);
 }

@@ -35,7 +35,7 @@ SdlDocumentTypeList CGqlExtSchemaParser::GetDocumentTypes(bool onlyLocal) const
 	SdlDocumentTypeList retVal = m_documentTypes;
 	if (onlyLocal){
 		QMutableListIterator documentTypesIter(retVal);
-		while (documentTypesIter.hasNext()) {
+		while (documentTypesIter.hasNext()){
 			CSdlDocumentType& documentType = documentTypesIter.next();
 			if (documentType.IsExternal()){
 				documentTypesIter.remove();

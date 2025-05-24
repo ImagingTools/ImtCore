@@ -101,7 +101,7 @@ void CProductInstanceInfoViewDelegateComp::SetupCommands()
 
 	m_rootCommands.InsertChild(&m_licenseCommands);
 
-	if (m_collectionPtr != nullptr) {
+	if (m_collectionPtr != nullptr){
 		connect(&m_exportLicenseCommand, &QAction::triggered, this, &CProductInstanceInfoViewDelegateComp::OnExportLicense);
 
 		m_licenseCommands.InsertChild(&m_exportLicenseCommand);
@@ -158,7 +158,7 @@ void CProductInstanceInfoViewDelegateComp::OnExportLicense()
 {
 	Q_ASSERT(m_collectionPtr != nullptr);
 
-	if (m_collectionPtr != nullptr) {
+	if (m_collectionPtr != nullptr){
 		iser::CMemoryWriteArchive archive;
 		if (!m_selectedItemIds.isEmpty()){
 			QByteArray id = m_selectedItemIds[0];

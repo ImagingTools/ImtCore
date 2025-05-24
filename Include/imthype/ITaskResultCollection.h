@@ -41,6 +41,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<ITaskResultCollection> ITaskResultCollectionPtr;
+typedef istd::TSharedInterfacePtr<ITaskResultCollection> ITaskResultCollectionSharedPtr;
+
+
 } // namespace imthype
 
 

@@ -23,17 +23,17 @@ void FileIO::setSource(QByteArray source)
 
 QByteArray FileIO::read()
 {
-	if(m_source.isEmpty()) {
+	if(m_source.isEmpty()){
 		return QByteArray();
 	}
 	QFile file(m_source);
-	if(!file.exists()) {
+	if(!file.exists()){
 		qWarning() << "Does not exits: " << m_source;
 		return QByteArray();
 	}
 
 	QByteArray data;
-	if(file.open(QIODevice::ReadOnly)) {
+	if(file.open(QIODevice::ReadOnly)){
 		data = file.readAll();
 	}
 
@@ -43,11 +43,11 @@ QByteArray FileIO::read()
 
 bool FileIO::write(QByteArray data)
 {
-	if(m_source.isEmpty()) {
+	if(m_source.isEmpty()){
 		return false;
 	}
 	QFile file(m_source);
-	if(file.open(QIODevice::WriteOnly)) {
+	if(file.open(QIODevice::WriteOnly)){
 		file.write(data);
 
 		return true;

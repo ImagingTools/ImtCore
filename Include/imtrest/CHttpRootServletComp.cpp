@@ -133,8 +133,8 @@ IRequestServlet* CHttpRootServletComp::FindRequestHandler(const QByteArray& comm
 {
 	for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i){
 		IRequestServlet* handlerPtr = m_requestHandlersCompPtr[i];
-		if (handlerPtr != nullptr) {
-			if (handlerPtr->IsCommandSupported(commandId)) {
+		if (handlerPtr != nullptr){
+			if (handlerPtr->IsCommandSupported(commandId)){
 				return handlerPtr;
 			}
 		}

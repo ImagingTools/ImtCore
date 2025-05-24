@@ -138,7 +138,7 @@ CMessagesReader::EventContainerListPtr CMessagesReader::ReadContainers(const imt
 				if (timeRange.Intersect(container->GetTimeRange()).IsClosed()){
 					const ilog::IMessageContainer::Messages messages = container->GetMessages();
 
-					for (ilog::IMessageContainer::Messages::const_iterator it = messages.begin(); it != messages.end(); it++) {
+					for (ilog::IMessageContainer::Messages::const_iterator it = messages.begin(); it != messages.end(); it++){
 						QDateTime timeStamp = (*it)->GetInformationTimeStamp();
 						if (timeRange.Contains(timeStamp)){
 							retVal->append(container);
@@ -239,7 +239,7 @@ CMessagesReader::EventContainerPtr CMessagesReader::ImportContainer(const QStrin
 		}
 	}
 
-	if (info.suffix() == m_containerExtension) {
+	if (info.suffix() == m_containerExtension){
 		containerPath = filePath;
 	}
 

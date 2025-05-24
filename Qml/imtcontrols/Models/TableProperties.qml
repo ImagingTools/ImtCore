@@ -37,7 +37,7 @@ QtObject {
     function setIsEnabledItem(index, isEnabled){
         if (isEnabled){
             let i = root.disableItems.indexOf(index);
-            if (i !== -1) {
+            if (i !== -1){
                 root.disableItems.splice(i, 1);
 
                 root.stateItemsChanged();
@@ -53,7 +53,7 @@ QtObject {
     function setIsVisibleItem(index, isVisible){
         if (isVisible){
             let i = root.invisibleItems.indexOf(index);
-            if (i !== -1) {
+            if (i !== -1){
                 root.invisibleItems.splice(i, 1);
 
                 root.visibleItemsChanged();
@@ -72,7 +72,7 @@ QtObject {
 
     function addCheckedItem(index){
         let i = root._checkedItems.indexOf(index);
-        if (i === -1) {
+        if (i === -1){
             root._checkedItems.push(index)
 
             root.checkedItemsChanged();
@@ -102,7 +102,7 @@ QtObject {
 
     function removeCheckedItem(index){
         let i = root._checkedItems.indexOf(index);
-        if (i !== -1) {
+        if (i !== -1){
             root._checkedItems.splice(i, 1);
 
             root.checkedItemsChanged();

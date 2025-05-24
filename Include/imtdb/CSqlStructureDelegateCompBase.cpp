@@ -188,7 +188,7 @@ bool CSqlStructureDelegateCompBase::MoveLeaf(
 			const Id& targetNodeId,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (!m_dbEngineCompPtr.IsValid()) {
+	if (!m_dbEngineCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Hierarchical structure info");
 
 		return false;
@@ -208,7 +208,7 @@ bool CSqlStructureDelegateCompBase::MoveLeaf(
 	QSqlError error;
 
 	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &error);
-	if (error.type() != QSqlError::NoError) {
+	if (error.type() != QSqlError::NoError){
 		SendErrorMessage(0, error.text(), "Hierarchical structure info");
 
 		qDebug() << "SQL-error: " << query;
@@ -219,7 +219,7 @@ bool CSqlStructureDelegateCompBase::MoveLeaf(
 	}
 
 	int count = sqlQuery.numRowsAffected();
-	if (count > 0) {
+	if (count > 0){
 		return true;
 	}
 
@@ -232,7 +232,7 @@ bool CSqlStructureDelegateCompBase::RemoveLeaf(
 			const Id& nodeId,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (!m_dbEngineCompPtr.IsValid()) {
+	if (!m_dbEngineCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Hierarchical structure info");
 
 		return false;
@@ -251,7 +251,7 @@ bool CSqlStructureDelegateCompBase::RemoveLeaf(
 	QSqlError error;
 
 	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &error);
-	if (error.type() != QSqlError::NoError) {
+	if (error.type() != QSqlError::NoError){
 		SendErrorMessage(0, error.text(), "Hierarchical structure info");
 
 		qDebug() << "SQL-error: " << query;
@@ -262,7 +262,7 @@ bool CSqlStructureDelegateCompBase::RemoveLeaf(
 	}
 
 	int count = sqlQuery.numRowsAffected();
-	if (count > 0) {
+	if (count > 0){
 		return true;
 	}
 

@@ -912,7 +912,7 @@ istd::IChangeableUniquePtr CFileCollectionCompBase::CreateDataObject(const QByte
 		icomp::IComponent* compPtr = m_objectFactoryListCompPtr.CreateComponent(factoryIndex);
 		return istd::IChangeableUniquePtr(
 					compPtr,
-					[this, compPtr]() {
+					[this, compPtr](){
 						return m_objectFactoryListCompPtr.ExtractInterface(compPtr);
 					});
 	}

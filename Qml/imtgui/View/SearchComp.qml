@@ -552,7 +552,7 @@ Rectangle{
 		let comaCount_ = 0;
 		let target = ",";
 
-		for (let i = 0; i < length_; i++) {
+		for (let i = 0; i < length_; i++){
 			let pos = text[i].indexOf(target)
 			if(pos > -1){
 				comaCount_++;
@@ -657,7 +657,7 @@ Rectangle{
 			}
 		}
 
-		function popupDestruction() {
+		function popupDestruction(){
 			console.log("popupDestruction override")
 			if(searchContainer.isAddressSearch){
 				searchContainer.closeComboAddressFunc();

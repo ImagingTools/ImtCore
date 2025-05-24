@@ -94,10 +94,10 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 		}
 
 		{
-			if (tileList.count()) {
+			if (tileList.count()){
 				int itemIndex = 0;
 				int z = tileList.at(0).second;
-				for (int i = 0; i < tileList.size(); i++) {
+				for (int i = 0; i < tileList.size(); i++){
 
 					double lat = 0;
 					double lon = 0;

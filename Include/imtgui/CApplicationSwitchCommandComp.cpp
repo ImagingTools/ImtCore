@@ -63,7 +63,7 @@ void CApplicationSwitchCommandComp::OnComponentCreated()
 
 	m_switchCommand.setVisible(m_executablePathCompPtr.IsValid());
 
-	if (m_actionShortcutAttrPtr.IsValid()) {
+	if (m_actionShortcutAttrPtr.IsValid()){
 		m_switchCommand.setShortcut(*m_actionShortcutAttrPtr);
 
 		if (m_switchCommand.toolTip().size())
@@ -129,9 +129,9 @@ void CApplicationSwitchCommandComp::OnCommandActivated()
 			ok = imtwidgets::CWindowSystem::RaiseWindowByTitle(processTitle);
 
 			// if !ok then run the app
-			if (!ok) {
+			if (!ok){
 				QStringList params;
-				if (m_parametersCompPtr.IsValid()) {
+				if (m_parametersCompPtr.IsValid()){
 					params = m_parametersCompPtr->GetName().split(";");
 				}
 

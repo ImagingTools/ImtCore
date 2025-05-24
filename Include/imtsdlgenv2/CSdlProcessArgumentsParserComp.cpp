@@ -54,7 +54,7 @@ QList<QCommandLineOption> CSdlProcessArgumentsParserComp::PrepareCommandLineOpti
 
 bool CSdlProcessArgumentsParserComp::ProcessCommandLineOptions(const QCommandLineParser& commandLineParser)
 {
-	if (m_generationCommandLinePtr == nullptr) {
+	if (m_generationCommandLinePtr == nullptr){
 		SendCriticalMessage(0, QString("Command line controller was not set"));
 
 		return false;

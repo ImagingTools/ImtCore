@@ -15,7 +15,7 @@ CQmlObjectCollectionIterator::CQmlObjectCollectionIterator(imtbase::IObjectColle
 
 bool CQmlObjectCollectionIterator::next()
 {
-	if (m_objectCollectionIterator != nullptr) {
+	if (m_objectCollectionIterator != nullptr){
 		return m_objectCollectionIterator->Next();
 	}
 
@@ -25,7 +25,7 @@ bool CQmlObjectCollectionIterator::next()
 
 bool CQmlObjectCollectionIterator::previous()
 {
-	if (m_objectCollectionIterator != nullptr) {
+	if (m_objectCollectionIterator != nullptr){
 		return m_objectCollectionIterator->Previous();
 	}
 
@@ -35,7 +35,7 @@ bool CQmlObjectCollectionIterator::previous()
 
 QString CQmlObjectCollectionIterator::getData(const QByteArray& fieldName)
 {
-	if (m_objectCollectionIterator != nullptr) {
+	if (m_objectCollectionIterator != nullptr){
 		return m_objectCollectionIterator->GetElementInfo(fieldName).toString();
 	}
 

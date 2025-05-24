@@ -13,19 +13,19 @@ namespace imtgeo
 
 // static tag wrappers
 
-const iser::CArchiveTag& s_latTag() {
+const iser::CArchiveTag& s_latTag(){
 	static const iser::CArchiveTag tag(QByteArrayLiteral("Latitude"), QByteArrayLiteral("Latitude"), iser::CArchiveTag::TT_LEAF);
 
 	return tag;
 }
 
-const iser::CArchiveTag& s_lonTag() {
+const iser::CArchiveTag& s_lonTag(){
 	static const iser::CArchiveTag tag(QByteArrayLiteral("Longitude"), QByteArrayLiteral("Longitude"), iser::CArchiveTag::TT_LEAF);
 
 	return tag;
 }
 
-const iser::CArchiveTag& s_zoomTag() {
+const iser::CArchiveTag& s_zoomTag(){
 	static const iser::CArchiveTag tag(QByteArrayLiteral("ZoomLevel"), QByteArrayLiteral("Zoom level"), iser::CArchiveTag::TT_LEAF);
 
 	return tag;
@@ -37,9 +37,9 @@ const iser::CArchiveTag& s_zoomTag() {
 CPosition::CPosition():
 	m_latitude(0.0),
 	m_longitude(0.0),
-	m_zoomLevel(1.0) {}
+	m_zoomLevel(1.0){}
 
-CPosition::~CPosition() {}
+CPosition::~CPosition(){}
 
 
 // reimplemented (imtgeo::IPosition)

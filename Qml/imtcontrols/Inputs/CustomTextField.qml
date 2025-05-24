@@ -57,7 +57,7 @@ FocusScope {
 	
 	Keys.onPressed: {
 		if (containerTextField.activeFocus){
-			if (event.key === Qt.Key_Escape) {
+			if (event.key === Qt.Key_Escape){
 				containerTextField.cancelled();
 			}
 		}
@@ -67,15 +67,15 @@ FocusScope {
 		textField.text = text;// for web TEMP!!!
 	}
 	
-	function select(from, to) {
+	function select(from, to){
 		textField.select(from, to)
 	}
 	
-	function setFocus(value) {
+	function setFocus(value){
 		textField.focus = value;
 	}
 	
-	function ensureVisible(pos) {
+	function ensureVisible(pos){
 		textField.ensureVisible(pos);
 	}
 	

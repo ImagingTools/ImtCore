@@ -810,7 +810,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 	QMutableListIterator typesIter(m_sdlTypes);
 	while(typesIter.hasNext()){
 		const CSdlType& sdlType = typesIter.next();
-		if (uniqueTypes.contains(sdlType)) {
+		if (uniqueTypes.contains(sdlType)){
 			typesIter.remove();
 
 			continue;

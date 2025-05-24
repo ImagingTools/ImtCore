@@ -31,15 +31,15 @@ void CButtonBasedSelectionGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 
 	int index = selectionPtr->GetSelectedOptionIndex();
 	QLayoutItem* itemPtr = layoutPtr->itemAt(index);
-	if (itemPtr != nullptr) {
+	if (itemPtr != nullptr){
 		QToolButton* buttonPtr = dynamic_cast<QToolButton*>(itemPtr->widget());
-		if (buttonPtr != nullptr) {
+		if (buttonPtr != nullptr){
 			buttonPtr->setChecked(true);
 		}
 	}
 	else {
 		QList<QToolButton*> buttonList = Frame->findChildren<QToolButton*>();
-		for (QToolButton* buttonPtr : buttonList) {
+		for (QToolButton* buttonPtr : buttonList){
 			buttonPtr->setChecked(false);
 		}
 	}
@@ -51,15 +51,15 @@ void CButtonBasedSelectionGuiComp::OnGuiModelAttached()
 	BaseClass::OnGuiModelAttached();
 
 	iprm::ISelectionParam* selectionParamsPtr = GetObservedObject();
-	if (selectionParamsPtr != nullptr) {
+	if (selectionParamsPtr != nullptr){
 		const iprm::IOptionsList* constraintsPtr = selectionParamsPtr->GetSelectionConstraints();
-		if (constraintsPtr != nullptr) {
+		if (constraintsPtr != nullptr){
 			m_optionListObserver.RegisterObject(constraintsPtr, &CButtonBasedSelectionGuiComp::OnOptionListUpdate);
 		}
 	}
 
 	iqtgui::IIconProvider* iconProviderPtr = m_iconProviderCompPtr.GetPtr();
-	if (iconProviderPtr != nullptr) {
+	if (iconProviderPtr != nullptr){
 		m_iconObserver.RegisterObject(iconProviderPtr, &CButtonBasedSelectionGuiComp::OnIconsUpdate);
 	}
 }
@@ -94,13 +94,13 @@ void CButtonBasedSelectionGuiComp::OnButtonClicked(bool checked)
 	QToolButton* buttonPtr = dynamic_cast<QToolButton*>(sender());
 	Q_ASSERT(buttonPtr != nullptr);
 
-	if (!checked) {
+	if (!checked){
 		buttonPtr->setChecked(true);
 	}
 
 	iprm::ISelectionParam* selectionPtr = GetObservedObject();
 	Q_ASSERT(selectionPtr != nullptr);
-	if (selectionPtr != nullptr) {
+	if (selectionPtr != nullptr){
 		selectionPtr->SetSelectedOptionIndex(buttonPtr->property("Index").toInt());
 	}
 }
@@ -111,14 +111,14 @@ void CButtonBasedSelectionGuiComp::OnButtonClicked(bool checked)
 void CButtonBasedSelectionGuiComp::OnOptionListUpdate(
 	const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IOptionsList* objectPtr)
 {
-	if (IsGuiCreated() && !IsUpdateBlocked() && IsModelAttached()) {
+	if (IsGuiCreated() && !IsUpdateBlocked() && IsModelAttached()){
 		QLayout* layoutPtr = Frame->layout();
-		if (layoutPtr != nullptr) {
+		if (layoutPtr != nullptr){
 			iwidgets::ClearLayout(layoutPtr);
 			delete layoutPtr;
 		}
 
-		switch (*m_orientationAttrPtr) {
+		switch (*m_orientationAttrPtr){
 		case O_VERTICAL:
 			layoutPtr = new QVBoxLayout(Frame);
 			break;
@@ -136,11 +136,11 @@ void CButtonBasedSelectionGuiComp::OnOptionListUpdate(
 			m_iconProviderCompPtr.IsValid() ? m_iconProviderCompPtr.GetPtr() : nullptr;
 
 		int count = objectPtr->GetOptionsCount();
-		if (count == 1 && *m_hideTheOnlyButtonAttrPtr) {
+		if (count == 1 && *m_hideTheOnlyButtonAttrPtr){
 			return;
 		}
 
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < count; i++){
 			QToolButton* buttonPtr = new QToolButton(Frame);
 			buttonPtr->setText(objectPtr->GetOptionName(i));
 			buttonPtr->setEnabled(objectPtr->IsOptionEnabled(i));
@@ -151,20 +151,20 @@ void CButtonBasedSelectionGuiComp::OnOptionListUpdate(
 			buttonPtr->setAutoExclusive(true);
 			buttonPtr->setProperty("Index", i);
 
-			if (i == 0) {
+			if (i == 0){
 				buttonPtr->setProperty("First", true);
 			}
 
-			if (i == count - 1) {
+			if (i == count - 1){
 				buttonPtr->setProperty("Last", true);
 			}
 
-			if (*m_buttonStyleAttrPtr >= 0 && *m_buttonStyleAttrPtr <= Qt::ToolButtonFollowStyle) {
+			if (*m_buttonStyleAttrPtr >= 0 && *m_buttonStyleAttrPtr <= Qt::ToolButtonFollowStyle){
 				buttonPtr->setToolButtonStyle((Qt::ToolButtonStyle)(*m_buttonStyleAttrPtr));
 			}
 
-			if (iconProvider != nullptr) {
-				if (i < iconProvider->GetIconCount()) {
+			if (iconProvider != nullptr){
+				if (i < iconProvider->GetIconCount()){
 					buttonPtr->setIcon(iconProvider->GetIcon(i));
 				}
 			}
@@ -185,7 +185,7 @@ void CButtonBasedSelectionGuiComp::OnIconsUpdate(
 	const istd::IChangeable::ChangeSet& /*changeSet*/, const iqtgui::IIconProvider* objectPtr)
 {
 	QList<QToolButton*> buttonList = Frame->findChildren<QToolButton*>();
-	for (int i = 0; i < buttonList.count(); i++) {
+	for (int i = 0; i < buttonList.count(); i++){
 		QToolButton* buttonPtr = buttonList[i];
 		int index = buttonPtr->property("Index").toInt();
 		QIcon icon = index < objectPtr->GetIconCount() ? objectPtr->GetIcon(index) : QIcon();

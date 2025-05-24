@@ -231,7 +231,7 @@ bool CFileRepositoryComp::UpdateFile(
 			const QString& localFilePath,
 			const QByteArray& objectId)
 {
-	if (!m_documentInfoCollectionCompPtr.IsValid()) {
+	if (!m_documentInfoCollectionCompPtr.IsValid()){
 		return false;
 	}
 
@@ -270,7 +270,7 @@ bool CFileRepositoryComp::UpdateFile(
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		bool indexUpdated = m_documentInfoCollectionCompPtr->SetObjectData(objectId, fileItemInfo);
-		if (indexUpdated) {
+		if (indexUpdated){
 			// TODO; Implement rollback logic!
 			SendErrorMessage(0, QT_TR_NOOP(QString("File meta info could not be updated")));
 
@@ -374,7 +374,7 @@ bool CFileRepositoryComp::RemoveElement(const Id& elementId, const imtbase::IOpe
 	}
 
 	CFileCollectionItem fileItemInfo;
-	if (!GetFileInfo(elementId, fileItemInfo)) {
+	if (!GetFileInfo(elementId, fileItemInfo)){
 		return false;
 	}
 
@@ -759,7 +759,7 @@ istd::IChangeableUniquePtr CFileRepositoryComp::CreateDataObject(const QByteArra
 		icomp::IComponent* compPtr = m_objectFactoryListCompPtr.CreateComponent(factoryIndex);
 		return istd::IChangeableUniquePtr(
 			compPtr,
-			[this, compPtr]() {
+			[this, compPtr](){
 				return m_objectFactoryListCompPtr.ExtractInterface(compPtr);
 			});
 	}

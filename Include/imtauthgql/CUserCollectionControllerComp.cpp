@@ -456,7 +456,7 @@ istd::IChangeableUniquePtr CUserCollectionControllerComp::CreateObjectFromRepres
 				password = *userDataRepresentation.password;
 			}
 
-			if (password.isEmpty()) {
+			if (password.isEmpty()){
 				errorMessage = QString("Password cannot be empty");
 				return nullptr;
 			}

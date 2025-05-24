@@ -35,7 +35,7 @@ Rectangle {
 		Events.unSubscribeEvent("AppSizeChanged", appSizeChanged);
 	}
 	
-	function viewTabInListView(index) {
+	function viewTabInListView(index){
 		list.positionViewAtIndex(index, ListView.Contain);
 	}
 	

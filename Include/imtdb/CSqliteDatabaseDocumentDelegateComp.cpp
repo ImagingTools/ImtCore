@@ -64,7 +64,7 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::GetSelectionQuery(
 QString CSqliteDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 {
 	QString schema;
-	if (m_tableSchemaAttrPtr.IsValid()) {
+	if (m_tableSchemaAttrPtr.IsValid()){
 		schema = *m_tableSchemaAttrPtr + ".";
 	}
 	
@@ -74,7 +74,7 @@ QString CSqliteDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 	QByteArray joinTablesQuery = CreateJoinTablesQuery();
 	
 	QString customColumns = GetCustomColumnsQuery();
-	if (!customColumns.isEmpty()) {
+	if (!customColumns.isEmpty()){
 		customColumns = ", " + customColumns;
 	}
 	
@@ -119,7 +119,7 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const
 		
 		QString key = keys[i];
 		QVariant value = paramMap[key];
-		if (value.canConvert<RawSqlExpression>()) {
+		if (value.canConvert<RawSqlExpression>()){
 			RawSqlExpression raw = value.value<RawSqlExpression>();
 			revisionInfo += QString("'%1', %2").arg(key, raw.sql);
 		}
@@ -161,11 +161,11 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 		CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
 		);
 	
-	switch (timeFilter.GetTimeUnit()) {
+	switch (timeFilter.GetTimeUnit()){
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
 		break;
 	case imtbase::ITimeFilterParam::TU_HOUR:
-		switch (timeFilter.GetInterpretationMode()) {
+		switch (timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
 			timeFilterQuery += QString(R"((strftime('%Y-%m-%d %H', %1) = strftime('%Y-%m-%d %H', 'now')))").arg(addedStrQuery);
 			break;
@@ -178,7 +178,7 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 		}
 		break;
 	case imtbase::ITimeFilterParam::TU_DAY:
-		switch (timeFilter.GetInterpretationMode()) {
+		switch (timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
 			timeFilterQuery += QString(R"((date(%1) = date('now')))").arg(addedStrQuery);
 			break;
@@ -191,7 +191,7 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 		}
 		break;
 	case imtbase::ITimeFilterParam::TU_WEEK:
-		switch (timeFilter.GetInterpretationMode()) {
+		switch (timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
 			timeFilterQuery += QString(R"(strftime('%Y-%W', %1) = strftime('%Y-%W', 'now'))").arg(addedStrQuery);
 			break;
@@ -204,7 +204,7 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 		}
 		break;
 	case imtbase::ITimeFilterParam::TU_MONTH:
-		switch (timeFilter.GetInterpretationMode()) {
+		switch (timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
 			timeFilterQuery += QString(R"(strftime('%Y-%m', %1) = strftime('%Y-%m', 'now'))").arg(addedStrQuery);
 			break;
@@ -217,7 +217,7 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 		}
 		break;
 	case imtbase::ITimeFilterParam::TU_YEAR:
-		switch (timeFilter.GetInterpretationMode()) {
+		switch (timeFilter.GetInterpretationMode()){
 		case imtbase::ITimeFilterParam::IM_CURRENT:
 			timeFilterQuery += QString(R"(strftime('%Y', %1) = strftime('%Y', 'now'))").arg(addedStrQuery);
 			break;
@@ -231,9 +231,9 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 		break;
 	}
 	
-	if (timeFilterQuery.isEmpty()) {
+	if (timeFilterQuery.isEmpty()){
 		imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
-		if (!timeRange.IsNull()) {
+		if (!timeRange.IsNull()){
 			timeFilterQuery += QString(R"(date(%0) >= date('%1') AND date(%0) <= date('%2'))")
 			.arg(addedStrQuery, timeRange.GetBeginTime().toString(Qt::ISODate), timeRange.GetEndTime().toString(Qt::ISODate));
 		}

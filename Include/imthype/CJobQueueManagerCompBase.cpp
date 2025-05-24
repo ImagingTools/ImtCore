@@ -389,7 +389,7 @@ imtbase::ICollectionInfo::Ids CJobQueueManagerCompBase::GetElementIds(
 
 	int elementsCount = count >= 0 ? qMin(count, m_jobItems.count()) : m_jobItems.count();
 
-	for (int i = offset; i < elementsCount; ++i) {
+	for (int i = offset; i < elementsCount; ++i){
 		retVal.push_back(m_jobItems[i].uuid);
 	}
 

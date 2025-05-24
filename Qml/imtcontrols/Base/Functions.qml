@@ -35,15 +35,15 @@ QtObject {
 		let afterDot	= splitArr[1]
 		let beforeDotFormatted = "";
 
-		for (let i = 0; i < beforeDot.length; i++) {
-			if (i > 0 && (beforeDot.length - i) % 3 === 0) {
+		for (let i = 0; i < beforeDot.length; i++){
+			if (i > 0 && (beforeDot.length - i) % 3 === 0){
 				beforeDotFormatted += " ";
 			}
 			beforeDotFormatted += beforeDot[i];
 		}
 
 		let retVal = beforeDotFormatted
-		if (afterDot) {
+		if (afterDot){
 			retVal += ",";
 			retVal += !decimalRoundupPrecision ? afterDot : afterDot.padEnd(decimalRoundupPrecision, "0");
 		}
@@ -54,7 +54,7 @@ QtObject {
 
 	function dateToStr(date, format){
 		let defaultFormat = "yyyy-MM-dd hh:mm:ss.zzz"
-		if(!date) {
+		if(!date){
 			console.error('date must be specified, default format: ' + defaultFormat)
 
 			return ''
@@ -83,10 +83,10 @@ QtObject {
 				.replace('mm', minutes)
 				.replace('ss', seconds)
 
-		if (format.includes('.zzz')) {
+		if (format.includes('.zzz')){
 			formatted = formatted.replace('.zzz', '.' + msecs.toString().padStart(3, '0'))
 		}
-		else if (format.includes('.z')) {
+		else if (format.includes('.z')){
 			formatted = formatted.replace('.z', '.' + msecs.toString())
 		}
 
@@ -116,7 +116,7 @@ QtObject {
 		let index = 1
 		parts.push(phone[0])
 
-		while (index < phone.length) {
+		while (index < phone.length){
 			let step = parts.length > 2 ? 2 : 3;
 			parts.push(phone.slice(index, index + step));
 			index += step;
@@ -130,21 +130,21 @@ QtObject {
 
 
 	// Supports UTF-8 encoded text. Works in both web and QML (only God knows how)
-	function stringToHex(str, delimiter) {
+	function stringToHex(str, delimiter){
 		let utf8 = [];
 
-		for (let i = 0; i < str.length; i++) {
+		for (let i = 0; i < str.length; i++){
 			let code = str.charCodeAt(i);
 
 			// Voodoo magic
-			if (code < 0x80) {
+			if (code < 0x80){
 				utf8.push(code);
 			}
-			else if (code < 0x800) {
+			else if (code < 0x800){
 				utf8.push(0xc0 | (code >> 6));
 				utf8.push(0x80 | (code & 0x3f));
 			}
-			else if (code < 0xd800 || code >= 0xe000) {
+			else if (code < 0xd800 || code >= 0xe000){
 				utf8.push(0xe0 | (code >> 12));
 				utf8.push(0x80 | ((code >> 6) & 0x3f));
 				utf8.push(0x80 | (code & 0x3f));
@@ -162,7 +162,7 @@ QtObject {
 
 		// Convert bytes to hex
 		var hex = [];
-		for (var j = 0; j < utf8.length; j++) {
+		for (var j = 0; j < utf8.length; j++){
 			hex.push(utf8[j].toString(16).padStart(2, '0'));
 		}
 
@@ -170,28 +170,28 @@ QtObject {
 	}
 
 	// Supports UTF-8 encoded text. Works in both web and QML (only God knows how)
-	function hexToString(hex, delimiter) {
+	function hexToString(hex, delimiter){
 		let bytes = [];
 		let step = delimiter ? 2 + delimiter.length : 2;
 
-		for (let i = 0; i < hex.length; i += step) {
+		for (let i = 0; i < hex.length; i += step){
 			bytes.push(parseInt(hex.slice(i, i + 2), 16));
 		}
 
 		let str = '';
 		let iter = 0;
-		while (iter < bytes.length) {
+		while (iter < bytes.length){
 			let byte1 = bytes[iter++];
 
 			// Voodoo magic
-			if (byte1 < 0x80) {
+			if (byte1 < 0x80){
 				str += String.fromCharCode(byte1);
 			}
-			else if (byte1 < 0xe0) {
+			else if (byte1 < 0xe0){
 				let byte2 = bytes[iter++];
 				str += String.fromCharCode(((byte1 & 0x1f) << 6) | (byte2 & 0x3f));
 			}
-			else if (byte1 < 0xf0) {
+			else if (byte1 < 0xf0){
 				let byte2 = bytes[iter++];
 				let byte3 = bytes[iter++];
 				str += String.fromCharCode(

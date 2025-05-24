@@ -13,8 +13,9 @@ namespace imtservergql
 {
 
 
-class CProgressManagerPublisherComp : public CGqlPublisherCompBase,
-									  virtual public imtbase::IProgressSessionsManager
+class CProgressManagerPublisherComp:
+			public CGqlPublisherCompBase,
+			virtual public imtbase::IProgressSessionsManager
 {
 public:
 	typedef CGqlPublisherCompBase BaseClass;
@@ -26,7 +27,10 @@ public:
 	// reimplemented (imtbase::IProgressSessionsManager)
 	virtual ibase::IProgressManager* BeginProgressSession(const QByteArray& sessionId, const QString& description) override;
 	virtual bool EndProgressSession(const QByteArray& sessionId) override;
-	virtual bool CancelProgressSession(const QByteArray& sessionId, const QString& description = QString(), bool isFailed = false) override;
+	virtual bool CancelProgressSession(
+				const QByteArray& sessionId,
+				const QString& description = QString(),
+				bool isFailed = false) override;
 
 private:
 	bool PublishSession(const QByteArray& sessionId);

@@ -227,7 +227,7 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 						statusMessage = QObject::tr("Plug-in instance creation failed");
 					}
 
-					if (m_pluginStatusMonitorPtr != nullptr) {
+					if (m_pluginStatusMonitorPtr != nullptr){
 						m_pluginStatusMonitorPtr->OnPluginStatusChanged(
 									pluginPath.canonicalFilePath(),
 									pluginName,
