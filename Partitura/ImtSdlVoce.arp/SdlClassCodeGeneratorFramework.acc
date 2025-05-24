@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5351" Description="ACF"/>
-            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5345" Description="ACF"/>
+            <Version Id="1" Number="2235" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -22,6 +22,42 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="CSdlClassGqlModificatorComp" PackageId="ImtSdlGenPck" ComponentId="SdlClassGqlModificator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProcessModificatorName" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQL"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SdlClassCodeGenerator" PackageId="ImtSdlGenPck" ComponentId="SdlClassCodeGenerator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -30,6 +66,15 @@
                     </AttributeInfo>
                     <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="BaseClassExtender">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CodeGeneratorExtenderList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SdlClassTreeModelModificator</Value>
+                                <Value>CSdlClassGqlModificatorComp</Value>
+                                <Value>SdlClassJsonModificator</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
                         <Data IsEnabled="false"/>
@@ -40,11 +85,92 @@
                     <AttributeInfo Id="FilesJoiner" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SimpleFileJoiner"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="IncludeDirectivesProviderList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SdlClassTreeModelModificator</Value>
+                                <Value>CSdlClassGqlModificatorComp</Value>
+                                <Value>SdlClassJsonModificator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SdlClassJsonModificator" PackageId="ImtSdlGenPck" ComponentId="SdlClassJsonModificator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProcessModificatorName" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="JSON"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SdlClassTreeModelModificator" PackageId="ImtSdlGenPck" ComponentId="SdlClassTreeModelModificator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProcessModificatorName" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="TreeModel"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
                         <Data IsEnabled="false"/>

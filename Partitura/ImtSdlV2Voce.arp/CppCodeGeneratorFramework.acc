@@ -160,6 +160,12 @@
                     <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

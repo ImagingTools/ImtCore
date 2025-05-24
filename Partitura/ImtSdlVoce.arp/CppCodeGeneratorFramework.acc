@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5351" Description="ACF"/>
-            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5302" Description="ACF"/>
+            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331532" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -49,6 +49,54 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SdlGqlCodeGeneratorFramework" PackageId="ImtSdlVoce" ComponentId="SdlGqlCodeGeneratorFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="BaseClassExtender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FilesJoiner" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlClassCodeGenerator/SimpleFileJoiner"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="SdlDocumentListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="SdlRequestListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces/>
@@ -57,6 +105,7 @@
         <Component ExportedId="GqlHandlerBaseClassGenerator" ComponentId="SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator"/>
         <Component ExportedId="GqlWrapClassCodeGenerator" ComponentId="SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator"/>
         <Component ExportedId="SdlClassCodeGenerator" ComponentId="SdlClassCodeGenerator"/>
+        <Component ExportedId="SdlGqlCodeGeneratorFramework" ComponentId="SdlGqlCodeGeneratorFramework"/>
         <Component ExportedId="SimpleFileJoiner" ComponentId="SdlClassCodeGenerator/SimpleFileJoiner"/>
     </ExportedComponents>
 </Acf>
