@@ -79,8 +79,7 @@ public:
 				idoc::MetaInfoPtr& objectMetaInfoPtr,
 				idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const  override;
 
-	virtual istd::IChangeable* CreateObjectFromRecord(const bsoncxx::document::view& doc) const override;
-
+	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(const bsoncxx::document::view& doc) const override;
 	virtual QVariant GetElementInfoFromRecord(const bsoncxx::document::view& doc, const QString& infoId) const override;
 
 	virtual QByteArray GetObjectIdFromMongoId(QByteArray mid) const override;

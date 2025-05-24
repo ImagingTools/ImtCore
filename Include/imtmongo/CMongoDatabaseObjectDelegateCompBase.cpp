@@ -232,10 +232,9 @@ bool CMongoDatabaseObjectDelegateCompBase::CreateSortQuery(
 
 // reimplemented (imtdb::IDatabaseObjectDelegate)
 
-istd::IChangeable* CMongoDatabaseObjectDelegateCompBase::CreateObjectFromRecord(const bsoncxx::document::view& doc) const
+istd::IChangeableUniquePtr CMongoDatabaseObjectDelegateCompBase::CreateObjectFromRecord(const bsoncxx::document::view& doc) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
-
 		return nullptr;
 	}
 

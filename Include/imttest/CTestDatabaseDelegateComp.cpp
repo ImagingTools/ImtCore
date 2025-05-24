@@ -17,7 +17,7 @@ namespace imttest
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CTestDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CTestDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -27,7 +27,7 @@ istd::IChangeable* CTestDatabaseDelegateComp::CreateObjectFromRecord(const QSqlR
 		return nullptr;
 	}
 
-	istd::TDelPtr<imttest::ITestInfo> testInfoPtr = m_testFactCompPtr.CreateInstance();
+	istd::TUniqueInterfacePtr<imttest::ITestInfo> testInfoPtr = m_testFactCompPtr.CreateInstance();
 	if (!testInfoPtr.IsValid()){
 		return nullptr;
 	}
@@ -49,7 +49,7 @@ istd::IChangeable* CTestDatabaseDelegateComp::CreateObjectFromRecord(const QSqlR
 		testInfoPtr->SetTestDescription(testDescription);
 	}
 
-	return testInfoPtr.PopPtr();
+	return testInfoPtr;
 }
 
 
