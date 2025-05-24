@@ -99,7 +99,7 @@ void CRevisionControllerPartituraTestBase::BackupRevisionWithIncorrectParamsTest
 			if (revisionControllerPtr != nullptr){
 
 				// insert new object in object collection
-				QByteArray idInsertObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestName", "TestDescription", imtbase::CObjectCollectionBase::DataPtr(), QByteArray("testObject"));
+				QByteArray idInsertObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestName", "TestDescription", nullptr, QByteArray("testObject"));
 				if (!idInsertObject.isEmpty() ){
 
 					// create backup object and check him
@@ -160,7 +160,7 @@ void CRevisionControllerPartituraTestBase::RestoreRevisionWithCorrectParamsTest(
 				inputImplPtr->SetAccountDescription(descriptionAccount);
 
 				// insert new object in object collection
-				QByteArray idInsertObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestName", "TestDescription", inputDataPtr);
+				QByteArray idInsertObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestName", "TestDescription", inputDataPtr.GetPtr());
 				if (!idInsertObject.isEmpty()){
 
 					// create backup object for first revision
@@ -268,7 +268,7 @@ void CRevisionControllerPartituraTestBase::RestoreRevisionWithIncorrectParamsTes
 				inputImplPtr->SetAccountDescription(descriptionAccount);
 
 				// insert new object in object collection
-				QByteArray idInsertObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestName", "TestDescription", inputDataPtr, "testObject");
+				QByteArray idInsertObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestName", "TestDescription", inputDataPtr.GetPtr(), "testObject");
 				if (!idInsertObject.isEmpty()){
 
 					// create backup object for first revision
