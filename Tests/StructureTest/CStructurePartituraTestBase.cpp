@@ -267,7 +267,7 @@ void CStructurePartituraTestBase::InsertObjectWithRequiredParamsTest()
 		imtbase::IStructuredObjectCollectionController* collectionStructureControllerPtr = compositePtr->GetComponentInterface<imtbase::IStructuredObjectCollectionController>();
 		if (collectionStructureControllerPtr != nullptr) {
 
-			QByteArray idNewObject = collectionStructureControllerPtr->InsertNewObjectIntoCollection(objectCollectionPtr, nodeId, typeId, name, description, imtbase::IObjectCollection::DataPtr(), objectId);
+			QByteArray idNewObject = collectionStructureControllerPtr->InsertNewObjectIntoCollection(objectCollectionPtr, nodeId, typeId, name, description, nullptr, objectId);
 			// check contains object in collection
 			imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
 			bool checkIdIsExist = idsInObject.contains(idNewObject);

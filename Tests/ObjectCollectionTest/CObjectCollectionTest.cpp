@@ -41,7 +41,7 @@ void CObjectCollectionTest::ResetCollectionWithFixedObjectTest()
 
 			imtbase::IObjectCollection::Ids idsInObjectBeforeReset = objectCollectionPtr->GetElementIds();
 			if (idsInObjectBeforeReset.count() > 0){
-				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::IObjectCollection::DataPtr(), "testId");
+				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, "testId");
 
 				// Reset collection
 				objectCollectionPtr->ResetData();

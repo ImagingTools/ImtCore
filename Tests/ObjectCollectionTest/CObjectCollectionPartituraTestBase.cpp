@@ -126,7 +126,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithNonExistElementTest(
 			objectCollectionPtr->ResetData();
 
 			// insert object in collection
-			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), "testId");
+			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, "testId");
 
 			// check contains object in collection
 			imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
@@ -161,8 +161,8 @@ void CObjectCollectionPartituraTestBase::GetDataFromEmpyObjectIdTest()
 			objectCollectionPtr->ResetData();
 
 			// insert objects in collection
-			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), QByteArray(""));
-			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), QByteArray("1_object"));
+			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, QByteArray(""));
+			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, QByteArray("1_object"));
 
 			imtbase::CObjectCollection::DataPtr dataPtr = nullptr;
 			bool checkGetData = objectCollectionPtr->GetObjectData(QByteArray(""), dataPtr);
@@ -189,7 +189,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithExistElementTest()
 			objectCollectionPtr->ResetData();
 
 			// insert first object in collection
-			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), "testId");
+			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, "testId");
 
 			if (idNewObject == "testId"){
 
@@ -200,7 +200,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithExistElementTest()
 				if(checkInsertFirstObject){
 
 					// insert second object with exist id in collection
-					QByteArray idSecondNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::CObjectCollection::DataPtr(), "testId");
+					QByteArray idSecondNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", nullptr, "testId");
 
 					if (!idSecondNewObject.isEmpty()){
 
@@ -278,7 +278,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithDataTest()
 			}
 
 			// insert new object with input data in collection
-			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", inputDataPtr);
+			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", inputDataPtr.GetPtr());
 			if (!idNewObject.isEmpty()){
 
 				// get reference data
@@ -350,14 +350,14 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithMetaObjectTest()
 				inputMetaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("Private"));
 				inputMetaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME, inputName);
 				inputMetaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION, inputDescription);
-				idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), QByteArray(), &inputMetaInfo);
+				idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, QByteArray(), &inputMetaInfo);
 			}
 			else{
 				imttest::CTestMetaInfo inputMetaInfo;
 
 				inputMetaInfo.SetMetaInfo(imttest::ITestInfo::MIT_TEST_NAME, inputName);
 				inputMetaInfo.SetMetaInfo(imttest::ITestInfo::MIT_TEST_DESCRIPTION, inputDescription);
-				idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), QByteArray(), &inputMetaInfo);
+				idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, QByteArray(), &inputMetaInfo);
 			}
 
 			if (!idNewObject.isEmpty()){
@@ -409,8 +409,8 @@ void CObjectCollectionPartituraTestBase::RemoveExistObjectTest()
 			objectCollectionPtr->ResetData();
 
 			// Insert two objects into the collection:
-			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), "testId");
-			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::CObjectCollection::DataPtr(), "testId2");
+			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, "testId");
+			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", nullptr, "testId2");
 
 			// Remove object with the ID 'testId':
 			objectCollectionPtr->RemoveElement("testId");
@@ -451,8 +451,8 @@ void CObjectCollectionPartituraTestBase::RemoveNonExistObjectTest()
 			objectCollectionPtr->ResetData();
 
 			// Insert two objects into the collection:
-			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), "testId");
-			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::CObjectCollection::DataPtr(), "testId2");
+			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, "testId");
+			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", nullptr, "testId2");
 
 			// Remove object with non-exist id
 			objectCollectionPtr->RemoveElement("testId3");
@@ -488,7 +488,7 @@ void CObjectCollectionPartituraTestBase::ResetCollectionWithoutFixedObjectsTest(
 		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
 
-			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), "testId");
+			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", nullptr, "testId");
 
 			// Reset collection
 			objectCollectionPtr->ResetData();
