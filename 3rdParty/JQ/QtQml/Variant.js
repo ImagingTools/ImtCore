@@ -1,7 +1,7 @@
 const BaseObject = require("../QtBase/BaseObject")
-const Property = require("./Property")
+const Var = require("./Var")
 
-class Variant extends Property {
+class Variant extends Var {
     static create(parent, meta){
         let obj = super.create(parent, meta)
 

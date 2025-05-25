@@ -2,16 +2,14 @@
 const Property = require("./Property")
 
 class Int extends Property {
-    static defaultValue = 0
-    
-    __typecasting(value){
+    static getDefaultValue(){
+        return 0
+    }
+
+    static typeCasting(value){
         if(value === undefined) throw 'Cannot assign [undefined] to int'
         if(value === null) throw 'Cannot assign std::nullptr_t to int'
-
-        if(typeof value === 'object') {
-            if(value instanceof Property) return value.__get()
-            throw 'Cannot assign QJSValue to int'
-        }
+        if(typeof value === 'object') throw 'Cannot assign QJSValue to int'
 
         if(typeof value === 'number') {
             if(isNaN(value) || value === Infinity || value === -Infinity) return -2147483648
@@ -22,7 +20,7 @@ class Int extends Property {
             return 1
         }
 
-        if(value === false) {
+        if(value === false || value === '') {
             return 0
         }
 
@@ -32,6 +30,7 @@ class Int extends Property {
             return number
         }
     }
+    
 }
 
 module.exports = Int

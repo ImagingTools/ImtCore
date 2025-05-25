@@ -1,8 +1,8 @@
 const Item = require("./Item")
 
 class FocusScope extends Item {
-    onFocusChanged(){
-        super.onFocusChanged()
+    SLOT_focusChanged(oldValue, newValue){
+        super.SLOT_focusChanged()
 
         if(this.focus){
             for(let child of this.children){
@@ -16,6 +16,6 @@ class FocusScope extends Item {
     }
 }
 
-FocusScope.initialize()
+
 
 module.exports = FocusScope

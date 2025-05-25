@@ -20,6 +20,8 @@ module.exports = {
     RemoteFileController: require("./RemoteFileController"),
     FileIO: require("./FileIO"),
     Process: require("./Process"),
+    BaseClass: require("./BaseClass"),
+    BaseModel: require("./BaseModel"),
     
     real: require("./Real"),
     double: require("./Double"),
@@ -33,6 +35,7 @@ module.exports = {
     variant: require("./Variant"),
 
     Signal: require("./Signal"),
+    Method: require("./Method"),
     SpecialSignal: require("./SpecialSignal"),
     SpecialProperty: require("./SpecialProperty"),
 

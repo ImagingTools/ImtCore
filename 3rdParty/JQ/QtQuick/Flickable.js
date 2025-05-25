@@ -2,6 +2,7 @@ const Item = require("./Item")
 const Real = require("../QtQml/Real")
 const Bool = require("../QtQml/Bool")
 const Variant = require("../QtQml/Variant")
+const Geometry = require("../QtQml/Geometry")
 const Signal = require("../QtQml/Signal")
 const QtFunctions = require("../Qt/functions")
 const MouseArea = require("./MouseArea")
@@ -20,8 +21,8 @@ class Flickable extends Item {
     static DragAndOvershootBounds = 3
 
     static meta = Object.assign({}, Item.meta, {
-        contentWidth: {type: Real, value:-1, signalName:'contentWidthChanged'},
-        contentHeight: {type: Real, value:-1, signalName:'contentHeightChanged'},
+        contentWidth: {type: Geometry, value:-1, signalName:'contentWidthChanged'},
+        contentHeight: {type: Geometry, value:-1, signalName:'contentHeightChanged'},
         contentX: {type: Real, value:0, signalName:'contentXChanged'},
         contentY: {type: Real, value:0, signalName:'contentYChanged'},
         originX: {type: Real, value:0, signalName:'originXChanged'},
@@ -98,16 +99,16 @@ class Flickable extends Item {
         return this.contentItem ? this.contentItem : this
     }
 
-    onContentXChanged(){
+    SLOT_contentXChanged(oldValue, newValue){
         this.contentItem.x = -this.contentX
     }
 
-    onContentYChanged(){
+    SLOT_contentYChanged(oldValue, newValue){
         this.contentItem.y = -this.contentY
     }
 
-    onWidthChanged(){
-        super.onWidthChanged()
+    SLOT_widthChanged(oldValue, newValue){
+        super.SLOT_widthChanged(oldValue, newValue)
         if(this.contentWidth - this.width > 0){
             if(this.contentX < this.originX){
                 this.contentX = this.originX
@@ -120,8 +121,8 @@ class Flickable extends Item {
         }
     }
 
-    onHeightChanged(){
-        super.onHeightChanged()
+    SLOT_heightChanged(oldValue, newValue){
+        super.SLOT_heightChanged(oldValue, newValue)
         if(this.contentHeight - this.height > 0){
             if(this.contentY < this.originY){
                 this.contentY = this.originY
@@ -134,7 +135,7 @@ class Flickable extends Item {
         }
     }
 
-    onContentWidthChanged(){
+    SLOT_contentWidthChanged(oldValue, newValue){
         this.contentItem.width = this.contentWidth
         if(this.contentWidth - this.width > 0){
             if(this.contentX < this.originX){
@@ -148,7 +149,7 @@ class Flickable extends Item {
         }
     }
 
-    onContentHeightChanged(){
+    SLOT_contentHeightChanged(oldValue, newValue){
         this.contentItem.height = this.contentHeight
         if(this.contentHeight - this.height > 0){
             if(this.contentY < this.originY){
@@ -290,6 +291,6 @@ class Flickable extends Item {
     }
 }
 
-Flickable.initialize()
+
 
 module.exports = Flickable

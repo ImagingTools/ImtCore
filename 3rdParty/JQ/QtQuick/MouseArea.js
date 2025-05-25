@@ -56,7 +56,7 @@ class MouseArea extends Item {
     __entered = false
     __timer = null
 
-    onCursorShapeChanged(){
+    SLOT_cursorShapeChanged(oldValue, newValue){
         this.__setDOMStyle({
             cursor: this.cursorShape
         })
@@ -105,7 +105,7 @@ class MouseArea extends Item {
 
         if(!mouse.target){
             this.__pressed = true
-            this.__getDataQml('pressed').__value = true
+            this.__self.pressed = true
             if(!this.__entered) this.entered()
             this.pressedChanged(mouse)
 
@@ -124,7 +124,7 @@ class MouseArea extends Item {
     __onMouseClick(mouse){
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
-        this.__getDataQml('pressed').__value = false
+        this.__self.pressed = false
 
         if(mouse.target === this && this.__pressed){
             this.clicked(mouse)
@@ -136,7 +136,7 @@ class MouseArea extends Item {
     __onMouseDblClick(mouse){
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
-        this.__getDataQml('pressed').__value = false
+        this.__self.pressed = false
 
         if(mouse.target === this && this.__pressed){
             this.clicked(mouse)
@@ -162,6 +162,6 @@ class MouseArea extends Item {
     }
 }
 
-MouseArea.initialize()
+
 
 module.exports = MouseArea

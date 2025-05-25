@@ -38,19 +38,19 @@ class Timer extends QtObject {
         if(this.running) this.running = false
     }
 
-    onIntervalChanged(){
+    SLOT_intervalChanged(oldValue, newValue){
         this.__updateTimer()
     }
 
-    onRepeatChanged(){
+    SLOT_repeatChanged(oldValue, newValue){
         this.__updateTimer()
     }
 
-    onRunningChanged(){
+    SLOT_runningChanged(oldValue, newValue){
         this.__updateTimer()
     }
 
-    onTriggeredOnStartChanged(){
+    SLOT_triggeredOnStartChanged(oldValue, newValue){
         this.__updateTimer()
     }
 
@@ -88,6 +88,6 @@ class Timer extends QtObject {
     }
 }
 
-Timer.initialize()
+
 
 module.exports = Timer

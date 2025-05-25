@@ -8,8 +8,8 @@ class Button extends AbstractButton {
 
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__getDOM().classList.add('Button')
 
         return obj
@@ -17,6 +17,6 @@ class Button extends AbstractButton {
 
 }
 
-Button.initialize()
+
 
 module.exports = Button

@@ -10,6 +10,7 @@ const QtFunctions = require("../Qt/functions")
 class QtObject extends QObject {
     static meta = Object.assign({}, QObject.meta, {
         model: {type:Var, auto: true, value:undefined, signalName:'modelChanged'},
+        modelData: { type: Var, auto: true, value: undefined },
         index: {type:Int, value:0, signalName:'indexChanged'},
         children: {type:List, signalName:'childrenChanged'},
         resources: {type:List, signalName:'resourcesChanged'},
@@ -23,24 +24,50 @@ class QtObject extends QObject {
         'Component.completed': {type:Signal, slotName:'Component.onCompleted', args:[]},
         'Component.destruction': {type:Signal, slotName:'Component.onDestruction', args:[]},
 
+        JQAbstractModelData: {type:Var, value:undefined, signalName:'JQAbstractModelDataChanged'},
         JQAbstractModel: {type:Var, value:undefined, signalName:'JQAbstractModelChanged'},
         JQAbstractModelChanged: {type:Signal, slotName:'onJQAbstractModelChanged', args:[]},
     })  
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
+        // let self = obj.__self
+        // self.data = []
+        // self.data.target = self
 
-        if(model){
-            obj.JQAbstractModel = model
+        // self.resources = []
+        // self.resources.target = self
+
+        // self.children = []
+        // self.children.target = self
+
+        if(properties.model){
+            let keys = Object.keys(properties.model)
+            if(keys.length === 1){
+                this.JQAbstractModelData = properties.model[keys[0]]
+            }
+            obj.JQAbstractModel = properties.model
+            delete properties.model
         } else {
-            obj.__getDataQml('JQAbstractModel').__setCompute(()=>{return obj.parent.JQAbstractModel})
+            obj.JQAbstractModel = ()=>{return obj.parent ? obj.parent.JQAbstractModel : undefined}
         }
 
-        if(!('model' in meta) && this.meta.model.auto){
-            obj.__getDataQml('model').__setCompute(()=>{return obj.JQAbstractModel})
+        if(properties.modelData){
+            obj.JQAbstractModelData = properties.modelData
+            delete properties.modelData
+        } else {
+            obj.JQAbstractModelData = ()=>{return obj.parent ? obj.parent.JQAbstractModelData : undefined}
         }
 
-        obj.__getDataQml('index').__setCompute(()=>{return obj.JQAbstractModel.index})
+        if(this.meta.modelData.auto){
+            obj.modelData = ()=>{return obj.JQAbstractModelData}
+        }
+        
+        if(this.meta.model.auto){
+            obj.model = ()=>{return obj.JQAbstractModel}
+        }
+
+        obj.index = ()=>{return obj.JQAbstractModel ? obj.JQAbstractModel.index : -1}
 
         return obj
     }
@@ -49,24 +76,14 @@ class QtObject extends QObject {
         if(this.__completed) return
 
         this.__completed = true
+        this['Component.completed']()
+
         for(let i = this.__children.length-1; i >= 0; i--){
             this.__children[i].__complete()
         }
-
-        // while(this.__properties.length){
-        //     this.__properties.shift().__update()
-        // }
-        
-        this['Component.completed']()
-
-        // for(let key in this.__dataQml){
-        //     if(this.__dataQml[key] instanceof Property && this.__dataQml[key].__value instanceof QtObject){
-        //         this.__dataQml[key].__value.__complete()
-        //     }
-        // }
     }
 
-    // onJQAbstractModelChanged(){
+    // onJQAbstractModelChanged(oldValue, newValue){
     //     this.index = this.JQAbstractModel.index
 
     //     if(this.constructor.meta.model.auto){
@@ -78,67 +95,104 @@ class QtObject extends QObject {
         let index = -1
 
         index = this.data.indexOf(child)
-        if(index >= 0) this.data.osplice(index, 1)
+        if(index >= 0) this.data.__splice(index, 1)
 
         index = this.resources.indexOf(child)
-        if(index >= 0) this.resources.osplice(index, 1)
+        if(index >= 0) this.resources.__splice(index, 1)
     }
 
     __addChild(child){
         let index = -1
 
         index = this.data.indexOf(child)
-        if(index < 0) this.data.opush(child)
+        if(index < 0) this.data.__push(child)
 
         index = this.resources.indexOf(child)
-        if(index < 0) this.resources.opush(child)
+        if(index < 0) this.resources.__push(child)
     }
 
-    onChildrenChanged(leftTop, bottonRight, roles){
-        if(roles === 'append'){
-            for(let i = leftTop; i < bottonRight; i++){
-                this.children[i].setParent(this)
+    SLOT_childrenChanged(...args){
+        if(args.length === 3){
+            let leftTop = args[0]
+            let bottonRight = args[1]
+            let roles = args[2]
+
+            if(roles === 'append'){
+                for(let i = leftTop; i < bottonRight; i++){
+                    this.children[i].setParent(this)
+                }
             }
         } else {
-            for(let i = 0; i < this.children.length; i++){
-                this.children[i].setParent(this)
+            let oldValue = args[0]
+            let newValue = args[1]
+
+            for(let child of oldValue){
+                if(newValue.indexOf(child) < 0) this.__removeChild(child)
+            }
+
+            for(let child of newValue){
+                child.setParent(this)
             }
         }
     }
 
-    onResourcesChanged(leftTop, bottonRight, roles){
-        if(roles === 'append'){
-            for(let i = leftTop; i < bottonRight; i++){
-                this.resources[i].setParent(this)
+    SLOT_resourcesChanged(leftTop, bottonRight, roles){
+        if(args.length === 3){
+            let leftTop = args[0]
+            let bottonRight = args[1]
+            let roles = args[2]
+
+            if(roles === 'append'){
+                for(let i = leftTop; i < bottonRight; i++){
+                    this.resources[i].setParent(this)
+                }
             }
         } else {
-            for(let i = 0; i < this.resources.length; i++){
-                this.resources[i].setParent(this)
+            let oldValue = args[0]
+            let newValue = args[1]
+
+            for(let child of oldValue){
+                if(newValue.indexOf(child) < 0) this.__removeChild(child)
+            }
+
+            for(let child of newValue){
+                child.setParent(this)
             }
         }
     }
 
-    onDataChanged(leftTop, bottonRight, roles){
-        if(roles === 'append'){
-            for(let i = leftTop; i < bottonRight; i++){
-                this.data[i].setParent(this)
+    SLOT_dataChanged(leftTop, bottonRight, roles){
+        if(args.length === 3){
+            let leftTop = args[0]
+            let bottonRight = args[1]
+            let roles = args[2]
+
+            if(roles === 'append'){
+                for(let i = leftTop; i < bottonRight; i++){
+                    this.data[i].setParent(this)
+                }
             }
         } else {
-            for(let i = 0; i < this.data.length; i++){
-                this.data[i].setParent(this)
+            let oldValue = args[0]
+            let newValue = args[1]
+
+            for(let child of oldValue){
+                if(newValue.indexOf(child) < 0) this.__removeChild(child)
+            }
+
+            for(let child of newValue){
+                child.setParent(this)
             }
         }
     }
 
-    onParentChanged(){
-        if(this.__parent){
-            this.__parent.__removeChild(this)
+    SLOT_parentChanged(oldValue, newValue){
+        if(oldValue){
+            oldValue.__removeChild(this)
         }
-
-        this.__parent = this.parent
-
-        if(this.__parent) {
-            this.__parent.__addChild(this)
+        
+        if(newValue) {
+            newValue.__addChild(this)
         }
     }
 
@@ -161,11 +215,16 @@ class QtObject extends QObject {
 
         if(this.parent && !this.parent.__destroyed) this.parent.__removeChild(this)
 
-        for(let key in this.__dataQml){
-            if(this.__dataQml[key] instanceof Property || this.__dataQml[key] instanceof GroupProperty || this.__dataQml[key] instanceof Signal){
-                this.__dataQml[key].destroy()
+        for(let key in this.__depends){
+            if(this.__depends[key]){
+                for(let connectionObj of this.__depends[key]){
+                    Signal.removeConnection(connectionObj)
+                }
+                delete this.__depends[key]
             }
         }
+
+        
 
         for(let key in this){
             delete this[key]
@@ -175,6 +234,6 @@ class QtObject extends QObject {
     }
 }
 
-QtObject.initialize()
+
 
 module.exports = QtObject

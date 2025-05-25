@@ -57,8 +57,8 @@ class Dialog extends Popup {
         reset: {type:Signal, slotName:'onReset', args:[]},
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__getDOM().classList.add('Dialog')
 
         return obj
@@ -70,6 +70,6 @@ class Dialog extends Popup {
     standardButton(button){}
 }
 
-Dialog.initialize()
+
 
 module.exports = Dialog

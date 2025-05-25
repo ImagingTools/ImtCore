@@ -221,7 +221,7 @@ module.exports = {
         return window.open(url, '_blank')
     },
     qsTr: function(sourceText){
-        return global.context.translate(sourceText)
+        return global.JSContext.translate(sourceText)
     },
     binding: function(func, lazy=false){
         func.bound = true
@@ -285,4 +285,6 @@ module.exports = {
 
         if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, cls)
     },
+
+    get localStorage(){return global.localStorage},
 }

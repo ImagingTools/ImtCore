@@ -14,25 +14,20 @@ class Plugin extends QtObject {
    
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
-        this.parameters = []
-        this.__url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+    parameters = []
+    __url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 
-        return obj
+    SLOT_nameChanged(oldValue, newValue){
+        if(newValue === 'osm') this.__url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
     }
 
-    onNameChanged(){
-        if(this.name === 'osm') this.__url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-    }
-
-    onParametersChanged(){
-        for(let parameter of this.parameters){
+    SLOT_parametersChanged(oldValue, newValue){
+        for(let parameter of newValue){
             if(parameter.name === 'osm.mapping.host') this.__url = parameter.value
         }
     }
 }
 
-Plugin.initialize()
+
 
 module.exports = Plugin

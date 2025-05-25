@@ -2,8 +2,12 @@ const TreeItemModel = require("./TreeItemModel")
 
 class GqlModel extends TreeItemModel {
     SetGlobalAccessToken(token){
-        XMLHttpRequest.QMLAuthToken = token
-    }
+		XMLHttpRequest.QMLAuthToken = token
+	}
+	
+	SetRefreshToken(token){
+		XMLHttpRequest.QMLAuthRefreshToken = token
+	}
     
     setGqlQuery(gqlData, headers){
         this.state = "Loading"
@@ -32,6 +36,6 @@ class GqlModel extends TreeItemModel {
     }
 }
 
-GqlModel.initialize()
+
 
 module.exports = GqlModel

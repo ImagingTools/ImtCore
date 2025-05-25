@@ -8,8 +8,8 @@ class Switch extends AbstractButton {
 
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__getDOM().classList.add('Switch')
 
         return obj
@@ -17,6 +17,6 @@ class Switch extends AbstractButton {
 
 }
 
-Switch.initialize()
+
 
 module.exports = Switch

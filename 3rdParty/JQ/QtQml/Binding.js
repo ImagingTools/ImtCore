@@ -31,47 +31,55 @@ class Binding extends QtObject {
         this.__update()
     }
 
-    onDelayedChanged(){
+    SLOT_delayedChanged(oldValue, newValue){
         this.__update()
     }
 
-    onPropertyChanged(){
+    SLOT_propertyChanged(oldValue, newValue){
         this.__update()
     }
 
-    onRestoreModeChanged(){
+    SLOT_restoreModeChanged(oldValue, newValue){
         this.__update()
     }
 
-    onTargetChanged(){
+    SLOT_targetChanged(oldValue, newValue){
         this.__update()
     }
 
-    onValueChanged(){
+    SLOT_valueChanged(oldValue, newValue){
         this.__update()
     }
 
-    onWhenChanged(){
+    SLOT_whenChanged(oldValue, newValue){
         this.__update()
     }  
 
     __update(){
-        if(this.__completed && this.target && !this.target.__destroyed && this.property){
+        if(this.target && this.property){
+            // if(this.$prop) this.getProperty('value').removeSubscriber(this.$prop)
+            
             let path = this.property.split('.')
-            let prop = this.target
+            let propName = path.pop()
 
-            while(path.length-1){
-                let propName = path.shift()
-                prop = prop[propName]
+            let obj = this.target
+
+            while(path.length){
+                let name = path.shift()
+                obj = obj[name]
             }
 
-            let targetProperty = prop.__getDataQml(path.shift())
-            targetProperty.__setCompute(()=>{return this.value})
-            targetProperty.__update()
+            obj[propName] = this.value
+
+            // this.$prop = prop
+            // prop.subscribe(this.getProperty('value'))
+            // prop.setCompute(()=>{return this.getPropertyValue('value')})
+            // this.getProperty('value').update()
+            // prop.update()
         }
     }
 }
 
-Binding.initialize()
+
 
 module.exports = Binding

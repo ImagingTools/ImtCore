@@ -36,6 +36,6 @@ class FileIO extends QtObject {
     }
 }
 
-FileIO.initialize()
+
 
 module.exports = FileIO

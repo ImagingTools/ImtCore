@@ -5,8 +5,8 @@ class Window extends QtObject {
 
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__getDOM().classList.add('Window')
 
         return obj
@@ -14,6 +14,6 @@ class Window extends QtObject {
 
 }
 
-Window.initialize()
+
 
 module.exports = Window

@@ -21,7 +21,7 @@ class JSONListModel extends ListModel {
         this.updateJSONModel()
     }
 
-    onSourceChanged(){
+    SLOT_sourceChanged(oldValue, newValue){
         this.state = "Loading"
         if(this.source == "")
             return
@@ -37,7 +37,7 @@ class JSONListModel extends ListModel {
         xhr.send()
     }
 
-    onInquiryChanged(){
+    SLOT_inquiryChanged(oldValue, newValue){
         this.updateJSONModel()
     }
     
@@ -70,6 +70,6 @@ class JSONListModel extends ListModel {
     }
 }
 
-JSONListModel.initialize()
+
 
 module.exports = JSONListModel

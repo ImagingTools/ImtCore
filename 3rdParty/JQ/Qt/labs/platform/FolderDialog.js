@@ -28,6 +28,6 @@ class FolderDialog extends Dialog {
     })
 }
 
-FolderDialog.initialize()
+
 
 module.exports = FolderDialog

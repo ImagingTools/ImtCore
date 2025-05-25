@@ -12,31 +12,48 @@ class Border extends GroupProperty {
         colorChanged: {type:Signal, slotName:'onColorChanged', args:[]},
     }
 
-    static create(parent, meta){
-        let obj = super.create(parent, meta)
+    static create(parent = null){
+        parent.__setDOMStyle({
+            outline: `1px solid black`,
+            outlineOffset: `-1px`,
+        })
 
-        obj.onChanged()
-
-        return obj
+        return super.create(parent)
     }
 
-    onChanged(){
+    SLOT_widthChanged(oldValue, newValue){
         if(this.__parent)
         this.__parent.__setDOMStyle({
-            outline: `${this.width}px solid ${this.color}`,
-            outlineOffset: `-${this.width}px`,
+            outline: `${newValue}px solid ${this.__proxy.color}`,
+            outlineOffset: `-${newValue}px`,
         })
     }
 
-    onWidthChanged(){
-        this.onChanged()
+    SLOT_colorChanged(oldValue, newValue){
+        if(this.__parent)
+        this.__parent.__setDOMStyle({
+            outline: `${this.__proxy.width}px solid ${newValue}`,
+            outlineOffset: `-${this.__proxy.width}px`,
+        })
     }
 
-    onColorChanged(){
-        this.onChanged()
-    }
+    // onChanged(){
+    //     if(this.__parent)
+    //     this.__parent.__setDOMStyle({
+    //         outline: `${this.width}px solid ${this.color}`,
+    //         outlineOffset: `-${this.width}px`,
+    //     })
+    // }
+
+    // onWidthChanged(){
+    //     this.onChanged()
+    // }
+
+    // onColorChanged(){
+    //     this.onChanged()
+    // }
 }
 
-Border.initialize()
+
 
 module.exports = Border

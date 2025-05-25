@@ -45,556 +45,335 @@ class Anchors extends GroupProperty {
         marginsChanged: {type:Signal, slotName:'onMarginsChanged', args:[]},
     }
 
-    onMarginsChanged(){
-        this.leftMargin = this.margins
-        this.topMargin = this.margins
-        this.rightMargin = this.margins
-        this.bottomMargin = this.margins
+    SLOT_fillChanged(oldValue, newValue){
+        let target = newValue
+        let self = this.__parent.__proxy
+
+        if(self.parent === target){
+            self.x = ()=>{return this.__proxy.leftMargin}
+            self.y = ()=>{return this.__proxy.topMargin}
+            self.width = ()=>{return target.width - (this.__proxy.leftMargin + this.__proxy.rightMargin)}
+            self.height = ()=>{return target.height - (this.__proxy.topMargin + this.__proxy.bottomMargin)}
+        } else {
+            self.x = ()=>{return target.x + this.__proxy.leftMargin}
+            self.y = ()=>{return target.y + this.__proxy.topMargin}
+            self.width = ()=>{return target.width - (this.__proxy.leftMargin + this.__proxy.rightMargin)}
+            self.height = ()=>{return target.height - (this.__proxy.topMargin + this.__proxy.bottomMargin)}
+        }
     }
 
-    onFillChanged(){
-        let target = this.fill
-        let self = this.__parent
+    SLOT_centerInChanged(oldValue, newValue){
+        let target = newValue
+        let self = this.__parent.__proxy
 
-        if(self){
-            self.__getDataQml('x').__unfreeze()
-            self.__getDataQml('y').__unfreeze()
-            self.__getDataQml('width').__unfreeze()
-            self.__getDataQml('height').__unfreeze()
-        }
-
-        if(self && target){
-            let lazy = !self.__completed
-
+        if(target){
             if(self.parent === target){
-                self.__getDataQml('x').__subscribe(this.__getDataQml('leftMargin'))
-                self.__getDataQml('y').__subscribe(this.__getDataQml('topMargin'))
-                self.__getDataQml('width').__subscribe(target.__getDataQml('width'),this.__getDataQml('leftMargin'),this.__getDataQml('rightMargin'))
-                self.__getDataQml('height').__subscribe(target.__getDataQml('height'),this.__getDataQml('topMargin'),this.__getDataQml('bottomMargin'))
-
-                self.x = QtFunctions.binding(()=>{return this.leftMargin},lazy)
-                self.y = QtFunctions.binding(()=>{return this.topMargin},lazy)
-                self.width = QtFunctions.binding(()=>{return target.width - (this.leftMargin + this.rightMargin)},lazy)
-                self.height = QtFunctions.binding(()=>{return target.height - (this.topMargin + this.bottomMargin)},lazy)
+                self.x = ()=>{return target.width / 2 - self.width / 2}
+                self.y = ()=>{return target.height / 2 - self.height / 2}
             } else {
-                self.__getDataQml('x').__subscribe(target.__getDataQml('x'),this.__getDataQml('leftMargin'))
-                self.__getDataQml('y').__subscribe(target.__getDataQml('y'),this.__getDataQml('topMargin'))
-                self.__getDataQml('width').__subscribe(target.__getDataQml('width'),this.__getDataQml('leftMargin'),this.__getDataQml('rightMargin'))
-                self.__getDataQml('height').__subscribe(target.__getDataQml('height'),this.__getDataQml('topMargin'),this.__getDataQml('bottomMargin'))
-
-                self.x = QtFunctions.binding(()=>{return target.x + this.leftMargin},lazy)
-                self.y = QtFunctions.binding(()=>{return target.y + this.topMargin},lazy)
-                self.width = QtFunctions.binding(()=>{return target.width - (this.leftMargin + this.rightMargin)},lazy)
-                self.height = QtFunctions.binding(()=>{return target.height - (this.topMargin + this.bottomMargin)},lazy)
+                self.x = ()=>{return target.x + target.width / 2 - self.width / 2}
+                self.y = ()=>{return target.y + target.height / 2 - self.height / 2}
             }
-            
-            self.__getDataQml('x').__freeze()
-            self.__getDataQml('y').__freeze()
-            self.__getDataQml('width').__freeze()
-            self.__getDataQml('height').__freeze()
         }
+        
     }
 
-    onCenterInChanged(){
-        let target = this.centerIn
-        let self = this.__parent
-
-        if(self){
-            self.__getDataQml('x').__unfreeze()
-            self.__getDataQml('y').__unfreeze()
-        }
-
-        if(self && target){
-            let lazy = !self.__completed
-
-            if(self.parent === target){
-                self.__getDataQml('x').__subscribe(target.__getDataQml('width'),self.__getDataQml('width'))
-                self.__getDataQml('y').__subscribe(target.__getDataQml('height'),self.__getDataQml('height'))
-
-                self.x = QtFunctions.binding(()=>{return target.width / 2 - self.width / 2},lazy)
-                self.y = QtFunctions.binding(()=>{return target.height / 2 - self.height / 2},lazy)
-            } else {
-                self.__getDataQml('x').__subscribe(target.__getDataQml('x'),target.__getDataQml('width'),self.__getDataQml('width'))
-                self.__getDataQml('y').__subscribe(target.__getDataQml('y'),target.__getDataQml('height'),self.__getDataQml('height'))
-
-                self.x = QtFunctions.binding(()=>{return target.x + target.width / 2 - self.width / 2},lazy)
-                self.y = QtFunctions.binding(()=>{return target.y + target.height / 2 - self.height / 2},lazy)
-            }
-
-            self.__getDataQml('x').__freeze()
-            self.__getDataQml('y').__freeze()
-        }
+    SLOT_marginsChanged(oldValue, newValue){
+        this.__proxy.leftMargin = this.margins
+        this.__proxy.topMargin = this.margins
+        this.__proxy.rightMargin = this.margins
+        this.__proxy.bottomMargin = this.margins
     }
 
-    onHorizontalCenterChanged(){
-        let target = this.horizontalCenter
-        let self = this.__parent
-
-        if(self){
-            self.__getDataQml('x').__unfreeze()
-        }
+    SLOT_horizontalCenterChanged(oldValue, newValue){
+        let target = newValue
+        let self = this.__parent.__proxy
 
         if(self && target){
             let targetFloat = target.__float
-            target = target.__parent
-
-            let lazy = !self.__completed
+            target = target.__parent.__proxy
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Left){
-                    self.__getDataQml('x').__subscribe(self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return -self.width / 2},lazy)
+                    self.x = ()=>{return -self.width / 2}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('width'),self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.width - self.width / 2},lazy)
+                    self.x = ()=>{return target.width - self.width / 2}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('width'),self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.width / 2 - self.width / 2},lazy)
+                    self.x = ()=>{return target.width / 2 - self.width / 2}
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('x'),self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.x - self.width / 2},lazy)
+                    self.x = ()=>{return target.x - self.width / 2}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('x'),target.__getDataQml('width'),self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.x + target.width - self.width / 2},lazy)
+                    self.x = ()=>{return target.x + target.width - self.width / 2}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('x'),target.__getDataQml('width'),self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.x + target.width / 2 - self.width / 2},lazy)
+                    self.x = ()=>{return target.x + target.width / 2 - self.width / 2}
                 }
             }
-
-            self.__getDataQml('x').__freeze()
         }
     }
 
-    onVerticalCenterChanged(){
-        let target = this.verticalCenter
-        let self = this.__parent
-
-        if(self){
-            self.__getDataQml('y').__unfreeze()
-        }
+    SLOT_verticalCenterChanged(oldValue, newValue){
+        let target = newValue
+        let self = this.__parent.__proxy
 
         if(self && target){
             let targetFloat = target.__float
-            target = target.__parent
-
-            let lazy = !self.__completed
+            target = target.__parent.__proxy
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Top){
-                    self.__getDataQml('y').__subscribe(self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return -self.height / 2},lazy)
+                    self.y = ()=>{return -self.height / 2}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('height'),self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.height - self.height / 2},lazy)
+                    self.y = ()=>{return target.height - self.height / 2}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('height'),self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.height / 2 - self.height / 2},lazy)
+                    self.y = ()=>{return target.height / 2 - self.height / 2}
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('y'),self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.y - self.height / 2},lazy)
+                    self.y = ()=>{return target.y - self.height / 2}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('y'),target.__getDataQml('height'),self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.y + target.height - self.height / 2},lazy)
+                    self.y = ()=>{return target.y + target.height - self.height / 2}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('y'),target.__getDataQml('height'),self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.y + target.height / 2 - self.height / 2},lazy)
+                    self.y = ()=>{return target.y + target.height / 2 - self.height / 2}
                 }               
             }
-
-            self.__getDataQml('y').__freeze()
         }
     }
 
-    onLeftChanged(){
-        let target = this.left
-        let self = this.__parent
+    SLOT_leftChanged(oldValue, newValue){
+        let target = newValue
+        let self = this.__parent.__proxy
 
         if(target && this.right) {
             this.onLeftRightChanged()
             return
         }
 
-        if(self){
-            self.__getDataQml('x').__unfreeze()
-        }
-
         if(self && target){
             let targetFloat = target.__float
-            target = target.__parent
-
-            let lazy = !self.__completed
+            target = target.__parent.__proxy
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Left){
-                    self.x = QtFunctions.binding(()=>{return this.leftMargin},lazy)
+                    self.x = ()=>{return this.__proxy.leftMargin}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.width + this.leftMargin},lazy)
+                    self.x = ()=>{return target.width + this.__proxy.leftMargin}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.width / 2 + this.leftMargin},lazy)
+                    self.x = ()=>{return target.width / 2 + this.__proxy.leftMargin}
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('x'))
-
-                    self.x = QtFunctions.binding(()=>{return target.x + this.leftMargin},lazy)
+                    self.x = ()=>{return target.x + this.__proxy.leftMargin}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('x'),target.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.x + target.width + this.leftMargin},lazy)
+                    self.x = ()=>{return target.x + target.width + this.__proxy.leftMargin}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('x'),target.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.x + target.width / 2 + this.leftMargin},lazy)
+                    self.x = ()=>{return target.x + target.width / 2 + this.__proxy.leftMargin}
                 }            
             }
-
-            self.__getDataQml('x').__freeze()
         }
     }
 
-    onRightChanged(){
-        let target = this.right
-        let self = this.__parent
+    SLOT_rightChanged(oldValue, newValue){
+        let target = newValue
+        let self = this.__parent.__proxy
 
         if(target && this.left) {
             this.onLeftRightChanged()
             return
         }
 
-        if(self){
-            self.__getDataQml('x').__unfreeze()
-        }
-
         if(self && target){
             let targetFloat = target.__float
-            target = target.__parent
-
-            let lazy = !self.__completed
+            target = target.__parent.__proxy
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Left){
-                    self.__getDataQml('x').__subscribe(self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return -self.width - this.rightMargin},lazy)
+                    self.x = ()=>{return -self.width - this.__proxy.rightMargin}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('width'), self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.width - self.width - this.rightMargin},lazy)
+                    self.x = ()=>{return target.width - self.width - this.__proxy.rightMargin}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('width'), self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.width / 2 - self.width - this.rightMargin},lazy)
+                    self.x = ()=>{return target.width / 2 - self.width - this.__proxy.rightMargin}
                 }
             } else {
                 if(targetFloat === AnchorLine.Left){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('x'), self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.x - self.width - this.rightMargin},lazy)
+                    self.x = ()=>{return target.x - self.width - this.__proxy.rightMargin}
                 } else if(targetFloat === AnchorLine.Right){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('x'), target.__getDataQml('width'), self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.x + target.width - self.width - this.rightMargin},lazy)
+                    self.x = ()=>{return target.x + target.width - self.width - this.__proxy.rightMargin}
                 } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('x').__subscribe(target.__getDataQml('x'), target.__getDataQml('width'), self.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return target.x + target.width / 2 - self.width - this.rightMargin},lazy)
+                    self.x = ()=>{return target.x + target.width / 2 - self.width - this.__proxy.rightMargin}
                 }              
             }
-
-            self.__getDataQml('x').__freeze()
         }
     }
 
     onLeftRightChanged(){
-        let left = this.left
-        let right = this.right
-        let self = this.__parent
-
-        if(self){
-            self.__getDataQml('x').__unfreeze()
-            self.__getDataQml('width').__unfreeze()
-        }
+        let left = this.__proxy.left
+        let right = this.__proxy.right
+        let self = this.__parent.__proxy
 
         if(self && left && right){
             let leftFloat = left.__float
-            left = left.__parent
+            left = left.__parent.__proxy
 
             let rightFloat = right.__float
-            right = right.__parent
-
-            let lazy = !self.__completed
+            right = right.__parent.__proxy
 
             if(self.parent === left){
                 if(leftFloat === AnchorLine.Left){
-                    self.x = QtFunctions.binding(()=>{return this.leftMargin},lazy)
+                    self.x = ()=>{return this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.Right){
-                    self.__getDataQml('x').__subscribe(left.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return left.width + this.leftMargin},lazy)
+                    self.x = ()=>{return left.width + this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('x').__subscribe(left.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return left.width / 2 + this.leftMargin},lazy)
+                    self.x = ()=>{return left.width / 2 + this.__proxy.leftMargin}
                 }
             } else {
                 if(leftFloat === AnchorLine.Left){
-                    self.__getDataQml('x').__subscribe(left.__getDataQml('x'))
-
-                    self.x = QtFunctions.binding(()=>{return left.x + this.leftMargin},lazy)
+                    self.x = ()=>{return left.x + this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.Right){
-                    self.__getDataQml('x').__subscribe(left.__getDataQml('x'), left.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return left.x + left.width + this.leftMargin},lazy)
+                    self.x = ()=>{return left.x + left.width + this.__proxy.leftMargin}
                 } else if(leftFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('x').__subscribe(left.__getDataQml('x'), left.__getDataQml('width'))
-
-                    self.x = QtFunctions.binding(()=>{return left.x + left.width / 2 + this.leftMargin},lazy)
+                    self.x = ()=>{return left.x + left.width / 2 + this.__proxy.leftMargin}
                 }
             }
 
             if(self.parent === right){
                 if(rightFloat === AnchorLine.Left){
-                    self.__getDataQml('width').__subscribe(self.__getDataQml('x'))
-
-                    self.width = QtFunctions.binding(()=>{return -this.rightMargin - self.x},lazy)
+                    self.width = ()=>{return -this.__proxy.rightMargin - self.x}
                 } else if(rightFloat === AnchorLine.Right){
-                    self.__getDataQml('width').__subscribe(right.__getDataQml('width'), self.__getDataQml('x'))
-
-                    self.width = QtFunctions.binding(()=>{return right.width - this.rightMargin - self.x},lazy)
+                    self.width = ()=>{return right.width - this.__proxy.rightMargin - self.x}
                 } else if(rightFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('width').__subscribe(right.__getDataQml('width'), self.__getDataQml('x'))
-
-                    self.width = QtFunctions.binding(()=>{return right.width / 2 - this.rightMargin - self.x},lazy)
+                    self.width = ()=>{return right.width / 2 - this.__proxy.rightMargin - self.x}
                 }
             } else {
                 if(rightFloat === AnchorLine.Left){
-                    self.__getDataQml('width').__subscribe(right.__getDataQml('x'), self.__getDataQml('x'))
-
-                    self.width = QtFunctions.binding(()=>{return right.x - this.rightMargin - self.x},lazy)
+                    self.width = ()=>{return right.x - this.__proxy.rightMargin - self.x}
                 } else if(rightFloat === AnchorLine.Right){
-                    self.__getDataQml('width').__subscribe(right.__getDataQml('x'), right.__getDataQml('width'), self.__getDataQml('x'))
-
-                    self.width = QtFunctions.binding(()=>{return right.x + right.width - this.rightMargin - self.x},lazy)
+                    self.width = ()=>{return right.x + right.width - this.__proxy.rightMargin - self.x}
                 } else if(rightFloat === AnchorLine.HorizontalCenter){
-                    self.__getDataQml('width').__subscribe(right.__getDataQml('x'), right.__getDataQml('width'), self.__getDataQml('x'))
-
-                    self.width = QtFunctions.binding(()=>{return right.x + right.width / 2 - this.rightMargin - self.x},lazy)
+                    self.width = ()=>{return right.x + right.width / 2 - this.__proxy.rightMargin - self.x}
                 }
             }
-
-            self.__getDataQml('x').__freeze()
-            self.__getDataQml('width').__freeze()
         }
     }
 
-    onTopChanged(){
-        let target = this.top
-        let self = this.__parent
+    SLOT_topChanged(oldValue, newValue){
+        let target = newValue
+        let self = this.__parent.__proxy
 
         if(target && this.bottom) {
             this.onTopBottomChanged()
             return
         }
 
-        if(self){
-            self.__getDataQml('y').__unfreeze()
-        }
-
         if(self && target){
             let targetFloat = target.__float
-            target = target.__parent
-
-            let lazy = !self.__completed
+            target = target.__parent.__proxy
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Top){
-                    self.y = QtFunctions.binding(()=>{return this.topMargin},lazy)
+                    self.y = ()=>{return this.__proxy.topMargin}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.height + this.topMargin},lazy)
+                    self.y = ()=>{return target.height + this.__proxy.topMargin}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.height / 2 + this.topMargin},lazy)
+                    self.y = ()=>{return target.height / 2 + this.__proxy.topMargin}
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('y'))
-
-                    self.y = QtFunctions.binding(()=>{return target.y + this.topMargin},lazy)
+                    self.y = ()=>{return target.y + this.__proxy.topMargin}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('y'), target.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.y + target.height + this.topMargin},lazy)
+                    self.y = ()=>{return target.y + target.height + this.__proxy.topMargin}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('y'), target.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.y + target.height / 2 + this.topMargin},lazy)
+                    self.y = ()=>{return target.y + target.height / 2 + this.__proxy.topMargin}
                 }               
             }
-
-            self.__getDataQml('y').__freeze()
         }
     }
 
-    onBottomChanged(){
-        let target = this.bottom
-        let self = this.__parent
+    SLOT_bottomChanged(oldValue, newValue){
+        let target = newValue
+        let self = this.__parent.__proxy
         
         if(target && this.top) {
             this.onTopBottomChanged()
             return
         }
 
-        if(self){
-            self.__getDataQml('y').__unfreeze()
-        }
-
         if(self && target){
             let targetFloat = target.__float
-            target = target.__parent
-
-            let lazy = !self.__completed
+            target = target.__parent.__proxy
 
             if(self.parent === target){
                 if(targetFloat === AnchorLine.Top){
-                    self.__getDataQml('y').__subscribe(self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return -self.height - this.bottomMargin},lazy)
+                    self.y = ()=>{return -self.height - this.__proxy.bottomMargin}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('height'), self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.height - self.height - this.bottomMargin},lazy)
+                    self.y = ()=>{return target.height - self.height - this.__proxy.bottomMargin}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('height'), self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.height / 2 - self.height - this.bottomMargin},lazy)
+                    self.y = ()=>{return target.height / 2 - self.height - this.__proxy.bottomMargin}
                 }
             } else {
                 if(targetFloat === AnchorLine.Top){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('y'), self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.y - self.height - this.bottomMargin},lazy)
+                    self.y = ()=>{return target.y - self.height - this.__proxy.bottomMargin}
                 } else if(targetFloat === AnchorLine.Bottom){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('y'), target.__getDataQml('height'), self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.y + target.height - self.height - this.bottomMargin},lazy)
+                    self.y = ()=>{return target.y + target.height - self.height - this.__proxy.bottomMargin}
                 } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('y').__subscribe(target.__getDataQml('y'), target.__getDataQml('height'), self.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return target.y + target.height / 2 - self.height - this.bottomMargin},lazy)
+                    self.y = ()=>{return target.y + target.height / 2 - self.height - this.__proxy.bottomMargin}
                 }               
             }
-
-            self.__getDataQml('y').__freeze()
         }
     }
 
     onTopBottomChanged(){
-        let top = this.top
-        let bottom = this.bottom
-        let self = this.__parent
-
-        if(self){
-            self.__getDataQml('y').__unfreeze()
-            self.__getDataQml('height').__unfreeze()
-        }
+        let top = this.__proxy.top
+        let bottom = this.__proxy.bottom
+        let self = this.__parent.__proxy
 
         if(self && top && bottom){
             let topFloat = top.__float
-            top = top.__parent
+            top = top.__parent.__proxy
 
             let bottomFloat = bottom.__float
-            bottom = bottom.__parent
-
-            let lazy = !self.__completed
+            bottom = bottom.__parent.__proxy
 
             if(self.parent === top){
                 if(topFloat === AnchorLine.Top){
-                    self.y = QtFunctions.binding(()=>{return this.topMargin},lazy)
+                    self.y = ()=>{return this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.Bottom){
-                    self.__getDataQml('y').__subscribe(top.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return top.height + this.topMargin},lazy)
+                    self.y = ()=>{return top.height + this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('y').__subscribe(top.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return top.height / 2 + this.topMargin},lazy)
+                    self.y = ()=>{return top.height / 2 + this.__proxy.topMargin}
                 }
             } else {
                 if(topFloat === AnchorLine.Top){
-                    self.__getDataQml('y').__subscribe(top.__getDataQml('y'))
-
-                    self.y = QtFunctions.binding(()=>{return top.y + this.topMargin},lazy)
+                    self.y = ()=>{return top.y + this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.Bottom){
-                    self.__getDataQml('y').__subscribe(top.__getDataQml('y'), top.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return top.y + top.height + this.topMargin},lazy)
+                    self.y = ()=>{return top.y + top.height + this.__proxy.topMargin}
                 } else if(topFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('y').__subscribe(top.__getDataQml('y'), top.__getDataQml('height'))
-
-                    self.y = QtFunctions.binding(()=>{return top.y + top.height / 2 + this.topMargin},lazy)
+                    self.y = ()=>{return top.y + top.height / 2 + this.__proxy.topMargin}
                 }
             }
 
             if(self.parent === bottom){
                 if(bottomFloat === AnchorLine.Top){
-                    self.__getDataQml('height').__subscribe(self.__getDataQml('y'))
-
-                    self.height = QtFunctions.binding(()=>{return -this.bottomMargin - self.y},lazy)
+                    self.height = ()=>{return -this.__proxy.bottomMargin - self.y}
                 } else if(bottomFloat === AnchorLine.Bottom){
-                    self.__getDataQml('height').__subscribe(bottom.__getDataQml('height'), self.__getDataQml('y'))
-
-                    self.height = QtFunctions.binding(()=>{return bottom.height - this.bottomMargin - self.y},lazy)
+                    self.height = ()=>{return bottom.height - this.__proxy.bottomMargin - self.y}
                 } else if(bottomFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('height').__subscribe(bottom.__getDataQml('height'), self.__getDataQml('y'))
-
-                    self.height = QtFunctions.binding(()=>{return bottom.height / 2 - this.bottomMargin - self.y},lazy)
+                    self.height = ()=>{return bottom.height / 2 - this.__proxy.bottomMargin - self.y}
                 }
             } else {
                 if(bottomFloat === AnchorLine.Top){
-                    self.__getDataQml('height').__subscribe(bottom.__getDataQml('y'), self.__getDataQml('y'))
-
-                    self.height = QtFunctions.binding(()=>{return bottom.y - this.bottomMargin - self.y},lazy)
+                    self.height = ()=>{return bottom.y - this.__proxy.bottomMargin - self.y}
                 } else if(bottomFloat === AnchorLine.Bottom){
-                    self.__getDataQml('height').__subscribe(bottom.__getDataQml('y'), bottom.__getDataQml('height'), self.__getDataQml('y'))
-
-                    self.height = QtFunctions.binding(()=>{return bottom.y + bottom.height - this.bottomMargin - self.y},lazy)
+                    self.height = ()=>{return bottom.y + bottom.height - this.__proxy.bottomMargin - self.y}
                 } else if(bottomFloat === AnchorLine.VerticalCenter){
-                    self.__getDataQml('height').__subscribe(bottom.__getDataQml('y'), bottom.__getDataQml('height'), self.__getDataQml('y'))
-
-                    self.height = QtFunctions.binding(()=>{return bottom.y + bottom.height / 2 - this.bottomMargin - self.y},lazy)
+                    self.height = ()=>{return bottom.y + bottom.height / 2 - this.__proxy.bottomMargin - self.y}
                 }
             }
-
-            self.__getDataQml('y').__freeze()
-            self.__getDataQml('height').__freeze()
         }
     }
 }
 
-Anchors.initialize()
+
 
 module.exports = Anchors

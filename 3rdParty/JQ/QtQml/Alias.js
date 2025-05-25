@@ -1,73 +1,97 @@
+const QBaseObject = require("../QtBase/QBaseObject")
 const Property = require("./Property")
+const Signal = require("./Signal")
 
 class Alias extends Property {
-    __getter = null
-    __setter = null
-
-    __get(key){
-        return this.__getter ? this.__getter(key) : this.__value
-    }
-    
-    __set(key, value){
-        this.__auto = false
-
-        if(typeof value === 'function' && value.bound){
-            this.__setCompute(value)
-            if(value.queue) {
-                value.queue.push(this)
-            } else {
-                this.__update()
-            }
-            return true
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
+     * @param {Object} obj 
+     * @param {String} propName
+     */
+    static init(target, name, obj, propName){
+        target.__self[name] = {
+            getter: ()=>{
+                return obj[propName]
+            },
+            setter: (val)=>{
+                obj[propName] = val
+            },
         }
 
-        this.__setter(value)
+        if(obj instanceof QBaseObject){
+            Signal.get(obj, propName+'Changed').connect((oldValue, newValue)=>{
+                Signal.get(target, name+'Changed')(oldValue, newValue)
+            })
+        }
+    }
+
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
+     * @param {Object} meta
+     * @returns {Object}
+     */
+    static get(target, name, meta){
+        let link = this.queueLink[this.queueLink.length - 1]
+        if(link){
+            if(!link.target.__depends[link.name]) link.target.__depends[link.name] = []
+
+            let found = false
+            for(let connectionObj of link.target.__depends[link.name]){
+                if(connectionObj.name === name + 'Changed' && connectionObj.target === target){
+                    found = true
+                    break
+                }
+            }
+
+            if(!found){
+                let connectionObj = Signal.get(target, name + 'Changed').connect(()=>{
+                    link.meta.type.set(link.target, link.name, link.func, link.meta)
+                })
+    
+                link.target.__depends[link.name].push(connectionObj)
+            }
+            
+        }
+        
+        return target[name].getter.call(target)
+    }
+
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
+    static set(target, name, value, meta){
+        let oldValue = target[name].getter.call(target)
+        let currentValue = oldValue
+
+        if(typeof value === 'function'){
+            try {
+                this.queueLink.push({
+                    target: target,
+                    name: name,
+                    meta: meta,
+                    func: value,
+                })
+                currentValue = value.call(target)
+            } finally {
+                this.queueLink.pop()
+            }
+        } else {
+            currentValue = value
+        }  
+
+        if(oldValue !== currentValue){
+            target[name].setter.call(target, value)
+            // Signal.get(target, name + 'Changed')(oldValue, currentValue)
+        }
 
         return true
-    }
-
-    __update(){
-        if(this.__updating || (!this.__compute && !this.__getter)) return
-        
-        this.__updating = true
-        Property.queueLink.push(this)
-        let value = this.__value
-        let leftValue = this.__leftValue
-        let rightValue = this.__rightValue
-        try {
-            rightValue = this.__getter()
-            if(this.__rightValue !== rightValue){
-                this.__rightValue = rightValue
-                value = rightValue
-            }
-
-            if(this.__compute) leftValue = this.__compute()
-            if(this.__leftValue !== leftValue){
-                this.__leftValue = leftValue
-                value = leftValue
-            }
-        } catch (error) {
-            
-        } finally {
-            Property.queueLink.pop()
-        }
-        
-        if(this.__compute) this.__set(undefined, value)
-        if(this.__value !== value){
-            this.__value = value
-            this.__emitSignal()
-        }
-        
-        this.__updating = false
-        this.__completed = true
-    }
-
-    __aliasInit(getter, setter, queue){
-        this.__getter = getter
-        this.__setter = setter
-        if(queue){
-            queue.push(this)
-        }
     }
 }
 

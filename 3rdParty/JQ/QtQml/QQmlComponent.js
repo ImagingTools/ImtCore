@@ -8,6 +8,6 @@ class QQmlComponent extends QObject {
     }
 }
 
-QQmlComponent.initialize()
+
 
 module.exports = QQmlComponent

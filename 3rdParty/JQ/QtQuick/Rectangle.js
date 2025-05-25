@@ -18,8 +18,8 @@ class Rectangle extends Item {
         gradientChanged: {type:Signal, slotName:'onGradientChanged', args:[]},
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent=null, properties = {}, context = {}){
+        let obj = super.create(parent, properties)
         obj.__getDOM().classList.add('Rectangle')
 
         return obj
@@ -43,37 +43,43 @@ class Rectangle extends Item {
             }
         }
     }
-    onGradientChanged(){
-        if(this.__gradient){
-            this.__gradient.__removeListener(this)
+
+    SLOT_gradientChanged(oldValue, newValue){
+        if(oldValue){
+            oldValue.__removeListener(this)
         }
 
-        this.__gradient = this.gradient
-
-        if(this.__gradient){
-            this.__gradient.__addListener(this)
+        if(newValue){
+            newValue.__addListener(this)
         }
 
         this.__updateGradient()
     }
 
-    onColorChanged(){
+    SLOT_colorChanged(oldValue, newValue){
+        // this.__setDOMStyle({
+        //     backgroundColor: newValue
+        // })
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
         this.__setDOMStyle({
-            backgroundColor: this.color
-        })
-    }
-    
-    onRadiusChanged(){
-        this.__setDOMStyle({
-            borderRadius: `${this.radius}px`
+            opacity: 1,
+            backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
         })
     }
 
-    onOpacityChanged(){
-        let rgba = this.__getDataQml('color').__toRGBA()
+    
+    
+    SLOT_radiusChanged(oldValue, newValue){
         this.__setDOMStyle({
-            opacity: this.opacity > 0 ? 1 : 0,
-            backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+            borderRadius: `${newValue}px`
+        })
+    }
+
+    SLOT_opacityChanged(oldValue, newValue){
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
+        this.__setDOMStyle({
+            opacity: newValue > 0 ? 1 : 0,
+            backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * newValue})`
         })
     }
 
@@ -86,6 +92,6 @@ class Rectangle extends Item {
     }
 }
 
-Rectangle.initialize()
+
 
 module.exports = Rectangle

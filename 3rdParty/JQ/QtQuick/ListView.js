@@ -1,8 +1,10 @@
 const Flickable = require("./Flickable")
 const Component = require("../QtQml/Component")
 const Variant = require("../QtQml/Variant")
+const Geometry = require("../QtQml/Geometry")
 const Var = require("../QtQml/Var")
 const Real = require("../QtQml/Real")
+const Bool = require("../QtQml/Bool")
 const Signal = require("../QtQml/Signal")
 const JQApplication = require("../core/JQApplication")
 
@@ -35,6 +37,7 @@ class ListView extends Flickable {
         count: { type: Real, value: 0, signalName: 'countChanged' },
         contentWidth: { type: Real, value: 0, signalName: 'contentWidthChanged' },
         contentHeight: { type: Real, value: 0, signalName: 'contentHeightChanged' },
+        reuseItems: { type: Bool, value: false },
 
         modelChanged: { type: Signal, slotName: 'onModelChanged', args: [] },
         delegateChanged: { type: Signal, slotName: 'onDelegateChanged', args: [] },
@@ -52,6 +55,7 @@ class ListView extends Flickable {
     })
 
     __items = []
+    __cache = []
 
     __middleWidth = 0
     __middleHeight = 0
@@ -112,22 +116,21 @@ class ListView extends Flickable {
 
     }
 
-    onModelChanged() {
+    SLOT_modelChanged(oldValue, newVlaue) {
         this.__clear()
 
-        if (this.__model && typeof this.__model === 'object' && !this.__model.__destroyed) {
-            this.__model.__removeViewListener(this)
+        if (oldValue && typeof oldValue === 'object' && !Array.isArray(oldValue) && !oldValue.__destroyed) {
+            oldValue.__removeViewListener(this)
         }
 
-        if (this.model && typeof this.model === 'object') {
-            this.model.__addViewListener(this)
-            this.__model = this.model
+        if (newVlaue && typeof newVlaue === 'object' && !Array.isArray(newVlaue)) {
+            newVlaue.__addViewListener(this)
         }
 
         this.__initView(this.__completed)
     }
 
-    onDelegateChanged() {
+    SLOT_delegateChanged() {
         this.__clear()
         this.__initView(this.__completed)
     }
@@ -137,6 +140,12 @@ class ListView extends Flickable {
 
         let removed = this.__items
         this.__items = []
+
+        for (let c of this.__cache) {
+            if (c) c.destroy()
+        }
+
+        this.__cache = []
 
         for (let r of removed) {
             if (r) r.destroy()
@@ -241,61 +250,106 @@ class ListView extends Flickable {
         }
     }
 
-    __createItem(index, itemInfo) {
-        let model
+    __toCache(item){
+        if(!item) return
 
-        if (typeof this.model === 'object') {
-            model = this.model.data[index]
+        if(this.reuseItems){
+            this.__cache.push(item) 
+
+            if(item instanceof JQModules.QtQuick.Item) {
+                this.contentItem.__getDOM().removeChild(item.__getDOM())
+
+                item['ListView.pooled']()
+            }
         } else {
-            model = { index: index }
+            item.destroy()
+        }
+    }
+
+    __fromCache(){
+        let item = this.__cache.pop()
+        if(item instanceof JQModules.QtQuick.Item) {
+            this.contentItem.__getDOM().appendChild(item.__getDOM())
         }
 
-        let item = this.delegate.createObject(this.contentItem, model)
+        return item
+    }
 
-        this.__items[index] = item
+    __createItem(index, itemInfo) {
+        let properties = {}
 
-        item.xChanged.connect(() => {
-            if (this.orientation === ListView.Horizontal) {
-                let _index = this.__items.indexOf(item)
-                if (_index >= 0 && this.__items[_index + 1]) {
-                    this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
-                }
-            }
-            JQApplication.updateLater(this)
-        })
-        item.yChanged.connect(() => {
-            if (this.orientation === ListView.Vertical) {
-                let _index = this.__items.indexOf(item)
-                if (_index >= 0 && this.__items[_index + 1]) {
-                    this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
-                }
-            }
-            JQApplication.updateLater(this)
-        })
-        item.widthChanged.connect(() => {
-            if (this.orientation === ListView.Horizontal) {
-                let _index = this.__items.indexOf(item)
-                if (_index >= 0 && this.__items[_index + 1]) {
-                    this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
-                }
-            }
-            JQApplication.updateLater(this)
-        })
-        item.heightChanged.connect(() => {
-            if (this.orientation === ListView.Vertical) {
-                let _index = this.__items.indexOf(item)
-                if (_index >= 0 && this.__items[_index + 1]) {
-                    this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
-                }
-            }
-            JQApplication.updateLater(this)
-        })
-        item.visibleChanged.connect(() => {
-            JQApplication.updateLater(this)
-        })
+        if (Array.isArray(this.model)) {
+            properties.modelData = this.model[index]
+        } else if (typeof this.model === 'object') {
+            properties.model = this.model.data[index]
+        } else {
+            properties.model = { index: index }
+        }
 
-        item.x = itemInfo.x
-        item.y = itemInfo.y
+        let item = null
+        
+        if(this.__cache.length){
+            properties.index = index
+
+            item = this.__fromCache()
+            this.__items[index] = item
+
+            for(let key in properties){
+                item[key] = properties[key]
+            }
+
+            item.x = itemInfo.x
+            item.y = itemInfo.y
+
+            item['ListView.reused']()
+        } else {
+            item = this.delegate.createObject(this.contentItem, properties, true)
+
+            this.__items[index] = item
+
+            item.xChanged.connect(() => {
+                if (this.orientation === ListView.Horizontal) {
+                    let _index = this.__items.indexOf(item)
+                    if (_index >= 0 && this.__items[_index + 1]) {
+                        this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
+                    }
+                }
+                JQApplication.updateLater(this)
+            })
+            item.yChanged.connect(() => {
+                if (this.orientation === ListView.Vertical) {
+                    let _index = this.__items.indexOf(item)
+                    if (_index >= 0 && this.__items[_index + 1]) {
+                        this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
+                    }
+                }
+                JQApplication.updateLater(this)
+            })
+            item.widthChanged.connect(() => {
+                if (this.orientation === ListView.Horizontal) {
+                    let _index = this.__items.indexOf(item)
+                    if (_index >= 0 && this.__items[_index + 1]) {
+                        this.__items[_index + 1].x = this.__items[_index].x + this.__items[_index].width + this.spacing
+                    }
+                }
+                JQApplication.updateLater(this)
+            })
+            item.heightChanged.connect(() => {
+                if (this.orientation === ListView.Vertical) {
+                    let _index = this.__items.indexOf(item)
+                    if (_index >= 0 && this.__items[_index + 1]) {
+                        this.__items[_index + 1].y = this.__items[_index].y + this.__items[_index].height + this.spacing
+                    }
+                }
+                JQApplication.updateLater(this)
+            })
+            item.visibleChanged.connect(() => {
+                JQApplication.updateLater(this)
+            })
+
+            item.x = itemInfo.x
+            item.y = itemInfo.y
+        }
 
         return item
     }
@@ -303,7 +357,9 @@ class ListView extends Flickable {
     __initView(isCompleted) {
         if (this.delegate && this.model && isCompleted) {
             let length = 0
-            if (typeof this.model === 'object') {
+            if (Array.isArray(this.model)) {
+                length = this.model.length
+            } else if (typeof this.model === 'object') {
                 length = this.model.count
             } else if (typeof this.model === 'number') {
                 length = this.model
@@ -319,7 +375,7 @@ class ListView extends Flickable {
                 countChanged = true
             }
 
-            this.__getDataQml('count').__value = length
+            this.__self.count = length
 
             JQApplication.beginUpdate()
             JQApplication.updateLater(this)
@@ -342,7 +398,9 @@ class ListView extends Flickable {
     __updateView(changeSet) {
         if (this.delegate && this.model && this.__completed) {
             let length = 0
-            if (typeof this.model === 'object') {
+            if (Array.isArray(this.model)) {
+                length = this.model.length
+            } else if (typeof this.model === 'object') {
                 length = this.model.count
             } else if (typeof this.model === 'number') {
                 length = this.model
@@ -361,7 +419,7 @@ class ListView extends Flickable {
                 countChanged = true
             }
 
-            this.__getDataQml('count').__value = length
+            this.__self.count = length
 
             for (let change of changeSet) {
                 let leftTop = change[0]
@@ -390,7 +448,7 @@ class ListView extends Flickable {
                 } else if (role === 'remove') {
                     let removed = this.__items.splice(leftTop, bottomRight - leftTop)
                     for (let r of removed) {
-                        if (r) r.destroy()
+                        if (r) this.__toCache(r)
                     }
                 }
             }
@@ -410,7 +468,7 @@ class ListView extends Flickable {
                         if (this.__items[i] = this.__createItem(i, itemInfo)) this.__updateGeometry()
                     }
                 } else if (itemInfo.exist) {
-                    this.__items[i].destroy()
+                    this.__toCache(this.__items[i])
                     this.__items[i] = undefined
                 }
 
@@ -422,7 +480,7 @@ class ListView extends Flickable {
                         if (this.__items[i] = this.__createItem(i, itemInfo)) this.__updateGeometry()
                     }
                 } else if (itemInfo.exist) {
-                    this.__items[i].destroy()
+                    this.__toCache(this.__items[i])
                     this.__items[i] = undefined
                 }
             }
@@ -433,52 +491,52 @@ class ListView extends Flickable {
         }
     }
 
-    onCacheBufferChanged() {
+    SLOT_cacheBufferChanged(oldValue, newValue) {
         this.__updateView([])
     }
 
-    onContentXChanged() {
-        super.onContentXChanged()
+    SLOT_contentXChanged(oldValue, newValue) {
+        super.SLOT_contentXChanged(oldValue, newValue)
 
         if (this.orientation === ListView.Horizontal) {
             this.__updateView([])
         }
     }
 
-    onContentYChanged() {
-        super.onContentYChanged()
+    SLOT_contentYChanged(oldValue, newValue) {
+        super.SLOT_contentYChanged(oldValue, newValue)
 
         if (this.orientation === ListView.Vertical) {
             this.__updateView([])
         }
     }
 
-    onWidthChanged() {
-        super.onWidthChanged()
+    SLOT_widthChanged(oldValue, newValue) {
+        super.SLOT_widthChanged(oldValue, newValue)
 
         if (this.orientation === ListView.Horizontal) {
             this.__updateView([])
         }
     }
 
-    onHeightChanged() {
-        super.onHeightChanged()
+    SLOT_heightChanged(oldValue, newValue) {
+        super.SLOT_heightChanged(oldValue, newValue)
 
         if (this.orientation === ListView.Vertical) {
             this.__updateView([])
         }
     }
 
-    onSpacingChanged() {
+    SLOT_spacingChanged(oldValue, newValue) {
         JQApplication.updateLater(this)
     }
 
-    onOrientationChanged() {
+    SLOT_orientationChanged(oldValue, newValue) {
         for (let i = 0; i < this.__items.length; i++) {
             let itemInfo = this.__getItemInfo(i)
 
             if (itemInfo.exist) {
-                if (this.orientation === ListView.Horizontal) {
+                if (newValue === ListView.Horizontal) {
                     this.originY = 0
                 } else {
                     this.originX = 0
@@ -496,7 +554,9 @@ class ListView extends Flickable {
         if (!this.__items.length) return
 
         let model = this.model
-        if (typeof model === 'object') {
+        if (Array.isArray(model)) {
+            length = model.length
+        } else if (typeof model === 'object') {
             length = model.count
         } else if (typeof model === 'number') {
             length = model
@@ -543,13 +603,15 @@ class ListView extends Flickable {
             let originX = (minX - firstIndex * (Math.round(middleWidth + this.spacing)))
             if (originX !== Infinity && originX !== -Infinity) this.originX = originX
 
-            this.__getDataQml('contentHeight').__setAuto(this.height)
+            Geometry.setAuto(this.__self, 'contentHeight', this.height, this.__self.constructor.meta.contentHeight)
+            // this.__getDataQml('contentHeight').__setAuto(this.height)
         } else {
             this.contentHeight = visibleContentHeight + Math.round(middleHeight) * (length - visibleCount) + this.spacing * (length - 1)
             let originY = (minY - firstIndex * (Math.round(middleHeight + this.spacing)))
             if (originY !== Infinity && originY !== -Infinity) this.originY = originY
 
-            this.__getDataQml('contentWidth').__setAuto(this.width)
+            // this.__getDataQml('contentWidth').__setAuto(this.width)
+            Geometry.setAuto(this.__self, 'contentWidth', this.width, this.__self.constructor.meta.contentWidth)
         }
     }
 
@@ -567,6 +629,6 @@ class ListView extends Flickable {
     }
 }
 
-ListView.initialize()
+
 
 module.exports = ListView

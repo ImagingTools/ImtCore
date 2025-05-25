@@ -1,20 +1,30 @@
 const QQmlComponent = require("./QQmlComponent");
+const JQContext = require("../core/JQContext");
 
 class Component extends QQmlComponent {
-    static create(parent, component){
-        let obj = super.create(parent)
+    static create(parent = null, context = {}, component = null){
+        let obj = super.create(parent, {})
 
+        obj.__context = context
         obj.__component = component
-        obj.__component.initialize()
-
         return obj
     } 
 
-    createObject(parent, model){
-        return this.__component.create(parent, model)
+    __context = {}
+
+    createObject(parent = null, properties = {}, forceUpdate = false){
+        if(!forceUpdate){
+            let obj = this.__component.create(parent, properties, this.__context, false)
+            obj.__updateAliases()
+            obj.__updateSimpleProperties()
+            JQApplication.initLater(obj)
+            return obj
+        } else {
+            return this.__component.create(parent, properties, this.__context)
+        }
     }
 }
 
-Component.initialize()
+
 
 module.exports = Component

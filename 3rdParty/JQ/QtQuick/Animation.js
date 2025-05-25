@@ -55,8 +55,8 @@ class Animation extends QtObject {
         finished: { type:Signal, slotName:'onFinished', args:[] },
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
 
         AnimationController.add(obj)
 
@@ -65,18 +65,18 @@ class Animation extends QtObject {
 
     __loopCounter = 0
 
-    onLoopsChanged(){
+    SLOT_loopsChanged(oldValue, newValue){
         this.__loopCounter = 0
     }
-    onRunningChanged(){
+    SLOT_runningChanged(oldValue, newValue){
 
     }
 
-    onPausedChanged(){
+    SLOT_pausedChanged(oldValue, newValue){
 
     }
 
-    onAlwaysRunToEndChanged(){
+    SLOT_alwaysRunToEndChanged(oldValue, newValue){
 
     }
 
@@ -111,6 +111,6 @@ class Animation extends QtObject {
     }
 }
 
-Animation.initialize()
+
 
 module.exports = Animation

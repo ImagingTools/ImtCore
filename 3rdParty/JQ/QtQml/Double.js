@@ -1,14 +1,7 @@
-const Property = require("./Property")
+const Real = require("./Real")
 
-class Double extends Property {
-    static defaultValue = 0
-    
-    __typecasting(value){
-        if(typeof value === 'object') {
-            if(value instanceof Property) return value.__get()
-        }
-        return value
-    }
+class Double extends Real {
+
 }
 
 module.exports = Double

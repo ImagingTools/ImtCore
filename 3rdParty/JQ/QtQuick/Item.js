@@ -4,14 +4,13 @@ const Real = require("../QtQml/Real")
 const Int = require("../QtQml/Int")
 const Bool = require("../QtQml/Bool")
 const LinkedBool = require("../QtQml/LinkedBool")
+const Geometry = require("../QtQml/Geometry")
 const Signal = require("../QtQml/Signal")
 const SpecialSignal = require("../QtQml/SpecialSignal")
 const SpecialProperty = require("../QtQml/SpecialProperty")
 const KeyNavigation = require("../QtQml/KeyNavigation")
 const Anchors = require("../QtQml/Anchors")
 const AnchorLine = require("../QtQml/AnchorLine")
-const JQApplication = require("../core/JQApplication")
-
 
 class Item extends QtObject {
     static TopLeft = 0
@@ -25,15 +24,10 @@ class Item extends QtObject {
     static Center = 8
 
     static meta = Object.assign({}, QtObject.meta, {
-        // AX: {type:SpecialProperty, value:0, signalName:'AXChanged'},
-        // AY: {type:SpecialProperty, value:0, signalName:'AYChanged'},
-        // AWidth: {type:SpecialProperty, value:0, signalName:'AWidthChanged'},
-        // AHeight: {type:SpecialProperty, value:0, signalName:'AHeightChanged'},
-
-        x: {type:Real, value:0, signalName:'xChanged'},
-        y: {type:Real, value:0, signalName:'yChanged'},
-        width: {type:Real, value:0, signalName:'widthChanged'},
-        height: {type:Real, value:0, signalName:'heightChanged'},
+        x: {type:Geometry, value:0, signalName:'xChanged'},
+        y: {type:Geometry, value:0, signalName:'yChanged'},
+        width: {type:Geometry, value:0, signalName:'widthChanged'},
+        height: {type:Geometry, value:0, signalName:'heightChanged'},
         z: {type:Int, value:0, signalName:'zChanged'},
         rotation: { type: Real, value: 0, signalName: 'rotationChanged' },
         transformOrigin: { type: Real, value: Item.Center, signalName: 'transformOriginChanged' },
@@ -114,31 +108,50 @@ class Item extends QtObject {
         'Keys.volumeDownPressed': {type:Signal, slotName: 'Keys.onVolumeDownPressed', args: ['event'] },
         'Keys.volumeUpPressed': {type:Signal, slotName: 'Keys.onVolumeUpPressed', args: ['event'] },
         'Keys.yesPressed': {type:Signal, slotName: 'Keys.onYesPressed', args: ['event'] },
+
+        'ListView.reused': { type:Signal, args: [] },
+        'ListView.pooled': { type:Signal, args: [] },
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
 
         let dom = obj.__getDOM()
         dom.classList.add('Item')
+
         dom.qml = obj
         obj.__connectDOM(this.parent)
 
         return obj
     }
 
+    visible = {
+        parentValue: true,
+        value: true,
+    }
+
+    enabled = {
+        parentValue: true,
+        value: true,
+    }
+
+    __complete(){
+        this.__checkVisibility()
+        super.__complete()
+    }
+
     __removeChild(child){
         let index = -1
 
         index = this.data.indexOf(child)
-        if(index >= 0) this.data.osplice(index, 1)
+        if(index >= 0) this.data.__splice(index, 1)
 
         if(child instanceof Item){
             index = this.children.indexOf(child)
-            if(index >= 0) this.children.osplice(index, 1)
+            if(index >= 0) this.children.__splice(index, 1)
         } else {
             index = this.resources.indexOf(child)
-            if(index >= 0) this.resources.osplice(index, 1)
+            if(index >= 0) this.resources.__splice(index, 1)
         }
     }
 
@@ -146,14 +159,14 @@ class Item extends QtObject {
         let index = -1
 
         index = this.data.indexOf(child)
-        if(index < 0) this.data.opush(child)
+        if(index < 0) this.data.__push(child)
 
         if(child instanceof Item){
             index = this.children.indexOf(child)
-            if(index < 0) this.children.opush(child)
+            if(index < 0) this.children.__push(child)
         } else {
             index = this.resources.indexOf(child)
-            if(index < 0) this.resources.opush(child)
+            if(index < 0) this.resources.__push(child)
         }
     }
 
@@ -187,21 +200,21 @@ class Item extends QtObject {
     }
 
     __checkVisibility(){
-        if(this.visible){
-            this.__DOM.removeAttribute('invisible')
-            if(this.width > 0 && this.height > 0){
-                this.__DOM.removeAttribute('no-view')
+        if(this.__proxy.visible){
+            this.__proxy.__DOM.removeAttribute('invisible')
+            if(this.__proxy.width > 0 && this.__proxy.height > 0){
+                this.__proxy.__DOM.removeAttribute('no-view')
             } else {
-                this.__DOM.setAttribute('no-view', '')
+                this.__proxy.__DOM.setAttribute('no-view', '')
             }
         } else {
-            this.__DOM.setAttribute('invisible', '')
+            this.__proxy.__DOM.setAttribute('invisible', '')
         }
         
     }
 
-    onFocusChanged(){
-        if(this.focus){
+    SLOT_focusChanged(oldValue, newValue){
+        if(newValue){
             let tree = this.__getTree()
             JQApplication.setFocusTree(tree)
 
@@ -213,8 +226,8 @@ class Item extends QtObject {
         }
     }
 
-    onActiveFocusChanged(){
-        if(this.activeFocus){
+    SLOT_activeFocusChanged(oldValue, newValue){
+        if(newValue){
             if(this.parent instanceof JQModules.QtQuick.FocusScope){
                 this.parent.activeFocus = true
             }
@@ -258,109 +271,84 @@ class Item extends QtObject {
         }
     }
 
-    // onAXChanged(){
-    //     if(this.AX !== this.x) 
-    //     this.__getDataQml('x').__resetForce(this.AX)
-    // }
-
-    // onAYChanged(){
-    //     if(this.AY !== this.y) 
-    //     this.__getDataQml('y').__resetForce(this.AY)
-    // }   
-
-    // onAWidthChanged(){
-    //     if(this.AWidth !== this.width) 
-    //     this.__getDataQml('width').__resetForce(this.AWidth)
-    // }
-
-    // onAHeightChanged(){
-    //     if(this.AHeight !== this.height) 
-    //     this.__getDataQml('height').__resetForce(this.AHeight)
-    // }
-
-    onParentChanged(){
-        super.onParentChanged()
-        this.__connectDOM(this.parent)
+    SLOT_parentChanged(oldValue, newValue){
+        super.SLOT_parentChanged(oldValue, newValue)
+        this.__connectDOM(newValue)
     }
 
-    onXChanged(){
-        // this.AX = this.x
-        
+    SLOT_xChanged(oldValue, newValue){
         this.__setDOMStyle({
-            left: this.x+'px'
+            left: newValue+'px'
         })
     }
 
-    onYChanged(){
-        // this.AY = this.y
-
+    SLOT_yChanged(oldValue, newValue){
         this.__setDOMStyle({
-            top: this.y+'px'
+            top: newValue+'px'
         })
     }
 
-    onEnabledChanged(){
+    SLOT_enabledChanged(oldValue, newValue){
         for(let child of this.children){
-            child.__getDataQml('enabled').__update()
+            if(child.__self.constructor.meta.enabled.type === LinkedBool)
+            LinkedBool.parentSet(child, 'enabled', newValue)
         }
     }
 
-    onVisibleChanged(){
+    SLOT_visibleChanged(oldValue, newValue){
         for(let child of this.children){
-            child.__getDataQml('visible').__update()
+            if(child.__self.constructor.meta.visible.type === LinkedBool)
+            LinkedBool.parentSet(child, 'visible', newValue)
         }
 
         this.__checkVisibility()
         JQApplication.updateLater(this.parent)
     }
 
-    onOpacityChanged(){
+    SLOT_opacityChanged(oldValue, newValue){
         this.__setDOMStyle({
-            opacity: this.opacity
+            opacity: newValue
         })
     }
 
-    onZChanged(){
-        this.__setDOMStyle({ zIndex: this.z })
+    SLOT_zChanged(oldValue, newValue){
+        this.__setDOMStyle({ zIndex: newValue })
     }
 
-    onWidthChanged(){
-        // this.AWidth = this.width
-        
+    SLOT_widthChanged(oldValue, newValue){
         this.__checkVisibility()
         this.__setDOMStyle({
-            width: this.width > 0 ? this.width + 'px' : '0px',
-            minWidth: this.width > 0 ? this.width + 'px' : '0px',
+            width: newValue > 0 ? newValue + 'px' : '0px',
+            minWidth: newValue > 0 ? newValue + 'px' : '0px',
         })
         JQApplication.updateLater(this.parent)
     }
 
-    onHeightChanged(){
-        // this.AHeight = this.height
+    SLOT_heightChanged(oldValue, newValue){
 
         this.__checkVisibility()
         this.__setDOMStyle({
-            height: this.height > 0 ? this.height + 'px' : '0px',
-            minHeight: this.height > 0 ? this.height + 'px' : '0px',
+            height: newValue > 0 ? newValue + 'px' : '0px',
+            minHeight: newValue > 0 ? newValue + 'px' : '0px',
         })
         JQApplication.updateLater(this.parent)
     }
 
-    onRotationChanged(){
+    SLOT_rotationChanged(oldValue, newValue){
         this.__setDOMStyle({
-            transform: `scale(${this.scale}) rotate(${this.rotation}deg)`
+            transform: `scale(${this.__proxy.scale}) rotate(${newValue}deg)`
         })
         JQApplication.updateLater(this.parent)
     }
-    onScaleChanged(){
+    SLOT_scaleChanged(oldValue, newValue){
         this.__setDOMStyle({
-            transform: `scale(${this.scale}) rotate(${this.rotation}deg)`
+            transform: `scale(${newValue}) rotate(${this.__proxy.rotation}deg)`
         })
         JQApplication.updateLater(this.parent)
     }
-    onClipChanged(){
+    SLOT_clipChanged(oldValue, newValue){
         this.__setDOMStyle({
-            overflow: this.clip ? "hidden" : "unset"
+            overflow: newValue ? "hidden" : "unset"
         })
     }
 
@@ -396,6 +384,6 @@ class Item extends QtObject {
     __onWheel(wheel){}
 }
 
-Item.initialize()
+
 
 module.exports = Item

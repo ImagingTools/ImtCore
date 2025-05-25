@@ -23,49 +23,49 @@ class DropShadow extends Item {
         sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},
     })
 
-    onVisibleChanged(){
-        super.onVisibleChanged()
+    SLOT_visibleChanged(oldValue, newValue){
+        super.SLOT_visibleChanged()
         this.__updateShadow()
     }
 
-    onColorChanged(){
+    SLOT_colorChanged(oldValue, newValue){
         this.__updateShadow()
     }
 
-    onHorizontalOffsetChanged(){
+    SLOT_horizontalOffsetChanged(oldValue, newValue){
         this.__updateShadow()
     }
 
-    onVerticalOffsetChanged(){
+    SLOT_verticalOffsetChanged(oldValue, newValue){
         this.__updateShadow()
     }
 
-    onRadiusChanged(){
+    SLOT_radiusChanged(oldValue, newValue){
         this.__updateShadow()
     }
 
-    onSamplesChanged(){
+    SLOT_samplesChanged(oldValue, newValue){
         this.__updateShadow()
     }
 
-    onSpreadChanged(){
+    SLOT_spreadChanged(oldValue, newValue){
         this.__updateShadow()
     }
 
-    onSourceChanged(){
+    SLOT_sourceChanged(oldValue, newValue){
         this.__updateShadow()
     }
 
     __updateShadow(){
-        if(this.source && this.visible){
-            let rgba = this.__getDataQml('color').__toRGBA()
-            this.source.__setDOMStyle({
-                boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
-            })
-        }
+        // if(this.source && this.visible){
+        //     let rgba = this.__getDataQml('color').__toRGBA()
+        //     this.source.__setDOMStyle({
+        //         boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+        //     })
+        // }
     }
 }
 
-DropShadow.initialize()
+
 
 module.exports = DropShadow

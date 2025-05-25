@@ -1,16 +1,14 @@
 const Property = require("./Property")
 
 class Real extends Property {
-    static defaultValue = 0
-    
-    __typecasting(value){
+    static getDefaultValue(){
+        return 0
+    }
+
+    static typeCasting(value){
         if(value === undefined) throw 'Cannot assign [undefined] to double'
         if(value === null) throw 'Cannot assign std::nullptr_t to double'
-
-        if(typeof value === 'object') {
-            if(value instanceof Property) return value.__get()
-            throw 'Cannot assign QJSValue to double'
-        }
+        if(typeof value === 'object') throw 'Cannot assign QJSValue to double'
 
         if(typeof value === 'number') {
             return value
@@ -20,7 +18,7 @@ class Real extends Property {
             return 1
         }
 
-        if(value === false) {
+        if(value === false || value === '') {
             return 0
         }
 
@@ -32,6 +30,7 @@ class Real extends Property {
         
         return value
     }
+    
 }
 
 module.exports = Real

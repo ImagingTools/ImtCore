@@ -17,18 +17,18 @@ class Gradient extends QtObject {
 
     __rects = new Set()
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.stops = []
 
         return obj
     }
 
-    onStopsChanged(){
+    SLOT_stopsChanged(oldValue, newValue){
         this.__updateGradient()
     }
 
-    onOrientationChanged(){
+    SLOT_orientationChanged(oldValue, newValue){
         this.__updateGradient()
     }
 
@@ -41,6 +41,7 @@ class Gradient extends QtObject {
 
     __addListener(obj){
         this.__rects.add(obj)
+        obj.__updateGradient()
     }
 
     __removeListener(obj){
@@ -48,6 +49,6 @@ class Gradient extends QtObject {
     }
 }
 
-Gradient.initialize()
+
 
 module.exports = Gradient

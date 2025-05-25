@@ -28,8 +28,8 @@ class Shortcut extends QtObject {
         activatedAmbiguously: { type:Signal, slotName:'onActivatedAmbiguously', args:[] },
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         JQApplication.KeyboardController.add(obj)
 
         return obj
@@ -41,6 +41,6 @@ class Shortcut extends QtObject {
     }
 }
 
-Shortcut.initialize()
+
 
 module.exports = Shortcut

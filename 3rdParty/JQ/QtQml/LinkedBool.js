@@ -1,48 +1,107 @@
-const Bool = require("./Bool")
+const Property = require("./Property")
+const Signal = require("./Signal")
 
-class LinkedBool extends Bool {
-    static create(parent, meta){
-        let obj = super.create(parent, meta)
-
-        obj.__originValue = meta.value
-        obj.__originCompute = ()=>{
-            if(obj.__parent && obj.__parent.parent && meta.link){
-                return obj.__parent.parent[meta.link] && obj.__originValue
-            } else {
-                return obj.__originValue
+class LinkedBool extends Property {
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
+     * @param {Object} meta
+     */
+    static init(target, name, value, parentValue){
+        if(!(name in target)) {
+            target.__self[name] = {
+                value: value,
+                parentValue: parentValue,
             }
         }
-        obj.__compute = obj.__originCompute
-
-        return obj
     }
 
-    __reset(value){
-        if(typeof value === 'function' && value.bound){
-            this.__setCompute(value)
-            if(value.lazy) {
-                this.__parent.__properties.push(this)
-            } else {
-                this.__update()
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
+     * @param {Object} meta
+     * @returns {Object}
+     */
+    static get(target, name, meta){
+        let link = this.queueLink[this.queueLink.length - 1]
+        if(link){
+            if(!link.target.__depends[link.name]) link.target.__depends[link.name] = []
+
+            let found = false
+            for(let connectionObj of link.target.__depends[link.name]){
+                if(connectionObj.name === name + 'Changed' && connectionObj.target === target){
+                    found = true
+                    break
+                }
             }
-            return true
+
+            if(!found){
+                let connectionObj = Signal.get(target, name + 'Changed').connect(()=>{
+                    link.meta.type.set(link.target, link.name, link.func, link.meta)
+                })
+
+                link.target.__depends[link.name].push(connectionObj)
+            }
+            
+        }
+        
+        return target.__self[name].value && target.__self[name].parentValue
+    }
+
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
+    static set(target, name, value, meta){
+        let oldValue = target.__self[name].value && target.__self[name].parentValue
+
+        if(typeof value === 'function'){
+            try {
+                this.queueLink.push({
+                    target: target,
+                    name: name,
+                    meta: meta,
+                    func: value,
+                })
+                target.__self[name].value = value.call(target)
+            } finally {
+                this.queueLink.pop()
+            }
+        } else {
+            target.__self[name].value = value
+        }  
+
+        let currentValue = target.__self[name].value && target.__self[name].parentValue
+
+        if(oldValue !== currentValue){
+            Signal.get(target, name + 'Changed')(oldValue, currentValue)
         }
 
-        let safeValue = this.__typecasting(value)
-        this.__originValue = safeValue
-
-        this.__subscribersReset()
-        this.__unsubscribe()
-
-        this.__compute = this.__originCompute
-
-        this.__update()
+        return true
     }
 
-    __setCompute(compute){
-        this.__compute = ()=>{ return this.__originCompute() && compute()}
-        this.__completed = false
+    static parentSet(target, name, value){
+        let oldValue = target.__self[name].value && target.__self[name].parentValue
+
+        target.__self[name].parentValue = value
+
+        let currentValue = target.__self[name].value && target.__self[name].parentValue
+
+        if(oldValue !== currentValue){
+            Signal.get(target, name + 'Changed')(oldValue, currentValue)
+        }
+
+        return true
     }
+
+    static getDefaultValue(){
+        return true
+    }
+
 }
 
 module.exports = LinkedBool

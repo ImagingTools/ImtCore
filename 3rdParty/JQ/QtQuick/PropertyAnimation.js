@@ -28,7 +28,7 @@ class PropertyAnimation extends Animation {
         return obj
     }
 
-    onPropertyChanged(){
+    SLOT_propertyChanged(oldValue, newValue){
         this.properties = this.property
     }   
     
@@ -86,6 +86,6 @@ class PropertyAnimation extends Animation {
  
 }
 
-PropertyAnimation.initialize()
+
 
 module.exports = PropertyAnimation

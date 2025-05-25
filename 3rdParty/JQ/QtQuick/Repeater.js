@@ -20,8 +20,8 @@ class Repeater extends Item {
         itemRemoved: {type:Signal, slotName:'onItemRemoved', args:['item']},
     })
 
-    static create(parent, ...args){
-        let obj = super.create(parent, ...args)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__DOM.classList.add('Repeater')
 
         return obj
@@ -38,22 +38,21 @@ class Repeater extends Item {
 
     }
 
-    onModelChanged(){
+    SLOT_modelChanged(oldValue, newValue){
         this.__clear()
         
-        if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){
-            this.__model.__removeViewListener(this)
+        if(oldValue && typeof oldValue === 'object' && !oldValue.__destroyed){
+            oldValue.__removeViewListener(this)
         }
 
-        if(this.model && typeof this.model === 'object'){
-            this.model.__addViewListener(this)
-            this.__model = this.model
+        if(newValue && typeof newValue === 'object'){
+            newValue.__addViewListener(this)
         }
 
         this.__initView(this.__completed)
     }
 
-    onDelegateChanged(){
+    SLOT_delegateChanged(oldValue, newValue){
         this.__clear()
         this.__initView(this.__completed)
     }
@@ -63,13 +62,13 @@ class Repeater extends Item {
         this.__items = []
 
         for(let r of removed){
-            this.itemRemoved(r)
+            this.__proxy.itemRemoved(r)
             if(r) r.destroy()
         }
     }
 
     __createItem(model){
-        let item = this.delegate.createObject(this.parent, model)
+        let item = this.delegate.createObject(this.parent, {model:model}, true)
 
         return item
     }
@@ -84,28 +83,30 @@ class Repeater extends Item {
             if(typeof this.model === 'number'){
                 if(this.count !== this.model){
                     countChanged = true
-                    this.__getDataQml('count').__value = this.model
+                    this.__self.count = this.model
+                    this.count = this.model
                 }
 
                 for(let i = 0; i < this.model; i++){
                     let item = this.__createItem({index: i})
                     this.__items.push(item)
-                    this.itemAdded(item)
+                    this.__proxy.itemAdded(item)
                 }
             } else {
                 if(this.count !== this.model.data.length){
                     countChanged = true
-                    this.__getDataQml('count').__value = this.model.data.length
+                    this.__self.count = this.model.data.length
+                    this.count = this.model.data.length
                 }
 
                 for(let i = 0; i < this.model.data.length; i++){
                     let item = this.__createItem(this.model.data[i])
                     this.__items.push(item)
-                    this.itemAdded(item)
+                    this.__proxy.itemAdded(item)
                 }
             }
 
-            if(countChanged) this.countChanged()
+            if(countChanged) this.__proxy.countChanged()
 
             JQApplication.endUpdate()
         }
@@ -125,7 +126,7 @@ class Repeater extends Item {
 
                 if(this.count !== this.model.data.length){
                     countChanged = true
-                    this.__getDataQml('count').__value = this.model.data.length
+                    this.__self.count = this.model.data.length
                 }
 
                 for(let change of changeSet){
@@ -154,7 +155,7 @@ class Repeater extends Item {
                     }
                 }
 
-                if(countChanged) this.countChanged()
+                if(countChanged) this.__proxy.countChanged()
             }
 
             JQApplication.endUpdate()
@@ -170,6 +171,6 @@ class Repeater extends Item {
     }
 }
 
-Repeater.initialize()
+
 
 module.exports = Repeater

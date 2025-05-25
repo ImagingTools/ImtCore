@@ -575,6 +575,6 @@ class TreeItemModel extends JSONListModel {
     }
 }
 
-TreeItemModel.initialize()
+
 
 module.exports = TreeItemModel

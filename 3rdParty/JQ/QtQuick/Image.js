@@ -49,14 +49,14 @@ class Image extends Item {
         verticalAlignmentChanged: {type:Signal, slotName:'onVerticalAlignmentChanged', args:[]},
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__DOM.classList.add('Image')
 
         return obj
     }
 
-    onSourceChanged(){
+    SLOT_sourceChanged(oldValue, newValue){
         if(!this.source) {
             this.__setDOMStyle({
                 backgroundImage: 'none'
@@ -71,8 +71,8 @@ class Image extends Item {
 
         JQApplication.ImageController.load(url, (img)=>{
             if(this.$url !== url) return
-            this.sourceSize.__getDataQml('width').__setAuto(img.width)
-            this.sourceSize.__getDataQml('height').__setAuto(img.height)
+            // this.sourceSize.__getDataQml('width').__setAuto(img.width)
+            // this.sourceSize.__getDataQml('height').__setAuto(img.height)
 
             this.__setDOMStyle({
                 backgroundImage: `url("${img.data}")`
@@ -140,11 +140,11 @@ class Image extends Item {
         }
     }
 
-    onFillModeChanged(){
+    SLOT_fillModeChanged(oldValue, newValue){
         this.__updateImage()
     }
 }
 
-Image.initialize()
+
 
 module.exports = Image

@@ -52,43 +52,72 @@ const Property = require("../QtQml/Property")
 //     }
 // }
 
+// class JQContext {
+//     static create(parent){
+//         let context = {}
+//         let __queue = parent ? parent.__queue : {}
+
+//         return new Proxy(context, { 
+//             get(target, key){
+//                 if(key === '__queue') return __queue
+
+//                 let obj = key in target ? target[key] : (parent ? parent[key] : undefined)
+
+//                 if(!obj){
+//                     let caller = Property.queueLink[Property.queueLink.length-1]
+//                     if(caller){
+//                         if(key in __queue){
+//                             __queue[key].push(caller)
+//                         } else {
+//                             __queue[key] = [caller]
+//                         }
+//                     }
+//                 }
+
+//                 return obj
+//             },
+//             set(target, key, value){
+//                 target[key] = value
+
+//                 if(key in __queue){
+//                     for(let property of __queue[key]){
+//                         property.__update()
+//                     }
+//                     delete __queue[key]
+//                 }
+
+//                 return true
+//             }
+//         })
+//     }
+// }
+
+
+
 class JQContext {
+    static handle = {
+        get(target, key){
+            if(key in target){
+                return target[key]
+            } else if(target.__parentContext){
+                return target.__parentContext[key]
+            } else {
+                return undefined
+            }
+        },
+
+        set(target, key, value){
+            target[key] = value
+
+            return true
+        },
+    }
+
     static create(parent){
         let context = {}
-        let __queue = parent ? parent.__queue : {}
+        context.__parentContext = parent
 
-        return new Proxy(context, { 
-            get(target, key){
-                if(key === '__queue') return __queue
-
-                let obj = key in target ? target[key] : (parent ? parent[key] : undefined)
-
-                if(!obj){
-                    let caller = Property.queueLink[Property.queueLink.length-1]
-                    if(caller){
-                        if(key in __queue){
-                            __queue[key].push(caller)
-                        } else {
-                            __queue[key] = [caller]
-                        }
-                    }
-                }
-
-                return obj
-            },
-            set(target, key, value){
-                target[key] = value
-
-                if(key in __queue){
-                    for(let property of __queue[key]){
-                        property.__update()
-                    }
-                    delete __queue[key]
-                }
-
-                return true
-            }
-        })
+        return new Proxy(context, this.handle)
     }
 }
 

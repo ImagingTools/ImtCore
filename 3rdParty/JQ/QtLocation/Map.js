@@ -4,13 +4,15 @@ const Real = require("../QtQml/Real")
 const Var = require("../QtQml/Var")
 const Signal = require("../QtQml/Signal")
 const MapGestureArea = require("./MapGestureArea")
+const MapQuickItem = require("./MapQuickItem")
+const GeoCoordinate = require("../QtPositioning/GeoCoordinate")
 const QtPositioning = require("../QtPositioning/QtPositioning")
 
 
 class Map extends Item {
     static meta = Object.assign({}, Item.meta, {
         plugin: {type: Var, value:'', signalName:'pluginChanged'},
-        center: {type: Var, value: QtPositioning.coordinate(0, 0), signalName:'centerChanged'},
+        center: {type: GeoCoordinate, value: QtPositioning.coordinate(0, 0), signalName:'centerChanged'},
         zoomLevel: {type: Real, value:2, signalName:'zoomLevelChanged'},
         copyrightsVisible: {type: Bool, value:true, signalName:'copyrightsVisibleChanged'},
         bearing: {type: Real, value:0, signalName:'bearingChanged'},
@@ -26,8 +28,8 @@ class Map extends Item {
    
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__getDOM().classList.add('Map')
 
         return obj
@@ -96,8 +98,8 @@ class Map extends Item {
         item.destroy()
     }
 
-    onMapReadyChanged(){
-        if(this.mapReady){
+    SLOT_mapReadyChanged(oldValue, newValue){
+        if(newValue){
             for(let f of this.__queue){
                 f.__updateFeature(true)
             }
@@ -105,20 +107,20 @@ class Map extends Item {
         }
     }
 
-    onCenterChanged(){
+    SLOT_centerChanged(oldValue, newValue){
         if(this.__map){
-            this.__map.getView().setCenter(OpenLayers.transform([this.center.longitude, this.center.latitude], 'EPSG:4326','EPSG:3857'))
+            this.__map.getView().setCenter(OpenLayers.transform([newValue.longitude, newValue.latitude], 'EPSG:4326','EPSG:3857'))
         }
     }
 
-    onZoomLevelChanged(){
+    SLOT_zoomLevelChanged(oldValue, newValue){
         if(this.__map){
-            this.__map.getView().setZoom(this.zoomLevel)
+            this.__map.getView().setZoom(newValue)
         }
     }
 
 }
 
-Map.initialize()
+
 
 module.exports = Map

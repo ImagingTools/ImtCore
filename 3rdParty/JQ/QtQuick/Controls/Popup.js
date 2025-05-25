@@ -8,14 +8,14 @@ class Popup extends QtObject {
 
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
 
         return obj
     }
 
 }
 
-Popup.initialize()
+
 
 module.exports = Popup

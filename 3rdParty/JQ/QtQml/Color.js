@@ -19,41 +19,34 @@ class Color extends Property {
         "tan":"#d2b48c","teal":"#008080","thistle":"#d8bfd8","tomato":"#ff6347","turquoise":"#40e0d0","violet":"#ee82ee","wheat":"#f5deb3","white":"#ffffff","whitesmoke":"#f5f5f5","yellow":"#ffff00","yellowgreen":"#9acd32"
     }
     
-    __typecasting(value){
-        if(typeof value === 'object') {
-            if(value instanceof Property) return value.__get()
-        }
-        return value
-    }
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
+     * @param {Object} meta
+     * @returns {Object}
+     */
+    static getRGBA(target, name, meta){
+        let value = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
-    __toRGBA(){
-        if(!this.__completed) this.__update()
-        if(!this.__value){
-            return {
-                r: 255,
-                g: 255,
-                b: 255,
-                a: 0,
-            }
-        }
         let hexColor = '#ffffff'
         let alpha = false
-        if(Color.colors[this.__value]){
-            hexColor = Color.colors[this.__value]
+        if(Color.colors[value]){
+            hexColor = Color.colors[value]
         } else {
-            if(this.__value[0] === '#') {
-                if(this.__value.length === 4){
-                    hexColor = `#${this.__value[1]}${this.__value[1]}${this.__value[2]}${this.__value[2]}${this.__value[3]}${this.__value[3]}`
-                } else if(this.__value.length === 7) {
-                    hexColor = this.__value
-                } else if(this.__value.length === 5) {
+            if(value[0] === '#') {
+                if(value.length === 4){
+                    hexColor = `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`
+                } else if(value.length === 7) {
+                    hexColor = value
+                } else if(value.length === 5) {
                     alpha = true
-                    hexColor = `#${this.__value[1]}${this.__value[1]}${this.__value[2]}${this.__value[2]}${this.__value[3]}${this.__value[3]}${this.__value[4]}${this.__value[4]}`
-                } else if(this.__value.length === 9) {
+                    hexColor = `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}${value[4]}${value[4]}`
+                } else if(value.length === 9) {
                     alpha = true
-                    hexColor = this.__value
+                    hexColor = value
                 } else {
-                    hexColor = this.__value
+                    hexColor = value
                 }
             } else {
                 return {

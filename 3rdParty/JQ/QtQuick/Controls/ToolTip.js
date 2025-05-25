@@ -8,13 +8,13 @@ class ToolTip extends Popup {
 
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
 
         return obj
     }
 
 }
-ToolTip.initialize()
+
 
 module.exports = ToolTip

@@ -12,6 +12,6 @@ class Process extends QtObject {
     setEnviroment(...args){}
 }
 
-Process.initialize()
+
 
 module.exports = Process

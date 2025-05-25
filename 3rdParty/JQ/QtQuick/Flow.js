@@ -1,6 +1,7 @@
 const Item = require("./Item")
 const Repeater = require("./Repeater")
 const Real = require("../QtQml/Real")
+const Geometry = require("../QtQml/Geometry")
 const Signal = require("../QtQml/Signal")
 
 class Flow extends Item {
@@ -22,37 +23,37 @@ class Flow extends Item {
         positioningComplete: {type:Signal, slotName:'onPositioningComplete', args:[]},
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__DOM.classList.add('Flow')
 
         return obj
     }
 
-    onPaddingChanged(){
+    SLOT_paddingChanged(oldValue, newValue){
         this.leftPadding = this.padding
         this.topPadding = this.padding
         this.rightPadding = this.padding
         this.bottomPadding = this.padding
     }
 
-    onLeftPaddingChanged(){
+    SLOT_leftPaddingChanged(oldValue, newValue){
         JQApplication.updateLater(this)
     }
 
-    onTopPaddingChanged(){
+    SLOT_topPaddingChanged(oldValue, newValue){
         JQApplication.updateLater(this)
     }
 
-    onRightPaddingChanged(){
+    SLOT_rightPaddingChanged(oldValue, newValue){
         JQApplication.updateLater(this)
     }
 
-    onBottomPaddingChanged(){
+    SLOT_bottomPaddingChanged(oldValue, newValue){
         JQApplication.updateLater(this)
     }
 
-    onSpacingChanged(){
+    SLOT_spacingChanged(oldValue, newValue){
         this.__setDOMStyle({
             gap: this.spacing + 'px'
         })
@@ -85,8 +86,8 @@ class Flow extends Item {
             paddingBottom: this.bottomPadding+'px',
         })
 
-        this.__getDataQml('width').__setAuto(width + this.leftPadding + this.rightPadding)
-        this.__getDataQml('height').__setAuto(height + this.topPadding + this.bottomPadding)
+        Geometry.setAuto(this.__self, 'width', width + this.leftPadding + this.rightPadding, this.__self.constructor.meta.width)
+        Geometry.setAuto(this.__self, 'height', height + this.topPadding + this.bottomPadding, this.__self.constructor.meta.height)
 
         this.positioningComplete()
     }
@@ -101,6 +102,6 @@ class Flow extends Item {
     }
 }
 
-Flow.initialize()
+
 
 module.exports = Flow

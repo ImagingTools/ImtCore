@@ -17,15 +17,15 @@ class SourceSize extends GroupProperty {
         }
     }
 
-    onWidthChanged(){
+    SLOT_widthChanged(oldValue, newValue){
         this.onChanged()
     }
 
-    onHeightChanged(){
+    SLOT_heightChanged(oldValue, newValue){
         this.onChanged()
     }
 }
 
-SourceSize.initialize()
+
 
 module.exports = SourceSize

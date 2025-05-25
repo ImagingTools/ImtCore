@@ -14,26 +14,14 @@ class Connections extends QtObject {
         ignoreUnknownSignalsChanged: {type:Signal, slotName:'onIgnoreUnknownSignalsChanged', args:[]},
     })
 
-    __target = null
     __connectionsInfo = {}
 
-    onTargetChanged(){
+    SLOT_targetChanged(oldValue, newValue){
         for(let signalName in this.__connectionsInfo){
             let slotName = this.__connectionsInfo[signalName]
-        
-            if(this.__target){
-                if(this.__target[signalName] instanceof Signal) this.__target[signalName].disconnect(this, this[slotName])
-            }
-        }
 
-        this.__target = this.target
-
-        for(let signalName in this.__connectionsInfo){
-            let slotName = this.__connectionsInfo[signalName]
-        
-            if(this.__target){
-                if(this.__target[signalName] instanceof Signal) this.__target[signalName].connect(this, this[slotName])
-            }
+            if(oldValue) oldValue[signalName].disconnect(this, this[slotName])
+            if(newValue) newValue[signalName].connect(this, this[slotName])
         }
     }
 
@@ -41,17 +29,15 @@ class Connections extends QtObject {
         for(let signalName in this.__connectionsInfo){
             let slotName = this.__connectionsInfo[signalName]
         
-            if(this.__target){
-                if(this.__target[signalName] instanceof Signal) this.__target[signalName].disconnect(this, this[slotName])
+            if(this.target){
+                this.target[signalName].disconnect(this, this[slotName])
             }
         }
-
-        delete this.__target
 
         super.__destroy()
     }
 }
 
-Connections.initialize()
+
 
 module.exports = Connections

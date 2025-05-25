@@ -8,8 +8,8 @@ class Control extends Item {
 
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__getDOM().classList.add('Control')
 
         return obj
@@ -17,6 +17,6 @@ class Control extends Item {
 
 }
 
-Control.initialize()
+
 
 module.exports = Control

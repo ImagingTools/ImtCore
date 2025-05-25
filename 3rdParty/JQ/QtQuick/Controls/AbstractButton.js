@@ -8,8 +8,8 @@ class AbstractButton extends Control {
 
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
         obj.__getDOM().classList.add('AbstractButton')
 
         return obj
@@ -17,6 +17,6 @@ class AbstractButton extends Control {
 
 }
 
-AbstractButton.initialize()
+
 
 module.exports = AbstractButton

@@ -11,8 +11,8 @@ class Screen extends QObject {
         heightChanged: {type:Signal, slotName:'onHeightChanged', args:[]},
     })
 
-    static create(parent=null, model=null, meta={}, properties=[], isRoot=true){
-        let obj = super.create(parent, model, meta, properties, isRoot)
+    static create(parent = null, properties = {}){
+        let obj = super.create(parent, properties)
 
         window.addEventListener('load', ()=>{
             obj.width = window.innerWidth
@@ -28,6 +28,6 @@ class Screen extends QObject {
     }
 }
 
-Screen.initialize()
+
 
 module.exports = Screen.create()

@@ -1,211 +1,110 @@
 const BaseObject = require("../QtBase/BaseObject")
+const Signal = require("./Signal")
 
-class Property extends BaseObject{
+class Property extends BaseObject {
     static queueLink = []
-    static defaultValue = null
 
-    static create(parent, meta){
-        let obj = super.create(parent, meta)
-
-        obj.__parent = parent
-        obj.__value = 'value' in meta ? meta.value : this.defaultValue
-        obj.__signalName = meta.signalName
-
-        return obj
-    }
-
-    __auto = true
-
-    __get(key){
-        let caller = Property.queueLink[Property.queueLink.length-1]
-        if(caller) caller.__subscribe(this)
-
-        if(!this.__completed){
-            this.__update()
-        } 
-
-        if(key && this.__value instanceof BaseObject){
-            return this.__value[key]
-        }
-
-        return this.__value
-    }
-
-    __getSignal(){
-        return this.__signalName && this.__parent ? this.__parent[this.__signalName] : undefined
-    }
-
-    __emitSignal(...args){
-        let signal = this.__getSignal()
-        if(signal) signal(...args)
-    }
-
-    __reset(value){
-        this.__subscribersReset()
-        if(this.__frozen) return
-        this.__unsubscribe()
-        this.__set(undefined, value)
-    }
-
-    __resetForce(value){
-        this.__subscribersReset()
-        this.__unsubscribe()
-        this.__set(undefined, value)
-    }
-
-    __set(key, value){
-        this.__auto = false
-
-        if(typeof value === 'function' && value.bound){
-            this.__setCompute(value)
-            if(value.lazy) {
-                this.__parent.__properties.push(this)
-            } else {
-                this.__update()
-            }
-            return true
-        }
-
-        let safeValue
-        try {
-            safeValue = this.__typecasting(value)
-        } catch (error) {
-            console.log(error)
-            return false
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
+     * @param {Object} meta
+     * @returns {Object}
+     */
+    static get(target, name, meta){
+        if(target.__properties && target.__properties[name]) {
+            target.__updateProperty(name)
+            // let func = target.__properties[name]
+            // this.set(target, name, func, meta)
         }
         
+        let link = this.queueLink[this.queueLink.length - 1]
+        if(link){
+            if(!link.target.__depends[link.name]) link.target.__depends[link.name] = []
 
-        if(key){
-            if(safeValue !== this.__value[key]){
-                this.__value[key] = safeValue
-            }
-        } else if(safeValue !== this.__value){
-            JQApplication.MemoryController.removeLink(this.__value, this)
-            this.__value = safeValue
-            JQApplication.MemoryController.addLink(safeValue, this)
-            this.__emitSignal()
-        }
-        
-        return true
-    }
-
-    __setAuto(newValue){
-        if(this.__auto) {
-            this.__set(undefined, newValue)
-            this.__auto = true
-        }
-    }
-
-    __typecasting(value){
-        return value
-    }
-
-    __update(){
-        if(this.__updating || !this.__compute) return
-        
-        this.__updating = true
-        Property.queueLink.push(this)
-        let value = this.__value
-        try {
-            value = this.__compute()
-        } catch (error) {
-            value = this.__value
-        } finally {
-            Property.queueLink.pop()
-        }
-        
-        if(this.__compute) this.__set(undefined, value)
-        
-        this.__updating = false
-        this.__completed = true
-    }
-
-    __addSubscriber(target){
-        if(!this.__subscribers) this.__subscribers = []
-        let signal = this.__getSignal()
-
-        if(signal && this.__subscribers.indexOf(target) < 0) {
-            this.__subscribers.push(target)
-            signal.connect(target, target.__update)
-        }
-    }
-
-    __removeSubscriber(target){
-        let signal = this.__getSignal()
-        if(!this.__subscribers || !signal) return
-
-        signal.disconnect(target, target.__update)
-        let index = this.__subscribers.indexOf(target)
-        if(index >= 0){
-            this.__subscribers.splice(index, 1)
-            if(this.__subscribers.length === 0) {
-                delete this.__subscribers
-            }
-        }
-    }
-
-    __unsubscribe(){
-        delete this.__compute
-        delete this.__updating
-
-        if(!this.__depends) return
-        
-        while(this.__depends.length){
-            let target = this.__depends.pop()
-            target.__removeSubscriber(this)
-        }
-        delete this.__depends
-    }
-
-    __subscribe(...targets){
-        if(!this.__depends) this.__depends = []
-
-        for(let target of targets){
-            if(target && target.__addSubscriber){
-                if(this.__depends.indexOf(target) < 0) {
-                    this.__depends.push(target)
+            let found = false
+            for(let connectionObj of link.target.__depends[link.name]){
+                if(connectionObj.name === name + 'Changed' && connectionObj.target === target){
+                    found = true
+                    break
                 }
-        
-                target.__addSubscriber(this)
+            }
+
+            if(!found){
+                let connectionObj = Signal.get(target, name + 'Changed').connect(()=>{
+                    link.meta.type.set(link.target, link.name, link.func, link.meta)
+                })
+    
+                link.target.__depends[link.name].push(connectionObj)
             }
             
         }
+
         
+
+        return name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
     }
 
-    __subscribersReset(){
-        if(this.__subscribers)
-        for(let subscriber of this.__subscribers){
-            subscriber.__updating = false
-            subscriber.__completed = false
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
+    static set(target, name, value, meta){
+        let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+
+        if(typeof value === 'function'){
+            try {
+                this.queueLink.push({
+                    target: target,
+                    name: name,
+                    meta: meta,
+                    func: value,
+                })
+                target[name] = this.typeCasting(value.call(target))
+            } finally {
+                this.queueLink.pop()
+            }
+        } else {
+            target[name] = this.typeCasting(value)
+        }  
+
+        let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+
+        if(oldValue !== currentValue){
+            Signal.get(target, name + 'Changed')(oldValue, currentValue)
         }
+
+        return true
     }
 
-    __setCompute(compute){
-        if(this.__frozen) return
-        this.__updating = false
-        this.__compute = compute
-        this.__completed = false
-    }
-
-    __freeze(){
-        this.__frozen = true
-    }
-
-    __unfreeze(){
-        this.__frozen = false
-    }
-
-    __destroy(){
-        super.__destroy()
-        JQApplication.MemoryController.removeLink(this.__value, this)
-
-        this.__unsubscribe()
-
-        for(let key in this){
-            delete this[key]
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
+    static reset(target, name, value, meta){
+        if(target.__depends[name]){
+            for(let connectionObj of target.__depends[name]){
+                Signal.removeConnection(connectionObj)
+            }
+            delete target.__depends[name]
         }
+
+        if(target.__properties) delete target.__properties[name]
+        return this.set(target, name, value, meta)
     }
+
+    static typeCasting(value){
+        return value
+    }
+
+    static getDefaultValue(){
+        return null
+    }
+
 }
 
 module.exports = Property

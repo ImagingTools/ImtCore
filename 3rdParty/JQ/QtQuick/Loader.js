@@ -3,6 +3,7 @@ const Component = require("../QtQml/Component")
 const Var = require("../QtQml/Var")
 const Variant = require("../QtQml/Variant")
 const Real = require("../QtQml/Real")
+const Geometry = require("../QtQml/Geometry")
 const Bool = require("../QtQml/Bool")
 const String = require("../QtQml/String")
 const Signal = require("../QtQml/Signal")
@@ -31,32 +32,30 @@ class Loader extends Item {
         loaded: {type:Signal, slotName:'onLoaded', args:[]},
     })
 
-    onSourceComponentChanged(){
+    SLOT_sourceComponentChanged(oldValue, newValue){
         if(this.item) this.item.destroy()
         if(!this.sourceComponent) return
 
-        let item = this.sourceComponent.createObject(this)
+        let item = this.sourceComponent.createObject(this, {}, true)
         this.item = item
 
-        if(this.__getDataQml('width').__auto) {
-            this.__getDataQml('width').__setCompute(()=>{return this.item.width})
-            this.__getDataQml('width').__update()
-        } else {
-            this.item.__getDataQml('width').__setCompute(()=>{return this.width})
-            this.item.__getDataQml('width').__update()
-        }
-        if(this.__getDataQml('height').__auto) {
-            this.__getDataQml('height').__setCompute(()=>{return this.item.height})
-            this.__getDataQml('height').__update()
-        } else {
-            this.item.__getDataQml('height').__setCompute(()=>{return this.height})
-            this.item.__getDataQml('height').__update()
-        }
+        this.item.widthChanged.connect(()=>{
+            Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
+        })
+        this.item.heightChanged.connect(()=>{
+            Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+        })
+
+        Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
+        Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+        
+        // Geometry.setAuto(this.item.__self, 'width', this.width, this.item.__self.constructor.meta.width)
+        // Geometry.setAuto(this.item.__self, 'height', this.height, this.item.__self.constructor.meta.height)
 
         this.loaded()
     }
 
-    onSourceChanged(){
+    SLOT_sourceChanged(oldValue, newValue){
         if(this.item) this.item.destroy()
         if(!this.source) return
 
@@ -86,41 +85,39 @@ class Loader extends Item {
         let item = cls.create(this)
         this.item = item
 
-        if(this.__getDataQml('width').__auto) {
-            this.__getDataQml('width').__setCompute(()=>{return this.item.width})
-            this.__getDataQml('width').__update()
-        } else {
-            this.item.__getDataQml('width').__setCompute(()=>{return this.width})
-            this.item.__getDataQml('width').__update()
-        }
-        if(this.__getDataQml('height').__auto) {
-            this.__getDataQml('height').__setCompute(()=>{return this.item.height})
-            this.__getDataQml('height').__update()
-        } else {
-            this.item.__getDataQml('height').__setCompute(()=>{return this.height})
-            this.item.__getDataQml('height').__update()
-        }
+        this.item.widthChanged.connect(()=>{
+            Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
+        })
+        this.item.heightChanged.connect(()=>{
+            Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+        })
+
+        Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
+        Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+
+        // Geometry.setAuto(this.item.__self, 'width', this.width, this.item.__self.constructor.meta.width)
+        // Geometry.setAuto(this.item.__self, 'height', this.height, this.item.__self.constructor.meta.height)
 
         this.loaded()
     }
 
-    onWidthChanged(){
-        super.onWidthChanged()
+    // SLOT_widthChanged(oldValue, newValue){
+    //     super.SLOT_widthChanged()
 
-        if(this.item){
-            this.item.__getDataQml('width').__setAuto(this.width)
-        }
-    }
+    //     if(this.item){
+    //         Geometry.setAuto(this.item.__self, 'width', newValue, this.item.__self.constructor.meta.width)
+    //     }
+    // }
 
-    onHeightChanged(){
-        super.onHeightChanged()
+    // SLOT_heightChanged(oldValue, newValue){
+    //     super.SLOT_heightChanged()
         
-        if(this.item){
-            this.item.__getDataQml('height').__setAuto(this.height)
-        }
-    }
+    //     if(this.item){
+    //         Geometry.setAuto(this.item.__self, 'height', newValue, this.item.__self.constructor.meta.height)
+    //     }
+    // }
 }
 
-Loader.initialize()
+
 
 module.exports = Loader

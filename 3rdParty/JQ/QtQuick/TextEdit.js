@@ -5,6 +5,7 @@ const Var = require('../QtQml/Var')
 const String = require('../QtQml/String')
 const Color = require('../QtQml/Color')
 const Real = require('../QtQml/Real')
+const Geometry = require('../QtQml/Geometry')
 const Font = require('../QtQml/Font')
 const Signal = require('../QtQml/Signal')
 const QtEnums = require('../Qt/enums')
@@ -126,7 +127,9 @@ class TextEdit extends Item {
             } else if(e.code === QtEnums.Key_A && e.ctrlKey){
                 e.stopPropagation()
                 this.selectAll()
-            } else if(e.key === QtEnums.Key_Enter || e.key === QtEnums.Key_Tab){
+            } else if(e.key === QtEnums.Key_Enter){
+                e.stopPropagation()
+            } else if(e.key === QtEnums.Key_Tab){
                 e.preventDefault()
                 e.stopPropagation()
             }
@@ -152,8 +155,8 @@ class TextEdit extends Item {
         this.__updateGeometry()
     }
 
-    onFocusChanged(){
-        super.onFocusChanged()
+    SLOT_focusChanged(oldValue, newValue){
+        super.SLOT_focusChanged()
         if(this.focus){
             if(!(this.parent instanceof JQModules.QtQuick.FocusScope)){
                 this.activeFocus = true
@@ -161,7 +164,7 @@ class TextEdit extends Item {
         }
     }
 
-    onHorizontalAlignmentChanged(){
+    SLOT_horizontalAlignmentChanged(oldValue, newValue){
         switch(this.horizontalAlignment){
             case TextEdit.AlignLeft: {
                 this.__setImplStyle({
@@ -190,7 +193,7 @@ class TextEdit extends Item {
         }
     }
 
-    onVerticalAlignmentChanged(){
+    SLOT_verticalAlignmentChanged(oldValue, newValue){
         switch(this.verticalAlignment){
             case TextEdit.AlignTop: {
                 this.__setImplStyle({
@@ -219,7 +222,7 @@ class TextEdit extends Item {
         }
     }
 
-    onActiveFocusChanged(){
+    SLOT_activeFocusChanged(oldValue, newValue){
         if(!this.activeFocus){
             this.__impl.blur()
         }
@@ -233,31 +236,45 @@ class TextEdit extends Item {
             text = '.'
         }
 
-        let textMetrics = JQApplication.TextController.measureText(text, this.font, this.__getDataQml('width').__auto ? 0 : this.width, this.wrapMode, 0)
-        
-        // let textMetrics = this.__impl.getBoundingClientRect()
-
-        this.__getDataQml('width').__setAuto(this.__impl.scrollWidth)
-        this.__getDataQml('height').__setAuto(this.__impl.scrollHeight)
+        let textMetrics = JQApplication.TextController.measureText(text, this.font, !this.width__prevent ? 0 : this.width, this.wrapMode, false, false)
 
         this.contentWidth = textMetrics.width
         this.contentHeight = textMetrics.height
-        this.paintedWidth = textMetrics.width
-        this.paintedHeight = textMetrics.height
+
+        // Geometry.setAuto(this.__self, 'height', textMetrics.height, this.__self.constructor.meta.height)
+        this.height = textMetrics.height
+        Geometry.setAuto(this.__self, 'width', textMetrics.width, this.__self.constructor.meta.width)
+
+        
+        // this.width = textMetrics.width
+        
+
+        // let textMetrics = JQApplication.TextController.measureText(text, this.font, this.__getDataQml('width').__auto ? 0 : this.width, this.wrapMode, 0)
+
+        // this.__getDataQml('width').__setAuto(this.__impl.scrollWidth)
+        // this.__getDataQml('height').__setAuto(this.__impl.scrollHeight)
+
+        // this.contentWidth = textMetrics.width
+        // this.contentHeight = textMetrics.height
+        // this.paintedWidth = textMetrics.width
+        // this.paintedHeight = textMetrics.height
+        // this.__setDOMStyle({
+        //     minHeight: textMetrics.height+'px'
+        // })
     }
 
-    onVisibleChanged(){
-        super.onVisibleChanged()
+    SLOT_visibleChanged(oldValue, newValue){
+        super.SLOT_visibleChanged()
         this.__updateGeometry()
     }
 
-    onTextChanged(){
+    SLOT_textChanged(oldValue, newValue){
         this.__impl.value = this.text
 
         this.__updateGeometry()
     }
 
-    onFontChanged(){
+    onFontChanged(oldValue, newValue){
         this.__setDOMStyle({
             fontWeight: this.font.bold == true ? 'bold' : 'normal',
             fontSize: this.font.pixelSize+'px',
@@ -351,6 +368,6 @@ class TextEdit extends Item {
     }
 }
 
-TextEdit.initialize()
+
 
 module.exports = TextEdit

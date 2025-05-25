@@ -33,17 +33,17 @@ class QWebSocket extends QtObject {
         textMessageReceived: {type:Signal, slotName:'onTextMessageReceived', args:['message']},
     })
 
-    onStatusChanged() {
+    SLOT_statusChanged() {
         if (this.status !== QWebSocket.Error) {
             this.errorString = ''
         }
     }
 
-    onUrlChanged(){
+    SLOT_urlChanged(oldValue, newValue){
         this.__reconnectSocket()
     }
 
-    onActiveChanged(){
+    SLOT_activeChanged(oldValue, newValue){
         this.__reconnectSocket()
     }
 
@@ -95,6 +95,6 @@ class QWebSocket extends QtObject {
     }
 }
 
-QWebSocket.initialize()
+
 
 module.exports = QWebSocket

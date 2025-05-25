@@ -89,14 +89,14 @@ class Canvas extends Item {
         this.__init = true
     }
 
-    onWidthChanged(){
-        super.onWidthChanged()
+    SLOT_widthChanged(oldValue, newValue){
+        super.SLOT_widthChanged()
         this.__getDOM().setAttribute('width', this.width)
         if(this.width > 0 && this.height > 0) this.paint()
     }
 
-    onHeightChanged(){
-        super.onHeightChanged()
+    SLOT_heightChanged(oldValue, newValue){
+        super.SLOT_heightChanged()
         this.__getDOM().setAttribute('height', this.height)
         if(this.width > 0 && this.height > 0) this.paint()
     }
@@ -141,6 +141,6 @@ class Canvas extends Item {
     }
 }
 
-Canvas.initialize()
+
 
 module.exports = Canvas

@@ -31,12 +31,12 @@ class ListModel extends QtObject {
     }
 
     __beginUpdate(){
-        this.dataChanged.blockSignal(true)
+        // this.dataChanged.blockSignal(true)
         super.__beginUpdate()
     }
 
     __endUpdate(){
-        this.dataChanged.blockSignal(false)
+        // this.dataChanged.blockSignal(false)
 
         let changeSet = this.__changeSet
         this.__changeSet = []
@@ -45,7 +45,7 @@ class ListModel extends QtObject {
             obj.__updateView(changeSet)
         } 
 
-        this.dataChanged()
+        this.__proxy.dataChanged()
         super.__endUpdate()
     }
 
@@ -58,11 +58,11 @@ class ListModel extends QtObject {
 
             this.__changeSet.push([this.data.length, this.data.length+dict.length, 'append'])
             for(let i = 0; i < dict.length; i++){
-                this.data.opush(AbstractItemModel.create(this, this.data.length, dict[i]))
+                this.data.__push(AbstractItemModel.create(this, this.data.length, dict[i]))
             }
 		} else {
             this.__changeSet.push([this.data.length, this.data.length+1, 'append'])
-            this.data.opush(AbstractItemModel.create(this, this.data.length, dict))
+            this.data.__push(AbstractItemModel.create(this, this.data.length, dict))
 		}
 
         this.count = this.data.length
@@ -76,11 +76,11 @@ class ListModel extends QtObject {
 
             this.__changeSet.push([index, index+dict.length, 'insert'])
             for(let i = 0; i < dict.length; i++){
-                this.data.osplice(i+index, 0, AbstractItemModel.create(this, i+index, dict[i]))
+                this.data.__splice(i+index, 0, AbstractItemModel.create(this, i+index, dict[i]))
             }
 		} else {
             this.__changeSet.push([index, index+1, 'insert'])
-            this.data.osplice(index, 0, AbstractItemModel.create(this, index, dict))
+            this.data.__splice(index, 0, AbstractItemModel.create(this, index, dict))
 		}
 
         this.count = this.data.length
@@ -89,7 +89,7 @@ class ListModel extends QtObject {
         JQApplication.updateLater(this)
 
         this.__changeSet.push([index, index+count, 'remove'])
-        this.data.osplice(index, count)
+        this.data.__splice(index, count)
 
         this.count = this.data.length
     }
@@ -107,7 +107,7 @@ class ListModel extends QtObject {
         this.data[index][property] = value
     }
 
-    onDataChanged(){
+    SLOT_dataChanged(...args){
 
     }
 
@@ -121,6 +121,6 @@ class ListModel extends QtObject {
     }
 }
 
-ListModel.initialize()
+
 
 module.exports = ListModel

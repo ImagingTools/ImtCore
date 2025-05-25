@@ -3,6 +3,7 @@ const Property = require('../QtQml/Property')
 const String = require('../QtQml/String')
 const Color = require('../QtQml/Color')
 const Real = require('../QtQml/Real')
+const Geometry = require('../QtQml/Geometry')
 const Font = require('../QtQml/Font')
 const Signal = require('../QtQml/Signal')
 
@@ -114,7 +115,7 @@ class Text extends Item {
             isHTML = true
         }
 
-        // let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__getDataQml('width').__auto ? 0 : this.width, this.wrapMode, this.textFormat, this.elide)
+        // let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.width, this.wrapMode, this.textFormat, this.elide)
 
         if(isHTML){
             this.__impl.innerHTML = this.text.replaceAll('<br>', '\r')
@@ -122,69 +123,59 @@ class Text extends Item {
             this.__impl.innerText = this.text.replaceAll('<br>', '\r')
         }
 
+        //temp
         if(this.wrapMode === Text.NoWrap && this.elide === Text.ElideNone && !isHTML){
             let textMetrics = JQApplication.TextController.measureTextFast(this.text, this.font)
 
             this.contentWidth = textMetrics.width
             this.contentHeight = textMetrics.height
 
-            this.__getDataQml('height').__setAuto(textMetrics.height)
-            this.__getDataQml('width').__setAuto(textMetrics.width)
+            Geometry.setAuto(this.__self, 'height', textMetrics.height, this.__self.constructor.meta.height)
+            Geometry.setAuto(this.__self, 'width', textMetrics.width, this.__self.constructor.meta.width)
         } else {
-            let textMetrics = JQApplication.TextController.measureText(this.text, this.font, this.__getDataQml('width').__auto ? 0 : this.width, this.wrapMode, isHTML, this.elide)
+            let textMetrics = JQApplication.TextController.measureText(this.text, this.font, !this.width__prevent ? 0 : this.width, this.wrapMode, isHTML, this.elide)
 
             this.contentWidth = textMetrics.width
             this.contentHeight = textMetrics.height
 
-            this.__getDataQml('height').__setAuto(textMetrics.height)
-            this.__getDataQml('width').__setAuto(textMetrics.width)
+            Geometry.setAuto(this.__self, 'height', textMetrics.height, this.__self.constructor.meta.height)
+            Geometry.setAuto(this.__self, 'width', textMetrics.width, this.__self.constructor.meta.width)
         }
-
-        
-        
-        // if(this.__getDataQml('width').__auto){
-        //     this.contentWidth = Math.max(textMetrics.width, this.__impl.scrollWidth)
-        //     this.contentHeight = Math.max(textMetrics.height, this.__impl.scrollHeight)
-        // } else {
-        //     this.contentWidth = textMetrics.width
-        //     this.contentHeight = textMetrics.height
-        // }
-        
     }
 
-    onWidthChanged(){
-        super.onWidthChanged()
+    SLOT_widthChanged(oldValue, newValue){
+        super.SLOT_widthChanged(oldValue, newValue)
 
         this.__updateGeometry()
     }
 
-    onTextChanged(){
+    SLOT_textChanged(oldValue, newValue){
         this.__updateGeometry()
     }
 
-    onColorChanged(){
-        let rgba = this.__getDataQml('color').__toRGBA()
+    SLOT_colorChanged(oldValue, newValue){
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
         this.__setDOMStyle({
             opacity: 1,
-            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
         })
     }
 
-    onOpacityChanged(){
-        let rgba = this.__getDataQml('color').__toRGBA()
+    SLOT_opacityChanged(oldValue, newValue){
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
         this.__setDOMStyle({
             opacity: 1,
-            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
         })
     }
 
-    onVisibleChanged(){
-        super.onVisibleChanged()
+    SLOT_visibleChanged(oldValue, newValue){
+        super.SLOT_visibleChanged()
 
         this.__updateGeometry()
     }
 
-    onElideChanged(){
+    SLOT_elideChanged(oldValue, newValue){
         if(this.elide === Text.ElideRight){
             this.__setImplStyle({
                 textOverflow: 'ellipsis',
@@ -200,7 +191,7 @@ class Text extends Item {
         this.__updateGeometry()
     }
 
-    onHorizontalAlignmentChanged(){
+    SLOT_horizontalAlignmentChanged(oldValue, newValue){
         switch(this.horizontalAlignment){
             case Text.AlignLeft: this.__setDOMStyle({ justifyContent: 'flex-start', textAlign: 'start' }); break;
             case Text.AlignRight: this.__setDOMStyle({ justifyContent: 'flex-end', textAlign: 'end' }); break;
@@ -211,7 +202,7 @@ class Text extends Item {
         this.__updateGeometry()
     }
 
-    onVerticalAlignmentChanged(){
+    SLOT_verticalAlignmentChanged(oldValue, newValue){
         switch(this.verticalAlignment){
             case Text.AlignTop: this.__setDOMStyle({ alignItems: 'flex-start' }); break;
             case Text.AlignBottom: this.__setDOMStyle({ alignItems: 'flex-end' }); break;
@@ -221,7 +212,7 @@ class Text extends Item {
         this.__updateGeometry()
     }
 
-    onWrapModeChanged(){
+    SLOT_wrapModeChanged(oldValue, newValue){
         switch(this.wrapMode){
             case Text.NoWrap: this.__setDOMStyle({ whiteSpace: 'pre' }); break;
             case Text.WordWrap: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
@@ -233,7 +224,7 @@ class Text extends Item {
         this.__updateGeometry()
     }
 
-    onFontChanged(){
+    onFontChanged(oldValue, newValue){
         this.__setDOMStyle({
             fontWeight: this.font.bold == true ? 'bold' : 'normal',
             fontSize: this.font.pixelSize+'px',
@@ -245,6 +236,6 @@ class Text extends Item {
     }
 }
 
-Text.initialize()
+
 
 module.exports = Text

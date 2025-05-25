@@ -241,10 +241,11 @@ class TextInput extends Item {
         // this.contentHeight = textMetrics.height
         // this.paintedWidth = textMetrics.width
         // this.paintedHeight = textMetrics.height
+        
     }
 
-    onFocusChanged(){
-        super.onFocusChanged()
+    SLOT_focusChanged(oldValue, newValue){
+        super.SLOT_focusChanged()
         if(this.focus){
             if(!(this.parent instanceof JQModules.QtQuick.FocusScope)){
                 this.activeFocus = true
@@ -252,7 +253,7 @@ class TextInput extends Item {
         }
     }
 
-    onHorizontalAlignmentChanged(){
+    SLOT_horizontalAlignmentChanged(oldValue, newValue){
         switch(this.horizontalAlignment){
             case TextInput.AlignLeft: {
                 this.__setImplStyle({
@@ -281,7 +282,7 @@ class TextInput extends Item {
         }
     }
 
-    onVerticalAlignmentChanged(){
+    SLOT_verticalAlignmentChanged(oldValue, newValue){
         switch(this.verticalAlignment){
             case TextInput.AlignTop: {
                 this.__setImplStyle({
@@ -310,14 +311,14 @@ class TextInput extends Item {
         }
     }
 
-    onActiveFocusChanged(){
+    SLOT_activeFocusChanged(oldValue, newValue){
         if(!this.activeFocus){
             this.__impl.blur()
             this.editingFinished()
         }
     }
 
-    onEchoModeChanged(){
+    SLOT_echoModeChanged(oldValue, newValue){
         if(this.text === ''){
             this.__impl.innerHTML = '&#8203'
             return
@@ -330,7 +331,7 @@ class TextInput extends Item {
         }
     }
 
-    onTextChanged(){
+    SLOT_textChanged(oldValue, newValue){
         if(this.text === ''){
             this.__impl.innerHTML = '&#8203'
             return
@@ -345,7 +346,7 @@ class TextInput extends Item {
         this.__updateGeometry()
     }
 
-    onFontChanged(){
+    onFontChanged(oldValue, newValue){
         this.__setDOMStyle({
             fontWeight: this.font.bold == true ? 'bold' : 'normal',
             fontSize: this.font.pixelSize+'px',
@@ -438,6 +439,6 @@ class TextInput extends Item {
     }
 }
 
-TextInput.initialize()
+
 
 module.exports = TextInput

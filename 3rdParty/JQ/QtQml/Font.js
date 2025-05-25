@@ -22,29 +22,29 @@ class Font extends GroupProperty {
     }
 
     onChanged(){
-        if(this.__parent && this.__parent.onFontChanged) this.__parent.onFontChanged()
+        if(this.__parent && this.__parent.onFontChanged) this.__parent.onFontChanged.call(this.__parent.__proxy)
     }
 
-    onBoldChanged(){
+    SLOT_boldChanged(oldValue, newValue){
         this.onChanged()
     }
-    onFamilyChanged(){
+    SLOT_familyChanged(oldValue, newValue){
         this.onChanged()
     }
-    onItalicChanged(){
+    SLOT_italicChanged(oldValue, newValue){
         this.onChanged()
     }
-    onUnderlineChanged(){
+    SLOT_underlineChanged(oldValue, newValue){
         this.onChanged()
     }
-    onPointSizeChanged(){
+    SLOT_pointSizeChanged(oldValue, newValue){
         this.onChanged()
     }
-    onPixelSizeChanged(){
+    SLOT_pixelSizeChanged(oldValue, newValue){
         this.onChanged()
     }
 }
 
-Font.initialize()
+
 
 module.exports = Font

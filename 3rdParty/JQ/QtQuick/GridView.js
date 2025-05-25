@@ -102,22 +102,21 @@ class GridView extends Flickable {
 
     }
 
-    onModelChanged(){
+    SLOT_modelChanged(oldValue, newVlaue) {
         this.__clear()
-        
-        if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){
-            this.__model.__removeViewListener(this)
+
+        if (oldValue && typeof oldValue === 'object' && !Array.isArray(oldValue) && !oldValue.__destroyed) {
+            oldValue.__removeViewListener(this)
         }
 
-        if(this.model && typeof this.model === 'object'){
-            this.model.__addViewListener(this)
-            this.__model = this.model
+        if (newVlaue && typeof newVlaue === 'object' && !Array.isArray(newVlaue)) {
+            newVlaue.__addViewListener(this)
         }
 
         this.__initView(this.__completed)
     }
 
-    onDelegateChanged(){
+    SLOT_delegateChanged(oldValue, newValue){
         this.__clear()
         this.__initView(this.__completed)
     }
@@ -143,15 +142,17 @@ class GridView extends Flickable {
     }
 
     __createItem(index){
-        let model
+        let properties = {}
 
-        if(typeof this.model === 'object'){
-            model = this.model.data[index]
+        if (Array.isArray(this.model)) {
+            properties.modelData = this.model[index]
+        } else if(typeof this.model === 'object'){
+            properties.model = this.model.data[index]
         } else {
-            model = {index:index}
+            properties.model = {index:index}
         }
 
-        let item = this.delegate.createObject(this.contentItem, model)
+        let item = this.delegate.createObject(this.contentItem, properties)
 
         this.__items[index] = item
 
@@ -161,7 +162,9 @@ class GridView extends Flickable {
     __initView(isCompleted){
         if(this.delegate && this.model && isCompleted){
             let length = 0 
-            if(typeof this.model === 'object'){     
+            if (Array.isArray(this.model)) {
+                length = this.model.length
+            } else if(typeof this.model === 'object'){     
                 length = this.model.count
             } else if(typeof this.model === 'number'){
                 length = this.model
@@ -180,7 +183,7 @@ class GridView extends Flickable {
                 countChanged = true 
             }
 
-            this.__getDataQml('count').__value = length
+            this.__self.count = length
 
             for(let i = 0; i < length; i++){
                 this.__createItem(i)
@@ -195,7 +198,9 @@ class GridView extends Flickable {
     __updateView(changeSet){
         if(this.delegate && this.model && this.__completed){
             let length = 0 
-            if(typeof this.model === 'object'){     
+            if (Array.isArray(this.model)) {
+                length = this.model.length
+            } else if(typeof this.model === 'object'){     
                 length = this.model.count
             } else if(typeof this.model === 'number'){
                 length = this.model
@@ -214,7 +219,7 @@ class GridView extends Flickable {
                 countChanged = true 
             }
 
-            this.__getDataQml('count').__value = length
+            this.__self.count = length
 
             for(let change of changeSet){
                 let leftTop = change[0]
@@ -246,7 +251,9 @@ class GridView extends Flickable {
 
     __updateGrid(){
         let length = 0 
-        if(typeof this.model === 'object'){     
+        if (Array.isArray(this.model)) {
+            length = this.model.length
+        } else if(typeof this.model === 'object'){     
             length = this.model.count
         } else if(typeof this.model === 'number'){
             length = this.model
@@ -285,31 +292,31 @@ class GridView extends Flickable {
 
     }
 
-    onWidthChanged(){
-        super.onWidthChanged()
+    SLOT_widthChanged(oldValue, newValue){
+        super.SLOT_widthChanged()
 
         JQApplication.updateLater(this)
     }
 
-    onHeightChanged(){
-        super.onHeightChanged()
+    SLOT_heightChanged(oldValue, newValue){
+        super.SLOT_heightChanged()
 
         JQApplication.updateLater(this)
     }
 
-    onCellWidthChanged(){
+    SLOT_cellWidthChanged(oldValue, newValue){
         JQApplication.updateLater(this)
     }
 
-    onCellHeightChanged(){
+    SLOT_cellHeightChanged(oldValue, newValue){
         JQApplication.updateLater(this)
     }
 
-    onContentWidthChanged(){
+    SLOT_contentWidthChanged(oldValue, newValue){
         
     }
 
-    onContentHeightChanged(){
+    SLOT_contentHeightChanged(oldValue, newValue){
         
     }
 
@@ -334,6 +341,6 @@ class GridView extends Flickable {
     }
 }
 
-GridView.initialize()
+
 
 module.exports = GridView

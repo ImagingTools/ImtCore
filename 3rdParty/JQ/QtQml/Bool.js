@@ -1,14 +1,12 @@
 const Property = require("./Property")
 
 class Bool extends Property {
-    static defaultValue = false
+    static getDefaultValue(){
+        return false
+    }
 
-    __typecasting(value){
-        if(value === undefined) throw 'Cannot assign [undefined] to Bool'
-        
-        if(typeof value === 'object') {
-            if(value instanceof Property) return value.__get() ? true : false
-        }
+    static typeCasting(value){
+        // if(value === undefined) throw 'Cannot assign [undefined] to Bool'
 
         return value ? true : false
     }

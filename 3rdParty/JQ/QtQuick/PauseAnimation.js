@@ -11,7 +11,7 @@ class PauseAnimation extends Animation {
 
     __duration = 250
  
-    onDurationChanged() {
+    SLOT_durationChanged() {
         this.__duration = this.duration
     }
 
@@ -32,6 +32,6 @@ class PauseAnimation extends Animation {
     }
 }
 
-PauseAnimation.initialize()
+
 
 module.exports = PauseAnimation

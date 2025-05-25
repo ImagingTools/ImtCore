@@ -13,6 +13,19 @@ class BaseObject {
         return false
     }
 
+    static getDefaultValue(){
+        return null
+    }
+
+    static cachedComponents = {}
+
+    static cachedComponent(id, comp){
+        if(this.cachedComponents[id]) return this.cachedComponents[id]
+
+        this.cachedComponents[id] = comp
+        return this.cachedComponents[id]
+    }
+
     __destroy(){}
 
     destroy(){

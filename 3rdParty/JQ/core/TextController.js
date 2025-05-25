@@ -34,7 +34,7 @@ module.exports = {
     },
 
     measureTextFast(text, font){
-        this.ctx.font = `${font.pixelSize}px ${font.family}`
+        this.ctx.font = `${font.italic ? 'italic ' : ''}${font.bold ? 'bold ' : ''}${font.pixelSize}px ${font.family}`
         let textMetrics = this.ctx.measureText(text)
         
         return {

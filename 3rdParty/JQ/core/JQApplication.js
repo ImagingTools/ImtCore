@@ -20,6 +20,9 @@ module.exports = {
             __queue: [],
         }
 
+        global.JQModules.QtQml.XMLHttpRequest = XMLHttpRequest
+        global.JQModules.QtQml.FileReader = FileReader
+
         let XMLParser = new DOMParser()
 
         let Context = (class extends JQModules.QtQml.QObject {
@@ -45,7 +48,7 @@ module.exports = {
                 return result ? result : sourceText
             }
 
-            onLanguageChanged(){
+            SLOT_languageChanged(oldValue, newValue){
                 if(this.application && this.language && !this.__languages[this.language]){
                     let langPrefixList = []
                     if(typeof this.application === 'string'){
@@ -83,8 +86,8 @@ module.exports = {
                 }
             }
         })
-        Context.initialize()
-        global.context = Context.create()
+        
+        global.JSContext = Context.create()
        
         XMLHttpRequest.querySet = {}
         let XMLProxy = XMLHttpRequest.prototype.open
@@ -176,6 +179,10 @@ module.exports = {
             }
 
 
+            .Map > *{
+                pointer-events: all;
+            }
+
             *[invisible] {
                 display: none;
             }
@@ -209,6 +216,7 @@ module.exports = {
 
     objectsAwaitingUpdate: new Set(),
     updateLayers: [],
+    initLayers: [],
     deleteObjects: [],
 
     focusTree: [],
@@ -239,6 +247,7 @@ module.exports = {
 
     beginUpdate: function(){
         this.updateLayers.push([])
+        this.initLayers.push([])
     },
 
     deleteLater: function(obj){
@@ -251,6 +260,10 @@ module.exports = {
         } else {
             obj.__destroy()
         }
+    },
+
+    initLater(obj){
+        this.initLayers[this.initLayers.length-1].push(obj)
     },
 
     updateLater(obj){
@@ -270,6 +283,13 @@ module.exports = {
 
     endUpdate: function(){
         let layer = this.updateLayers.pop()
+        let initLayer = this.initLayers.pop()
+
+        if(initLayer){
+            for(let obj of initLayer){
+                obj.__init()
+            }
+        } 
 
         if(layer){
             for(let obj of layer){

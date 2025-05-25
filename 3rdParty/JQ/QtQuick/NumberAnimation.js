@@ -12,6 +12,6 @@ class NumberAnimation extends PropertyAnimation {
     })
 }
 
-NumberAnimation.initialize()
+
 
 module.exports = NumberAnimation
