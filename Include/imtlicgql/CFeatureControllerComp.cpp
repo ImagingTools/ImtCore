@@ -29,7 +29,7 @@ istd::IChangeableUniquePtr CFeatureControllerComp::CreateObjectFromRequest(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to create object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Feature controller");
@@ -94,7 +94,7 @@ imtbase::CTreeItemModel* CFeatureControllerComp::GetObject(const imtgql::CGqlReq
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Feature controller");
@@ -188,11 +188,11 @@ imtbase::CTreeItemModel* CFeatureControllerComp::GetTreeItemModel(const imtgql::
 
 bool CFeatureControllerComp::GetOperationFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
-			imtgql::CGqlObject& gqlObject,
+			imtgql::CGqlParamObject& gqlObject,
 			QString& errorMessage,
 			int& operationType) const
 {
-	const imtgql::CGqlObject fieldList = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject fieldList = gqlRequest.GetFields();
 
 	if (fieldList.GetFieldIds().contains("treeItem")){
 		// operationType = OT_USER_OPERATION + 1;

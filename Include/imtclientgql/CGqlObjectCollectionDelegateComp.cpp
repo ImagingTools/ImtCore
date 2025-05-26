@@ -33,11 +33,11 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectTypeIdRequ
 	QByteArray commandId = *m_collectionIdAttrPtr + "TypeId";
 
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("id", QVariant(objectId));
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	requestPtr->AddField("objectTypeId", query);
 
 	return requestPtr;
@@ -48,11 +48,11 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectInfoReques
 {
 	QByteArray commandId = *m_collectionIdAttrPtr + "Info";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("id", QVariant(objectId));
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	requestPtr->AddField("info", query);
 
 	return requestPtr;
@@ -63,11 +63,11 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectMetaInfoRe
 {
 	QByteArray commandId = *m_collectionIdAttrPtr + "MetaInfo";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("id", QVariant(objectId));
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	requestPtr->AddField("metaInfo", query);
 
 	return requestPtr;
@@ -78,11 +78,11 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectDataMetaIn
 {
 	QByteArray commandId = *m_collectionIdAttrPtr + "DataMetaInfo";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("id", QVariant(objectId));
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	requestPtr->AddField("dataMetaInfo", query);
 
 	return requestPtr;
@@ -104,7 +104,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 	QByteArray data;
 	QByteArray commandId = *m_collectionIdAttrPtr + "Add";
 	istd::TDelPtr<imtgql::CGqlRequest> requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("typeId", QVariant(typeId));
 	input.InsertField("name", QVariant(name));
 	input.InsertField("description", QVariant(description));
@@ -161,7 +161,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	requestPtr->AddField("addedNotification", query);
 
 	return requestPtr.PopPtr();
@@ -172,11 +172,11 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(co
 {
 	QByteArray commandId = *m_collectionIdAttrPtr + "View";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("id", QVariant(objectId));
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	query.InsertField("Id");
 	requestPtr->AddField("item", query);
 
@@ -198,7 +198,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 
 	QByteArray commandId = *m_collectionIdAttrPtr + "Update";
 	istd::TDelPtr<imtgql::CGqlRequest> requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("id", QVariant(objectId));
 	input.InsertField("typeId", QVariant(typeId));
 
@@ -252,7 +252,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	requestPtr->AddField("updatedNotification", query);
 
 	return requestPtr.PopPtr();
@@ -268,7 +268,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectRequest
 	QByteArray data;
 	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 	
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("id", QVariant(objectId));
 	input.InsertField("version", QVariant(clientElementVersion));
 	if (operationContextPtr != nullptr){
@@ -285,7 +285,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectRequest
 
 	queryPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	queryPtr->AddField("removedNotification", query);
 
 	return queryPtr;
@@ -296,7 +296,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequ
 {
 	QByteArray commandId = *m_collectionIdAttrPtr + "Count";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 
 	QByteArray data;
 	if (selectionParamsPtr != nullptr){
@@ -313,7 +313,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequ
 
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	requestPtr->AddField("itemsCount", query);
 
 	return requestPtr;
@@ -327,7 +327,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 {
 	QByteArray commandId = *m_collectionIdAttrPtr + "Ids";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("offset", QVariant(offset));
 	input.InsertField("count", QVariant(count));
 	QByteArray data;
@@ -344,7 +344,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 	}
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	requestPtr->AddField("itemIds", query);
 
 	return requestPtr;
@@ -358,9 +358,9 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionReq
 {
 	QByteArray commandId = *m_collectionIdAttrPtr + "SubCollection";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 
-	imtgql::CGqlObject viewParams;
+	imtgql::CGqlParamObject viewParams;
 	viewParams.InsertField("offset", QVariant(offset));
 	viewParams.InsertField("count", QVariant(count));
 	QByteArray data;
@@ -380,7 +380,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionReq
 
 	requestPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	query.InsertField("info");
 	query.InsertField("metaInfo");
 	query.InsertField("dataMetaInfo");
@@ -401,7 +401,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectNameReques
 	QByteArray data;
 	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("id", QVariant(objectId));
 	input.InsertField("newName", QVariant(name));
 	input.InsertField("version", QVariant(clientVersion));
@@ -419,7 +419,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectNameReques
 	}
 	queryPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	queryPtr->AddField("rename", query);
 
 	return queryPtr;
@@ -436,7 +436,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptio
 	QByteArray data;
 	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 
-	imtgql::CGqlObject input;
+	imtgql::CGqlParamObject input;
 	input.InsertField("id", QVariant(objectId));
 	input.InsertField("description", QVariant(description));
 	input.InsertField("version", QVariant(clientVersion));
@@ -455,7 +455,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptio
 
 	queryPtr->AddParam("input", input);
 
-	imtgql::CGqlObject query;
+	imtgql::CGqlFieldObject query;
 	queryPtr->AddField("setDescription", query);
 
 	return queryPtr;

@@ -317,7 +317,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
@@ -367,7 +367,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::ImportObject(const im
 	istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = BaseClass::ImportObject(gqlRequest, errorMessage);
 	if (resultModelPtr.IsValid()){
 		if (m_objectCollectionCompPtr.IsValid()){
-			const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+			const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 			if (inputParamPtr != nullptr){
 				bool force = inputParamPtr->GetFieldArgumentValue("force").toBool();
 				QByteArray objectId = resultModelPtr->GetData("id").toByteArray();

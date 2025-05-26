@@ -12,7 +12,7 @@ namespace imtsdlgenv2
 
 /**
 	The C++ class modificator, adds saving and loading generated SDL types to/from  GraphQL object
-	Extends generated classes by add methods, allows to save and load it from/to \c imtgql::CGqlObject
+	Extends generated classes by add methods, allows to save and load it from/to \c imtgql::CGqlParamObject
  */
 class CSdlClassGqlModificatorComp: public imtsdlgen::CSdlClassModificatorBaseComp, protected CSdlGenTools
 {

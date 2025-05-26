@@ -156,7 +156,7 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
 	if (inputParamPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to create address object. Error: GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, __FILE__);
@@ -238,7 +238,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject(QByteArrayLiteral("input"));
 	if (inputParamPtr == nullptr){
 		errorMessage = QStringLiteral("Unable to update address object. Error: GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, __FILE__);

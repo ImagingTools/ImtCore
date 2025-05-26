@@ -40,8 +40,8 @@ imtbase::CTreeItemModel* CObjectMetaInfoCollectionControllerComp::ListObjects(co
 		itemsModel = new imtbase::CTreeItemModel();
 		notificationModel = new imtbase::CTreeItemModel();
 
-		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		QList<imtgql::CGqlObject> inputParams;
+		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
+		QList<imtgql::CGqlParamObject> inputParams;
 		inputParams.append(gqlRequest.GetParams());
 		if (inputParams.size() > 0){
 			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");

@@ -17,7 +17,7 @@ imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalRespon
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		SendErrorMessage(0, QString("Unable to create object. GQL input params is invalid."), "CProductPermissionsControllerComp");
 

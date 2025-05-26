@@ -278,7 +278,7 @@ bool CDocumentRevisionControllerComp::IsRequestSupported(const imtgql::CGqlReque
 		return false;
 	}
 
-	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
 		return false;
 	}

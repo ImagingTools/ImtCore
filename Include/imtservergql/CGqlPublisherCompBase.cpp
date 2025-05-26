@@ -20,7 +20,7 @@ namespace imtservergql
 
 bool CGqlPublisherCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	imtgql::CGqlObject fieldsPtr = gqlRequest.GetFields();
+	imtgql::CGqlFieldObject fieldsPtr = gqlRequest.GetFields();
 	if (fieldsPtr.GetFieldIds().isEmpty()){
 		return false;
 	}

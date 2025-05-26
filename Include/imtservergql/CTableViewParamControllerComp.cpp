@@ -38,7 +38,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to create response for GraphQL request with ID: '%1'. Invalid GraphQL input params.").arg(qPrintable(commandId));
 		SendErrorMessage(0, errorMessage, "imtservergql::CTableViewParamControllerComp");

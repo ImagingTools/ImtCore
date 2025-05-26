@@ -555,7 +555,7 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to get a meta info. Error: GraphQL params is invalid");
 		return nullptr;

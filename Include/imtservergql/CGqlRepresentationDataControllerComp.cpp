@@ -77,7 +77,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 		return CreateRepresentationFromRequest(gqlRequest, errorMessage);
 	}
 	else if (requestType == imtgql::IGqlRequest::RT_MUTATION){
-		QList<imtgql::CGqlObject> params;
+		QList<imtgql::CGqlParamObject> params;
 		params.append(gqlRequest.GetParams());
 		if (!params.isEmpty()){
 			QByteArray itemData = params.at(0).GetFieldArgumentValue("Item").toByteArray();
@@ -106,7 +106,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
 {
 	QByteArray productId;
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
 		productId = inputParamPtr->GetFieldArgumentValue("productId").toByteArray();
 	}

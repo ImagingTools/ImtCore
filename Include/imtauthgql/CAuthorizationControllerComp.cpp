@@ -22,7 +22,7 @@ bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
 	QByteArray& password,
 	QByteArray& productId) const
 {
-	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		return false;
 	}

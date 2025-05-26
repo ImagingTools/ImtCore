@@ -30,7 +30,7 @@ imtbase::CTreeItemModel* CBroadcastMessageConsumerControllerComp::CreateInternal
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
 		errorMessage = QString("Unable to send broadcast message. GraphQL input params is invalid");
 		SendErrorMessage(0, errorMessage);

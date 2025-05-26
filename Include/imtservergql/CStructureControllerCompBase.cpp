@@ -50,7 +50,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	imtgql::CGqlObject gqlObject;
+	imtgql::CGqlParamObject gqlObject;
 
 	int operationType = OT_UNKNOWN;
 	if (!GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType)){
@@ -101,7 +101,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
 
 bool CStructureControllerCompBase::GetOperationFromRequest(
 	const imtgql::CGqlRequest& gqlRequest,
-	imtgql::CGqlObject& /*gqlObject*/,
+	imtgql::CGqlParamObject& /*gqlObject*/,
 	QString& errorMessage,
 	int& operationType) const
 {
@@ -176,7 +176,7 @@ bool CStructureControllerCompBase::GetOperationFromRequest(
 }
 
 
-QByteArray CStructureControllerCompBase::GetObjectIdFromInputParams(const QList<imtgql::CGqlObject>& inputParams) const
+QByteArray CStructureControllerCompBase::GetObjectIdFromInputParams(const QList<imtgql::CGqlParamObject>& inputParams) const
 {
 	int count = inputParams.count();
 	for (int i = 0; i < count; i++){
@@ -200,7 +200,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewNode(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
 
 	QByteArray nodeId;
 	QByteArray parentNodeId;
@@ -237,7 +237,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeName(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
 
 	QByteArray nodeId;
 	QString newName;
@@ -308,9 +308,9 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 	QByteArray typeId;
 	QByteArray nodeId;
 	QByteArray selectIndex;
-	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
-	const imtgql::CGqlObject* additionObject = nullptr;
-	const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject* additionObject = nullptr;
+	const imtgql::CGqlParamObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
 	if (inputObject != nullptr){
 		additionObject = inputObject->GetFieldArgumentObjectPtr("addition");
 	}
@@ -429,7 +429,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -446,8 +446,8 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 		itemsModel = new imtbase::CTreeItemModel();
 		notificationModel = new imtbase::CTreeItemModel();
 
-		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
+		const imtgql::CGqlParamObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
 		if (inputObject != nullptr){
 			viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
 		}
@@ -533,8 +533,8 @@ QByteArrayList CStructureControllerCompBase::GetInformationIds(const imtgql::CGq
 {
 	QByteArrayList retVal;
 
-	const imtgql::CGqlObject fields = gqlRequest.GetFields();
-	const imtgql::CGqlObject* findObject = fields.GetFieldArgumentObjectPtr(objectId);
+	const imtgql::CGqlFieldObject fields = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject* findObject = fields.GetFieldArgumentObjectPtr(objectId);
 	if (findObject != nullptr){
 		retVal= findObject->GetFieldIds();
 	}

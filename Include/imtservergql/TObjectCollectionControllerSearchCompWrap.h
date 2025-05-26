@@ -115,12 +115,12 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	groupFilter.fieldFilters = fieldList;
 	complexFilter.fieldsFilter = groupFilter;
 
-	imtgql::CGqlObject input;
-	imtgql::CGqlObject viewParams;
+	imtgql::CGqlParamObject input;
+	imtgql::CGqlParamObject viewParams;
 	viewParams.InsertField("offset", 0);
 	viewParams.InsertField("count", -1);
 	
-	imtgql::CGqlObject complexFilterGqlOblect;
+	imtgql::CGqlParamObject complexFilterGqlOblect;
 	if (complexFilter.WriteToGraphQlObject(complexFilterGqlOblect)){
 		viewParams.InsertField("filterModel", complexFilterGqlOblect);
 	}
@@ -128,7 +128,7 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	input.InsertField("viewParams", viewParams);
 	gqlRequest.AddParam("input", input);
 
-	imtgql::CGqlObject items;
+	imtgql::CGqlFieldObject items;
 	items.InsertField("id");
 	items.InsertField("name");
 	items.InsertField("typeId");

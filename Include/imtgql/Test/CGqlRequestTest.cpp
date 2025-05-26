@@ -213,6 +213,7 @@ const char* complexQuery = R"(
 }"}
 )";
 
+
 static const QByteArray complexQueryResult = R"({"query": "mutation TestMutation {TestMutation(input: {ArrayOfBools: [true, false, true], ArrayOfDoubles: [0.1, 0.2, 0.3], ArrayOfInts: [1, 2, 3], ArrayOfStrings: [\"1\", \"2\", \"3\"], BoolValueNo: false, BoolValueYes: true, DoubleValue: 1.1, IntValue: 1, StringValue: \"1\", ObjectValue: {DoubleValue: 1.1, IntValue: 1, StringValue: \"1\"}, ArrayOfObjectArrays :[ {object: {ArrayOfObjectsWithArray :[ {Array: [1, 2, 3]}, {Array: [0.1, 0.2, 0.3]}, {Array: [\"1\", \"2\", \"3\"]} ]}}, {object2: {ArrayOfObjectsWithArray :[ {Array: [1, 2, 3]} ]}} ], ArrayOfObjects :[ {Value: 1}, {Value: 1.1}, {Value: \"1\"} ]}) {RootField {Field}}}"})";
 
 const char* substratQuery = R"(
@@ -277,12 +278,146 @@ const char* substratQuery = R"(
 	}) {items {id name lab classDeltaE typeId substrateClassName manufacturer article added lastModified}}}"}
 )";
 
+
 static const QByteArray substratQueryResult = R"({"query": "query SubstratesList {SubstratesList(input: {viewParams: {count: 25, offset: 0, filterModel: {fieldsFilter: {logicalOperation: \"AND\", fieldFilters :[ ], groupFilters :[ {logicalOperation: \"OR\", fieldFilters :[ {fieldId: \"Name\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"TypeId\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"SubstrateClassName\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"Manufacturer\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"}, {fieldId: \"Article\", filterOperation: \"CONTAINS\", filterValue: \"cc\", filterValueType: \"string\"} ], groupFilters :[ ]} ]}, timeFilter: {interpretationMode: \"\", timeUnit: \"\", unitMultiplier: 0, timeRange: {Begin: \"\", End: \"\"}}, sortingInfo :[ {fieldId: \"Name\", sortingOrder: \"ASC\"} ]}}}) {items {id name lab classDeltaE typeId substrateClassName manufacturer article added lastModified}}}"})";
+
+const char* unionFieldsQuery = R"(
+{"query": "query TestUnionQuery {
+		TestUnionQuery
+		{
+			FirstField {first second {... on Person { name } ... on Photo { height } }}
+			SecondField {
+				first
+				second {
+					... on Person {
+						name
+					}
+					... on Photo {
+						height
+						status {
+							isOpen
+							... on Device {
+								id
+								type
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+"}
+)";
+
+
+const char* arrayQuery2 = R"(
+{"query": "mutation TestMutation {
+	TestMutation(
+		input: {
+			ArrayOfInts: [1,2,3],
+			ArrayOfDoubles: [0.1,0.2,0.3],
+			ArrayOfStrings: [\"1\",\"2\",\"3\"],
+			ArrayOfObjects: [
+				{Value: 1},
+				{Value: 1.1},
+				{Value:\"1\"},
+			]
+		}
+	)
+	{
+		RootField {
+			Field
+		}
+	}
+}"}
+)";
+
+static const QByteArray unionFieldsQueryResult = R"({"query": "query TestUnionQuery {TestUnionQuery {FirstField {first second { ... on Person {name}  ... on Photo {height}}} SecondField {first second { ... on Person {name}  ... on Photo {height status {isOpen  ... on Device {id type}}}}}}}"})";
 
 
 void CGqlRequestTest::initTestCase()
 {
 
+}
+
+void CGqlRequestTest::CreateArrayQuery()
+{
+	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_MUTATION);
+	request.SetCommandId("TestMutation");
+	imtgql::CGqlFieldObject rootField;
+	rootField.InsertField("Field");
+	request.AddField("RootField", rootField);
+
+	imtgql::CGqlParamObject inputObject;
+	QList<int> arrayOfInts = {1,2,3};
+	inputObject.InsertField("ArrayOfInts", QVariant::fromValue(arrayOfInts));
+	QList<double> arrayOfDoubles = {0.1,0.2,0.3};
+	inputObject.InsertField("ArrayOfDoubles", QVariant::fromValue(arrayOfDoubles));
+	QList<QString> arrayOfStrings = {"1","2","3"};
+	inputObject.InsertField("ArrayOfStrings", QVariant::fromValue(arrayOfStrings));
+
+	imtgql::CGqlParamObject valueObject;
+	valueObject.InsertField("Value", 1);
+	inputObject.AppendFieldToArray("ArrayOfObjects",valueObject);
+	valueObject.InsertField("Value", 1.1);
+	inputObject.AppendFieldToArray("ArrayOfObjects",valueObject);
+	valueObject.InsertField("Value", "1");
+	inputObject.AppendFieldToArray("ArrayOfObjects",valueObject);
+
+	request.AddParam("input", inputObject);
+
+	QByteArray resultQuery = request.GetQuery();
+	QCOMPARE(resultQuery, arrayQueryResult);
+}
+
+
+void CGqlRequestTest::CreateUnionRequest()
+{
+	imtgql::CGqlRequest request;
+	request.SetCommandId("TestUnionQuery");
+
+	imtgql::CGqlFieldObject firstField;
+	firstField.InsertField("first");
+	imtgql::CGqlFieldObject secondInternalField;
+	imtgql::CGqlFieldFragment fragmentPerson;
+	fragmentPerson.InsertField("name");
+	secondInternalField.InsertFragment("Person", fragmentPerson);
+	imtgql::CGqlFieldFragment fragmentPhoto;
+	fragmentPhoto.InsertField("height");
+	secondInternalField.InsertFragment("Photo", fragmentPhoto);
+	firstField.InsertField("second", secondInternalField);
+	request.AddField("FirstField", firstField);
+
+	imtgql::CGqlFieldObject secondField;
+	secondInternalField.ResetData();
+	secondField.InsertField("first");
+	secondInternalField.InsertFragment("Person", fragmentPerson);
+	imtgql::CGqlFieldObject fieldStatus;
+	fieldStatus.InsertField("isOpen");
+	imtgql::CGqlFieldFragment fragmentDevice;
+	fragmentDevice.InsertField("id");
+	fragmentDevice.InsertField("type");
+	fieldStatus.InsertFragment("Device", fragmentDevice);
+	fragmentPhoto.InsertField("status", fieldStatus);
+	secondInternalField.InsertFragment("Photo", fragmentPhoto);
+	secondField.InsertField("second", secondInternalField);
+	request.AddField("SecondField", secondField);
+
+	QByteArray resultQuery = request.GetQuery();
+	QCOMPARE(resultQuery, unionFieldsQueryResult);
+}
+
+
+void CGqlRequestTest::ParseUnionFields()
+{
+	int errorPosition = -1;
+
+	imtgql::CGqlRequest request;
+	bool retVal = request.ParseQuery(unionFieldsQuery, errorPosition);
+	QByteArray resultQuery = request.GetQuery();
+	QVERIFY(retVal);
+	QVERIFY(errorPosition < 0);
+	QCOMPARE(resultQuery, unionFieldsQueryResult);
 }
 
 

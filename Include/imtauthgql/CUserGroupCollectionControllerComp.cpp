@@ -304,7 +304,7 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject& params = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject& params = gqlRequest.GetParams();
 
 	QByteArray productId = params.GetFieldArgumentValue("productId").toByteArray();
 

@@ -11,7 +11,7 @@ namespace imtgql
 
 // public methods
 
-QByteArray GetLanguageIdFromRequest(const QList<imtgql::CGqlObject>& inputParams)
+QByteArray GetLanguageIdFromRequest(const QList<imtgql::CGqlParamObject>& inputParams)
 {
 	int count = inputParams.count();
 	for (int i = 0; i < count; i++){
@@ -24,7 +24,7 @@ QByteArray GetLanguageIdFromRequest(const QList<imtgql::CGqlObject>& inputParams
 }
 
 
-QByteArray GetDesignSchemeIdFromRequest(const QList<imtgql::CGqlObject>& /*inputParams*/)
+QByteArray GetDesignSchemeIdFromRequest(const QList<imtgql::CGqlParamObject>& /*inputParams*/)
 {
 	return QByteArray();
 }

@@ -25,7 +25,7 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to create object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "License controller");
@@ -161,7 +161,7 @@ imtbase::CTreeItemModel* CLicenseControllerComp::GetObject(const imtgql::CGqlReq
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "License controller");

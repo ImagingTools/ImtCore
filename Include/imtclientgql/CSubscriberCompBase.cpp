@@ -53,7 +53,7 @@ void CSubscriberCompBase::OnComponentCreated()
 		for (int i = 0; i < m_commandAttrPtr.GetCount(); i++){
 			imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, m_commandAttrPtr[i]);
 
-			imtgql::CGqlObject subscriptionField;
+			imtgql::CGqlFieldObject subscriptionField;
 			subscriptionField.InsertField("id");
 			gqlRequest.AddField("data", subscriptionField);
 

@@ -30,15 +30,15 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType&
 
 	// add method definitions
 	ofStream << QStringLiteral("\t\t[[nodiscard]] bool WriteToGraphQlObject(");
-	ofStream << ("::imtgql::CGqlObject& request) const;");
+	ofStream << ("::imtgql::CGqlParamObject& request) const;");
 	FeedStream(ofStream, 1, false);
 	
 	ofStream << QStringLiteral("\t\t[[nodiscard]] bool ReadFromGraphQlObject(");
-	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request);");
+	ofStream << QStringLiteral("const ::imtgql::CGqlParamObject& request);");
 	FeedStream(ofStream, 1);
 	
 	ofStream << QStringLiteral("\t\t[[nodiscard]] bool OptReadFromGraphQlObject(");
-	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request);");
+	ofStream << QStringLiteral("const ::imtgql::CGqlParamObject& request);");
 	FeedStream(ofStream, 1);
 
 	return true;
@@ -64,7 +64,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	ofStream << QStringLiteral("bool ");
 	ofStream << structNameConverter.GetString();
 	ofStream << QStringLiteral("::WriteToGraphQlObject(");
-	ofStream << ("::imtgql::CGqlObject& request) const\n{");
+	ofStream << ("::imtgql::CGqlParamObject& request) const\n{");
 	FeedStream(ofStream, 1, false);
 
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
@@ -78,7 +78,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	ofStream << QStringLiteral("bool ");
 	ofStream << structNameConverter.GetString();
 	ofStream << QStringLiteral("::ReadFromGraphQlObject(");
-	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request)\n{");
+	ofStream << QStringLiteral("const ::imtgql::CGqlParamObject& request)\n{");
 	FeedStream(ofStream, 1, false);
 
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
@@ -92,7 +92,7 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType&
 	ofStream << QStringLiteral("bool ");
 	ofStream << structNameConverter.GetString();
 	ofStream << QStringLiteral("::OptReadFromGraphQlObject(");
-	ofStream << QStringLiteral("const ::imtgql::CGqlObject& request)\n{");
+	ofStream << QStringLiteral("const ::imtgql::CGqlParamObject& request)\n{");
 	FeedStream(ofStream, 1, false);
 
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
@@ -520,7 +520,7 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 
 	// declare temp GQL object
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("::imtgql::CGqlObject ") << dataObjectVariableName << ';';
+	stream << QStringLiteral("::imtgql::CGqlParamObject ") << dataObjectVariableName << ';';
 	FeedStream(stream, 1, false);
 	if (isUnion){
 		const QString unionSourceVarName = '*' + field.GetId();
@@ -581,7 +581,7 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 
 	// declare temp GQL object list
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("QList<::imtgql::CGqlObject> ") << dataObjectListVariableName << ';';
+	stream << QStringLiteral("QList<::imtgql::CGqlParamObject> ") << dataObjectListVariableName << ';';
 	FeedStream(stream, 1, false);
 
 	// declare loop
@@ -599,7 +599,7 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 		const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("GqlValue");
 
 		// declare target value, to store value
-		stream << QStringLiteral("::imtgql::CGqlObject ");
+		stream << QStringLiteral("::imtgql::CGqlParamObject ");
 		stream << unionConvertedVarName << ';';
 		FeedStream(stream, 1, false);
 
@@ -629,7 +629,7 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 	else{
 		// inLoop: declare temp object (inserted to list)
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("::imtgql::CGqlObject ") << dataObjectVariableName << ';';
+		stream << QStringLiteral("::imtgql::CGqlParamObject ") << dataObjectVariableName << ';';
 		FeedStream(stream, 1, false);
 
 		// inLoop: add me to temp object and checks
@@ -753,7 +753,7 @@ void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, c
 void CSdlClassGqlModificatorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const ::imtgql::CGqlObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
+	stream << QStringLiteral("const ::imtgql::CGqlParamObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
@@ -858,7 +858,7 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 
 	// declare iteration var
 	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("const ::imtgql::CGqlObject* ");
+	stream << QStringLiteral("const ::imtgql::CGqlParamObject* ");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
 	stream << '"' << field.GetId() << '"' << ',' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index);");
 	FeedStream(stream, 1, false);
@@ -1087,7 +1087,7 @@ void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream&
 
 		// declare iteration var
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("const ::imtgql::CGqlObject* ");
+		stream << QStringLiteral("const ::imtgql::CGqlParamObject* ");
 		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
 		stream << '"' << field.GetId() << '"' << ',' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index);");
 		FeedStream(stream, 1, false);
@@ -1182,7 +1182,7 @@ void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream&
 
 QList<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirectives() const
 {
-	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtgql/CGqlObject.h>"))};
+	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtgql/CGqlParamObject.h>"))};
 
 	return retVal;
 }
@@ -1206,7 +1206,7 @@ imtsdlgen::ICxxModifier::ArgumentList CSdlClassGqlModificatorComp::GetArguments(
 
 	Argument arg;
 	arg.Name = QStringLiteral("gqlObject");
-	arg.Type = QStringLiteral("::imtgql::CGqlObject");
+	arg.Type = QStringLiteral("::imtgql::CGqlParamObject");
 	retVal << arg;
 
 	return retVal;

@@ -80,7 +80,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 
 
 istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
-			const QList<imtgql::CGqlObject>& inputParams,
+			const QList<imtgql::CGqlParamObject>& inputParams,
 			QByteArray& objectId,
 			QString& errorMessage) const
 {

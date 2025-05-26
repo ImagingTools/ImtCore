@@ -25,7 +25,7 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 
 	QByteArray objectId;
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
 		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
 	}

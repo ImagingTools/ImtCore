@@ -110,7 +110,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
-	imtgql::CGqlObject inputParams = gqlRequest.GetParams();
+	imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	dataModel->SetData("id", objectId);
@@ -147,7 +147,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 	imtbase::CTreeItemModel* infoModelPtr = dataModel->AddTreeModel("info");
 
-	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	infoModelPtr->SetData("id", objectId);
@@ -180,7 +180,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMet
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
-	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	dataModel->SetData("id", objectId);
@@ -215,7 +215,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 
@@ -277,7 +277,7 @@ istd::IChangeableUniquePtr CSerializableObjectCollectionControllerComp::CreateOb
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
 		errorMessage = QString("Unable to create object from request. Error: GraphQL input parameters is invalid");
 		SendErrorMessage(0, errorMessage);
@@ -322,7 +322,7 @@ bool CSerializableObjectCollectionControllerComp::UpdateObjectFromRequest(
 			istd::IChangeable& object,
 			QString& errorMessage) const
 {
-	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
 		errorMessage = QString("Unable to create object from request. Error: GraphQL input parameters is invalid");
 		SendErrorMessage(0, errorMessage);
@@ -352,7 +352,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject inputParams = gqlRequest.GetParams();
+	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -360,8 +360,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 	imtbase::CTreeItemModel* itemsModel = dataModel->AddTreeModel("items");
 	itemsModel->SetIsArray(true);
 
-	const imtgql::CGqlObject* viewParamsGql = nullptr;
-	const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+	const imtgql::CGqlParamObject* viewParamsGql = nullptr;
+	const imtgql::CGqlParamObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
 	if (inputObject != nullptr){
 		viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
 	}
@@ -441,7 +441,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::RenameObje
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
 		errorMessage = QString("Unable to rename an object. Error: GraphQL input parameters is invalid");
 		SendErrorMessage(0, errorMessage);
@@ -476,7 +476,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::SetObjectD
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
 		errorMessage = QString("Unable to set description for object. Error: GraphQL input parameters is invalid");
 		SendErrorMessage(0, errorMessage);
@@ -510,7 +510,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputObjectPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputObjectPtr == nullptr){
 		errorMessage = QString("Unable to get elements ids. Error: GraphQL input parameters is invalid");
 		SendErrorMessage(0, errorMessage);
@@ -556,7 +556,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");

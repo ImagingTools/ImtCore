@@ -379,7 +379,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	FeedStream(ifStream, 1, false);
 
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("virtual bool GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const override;");
+	ifStream << QStringLiteral("virtual bool GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const override;");
 	FeedStream(ifStream, 1, false);
 
 	if (operationsList.contains(imtsdl::CSdlDocumentType::OT_LIST)){
@@ -1035,7 +1035,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 	// add GetOperationFromRequest() method
 	stream << QStringLiteral("bool ");
 	stream << className << ':' << ':';
-	stream << QStringLiteral("GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const");
+	stream << QStringLiteral("GetOperationFromRequest(const ::imtgql::CGqlRequest& gqlRequest, ::imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const");
 	FeedStream(stream, 1, false);
 
 	stream << '{';

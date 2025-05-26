@@ -39,14 +39,14 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateInsertNewNodeR
 	if (!name.isEmpty()){
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "InsertNewNode");
 
-		imtgql::CGqlObject input;
+		imtgql::CGqlParamObject input;
 		input.InsertField("name", name);
 		input.InsertField("description", description);
 		input.InsertField("proposedNodeId", QVariant(proposedNodeId));
 		input.InsertField("parentNodeId", QVariant(parentNodeId));
 		requestPtr->AddParam("input", input);
 
-		imtgql::CGqlObject query;
+		imtgql::CGqlFieldObject query;
 		query.InsertField("successfull");
 		query.InsertField("id");
 		requestPtr->AddField("query", query);
@@ -66,12 +66,12 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateSetNodeNameReq
 	if (!nodeId.isEmpty() && !name.isEmpty()){
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "SetNodeName");
 
-		imtgql::CGqlObject input;
+		imtgql::CGqlParamObject input;
 		input.InsertField("nodeId", QVariant(nodeId));
 		input.InsertField("name", name);
 		requestPtr->AddParam("input", input);
 
-		imtgql::CGqlObject query;
+		imtgql::CGqlFieldObject query;
 		query.InsertField("successfull");
 		requestPtr->AddField("query", query);
 	}
@@ -90,12 +90,12 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateSetNodeDescrip
 	if (!nodeId.isEmpty()){
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "SetNodeDescription");
 
-		imtgql::CGqlObject input;
+		imtgql::CGqlParamObject input;
 		input.InsertField("nodeId", QVariant(nodeId));
 		input.InsertField("description", description);
 		requestPtr->AddParam("input", input);
 
-		imtgql::CGqlObject query;
+		imtgql::CGqlFieldObject query;
 		query.InsertField("successfull");
 		requestPtr->AddField("query", query);
 	}
@@ -123,12 +123,12 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateMoveNodeReques
 	if (!nodeId.isEmpty()){
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "MoveNode");
 
-		imtgql::CGqlObject input;
+		imtgql::CGqlParamObject input;
 		input.InsertField("nodeId", QVariant(nodeId));
 		input.InsertField("parentNodeId", QVariant(parentNodeId));
 		requestPtr->AddParam("input", input);
 
-		imtgql::CGqlObject query;
+		imtgql::CGqlFieldObject query;
 		query.InsertField("successfull");
 		requestPtr->AddField("query", query);
 	}
@@ -146,11 +146,11 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateRemoveNodeRequ
 	if (!nodeId.isEmpty()){
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "RemoveNode");
 
-		imtgql::CGqlObject input;
+		imtgql::CGqlParamObject input;
 		input.InsertField("nodeId", QVariant(nodeId));
 		requestPtr->AddParam("input", input);
 
-		imtgql::CGqlObject query;
+		imtgql::CGqlFieldObject query;
 		query.InsertField("successfull");
 		requestPtr->AddField("query", query);
 	}
@@ -170,12 +170,12 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateInsertLeafRequ
 	if (!leafId.isEmpty()){
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "InsertNewLeaf");
 
-		imtgql::CGqlObject input;
+		imtgql::CGqlParamObject input;
 		input.InsertField("leafId", QVariant(leafId));
 		input.InsertField("nodeId", QVariant(nodeId));
 		requestPtr->AddParam("input", input);
 
-		imtgql::CGqlObject query;
+		imtgql::CGqlFieldObject query;
 		query.InsertField("successfull");
 		requestPtr->AddField("query", query);
 	}
@@ -195,13 +195,13 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateMoveLeafReques
 	if (!leafId.isEmpty()){
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "MoveLeaf");
 
-		imtgql::CGqlObject input;
+		imtgql::CGqlParamObject input;
 		input.InsertField("objectId", QVariant(leafId));
 		input.InsertField("sourceNodeId", QVariant(sourceNodeId));
 		input.InsertField("targetNodeId", QVariant(targetNodeId));
 		requestPtr->AddParam("input", input);
 
-		imtgql::CGqlObject query;
+		imtgql::CGqlFieldObject query;
 		query.InsertField("successfull");
 		requestPtr->AddField("query", query);
 	}
@@ -220,12 +220,12 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateRemoveLeafRequ
 	if (!leafId.isEmpty()){
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "RemoveLeaf");
 
-		imtgql::CGqlObject input;
+		imtgql::CGqlParamObject input;
 		input.InsertField("leafId", QVariant(leafId));
 		input.InsertField("nodeId", QVariant(nodeId));
 		requestPtr->AddParam("input", input);
 
-		imtgql::CGqlObject query;
+		imtgql::CGqlFieldObject query;
 		query.InsertField("successfull");
 		requestPtr->AddField("query", query);
 	}
@@ -247,12 +247,12 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateGetItemCountRe
 	//	if (nodeIdPtr.IsValid() && filterPtr.IsValid()){
 	//		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "GetNodeCount");
 
-	//		imtgql::CGqlObject input("input");
+	//		imtgql::CGqlParamObject input("input");
 	//		input.InsertField("nodeId", QVariant(nodeIdPtr->GetId()));
 	//		input.InsertField("filter", filterPtr->);
 	//		requestPtr->AddParam(input);
 
-	//		imtgql::CGqlObject query("query");
+	//		imtgql::CGqlParamObject query("query");
 	//		query.InsertField("count");
 	//		requestPtr->AddField(query);
 	//	}
@@ -277,12 +277,12 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateGetItemIdsRequ
 	//	if (nodeIdPtr.IsValid() && filterPtr.IsValid()){
 	//		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "GetNodeIds");
 
-	//		imtgql::CGqlObject input("input");
+	//		imtgql::CGqlParamObject input("input");
 	//		input.InsertField("nodeId", QVariant(nodeIdPtr->GetId()));
 	//		input.InsertField("filter", filterPtr->);
 	//		requestPtr->AddParam(input);
 
-	//		imtgql::CGqlObject query("query");
+	//		imtgql::CGqlParamObject query("query");
 	//		query.InsertField("count");
 	//		requestPtr->AddField(query);
 	//	}
@@ -299,11 +299,11 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateGetItemInfosRe
 	if (!itemIds.isEmpty()){
 		//requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "GetItemInfos");
 
-		//imtgql::CGqlObject input("input");
+		//imtgql::CGqlParamObject input("input");
 		//input.InsertField("nodeId", QVariant(nodeId));
 		//requestPtr->AddParam(input);
 
-		//imtgql::CGqlObject query("query");
+		//imtgql::CGqlParamObject query("query");
 		//query.InsertField("info");
 		//requestPtr->AddField(query);
 	}
@@ -319,11 +319,11 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateGetItemPathReq
 	if (!itemId.isEmpty()){
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "GetItemPath");
 
-		imtgql::CGqlObject input;
+		imtgql::CGqlParamObject input;
 		input.InsertField("itemId", QVariant(itemId));
 		requestPtr->AddParam("input", input);
 
-		imtgql::CGqlObject query;
+		imtgql::CGqlFieldObject query;
 		query.InsertField("ItemInfos");
 		requestPtr->AddField("query", query);
 	}

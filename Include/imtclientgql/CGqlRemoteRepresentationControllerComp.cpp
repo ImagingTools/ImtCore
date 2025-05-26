@@ -33,9 +33,9 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParam = gqlRequestPtr->GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParam = gqlRequestPtr->GetParamObject("input");
 	if (inputParam != nullptr){
-		istd::TDelPtr<imtgql::CGqlObject> newInputParamPtr;
+		istd::TDelPtr<imtgql::CGqlParamObject> newInputParamPtr;
 		newInputParamPtr.SetCastedOrRemove(inputParam->CloneMe());
 		if (!newInputParamPtr.IsValid()){
 			errorMessage = QString("Creation of input parameters related to the GraphQL-request failed").toUtf8();
@@ -48,7 +48,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		gqlRequestPtr->AddParam("input", *newInputParamPtr.GetPtr());
 	}
 	else{
-		imtgql::CGqlObject inputGqlObject;
+		imtgql::CGqlParamObject inputGqlObject;
 		inputGqlObject.InsertField("productId", QVariant(*m_productIdAttrPtr));
 
 		gqlRequestPtr->AddParam("input", inputGqlObject);

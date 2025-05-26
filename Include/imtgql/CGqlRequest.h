@@ -3,7 +3,8 @@
 
 // ImtCore includes
 #include <imtgql/IGqlRequest.h>
-#include <imtgql/CGqlObject.h>
+#include <imtgql/CGqlParamObject.h>
+#include <imtgql/CGqlFieldObject.h>
 
 
 namespace imtgql
@@ -18,21 +19,21 @@ public:
 
 	void AddParamValue(const QByteArray& paramId, const QVariant& value);
 	void AddParamValue(const QByteArray& paramId, const imtgql::CGqlEnum& value);
-	void AddParam(const QByteArray& paramId, const CGqlObject& param);
-	void AddField(const QByteArray& fieldId, const CGqlObject& field);
+	void AddParam(const QByteArray& paramId, const CGqlParamObject& param);
+	void AddField(const QByteArray& fieldId, const CGqlFieldObject& field);
 	void AddSimpleField(const QByteArray& fieldId);
 	void SetGqlContext(const imtgql::IGqlContext* gqlContext);
 	void SetRequestType(RequestType requestType);
 	void SetCommandId(const QByteArray& commandId);
 	QByteArray GetHeader(QByteArray headerId) const;
 
-	const CGqlObject& GetFields() const;
-	const CGqlObject& GetParams() const;
+	const CGqlFieldObject& GetFields() const;
+	const CGqlParamObject& GetParams() const;
 
-	void SetParams(const CGqlObject& params);
+	void SetParams(const CGqlParamObject& params);
 
-	const CGqlObject* GetFieldObject(const QByteArray& fieldId) const;
-	const CGqlObject* GetParamObject(const QByteArray& paramId) const;
+	const CGqlFieldObject* GetFieldObject(const QByteArray& fieldId) const;
+	const CGqlParamObject* GetParamObject(const QByteArray& paramId) const;
 
 	void SetProtocolVersion(const QByteArray& protocolVersion);
 
@@ -60,11 +61,11 @@ public:
 protected:
 	virtual QByteArray CreateQueryFields() const;
 	virtual QByteArray CreateQueryParams() const;
-	virtual QByteArray AddObjectFieldPart(const CGqlObject& gqlObject) const;
-	virtual QByteArray AddObjectParamPart(const CGqlObject& gqlObject) const;
+	virtual QByteArray AddObjectFieldPart(const CGqlFieldObject& gqlObject) const;
+	virtual QByteArray AddObjectParamPart(const CGqlParamObject& gqlObject) const;
 	virtual QByteArray AddObjectParamValue(const QVariant& value) const;
-	virtual void ParceObjectFieldPart(CGqlObject& gqlObject, const QJsonObject& object) const;
-	virtual void ParceObjectParamPart(CGqlObject& gqlObject, const QJsonObject& object) const;
+	virtual void ParceObjectFieldPart(CGqlFieldObject& gqlObject, const QJsonObject& object) const;
+	virtual void ParceObjectParamPart(CGqlParamObject& gqlObject, const QJsonObject& object) const;
 
 private:
 	void SetParseObject(const QByteArray& commandId);
@@ -75,20 +76,22 @@ private:
 protected:
 	QByteArray m_commandId;
 	RequestType m_requestType;
-	CGqlObject m_params;
-	CGqlObject m_fields;
+	CGqlParamObject m_params;
+	CGqlFieldObject m_fields;
 
 	bool m_startKey;
 	bool m_startValue;
 	bool m_startParams;
 	bool m_startFields;
+	bool m_startFragment;
 	bool m_startArrayPrimitives;
 	bool m_textString;
 	QByteArray m_currentField;
 	QByteArray m_protocolVersion;
 
-	CGqlObject* m_activeGqlObjectPtr;
-	QList<CGqlObject*> m_objectArrayList;
+	CGqlParamObject* m_activeGqlObjectPtr;
+	CGqlFieldObject* m_activeFieldObjectPtr;
+	QList<CGqlParamObject*> m_objectArrayList;
 	std::shared_ptr<imtgql::IGqlContext> m_gqlContextPtr;
 	QList<QByteArray> m_activeArrayIds;
 

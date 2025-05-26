@@ -132,7 +132,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 	}
 
-	imtgql::CGqlObject gqlObject;
+	imtgql::CGqlParamObject gqlObject;
 
 	int operationType = OT_UNKNOWN;
 	if (!GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType)){
@@ -260,11 +260,11 @@ void CObjectCollectionControllerCompBase::ReplaceComplexFilterFields(imtbase::IC
 
 bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 		const imtgql::CGqlRequest& gqlRequest,
-		imtgql::CGqlObject& /*gqlObject*/,
+		imtgql::CGqlParamObject& /*gqlObject*/,
 		QString& errorMessage,
 		int& operationType) const
 {
-	const imtgql::CGqlObject fields = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject fields = gqlRequest.GetFields();
 
 	const QByteArrayList ids = fields.GetFieldIds();
 	for (const QByteArray& fieldId: ids){
@@ -346,7 +346,7 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 }
 
 
-QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const imtgql::CGqlObject& inputParams) const
+QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const imtgql::CGqlParamObject& inputParams) const
 {
 	QByteArray retVal;
 
@@ -354,7 +354,7 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 		retVal = inputParams.GetFieldArgumentValue(QByteArrayLiteral("id")).toByteArray();
 	}
 	else if(inputParams.GetFieldIds().contains(QByteArrayLiteral("input"))){
-		const imtgql::CGqlObject* inputObject = inputParams.GetFieldArgumentObjectPtr(QByteArrayLiteral("input"));
+		const imtgql::CGqlParamObject* inputObject = inputParams.GetFieldArgumentObjectPtr(QByteArrayLiteral("input"));
 		if (inputObject != nullptr){
 			return GetObjectIdFromInputParams(*inputObject);
 		}
@@ -381,7 +381,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to get data object. Error: GraphQL input params is invalid.").toUtf8();
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -428,7 +428,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
 		errorMessage = QString("Unable to insert an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -445,7 +445,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	}
 
 	QByteArray objectId;
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
 		objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
 	}
@@ -512,7 +512,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to update an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -591,7 +591,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to update collection. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -664,7 +664,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -703,7 +703,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to set description for object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -750,8 +750,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	int offset = 0;
 	int count = -1;
 
-	const imtgql::CGqlObject* viewParamsPtr = nullptr;
-	const imtgql::CGqlObject* inputParamsPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* viewParamsPtr = nullptr;
+	const imtgql::CGqlParamObject* inputParamsPtr = gqlRequest.GetParamObject("input");
 	if (inputParamsPtr != nullptr){
 		viewParamsPtr = inputParamsPtr->GetFieldArgumentObjectPtr("viewParams");
 	}
@@ -812,7 +812,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -821,7 +821,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 	}
 
 	iprm::CParamsSet filterParams;
-	const imtgql::CGqlObject* viewParamsPtr = inputParamPtr->GetFieldArgumentObjectPtr("viewParams");
+	const imtgql::CGqlParamObject* viewParamsPtr = inputParamPtr->GetFieldArgumentObjectPtr("viewParams");
 	if (viewParamsPtr != nullptr){
 		PrepareFilters(gqlRequest, *viewParamsPtr, filterParams);
 	}
@@ -845,7 +845,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementIds(cons
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -855,7 +855,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementIds(cons
 
 	int offset = 0, count = -1;
 	iprm::CParamsSet filterParams;
-	const imtgql::CGqlObject* viewParamsPtr = inputParamPtr->GetFieldArgumentObjectPtr("viewParams");
+	const imtgql::CGqlParamObject* viewParamsPtr = inputParamPtr->GetFieldArgumentObjectPtr("viewParams");
 	if (viewParamsPtr != nullptr){
 		offset = viewParamsPtr->GetFieldArgumentValue("Offset").toInt();
 		count = viewParamsPtr->GetFieldArgumentValue("Count").toInt();
@@ -892,7 +892,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to delete object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -1023,7 +1023,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectTypeId(co
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1048,7 +1048,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1171,7 +1171,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ExportObject(const
 		return nullptr;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to import the object. GQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
@@ -1324,7 +1324,7 @@ QVariant CObjectCollectionControllerCompBase::GetInputArgumentFromRequest(
 	const imtgql::CGqlRequest& gqlRequest,
 	const QString& argumentKey) const
 {
-	const imtgql::CGqlObject* inputParamObjectPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamObjectPtr = gqlRequest.GetParamObject("input");
 	if (inputParamObjectPtr == nullptr){
 		return QVariant();
 	}
@@ -1452,8 +1452,8 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 QByteArrayList CObjectCollectionControllerCompBase::GetInformationIds(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId) const
 {
 	QByteArrayList retVal;
-	const imtgql::CGqlObject fields = gqlRequest.GetFields();
-	const imtgql::CGqlObject* findObject = fields.GetFieldArgumentObjectPtr(objectId);
+	const imtgql::CGqlFieldObject fields = gqlRequest.GetFields();
+	const imtgql::CGqlFieldObject* findObject = fields.GetFieldArgumentObjectPtr(objectId);
 	if (findObject != nullptr){
 		retVal =findObject->GetFieldIds();
 	}
@@ -1470,7 +1470,7 @@ QVariant CObjectCollectionControllerCompBase::GetObjectInformation(const QByteAr
 
 QByteArray CObjectCollectionControllerCompBase::GetObjectTypeIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const
 {
-	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr != nullptr){
 		QVariant typeId = gqlInputParamPtr->GetFieldArgumentValue("typeId");
 		if (!typeId.isNull()){
@@ -1494,7 +1494,7 @@ bool CObjectCollectionControllerCompBase::CreateRepresentationFromObject(
 
 
 istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateObjectFromInputParams(
-		const QList<imtgql::CGqlObject>& /*inputParams*/,
+		const QList<imtgql::CGqlParamObject>& /*inputParams*/,
 		QByteArray& /*objectId*/,
 		QString& /*errorMessage*/) const
 {
@@ -1507,7 +1507,7 @@ istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateObjectFrom
 		QByteArray& newObjectId,
 		QString& errorMessage) const
 {
-	QList<imtgql::CGqlObject> inputParams;
+	QList<imtgql::CGqlParamObject> inputParams;
 	inputParams.append(gqlRequest.GetParams());
 
 	return CreateObjectFromInputParams(inputParams, newObjectId, errorMessage);
@@ -1516,12 +1516,12 @@ istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateObjectFrom
 
 void CObjectCollectionControllerCompBase::PrepareFilters(
 		const imtgql::CGqlRequest& gqlRequest,
-		const imtgql::CGqlObject& viewParamsGql,
+		const imtgql::CGqlParamObject& viewParamsGql,
 		iprm::CParamsSet& filterParams) const
 {
 	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
 	
-	const imtgql::CGqlObject* complexFilterModelPtr = viewParamsGql.GetFieldArgumentObjectPtr("filterModel");
+	const imtgql::CGqlParamObject* complexFilterModelPtr = viewParamsGql.GetFieldArgumentObjectPtr("filterModel");
 	if (complexFilterModelPtr != nullptr){
 		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
 		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(*complexFilterModelPtr);
@@ -1541,7 +1541,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 
 void CObjectCollectionControllerCompBase::SetAdditionalFilters(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
-			const imtgql::CGqlObject& /*viewParamsGql*/,
+			const imtgql::CGqlParamObject& /*viewParamsGql*/,
 			iprm::CParamsSet* /*filterParamsPtr*/) const
 {
 }
@@ -1593,7 +1593,7 @@ bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(
 		return true;
 	}
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
 		errorMessage = QString("Unable to update an object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");

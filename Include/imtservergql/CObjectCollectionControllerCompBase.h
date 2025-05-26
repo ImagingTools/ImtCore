@@ -88,8 +88,8 @@ public:
 protected:
 	void ReplaceComplexFilterFields(imtbase::IComplexCollectionFilter& filter) const;
 
-	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const;
-	virtual QByteArray GetObjectIdFromInputParams(const imtgql::CGqlObject &inputParams) const;
+	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const;
+	virtual QByteArray GetObjectIdFromInputParams(const imtgql::CGqlParamObject &inputParams) const;
 	virtual QByteArray GetObjectIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
@@ -165,7 +165,7 @@ protected:
 	/**
 		Create object from the GraphQL
 	*/
-	[[deprecated]] virtual istd::IChangeableUniquePtr CreateObjectFromInputParams(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString& errorMessage) const;
+	[[deprecated]] virtual istd::IChangeableUniquePtr CreateObjectFromInputParams(const QList<imtgql::CGqlParamObject>& inputParams, QByteArray &objectId, QString& errorMessage) const;
 
 	/**
 		Create object from the GraphQL
@@ -175,12 +175,12 @@ protected:
 	/**
 		Prepare filters from the GraphQL
 	*/
-	virtual void PrepareFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet& filterParams) const;
+	virtual void PrepareFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet& filterParams) const;
 
 	/**
 		Set multiple optional additional filters to initially get a more refined collection.
 	*/
-	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest,const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
+	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest,const imtgql::CGqlParamObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
 	
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const;
 

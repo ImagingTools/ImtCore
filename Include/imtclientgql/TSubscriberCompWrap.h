@@ -56,7 +56,7 @@ void TSubscriberCompWrap<Base>::RegisterSubscription()
 	if (m_subscriptionManagerCompPtr.IsValid()){
 		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, *m_commandAttrPtr);
 
-		imtgql::CGqlObject subscriptionField;
+		imtgql::CGqlParamObject subscriptionField;
 		subscriptionField.InsertField("id");
 		gqlRequest.AddField("data", subscriptionField);
 

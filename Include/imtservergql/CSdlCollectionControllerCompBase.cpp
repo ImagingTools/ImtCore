@@ -26,8 +26,8 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 	int offset = 0;
 	int count = -1;
 
-	const imtgql::CGqlObject* viewParamsGql = nullptr;
-	QList<imtgql::CGqlObject> inputParams;
+	const imtgql::CGqlParamObject* viewParamsGql = nullptr;
+	QList<imtgql::CGqlParamObject> inputParams;
 	inputParams.append(gqlRequest.GetParams());
 	if (inputParams.size() > 0){
 		viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
@@ -103,7 +103,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 
 	QByteArray objectId;
 
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParamObject("input");
+	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
 		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
 	}

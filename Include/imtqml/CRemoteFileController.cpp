@@ -11,8 +11,8 @@
 #include <QtCore/QFileInfo>
 
 #ifdef Q_OS_ANDROID
-#include <QtAndroidExtras/QAndroidJniObject>
-#include <QtAndroidExtras/QtAndroid>
+// #include <QtAndroidExtras/QAndroidJniObject>
+// #include <QtAndroidExtras/QtAndroid>
 #else
 #include <QtGui/QDesktopServices>
 #endif
@@ -45,7 +45,7 @@ bool CRemoteFileController::OpenFile(const QString& filePath) const
 	if(!fileInfo.isReadable()){
         qWarning() << "Attempting to aquire an unreadable file" << fileInfo.absoluteFilePath();
 	}
-#ifdef Q_OS_ANDROID
+#ifdef Q_OS_ANDROID0
 	QString type = "*/*";
 	if (filePath.contains(".doc") || filePath.contains(".docx")){
 		// Word document
@@ -113,8 +113,10 @@ bool CRemoteFileController::OpenFile(const QString& filePath) const
 	QtAndroid::androidActivity().callMethod<void>("startActivity", "(Landroid/content/Intent;)V", jniIntent.object());
 	return true;
 #else
-	return QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
+	// return QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
 #endif
+
+	return false;
 }
 
 
