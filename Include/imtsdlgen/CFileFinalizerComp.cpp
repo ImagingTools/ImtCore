@@ -68,7 +68,7 @@ iproc::IProcessor::TaskState CFileFinalizerComp::DoProcessing(
 			}
 		}
 		else {
-			SendWarningMessage(0, QString("File '%1' is not exists. Cleanup skipped").arg(joinedHeaderFilePath));
+			SendWarningMessage(0, QStringLiteral("File '%1' does not exist. Cleanup skipped").arg(joinedHeaderFilePath));
 		}
 	}
 
@@ -81,7 +81,7 @@ iproc::IProcessor::TaskState CFileFinalizerComp::DoProcessing(
 			}
 		}
 		else {
-			SendWarningMessage(0, QString("File '%1' is not exists. Cleanup skipped").arg(joinedSourceFilePath));
+			SendWarningMessage(0, QStringLiteral("File '%1' does not exist. Cleanup skipped").arg(joinedSourceFilePath));
 		}
 	}
 

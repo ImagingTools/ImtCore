@@ -62,7 +62,7 @@ CSdlRequest CSdlDocumentType::GetRequest(OperationType operationType) const
 		return m_operationsList.value(operationType);
 	}
 
-	Q_ASSERT_X(false, __func__, "Request for operationType is not exists. Did you check it with HasRequest()?");
+	Q_ASSERT_X(false, __func__, "Request for operationType does not exist. Did you check it with HasRequest()?");
 
 	return CSdlRequest();
 }

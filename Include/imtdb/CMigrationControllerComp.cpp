@@ -43,7 +43,7 @@ bool CMigrationControllerComp::DoMigration(int& resultRevision, const istd::CInt
 
 	QDir folder(m_migrationFolderPathCompPtr->GetPath());
 	if (!folder.exists()){
-		qWarning() << __func__ << "Unable to migrate. Migration dir is not exists" << folder.absolutePath() << m_migrationFolderPathCompPtr->GetPath();
+		qWarning() << __func__ << "Unable to migrate. Migration dir does not exist" << folder.absolutePath() << m_migrationFolderPathCompPtr->GetPath();
 
 		return false;
 	}

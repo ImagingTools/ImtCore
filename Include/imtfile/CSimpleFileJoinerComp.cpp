@@ -67,7 +67,7 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 
 	QDir sourceDir(sourceDirPath);
 	if (!sourceDir.exists()){
-		SendErrorMessage(0, QString("Source directory is not exists: '%1'").arg(sourceDirPath));
+		SendErrorMessage(0, QStringLiteral("Source directory does not exist: '%1'").arg(sourceDirPath));
 
 		return TS_INVALID;
 	}
