@@ -23,7 +23,7 @@ class IOperationContext: virtual public istd::IChangeable
 public:
 	struct IdentifableObjectInfo
 	{
-		IdentifableObjectInfo(const QByteArray& id = QByteArray(), const QString& name = QString()): id(), name() {}
+		IdentifableObjectInfo(const QByteArray& id = QByteArray(), const QString& name = QString()): id(id), name(name) {}
 
 		QByteArray id;
 		QString name;
