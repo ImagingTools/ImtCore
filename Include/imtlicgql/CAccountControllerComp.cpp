@@ -98,7 +98,7 @@ istd::IChangeableUniquePtr CAccountControllerComp::CreateObjectFromInputParams(
 		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 
-	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+	QByteArray itemData = inputParams.at(0).GetParamArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TUniqueInterfacePtr<imtauth::ICompanyInfo> companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
 		if (!companyInstancePtr.IsValid()){

@@ -17,26 +17,26 @@ CGqlParamObject::CGqlParamObject(): m_parentPtr(nullptr)
 }
 
 
-QByteArrayList CGqlParamObject::GetFieldIds() const
+QByteArrayList CGqlParamObject::GetParamIds() const
 {
-	QByteArrayList retVal = m_simpleFields.keys();
-	retVal += m_objectFields.keys();
-	retVal += m_objectFieldsArray.keys();
+	QByteArrayList retVal = m_simpleParams.keys();
+	retVal += m_objectParams.keys();
+	retVal += m_objectParamsArray.keys();
 
 	return retVal;
 }
 
 
-QVariant CGqlParamObject::GetFieldArgumentValue(const QByteArray &fieldId) const
+QVariant CGqlParamObject::GetParamArgumentValue(const QByteArray &paramId) const
 {
 	QVariant retVal;
-	if (m_simpleFields.contains(fieldId)){
-		retVal = m_simpleFields[fieldId];
+	if (m_simpleParams.contains(paramId)){
+		retVal = m_simpleParams[paramId];
 	}
-	else if (m_objectFieldsArray.contains(fieldId)){
+	else if (m_objectParamsArray.contains(paramId)){
 		QVariantList objectList;
-		for (int i = 0; i < m_objectFieldsArray[fieldId].count(); i++){
-			const CGqlParamObject* gqlObject = m_objectFieldsArray[fieldId][i].GetPtr();
+		for (int i = 0; i < m_objectParamsArray[paramId].count(); i++){
+			const CGqlParamObject* gqlObject = m_objectParamsArray[paramId][i].GetPtr();
 			objectList.append(QVariant::fromValue(gqlObject));
 		}
 		retVal = objectList;
@@ -46,40 +46,40 @@ QVariant CGqlParamObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 }
 
 
-CGqlParamObject *CGqlParamObject::CreateFieldObject(const QByteArray& fieldId)
+CGqlParamObject *CGqlParamObject::CreateParamObject(const QByteArray& paramId)
 {
-	if (m_objectFields.contains(fieldId)){
+	if (m_objectParams.contains(paramId)){
 		return nullptr;
 	}
 
 	CGqlParamObject gqlObject;
-	InsertField(fieldId, gqlObject);
+	InsertParam(paramId, gqlObject);
 
-	return m_objectFields[fieldId].GetPtr();
+	return m_objectParams[paramId].GetPtr();
 }
 
 
-const CGqlParamObject* CGqlParamObject::GetFieldArgumentObjectPtr(const QByteArray &fieldId,int index) const
+const CGqlParamObject* CGqlParamObject::GetParamArgumentObjectPtr(const QByteArray &paramId,int index) const
 {
 	const CGqlParamObject* retVal = nullptr;
 
-	if (m_objectFields.contains(fieldId)){
-		retVal = m_objectFields[fieldId].GetPtr();
+	if (m_objectParams.contains(paramId)){
+		retVal = m_objectParams[paramId].GetPtr();
 	}
-	else if (m_objectFieldsArray.contains(fieldId)){
-		retVal = m_objectFieldsArray[fieldId][index].GetPtr();
+	else if (m_objectParamsArray.contains(paramId)){
+		retVal = m_objectParamsArray[paramId][index].GetPtr();
 	}
 
 	return retVal;
 }
 
 
-QList<const CGqlParamObject *> CGqlParamObject::GetFieldArgumentObjectPtrList(const QByteArray &fieldId) const
+QList<const CGqlParamObject *> CGqlParamObject::GetParamArgumentObjectPtrList(const QByteArray &paramId) const
 {
 	QList<const CGqlParamObject*> retVal;
-	if (m_objectFieldsArray.contains(fieldId)){
-		for (int i = 0; i < m_objectFieldsArray[fieldId].count(); i++){
-			const CGqlParamObject* gqlObject = m_objectFieldsArray[fieldId][i].GetPtr();
+	if (m_objectParamsArray.contains(paramId)){
+		for (int i = 0; i < m_objectParamsArray[paramId].count(); i++){
+			const CGqlParamObject* gqlObject = m_objectParamsArray[paramId][i].GetPtr();
 			retVal.append(gqlObject);
 		}
 	}
@@ -88,31 +88,31 @@ QList<const CGqlParamObject *> CGqlParamObject::GetFieldArgumentObjectPtrList(co
 }
 
 
-void CGqlParamObject::InsertField(const QByteArray &fieldId, const QVariant &value)
+void CGqlParamObject::InsertParam(const QByteArray &paramId, const QVariant &value)
 {
-	RemoveField(fieldId);
-	m_simpleFields.insert(fieldId, value);
+	RemoveParam(paramId);
+	m_simpleParams.insert(paramId, value);
 }
 
 
-void CGqlParamObject::InsertField(const QByteArray &fieldId, const CGqlEnum &value)
+void CGqlParamObject::InsertParam(const QByteArray &paramId, const CGqlEnum &value)
 {
-	RemoveField(fieldId);
-	m_simpleFields.insert(fieldId, value);
+	RemoveParam(paramId);
+	m_simpleParams.insert(paramId, value);
 }
 
 
-void CGqlParamObject::InsertField(const QByteArray &fieldId, const CGqlParamObject& object)
+void CGqlParamObject::InsertParam(const QByteArray &paramId, const CGqlParamObject& object)
 {
 	istd::TSmartPtr<CGqlParamObject> objectPtr(new CGqlParamObject());
 	*objectPtr = object;
 	objectPtr->m_parentPtr = this;
-	RemoveField(fieldId);
-	m_objectFields.insert(fieldId, objectPtr);
+	RemoveParam(paramId);
+	m_objectParams.insert(paramId, objectPtr);
 }
 
 
-void CGqlParamObject::InsertField(const QByteArray &fieldId, const QList<CGqlParamObject> objectList)
+void CGqlParamObject::InsertParam(const QByteArray &paramId, const QList<CGqlParamObject> objectList)
 {
 	QList<istd::TSmartPtr<CGqlParamObject>> objectPtrList;
 	for (int i = 0; i < objectList.count(); i++){
@@ -121,33 +121,33 @@ void CGqlParamObject::InsertField(const QByteArray &fieldId, const QList<CGqlPar
 		objectPtr->m_parentPtr = this;
 		objectPtrList.append(objectPtr);
 	}
-	RemoveField(fieldId);
-	m_objectFieldsArray.insert(fieldId,objectPtrList);
+	RemoveParam(paramId);
+	m_objectParamsArray.insert(paramId,objectPtrList);
 }
 
 
-CGqlParamObject* CGqlParamObject::AppendFieldToArray(const QByteArray& fieldId, const CGqlParamObject& object)
+CGqlParamObject* CGqlParamObject::AppendParamToArray(const QByteArray& paramId, const CGqlParamObject& object)
 {
 	CGqlParamObject* retVal = nullptr;
-	if (!m_objectFieldsArray.contains(fieldId)){
+	if (!m_objectParamsArray.contains(paramId)){
 		QList<istd::TSmartPtr<CGqlParamObject>> emptyList;
-		m_objectFieldsArray.insert(fieldId, emptyList);
+		m_objectParamsArray.insert(paramId, emptyList);
 	}
 
 	istd::TSmartPtr<CGqlParamObject> objectPtr(new CGqlParamObject());
 	*objectPtr = object;
 	objectPtr->m_parentPtr = this;
-	m_objectFieldsArray[fieldId].append(objectPtr);
+	m_objectParamsArray[paramId].append(objectPtr);
 	retVal = objectPtr.GetPtr();
 
 	return retVal;
 }
 
 
-bool CGqlParamObject::IsObject(const QByteArray &fieldId) const
+bool CGqlParamObject::IsObject(const QByteArray &paramId) const
 {
 	bool retVal = false;
-	if (m_objectFields.contains(fieldId)){
+	if (m_objectParams.contains(paramId)){
 		retVal = true;
 	}
 
@@ -155,10 +155,10 @@ bool CGqlParamObject::IsObject(const QByteArray &fieldId) const
 }
 
 
-bool CGqlParamObject::IsObjectList(const QByteArray &fieldId) const
+bool CGqlParamObject::IsObjectList(const QByteArray &paramId) const
 {
 	bool retVal = false;
-	if (m_objectFieldsArray.contains(fieldId)){
+	if (m_objectParamsArray.contains(paramId)){
 		retVal = true;
 	}
 
@@ -166,12 +166,12 @@ bool CGqlParamObject::IsObjectList(const QByteArray &fieldId) const
 }
 
 
-bool CGqlParamObject::IsEnum(const QByteArray &fieldId) const
+bool CGqlParamObject::IsEnum(const QByteArray &paramId) const
 {
 	bool retVal = false;
 
-	if (m_simpleFields.contains(fieldId)){
-		if (m_simpleFields[fieldId].canConvert<CGqlEnum>()){
+	if (m_simpleParams.contains(paramId)){
+		if (m_simpleParams[paramId].canConvert<CGqlEnum>()){
 			retVal = true;
 		}
 	}
@@ -180,11 +180,11 @@ bool CGqlParamObject::IsEnum(const QByteArray &fieldId) const
 }
 
 
-int CGqlParamObject::GetObjectsCount(const QByteArray &fieldId) const
+int CGqlParamObject::GetObjectsCount(const QByteArray &paramId) const
 {
 	int retVal = 0;
-	if (m_objectFieldsArray.contains(fieldId)){
-		retVal = m_objectFieldsArray[fieldId].count();
+	if (m_objectParamsArray.contains(paramId)){
+		retVal = m_objectParamsArray[paramId].count();
 	}
 
 	return retVal;
@@ -213,15 +213,15 @@ bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_simpleFields = sourcePtr->m_simpleFields;
+		m_simpleParams = sourcePtr->m_simpleParams;
 		m_objectId = sourcePtr->m_objectId;
 		m_parentPtr = sourcePtr->m_parentPtr;
 
-		m_objectFields.clear();
+		m_objectParams.clear();
 
-		QByteArrayList keys = sourcePtr->m_objectFields.keys();
+		QByteArrayList keys = sourcePtr->m_objectParams.keys();
 		for (const QByteArray& key : keys){
-			istd::TSmartPtr<CGqlParamObject> sourceObject = sourcePtr->m_objectFields.value(key);
+			istd::TSmartPtr<CGqlParamObject> sourceObject = sourcePtr->m_objectParams.value(key);
 
 			istd::TSmartPtr<CGqlParamObject> gqlObject;
 			gqlObject.SetCastedOrRemove(sourceObject->CloneMe());
@@ -229,15 +229,15 @@ bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 				return false;
 			}
 
-			m_objectFields.insert(key, gqlObject);
+			m_objectParams.insert(key, gqlObject);
 		}
 
-		m_objectFieldsArray.clear();
+		m_objectParamsArray.clear();
 
-		QByteArrayList objectFieldsArrayKeys = sourcePtr->m_objectFieldsArray.keys();
-		for (const QByteArray& key : objectFieldsArrayKeys){
+		QByteArrayList objectParamsArrayKeys = sourcePtr->m_objectParamsArray.keys();
+		for (const QByteArray& key : objectParamsArrayKeys){
 			QList<istd::TSmartPtr<CGqlParamObject>> value;
-			QList<istd::TSmartPtr<CGqlParamObject>> sourceValue = sourcePtr->m_objectFieldsArray.value(key);
+			QList<istd::TSmartPtr<CGqlParamObject>> sourceValue = sourcePtr->m_objectParamsArray.value(key);
 			for (const istd::TSmartPtr<CGqlParamObject>& sourceObject : sourceValue){
 				istd::TSmartPtr<CGqlParamObject> emptyObject;
 				emptyObject.SetCastedOrRemove(sourceObject->CloneMe());
@@ -248,7 +248,7 @@ bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 				value.append(emptyObject);
 			}
 
-			m_objectFieldsArray.insert(key, value);
+			m_objectParamsArray.insert(key, value);
 		}
 
 		return true;
@@ -273,11 +273,11 @@ bool CGqlParamObject::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_simpleFields.clear();
+	m_simpleParams.clear();
 	m_objectId.clear();
 	m_parentPtr = nullptr;
-	m_objectFields.clear();
-	m_objectFieldsArray.clear();
+	m_objectParams.clear();
+	m_objectParamsArray.clear();
 
 	return true;
 }
@@ -285,11 +285,11 @@ bool CGqlParamObject::ResetData(CompatibilityMode /*mode*/)
 
 // protected methods
 
-void CGqlParamObject::RemoveField(const QByteArray &fieldId)
+void CGqlParamObject::RemoveParam(const QByteArray &paramId)
 {
-	m_simpleFields.remove(fieldId);
-	m_objectFields.remove(fieldId);
-	m_objectFieldsArray.remove(fieldId);
+	m_simpleParams.remove(paramId);
+	m_objectParams.remove(paramId);
+	m_objectParamsArray.remove(paramId);
 }
 
 

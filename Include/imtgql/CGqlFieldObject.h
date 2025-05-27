@@ -59,14 +59,6 @@ protected:
 };
 
 
-class CGqlFieldFragment: public CGqlFieldObject
-{
-public:
-	CGqlFieldFragment() : CGqlFieldObject() {}
-
-};
-
-
 } // namespace imtgql
 
 

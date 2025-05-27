@@ -285,8 +285,8 @@ istd::IChangeableUniquePtr CSerializableObjectCollectionControllerComp::CreateOb
 		return nullptr;
 	}
 
-	QByteArray typeId = inputObjectPtr->GetFieldArgumentValue("typeId").toByteArray();
-	QByteArray objectData64 = inputObjectPtr->GetFieldArgumentValue("item").toByteArray();
+	QByteArray typeId = inputObjectPtr->GetParamArgumentValue("typeId").toByteArray();
+	QByteArray objectData64 = inputObjectPtr->GetParamArgumentValue("item").toByteArray();
 	QByteArray objectData = QByteArray::fromBase64(objectData64);
 	if (objectData.isEmpty()){
 		errorMessage = QString("Unable to create object from request. Error: 'item' from input params is empty");
@@ -330,7 +330,7 @@ bool CSerializableObjectCollectionControllerComp::UpdateObjectFromRequest(
 		return false;
 	}
 
-	QByteArray objectData64 = inputObjectPtr->GetFieldArgumentValue("item").toByteArray();
+	QByteArray objectData64 = inputObjectPtr->GetParamArgumentValue("item").toByteArray();
 	QByteArray objectData = QByteArray::fromBase64(objectData64);
 	if (objectData.isEmpty()){
 		errorMessage = QString("Unable to create object from request. Error: 'item' from input params is empty");
@@ -361,18 +361,18 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 	itemsModel->SetIsArray(true);
 
 	const imtgql::CGqlParamObject* viewParamsGql = nullptr;
-	const imtgql::CGqlParamObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+	const imtgql::CGqlParamObject* inputObject = inputParams.GetParamArgumentObjectPtr("input");
 	if (inputObject != nullptr){
-		viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
+		viewParamsGql = inputObject->GetParamArgumentObjectPtr("viewParams");
 	}
 
 	int offset = 0, count = -1;
 
 	QByteArray data;
 	if (viewParamsGql != nullptr){
-		offset = viewParamsGql->GetFieldArgumentValue("offset").toInt();
-		count = viewParamsGql->GetFieldArgumentValue("count").toInt();
-		data = viewParamsGql->GetFieldArgumentValue("selectionParams").toByteArray();
+		offset = viewParamsGql->GetParamArgumentValue("offset").toInt();
+		count = viewParamsGql->GetParamArgumentValue("count").toInt();
+		data = viewParamsGql->GetParamArgumentValue("selectionParams").toByteArray();
 	}
 
 	iprm::IParamsSetUniquePtr filterParamsPtr;
@@ -449,8 +449,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::RenameObje
 		return nullptr;
 	}
 
-	QByteArray objectId = inputObjectPtr->GetFieldArgumentValue("id").toByteArray();
-	QString newName = inputObjectPtr->GetFieldArgumentValue("newName").toString();;
+	QByteArray objectId = inputObjectPtr->GetParamArgumentValue("id").toByteArray();
+	QString newName = inputObjectPtr->GetParamArgumentValue("newName").toString();;
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
@@ -484,8 +484,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::SetObjectD
 		return nullptr;
 	}
 
-	QByteArray objectId = inputObjectPtr->GetFieldArgumentValue("id").toByteArray();
-	QString description = inputObjectPtr->GetFieldArgumentValue("description").toString();
+	QByteArray objectId = inputObjectPtr->GetParamArgumentValue("id").toByteArray();
+	QString description = inputObjectPtr->GetParamArgumentValue("description").toString();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
@@ -518,10 +518,10 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 		return nullptr;
 	}
 
-	int offset = inputObjectPtr->GetFieldArgumentValue("offset").toInt();
-	int count = inputObjectPtr->GetFieldArgumentValue("count").toInt();
+	int offset = inputObjectPtr->GetParamArgumentValue("offset").toInt();
+	int count = inputObjectPtr->GetParamArgumentValue("count").toInt();
 
-	QByteArray data = inputObjectPtr->GetFieldArgumentValue("selectionParams").toByteArray();
+	QByteArray data = inputObjectPtr->GetParamArgumentValue("selectionParams").toByteArray();
 
 	iprm::IParamsSetUniquePtr filterParamsPtr;
 	if (m_paramsSetFactCompPtr.IsValid()){
@@ -564,7 +564,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetElement
 		return nullptr;
 	}
 
-	QByteArray data = inputParamPtr->GetFieldArgumentValue("selectionParams").toByteArray();
+	QByteArray data = inputParamPtr->GetParamArgumentValue("selectionParams").toByteArray();
 
 	iprm::IParamsSetUniquePtr filterParamsPtr;
 	if (m_paramsSetFactCompPtr.IsValid()){

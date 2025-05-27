@@ -24,7 +24,7 @@ imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalRespon
 		return nullptr;
 	}
 
-	QByteArray productId = inputParamPtr->GetFieldArgumentValue("productId").toByteArray();
+	QByteArray productId = inputParamPtr->GetParamArgumentValue("productId").toByteArray();
 	if (productId.isEmpty()){
 		SendErrorMessage(0, QString("Unable to get permission for product with empty ID."), "CProductPermissionsControllerComp");
 

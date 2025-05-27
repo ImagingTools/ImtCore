@@ -66,7 +66,7 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 		QList<imtgql::CGqlParamObject> inputParams;
 		inputParams.append(gqlRequest.GetParams());
 		if (inputParams.size() > 0){
-			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
+			viewParamsGql = inputParams.at(0).GetParamArgumentObjectPtr("viewParams");
 		}
 
 		double zoomLevel = 0;
@@ -78,7 +78,7 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 		QList<QPair<QPair<qint64, qint64>, int>> tileList;
 
 		if (viewParamsGql != nullptr){
-			QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
+			QByteArray filterBA = viewParamsGql->GetParamArgumentValue("FilterModel").toByteArray();
 			if (!filterBA.isEmpty()){
 				imtbase::CTreeItemModel generalModel;
 				generalModel.CreateFromJson(filterBA);

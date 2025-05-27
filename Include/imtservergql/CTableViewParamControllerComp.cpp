@@ -56,7 +56,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 	
 	QByteArray userId = userInfoPtr->GetObjectUuid();
 
-	QByteArray tableId = gqlInputParamPtr->GetFieldArgumentValue("TableId").toByteArray();
+	QByteArray tableId = gqlInputParamPtr->GetParamArgumentValue("TableId").toByteArray();
 
 	imtauth::IUserSettingsSharedPtr userSettingsPtr;
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -110,7 +110,7 @@ imtbase::CTreeItemModel* CTableViewParamControllerComp::CreateInternalResponse(
 		}
 	}
 	else if (gqlRequest.GetRequestType() == imtgql::IGqlRequest::RT_MUTATION){
-		QByteArray tableViewParamsJson = gqlInputParamPtr->GetFieldArgumentValue("TableViewParams").toByteArray();
+		QByteArray tableViewParamsJson = gqlInputParamPtr->GetParamArgumentValue("TableViewParams").toByteArray();
 
 		imtbase::CTreeItemModel tableViewParamRepresentation;
 		if (!tableViewParamRepresentation.CreateFromJson(tableViewParamsJson)){

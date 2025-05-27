@@ -27,7 +27,7 @@ void CUserSerializableCollectionControllerComp::CustomProcessObject(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
-		productId = inputParamPtr->GetFieldArgumentValue("productId").toByteArray();
+		productId = inputParamPtr->GetParamArgumentValue("productId").toByteArray();
 	}
 
 	if (productId.isEmpty()){

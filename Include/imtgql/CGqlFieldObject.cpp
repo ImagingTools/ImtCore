@@ -5,6 +5,9 @@
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtgql/CGqlFieldFragment.h>
+
 
 namespace imtgql
 {

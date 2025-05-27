@@ -40,10 +40,10 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateInsertNewNodeR
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "InsertNewNode");
 
 		imtgql::CGqlParamObject input;
-		input.InsertField("name", name);
-		input.InsertField("description", description);
-		input.InsertField("proposedNodeId", QVariant(proposedNodeId));
-		input.InsertField("parentNodeId", QVariant(parentNodeId));
+		input.InsertParam("name", name);
+		input.InsertParam("description", description);
+		input.InsertParam("proposedNodeId", QVariant(proposedNodeId));
+		input.InsertParam("parentNodeId", QVariant(parentNodeId));
 		requestPtr->AddParam("input", input);
 
 		imtgql::CGqlFieldObject query;
@@ -67,8 +67,8 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateSetNodeNameReq
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "SetNodeName");
 
 		imtgql::CGqlParamObject input;
-		input.InsertField("nodeId", QVariant(nodeId));
-		input.InsertField("name", name);
+		input.InsertParam("nodeId", QVariant(nodeId));
+		input.InsertParam("name", name);
 		requestPtr->AddParam("input", input);
 
 		imtgql::CGqlFieldObject query;
@@ -91,8 +91,8 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateSetNodeDescrip
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "SetNodeDescription");
 
 		imtgql::CGqlParamObject input;
-		input.InsertField("nodeId", QVariant(nodeId));
-		input.InsertField("description", description);
+		input.InsertParam("nodeId", QVariant(nodeId));
+		input.InsertParam("description", description);
 		requestPtr->AddParam("input", input);
 
 		imtgql::CGqlFieldObject query;
@@ -124,8 +124,8 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateMoveNodeReques
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "MoveNode");
 
 		imtgql::CGqlParamObject input;
-		input.InsertField("nodeId", QVariant(nodeId));
-		input.InsertField("parentNodeId", QVariant(parentNodeId));
+		input.InsertParam("nodeId", QVariant(nodeId));
+		input.InsertParam("parentNodeId", QVariant(parentNodeId));
 		requestPtr->AddParam("input", input);
 
 		imtgql::CGqlFieldObject query;
@@ -147,7 +147,7 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateRemoveNodeRequ
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "RemoveNode");
 
 		imtgql::CGqlParamObject input;
-		input.InsertField("nodeId", QVariant(nodeId));
+		input.InsertParam("nodeId", QVariant(nodeId));
 		requestPtr->AddParam("input", input);
 
 		imtgql::CGqlFieldObject query;
@@ -171,8 +171,8 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateInsertLeafRequ
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "InsertNewLeaf");
 
 		imtgql::CGqlParamObject input;
-		input.InsertField("leafId", QVariant(leafId));
-		input.InsertField("nodeId", QVariant(nodeId));
+		input.InsertParam("leafId", QVariant(leafId));
+		input.InsertParam("nodeId", QVariant(nodeId));
 		requestPtr->AddParam("input", input);
 
 		imtgql::CGqlFieldObject query;
@@ -196,9 +196,9 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateMoveLeafReques
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "MoveLeaf");
 
 		imtgql::CGqlParamObject input;
-		input.InsertField("objectId", QVariant(leafId));
-		input.InsertField("sourceNodeId", QVariant(sourceNodeId));
-		input.InsertField("targetNodeId", QVariant(targetNodeId));
+		input.InsertParam("objectId", QVariant(leafId));
+		input.InsertParam("sourceNodeId", QVariant(sourceNodeId));
+		input.InsertParam("targetNodeId", QVariant(targetNodeId));
 		requestPtr->AddParam("input", input);
 
 		imtgql::CGqlFieldObject query;
@@ -221,8 +221,8 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateRemoveLeafRequ
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "RemoveLeaf");
 
 		imtgql::CGqlParamObject input;
-		input.InsertField("leafId", QVariant(leafId));
-		input.InsertField("nodeId", QVariant(nodeId));
+		input.InsertParam("leafId", QVariant(leafId));
+		input.InsertParam("nodeId", QVariant(nodeId));
 		requestPtr->AddParam("input", input);
 
 		imtgql::CGqlFieldObject query;
@@ -248,12 +248,12 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateGetItemCountRe
 	//		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "GetNodeCount");
 
 	//		imtgql::CGqlParamObject input("input");
-	//		input.InsertField("nodeId", QVariant(nodeIdPtr->GetId()));
-	//		input.InsertField("filter", filterPtr->);
+	//		input.InsertParam("nodeId", QVariant(nodeIdPtr->GetId()));
+	//		input.InsertParam("filter", filterPtr->);
 	//		requestPtr->AddParam(input);
 
 	//		imtgql::CGqlParamObject query("query");
-	//		query.InsertField("count");
+	//		query.InsertParam("count");
 	//		requestPtr->AddField(query);
 	//	}
 	//}
@@ -278,12 +278,12 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateGetItemIdsRequ
 	//		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "GetNodeIds");
 
 	//		imtgql::CGqlParamObject input("input");
-	//		input.InsertField("nodeId", QVariant(nodeIdPtr->GetId()));
-	//		input.InsertField("filter", filterPtr->);
+	//		input.InsertParam("nodeId", QVariant(nodeIdPtr->GetId()));
+	//		input.InsertParam("filter", filterPtr->);
 	//		requestPtr->AddParam(input);
 
 	//		imtgql::CGqlParamObject query("query");
-	//		query.InsertField("count");
+	//		query.InsertParam("count");
 	//		requestPtr->AddField(query);
 	//	}
 	//}
@@ -300,11 +300,11 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateGetItemInfosRe
 		//requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "GetItemInfos");
 
 		//imtgql::CGqlParamObject input("input");
-		//input.InsertField("nodeId", QVariant(nodeId));
+		//input.InsertParam("nodeId", QVariant(nodeId));
 		//requestPtr->AddParam(input);
 
 		//imtgql::CGqlParamObject query("query");
-		//query.InsertField("info");
+		//query.InsertParam("info");
 		//requestPtr->AddField(query);
 	}
 
@@ -320,7 +320,7 @@ imtgql::IGqlRequest* CGqlHierarchicalStructureDelegateComp::CreateGetItemPathReq
 		requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "GetItemPath");
 
 		imtgql::CGqlParamObject input;
-		input.InsertField("itemId", QVariant(itemId));
+		input.InsertParam("itemId", QVariant(itemId));
 		requestPtr->AddParam("input", input);
 
 		imtgql::CGqlFieldObject query;

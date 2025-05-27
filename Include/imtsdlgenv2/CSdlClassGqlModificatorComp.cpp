@@ -213,7 +213,7 @@ void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream&
 void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool isUnion, bool optional)
 {
 	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetFieldArgumentValue(");
+	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetParamArgumentValue(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
@@ -383,7 +383,7 @@ void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& 
 
 		FeedStreamHorizontally(stream, hIndents);
 
-		stream << QStringLiteral("request.InsertField(");
+		stream << QStringLiteral("request.InsertParam(");
 		stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
 		if (!isEnum && field.IsArray()){
 			stream << tempListVarName;
@@ -422,7 +422,7 @@ void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& 
 
 		FeedStreamHorizontally(stream, hIndents);
 
-		stream << QStringLiteral("request.InsertField(");
+		stream << QStringLiteral("request.InsertParam(");
 		stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
 		if (!isUnion && field.IsArray()){
 			stream << tempListVarName;
@@ -435,7 +435,7 @@ void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& 
 	}
 	else {
 		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("request.InsertField(");
+		stream << QStringLiteral("request.InsertParam(");
 		stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
 		stream << QStringLiteral("QVariant(*") << field.GetId() << ')';
 		stream << QStringLiteral(");");
@@ -504,7 +504,7 @@ void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStre
 
 	// add values to request
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("request.InsertField(");
+	stream << QStringLiteral("request.InsertParam(");
 	stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
 	stream << QStringLiteral("QVariant(") << tempListVarName;
 	stream << QStringLiteral("));");
@@ -562,7 +562,7 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 	}
 	// insert temp GQL object
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("request.InsertField(");
+	stream << QStringLiteral("request.InsertParam(");
 	stream << '"' << field.GetId() << '"';
 	stream << ',' << ' ';
 	stream << dataObjectVariableName;
@@ -666,7 +666,7 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 
 	// and finally add list to GQL
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("request.InsertField(");
+	stream << QStringLiteral("request.InsertParam(");
 	stream << '"' << field.GetId() << '"';
 	stream << ',' << ' ' << dataObjectListVariableName;
 	stream << ')' << ';';
@@ -682,7 +682,7 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStre
 void CSdlClassGqlModificatorComp::AddExtractValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, quint32 hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetFieldArgumentValue(");
+	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetParamArgumentValue(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
@@ -753,7 +753,7 @@ void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, c
 void CSdlClassGqlModificatorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const ::imtgql::CGqlParamObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
+	stream << QStringLiteral("const ::imtgql::CGqlParamObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetParamArgumentObjectPtr(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(");");
 	FeedStream(stream, 1, false);
@@ -859,7 +859,7 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	// declare iteration var
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("const ::imtgql::CGqlParamObject* ");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetParamArgumentObjectPtr(");
 	stream << '"' << field.GetId() << '"' << ',' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index);");
 	FeedStream(stream, 1, false);
 
@@ -1088,7 +1088,7 @@ void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream&
 		// declare iteration var
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("const ::imtgql::CGqlParamObject* ");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetParamArgumentObjectPtr(");
 		stream << '"' << field.GetId() << '"' << ',' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index);");
 		FeedStream(stream, 1, false);
 

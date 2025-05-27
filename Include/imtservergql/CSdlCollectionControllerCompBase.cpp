@@ -30,14 +30,14 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 	QList<imtgql::CGqlParamObject> inputParams;
 	inputParams.append(gqlRequest.GetParams());
 	if (inputParams.size() > 0){
-		viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
+		viewParamsGql = inputParams.at(0).GetParamArgumentObjectPtr("viewParams");
 	}
 
 	iprm::CParamsSet filterParams;
 
 	if (viewParamsGql != nullptr){
-		offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
-		count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
+		offset = viewParamsGql->GetParamArgumentValue("Offset").toInt();
+		count = viewParamsGql->GetParamArgumentValue("Count").toInt();
 		PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 	}
 
@@ -105,7 +105,7 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::GetObject(
 
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
-		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+		objectId = inputParamPtr->GetParamArgumentValue("Id").toByteArray();
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;

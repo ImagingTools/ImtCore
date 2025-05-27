@@ -30,7 +30,7 @@ bool CRemotePermissionCheckerComp::CheckPermission(const imtauth::IUserInfo::Fea
 
 	imtgql::CGqlRequest gqlRequest(imtgql::CGqlRequest::RT_QUERY, "GetFeatureDependencies");
 	imtgql::CGqlParamObject inputParam;
-	inputParam.InsertField(QByteArray("FeatureIds"), QVariant(permissions.join(';')));
+	inputParam.InsertParam(QByteArray("FeatureIds"), QVariant(permissions.join(';')));
 	gqlRequest.AddParam("input", inputParam);
 
 	QString errorMessage;

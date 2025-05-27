@@ -350,19 +350,19 @@ void CGqlRequestTest::CreateArrayQuery()
 
 	imtgql::CGqlParamObject inputObject;
 	QList<int> arrayOfInts = {1,2,3};
-	inputObject.InsertField("ArrayOfInts", QVariant::fromValue(arrayOfInts));
+	inputObject.InsertParam("ArrayOfInts", QVariant::fromValue(arrayOfInts));
 	QList<double> arrayOfDoubles = {0.1,0.2,0.3};
-	inputObject.InsertField("ArrayOfDoubles", QVariant::fromValue(arrayOfDoubles));
+	inputObject.InsertParam("ArrayOfDoubles", QVariant::fromValue(arrayOfDoubles));
 	QList<QString> arrayOfStrings = {"1","2","3"};
-	inputObject.InsertField("ArrayOfStrings", QVariant::fromValue(arrayOfStrings));
+	inputObject.InsertParam("ArrayOfStrings", QVariant::fromValue(arrayOfStrings));
 
 	imtgql::CGqlParamObject valueObject;
-	valueObject.InsertField("Value", 1);
-	inputObject.AppendFieldToArray("ArrayOfObjects",valueObject);
-	valueObject.InsertField("Value", 1.1);
-	inputObject.AppendFieldToArray("ArrayOfObjects",valueObject);
-	valueObject.InsertField("Value", "1");
-	inputObject.AppendFieldToArray("ArrayOfObjects",valueObject);
+	valueObject.InsertParam("Value", 1);
+	inputObject.AppendParamToArray("ArrayOfObjects",valueObject);
+	valueObject.InsertParam("Value", 1.1);
+	inputObject.AppendParamToArray("ArrayOfObjects",valueObject);
+	valueObject.InsertParam("Value", "1");
+	inputObject.AppendParamToArray("ArrayOfObjects",valueObject);
 
 	request.AddParam("input", inputObject);
 

@@ -561,8 +561,8 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 		return nullptr;
 	}
 
-	QByteArray userId = gqlInputParamPtr->GetFieldArgumentValue("id").toByteArray();
-	QByteArray productId = gqlInputParamPtr->GetFieldArgumentValue("productId").toByteArray();
+	QByteArray userId = gqlInputParamPtr->GetParamArgumentValue("id").toByteArray();
+	QByteArray productId = gqlInputParamPtr->GetParamArgumentValue("productId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 

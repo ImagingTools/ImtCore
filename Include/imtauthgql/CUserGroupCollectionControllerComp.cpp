@@ -306,7 +306,7 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 
 	const imtgql::CGqlParamObject& params = gqlRequest.GetParams();
 
-	QByteArray productId = params.GetFieldArgumentValue("productId").toByteArray();
+	QByteArray productId = params.GetParamArgumentValue("productId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 

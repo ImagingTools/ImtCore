@@ -170,7 +170,7 @@ istd::IChangeableUniquePtr CAddressControllerComp::CreateObjectFromRequest(
 		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 
-	QByteArray itemData = inputParamPtr->GetFieldArgumentValue(QByteArrayLiteral("Item")).toByteArray();
+	QByteArray itemData = inputParamPtr->GetParamArgumentValue(QByteArrayLiteral("Item")).toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<CAddressElementInfo> addressInfoPtr = new CAddressElementInfo();
 		if (addressInfoPtr == nullptr){

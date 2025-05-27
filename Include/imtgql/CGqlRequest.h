@@ -5,7 +5,7 @@
 #include <imtgql/IGqlRequest.h>
 #include <imtgql/CGqlParamObject.h>
 #include <imtgql/CGqlFieldObject.h>
-
+#include <imtgql/CGqlFieldFragment.h>
 
 namespace imtgql
 {

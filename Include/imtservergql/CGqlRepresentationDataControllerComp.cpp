@@ -80,7 +80,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 		QList<imtgql::CGqlParamObject> params;
 		params.append(gqlRequest.GetParams());
 		if (!params.isEmpty()){
-			QByteArray itemData = params.at(0).GetFieldArgumentValue("Item").toByteArray();
+			QByteArray itemData = params.at(0).GetParamArgumentValue("Item").toByteArray();
 			if (!itemData.isEmpty()){
 				istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);
 				if (representationPtr->CreateFromJson(itemData)){
@@ -108,7 +108,7 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 	QByteArray productId;
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr != nullptr){
-		productId = inputParamPtr->GetFieldArgumentValue("productId").toByteArray();
+		productId = inputParamPtr->GetParamArgumentValue("productId").toByteArray();
 	}
 
 	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();

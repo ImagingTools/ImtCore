@@ -38,8 +38,8 @@ imtbase::CTreeItemModel* CBroadcastMessageConsumerControllerComp::CreateInternal
 		return nullptr;
 	}
 
-	QString source = inputObjectPtr->GetFieldArgumentValue("source").toByteArray();
-	QString messageText = inputObjectPtr->GetFieldArgumentValue("message").toString();
+	QString source = inputObjectPtr->GetParamArgumentValue("source").toByteArray();
+	QString messageText = inputObjectPtr->GetParamArgumentValue("message").toString();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");

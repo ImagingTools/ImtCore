@@ -180,8 +180,8 @@ QByteArray CStructureControllerCompBase::GetObjectIdFromInputParams(const QList<
 {
 	int count = inputParams.count();
 	for (int i = 0; i < count; i++){
-		if (inputParams.at(i).GetFieldIds().contains("Id")){
-			return inputParams.at(i).GetFieldArgumentValue("Id").toByteArray();
+		if (inputParams.at(i).GetParamIds().contains("Id")){
+			return inputParams.at(i).GetParamArgumentValue("Id").toByteArray();
 		}
 	}
 	return QByteArray();
@@ -206,10 +206,10 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewNode(
 	QByteArray parentNodeId;
 	QString newName;
 	QString description;
-	nodeId = inputParams.GetFieldArgumentValue("Id").toByteArray();
-	parentNodeId = inputParams.GetFieldArgumentValue("ParentNodeId").toByteArray();
-	newName = inputParams.GetFieldArgumentValue("NewName").toString();
-	description = inputParams.GetFieldArgumentValue("Description").toString();
+	nodeId = inputParams.GetParamArgumentValue("Id").toByteArray();
+	parentNodeId = inputParams.GetParamArgumentValue("ParentNodeId").toByteArray();
+	newName = inputParams.GetParamArgumentValue("NewName").toString();
+	description = inputParams.GetParamArgumentValue("Description").toString();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
@@ -242,8 +242,8 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeName(
 	QByteArray nodeId;
 	QString newName;
 
-	nodeId = inputParams.GetFieldArgumentValue("Id").toByteArray();
-	newName = inputParams.GetFieldArgumentValue("NewName").toString();
+	nodeId = inputParams.GetParamArgumentValue("Id").toByteArray();
+	newName = inputParams.GetParamArgumentValue("NewName").toString();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
@@ -310,14 +310,14 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 	QByteArray selectIndex;
 	const imtgql::CGqlParamObject inputParams = gqlRequest.GetParams();
 	const imtgql::CGqlParamObject* additionObject = nullptr;
-	const imtgql::CGqlParamObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+	const imtgql::CGqlParamObject* inputObject = inputParams.GetParamArgumentObjectPtr("input");
 	if (inputObject != nullptr){
-		additionObject = inputObject->GetFieldArgumentObjectPtr("addition");
+		additionObject = inputObject->GetParamArgumentObjectPtr("addition");
 	}
 
 	if (additionObject != nullptr){
-		nodeId = additionObject->GetFieldArgumentValue("nodeId").toByteArray();
-		selectIndex = additionObject->GetFieldArgumentValue("selectIndex").toByteArray();
+		nodeId = additionObject->GetParamArgumentValue("nodeId").toByteArray();
+		selectIndex = additionObject->GetParamArgumentValue("selectIndex").toByteArray();
 	}
 
 	if (typeId.isEmpty()){
@@ -447,9 +447,9 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
-		const imtgql::CGqlParamObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+		const imtgql::CGqlParamObject* inputObject = inputParams.GetParamArgumentObjectPtr("input");
 		if (inputObject != nullptr){
-			viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
+			viewParamsGql = inputObject->GetParamArgumentObjectPtr("viewParams");
 		}
 
 		iprm::CParamsSet filterParams;
@@ -457,8 +457,8 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 		int offset = 0, count = -1;
 
 		if (viewParamsGql != nullptr){
-			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
-			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
+			offset = viewParamsGql->GetParamArgumentValue("Offset").toInt();
+			count = viewParamsGql->GetParamArgumentValue("Count").toInt();
 			// PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 		}
 

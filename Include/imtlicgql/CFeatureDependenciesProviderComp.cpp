@@ -27,7 +27,7 @@ imtbase::CTreeItemModel* CFeatureDependenciesProviderComp::CreateInternalRespons
 		return nullptr;
 	}
 
-	QByteArray features = gqlInputParamPtr->GetFieldArgumentValue("FeatureIds").toByteArray();
+	QByteArray features = gqlInputParamPtr->GetParamArgumentValue("FeatureIds").toByteArray();
 	if (features.isEmpty()){
 		errorMessage = QString("Unable to get dependencies for feature with empty Feature-ID.");
 		SendErrorMessage(0, errorMessage, "CFeatureDependenciesProviderComp");

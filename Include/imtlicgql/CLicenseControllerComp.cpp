@@ -33,12 +33,12 @@ istd::IChangeableUniquePtr CLicenseControllerComp::CreateObjectFromRequest(
 		return nullptr;
 	}
 
-	objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	objectId = inputParamPtr->GetParamArgumentValue("Id").toByteArray();
 	if (objectId.isEmpty()){
 		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 
-	QByteArray jsonItemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
+	QByteArray jsonItemData = inputParamPtr->GetParamArgumentValue("Item").toByteArray();
 	if (jsonItemData.isEmpty()){
 		errorMessage = QT_TR_NOOP("Unable to create object from empty json.");
 		SendErrorMessage(0, errorMessage, "License controller");
@@ -169,7 +169,7 @@ imtbase::CTreeItemModel* CLicenseControllerComp::GetObject(const imtgql::CGqlReq
 		return nullptr;
 	}
 
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QByteArray objectId = inputParamPtr->GetParamArgumentValue("Id").toByteArray();
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){

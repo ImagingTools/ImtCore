@@ -44,12 +44,12 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 			return nullptr;
 		}
 
-		newInputParamPtr->InsertField("productId", QVariant(*m_productIdAttrPtr));
+		newInputParamPtr->InsertParam("productId", QVariant(*m_productIdAttrPtr));
 		gqlRequestPtr->AddParam("input", *newInputParamPtr.GetPtr());
 	}
 	else{
 		imtgql::CGqlParamObject inputGqlObject;
-		inputGqlObject.InsertField("productId", QVariant(*m_productIdAttrPtr));
+		inputGqlObject.InsertParam("productId", QVariant(*m_productIdAttrPtr));
 
 		gqlRequestPtr->AddParam("input", inputGqlObject);
 	}

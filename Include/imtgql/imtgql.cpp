@@ -15,8 +15,8 @@ QByteArray GetLanguageIdFromRequest(const QList<imtgql::CGqlParamObject>& inputP
 {
 	int count = inputParams.count();
 	for (int i = 0; i < count; i++){
-		if (inputParams.at(i).GetFieldIds().contains("LanguageId")){
-			return inputParams.at(i).GetFieldArgumentValue("LanguageId").toByteArray();
+		if (inputParams.at(i).GetParamIds().contains("LanguageId")){
+			return inputParams.at(i).GetParamArgumentValue("LanguageId").toByteArray();
 		}
 	}
 

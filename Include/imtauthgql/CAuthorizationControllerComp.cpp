@@ -27,9 +27,9 @@ bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
 		return false;
 	}
 
-	login = gqlInputParamPtr->GetFieldArgumentValue("login").toByteArray();
-	productId = gqlInputParamPtr->GetFieldArgumentValue("productId").toByteArray();
-	password = gqlInputParamPtr->GetFieldArgumentValue("password").toByteArray();
+	login = gqlInputParamPtr->GetParamArgumentValue("login").toByteArray();
+	productId = gqlInputParamPtr->GetParamArgumentValue("productId").toByteArray();
+	password = gqlInputParamPtr->GetParamArgumentValue("password").toByteArray();
 
 	return true;
 }

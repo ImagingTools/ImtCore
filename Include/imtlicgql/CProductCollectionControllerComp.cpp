@@ -325,8 +325,8 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 		return nullptr;
 	}
 
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("id").toByteArray();
-	QString newName = inputParamPtr->GetFieldArgumentValue("NewName").toByteArray();
+	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
+	QString newName = inputParamPtr->GetParamArgumentValue("NewName").toByteArray();
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -369,7 +369,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::ImportObject(const im
 		if (m_objectCollectionCompPtr.IsValid()){
 			const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 			if (inputParamPtr != nullptr){
-				bool force = inputParamPtr->GetFieldArgumentValue("force").toBool();
+				bool force = inputParamPtr->GetParamArgumentValue("force").toBool();
 				QByteArray objectId = resultModelPtr->GetData("id").toByteArray();
 				imtbase::IObjectCollection::DataPtr dataPtr;
 				if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){

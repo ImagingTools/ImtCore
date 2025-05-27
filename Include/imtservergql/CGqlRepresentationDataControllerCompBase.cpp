@@ -40,7 +40,7 @@ imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateInternalRes
 			return nullptr;
 		}
 
-		QByteArray itemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
+		QByteArray itemData = inputParamPtr->GetParamArgumentValue("Item").toByteArray();
 		if (!itemData.isEmpty()){
 			istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);
 			if (representationPtr->CreateFromJson(itemData)){

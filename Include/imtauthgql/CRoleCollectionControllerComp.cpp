@@ -352,7 +352,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 	const imtgql::CGqlParamObject paramsPtr = gqlRequest.GetParams();
 
 	QByteArray productId;
-	productId = paramsPtr.GetFieldArgumentValue("productId").toByteArray();
+	productId = paramsPtr.GetParamArgumentValue("productId").toByteArray();
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");

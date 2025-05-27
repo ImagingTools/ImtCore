@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlFieldFragment.h>
 
 
 namespace imtgql
@@ -43,7 +44,7 @@ imtgql::CGqlRequest::~CGqlRequest()
 
 void CGqlRequest::AddParam(const QByteArray &paramId, const CGqlParamObject &param)
 {
-	m_params.InsertField(paramId, param);
+	m_params.InsertParam(paramId, param);
 }
 
 
@@ -119,7 +120,7 @@ const CGqlFieldObject* CGqlRequest::GetFieldObject(const QByteArray& fieldId) co
 
 const CGqlParamObject* CGqlRequest::GetParamObject(const QByteArray& paramId) const
 {
-	return m_params.GetFieldArgumentObjectPtr(paramId);
+	return m_params.GetParamArgumentObjectPtr(paramId);
 }
 
 
@@ -609,14 +610,14 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject &gqlObject) con
 	QByteArray retVal;
 
 
-	QByteArrayList fieldIds = gqlObject.GetFieldIds();
+	QByteArrayList fieldIds = gqlObject.GetParamIds();
 	for (int i = 0; i < fieldIds.count(); ++i) {
 		const QByteArray& fieldId = fieldIds[i];
 
 		if (gqlObject.IsObject(fieldId)) {
 			retVal += fieldId;
 			retVal += ": {";
-			retVal += AddObjectParamPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
+			retVal += AddObjectParamPart(*gqlObject.GetParamArgumentObjectPtr(fieldId));
 			retVal += "}";
 		}
 		else if (gqlObject.IsObjectList(fieldId)){
@@ -627,7 +628,7 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject &gqlObject) con
 					retVal += ",";
 				}
 				retVal += " {";
-				const CGqlParamObject* paramsObject = gqlObject.GetFieldArgumentObjectPtr(fieldId, objectIndex);
+				const CGqlParamObject* paramsObject = gqlObject.GetParamArgumentObjectPtr(fieldId, objectIndex);
 				if (paramsObject != nullptr){
 					retVal += AddObjectParamPart(*paramsObject);
 				}
@@ -638,7 +639,7 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject &gqlObject) con
 		else {
 			retVal += fieldId;
 			retVal += ": ";
-			QVariant value = gqlObject.GetFieldArgumentValue(fieldId);
+			QVariant value = gqlObject.GetParamArgumentValue(fieldId);
 			retVal += AddObjectParamValue(value);
 		}
 		if (i < fieldIds.count() - 1){
@@ -757,7 +758,7 @@ void CGqlRequest::ParceObjectParamPart(CGqlParamObject &gqlObject, const QJsonOb
 	QStringList keys = object.keys();
 	for (const QString& key : keys){
 		if (object.value(key).isObject()){
-			CGqlParamObject* slaveGqlObjectPtr = gqlObject.CreateFieldObject(key.toUtf8());
+			CGqlParamObject* slaveGqlObjectPtr = gqlObject.CreateParamObject(key.toUtf8());
 			ParceObjectParamPart(*slaveGqlObjectPtr, object.value(key).toObject());
 		}
 	}
@@ -780,8 +781,8 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 	else if (m_startParams){
 		CGqlParamObject newObject;
 		if (m_activeGqlObjectPtr == nullptr){
-			m_params.InsertField(commandId, newObject);
-			m_activeGqlObjectPtr = const_cast<CGqlParamObject*>(m_params.GetFieldArgumentObjectPtr(commandId));
+			m_params.InsertParam(commandId, newObject);
+			m_activeGqlObjectPtr = const_cast<CGqlParamObject*>(m_params.GetParamArgumentObjectPtr(commandId));
 		}
 		else{
 			QByteArray lastArrayId;
@@ -789,12 +790,12 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 				lastArrayId = m_activeArrayIds.last();
 			}
 			if (!lastArrayId.isEmpty() && !m_objectArrayList.isEmpty() && m_objectArrayList.last() == m_activeGqlObjectPtr){
-				m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendFieldToArray(lastArrayId, newObject);
-				m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
+				m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, newObject);
+				m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateParamObject(commandId);
 				m_currentField = commandId;
 			}
 			else {
-				m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateFieldObject(commandId);
+				m_activeGqlObjectPtr = m_activeGqlObjectPtr->CreateParamObject(commandId);
 			}
 		}
 	}
@@ -826,7 +827,7 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 	}
 	if (!lastArrayId.isEmpty() && m_startArrayPrimitives){
 
-		QVariant value = m_activeGqlObjectPtr->GetFieldArgumentValue(lastArrayId);
+		QVariant value = m_activeGqlObjectPtr->GetParamArgumentValue(lastArrayId);
 		QVariantList variantList;
 		if (!value.isNull()){
 			variantList = value.toList();
@@ -852,13 +853,13 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 				variantList.append(intValue);
 			}
 		}
-		m_activeGqlObjectPtr->InsertField(lastArrayId, variantList);
+		m_activeGqlObjectPtr->InsertParam(lastArrayId, variantList);
 
 		return;
 	}
 	else if (!lastArrayId.isEmpty() &&  !m_objectArrayList.isEmpty() && m_objectArrayList.last() == m_activeGqlObjectPtr){
 		CGqlParamObject newObject;
-		m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendFieldToArray(lastArrayId, newObject);
+		m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, newObject);
 		m_currentField = text;
 	}
 	else if (m_startKey){
@@ -897,7 +898,7 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 
 			}
 		}
-		m_activeGqlObjectPtr->InsertField(m_currentField, value);
+		m_activeGqlObjectPtr->InsertParam(m_currentField, value);
 	}
 
 }
@@ -912,10 +913,10 @@ void CGqlRequest::StartArray(const QByteArray& text)
 		}
 		if (!lastArrayId.isEmpty() && !m_startArrayPrimitives && m_activeGqlObjectPtr->IsObjectList(lastArrayId)){
 			CGqlParamObject newObject;
-			m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendFieldToArray(lastArrayId, newObject);
+			m_activeGqlObjectPtr = m_activeGqlObjectPtr->AppendParamToArray(lastArrayId, newObject);
 		}
 		QList<CGqlParamObject> objectList;
-		m_activeGqlObjectPtr->InsertField(text, objectList);
+		m_activeGqlObjectPtr->InsertParam(text, objectList);
 		m_currentField = text;
 		m_activeArrayIds.append(text);
 		m_objectArrayList.append(m_activeGqlObjectPtr);

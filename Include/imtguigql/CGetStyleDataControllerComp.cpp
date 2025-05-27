@@ -26,7 +26,7 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 		return nullptr;
 	}
 
-	QString theme = gqlInputParamPtr->GetFieldArgumentValue("theme").toString();
+	QString theme = gqlInputParamPtr->GetParamArgumentValue("theme").toString();
 	if(theme.isEmpty()){
 		if (m_selectionParamCompPtr.IsValid()){
 			const iprm::IOptionsList* optionList = m_selectionParamCompPtr->GetSelectionConstraints();

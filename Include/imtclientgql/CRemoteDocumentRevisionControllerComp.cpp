@@ -123,7 +123,7 @@ bool CRemoteDocumentRevisionControllerComp::IsRequestSupported(const imtgql::CGq
 		return false;
 	}
 
-	QByteArray collectionId = inputObjectPtr->GetFieldArgumentValue(
+	QByteArray collectionId = inputObjectPtr->GetParamArgumentValue(
 				sdl::imtbase::DocumentRevision::CGetRevisionInfoListInput::V1_0::GetRevisionInfoListInputFields::CollectionId.toUtf8()).toByteArray();
 	if (collectionId.isEmpty()){
 		return false;

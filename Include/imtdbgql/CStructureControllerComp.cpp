@@ -70,27 +70,27 @@ imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
 		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
-		const imtgql::CGqlParamObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+		const imtgql::CGqlParamObject* inputObject = inputParams.GetParamArgumentObjectPtr("input");
 		if (inputObject != nullptr){
-			viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
+			viewParamsGql = inputObject->GetParamArgumentObjectPtr("viewParams");
 		}
 
 		iprm::CParamsSet filterParams;
 
-		QByteArray parentNodeId = inputParams.GetFieldArgumentValue("ParentNodeId").toByteArray();
+		QByteArray parentNodeId = inputParams.GetParamArgumentValue("ParentNodeId").toByteArray();
 		QByteArray selectIndex;
 		iprm::CTextParam parentNodeIdParams;
 		parentNodeIdParams.SetText(parentNodeId);
 		filterParams.SetEditableParameter("ParentNodeId", &parentNodeIdParams);
 
-		const imtgql::CGqlParamObject* additionObject = inputParams.GetFieldArgumentObjectPtr("addition");
+		const imtgql::CGqlParamObject* additionObject = inputParams.GetParamArgumentObjectPtr("addition");
 		if (inputObject != nullptr){
-			additionObject = inputObject->GetFieldArgumentObjectPtr("addition");
+			additionObject = inputObject->GetParamArgumentObjectPtr("addition");
 		}
 
 		if (additionObject != nullptr){
-			parentNodeId = additionObject->GetFieldArgumentValue("nodeId").toByteArray();
-			selectIndex = additionObject->GetFieldArgumentValue("selectIndex").toByteArray();
+			parentNodeId = additionObject->GetParamArgumentValue("nodeId").toByteArray();
+			selectIndex = additionObject->GetParamArgumentValue("selectIndex").toByteArray();
 		}
 
 		QByteArray getElementsQuery = GetElementsQuery(&filterParams);

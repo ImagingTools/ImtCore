@@ -363,7 +363,7 @@ void CSdlUnionConverter::WriteUnionConversionFromString(
 				QString gqlVariable = targetName + QString("DataObjectPtr");
 				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const ::imtgql::CGqlParamObject* ") << gqlVariable;
-				stream << QStringLiteral(" = request.GetFieldArgumentObjectPtr(\"");
+				stream << QStringLiteral(" = request.GetParamArgumentObjectPtr(\"");
 				if (conversionType == CT_GQL_SCALAR){
 					stream << targetVariableName;
 				}

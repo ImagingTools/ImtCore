@@ -117,15 +117,15 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 
 	imtgql::CGqlParamObject input;
 	imtgql::CGqlParamObject viewParams;
-	viewParams.InsertField("offset", 0);
-	viewParams.InsertField("count", -1);
+	viewParams.InsertParam("offset", 0);
+	viewParams.InsertParam("count", -1);
 	
 	imtgql::CGqlParamObject complexFilterGqlOblect;
 	if (complexFilter.WriteToGraphQlObject(complexFilterGqlOblect)){
-		viewParams.InsertField("filterModel", complexFilterGqlOblect);
+		viewParams.InsertParam("filterModel", complexFilterGqlOblect);
 	}
 	
-	input.InsertField("viewParams", viewParams);
+	input.InsertParam("viewParams", viewParams);
 	gqlRequest.AddParam("input", input);
 
 	imtgql::CGqlFieldObject items;

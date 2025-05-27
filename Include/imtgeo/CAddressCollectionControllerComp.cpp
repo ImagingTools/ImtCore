@@ -67,9 +67,9 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 
 		const imtgql::CGqlParamObject* viewParamsGql = nullptr;
 		const imtgql::CGqlParamObject& inputParams = gqlRequest.GetParams();
-		const imtgql::CGqlParamObject* inputObject = inputParams.GetFieldArgumentObjectPtr("input");
+		const imtgql::CGqlParamObject* inputObject = inputParams.GetParamArgumentObjectPtr("input");
 		if (inputObject != nullptr){
-			viewParamsGql = inputObject->GetFieldArgumentObjectPtr("viewParams");
+			viewParamsGql = inputObject->GetParamArgumentObjectPtr("viewParams");
 		}
 
 		imtbase::CCollectionFilter filter;
@@ -82,10 +82,10 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 		QString filterText = "";
 		QString typeId = "";
 		if (viewParamsGql != nullptr){
-			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
-			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
+			offset = viewParamsGql->GetParamArgumentValue("Offset").toInt();
+			count = viewParamsGql->GetParamArgumentValue("Count").toInt();
 
-			QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
+			QByteArray filterBA = viewParamsGql->GetParamArgumentValue("FilterModel").toByteArray();
 			//qDebug() << "filterBA:: " << filterBA;
 			if (!filterBA.isEmpty()){
 				imtbase::CTreeItemModel generalModel;

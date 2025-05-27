@@ -22,24 +22,24 @@ class CGqlParamObject: virtual public iser::IObject
 public:
 	CGqlParamObject();
 
-	QByteArrayList GetFieldIds() const;
-	QVariant GetFieldArgumentValue(const QByteArray& fieldId) const;
-	CGqlParamObject* CreateFieldObject(const QByteArray& fieldId);
-	const CGqlParamObject* GetFieldArgumentObjectPtr(const QByteArray& fieldId, int index = 0) const;
-	int GetObjectsCount(const QByteArray& fieldId) const;
-	QList<const CGqlParamObject*> GetFieldArgumentObjectPtrList(const QByteArray& fieldId) const;
+	QByteArrayList GetParamIds() const;
+	QVariant GetParamArgumentValue(const QByteArray& paramId) const;
+	CGqlParamObject* CreateParamObject(const QByteArray& paramId);
+	const CGqlParamObject* GetParamArgumentObjectPtr(const QByteArray& paramId, int index = 0) const;
+	int GetObjectsCount(const QByteArray& paramId) const;
+	QList<const CGqlParamObject*> GetParamArgumentObjectPtrList(const QByteArray& paramId) const;
 	CGqlParamObject* GetParentObject() const;
-	void InsertField(const QByteArray& fieldId, const QVariant& value);
-	void InsertField(const QByteArray& fieldId, const imtgql::CGqlEnum& value);
-	void InsertField(const QByteArray& fieldId, const CGqlParamObject& object);
-	void InsertField(const QByteArray& fieldId, const QList<CGqlParamObject> objectList);
-	CGqlParamObject* AppendFieldToArray(const QByteArray& fieldId, const CGqlParamObject& object);
-	bool IsObject(const QByteArray& fieldId) const;
-	bool IsEnum(const QByteArray& fieldId) const;
-	bool IsObjectList(const QByteArray& fieldId) const;
+	void InsertParam(const QByteArray& paramId, const QVariant& value);
+	void InsertParam(const QByteArray& paramId, const imtgql::CGqlEnum& value);
+	void InsertParam(const QByteArray& paramId, const CGqlParamObject& object);
+	void InsertParam(const QByteArray& paramId, const QList<CGqlParamObject> objectList);
+	CGqlParamObject* AppendParamToArray(const QByteArray& paramId, const CGqlParamObject& object);
+	bool IsObject(const QByteArray& paramId) const;
+	bool IsEnum(const QByteArray& paramId) const;
+	bool IsObjectList(const QByteArray& paramId) const;
 
 	// comfort
-	Q_REQUIRED_RESULT QVariant operator[](const QByteArray& fieldId) const;
+	Q_REQUIRED_RESULT QVariant operator[](const QByteArray& paramId) const;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -50,22 +50,22 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	void InsertFieldObject(istd::TSmartPtr<CGqlParamObject> objectPtr);
-	void RemoveField(const QByteArray& fieldId);
+	void InsertParamObject(istd::TSmartPtr<CGqlParamObject> objectPtr);
+	void RemoveParam(const QByteArray& paramId);
 
 protected:
-	QMap<QByteArray, QVariant> m_simpleFields;
-	QMap<QByteArray, istd::TSmartPtr<CGqlParamObject>> m_objectFields;
-	QMap<QByteArray, QList<istd::TSmartPtr<CGqlParamObject>>> m_objectFieldsArray;
+	QMap<QByteArray, QVariant> m_simpleParams;
+	QMap<QByteArray, istd::TSmartPtr<CGqlParamObject>> m_objectParams;
+	QMap<QByteArray, QList<istd::TSmartPtr<CGqlParamObject>>> m_objectParamsArray;
 	QByteArray m_objectId;
 	CGqlParamObject* m_parentPtr;
 };
 
 
 // inline methods
-inline QVariant CGqlParamObject::operator[](const QByteArray& fieldId) const
+inline QVariant CGqlParamObject::operator[](const QByteArray& paramId) const
 {
-	return GetFieldArgumentValue(fieldId);
+	return GetParamArgumentValue(paramId);
 }
 
 
