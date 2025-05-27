@@ -30,6 +30,12 @@ const QHash<QByteArray, imtgql::IGqlRequest::RequestType> CGqlRequest::s_request
 imtgql::CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& commandId)
 	:m_commandId(commandId),
 	m_requestType(requestType),
+	m_startKey(false),
+	m_startValue(false),
+	m_startParams(false),
+	m_startFields(false),
+	m_startArrayPrimitives(false),
+	m_textString(false),
 	m_activeGqlObjectPtr(nullptr),
 	m_activeFieldObjectPtr(nullptr),
 	m_gqlContextPtr(nullptr)
@@ -42,13 +48,13 @@ imtgql::CGqlRequest::~CGqlRequest()
 }
 
 
-void CGqlRequest::AddParam(const QByteArray &paramId, const CGqlParamObject &param)
+void CGqlRequest::AddParam(const QByteArray& paramId, const CGqlParamObject& param)
 {
 	m_params.InsertParam(paramId, param);
 }
 
 
-void CGqlRequest::AddField(const QByteArray &fieldId, const CGqlFieldObject &field)
+void CGqlRequest::AddField(const QByteArray& fieldId, const CGqlFieldObject& field)
 {
 	m_fields.InsertField(fieldId, field);
 }
@@ -153,29 +159,29 @@ QByteArray CGqlRequest::GetQuery() const
 	QByteArray fields = CreateQueryFields();
 	QByteArray params = CreateQueryParams();
 
-	QByteArray type = "";
+	QByteArray type;
 	switch (m_requestType)
 	{
 	case imtgql::IGqlRequest::RT_QUERY:
-		type = "query";
+		type = QByteArrayLiteral("query");
 		break;
 	case imtgql::IGqlRequest::RT_MUTATION:
-		type = "mutation";
+		type = QByteArrayLiteral("mutation");
 		break;
 	case imtgql::IGqlRequest::RT_SUBSCRIPTION:
-		type = "subscription";
+		type = QByteArrayLiteral("subscription");
 		break;
 	default:
 		Q_ASSERT(false);
 		return QByteArray();
 	}
 
-	if (!params.isEmpty()) {
-		params.prepend("(");
-		params.append(")");
+	if (!params.isEmpty()){
+		params.prepend('(').append(')');
 	}
 
 	QByteArray queryData = QByteArrayLiteral("{\"query\": \"") + type + ' ' + m_commandId + ' ' + '{' + m_commandId + params + fields + QByteArrayLiteral("}\"}");
+
 	return queryData;
 }
 
@@ -192,25 +198,35 @@ QByteArray CGqlRequest::GetProtocolVersion() const
 }
 
 
-bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
+bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 {
-	QJsonDocument document = QJsonDocument::fromJson(query);
-	QByteArray body = document.object().value("query").toString().toUtf8();
-	int index = body.indexOf("{");
-	QByteArray header = body.left(index);
-	QList<QByteArray> headersData = header.split(' ');
-	QByteArray type;
-	bool endParams = false;
-	bool startText = false;
-	bool startBigText = false;
-	bool startBackSlash = false;
-	// QByteArray key;
-	// QByteArray value;
-	QByteArray text;
+	if(query.isEmpty()){
+		return false;
+	}
 
-	for (int i = 0; i < headersData.count(); ++i){
-		if (!headersData[i].isEmpty()){
-			type = headersData[i];
+	const QJsonDocument document = QJsonDocument::fromJson(query);
+	if(document.isNull() || !document.isObject()){
+		return false;
+	}
+
+	QByteArray body = document.object().value(QStringLiteral("query")).toString().toUtf8();
+	if (body.isEmpty()){
+		return false;
+	}
+
+	int index = body.indexOf('{');
+	if (index == -1){
+		return false;
+	}
+
+	const QByteArray header = body.left(index);
+	const QList<QByteArray> headersData = header.split(' ');
+
+	QByteArray type;
+	for (const QByteArray& header : headersData){
+		if (!header.isEmpty()){
+			type = header;
+
 			break;
 		}
 	}
@@ -222,28 +238,39 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 	m_requestType = CGqlRequest::s_requestNameMap[type];
 
 	body = body.mid(index + 1);
-	index = body.lastIndexOf("}");
+	index = body.lastIndexOf('}');
+	if (index == -1){
+		return false;
+	}
+
 	body = body.left(index);
 
-	index = body.indexOf("(");
+	bool endParams = false;
+	bool startText = false;
+	bool startBigText = false;
+	bool startBackSlash = false;
+
+	index = body.indexOf('(');
 	if (index > -1){
 		m_commandId = body.left(index);
 		m_startParams = false;
 	}
 	else{
-		index = body.indexOf("{");
+		index = body.indexOf('{');
 		m_commandId = body.left(index);
 		m_startParams = endParams = true;
 	}
+
 	m_commandId = m_commandId.simplified().replace(' ', "");
-	body = body.remove(0,index);
+	body = body.remove(0, index);
 	m_activeGqlObjectPtr = nullptr;
-	m_activeFieldObjectPtr =nullptr;
+	m_activeFieldObjectPtr = nullptr;
 	m_startFields = false;
 	m_startArrayPrimitives = false;
 	m_textString = false;
 	m_startFragment = false;
 
+	QByteArray text;
 	for (int i = 0; i < body.length() ; ++i){
 		char chr = body[i];
 		switch (chr){
@@ -306,7 +333,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
-				if (!text.isEmpty()) {
+				if (!text.isEmpty()){
 					SetParseText(text);
 					text.clear();
 					startText = false;
@@ -338,7 +365,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				text.append(chr);
 			}
 			else{
-				if (!text.isEmpty()) {
+				if (!text.isEmpty()){
 					SetParseText(text);
 					text.clear();
 					startText = false;
@@ -557,7 +584,7 @@ QByteArray CGqlRequest::CreateQueryFields() const
 	QByteArray retVal;
 	retVal = AddObjectFieldPart(m_fields);
 	if (retVal.isEmpty()){
-		retVal = "{}";
+		retVal = QByteArrayLiteral("{}");
 	}
 
 	return retVal;
@@ -573,18 +600,18 @@ QByteArray CGqlRequest::CreateQueryParams() const
 }
 
 
-QByteArray CGqlRequest::AddObjectFieldPart(const CGqlFieldObject &gqlObject) const
+QByteArray CGqlRequest::AddObjectFieldPart(const CGqlFieldObject& gqlObject) const
 {
 	QByteArray retVal;
 
 	QByteArrayList fieldIds = gqlObject.GetFieldIds();
 	if (!fieldIds.isEmpty()){
-		retVal += " {";
+		retVal.append(' ').append('{');
 
 		for (int i = 0; i < fieldIds.count(); ++i){
 			const QByteArray& fieldId = fieldIds[i];
 			if (gqlObject.IsFragment(fieldId)){
-				retVal += " ... on ";
+				retVal += QByteArrayLiteral(" ... on ");
 			}
 			retVal += fieldId;
 			if (gqlObject.IsObject(fieldId)){
@@ -594,65 +621,63 @@ QByteArray CGqlRequest::AddObjectFieldPart(const CGqlFieldObject &gqlObject) con
 				retVal += AddObjectFieldPart(*gqlObject.GetFragmentArgumentObjectPtr(fieldId));
 			}
 			if (i < fieldIds.count() - 1){
-				retVal += " ";
+				retVal += ' ';
 			}
 		}
 
-		retVal += "}";
+		retVal += '}';
 	}
 
 	return retVal;
 }
 
 
-QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject &gqlObject) const
+QByteArray CGqlRequest::AddObjectParamPart(const CGqlParamObject& gqlObject) const
 {
 	QByteArray retVal;
 
+	QByteArrayList paramIds = gqlObject.GetParamIds();
+	for (int i = 0; i < paramIds.count(); ++i){
+		const QByteArray& paramId = paramIds[i];
 
-	QByteArrayList fieldIds = gqlObject.GetParamIds();
-	for (int i = 0; i < fieldIds.count(); ++i) {
-		const QByteArray& fieldId = fieldIds[i];
-
-		if (gqlObject.IsObject(fieldId)) {
-			retVal += fieldId;
-			retVal += ": {";
-			retVal += AddObjectParamPart(*gqlObject.GetParamArgumentObjectPtr(fieldId));
-			retVal += "}";
+		if (gqlObject.IsObject(paramId)){
+			retVal += paramId;
+			retVal += QByteArrayLiteral(": {");
+			retVal += AddObjectParamPart(*gqlObject.GetParamArgumentObjectPtr(paramId));
+			retVal += '}';
 		}
-		else if (gqlObject.IsObjectList(fieldId)){
-			retVal += fieldId + " :[";
-			int objectsCount = gqlObject.GetObjectsCount(fieldId);
+		else if (gqlObject.IsObjectList(paramId)){
+			retVal += paramId + QByteArrayLiteral(" :[");
+			int objectsCount = gqlObject.GetObjectsCount(paramId);
 			for (int objectIndex = 0; objectIndex < objectsCount; objectIndex++){
 				if (objectIndex > 0){
-					retVal += ",";
+					retVal += ',';
 				}
-				retVal += " {";
-				const CGqlParamObject* paramsObject = gqlObject.GetParamArgumentObjectPtr(fieldId, objectIndex);
+				retVal.append(' ').append('{');
+				const CGqlParamObject* paramsObject = gqlObject.GetParamArgumentObjectPtr(paramId, objectIndex);
 				if (paramsObject != nullptr){
 					retVal += AddObjectParamPart(*paramsObject);
 				}
-				retVal += "}";
+				retVal += '}';
 			}
-			retVal += " ]";
+			retVal.append(' ').append(']');
 		}
 		else {
-			retVal += fieldId;
-			retVal += ": ";
-			QVariant value = gqlObject.GetParamArgumentValue(fieldId);
+			retVal += paramId;
+			retVal.append(':').append(' ');
+			QVariant value = gqlObject.GetParamArgumentValue(paramId);
 			retVal += AddObjectParamValue(value);
 		}
-		if (i < fieldIds.count() - 1){
-			retVal += ", ";
+		if (i < paramIds.count() - 1){
+			retVal.append(',').append(' ');
 		}
 	}
-
 
 	return retVal;
 }
 
 
-QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
+QByteArray CGqlRequest::AddObjectParamValue(const QVariant& value) const
 {
 	QByteArray retVal;
 #if QT_VERSION >= 0x060000
@@ -662,10 +687,10 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 #endif
 	if (valueType == QMetaType::QVariantList || valueType == QMetaType::QStringList){
 		QVariantList variantList = value.toList();
-		retVal += "[";
+		retVal += '[';
 		for (int i = 0; i < variantList.count(); i++){
 			if (i > 0){
-				retVal += ", ";
+				retVal.append(',').append(' ');
 			}
 			retVal += AddObjectParamValue(variantList.value(i));
 		}
@@ -684,47 +709,47 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 	}
 	else if (value.canConvert<QStringList>()){
 		QStringList stringList = value.value<QStringList>();
-		retVal += "[";
+		retVal += '[';
 		for (int i = 0; i < stringList.count(); i++){
 			if (i > 0){
-				retVal += ", ";
+				retVal.append(',').append(' ');
 			}
 			retVal += AddObjectParamValue(stringList.value(i));
 		}
-		retVal += "]";
+		retVal += ']';
 	}
 	else if (value.canConvert<QList<QString>>()){
 		QList<QString> stringList = value.value<QList<QString>>();
-		retVal += "[";
+		retVal += '[';
 		for (int i = 0; i < stringList.count(); i++){
 			if (i > 0){
-				retVal += ", ";
+				retVal.append(',').append(' ');
 			}
 			retVal += AddObjectParamValue(stringList.value(i));
 		}
-		retVal += "]";
+		retVal += ']';
 	}
 	else if (value.canConvert<QList<int>>()){
 		QList<int> intList = value.value<QList<int>>();
-		retVal += "[";
+		retVal += '[';
 		for (int i = 0; i < intList.count(); i++){
 			if (i > 0){
-				retVal += ", ";
+				retVal.append(',').append(' ');
 			}
 			retVal += AddObjectParamValue(intList.value(i));
 		}
-		retVal += "]";
+		retVal += ']';
 	}
 	else if (value.canConvert<QList<double>>()){
 		QList<double> intList = value.value<QList<double>>();
-		retVal += "[";
+		retVal += '[';
 		for (int i = 0; i < intList.count(); i++){
 			if (i > 0){
-				retVal += ", ";
+				retVal.append(',').append(' ');
 			}
 			retVal += AddObjectParamValue(intList.value(i));
 		}
-		retVal += "]";
+		retVal += ']';
 	}
 	else if (value.canConvert<imtgql::CGqlEnum>()){
 		retVal += value.value<imtgql::CGqlEnum>().GetValue();
@@ -738,7 +763,7 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 }
 
 
-void CGqlRequest::ParceObjectFieldPart(CGqlFieldObject &gqlObject, const QJsonObject &object) const
+void CGqlRequest::ParceObjectFieldPart(CGqlFieldObject& gqlObject, const QJsonObject& object) const
 {
 	QStringList keys = object.keys();
 	for (const QString& key: std::as_const(keys)){
@@ -753,9 +778,9 @@ void CGqlRequest::ParceObjectFieldPart(CGqlFieldObject &gqlObject, const QJsonOb
 }
 
 
-void CGqlRequest::ParceObjectParamPart(CGqlParamObject &gqlObject, const QJsonObject &object) const
+void CGqlRequest::ParceObjectParamPart(CGqlParamObject& gqlObject, const QJsonObject& object) const
 {
-	QStringList keys = object.keys();
+	const QStringList keys = object.keys();
 	for (const QString& key : keys){
 		if (object.value(key).isObject()){
 			CGqlParamObject* slaveGqlObjectPtr = gqlObject.CreateParamObject(key.toUtf8());
@@ -765,7 +790,7 @@ void CGqlRequest::ParceObjectParamPart(CGqlParamObject &gqlObject, const QJsonOb
 }
 
 
-void CGqlRequest::SetParseObject(const QByteArray &commandId)
+void CGqlRequest::SetParseObject(const QByteArray& commandId)
 {
 	if (m_startFields){
 		if (m_activeFieldObjectPtr != nullptr){
@@ -803,9 +828,9 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 }
 
 
-void CGqlRequest::SetParseText(const QByteArray &text)
+void CGqlRequest::SetParseText(const QByteArray& text)
 {
-	if (text == "..."){
+	if (text == QByteArrayLiteral("...")){
 		m_startFragment = true;
 
 		return;
@@ -836,10 +861,10 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 			QString stringValue = text;
 			variantList.append(stringValue);
 		}
-		else if (text == "true"){
+		else if (text == QByteArrayLiteral("true")){
 			variantList.append(QVariant(true));
 		}
-		else if (text == "false"){
+		else if (text == QByteArrayLiteral("false")){
 			variantList.append(QVariant(false));
 		}
 		else {
@@ -875,10 +900,10 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 			QString stringValue = text;
 			value = stringValue;
 		}
-		else if (text == "true"){
+		else if (text == QByteArrayLiteral("true")){
 			value = true;
 		}
-		else if (text == "false"){
+		else if (text == QByteArrayLiteral("false")){
 			value = false;
 		}
 		else {
