@@ -43,7 +43,7 @@ ViewCommandsDelegateBase {
 	signal renamed(string id, string newName);
 	signal descriptionSetted(string id, string description);
 	signal removed(string id);
-	signal selectionChanged(var selection)
+	signal selectionChanged(var selectedIds, var selectedIndexes)
 	signal beginImport(string fileName, string filePath, int fileSize);
 
 	Component.onDestruction: {
@@ -79,11 +79,12 @@ ViewCommandsDelegateBase {
 	Connections {
 		id: collectionConnections;
 
-		function onSelectionChanged(selection){
+		function onSelectionChanged(selectedIds, selectedIndexes){
+			console.log("CollectionViewCommandsDelegateBase.qml onSelectionChanged", selectedIds)
 			collectionViewCommandsDelegate.updateBaseCommandsAccent();
-			collectionViewCommandsDelegate.updateItemSelection(selection);
+			collectionViewCommandsDelegate.updateItemSelection(selectedIndexes);
 
-			collectionViewCommandsDelegate.selectionChanged(selection);
+			collectionViewCommandsDelegate.selectionChanged(selectedIds, selectedIndexes);
 		}
 
 		function onDataControllerChanged(){
@@ -167,6 +168,7 @@ ViewCommandsDelegateBase {
 	function updateCustomCommandsAccent(){}
 
 	function updateItemSelection(selectedItems){
+		console.log("CollectionViewCommandsDelegateBase.qml updateItemSelection", selectedItems)
 		if (collectionViewCommandsDelegate.collectionView && collectionViewCommandsDelegate.collectionView.commandsController){
 			let commandsController = collectionViewCommandsDelegate.collectionView.commandsController;
 			let elementsModel = collectionView.table.elements;
@@ -615,10 +617,15 @@ ViewCommandsDelegateBase {
 			onFinished: {
 				if (buttonId == Enums.yes){
 					let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
+					let elementsModel = collectionViewCommandsDelegate.collectionView.table.elements
 
+					let elementIds = []
 					for (let i = 0; i < indexes.length; i++){
-						collectionViewCommandsDelegate.collectionView.removeElement(indexes[i])
+						let elementId = elementsModel.getData("id", indexes[i])
+						elementIds.push(elementId)
 					}
+					
+					collectionViewCommandsDelegate.collectionView.removeElements(elementIds)
 				}
 
 				if (collectionViewCommandsDelegate.collectionView){

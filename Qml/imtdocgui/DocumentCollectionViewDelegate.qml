@@ -364,7 +364,7 @@ CollectionViewCommandsDelegateBase {
 								let isEnabled = selection.length === 1;
 								if (isEnabled){
 									if (selection.length > 0){
-										let index = selection[0];
+										let index = selection[0]
 										let selectedRevision = table.elements.get(index).item.m_revision;
 										if (selectedRevision !== documentRevisionDialog.currentRevision){
 											documentRevisionDialog.selectedRevision = selectedRevision;

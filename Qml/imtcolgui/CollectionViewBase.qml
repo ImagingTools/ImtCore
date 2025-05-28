@@ -28,6 +28,14 @@ ViewBase {
 	property alias scrollbarItemHoriz: tableInternal.scrollbarItemHoriz
 
 	property CollectionFilter collectionFilter: CollectionFilter {}
+	property IdSelectionManager selectionManager: IdSelectionManager {
+		onSelectionChanged: {
+			console.log("IdSelectionManager onSelectionChanged", selectedIds)
+		}
+	}
+
+	property Component dataControllerComp: Component {CollectionDataController { collectionId: collectionViewBaseContainer.collectionId}}
+	property var dataController: null;
 	
 	signal selectedIndexChanged(int index);
 	signal tableViewParamsAccepted();
@@ -38,7 +46,7 @@ ViewBase {
 
 	signal filterChanged(string filterId, var filterValue);
 	
-	signal selectionChanged(var selection);
+	signal selectionChanged(var ids, var indexes);
 	signal checkedItemsChanged();
 	signal rightButtonMouseClicked(int mouseX, int mouseY);
 	signal doubleClicked(string id, int index);
@@ -56,6 +64,10 @@ ViewBase {
 	}
 	
 	function onModelChanged(){}
+	
+	function getSelectedIds(){
+		return selectionManager.selectedIds
+	}
 	
 	FilterMenu {
 		id: filterMenu_;
@@ -187,8 +199,20 @@ ViewBase {
 			visibleLeftBorderFirst: false;
 			borderColorVertical: Style.borderColor;
 			
+			property bool selectionBlock: false
 			onSelectionChanged: {
-				collectionViewBaseContainer.selectionChanged(selection);
+				if (selectionBlock){
+					return
+				}
+
+				let selectedIds = []
+				for (let i = 0; i < selection.length; i++){
+					let elementId = elements.getData("id", selection[i])
+					selectedIds.push(elementId)
+				}
+
+				collectionViewBaseContainer.selectionManager.selectMultiple(selectedIds)
+				collectionViewBaseContainer.selectionChanged(collectionViewBaseContainer.selectionManager.selectedIds, selectionManager.selectedIndexes);
 			}
 			
 			onCheckedItemsChanged: {
@@ -196,7 +220,23 @@ ViewBase {
 			}
 			
 			onElementsChanged: {
+				selectionBlock = true
+				resetSelection()
+
+				let elementsModel = collectionViewBaseContainer.dataController.elementsModel
+				let selectedIndexes = []
+				for (let i = 0; i < elementsModel.getItemsCount(); i++){
+					let elementId = elementsModel.getData("id", i)
+					if (container.selectionManager.isSelected(elementId)){
+						selectedIndexes.push(i)
+					}
+				}
+
+				selectionManager.selectMultiple(selectedIndexes)
+				
 				collectionViewBaseContainer.elementsChanged();
+				
+				selectionBlock = false
 			}
 			
 			onHeadersChanged: {
@@ -283,7 +323,6 @@ ViewBase {
 		}
 	}
 	
-	
 	Loading {
 		id: loading_;
 		
@@ -317,15 +356,11 @@ ViewBase {
 
 			onCurrentIndexChanged: {
 				tableInternal.resetSelection();
-				
-				console.log("onCurrentIndexChanged")
 				collectionViewBaseContainer.doUpdateGui();
 			}
 			
 			onCountElementsChanged: {
 				tableInternal.selectedIndex = -1;
-				console.log("onCountElementsChanged")
-				
 				collectionViewBaseContainer.doUpdateGui();
 			}
 		}

@@ -31,6 +31,8 @@ ResizeItem 1.0 ./Actions/ResizeItem.qml
 ControlArea 1.0 ./Actions/ControlArea.qml
 TableSelectionManager 1.0 ./Actions/TableSelectionManager.qml
 LocalizationEvent 1.0 ./Actions/LocalizationEvent.qml
+IdSelectionManager 1.0 ./Actions/IdSelectionManager.qml
+IndexSelectionManager 1.0 ./Actions/IndexSelectionManager.qml
 
 Button 1.0 ./Buttons/Button.qml
 TextButton 1.0 ./Buttons/TextButton.qml

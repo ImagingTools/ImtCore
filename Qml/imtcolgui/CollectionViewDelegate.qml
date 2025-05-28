@@ -7,9 +7,9 @@ QtObject {
 
     property CollectionView collectionView: null;
 
-    function removeObject(objectId){
+    function removeObject(objectIds){
         if (root.collectionView){
-            root.collectionView.removeElement(objectId)
+            root.collectionView.removeElements(objectIds)
         }
     }
 

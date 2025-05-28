@@ -93,8 +93,9 @@ Dialog {
 						downButton.enabled = false;
 					}
 					else{
-						upButton.enabled = selection[0] > 0;
-						downButton.enabled = selection[selection.length - 1] < leftTable.elementsCount - 1;
+						let index = selection[0]
+						upButton.enabled = index > 0;
+						downButton.enabled = index < leftTable.elementsCount - 1;
 					}
 				}
 			}

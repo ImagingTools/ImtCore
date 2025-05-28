@@ -46,7 +46,14 @@ Item {
 	signal elementsChanged();
 	signal headersChanged();
 	signal tableDecoratorChanged()
-	signal selectionChanged(var selection);
+	
+	/*!
+		\qmlsignal selectionChanged(var selectedIds)
+		Emitted whenever the selection changes.
+		\param selectedIds The array of selected item IDs.
+		\param selectedIndexes The array of selected item indexes.
+	*/
+	signal selectionChanged(var selectedIds, var selectedIndexes);
 	signal checkedItemsChanged();
 	signal rightButtonMouseClicked(int mouseX, int mouseY);
 	signal tableViewParamsAccepted();
@@ -89,8 +96,8 @@ Item {
 		container.doUpdateModel();
 	}
 	
-	function removeElement(elementIndex){
-		container.removeElement(elementIndex);
+	function removeElements(elementIds){
+		container.removeElements(elementIds);
 	}
 	
 	function setElementName(elementIndex, name){
@@ -110,7 +117,7 @@ Item {
 			container.commandsDelegate.commandHandle("Edit");
 		}
 	}
-	
+
 	Connections {
 		target: container.commandsController;
 		
@@ -140,11 +147,11 @@ Item {
 			root.tableDecoratorChanged()
 		}
 		
-		function onSelectionChanged(selection){
-			root.selectionChanged(selection);
+		function onSelectionChanged(ids, indexes){
+			root.selectionChanged(ids, indexes);
 			
-			collectionMetaInfo.contentVisible = selection.length === 1;
-			additionalInformation.visible = root.visibleMetaInfo && selection.length === 0;
+			collectionMetaInfo.contentVisible = ids.length === 1;
+			additionalInformation.visible = root.visibleMetaInfo && ids.length === 0;
 		}
 		
 		function onRightButtonMouseClicked(mouseX, mouseY){
@@ -159,9 +166,6 @@ Item {
 		anchors.bottom: parent.bottom;
 		anchors.left: parent.left;
 		anchors.right: collectionMetaInfo.left;
-		
-		property Component dataControllerComp: Component {CollectionDataController { collectionId: container.collectionId}}
-		property var dataController: null;
 		
 		onTableViewParamsAccepted: {
 			root.tableViewParamsAccepted();
@@ -192,7 +196,7 @@ Item {
 				internal.isReady = true;
 				container.doUpdateGui();
 			}
-			
+
 			function onNotificationModelChanged(){
 				if (!container.dataController){
 					return;
@@ -303,8 +307,6 @@ Item {
 			if (container.dataController){
 				container.dataController.updateElements(count, offset, container.collectionFilter);
 			}
-			
-			container.table.resetSelection();
 		}
 		
 		function openPopupMenu(x, y){
@@ -319,9 +321,9 @@ Item {
 			}
 		}
 		
-		function removeElement(elementIndex){
+		function removeElements(elementIds){
 			if (container.dataController){
-				return container.dataController.removeElement(elementIndex);
+				return container.dataController.removeElements(elementIds);
 			}
 		}
 		

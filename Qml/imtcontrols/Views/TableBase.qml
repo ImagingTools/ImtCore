@@ -109,9 +109,11 @@ Rectangle {
 
 	property bool isMultiSelect: true;
 
-	property TableSelection tableSelection: TableSelection {
+	property IndexSelectionManager selectionManager: IndexSelectionManager {
+		multiSelect: tableContainer.isMultiSelect
 		onSelectionChanged: {
-			tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
+			console.log("onSelectionChanged", selectedIndexes)
+			tableContainer.selectionChanged(selectedIndexes);
 		}
 	}
 
@@ -161,6 +163,12 @@ Rectangle {
 	property  Component cellDelegate
 
 	signal checkedItemsChanged();
+	
+	/*!
+		\qmlsignal selectionChanged(var selection)
+		Emitted whenever the selection changes.
+		\param selection The array of selected item indexes.
+	*/
 	signal selectionChanged(var selection);
 
 	signal clicked(int index);
@@ -299,22 +307,16 @@ Rectangle {
 	}
 
 	function getSelectedIndexes(){
-		return tableContainer.tableSelection.selectedIndexes;
-	}
-
-	function setSelectedIndexes(indexes){
-		return tableContainer.tableSelection.selectedIndexes;
+		return selectionManager.selectedIndexes
 	}
 
 	function select(index){
-		tableContainer.tableSelection.singleSelect(index);
+		selectionManager.singleSelect(index)
 	}
 
-	function resetSelection(){
-		tableContainer.tableSelection.resetSelection();
+	function resetSelection(beQuiet){
+		selectionManager.clear(beQuiet)
 	}
-
-	//
 
 	function checkItem(index){
 		if (!tableContainer.checkable){
@@ -571,63 +573,6 @@ Rectangle {
 			tableContainer.elideMode = tableContainer.headerDecorator.getData("ElideMode");
 		}
 	}
-
-	function getSelectedIds(){
-		let retVal = []
-
-		let indexes = tableContainer.getSelectedIndexes();
-		for (let i = 0; i < indexes.length; i++){
-			if (elementsListObj.model.containsKey("id", indexes[i])){
-				let id = elementsListObj.model.getData("id", indexes[i]);
-				retVal.push(id);
-			}
-		}
-
-		return retVal;
-	}
-
-	function getSelectedNames(){
-		let retVal = []
-
-		let indexes = tableContainer.getSelectedIndexes();
-		for (let i = 0; i < indexes.length; i++){
-			if (elementsListObj.model.containsKey("name", indexes[i])){
-				let name = elementsListObj.model.getData("name", indexes[i]);
-				retVal.push(name);
-			}
-		}
-
-		return retVal;
-	}
-
-
-	function getSelectedId(){
-		if (tableContainer.selectedIndex > -1){
-			let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
-			return item.getSelectedId();
-		}
-
-		return "";
-	}
-
-	function getSelectedName(){
-		if (tableContainer.selectedIndex > -1){
-			let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
-			return item.getSelectedName();
-		}
-
-		return "";
-	}
-
-	function getSelectedItemData(){
-		if (tableContainer.selectedIndex > -1){
-			let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
-			return item.getItemData();
-		}
-
-		return null;
-	}
-
 
 	function setContentHeight(content_height){
 		elementsBg.contentHeight = content_height;
