@@ -59,17 +59,6 @@ class TextInput extends Item {
             pointerEvents: 'auto',
             touchAction: 'auto',
         })
-        
-        this.$form = document.createElement('form')
-        this.$form.style.outline = 'none'
-        this.$form.style.border = 'none'
-        this.$form.style.background = 'none'
-        this.$form.style.width = '100%'
-        // this.$form.style.height = '1em'
-        this.$form.style.font = 'inherit'
-        this.$form.style.color = 'inherit'
-        this.$form.autocomplete = "new-password"
-        this.getDom().appendChild(this.$form)
 
         this.$input = document.createElement('input')
         this.$input.type = 'text'
@@ -82,15 +71,13 @@ class TextInput extends Item {
         this.$input.style.color = 'inherit'
         this.$input.style.textAlign = 'inherit'
         this.$input.style.cursor = 'unset'
-        this.$input.setAttribute('autocomplete', "new-password")
-        this.$input.setAttribute('spellcheck', "false")
         this.$input.onfocus = ()=>{
             if(!this.getPropertyValue('activeFocus') && !this.getPropertyValue('readOnly')) this.forceActiveFocus()
         }
         // this.$input.onblur = ()=>{
         //     this.getProperty('activeFocus').reset(false)
         // }
-        this.$form.appendChild(this.$input)
+        this.getDom().appendChild(this.$input)
         MouseController.add(this)
 
         this.$input.oninput = (e)=>{
