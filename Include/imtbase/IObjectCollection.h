@@ -130,8 +130,8 @@ public:
 	/**
 		Remove element with the given ID.
 	*/
-	virtual bool RemoveElement(
-				const Id& elementId,
+	virtual bool RemoveElements(
+				const Ids& elementIds,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**

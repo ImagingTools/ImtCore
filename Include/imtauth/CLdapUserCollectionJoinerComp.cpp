@@ -102,7 +102,9 @@ void CLdapUserCollectionJoinerComp::OnUpdate(
 	for (const QByteArray& userUuid : storedLdapUserIds){
 		QByteArray login = GetLoginByUserUuid(userUuid);
 		if (!actualLdapUserIds.contains(login)){
-			m_userCollectionCompPtr->RemoveElement(userUuid);
+			imtbase::ICollectionInfo::Ids elementIds;
+			elementIds << userUuid;
+			m_userCollectionCompPtr->RemoveElements(elementIds);
 		}
 	}
 }

@@ -352,8 +352,11 @@ void TTaskCollectionEditorCompBase<UI>::DeleteTask()
 	const QModelIndex index = indexes[0];
 
 	QByteArray taskId = index.data(CTaskItemDelegate::DR_TASK_UUID).toByteArray();
-
-	objectPtr->RemoveElement(taskId);
+	
+	imtbase::ICollectionInfo::Ids elementIds;
+	elementIds << taskId;
+	
+	objectPtr->RemoveElements(elementIds);
 }
 
 

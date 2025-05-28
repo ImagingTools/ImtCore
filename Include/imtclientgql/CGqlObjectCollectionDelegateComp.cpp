@@ -259,8 +259,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 }
 
 
-imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectRequest(
-			const QByteArray& objectId,
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectsRequest(
+			const QByteArrayList& objectIds,
 			int clientElementVersion,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
@@ -269,7 +269,13 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectRequest
 	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 	
 	imtgql::CGqlParamObject input;
-	input.InsertParam("id", QVariant(objectId));
+	
+	QVariantList elementIdsTempList;
+	for (const QByteArray& objectId : objectIds){
+		elementIdsTempList << objectId;
+	}
+
+	input.InsertParam("elementIds", QVariant(elementIdsTempList));
 	input.InsertParam("version", QVariant(clientElementVersion));
 	if (operationContextPtr != nullptr){
 		if (SerializeObject(operationContextPtr,data)){

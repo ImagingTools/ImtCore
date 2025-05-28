@@ -285,9 +285,7 @@ void CObjectCollectionViewDelegate::RemoveObjects(const imtbase::ICollectionInfo
 	if (m_collectionPtr != nullptr){
 		istd::CChangeGroup changeGroup(m_collectionPtr);
 
-		for (const QByteArray& id : objectIds){
-			m_collectionPtr->RemoveElement(id);
-		}
+		m_collectionPtr->RemoveElements(objectIds);
 	}
 }
 

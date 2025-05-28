@@ -194,14 +194,29 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateLegac
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateDeleteObjectQuery(
+QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId,
+			const QByteArrayList& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(s_idColumn)).arg(qPrintable(objectId)).toUtf8();
-
-	return retVal;
+	if (objectIds.isEmpty()){
+		return QByteArray();
+	}
+	
+	QStringList quotedIds;
+	for (const QByteArray& objectId : objectIds){
+		quotedIds << QString("'%1'").arg(objectId);
+	}
+	
+	QString query = QString(
+						"DELETE FROM \"%1\" WHERE \"%2\" IN (%3);")
+						.arg(
+							QString::fromUtf8(*m_tableNameAttrPtr),
+							QString::fromUtf8(s_idColumn),
+							quotedIds.join(", ")
+							);
+	
+	return query.toUtf8();
 }
 
 

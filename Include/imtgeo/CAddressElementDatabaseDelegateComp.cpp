@@ -142,14 +142,27 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 }
 
 
-QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectQuery(
+QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId,
+			const QByteArrayList& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QByteArray retVal = QString("DELETE FROM \"AddressElements\" WHERE \"Id\" = '%1';").arg(qPrintable(objectId)).toUtf8();
-
-	return retVal;
+	if (objectIds.isEmpty()){
+		return QByteArray();
+	}
+	
+	QStringList quotedIds;
+	for (const QByteArray& objectId : objectIds){
+		quotedIds << QString("'%1'").arg(objectId);
+	}
+	
+	QString query = QString(
+						"DELETE FROM \"AddressElements\" WHERE \"Id\" IN (%1);")
+						.arg(
+							quotedIds.join(", ")
+							);
+	
+	return query.toUtf8();
 }
 
 

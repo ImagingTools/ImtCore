@@ -2,21 +2,21 @@
 
 
 // Qt includes
-#include <QtCore/QUuid>
 #include <QtCore/QDir>
+#include <QtCore/QUuid>
 
 // ACF includes
-#include <istd/TOptDelPtr.h>
-#include <istd/CChangeNotifier.h>
-#include <istd/CSystem.h>
-#include <istd/CCrcCalculator.h>
-#include <iser/IArchive.h>
-#include <iser/CArchiveTag.h>
-#include <ilog/CMessage.h>
-#include <ifile/CFileListProviderComp.h>
 #include <ifile/CCompactXmlFileReadArchive.h>
 #include <ifile/CCompactXmlFileWriteArchive.h>
+#include <ifile/CFileListProviderComp.h>
+#include <ilog/CMessage.h>
+#include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
+#include <iser/IArchive.h>
+#include <istd/CChangeNotifier.h>
+#include <istd/CCrcCalculator.h>
+#include <istd/CSystem.h>
+#include <istd/TOptDelPtr.h>
 
 // ImtCore includes
 #include <imtcore/Version.h>
@@ -40,7 +40,7 @@ imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionI
 			const QByteArray& objectId) const
 {
 	imtbase::IRevisionController::RevisionInfoList revisionInfoList;
-	
+
 	const IFileObjectCollection* collectionPtr = dynamic_cast<const IFileObjectCollection*>(&collection);
 	if (collectionPtr == nullptr){
 		return revisionInfoList;
@@ -164,7 +164,6 @@ int CFileCollectionComp::BackupRevision(
 
 					if (SaveRevisionsContents(*collectionPtr, objectId, revisionsContents)){
 						// TODO: remove dirty code
-
 						QReadLocker readLocker(&m_filesLock);
 
 						int fileIndex = GetFileIndexById(objectId);
@@ -371,7 +370,10 @@ bool CFileCollectionComp::ExportRevision(
 }
 
 
-bool CFileCollectionComp::DeleteRevision(IObjectCollection& /*collection*/, const ICollectionInfo::Id& /*objectId*/, int /*revision*/) const
+bool CFileCollectionComp::DeleteRevision(
+			IObjectCollection& /*collection*/,
+			const ICollectionInfo::Id& /*objectId*/,
+			int /*revision*/) const
 {
 	Q_ASSERT_X(false, "Method not implemented", "CFileCollectionComp");
 	return false;
@@ -394,71 +396,71 @@ const imtbase::IRevisionController* CFileCollectionComp::GetRevisionController()
 }
 
 
-bool CFileCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOperationContext* /*operationContextPtr*/)
+bool CFileCollectionComp::RemoveElements(
+			const Ids& elementIds,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
 {
-	if (elementId.isEmpty()){
+	if (elementIds.isEmpty()){
 		SendErrorMessage(0, "Object-ID is empty. Unknown resource could not be removed");
 
 		return false;
 	}
 
-	{
-		QWriteLocker cacheLocker(&m_objectCacheLock);
-
-		if (m_objectCache.contains(elementId)){
-			m_objectCache.remove(elementId);
-		}
-	}
+	MultiElementNotifierInfo notifierInfo;
 
 	QWriteLocker repositoryDataLocker(&m_filesLock);
 
-	int fileIndex = GetFileIndexById(elementId);
-	if (fileIndex >= 0){
-		// If the file was copied into the repository, remove also the file from repository folder:
-		const CFileCollectionItem& itemToRemove = m_files[fileIndex];
+	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
+	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+	istd::IChangeable::ChangeInfoMap changeInfoMap;
 
-		QFileInfo fileInfo(itemToRemove.GetFilePath());
-
-		QString dataFilePath = GetDataItemFilePath(itemToRemove);
-		QFile dataFile(dataFilePath);
-		if (!dataFile.remove()){
-			SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be removed. Error status: %2").arg(dataFilePath).arg(dataFile.errorString())));
-
-			return false;
-		}
-
-		QString metaDataFilePath = GetMetaInfoFilePath(itemToRemove);
-		QFile metaDataFile(metaDataFilePath);
-		if (!metaDataFile.remove()){
-			SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be removed. Error status: %2").arg(metaDataFilePath).arg(metaDataFile.errorString())));
-
-			return false;
-		}
-
-		QString parentDirectory = fileInfo.absolutePath();
-
-		if (!istd::CSystem::RemoveDirectory(parentDirectory)){
-			SendErrorMessage(0, QT_TR_NOOP(QString("Folder containing file '%1'could not be removed").arg(itemToRemove.GetFilePath())));
-
-			return false;
-		}
-
+	for (const Id& elementId : elementIds){
 		{
-			static ChangeSet changes(CF_REMOVED);
-			changes.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
-			istd::CChangeNotifier changeNotifier(this, &changes);
+			QWriteLocker cacheLocker(&m_objectCacheLock);
 
-			// Remove the repository item with the corresponding object-ID:
-			m_files.removeAt(fileIndex);
-
-			repositoryDataLocker.unlock();
+			if (m_objectCache.contains(elementId)){
+				m_objectCache.remove(elementId);
+			}
 		}
 
-		return true;
+		int fileIndex = GetFileIndexById(elementId);
+		if (fileIndex >= 0){
+			// If the file was copied into the repository, remove also the file from repository folder:
+			const CFileCollectionItem& itemToRemove = m_files[fileIndex];
+
+			QFileInfo fileInfo(itemToRemove.GetFilePath());
+
+			QString dataFilePath = GetDataItemFilePath(itemToRemove);
+			QFile dataFile(dataFilePath);
+			if (!dataFile.remove()){
+				SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be removed. Error status: %2").arg(dataFilePath).arg(dataFile.errorString())));
+			}
+
+			QString metaDataFilePath = GetMetaInfoFilePath(itemToRemove);
+			QFile metaDataFile(metaDataFilePath);
+			if (!metaDataFile.remove()){
+				SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be removed. Error status: %2").arg(metaDataFilePath).arg(metaDataFile.errorString())));
+			}
+
+			QString parentDirectory = fileInfo.absolutePath();
+
+			if (!istd::CSystem::RemoveDirectory(parentDirectory)){
+				SendErrorMessage(0, QT_TR_NOOP(QString("Folder containing file '%1'could not be removed").arg(itemToRemove.GetFilePath())));
+			}
+
+			notifierInfo.elementIds << elementId;
+			m_files.removeAt(fileIndex);
+		}
+		else{
+			SendInfoMessage(0, QT_TR_NOOP(QString("Resource '%1' doesn't exist").arg(qPrintable(elementId))));
+		}
 	}
-	else{
-		SendInfoMessage(0, QT_TR_NOOP(QString("Resource '%1' doesn't exist").arg(qPrintable(elementId))));
-	}
+
+	changeInfoMap.insert(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
+	changeSet.SetChangeInfoMap(changeInfoMap);
+
+	repositoryDataLocker.unlock();
 
 	return true;
 }
@@ -466,7 +468,10 @@ bool CFileCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOpe
 
 // reimplemented (ICollectionInfo)
 
-bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* /*logPtr*/)
+bool CFileCollectionComp::SetElementName(
+			const Id& elementId,
+			const QString& name,
+			ilog::IMessageConsumer* /*logPtr*/)
 {
 	QWriteLocker locker(&m_filesLock);
 
@@ -538,7 +543,7 @@ bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& nam
 			targetFolderPath += "/" + newPhysicalName;
 
 			if (!resourceDir.rename(resouceDirPath, targetFolderPath)){
-				SendErrorMessage(0, QT_TR_NOOP(QString("Resource path could not be renamed from '%1' into '%2'. Resource could not be renamed to '%3'").arg(resouceDirPath).arg(targetFolderPath).arg(name)));
+				SendErrorMessage(0, QT_TR_NOOP(QString("Resource path could not be renamed from '%1' " "into " "'%2'. " "Resou" "rce " "could not be " "renamed " "to " "'%" "3'").arg(resouceDirPath).arg(targetFolderPath).arg(name)));
 
 				locker.unlock();
 
@@ -618,7 +623,7 @@ QByteArray CFileCollectionComp::ImportFile(
 			if (m_compressorCompPtr->DecompressFolder(sourceFilePath, workingPath)){
 				QString itemSuffix = GetRepositoryInfo().dataFileSuffix;
 				workingDir.setFilter(QDir::Files);
-				workingDir.setNameFilters({ "*." + GetRepositoryInfo().dataFileSuffix });
+				workingDir.setNameFilters({"*." + GetRepositoryInfo().dataFileSuffix});
 				QStringList list = workingDir.entryList();
 				if (!list.isEmpty()){
 					QString itemFile = workingDir.filePath(list[0]);
@@ -778,13 +783,15 @@ bool CFileCollectionComp::LoadRevisionsContents(
 			RevisionsContents& revisionsContents) const
 {
 	CFileCollectionItem item;
-	if (!GetFileInfo(objectId, item)){
+	if (!GetFileInfo(objectId, item)) {
 		return false;
 	}
-
+	else {
+	}
+	
 	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
 	QString revisionsContentsPath = QFileInfo(item.GetFilePath()).path() + "/Revisions/contents.xml";
-
+	
 	ifile::CCompactXmlFileReadArchive archive(revisionsContentsPath, m_versionInfoCompPtr.GetPtr());
 	return revisionsContents.Serialize(archive);
 }
@@ -802,7 +809,7 @@ bool CFileCollectionComp::SaveRevisionsContents(
 
 	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
 	QString revisionsContentsPath = QFileInfo(item.GetFilePath()).path() + "/Revisions/contents.xml";
-
+	
 	ifile::CCompactXmlFileWriteArchive archive(revisionsContentsPath, m_versionInfoCompPtr.GetPtr());
 	return revisionsContents.Serialize(archive);
 }
@@ -872,8 +879,7 @@ bool CFileCollectionComp::TransformRepositoryItem(
 			int toRepositoryRevision) const
 {
 	if (m_transformationStepsProviderCompPtr.IsValid()){
-		IRepositoryFileTransformationStepsProvider::TransformationSteps steps =
-					m_transformationStepsProviderCompPtr->GetTransformationSteps(fromRepositoryRevision, toRepositoryRevision);
+		IRepositoryFileTransformationStepsProvider::TransformationSteps steps = m_transformationStepsProviderCompPtr->GetTransformationSteps(fromRepositoryRevision, toRepositoryRevision);
 
 		if (steps.isEmpty()){
 			return false;
@@ -900,7 +906,7 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 {
 	QFileInfo inputFileInfo(localFilePath);
 	if (!inputFileInfo.isFile()){
-		SendErrorMessage(0 , QT_TR_NOOP(QString("Path '%1' is not a valid path to an existing file").arg(localFilePath)));
+		SendErrorMessage(0, QT_TR_NOOP(QString("Path '%1' is not a valid path to an existing file").arg(localFilePath)));
 
 		return QString();
 	}
@@ -977,9 +983,7 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 }
 
 
-QString CFileCollectionComp::CalculateTargetFilePath(
-			const QString& targetFolderPath,
-			const QString& localFilePath) const
+QString CFileCollectionComp::CalculateTargetFilePath(const QString& targetFolderPath, const QString& localFilePath) const
 {
 	QFileInfo inputFileInfo(localFilePath);
 
@@ -1027,7 +1031,7 @@ void CFileCollectionComp::OnComponentCreated()
 			ReadRepositoryItems();
 		}
 	}
- }
+}
 
 
 void CFileCollectionComp::OnComponentDestroyed()
@@ -1038,9 +1042,7 @@ void CFileCollectionComp::OnComponentDestroyed()
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(
-			const iprm::IParamsSet* /*selectionParamPtr*/,
-			ilog::IMessageConsumer* /*logPtr*/) const
+int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -1072,8 +1074,7 @@ imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::G
 
 bool CFileCollectionCompBase::RepositoryItemInfoProvider::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
-			int /*offset*/,
-			int /*count*/,
+			int /*offset*/, int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/,
 			ilog::IMessageConsumer* /*logPtr*/) const
 {
@@ -1081,31 +1082,45 @@ bool CFileCollectionCompBase::RepositoryItemInfoProvider::GetSubsetInfo(
 }
 
 
-QVariant CFileCollectionComp::RepositoryItemInfoProvider::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/, ilog::IMessageConsumer* /*logPtr*/) const
+QVariant CFileCollectionComp::RepositoryItemInfoProvider::GetElementInfo(
+			const QByteArray& /*elementId*/,
+			int /*infoType*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return QVariant();
 }
 
 
-idoc::MetaInfoPtr CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementMetaInfo(const Id& /*elementId*/, ilog::IMessageConsumer* /*logPtr*/) const
+idoc::MetaInfoPtr CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementMetaInfo(
+			const Id& /*elementId*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return idoc::MetaInfoPtr();
 }
 
 
-bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementName(const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementName(
+			const Id& /*elementId*/,
+			const QString& /*name*/,
+			ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/, ilog::IMessageConsumer* /*logPtr*/)
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementDescription(
+			const Id& /*elementId*/,
+			const QString& /*description*/,
+			ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementEnabled(
+			const Id& /*elementId*/,
+			bool /*isEnabled*/,
+			ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
@@ -1184,7 +1199,7 @@ bool CFileCollectionComp::RevisionsContents::Serialize(iser::IArchive& archive)
 				retVal = retVal && archive.Process(revisionsContentsItem.softwareVersion);
 				retVal = retVal && archive.EndTag(appVersionTag);
 			}
-			else {
+			else{
 				revisionsContentsItem.softwareVersion = "";
 			}
 		}

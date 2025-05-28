@@ -58,10 +58,10 @@ void CCollectionInfo::RemoveItem(const QByteArray& id)
 {
 	for (const Item& item : m_items){
 		if (item.id == id){
-			ElementRemoveInfo info;
-			info.elementId = id;
+			ElementsRemoveInfo info;
+			info.elementIds << id;
 			istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-			changeSet.SetChangeInfo(CN_ELEMENT_REMOVED, QVariant::fromValue<ElementRemoveInfo>(info));
+			changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue<ElementsRemoveInfo>(info));
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			m_items.removeOne(item);

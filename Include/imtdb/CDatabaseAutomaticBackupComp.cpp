@@ -173,7 +173,6 @@ QStringList CDatabaseAutomaticBackupComp::GetPrevBackupsList(const QString& back
 }
 
 
-
 // private slots
 
 void CDatabaseAutomaticBackupComp::OnBackupFinished()

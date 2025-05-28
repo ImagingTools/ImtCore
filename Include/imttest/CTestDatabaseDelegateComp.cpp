@@ -115,24 +115,29 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTestDatabaseDelegateComp::Create
 }
 
 
-QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
+QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectsQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArrayList& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	imtbase::IObjectCollection::DataPtr objectPtr;
-	if (collection.GetObjectData(objectId, objectPtr)){
-		const imttest::ITestInfo* testInfoPtr = dynamic_cast<const imttest::ITestInfo*>(objectPtr.GetPtr());
-		if (testInfoPtr == nullptr){
-			return QByteArray();
-		}
-
-		QByteArray retVal = QString("DELETE FROM \"Tests\" WHERE \"Id\" = '%1';").arg(qPrintable(objectId)).toLocal8Bit();
-
-		return retVal;
+	if (objectIds.isEmpty()){
+		return QByteArray();
 	}
-
-	return QByteArray();
+	
+	QStringList quotedIds;
+	for (const QByteArray& objectId : objectIds){
+		quotedIds << QString("'%1'").arg(objectId);
+	}
+	
+	QString query = QString(
+						"DELETE FROM \"%1\" WHERE \"%2\" IN (%3);")
+						.arg(
+							QString::fromUtf8(*m_tableNameAttrPtr),
+							QString::fromUtf8(*m_objectIdColumnAttrPtr),
+							quotedIds.join(", ")
+							);
+	
+	return query.toUtf8();
 }
 
 

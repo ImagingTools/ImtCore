@@ -54,7 +54,7 @@ public:
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
 				const IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool RemoveElement(const QByteArray& elementId, const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveElements(const Ids& elementIds, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
@@ -188,11 +188,11 @@ inline QByteArray TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::In
 
 
 template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RemoveElement(
-			const QByteArray& elementId,
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RemoveElements(
+			const Ids& elementIds,
 			const IOperationContext* operationContextPtr)
 {
-	return m_collection.RemoveElement(elementId, operationContextPtr);
+	return m_collection.RemoveElements(elementIds, operationContextPtr);
 }
 
 

@@ -124,17 +124,20 @@ ICollectionInfo::Id CCachedObjectCollectionComp::InsertNewObject(
 }
 
 
-bool CCachedObjectCollectionComp::RemoveElement(const Id& elementId, const IOperationContext* operationContextPtr)
+bool CCachedObjectCollectionComp::RemoveElements(const Ids& elementIds, const IOperationContext* operationContextPtr)
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
 	}
+	
+	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = elementIds;
 
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-	changeSet.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
+	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	bool retVal = m_objectCollectionCompPtr->RemoveElement(elementId, operationContextPtr);
+	bool retVal = m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr);
 	if (retVal){
 		QWriteLocker locker(&m_lock);
 		m_cachedCollections.Reset();

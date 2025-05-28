@@ -195,10 +195,10 @@ bool CJobQueueManagerCompBase::RemoveJob(const QByteArray& jobId)
 		}
 
 		istd::IChangeable::ChangeSet changeSet = istd::IChangeable::GetAnyChange();
-		imtbase::ICollectionInfo::ElementRemoveInfo info;
-		info.elementId = jobId;
+		imtbase::ICollectionInfo::ElementsRemoveInfo info;
+		info.elementIds << jobId;
 
-		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED, QVariant::fromValue(info));
+		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED, QVariant::fromValue(info));
 
 		istd::CChangeNotifier changeNotifier(this, &changeSet);
 

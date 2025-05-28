@@ -40,7 +40,7 @@ type AddedNotificationPayload {
 }
 
 type RemovedNotificationPayload {
-	id: ID!
+	elementIds: [ID]
 }
 
 type RenamedNotificationPayload {
@@ -78,6 +78,10 @@ input RenameInput {
 input SetDescriptionInput {
 	id: ID!
 	description: String!
+}
+
+input RemoveElementsInput {
+	elementIds: [ID]
 }
 
 input ObjectVisualStatusInput {

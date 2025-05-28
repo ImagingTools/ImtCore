@@ -78,9 +78,9 @@ public:
 	/**
 		Create query for the deletion of the object from the database.
 	*/
-	virtual QByteArray CreateDeleteObjectQuery(
+	virtual QByteArray CreateDeleteObjectsQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
+				const QByteArrayList& objectIds,
 				const imtbase::IOperationContext* operationContextPtr) const = 0;
 
 	/**

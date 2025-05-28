@@ -178,6 +178,7 @@ void CDocumentCollectionViewDelegateComp::RemoveObjects(const imtbase::ICollecti
 	if (m_collectionPtr != nullptr){
 		istd::CChangeGroup changeGroup(m_collectionPtr);
 
+		imtbase::ICollectionInfo::Ids removeAcceptedIds;
 		for (const QByteArray& id : objectIds){
 			bool isRemoveAccepted = true;
 
@@ -210,9 +211,11 @@ void CDocumentCollectionViewDelegateComp::RemoveObjects(const imtbase::ICollecti
 			}
 
 			if (isRemoveAccepted){
-				m_collectionPtr->RemoveElement(id);
+				removeAcceptedIds << id;
 			}
 		}
+
+		m_collectionPtr->RemoveElements(removeAcceptedIds);
 	}
 }
 

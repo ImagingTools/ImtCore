@@ -29,9 +29,9 @@ public:
 				const QString& objectDescription,
 				const istd::IChangeable* valuePtr,
 				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateDeleteObjectQuery(
+	virtual QByteArray CreateDeleteObjectsQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId, 
+				const QByteArrayList& objectIds,
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,

@@ -96,7 +96,7 @@ imtbase::ICollectionInfo::Id CRemoteGqlCollectionController::InsertNewObject(
 }
 
 
-bool CRemoteGqlCollectionController::RemoveElement(const Id& elementId, const imtbase::IOperationContext* operationContextPtr)
+bool CRemoteGqlCollectionController::RemoveElements(const Ids& elementIds, const imtbase::IOperationContext* operationContextPtr)
 {
 	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
 		return false;
@@ -104,7 +104,7 @@ bool CRemoteGqlCollectionController::RemoveElement(const Id& elementId, const im
 
 	bool retVal = false;
 
-	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateRemoveObjectRequest(elementId, -1, operationContextPtr));
+	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateRemoveObjectsRequest(elementIds, -1, operationContextPtr));
 
 	if (!requestPtr.isNull()){
 		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);

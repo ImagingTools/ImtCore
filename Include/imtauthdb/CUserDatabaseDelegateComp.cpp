@@ -144,26 +144,28 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 }
 
 
-QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
+QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectsQuery(
 		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
+		const QByteArrayList& objectIds,
 		const imtbase::IOperationContext* operationContextPtr) const
 {
-	const imtauth::IUserInfo* userInfoPtr = nullptr;
-	imtbase::IObjectCollection::DataPtr objectPtr;
-	if (collection.GetObjectData(objectId, objectPtr)){
-		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
+	for (const imtbase::ICollectionInfo::Id& objectId : objectIds){
+		const imtauth::IUserInfo* userInfoPtr = nullptr;
+		imtbase::IObjectCollection::DataPtr objectPtr;
+		if (collection.GetObjectData(objectId, objectPtr)){
+			userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
+		}
+		
+		if (userInfoPtr == nullptr){
+			return QByteArray();
+		}
+		
+		if (userInfoPtr->IsAdmin()){
+			return QByteArray();
+		}
 	}
 
-	if (userInfoPtr == nullptr){
-		return QByteArray();
-	}
-
-	if (userInfoPtr->IsAdmin()){
-		return QByteArray();
-	}
-
-	return BaseClass::CreateDeleteObjectQuery(collection, objectId, operationContextPtr);
+	return BaseClass::CreateDeleteObjectsQuery(collection, objectIds, operationContextPtr);
 }
 
 

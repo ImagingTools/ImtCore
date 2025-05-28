@@ -33,6 +33,11 @@ public:
 		QByteArray elementId;
 	};
 
+	struct MultiElementNotifierInfo
+	{
+		QByteArrayList elementIds;
+	};
+
 	static const QByteArray CN_ALL_CHANGED;
 
 	static const QByteArray CN_ELEMENT_INSERTED;
@@ -47,8 +52,8 @@ public:
 	static const QByteArray CN_ELEMENT_STATE;
 	typedef NotifierInfo ElementStateChangeInfo;
 
-	static const QByteArray CN_ELEMENT_REMOVED;
-	typedef NotifierInfo ElementRemoveInfo;
+	static const QByteArray CN_ELEMENTS_REMOVED;
+	typedef MultiElementNotifierInfo ElementsRemoveInfo;
 
 	/**
 		Change notification flags.
@@ -214,5 +219,6 @@ public:
 
 
 Q_DECLARE_METATYPE(imtbase::ICollectionInfo::NotifierInfo);
+Q_DECLARE_METATYPE(imtbase::ICollectionInfo::MultiElementNotifierInfo);
 
 

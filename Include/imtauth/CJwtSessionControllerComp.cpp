@@ -205,8 +205,11 @@ bool CJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId) const
 	if (sessionId.isEmpty()){
 		return false;
 	}
+	
+	imtbase::ICollectionInfo::Ids elementIds;
+	elementIds << sessionId;
 
-	return m_sessionCollectionCompPtr->RemoveElement(sessionId);
+	return m_sessionCollectionCompPtr->RemoveElements(elementIds);
 }
 
 

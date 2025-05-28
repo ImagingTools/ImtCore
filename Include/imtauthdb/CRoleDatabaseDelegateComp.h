@@ -20,9 +20,9 @@ public:
 
 	// reimplemented (imtdb::CSqlJsonDatabaseDelegateComp)
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
-	virtual QByteArray CreateDeleteObjectQuery(
+	virtual QByteArray CreateDeleteObjectsQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
+				const QByteArrayList& objectIds,
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 };

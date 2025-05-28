@@ -2,6 +2,7 @@
 
 
 // Qt includes
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
@@ -44,7 +45,7 @@ void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subsc
 	if (subscriptionObject.contains("itemId")){
 		itemId = subscriptionObject.value("itemId").toString().toUtf8();
 	}
-	
+
 	if (subscriptionObject.contains("operationContext")){
 		imtbase::IOperationContext::OperationContextInfo info;
 		
@@ -71,8 +72,18 @@ void CObjectCollectionSubscriberComp::OnResponseReceived(const QByteArray& subsc
 			changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENT_INSERTED, itemId);
 		}
 		else if (typeOperation == "removed"){
+			if (subscriptionObject.contains("itemIds")){
+				QJsonArray itemIdsArr = subscriptionObject.value("itemIds").toArray();
+				
+				imtbase::ICollectionInfo::MultiElementNotifierInfo multiElementNotifierInfo;
+				for (const QJsonValue& itemIdValue : itemIdsArr){
+					multiElementNotifierInfo.elementIds.append(itemIdValue.toString().toUtf8());
+				}
+				
+				changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENTS_REMOVED, QVariant::fromValue(multiElementNotifierInfo));
+			}
+			
 			changeSet += imtbase::ICollectionInfo::CF_REMOVED;
-			changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENT_REMOVED, itemId);
 		}
 		else if (typeOperation == "updated"){
 			changeSet += imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED;

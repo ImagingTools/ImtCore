@@ -145,21 +145,24 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOperationContext* operationContextPtr)
+bool CSqlDatabaseObjectCollectionComp::RemoveElements(const Ids& elementIds, const imtbase::IOperationContext* operationContextPtr)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
 	}
 	
-	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectQuery(*this, elementId, operationContextPtr);
+	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectsQuery(*this, elementIds, operationContextPtr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 		
 		return false;
 	}
 	
+	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = elementIds;
+	
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-	changeSet.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
+	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 	
 	if (operationContextPtr != nullptr){
 		AddOperationContextToChangeSet(*operationContextPtr, changeSet);

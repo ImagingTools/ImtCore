@@ -795,8 +795,11 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::DeleteObject
 	if (m_operationContextControllerCompPtr.IsValid()){
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectId, dataPtr.GetPtr());
 	}
+	
+	imtbase::ICollectionInfo::Ids elementIds;
+	elementIds << objectId;
 
-	if (!m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr.GetPtr())){
+	if (!m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr.GetPtr())){
 		errorMessage = QString("Can't remove object with ID: '%1'").arg(QString(objectId));
 		SendErrorMessage(0, errorMessage, "CLegacyObjectCollectionControllerCompBase");
 

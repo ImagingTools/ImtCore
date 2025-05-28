@@ -160,7 +160,9 @@ void CLdapUserCollectionControllerComp::CheckLdapUsersThread::run()
 
 			for (const QByteArray& userId : actualUserIds){
 				if (!expectedUserIds.contains(userId)){
-					m_parent.RemoveElement(userId);
+					imtbase::ICollectionInfo::Ids elementIds;
+					elementIds << userId;
+					m_parent.RemoveElements(elementIds);
 				}
 			}
 		}

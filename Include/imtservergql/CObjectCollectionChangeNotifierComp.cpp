@@ -50,14 +50,28 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 			QByteArray data;
 			QByteArray itemId;
 			QJsonObject dataObject;
+			
+			bool isRemoved = false;
 
 			if (changeSet.Contains(imtbase::ICollectionInfo::CF_ADDED)){
 				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED).toByteArray();
 				dataObject.insert("typeOperation", "inserted");
 			}
 			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
-				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED).toByteArray();
+				QVariant changeInfo = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED);
+				if (changeInfo.isValid()){
+					imtbase::ICollectionInfo::MultiElementNotifierInfo info = changeInfo.value<imtbase::ICollectionInfo::MultiElementNotifierInfo>();
+
+					QJsonArray removedItemsArray;
+					for (const QByteArray& elementId: info.elementIds){
+						removedItemsArray.append(QJsonValue(QString(elementId)));
+					}
+					
+					dataObject.insert("itemIds", removedItemsArray);
+				}
 				dataObject.insert("typeOperation", "removed");
+				
+				isRemoved = true;
 			}
 			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED)){
 				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_DESCRIPTION_CHANGED).toByteArray();
@@ -90,25 +104,27 @@ void CObjectCollectionChangeNotifierComp::OnUpdate(const istd::IChangeable::Chan
 
 				dataObject.insert("operationContext", operationContextObject);
 			}
-
-			dataObject.insert("itemId", QString(itemId));
-
-			if (itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource == true){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				m_objectCollectionCompPtr->GetObjectData(itemId, dataPtr);
-				QByteArray representationData;
-				iser::ISerializable* objectPtr = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
-				if (objectPtr != nullptr){
-					iser::CJsonMemWriteArchive archive;
-					
-					if (objectPtr->Serialize(archive)){
-						representationData = archive.GetData();
+			
+			if (!isRemoved){
+				dataObject.insert("itemId", QString(itemId));
+				
+				if (itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource == true){
+					imtbase::IObjectCollection::DataPtr dataPtr;
+					m_objectCollectionCompPtr->GetObjectData(itemId, dataPtr);
+					QByteArray representationData;
+					iser::ISerializable* objectPtr = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
+					if (objectPtr != nullptr){
+						iser::CJsonMemWriteArchive archive;
+						
+						if (objectPtr->Serialize(archive)){
+							representationData = archive.GetData();
+						}
+						else{
+							Q_ASSERT(false);
+						}
 					}
-					else{
-						Q_ASSERT(false);
-					}
+					dataObject.insert("item", QString(representationData));
 				}
-				dataObject.insert("item", QString(representationData));
 			}
 
 			QJsonDocument jsonDocument;

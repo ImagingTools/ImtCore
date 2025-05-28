@@ -60,11 +60,17 @@ bool CObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 		RemoveAllObjects();
 	}
 	else{
+		imtbase::ICollectionInfo::Ids elementIds;
+
 		for (int i = 0; i < m_objects.count(); ++i){
 			int checkIsFixed = m_fixedObjectIdsAttrPtr.FindValue(m_objects[i].id);
 			if (checkIsFixed < 0){
-				RemoveElement(m_objects[i].id);
+				elementIds << m_objects[i].id;
 			}
+		}
+		
+		if (elementIds.size() > 0){
+			RemoveElements(elementIds);
 		}
 	}
 

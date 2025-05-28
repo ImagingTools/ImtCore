@@ -42,7 +42,7 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 		elementId = changeSet.GetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED).toByteArray();
 	}
 	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
-		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED).toByteArray();
+		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED).toByteArray();
 		
 		isRemoved = true;
 	}

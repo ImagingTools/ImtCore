@@ -22,7 +22,7 @@ Rectangle {
 	TreeItemModel {
 		id: treeItemModel2
 	}
-	
+
 	Row {
 		height: 30;
 

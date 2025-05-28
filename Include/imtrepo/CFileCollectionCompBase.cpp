@@ -483,7 +483,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 }
 
 
-bool CFileCollectionCompBase::RemoveElement(const Id& /*elementId*/, const imtbase::IOperationContext* /*operationContextPtr*/)
+bool CFileCollectionCompBase::RemoveElements(const Ids& /*elementIds*/, const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	return false;
 }

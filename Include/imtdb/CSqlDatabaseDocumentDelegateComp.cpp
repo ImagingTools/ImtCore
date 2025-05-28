@@ -185,20 +185,30 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 }
 
 
-QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
+QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
 	const imtbase::IObjectCollection& /*collection*/,
-	const QByteArray& objectId,
+	const QByteArrayList& objectIds,
 	const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QByteArray retVal = QString("UPDATE \"%1\" SET \"%2\" = 'Disabled' WHERE \"%3\" = '%4';")
-				.arg(
-						qPrintable(*m_tableNameAttrPtr),
-						qPrintable(s_stateColumn),
-						qPrintable(s_documentIdColumn),
-						qPrintable(objectId)
-					).toUtf8();
+	if (objectIds.isEmpty()){
+		return QByteArray();
+	}
+
+	QStringList quotedIds;
+	for (const QByteArray& objectId : objectIds){
+		quotedIds << QString("'%1'").arg(objectId);
+	}
 	
-	return retVal;
+	QString query = QString(
+						"UPDATE \"%1\" SET \"%2\" = 'Disabled' WHERE \"%3\" IN (%4);")
+						.arg(
+							QString::fromUtf8(*m_tableNameAttrPtr),
+							QString::fromUtf8(s_stateColumn),
+							QString::fromUtf8(s_documentIdColumn),
+							quotedIds.join(", ")
+							);
+	
+	return query.toUtf8();
 }
 
 

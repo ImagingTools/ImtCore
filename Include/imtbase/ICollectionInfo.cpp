@@ -9,7 +9,7 @@ const QByteArray ICollectionInfo::CN_ALL_CHANGED = QByteArrayLiteral("imtbase:IC
 const QByteArray ICollectionInfo::CN_ELEMENT_INSERTED = QByteArrayLiteral("imtbase:ICollectionInfo::ElementInserted");
 const QByteArray ICollectionInfo::CN_ELEMENT_RENAMED = QByteArrayLiteral("imtbase:ICollectionInfo::ElementRenamed");
 const QByteArray ICollectionInfo::CN_ELEMENT_DESCRIPTION_CHANGED = QByteArrayLiteral("imtbase:ICollectionInfo::ElementDescriptionChanged");
-const QByteArray ICollectionInfo::CN_ELEMENT_REMOVED = QByteArrayLiteral("imtbase:ICollectionInfo::ElementRemoved");
+const QByteArray ICollectionInfo::CN_ELEMENTS_REMOVED = QByteArrayLiteral("imtbase:ICollectionInfo::ElementRemoved");
 const QByteArray ICollectionInfo::CN_ELEMENT_STATE = QByteArrayLiteral("imtbase:ICollectionInfo::ElementStateChanged");
 
 

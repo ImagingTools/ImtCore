@@ -293,7 +293,7 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 	}
 
 	if (changeset.GetChangeInfoMap().contains(imthype::IJobQueueManager::CN_JOB_STATUS_CHANGED)){
-		if (changeset.GetChangeInfoMap().contains(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED)){
+		if (changeset.GetChangeInfoMap().contains(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED)){
 			return;
 		}
 

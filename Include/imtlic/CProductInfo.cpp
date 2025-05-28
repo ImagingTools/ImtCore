@@ -98,7 +98,10 @@ bool CProductInfo::AddFeature(const QByteArray& featureId, const IFeatureInfo& f
 
 bool CProductInfo::RemoveFeature(const QByteArray& featureId)
 {
-	return m_featureCollection.RemoveElement(featureId);
+	imtbase::ICollectionInfo::Ids elementIds;
+	elementIds << featureId;
+
+	return m_featureCollection.RemoveElements(elementIds);
 }
 
 

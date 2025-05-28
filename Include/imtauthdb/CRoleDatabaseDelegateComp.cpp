@@ -44,26 +44,28 @@ bool CRoleDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 }
 
 
-QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectQuery(
+QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
+			const QByteArrayList& objectIds,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
-	imtauth::CRole* roleInfoPtr = nullptr;
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (collection.GetObjectData(objectId, dataPtr)){
-		roleInfoPtr = dynamic_cast<imtauth::CRole*>(dataPtr.GetPtr());
+	for (const imtbase::ICollectionInfo::Id& objectId : objectIds){
+		imtauth::CRole* roleInfoPtr = nullptr;
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (collection.GetObjectData(objectId, dataPtr)){
+			roleInfoPtr = dynamic_cast<imtauth::CRole*>(dataPtr.GetPtr());
+		}
+		
+		if (roleInfoPtr == nullptr){
+			return QByteArray();
+		}
+		
+		if (roleInfoPtr->IsDefault() || roleInfoPtr->IsGuest()){
+			return QByteArray();
+		}
 	}
 
-	if (roleInfoPtr == nullptr){
-		return QByteArray();
-	}
-
-	if (roleInfoPtr->IsDefault() || roleInfoPtr->IsGuest()){
-		return QByteArray();
-	}
-
-	return BaseClass::CreateDeleteObjectQuery(collection, objectId, operationContextPtr);
+	return BaseClass::CreateDeleteObjectsQuery(collection, objectIds, operationContextPtr);
 }
 
 

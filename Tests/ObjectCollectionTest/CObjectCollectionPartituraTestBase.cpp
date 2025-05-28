@@ -413,7 +413,10 @@ void CObjectCollectionPartituraTestBase::RemoveExistObjectTest()
 			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", nullptr, "testId2");
 
 			// Remove object with the ID 'testId':
-			objectCollectionPtr->RemoveElement("testId");
+			imtbase::IObjectCollection::Ids removedElementIds;
+			removedElementIds << "testId";
+			
+			objectCollectionPtr->RemoveElements(removedElementIds);
 
 			// Get IDs in the collection after removing of the 'testId':
 			imtbase::IObjectCollection::Ids idsInObjectAfterRemove = objectCollectionPtr->GetElementIds();
@@ -455,7 +458,10 @@ void CObjectCollectionPartituraTestBase::RemoveNonExistObjectTest()
 			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", nullptr, "testId2");
 
 			// Remove object with non-exist id
-			objectCollectionPtr->RemoveElement("testId3");
+			imtbase::IObjectCollection::Ids removedElementIds;
+			removedElementIds << "testId3";
+			
+			objectCollectionPtr->RemoveElements(removedElementIds);
 
 			// Check contains removed object and another objects
 			imtbase::IObjectCollection::Ids idsInObjectAfterRemove = objectCollectionPtr->GetElementIds();
@@ -647,11 +653,7 @@ void CObjectCollectionPartituraTestBase::GetElementsCountTest()
 
 			if (m_typeIdObjectCollection == "TestInfo"){
 				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
-				if (!idsInObject.isEmpty()){
-					for (int i = 0; i < idsInObject.count(); i++){
-						objectCollectionPtr->RemoveElement(idsInObject[i]);
-					}
-				}
+				objectCollectionPtr->RemoveElements(idsInObject);
 			}
 
 			// Set text filter
@@ -832,11 +834,7 @@ void CObjectCollectionPartituraTestBase::FilterTest()
 
 			if (m_typeIdObjectCollection == "TestInfo"){
 				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
-				if (!idsInObject.isEmpty()){
-					for (int i = 0; i < idsInObject.count(); i++){
-						objectCollectionPtr->RemoveElement(idsInObject[i]);
-					}
-				}
+				objectCollectionPtr->RemoveElements(idsInObject);
 			}
 
 			// Set text filter
@@ -932,11 +930,7 @@ void CObjectCollectionPartituraTestBase::SortingTest()
 
 			if (m_typeIdObjectCollection == "TestInfo"){
 				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
-				if (!idsInObject.isEmpty()){
-					for (int i = 0; i < idsInObject.count(); i++){
-						objectCollectionPtr->RemoveElement(idsInObject[i]);
-					}
-				}
+				objectCollectionPtr->RemoveElements(idsInObject);
 			}
 
 			// Set sorting
@@ -1061,11 +1055,7 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 
 			if (m_typeIdObjectCollection == "TestInfo"){
 				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
-				if (!idsInObject.isEmpty()){
-					for (int i = 0; i < idsInObject.count(); i++){
-						objectCollectionPtr->RemoveElement(idsInObject[i]);
-					}
-				}
+				objectCollectionPtr->RemoveElements(idsInObject);
 			}
 
 			// Set sorting and text filter

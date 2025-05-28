@@ -3,6 +3,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
+import imtbaseImtCollectionSdl 1.0
 
 Item {
 	id: root;
@@ -25,13 +26,12 @@ Item {
 	
 	property var additionalFieldIds: []
 
-	signal removed(string objectId);
+	signal removed(var objectIds);
 	signal renamed(string objectId, string newName);
 	signal imported(string objectId);
 	signal exported(string fileName, string data);
 	signal descriptionSetted(string objectId, string description);
 	
-	property alias removeGqlModel: removeModel;
 	property alias headersGqlModel: headersGqlModel;
 
 	signal beginUpdate();
@@ -69,8 +69,6 @@ Item {
 	}
 	
 	onCollectionIdChanged: {
-		console.log("onCollectionIdChanged", collectionId);
-		
 		root.gqlGetHeadersCommandId = collectionId + "Info";
 		
 		updateModel();
@@ -150,19 +148,11 @@ Item {
 	function getObjectData(objectId, callback){
 	}
 	
-	function setObjectData(objectId, objectData, callback){
-	}
+	function setObjectData(objectId, objectData, callback){}
 	
-	function removeElement(elementIndex){
-		if (elementIndex < 0 || elementIndex >= root.elementsModel.getItemsCount()){
-			console.error();
-			
-			return;
-		}
-		
-		let elementId = root.elementsModel.getData("id", elementIndex);
-		
-		removeModel.send({"id":elementId})
+	function removeElements(elementIds){
+		removeElementsInput.m_elementIds = elementIds
+		removeGqlSender.send(removeElementsInput)
 	}
 	
 	function setElementName(elementIndex, name){
@@ -193,28 +183,27 @@ Item {
 		return {};
 	}
 	
-	GqlRequestSender {
-		id: removeModel;
-		requestType: 1;
-		gqlCommandId: root.gqlRemoveCommandId;
-		
-		function createQueryParams(query, params){
-			var inputParams = Gql.GqlObject("input");
-			inputParams.InsertField("id", params["id"]);
-			
-			query.AddParam(inputParams);
-			
-			var queryFields = Gql.GqlObject("removedNotification");
-			queryFields.InsertField("id");
-			query.AddField(queryFields);
+	RemoveElementsInput {
+		id: removeElementsInput
+	}
+	
+	GqlSdlRequestSender {
+		id: removeGqlSender
+		gqlCommandId: root.gqlRemoveCommandId
+		requestType: 1
+		sdlObjectComp: Component {
+			RemovedNotificationPayload {
+				onFinished: {
+					root.removed(m_elementIds)
+				}
+			}
 		}
 		
-		function onResult(data){
-			if (data.containsKey("id")){
-				var itemId = data.getData("id");
-				
-				root.removed(itemId);
-			}
+		function getRequestedFields(){
+			var queryFields = Gql.GqlObject("removedNotification");
+			queryFields.InsertField("elementIds");
+			
+			return queryFields;
 		}
 		
 		function getHeaders(){

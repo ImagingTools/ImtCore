@@ -68,8 +68,8 @@ public:
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
 				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-	virtual imtgql::IGqlRequest* CreateRemoveObjectRequest(
-				const QByteArray& objectId,
+	virtual imtgql::IGqlRequest* CreateRemoveObjectsRequest(
+				const QByteArrayList& objectIds,
 				int clientElementVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual imtgql::IGqlRequest* CreateGetElementCountRequest(const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;

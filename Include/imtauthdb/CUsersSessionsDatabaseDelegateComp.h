@@ -38,9 +38,9 @@ public:
 				const imtbase::IOperationContext* operationContextPtr,
 				bool useExternDelegate = true) const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
-	virtual QByteArray CreateDeleteObjectQuery(
+	virtual QByteArray CreateDeleteObjectsQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
+				const QByteArrayList& objectIds,
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 };

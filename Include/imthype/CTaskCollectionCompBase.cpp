@@ -288,25 +288,32 @@ QByteArray CTaskCollectionCompBase::InsertNewObject(
 }
 
 
-bool CTaskCollectionCompBase::RemoveElement(const QByteArray& objectId, const imtbase::IOperationContext* /*operationContextPtr*/)
+bool CTaskCollectionCompBase::RemoveElements(const Ids& objectIds, const imtbase::IOperationContext* /*operationContextPtr*/)
 {
-	for (int i = 0; i < m_tasks.count(); ++i){
-		if (m_tasks[i].uuid == objectId){
-			istd::TSmartPtr<istd::IChangeable> eventPtr;
-
-			istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-			changeSet.SetChangeInfo(imtbase::IObjectCollection::CN_ELEMENT_REMOVED, objectId);
-			istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-			OnTaskRemoved(objectId);
-
-			m_tasks.removeAt(i);
-
-			return true;
-		}
+	if (objectIds.isEmpty()){
+		return false;
 	}
 
-	return false;
+	MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = objectIds;
+	
+	TaskList::iterator iter = m_tasks.begin();
+	while (iter != m_tasks.end()){
+		const QByteArray& taskId = iter->uuid;
+		if (objectIds.contains(taskId)){
+			OnTaskRemoved(taskId);
+			iter = m_tasks.erase(iter);
+		}
+		else{
+			++iter;
+		}
+	}
+	
+	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
+	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	return true;
 }
 
 
@@ -866,7 +873,7 @@ void CTaskCollectionCompBase::OnTaskInputsUpdated(const istd::IChangeable::Chang
 {
 	istd::IChangeable::ChangeInfoMap changeInfoMap = changeSet.GetChangeInfoMap();
 
-	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_ELEMENT_REMOVED)){
+	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_ELEMENTS_REMOVED)){
 		QSet<QByteArray> inputIds;
 
 		imtbase::IObjectCollection::Ids ids = objectCollectionPtr->GetElementIds();

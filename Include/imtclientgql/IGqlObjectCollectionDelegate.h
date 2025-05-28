@@ -80,8 +80,8 @@ public:
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
 				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual imtgql::IGqlRequest* CreateRemoveObjectRequest(
-				const QByteArray& objectId,
+	virtual imtgql::IGqlRequest* CreateRemoveObjectsRequest(
+				const QByteArrayList& objectIds,
 				int clientElementVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetElementCountRequest(

@@ -50,7 +50,9 @@ bool CUserVerificationControllerComp::GenerateVerificationData(const QByteArray&
 		imtbase::ICollectionInfo::Ids ids = m_userVerificationCollectionCompPtr->GetElementIds();
 		if (ids.contains(userId)){
 			// Verification data already exists
-			m_userVerificationCollectionCompPtr->RemoveElement(userId);
+			imtbase::ICollectionInfo::Ids elementIds;
+			elementIds << userId;
+			m_userVerificationCollectionCompPtr->RemoveElements(elementIds);
 		}
 
 		istd::TDelPtr<imtauth::CIdentifiableUserVerificationInfo> userVerificationInfoPtr;
@@ -164,7 +166,9 @@ void CUserVerificationControllerComp::CheckExpiredVerificationDataThread::run()
 				const imtauth::IUserVerification* userVerificationInfoPtr = dynamic_cast<const imtauth::IUserVerification*>(dataPtr.GetPtr());
 				if (userVerificationInfoPtr != nullptr){
 					if (userVerificationInfoPtr->IsExpired()){
-						m_parent.m_userVerificationCollectionCompPtr->RemoveElement(id);
+						imtbase::ICollectionInfo::Ids elementIds;
+						elementIds << id;
+						m_parent.m_userVerificationCollectionCompPtr->RemoveElements(elementIds);
 					}
 				}
 			}

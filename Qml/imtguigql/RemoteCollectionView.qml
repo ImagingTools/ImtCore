@@ -72,7 +72,7 @@ CollectionView {
 			additionalFieldIds: root.additionalFieldIds;
 
 			onRemoved: {
-				root.removed(objectId)
+				root.removed(objectIds)
 			}
 
 			function getHeaders(){
@@ -101,11 +101,11 @@ CollectionView {
 		if (!root.visibleMetaInfo){
 			return;
 		}
+		
+		console.log("onSelectionChanged", selectedIds, selectedIndexes)
 
-		if (selection.length === 1){
-			let index = selection[0];
-			let elementsModel = root.table.elements;
-			let elementId = elementsModel.getData("id", index);
+		if (selectedIds.length === 1){
+			let elementId = selectedIds[0];
 			metaInfoProvider.getMetaInfo(elementId);
 		}
 	}
