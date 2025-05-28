@@ -1110,10 +1110,6 @@ class QModelData {
                     return true
                 }
 
-                if(name === '' && !(name in target)){
-                    return false
-                }
-
                 if(name === 'index' && !(name in target)){
                     $index.reset(value)
                     return true
