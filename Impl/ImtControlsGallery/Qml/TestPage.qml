@@ -5,91 +5,37 @@ import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtgui 1.0
 import imtdocgui 1.0
-import imtappApplicationSdl 1.0
 import imtguigql 1.0
-import imtauthUsersSdl 1.0
 
 Rectangle {
 	id: testPage;
 
 	anchors.fill: parent;
 	clip: true;
-
-	BaseModel {
-		id: baseModel;
+	
+	property string json: "{\"type\": \"data\",\"id\": \"70e4d6b5-7afe-4490-9b80-09636fc825e2\",\"payload\": {\"data\": {\"OnAccountsCollectionChanged\": {\"itemIds\":[\"dce1f9da-8a1b-40c7-b903-49076ab7e550\",\"0722c437-dbaf-4a09-ac64-411ca5bcb61c\"],\"operationContext\":{\"ownerId\":\"su\",\"ownerName\":\"superuser\"},\"typeOperation\":\"removed\"}}}}"
+	
+	TreeItemModel {
+		id: treeItemModel
 	}
-
-	UserData {
-		id: userData;
-
-		onModelChanged: {
-			console.log("onModelChanged");
-		}
+	
+	TreeItemModel {
+		id: treeItemModel2
 	}
-
-	SystemInfo {
-		id: systemInfo;
-	}
-
+	
 	Row {
 		height: 30;
 
 		Button {
 			width: 100;
 			height: 30;
-
-			text: "owner";
-
-			property int index: 1
+			text: "Test";
 			onClicked: {
-				console.log("onClicked");
-
-				index++;
-
-				userData.m_systemInfos.addElement(systemInfo);
-			}
-		}
-
-		Button {
-			width: 100;
-			height: 30;
-
-			text: "changeList";
-
-			property int index: 1
-			onClicked: {
-				console.log("onClicked");
-
-				index++;
-
-				userData.beginChanges();
-				userData.m_roles = "rewrwer;werwerwe;rwer";
-				userData.m_name = "Test";
-				userData.m_username = "Test";
-				userData.endChanges();
+				treeItemModel.createFromJson(testPage.json)
+				console.log("treeItemModel", treeItemModel.toJson())
+				treeItemModel2.copy(treeItemModel)
+				console.log("treeItemModel2", treeItemModel2.toJson())
 			}
 		}
 	}
-
-	Rectangle{
-		id: rec
-
-		x: 400;
-		y: 400;
-
-		width: 100;
-		height: 100;
-
-		color: "red";
-
-		MovingItem{
-			containerItem: rec;
-			movingItem: rec;
-
-			hoverEnabled: true;
-			cursorShape: pressed ? Qt.ClosedHandCursor : Qt.OpenHandCursor
-		}
-	}
-
-
 }
