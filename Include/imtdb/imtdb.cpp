@@ -8,7 +8,7 @@ namespace imtdb
 QString SqlEncode(const QString& sqlQuery)
 {
 	QString retVal = sqlQuery;
-	return retVal.replace("'", "''").replace(";", "\b");
+	return retVal.replace('\'', "''").replace(';', '\b');
 }
 
 

@@ -13,6 +13,12 @@ namespace imtdb
 {
 
 
+// statics
+
+static const QString NULL_DATA_LITERAL		= QStringLiteral("NULL");
+static const QString DEFAULT_DATA_LITERAL	= QStringLiteral("DEFAULT");
+
+
 QString SqlEncode(const QString& sqlQuery);
 
 
