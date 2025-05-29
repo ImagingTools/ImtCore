@@ -194,18 +194,14 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
 		return QByteArray();
 	}
 
-	QStringList quotedIds;
-	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(objectId);
-	}
-	
-	QString query = QString(
-						"UPDATE \"%1\" SET \"%2\" = 'Disabled' WHERE \"%3\" IN (%4);")
+	const QString quotedIds = objectIds.join("','").append('\'').prepend('\'');
+	QString query = QStringLiteral(
+						R"sql(UPDATE "%1" SET "%2" = 'Disabled' WHERE "%3" IN (%4);)sql")
 						.arg(
 							QString::fromUtf8(*m_tableNameAttrPtr),
 							QString::fromUtf8(s_stateColumn),
 							QString::fromUtf8(s_documentIdColumn),
-							quotedIds.join(", ")
+							quotedIds
 							);
 	
 	return query.toUtf8();
