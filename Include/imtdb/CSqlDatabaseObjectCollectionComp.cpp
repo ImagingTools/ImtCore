@@ -706,10 +706,12 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 		return false;
 	}
 	
-	QStringList queryList = QString::fromUtf8(sqlQuery).split(";");
-	
-	m_dbEngineCompPtr->BeginTransaction();
-	
+	QStringList queryList = QString::fromUtf8(sqlQuery).split(';');
+
+	if(!m_dbEngineCompPtr->BeginTransaction()){
+		qCritical() << "Failed to begin SQL transaction with queries:" << sqlQuery;
+	}
+
 	for (QString& singleQuery: queryList){
 		if (!singleQuery.isEmpty()){
 			QSqlError error;
@@ -727,9 +729,12 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 		}
 	}
 	
-	m_dbEngineCompPtr->FinishTransaction();
-	
-	return true;
+	const bool transactionSuccess = m_dbEngineCompPtr->FinishTransaction();
+	if(!transactionSuccess){
+		qCritical() << "Failed to finish SQL transaction with queries:" << sqlQuery;
+	}
+
+	return transactionSuccess;
 }
 
 
@@ -741,7 +746,10 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 		return false;
 	}
 	
-	m_dbEngineCompPtr->BeginTransaction();
+	if(!m_dbEngineCompPtr->BeginTransaction()){
+		qCritical() << "Failed to begin SQL transaction with queries:" << sqlQuery;
+	}
+
 	QSqlError error;
 	m_dbEngineCompPtr->ExecSqlQuery(sqlQuery, bindValues, &error);
 	
@@ -756,9 +764,12 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 		return false;
 	}
 	
-	m_dbEngineCompPtr->FinishTransaction();
-	
-	return true;
+	const bool transactionSuccess = m_dbEngineCompPtr->FinishTransaction();
+	if(!transactionSuccess){
+		qCritical() << "Failed to finish SQL transaction with queries:" << sqlQuery;
+	}
+
+	return transactionSuccess;
 }
 
 
