@@ -666,7 +666,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 
 	ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel = m_argumentParserCompPtr->GetAutoLinkLevel();
 
-	/// \todo generalize all loops. use common nethod
+	/// \todo generalize all loops. use common nethod ASAP!!!!
 	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled()){
 		for (CSdlType& sdlType: m_sdlTypes){
 			bool isExternal = sdlType.IsExternal();
@@ -754,6 +754,28 @@ bool CGqlSchemaParserComp::ValidateSchema()
 					SendErrorMessage(0, QString("Unable to set output file for type: '%1' in '%2'").arg(sdlEnum.GetName(), m_currentSchemaFilePath));
 
 					return false;
+				}
+			}
+			else {
+				// update target header path
+				const QString targetPath = sdlEnum.GetTargetHeaderFilePath();
+				const QString typeSchemaPath = sdlEnum.GetSchemaFilePath();
+				const QString processingSchemaPath = m_argumentParserCompPtr->GetSchemaFilePath();
+				// fallback for parallel automatic generation. In this case, it is expected that all target files with schemas from the same folder will have the same output folder.
+				if (targetPath.isEmpty() || (QFileInfo(typeSchemaPath).absoluteDir().absolutePath() != QFileInfo(processingSchemaPath).absoluteDir().absolutePath())){
+					if (m_argumentParserCompPtr->IsGenerateMode() && m_argumentParserCompPtr->IsCppEnabled()){
+						IModuleManager::ItemInfo info = m_sdlModuleManaerCompPtr->GetItemInfo(sdlEnum);
+						sdlEnum.SetTargetHeaderFilePath(info.TargerHeaderFilePath);
+						// MUST NOT be empty!!!
+						if (info.TargerHeaderFilePath.isEmpty()){
+							SendErrorMessage(0, QString("Missing header for %1. Perhaps data for schema %2 is not generated").arg(sdlEnum.GetName(), typeSchemaPath));
+							SendErrorMessage(0, QString("targetPath: %1").arg(targetPath));
+							SendErrorMessage(0, QString("typeSchemaPath:%1").arg(typeSchemaPath));
+							SendErrorMessage(0, QString("processingSchemaPath:%1").arg(processingSchemaPath));
+
+							return false;
+						}
+					}
 				}
 			}
 		}

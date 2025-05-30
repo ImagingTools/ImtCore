@@ -366,6 +366,10 @@ bool CGqlSchemaParser::ProcessUnion()
 		atEnd = bool(!retVal || foundDelimeter == '\n');
 	}
 
+	/// \todo make a common update method
+	currentUnion.SetSchemaFilePath(m_originalSchemaFile);
+	currentUnion.SetSchemaParamsPtr(m_schemaParamsPtr);
+
 	m_unions.push_back(currentUnion);
 
 	return retVal;
@@ -409,6 +413,8 @@ bool CGqlSchemaParser::ProcessEnum()
 		QString convertedEnumValue = ConvertEnumValueToStringEquivalent(enumValue);
 
 		currentEnum.AddValue(QPair<QString,QString>(QString(qPrintable(enumValue)), convertedEnumValue));
+		currentEnum.SetSchemaFilePath(m_originalSchemaFile);
+		currentEnum.SetSchemaParamsPtr(m_schemaParamsPtr);
 
 		atEnd = bool(!retVal || foundDelimeter == '}');
 	}
