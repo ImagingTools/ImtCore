@@ -37,7 +37,7 @@ public:
 	virtual bool CopyFrom(const IChangeable &object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual bool IsEqual(const IChangeable &object) const override;
 	virtual istd::IChangeable *CloneMe(CompatibilityMode mode) const override;
-	virtual bool ResetData(CompatibilityMode mode) override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
 	static bool SerializeFieldSortingInfo(IComplexCollectionFilter::FieldSortingInfo& object, iser::IArchive& archive);

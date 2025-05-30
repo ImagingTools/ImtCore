@@ -56,6 +56,13 @@ public:
 
 	struct FieldSortingInfo
 	{
+		FieldSortingInfo(
+			const QByteArray& fieldId = QByteArray(),
+			SortingOrder sortingOrder = SO_ASC
+		):
+		fieldId(fieldId),
+		sortingOrder(sortingOrder) {};
+
 		bool operator==(const FieldSortingInfo& other) const;
 		bool operator!=(const FieldSortingInfo& other) const;
 
@@ -66,6 +73,15 @@ public:
 
 	struct FieldFilter
 	{
+		FieldFilter(
+			const QByteArray& fieldId = QByteArray(),
+			const QVariant& filterValue = QVariant(),
+			FieldOperation filterOperation = FO_EQUAL
+		):
+		fieldId(fieldId),
+		filterValue(filterValue),
+		filterOperation(filterOperation) {};
+
 		bool operator==(const FieldFilter& other) const;
 		bool operator!=(const FieldFilter& other) const;
 
@@ -76,6 +92,15 @@ public:
 
 	struct GroupFilter
 	{
+		GroupFilter(
+			const QVector<FieldFilter>& fieldFilters = QVector<FieldFilter>(),
+			const QVector<GroupFilter>& groupFilters = QVector<GroupFilter>(),
+			LogicalOperation logicalOperation = LO_AND
+		):
+		fieldFilters(fieldFilters),
+		groupFilters(groupFilters),
+		logicalOperation(logicalOperation) {};
+
 		bool operator==(const GroupFilter& other) const;
 		bool operator!=(const GroupFilter& other) const;
 
