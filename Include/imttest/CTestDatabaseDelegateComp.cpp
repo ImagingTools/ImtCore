@@ -141,6 +141,15 @@ QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectsQuery(
 }
 
 
+QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectSetQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const iprm::IParamsSet* paramsPtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
 QByteArray CTestDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,

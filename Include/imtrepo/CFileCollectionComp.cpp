@@ -466,6 +466,14 @@ bool CFileCollectionComp::RemoveElements(
 }
 
 
+bool CFileCollectionComp::RemoveElementSet(
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
+{
+	return false;
+}
+
+
 // reimplemented (ICollectionInfo)
 
 bool CFileCollectionComp::SetElementName(

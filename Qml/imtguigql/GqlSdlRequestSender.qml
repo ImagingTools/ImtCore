@@ -114,11 +114,13 @@ GqlRequest {
 			console.error("Unable to send request", root.gqlCommandId ,". Error: Request type is unsupported.");
 			return;
 		}
-		
+
 		var query = Gql.GqlRequest(type, root.gqlCommandId);
-		
+
 		let gqlObject = Gql.GqlObject("input")
 		if (sdlInputObject){
+			// console.log("sdlInputObject", sdlInputObject.toJson())
+			// gqlObject.fromJson(sdlInputObject.toJson())
 			gqlObject.fromObject(sdlInputObject)
 			query.AddParam(gqlObject);
 		}

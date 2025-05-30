@@ -45,6 +45,9 @@ public:
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	virtual bool RemoveElements(const Ids& elementIds, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveElementSet(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const imtbase::IOperationContext* operationContextPtr = nullptr) override;

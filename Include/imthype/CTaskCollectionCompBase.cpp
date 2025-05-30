@@ -317,6 +317,14 @@ bool CTaskCollectionCompBase::RemoveElements(const Ids& objectIds, const imtbase
 }
 
 
+bool CTaskCollectionCompBase::RemoveElementSet(
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
+{
+	return false;
+}
+
+
 const istd::IChangeable* CTaskCollectionCompBase::GetObjectPtr(const QByteArray& objectId) const
 {
 	// TODO: think about using this code for staticaly defined tasks only!

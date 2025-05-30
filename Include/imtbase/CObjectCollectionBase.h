@@ -63,6 +63,9 @@ public:
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
 				const IOperationContext* operationContextPtr = nullptr) override;
 	virtual bool RemoveElements(const Ids& elementIds, const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveElementSet(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(

@@ -141,7 +141,7 @@ Item {
 	function getHeadersRepresentation(){
 		return root.headersModel;
 	}
-	
+
 	function insertNewObject(typeId){
 	}
 	
@@ -153,6 +153,11 @@ Item {
 	function removeElements(elementIds){
 		removeElementsInput.m_elementIds = elementIds
 		removeGqlSender.send(removeElementsInput)
+	}
+
+	function removeElementSet(filter){
+		removeElementSetInput.m_filterModel = filter
+		removeElementSetSender.send(removeElementSetInput)
 	}
 	
 	function setElementName(elementIndex, name){
@@ -185,6 +190,31 @@ Item {
 	
 	RemoveElementsInput {
 		id: removeElementsInput
+	}
+	
+	RemoveElementSetInput {
+		id: removeElementSetInput
+		m_collectionId: root.collectionId
+	}
+	
+	GqlSdlRequestSender {
+		id: removeElementSetSender
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_removeElementSet
+		requestType: 1
+		sdlObjectComp: Component {
+			RemoveElementSetPayload {}
+		}
+		
+		function getRequestedFields(){
+			var queryFields = Gql.GqlObject("removedNotification");
+			queryFields.InsertField("success");
+			
+			return queryFields;
+		}
+		
+		function getHeaders(){
+			return root.getHeaders();
+		}
 	}
 	
 	GqlSdlRequestSender {

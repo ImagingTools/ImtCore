@@ -19,6 +19,7 @@
 #include <imtbase/CFilterCollectionProxy.h>
 #include <imtbase/COperationContext.h>
 #include <imtgql/CGqlRequest.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtclientgql
@@ -285,6 +286,47 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectsReques
 			SendWarningMessage(0,
 							   QString("Unable to insert field 'operationContext' to the request '%1'. Error: Serialization failed")
 								   .arg(qPrintable(commandId)),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+
+	queryPtr->AddParam("input", input);
+
+	imtgql::CGqlFieldObject query;
+	queryPtr->AddField("removedNotification", query);
+
+	return queryPtr;
+}
+
+
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectSetRequest(
+			const iprm::IParamsSet* selectionParamsPtr,
+			int clientElementVersion,
+			const imtbase::IOperationContext* operationContextPtr) const
+{
+	QByteArray data;
+	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, QByteArrayLiteral("RemoveElementSet"));
+
+	imtgql::CGqlParamObject input;
+	if (selectionParamsPtr != nullptr){
+		if (SerializeObject(selectionParamsPtr, data)){
+			input.InsertParam("selectionParams", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to insert field 'selectionParams' to the request '%1'. Error: Serialization failed"),
+							   "CGqlObjectCollectionDelegateComp");
+		}
+	}
+	
+	input.InsertParam("version", QVariant(clientElementVersion));
+	if (operationContextPtr != nullptr){
+		if (SerializeObject(operationContextPtr,data)){
+			input.InsertParam("operationContext", QVariant(data.toBase64()));
+		}
+		else{
+			SendWarningMessage(0,
+							   QString("Unable to insert field 'operationContext' to the request 'RemoveElementSet'. Error: Serialization failed"),
 							   "CGqlObjectCollectionDelegateComp");
 		}
 	}

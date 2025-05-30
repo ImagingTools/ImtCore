@@ -38,6 +38,10 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArrayList& objectIds,
 				const imtbase::IOperationContext* operationContextPtr) const override;
+	virtual QByteArray CreateDeleteObjectSetQuery(
+				const imtbase::IObjectCollection& collection,
+				const iprm::IParamsSet* paramsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,

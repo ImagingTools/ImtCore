@@ -53,7 +53,9 @@ public:
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
 	virtual bool RemoveElements(const Ids& elementIds, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-
+	virtual bool RemoveElementSet(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	// reimplemented (ICollectionInfo)
 	virtual bool SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr = nullptr) override;
 

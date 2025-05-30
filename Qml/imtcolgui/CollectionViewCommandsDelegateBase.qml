@@ -479,29 +479,46 @@ ViewCommandsDelegateBase {
 		}
 	}
 
-	function onRemove(){
+	function onRemove(params){
 		ModalDialogManager.openDialog(removeDialog, {});
+	}
+
+	function onRemoveAll(){
+		if (!collectionView){
+			console.error("Unable to remove all elements. CollectionView reference is invalid")
+			return
+		}
+
+		let message = ""
+		if (collectionView.hasActiveFilter()){
+			message = qsTr("Delete all items with the current filter ?")
+		}
+		else{
+			message = qsTr("Delete all data from this collection ?")
+		}
+
+		ModalDialogManager.openDialog(removeAllDialogComp, {message: message});
 	}
 
 	function onNew(){}
 
 	function onRename(){
-		let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
+		let indexes = collectionView.table.getSelectedIndexes();
 		if (indexes.length > 0){
-			let selectedName = collectionViewCommandsDelegate.collectionView.table.elements.getData("name", indexes[0]);
+			let selectedName = collectionView.table.elements.getData("name", indexes[0]);
 			ModalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
 		}
 	}
 
 	function onSetDescription(){
-		let elements = collectionViewCommandsDelegate.collectionView.table.elements;
+		let elements = collectionView.table.elements;
 
-		let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
+		let indexes = collectionView.table.getSelectedIndexes();
 		if (indexes.length > 0){
 			let selectedDescription = "";
 
-			if (elements.containsKey(collectionViewCommandsDelegate.descriptionFieldId, indexes[0])){
-				selectedDescription = elements.getData(collectionViewCommandsDelegate.descriptionFieldId, indexes[0]);
+			if (elements.containsKey(descriptionFieldId, indexes[0])){
+				selectedDescription = elements.getData(descriptionFieldId, indexes[0]);
 			}
 
 			ModalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
@@ -511,50 +528,51 @@ ViewCommandsDelegateBase {
 	function commandHandle(commandId, params){
 		console.log("CollectionViewCommandsDelegateBase commandHandle", commandId, params);
 
-		if (!collectionViewCommandsDelegate.collectionView){
+		if (!collectionView){
 			return;
 		}
 
-		let commandsController = collectionViewCommandsDelegate.collectionView.commandsController;
+		let commandsController = collectionView.commandsController;
 		if (!commandsController){
 			return;
 		}
 
 		let commandIsEnabled = commandsController.commandIsEnabled(commandId);
-		console.log("commandIsEnabled", commandIsEnabled);
-
 		if (commandIsEnabled){
 			if (commandId === "New"){
-				collectionViewCommandsDelegate.onNew(params);
+				onNew(params);
 			}
 			else if (commandId === "Remove"){
-				collectionViewCommandsDelegate.onRemove(params);
+				onRemove(params);
+			}
+			else if (commandId === "RemoveAll"){
+				onRemoveAll(params);
 			}
 			else if (commandId === "Edit"){
-				collectionViewCommandsDelegate.onEdit(params);
+				onEdit(params);
 			}
 			else if (commandId === "Import"){
-				collectionViewCommandsDelegate.onImport(params);
+				onImport(params);
 			}
 			else if (commandId === "Export"){
-				collectionViewCommandsDelegate.onExport(params);
+				onExport(params);
 			}
 			else if (commandId === "Revision"){
-				collectionViewCommandsDelegate.onRevision(params);
+				onRevision(params);
 			}
 		}
 
 		let editIsEnabled = commandsController.commandIsEnabled("Edit");
 		if (editIsEnabled){
 			if (commandId === "Rename"){
-				collectionViewCommandsDelegate.onRename(params);
+				onRename(params);
 			}
 			else if (commandId === "SetDescription"){
-				collectionViewCommandsDelegate.onSetDescription(params);
+				onSetDescription(params);
 			}
 		}
 
-		collectionViewCommandsDelegate.commandActivated(commandId);
+		commandActivated(commandId);
 	}
 
 	Component {
@@ -616,20 +634,35 @@ ViewCommandsDelegateBase {
 			message: collectionViewCommandsDelegate.removeMessage;
 			onFinished: {
 				if (buttonId == Enums.yes){
-					let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
-					let elementsModel = collectionViewCommandsDelegate.collectionView.table.elements
-
-					let elementIds = []
-					for (let i = 0; i < indexes.length; i++){
-						let elementId = elementsModel.getData("id", indexes[i])
-						elementIds.push(elementId)
-					}
-					
+					let elementIds = collectionViewCommandsDelegate.collectionView.getSelectedIds()
 					collectionViewCommandsDelegate.collectionView.removeElements(elementIds)
 				}
 
 				if (collectionViewCommandsDelegate.collectionView){
 					collectionViewCommandsDelegate.collectionView.table.forceActiveFocus();
+				}
+			}
+		}
+	}
+	
+	Component {
+		id: removeAllDialogComp
+		ImtControls.MessageDialog {
+			width: 400;
+			title: qsTr("Deleting elements");
+			onFinished: {
+				if (buttonId == Enums.yes){
+					let collectionView = collectionViewCommandsDelegate.collectionView
+					if (collectionView.hasActiveFilter()){
+						collectionView.removeElementSet(collectionView.collectionFilter)
+					}
+					else{
+						collectionView.removeElementSet(null)
+					}
+				}
+
+				if (collectionView){
+					collectionView.table.forceActiveFocus();
 				}
 			}
 		}

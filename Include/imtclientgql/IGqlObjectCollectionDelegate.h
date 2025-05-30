@@ -84,6 +84,10 @@ public:
 				const QByteArrayList& objectIds,
 				int clientElementVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
+	virtual imtgql::IGqlRequest* CreateRemoveObjectSetRequest(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				int clientElementVersion = -1,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetElementCountRequest(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetElementListRequest(

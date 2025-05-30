@@ -111,6 +111,15 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateDeleteObjectsQuery(
 }
 
 
+QByteArray CAddressTypeDatabaseDelegateComp::CreateDeleteObjectSetQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
 QByteArray CAddressTypeDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,

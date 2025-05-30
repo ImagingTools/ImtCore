@@ -121,6 +121,44 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 }
 
 
+sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControllerCompBase::OnRemoveElementSet(
+			const sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest& removeElementSetRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::imtbase::ImtCollection::CRemoveElementSetPayload::V1_0 response;
+
+	sdl::imtbase::ImtCollection::RemoveElementSetRequestArguments arguments = removeElementSetRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0){
+		return sdl::imtbase::ImtCollection::CRemoveElementSetPayload();
+	}
+	
+	istd::TDelPtr<iprm::CParamsSet> filterParamPtr;
+	if (arguments.input.Version_1_0->filterModel.has_value()){
+		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 filterModel = *arguments.input.Version_1_0->filterModel;
+
+		istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
+		if (!imtcol::CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(filterModel, *complexFilterPtr, GetLogPtr())){
+			errorMessage = QString("Unable to remove element set for collection '%1'. Error: SDL model parsing failed").arg(qPrintable(*m_collectionIdAttrPtr));
+			return sdl::imtbase::ImtCollection::CRemoveElementSetPayload();
+		}
+
+		ReplaceComplexFilterFields(*complexFilterPtr);
+
+		filterParamPtr.SetPtr(new iprm::CParamsSet);
+
+		filterParamPtr->SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
+	}
+
+	response.success = m_objectCollectionCompPtr->RemoveElementSet(filterParamPtr.GetPtr());
+
+	sdl::imtbase::ImtCollection::CRemoveElementSetPayload retVal;
+	retVal.Version_1_0 = std::make_optional(response);
+
+	return retVal;
+}
+
+
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResponse(
@@ -132,6 +170,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 	}
 	
+	sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest removeElementSetGqlRequest(gqlRequest, false);
+	if (removeElementSetGqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
+		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+	}
+
 	imtgql::CGqlParamObject gqlObject;
 	
 	int operationType = OT_UNKNOWN;
@@ -191,32 +234,52 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
+	sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest removeElementSetGqlRequest(gqlRequest, false);
 	
+	QByteArray removeElementSetCommandId = removeElementSetGqlRequest.GetCommandId();
 	QByteArray getVisualStatusCommandId = getVisualStatusRequest.GetCommandId();
 	QByteArray requestCommandId = gqlRequest.GetCommandId();
-	if (getVisualStatusCommandId != requestCommandId){
-		bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
-		if (!isSupported){
+	
+	if (getVisualStatusCommandId == requestCommandId){
+		sdl::imtbase::ImtCollection::GetObjectVisualStatusRequestArguments arguments = getVisualStatusRequest.GetRequestedArguments();
+		if (!arguments.input.Version_1_0.has_value()){
+			Q_ASSERT(false);
 			return false;
 		}
+		
+		if (getVisualStatusRequest.IsValid()){
+			QByteArray typeId;
+			if (arguments.input.Version_1_0->typeId.has_value()){
+				typeId = *arguments.input.Version_1_0->typeId;
+			}
+			
+			return m_objectTypeIdAttrPtr.FindValue(typeId) >= 0;
+		}
 	}
-	
-	sdl::imtbase::ImtCollection::GetObjectVisualStatusRequestArguments arguments = getVisualStatusRequest.GetRequestedArguments();
-	if (!arguments.input.Version_1_0.has_value()){
-		Q_ASSERT(false);
-		return false;
-	}
-	
-	if (getVisualStatusRequest.IsValid()){
-		QByteArray typeId;
-		if (arguments.input.Version_1_0->typeId.has_value()){
-			typeId = *arguments.input.Version_1_0->typeId;
+	else if (removeElementSetCommandId == requestCommandId){
+		sdl::imtbase::ImtCollection::RemoveElementSetRequestArguments arguments = removeElementSetGqlRequest.GetRequestedArguments();
+		if (!arguments.input.Version_1_0.has_value()){
+			Q_ASSERT(false);
+			return false;
 		}
 		
-		return m_objectTypeIdAttrPtr.FindValue(typeId) >= 0;
+		if (removeElementSetGqlRequest.IsValid()){
+			QByteArray collectionId;
+			if (arguments.input.Version_1_0->collectionId.has_value()){
+				collectionId = *arguments.input.Version_1_0->collectionId;
+			}
+			
+			return *m_collectionIdAttrPtr == collectionId;
+		}
 	}
-	
-	return true;
+	else{
+		bool isSupported = BaseClass::IsRequestSupported(gqlRequest);
+		if (isSupported){
+			return true;
+		}
+	}
+
+	return false;
 }
 
 

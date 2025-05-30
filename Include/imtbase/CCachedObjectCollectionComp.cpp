@@ -147,6 +147,14 @@ bool CCachedObjectCollectionComp::RemoveElements(const Ids& elementIds, const IO
 }
 
 
+bool CCachedObjectCollectionComp::RemoveElementSet(
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const IOperationContext* /*operationContextPtr*/)
+{
+	return false;
+}
+
+
 const istd::IChangeable* CCachedObjectCollectionComp::GetObjectPtr(const Id& objectId) const
 {
 	if (m_objectCollectionCompPtr.IsValid()){

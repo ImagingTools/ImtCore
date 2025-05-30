@@ -117,6 +117,29 @@ bool CRemoteGqlCollectionController::RemoveElements(const Ids& elementIds, const
 }
 
 
+bool CRemoteGqlCollectionController::RemoveElementSet(
+			const iprm::IParamsSet* selectionParamsPtr,
+			const imtbase::IOperationContext* operationContextPtr)
+{
+	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
+		return false;
+	}
+
+	bool retVal = false;
+
+	GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateRemoveObjectSetRequest(selectionParamsPtr, -1, operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);
+		}
+	}
+
+	return retVal;
+}
+
+
 const istd::IChangeable* CRemoteGqlCollectionController::GetObjectPtr(const Id& /*objectId*/) const
 {
 	return nullptr;

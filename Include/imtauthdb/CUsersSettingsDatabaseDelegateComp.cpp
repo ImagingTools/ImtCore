@@ -148,6 +148,15 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectsQuery(
 }
 
 
+QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectSetQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
 QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,

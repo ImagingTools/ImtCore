@@ -401,6 +401,14 @@ bool CFileRepositoryComp::RemoveElements(const Ids& elementIds, const imtbase::I
 }
 
 
+bool CFileRepositoryComp::RemoveElementSet(
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
+{
+	return false;
+}
+
+
 const istd::IChangeable* CFileRepositoryComp::GetObjectPtr(const QByteArray& /*objectId*/) const
 {
 	Q_ASSERT_X(false, __func__, "Access to the raw object pointer is not supported by this implementation");

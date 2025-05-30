@@ -3,6 +3,7 @@ schema {
 	namespace: imtbase
 	version: 1.0
 	query: Query
+	mutation: Mutation
 }
 
 import {
@@ -53,6 +54,10 @@ type SetDescriptionNotificationPayload {
 	description: String
 }
 
+type RemoveElementSetPayload {
+	success: Boolean
+}
+
 type CollectionMetaInfo {
 	id: ID!
 	name: String
@@ -84,6 +89,11 @@ input RemoveElementsInput {
 	elementIds: [ID]
 }
 
+input RemoveElementSetInput {
+	collectionId: ID
+	filterModel: ComplexCollectionFilter
+}
+
 input ObjectVisualStatusInput {
 	objectId: ID!
 	typeId: ID!
@@ -91,6 +101,10 @@ input ObjectVisualStatusInput {
 
 type Query {
 	GetObjectVisualStatus (input: ObjectVisualStatusInput): VisualStatus!
+}
+
+type Mutation {
+	RemoveElementSet (input: RemoveElementSetInput): RemoveElementSetPayload!
 }
 
 

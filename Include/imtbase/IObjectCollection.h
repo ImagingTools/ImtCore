@@ -135,6 +135,14 @@ public:
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**
+		Remove element with the given filter.
+		\param selectionParamsPtr				The filter by which the selection will be made for deletion. If it is null, then everything will be deleted.
+	*/
+	virtual bool RemoveElementSet(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const IOperationContext* operationContextPtr = nullptr) = 0;
+
+	/**
 		Get access to the object instance inside of collecton.
 		\note This method should return a valid instance for an object only for objects that are permanent in the collection (fixed).
 	*/

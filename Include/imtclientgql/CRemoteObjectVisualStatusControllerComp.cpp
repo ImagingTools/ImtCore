@@ -28,6 +28,15 @@ sdl::imtbase::ImtCollection::CVisualStatus CRemoteObjectVisualStatusControllerCo
 }
 
 
+sdl::imtbase::ImtCollection::CRemoveElementSetPayload CRemoteObjectVisualStatusControllerComp::OnRemoveElementSet(
+			const sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest& /*removeElementSetRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	return sdl::imtbase::ImtCollection::CRemoveElementSetPayload();
+}
+
+
 // reimplemented (imtgql::IGqlRequestHandler)
 
 bool CRemoteObjectVisualStatusControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
@@ -52,7 +61,7 @@ bool CRemoteObjectVisualStatusControllerComp::IsRequestSupported(const imtgql::C
 		return m_typeIdsAttrPtr.FindValue(typeId) >= 0;
 	}
 
-	return true;
+	return false;
 }
 
 

@@ -220,6 +220,15 @@ QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateDeleteObjectsQuery(
 }
 
 
+QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateDeleteObjectSetQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
 QByteArray CSqlDatabaseDocumentDelegateLegacyComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,

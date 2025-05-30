@@ -269,6 +269,15 @@ bool CObjectCollectionBase::RemoveElements(const Ids& elementIds, const IOperati
 	return true;
 }
 
+
+bool CObjectCollectionBase::RemoveElementSet(
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const IOperationContext* /*operationContextPtr*/)
+{
+	return false;
+}
+
+
 const istd::IChangeable* CObjectCollectionBase::GetObjectPtr(const Id& objectId) const
 {
 	QReadLocker locker(&m_lock);

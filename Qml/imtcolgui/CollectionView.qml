@@ -100,6 +100,10 @@ Item {
 		container.removeElements(elementIds);
 	}
 	
+	function removeElementSet(filter){
+		container.removeElementSet(filter);
+	}
+	
 	function setElementName(elementIndex, name){
 		container.setElementName(elementIndex, name);
 	}
@@ -116,6 +120,18 @@ Item {
 		if (container.commandsDelegate){
 			container.commandsDelegate.commandHandle("Edit");
 		}
+	}
+	
+	function getSelectedIds(){
+		return container.getSelectedIds()
+	}
+	
+	function hasActiveFilter(){
+		if (collectionFilter){
+			return !collectionFilter.isEmpty()
+		}
+		
+		return false
 	}
 
 	Connections {
@@ -324,6 +340,12 @@ Item {
 		function removeElements(elementIds){
 			if (container.dataController){
 				return container.dataController.removeElements(elementIds);
+			}
+		}
+		
+		function removeElementSet(filter){
+			if (container.dataController){
+				return container.dataController.removeElementSet(filter);
 			}
 		}
 		

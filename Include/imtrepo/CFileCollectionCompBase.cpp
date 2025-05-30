@@ -489,6 +489,14 @@ bool CFileCollectionCompBase::RemoveElements(const Ids& /*elementIds*/, const im
 }
 
 
+bool CFileCollectionCompBase::RemoveElementSet(
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
+{
+	return false;
+}
+
+
 const istd::IChangeable* CFileCollectionCompBase::GetObjectPtr(const QByteArray& /*objectId*/) const
 {
 	return nullptr;

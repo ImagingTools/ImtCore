@@ -71,14 +71,12 @@ ViewBase {
 	
 	FilterMenu {
 		id: filterMenu_;
-		
 		anchors.top: parent.top;
 		anchors.topMargin: Style.sizeMainMargin;
 		anchors.left: parent.left;
 		anchors.leftMargin: Style.sizeMainMargin;
 		anchors.right: parent.right;
 		anchors.rightMargin: Style.sizeMainMargin;
-		
 		complexFilter: collectionViewBaseContainer.collectionFilter;
 		
 		onClose: {
@@ -101,25 +99,24 @@ ViewBase {
 	
 	Rectangle {
 		id: backgroundTable;
-		
 		anchors.top: filterMenu_.visible ? filterMenu_.bottom: parent.top;
 		anchors.left: parent.left;
 		anchors.topMargin: filterMenu_.visible ? Style.sizeMainMargin : 0;
 		anchors.bottom: paginationObj.top;
-		
 		width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
-		
 		color: Style.baseColor;
-		
 		radius: Style.size_mainCornerRadius !== undefined ? Style.size_mainCornerRadius: 0;
+		
 		TreeItemModel{
 			id: tableDecoratorModel;
 			
 			property bool compl: false;
 			property bool complCompl: tableDecoratorModel.compl && loaderTableDecorator.compl && tableInternal.headersCompl;
+			
 			Component.onCompleted: {
 				tableDecoratorModel.compl = true;
 			}
+			
 			onComplComplChanged: {
 				if(tableDecoratorModel.complCompl){
 					
@@ -164,9 +161,10 @@ ViewBase {
 		
 		Loader{
 			id: loaderTableDecorator;
+			sourceComponent: Style.collectionTableDecorator;
 			
 			property bool compl: false;
-			sourceComponent: Style.collectionTableDecorator;
+			
 			onLoaded: {
 				if(loaderTableDecorator.item){
 					loaderTableDecorator.compl = true;
@@ -176,30 +174,26 @@ ViewBase {
 		
 		Table {
 			id: tableInternal;
-			
 			anchors.left: parent.left;
 			anchors.right: tableRightPanel.left;
 			anchors.top: parent.top;
 			anchors.bottom: parent.bottom;
-			
 			hasFilter: collectionViewBaseContainer.hasFilter;
 			hasSort: collectionViewBaseContainer.hasSort;
 			scrollbarVisible: false;
-			
 			canSetBorderParams: true;
 			canSetBorderParams_deleg: true;
-			property real minWidth: 1000000;
-			property bool headersCompl: false;
-			
 			canMoveColumns: true;
-			
 			scrollbarRightMargin: collectionViewBaseContainer.hasFilter ? -20 : 0;
 			verticalBorderHeight: headerHeight / 2;
 			verticalBorderSize: 1;
 			visibleLeftBorderFirst: false;
 			borderColorVertical: Style.borderColor;
 			
+			property real minWidth: 1000000;
+			property bool headersCompl: false;
 			property bool selectionBlock: false
+			
 			onSelectionChanged: {
 				if (selectionBlock){
 					return
@@ -272,32 +266,24 @@ ViewBase {
 		
 		Item {
 			id: tableRightPanel;
-			
 			anchors.top: parent.top;
 			anchors.right: parent.right;
 			anchors.bottom: parent.bottom;
-			
 			width: collectionViewBaseContainer.hasFilter ? 35 : 0;
-			
 			visible: tableInternal.width > 0;
 			
 			Item {
 				id: filterItem;
-				
 				anchors.top: parent.top;
-				
 				width: parent.width;
 				height: tableInternal.headerHeight;
+
 				ToolButton {
 					id: iconFilter;
-					
 					anchors.centerIn: parent;
-					
 					width: Style.buttonWidthMedium;
 					height: width;
-					
 					visible: collectionViewBaseContainer.hasFilter;
-					
 					iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
 					
 					onClicked: {
@@ -325,33 +311,24 @@ ViewBase {
 	
 	Loading {
 		id: loading_;
-		
 		anchors.fill: backgroundTable;
-		
 		color: Style.baseColor;
-		
 		visible: false;
 	}
 	
 	Rectangle {
 		id: paginationObj;
-		
 		anchors.bottom: parent.bottom;
 		anchors.horizontalCenter: parent.horizontalCenter;
-		
 		width: parent.width;
 		height: collectionViewBaseContainer.hasPagination ? 30: 0;
-		
 		color: pagination_.color;
 		
 		Pagination {
 			id: pagination_;
-			
 			anchors.horizontalCenter: parent.horizontalCenter;
 			anchors.verticalCenter: parent.verticalCenter;
-			
 			pagesSize: 1;
-			
 			visible: collectionViewBaseContainer.hasPagination /*&& pagesSize > 1*/;
 
 			onCurrentIndexChanged: {

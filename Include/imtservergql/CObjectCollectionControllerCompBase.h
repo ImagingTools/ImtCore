@@ -36,6 +36,7 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
 		I_ASSIGN_MULTI_0(m_replaceableFieldsAttrPtr, "ReplaceableFilterFields", "List of filter fields to be replaced", false);
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
+		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
@@ -77,7 +78,11 @@ public:
 				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	
+	virtual sdl::imtbase::ImtCollection::CRemoveElementSetPayload OnRemoveElementSet(
+				const sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest& removeElementSetRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
@@ -202,6 +207,7 @@ protected:
 	QMap<QByteArray, QByteArray> m_fieldReplacementMap;
 
 protected:
+	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);
 	I_MULTIATTR(QByteArray, m_replacementFieldsAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);

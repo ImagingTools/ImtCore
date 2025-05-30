@@ -84,6 +84,14 @@ public:
 				const imtbase::IOperationContext* operationContextPtr) const = 0;
 
 	/**
+		Create query for the deletion of the object from the database using the passed filter.
+	*/
+	virtual QByteArray CreateDeleteObjectSetQuery(
+				const imtbase::IObjectCollection& collection,
+				const iprm::IParamsSet* paramsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
+
+	/**
 		Create query for the update an existing object in the collection.
 	*/
 	virtual QByteArray CreateUpdateObjectQuery(
