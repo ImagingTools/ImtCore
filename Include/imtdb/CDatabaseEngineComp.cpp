@@ -22,18 +22,30 @@ CDatabaseEngineComp::CDatabaseEngineComp()
 
 bool CDatabaseEngineComp::BeginTransaction() const
 {
+	if (!EnsureDatabaseConnected()){
+		return false;
+	}
+
 	return QSqlDatabase::database(GetConnectionName()).transaction();
 }
 
 
 bool CDatabaseEngineComp::FinishTransaction() const
 {
+	if (!EnsureDatabaseConnected()){
+		return false;
+	}
+
 	return QSqlDatabase::database(GetConnectionName()).commit();
 }
 
 
 bool CDatabaseEngineComp::CancelTransaction() const
 {
+	if (!EnsureDatabaseConnected()){
+		return false;
+	}
+
 	return QSqlDatabase::database(GetConnectionName()).rollback();
 }
 
@@ -51,25 +63,27 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 	retVal.setForwardOnly(isForwardOnly);
 
 	bool success = retVal.exec(queryString);
+	const QSqlError queryError = retVal.lastError();
 	if (!success){
 		if (sqlErrorPtr != nullptr){
-			*sqlErrorPtr = retVal.lastError();
+			*sqlErrorPtr = queryError;
 		}
 
-		SendErrorMessage(0, QT_TR_NOOP(QString("Database query failed: '%1'").arg(retVal.lastError().text())), "Database engine");
+		SendErrorMessage(0, QStringLiteral("Database query failed: '%1'").arg(queryError.text()), __FILE__);
 
 		return QSqlQuery();
 	}
-	
-	if (sqlErrorPtr != nullptr){
-		*sqlErrorPtr = databaseConnection.lastError().type() != QSqlError::NoError ? databaseConnection.lastError() : retVal.lastError();
+
+	const QSqlError dbError = databaseConnection.lastError();
+	if (sqlErrorPtr != nullptr) {
+		*sqlErrorPtr = dbError.type() != QSqlError::NoError ? dbError : queryError;
 	}
 
-	if ((databaseConnection.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
+	if (dbError.type() != QSqlError::NoError || queryError.type() != QSqlError::NoError) {
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what() sqlError Occured"
-					<< "\n\t| Database error" << databaseConnection.lastError().text()
-					<< "\n\t| Query error" << retVal.lastError().text()
+					<< "\n\t| Database error" << dbError.text()
+					<< "\n\t| Query error" << queryError.text()
 					<< "\n\t| Executed query" << queryString;
 	}
 
@@ -88,7 +102,6 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 	QSqlQuery retVal(databaseConnection);
 
 	retVal.setForwardOnly(isForwardOnly);
-
 	retVal.prepare(queryString);
 
 	for(auto value = bindValues.cbegin(); value != bindValues.cend(); ++ value){
@@ -97,19 +110,21 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 
 	retVal.exec();
 
+	const QSqlError queryError = retVal.lastError();
+	const QSqlError dbError = databaseConnection.lastError();
 	if (sqlError){
-		*sqlError = databaseConnection.lastError().type() ? databaseConnection.lastError() : retVal.lastError();
+		*sqlError = dbError.type() ? dbError : queryError;
 	}
 
-	if ((databaseConnection.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
+	if ((dbError.type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
 		qCritical() << __FILE__ << __LINE__
 					<< "\n\t| what(): sqlError Occured"
-					<< "\n\t| Database error" << databaseConnection.lastError().text()
-					<< "\n\t| Query error" << retVal.lastError().text()
+					<< "\n\t| Database error" << dbError.text()
+					<< "\n\t| Query error" << queryError.text()
 					<< "\n\t| Executed query" << queryString
 					<< "\n\t| Bind Values" << bindValues
 					<< "\n\t| Bound Values" << retVal.boundValues()
-					<< "\n\t| Executed query" << ::qPrintable(retVal.executedQuery());
+					<< "\n\t| Executed query" << retVal.executedQuery();
 	}
 
 	return retVal;
@@ -195,7 +210,7 @@ void CDatabaseEngineComp::DrectBindValue(QByteArray* string, const QByteArray& w
 
 void CDatabaseEngineComp::DrectBindValueInsertDefault(QByteArray* string, const QByteArray& what)
 {
-	CDatabaseEngineComp::DrectBindValue(string, what, " DEFAULT ");
+	CDatabaseEngineComp::DrectBindValue(string, what, QByteArrayLiteral(" DEFAULT "));
 }
 
 
@@ -247,7 +262,7 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 	if (flags & DCF_CREATE_DATABASE){
 		retVal = CreateDatabaseInstance();
 
-		rollbackQuery = QString("DROP DATABASE %1").arg(GetDatabaseName());
+		rollbackQuery = QStringLiteral("DROP DATABASE %1").arg(GetDatabaseName());
 	}
 
 	if (retVal){
@@ -256,27 +271,28 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 
 		// Open the database
 		retVal = databaseConnection.open();
-		if (retVal){
-			if (flags & DCF_CREATE_DATABASE_META){
-				retVal = CreateDatabaseMetaInfo();
-				if (!retVal && !rollbackQuery.isEmpty()){
-					// If the creation of the revision tables was failed, remove newly created database:
-					ExecSqlQuery(rollbackQuery.toUtf8());
-				}
-			}
+		if (!retVal){
+			SendErrorMessage(0, QStringLiteral("\n\t| Database could not be connected""\n\t| Error: %1").arg(databaseConnection.lastError().text()));
 
-			if (flags & DCF_EXECUTE_PATCHES){
-				if (retVal && (*m_autoCreateTablesAttrPtr > 0)){
-					retVal = ExecuteDatabasePatches();
-					if (!retVal && !rollbackQuery.isEmpty()){
-						// If the execution of patches was failed, remove newly created database:
-						ExecSqlQuery(rollbackQuery.toLocal8Bit());
-					}
-				}
+			return retVal;
+		}
+
+		if (flags & DCF_CREATE_DATABASE_META){
+			retVal = CreateDatabaseMetaInfo();
+			if (!retVal && !rollbackQuery.isEmpty()){
+				// If the creation of the revision tables was failed, remove newly created database:
+				ExecSqlQuery(rollbackQuery.toUtf8());
 			}
 		}
-		else {
-			SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Database could not be connected""\n\t| Error: %1").arg(databaseConnection.lastError().text())));
+
+		if (flags & DCF_EXECUTE_PATCHES){
+			if (retVal && (*m_autoCreateTablesAttrPtr > 0)){
+				retVal = ExecuteDatabasePatches();
+				if (!retVal && !rollbackQuery.isEmpty()){
+					// If the execution of patches was failed, remove newly created database:
+					ExecSqlQuery(rollbackQuery.toLocal8Bit());
+				}
+			}
 		}
 	}
 
@@ -286,36 +302,37 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 
 bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 {
+	if (!m_migrationControllerCompPtr.IsValid()){
+		return false;
+	}
+
+	int newRevision;
 	int databaseVersion = GetDatabaseVersion();
-	bool retVal = false;
 
-	if (m_migrationControllerCompPtr.IsValid()){
-		BeginTransaction();
+	BeginTransaction();
 
-		int newRevision;
-		retVal = m_migrationControllerCompPtr->DoMigration(newRevision, istd::CIntRange(databaseVersion + 1, -1));
-		if (!retVal){
+	bool retVal = m_migrationControllerCompPtr->DoMigration(newRevision, istd::CIntRange(databaseVersion + 1, -1));
+	if (!retVal){
+		CancelTransaction();
+
+		return false;
+	}
+	else if (newRevision >= 0){
+		// Set max revision to database
+		QSqlError sqlError;
+		QVariantMap valuesRevision({ {QStringLiteral(":Revision"), newRevision} });
+		ExecSqlQueryFromFile(QStringLiteral(":/SQL/SetRevision.sql"), valuesRevision, &sqlError);
+
+		if (sqlError.type() != QSqlError::NoError){
+			SendErrorMessage(0, QStringLiteral("Execution of SetRevision.sql failed: '%1'").arg(sqlError.text()), __FILE__);
+
 			CancelTransaction();
-		}
-		else{
-			if (newRevision >= 0){
-				// Set max revision to database
-				QSqlError sqlError;
-				QVariantMap valuesRevision;
-				valuesRevision.insert(":Revision", newRevision);
-				ExecSqlQueryFromFile(":/SQL/SetRevision.sql", valuesRevision, &sqlError);
-				if (sqlError.type() != QSqlError::NoError){
-					SendErrorMessage(0, QString("Execution of SetRevision.sql failed: '%1'").arg(sqlError.text()), "CDatabaseEngineComp");
 
-					CancelTransaction();
-
-					return false;
-				}
-			}
-
-			FinishTransaction();
+			return false;
 		}
 	}
+
+	FinishTransaction();
 
 	return retVal;
 }
@@ -341,9 +358,9 @@ QSqlDatabase CDatabaseEngineComp::InitDatabase(QByteArray databaseDriverTypeId) 
 	databaseConnection.setConnectOptions(GetConnectionOptionsString(databaseDriverTypeId));
 
 	QString databaseName = GetDatabaseName();
-	if (databaseDriverTypeId.compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
+	if (databaseDriverTypeId.compare(QByteArrayLiteral("QODBC"), Qt::CaseInsensitive) == 0){
 	}
-	else if (databaseDriverTypeId.compare(QByteArray("QSQLITE"), Qt::CaseInsensitive) == 0){
+	else if (databaseDriverTypeId.compare(QByteArrayLiteral("QSQLITE"), Qt::CaseInsensitive) == 0){
 		databaseName = GetDatabasePath();
 	}
 	else{
@@ -398,7 +415,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 						<< "\n\t| Unable to open database"
 						<< "\n\t| Error: " << databaseConnection.lastError().text();
 
-			SendErrorMessage(0, QT_TR_NOOP(QString("Database '%1' could not be connected").arg(GetDatabaseName())), "Database engine");
+			SendErrorMessage(0, QStringLiteral("Database '%1' could not be connected").arg(GetDatabaseName()), __FILE__);
 		}
 	}
 
@@ -422,7 +439,7 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 			}
 		}
 		else{
-			SendErrorMessage(0, QT_TR_NOOP(QString("Database server could not be connected: %1").arg(errorMessage)), "Database Engine");
+			SendErrorMessage(0, QStringLiteral("Database server could not be connected: %1").arg(errorMessage), __FILE__);
 
 			return false;
 		}
@@ -475,48 +492,47 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 	maintainanceDb.setPort(GetPort());
 
 	retVal = maintainanceDb.open();
-	if (retVal){
-		QFile scriptFile(":/SQL/CreateDatabase.sql");
-		if (!scriptFile.open(QFile::ReadOnly)){
-			SendErrorMessage(0, QT_TR_NOOP(QString("Database creation script '%1'could not be loaded").arg(scriptFile.fileName())));
+	if (!retVal){
+		SendErrorMessage(0, QStringLiteral("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
 
-			return false;
-		}
-
-		QString createDatabaseQuery = scriptFile.readAll();
-		createDatabaseQuery.replace(":DatabaseName", GetDatabaseName());
-
-		maintainanceDb.exec(createDatabaseQuery);
-
-		QSqlError sqlError = maintainanceDb.lastError();
-
-		retVal = bool(sqlError.type() == QSqlError::ErrorType::NoError);
-		if (!retVal){
-			qCritical() << __FILE__ << __LINE__
-						<< "\n\t| Database could not be created"
-						<< "\n\t| Error: " << sqlError
-						<< "\n\t| Query: " << createDatabaseQuery;
-
-			SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Database could not be created"
-										"\n\t| Error: %1"
-										"\n\t| Query: %2")
-									.arg(sqlError.text())
-									.arg(createDatabaseQuery)));
-
-		}
-
-		maintainanceDb.close();
-
-		// Close connection to the service database:
-		QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
-
-		return retVal;
-	}
-	else {
-		SendErrorMessage(0, QT_TR_NOOP(QString("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text())));
+		return false;
 	}
 
-	return false;
+	QFile scriptFile(QStringLiteral(":/SQL/CreateDatabase.sql"));
+	if (!scriptFile.open(QFile::ReadOnly)){
+		SendErrorMessage(0, QStringLiteral("Database creation script '%1'could not be loaded").arg(scriptFile.fileName()));
+
+		return false;
+	}
+
+	QString createDatabaseQuery = scriptFile.readAll();
+	createDatabaseQuery.replace(QStringLiteral(":DatabaseName"), GetDatabaseName());
+
+	QSqlQuery createDbQuery;
+	createDbQuery.exec(createDatabaseQuery);
+
+	QSqlError sqlError = createDbQuery.lastError();
+	retVal = bool(sqlError.type() == QSqlError::ErrorType::NoError);
+	if (!retVal){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| Database could not be created"
+					<< "\n\t| Error: " << sqlError
+					<< "\n\t| Query: " << createDatabaseQuery;
+
+		SendErrorMessage(0,  QStringLiteral("\n\t| Database could not be created"
+											"\n\t| Error: %1"
+											"\n\t| Query: %2")
+								.arg(sqlError.text())
+								.arg(createDatabaseQuery));
+
+	}
+
+	maintainanceDb.close();
+
+	// Close connection to the service database:
+	QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
+
+	return retVal;
 }
 
 
@@ -525,9 +541,9 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 	QSqlError sqlError;
 
 	// Create revision table in the database:
-	ExecSqlQueryFromFile(":/SQL/CreateRevision.sql", &sqlError);
+	ExecSqlQueryFromFile(QStringLiteral(":/SQL/CreateRevision.sql"), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
-		SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text())));
+		SendErrorMessage(0, QStringLiteral("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
 
 		return false;
 	}
@@ -538,9 +554,9 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 
 QString CDatabaseEngineComp::GetConnectionName() const
 {
-	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
+	quintptr threadId = reinterpret_cast<quintptr>(QThread::currentThreadId());
 
-	return GetDatabaseName() + QString(" - %1").arg(threadId);
+	return GetDatabaseName() + QStringLiteral(" - %1").arg(threadId);
 }
 
 
@@ -579,7 +595,7 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 
 bool CDatabaseEngineComp::IsSslConnectionRequired() const
 {
-	if (m_databaseAccessSettingsCompPtr.IsValid()){
+	if (!m_databaseAccessSettingsCompPtr.IsValid()){
 		return m_databaseAccessSettingsCompPtr->GetConnectionFlags() & IDatabaseLoginSettings::COF_SSL;
 	}
 
@@ -630,16 +646,13 @@ QString CDatabaseEngineComp::GetPassword() const
 int CDatabaseEngineComp::GetDatabaseVersion() const
 {
 	QSqlError sqlError;
-	QSqlQuery queryGetRevision = ExecSqlQueryFromFile(":/SQL/GetRevision.sql", &sqlError);
+	QSqlQuery queryGetRevision = ExecSqlQueryFromFile(QStringLiteral(":/SQL/GetRevision.sql"), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		return -1;
 	}
-	else{
-		if (queryGetRevision.next()){
-			return queryGetRevision.value(0).toInt();
-		}
 
-		return -1;
+	if (queryGetRevision.next()){
+		return queryGetRevision.value(0).toInt();
 	}
 
 	return -1;
@@ -648,16 +661,15 @@ int CDatabaseEngineComp::GetDatabaseVersion() const
 
 QString CDatabaseEngineComp::GetConnectionOptionsString(const QByteArray& databaseDriverId) const
 {
-	QString retVal;
+	if (!m_databaseAccessSettingsCompPtr.IsValid()){
+		return QString();
+	}
 
-	if (m_databaseAccessSettingsCompPtr.IsValid()){
-		int flags = m_databaseAccessSettingsCompPtr->GetConnectionFlags();
-		if (flags > 0){
-			if (databaseDriverId == "PSQL"){
-				if (flags & imtdb::IDatabaseLoginSettings::COF_SSL){
-					retVal += "requiressl=1";
-				}
-			}
+	QString retVal;
+	int flags = m_databaseAccessSettingsCompPtr->GetConnectionFlags();
+	if (flags > 0){
+		if (databaseDriverId == QStringLiteral("PSQL") && (flags & imtdb::IDatabaseLoginSettings::COF_SSL)){
+			retVal += QStringLiteral("requiressl=1");
 		}
 	}
 
@@ -665,7 +677,7 @@ QString CDatabaseEngineComp::GetConnectionOptionsString(const QByteArray& databa
 }
 
 
-bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
+bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 {
 	BeginTransaction();
 
@@ -674,21 +686,22 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
 	for (const char* ch = sqlQuery.begin(); ch != sqlQuery.end(); ch++){
 		if (*ch != ';'){
 			singleQuery.append(*ch);
+
+			continue;
 		}
-		else {
-			if (!singleQuery.isEmpty()){
-				QSqlError error;
-				ExecSqlQuery(singleQuery, &error);
-				if (error.type() != QSqlError::NoError){
-					SendErrorMessage(0, error.text(), "Database collection");
 
-					CancelTransaction();
+		if (!singleQuery.isEmpty()){
+			QSqlError error;
+			ExecSqlQuery(singleQuery, &error);
+			if (error.type() != QSqlError::NoError){
+				SendErrorMessage(0, error.text(), __FILE__);
 
-					return false;
-				}
+				CancelTransaction();
 
-				singleQuery.clear();
+				return false;
 			}
+
+			singleQuery.clear();
 		}
 	}
 
@@ -696,7 +709,7 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
 		QSqlError error;
 		ExecSqlQuery(singleQuery, &error);
 		if (error.type() != QSqlError::NoError){
-			SendErrorMessage(0, error.text(), "Database collection");
+			SendErrorMessage(0, error.text(), __FILE__);
 
 			CancelTransaction();
 
