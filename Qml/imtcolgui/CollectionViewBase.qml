@@ -72,11 +72,11 @@ ViewBase {
 	FilterMenu {
 		id: filterMenu_;
 		anchors.top: parent.top;
-		anchors.topMargin: Style.sizeMainMargin;
+		anchors.topMargin: Style.marginM;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeMainMargin;
+		anchors.leftMargin: Style.marginM;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.sizeMainMargin;
+		anchors.rightMargin: Style.marginM;
 		complexFilter: collectionViewBaseContainer.collectionFilter;
 		
 		onClose: {
@@ -101,7 +101,7 @@ ViewBase {
 		id: backgroundTable;
 		anchors.top: filterMenu_.visible ? filterMenu_.bottom: parent.top;
 		anchors.left: parent.left;
-		anchors.topMargin: filterMenu_.visible ? Style.sizeMainMargin : 0;
+		anchors.topMargin: filterMenu_.visible ? Style.marginM : 0;
 		anchors.bottom: paginationObj.top;
 		width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
 		color: Style.baseColor;
@@ -281,7 +281,7 @@ ViewBase {
 				ToolButton {
 					id: iconFilter;
 					anchors.centerIn: parent;
-					width: Style.buttonWidthMedium;
+					width: Style.buttonWidthM;
 					height: width;
 					visible: collectionViewBaseContainer.hasFilter;
 					iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
@@ -321,7 +321,7 @@ ViewBase {
 		anchors.bottom: parent.bottom;
 		anchors.horizontalCenter: parent.horizontalCenter;
 		width: parent.width;
-		height: collectionViewBaseContainer.hasPagination ? 30: 0;
+		height: collectionViewBaseContainer.hasPagination ? Style.controlHeightM: 0;
 		color: pagination_.color;
 		
 		Pagination {

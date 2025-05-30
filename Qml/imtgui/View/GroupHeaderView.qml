@@ -18,7 +18,7 @@ Rectangle {
 	property alias titleText: titleText_;
 	property int topPadding: 0
 	property int leftPadding: 0
-	property int rightPadding: Style.sizeMainMargin
+	property int rightPadding: Style.marginM
 	property int bottomPadding: 0
 	property Component controlComp: baseControlComp
 	
@@ -72,7 +72,7 @@ Rectangle {
 			anchors.right: parent.right;
 			anchors.rightMargin: root.rightPadding;
 			
-			height: 22;
+			height: Style.buttonHeightS;
 			width: height;
 			visible: root.groupView != null
 			
@@ -96,7 +96,7 @@ Rectangle {
 		
 		color: Style.textColor;
 		font.family: Style.fontFamilyBold;
-		font.pixelSize: Style.fontSizeXXLarge;
+		font.pixelSize: Style.fontSizeXXL;
 	}
 }
 

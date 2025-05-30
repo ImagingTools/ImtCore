@@ -13,32 +13,32 @@ Dialog {
 	property bool hiddenBackground: true;
 	property bool noMouseArea: true;
 
-	x: ModalDialogManager.activeView.width - contentWidth - Style.sizeMainMargin;
-	y: ModalDialogManager.activeView.height - height - Style.sizeMainMargin;
+	x: ModalDialogManager.activeView.width - contentWidth - Style.marginM;
+	y: ModalDialogManager.activeView.height - height - Style.marginM;
 
 	property string text: "";
-	property int contentWidth: 300;
+	property int contentWidth: Style.sizeHintXS;
 
 	topPanelComp: Component{TopPanelDialog{canClose: false}}
 
 	contentComp: Component{ Rectangle{
 			width: message.contentWidth;
-			height: messageText.height + Style.sizeLargeMargin;
+			height: messageText.height + Style.marginXL;
 
 			color: "transparent";
 
-			radius: 4;
+			radius: Style.radiusM;
 			//border.color: Style.backgroundColor2;
 
 			Text {
 				id: messageText;
 
 				anchors.horizontalCenter: parent.horizontalCenter;
-				width: parent.width - 40;
+				width: parent.width - 2*Style.marginL;
 
 				text: message.text;
 
-				font.pixelSize: Style.fontSizeLarge;
+				font.pixelSize: Style.fontSizeL;
 				font.family: Style.fontFamily;
 				color: Style.textColor;
 				wrapMode: Text.WordWrap;

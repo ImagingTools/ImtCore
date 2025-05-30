@@ -7,12 +7,12 @@ import imtcontrols 1.0
 Rectangle {
     id: alertMessage;
 
-    width: 500;
-    height: 40;
+	width: Style.sizeHintL;
+	height: Style.controlHeightL;
 
     color: "#f9dedc";
 
-    property int margin: 10;
+	property int margin: Style.marginM;
     property string message: "";
     property string colorText: Style.textColor;
     property string iconSource: "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal);
@@ -24,8 +24,8 @@ Rectangle {
         anchors.leftMargin: alertMessage.margin;
         anchors.verticalCenter: parent.verticalCenter;
 
-        width: 20;
-        height: 20;
+		width: Style.iconSizeM;
+		height: width;
 
         sourceSize.height: height;
         sourceSize.width: width;

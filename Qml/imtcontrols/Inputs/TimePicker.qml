@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Item {
     id: root;
 
-    height: 100;
+	height: Style.sizeHintBXS;
     width: row.width;
 
     property int hours: 0;
@@ -98,14 +98,14 @@ Item {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeM;
             }
 
             Spinner {
                 id: hours;
 
                 anchors.top: hoursTitle.bottom;
-                anchors.topMargin: 5;
+				anchors.topMargin: Style.marginXS;
 
                 onCurrentValueChanged: {
                     root.hours = hours.currentValue;
@@ -124,14 +124,14 @@ Item {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeM;
             }
 
             Spinner {
                 id: minutes;
 
                 anchors.top: minutesTitle.bottom;
-                anchors.topMargin: 5;
+				anchors.topMargin: Style.marginXS;
 
                 onCurrentValueChanged: {
                     root.minutes = minutes.currentValue;

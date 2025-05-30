@@ -29,7 +29,7 @@ ViewCommandsDelegateBase {
 	property alias exportFileDialog: fileDialogSave;
 	property alias setDescriptionDialogComp: setDescriptionDialog;
 	
-	property int exportContextMenuWidth: 300
+	property int exportContextMenuWidth: Style.sizeHintXS
 
 	property string importObjectTypeId;
 
@@ -585,7 +585,7 @@ ViewCommandsDelegateBase {
 		id: setDescriptionDialog;
 
 		ImtControls.InputDialog {
-			width: 300;
+			width: Style.sizeHintXS;
 			title: qsTr("Set description");
 			placeHolderText: qsTr("Enter the description")
 			onFinished: {
@@ -629,7 +629,7 @@ ViewCommandsDelegateBase {
 	Component {
 		id: removeDialog;
 		ImtControls.MessageDialog {
-			width: 400;
+			width: Style.sizeHintM;
 			title: collectionViewCommandsDelegate.removeDialogTitle;
 			message: collectionViewCommandsDelegate.removeMessage;
 			onFinished: {

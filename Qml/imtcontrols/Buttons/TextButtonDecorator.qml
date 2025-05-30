@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Item {
     id: commonButtonDecorator;
 
-    width: textObj.width + Style.paddingSmall * 3;
+    width: textObj.width + Style.paddingS * 3;
     height: 25;
 
     property var baseButton;
@@ -36,11 +36,11 @@ Item {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
-            anchors.leftMargin: commonButtonDecorator.baseButton.imageSource ? Style.paddingSmall : commonButtonDecorator.baseButton.width/2 - width/2;
+            anchors.leftMargin: commonButtonDecorator.baseButton.imageSource ? Style.paddingS : commonButtonDecorator.baseButton.width/2 - width/2;
 
             color: commonButtonDecorator.baseButton.enabled ? Style.textColor : Style.inactiveTextColor;
 
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
             font.family: Style.fontFamily;
 
             text: commonButtonDecorator.baseButton.text;

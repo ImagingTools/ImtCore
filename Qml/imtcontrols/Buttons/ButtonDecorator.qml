@@ -6,22 +6,22 @@ import imtcontrols 1.0
 DecoratorBase {
 	id: commonButtonDecorator
 
-	width: Math.max(contentWidth + Style.sizeMainMargin * 2, widthDefault)
-	height: Style.buttonHeight;
+	width: Math.max(contentWidth + Style.marginM * 2, widthDefault)
+	height: Style.buttonHeightM;
 
 	clip: true;
 
-	property int maxTextWidth: 200;
-	property int minTextWidth: 20;
-	property int contentSpacing: Style.sizeMainMargin;
-	property int contentLeftMargin: Style.sizeMainMargin;
+	property int maxTextWidth: Style.sizeHintXXS;
+	property int minTextWidth: Style.controlHeightS;
+	property int contentSpacing: Style.marginM;
+	property int contentLeftMargin: Style.marginM;
 	property alias contentWidth: content.width;
 
 	property int widthDefault: 0;
 	property alias icon: iconObj
 	property alias font: textObj.font
 	property string fontFamily: (baseElement && baseElement.font && baseElement.fontFamily) ? baseElement.font.fontFamily : Style.fontFamily
-	property int fontSize:  (baseElement && baseElement.font) ? baseElement.font.pixelSize : Style.fontSizeNormal
+	property int fontSize:  (baseElement && baseElement.font) ? baseElement.font.pixelSize : Style.fontSizeM
 	property alias textColor: textObj.color
 	property alias color: background.color
 	property alias radius: background.radius
@@ -31,7 +31,7 @@ DecoratorBase {
 
 	property bool contentCentered: true;
 	property bool textIsCropped: textObj.text !== "" && helperText.width > textObj.width;
-	property real maxContentWidth: helperText.width + 2*Style.sizeMainMargin;
+	property real maxContentWidth: helperText.width + 2*Style.marginM;
 
 	property string tooltipText: baseElement && baseElement.tooltipText !== "" ? baseElement.tooltipText : (textIsCropped ? textObj.text : "");
 	property bool enabled: baseElement ? baseElement.enabled : false;
@@ -111,7 +111,7 @@ DecoratorBase {
 		anchors.verticalCenter: commonButtonDecorator.verticalCenter;
 		anchors.horizontalCenter: commonButtonDecorator.horizontalCenter;
 
-		width: iconObj.width + textItem.width + Style.sizeMainMargin;
+		width: iconObj.width + textItem.width + Style.marginM;
 		height: Math.max(iconObj.height, textItem.height)
 
 
@@ -123,7 +123,7 @@ DecoratorBase {
 
 			width: (!visible || !commonButtonDecorator.baseElement) ? 0 :
 																	  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.width !== 0) ?
-																	  commonButtonDecorator.baseElement.icon.width : Style.iconSizeSmall
+																	  commonButtonDecorator.baseElement.icon.width : Style.iconSizeS
 
 			height: !commonButtonDecorator.baseElement ? 0 :
 														 (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.height !== 0) ?
@@ -148,7 +148,7 @@ DecoratorBase {
 			anchors.left: iconObj && iconObj.visible ? iconObj.right : undefined;
 			anchors.leftMargin: iconObj && iconObj.visible ? commonButtonDecorator.contentSpacing : 0;
 
-			width: visible ? helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth : helperText.width : -Style.sizeMainMargin;
+			width: visible ? helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth : helperText.width : -Style.marginM;
 			height: textObj.height;
 
 			visible: textObj.text !== "";
@@ -193,7 +193,7 @@ DecoratorBase {
 
 		text: commonButtonDecorator.tooltipText;
 		fitToTextWidth: false;
-		componentMinHeight: 30;
+		componentMinHeight: Style.controlHeightM;
 
 		fitToHCenter: true;
 

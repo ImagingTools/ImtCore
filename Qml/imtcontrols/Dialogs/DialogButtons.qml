@@ -8,7 +8,7 @@ Item {
     id: buttonsDialogContainer;
 
     width: rowButtons.width;
-    height: 30;
+	height: Style.controlHeightM;
 
     property alias buttons: buttonsRepeater.model;
     property int count: buttonsRepeater.count;
@@ -47,7 +47,7 @@ Item {
     Row {
         id: rowButtons;
         height: buttonsDialogContainer.height;
-        spacing: Style.sizeMainMargin;
+        spacing: Style.marginM;
 
         Repeater {
             id: buttonsRepeater;

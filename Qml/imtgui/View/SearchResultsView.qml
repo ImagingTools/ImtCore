@@ -9,7 +9,7 @@ Item {
 	id: root;
 	
 	property SearchResults searchResults;
-	property int contentWidth: 700;
+	property int contentWidth: Style.sizeHintXXL;
 	
 	signal itemDoubleClicked(int tabIndex, int itemIndex);
 	signal selectionChanged(var selection);
@@ -23,8 +23,8 @@ Item {
 	}
 	
 	function checkWidth(){
-		if (width - 2 * Style.sizeMainMargin <= root.contentWidth){
-			table.width = width - 2 * Style.sizeMainMargin;
+		if (width - 2 * Style.marginM <= root.contentWidth){
+			table.width = width - 2 * Style.marginM;
 		}
 		else{
 			table.width = root.contentWidth;
@@ -73,11 +73,11 @@ Item {
 	TabPanel {
 		id: tabPanel;
 		anchors.top: parent.top;
-		anchors.topMargin: Style.sizeMainMargin;
+		anchors.topMargin: Style.marginM;
 		anchors.horizontalCenter: parent.horizontalCenter;
-		height: 30;
+		height: Style.controlHeightM;
 		visible: false;
-		spacing: Style.sizeMainMargin;
+		spacing: Style.marginM;
 		color: Style.backgroundColor2;
 		selectedIndex: -1;
 		onSelectedIndexChanged: {
@@ -92,13 +92,13 @@ Item {
 			DecoratorBase {
 				id: tabPanelDecorator;
 				
-				width: content.width + 2 * Style.sizeMainMargin;
-				height: baseElement ? baseElement.height : 50
+				width: content.width + 2 * Style.marginM;
+				height: baseElement ? baseElement.height : Style.headerHeight
 				
 				Rectangle {
 					anchors.fill: tabPanelDecorator;
 					color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.selectedColor: "transparent";
-					radius: 15;
+					radius: Style.radiusXL;
 					border.width: 1;
 					border.color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.iconColorOnSelected: Style.borderColor;
 				}
@@ -107,14 +107,14 @@ Item {
 					id: content;
 					anchors.centerIn: tabPanelDecorator;
 					height: tabPanelDecorator.height;
-					spacing: Style.sizeMainMargin;
+					spacing: Style.marginM;
 					
 					Text {
 						id: text;
 						anchors.verticalCenter: content.verticalCenter;
 						color: Style.textColor;
 						font.family: Style.fontFamily;
-						font.pixelSize: Style.fontSizeNormal;
+						font.pixelSize: Style.fontSizeM;
 						text: model.item.m_name;
 						elide: Text.ElideRight;
 					}
@@ -126,7 +126,7 @@ Item {
 	Rectangle {
 		id: separator;
 		anchors.top: tabPanel.bottom;
-		anchors.topMargin: Style.sizeMainMargin;
+		anchors.topMargin: Style.marginM;
 		width: parent.width;
 		height: 1;
 		color: Style.borderColor;
@@ -135,22 +135,22 @@ Item {
 	Table {
 		id: table;
 		anchors.top: separator.bottom;
-		anchors.topMargin: Style.sizeMainMargin;
+		anchors.topMargin: Style.marginM;
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.sizeMainMargin;
+		anchors.bottomMargin: Style.marginM;
 		anchors.horizontalCenter: parent.horizontalCenter;
 		width: root.contentWidth;
 		visible: tabPanel.visible;
 		showHeaders: false;
 		backgroundElementsColor: Style.backgroundColor2;
-		elementsSpacing: Style.sizeMainMargin;
+		elementsSpacing: Style.marginM;
 		enableAlternating: false;
 		itemHeight: 70;
 		rowDelegate: Component {
 			TableRowDelegateBase {
 				id: tableDelegate;
 				tableItem: table
-				width: table.elementsListWidth - Style.sizeMainMargin;
+				width: table.elementsListWidth - Style.marginM;
 				height: elementView.height;
 				selectedOpacity: 0;
 				hoverOpacity: 0;
@@ -167,7 +167,7 @@ Item {
 					Component {
 						id: button;
 						ToolButton {
-							width: 20;
+							width: Style.buttonWidthS;
 							height: width;
 							iconSource: "../../../" + Style.getIconPath("Icons/ExternalLink", Icon.State.On, Icon.Mode.Normal);
 							tooltipText: qsTr("Go to the content");

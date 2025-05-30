@@ -6,7 +6,7 @@ import imtcontrols 1.0
 
 Column {
 	id: root;
-	spacing: Style.sizeLargeMargin;
+	spacing: Style.marginXL;
 	property alias oldPassword: currentPasswordInput.text;
 	property alias newPassword: newPasswordInput1.text;
 	property bool accepted: false;
@@ -43,7 +43,7 @@ Column {
 			text: qsTr("Passwords don't match");
 			color: Style.errorTextColor;
 			font.family: Style.fontFamily;
-			font.pixelSize: Style.fontSizeNormal;
+			font.pixelSize: Style.fontSizeM;
 		}
 	}
 	

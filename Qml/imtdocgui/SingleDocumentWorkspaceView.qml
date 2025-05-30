@@ -143,7 +143,7 @@ Rectangle {
 		id: buttonPanel;
 		anchors.top: parent.top;
 		anchors.left: parent.left;
-		anchors.leftMargin: visible ? Style.sizeMainMargin : 0;
+		anchors.leftMargin: visible ? Style.marginM : 0;
 		width: visible ? closeButton.width: 0;
 		height: headersListView.height;
 		visible: headersModel.count > 1;
@@ -151,7 +151,7 @@ Rectangle {
 		ToolButton {
 			id: closeButton;
 			anchors.centerIn: buttonPanel;
-			width: visible ? 25: 0;
+			width: visible ? Style.buttonWidthM: 0;
 			height: width;
 			iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
 			onClicked: {
@@ -209,9 +209,9 @@ Rectangle {
 		id: headersListView;
 		anchors.top: parent.top;
 		anchors.left: buttonPanel.right;
-		anchors.leftMargin: Style.sizeMainMargin;
+		anchors.leftMargin: Style.marginM;
 		anchors.right: parent.right;
-		height: visible ? 40 : 0;
+		height: visible ? Style.controlHeightL : 0;
 		orientation: ListView.Horizontal;
 		boundsBehavior: Flickable.StopAtBounds;
 		visible: count === 1 && !root.initialItemTitleVisible ? false : true;
@@ -224,7 +224,7 @@ Rectangle {
 			Item {
 				id: spacer;
 				anchors.left: parent.left;
-				width: visible ? Style.sizeMainMargin : 0;
+				width: visible ? Style.marginM : 0;
 				visible: model.index === 1 && !root.initialItemTitleVisible ? false : true;
 			}
 
@@ -232,12 +232,12 @@ Rectangle {
 				id: content;
 				anchors.left: spacer.right;
 				height: parent.height;
-				spacing: Style.sizeMainMargin;
+				spacing: Style.marginM;
 
 				Text {
 					id: separator;
 					anchors.verticalCenter: content.verticalCenter;
-					font.pixelSize: Style.fontSizeXXLarge;
+					font.pixelSize: Style.fontSizeXXL;
 					font.family: Style.fontFamily;
 					color: Style.titleColor;
 					text: root.titleSeparation;
@@ -247,7 +247,7 @@ Rectangle {
 				Text {
 					id: headerText;
 					anchors.verticalCenter: content.verticalCenter;
-					font.pixelSize: Style.fontSizeXXLarge;
+					font.pixelSize: Style.fontSizeXXL;
 					font.family: Style.fontFamily;
 					color: Style.titleColor;
 					text: model.name;

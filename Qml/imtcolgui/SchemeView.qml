@@ -114,8 +114,8 @@ Rectangle {
 			return
 		}
 		
-		let scaleCoeff_ = (canvas.width - Style.sizeMainMargin * 2) / canvas.backgroundWidth;
-		let scaleCoeff_h = (canvas.height - Style.sizeMainMargin * 2) / canvas.backgroundHeight;
+		let scaleCoeff_ = (canvas.width - Style.marginM * 2) / canvas.backgroundWidth;
+		let scaleCoeff_h = (canvas.height - Style.marginM * 2) / canvas.backgroundHeight;
 		if (scaleCoeff_ > scaleCoeff_h){
 			scaleCoeff_ = scaleCoeff_h
 		}
@@ -435,9 +435,9 @@ Rectangle {
 			property real mainRec_width: 250
 			property real mainRec_height: 60
 			
-			property int fontSize: 20
-			property int fontSizeSmall: 14
-			property int radius_: 2
+			property int fontSize: Style.fontSizeXXL
+			property int fontSizeS: Style.fontSizeM
+			property int radius_: Style.radiusXS
 			property int borderShift: 4
 			property int shadowSize: 6
 			
@@ -446,10 +446,10 @@ Rectangle {
 			property int backgroundHeight: 768
 			
 			property int intersectionSize: 16
-			property int arcRadius: 8
-			property int textMargin: 8
+			property int arcRadius: Style.radiusL
+			property int textMargin: Style.marginS
 			property int textVerticalOffset: 22
-			property real imageSize: 20
+			property real imageSize: Style.iconSizeM
 			property real imageMargin: 4
 			
 			//colors
@@ -620,7 +620,7 @@ Rectangle {
 				let textWidth_main = ctx.measureText(mainText).width
 				
 				ctx.lineWidth = 0.5;
-				let fontStr_second = String(canvas.fontSizeSmall) + "px sans-serif"
+				let fontStr_second = String(canvas.fontSizeS) + "px sans-serif"
 				ctx.font = fontStr_second;
 				let textStr_second = secondText;
 				let textWidth_second = ctx.measureText(secondText).width
@@ -710,7 +710,7 @@ Rectangle {
 				ctx.strokeStyle = canvas.secondTextColor;
 				ctx.fillStyle = canvas.secondTextColor;
 				ctx.lineWidth = 0.5;
-				let fontStr2 = String(canvas.fontSizeSmall) + "px sans-serif"
+				let fontStr2 = String(canvas.fontSizeS) + "px sans-serif"
 				ctx.font = fontStr2;
 				let textStr2 = secondText;
 				let textWidth2 = ctx.measureText(secondText).width

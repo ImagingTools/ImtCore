@@ -7,7 +7,7 @@ import imtcontrols 1.0
 Row {
     id: content;
 
-    spacing: Style.sizeMainMargin;
+    spacing: Style.marginM;
 
     property alias icon: image_
     property alias text: infoText.text
@@ -18,7 +18,7 @@ Row {
 
         anchors.verticalCenter: content.verticalCenter;
 
-        width: visible ? Style.itemSizeMedium * 0.8 : 0;
+        width: visible ? Style.itemSizeM * 0.8 : 0;
         height: width;
 
         sourceSize.width: width;
@@ -41,7 +41,7 @@ Row {
 
         color: Style.textColor;
         font.family: Style.fontFamily;
-        font.pixelSize: Style.fontSizeNormal;
+        font.pixelSize: Style.fontSizeM;
     }
 
 

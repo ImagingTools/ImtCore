@@ -48,7 +48,7 @@ ControlBase {
 		
 		Defines the background color when the switch is in the unchecked state.
 	*/
-	property string backgroundColor: "#E1E1E1"
+	property string backgroundColor: Style.borderColor
 	
 	/*!
 		\qmlproperty string SwitchCustom::controlColor
@@ -56,7 +56,7 @@ ControlBase {
 		
 		Defines the color of the control (toggle button) when the switch is in the unchecked state.
 	*/
-	property string controlColor: "#C4C4C4"
+	property string controlColor: Style.borderColor2
 	
 	/*!
 		\qmlproperty string SwitchCustom::backgroundColorChecked
@@ -64,7 +64,7 @@ ControlBase {
 		
 		Defines the background color when the switch is in the checked state.
 	*/
-	property string backgroundColorChecked: "#ffc0cb"
+	property string backgroundColorChecked: Style.firstColorHighlight
 	
 	/*!
 		\qmlproperty string SwitchCustom::controlColorChecked
@@ -72,7 +72,7 @@ ControlBase {
 		
 		Defines the color of the control (toggle button) when the switch is in the checked state.
 	*/
-	property string controlColorChecked: "#F7B6AE"
+	property string controlColorChecked: Style.firstColor
 	
 	/*!
 		\qmlproperty real SwitchCustom::backgroundOpacity
@@ -104,7 +104,7 @@ ControlBase {
 		
 		Defines the size of the text displayed next to the switch.
 	*/
-	property int fontPixelSize: Style.fontSizeNormal
+	property int fontPixelSize: Style.fontSizeM
 	
 	/*!
 		\qmlproperty bool SwitchCustom::fontBold
@@ -152,7 +152,7 @@ ControlBase {
 		
 		This readonly property defines the width of the toggle control, which is based on the height of the switch.
 	*/
-	readonly property real controlWidth: switchCustom.height > 0 ? switchCustom.height : 20
+	readonly property real controlWidth: switchCustom.height > 0 ? switchCustom.height : Style.controlHeightS
 	
 	/*!
 		\qmlproperty real SwitchCustom::controlRecX

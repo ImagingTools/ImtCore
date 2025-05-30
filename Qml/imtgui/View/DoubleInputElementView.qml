@@ -87,7 +87,7 @@ TextInputElementView {
         id: errorView;
         x: root.controlItem ? root.width - root.controlItem.width : 0;
         z: root.z + 1;
-        width: errorText.width + 2*Style.sizeMainMargin;
+        width: errorText.width + 2*Style.marginM;
         height: 30;
         noMouseArea: true;
         forceFocus: false;
@@ -106,7 +106,7 @@ TextInputElementView {
                 anchors.centerIn: parent;
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeM;
             }
         }
     }
@@ -118,7 +118,7 @@ TextInputElementView {
             text: internal.errorMessage1;
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
         }
     }
 
@@ -129,7 +129,7 @@ TextInputElementView {
             text: internal.errorMessage2;
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
         }
     }
 
@@ -140,7 +140,7 @@ TextInputElementView {
             text: internal.errorMessage3;
             color: Style.errorTextColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
         }
     }
 }

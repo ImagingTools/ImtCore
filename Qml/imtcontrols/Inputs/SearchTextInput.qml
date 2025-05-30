@@ -9,8 +9,8 @@ CustomTextField {
 	textFieldLeftMargin: searchIcon.width + 2 * margin;
 	textFieldRightMargin: iconClear.width + 2 * margin;
 	placeHolderText: qsTr("Enter text for search");
-	width: 270;
-	height: 30;
+	width: Style.sizeHintM;
+	height: Style.controlHeightM;
 	
 	signal searchChanged()
 	
@@ -29,9 +29,9 @@ CustomTextField {
 	Image {
 		id: searchIcon
 		anchors.left: parent.left
-		anchors.leftMargin: Style.sizeMainMargin
+		anchors.leftMargin: Style.marginM
 		anchors.verticalCenter: parent.verticalCenter
-		width: Style.buttonWidthSmall;
+		width: Style.buttonWidthXS;
 		height: width;
 		source: "../../../" + Style.getIconPath("Icons/Search", Icon.State.On, Icon.Mode.Normal);
 		sourceSize.width: width
@@ -45,9 +45,9 @@ CustomTextField {
 		
 		anchors.verticalCenter: tfc.verticalCenter;
 		anchors.right: tfc.right;
-		anchors.rightMargin: Style.sizeMainMargin;
+		anchors.rightMargin: Style.marginM;
 		
-		width: Style.buttonWidthSmall;
+		width: Style.buttonWidthXS;
 		height: width;
 		
 		visible: tfc.text != "";
@@ -56,7 +56,7 @@ CustomTextField {
 		decorator: Component {
 			ToolButtonDecorator {
 				color: "transparent";
-				icon.width: 16;
+				icon.width: Style.iconSizeS;
 			}
 		}
 		

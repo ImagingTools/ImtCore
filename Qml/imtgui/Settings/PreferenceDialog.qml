@@ -11,7 +11,7 @@ Dialog {
 	
 	title: qsTr("Preferences");
 
-	width: 1000;
+	width: Style.sizeHintXXXL;
 	
 	// notClosingButtons: Enums.apply;
 	
@@ -29,7 +29,7 @@ Dialog {
 	property int rootWidth: ModalDialogManager.activeView.width
 	
 	onRootWidthChanged: {
-		let newWidth = Math.min(rootWidth - 2 * Style.sizeMainMargin, 1000);
+		let newWidth = Math.min(rootWidth - 2 * Style.marginM, 1000);
 		
 		if (messageDialog.width !== newWidth){
 			messageDialog.width = newWidth;
@@ -62,7 +62,7 @@ Dialog {
 	contentComp: Component {
 		Preference {
 			width: messageDialog.width;
-			height: 500
+			height: Style.sizeHintL
 			paramsSet: messageDialog.paramsSet
 			settingsController: messageDialog.settingsController
 			

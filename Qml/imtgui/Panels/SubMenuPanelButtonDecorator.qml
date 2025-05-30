@@ -24,7 +24,7 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeMainMargin;
+		anchors.leftMargin: Style.marginM;
 
         width: 8;
         height: width;

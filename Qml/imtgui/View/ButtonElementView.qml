@@ -14,8 +14,8 @@ ElementView {
     controlComp: Component {
         Button {
             id: buttonControl;
-            width: 100;
-            height: 30;
+			width: Style.sizeHintBXS;
+			height: Style.controlHeightM;
             text: elementView.text;
             enabled: elementView.buttonEnabled;
             Component.onCompleted: {

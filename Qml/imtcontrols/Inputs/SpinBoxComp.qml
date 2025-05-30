@@ -7,7 +7,7 @@ Item {
     id: spinBox;
 
     width: 120;
-    height: 30;
+	height: Style.controlHeightM;
 
     property var baseElement: null;
 
@@ -26,7 +26,7 @@ Item {
     property string icon: !baseElement ? "" : baseElement.icon;
 
     property string fontColor: "#000000";
-    property int fontSize: Style.fontSizeNormal;
+    property int fontSize: Style.fontSizeM;
 
     Component.onCompleted: {
         numberTextField.text = String(startValue);
@@ -47,9 +47,9 @@ Item {
 
         anchors.fill: parent;
 
-        radius: 4
+		radius: Style.radiusM;
         border.width: 1;
-        border.color: "lightgrey";
+		border.color: Style.borderColor;
 
         Item {
             id: numberBlock;
@@ -64,7 +64,7 @@ Item {
 
                 anchors.centerIn: parent;
 
-				width: parent.width - Style.sizeMainMargin;
+				width: parent.width - Style.marginM;
                 height: parent.height - 2*mainRec.border.width;
                 fontColor: spinBox.fontColor;
                 textSize: spinBox.fontSize;
@@ -92,7 +92,7 @@ Item {
             anchors.right: parent.right;
             anchors.rightMargin: 2*mainRec.border.width;
 
-            width: 20;
+			width: Style.buttonWidthS;
             height: parent.height - 2*mainRec.border.width;
             Column {
                 id: buttonColumn;

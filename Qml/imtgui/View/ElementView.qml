@@ -7,13 +7,13 @@ import imtcontrols 1.0
 Rectangle {
 	id: rootElement
 	
-	width: 700
-	height: contentHeight + 2 * Style.sizeLargeMargin
+	width: Style.sizeHintXXL
+	height: contentHeight + 2 * Style.marginXL
 	
 	border.width: 1
 	border.color: Style.borderColor
 	
-	radius: 5
+	radius: Style.radiusM
 	
 	color: Style.baseColor
 	
@@ -36,10 +36,10 @@ Rectangle {
 	
 	property alias nameWidth: textName.width
 	
-	property int controlWidth: 400
-	property int contentMargin: Style.sizeLargeMargin
+	property int controlWidth: Style.sizeHintM
+	property int contentMargin: Style.marginXL
 	property int contentHeight: content.height
-	property int controlHeight: 30
+	property int controlHeight: Style.controlHeightM
 	
 	onFocusChanged: {
 		console.log("ElementView.qml onFocusChanged", focus)
@@ -122,10 +122,10 @@ Rectangle {
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.left: parent.left
 				anchors.right: controlLoader.left
-				anchors.rightMargin: Style.sizeLargeMargin
+				anchors.rightMargin: Style.marginXL
 				color: Style.textColor
 				font.family: Style.fontFamilyBold
-				font.pixelSize: Style.fontSizeXLarge
+				font.pixelSize: Style.fontSizeXL
 				elide: Text.ElideRight
 				wrapMode: Text.NoWrap
 			}
@@ -149,7 +149,7 @@ Rectangle {
 				width: parent.width
 				color: Style.inactiveTextColor
 				font.family: Style.fontFamily
-				font.pixelSize: Style.fontSizeNormal
+				font.pixelSize: Style.fontSizeM
 				wrapMode: Text.WordWrap
 				elide: Text.ElideRight
 			}

@@ -37,11 +37,11 @@ Rectangle {
 			id: column;
 			
 			anchors.top: parent.top;
-			anchors.topMargin: Style.sizeMainMargin;
+			anchors.topMargin: Style.marginM;
 			anchors.left: parent.left;
-			anchors.leftMargin: Style.sizeMainMargin;
+			anchors.leftMargin: Style.marginM;
 			anchors.right: parent.right;
-			anchors.rightMargin: Style.sizeMainMargin;
+			anchors.rightMargin: Style.marginM;
 			
 			visible: container.contentVisible;
 			
@@ -65,7 +65,7 @@ Rectangle {
 						
 						width: column.width;
 						
-						font.pixelSize: Style.fontSizeNormal;
+						font.pixelSize: Style.fontSizeM;
 						font.family: Style.fontFamilyBold;
 						font.bold: true;
 						
@@ -80,7 +80,7 @@ Rectangle {
 						id: childColumn;
 						
 						anchors.top: nameTitle.bottom;
-						anchors.topMargin: Style.sizeSmallMargin;
+						anchors.topMargin: Style.marginXS;
 						
 						width: column.width;
 						
@@ -102,9 +102,9 @@ Rectangle {
 									
 									anchors.verticalCenter: parent.verticalCenter
 									anchors.left: parent.left;
-									anchors.leftMargin: width > 0 ? Style.sizeMainMargin : 0;
+									anchors.leftMargin: width > 0 ? Style.marginM : 0;
 									
-									width: model.icon === undefined ? 0 : Style.iconSizeSmall
+									width: model.icon === undefined ? 0 : Style.iconSizeS
 									height: width
 									
 									sourceSize.width: width
@@ -117,11 +117,11 @@ Rectangle {
 									
 									anchors.verticalCenter: parent.verticalCenter
 									anchors.left: icon.right;
-									anchors.leftMargin: icon.width == 0 ? 0 : Style.sizeMainMargin;
+									anchors.leftMargin: icon.width == 0 ? 0 : Style.marginM;
 									anchors.right: parent.right;
 
 									font.family: Style.fontFamily;
-									font.pixelSize: Style.fontSizeSmall;
+									font.pixelSize: Style.fontSizeS;
 									wrapMode: Text.WordWrap
 									
 									color: Style.textColor;
@@ -150,9 +150,9 @@ Rectangle {
 		anchors.top: parent.top;
 		
 		width: parent.width;
-		height: 200;
+		height: Style.sizeHintXXS;
 		
-		indicatorSize: 20;
+		indicatorSize: Style.controlHeightS;
 		
 		color: container.color;
 		

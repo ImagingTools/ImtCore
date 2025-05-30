@@ -8,7 +8,7 @@ Rectangle {
     width: 50;
     height: 60;
 
-    property int itemHeight: 20;
+	property int itemHeight: Style.controlHeightS;
 
     property int currentValue: -1;
 
@@ -86,7 +86,7 @@ Rectangle {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeM;
             }
 
             MouseArea {

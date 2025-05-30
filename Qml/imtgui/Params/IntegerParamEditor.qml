@@ -20,7 +20,7 @@ ParamEditorBase {
 			width: integerParamEditor.width
 			name: integerParamEditor.name
 			description: integerParamEditor.description
-			controlWidth: 300
+			controlWidth: Style.sizeHintXS
 			text: integerParamEditor.valueParam ? integerParamEditor.valueParam.m_value : 0
 			readOnly: integerParamEditor.readOnly
 			onEditingFinished: {

@@ -247,7 +247,7 @@ Item {
 
 		anchors.right: parent.right;
 
-		width: visible ? 200 : 1;
+		width: visible ? Style.sizeHintXXS : 1;
 		height: parent.height;
 
 		visible: gridCollectionViewContainer.visibleMetaInfo;

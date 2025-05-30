@@ -58,7 +58,7 @@ ViewBase {
 		anchors.right: parent.right;
 		anchors.top: flickable.top;
 		anchors.bottom: flickable.bottom;
-		secondSize: Style.sizeMainMargin;
+		secondSize: Style.marginM;
 		targetItem: flickable;
 	}
 	
@@ -68,7 +68,7 @@ ViewBase {
 		anchors.left: flickable.left;
 		anchors.right: flickable.right;
 		anchors.bottom: flickable.bottom;
-		secondSize: Style.sizeMainMargin;
+		secondSize: Style.marginM;
 		vertical: false;
 		targetItem: flickable;
 	}
@@ -76,23 +76,23 @@ ViewBase {
 	Flickable {
 		id: flickable;
 		anchors.top: parent.top;
-		anchors.topMargin: Style.sizeLargeMargin;
+		anchors.topMargin: Style.marginXL;
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.sizeLargeMargin;
+		anchors.bottomMargin: Style.marginXL;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeLargeMargin;
+		anchors.leftMargin: Style.marginXL;
 		anchors.right: scrollbar.left;
-		anchors.rightMargin: Style.sizeLargeMargin;
+		anchors.rightMargin: Style.marginXL;
 		contentWidth: bodyColumn.width;
-		contentHeight: Math.max(bodyColumn.height + 2 * Style.sizeLargeMargin, historyPanel.contentHeight + 2 * Style.sizeLargeMargin);
+		contentHeight: Math.max(bodyColumn.height + 2 * Style.marginXL, historyPanel.contentHeight + 2 * Style.marginXL);
 		
 		boundsBehavior: Flickable.StopAtBounds;
 		clip: true;
 		
 		Column {
 			id: bodyColumn;
-			width: 700;
-			spacing: Style.sizeLargeMargin;
+			width: Style.sizeHintXXL;
+			spacing: Style.marginXL;
 			
 			GroupHeaderView {
 				width: parent.width;

@@ -6,11 +6,11 @@ import imtcontrols 1.0
 Dialog {
 	id: inputDialogContainer;
 	
-	width: 300;
+	width: Style.sizeHintXS;
 	
 	property string message;
 	property string inputValue;
-	property int contentWidth: 300;
+	property int contentWidth: Style.sizeHintXS;
 	
 	property string placeHolderText;
 	

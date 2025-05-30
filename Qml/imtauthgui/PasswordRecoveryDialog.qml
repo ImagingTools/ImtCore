@@ -9,8 +9,8 @@ import imtguigql 1.0
 Dialog {
 	id: passwordRecoveryDialog;
 
-	width: 700;
-	height: 500;
+	width: Style.sizeHintXXL;
+	height: Style.sizeHintL;
 
 	title: qsTr("Password Recovery");
 	canMove: false;
@@ -137,11 +137,11 @@ Dialog {
 				id: group;
 
 				anchors.top: parent.top;
-				anchors.topMargin: Style.sizeLargeMargin;
+				anchors.topMargin: Style.marginXL;
 				anchors.left: parent.left;
-				anchors.leftMargin: Style.sizeLargeMargin;
+				anchors.leftMargin: Style.marginXL;
 				anchors.right: parent.right;
-				anchors.rightMargin: Style.sizeLargeMargin;
+				anchors.rightMargin: Style.marginXL;
 
 				TextInputElementView {
 					id: emailElementView;
@@ -183,11 +183,11 @@ Dialog {
 			GroupElementView {
 				id: group;
 				anchors.top: parent.top;
-				anchors.topMargin: Style.sizeLargeMargin;
+				anchors.topMargin: Style.marginXL;
 				anchors.left: parent.left;
-				anchors.leftMargin: Style.sizeLargeMargin;
+				anchors.leftMargin: Style.marginXL;
 				anchors.right: parent.right;
-				anchors.rightMargin: Style.sizeLargeMargin;
+				anchors.rightMargin: Style.marginXL;
 
 				TextInputElementView {
 					id: codeElementView;
@@ -246,11 +246,11 @@ Dialog {
 			GroupElementView {
 				id: group;
 				anchors.top: parent.top;
-				anchors.topMargin: Style.sizeLargeMargin;
+				anchors.topMargin: Style.marginXL;
 				anchors.left: parent.left;
-				anchors.leftMargin: Style.sizeLargeMargin;
+				anchors.leftMargin: Style.marginXL;
 				anchors.right: parent.right;
-				anchors.rightMargin: Style.sizeLargeMargin;
+				anchors.rightMargin: Style.marginXL;
 
 				TextInputElementView {
 					id: usernameElementView;
@@ -269,11 +269,11 @@ Dialog {
 		Item {
 			PasswordInput {
 				anchors.top: parent.top;
-				anchors.topMargin: Style.sizeLargeMargin;
+				anchors.topMargin: Style.marginXL;
 				anchors.left: parent.left;
-				anchors.leftMargin: Style.sizeLargeMargin;
+				anchors.leftMargin: Style.marginXL;
 				anchors.right: parent.right;
-				anchors.rightMargin: Style.sizeLargeMargin;
+				anchors.rightMargin: Style.marginXL;
 				currentPasswordInputVisible: false;
 				onAcceptedChanged: {
 					passwordRecoveryDialog.setButtonEnabled(Enums.yes, accepted);

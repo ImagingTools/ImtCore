@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Dialog {
 	id: messageDialog;
 	
-	width: 500;
+	width: Style.sizeHintL;
 	
 	title: qsTr("Message");
 	

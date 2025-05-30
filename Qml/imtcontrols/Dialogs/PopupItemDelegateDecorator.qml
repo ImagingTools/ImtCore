@@ -7,7 +7,7 @@ ItemDelegateDecorator {
 	id: root;
 
 	contentCentered: false;
-	contentLeftMargin: !root.baseElement ? Style.sizeMainMargin : root.baseElement.contentLeftMargin;
+	contentLeftMargin: !root.baseElement ? Style.marginM : root.baseElement.contentLeftMargin;
 
 	color: !baseElement ? "transparent" :
 						  baseElement.highlighted ? Style.selectedColor :

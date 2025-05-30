@@ -15,7 +15,7 @@ TableCellDelegateBase {
         anchors.left: parent.left;
         anchors.leftMargin:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.textLeftMargin : 0
 
-        width: visible ? Style.itemSizeSmall : 0;
+        width: visible ? Style.itemSizeS : 0;
         height: width;
 
         sourceSize.width: width;

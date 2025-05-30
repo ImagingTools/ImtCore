@@ -7,7 +7,7 @@ Button {
     id: root;
 
     width: parent ? parent.width : 0;
-    height: 30;
+	height: Style.controlHeightM;
 
     decorator: Style.itemDelegateDecorator;
 

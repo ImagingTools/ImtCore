@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 
 
 MouseArea{
@@ -9,9 +10,9 @@ MouseArea{
 
     cursorShape: containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-    property int addToSize: 20;
-    property int minWidht : 200;
-    property int minHeight: 200;
+	property int addToSize: Style.controlHeightS;
+	property int minWidth : Style.sizeHintXXS;
+	property int minHeight: Style.sizeHintXXS;
 
     property Item rootItem: null;
 
@@ -56,7 +57,7 @@ MouseArea{
                 height_  =  this.rootItem.height - deltaY;
             }
 
-            if(width_ > this.minWidht){
+			if(width_ > this.minWidth){
                 this.rootItem.width = width_;
             }
             if(height_ > this.minHeight){

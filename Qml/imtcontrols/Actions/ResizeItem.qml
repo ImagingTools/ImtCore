@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import imtcontrols 1.0
+import Acf 1.0
 
 Item{
 
@@ -8,8 +9,8 @@ Item{
 	property int mainSize: 15;
 	property Item targetItem: null;
 	property Item globalParent: ModalDialogManager.activeView;
-	property int gap: 100;
-	property int minSize: 100;
+	property int gap: Style.sizeHintBXS;
+	property int minSize: Style.sizeHintBXS;
 	property int cursorAreaSize: 6;
 	property bool canCorrectCoord: true;
 

@@ -221,18 +221,18 @@ ViewBase {
     Column {
         id: column;
         anchors.top: parent.top;
-        anchors.topMargin: Style.sizeMainMargin;
+        anchors.topMargin: Style.marginM;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.sizeMainMargin;
-        width: 500;
-        spacing: Style.sizeMainMargin;
+        anchors.leftMargin: Style.marginM;
+		width: Style.sizeHintL;
+        spacing: Style.marginM;
 
         Text {
             id: titleLicense;
 
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
 
             text: qsTr("License Name");
         }
@@ -241,7 +241,7 @@ ViewBase {
             id: licenseNameInput;
 
             width: parent.width;
-            height: 30;
+			height: Style.controlHeightM;
 
             placeHolderText: qsTr("Enter the license name");
 
@@ -262,7 +262,7 @@ ViewBase {
 
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
 
             text: qsTr("License-ID");
         }
@@ -271,7 +271,7 @@ ViewBase {
             id: licenseIdInput;
 
             width: parent.width;
-            height: 30;
+			height: Style.controlHeightM;
 
             placeHolderText: qsTr("Enter the license ID");
 
@@ -292,7 +292,7 @@ ViewBase {
 
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
 
             text: qsTr("Description");
         }
@@ -301,7 +301,7 @@ ViewBase {
             id: descriptionInput;
 
             width: parent.width;
-            height: 30;
+			height: Style.controlHeightM;
 
             placeHolderText: qsTr("Enter the license description");
 
@@ -322,16 +322,16 @@ ViewBase {
             text: qsTr("Product");
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
         }
 
         ComboBox {
             id: productsCB;
 
             width: parent.width;
-            height: 30;
+			height: Style.controlHeightM;
 
-            radius: 3;
+			radius: Style.radiusS;
 
             nameId: "productName";
 
@@ -361,7 +361,7 @@ ViewBase {
         Text {
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
 
             text: qsTr("Features");
         }
@@ -371,12 +371,12 @@ ViewBase {
         id: featuresTable;
 
         anchors.top: column.bottom;
-        anchors.topMargin: Style.sizeMainMargin;
+        anchors.topMargin: Style.marginM;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: Style.sizeMainMargin;
+        anchors.bottomMargin: Style.marginM;
 
         width: column.width;
-        height: 300;
+		height: Style.sizeHintXS;
 
         checkable: true;
 
@@ -396,20 +396,20 @@ ViewBase {
         id: dependenciesBlock;
 
         anchors.top: parent.top;
-        anchors.topMargin: Style.sizeMainMargin;
+        anchors.topMargin: Style.marginM;
         anchors.left: column.right;
-        anchors.leftMargin: Style.sizeMainMargin;
+        anchors.leftMargin: Style.marginM;
         anchors.right: parent.right;
-        anchors.rightMargin: Style.sizeMainMargin;
+        anchors.rightMargin: Style.marginM;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: Style.sizeMainMargin;
+        anchors.bottomMargin: Style.marginM;
 
         Text {
             id: dependenciesTitle;
 
             color: Style.textColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
 
             text: qsTr("Dependencies");
         }
@@ -418,7 +418,7 @@ ViewBase {
             id: licensesTable;
 
             anchors.top: dependenciesTitle.bottom;
-			anchors.topMargin: Style.sizeSmallMargin;
+			anchors.topMargin: Style.marginXS;
             anchors.bottom: parent.bottom;
 
             width: parent.width;

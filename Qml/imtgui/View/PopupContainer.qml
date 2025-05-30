@@ -7,11 +7,11 @@ import imtcontrols 1.0
 Item {
 	id: popupContainer
 
-	width: 300
+	width: Style.sizeHintXS
 
 	Column {
 		id: messageColumn
-		spacing: Style.sizeMainMargin
+		spacing: Style.marginM
 		anchors.bottom: parent.bottom
 
 		Repeater {
@@ -19,9 +19,9 @@ Item {
 
 			delegate: Rectangle {
 				width: popupContainer.width
-				height: 100
+				height: Style.sizeHintBXS
 				color: model.type == "error" ? "#ffcccc" : model.type == "warning" ? "#fff4cc" : "#ccffcc"
-				radius: 5
+				radius: Style.radiusM
 				border.color: Style.borderColor2
 
 				Component.onCompleted: {
@@ -38,7 +38,7 @@ Item {
 					Image {
 						id: icon;
 						anchors.centerIn: parent;
-						width: 20;
+						width: Style.iconSizeM;
 						height: width;
 						sourceSize.height: height;
 						sourceSize.width: width;
@@ -53,7 +53,7 @@ Item {
 					anchors.verticalCenter: parent.verticalCenter
 					anchors.left: iconItem.right;
 					anchors.right: parent.right;
-					anchors.rightMargin: Style.sizeMainMargin;
+					anchors.rightMargin: Style.marginM;
 					text: model.text
 					wrapMode: Text.WordWrap
 				}
@@ -62,14 +62,14 @@ Item {
 					id: closeButton;
 					anchors.right: parent.right
 					anchors.top: parent.top
-					anchors.margins: Style.sizeMainMargin
-					width: 15
+					anchors.margins: Style.marginM
+					width: Style.buttonWidthXS
 					height: width
 					iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 					decorator: Component {
 						ToolButtonDecorator {
 							color: "transparent";
-							icon.width: 12;
+							icon.width: Style.iconSizeXS;
 						}
 					}
 

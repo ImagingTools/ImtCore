@@ -19,7 +19,7 @@ ControlBase {
 	property int selectedIndex:  tabPanel ? tabPanel.selectedIndex : -1;
 
 	property int maxWidth: 250;
-	property int minWidth: 100;
+	property int minWidth: Style.sizeHintBXS;
 
 	property ListView listView: null;
 	property Item tabPanel: null;

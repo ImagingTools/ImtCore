@@ -1,13 +1,14 @@
 import QtQuick 2.0
+import Acf 1.0
 
 
 Rectangle {
     id: paintedCorner;
 
-    width: 20;
-    height: 20;
+	width: height;
+	height: Style.controlHeightS;
     color: "transparent";
-    property real r: 20;
+	property real r: height;
     property string mainColor: "red";
     property string lineColor: "red";
     property real lineWidth: 1;

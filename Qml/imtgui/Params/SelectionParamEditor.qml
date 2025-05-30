@@ -19,7 +19,7 @@ ParamEditorBase {
 			description: selectionParamEditor.description
 			model: selectionParamEditor.selectionParam ? selectionParamEditor.selectionParam.m_constraints.m_options : 0
 			currentIndex: selectionParamEditor.selectionParam ? selectionParamEditor.selectionParam.m_selectedIndex : -1
-			controlWidth: 300
+			controlWidth: Style.sizeHintXS
 			nameId: "m_name"
 			onCurrentIndexChanged: {
 				if (selectionParamEditor.selectionParam){

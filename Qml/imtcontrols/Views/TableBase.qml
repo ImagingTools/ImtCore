@@ -9,9 +9,9 @@ Rectangle {
 	color: "transparent";
 
 	property int selectedIndex: -1;
-	property int itemHeight: 35;
-	property int headerHeight: 35;
-	property int headerMinHeight: 35;
+	property int itemHeight: Style.tableRowHeight;
+	property int headerHeight: Style.tableHeaderHeight;
+	property int headerMinHeight: Style.tableHeaderHeight;
 	property int headerGap: 0;
 
 	property bool hasFilter: false;
@@ -72,7 +72,7 @@ Rectangle {
 
 	property bool emptyDecorCell: true;
 
-	/*property int */radius: 7;
+	/*property int */radius: Style.radiusL;
 
 	property int columnCount: 0;
 
@@ -146,8 +146,8 @@ Rectangle {
 
 	property string maxLengthText: '';
 
-	property int textMarginHor: Style.sizeMainMargin;
-	property int textMarginVer: Style.sizeMainMargin;
+	property int textMarginHor: Style.marginM;
+	property int textMarginVer: Style.marginM;
 
 	property bool emptyDecor: true;
 	property bool emptyDecorHeader: true;
@@ -158,7 +158,7 @@ Rectangle {
 	property bool compl: false;
 
 	property bool isFlickable: false;
-	property int defaultColumnWidth: 200;
+	property int defaultColumnWidth: Style.sizeHintXXS;
 
 	property  Component cellDelegate
 
@@ -624,7 +624,7 @@ Rectangle {
 
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.left: parent.left;
-			anchors.leftMargin: Style.sizeMainMargin;
+			anchors.leftMargin: Style.marginM;
 
 			visible: tableContainer.checkable && tableContainer.elementsList.count > 0 && tableContainer.canSelectAll;
 

@@ -177,15 +177,15 @@ CustomTextField {
 
     Column {
         anchors.right: root.right;
-        anchors.rightMargin: Style.sizeSmallMargin;
+        anchors.rightMargin: Style.marginXS;
         anchors.verticalCenter: root.verticalCenter;
-        width: Style.sizeLargeMargin;
+        width: Style.marginXL;
         z: root.parent.z + 1;
 
         Button {
             id: upButton;
             width: parent.width;
-            height: Style.sizeMainMargin;
+            height: Style.marginM;
             iconSource: root.iconUpSource;
             enabled: !root.readOnly;
             decorator: Component { ButtonDecorator {
@@ -224,7 +224,7 @@ CustomTextField {
         Button {
             id: downButton;
             width: parent.width;
-            height: Style.sizeMainMargin;
+            height: Style.marginM;
             iconSource: root.iconDownSource;
             enabled: !root.readOnly;
             decorator: Component { ButtonDecorator {

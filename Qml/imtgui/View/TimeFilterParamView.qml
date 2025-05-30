@@ -11,7 +11,7 @@ PopupView {
 	id: root;
 	
 	width: 260;
-	height: content.height + 2 * Style.sizeMainMargin;
+	height: content.height + 2 * Style.marginM;
 		
 	property TimeFilter timeFilter: TimeFilter {}
 	property alias listView: listView;
@@ -21,7 +21,7 @@ PopupView {
 				color: Style.backgroundColor2;
 			}
 
-	property int fontSize: Style.fontSizeNormal;
+	property int fontSize: Style.fontSizeM;
 	property var datePickerParams;
 	
 	signal accepted(string id, string name);
@@ -142,13 +142,13 @@ PopupView {
 	Item {
 		id: body;
 		anchors.fill: parent;
-		anchors.margins: Style.sizeMainMargin;
+		anchors.margins: Style.marginM;
 		
 		Column {
 			id: content;
 			anchors.verticalCenter: parent.verticalCenter;
 			width: parent.width;
-			spacing: Style.sizeMainMargin;
+			spacing: Style.marginM;
 			
 			ListView {
 				id: listView;
@@ -191,7 +191,7 @@ PopupView {
 			Item {
 				id: selectDateItem;
 				width: parent.width;
-				height: 30;
+				height: Style.controlHeightM;
 				visible: !fromDateItem.visible;
 				
 				Button {
@@ -210,7 +210,7 @@ PopupView {
 			Item {
 				id: fromDateItem;
 				width: parent.width;
-				height: 30;
+				height: Style.controlHeightM;
 				visible: false;
 
 				DateInput {
@@ -229,7 +229,7 @@ PopupView {
 			
 			Item {
 				width: parent.width;
-				height: 30;
+				height: Style.controlHeightM;
 				
 				DateInput {
 					id: toDatePicker;
@@ -241,12 +241,12 @@ PopupView {
 			
 			Item {
 				width: parent.width;
-				height: 30;
+				height: Style.controlHeightM;
 				
 				Row {
 					anchors.horizontalCenter: parent.horizontalCenter;
-					height: 30;
-					spacing: Style.sizeMainMargin;
+					height: Style.controlHeightM;
+					spacing: Style.marginM;
 					
 					Button {
 						id: applyButton;
@@ -292,7 +292,7 @@ PopupView {
 		horizontalOffset: 2;
 		verticalOffset: 2;
 		
-		radius: 4;
+		radius: Style.radiusM;
 		color: Style.shadowColor;
 		
 		source: background;

@@ -8,7 +8,7 @@ Item {
 	id: root;
 	
 	width: 50;
-	height: 30;
+	height: Style.controlHeightM;
 	
 	property bool enabled: false;
 	
@@ -57,10 +57,10 @@ Item {
 		id: usernameText;
 		anchors.verticalCenter: root.verticalCenter;
 		anchors.right: loginButton.left;
-		anchors.rightMargin: Style.sizeSmallMargin;
+		anchors.rightMargin: Style.marginXS;
 		color: Style.textColor;
 		font.family: Style.fontFamily;
-		font.pixelSize: Style.fontSizeNormal;
+		font.pixelSize: Style.fontSizeM;
 		text: AuthorizationController.userTokenProvider.login;
 	}
 	
@@ -70,7 +70,7 @@ Item {
 		anchors.right: parent ? parent.right : undefined;
 		anchors.verticalCenter: root.verticalCenter;
 		
-		width: Style.buttonWidthMedium;
+		width: Style.buttonWidthM;
 		height: width;
 		
 		iconSource: "../../../" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal);

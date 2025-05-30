@@ -22,8 +22,8 @@ Rectangle{
 
 	property real coeff: 1;
 	property real textVerticalOffset: 0;
-	property int mainMarginVertical: 40;
-	property int textMargin: 3*Style.sizeMainMargin;
+	property int mainMarginVertical: 4*Style.marginM;
+	property int textMargin: 3*Style.marginM;
 
 	property alias textObj: bigIndicatorText;
 
@@ -89,7 +89,7 @@ Rectangle{
 		anchors.verticalCenterOffset: bigIndicatorContainer.textVerticalOffset;
 
 		font.family: Style.fontFamily;
-		font.pixelSize: Style.fontSizeXLarge;
+		font.pixelSize: Style.fontSizeXL;
 		color: Style.firstColor;
 		text: bigIndicatorContainer.text;
 		z: 10;

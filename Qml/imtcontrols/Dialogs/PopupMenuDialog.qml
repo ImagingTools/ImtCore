@@ -19,11 +19,11 @@ ControlBase {
 	// Main dialog manager reference
 	property Item root: null;
 	
-	property int itemWidth: 200;
-	property int itemHeight: 30;
+	property int itemWidth: Style.sizeHintXXS;
+	property int itemHeight: Style.controlHeightM;
 	property int shownItemsCount: 5;
 	
-	property int textSize: Style.fontSizeNormal;
+	property int textSize: Style.fontSizeM;
 	property string fontColor: Style.textColor;
 	
 	property bool hiddenBackground: true;

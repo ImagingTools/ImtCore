@@ -11,7 +11,7 @@ Item {
 
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
 
-        width: Style.buttonWidthMedium;
+        width: Style.buttonWidthM;
         height: width;
 
         iconSource: "../../../" + Style.getIconPath("Icons/Settings", "On", "Normal");

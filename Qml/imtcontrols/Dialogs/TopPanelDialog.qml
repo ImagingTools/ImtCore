@@ -7,14 +7,14 @@ import imtcontrols 1.0
 Rectangle {
 	id: topPanelDialogContainer;
 
-	width: 300;
-	height: 40;
-	radius: 2;
+	width: Style.sizeHintXS;
+	height: Style.controlHeightL;
+	radius: Style.radiusXS;
 
 	color: Style.baseColor;
 
 	property string title;
-	property int titleFontSize: Style.fontSizeXLarge;
+	property int titleFontSize: Style.fontSizeXL;
 	property string titleFontFamily: Style.fontFamily;
 	property color titleTextColor: Style.textColor;
 
@@ -29,11 +29,11 @@ Rectangle {
 		id: iconDialog;
 
 		anchors.left: topPanelDialogContainer.left;
-		anchors.leftMargin: 10;
+		anchors.leftMargin: Style.marginM;
 		anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
 
-		width: 20;
-		height: 20;
+		width: Style.iconSizeM;
+		height: width;
 
 		sourceSize.height: height;
 		sourceSize.width: width;
@@ -47,10 +47,10 @@ Rectangle {
 		id: titleDialog;
 
 		anchors.left: topPanelDialogContainer.hasIcon ? iconDialog.right : parent.left;
-		anchors.leftMargin: topPanelDialogContainer.hasIcon ? 10 : 15;
+		anchors.leftMargin: topPanelDialogContainer.hasIcon ? Style.marginM : 1.5 * Style.marginL;
 		anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
 		anchors.right: closeButton.left;
-		anchors.rightMargin: 10;
+		anchors.rightMargin: Style.marginM;
 
 		color: topPanelDialogContainer.titleTextColor;
 		font.family: topPanelDialogContainer.titleFontFamily;
@@ -66,10 +66,10 @@ Rectangle {
 
 		anchors.right: topPanelDialogContainer.right;
 		anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
-		anchors.rightMargin: 15;
+		anchors.rightMargin: Style.marginL;
 
-		width: 20;
-		height: 20;
+		width: Style.iconSizeM;
+		height: width;
 
 		visible: topPanelDialogContainer.canClose;
 

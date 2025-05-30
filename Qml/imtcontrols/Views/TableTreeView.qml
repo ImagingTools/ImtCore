@@ -8,11 +8,11 @@ Table{
 
     property TreeItemModel model: TreeItemModel{};
 
-    property int shift: 35;
+	property int shift: Style.treeBranchOffset;
     property string nameId: "name";
 
     property int delegateHeight: itemHeight;
-    property int delegateWidth: 200;
+	property int delegateWidth: Style.sizeHintXXS;
     property int delegateWidthFull: maxLevel * shift + delegateWidth;
     property int maxLevel: 1;
     property bool hasSelection: true;
@@ -41,8 +41,8 @@ Table{
         tableTreeView.contentX = tableTreeView.originX;
     }
 
-    itemHeight: 40;
-    headerHeight: 40;
+	itemHeight: Style.controlHeightL;
+	headerHeight: Style.controlHeightL;
     visibleLeftBorderFirst: false;
     hasFilter: false;
     hasSort: false;
@@ -146,9 +146,9 @@ Table{
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: parent.left;
-                    anchors.leftMargin: 8;
+					anchors.leftMargin: Style.marginS;
 
-                    width: 16;
+					width: Style.buttonWidthXS;
                     height: width;
 
                     visible: model.HasChildren__ == undefined ? false : model.HasChildren__;
@@ -203,10 +203,10 @@ Table{
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: openButton.right;
-                    anchors.leftMargin: 8;
+					anchors.leftMargin: Style.marginS;
 
                     visible: model.TypeId__ !== undefined;
-                    width: 16;
+					width: Style.iconSizeS;
                     height: width;
                     sourceSize.width: width;
                     sourceSize.height: height;
@@ -218,11 +218,11 @@ Table{
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: model.TypeId__ == undefined ? folderImage.left : folderImage.right;
-                    anchors.leftMargin: model.TypeId__ == undefined ? 0 : 16;
+					anchors.leftMargin: model.TypeId__ == undefined ? 0 : Style.marginL;
                     //anchors.right: parent.right;
 
                     font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSizeXLarge;
+					font.pixelSize: Style.fontSizeXL;
                     color: Style.textColor;
 
                     text: model[tableTreeView.nameId] !== undefined ? model[tableTreeView.nameId] : "";

@@ -8,7 +8,7 @@ Item{
 
 	property TreeItemModel model: TreeItemModel{};
 	property TreeItemModel dataModel: TreeItemModel{};
-	property int spacing: 20;
+	property int spacing: Style.spacingXL;
 	property alias contentHeight: list.contentHeight;
 	property alias contentWidth: list.contentWidth;
 	property bool fitToWidth: false;

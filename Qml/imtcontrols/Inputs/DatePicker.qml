@@ -7,7 +7,7 @@ import imtcontrols 1.0
 Item {
 	id: datePicker;
 
-	height: 20;
+	height: Style.controlHeightS;
 	width: content.width;
 
 	// aliases
@@ -59,8 +59,8 @@ Item {
 	property bool readOnly: false;
 	property bool textInputBan: false;
 	// icons
-	property int iconWidth: 12;
-	property int iconHeight: 10;
+	property int iconWidth: Style.iconSizeXS;
+	property int iconHeight: Style.iconSizeXXS;
 	property string iconUpSource: readOnly ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.Off, Icon.Mode.Disabled)
 										   : "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal);
 	property string iconDownSource: readOnly ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
@@ -68,20 +68,20 @@ Item {
 	// margins
 	property int mainMargin: 0;
 	// CustomTextField
-	property int textFieldHeight: 20;
+	property int textFieldHeight: Style.controlHeightS;
 	property int textFieldWidthYear: 42;
 	property int textFieldWidthMonth: 85;
 	property int textFieldWidthDay: 25;
 	property int textFieldRadius:0;
-	property int textSize: Style.fontSizeNormal;
+	property int textSize: Style.fontSizeM;
 	property string textFieldColor: Style.baseColor;
 	property string fontColor: Style.textColor;
 	property string textFieldBorderColor: ""; // textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 	property int textFieldMargin: 5;
 	property int horizontalAlignment: TextInput.AlignHCenter;
 	// buttons
-	property int buttonWidth: 15;
-	property int buttonHeight: 10;
+	property int buttonWidth: Style.buttonWidthXS;
+	property int buttonHeight: Style.buttonHeightXXXS;
 	property string buttonColor:"";
 	property int buttonHighlighted: -1;
 	property int spinBoxSpacing: 0;
@@ -370,7 +370,7 @@ Item {
 		id: content;
 
 		height: datePicker.height;
-		spacing: Style.sizeMainMargin;
+		spacing: Style.marginM;
 
 		RegularExpressionValidator {
 			id: yearValid;
@@ -688,7 +688,7 @@ Item {
 					enabled: visible;
 					model: datePicker.monthTreeModel;
 
-					textSize: datePicker.textSize;//Style.fontSizeNormal;
+					textSize: datePicker.textSize;//Style.fontSizeM;
 					fontColor: monthField.fontColor;
 					borderColor: "transparent";
 					backgroundColor: "transparent";

@@ -63,7 +63,7 @@ RemoteCollectionView {
 			id: decoratorBase;
 			
 			width: baseElement ? baseElement.width: 0;
-			height: 40;
+			height: Style.controlHeightL;
 			
 			property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;
 			
@@ -71,7 +71,7 @@ RemoteCollectionView {
 				id: content;
 				anchors.left: parent.left;
 				anchors.verticalCenter: parent.verticalCenter;
-				spacing: Style.sizeMainMargin;
+				spacing: Style.marginM;
 				
 				TreeItemModel {
 					id: systemInfoModel;
@@ -169,7 +169,7 @@ RemoteCollectionView {
 		TableCellDelegateBase {
 			id: cellDelegate
 			
-			height: 20;
+			height: Style.controlHeightS;
 			
 			clip: true;
 			
@@ -202,7 +202,7 @@ RemoteCollectionView {
 				
 				anchors.verticalCenter: parent.verticalCenter;
 				
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 				font.family: Style.fontFamily;
 				color: Style.textColor;
 				
@@ -214,9 +214,9 @@ RemoteCollectionView {
 				
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.left: name.right;
-				anchors.leftMargin: Style.sizeSmallMargin;
+				anchors.leftMargin: Style.marginXS;
 				
-				width: 15;
+				width: Style.buttonWidthXS;
 				height: width;
 				
 				iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
@@ -224,7 +224,7 @@ RemoteCollectionView {
 				decorator: Component {
 					ToolButtonDecorator {
 						color: "transparent";
-						icon.width: 16;
+						icon.width: arrowButton.width;
 					}
 				}
 			}
@@ -270,9 +270,9 @@ RemoteCollectionView {
 					
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: parent.left
-					anchors.leftMargin: Style.sizeMainMargin;
+					anchors.leftMargin: Style.marginM;
 					
-					font.pixelSize: Style.fontSizeNormal;
+					font.pixelSize: Style.fontSizeM;
 					font.family: Style.fontFamily;
 					color: Style.textColor;
 					
@@ -284,7 +284,7 @@ RemoteCollectionView {
 					
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: name2.right;
-					anchors.leftMargin: Style.sizeSmallMargin;
+					anchors.leftMargin: Style.marginXS;
 					
 					width: 15;
 					height: width;

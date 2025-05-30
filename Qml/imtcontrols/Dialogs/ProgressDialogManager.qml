@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Dialog {
 	id: progressDialog;
 
-	width: 500;
+	width: Style.sizeHintL;
 
 	title:  qsTr("Progress manager");
 
@@ -134,9 +134,9 @@ Dialog {
 				anchors.top: parent.top;
 				anchors.left: parent.left;
 				anchors.right: parent.right;
-				anchors.topMargin: Style.sizeMainMargin;
-				anchors.leftMargin: Style.sizeMainMargin;
-				anchors.rightMargin: Style.sizeMainMargin;
+				anchors.topMargin: Style.marginM;
+				anchors.leftMargin: Style.marginM;
+				anchors.rightMargin: Style.marginM;
 
 				title: progressDialog.totalProgressTitle;
 				text:  percent + "%"
@@ -149,9 +149,9 @@ Dialog {
 
 				anchors.top: mainProgressBar.bottom;
 				anchors.left: mainProgressBar.left;
-				anchors.topMargin: Style.sizeMainMargin;
-				anchors.leftMargin: Style.sizeMainMargin;
-				font.pixelSize: Style.fontSizeLarge
+				anchors.topMargin: Style.marginM;
+				anchors.leftMargin: Style.marginM;
+				font.pixelSize: Style.fontSizeL
 
 				text: qsTr("Subtasks") + ":"
 				visible: subtaskColumn.height;
@@ -163,10 +163,10 @@ Dialog {
 				anchors.top: subtaskTitle.bottom;
 				anchors.left: subtaskTitle.left;
 				anchors.right: parent.right;
-				anchors.topMargin: Style.sizeMainMargin;
-				anchors.leftMargin: Style.sizeMainMargin;
-				anchors.rightMargin: Style.sizeMainMargin;
-				spacing: Style.sizeMainMargin;
+				anchors.topMargin: Style.marginM;
+				anchors.leftMargin: Style.marginM;
+				anchors.rightMargin: Style.marginM;
+				spacing: Style.marginM;
 				Repeater{
 					id: subtaskRepeater;
 
@@ -183,11 +183,11 @@ Dialog {
 							anchors.verticalCenter: parent.verticalCenter;
 							anchors.left: parent.left
 							anchors.right: cancelButton.left;
-							anchors.rightMargin: Style.sizeMainMargin;
+							anchors.rightMargin: Style.marginM;
 
 							width: subtaskColumn.width;
 
-							fontSize: Style.fontSizeNormal;
+							fontSize: Style.fontSizeM;
 
 							title: model.description !==undefined ? model.description : "";
 							text:  percent + "%"
@@ -215,9 +215,9 @@ Dialog {
 				anchors.bottom: parent.bottom;
 				anchors.left: parent.left;
 				anchors.right: parent.right;
-				anchors.bottomMargin: Style.sizeMainMargin;
-				anchors.leftMargin: 2*Style.sizeMainMargin;
-				anchors.rightMargin: Style.sizeMainMargin;
+				anchors.bottomMargin: Style.marginM;
+				anchors.leftMargin: 2*Style.marginM;
+				anchors.rightMargin: Style.marginM;
 
 				height: 1;
 				color: Style.backgroundColor;
@@ -230,8 +230,8 @@ Dialog {
 
 		anchors.bottom: parent.bottom;
 		anchors.right: parent.right;
-		anchors.bottomMargin: Style.sizeMainMargin + progressDialog.buttons.height/2 - height/2;
-		anchors.rightMargin:  Style.sizeMainMargin;
+		anchors.bottomMargin: Style.marginM + progressDialog.buttons.height/2 - height/2;
+		anchors.rightMargin:  Style.marginM;
 
 		visible: progressDialog.isCancelling;
 

@@ -6,16 +6,16 @@ import imtcontrols 1.0
 Rectangle {
 	id: tableDelegateContainer;
 	
-	width: 1000;
+	width: Style.sizeHintXXXL;
 	height: minHeight;
-	property real minHeight: 40;
+	property real minHeight: Style.controlHeightL;
 	property real contentHeight: height;
 	
 	color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
 	
 	visible: true
 	
-	property int textTopMargin: 8;
+	property int textTopMargin: Style.marginS;
 	property int columnCount: tableItem ? tableItem.columnCount : 0;
 	
 	property bool selected: false;
@@ -59,9 +59,9 @@ Rectangle {
 	
 	property string cellColor: "transparent";
 	
-	property int textMarginHor: 8;
-	property int textLeftMargin: 8;
-	property int textRightMargin: 8;
+	property int textMarginHor: Style.marginS;
+	property int textLeftMargin: Style.marginS;
+	property int textRightMargin: Style.marginS;
 	property int textMarginVer: textTopMargin;
 	
 	property bool compl: false;
@@ -374,7 +374,7 @@ Rectangle {
 			
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.left: parent.left;
-			anchors.leftMargin: Style.sizeMainMargin;
+			anchors.leftMargin: Style.marginM;
 			
 			visible: tableDelegateContainer.tableItem ? tableDelegateContainer.tableItem.checkable : false;
 			isActive: !tableDelegateContainer.readOnly;

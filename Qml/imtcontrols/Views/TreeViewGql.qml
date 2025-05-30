@@ -11,10 +11,10 @@ Rectangle{
     color: "transparent";
     property TreeItemModel model: TreeItemModel{};
 
-    property int shift: 35;
+	property int shift: Style.treeBranchOffset;
     property string nameId: "name";
-    property int delegateWidht: 200;
-    property int delegateHeight: 40;
+	property int delegateWidth: Style.sizeHintXXS;
+	property int delegateHeight: Style.controlHeightL;
     property alias delegate: list.delegate;
     property bool hasSelection: false;
     property int selectedIndex: -1;
@@ -104,7 +104,7 @@ Rectangle{
             boundsBehavior: Flickable.StopAtBounds;
             contentWidth: delegateWidth;
             clip: true;
-            property int delegateWidth: treeViewGql.delegateWidht;
+			property int delegateWidth: treeViewGql.delegateWidth;
             property int delegateWidthFull: list.maxLevel * treeViewGql.shift + list.delegateWidth;
             property int maxLevel: 1;
 			reuseItems: true
@@ -278,8 +278,8 @@ Rectangle{
                         anchors.left: openButton.right;
                         anchors.leftMargin: 8;
 
-						visible: model.typeId__ !== undefined;
-                        width: 16;
+						visible: true//model.typeId__ !== undefined;
+						width: Style.iconSizeS;
                         height: width;
                         sourceSize.width: width;
                         sourceSize.height: height;
@@ -298,7 +298,7 @@ Rectangle{
                         elide: Text.ElideRight;
 
                         font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSizeXLarge !==undefined ? Style.fontSizeXLarge : 18;
+                        font.pixelSize: Style.fontSizeXL !==undefined ? Style.fontSizeXL : 18;
                         color: treeViewGql.textColor;
 
                         text: model[treeViewGql.nameId] !== undefined ? model[treeViewGql.nameId] : "";
@@ -761,7 +761,7 @@ Rectangle{
         visible: false;
 
         font.family: Style.fontFamily;
-		font.pixelSize: Style.fontSizeXLarge;
+		font.pixelSize:  Style.fontSizeXL !==undefined ? Style.fontSizeXL : 18;//Style.fontSizeXL;
         color: Style.textColor;
 
         property real sourceWidth: 0;
@@ -796,7 +796,7 @@ Rectangle{
         id: toolTip;
 
         text: "";
-        componentMinHeight: 30;
+		componentMinHeight: Style.controlHeightM;
 
         function openTooltip(xX, yY){
             open(xX, yY)

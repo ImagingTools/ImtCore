@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Dialog {
 	id: featuresDialog;
 	
-	width: 500;
+	width: Style.sizeHintL;
 	
 	title: qsTr("Select features");
 	
@@ -90,14 +90,14 @@ Dialog {
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.right: parent.right;
 				anchors.left: parent.left;
-				anchors.rightMargin: Style.sizeMainMargin;
-				anchors.leftMargin: Style.sizeMainMargin;
+				anchors.rightMargin: Style.marginM;
+				anchors.leftMargin: Style.marginM;
 				width: featuresDialog.width;
 				
 				Table {
 					id: tableTreeView;
 					width: parent.width;
-					height: 300;
+					height: Style.sizeHintXS;
 					radius: 0;
 					checkable: true;
 					onCheckedItemsChanged: {

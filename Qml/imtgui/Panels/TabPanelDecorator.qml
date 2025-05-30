@@ -6,8 +6,8 @@ import imtcontrols 1.0
 DecoratorBase {
 	id: tabPanelDecorator;
 
-	width: content.width + 2 * Style.sizeMainMargin;
-	height: baseElement ? baseElement.height : 50
+	width: content.width + 2 * Style.marginM;
+	height: baseElement ? baseElement.height : Style.headerHeight
 
 	property bool textIsCropped: textHelper.text != "" && textHelper.width > text.width;
 
@@ -62,7 +62,7 @@ DecoratorBase {
 		id: content;
 		anchors.centerIn: tabPanelDecorator;
 		height: tabPanelDecorator.height;
-		spacing: Style.sizeMainMargin;
+		spacing: Style.marginM;
 		visible: !loading.visible;
 
 		Item {
@@ -75,7 +75,7 @@ DecoratorBase {
 			Image {
 				id: firsElementImage;
 				anchors.centerIn: imagetabDelegate;
-				width: 20;
+				width: Style.iconSizeM;
 				height: width;
 				source: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.icon !== "" ? "../../../" + Style.getIconPath(tabPanelDecorator.baseElement.icon, "On", "Normal"): "";
 				sourceSize.width: width;
@@ -104,7 +104,7 @@ DecoratorBase {
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
 				font.bold: tabPanelDecorator.baseElement.index === 0;
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 			}
 
 			Text {
@@ -119,7 +119,7 @@ DecoratorBase {
 				color: Style.textColor;
 				font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
 				font.bold: tabPanelDecorator.baseElement.index === 0;
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 				text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
 
 				elide: Text.ElideRight;
@@ -129,7 +129,7 @@ DecoratorBase {
 		ToolButton {
 			id: closeButton;
 			anchors.verticalCenter: parent.verticalCenter;
-			width: Style.iconSizeSmall;
+			width: Style.iconSizeS;
 			height: width;
 			visible: !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
 			iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
@@ -149,7 +149,7 @@ DecoratorBase {
 	Loading {
 		id: loading;
 		anchors.fill: bg;
-		indicatorSize: 20;
+		indicatorSize: Style.controlHeightS;
 		color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent";
 		visible: false;
 	}

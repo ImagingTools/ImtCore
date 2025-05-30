@@ -6,7 +6,7 @@ QtObject{
 	id: fontObj;
 
 	property string family: Style.fontFamily;
-	property int pixelSize: Style.fontSizeNormal;
+	property int pixelSize: Style.fontSizeM;
 	property bool bold: false;
 	property string color: "";
 }

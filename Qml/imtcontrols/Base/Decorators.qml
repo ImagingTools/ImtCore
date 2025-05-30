@@ -213,7 +213,7 @@ StyleComponents {
 		id: roundButtonDecoratorComp;
 
 		ButtonDecorator{
-			width: 30;
+			width: Style.controlHeightM;
 			height: width;
 			radius: width;
 		}
@@ -225,8 +225,8 @@ StyleComponents {
 		Item{
 			id: textFieldItem;
 
-			width: 200;
-			height: 30;
+			width: Style.sizeHintXXS;
+			height: Style.controlHeightM;
 			z: -1;
 
 			property var baseElement;
@@ -259,7 +259,7 @@ StyleComponents {
 				anchors.verticalCenter: textFieldItem.verticalCenter;
 
 
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 				font.family: Style.fontFamily;
 
 				//TODO -> Style
@@ -297,8 +297,8 @@ StyleComponents {
 		Item{
 			id: textAreaItem;
 
-			width: 200;
-			height: 30;
+			width: Style.sizeHintXXS;
+			height: Style.controlHeightM;
 			z: -1;
 
 			property var baseElement;
@@ -330,7 +330,7 @@ StyleComponents {
 				anchors.verticalCenter: textAreaItem.verticalCenter;
 
 
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 				font.family: Style.fontFamily;
 
 				//TODO -> Style
@@ -368,8 +368,8 @@ StyleComponents {
 		Rectangle {
 			id: cbMainRect;
 
-			width: 200;
-			height: 30;
+			width: Style.sizeHintXXS;
+			height: Style.controlHeightM;
 
 			property var baseElement;
 			property var model;
@@ -391,16 +391,16 @@ StyleComponents {
 
 				anchors.verticalCenter: cbMainRect.verticalCenter;
 				anchors.left: cbMainRect.left;
-				anchors.leftMargin: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - width/2 : Style.sizeMainMargin;
+				anchors.leftMargin: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - width/2 : Style.marginM;
 				anchors.right: cbArrowIcon.left;
-				anchors.rightMargin: Style.sizeMainMargin;
+				anchors.rightMargin: Style.marginM;
 
 				horizontalAlignment: !cbMainRect.baseElement ? Text.AlignLeft : cbMainRect.baseElement.textCentered ? Text.AlignHCenter : Text.AlignLeft;
 
 				color: !cbMainRect.baseElement ? "transparent" : cbMainRect.baseElement.fontColorTitle;
 				text: !cbMainRect.baseElement ? "" : cbMainRect.baseElement.currentText !== "" ? cbMainRect.baseElement.currentText : cbMainRect.baseElement.placeHolderText;
 				font.family: Style.fontFamily;
-				font.pixelSize: !cbMainRect.baseElement ? Style.fontSizeNormal : cbMainRect.baseElement.textSize;
+				font.pixelSize: !cbMainRect.baseElement ? Style.fontSizeM : cbMainRect.baseElement.textSize;
 
 				elide: Text.ElideRight;
 			}
@@ -420,10 +420,10 @@ StyleComponents {
 
 				anchors.right: cbMainRect.right;
 				anchors.verticalCenter: cbMainRect.verticalCenter;
-				anchors.rightMargin: Style.sizeSmallMargin;
+				anchors.rightMargin: Style.marginXS;
 
-				width: 12;
-				height: 10;
+				width: Style.iconSizeXS;
+				height: Style.iconSizeXXS;
 
 				rotation: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.isOpen ? 180 : 0
 				source: cbMainRect.baseElement.changeable ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
@@ -451,7 +451,7 @@ StyleComponents {
 			id: checkBoxItem;
 
 			width: checkBoxText.text == "" ? checkRect.width : checkRect.width + checkBoxText.width + checkBoxItem.mainMargin;
-			height: 17;
+			height: Style.itemSizeS;
 
 			property var baseElement: null;
 
@@ -537,15 +537,15 @@ StyleComponents {
 			id: switchItem;
 
 			width: switchText.text == "" ? backgroundRec.width : backgroundRec.width + switchText.width + switchItem.mainMargin;
-			height: 20;
+			height: Style.controlHeightS;
 
 			property var baseElement: null;
 			property bool checked: !baseElement ? false : baseElement.checked;
 
-			property int mainMargin: !baseElement ? 0 : 8;
+			property int mainMargin: !baseElement ? 0 : Style.marginS;
 			property string text: !baseElement ? "" : baseElement.text == undefined ? "" : baseElement.text;
 			property string borderColor: !baseElement ? "" : baseElement.borderColor == undefined ? "" : baseElement.borderColor;
-			property int fontPixelSize: !baseElement ? Style.fontSizeXSmall : baseElement.fontPixelSize == undefined ? 10 : baseElement.fontPixelSize;
+			property int fontPixelSize: !baseElement ? Style.fontSizeXS : baseElement.fontPixelSize == undefined ? 10 : baseElement.fontPixelSize;
 			property bool fontBold: !baseElement ? false : baseElement.fontBold == undefined ? false : baseElement.fontBold;
 
 			property real backgroundWidth: !baseElement ? 0 : baseElement.backgroundWidth;
@@ -604,7 +604,7 @@ StyleComponents {
 		Item{
 			id: sliderItem;
 
-			width: 150;
+			width: Style.sizeHintXXXS;
 			height: !baseElement ?  0 :baseElement.height;
 
 			property var baseElement: null;
@@ -785,7 +785,7 @@ StyleComponents {
 						anchors.topMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
 
 						height: parent.width;
-						width: 30;
+						width: Style.controlheightM;
 						color: Style.textColor//Style.borderColor;
 						property bool isLeft: !sliderItem.baseElement ? false : sliderItem.baseElement.value > sliderItem.baseElement.to/2;
 
@@ -823,7 +823,7 @@ StyleComponents {
 		Item{
 			id: rangeSliderItem;
 
-			width: 150;
+			width: Style.sizeHintXXXS;
 			height: !baseElement ?  0 :baseElement.height;
 
 			property var baseElement: null;
@@ -1002,7 +1002,7 @@ StyleComponents {
 						anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
 
 						height: parent.width;
-						width: 30;
+						width: Style.controlheightM;
 						color: Style.textColor//Style.borderColor;
 						BaseText{
 							anchors.horizontalCenter: parent.horizontalCenter;
@@ -1044,7 +1044,7 @@ StyleComponents {
 						anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
 
 						height: parent.width;
-						width: 30;
+						width: Style.controlheightM;
 						color: Style.textColor//Style.borderColor;
 						BaseText{
 							anchors.horizontalCenter: parent.horizontalCenter;
@@ -1139,7 +1139,7 @@ StyleComponents {
 
 				color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.enabled ? Style.buttonTextColor : Style.buttonInactiveTextColor;
 
-				font.pixelSize: !radioButtonItem.baseElement ? Style.fontSizeXXSmall : radioButtonItem.baseElement.fontPixelSize;
+				font.pixelSize: !radioButtonItem.baseElement ? Style.fontSizeXXS : radioButtonItem.baseElement.fontPixelSize;
 				font.family: Style.fontFamily;
 				font.bold: !radioButtonItem.baseElement ? false : radioButtonItem.baseElement.fontBold;
 
@@ -1153,8 +1153,8 @@ StyleComponents {
 		Item{
 			id: textAreaItem;
 
-			width: 200;
-			height: 30;
+			width: Style.sizeHintXXS;
+			height: Style.controlHeightM;
 			z: -1;
 
 			property var baseElement;
@@ -1185,7 +1185,7 @@ StyleComponents {
 				anchors.verticalCenter: textAreaItem.verticalCenter;
 
 
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 				font.family: Style.fontFamily;
 
 				//TODO -> Style
@@ -1230,12 +1230,12 @@ StyleComponents {
 		Item {
 			id: progressBar;
 
-			width: 300;
+			width: Style.sizeHintXS;
 			height: progressContainer.y + progressContainer.height;
 
 			clip: true;
 
-			property int barHeight: !baseElement ? 30 : baseElement.barHeight;
+			property int barHeight: !baseElement ? Style.controlHeightM : baseElement.barHeight;
 
 			property bool hasText: !baseElement ? true : baseElement.hasText;
 			property bool hasTitle: !baseElement ? true : baseElement.hasTitle;
@@ -1250,13 +1250,13 @@ StyleComponents {
 			property real position: !baseElement ? 0.0 : baseElement.position;
 			property bool indeterminate: !baseElement ? false : baseElement.indeterminate;
 
-			property int barRadius: !baseElement ? 4 : baseElement.barRadius;
+			property int barRadius: !baseElement ? Style.radiusM : baseElement.barRadius;
 			property string barColor: "lightgreen";
 			property bool barIsGradient: !baseElement ? false : baseElement.barIsGradient;
 			property Gradient gradient: !baseElement ? null : baseElement.gradient;
-			property string borderColor: !baseElement ? "lightgrey" : baseElement.borderColor;
-			property string backgroundColor: !baseElement ? "#ffffff" : baseElement.backgroundColor;
-			property int fontSize: !baseElement ? Style.fontSizeLarge : baseElement.fontSize;
+			property string borderColor: !baseElement ? Style.backgroundColor : baseElement.borderColor;
+			property string backgroundColor: !baseElement ? Style.baseColor : baseElement.backgroundColor;
+			property int fontSize: !baseElement ? Style.fontSizeL : baseElement.fontSize;
 
 			property var baseElement: null;
 

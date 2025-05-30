@@ -188,10 +188,10 @@ ViewBase {
         id: headerPanel;
 
         anchors.left: parent.left;
-        anchors.leftMargin: Style.sizeMainMargin
-        height: 50;
+        anchors.leftMargin: Style.marginM
+		height: Style.headerHeight;
 
-        spacing: Style.sizeMainMargin;
+        spacing: Style.marginM;
 
         Text {
             id: productNameLable;
@@ -200,7 +200,7 @@ ViewBase {
 
             color: Style.buttonTextColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
 
             text: qsTr("Product Name");
         }
@@ -210,8 +210,8 @@ ViewBase {
 
             anchors.verticalCenter: headerPanel.verticalCenter;
 
-            height: 30;
-            width: 200;
+			height: Style.controlHeightM;
+			width: Style.sizeHintXXS;
 
             placeHolderText: qsTr("Enter the product name");
 
@@ -232,7 +232,7 @@ ViewBase {
 
             color: Style.buttonTextColor;
             font.family: Style.fontFamilyBold;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
 
             text: qsTr("Category");
         }

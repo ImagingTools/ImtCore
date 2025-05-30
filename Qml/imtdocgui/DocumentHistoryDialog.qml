@@ -16,8 +16,8 @@ Dialog {
 		id: productPairEditor;
 		
 		DocumentHistoryView {
-			width: 500;
-			height: 500;
+			width: Style.sizeHintL;
+			height: width;
 			documentId: documentHistoryDialog.documentId;
 		}
 	}

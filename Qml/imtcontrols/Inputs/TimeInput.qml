@@ -9,14 +9,14 @@ Item {
 	width: 64;
 	height: column.height;
 
-	property int inputHeight: 30;
-	property int fontSize: Style.fontSizeNormal;
+	property int inputHeight: Style.controlHeightM;
+	property int fontSize: Style.fontSizeM;
 
 	property string fontColor: Style.textColor;
 	property alias radius: input.radius;
 	property alias color: input.color;
 
-	property int timeInputDialogWidth: 100;
+	property int timeInputDialogWidth: Style.sizeHintBXS;
 	property int timeInputDialogHeight: 90;
 
 	property string placeHolderText: "hh:mm";
@@ -139,7 +139,7 @@ Item {
 	Column{
 		id: column;
 
-		spacing: Style.sizeSmallMargin;
+		spacing: Style.marginXS;
 
 		Text{
 			id: titleText;
@@ -238,7 +238,7 @@ Item {
 
 		text: qsTr("Wrong time format!")
 
-		fontPixelSize: Style.fontSizeXLarge
+		fontPixelSize: Style.fontSizeXL
 	}
 
 

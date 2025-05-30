@@ -7,13 +7,13 @@ DecoratorBase{
     id: decorator;
 
     width: buttonText.width + buttonText.x;
-    height: 20;
+	height: Style.controlHeightS;
 
     opacity: !baseElement ? 0.4 : baseElement.checked ? 1 : 0.25
 
-    property string color: "gray";
+	property string color: Style.grayColor;
     property string selectedColor: Style.imaginToolsAccentColor;
-    property int fontSize: Style.fontSizeNormal;
+    property int fontSize: Style.fontSizeM;
 
     Rectangle {
         id: circle;
@@ -44,7 +44,7 @@ DecoratorBase{
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.left: circle.right;
-        anchors.leftMargin: 10;
+		anchors.leftMargin: Style.marginM;
         font.pixelSize: decorator.fontSize;
         font.bold: true;
         font.family: Style.fontFamily;

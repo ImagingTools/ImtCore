@@ -14,7 +14,7 @@ Item {
     Column {
         id: content;
         width: parent.width;
-        spacing: Style.sizeMainMargin;
+        spacing: Style.marginM;
 
         GroupHeaderView {
             id: headerView;

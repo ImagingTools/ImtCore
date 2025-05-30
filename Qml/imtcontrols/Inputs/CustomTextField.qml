@@ -5,7 +5,7 @@ import com.imtcore.imtqml 1.0;
 FocusScope {
 	id: containerTextField;
 	
-	height: 40;
+	height: Style.controlHeightL;
 	
 	// property alias text: textField.text;
 	property string text: textField.text; // for web TEMP!!!
@@ -36,10 +36,10 @@ FocusScope {
 	property string borderColorConst: "";
 	
 	property int radius: Style.textFieldRadius;
-	property int textSize: Style.fontSizeNormal;
+	property int textSize: Style.fontSizeM;
 	property int placeHolderTextSize: textSize;
 	property int echoMode: TextInput.Normal;
-	property int margin: Style.sizeMainMargin;
+	property int margin: Style.marginM;
 	
 	property int textFieldLeftMargin: margin;
 	property int textFieldRightMargin: margin;

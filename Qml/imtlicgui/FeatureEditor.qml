@@ -152,25 +152,25 @@ ViewBase {
 	Row {
 		id: headerPanel;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeMainMargin
+		anchors.leftMargin: Style.marginM
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.sizeMainMargin
-		spacing: Style.sizeMainMargin;
-		height: 50;
+		anchors.rightMargin: Style.marginM
+		spacing: Style.marginM;
+		height: Style.headerHeight;
 		
 		Text {
 			anchors.verticalCenter: parent.verticalCenter;
 			color: Style.buttonTextColor;
 			font.family: Style.fontFamilyBold;
-			font.pixelSize: Style.fontSizeNormal;
+			font.pixelSize: Style.fontSizeM;
 			text: qsTr("Feature Name");
 		}
 		
 		CustomTextField {
 			id: featureNameInput;
 			anchors.verticalCenter: parent.verticalCenter;
-			width: 200;
-			height: 30;
+			width: Style.sizeHintXXS;
+			height: Style.controlHeightM;
 			placeHolderText: qsTr("Enter the feature name");
 			autoEditingFinished: false;
 			onEditingFinished: {
@@ -186,15 +186,15 @@ ViewBase {
 			anchors.verticalCenter: parent.verticalCenter;
 			color: Style.buttonTextColor;
 			font.family: Style.fontFamilyBold;
-			font.pixelSize: Style.fontSizeNormal;
+			font.pixelSize: Style.fontSizeM;
 			text: qsTr("Feature-ID");
 		}
 		
 		CustomTextField {
 			id: featureIdInput;
 			anchors.verticalCenter: parent.verticalCenter;
-			width: 200;
-			height: 30;
+			width: Style.sizeHintXXS;
+			height: Style.controlHeightM;
 			placeHolderText: qsTr("Enter the feature ID");
 			onEditingFinished: {
 				featureEditor.doUpdateModel();
@@ -205,7 +205,7 @@ ViewBase {
 			anchors.verticalCenter: parent.verticalCenter;
 			color: Style.buttonTextColor;
 			font.family: Style.fontFamilyBold;
-			font.pixelSize: Style.fontSizeNormal;
+			font.pixelSize: Style.fontSizeM;
 			text: qsTr("Description");
 		}
 		
@@ -226,11 +226,11 @@ ViewBase {
 		
 		anchors.top: headerPanel.bottom;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeMainMargin;
+		anchors.leftMargin: Style.marginM;
 		anchors.right: rightBlock.left;
-		anchors.rightMargin: Style.sizeMainMargin;
+		anchors.rightMargin: Style.marginM;
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.sizeMainMargin;
+		anchors.bottomMargin: Style.marginM;
 		
 		BasicTreeView {
 			id: tableView_;
@@ -352,11 +352,11 @@ ViewBase {
 		
 		anchors.top: headerPanel.bottom;
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.sizeMainMargin;
+		anchors.bottomMargin: Style.marginM;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.sizeMainMargin;
+		anchors.rightMargin: Style.marginM;
 		
-		width: 300;
+		width: Style.sizeHintXS;
 		
 		BasicTreeView {
 			id: featureDependenciesView;

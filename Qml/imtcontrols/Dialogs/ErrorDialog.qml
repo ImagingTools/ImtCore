@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Dialog {
 	id: messageDialog;
 	
-	width: 400;
+	width: Style.sizeHintM;
 	
 	title: qsTr("Error");
 	forceFocus: true;

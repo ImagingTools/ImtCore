@@ -183,7 +183,7 @@ Rectangle {
 						
 						anchors.horizontalCenter: parent.horizontalCenter;
 
-						width: parent.width - 2 * Style.sizeMainMargin;
+						width: parent.width - 2 * Style.marginM;
 						
 						text: "The document has been modified.\nDo you want to save your changes?";
 						font.pixelSize: 18;
@@ -299,7 +299,7 @@ Rectangle {
 						
 						anchors.centerIn: parent;
 						
-						width: parent.width - 2*Style.sizeMainMargin;
+						width: parent.width - 2*Style.marginM;
 						
 						spacing: 30;
 						

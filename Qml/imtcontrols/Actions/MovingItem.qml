@@ -14,8 +14,8 @@ MouseArea{
     property Item containerItem: null;
     property Item movingItem: null;
 
-	property int mainMargin : Style.sizeMainMargin;
-	property int alwaysVisibleSize: 2000;
+	property int mainMargin : Style.marginM;
+	property int alwaysVisibleSize: 2*Style.sizeHintXXXL;
     property var coord: mapToItem(this,0,0);
 	property bool isPressed: false;
     onPressed: {

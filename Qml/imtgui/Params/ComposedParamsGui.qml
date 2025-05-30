@@ -18,7 +18,7 @@ ParamEditorBase {
 	}
 
 	property var settingsController: null
-	property int spacing: Style.sizeLargeMargin
+	property int spacing: Style.marginXL
 
 	sourceComp: Component {
 		Column {
@@ -26,7 +26,7 @@ ParamEditorBase {
 			width: contentWidth;
 			spacing: composedParamsGui.spacing
 			
-			property int contentWidth: 700
+			property int contentWidth: Style.sizeHintXXL
 			
 			property int rootWidth: composedParamsGui.width
 			onRootWidthChanged: {

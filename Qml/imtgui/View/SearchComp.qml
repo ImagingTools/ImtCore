@@ -8,8 +8,8 @@ import imtcontrols 1.0
 Rectangle{
 	id: searchContainer;
 
-	width: 400;
-	height:  40;
+	width: Style.sizeHintM;
+	height:  Style.controlHeightL;
 	radius: Style.size_TextFieldRadius;
 	border.color: Style.grayColor;
 	border.width: 1;
@@ -17,7 +17,7 @@ Rectangle{
 	property int elementHeight: 60;
 
 	property string fontColor: Style.textColor;
-	property int textSize: Style.fontSizeNormal -2;
+	property int textSize: Style.fontSizeM -2;
 
 	property string commandId: "AddressesList";
 
@@ -692,9 +692,9 @@ Rectangle{
 
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.left: parent.left;
-					anchors.leftMargin: Style.sizeMainMargin;
+					anchors.leftMargin: Style.marginM;
 					anchors.right: parent.right;
-					anchors.rightMargin: Style.sizeMainMargin;
+					anchors.rightMargin: Style.marginM;
 
 					wrapMode: Text.WordWrap;
 
@@ -716,9 +716,9 @@ Rectangle{
 
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeMainMargin;
+		anchors.leftMargin: Style.marginM;
 		anchors.right: parent.right;
-		anchors.rightMargin: 2*Style.sizeMainMargin;
+		anchors.rightMargin: 2*Style.marginM;
 		clip: true;
 
 		font.family: Style.fontFamily;
@@ -735,7 +735,7 @@ Rectangle{
 
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.sizeSmallMargin;
+		anchors.rightMargin: Style.marginXS;
 
 		width: height;
 		height: 12;//Math.max(parent.height/2, 16);

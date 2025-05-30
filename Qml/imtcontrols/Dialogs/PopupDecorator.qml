@@ -55,7 +55,7 @@ DecoratorBase {
         anchors.top: topContentLoader.bottom;
 
         width: root.width;
-		height: visible ? popupMenuListView.height + 2 * Style.sizeSmallMargin : false;
+		height: visible ? popupMenuListView.height + 2 * Style.marginXS : false;
 
 		color: Style.baseColor;
 
@@ -124,7 +124,7 @@ DecoratorBase {
         z: itemBody.z-1
         horizontalOffset: 3;
 		verticalOffset: root.isUpwards ? -3 : 3;
-        radius: 8;
+		radius: Style.radiusL;
         spread: 0;
         color: Style.shadowColor;
         source: itemBody;

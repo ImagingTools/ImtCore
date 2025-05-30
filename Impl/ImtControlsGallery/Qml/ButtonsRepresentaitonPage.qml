@@ -107,7 +107,7 @@ Rectangle {
 
         SegmentedButton {
 
-            height: Style.buttonHeight
+            height: Style.buttonHeightM
             isExclusive: true
 
             Button{
@@ -213,7 +213,7 @@ Rectangle {
             wrapMode: Text.WordWrap;
             horizontalAlignment: Text.AlignHCenter;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeXXLarge;
+            font.pixelSize: Style.fontSizeXXL;
             color: Style.errorTextColor;
 
             text: "Click!";

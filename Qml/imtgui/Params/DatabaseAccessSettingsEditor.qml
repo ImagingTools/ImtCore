@@ -76,7 +76,7 @@ ParamEditorBase {
 		Column {
 			id: content
 			width: dbEditor.width
-			spacing: Style.sizeLargeMargin
+			spacing: Style.marginXL
 			
 			GroupHeaderView {
 				width: parent.width;

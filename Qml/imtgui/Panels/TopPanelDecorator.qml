@@ -41,7 +41,7 @@ DecoratorBase {
         id: rightPanel;
         z: 100;
         anchors.right: parent.right;
-        width: 100;
+		width: Style.sizeHintBXS;
         height: topPanelDecorator.height;
     }
 

@@ -25,11 +25,11 @@ ControlBase {
 	property string imageSourceActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
 	property string imageSourceNotActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.Off, Icon.Mode.Disabled);
 
-	property int fontPixelSize: Style.fontSizeNormal;
+	property int fontPixelSize: Style.fontSizeM;
 	property bool fontBold: false;
 	property bool isLeftText: false;
 
-	property int mainMargin: 8;
+	property int mainMargin: Style.marginS;
 
 	function nextCheckState(){
 		if(!tristate){

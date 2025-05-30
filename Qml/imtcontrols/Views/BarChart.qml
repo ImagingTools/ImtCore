@@ -22,9 +22,9 @@ Item {
 	property real minValue: 0;
 
 
-	property string color_positive: "#ff8a3d";
-	property string color_negative: "#000000";
-	property string backgroundColor: "#000000";
+	property string color_positive: Style.positiveAccentColor;
+	property string color_negative: Style.negativeAccentColor;
+	property string backgroundColor: Style.baseColorInverted;
 
 	property bool hasTooltip: true;
 	property bool isPositiveTooltip: true;
@@ -160,8 +160,8 @@ Item {
 
 		fitToTextWidth: true;
 
-		componentHeight: 30;
-		fontPixelSize:  Style.fontSizeNormal;
+		componentHeight: Style.controlHeightM;
+		fontPixelSize:  Style.fontSizeM;
 
 		color: Style.color_buttonText;
 		fontColor: "#ffffff";

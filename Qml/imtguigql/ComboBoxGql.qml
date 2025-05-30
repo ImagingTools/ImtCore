@@ -9,7 +9,7 @@ Item {
 	id: comboBoxContainerGql;
 
 	width: 90;
-	height: 30;
+	height: Style.controlHeightM;
 
 	property var model;
 	property TreeItemModel properties : TreeItemModel{};
@@ -33,16 +33,16 @@ Item {
 	property bool openST: false;
 	property bool preventFirstLoading: false;
 
-	property int radius: 5;
+	property int radius: Style.radiusM;
 	property int currentIndex: -1;
 	property int offset: 0;
 	property int count: 15;
 	property int countVisibleItem: 5;
 	property int delegateRadius: 0;
 	property int itemHeight: 26;
-	property int filterHeiht: 30;
-	property int textSize: Style.fontSizeNormal;
-	property int textDelegateSize: Style.fontSizeNormal;
+	property int filterHeiht: Style.controlHeightM;
+	property int textSize: Style.fontSizeM;
+	property int textDelegateSize: Style.fontSizeM;
 	property int dialogsCountPrev: 1000;
 	property int dialogsCount: ModalDialogManager.count;
 
@@ -323,10 +323,10 @@ Item {
 
 			anchors.right: cbMainRect.right;
 			anchors.verticalCenter: cbMainRect.verticalCenter;
-			anchors.rightMargin: Style.sizeSmallMargin;
+			anchors.rightMargin: Style.marginXS;
 
-			width: 12;
-			height: 10;
+			width: Style.iconSizeXS;
+			height: Style.iconSizeXXS;
 
 			source: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 

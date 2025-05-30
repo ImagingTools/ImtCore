@@ -8,7 +8,7 @@ Rectangle {
 	id: tabPanelContainer;
 	
 	width: list.contentWidth + externButtons.width;
-	height: 40;
+	height: Style.controlHeightL;
 	
 	color: Style.tabPanelBackgroundColor;
 	

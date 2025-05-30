@@ -7,7 +7,7 @@ import imtcontrols 1.0
 Dialog {
 	id: rootDialog;
 	
-	width: 700;
+	width: Style.sizeHintXXL;
 	
 	property bool currentPasswordInputVisible: true;
 	
@@ -28,7 +28,7 @@ Dialog {
 	contentComp: Component {
 		Item {
 			width: rootDialog.width;
-			height: column.height + 2 *  Style.sizeLargeMargin;
+			height: column.height + 2 *  Style.marginXL;
 			
 			property alias oldPassword: column.oldPassword;
 			property alias newPassword: column.newPassword;
@@ -38,9 +38,9 @@ Dialog {
 				
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.left: parent.left;
-				anchors.leftMargin: Style.sizeLargeMargin;
+				anchors.leftMargin: Style.marginXL;
 				anchors.right: parent.right;
-				anchors.rightMargin: Style.sizeLargeMargin;
+				anchors.rightMargin: Style.marginXL;
 				currentPasswordInputVisible: rootDialog.currentPasswordInputVisible;
 				
 				onAcceptedChanged: {

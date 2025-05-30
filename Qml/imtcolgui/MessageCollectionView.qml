@@ -8,7 +8,7 @@ RemoteCollectionView {
 	id: log;
 	
 	width: parent.width
-	height: 200;
+	height: Style.sizeHintXXS;
 	
 	commandsControllerComp: null
 	table.enableAlternating: false

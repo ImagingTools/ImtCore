@@ -21,7 +21,7 @@ ParamEditorBase {
 			width: enableableParamEditor.width
 			name: enableableParamEditor.name
 			description: enableableParamEditor.description
-			controlWidth: 300
+			controlWidth: Style.sizeHintXS
 			checked: enableableParamEditor.enableableParam ? enableableParamEditor.enableableParam.m_value : false
 			readOnly: enableableParamEditor.readOnly
 			onCheckedChanged: {

@@ -20,9 +20,9 @@ Item {
 		anchors.top: parent.top;
 		anchors.left: parent.left;
 		anchors.bottom: parent.bottom;
-		anchors.margins: Style.sizeMainMargin;
+		anchors.margins: Style.marginM;
 		
-		width: 200;
+		width: Style.sizeHintXXS;
 		height: parent.height;
 		
 		color: Style.baseColor;
@@ -31,21 +31,21 @@ Item {
 			id: mainPanel;
 			
 			anchors.fill: parent;
-			anchors.topMargin: Style.sizeMainMargin;
+			anchors.topMargin: Style.marginM;
 			
-			spacing: Style.sizeMainMargin;
+			spacing: Style.marginM;
 			
 			ListView {
 				id: mainPanelRepeater;
 				
 				anchors.left: parent.left;
-				anchors.leftMargin: Style.sizeMainMargin;
+				anchors.leftMargin: Style.marginM;
 				anchors.right: parent.right;
-				anchors.rightMargin: Style.sizeMainMargin;
+				anchors.rightMargin: Style.marginM;
 				
 				height: contentHeight;
 				
-				spacing: Style.sizeMainMargin;
+				spacing: Style.marginM;
 				model: root.paramsSet.m_paramIds;
 				
 				boundsBehavior: Flickable.StopAtBounds;
@@ -79,14 +79,14 @@ Item {
 				z: 100;
 				anchors.right: parent.right;
 				height: root.height
-				secondSize: Style.sizeMainMargin;
+				secondSize: Style.marginM;
 				targetItem: flickable;
 			}
 			
 			Flickable {
 				id: flickable;
 				anchors.fill: parent
-				anchors.margins: Style.sizeLargeMargin
+				anchors.margins: Style.marginXL
 				clip: true;
 				contentWidth: width;
 				contentHeight: bodyPanel.height;

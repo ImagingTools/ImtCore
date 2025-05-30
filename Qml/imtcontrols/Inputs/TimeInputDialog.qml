@@ -11,10 +11,10 @@ import imtgui 1.0
 PopupView {
 	id: timeInputDialog;
 
-	width: 100;
+	width: Style.sizeHintBXS;
 	height: 90;
 
-	property int radius: 8;
+	property int radius: Style.radiusL;
 	property string color: Style.baseColor;
 
 	property int hours: 0;
@@ -76,7 +76,7 @@ PopupView {
 		verticalOffset: 2;
 
 		radius: forShadowRec.radius;
-		color: "lightgray";
+		color: Style.shadowColor;
 
 		source: forShadowRec;
 	}
@@ -98,15 +98,15 @@ PopupView {
 		color: parent.color;
 		border.color: Style.borderColor;
 
-		property int buttonWidth: 20;
-		property int buttonHeight: 16;
-		property int fontSize: Style.fontSizeNormal;
+		property int buttonWidth: Style.buttonWidthS;
+		property int buttonHeight: Style.buttonHeightXXS;
+		property int fontSize: Style.fontSizeM;
 
 		Item{
 			id: hoursColumn;
 
 			anchors.left: parent.left;
-			anchors.leftMargin: Style.sizeMainMargin;
+			anchors.leftMargin: Style.marginM;
 
 			width: body.buttonWidth;
 			height: parent.height;
@@ -116,7 +116,7 @@ PopupView {
 
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.top: parent.top;
-				anchors.topMargin: Style.sizeSmallMargin;
+				anchors.topMargin: Style.marginXS;
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;
@@ -170,7 +170,7 @@ PopupView {
 
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.sizeSmallMargin;
+				anchors.bottomMargin: Style.marginXS;
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;
@@ -194,7 +194,7 @@ PopupView {
 
 			anchors.right: parent.right;
 			anchors.verticalCenter: parent.verticalCenter;
-			anchors.rightMargin: Style.sizeMainMargin;
+			anchors.rightMargin: Style.marginM;
 
 			width: body.buttonWidth;
 			height: parent.height
@@ -205,7 +205,7 @@ PopupView {
 
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.top: parent.top;
-				anchors.topMargin: Style.sizeSmallMargin;
+				anchors.topMargin: Style.marginXS;
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;
@@ -257,7 +257,7 @@ PopupView {
 
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.bottom: parent.bottom;
-				anchors.bottomMargin: Style.sizeSmallMargin;
+				anchors.bottomMargin: Style.marginXS;
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;

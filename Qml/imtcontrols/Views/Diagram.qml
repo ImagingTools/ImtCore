@@ -7,8 +7,8 @@ import imtcontrols 1.0
 Item {
 	id: diagram;
 
-	width: 1000;
-	height: 500;
+	width: Style.sizeHintXXXL;
+	height: Style.sizeHintL;
 
 	property string title: "Заголовок";
 	property string diagramName: "Название диаграммы";
@@ -21,7 +21,7 @@ Item {
 	property TreeItemModel axeYValueModel: TreeItemModel{};
 	property bool visibleAxeX: false;
 	property bool visibleAxeY: true;
-	property int fontSize: 18;
+	property int fontSize: Style.fontSizeXL;
 	property bool hasMinValue: false;
 	property real minValue: 0;
 	property real maxValue: 100;
@@ -29,7 +29,7 @@ Item {
 
 
 	property real minWidth: Math.max((axeYValuesContainer.width + axeY.width + barsList.contentWidth + barsList.anchors.leftMargin + barsSpace.anchors.rightMargin + legendXTextRight.width),
-									 400);
+									 Style.sizeHintM);
 
 
 	property string backgroundColor: "transparent";
@@ -40,10 +40,10 @@ Item {
 	property bool hasMiddleLine: false;
 	property bool hasBarFillingChange: false;
 	property bool hasBigIndicator: false;
-	property real bigIndicatorMargin: 20
+	property real bigIndicatorMargin: 2*Style.marginM
 	property string middleLineColor: "orange";
 
-	property int spacingX: 25;
+	property int spacingX: Style.spacingXXL;
 
 	property real xElementRotation: 0;
 
@@ -334,11 +334,11 @@ Item {
 
 		anchors.left: parent.left;
 		anchors.top: legendYText.bottom;
-		anchors.topMargin: Style.sizeMainMargin;
+		anchors.topMargin: Style.marginM;
 		anchors.bottom: legendXText.top;
-		anchors.bottomMargin: 10;//Style.sizeMainMargin
+		anchors.bottomMargin: 10;//Style.marginM
 
-		width: sizeText.width + 2 * Style.sizeMainMargin;
+		width: sizeText.width + 2 * Style.marginM;
 
 		color: diagram.backgroundColor;
 
@@ -398,7 +398,7 @@ Item {
 		anchors.left: axeYValuesContainer.right;
 		anchors.top: axeYValuesContainer.top;
 		anchors.bottom: axeYValuesContainer.bottom;
-		anchors.bottomMargin: 10;//Style.sizeMainMargin
+		anchors.bottomMargin: 10;//Style.marginM
 
 		width: 2;
 		visible: diagram.visibleAxeY;
@@ -412,7 +412,7 @@ Item {
 		anchors.bottom: axeY.bottom;
 		anchors.left: axeY.right;
 		anchors.right: legendXTextRight.left;
-		anchors.rightMargin: Style.sizeMainMargin;
+		anchors.rightMargin: Style.marginM;
 
 		height: 2;
 		visible: diagram.visibleAxeX;
@@ -424,7 +424,7 @@ Item {
 		id: legendYText;
 
 		anchors.top: titleText.text !== "" ? titleText.bottom : parent.top;
-		anchors.topMargin: Style.sizeSmallMargin;
+		anchors.topMargin: Style.marginXS;
 		anchors.horizontalCenter: axeY.horizontalCenter;
 
 		wrapMode: Text.NoWrap;
@@ -477,7 +477,7 @@ Item {
 		anchors.top: axeYValuesContainer.top;
 		anchors.left: axeY.right;
 		anchors.right: legendXTextRight.left;
-		anchors.rightMargin: Style.sizeMainMargin;
+		anchors.rightMargin: Style.marginM;
 		anchors.bottom: axeX.top;
 		//width: barsList.width + barsList.anchors.leftMargin
 		color: diagram.backgroundColor;

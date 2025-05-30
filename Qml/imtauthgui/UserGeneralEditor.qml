@@ -8,7 +8,7 @@ import imtdocgui 1.0
 
 Column {
 	id: container;
-	spacing: Style.sizeLargeMargin;
+	spacing: Style.marginXL;
 
 	property UserData userData;
 	property bool readOnly: false;
@@ -128,7 +128,7 @@ Column {
 				text: qsTr("Passwords don't match");
 				color: Style.errorTextColor;
 				font.family: Style.fontFamily;
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 			}
 		}
 
@@ -139,7 +139,7 @@ Column {
 				text: qsTr("Passwords don't match");
 				color: Style.errorTextColor;
 				font.family: Style.fontFamily;
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 			}
 		}
 
@@ -209,8 +209,8 @@ Column {
 
 			controlComp: Component {
 				Button {
-					width: 100;
-					height: 30;
+					width: Style.buttonWidthXXL;
+					height: Style.controlHeightM;
 					text: qsTr("Change");
 					onClicked: {
 						ModalDialogManager.openDialog(changePasswordComp, {});

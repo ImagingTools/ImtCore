@@ -73,7 +73,7 @@ Rectangle {
         id: header;
 
         width: parent.width;
-        height: 50;
+		height: Style.headerHeight;
 
         Text {
             id: titleText;
@@ -82,7 +82,7 @@ Rectangle {
 
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeXXLarge;
+            font.pixelSize: Style.fontSizeXXL;
 
 			text: qsTr("Gallery");
 
@@ -93,9 +93,9 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
-            anchors.leftMargin: Style.sizeSmallMargin;
+            anchors.leftMargin: Style.marginXS;
 
-            width: 20;
+			width: Style.buttonWidthS;
             height: width;
 
             decorator: Component{IconButtonDecorator{}}
@@ -116,9 +116,9 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.right: parent.right;
-            anchors.rightMargin: Style.sizeSmallMargin;
+            anchors.rightMargin: Style.marginXS;
 
-            width: 20;
+			width: Style.buttonWidthS;
             height: width;
 
             decorator: Component{IconButtonDecorator{}}
@@ -137,7 +137,7 @@ Rectangle {
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: listContainer.top;
-        anchors.bottomMargin: gallery.isFullScreen ? - 5 : 5;
+		anchors.bottomMargin: gallery.isFullScreen ? - Style.marginXS : Style.marginXS;
         height: 1;
 		color: Style.grayColor;
         opacity: 0.2;
@@ -148,13 +148,13 @@ Rectangle {
         id: listContainer;
 
         anchors.top: gallery.isFullScreen ? parent.top : header.bottom;
-        anchors.topMargin: gallery.isFullScreen ? 0 :10;
+		anchors.topMargin: gallery.isFullScreen ? 0 :Style.marginM;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: gallery.isFullScreen ? 0 : 100;
+		anchors.bottomMargin: gallery.isFullScreen ? 0 : Style.sizeHintBXS;
         anchors.left: parent.left;
         anchors.right: parent.right;
 
-        z: 20;
+		z: 20;
 
 		color: Style.baseColorInverted;
 
@@ -243,11 +243,11 @@ Rectangle {
         anchors.top: listContainer.bottom;
         anchors.topMargin: gallery.isFullScreen ? - 200 :20;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 10;
+		anchors.bottomMargin: Style.marginM;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.leftMargin: 10;
-        anchors.rightMargin: 10;
+		anchors.leftMargin: Style.marginM;
+		anchors.rightMargin: Style.marginM;
 
         clip: true;
 
@@ -391,7 +391,7 @@ Rectangle {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeXXLarge;
+                font.pixelSize: Style.fontSizeXXL;
 
 				text: qsTr("Are you sure you want to delete the photo?");
 
@@ -402,10 +402,10 @@ Rectangle {
 
                 anchors.bottom: parent.bottom;
                 anchors.right: cancelButton.left;
-                anchors.rightMargin: Style.sizeSmallMargin;
-                anchors.bottomMargin: Style.sizeSmallMargin;
+                anchors.rightMargin: Style.marginXS;
+                anchors.bottomMargin: Style.marginXS;
 
-                width: (parent.width - 3 * Style.sizeSmallMargin)/2;
+                width: (parent.width - 3 * Style.marginXS)/2;
                 height: Style.size_ButtonHeight;
 
 				text: qsTr("Ok");
@@ -421,10 +421,10 @@ Rectangle {
 
                 anchors.bottom: parent.bottom;
                 anchors.right: parent.right;
-                anchors.rightMargin: Style.sizeSmallMargin;
-                anchors.bottomMargin: Style.sizeSmallMargin;
+                anchors.rightMargin: Style.marginXS;
+                anchors.bottomMargin: Style.marginXS;
 
-                width: (parent.width - 3 * Style.sizeSmallMargin)/2;
+                width: (parent.width - 3 * Style.marginXS)/2;
                 height: Style.size_ButtonHeight;
 
 				text: qsTr("Cancel");

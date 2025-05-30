@@ -8,7 +8,7 @@ ControlBase {
 
     decorator: Style.progressBarDecorator;
 
-    property int barHeight: 20;
+	property int barHeight: Style.controlHeightS;
 
     property bool hasText: true;
     property bool hasTitle: true;
@@ -27,6 +27,6 @@ ControlBase {
     property string borderColor: "lightgrey";
     property string backgroundColor: "#ffffff";
     property Gradient gradient: Gradient{};
-	property int fontSize: Style.fontSizeLarge;
+	property int fontSize: Style.fontSizeL;
 }
 

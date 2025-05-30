@@ -9,7 +9,7 @@ Item {
 
     height: childrenColumn.visible ? childrenColumn.height + viewDelegateLoader.height : viewDelegateLoader.height;
 
-    property int itemHeight: 30;
+	property int itemHeight: Style.controlHeightM;
 
     property TreeItemModel childModel: model.ChildModel ? model.ChildModel : null;
 
@@ -73,11 +73,11 @@ Item {
                 id: iconArrow;
 
                 anchors.left: parent.left;
-                anchors.leftMargin: 10;
+				anchors.leftMargin: Style.marginM;
                 anchors.verticalCenter: parent.verticalCenter;
 
-                width: 10;
-                height: 10;
+				width: Style.iconSizeXXS;
+				height: width;
 
                 visible: treeItemDelegate.childrenCount > 0;
 
@@ -103,7 +103,7 @@ Item {
                 id: checkBox;
 
                 anchors.left: iconArrow.right;
-				anchors.leftMargin: Style.sizeSmallMargin;
+				anchors.leftMargin: Style.marginXS;
                 anchors.verticalCenter: parent.verticalCenter;
 
                 checkState: model.State;
@@ -130,12 +130,12 @@ Item {
                 id: title;
 
                 anchors.left: checkBox.visible ? checkBox.right : iconArrow.right;
-				anchors.leftMargin: Style.sizeMainMargin;
+				anchors.leftMargin: Style.marginM;
                 anchors.verticalCenter: parent.verticalCenter;
 
                 color: model.Active ? Style.textColor : Style.inactiveTextColor;
 
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeM;
                 font.family: Style.fontFamily;
 
                 text: model.name;
@@ -150,7 +150,7 @@ Item {
         anchors.top: viewDelegateLoader.bottom;
         anchors.right: parent.right;
 
-		width: treeItemDelegate.width - 2*Style.sizeMainMargin;
+		width: treeItemDelegate.width - 2*Style.marginM;
 
         visible: model.Opened && model.Visible;
 

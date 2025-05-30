@@ -26,9 +26,9 @@ ComboBoxElementView {
 				
 				anchors.left: parent.left;
 				anchors.right: clearButton.left;
-				anchors.rightMargin: Style.sizeMainMargin
+				anchors.rightMargin: Style.marginM
 				
-				height: 30;
+				height: Style.controlHeightM;
 				
 				Component.onCompleted: {
 					root.setupComboBox(cb);
@@ -68,7 +68,7 @@ ComboBoxElementView {
 				
 				anchors.right: parent.right;
 				
-				height: 30;
+				height: Style.controlHeightM;
 				
 				widthFromDecorator: true;
 				

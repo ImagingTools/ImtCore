@@ -164,10 +164,10 @@ CollectionView {
 
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.left: parent.left;
-				anchors.leftMargin: Style.sizeMainMargin;
+				anchors.leftMargin: Style.marginM;
 
-				width: 20;
-				height: 20;
+				width: Style.iconSizeM;
+				height: width;
 
 				sourceSize.height: height;
 				sourceSize.width: width;
@@ -180,7 +180,7 @@ CollectionView {
 
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.left: icon.right;
-				anchors.leftMargin: Style.sizeMainMargin;
+				anchors.leftMargin: Style.marginM;
 				anchors.right: updateButton.left;
 
 				text: qsTr("This table has been modified from another computer");
@@ -191,10 +191,10 @@ CollectionView {
 
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.right: parent.right;
-				anchors.rightMargin: Style.sizeMainMargin;
+				anchors.rightMargin: Style.marginM;
 
-				width: 70;
-				height: 30;
+				width: Style.buttonWidthXL;
+				height: Style.controlHeightM;
 
 				text: qsTr("Update");
 

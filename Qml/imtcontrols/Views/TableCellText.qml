@@ -9,7 +9,7 @@ import imtcontrols 1.0
 //     property TableRowDelegateBase rowDelegate: null;
 //     property int columnIndex: -1;
 //     property string text
-//     height: rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeNormal : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeNormal
+//     height: rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeM : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeM
 
 //     Component.onCompleted: {
 //         console.log("onCompleted", text)
@@ -44,7 +44,7 @@ import imtcontrols 1.0
 
 
 //     function drawText(ctx, x, y, cellWidth, text){
-//         let maxTextWidth = cellWidth - Style.sizeSmallMargin * 2;
+//         let maxTextWidth = cellWidth - Style.marginXS * 2;
 //         let trimmedText;
 //         if (text !== ""){
 //             trimmedText = trimTextToFit(ctx, text, maxTextWidth);
@@ -69,13 +69,13 @@ import imtcontrols 1.0
 
 
 //         ctx.strokeStyle =  rowDelegate.tableItem.borderColorVertical
-//         let fontPixelSize = height // rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeNormal : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeNormal
+//         let fontPixelSize = height // rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeM : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeM
 //         ctx.font = '' + fontPixelSize + "px " + Style.fontFamily
 //         // ctx.fillStyle = rowDelegate.tableItem.emptyDecorCell ? Style.textColor : rowDelegate.tableItem.cellDecorator.isValidData("FontColor", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontColor", columnIndex) : Style.textColor
 
 //          ctx.fillStyle = Style.textColor
 
-//         drawText(ctx, Style.sizeSmallMargin, height / 2, width, text)
+//         drawText(ctx, Style.marginXS, height / 2, width, text)
 
 
 //         ctx.stroke();
@@ -94,7 +94,7 @@ Text {
     verticalAlignment: Text.AlignVCenter
     horizontalAlignment: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft : rowDelegate.tableItem.cellDecorator.isValidData("TextPosition", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("TextPosition", name.columnIndex) : Text.AlignLeft : Text.AlignLeft
 
-    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeNormal : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", name.columnIndex) : Style.fontSizeNormal : Style.fontSizeNormal
+    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeM : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", name.columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", name.columnIndex) : Style.fontSizeM : Style.fontSizeM
     font.family: Style.fontFamily
 
     color: rowDelegate

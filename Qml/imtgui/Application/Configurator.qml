@@ -81,8 +81,8 @@ Rectangle {
 		
 		anchors.bottom: parent.bottom;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.sizeMainMargin;
-		anchors.bottomMargin: Style.sizeMainMargin;
+		anchors.rightMargin: Style.marginM;
+		anchors.bottomMargin: Style.marginM;
 		
 		Component.onCompleted: {
 			buttons.addButton({"id":Enums.apply, "name": qsTr("Apply"), "enabled": false});

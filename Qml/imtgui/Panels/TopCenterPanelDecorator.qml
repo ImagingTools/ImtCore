@@ -23,11 +23,11 @@ DecoratorBase {
 		checkWidth()
 	}
 	
-	property int contentWidth: 350;
+	property int contentWidth: Style.sizeHintS;
 	
 	function checkWidth(){
-		tfc.width = Math.min(	contentWidth - buttonItem.width - Style.sizeMainMargin,
-								width - buttonItem.width - Style.sizeMainMargin)
+		tfc.width = Math.min(	contentWidth - buttonItem.width - Style.marginM,
+								width - buttonItem.width - Style.marginM)
 	}
 	
 	Connections {
@@ -58,9 +58,9 @@ DecoratorBase {
 		anchors.verticalCenter: topCenterPanelDecorator.verticalCenter;
 		anchors.horizontalCenter: topCenterPanelDecorator.horizontalCenter;
 		
-		height: 30;
+		height: Style.controlHeightM;
 		
-		spacing: Style.sizeMainMargin;
+		spacing: Style.marginM;
 		
 		Connections {
 			target: NavigationController;
@@ -79,14 +79,14 @@ DecoratorBase {
 			ToolButton {
 				id: leftButton;
 				anchors.left: parent.left;
-				width: 24;
+				width: Style.buttonWidthM;
 				height: parent.height;
 				iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
 									: "../../../" +  Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
 				enabled: false;
 				decorator: Component {
 					ToolButtonDecorator {
-						icon.width: 16;
+						icon.width: Style.iconSizeS;
 					}
 				}
 				onClicked: {
@@ -97,14 +97,14 @@ DecoratorBase {
 			ToolButton {
 				id: rightButton;
 				anchors.left: leftButton.right;
-				width: 24;
+				width: Style.buttonWidthM;
 				height: parent.height;
 				iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
 									: "../../../" +  Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
 				enabled: false;
 				decorator: Component {
 					ToolButtonDecorator {
-						icon.width: 16;
+						icon.width: Style.iconSizeS;
 					}
 				}
 				onClicked: {
@@ -115,9 +115,9 @@ DecoratorBase {
 		
 		SearchTextInput {
 			id: tfc;
-			width: 350;
+			width: Style.sizeHintS;
 			height: parent.height;
-			radius: 4;
+			radius: Style.radiusM;
 			
 			onSearchChanged: {
 				Events.sendEvent("GlobalSearchActivated", tfc.text)

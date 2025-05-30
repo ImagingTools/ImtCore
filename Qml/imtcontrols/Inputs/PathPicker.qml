@@ -8,8 +8,8 @@ import Qt.labs.platform 1.1
 Item {
     id: root;
 
-    width: 400;
-    height: 30;
+	width: Style.sizeHintM;
+	height: Style.controlHeightM;
 
     property string path: model.Path;
 
@@ -33,7 +33,7 @@ Item {
 
             anchors.left: parent.left;
             anchors.right: button.left;
-			anchors.rightMargin: Style.sizeMainMargin;
+			anchors.rightMargin: Style.marginM;
             anchors.verticalCenter: parent.verticalCenter;
 
             height: parent.height;

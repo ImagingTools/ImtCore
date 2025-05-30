@@ -437,7 +437,7 @@ Item {
 
         anchors.right: parent.right;
 
-        width: visible ? 200 : 1;
+		width: visible ? Style.sizeHintXXS : 1;
         height: parent.height;
 
         visible: collectionStructureContainer.visibleMetaInfo;
@@ -504,10 +504,10 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: parent.left;
-                anchors.leftMargin: 10;
+				anchors.leftMargin: Style.marginM;
 
-                width: 20;
-                height: 20;
+				width: Style.iconSizeM;
+				height: width;
 
                 sourceSize.height: height;
                 sourceSize.width: width;
@@ -520,7 +520,7 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: icon.right;
-				anchors.leftMargin: Style.sizeMainMargin;
+				anchors.leftMargin: Style.marginM;
                 anchors.right: updateButton.left;
 
                 text: qsTr("This table has been modified from another computer");
@@ -531,10 +531,10 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.right: parent.right;
-				anchors.rightMargin: Style.sizeMainMargin;
+				anchors.rightMargin: Style.marginM;
 
-                width: 70;
-                height: 30;
+				width: Style.buttonWidthXL;
+				height: Style.conntrolHeightM;
 
                 text: qsTr("Update");
 

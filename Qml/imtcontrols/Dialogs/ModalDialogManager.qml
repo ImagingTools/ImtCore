@@ -181,8 +181,8 @@ Item {
 			flags: Qt.Dialog;
 			modality: Qt.NonModal;//Qt.WindowModal
 			
-			width: 100;
-			height: 100;
+			width: Style.sizeHintBXS;
+			height: width;
 			
 			property var parameters;
 			property alias sourceComponent: windowLoader.sourceComponent;

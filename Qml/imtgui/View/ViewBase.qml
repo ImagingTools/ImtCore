@@ -57,7 +57,7 @@ Item {
 		anchors.top: parent.top;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
-		height: visible ? 40: 0;
+		height: visible ? Style.controlHeightL: 0;
 		visible: alertPanel.item != null && alertPanel.item !== undefined;
 		objectName: "ViewBase";
 	}
@@ -67,7 +67,7 @@ Item {
 		anchors.top: alertPanel.bottom;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
-		height: visible ? 30 + 2 * Style.sizeMainMargin : 0;
+		height: visible ? Style.controlHeightM + 2 * Style.marginM : 0;
 		objectName: "ViewBase";
 		visible: headerViewLoader.item && viewBase.commandsController != null;
 		

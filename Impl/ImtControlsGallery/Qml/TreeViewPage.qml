@@ -30,38 +30,38 @@ Rectangle {
                 index = testInsertModelLevel0.insertNewItem();
                 testInsertModelLevel0.setData("id", String(val + index), index);
                 testInsertModelLevel0.setData("name","ул. Ленина", index);
-                testInsertModelLevel0.setData("TypeId__", "Node", index);
-                testInsertModelLevel0.setData("HasChildren__", true, index);
+				testInsertModelLevel0.setData("typeId__", "Node", index);
+				testInsertModelLevel0.setData("hasChildren__", true, index);
 
                 index = testInsertModelLevel0.insertNewItem();
                 testInsertModelLevel0.setData("id", String(val + index), index);
                 testInsertModelLevel0.setData("name","ул. Маркса", index);
-                testInsertModelLevel0.setData("TypeId__", "Node", index);
-                testInsertModelLevel0.setData("HasChildren__", true, index);
+				testInsertModelLevel0.setData("typeId__", "Node", index);
+				testInsertModelLevel0.setData("hasChildren__", true, index);
 
                 index = testInsertModelLevel0.insertNewItem();
                 testInsertModelLevel0.setData("id", String(val + index), index);
                 testInsertModelLevel0.setData("name","ул. Менделеева", index);
-                testInsertModelLevel0.setData("TypeId__", "Node", index);
-                testInsertModelLevel0.setData("HasChildren__", true, index);
+				testInsertModelLevel0.setData("typeId__", "Node", index);
+				testInsertModelLevel0.setData("hasChildren__", true, index);
 
                 index = testInsertModelLevel0.insertNewItem();
                 testInsertModelLevel0.setData("id", String(val + index), index);
                 testInsertModelLevel0.setData("name","ул. Королёва", index);
-                testInsertModelLevel0.setData("TypeId__", "Node", index);
-                testInsertModelLevel0.setData("HasChildren__", true, index);
+				testInsertModelLevel0.setData("typeId__", "Node", index);
+				testInsertModelLevel0.setData("hasChildren__", true, index);
 
                 index = testInsertModelLevel0.insertNewItem();
                 testInsertModelLevel0.setData("id", String(val + index), index);
                 testInsertModelLevel0.setData("name","ул. Гагарина", index);
-                testInsertModelLevel0.setData("TypeId__", "Node", index);
-                testInsertModelLevel0.setData("HasChildren__", false, index);
+				testInsertModelLevel0.setData("typeId__", "Node", index);
+				testInsertModelLevel0.setData("hasChildren__", false, index);
 
                 index = testInsertModelLevel0.insertNewItem();
                 testInsertModelLevel0.setData("id", String(val + index), index);
                 testInsertModelLevel0.setData("name","ул. Мира", index);
-                testInsertModelLevel0.setData("TypeId__", "Doc", index);
-                testInsertModelLevel0.setData("HasChildren__", false, index);
+				testInsertModelLevel0.setData("typeId__", "Doc", index);
+				testInsertModelLevel0.setData("hasChildren__", false, index);
 
 
             }
@@ -70,18 +70,18 @@ Rectangle {
 
             index = testInsertModel.insertNewItem();
             testInsertModel.setData("name", "дом 1" , index);
-            testInsertModel.setData("TypeId__", "Node", index);
-            testInsertModel.setData("HasChildren__", true, index);
+			testInsertModel.setData("typeId__", "Node", index);
+			testInsertModel.setData("hasChildren__", true, index);
 
             index = testInsertModel.insertNewItem();
             testInsertModel.setData("name","дом 2" , index);
-            testInsertModel.setData("TypeId__", "Node", index);
-            testInsertModel.setData("HasChildren__", true, index);
+			testInsertModel.setData("typeId__", "Node", index);
+			testInsertModel.setData("hasChildren__", true, index);
 
             index = testInsertModel.insertNewItem();
             testInsertModel.setData("name", "дом 3" , index);
-            testInsertModel.setData("TypeId__", "Doc", index);
-            testInsertModel.setData("HasChildren__", false, index);
+			testInsertModel.setData("typeId__", "Doc", index);
+			testInsertModel.setData("hasChildren__", false, index);
 
         }
 

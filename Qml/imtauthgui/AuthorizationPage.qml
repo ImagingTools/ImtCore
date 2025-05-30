@@ -12,7 +12,7 @@ Rectangle {
 
 	property string state:"";
 
-	property int mainRadius: 3;
+	property int mainRadius: Style.radiusS;
 	property string mainColor: Style.backgroundColor;
 
 	property bool canRecoveryPassword: true;
@@ -101,7 +101,7 @@ Rectangle {
 		anchors.horizontalCenter: parent.horizontalCenter;
 		anchors.verticalCenter: parent.verticalCenter;
 
-		width: 400;
+		width: Style.sizeHintM;
 		//height: 380;
 		height: bodyColumn.height + headerItem.height;
 
@@ -132,7 +132,7 @@ Rectangle {
 
 					color: Style.textColor;
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSizeXXLarge;
+					font.pixelSize: Style.fontSizeXXL;
 
 					text: authPageContainer.appName !== "" ? qsTr("Welcome to") + " " + authPageContainer.appName : qsTr("Welcome");
 				}
@@ -167,14 +167,14 @@ Rectangle {
 			anchors.top: headerItem.bottom;
 			anchors.horizontalCenter: parent.horizontalCenter;
 
-			spacing: Style.sizeMainMargin;
+			spacing: Style.marginM;
 
 			Text {
 				id: titleLogin;
 
 				color: Style.textColor;
 				font.family: Style.fontFamilyBold;
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 
 				text: qsTr("Login");
 
@@ -190,8 +190,8 @@ Rectangle {
 			CustomTextField {
 				id: loginTextInput;
 
-				width: 300;
-				height: 30;
+				width: Style.sizeHintXS;
+				height: Style.controlHeightM;
 
 				placeHolderText: qsTr("Enter the login");
 				KeyNavigation.tab: passwordTextInput;
@@ -226,7 +226,7 @@ Rectangle {
 
 				color: Style.textColor;
 				font.family: Style.fontFamilyBold;
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 
 				text: qsTr("Password");
 
@@ -242,8 +242,8 @@ Rectangle {
 			CustomTextField {
 				id: passwordTextInput;
 
-				width: 300;
-				height: 30;
+				width: Style.sizeHintXS;
+				height: Style.controlHeightM;
 
 				placeHolderText: qsTr("Enter the password");
 				echoMode: TextInput.Password;
@@ -312,7 +312,7 @@ Rectangle {
 
 					color: Style.textColor;
 					font.family: Style.fontFamilyBold;
-					font.pixelSize: Style.fontSizeNormal;
+					font.pixelSize: Style.fontSizeM;
 					font.underline: true;
 
 					text: qsTr("Password recovery");
@@ -352,7 +352,7 @@ Rectangle {
 
 					color: Style.textColor;
 					font.family: Style.fontFamilyBold;
-					font.pixelSize: Style.fontSizeNormal;
+					font.pixelSize: Style.fontSizeM;
 					font.underline: true;
 
 					text: qsTr("Register");
@@ -379,7 +379,7 @@ Rectangle {
 				id: errorMessageItem;
 
 				width: parent.width;
-				height: 20;
+				height: Style.controlHeightS;
 
 				Text {
 					id: errorMessage;
@@ -389,7 +389,7 @@ Rectangle {
 
 					color:  Style.errorTextColor;
 					font.family: Style.fontFamily;
-					font.pixelSize: Style.fontSizeNormal;
+					font.pixelSize: Style.fontSizeM;
 
 					visible:  errorMessage.text != "";
 				}
@@ -405,8 +405,8 @@ Rectangle {
 					id: loginButton;
 
 					anchors.centerIn: parent;
-					width: 100;
-					height: 30;
+					width: Style.buttonWidthXXL;
+					height: Style.controlHeightM;
 
 					property int loadingCount: 0;//for web
 					function setItemPropertiesAdd(){
@@ -436,7 +436,7 @@ Rectangle {
 		id: registerDialogComp;
 		Dialog {
 			id: registerDialog;
-			width: 700;
+			width: Style.sizeHintXXL;
 			height: ModalDialogManager.activeView.height - 100;
 			title: qsTr("User Registration");
 			canMove: false;
@@ -476,9 +476,9 @@ Rectangle {
 					Flickable {
 						id: flickable;
 						anchors.left: parent.left;
-						anchors.leftMargin: Style.sizeLargeMargin;
+						anchors.leftMargin: Style.marginXL;
 						anchors.right: parent.right
-						anchors.rightMargin: Style.sizeLargeMargin;
+						anchors.rightMargin: Style.marginXL;
 						height: parent.height;
 
 						contentHeight: userGeneralEditor.height;

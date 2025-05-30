@@ -40,65 +40,181 @@ StyleComponents {
 	property alias mainFontLoader: mainFont;
 	property alias boldFontLoader: boldFont;
 
-	//Font size
-	property int fontSizeXHuge: 64
-	property int fontSizeHuge: 48
-	property int fontSizeXXXXLarge: 32
-	property int fontSizeXXXLarge: 24
-	property int fontSizeXXLarge: 20
-	property int fontSizeXLarge: 18
-	property int fontSizeLarge: 16
-	property int fontSizeNormal: 13
-	property int fontSizeSmall: 11
-	property int fontSizeXSmall: 10
-	property int fontSizeXXSmall: 8
-	property int fontSizeTiny: 6
+	//Start window sizes
+	property int startWindowWidth: 800;
+	property int startWindowHeight: 600;
 
-	//Button sizes
-	property int buttonWidthLarge: 32
-	property int buttonWidthMedium: 24
-	property int buttonWidthSmall: 16
-	property int buttonWidthXSmall: 8
-	property int buttonWidthTiny: 4
+
+	//deprecated, will be romoved after refactoring
+	//Font size - deprecated,change to --------------->
+	property int fontSizeXHuge: 64			//fontSizeBXXXL
+	property int fontSizeHuge: 48			//fontSizeBXXL
+	property int fontSizeXXXXLarge: 32		//fontSizeBXL
+	property int fontSizeXXXLarge: 24		//fontSizeXXXL
+	property int fontSizeXXLarge: 20		//fontSizeXXL
+	property int fontSizeXLarge: 18			//fontSizeXL
+	property int fontSizeLarge: 16			//fontSizeL
+	property int fontSizeNormal: 13			//fontSizeM
+	property int fontSizeSmall: 11			//fontSizeS
+	property int fontSizeXSmall: 10			//fontSizeXS
+	property int fontSizeXXSmall: 8			//fontSizeXXS
+	property int fontSizeTiny: 6			//fontSizeXXXS
+
+
+	//Button sizes - deprecated, change to ---------->
+	property int buttonWidthLarge: 32		//buttonWidthL
+	property int buttonWidthMedium: 24		//buttonWidthM
+	property int buttonWidthSmall: 16		//buttonWidthXS
+	property int buttonWidthXSmall: 8		//buttonWidthXXS
+	property int buttonWidthTiny: 4			//buttonWidthXXXS
+
+	property int buttonHeight: 30 //  deprecated, change to ----->buttonHeightM
+
+	//Icon sizes - - deprecated,change to ---------->
+	property int iconSizeXLarge: 128	//iconSizeXXXL
+	property int iconSizeLarge: 64		//iconSizeXXL
+	property int iconSizeMedium: 32		//iconSizeL
+	property int iconSizeSmall: 16		//iconSizeS
+	property int iconSizeXSmall: 8		//iconSizeXXXS
+
+	//Item sizes - deprecated,change to ---------->
+	property int itemSizeHuge: 128		//itemSizeXXL
+	property int itemSizeXLarge: 64		//itemSizeXL
+	property int itemSizeLarge: 48		//itemSizeL
+	property int itemSizeMedium: 32		//itemSizeM
+	property int itemSizeSmall: 16		//itemSizeS
+	property int itemSizeXSmall: 8		//itemSizeXS
+
+	//Paddings - deprecated,change to ---------->
+	property int paddingHuge: 64		//paddingXL
+	property int paddingLarge: 32		//paddingL
+	property int paddingMedium: 16		//paddingM
+	property int paddingSmall: 8		//paddingS
+
+	//Margins - deprecated, change to ---------->
+	property int sizeLargeMargin: 23;	//marginXL
+	property int sizeMainMargin: 10;	//marginM
+	property int sizeSmallMargin: 6;	//marginXS
+
+	//NEW
+	//Font size
+	property int fontSizeBXXXL: 64
+	property int fontSizeBXXL: 48
+	property int fontSizeBXL: 32
+	property int fontSizeXXXL: 24
+	property int fontSizeXXL: 20
+	property int fontSizeXL: 18
+	property int fontSizeL: 16
+	property int fontSizeM: 13
+	property int fontSizeS: 11
+	property int fontSizeXS: 10
+	property int fontSizeXXS: 8
+	property int fontSizeXXXS: 6
+
+	//Margins
+	property int marginXXXL: 64;
+	property int marginXXL: 32;
+	property int marginXL: 24;
+	property int marginL: 16;
+	property int marginM: 10;
+	property int marginS: 8;
+	property int marginXS: 6;
+
+	//SizeHint
+	property int sizeHintXXXL: 1000
+	property int sizeHintXXL: 700
+	property int sizeHintXL: 600
+	property int sizeHintL: 500
+	property int sizeHintM: 400
+	property int sizeHintS: 350
+	property int sizeHintXS: 300
+	property int sizeHintXXS: 200
+	property int sizeHintXXXS: 150
+	property int sizeHintBXS: 100
+
+
+	//Control height
+	property int controlHeightL: 40
+	property int controlHeightM: 30
+	property int controlHeightS: 20
+
+	//radius
+	property int radiusXXL: 30
+	property int radiusXL: 16
+	property int radiusL: 8
+	property int radiusM: 4
+	property int radiusS: 3
+	property int radiusXS: 2
+
+	//spacing
+	property int spacingXXXL: 50
+	property int spacingXXL: 25
+	property int spacingXL: 20
+	property int spacingL: 16
+	property int spacingM: 10
+	property int spacingS: 8
+	property int spacingXS: 4
+
+	//Icon sizes
+	property int iconSizeXXXL: 128
+	property int iconSizeXXL: 64
+	property int iconSizeXL: 40
+	property int iconSizeL: 32
+	property int iconSizeM: 20
+	property int iconSizeS: 16
+	property int iconSizeXS: 12
+	property int iconSizeXXS: 10
+	property int iconSizeXXXS: 8
+
+	//Button width
+	property int buttonWidthXXXL: 150
+	property int buttonWidthXXL: 100
+	property int buttonWidthXL: 70
+	property int buttonWidthL: 32
+	property int buttonWidthM: 24
+	property int buttonWidthS: 20
+	property int buttonWidthXS: 16
+	property int buttonWidthXXS: 8
+	property int buttonWidthXXXS: 4
+
+	//Button height
+	property int buttonHeightM: 30
+	property int buttonHeightS: 22
+	property int buttonHeightXS: 20
+	property int buttonHeightXXS: 16
+	property int buttonHeightXXXS: 10
 
 	property int buttonRadius: 4
 	property int buttonBorderWidth: 1
-	property int buttonHeight: 30
-
-	//Icon sizes
-	property int iconSizeXLarge: 128
-	property int iconSizeLarge: 64
-	property int iconSizeMedium: 32
-	property int iconSizeSmall: 16
-	property int iconSizeXSmall: 8
 
 	//Item sizes
-	property int itemSizeHuge: 128
-	property int itemSizeXLarge: 64
-	property int itemSizeLarge: 48
-	property int itemSizeMedium: 32
-	property int itemSizeSmall: 16
-	property int itemSizeXSmall: 8
-
-	//Opacity
-	property real opacityFaint: 0.05
-	property real opacityHigh: 0.75
-	property real opacityLow: 0.25
-	property real opacityOverlay: 0.15
-	property real selectedOpacity: 0.75
-	property real hoverOpacity: selectedOpacity/2
-	property real highlightBackgroundOpacity: 0.15
+	property int itemSizeXXL: 128
+	property int itemSizeXL: 64
+	property int itemSizeL: 48
+	property int itemSizeM: 32
+	property int itemSizeS: 16
+	property int itemSizeXS: 8
 
 	//Paddings
-	property int paddingHuge: 64
-	property int paddingLarge: 32
-	property int paddingMedium: 16
-	property int paddingSmall: 8
+	property int paddingXL: 64
+	property int paddingL: 32
+	property int paddingM: 16
+	property int paddingS: 8
 
-	//Margins
-	property int sizeSmallMargin: 6;
-	property int sizeMainMargin: 11;
-	property int sizeLargeMargin: 23;
+	//menu row
+	property int menuRowHeight: 30
+
+	//table sizes
+	property int tableRowHeight: 35
+	property int tableHeaderHeight: 35
+
+	//grid cell size
+	property int gridCellSize: 110
+
+	//treeView
+	property int treeBranchOffset: 35;
+	//NEW
+
 
 	property int mainWindowMargin: 0;
 	property int pageMargin: 0;
@@ -109,7 +225,16 @@ StyleComponents {
 
 	//Other sizes
 	property int sizePanelsHeight: 50;
+	property int headerHeight: 50;
 
+	//Opacity
+	property real opacityFaint: 0.05
+	property real opacityHigh: 0.75
+	property real opacityLow: 0.25
+	property real opacityOverlay: 0.15
+	property real selectedOpacity: 0.75
+	property real hoverOpacity: selectedOpacity/2
+	property real highlightBackgroundOpacity: 0.15
 
 	//Alternating
 	property bool enableAlternating: true;
@@ -128,8 +253,9 @@ StyleComponents {
 	property string baseColor: "white";
 	property string baseColorInverted: "black";
 	property string mainColor: "#e6e6e8";
-	property string firstColor: mainColor
+	property string firstColor: "#4682B4";
 	property string secondColor: "#F18C16";
+	property string firstColorHighlight: "#B0C4DE";
 	property string colorMenuPanel: imagingToolsGradient1;
 
 		//error
@@ -187,6 +313,14 @@ StyleComponents {
 	property string buttonBorderFocusColor: borderColor;
 	property string buttonTextColor: "#335777";
 	property string buttonInactiveTextColor: "#335777";
+
+		//Table
+	property string tableHeaderColor: "#E5E5E5";
+	property string tableCellColor: "#ffffff";
+	property string tableHeaderBorederColor: "#686671";
+	property string tableCellBorderColor: "#E5E5E5";
+	property string tableHeaderFontColor: "#686671";
+	property string tableCellFontColor: "#686671";
 
 		//scroll
 	property string scrollBackgroundColor: styleContainer.imagingToolsGradient0;

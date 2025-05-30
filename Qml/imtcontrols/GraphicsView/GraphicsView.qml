@@ -142,8 +142,8 @@ Rectangle {
 			return
 		}
 
-		let scaleCoeff_ = (canvas.width - Style.sizeMainMargin * 2) / canvas.backgroundWidth;
-		let scaleCoeff_h = (canvas.height - Style.sizeMainMargin * 2) / canvas.backgroundHeight;
+		let scaleCoeff_ = (canvas.width - Style.marginM * 2) / canvas.backgroundWidth;
+		let scaleCoeff_h = (canvas.height - Style.marginM * 2) / canvas.backgroundHeight;
 		if (scaleCoeff_ > scaleCoeff_h){
 			scaleCoeff_ = scaleCoeff_h
 		}
@@ -608,7 +608,7 @@ Rectangle {
 			property real mainRec_height: 60
 
 			property int fontSize: 20
-			property int fontSizeSmall: 14
+			property int fontSizeS: 14
 			property int radius_: 2
 			property int borderShift: 4
 			property int shadowSize: 6
@@ -800,7 +800,7 @@ Rectangle {
 				let textWidth_main = ctx.measureText(mainText).width
 
 				ctx.lineWidth = 0.5;
-				let fontStr_second = String(canvas.fontSizeSmall) + "px sans-serif"
+				let fontStr_second = String(canvas.fontSizeS) + "px sans-serif"
 				ctx.font = fontStr_second;
 				let textStr_second = secondText;
 				let textWidth_second = ctx.measureText(secondText).width
@@ -891,7 +891,7 @@ Rectangle {
 				ctx.strokeStyle = canvas.secondTextColor;
 				ctx.fillStyle = canvas.secondTextColor;
 				ctx.lineWidth = 0.5;
-				let fontStr2 = String(canvas.fontSizeSmall) + "px sans-serif"
+				let fontStr2 = String(canvas.fontSizeS) + "px sans-serif"
 				ctx.font = fontStr2;
 				let textStr2 = secondText;
 				let textWidth2 = ctx.measureText(secondText).width

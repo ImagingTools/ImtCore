@@ -11,7 +11,7 @@ DecoratorBase {
 	id: mainItem;
 	
 	width: baseElement ? baseElement.width: 0;
-	height: 40;
+	height: Style.controlHeightL;
 	
 	property alias segmentedButton: segmentedButton_
 	property alias filtermenu: filtermenu_

@@ -89,7 +89,7 @@ Rectangle {
 
 			Item {
 				width: parent.width;
-				height: elementView.height + 2*Style.sizeMainMargin;
+				height: elementView.height + 2*Style.marginM;
 
 				ElementView {
 					id: elementView;
@@ -102,7 +102,7 @@ Rectangle {
 						Text {
 							width: parent.width;
 							font.family: Style.fontFamily;
-							font.pixelSize: Style.fontSizeNormal;
+							font.pixelSize: Style.fontSizeM;
 							color: Style.textColor;
 							wrapMode: Text.WrapAnywhere;
 							text: model.item.m_description;
@@ -114,8 +114,8 @@ Rectangle {
 						z: 999;
 						anchors.verticalCenter: parent.top;
 						anchors.left: parent.left;
-						anchors.leftMargin: Style.sizeMainMargin;
-						spacing: Style.sizeMainMargin;
+						anchors.leftMargin: Style.marginM;
+						spacing: Style.marginM;
 
 						StickerView {
 							anchors.verticalCenter: parent.verticalCenter;
@@ -140,9 +140,9 @@ Rectangle {
 		anchors.left: parent.left;
 		anchors.right: parent.right;
 		anchors.top: parent.top;
-		anchors.topMargin: Style.sizeMainMargin;
+		anchors.topMargin: Style.marginM;
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.sizeMainMargin;
+		anchors.bottomMargin: Style.marginM;
 
 		contentWidth: width;
 		contentHeight: column.height;
@@ -156,11 +156,11 @@ Rectangle {
 			id: column;
 
 			anchors.left: parent.left;
-			anchors.leftMargin: Style.sizeMainMargin;
+			anchors.leftMargin: Style.marginM;
 			anchors.right: parent.right;
-			anchors.rightMargin: Style.sizeMainMargin;
+			anchors.rightMargin: Style.marginM;
 
-			spacing: Style.sizeMainMargin;
+			spacing: Style.marginM;
 
 			Repeater {
 				id: repeaterColumn;
@@ -172,7 +172,7 @@ Rectangle {
 
 	Text {
 		anchors.centerIn: parent;
-		font.pixelSize: Style.fontSizeNormal;
+		font.pixelSize: Style.fontSizeM;
 		font.family: Style.fontFamilyBold;
 		font.bold: true;
 		color: Style.textColor;

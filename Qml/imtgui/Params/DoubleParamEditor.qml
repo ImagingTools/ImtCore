@@ -20,7 +20,7 @@ ParamEditorBase {
 			width: doubleParamEditor.width
 			name: doubleParamEditor.name
 			description: doubleParamEditor.description
-			controlWidth: 300
+			controlWidth: Style.sizeHintXS
 			text: doubleParamEditor.valueParam ? doubleParamEditor.valueParam.m_value : 0
 			readOnly: doubleParamEditor.readOnly
 			onEditingFinished: {

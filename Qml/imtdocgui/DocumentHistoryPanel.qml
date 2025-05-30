@@ -16,7 +16,7 @@ Rectangle {
 	color: Style.baseColor;
 
 	property bool opened: true;
-	property int contentWidth: 500;
+	property int contentWidth: Style.sizeHintL;
 	property alias contentHeight: historyView.contentHeight;
 	property string documentId: "";
 	property alias collectionId: historyView.collectionId;
@@ -71,11 +71,11 @@ Rectangle {
 	GroupHeaderView {
 		id: historyHeader;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeLargeMargin;
+		anchors.leftMargin: Style.marginXL;
 		anchors.top: parent.top;
-		anchors.topMargin: Style.sizeLargeMargin;
+		anchors.topMargin: Style.marginXL;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.sizeLargeMargin;
+		anchors.rightMargin: Style.marginXL;
 		title: qsTr("History");
 		titleText.visible: historyPanel.width == historyPanel.contentWidth;
 		
@@ -85,7 +85,7 @@ Rectangle {
 			ToolButton {
 				id: openButton;
 
-				height: 22;
+				height: Style.buttonHeightS;
 				width: height;
 				iconSource: historyPanel.opened
 							? "../../../" + Style.getIconPath("Icons/History", Icon.State.On, Icon.Mode.Normal)
@@ -103,11 +103,11 @@ Rectangle {
 	DocumentHistoryView {
 		id: historyView;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeLargeMargin;
+		anchors.leftMargin: Style.marginXL;
 		anchors.top: historyHeader.bottom;
 		anchors.bottom: parent.bottom;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.sizeLargeMargin;
+		anchors.rightMargin: Style.marginXL;
 		// visible: historyPanel.width !== 0;
 		visible: historyPanel.width == historyPanel.contentWidth;
 		documentId: historyPanel.documentId;

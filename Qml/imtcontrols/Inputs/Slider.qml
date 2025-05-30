@@ -19,7 +19,7 @@ ControlBase {
 	property real backgroundOpacity: 1.;
 
 	property real controlRecX: 0;
-	property real controlWidth: 20;
+	property real controlWidth: Style.controlHeightS;
 	property real controlHeight: controlWidth;
 
 	property int orientation: Qt.Horizontal;
@@ -34,14 +34,14 @@ ControlBase {
 
 	property bool hasTicks: majorTickInterval > 0;
 	property bool hasIndicator: false;
-	property int majorTickHeight: 30;
+	property int majorTickHeight: Style.controlHeightM;
 	property int minorTickHeight: majorTickHeight/2;
-	property int indicatorHeight: 60;
+	property int indicatorHeight: 2*Style.controlHeightM;
 
 	property int ticksPosition: RelativePosition.verticalCenter
 	property int indicatorPosition: RelativePosition.top
 	property real controlCenterY: height/2;
-	property int fontSize: Style.fontSizeNormal;
+	property int fontSize: Style.fontSizeM;
 
 	property alias tooltipText: tooltip.text;
 	property alias tooltipItem: tooltip;

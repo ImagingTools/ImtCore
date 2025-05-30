@@ -16,7 +16,7 @@ TableRowDelegateBase {
 
 		anchors.left: parent.left;
 		anchors.leftMargin: tableDelegateContainer.tableItem
-							&& tableDelegateContainer.tableItem.checkable ? 3 * Style.sizeMainMargin : 0
+							&& tableDelegateContainer.tableItem.checkable ? 3 * Style.marginM : 0
 
 		rowDelegate: tableDelegateContainer
 		model: tableDelegateContainer.columnCount

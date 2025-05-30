@@ -26,7 +26,7 @@ ParamEditorBase {
 			width: urlParamEditor.width
 			name: urlParamEditor.name
 			description: urlParamEditor.description
-			controlWidth: 300
+			controlWidth: Style.sizeHintXS
 			textInputValidator: urlValid
 			showErrorWhenInvalid: true
 			onEditingFinished: {

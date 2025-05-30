@@ -7,7 +7,7 @@ import imtcontrols 1.0
 Dialog {
 	id: dialog;
 
-	width: 300;
+	width: Style.sizeHintXS;
 
 	title: qsTr("Table configuration");
 	property TableViewParams tableViewParamsCopied: TableViewParams {};
@@ -21,7 +21,7 @@ Dialog {
 			property var checkedIndexes: [];
 			property bool block: true;
 
-			spacing: Style.sizeMainMargin;
+			spacing: Style.marginM;
 
 			function updateGui(){
 				item.block = true;
@@ -116,10 +116,10 @@ Dialog {
 					id: buttonRow;
 
 					anchors.left: parent.left;
-					anchors.leftMargin: Style.sizeMainMargin;
+					anchors.leftMargin: Style.marginM;
 
 					height: 25;
-					spacing: Style.sizeSmallMargin
+					spacing: Style.marginXS
 
 					visible: !dialog.tableItem ? false : dialog.tableItem.canSwapColumns;
 
@@ -197,7 +197,7 @@ Dialog {
 
 					anchors.verticalCenter: buttonRow.verticalCenter;
 					anchors.right: buttonRow.visible ? parent.right : undefined;
-					anchors.rightMargin: buttonRow.visible ? Style.sizeMainMargin : 0;
+					anchors.rightMargin: buttonRow.visible ? Style.marginM : 0;
 					anchors.horizontalCenter: !buttonRow.visible ? parent.horizontalCenter : undefined;
 
 					visible: !dialog.tableItem ? false : dialog.tableItem.isFlickable;
@@ -252,7 +252,7 @@ Dialog {
 	Component {
 		id: resetDialog;
 		MessageDialog {
-			width: 400;
+			width: Style.sizeHintM;
 			title: qsTr("Confirm reset headers");
 			message: qsTr("Reset header settings to default ?");
 			onFinished: {

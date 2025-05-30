@@ -6,7 +6,7 @@ import imtcontrols 1.0
 Item {
     id: inputDialogBodyContainer;
 
-	height: columnBody.height + 2*Style.sizeLargeMargin;
+	height: columnBody.height + 2*Style.marginXL;
 
     property string message;
     property string inputValue: "";
@@ -22,9 +22,9 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.right: parent.right;
-        anchors.rightMargin: Style.sizeMainMargin;
+        anchors.rightMargin: Style.marginM;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.sizeMainMargin;
+        anchors.leftMargin: Style.marginM;
 
         spacing: 5;
 
@@ -36,7 +36,7 @@ Item {
             text: inputDialogBodyContainer.message;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeNormal;
+            font.pixelSize: Style.fontSizeM;
             elide: Text.ElideRight;
 
             wrapMode: Text.WordWrap;

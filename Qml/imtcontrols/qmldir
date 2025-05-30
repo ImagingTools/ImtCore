@@ -43,7 +43,6 @@ TextButtonDecorator 1.0 ./Buttons/TextButtonDecorator.qml
 ToolButton 1.0 ./Buttons/ToolButton.qml
 ToolButtonDecorator 1.0 ./Buttons/ToolButtonDecorator.qml
 TopButtonDecorator 1.0 ./Buttons/TopButtonDecorator.qml
-TopButtonDecoratorNew 1.0 ./Buttons/TopButtonDecoratorNew.qml
 IconButtonDecorator 1.0 ./Buttons/IconButtonDecorator.qml
 RadioButtonDecorator 1.0 ./Buttons/RadioButtonDecorator.qml
 SegmentedButton 1.0 ./Buttons/SegmentedButton.qml

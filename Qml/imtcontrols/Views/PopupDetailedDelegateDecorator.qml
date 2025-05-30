@@ -8,7 +8,7 @@ import imtcontrols 1.0
 DecoratorBase {
     id: commonButtonDecorator
 
-    height: content.height + Style.sizeMainMargin;
+    height: content.height + Style.marginM;
 
     clip: true;
 
@@ -28,9 +28,9 @@ DecoratorBase {
 
         anchors.verticalCenter: commonButtonDecorator.verticalCenter;
         anchors.left: commonButtonDecorator.left;
-        anchors.leftMargin: Style.sizeMainMargin;
+        anchors.leftMargin: Style.marginM;
         anchors.right: commonButtonDecorator.right;
-        anchors.rightMargin: Style.sizeMainMargin;
+        anchors.rightMargin: Style.marginM;
 
         Text {
             id: textObj
@@ -39,7 +39,7 @@ DecoratorBase {
 
             color: !commonButtonDecorator.baseElement ? "transparent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactiveTextColor
 
-            font.pixelSize: Style.fontSizeNormal
+            font.pixelSize: Style.fontSizeM
             font.family: Style.fontFamily
 
             text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
@@ -53,7 +53,7 @@ DecoratorBase {
 
             color: Style.inactiveTextColor
 
-            font.pixelSize: Style.fontSizeSmall
+            font.pixelSize: Style.fontSizeS
             font.family: Style.fontFamily
 
             text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.description;

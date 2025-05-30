@@ -11,7 +11,7 @@ Rectangle {
 	clip: true;
 
 	color: Style.backgroundColor;
-	radius: 7;
+	radius: Style.radiusL;
 
 	property string textColor: Style.textColor;
 	property string fontName: "Helvetica";

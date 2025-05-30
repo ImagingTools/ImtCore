@@ -6,14 +6,14 @@ import imtcontrols 1.0
 Rectangle {
     id: tableDelegateContainer;
 
-    width: 1000;
+	width: Style.sizeHintXXXL;
     height: visible ? minHeight : 0;
 	color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
 
-    property int textTopMargin: 8;
+	property int textTopMargin: Style.marginS;
     property int count: 0;
 
-    property real minHeight: 40;
+	property real minHeight: Style.controlHeightL;
 
     property bool selected: false;
     property int checkedState: Qt.Unchecked;
@@ -62,9 +62,9 @@ Rectangle {
 
     property string maxLengthText: '';
 
-    property int textMarginHor: 8;
-    property int textLeftMargin: 8;
-    property int textRightMargin: 8;
+	property int textMarginHor: Style.marginS;
+	property int textLeftMargin: Style.marginS;
+	property int textRightMargin: Style.marginS;
     property int textMarginVer: textTopMargin;
 
     property bool compl: false;

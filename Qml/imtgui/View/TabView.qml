@@ -14,7 +14,7 @@ Item {
 	property alias currentIndex: tabPanel.selectedIndex;
 	property alias closable: tabPanel.isCloseEnable;
 
-	property int mainMargin: Style.sizeMainMargin;
+	property int mainMargin: Style.marginM;
 
 	signal tabLoaded(int index, string tabId, var tabItem);
 	signal tabClicked(var mouse, var tabItem, int index);

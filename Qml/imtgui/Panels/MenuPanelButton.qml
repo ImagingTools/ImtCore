@@ -19,7 +19,7 @@ ControlBase {
 
     property real imageDecrease: 0.63;
     property real imageSelectedCoeff: 0.73;
-	property real fontSize: Style.fontSizeSmall;
+	property real fontSize: Style.fontSizeS;
 
     property int contentWidth: 80;
     property int contentHeight: 80;

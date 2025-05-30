@@ -21,7 +21,7 @@ ParamEditorBase {
 			width: textParamEditor.width
 			name: textParamEditor.name
 			description: textParamEditor.description
-			controlWidth: 300
+			controlWidth: Style.sizeHintXS
 			text: textParamEditor.textParam ? textParamEditor.textParam.m_text : ""
 			readOnly: textParamEditor.readOnly
 			onEditingFinished: {

@@ -5,8 +5,8 @@ import Acf 1.0
 Canvas {
 	id: canvas;
 
-	width: Style.sizeLargeMargin;
-	height: Style.sizeLargeMargin;
+	width: Style.marginXL;
+	height: Style.marginXL;
 
 	antialiasing: true;
 

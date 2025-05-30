@@ -32,9 +32,9 @@ ComboBoxElementView {
 
                 anchors.left: parent.left;
                 anchors.right: clearButton.left;
-                anchors.rightMargin: Style.sizeMainMargin
+                anchors.rightMargin: Style.marginM
 
-                height: 30;
+				height: Style.controlHeightM;
 
                 filteringFields: root.filteringFields;
                 descriptionFieldId: root.descriptionFieldId;
@@ -82,7 +82,7 @@ ComboBoxElementView {
             Button {
                 id: clearButton;
                 anchors.right: parent.right;
-                height: 30;
+				height: Style.controlHeightM;
                 text: qsTr("Clear");
                 widthFromDecorator: true;
                 enabled: root.changeable && root.currentIndex >= 0;

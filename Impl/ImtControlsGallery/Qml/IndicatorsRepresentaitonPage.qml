@@ -110,7 +110,29 @@ Rectangle {
 
 				}
 			}
+
+			Button{
+				id: taskFailedButton;
+
+				property bool isFailed: false;
+				visible: false;
+				anchors.verticalCenter: parent.verticalCenter;
+				text: "taskFailed"
+				onClicked: {
+					isFailed = true;
+				}
+			}
         }//progressBarRow
+
+		Shortcut{
+			id: taskFailedShortCut
+			sequence: "Return";
+			enabled: true;
+			onActivated: {
+				//console.log("TASK FAILED!!!")
+				taskFailedButton.clicked();
+			}
+		}
 
         Row{
             id: indicatorsRow;
@@ -333,16 +355,42 @@ Rectangle {
 	property real percent: 0;
 
 
-
 	Component {
 		id: proggressDialog;
 
 		ProgressDialogManager{
 			value: indicatorsRepresentaitonPage.percent/100;
+			//isFailed: true;
+			isFailed: taskFailedButton.isFailed;
+			onValueChanged: {
+				if(value >= 1 && !isFailed){
+					root.closeByComp(proggressDialog);
+					taskComleted(taskId);
+				}
+			}
+
 			onTaskComleted: {
 				let text_ = description + " "  + qsTr("completed")
 				let param = {"text": text_}
 				ModalDialogManager.openDialog(messageComp, param)
+			}
+			onIsFailedChanged: {
+				if(isFailed){
+					let text_ = description + " "  + qsTr("failed") + "!";
+					let param = {"text": text_};
+					ModalDialogManager.openDialog(messageComp, param);
+				}
+			}
+			onTaskCanceled: {
+				root.closeByComp(proggressDialog);
+
+				let text_ = description + " "  + qsTr("cancelled") + "!";
+				let param = {"text": text_};
+				ModalDialogManager.openDialog(messageComp, param);
+
+			}
+			onTaskClosed: {
+				taskFailedButton.isFailed = false;
 			}
 		}
 

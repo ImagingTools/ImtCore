@@ -103,12 +103,12 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.sizeMainMargin;
+        anchors.leftMargin: Style.marginM;
 
         width:  parent.width - 2*anchors.leftMargin;
         height: parent.height
 
-        horizontalSpacing: Style.sizeMainMargin;
+        horizontalSpacing: Style.marginM;
         verticalSpacing: 2;
 
         openButtonImageSource: "../../../" + Style.getIconPath("Icons/Next", Icon.Mode.On, Icon.State.Active);
@@ -159,7 +159,7 @@ Item {
             Item{
                 id: verticalComp;
 
-                width: 150;
+				width: Style.sizeHintXXXS;
                 height: isHorizontal ? -buttonPanel.verticalSpacing : model.name == "" ? splitter.height : textButtonDelegateContainer.height;
 
                 property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;

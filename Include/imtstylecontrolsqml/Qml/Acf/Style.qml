@@ -5,7 +5,7 @@ import imtguigql 1.0
 ClientStyle {
     id: styleContainer;
 
-    buttonWidthMedium: 20;
+    buttonWidthM: 20;
 
     dialogBackgroundColor: styleContainer.backgroundColor2;
 

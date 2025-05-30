@@ -1,15 +1,16 @@
 import QtQuick 2.13
 import QtQuick.Window 2.1
+import Acf 1.0
 
 Window
 {
     id: mainWindow;
 
-    width: 800;
-    height: 600;
+	width: Style.startWindowWidth;
+	height: Style.startWindowHeight;
 
-    minimumHeight: 600;
-    minimumWidth: 800;
+	minimumHeight: Style.startWindowHeight;
+	minimumWidth: Style.startWindowWidth;
 
     visible: true;
 }

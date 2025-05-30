@@ -14,10 +14,10 @@ TreeItemModel {
         var cellWidth = tableDecorator.addTreeModel("CellWidth");
 
         //headers
-        headers.setData("Color","#E5E5E5");
-		headers.setData("FontSize",Style.fontSizeLarge);
+		headers.setData("Color", Style.tableHeaderColor);
+		headers.setData("FontSize",Style.fontSizeL);
         headers.setData("FontBold", false);
-        headers.setData("FontColor","#686671");
+		headers.setData("FontColor", Style.tableHeaderFontColor);
         headers.setData("TextPosition",Text.AlignHCenter);
 
         headers.setData("CellRadius",8);
@@ -26,8 +26,8 @@ TreeItemModel {
         headers.setData("LeftBottomRound",false);
         headers.setData("RightBottomRound",false);
 
-        headers.setData("BorderColorHorizontal","#686671");
-        headers.setData("BorderColorVertical","#686671");
+		headers.setData("BorderColorHorizontal", Style.tableHeaderBorederColor);
+		headers.setData("BorderColorVertical", Style.tableHeaderBorederColor);
         headers.setData("HorizontalBorderSize",1);
         headers.setData("VerticalBorderSize",1);
 
@@ -41,10 +41,10 @@ TreeItemModel {
         headers.setData("IsRightBorder",false);
 
         //cells
-        cells.setData("Color","#FFFFFF");
-		cells.setData("FontSize",Style.fontSizeXLarge);
+		cells.setData("Color", Style.tableCellColor);
+		cells.setData("FontSize",Style.fontSizeXL);
         cells.setData("FontBold",false);
-        cells.setData("FontColor","#686671");
+		cells.setData("FontColor", Style.tableCellFontColor);
         cells.setData("TextPosition",Text.AlignHCenter);
 
         cells.setData("CellRadius",0);
@@ -53,8 +53,8 @@ TreeItemModel {
         cells.setData("LeftBottomRound",false);
         cells.setData("RightBottomRound",false);
 
-        cells.setData("BorderColorHorizontal","#E5E5E5");
-        cells.setData("BorderColorVertical","#E5E5E5");
+		cells.setData("BorderColorHorizontal", Style.tableCellBorderColor);
+		cells.setData("BorderColorVertical", Style.tableCellBorderColor);
         cells.setData("HorizontalBorderSize",1);
         cells.setData("VerticalBorderSize",1);
 

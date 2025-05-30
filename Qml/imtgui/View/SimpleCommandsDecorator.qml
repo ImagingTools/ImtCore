@@ -105,7 +105,7 @@ Item {
 		anchors.horizontalCenter: parent.horizontalCenter;
 		anchors.verticalCenter: parent.verticalCenter;
 
-		spacing: Style.sizeMainMargin;
+		spacing: Style.marginM;
 
 		Repeater {
 			id: repeater;

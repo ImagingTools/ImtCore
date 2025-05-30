@@ -3,8 +3,8 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 
 Rectangle {
-	width: stickerText.width + 2* Style.sizeSmallMargin;
-	height: 20;
+	width: stickerText.width + 2* Style.marginXS;
+	height: Style.controlHeightS;
 	radius: Style.buttonRadius;
 	property alias text: stickerText.text
 	property alias textColor: stickerText.color
@@ -15,7 +15,7 @@ Rectangle {
 		anchors.centerIn: parent;
 		color: Style.baseColor;
 		font.family:Style.fontFamily;
-		font.pixelSize: Style.fontSizeNormal;
+		font.pixelSize: Style.fontSizeM;
 	}
 }
 

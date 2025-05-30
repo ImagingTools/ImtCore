@@ -9,7 +9,7 @@ import imtbaseCommandsSdl 1.0
 Item {
 	id: commandsItem;
 	width: contentWidth;
-	height: 30;
+	height: Style.controlHeightM;
 	
 	property alias contentWidth: content_.width;
 	property int maximumWidth: -1;
@@ -122,7 +122,7 @@ Item {
 		for (let j = 0; j < priorityElements.length; j++){
 			let elementWidth = priorityElements[j].maxWidth;
 			tempWidth += elementWidth;
-			if (tempWidth + visibleCount * Style.sizeMainMargin < maxWidth){
+			if (tempWidth + visibleCount * Style.marginM < maxWidth){
 				priorityElements[j].modelData.m_visible = true;
 				visibleCount++;
 			}
@@ -136,7 +136,7 @@ Item {
 	Row {
 		id: content_;
 		height: commandsItem.height;
-		spacing: Style.sizeMainMargin;
+		spacing: Style.marginM;
 		
 		Repeater {
 			id: repeater;
@@ -153,7 +153,7 @@ Item {
 					Row {
 						id: listView;
 						height: commandsItem.height;
-						spacing: Style.sizeMainMargin;
+						spacing: Style.marginM;
 						
 						Repeater {
 							id: repeater2;

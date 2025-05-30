@@ -9,21 +9,21 @@ import imtcontrols 1.0
 Rectangle {
     id: buttonPanel;
 
-    width: 500;
+	width: Style.sizeHintL;
     height: delegateHeight;
 
     color: "transparent";
 
-    property int delegateWidth: 110;
-    property int delegateHeight: 30;
+	property int delegateWidth: Style.gridCellSize;
+	property int delegateHeight: Style.controlHeightM;
     property int verticalMenuWidth: 1;
     property int visibleCount: 5;
-    property int mainMargin: 10;
+	property int mainMargin: Style.marginM;
 
     property int horizCount: 0;
 
-    property int horizontalSpacing: 50;
-    property int verticalSpacing: 10;
+	property int horizontalSpacing: Style.spacingXXXL;
+	property int verticalSpacing: Style.spacingM;
 
     property bool hasShadow: true;
 
@@ -37,8 +37,8 @@ Rectangle {
 
     property string openButtonText: "";
     property string openButtonImageSource: "";
-    property int openButtonWidth: 32;
-    property int openButtonHeight: 22;
+	property int openButtonWidth: Style.buttonWidthL;
+	property int openButtonHeight: Style.buttonHeightS;
     property int openDuration: 0;
 
     property var widthArr: [];
@@ -105,7 +105,7 @@ Rectangle {
                 active: model.Active !== undefined ? model.Active : false;
                 fontFamily: Style.fontFamily;
                 fontBold: true;
-                fontPixelSize: Style.fontSizeNormal;
+                fontPixelSize: Style.fontSizeM;
 
                 property Item rootItem: buttonPanel;
                 property string id: model.id !== undefined ? model.id : "";
@@ -689,7 +689,7 @@ Rectangle {
 //            height: verticalListView.height + 2*buttonPanel.mainMargin;
             width: verticalListView.width;
             height: verticalListView.height;
-            radius: 4;
+			radius: Style.radiusM;
             border.width: 1;
             border.color: buttonPanel.shadowColor;
             color: buttonPanel.baseColor;

@@ -39,14 +39,14 @@ Rectangle {
 		id: content;
 		anchors.centerIn: parent;
 		width: parent.width - 100;
-		spacing: Style.sizeMainMargin;
+		spacing: Style.marginM;
 		
 		Text {
 			id: textNoConnection;
 			anchors.horizontalCenter: parent.horizontalCenter;
 			horizontalAlignment: Text.AlignHCenter;
 			color: Style.textColor;
-			font.pixelSize: Style.fontSizeXXLarge;
+			font.pixelSize: Style.fontSizeXXL;
 			font.family: Style.fontFamily;
 			wrapMode: Text.Wrap;
 			visible: false
@@ -55,8 +55,8 @@ Rectangle {
 		Loading {
 			id: loading;
 			anchors.horizontalCenter: parent.horizontalCenter;
-			width: 100;
-			height: 100;
+			width: Style.sizeHintBXS;
+			height: width;
 			visible: false;
 		}
 	}

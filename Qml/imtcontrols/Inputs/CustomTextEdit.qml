@@ -5,7 +5,7 @@ import com.imtcore.imtqml 1.0;
 FocusScope {
     id: containerTextEdit;
 
-    height: 40;
+	height: Style.controlHeightL;
 
 
     property bool isDinamicHeight: true;
@@ -30,10 +30,10 @@ FocusScope {
     property string borderColorConst: "";
 
     property int radius: 0;
-    property int textSize: 15;
+	property int textSize: Style.fontSizeLarge;
     property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;
-    property int margin: 8;
+	property int margin: Style.marginS;
 
     property bool fontBold: false;
 

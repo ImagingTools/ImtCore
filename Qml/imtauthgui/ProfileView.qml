@@ -79,7 +79,7 @@ ViewBase {
 		anchors.top: flickable.top;
 		anchors.bottom: flickable.bottom;
 		
-		secondSize: Style.sizeMainMargin;
+		secondSize: Style.marginM;
 		targetItem: flickable;
 	}
 	
@@ -92,7 +92,7 @@ ViewBase {
 		anchors.right: flickable.right;
 		anchors.bottom: flickable.bottom;
 		
-		secondSize: Style.sizeMainMargin;
+		secondSize: Style.marginM;
 		
 		vertical: false;
 		targetItem: flickable;
@@ -101,22 +101,22 @@ ViewBase {
 	Flickable {
 		id: flickable;
 		anchors.top: parent.top;
-		anchors.topMargin: Style.sizeLargeMargin;
+		anchors.topMargin: Style.marginXL;
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.sizeLargeMargin;
+		anchors.bottomMargin: Style.marginXL;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeLargeMargin;
+		anchors.leftMargin: Style.marginXL;
 		anchors.right: scrollbar.left;
-		anchors.rightMargin: Style.sizeLargeMargin;
+		anchors.rightMargin: Style.marginXL;
 		contentWidth: bodyColumn.width;
-		contentHeight: bodyColumn.height + 2 * Style.sizeLargeMargin;
+		contentHeight: bodyColumn.height + 2 * Style.marginXL;
 		boundsBehavior: Flickable.StopAtBounds;
 		clip: true;
 		
 		Column {
 			id: bodyColumn;
-			width: 700;
-			spacing: Style.sizeLargeMargin;
+			width: Style.sizeHintXXL;
+			spacing: Style.marginXL;
 			
 			GroupHeaderView {
 				width: parent.width;
@@ -190,8 +190,8 @@ ViewBase {
 				
 				controlComp: Component {
 					Button {
-						width: 100;
-						height: 30;
+						width: Style.buttonWidthXXL;
+						height: Style.controlHeightM;
 						text: qsTr("Change");
 						onClicked: {
 							ModalDialogManager.openDialog(changePasswordComp, {});

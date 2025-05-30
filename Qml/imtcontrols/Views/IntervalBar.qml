@@ -13,11 +13,11 @@ Rectangle {
 
 	color: "transparent";
 
-	property int maxColumnHeight: 200;//!!!
+	property int maxColumnHeight: Style.sizeHintXXS;
 	property int columnWidth: 60;//!!!
 
 	property int barHeight: 8;
-	property int spacing: 8;
+	property int spacing: Style.spacingS;
 
 	property string positiveColor: Style.positiveAccentColor;
 	property string negativeColor: Style.negativeAccentColor;
@@ -63,7 +63,7 @@ Rectangle {
 		anchors.bottomMargin: 4;
 
 		font.family: Style.fontFamilyBold;
-		font.pixelSize: Style.fontSizeXXXLarge;
+		font.pixelSize: Style.fontSizeXXXL;
 
 		color: indicator.percent >= indicator.percentCritical ? indicator.negativeColor: indicator.textColor;
 
@@ -122,7 +122,7 @@ Rectangle {
 		anchors.bottomMargin: valueNameText.visible *(valueNameText.height + valueNameText.anchors.bottomMargin);
 
 		font.family: Style.fontFamilyBold;
-		font.pixelSize: Style.fontSizeXLarge;
+		font.pixelSize: Style.fontSizeXL;
 
 		color:  indicator.textColor;
 
@@ -139,7 +139,7 @@ Rectangle {
 		anchors.bottomMargin: 0;
 
 		font.family: Style.fontFamilyBold;
-		font.pixelSize: Style.fontSizeXLarge;
+		font.pixelSize: Style.fontSizeXL;
 
 		color:  indicator.textColor;
 

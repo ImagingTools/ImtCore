@@ -8,7 +8,7 @@ Row{
 
 	height: Math.max(dateInput.height, timeInput.height);
 
-	spacing: 16;
+	spacing: Style.spacingL;
 
 	property bool canShowCurrentTime: true;
 	property bool hasTitle: true;
@@ -22,11 +22,11 @@ Row{
 
 	property var dateTimeRegExp: /^\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}$/
 
-	property int calendarWidth: 350;
-	property int calendarHeight: 350;
-	property int timeInputDialogWidth: 100;
+	property int calendarWidth: Style.sizeHintS;
+	property int calendarHeight: Style.sizeHintS;
+	property int timeInputDialogWidth: Style.sizeHintBXS;
 	property int timeInputDialogHeight: 90;
-	property int fontSize: Style.fontSizeNormal;
+	property int fontSize: Style.fontSizeM;
 
 	property alias dateInputWidth: dateInput.width;
 	property alias timeInputWidth: timeInput.width;

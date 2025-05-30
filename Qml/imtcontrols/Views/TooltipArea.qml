@@ -42,7 +42,7 @@ Item {
         id: tp;
 
         text: root.text;
-        componentMinHeight: 30;
+		componentMinHeight: Style.controlHeightM;
 
         function openTooltip(xX, yY){
             var point = mapToItem(null, xX, yY);

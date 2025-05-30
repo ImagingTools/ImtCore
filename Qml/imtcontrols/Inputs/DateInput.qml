@@ -9,8 +9,8 @@ Item {
 	width: 130;
 	height: column.height;
 
-	property int inputHeight: 30;
-	property int fontSize: Style.fontSizeNormal;
+	property int inputHeight: Style.controlHeightM;
+	property int fontSize: Style.fontSizeM;
 
 	property string fontColor: Style.textColor;
 	property alias radius: input.radius;
@@ -255,7 +255,7 @@ Item {
 	Column{
 		id: column;
 
-		spacing: Style.sizeSmallMargin;
+		spacing: Style.marginXS;
 
 		Text{
 			id: titleText;
@@ -336,7 +336,7 @@ Item {
 
 				anchors.verticalCenter: parent.verticalCenter;
 				anchors.left: input.right;
-				width: 30;
+				width: Style.controlHeightM;
 				height: parent.height;
 				clip: true;
 				Rectangle{
@@ -408,7 +408,7 @@ Item {
 	CustomTooltip{
 		id: tooltip;
 
-		fontPixelSize: Style.fontSizeXLarge
+		fontPixelSize: Style.fontSizeXL
 	}
 
 

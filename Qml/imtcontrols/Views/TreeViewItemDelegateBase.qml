@@ -92,7 +92,7 @@ TableViewItemDelegateBase {
 			
 			height: treeDelegateBase.root ? treeDelegateBase.root.rowItemHeight : 0;
 			
-			spacing: 10;
+			spacing: Style.spacingM;
 			
 			Item {
 				width: 15;

@@ -22,8 +22,8 @@ ListView{
 	property Component weekDayCellDelegate: weekDayCellComp;
 	property Component dayCellDelegate: dayCellComp;
 
-	property int radius: 8;
-	property int weekDayListHeight: 50;
+	property int radius: Style.radiusL;
+	property int weekDayListHeight: Style.headerHeight;
 
 	property ListModel dayOfWeekModel: ListModel{};
 

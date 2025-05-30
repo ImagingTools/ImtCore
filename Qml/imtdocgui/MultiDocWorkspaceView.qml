@@ -9,7 +9,7 @@ Item {
 	id: workspaceView
 
 	property DocumentManager documentManager
-	property int popupWidth: 200
+	property int popupWidth: Style.sizeHintXXS
 	property ObjectVisualStatusProvider visualStatusProvider: ObjectVisualStatusProvider {}
 	
 	Connections {

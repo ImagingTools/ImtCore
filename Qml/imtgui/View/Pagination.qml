@@ -7,8 +7,8 @@ import imtcontrols 1.0
 Row {
 	id: paginationContainer;
 
-	height: visible ? 20 : 0;
-	spacing: 15;
+	height: visible ? Style.controlHeightS : 0;
+	spacing: Style.spacingL;
 
 	property int pagesSize: 1;
 	property int currentValue: currentIndex + 1;
@@ -100,8 +100,8 @@ Row {
 
 		anchors.verticalCenter: parent.verticalCenter;
 
-		height: 20;
-		width: 24;
+		height: Style.buttonHeightXS;
+		width: Style.buttonWidthM;
 
 		enabled: listModel.count > 1 && paginationContainer.currentIndex != 0;
 
@@ -120,7 +120,7 @@ Row {
 	Row{
 		anchors.verticalCenter: parent.verticalCenter;
 
-		spacing: Style.sizeSmallMargin;
+		spacing: Style.marginXS;
 
 		Repeater {
 			id: repeaterPagination;
@@ -128,8 +128,8 @@ Row {
 			delegate: Component {Button {
 					id: buttonDelegate;
 
-					width: Math.max(24, helperText.width + 8);
-					height: 20;
+					width: Math.max(Style.buttonWidthM, helperText.width + 8);
+					height: Style.buttonHeightXS;
 
 					decorator: buttonDecorator;
 
@@ -164,8 +164,8 @@ Row {
 
 		anchors.verticalCenter: parent.verticalCenter;
 
-		width: 24;
-		height: 20;
+		width: Style.buttonWidthM;
+		height: Style.buttonHeightXS;
 
 		decorator: buttonDecorator;
 
@@ -197,7 +197,7 @@ Row {
 			anchors.verticalCenter: parent.verticalCenter;
 
 			width: 25;
-			height: 20;
+			height: Style.buttonHeightXS;
 
 			decorator: buttonDecorator;
 
@@ -216,7 +216,7 @@ Row {
 			anchors.verticalCenter: parent.verticalCenter;
 
 			width: 25;
-			height: 20;
+			height: Style.buttonHeightXS;
 
 			decorator: buttonDecorator;
 
@@ -239,7 +239,7 @@ Row {
 			anchors.verticalCenter: parent.verticalCenter;
 
 			width: 50;
-			height: 20;
+			height: Style.buttonHeightXS;
 
 			decorator: buttonDecorator;
 
@@ -258,7 +258,7 @@ Row {
 			anchors.verticalCenter: parent.verticalCenter;
 
 			width: 50;
-			height: 20;
+			height: Style.buttonHeightXS;
 
 			decorator: buttonDecorator;
 
@@ -277,7 +277,7 @@ Row {
 			anchors.verticalCenter: parent.verticalCenter;
 
 			width: 50;
-			height: 20;
+			height: Style.buttonHeightXS;
 
 			decorator: buttonDecorator;
 

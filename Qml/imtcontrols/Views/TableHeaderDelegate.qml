@@ -207,10 +207,10 @@ Item{
 																			 Text.AlignLeft;
 
 
-		font.pixelSize: headerDelegate.tableItem.emptyDecorHeader ? Style.fontSizeNormal * headerDelegate.scale :
+		font.pixelSize: headerDelegate.tableItem.emptyDecorHeader ? Style.fontSizeM * headerDelegate.scale :
 																	headerDelegate.tableItem.headerDecorator.isValidData("FontSize", headerDelegate.columnIndex) ?
 																		headerDelegate.tableItem.headerDecorator.getData("FontSize", headerDelegate.columnIndex) :
-																		Style.fontSizeNormal * headerDelegate.scale;
+																		Style.fontSizeM * headerDelegate.scale;
 
 
 		font.family: Style.fontFamilyBold;
@@ -253,7 +253,7 @@ Item{
 
 		anchors.verticalCenter: mainRec.verticalCenter;
 		anchors.right: mainRec.right;
-		anchors.rightMargin: headerDelegate.columnIndex == headerDelegate.columnCount - 1 ? 3 * Style.sizeMainMargin : Style.sizeMainMargin;
+		anchors.rightMargin: headerDelegate.columnIndex == headerDelegate.columnCount - 1 ? 3 * Style.marginM : Style.marginM;
 
 		width: visible ? 12 : 0;
 		height: width;

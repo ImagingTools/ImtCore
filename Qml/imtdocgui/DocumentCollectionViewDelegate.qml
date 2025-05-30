@@ -279,7 +279,7 @@ CollectionViewCommandsDelegateBase {
 			Component {
 				id: removeRevisionConfirmDialog;
 				MessageDialog {
-					width: 400;
+					width: Style.sizeHintM;
 					title: qsTr("Remove revision");
 					message: qsTr("Delete the selected revision ?");
 					onFinished: {
@@ -293,8 +293,8 @@ CollectionViewCommandsDelegateBase {
 			contentComp: Component {
 				Item {
 					id: contentItem;
-					width: 700;
-					height: 600;
+					width: Style.sizeHintXXL;
+					height: Style.sizeHintXL;
 
 					Connections {
 						target: documentRevisionDialog;
@@ -313,8 +313,8 @@ CollectionViewCommandsDelegateBase {
 								id: image;
 								anchors.verticalCenter: parent.verticalCenter;
 								anchors.left: parent.left;
-								anchors.leftMargin: Style.sizeMainMargin;
-								width: 20;
+								anchors.leftMargin: Style.marginM;
+								width: Style.iconSizeM;
 								height: width;
 								source: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
 								sourceSize.width: width;
@@ -337,16 +337,16 @@ CollectionViewCommandsDelegateBase {
 					SplitView {
 						id: splitView;
 						anchors.left: parent.left;
-						anchors.leftMargin: Style.sizeMainMargin;
+						anchors.leftMargin: Style.marginM;
 						anchors.right: parent.right;
-						anchors.rightMargin: Style.sizeMainMargin;
+						anchors.rightMargin: Style.marginM;
 						height: parent.height;
 						orientation: Qt.Vertical
 
 						Table {
 							id: table;
 							width: parent.width;
-							height: 400;
+							height: Style.sizeHintM;
 							elements: documentRevisionDialog.revisionsModel;
 
 							onElementsChanged: {
@@ -404,17 +404,17 @@ CollectionViewCommandsDelegateBase {
 						Rectangle {
 							id: descriptionItem;
 							width: parent.width;
-							height: 200;
+							height: Style.sizeHintXXS;
 							clip: true
 							color: Style.backgroundColor2
 
 							Text {
 								id: descriptionTitle;
 								anchors.top: parent.top;
-								anchors.topMargin: Style.sizeMainMargin;
+								anchors.topMargin: Style.marginM;
 								color: Style.buttonTextColor;
 								font.family: Style.fontFamilyBold;
-								font.pixelSize: Style.fontSizeNormal;
+								font.pixelSize: Style.fontSizeM;
 								font.bold: true;
 								text: qsTr("Description");
 							}
@@ -422,7 +422,7 @@ CollectionViewCommandsDelegateBase {
 							Rectangle {
 								id: background;
 								anchors.top: descriptionTitle.bottom;
-								anchors.topMargin: Style.sizeMainMargin;
+								anchors.topMargin: Style.marginM;
 								anchors.bottom: parent.bottom;
 								width: parent.width;
 								border.width: 1;
@@ -436,15 +436,15 @@ CollectionViewCommandsDelegateBase {
 								anchors.right: parent.right;
 								anchors.top: parent.top;
 								anchors.bottom: parent.bottom;
-								secondSize: Style.sizeSmallMargin;
+								secondSize: Style.marginXS;
 								targetItem: flickable;
 							}
 
 							Flickable {
 								id: flickable;
 								anchors.centerIn: background;
-								width: background.width - 2 * Style.sizeMainMargin;
-								height: background.height - 2 * Style.sizeMainMargin;
+								width: background.width - 2 * Style.marginM;
+								height: background.height - 2 * Style.marginM;
 								contentHeight: descriptionTextField.height;
 								clip: true;
 								boundsBehavior: Flickable.StopAtBounds;
@@ -453,7 +453,7 @@ CollectionViewCommandsDelegateBase {
 									id: descriptionTextField;
 									width: parent.width;
 									font.family: Style.fontFamily;
-									font.pixelSize: Style.fontSizeNormal;
+									font.pixelSize: Style.fontSizeM;
 									color: Style.textColor;
 									wrapMode: Text.WordWrap;
 								}

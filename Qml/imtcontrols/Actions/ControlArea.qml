@@ -15,7 +15,7 @@ MouseArea{
 
     property bool hasWheelControl: true;
     property real scaleStep: 0.1;
-	property int mainMargin: Style.sizeMainMargin;
+	property int mainMargin: Style.marginM;
 
     property bool wasMoving: false;
     property bool isPressed: false;

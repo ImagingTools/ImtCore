@@ -22,8 +22,7 @@ Item {
 	property real minValue: 0;
 
 
-	property string color_positive: "#ff8a3d";
-	property string backgroundColor: "#000000";
+	property string color_positive: Style.positiveAccentColor;
 
 	property bool hasTooltip: true;
 
@@ -89,8 +88,8 @@ Item {
 
 		fitToTextWidth: true;
 
-		componentHeight: 30;
-		fontPixelSize:  Style.fontSizeNormal;
+		componentHeight: Style.controlHeightM;
+		fontPixelSize:  Style.fontSizeM;
 
 		color: Style.color_buttonText;
 		fontColor: "#ffffff";

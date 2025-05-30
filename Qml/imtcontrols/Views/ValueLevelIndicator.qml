@@ -8,13 +8,13 @@ Rectangle {
 	id: indicator;
 
 	width: row.width;
-	height: 30;
+	height: Style.controlHeightM;
 
 	color: "transparent";
 
 	property int count: 5;
 	property int barWidth: continuous ? 8 : 4;
-	property int spacing: indicator.continuous ? 0 : 4;
+	property int spacing: indicator.continuous ? 0 : Style.spacingXS;
 	property int percent: 0;
 
 	property string colorActive: "red";

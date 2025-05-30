@@ -7,7 +7,7 @@ import imtbaseCommandsSdl 1.0
 
 Item {
 	id: commandsItem;
-	height: 30;
+	height: Style.controlHeightM;
 
 	signal commandActivated(string commandId, var params);
 	
@@ -132,7 +132,7 @@ Item {
 	CommandsView {
 		id: leftCommands;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.sizeMainMargin;
+		anchors.leftMargin: Style.marginM;
 		maximumWidth: (centerCommands.commandsCount > 0 ?
 						   centerCommands.x :
 						   rightCommands.commandsCount > 0 ? rightCommands.x : commandsItem.width) - button.width - leftCommands.anchors.leftMargin;
@@ -163,7 +163,7 @@ Item {
 	CommandsView {
 		id: rightCommands;
 		anchors.right: button.left;
-		anchors.rightMargin: Style.sizeMainMargin;
+		anchors.rightMargin: Style.marginM;
 		maximumWidth: (commandsItem.width - (centerCommands.x + centerCommands.contentWidth)) - button.width;
 		
 		onCommandActivated: {
@@ -179,7 +179,7 @@ Item {
 		id: button;
 		anchors.verticalCenter: parent.verticalCenter;
 		anchors.right: parent.right;
-		width: visible ? 30 : 0;
+		width: visible ? Style.controlHeightM : 0;
 		height: width;
 		iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.Mode.On, Icon.State.Active);
 		visible: false;
@@ -258,7 +258,7 @@ Item {
 		PopupMenuDialog {
 			id: popupMenuDialog;
 			shownItemsCount: 20;
-			itemHeight: 30;
+			itemHeight: Style.controlHeightM;
 			onFinished: {
 				if (commandId !== ""){
 					commandsItem.commandActivated(commandId)

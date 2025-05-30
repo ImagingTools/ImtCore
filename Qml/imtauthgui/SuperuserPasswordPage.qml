@@ -58,12 +58,12 @@ Rectangle {
         id: bodyColumn;
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
-        spacing: Style.sizeMainMargin;
-		width: 700;
+        spacing: Style.marginM;
+		width: Style.sizeHintXXL;
 
 		GroupHeaderView {
 			width: parent.width;
-			bottomPadding: Style.sizeMainMargin;
+			bottomPadding: Style.marginM;
 			title: qsTr("Please fill in the information for the system administrator");
 		}
 
@@ -85,7 +85,7 @@ Rectangle {
 
 		Item {
 			width: bodyColumn.width;
-			height: 30;
+			height: Style.controlHeightM;
 
 			Button {
 				id: okButton;
@@ -99,8 +99,8 @@ Rectangle {
 					root.setSuperuserPassword();
 				}
 				decorator: Component{ButtonDecorator{
-					width: 70;
-					height: 30;
+					width: Style.buttonWidthXL;
+					height: Style.controlHeightM;
 				}}
 			}
 		}

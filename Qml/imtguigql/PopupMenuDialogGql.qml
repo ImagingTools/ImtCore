@@ -18,12 +18,12 @@ Item {
 	property Item root: null;
 	property Item rootItem: null;
 	
-	property int itemWidth: 200;
+	property int itemWidth: Style.sizeHintXXS;
 	property int itemHeight: 26;
-	property int filterHeight: 30;
+	property int filterHeight: Style.controlHeightM;
 	property int offset: 0;
 	property int delegateRadius: 0;
-	property int textSize: Style.fontSizeNormal;
+	property int textSize: Style.fontSizeM;
 	property int count: 15;
 	property string commandId: "";
 	property string filterName: "name";
@@ -228,7 +228,7 @@ Item {
 		
 		anchors.right: filterField.right;
 		anchors.verticalCenter: filterField.verticalCenter;
-		anchors.rightMargin: Style.sizeSmallMargin;
+		anchors.rightMargin: Style.marginXS;
 		
 		z: filterField.z +1;
 		
@@ -323,7 +323,7 @@ Item {
 				anchors.centerIn: parent;
 				
 				color: Style.textColor;
-				font.pixelSize: Style.fontSizeNormal;
+				font.pixelSize: Style.fontSizeM;
 				font.family: Style.fontFamily;
 				
 				text: "Loaded..."

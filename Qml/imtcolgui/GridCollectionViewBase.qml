@@ -34,13 +34,13 @@ Item {
 	property int gridSelectedRow: gridInternal.selectedIndex < 0 ? 0 : Math.trunc(gridInternal.selectedIndex/gridCountInLine);
 	property bool gridIsLastRow: gridSelectedRow == gridRowCount -1;
 	property int gridSelectedIndexInRow: gridSelectedRow < 0 ? 0 : gridInternal.selectedIndex - gridSelectedRow * gridCountInLine;
-	property real gridAddHeight: 110*3;
-	property int gridCellHeightMin: 110;
+	property real gridAddHeight: Style.gridCellSize * 3;
+	property int gridCellHeightMin: Style.gridCellSize;
 
 	property int gridCellHeightMax: gridRowCount == 0 ? gridCellHeightMin : (gridCellHeightMin * gridRowCount + gridAddHeight) / gridRowCount
 														+ !isWeb * (gridIsLastRow * gridAddHeight - gridAddHeight / gridRowCount + 1);
 
-	property int gridDelegateMargin: 10;
+	property int gridDelegateMargin: Style.marginM;
 
 	property string gridIndicatorMainColor: Style.color_element;
 	property alias gridIndicatorCoverColor: gridIndicatorCover.color;
@@ -266,7 +266,7 @@ Item {
 		id: scrollBar;
 
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.sizeMainMargin;
+		anchors.rightMargin: Style.marginM;
 		anchors.bottom: backgroundTable.bottom;
 
 		targetItem: gridFrame;
@@ -448,7 +448,7 @@ Item {
 		id: paginationObj;
 
 		anchors.bottom: parent.bottom;
-		anchors.bottomMargin: Style.sizeMainMargin;
+		anchors.bottomMargin: Style.marginM;
 		anchors.horizontalCenter: parent.horizontalCenter;
 
 		pagesSize: 1;

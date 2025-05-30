@@ -40,7 +40,7 @@ Item {
 	property alias scrollbarItemHoriz: container.scrollbarItemHoriz
 
 	property bool visibleMetaInfo: false;
-	property int metaInfoWidth: 200;
+	property int metaInfoWidth: Style.sizeHintXXS;
 	
 	signal selectedIndexChanged(int index);
 	signal elementsChanged();
@@ -390,7 +390,7 @@ Item {
 		id: additionalInformation;
 		
 		anchors.fill: collectionMetaInfo;
-		anchors.margins: Style.sizeMainMargin;
+		anchors.margins: Style.marginM;
 		
 		color: collectionMetaInfo.color;
 		
@@ -402,7 +402,7 @@ Item {
 			anchors.fill: parent;
 			
 			font.family: Style.fontFamily;
-			font.pixelSize: Style.fontSizeNormal;
+			font.pixelSize: Style.fontSizeM;
 			
 			wrapMode: Text.WordWrap;
 			color: Style.textColor;

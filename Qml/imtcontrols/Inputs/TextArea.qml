@@ -29,10 +29,10 @@ ControlBase {
     property string borderColorConst: "";
 
     property int radius: 0;
-    property int textSize: 15;
+	property int textSize: Style.fontSizeL;
     property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;
-    property int margin: 5;
+	property int margin: Style.marginXS;
 
     property bool fontBold: false;
 

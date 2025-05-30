@@ -66,7 +66,7 @@ Item {
         id: filterMenuLocal;
 
         anchors.top: collectionStructureBaseContainer.top;
-		anchors.topMargin: Style.sizeMainMargin;
+		anchors.topMargin: Style.marginM;
 
         width: parent.width;
 
@@ -122,7 +122,7 @@ Item {
         id: backgroundTreeView;
 
         anchors.top: filterMenuLocal.visible ? filterMenuLocal.bottom: parent.top;
-		anchors.topMargin: filterMenuLocal.visible ? Style.sizeMainMargin : 0;
+		anchors.topMargin: filterMenuLocal.visible ? Style.marginM : 0;
         anchors.left: parent.left;
 
         width: parent.width
@@ -151,7 +151,7 @@ Item {
 
             anchors.top: parent.top;
             anchors.right: parent.right;
-			anchors.rightMargin: Style.sizeSmallMargin;
+			anchors.rightMargin: Style.marginXS;
             anchors.bottom: parent.bottom;
 
             width: collectionStructureBaseContainer.hasFilter ? 35 : 10;
@@ -171,7 +171,7 @@ Item {
 
                     anchors.centerIn: parent;
 
-                    width: Style.buttonWidthMedium;
+                    width: Style.buttonWidthM;
                     height: width;
 
                     visible: collectionStructureBaseContainer.hasFilter;

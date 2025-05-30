@@ -8,17 +8,17 @@ import imtcontrols 1.0
 Item {
     id: pieChart;
 
-    width: 200;
-    height: 200;
+	width: Style.sizeHintXXS;
+	height: width;
 
     property real percent: 50;
-    property string pieColor: "#4682B4";
-    property string pieColor_second:  "#ff8a3d"; //"black"
+	property string pieColor: Style.positiveAccentColor;
+	property string pieColor_second:  Style.negativeAccentColor;
     property bool isRing: true;
     property bool clockwise: false;
     property bool visibleText: false;
     property real rotationAngle: 0;
-    property int fontSize: 20;
+	property int fontSize: Style.fontSizeXXL;
     property string fontFamily: Style.fontFamilyBold;
     property bool fontBold: false;
     property real textPositionCoeff: 0.6;
@@ -38,7 +38,7 @@ Item {
         radius : parent.width * pieChart.ringSizeCoeff;
         height: parent.height * pieChart.ringSizeCoeff;
         width:  parent.width * pieChart.ringSizeCoeff;
-        color: "white";
+		color: Style.baseColor;
         z:1;
 
     }
@@ -121,8 +121,8 @@ Item {
             {
 
                 ctx.beginPath();
-                ctx.strokeStyle = pieChart.pieColor_second; //"black";
-                ctx.fillStyle = pieChart.pieColor_second; //"black"
+				ctx.strokeStyle = pieChart.pieColor_second;
+				ctx.fillStyle = pieChart.pieColor_second;
                 ctx.arc(canvas.width/2,  canvas.height/2, r, 0,  2*Math.PI, true);
                 ctx.stroke();
                 ctx.fill();
@@ -225,7 +225,7 @@ Item {
         font.pixelSize: pieChart.fontSize;
         font.bold: pieChart.fontBold;
         font.family: pieChart.fontFamily;
-        color: "black";
+		color: Style.textColor;
 
         text: positive.text;
 

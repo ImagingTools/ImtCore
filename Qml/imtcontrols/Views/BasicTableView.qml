@@ -21,8 +21,8 @@ FocusScope {
     property int columnCount:repeater.count;
     property int rowCount: listView.count;
 
-    property int rowItemHeight: 30;
-    property int headerHeight: 35;
+	property int rowItemHeight: Style.controlHeightM;
+	property int headerHeight: Style.tableHeaderHeight;
 
     property alias contentHeight: bodyColumn.height;
 
@@ -291,7 +291,7 @@ FocusScope {
             id: headerRow;
 
             focus: true;
-            spacing: Style.sizeMainMargin;
+            spacing: Style.marginM;
 
             Repeater {
                 id: repeater;
@@ -308,7 +308,7 @@ FocusScope {
                         id: headerText;
 
                         anchors.left: repeaterItem.left;
-                        anchors.leftMargin: Style.sizeMainMargin;
+                        anchors.leftMargin: Style.marginM;
                         anchors.verticalCenter: repeaterItem.verticalCenter;
 
                         Component.onCompleted: {
@@ -317,7 +317,7 @@ FocusScope {
 
                         width: parent.width;
 
-                        font.pixelSize: Style.fontSizeNormal;
+                        font.pixelSize: Style.fontSizeM;
                         font.family: Style.fontFamilyBold;
                         font.bold: true;
                         color: Style.textColor;

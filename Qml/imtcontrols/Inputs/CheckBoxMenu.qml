@@ -9,7 +9,7 @@ import imtgui 1.0
 FocusScope{
     id: checkBoxMenu;
 
-    width: 300;
+	width: Style.sizeHintXS;
     height: 34;
 
     property var model;
@@ -17,7 +17,7 @@ FocusScope{
 
     property string currentText;
 
-    property int radius: 2;
+	property int radius: Style.radiusXS;
     property int currentIndex: -1;
     property string placeHolderText: "";
     property string multipleChoiceText: "Multiple choice";
@@ -38,7 +38,7 @@ FocusScope{
 
     property string checkImageSource: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
 
-    property int textSize: Style.fontSizeNormal;
+    property int textSize: Style.fontSizeM;
     property string fontColor: Style.textColor;
     property string fontColorTitle: fontColor;
 
@@ -55,7 +55,7 @@ FocusScope{
     property bool hasSearch : true;
     property bool hasAllSelection : true;
 
-    property int menuHeight: 400;
+	property int menuHeight: Style.sizeHintM;
     property int delegateHeight: 60;
 
     signal finished();
@@ -228,7 +228,7 @@ FocusScope{
                 horizontalOffset: 2;
                 verticalOffset: 2;
 
-                radius: 4;
+				radius: Style.radiusM;
                 color: Style.shadowColor;
 
                 source: body;
@@ -272,12 +272,12 @@ FocusScope{
                     id: checkBoxAll;
 
                     anchors.left: parent.left;
-                    anchors.leftMargin: Style.sizeMainMargin;
+                    anchors.leftMargin: Style.marginM;
                     anchors.verticalCenter: searchBlock.verticalCenter;
 
-                    width: 20;
-                    height: 20;
-                    mainMargin: 16;
+					width: Style.controlHeightS;
+					height: Style.controlHeightS;
+					mainMargin: Style.marginL;
 					borderColor:Style.grayColor;
                     visible: checkBoxMenu.hasAllSelection;
                     enabled: visible;
@@ -309,9 +309,9 @@ FocusScope{
                     anchors.top: parent.top;
                     anchors.left: checkBoxAll.right;
                     anchors.right: parent.right;
-                    anchors.leftMargin: Style.sizeMainMargin;
-                    anchors.rightMargin: Style.sizeMainMargin;
-					anchors.topMargin: Style.sizeMainMargin;
+                    anchors.leftMargin: Style.marginM;
+                    anchors.rightMargin: Style.marginM;
+					anchors.topMargin: Style.marginM;
 
                     width: parent.width;
                     height: Style.size_TextFieldHeight;
@@ -327,12 +327,12 @@ FocusScope{
                         anchors.horizontalCenter: parent.horizontalCenter;
                         anchors.verticalCenter: parent.verticalCenter;
 
-						width: parent.width - Style.sizeMainMargin;
+						width: parent.width - Style.marginM;
                         height: parent.height - 2*parent.border.width;
                         radius: parent.radius;
                         color: "#ffffff";
                         fontColor: "#000000";
-                        textSize: Style.fontSizeNormal;
+                        textSize: Style.fontSizeM;
                         borderColorConst: "transparent";
                         placeHolderText: "Поиск";
                         readOnly: !searchBlock.visible;
@@ -347,10 +347,10 @@ FocusScope{
                     anchors.bottom: parent.bottom;
                     anchors.left: parent.left;
                     anchors.right: parent.right;
-                    anchors.topMargin: Style.sizeSmallMargin;
-                    anchors.bottomMargin: Style.sizeSmallMargin;
-                    anchors.leftMargin: Style.sizeMainMargin;
-                    anchors.rightMargin: Style.sizeMainMargin;
+                    anchors.topMargin: Style.marginXS;
+                    anchors.bottomMargin: Style.marginXS;
+                    anchors.leftMargin: Style.marginM;
+                    anchors.rightMargin: Style.marginM;
 
                     boundsBehavior: Flickable.StopAtBounds;
                     clip: true;
@@ -367,10 +367,10 @@ FocusScope{
 
                             anchors.verticalCenter: parent.verticalCenter;
 
-                            width: 20;
-                            height: 20;
+							width: Style.controlHeightS;
+							height: width;
                             //radius: 5
-                            mainMargin: 16;
+							mainMargin: Style.marginL;
 							borderColor:Style.grayColor;
 
                             //imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
@@ -433,9 +433,9 @@ FocusScope{
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
-			anchors.leftMargin: Style.sizeMainMargin;
+			anchors.leftMargin: Style.marginM;
             anchors.right: cbArrowIcon.left;
-			anchors.rightMargin: Style.sizeMainMargin;
+			anchors.rightMargin: Style.marginM;
 
             color: checkBoxMenu.fontColorTitle;
             font.family: Style.fontFamily;

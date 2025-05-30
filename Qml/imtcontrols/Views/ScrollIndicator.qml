@@ -9,7 +9,7 @@ Rectangle{
     height: targetItem && vertical ? targetItem.height : secondSize;
     width: vertical ? secondSize : targetItem.width;
     color: backgroundColor;
-    radius: 4;
+	radius: Style.radiusS;
 
     visible: vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
 
@@ -17,9 +17,9 @@ Rectangle{
 
     property bool vertical: true;
 
-    property real minSize: 20;
-    property real secondSize: 20;
-    property int indicatorRadius: 4;
+	property real minSize: secondSize;
+	property real secondSize: Style.controlHeightS;
+	property int indicatorRadius: Style.radiusS;
     property string backgroundColor: Style.scrollBackgroundColor !== undefined ? Style.scrollBackgroundColor  : "#efefef";
     property string indicatorColor: Style.scrollIndicatorColor !== undefined ? Style.scrollIndicatorColor : "lightgray";
     property string highlightColor: Style.scrollHighlightColor !== undefined ? Style.scrollHighlightColor : "lightgray";

@@ -5,7 +5,7 @@ import com.imtcore.imtqml 1.0
 Item {
     id: root;
 
-    height: 100;
+	height: Style.sizeHintBXS;
     width: row.width;
 
     property int days: 0;
@@ -128,7 +128,7 @@ Item {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeM;
             }
 
             Spinner {
@@ -154,7 +154,7 @@ Item {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeM;
             }
 
             Spinner {
@@ -180,7 +180,7 @@ Item {
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSizeNormal;
+                font.pixelSize: Style.fontSizeM;
             }
 
             Spinner {

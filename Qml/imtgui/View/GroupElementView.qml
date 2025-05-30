@@ -7,13 +7,13 @@ import imtcontrols 1.0
 Rectangle {
 	id: container;
 	
-	width: 700;
-	height: 100;
+	width: Style.sizeHintXXL;
+	height: Style.sizeHintBXS;
 
 	border.width: 1;
 	border.color: Style.borderColor;
 	
-	radius: Style.sizeSmallMargin;
+	radius: Style.marginXS;
 	
 	color: Style.baseColor;
 	

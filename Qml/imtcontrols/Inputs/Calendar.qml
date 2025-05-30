@@ -11,12 +11,12 @@ import imtcontrols 1.0
 Rectangle {
 	id: calendar;
 
-	width: 400;
-	height: 480;
-	radius: 8;
+	width: Style.sizeHintM;
+	height: Style.sizeHintL;
+	radius: Style.radiusL;
 
 	border.width: 1;
-	border.color: "#f6f6f6";
+	border.color: Style.dialogBackgroundColor;
 
 	property bool centered: true;
 	property Item root: null;
@@ -122,17 +122,17 @@ Rectangle {
 	//read only
 
 	//decoration
-	property string mainColor: "#4682B4";
-	property string cellColor: "#ffffff";
-	property string selectColor: "#4682B4";
-	property string topPanelColor: "#4682B4";
-	property string highlightColor: "#B0C4DE";
-	property string fontColor_title: "#ffffff";
-	property string fontColor_cell: "#000000";
-	property int fontSize_cell: 12;
-	property int fontSize_title: 20;
+	property string mainColor: Style.firstColor;
+	property string cellColor: Style.baseColor;
+	property string selectColor: mainColor;
+	property string topPanelColor: mainColor;
+	property string highlightColor: Style.firstColorHighlight;
+	property string fontColor_title: Style.baseColor;
+	property string fontColor_cell: Style.baseColorInverted;
+	property int fontSize_cell: Style.fontSizeM;
+	property int fontSize_title: Style.fontSizeXXL;
 	property bool fontBold_title: false;
-	property int weekDayListHeight: 50;
+	property int weekDayListHeight: Style.headerHeight;
 	property alias leftImageSource: leftButton.iconSource;
 	property alias rightImageSource: rightButton.iconSource;
 	property int bodyWidth: mainRec.width;
@@ -911,7 +911,7 @@ Rectangle {
 			anchors.bottom: parent.bottom;
 
 			width: parent.width;
-			height: visible ? okButton.height + Style.sizeSmallMargin : 1;
+			height: visible ? okButton.height + Style.marginXS : 1;
 
 			visible: !calendar.gridOnly;
 			clip: true;

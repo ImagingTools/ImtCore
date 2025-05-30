@@ -11,11 +11,11 @@ ControlBase {
 
     property string text: "";
 
-    property int componentWidth: 200;
+	property int componentWidth: Style.sizeHintXXS;
     property int tooltipWidth: customTooltip.fitToTextWidth ? forWidthText.width + 2.5*customTooltip.textMargin : Math.min(customTooltip.componentWidth, forWidthText.width + 2.5*customTooltip.textMargin);
 
-    property int componentMinHeight: 40;
-    property int componentMargin: Style.sizeMainMargin;
+	property int componentMinHeight: Style.controlHeightL;
+    property int componentMargin: Style.marginM;
 
     property bool fitToTextWidth: false;
     property bool fitToHCenter: false;
@@ -23,13 +23,13 @@ ControlBase {
     property int componentHeight: Math.max(customTooltip.componentMinHeight, forHeightText.height + 2*customTooltip.textMargin);
 
 
-    property int fontPixelSize: Style.fontSizeNormal;
+    property int fontPixelSize: Style.fontSizeM;
     property bool fontBold: false;
     property string fontColor: Style.textColor;
-    property int textMargin: Style.sizeSmallMargin;
+    property int textMargin: Style.marginXS;
     property int horizontalAlignment: Text.AlignHCenter;
 
-    property int radius: 4;
+	property int radius: Style.radiusM;
     property string color: Style.baseColor;
     property int borderWidth: 1;
     property string borderColor: Style.borderColor;

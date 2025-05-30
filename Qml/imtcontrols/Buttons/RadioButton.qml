@@ -13,11 +13,11 @@ ControlBase {
     property int checkState: checked ? Qt.Checked : Qt.Unchecked;
     property bool checked: false;
 
-    property int checkSize: 20;
-    property int fontPixelSize: Style.fontSizeNormal;
+	property int checkSize: Style.controlHeightS;
+    property int fontPixelSize: Style.fontSizeM;
     property bool fontBold: false;
 
-    property int mainMargin: 8;
+	property int mainMargin: Style.marginS;
 
     property string selectedColor: "#000000";
 

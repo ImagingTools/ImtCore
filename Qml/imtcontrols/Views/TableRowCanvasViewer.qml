@@ -43,12 +43,12 @@ Canvas {
 		let val = getCellValue(key);
 		if (val !== undefined && val !== ""){
 			let text = String(val);
-			drawText(ctx, x + 2 + Style.sizeSmallMargin, cellHeight / 2, cellWidth, text)
+			drawText(ctx, x + 2 + Style.marginXS, cellHeight / 2, cellWidth, text)
 		}
 	}
 
 	function drawText(ctx, x, y, cellWidth, text){
-		let maxTextWidth = cellWidth - Style.sizeSmallMargin * 2;
+		let maxTextWidth = cellWidth - Style.marginXS * 2;
 		let trimmedText;
 		if (text !== ""){
 			trimmedText = trimTextToFit(ctx, text, maxTextWidth);
@@ -105,11 +105,11 @@ Canvas {
 
 		// ctx.stroke();
 		ctx.strokeStyle =  rowDelegate.tableItem.borderColorVertical
-		let fontPixelSize = rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeNormal : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeNormal
+		let fontPixelSize = rowDelegate.tableItem.emptyDecorCell ? Style.fontSizeM : rowDelegate.tableItem.cellDecorator.isValidData("FontSize", columnIndex) ? rowDelegate.tableItem.cellDecorator.getData("FontSize", columnIndex) : Style.fontSizeM
 		ctx.font = '' + fontPixelSize + "px " + Style.fontFamily
 
 
-		let xCell = 0; // Style.sizeMainMargin;
+		let xCell = 0; // Style.marginM;
 
 		for (let columnIndex = 0; columnIndex < rowDelegate.columnCount; columnIndex++){
 			let defaultWidth = rowDelegate.columnCount == 0 ? 0 : rowDelegate.width/rowDelegate.columnCount;

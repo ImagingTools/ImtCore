@@ -31,8 +31,7 @@ DecoratorBase {
     Rectangle {
         id: marker;
         anchors.fill: leftPanelElement;
-//        anchors.margins: Style.sizeSmallMargin;
-        anchors.margins: 8;
+		anchors.margins: Style.marginS;
         radius: Style.buttonRadius;
         color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.backgroundColor2 : "transparent";
         border.width: 1;
@@ -53,7 +52,7 @@ DecoratorBase {
             id: image;
             anchors.horizontalCenter: itemBody.horizontalCenter;
             anchors.top: itemBody.top;
-            width: 30;
+			width: Style.iconSizeL;
             height: width;
             fillMode: Image.PreserveAspectFit;
             source: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.iconSource
@@ -64,14 +63,14 @@ DecoratorBase {
         Text {
             id: description;
             anchors.top: image.bottom;
-            anchors.topMargin: Style.sizeMainMargin;
+            anchors.topMargin: Style.marginM;
             anchors.left: itemBody.left;
-            anchors.leftMargin: Style.sizeMainMargin;
+            anchors.leftMargin: Style.marginM;
             anchors.right: itemBody.right;
-            anchors.rightMargin: Style.sizeMainMargin;
+            anchors.rightMargin: Style.marginM;
             color: leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted ? Style.iconColorOnSelected : Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSizeSmall;
+            font.pixelSize: Style.fontSizeS;
             text: leftPanelElement.baseElement.text;
             horizontalAlignment: Text.AlignHCenter;
             elide: Text.ElideRight;

@@ -23,7 +23,7 @@ ParamEditorBase {
 			Column {
 				id: column;
 				width: root.width;
-				spacing: Style.sizeMainMargin;
+				spacing: Style.marginM;
 		
 				GroupElementView {
 					id: group;
