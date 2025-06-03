@@ -508,7 +508,7 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 	QString createDatabaseQuery = scriptFile.readAll();
 	createDatabaseQuery.replace(QStringLiteral(":DatabaseName"), GetDatabaseName());
 
-	QSqlQuery createDbQuery;
+	QSqlQuery createDbQuery(maintainanceDb);
 	createDbQuery.exec(createDatabaseQuery);
 
 	QSqlError sqlError = createDbQuery.lastError();
