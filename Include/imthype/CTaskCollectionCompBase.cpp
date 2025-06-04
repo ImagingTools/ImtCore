@@ -325,6 +325,22 @@ bool CTaskCollectionCompBase::RemoveElementSet(
 }
 
 
+bool CTaskCollectionCompBase::RestoreObjects(
+			const Ids& /*objectIds*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
+{
+	return false;
+}
+
+
+bool CTaskCollectionCompBase::RestoreObjectSet(
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
+{
+	return false;
+}
+
+
 const istd::IChangeable* CTaskCollectionCompBase::GetObjectPtr(const QByteArray& objectId) const
 {
 	// TODO: think about using this code for staticaly defined tasks only!

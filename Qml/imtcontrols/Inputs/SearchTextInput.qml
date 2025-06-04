@@ -9,7 +9,7 @@ CustomTextField {
 	textFieldLeftMargin: searchIcon.width + 2 * margin;
 	textFieldRightMargin: iconClear.width + 2 * margin;
 	placeHolderText: qsTr("Enter text for search");
-	width: Style.sizeHintM;
+	width: Style.sizeHintXS;
 	height: Style.controlHeightM;
 	
 	signal searchChanged()

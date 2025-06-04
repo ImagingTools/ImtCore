@@ -11,6 +11,7 @@
 #include <imtdb/IJsonBasedMetaInfoDelegate.h>
 #include <imtdb/IDependentMetaInfoController.h>
 #include <imtdb/ISqlJsonXPathExtractor.h>
+#include <imtcol/CDocumentCollectionFilter.h>
 
 
 namespace imtdb
@@ -83,6 +84,14 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const iprm::IParamsSet* paramsPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual QByteArray CreateRestoreObjectsQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArrayList& objectIds,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual QByteArray CreateRestoreObjectSetQuery(
+				const imtbase::IObjectCollection& collection,
+				const iprm::IParamsSet* paramsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
@@ -101,7 +110,7 @@ public:
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray GetSelectionByMetaInfoQuery(const QByteArray& metaInfoId, const QVariant& metaInfoValue) const override;
 	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& record) const override;
-	
+
 	// reimplemented (imtbase::IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(
 				const imtbase::IObjectCollection& collection,
@@ -163,7 +172,8 @@ protected:
 	virtual QByteArray GetObjectSelectionQuery(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const;
 	virtual QByteArray CreateJoinTablesQuery() const;
 	virtual QByteArray GetCustomColumnsQuery() const;
-
+	virtual bool CreateDocumentCollectionFilterQuery(const imtcol::IDocumentCollectionFilter& documentCollectionFilter, QString& documentFilterQuery) const;
+	
 protected:
 	I_ATTR(bool, m_useDataMetaInfoAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);

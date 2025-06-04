@@ -48,6 +48,12 @@ public:
 	virtual bool RemoveElementSet(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RestoreObjects(
+				const Ids& objectIds,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RestoreObjectSet(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const imtbase::IOperationContext* operationContextPtr = nullptr) override;

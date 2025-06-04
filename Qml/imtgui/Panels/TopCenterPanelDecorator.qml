@@ -115,7 +115,6 @@ DecoratorBase {
 		
 		SearchTextInput {
 			id: tfc;
-			width: Style.sizeHintS;
 			height: parent.height;
 			radius: Style.radiusM;
 			

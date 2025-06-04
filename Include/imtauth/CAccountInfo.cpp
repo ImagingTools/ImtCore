@@ -182,11 +182,6 @@ bool CAccountInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && m_accountPicture.Serialize(archive);
 	retVal = retVal && archive.EndTag(accountPictureTag);
 
-//	iser::CArchiveTag contactTag("Contact", "Contact", iser::CArchiveTag::TT_GROUP);
-//	retVal = retVal && archive.BeginTag(contactTag);
-//	retVal = retVal && m_contact.Serialize(archive);
-//	retVal = retVal && archive.EndTag(contactTag);
-
 	return retVal;
 }
 

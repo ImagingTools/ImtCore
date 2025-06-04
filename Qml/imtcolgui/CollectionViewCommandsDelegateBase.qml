@@ -35,6 +35,7 @@ ViewCommandsDelegateBase {
 
 	property bool canRename: false;
 	property bool canSetDescription: false;
+	property bool showingDisableObjects: false;
 
 	property var importDialogMimeTypes: []
 	property var exportDialogMimeTypes: []
@@ -66,6 +67,15 @@ ViewCommandsDelegateBase {
 
 	ListModel {
 		id: extensionModel;
+	}
+	
+	Connections {
+		target: collectionViewCommandsDelegate.collectionView.documentCollectionFilter
+		
+		function onFilterChanged(){
+			let documentFilter = collectionViewCommandsDelegate.collectionView.documentCollectionFilter
+			collectionViewCommandsDelegate.showingDisableObjects = documentFilter.containsState(documentFilter.s_disabledState)
+		}
 	}
 
 	Connections {
@@ -168,7 +178,6 @@ ViewCommandsDelegateBase {
 	function updateCustomCommandsAccent(){}
 
 	function updateItemSelection(selectedItems){
-		console.log("CollectionViewCommandsDelegateBase.qml updateItemSelection", selectedItems)
 		if (collectionViewCommandsDelegate.collectionView && collectionViewCommandsDelegate.collectionView.commandsController){
 			let commandsController = collectionViewCommandsDelegate.collectionView.commandsController;
 			let elementsModel = collectionView.table.elements;
@@ -179,61 +188,69 @@ ViewCommandsDelegateBase {
 	}
 
 	function updateStateBaseCommands(selection, commandsController, elementsModel){
-		let isEnabled = selection.length > 0;
 		if(commandsController){
-			commandsController.setCommandIsEnabled("Remove", isEnabled);
-			commandsController.setCommandIsEnabled("Edit", isEnabled);
-			commandsController.setCommandIsEnabled("Export", selection.length === 1);
-			commandsController.setCommandIsEnabled("Revision", selection.length === 1);
+			// State commands
+			commandsController.setCommandIsEnabled("New", !showingDisableObjects);
+			commandsController.setCommandIsEnabled("Import", !showingDisableObjects);
+			commandsController.setCommandIsEnabled("Remove", selection.length > 0 && !showingDisableObjects);
+			commandsController.setCommandIsEnabled("RemoveAll", !showingDisableObjects);
+			commandsController.setCommandIsEnabled("Edit", selection.length > 0 && !showingDisableObjects);
+			commandsController.setCommandIsEnabled("Export", selection.length === 1 && !showingDisableObjects);
+			commandsController.setCommandIsEnabled("Revision", selection.length === 1 && !showingDisableObjects);
+			commandsController.setCommandIsEnabled("Restore", selection.length > 0 && showingDisableObjects);
+			commandsController.setCommandIsEnabled("RestoreAll", showingDisableObjects);
 		}
 	}
 
-	function updateStateCustomCommands(selection, commandsController, elementsModel){
-	}
+	function updateStateCustomCommands(selection, commandsController, elementsModel){}
 
 	function setupContextMenu(){
 		let commandsController = collectionView.commandsController;
 		if (commandsController){
-			collectionViewCommandsDelegate.contextMenuModel.clear();
+			contextMenuModel.clear();
+			
+			if (showingDisableObjects){
+				return
+			}
 
 			let canEdit = commandsController.commandExists("Edit");
 			let canRemove = commandsController.commandExists("Remove");
 
 			if (canEdit){
-				let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
+				let index = contextMenuModel.insertNewItem();
 
-				collectionViewCommandsDelegate.contextMenuModel.setData("id", "Edit", index);
-				collectionViewCommandsDelegate.contextMenuModel.setData("name", qsTr("Edit"), index);
-				collectionViewCommandsDelegate.contextMenuModel.setData("icon", "Icons/Edit", index);
+				contextMenuModel.setData("id", "Edit", index);
+				contextMenuModel.setData("name", qsTr("Edit"), index);
+				contextMenuModel.setData("icon", "Icons/Edit", index);
 			}
 
 			if (canRemove){
-				let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
+				let index = contextMenuModel.insertNewItem();
 
-				collectionViewCommandsDelegate.contextMenuModel.setData("id", "Remove", index);
-				collectionViewCommandsDelegate.contextMenuModel.setData("name", qsTr("Remove"), index);
-				collectionViewCommandsDelegate.contextMenuModel.setData("icon", "Icons/Delete", index);
+				contextMenuModel.setData("id", "Remove", index);
+				contextMenuModel.setData("name", qsTr("Remove"), index);
+				contextMenuModel.setData("icon", "Icons/Delete", index);
 			}
 
 			if (canEdit){
-				if (collectionViewCommandsDelegate.canRename){
-					let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
+				if (canRename){
+					let index = contextMenuModel.insertNewItem();
 
-					collectionViewCommandsDelegate.contextMenuModel.setData("id", "Rename", index);
-					collectionViewCommandsDelegate.contextMenuModel.setData("name", qsTr("Rename"), index);
-					collectionViewCommandsDelegate.contextMenuModel.setData("icon", "", index);
+					contextMenuModel.setData("id", "Rename", index);
+					contextMenuModel.setData("name", qsTr("Rename"), index);
+					contextMenuModel.setData("icon", "", index);
 				}
 
-				if (collectionViewCommandsDelegate.canSetDescription){
-					let index = collectionViewCommandsDelegate.contextMenuModel.insertNewItem();
+				if (canSetDescription){
+					let index = contextMenuModel.insertNewItem();
 
-					collectionViewCommandsDelegate.contextMenuModel.setData("id", "SetDescription", index);
-					collectionViewCommandsDelegate.contextMenuModel.setData("name", qsTr("Set Description"), index);
-					collectionViewCommandsDelegate.contextMenuModel.setData("icon", "", index);
+					contextMenuModel.setData("id", "SetDescription", index);
+					contextMenuModel.setData("name", qsTr("Set Description"), index);
+					contextMenuModel.setData("icon", "", index);
 				}
 			}
 
-			collectionViewCommandsDelegate.contextMenuModel.refresh();
+			contextMenuModel.refresh();
 		}
 	}
 
@@ -285,6 +302,27 @@ ViewCommandsDelegateBase {
 	}
 
 	function onRevision(){
+	}
+	
+	function onRestore(params){
+		ModalDialogManager.openDialog(restoreObjectDialog, {});
+	}
+	
+	function onRestoreAll(params){
+		if (!collectionView){
+			console.error("Unable to restore all elements. CollectionView reference is invalid")
+			return
+		}
+
+		let message = ""
+		if (collectionView.hasActiveFilter()){
+			message = qsTr("Restore all items with the current filter ?")
+		}
+		else{
+			message = qsTr("Restore all data from this collection ?")
+		}
+
+		ModalDialogManager.openDialog(restoreAllDialogComp, {message: message});
 	}
 
 	// importObject(typeId, name, description, b64encoded, ext, additionalParamsObj) - signature in dataController
@@ -560,6 +598,12 @@ ViewCommandsDelegateBase {
 			else if (commandId === "Revision"){
 				onRevision(params);
 			}
+			else if (commandId === "Restore"){
+				onRestore(params);
+			}
+			else if (commandId === "RestoreAll"){
+				onRestoreAll(params);
+			}
 		}
 
 		let editIsEnabled = commandsController.commandIsEnabled("Edit");
@@ -578,6 +622,27 @@ ViewCommandsDelegateBase {
 	Component {
 		id: errorDialog;
 		ImtControls.ErrorDialog {
+		}
+	}
+	
+	Component {
+		id: restoreObjectDialog;
+		ImtControls.MessageDialog {
+			width: Style.sizeHintM;
+			title: qsTr("Restoring an objects")
+			message: qsTr("Restore the selected objects ?")
+			onFinished: {
+				if (!collectionViewCommandsDelegate.collectionView){
+					return
+				}
+
+				if (buttonId == Enums.yes){
+					let elementIds = collectionViewCommandsDelegate.collectionView.getSelectedIds()
+					collectionViewCommandsDelegate.collectionView.restoreObjects(elementIds)
+				}
+
+				collectionViewCommandsDelegate.collectionView.table.forceActiveFocus();
+			}
 		}
 	}
 
@@ -653,11 +718,42 @@ ViewCommandsDelegateBase {
 			onFinished: {
 				if (buttonId == Enums.yes){
 					let collectionView = collectionViewCommandsDelegate.collectionView
+					if (!collectionView){
+						return
+					}
+
 					if (collectionView.hasActiveFilter()){
 						collectionView.removeElementSet(collectionView.collectionFilter)
 					}
 					else{
 						collectionView.removeElementSet(null)
+					}
+				}
+
+				if (collectionView){
+					collectionView.table.forceActiveFocus();
+				}
+			}
+		}
+	}
+	
+	Component {
+		id: restoreAllDialogComp
+		ImtControls.MessageDialog {
+			width: 400;
+			title: qsTr("Restoring elements");
+			onFinished: {
+				if (buttonId == Enums.yes){
+					let collectionView = collectionViewCommandsDelegate.collectionView
+					if (!collectionView){
+						return
+					}
+
+					if (collectionView.hasActiveFilter()){
+						collectionView.restoreObjectSet(collectionView.collectionFilter)
+					}
+					else{
+						collectionView.restoreObjectSet(null)
 					}
 				}
 

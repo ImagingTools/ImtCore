@@ -15,6 +15,7 @@ DecoratorBase {
 	property alias contentWidth: content.width;
 	
 	property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;
+	property DocCollectionFilter documentFilter: baseElement ? baseElement.documentFilter : null;
 	
 	Component.onCompleted: {
 		updateText();
@@ -69,6 +70,48 @@ DecoratorBase {
 		anchors.right: filterPanelDecorator.right;
 		height: tfc.height;
 		spacing: Style.marginM;
+		
+		ComboBox {
+			id: stateCb
+			height: parent.height;
+			width: 250;
+			currentIndex: 0;
+			radius: 3;
+			
+			TreeItemModel {
+				id: stateModel
+				Component.onCompleted: {
+					let index = insertNewItem();
+					setData("id", "Active", index);
+					setData("name", qsTr("Active Documents"), index);
+					
+					index = insertNewItem();
+					setData("id", "Disabled", index);
+					setData("name", qsTr("Disabled Documents"), index);
+					
+					stateCb.model = stateModel
+				}
+			}
+			
+			onCurrentIndexChanged: {
+				filterPanelDecorator.documentFilter.clear()
+				if (currentIndex == 0){
+					filterPanelDecorator.documentFilter.addDocumentState(filterPanelDecorator.documentFilter.s_activeState)
+				}
+				else if (currentIndex == 1){
+					filterPanelDecorator.documentFilter.addDocumentState(filterPanelDecorator.documentFilter.s_disabledState)
+				}
+				
+				filterPanelDecorator.documentFilter.filterChanged()
+			}
+			
+			FieldFilter {
+				id: stateFilter
+				m_fieldId: "State"
+				m_filterValueType: "String"
+				m_filterOperations: ["Equal"]
+			}
+		}
 		
 		Rectangle {
 			id: rect;

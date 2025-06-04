@@ -24,6 +24,7 @@ Item {
 	property alias commandsDelegate: container.commandsDelegate;
 	
 	property alias collectionFilter: container.collectionFilter;
+	property alias documentCollectionFilter: container.documentCollectionFilter;
 	property alias table: container.table;
 	
 	property alias readOnly: container.readOnly;
@@ -104,12 +105,30 @@ Item {
 		container.removeElementSet(filter);
 	}
 	
+	function restoreObjects(elementIds){
+		if (container.dataController){
+			container.dataController.restoreObjects(elementIds);
+		}
+	}
+	
+	function restoreObjectSet(filter){
+		if (container.dataController){
+			container.dataController.restoreObjectSet(filter);
+		}
+	}
+	
 	function setElementName(elementIndex, name){
 		container.setElementName(elementIndex, name);
 	}
 	
 	function setElementDescription(elementIndex, description){
 		container.setElementDescription(elementIndex, description);
+	}
+	
+	function setElementEnabled(elementId, enabled){
+		if (container.dataController){
+			container.dataController.setElementEnabled(elementId, enabled);
+		}
 	}
 	
 	function setMetaInfoModel(metaInfoModel){
@@ -127,6 +146,7 @@ Item {
 	}
 	
 	function hasActiveFilter(){
+		console.log("hasActiveFilter", collectionFilter.toJson())
 		if (collectionFilter){
 			return !collectionFilter.isEmpty()
 		}
@@ -315,13 +335,18 @@ Item {
 			let count = -1;
 			let offset = 0;
 			
-			if (container.hasPagination){
+			if (hasPagination){
 				count = pagination.countElements;
 				offset = pagination.currentIndex * count;
 			}
 			
-			if (container.dataController){
-				container.dataController.updateElements(count, offset, container.collectionFilter);
+			if (dataController){
+				let documentFilter = null
+				if (!documentCollectionFilter.isEmpty()){
+					documentFilter = documentCollectionFilter
+				}
+
+				dataController.updateElements(count, offset, collectionFilter, documentFilter);
 			}
 		}
 		

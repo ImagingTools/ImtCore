@@ -5,7 +5,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtbaseCommandsSdl 1.0
 
-// Commands with priority = -1 always hidden
+// !!! Commands with priority = -1 always hidden
 Item {
 	id: commandsItem;
 	width: contentWidth;
@@ -39,7 +39,7 @@ Item {
 	// params["y"] = Y coord click
 	// params["target"] = button reference
 	signal commandActivated(string commandId, var params);
-	
+
 	function setCommandData(commandId, key, value){
 		if (!commandsModel){
 			return;
@@ -87,8 +87,8 @@ Item {
 	
 	function reset(){
 		for (let j = 0; j < allElements.length; j++){
-			if (allElements[j]){
-				allElements[j].modelData.m_visible = false;
+			if (allElements[j] && allElements[j].element){
+				allElements[j].element.m_visible = false;
 			}
 		}
 	}
@@ -122,8 +122,8 @@ Item {
 		for (let j = 0; j < priorityElements.length; j++){
 			let elementWidth = priorityElements[j].maxWidth;
 			tempWidth += elementWidth;
-			if (tempWidth + visibleCount * Style.marginM < maxWidth){
-				priorityElements[j].modelData.m_visible = true;
+			if (tempWidth + visibleCount * Style.marginM < maxWidth && priorityElements[j].element){
+				priorityElements[j].element.m_visible = true;
 				visibleCount++;
 			}
 			
@@ -213,6 +213,7 @@ Item {
 									
 									onWidthChanged: {
 										maxWidth = Math.max(maxWidth, width);
+										console.log("onWidthChanged", element.m_elementId, maxWidth)
 									}
 								}
 							}

@@ -28,11 +28,8 @@ ViewBase {
 	property alias scrollbarItemHoriz: tableInternal.scrollbarItemHoriz
 
 	property CollectionFilter collectionFilter: CollectionFilter {}
-	property IdSelectionManager selectionManager: IdSelectionManager {
-		onSelectionChanged: {
-			console.log("IdSelectionManager onSelectionChanged", selectedIds)
-		}
-	}
+	property DocCollectionFilter documentCollectionFilter: DocCollectionFilter {}
+	property IdSelectionManager selectionManager: IdSelectionManager {}
 
 	property Component dataControllerComp: Component {CollectionDataController { collectionId: collectionViewBaseContainer.collectionId}}
 	property var dataController: null;
@@ -63,6 +60,14 @@ ViewBase {
 		}
 	}
 	
+	Connections {
+		target: collectionViewBaseContainer.documentCollectionFilter;
+		
+		function onFilterChanged(){
+			collectionViewBaseContainer.doUpdateGui();
+		}
+	}
+	
 	function onModelChanged(){}
 	
 	function getSelectedIds(){
@@ -78,6 +83,7 @@ ViewBase {
 		anchors.right: parent.right;
 		anchors.rightMargin: Style.marginM;
 		complexFilter: collectionViewBaseContainer.collectionFilter;
+		documentFilter: collectionViewBaseContainer.documentCollectionFilter;
 		
 		onClose: {
 			filterMenu_.visible = false;

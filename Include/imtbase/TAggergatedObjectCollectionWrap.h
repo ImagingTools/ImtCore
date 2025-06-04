@@ -58,6 +58,12 @@ public:
 	virtual bool RemoveElementSet(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RestoreObjects(
+				const Ids& objectIds,
+				const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RestoreObjectSet(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
@@ -205,6 +211,24 @@ inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RemoveEl
 			const IOperationContext* operationContextPtr)
 {
 	return m_collection.RemoveElementSet(selectionParamsPtr, operationContextPtr);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RestoreObjects(
+			const Ids& objectIds,
+			const IOperationContext* operationContextPtr)
+{
+	return m_collection.RestoreObjects(objectIds, operationContextPtr);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RestoreObjectSet(
+			const iprm::IParamsSet* selectionParamsPtr,
+			const IOperationContext* operationContextPtr)
+{
+	return m_collection.RestoreObjectSet(selectionParamsPtr, operationContextPtr);
 }
 
 

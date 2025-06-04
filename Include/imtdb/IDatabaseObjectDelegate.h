@@ -92,6 +92,22 @@ public:
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 
 	/**
+		Create query for the restoring of the object from the database.
+	*/
+	virtual QByteArray CreateRestoreObjectsQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArrayList& objectIds,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
+
+	/**
+		Create query for the restoring of the object from the database using the passed filter.
+	*/
+	virtual QByteArray CreateRestoreObjectSetQuery(
+				const imtbase::IObjectCollection& collection,
+				const iprm::IParamsSet* paramsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
+
+	/**
 		Create query for the update an existing object in the collection.
 	*/
 	virtual QByteArray CreateUpdateObjectQuery(

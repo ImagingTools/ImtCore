@@ -12,6 +12,7 @@ ControlBase {
     heightFromDecorator: true;
 	
 	property CollectionFilter complexFilter: CollectionFilter {}
+	property DocCollectionFilter documentFilter: DocCollectionFilter {}
 
     signal close();
     signal clear();

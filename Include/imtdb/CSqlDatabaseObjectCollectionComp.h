@@ -68,6 +68,12 @@ public:
 	virtual bool RemoveElementSet(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RestoreObjects(
+				const Ids& objectIds,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RestoreObjectSet(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(

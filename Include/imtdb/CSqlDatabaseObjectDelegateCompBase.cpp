@@ -123,14 +123,15 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 				return QByteArray();
 			}
 
-			iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
-			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
-			if (complexFilterParamPtr.IsValid()){
+			iprm::IParamsSet::Ids paramIds = paramsPtr->GetParamIds();
+			if (paramIds.contains("ComplexFilter")){
+				iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
 				if (!CreateSortQuery(*complexFilterParamPtr, sortQuery)){
 					return QByteArray();
 				}
 			}
-			else if (collectionFilterParamPtr.IsValid()){
+			else if (paramIds.contains("Filter")){
+				iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
 				if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
 					return QByteArray();
 				}
@@ -275,6 +276,24 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableName() const
 }
 
 
+QByteArray CSqlDatabaseObjectDelegateCompBase::CreateRestoreObjectsQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArrayList& /*objectIds*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
+QByteArray CSqlDatabaseObjectDelegateCompBase::CreateRestoreObjectSetQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const iprm::IParamsSet* /*paramsPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
 // protected methods
 
 QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
@@ -370,11 +389,14 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 	}
 
 	QString textFilterQuery;
-	iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
-	if (collectionFilterParamPtr.IsValid()){
-		retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
-		if (!retVal){
-			return false;
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+	if (paramIds.contains("Filter")){
+		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
+		if (collectionFilterParamPtr.IsValid()){
+			retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
+			if (!retVal){
+				return false;
+			}
 		}
 	}
 

@@ -30,8 +30,10 @@
 #include <imtbase/IRevisionController.h>
 #include <imtgql/imtgql.h>
 #include <imtcol/CComplexCollectionFilterRepresentationController.h>
+#include <imtcol/CDocumentCollectionFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/DocumentCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
@@ -123,7 +125,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 
 sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControllerCompBase::OnRemoveElementSet(
 			const sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest& removeElementSetRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CRemoveElementSetPayload::V1_0 response;
@@ -159,6 +161,70 @@ sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControlle
 }
 
 
+sdl::imtbase::ImtCollection::CRestoreObjectsPayload CObjectCollectionControllerCompBase::OnRestoreObjects(
+			const sdl::imtbase::ImtCollection::CRestoreObjectsGqlRequest& restoreObjectsRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::imtbase::ImtCollection::CRestoreObjectsPayload::V1_0 response;
+
+	sdl::imtbase::ImtCollection::RestoreObjectsRequestArguments arguments = restoreObjectsRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0){
+		return sdl::imtbase::ImtCollection::CRestoreObjectsPayload();
+	}
+
+	QByteArrayList objectIds;
+	if (arguments.input.Version_1_0->objectIds){
+		objectIds = *arguments.input.Version_1_0->objectIds;
+	}
+
+	response.success = m_objectCollectionCompPtr->RestoreObjects(objectIds);
+	
+	sdl::imtbase::ImtCollection::CRestoreObjectsPayload retVal;
+	retVal.Version_1_0 = std::make_optional(response);
+
+	return retVal;
+}
+
+
+sdl::imtbase::ImtCollection::CRestoreObjectSetPayload CObjectCollectionControllerCompBase::OnRestoreObjectSet(
+			const sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest& restoreObjectSetRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
+{
+	sdl::imtbase::ImtCollection::CRestoreObjectSetPayload::V1_0 response;
+
+	sdl::imtbase::ImtCollection::RestoreObjectSetRequestArguments arguments = restoreObjectSetRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0){
+		return sdl::imtbase::ImtCollection::CRestoreObjectSetPayload();
+	}
+
+	istd::TDelPtr<iprm::CParamsSet> filterParamPtr;
+	if (arguments.input.Version_1_0->filterModel.has_value()){
+		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 filterModel = *arguments.input.Version_1_0->filterModel;
+
+		istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
+		if (!imtcol::CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(filterModel, *complexFilterPtr, GetLogPtr())){
+			errorMessage = QString("Unable to restore object set for collection '%1'. Error: SDL model parsing failed").arg(qPrintable(*m_collectionIdAttrPtr));
+			return sdl::imtbase::ImtCollection::CRestoreObjectSetPayload();
+		}
+
+		ReplaceComplexFilterFields(*complexFilterPtr);
+
+		filterParamPtr.SetPtr(new iprm::CParamsSet);
+
+		filterParamPtr->SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
+	}
+
+	response.success = m_objectCollectionCompPtr->RestoreObjectSet(filterParamPtr.GetPtr());
+
+	sdl::imtbase::ImtCollection::CRestoreObjectSetPayload retVal;
+	retVal.Version_1_0 = std::make_optional(response);
+
+	return retVal;
+}
+
+
 // reimplemented (imtservergql::CGqlRepresentationDataControllerComp)
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResponse(
@@ -172,6 +238,16 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 	
 	sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest removeElementSetGqlRequest(gqlRequest, false);
 	if (removeElementSetGqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
+		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+	}
+
+	sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest restoreObjectSetGqlRequest(gqlRequest, false);
+	if (restoreObjectSetGqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
+		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
+	}
+
+	sdl::imtbase::ImtCollection::CRestoreObjectsGqlRequest restoreObjectsGqlRequest(gqlRequest, false);
+	if (restoreObjectsGqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
 		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 	}
 
@@ -235,9 +311,13 @@ bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlR
 {
 	sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
 	sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest removeElementSetGqlRequest(gqlRequest, false);
+	sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest restoreObjectSetGqlRequest(gqlRequest, false);
+	sdl::imtbase::ImtCollection::CRestoreObjectsGqlRequest restoreObjectsGqlRequest(gqlRequest, false);
 	
 	QByteArray removeElementSetCommandId = removeElementSetGqlRequest.GetCommandId();
 	QByteArray getVisualStatusCommandId = getVisualStatusRequest.GetCommandId();
+	QByteArray restoreObjectSetCommandId = restoreObjectSetGqlRequest.GetCommandId();
+	QByteArray restoreObjectsCommandId = restoreObjectsGqlRequest.GetCommandId();
 	QByteArray requestCommandId = gqlRequest.GetCommandId();
 	
 	if (getVisualStatusCommandId == requestCommandId){
@@ -258,6 +338,38 @@ bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlR
 	}
 	else if (removeElementSetCommandId == requestCommandId){
 		sdl::imtbase::ImtCollection::RemoveElementSetRequestArguments arguments = removeElementSetGqlRequest.GetRequestedArguments();
+		if (!arguments.input.Version_1_0.has_value()){
+			Q_ASSERT(false);
+			return false;
+		}
+		
+		if (removeElementSetGqlRequest.IsValid()){
+			QByteArray collectionId;
+			if (arguments.input.Version_1_0->collectionId.has_value()){
+				collectionId = *arguments.input.Version_1_0->collectionId;
+			}
+			
+			return *m_collectionIdAttrPtr == collectionId;
+		}
+	}
+	else if (restoreObjectSetCommandId == requestCommandId){
+		sdl::imtbase::ImtCollection::RestoreObjectSetRequestArguments arguments = restoreObjectSetGqlRequest.GetRequestedArguments();
+		if (!arguments.input.Version_1_0.has_value()){
+			Q_ASSERT(false);
+			return false;
+		}
+		
+		if (removeElementSetGqlRequest.IsValid()){
+			QByteArray collectionId;
+			if (arguments.input.Version_1_0->collectionId.has_value()){
+				collectionId = *arguments.input.Version_1_0->collectionId;
+			}
+			
+			return *m_collectionIdAttrPtr == collectionId;
+		}
+	}
+	else if (restoreObjectsCommandId == requestCommandId){
+		sdl::imtbase::ImtCollection::RestoreObjectsRequestArguments arguments = restoreObjectsGqlRequest.GetRequestedArguments();
 		if (!arguments.input.Version_1_0.has_value()){
 			Q_ASSERT(false);
 			return false;
@@ -1607,7 +1719,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	iprm::CParamsSet& filterParams) const
 {
 	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
-	
+
 	const imtgql::CGqlParamObject* complexFilterModelPtr = viewParamsGql.GetParamArgumentObjectPtr("filterModel");
 	if (complexFilterModelPtr != nullptr){
 		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
@@ -1620,6 +1732,18 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 				SetAdditionalFilters(gqlRequest, *complexFilterPtr);
 				
 				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
+			}
+		}
+	}
+
+	const imtgql::CGqlParamObject* documentFilterModelPtr = viewParamsGql.GetParamArgumentObjectPtr("documentFilterModel");
+	if (documentFilterModelPtr != nullptr){
+		sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0 documentFilterSdl;
+		bool isDocumentFilterOk = documentFilterSdl.ReadFromGraphQlObject(*documentFilterModelPtr);
+		if (isDocumentFilterOk){
+			istd::TDelPtr<imtcol::CDocumentCollectionFilter> documentFilterPtr = new imtcol::CDocumentCollectionFilter();
+			if (imtcol::CDocumentCollectionFilterRepresentationController::DocumentCollectionFilterRepresentationToModel(documentFilterSdl, *documentFilterPtr, GetLogPtr())){
+				filterParams.SetEditableParameter("DocumentFilter", documentFilterPtr.PopPtr(), true);
 			}
 		}
 	}

@@ -261,7 +261,7 @@ Item {
 			itemHeight: Style.controlHeightM;
 			onFinished: {
 				if (commandId !== ""){
-					commandsItem.commandActivated(commandId)
+					commandsItem.commandActivated(commandId, null)
 				}
 			}
 		}

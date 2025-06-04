@@ -37,6 +37,24 @@ sdl::imtbase::ImtCollection::CRemoveElementSetPayload CRemoteObjectVisualStatusC
 }
 
 
+sdl::imtbase::ImtCollection::CRestoreObjectsPayload CRemoteObjectVisualStatusControllerComp::OnRestoreObjects(
+			const sdl::imtbase::ImtCollection::CRestoreObjectsGqlRequest& /*restoreObjectsRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	return sdl::imtbase::ImtCollection::CRestoreObjectsPayload();
+}
+
+
+sdl::imtbase::ImtCollection::CRestoreObjectSetPayload CRemoteObjectVisualStatusControllerComp::OnRestoreObjectSet(
+			const sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest& /*restoreObjectSetRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	return sdl::imtbase::ImtCollection::CRestoreObjectSetPayload();
+}
+
+
 // reimplemented (imtgql::IGqlRequestHandler)
 
 bool CRemoteObjectVisualStatusControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const

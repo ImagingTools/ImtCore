@@ -100,6 +100,8 @@
                                 <Value>Import</Value>
                                 <Value>Export</Value>
                                 <Value>RemoveAll</Value>
+                                <Value>Restore</Value>
+                                <Value>RestoreAll</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -217,7 +219,7 @@
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="RemoveAll"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="RemovePermissions">
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="RemoveAllPermissions">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="">
@@ -244,6 +246,72 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="Restore" PackageId="ImtCoreVoce" ComponentId="Command">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Restore"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="RestorePermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Restore"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="String" ExportId="RestoreCommandName">
+                        <Data IsEnabled="true" Value="Restore"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Priority" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RestoreAll" PackageId="ImtCoreVoce" ComponentId="Command">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="RestoreAll"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="RestoreAllPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Icons/Restore"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="String" ExportId="RestoreAllCommandName">
+                        <Data IsEnabled="true" Value="Restore All"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Priority" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="-1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -260,5 +328,7 @@
         <Component ExportedId="New" ComponentId="New"/>
         <Component ExportedId="Remove" ComponentId="Remove"/>
         <Component ExportedId="RemoveAll" ComponentId="RemoveAll"/>
+        <Component ExportedId="Restore" ComponentId="Restore"/>
+        <Component ExportedId="RestoreAll" ComponentId="RestoreAll"/>
     </ExportedComponents>
 </Acf>

@@ -104,13 +104,13 @@ bool CSmtpMessage::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_body);
 	retVal = retVal && archive.EndTag(bodyTag);
 
-	return true;
+	return retVal;
 }
 
 
 // reimplemented (iser::IChangeable)
 
-bool CSmtpMessage::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CSmtpMessage::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CSmtpMessage* sourcePtr = dynamic_cast<const CSmtpMessage*>(&object);
 	if (sourcePtr != nullptr){
@@ -156,7 +156,7 @@ istd::IChangeable* CSmtpMessage::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CSmtpMessage::ResetData(CompatibilityMode mode)
+bool CSmtpMessage::ResetData(CompatibilityMode /*mode*/)
 {
 	m_to.clear();
 	m_from.clear();

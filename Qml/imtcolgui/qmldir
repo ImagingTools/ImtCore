@@ -29,3 +29,4 @@ SchemeView 1.0 SchemeView.qml
 MetaInfo 1.0 MetaInfo.qml
 
 CollectionDataController 1.0 CollectionDataController.qml
+DocCollectionFilter 1.0 DocCollectionFilter.qml

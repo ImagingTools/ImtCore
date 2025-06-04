@@ -107,7 +107,7 @@ Item {
 		headersGqlModel.send();
 	}
 	
-	function updateElements(count, offset, filterModel){
+	function updateElements(count, offset, filterModel, documentFilterModel){
 		if (internal.elementsUpdatingBlock){
 			return;
 		}
@@ -119,7 +119,7 @@ Item {
 		
 		root.beginUpdate();
 		elementsGqlModel.gqlCommandId = gqlGetListCommandId;
-		elementsGqlModel.send({"count":count, "offset":offset,"filterModel":filterModel})
+		elementsGqlModel.send({"count":count, "offset":offset,"filterModel":filterModel,"documentFilterModel":documentFilterModel})
 	}
 	
 	function clearElements(){
@@ -183,6 +183,19 @@ Item {
 		
 		setDescriptionQuery.send({"id":elementId,"description":description});
 	}
+
+	function restoreObjectSet(filterModel){
+		restoreObjectSetInput.m_filterModel = filterModel
+		restoreObjectSetRequest.send(restoreObjectSetInput)
+	}
+	
+	function restoreObjects(objectIds){
+		restoreObjectsInput.m_objectIds = objectIds
+		restoreObjectsRequest.send(restoreObjectsInput)
+	}
+	
+	function setElementEnabled(elementId, enabled){
+	}
 	
 	function getHeaders(){
 		return {};
@@ -195,6 +208,42 @@ Item {
 	RemoveElementSetInput {
 		id: removeElementSetInput
 		m_collectionId: root.collectionId
+	}
+	
+	RestoreObjectsInput {
+		id: restoreObjectsInput
+		m_collectionId: root.collectionId
+	}
+	
+	RestoreObjectSetInput {
+		id: restoreObjectSetInput
+		m_collectionId: root.collectionId
+	}
+	
+	GqlSdlRequestSender {
+		id: restoreObjectsRequest
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjects
+		requestType: 1
+		sdlObjectComp: Component {
+			RestoreObjectsPayload {}
+		}
+
+		function getHeaders(){
+			return root.getHeaders();
+		}
+	}
+	
+	GqlSdlRequestSender {
+		id: restoreObjectSetRequest
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_restoreObjectSet
+		requestType: 1
+		sdlObjectComp: Component {
+			RestoreObjectSetPayload {}
+		}
+
+		function getHeaders(){
+			return root.getHeaders();
+		}
 	}
 	
 	GqlSdlRequestSender {
@@ -352,6 +401,7 @@ Item {
 			viewParams.InsertField("count", params["count"]);
 			viewParams.InsertField("offset", params["offset"]);
 			viewParams.InsertField("filterModel", params["filterModel"]);
+			viewParams.InsertField("documentFilterModel", params["documentFilterModel"]);
 
 			var inputParams = Gql.GqlObject("input");
 			inputParams.InsertFieldObject(viewParams);

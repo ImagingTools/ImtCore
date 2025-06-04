@@ -8,6 +8,7 @@ schema {
 
 import {
 	"../../imtbase/1.0/ComplexCollectionFilter.sdl"
+	#"../../imtbase/1.0/DocumentCollectionFilter.sdl"
 }
 
 type HeaderInfo {
@@ -25,6 +26,7 @@ type CollectionViewParams {
 	count: Int
 	offset: Int
 	filterModel: ComplexCollectionFilter
+	#documentFilterModel: DocumentCollectionFilter
 }
 
 type NotificationItem {
@@ -55,6 +57,14 @@ type SetDescriptionNotificationPayload {
 }
 
 type RemoveElementSetPayload {
+	success: Boolean
+}
+
+type RestoreObjectsPayload {
+	success: Boolean
+}
+
+type RestoreObjectSetPayload {
 	success: Boolean
 }
 
@@ -94,6 +104,16 @@ input RemoveElementSetInput {
 	filterModel: ComplexCollectionFilter
 }
 
+input RestoreObjectsInput {
+	collectionId: ID
+	objectIds: [ID]
+}
+
+input RestoreObjectSetInput {
+	collectionId: ID
+	filterModel: ComplexCollectionFilter
+}
+
 input ObjectVisualStatusInput {
 	objectId: ID!
 	typeId: ID!
@@ -105,6 +125,8 @@ type Query {
 
 type Mutation {
 	RemoveElementSet (input: RemoveElementSetInput): RemoveElementSetPayload!
+	RestoreObjects (input: RestoreObjectsInput): RestoreObjectsPayload!
+	RestoreObjectSet (input: RestoreObjectSetInput): RestoreObjectSetPayload!
 }
 
 

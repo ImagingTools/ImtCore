@@ -65,6 +65,14 @@ public:
 	virtual QByteArray GetSelectionByMetaInfoQuery(const QByteArray& metaInfoId, const QVariant& metaInfoValue) const override;
 	virtual QByteArray CreateUpdateMetaInfoQuery(const QSqlRecord& record) const override;
 	virtual QByteArray GetTableName() const override;
+	virtual QByteArray CreateRestoreObjectsQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArrayList& objectIds,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual QByteArray CreateRestoreObjectSetQuery(
+				const imtbase::IObjectCollection& collection,
+				const iprm::IParamsSet* paramsPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 protected:
 	virtual QString GetBaseSelectionQuery() const;

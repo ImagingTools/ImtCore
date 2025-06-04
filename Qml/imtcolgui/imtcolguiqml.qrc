@@ -25,5 +25,6 @@
         	<file alias="imtcolgui/MessageFilterItem.qml">MessageFilterItem.qml</file>
 		<file alias="imtcolgui/MessageCollectionView.qml">MessageCollectionView.qml</file>
 		<file alias="imtcolgui/CollectionDataController.qml">CollectionDataController.qml</file>
+		<file alias="imtcolgui/DocCollectionFilter.qml">DocCollectionFilter.qml</file>
     </qresource>
 </RCC>

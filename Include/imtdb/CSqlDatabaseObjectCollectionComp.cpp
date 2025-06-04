@@ -216,6 +216,80 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElementSet(
 }
 
 
+
+bool CSqlDatabaseObjectCollectionComp::RestoreObjects(
+			const Ids& objectIds,
+			const imtbase::IOperationContext* operationContextPtr)
+{
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return false;
+	}
+	
+	QByteArray query = m_objectDelegateCompPtr->CreateRestoreObjectsQuery(*this, objectIds, operationContextPtr);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+		
+		return false;
+	}
+	
+	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = objectIds;
+	
+	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
+	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
+	
+	if (operationContextPtr != nullptr){
+		AddOperationContextToChangeSet(*operationContextPtr, changeSet);
+	}
+	
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+	
+	if (ExecuteTransaction(query)){
+		return true;
+	}
+	else{
+		changeNotifier.Abort();
+	}
+	
+	return false;
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::RestoreObjectSet(
+			const iprm::IParamsSet* selectionParamsPtr,
+			const imtbase::IOperationContext* operationContextPtr)
+{
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return false;
+	}
+
+	QByteArray query = m_objectDelegateCompPtr->CreateRestoreObjectSetQuery(*this, selectionParamsPtr, operationContextPtr);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
+		return false;
+	}
+
+	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
+	notifierInfo.elementIds = QByteArrayList();
+
+	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
+	changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));
+
+	if (operationContextPtr != nullptr){
+		AddOperationContextToChangeSet(*operationContextPtr, changeSet);
+	}
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	if (ExecuteTransaction(query)){
+		return true;
+	}
+
+	return false;
+}
+
+
 const istd::IChangeable* CSqlDatabaseObjectCollectionComp::GetObjectPtr(const QByteArray& /*objectId*/) const
 {
 	return nullptr;

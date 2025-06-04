@@ -15,6 +15,8 @@
         <Element ComponentName="New" X="125" Y="350" Note=""/>
         <Element ComponentName="Remove" X="525" Y="350" Note=""/>
         <Element ComponentName="RemoveAll" X="700" Y="350" Note=""/>
+        <Element ComponentName="Restore" X="675" Y="525" Note=""/>
+        <Element ComponentName="RestoreAll" X="850" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
