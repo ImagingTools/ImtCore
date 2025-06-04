@@ -69,6 +69,7 @@ void CWebSocketServerComp::RegisterSender(const QByteArray& clientId, QWebSocket
 void CWebSocketServerComp::SetConnectionStatus(const QByteArray& clientId)
 {
 	imtcom::IConnectionStatusProvider::ConnectionStatus loginStatus = imtcom::IConnectionStatusProvider::CS_CONNECTED;
+
 	istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QString("Login"));
 	loginChangeSet.SetChangeInfo("ClientId", clientId);
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
@@ -95,6 +96,7 @@ bool CWebSocketServerComp::SendErrorMessage(
 {
 	return BaseClass::SendErrorMessage(id, message, messageSource, flags);
 }
+
 
 void CWebSocketServerComp::SendVerboseMessage(const QString& message, const QString& messageSource) const
 {
@@ -214,23 +216,27 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 					imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
 		if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
 			if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
-				m_webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::SecureMode,this));
+				m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::SecureMode, this));
+
 				m_webSocketServerPtr->setSslConfiguration(sslConfiguration);
 			}
 			else{
-				m_webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
+				m_webSocketServerPtr.SetPtr(new QWebSocketServer("" ,QWebSocketServer::NonSecureMode, this));
 			}
 		}
 		else{
-			m_webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
+			m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::NonSecureMode, this));
 		}
 	}
 	else{
-		m_webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
+		m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::NonSecureMode, this));
 	}
+
 	if (m_webSocketServerPtr->listen(address, port)){
 		QString message = QString("Web socket server successfully started on port %1").arg(port);
+
 		SendInfoMessage(0, message);
+
 		qDebug() << message;
 
 		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
