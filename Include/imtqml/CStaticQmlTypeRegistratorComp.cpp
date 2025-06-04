@@ -16,7 +16,9 @@
 namespace imtqml
 {
 
+
 bool CStaticQmlTypeRegistratorComp::s_isInitialized = false;
+
 
 // protected methods
 

@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
+#include <imtqml/CQmlWebSocket.h>
 
 
 namespace imtqml
@@ -32,6 +33,7 @@ void CStaticQmlBaseTypeRegistratorComp::OnComponentCreated()
 	s_isInitialized = true;
 
 	qmlRegisterType<imtbase::CTreeItemModel>("com.imtcore.imtqml", 1, 0, "TreeItemModel");
+	qmlRegisterType<imtqml::CQmlWebSocket>("com.imtcore.imtqml", 1, 0, "WebSocket");
 }
 
 

@@ -21,12 +21,15 @@ SingleDocumentWorkspacePageView {
     Component.onCompleted: {
         Style.setDecorators(decorators_)
     }
+	
+	onProductIdChanged: {
+		AuthorizationController.productId = productId
+	}
 
     Connections {
         target: AuthorizationController;
 
 		function onLoggedIn(){
-			console.log("onLoggedIn", container.productId);
             if (container.productId !== ""){
                 container.startItemSourceComp = administrationViewComp
             }
@@ -53,8 +56,8 @@ SingleDocumentWorkspacePageView {
     }
 
     SubscriptionManager {
-        id: subscriptionManager;
-        url: container.webSocketUrl;
+        id: subscriptionManager
+        url: container.webSocketUrl
     }
 
     DialogManagerView {

@@ -383,7 +383,6 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 
 	QString host;
 	QString path;
-	QString scheme = "ws";
 	int port = 0;
 
 	if (m_webSocketServerAddressCompPtr.IsValid()){
@@ -391,7 +390,6 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 		host = url.host();
 		port = url.port();
 		path = url.path();
-		scheme = url.scheme();
 	}
 
 	QJsonObject authorization;
@@ -407,9 +405,9 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 	url.setHost(host);
 	url.setPath(path);
 	url.setQuery("header=" + authHeader.toBase64() + "&payload=e30=");
-	url.setScheme(scheme);
+	url.setScheme("ws");
 	url.setPort(port);
-	
+
 	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
 		QSslConfiguration sslConfiguration;
 		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(
@@ -417,6 +415,7 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 					imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
 		if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
 			if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
+				url.setScheme("wss");
 				m_webSocket.setSslConfiguration(sslConfiguration);
 			}
 		}

@@ -32,6 +32,7 @@ public:
 public Q_SLOTS:
 	void replyFinished();
 	void errorOccurred(QNetworkReply::NetworkError code);
+	void onSslErrors(const QList<QSslError>& errors);
 
 Q_SIGNALS:
 	void stateChanged(const QString& state);

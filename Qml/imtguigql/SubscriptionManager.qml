@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import QtWebSockets 1.2
+// import QtWebSockets 1.2
 import imtcontrols 1.0
 
 WebSocket {
@@ -21,6 +21,10 @@ WebSocket {
 	Component.onDestruction: {
 		Events.unSubscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
 		Events.unSubscribeEvent("UnregisterSubscription", container.unRegisterSubscription);
+	}
+	
+	onUrlChanged: {
+		console.log("WebSocket onUrlChanged", url)
 	}
 
 	onStatusChanged: {
@@ -57,8 +61,10 @@ WebSocket {
 	}
 
 	onTextMessageReceived:{
+		console.log("onTextMessageReceived", message)
 		socketModel.createFromJson(message)
-
+		
+		console.log("socketModel", socketModel.toJson())
 		if (socketModel.getData("type") === "connection_ask"){
 			registerSubscriptionToServer()
 		}

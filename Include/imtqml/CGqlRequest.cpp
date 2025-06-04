@@ -53,11 +53,11 @@ bool CGqlRequest::SetGqlQuery(QString query, QVariantMap headers)
 		qDebug() << message;
 
 		QNetworkReply* reply = accessManager->post(networkRequest, query.toUtf8());
-
 		reply->setProperty("requestBody", query.toUtf8());
 
 		connect(reply, &QNetworkReply::finished, this, &CGqlRequest::replyFinished);
 		connect(reply, &QNetworkReply::errorOccurred, this, &CGqlRequest::errorOccurred);
+		connect(reply, &QNetworkReply::sslErrors, this, &CGqlRequest::onSslErrors);
 		CNetworkEventInterceptor::Instance()->InterceptRequest(reply, this);
 
 		return true;
@@ -105,6 +105,14 @@ void CGqlRequest::errorOccurred(QNetworkReply::NetworkError /*code*/)
 		qDebug() << networkReplyPtr->errorString();
 
 		networkReplyPtr->deleteLater();
+	}
+}
+
+void CGqlRequest::onSslErrors(const QList<QSslError>& errors)
+{
+	QNetworkReply* networkReplyPtr = dynamic_cast<QNetworkReply*>(sender());
+	if (networkReplyPtr != nullptr){
+		networkReplyPtr->ignoreSslErrors();
 	}
 }
 

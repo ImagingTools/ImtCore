@@ -2,12 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5311" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="0" Number="5385" Description="ACF"/>
+            <Version Id="1" Number="2247" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="SslConfigurationManager" X="225" Y="300" Note=""/>
         <Element ComponentName="SubscriptionManager" X="920" Y="620" Note=""/>
         <Element ComponentName="WebSocketProtocolEngine" X="280" Y="620" Note=""/>
         <Element ComponentName="WebSocketServer" X="580" Y="440" Note=""/>

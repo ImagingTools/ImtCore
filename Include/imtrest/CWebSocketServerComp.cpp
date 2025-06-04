@@ -69,7 +69,6 @@ void CWebSocketServerComp::RegisterSender(const QByteArray& clientId, QWebSocket
 void CWebSocketServerComp::SetConnectionStatus(const QByteArray& clientId)
 {
 	imtcom::IConnectionStatusProvider::ConnectionStatus loginStatus = imtcom::IConnectionStatusProvider::CS_CONNECTED;
-
 	istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QString("Login"));
 	loginChangeSet.SetChangeInfo("ClientId", clientId);
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
@@ -84,6 +83,7 @@ bool CWebSocketServerComp::SendInfoMessage(
 			const QString& messageSource,
 			int flags) const
 {
+	qDebug() << message;
 	return BaseClass::SendInfoMessage(id, message, messageSource, flags);
 }
 
@@ -96,7 +96,6 @@ bool CWebSocketServerComp::SendErrorMessage(
 {
 	return BaseClass::SendErrorMessage(id, message, messageSource, flags);
 }
-
 
 void CWebSocketServerComp::SendVerboseMessage(const QString& message, const QString& messageSource) const
 {
@@ -132,7 +131,7 @@ void CWebSocketServerComp::OnComponentCreated()
 
 	connect(&m_timer, &QTimer::timeout, this, &CWebSocketServerComp::OnTimeout);
 
-	m_timer.start(5000);
+	m_timer.start(3000);
 }
 
 
@@ -203,12 +202,13 @@ bool CWebSocketServerComp::EnsureServerStarted()
 }
 
 
-bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 port)
+bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 port)
 {
 	if (!m_protocolEngineCompPtr.IsValid()){
 		return false;
 	}
 
+	bool isSecureConnection = false;
 	if (m_sslConfigurationCompPtr.IsValid() && m_sslConfigurationManagerCompPtr.IsValid()){
 		QSslConfiguration sslConfiguration;
 		iprm::TParamsPtr<iprm::IEnableableParam> sslEnableParamPtr(
@@ -216,28 +216,22 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 					imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
 		if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
 			if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
-				m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::SecureMode, this));
-
+				m_webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::SecureMode,this));
 				m_webSocketServerPtr->setSslConfiguration(sslConfiguration);
+
+				SendInfoMessage(0, QString("Secure connection (SSL) enabled on web socket server"));
+
+				isSecureConnection = true;
 			}
-			else{
-				m_webSocketServerPtr.SetPtr(new QWebSocketServer("" ,QWebSocketServer::NonSecureMode, this));
-			}
-		}
-		else{
-			m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::NonSecureMode, this));
 		}
 	}
-	else{
-		m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::NonSecureMode, this));
+
+	if (!isSecureConnection){
+		m_webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
 	}
 
 	if (m_webSocketServerPtr->listen(address, port)){
-		QString message = QString("Web socket server successfully started on port %1").arg(port);
-
-		SendInfoMessage(0, message);
-
-		qDebug() << message;
+		SendInfoMessage(0, QString("Web socket server successfully started on port %1").arg(port));
 
 		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections);
 		connect(m_webSocketServerPtr.GetPtr(), &QWebSocketServer::acceptError, this, &CWebSocketServerComp::OnAcceptError);
@@ -330,7 +324,7 @@ void CWebSocketServerComp::OnAcceptError(QAbstractSocket::SocketError /*socketEr
 }
 
 
-void CWebSocketServerComp::OnSslErrors(const QList<QSslError> &errors)
+void CWebSocketServerComp::OnSslErrors(const QList<QSslError>& errors)
 {
 	QString errorMessage;
 
