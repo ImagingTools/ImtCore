@@ -181,7 +181,7 @@ bool CTcpServerComp::EnsureServerStarted()
 
 			m_serverPtr->SetSslConfiguration(sslConfiguration);
 
-			QString message = QString("Secure connection (SSL) enabled on Tcp server");
+			QString message = QString("Secure connection (SSL) enabled on TCP server");
 			qDebug() << message;
 			SendInfoMessage(0, message);
 		}

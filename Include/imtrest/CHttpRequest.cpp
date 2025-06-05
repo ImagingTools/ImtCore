@@ -373,8 +373,14 @@ bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* sock
 		m_url.setScheme(QStringLiteral("https"));
 	}
 	else{
-		const QWebSocket* webSocketPtr = qobject_cast<const QWebSocket*>(socketObjectPtr);
-		if (webSocketPtr != nullptr){
+		m_url.setScheme(QStringLiteral("http"));
+	}
+	
+	const QWebSocket* webSocketPtr = qobject_cast<const QWebSocket*>(socketObjectPtr);
+	if (webSocketPtr != nullptr){
+		m_url.setScheme(QStringLiteral("ws"));
+		
+		if (isSecure){
 			m_url.setScheme(QStringLiteral("wss"));
 		}
 	}
