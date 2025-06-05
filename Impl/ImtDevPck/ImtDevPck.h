@@ -11,6 +11,8 @@
 #include <imtdev/CDeviceIdBasedConfigurationManagerComp.h>
 #include <imtdev/CDeviceIdBasedConfigurationComp.h>
 #include <imtdev/CDeviceIdBasedAttributesComp.h>
+#include <imtdev/CDeviceFrameworkComp.h>
+#include <imtdev/CDeviceFrameworkProxyComp.h>
 
 
 /**
@@ -25,6 +27,8 @@ typedef imtdev::CDeviceDataFilePersistenceComp DeviceDataFilePersistence;
 typedef icomp::TModelCompWrap<imtdev::CDeviceIdBasedConfigurationManagerComp> DeviceIdBasedConfigurationManager;
 typedef icomp::TModelCompWrap<imtdev::CDeviceIdBasedConfigurationComp> DeviceIdBasedConfiguration;
 typedef icomp::TModelCompWrap<imtdev::CDeviceIdBasedAttributesComp> DeviceIdBasedAttributes;
+typedef imtdev::CDeviceFrameworkComp DeviceFramework;
+typedef imtdev::CDeviceFrameworkProxyComp DeviceFrameworkProxy;
 
 
 } // namespace ImtDevPck

@@ -39,6 +39,16 @@ I_EXPORT_COMPONENT(
 			"Device ID based attributes",
 			"Device Attributes");
 
+I_EXPORT_COMPONENT(
+			DeviceFrameworkProxy,
+			"device framework elements proxy",
+			"Device Framework Proxy");
+
+I_EXPORT_COMPONENT(
+			DeviceFramework,
+			"Provider of device framework elements",
+			"Device Framework");
+
 
 } // namespace ImtDevPck
 
