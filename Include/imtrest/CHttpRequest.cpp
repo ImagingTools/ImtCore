@@ -379,10 +379,6 @@ bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* sock
 	const QWebSocket* webSocketPtr = qobject_cast<const QWebSocket*>(socketObjectPtr);
 	if (webSocketPtr != nullptr){
 		m_url.setScheme(QStringLiteral("ws"));
-		
-		if (isSecure){
-			m_url.setScheme(QStringLiteral("wss"));
-		}
 	}
 #else
 	const QWebSocket* webSocketPtr = qobject_cast<QWebSocket*>(socketObjectPtr);
