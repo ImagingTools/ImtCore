@@ -12,9 +12,13 @@ CQmlWebSocket::CQmlWebSocket(QObject* parent)
 	connect(&m_socket,& QWebSocket::disconnected, this,& CQmlWebSocket::onDisconnected);
 	connect(&m_socket,& QWebSocket::textMessageReceived, this,& CQmlWebSocket::textMessageReceived);
 	connect(&m_socket,& QWebSocket::binaryMessageReceived, this,& CQmlWebSocket::binaryMessageReceived);
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 	connect(&m_socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred),
 			this,& CQmlWebSocket::onError);
-
+#else
+	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CQmlWebSocket::onError);
+#endif
 	connect(&m_socket, &QWebSocket::sslErrors, this, &CQmlWebSocket::onSslErrors);
 }
 
