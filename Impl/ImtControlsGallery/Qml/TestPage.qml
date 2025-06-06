@@ -38,4 +38,77 @@ Rectangle {
 			}
 		}
 	}
+
+
+	Canvas{
+		id: canvas;
+		anchors.centerIn: parent;
+
+		width:  parent.width;
+		height:  parent.height;
+
+		property real imageX: (canvas.width/3 + canvas.width/8)
+		property real imageY: (canvas.height/3 + canvas.height/8)
+
+		Component.onCompleted: {
+			loadImage("/Images/testImage")
+		}
+
+		onImageLoaded: {
+			requestPaint()
+		}
+
+		onWidthChanged: {
+			requestPaint()
+		}
+
+		onHeightChanged: {
+			requestPaint()
+		}
+
+		onPaint: {
+			console.log("ON_PAINT")
+			var ctx = getContext('2d');
+
+			canvas.imageX = (canvas.width/3 + canvas.width/8);
+			canvas.imageY = (canvas.height/3 + canvas.height/8);
+
+			matrix.rotateContext(ctx, Math.PI/2, Qt.point(canvas.imageX, canvas.imageY))
+
+			// matrix.setContextTransform(ctx);
+			// ctx.translate(-canvas.imageX, -canvas.imageY)
+
+			// matrix.reset()
+			// matrix.xTranslation = - canvas.imageX
+			// matrix.yTranslation = - canvas.imageY
+			// matrix.transformContext(ctx);
+
+			ctx.drawImage("/Images/testImage", canvas.width/3, canvas.height/3, canvas.width/4, canvas.height/4)
+
+		}
+
+	}
+
+	CanvasMatrix{
+		id: matrix;
+	}
+
+	Rectangle{
+		x:canvas.width/3
+		y: canvas.height/3;
+
+		width: canvas.width/4
+		height:  canvas.height/4
+
+		color: "transparent"
+		border.color: "green"
+	}
+
+	Rectangle{
+		anchors.fill: canvas;
+		color: "transparent"
+		border.color: "red"
+	}
+
+
 }

@@ -16,4 +16,7 @@
         <file alias="TableTreeViewPage.qml">Qml/TableTreeViewPage.qml</file>
         <file alias="TopPanelDecoratorCustom.qml">Qml/TopPanelDecoratorCustom.qml</file>
     </qresource>
+	<qresource prefix="/Images">
+			<file alias="testImage">Resources/Images/testImage.jpg</file>
+	</qresource>
 </RCC>

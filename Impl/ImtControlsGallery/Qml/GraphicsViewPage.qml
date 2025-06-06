@@ -7,7 +7,7 @@ import imtcontrols 1.0
 import imtcolgui 1.0
 
 GraphicsView{
-    id: scheme;
+	id: view;
 
 	property var drawModel: []
 
@@ -15,11 +15,16 @@ GraphicsView{
 	Component.onCompleted: {
 		//TEST
 
-		let layer = scheme.createLayer("test");
+		let background = view.getBackgroundLayer()
+		background.addShape(imageShape);
+		background.addShape(gridShape);
+
+		let layer = view.getActiveLayer();
 
 		layer.addShape(rec1);
 		layer.addShape(rec2);
 		layer.addShape(rec3);
+
 
 		// layer.addShape(polygon);
 
@@ -34,9 +39,9 @@ GraphicsView{
 		// layer.addShape(text);
 
 		//Rectangle
-		drawModel.push({"point": Qt.point(300, 300), "width": 100, "height": 100, "color": "red"})
-		drawModel.push({"point": Qt.point(600, 300), "width": 100, "height": 100, "color": "green"})
-		drawModel.push({"point": Qt.point(600, 600), "width": 100, "height": 100, "color": "blue"})
+		drawModel.push({"point": Qt.point(600, 300), "width": 100, "height": 100, "color": "red"})
+		drawModel.push({"point": Qt.point(1200, 300), "width": 100, "height": 100, "color": "green"})
+		drawModel.push({"point": Qt.point(1200, 600), "width": 100, "height": 100, "color": "blue"})
 
 		//Polygon
 		// drawModel.push({"points": [Qt.point(300, 300), Qt.point(600, 300),  Qt.point(600, 600)], "color": "red"})
@@ -55,11 +60,78 @@ GraphicsView{
 		//Text
 		//drawModel.push({"point": Qt.point(300, 300), "color": "red", "fontSize": 20, "text": "TEXT"})
 
-		scheme.requestPaint();
+		view.requestPaint();
 
 		//TEST
 	}
 
+	GraphicsShapeBase{
+		id: gridShape;
+
+		function drawBase(ctx, layerId){
+			let step = 30;
+
+			ctx.lineCap = "round"
+			ctx.lineJoin = "round"
+			ctx.lineWidth = 1;
+
+			ctx.fillStyle = Style.imagingToolsGradient1;
+			ctx.strokeStyle = Style.imagingToolsGradient1;
+
+
+			for(let i = 0; i * step < view.drawingAreaWidth; i++){//vertical lines
+				let x1 = i * step;
+				let y1 =  0 ;
+				let x2 = i * step;
+				let y2 = view.drawingAreaHeight ;
+
+				ctx.beginPath()
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.stroke();
+			}
+
+			for(let i = 0; i * step < view.drawingAreaHeight; i++){//horizontal lines
+				let x1 = 0 ;
+				let y1 =  i * step ;
+				let x2 =  view.drawingAreaWidth;
+				let y2 =  i * step;
+
+				ctx.beginPath()
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.stroke();
+			}
+
+			ctx.strokeStyle = Style.borderColor;
+			ctx.lineWidth = 2;
+			ctx.beginPath()
+			ctx.moveTo(1, 1);
+			ctx.lineTo(view.drawingAreaWidth, 1);
+			ctx.lineTo(view.drawingAreaWidth, view.drawingAreaHeight - 1);
+			ctx.lineTo(1, view.drawingAreaHeight - 1);
+			ctx.lineTo(1, 1);
+			ctx.stroke();
+		}
+	}
+
+	ImageParams{
+		id: imageParams
+
+		source: "/Images/testImage"
+		width: view.width;
+		height: view.height;
+		point: Qt.point(0,0)
+	}
+
+	ImageShape{
+		id: imageShape;
+
+		imageSource: "/Images/testImage";
+		function getParams(layerId){
+			return imageParams;
+		}
+	}
 
 	Component{
 		id: selectedRecComp;
@@ -72,19 +144,18 @@ GraphicsView{
 	}
 	RectangleShape{
 		id: rec1;
-		selectionComp: selectedRecComp;
 
 		Component.onCompleted: {
 		}
 
-		function setCoordinate(coord){
-			let item = scheme.drawModel[0];
-			item.point.x = coord.x;
-			item.point.y = coord.y;
+		function setPoints(pointList){
+			let item = view.drawModel[0];
+			item.point.x = pointList[0].x;
+			item.point.y = pointList[0].y;
 		}
 
 		function getParams(layerId){
-			let item = scheme.drawModel[0];
+			let item = view.drawModel[0];
 
 			recParams1.point = item.point;
 			recParams1.width = item.width;
@@ -100,19 +171,18 @@ GraphicsView{
 	}
 	RectangleShape{
 		id: rec2;
-		selectionComp: selectedRecComp;
 
 		Component.onCompleted: {
 		}
 
-		function setCoordinate(coord){
-			let item = scheme.drawModel[1];
-			item.point.x = coord.x;
-			item.point.y = coord.y;
+		function setPoints(pointList){
+			let item = view.drawModel[1];
+			item.point.x = pointList[0].x;
+			item.point.y = pointList[0].y;
 		}
 
 		function getParams(layerId){
-			let item = scheme.drawModel[1];
+			let item = view.drawModel[1];
 
 			recParams2.point = item.point;
 			recParams2.width = item.width;
@@ -128,19 +198,19 @@ GraphicsView{
 	}
 	RectangleShape{
 		id: rec3;
-		selectionComp: selectedRecComp;
 
 		Component.onCompleted: {
 		}
 
-		function setCoordinate(coord){
-			let item = scheme.drawModel[2];
-			item.point.x = coord.x;
-			item.point.y = coord.y;
+
+		function setPoints(pointList){
+			let item = view.drawModel[2];
+			item.point.x = pointList[0].x;
+			item.point.y = pointList[0].y;
 		}
 
 		function getParams(layerId){
-			let item = scheme.drawModel[2];
+			let item = view.drawModel[2];
 
 			recParams3.point = item.point;
 			recParams3.width = item.width;
@@ -163,7 +233,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return scheme.drawModel[0];
+			return view.drawModel[0];
 		}
 	}
 
@@ -177,7 +247,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return scheme.drawModel[0];
+			return view.drawModel[0];
 		}
 	}
 
@@ -191,7 +261,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return scheme.drawModel[0];
+			return view.drawModel[0];
 		}
 	}
 
@@ -204,7 +274,7 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return scheme.drawModel[0];
+			return view.drawModel[0];
 		}
 	}
 
@@ -218,9 +288,10 @@ GraphicsView{
 		}
 
 		function getParams(layerId){
-			return scheme.drawModel[0];
+			return view.drawModel[0];
 		}
 	}
+
 
 
 	ComplexShape{
@@ -235,18 +306,18 @@ GraphicsView{
 
 
     onCopySignal: {
-        if(scheme.selectedIndex >=0){
-            scheme.copyObjectFunc(scheme.selectedIndex);
+		if(view.selectedIndex >=0){
+			view.copyObjectFunc(view.selectedIndex);
         }
     }
     onPasteSignal: {
-        if(scheme.selectedIndex >=0){
-            scheme.pasteObjectFunc();
+		if(view.selectedIndex >=0){
+			view.pasteObjectFunc();
         }
     }
     onDeleteSignal: {
-        if(scheme.selectedIndex >=0){
-            scheme.deleteObjectFunc(scheme.selectedIndex);
+		if(view.selectedIndex >=0){
+			view.deleteObjectFunc(view.selectedIndex);
         }
     }
 }
