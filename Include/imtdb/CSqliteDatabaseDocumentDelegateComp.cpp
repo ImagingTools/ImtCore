@@ -93,7 +93,6 @@ QString CSqliteDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 			) AS root1 
 			ON root1."DocumentId" = root."DocumentId"
 			%3
-			WHERE root."State" = 'Active'
 			)")
 			.arg(
 				schema,
