@@ -50,7 +50,6 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	void InsertParamObject(istd::TSmartPtr<CGqlParamObject> objectPtr);
 	void RemoveParam(const QByteArray& paramId);
 
 protected:

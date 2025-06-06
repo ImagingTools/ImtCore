@@ -132,7 +132,7 @@ protected:
 	virtual QString GetExportFileName(const QByteArray& objectId) const;
 	virtual bool UpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QString& errorMessage) const;
 	virtual QVariant GetInputArgumentFromRequest(const imtgql::CGqlRequest& gqlRequest, const QString& argumentKey) const;
-	virtual QByteArrayList ExtractObjectIdsForRemoval(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::ICollectionInfo::Ids ExtractObjectIdsForRemoval(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.

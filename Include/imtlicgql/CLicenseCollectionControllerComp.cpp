@@ -74,9 +74,9 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 
 	if (requestInfo.items.isProductIdRequested){
 		if (m_productCollectionCompPtr.IsValid()){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_productCollectionCompPtr->GetObjectData(productUuid, dataPtr)){
-				const imtlic::IProductInfo* productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(dataPtr.GetPtr());
+			imtbase::IObjectCollection::DataPtr productDataPtr;
+			if (m_productCollectionCompPtr->GetObjectData(productUuid, productDataPtr)){
+				const imtlic::IProductInfo* productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(productDataPtr.GetPtr());
 				if (productInfoPtr != nullptr){
 					representationObject.productId = productInfoPtr->GetProductId();
 				}

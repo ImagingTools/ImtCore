@@ -145,12 +145,12 @@ istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObjectFromRec
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp::CreateNewObjectQuery(
-		const QByteArray& typeId,
-		const QByteArray& proposedObjectId,
-		const QString& objectName,
-		const QString& objectDescription,
-		const istd::IChangeable* valuePtr,
-		const imtbase::IOperationContext* operationContextPtr) const
+			const QByteArray& typeId,
+			const QByteArray& proposedObjectId,
+			const QString& objectName,
+			const QString& objectDescription,
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
 	
@@ -162,27 +162,28 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 	if (valuePtr != nullptr){
 		workingDocumentPtr.SetPtr(valuePtr, false);
 	}
+
 	// Otherwise create a new document instance of the related type:
 	else{
 		documentInstancePtr = CreateObject(typeId);
 		
 		workingDocumentPtr.SetPtr(documentInstancePtr.GetPtr(), false);
 	}
-	
+
 	if (!workingDocumentPtr.IsValid()){
 		return retVal;
 	}
-	
+
 	QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
-	
+
 	retVal.query = PrepareInsertNewObjectQuery(
-					   typeId,
-					   objectId,
-					   objectName,
-					   objectDescription,
-					   *workingDocumentPtr,
-					   operationContextPtr,
-					   1);
+				typeId,
+				objectId,
+				objectName,
+				objectDescription,
+				*workingDocumentPtr,
+				operationContextPtr,
+				1);
 	
 	retVal.objectName = objectName;
 	
@@ -192,22 +193,21 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArrayList& objectIds,
+			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
 
-	const QString quotedIds = objectIds.join("','").append('\'').prepend('\'');
-	QString query = QStringLiteral(
-						R"sql(UPDATE "%1" SET "%2" = 'Disabled' WHERE "%2" = 'Active' AND "%3" IN (%4);)sql")
+	const QString quotedIds = objectIds.toList().join("','").append('\'').prepend('\'');
+	QString query = 
+		QStringLiteral(R"sql(UPDATE "%1" SET "%2" = 'Disabled' WHERE "%2" = 'Active' AND "%3" IN (%4);)sql")
 					.arg(
-						QString::fromUtf8(*m_tableNameAttrPtr),
-						QString::fromUtf8(s_stateColumn),
-						QString::fromUtf8(s_documentIdColumn),
-						quotedIds
-						);
+								QString::fromUtf8(*m_tableNameAttrPtr),
+								QString::fromUtf8(s_stateColumn),
+								QString::fromUtf8(s_documentIdColumn),
+								quotedIds);
 
 	return query.toUtf8();
 }
@@ -240,14 +240,14 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectSetQuery(
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArrayList& objectIds,
+			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (objectIds.isEmpty()){
 		return QByteArray();
 	}
 
-	const QString quotedIds = objectIds.join("','").append('\'').prepend('\'');
+	const QString quotedIds = objectIds.toList().join("','").append('\'').prepend('\'');
 
 	return QString(R"(
 				UPDATE "%1"
@@ -260,7 +260,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectsQuery(
 				);)")
 				.arg(
 					CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
-					QString::fromUtf8(*m_tableNameAttrPtr),
+					QString::fromUtf8(qPrintable(*m_tableNameAttrPtr)),
 					QString::fromUtf8(s_stateColumn),
 					QString::fromUtf8(s_documentIdColumn),
 					quotedIds,
@@ -274,11 +274,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectSetQuery(
 			const iprm::IParamsSet* paramsPtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QByteArray retVal = QString("UPDATE \"%1\" as root SET \"%2\" = 'Active' WHERE \"%2\" = 'Disabled'")
-						.arg(
-							QString::fromUtf8(*m_tableNameAttrPtr),
-							QString::fromUtf8(s_stateColumn)
-							).toUtf8();
+	QByteArray retVal = 
+				QString("UPDATE \"%1\" as root SET \"%2\" = 'Active' WHERE \"%2\" = 'Disabled'")
+							.arg(QString::fromUtf8(*m_tableNameAttrPtr),QString::fromUtf8(s_stateColumn)).toUtf8();
 
 	if (paramsPtr != nullptr){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
@@ -299,20 +297,19 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectSetQuery(
 
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
-		const istd::IChangeable& object,
-		const imtbase::IOperationContext* operationContextPtr,
-		bool /*useExternDelegate*/) const
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
+			const imtbase::IOperationContext* operationContextPtr,
+			bool /*useExternDelegate*/) const
 {
 	// Get number of the revisions of the document in the database:
-	QByteArray countRevisionsQuery = QString("(SELECT MAX(%0) + 1 FROM \"%1\" as root WHERE \"%2\" = '%3')")
-									 .arg(
-										 CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
-										 qPrintable(*m_tableNameAttrPtr),
-										 qPrintable(s_documentIdColumn),
-										 qPrintable(objectId)
-										 ).toUtf8();
+	QByteArray countRevisionsQuery = 
+				QString("(SELECT MAX(%0) + 1 FROM \"%1\" as root WHERE \"%2\" = '%3')").arg(
+							CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
+										qPrintable(*m_tableNameAttrPtr),
+										qPrintable(s_documentIdColumn),
+										qPrintable(objectId)).toUtf8();
 	
 	RawSqlExpression sqlExpression;
 	sqlExpression.sql = countRevisionsQuery;
@@ -327,17 +324,17 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 	}
 	
 	retVal = PrepareInsertNewObjectQuery(
-				 typeId, objectId, objectName, objectDescription, object, operationContextPtr, QVariant::fromValue(sqlExpression));
+				typeId, objectId, objectName, objectDescription, object, operationContextPtr, QVariant::fromValue(sqlExpression));
 	
 	return retVal;
 }
 
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
-		const imtbase::IObjectCollection& /*collection*/,
-		const QByteArray& objectId,
-		const QString& newObjectName,
-		const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const QString& newObjectName,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"%2\" = '%3' WHERE \"%4\" = '%5';")
 						.arg(
@@ -514,28 +511,26 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreRevision(
 	istd::CChangeNotifier changeNotifier(&collection, &changeSet);
 	
 	QByteArray query = QString("UPDATE \"%1\" SET \"%2\" = 'InActive' WHERE \"%3\" = '%4';")
-					   .arg(
-						   qPrintable(*m_tableNameAttrPtr),
-						   qPrintable(s_stateColumn),
-						   qPrintable(s_documentIdColumn),
-						   qPrintable(objectId)
-						   ).toUtf8();
+			.arg(
+						qPrintable(*m_tableNameAttrPtr),
+						qPrintable(s_stateColumn),
+						qPrintable(s_documentIdColumn),
+						qPrintable(objectId)).toUtf8();
 	
 	query += QString(R"(UPDATE "%1" SET "%2" = 'Active' WHERE "%3" = '%4' AND %5 = %6;)")
-			 .arg(
-				 qPrintable(*m_tableNameAttrPtr),
-				 qPrintable(s_stateColumn),
-				 qPrintable(s_documentIdColumn),
-				 qPrintable(objectId),
-				 CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int)
-				 )
-			 .arg(revision).toUtf8();
+				.arg(
+							qPrintable(*m_tableNameAttrPtr),
+							qPrintable(s_stateColumn),
+							qPrintable(s_documentIdColumn),
+							qPrintable(objectId),
+							CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int))
+			.arg(revision).toUtf8();
 	
 	QSqlError sqlError;
 	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "Database collection");
-		
+
 		return false;
 	}
 	
@@ -544,27 +539,26 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreRevision(
 
 
 bool CSqlDatabaseDocumentDelegateComp::ExportRevision(
-		const imtbase::IObjectCollection& /*collection*/,
-		const imtbase::ICollectionInfo::Id& /*objectId*/,
-		int /*revision*/,
-		const QString& /*filePath*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::ICollectionInfo::Id& /*objectId*/,
+			int /*revision*/,
+			const QString& /*filePath*/) const
 {
 	return false;
 }
 
 
 bool CSqlDatabaseDocumentDelegateComp::DeleteRevision(
-		imtbase::IObjectCollection& collection,
-		const imtbase::ICollectionInfo::Id& objectId,
-		int revision) const
+			imtbase::IObjectCollection& collection,
+			const imtbase::ICollectionInfo::Id& objectId,
+			int revision) const
 {
 	QByteArray checkCurrentRevisionQuery = QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3' AND \"%4\" = 'Active';")
-										   .arg(
-											   qPrintable(*m_tableNameAttrPtr),
-											   qPrintable(s_documentIdColumn),
-											   qPrintable(objectId),
-											   qPrintable(s_stateColumn)
-											   ).toUtf8();
+				.arg(
+							qPrintable(*m_tableNameAttrPtr),
+							qPrintable(s_documentIdColumn),
+							qPrintable(objectId),
+							qPrintable(s_stateColumn)).toUtf8();
 	
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkCurrentRevisionQuery, &sqlError);

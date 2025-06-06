@@ -35,7 +35,7 @@ public:
 				bool useExternDelegate = true) const override;
 	virtual QByteArray CreateDeleteObjectsQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArrayList& objectIds,
+				const imtbase::ICollectionInfo::Ids& objectIds,
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const override;

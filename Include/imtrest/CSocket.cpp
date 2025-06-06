@@ -22,6 +22,13 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnec
 {
 	if (secureConnection){
 		m_socket = new QSslSocket();
+
+#if 0
+		qDebug() << "SSL Build Version:" << QSslSocket::sslLibraryBuildVersionString();
+		qDebug() << "Supports SSL:" << QSslSocket::supportsSsl();
+		qDebug() << "SSL Library Version:" << QSslSocket::sslLibraryVersionString();
+#endif
+		Q_ASSERT(QSslSocket::supportsSsl());
 	}
 	else {
 		m_socket = new QTcpSocket();
@@ -38,6 +45,8 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, bool secureConnec
 
 	if (secureConnection){
 		QSslSocket* socketPtr = dynamic_cast<QSslSocket*>(m_socket.data());
+		connect(socketPtr, SIGNAL(sslErrors(QList<QSslError>)), this, SLOT(OnHandleSslErrors(QList<QSslError>)));
+
 		Q_ASSERT_X(socketPtr != nullptr, __func__, "Invalid socket!");
 		socketPtr->setLocalCertificate(sslConfiguration.localCertificate());
 		socketPtr->setPrivateKey(sslConfiguration.privateKey());
@@ -79,6 +88,14 @@ void CSocket::TimeOut()
 		qDebug() << "Connection time out: " << m_socket->socketDescriptor();
 
 		m_socket->abort();
+	}
+}
+
+
+void CSocket::OnHandleSslErrors(QList<QSslError> errorList)
+{
+	for (const QSslError& error : errorList){
+		qDebug() << error.errorString();
 	}
 }
 

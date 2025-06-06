@@ -147,7 +147,7 @@ QByteArray CSqliteUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 QByteArray CSqliteUserDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& collection,
-			const QByteArrayList& objectIds,
+			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
 	for (const imtbase::ICollectionInfo::Id& objectId : objectIds){

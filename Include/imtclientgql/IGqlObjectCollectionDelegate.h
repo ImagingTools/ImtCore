@@ -81,7 +81,7 @@ public:
 				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 	virtual imtgql::IGqlRequest* CreateRemoveObjectsRequest(
-				const QByteArrayList& objectIds,
+				const imtbase::ICollectionInfo::Ids& objectIds,
 				int clientElementVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 	virtual imtgql::IGqlRequest* CreateRemoveObjectSetRequest(

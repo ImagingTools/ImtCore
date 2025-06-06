@@ -119,6 +119,7 @@ private Q_SLOTS:
 	void OnWebSocketConnected();
 	void OnWebSocketDisconnected();
 	void OnWebSocketError(QAbstractSocket::SocketError error);
+	void OnSslErrors(const QList<QSslError>& sslErrors);
 	void OnWebSocketTextMessageReceived(const QString& message);
 	void OnWebSocketBinaryMessageReceived(const QByteArray& message);
 	void OnSendTextMessage(const QByteArray& message);

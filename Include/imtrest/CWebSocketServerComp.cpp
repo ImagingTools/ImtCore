@@ -69,6 +69,7 @@ void CWebSocketServerComp::RegisterSender(const QByteArray& clientId, QWebSocket
 void CWebSocketServerComp::SetConnectionStatus(const QByteArray& clientId)
 {
 	imtcom::IConnectionStatusProvider::ConnectionStatus loginStatus = imtcom::IConnectionStatusProvider::CS_CONNECTED;
+
 	istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QString("Login"));
 	loginChangeSet.SetChangeInfo("ClientId", clientId);
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
@@ -83,7 +84,6 @@ bool CWebSocketServerComp::SendInfoMessage(
 			const QString& messageSource,
 			int flags) const
 {
-	qDebug() << message;
 	return BaseClass::SendInfoMessage(id, message, messageSource, flags);
 }
 
@@ -96,6 +96,7 @@ bool CWebSocketServerComp::SendErrorMessage(
 {
 	return BaseClass::SendErrorMessage(id, message, messageSource, flags);
 }
+
 
 void CWebSocketServerComp::SendVerboseMessage(const QString& message, const QString& messageSource) const
 {

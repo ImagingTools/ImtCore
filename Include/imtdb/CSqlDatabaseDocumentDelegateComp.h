@@ -78,7 +78,7 @@ public:
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateDeleteObjectsQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArrayList& objectIds,
+				const imtbase::ICollectionInfo::Ids& objectIds,
 				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateDeleteObjectSetQuery(
 				const imtbase::IObjectCollection& collection,
@@ -86,7 +86,7 @@ public:
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QByteArray CreateRestoreObjectsQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArrayList& objectIds,
+				const imtbase::ICollectionInfo::Ids& objectIds,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QByteArray CreateRestoreObjectSetQuery(
 				const imtbase::IObjectCollection& collection,

@@ -551,7 +551,7 @@ bool CFileCollectionComp::SetElementName(
 			targetFolderPath += "/" + newPhysicalName;
 
 			if (!resourceDir.rename(resouceDirPath, targetFolderPath)){
-				SendErrorMessage(0, QT_TR_NOOP(QString("Resource path could not be renamed from '%1' " "into " "'%2'. " "Resou" "rce " "could not be " "renamed " "to " "'%" "3'").arg(resouceDirPath).arg(targetFolderPath).arg(name)));
+				SendErrorMessage(0, QT_TR_NOOP(QString("Resource path could not be renamed from '%1' into '%2'. Resource could not be renamed to '%3'").arg(resouceDirPath).arg(targetFolderPath).arg(name)));
 
 				locker.unlock();
 
@@ -791,15 +791,13 @@ bool CFileCollectionComp::LoadRevisionsContents(
 			RevisionsContents& revisionsContents) const
 {
 	CFileCollectionItem item;
-	if (!GetFileInfo(objectId, item)) {
+	if (!GetFileInfo(objectId, item)){
 		return false;
 	}
-	else {
-	}
-	
+
 	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
 	QString revisionsContentsPath = QFileInfo(item.GetFilePath()).path() + "/Revisions/contents.xml";
-	
+
 	ifile::CCompactXmlFileReadArchive archive(revisionsContentsPath, m_versionInfoCompPtr.GetPtr());
 	return revisionsContents.Serialize(archive);
 }
@@ -817,7 +815,7 @@ bool CFileCollectionComp::SaveRevisionsContents(
 
 	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
 	QString revisionsContentsPath = QFileInfo(item.GetFilePath()).path() + "/Revisions/contents.xml";
-	
+
 	ifile::CCompactXmlFileWriteArchive archive(revisionsContentsPath, m_versionInfoCompPtr.GetPtr());
 	return revisionsContents.Serialize(archive);
 }
@@ -887,7 +885,8 @@ bool CFileCollectionComp::TransformRepositoryItem(
 			int toRepositoryRevision) const
 {
 	if (m_transformationStepsProviderCompPtr.IsValid()){
-		IRepositoryFileTransformationStepsProvider::TransformationSteps steps = m_transformationStepsProviderCompPtr->GetTransformationSteps(fromRepositoryRevision, toRepositoryRevision);
+		IRepositoryFileTransformationStepsProvider::TransformationSteps steps =
+					m_transformationStepsProviderCompPtr->GetTransformationSteps(fromRepositoryRevision, toRepositoryRevision);
 
 		if (steps.isEmpty()){
 			return false;
@@ -991,7 +990,9 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 }
 
 
-QString CFileCollectionComp::CalculateTargetFilePath(const QString& targetFolderPath, const QString& localFilePath) const
+QString CFileCollectionComp::CalculateTargetFilePath(
+			const QString& targetFolderPath,
+			const QString& localFilePath) const
 {
 	QFileInfo inputFileInfo(localFilePath);
 
@@ -1050,7 +1051,9 @@ void CFileCollectionComp::OnComponentDestroyed()
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/, ilog::IMessageConsumer* /*logPtr*/) const
+int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -1082,7 +1085,8 @@ imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::G
 
 bool CFileCollectionCompBase::RepositoryItemInfoProvider::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
-			int /*offset*/, int /*count*/,
+			int /*offset*/,
+			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/,
 			ilog::IMessageConsumer* /*logPtr*/) const
 {

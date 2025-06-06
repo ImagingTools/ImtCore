@@ -12,8 +12,12 @@ namespace imtgql
 class CGqlFieldFragment: public CGqlFieldObject
 {
 public:
-	CGqlFieldFragment() : CGqlFieldObject() {}
+	typedef CGqlFieldObject BaseClass;
 
+	CGqlFieldFragment()
+		:BaseClass()
+	{
+	}
 };
 
 

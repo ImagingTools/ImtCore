@@ -49,7 +49,7 @@ bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 
 sdl::imtbase::Commands::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
 	const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
-	const ::imtgql::CGqlRequest& gqlRequest,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& errorMessage) const
 {
 	sdl::imtbase::Commands::CGuiElementContainer::V1_0 response;

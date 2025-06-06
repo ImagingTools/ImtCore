@@ -188,6 +188,7 @@ void CWebSocketClientComp::OnComponentCreated()
 	connect(this, SIGNAL(EmitStartTimer()), &m_refreshTimer, SLOT(start()), Qt::QueuedConnection);
 	connect(this, SIGNAL(EmitStopTimer()), &m_refreshTimer, SLOT(stop()), Qt::QueuedConnection);
 	connect(&m_webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnWebSocketError(QAbstractSocket::SocketError)));
+	connect(&m_webSocket, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(OnSslErrors(const QList<QSslError>&)));
 
 	connect(&m_refreshTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnTimeout);
 
@@ -272,6 +273,16 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
 }
 
 
+void CWebSocketClientComp::OnSslErrors(const QList<QSslError>& sslErrors)
+{
+	for (const QSslError& error : sslErrors){
+		SendErrorMessage(0, QString("SSL client error: %1").arg(error.errorString()));
+	}
+
+	m_webSocket.ignoreSslErrors(sslErrors);
+}
+
+
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
 	if (!message.contains("keep_alive")){
@@ -279,7 +290,6 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 	}
 
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
-
 	if (webSocketPtr == nullptr){
 		return;
 	}
@@ -333,7 +343,6 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*newHttpRequestPtr);
 			}
 		}
-
 	}
 
 	if (responsePtr.IsValid()){

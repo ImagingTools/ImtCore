@@ -36,6 +36,7 @@ public Q_SLOTS:
 	void OnSendResponse(ConstResponsePtr response);
 	void Abort();
 	void TimeOut();
+	void OnHandleSslErrors(QList<QSslError> errorList);
 
 private:
 	QTimer m_startTimer;

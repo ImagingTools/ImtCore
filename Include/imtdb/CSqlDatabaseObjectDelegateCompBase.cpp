@@ -278,7 +278,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableName() const
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateRestoreObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArrayList& /*objectIds*/,
+			const imtbase::ICollectionInfo::Ids& /*objectIds*/,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();

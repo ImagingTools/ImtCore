@@ -1,6 +1,9 @@
 #include <imtdb/CComplexCollectionFilterConverter.h>
 
 
+// Qt includes
+#include <QtCore/QDebug>
+
 
 namespace imtdb
 {

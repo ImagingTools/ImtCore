@@ -80,7 +80,7 @@ public:
 	*/
 	virtual QByteArray CreateDeleteObjectsQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArrayList& objectIds,
+				const imtbase::ICollectionInfo::Ids& objectIds,
 				const imtbase::IOperationContext* operationContextPtr) const = 0;
 
 	/**
@@ -96,7 +96,7 @@ public:
 	*/
 	virtual QByteArray CreateRestoreObjectsQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArrayList& objectIds,
+				const imtbase::ICollectionInfo::Ids& objectIds,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 
 	/**

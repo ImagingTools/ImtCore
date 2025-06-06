@@ -41,7 +41,7 @@ bool CRemoteCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest
 
 
 sdl::imtbase::Commands::CGuiElementContainer CRemoteCommandsControllerComp::OnGetCommands(
-	const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
+	const sdl::imtbase::Commands::CGetCommandsGqlRequest& /*getCommandsRequest*/,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {

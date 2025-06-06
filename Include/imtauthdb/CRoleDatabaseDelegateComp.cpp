@@ -46,7 +46,7 @@ bool CRoleDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& 
 
 QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& collection,
-			const QByteArrayList& objectIds,
+			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
 	for (const imtbase::ICollectionInfo::Id& objectId : objectIds){

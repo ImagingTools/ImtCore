@@ -197,7 +197,7 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElementSet(
 	}
 
 	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
-	notifierInfo.elementIds = QByteArrayList();
+	notifierInfo.elementIds = imtbase::ICollectionInfo::Ids();
 
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 	changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));
@@ -271,7 +271,7 @@ bool CSqlDatabaseObjectCollectionComp::RestoreObjectSet(
 	}
 
 	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
-	notifierInfo.elementIds = QByteArrayList();
+	notifierInfo.elementIds = imtbase::ICollectionInfo::Ids();
 
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 	changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));

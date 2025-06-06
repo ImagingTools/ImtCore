@@ -11,7 +11,7 @@ namespace imtservergql
 
 collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnBeginCollectionImportSession(
 	const collectionImport::CBeginCollectionImportSessionGqlRequest& request,
-	const ::imtgql::CGqlRequest& gqlRequest,
+	const ::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& errorMessage) const
 {
 	collectionImport::CSessionStatus retVal;
@@ -74,7 +74,7 @@ collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnBeginColl
 
 collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnCancelCollectionImportSession(
 	const collectionImport::CCancelCollectionImportSessionGqlRequest& request,
-	const::imtgql::CGqlRequest& gqlRequest,
+	const::imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& errorMessage) const
 {
 	Q_ASSERT(m_collectionImportControllerCompPtr.IsValid());

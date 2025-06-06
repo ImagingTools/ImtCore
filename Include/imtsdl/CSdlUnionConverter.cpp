@@ -184,7 +184,7 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			if (conversionType == CT_GQL_SCALAR){
 				CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
 				stream << targetVariableName;
-				stream << QStringLiteral(".InsertField(\"") << targetName << QStringLiteral("\", *val);");
+				stream << QStringLiteral(".InsertParam(\"") << targetName << QStringLiteral("\", *val);");
 				CSdlTools::FeedStream(stream, 1, false);
 
 			}

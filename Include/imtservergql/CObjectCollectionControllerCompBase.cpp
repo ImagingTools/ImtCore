@@ -178,7 +178,7 @@ sdl::imtbase::ImtCollection::CRestoreObjectsPayload CObjectCollectionControllerC
 		objectIds = *arguments.input.Version_1_0->objectIds;
 	}
 
-	response.success = m_objectCollectionCompPtr->RestoreObjects(objectIds);
+	response.success = m_objectCollectionCompPtr->RestoreObjects(imtbase::ICollectionInfo::Ids(objectIds.constBegin(), objectIds.constEnd()));
 	
 	sdl::imtbase::ImtCollection::CRestoreObjectsPayload retVal;
 	retVal.Version_1_0 = std::make_optional(response);
@@ -637,7 +637,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		objectId = objectIdFromRepresentation;
 	}
 	
-	QByteArrayList elementIds = m_objectCollectionCompPtr->GetElementIds();
+	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
 	if (elementIds.contains(objectId)){
 		errorMessage = QString("Object with ID: '%1' already exists").arg(qPrintable(objectId));
 		SendErrorMessage(0, errorMessage, "Object collection controller");
@@ -1067,7 +1067,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		return nullptr;
 	}
 	
-	QByteArrayList objectIds = ExtractObjectIdsForRemoval(gqlRequest, errorMessage);
+	imtbase::ICollectionInfo::Ids objectIds = ExtractObjectIdsForRemoval(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
 		return nullptr;
 	}
@@ -1083,18 +1083,18 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectIds.join(';'));
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", objectIds.toList().join(';'));
 	}
 	
 	if (!m_objectCollectionCompPtr->RemoveElements(objectIds, operationContextPtr.GetPtr())){
-		errorMessage = QString("Can't remove object with ID: '%1'").arg(QString(objectIds.join(';')));
+		errorMessage = QString("Can't remove object with ID: '%1'").arg(QString(objectIds.toList().join(';')));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		
 		return nullptr;
 	}
 	
 	sdl::imtbase::ImtCollection::CRemovedNotificationPayload::V1_0 response;
-	response.elementIds = objectIds;
+	response.elementIds = QByteArrayList(objectIds.constBegin(), objectIds.constEnd());
 	
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	
@@ -1102,7 +1102,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 	Q_ASSERT(dataModelPtr != nullptr);
 	
 	if (!response.WriteToModel(*dataModelPtr)){
-		errorMessage = QString("Unable to delete object '%1'. Error: Unable to write notification data to the model").arg(objectIds.join(';'));
+		errorMessage = QString("Unable to delete object '%1'. Error: Unable to write notification data to the model").arg(qPrintable(objectIds.toList().join(';')));
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 		return nullptr;
 	}
@@ -1500,11 +1500,11 @@ QVariant CObjectCollectionControllerCompBase::GetInputArgumentFromRequest(
 }
 
 
-QByteArrayList CObjectCollectionControllerCompBase::ExtractObjectIdsForRemoval(
+imtbase::ICollectionInfo::Ids CObjectCollectionControllerCompBase::ExtractObjectIdsForRemoval(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	QByteArrayList retVal;
+	imtbase::ICollectionInfo::Ids retVal;
 	
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
 	if (inputParamPtr == nullptr){
@@ -1521,7 +1521,7 @@ QByteArrayList CObjectCollectionControllerCompBase::ExtractObjectIdsForRemoval(
 	}
 	
 	if (removeElementsInput.elementIds.has_value()){
-		retVal = *removeElementsInput.elementIds;
+		retVal = imtbase::ICollectionInfo::Ids((*removeElementsInput.elementIds).constBegin(), (*removeElementsInput.elementIds).constEnd());
 	}
 	else{
 		errorMessage = QString("Failed to delete objects: 'elementIds' list is empty.");

@@ -261,7 +261,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 
 
 imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectsRequest(
-			const QByteArrayList& objectIds,
+			const imtbase::ICollectionInfo::Ids& objectIds,
 			int clientElementVersion,
 			const imtbase::IOperationContext* operationContextPtr) const
 {

@@ -223,9 +223,9 @@ bool CGqlRequest::ParseQuery(const QByteArray& query, int& errorPosition)
 	const QList<QByteArray> headersData = header.split(' ');
 
 	QByteArray type;
-	for (const QByteArray& header : headersData){
-		if (!header.isEmpty()){
-			type = header;
+	for (const QByteArray& headerItem : headersData){
+		if (!headerItem.isEmpty()){
+			type = headerItem;
 
 			break;
 		}

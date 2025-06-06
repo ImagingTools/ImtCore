@@ -35,7 +35,7 @@ public:
 
 	struct MultiElementNotifierInfo
 	{
-		QByteArrayList elementIds;
+		imtbase::ICollectionInfo::Ids elementIds;
 	};
 
 	static const QByteArray CN_ALL_CHANGED;

@@ -144,7 +144,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArrayList& objectIds,
+			const imtbase::ICollectionInfo::Ids& objectIds,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (objectIds.isEmpty()){
@@ -153,7 +153,7 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectsQuery(
 	
 	QStringList quotedIds;
 	for (const QByteArray& objectId : objectIds){
-		quotedIds << QString("'%1'").arg(objectId);
+		quotedIds << QString("'%1'").arg(qPrintable(objectId));
 	}
 	
 	QString query = QString(

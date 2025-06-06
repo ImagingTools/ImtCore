@@ -105,7 +105,7 @@ QString CFileRepositoryComp::GetFile(
 		// If the output file path is empty, then create the file path automatically:
 		if (outputFilePath.isEmpty()){
 			QString fileExtension = fileInfo.suffix();
-			
+
 			outputFilePath = QDir::tempPath() + "/ImtCore/" + fileInfo.completeBaseName() + "_" + QUuid::createUuid().toString() + "." + fileExtension;
 		}
 
@@ -164,11 +164,11 @@ QByteArray CFileRepositoryComp::InsertFile(
 	QString workingFilePath = workingPath + "/" + targetFileInfo.fileName();
 	if (istd::CSystem::FileCopy(localFilePath, workingFilePath)){
 		if (QFile::setPermissions(workingFilePath,
-								  QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner |
-									  QFile::ReadUser | QFile::WriteUser | QFile::ExeUser |
-									  QFile::ReadGroup | QFile::WriteGroup | QFile::ExeGroup |
-									  QFile::ReadOther | QFile::WriteOther | QFile::ExeOther)){
-			
+			QFile::ReadOwner | QFile::WriteOwner | QFile::ExeOwner |
+			QFile::ReadUser | QFile::WriteUser | QFile::ExeUser |
+			QFile::ReadGroup | QFile::WriteGroup | QFile::ExeGroup |
+			QFile::ReadOther | QFile::WriteOther | QFile::ExeOther)){
+
 			CFileCollectionItem collectionItem(GetCollectionRootFolder(), *m_revisionAttrPtr, fileId, typeId, targetFilePath, targetName);
 			if (collectionItemMetaInfoPtr != nullptr){
 				idoc::CStandardDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfoPtr->GetMetaInfoTypes();
@@ -203,7 +203,7 @@ QByteArray CFileRepositoryComp::InsertFile(
 			}
 
 			collectionItem.SetContentsMetaInfo(metaInfoPtr);
-			
+
 			if (FinishInsertFileTransaction(workingPath, targetFileInfo.dir().absolutePath(), fileId, collectionItem)){
 				QDir(workingPath).removeRecursively();
 
@@ -237,7 +237,7 @@ bool CFileRepositoryComp::UpdateFile(
 
 	{
 		QWriteLocker cacheLocker(&m_objectCacheLock);
-		
+
 		if (m_objectCache.contains(objectId)){
 			m_objectCache.remove(objectId);
 		}
@@ -252,7 +252,7 @@ bool CFileRepositoryComp::UpdateFile(
 	fileItemInfo.SetContentsMetaInfo(CreateItemMetaInfo(localFilePath, fileItemInfo.GetTypeId()));
 	if (!fileItemInfo.GetContentsMetaInfo().IsValid()){
 		SendErrorMessage(0, QT_TR_NOOP(QString("Meta-informations could not be created for'%1'. File could not be updated").arg(localFilePath)));
-		
+
 		return false;
 	}
 
@@ -264,22 +264,22 @@ bool CFileRepositoryComp::UpdateFile(
 		if (!QFile::setPermissions(targetFilePath, QFile::WriteGroup)){
 			SendErrorMessage(0, QT_TR_NOOP(QString("Permissions for the file '%1' could not be set").arg(targetFilePath)));
 		}
-		
+
 		static ChangeSet changes(CF_OBJECT_DATA_CHANGED);
 		changes.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
 		istd::CChangeNotifier changeNotifier(this, &changes);
-		
+
 		bool indexUpdated = m_documentInfoCollectionCompPtr->SetObjectData(objectId, fileItemInfo);
 		if (indexUpdated){
 			// TODO; Implement rollback logic!
 			SendErrorMessage(0, QT_TR_NOOP(QString("File meta info could not be updated")));
-			
+
 			return false;
 		}
 	}
 
 	SendErrorMessage(0, QT_TR_NOOP(QString("File '%1' could not be copied to %2").arg(localFilePath).arg(targetFilePath)));
-	
+
 	return false;
 }
 
@@ -320,7 +320,7 @@ QByteArray CFileRepositoryComp::InsertNewObject(
 		if (defaultValuePtr != nullptr){
 			if (!newObjectPtr->CopyFrom(*defaultValuePtr)){
 				SendErrorMessage(0, QT_TR_NOOP("Initial value could not be set"));
-				
+
 				return QByteArray();
 			}
 		}
@@ -337,9 +337,9 @@ QByteArray CFileRepositoryComp::InsertNewObject(
 			QString tempFileBaseName = tempDir.Path() + "/" + QUuid::createUuid().toString();
 
 			QString workingExt = GetWorkingExt(
-				persistencePtr,
-				newObjectPtr.GetPtr(),
-				tempFileBaseName);
+						persistencePtr,
+						newObjectPtr.GetPtr(),
+						tempFileBaseName);
 
 			QString tempFilePath = tempFileBaseName;
 			tempFilePath += workingExt.isEmpty() ? "" : "." + workingExt;
@@ -520,13 +520,13 @@ bool CFileRepositoryComp::SetObjectData(
 		QString tempFileBaseName = tempDir.Path() + "/" + QUuid::createUuid().toString();
 
 		QString workingExt = GetWorkingExt(
-			persistencePtr,
-			&object,
-			tempFileBaseName);
+					persistencePtr,
+					&object,
+					tempFileBaseName);
 
 		QString tempFilePath = tempFileBaseName;
 		tempFilePath += workingExt.isEmpty() ? "" : "." + workingExt;
-		
+
 		if (persistencePtr->SaveToFile(object, tempFilePath) == ifile::IFilePersistence::OS_OK){
 			bool retVal = UpdateFile(tempFilePath, objectId);
 
@@ -727,11 +727,11 @@ const ifile::IFilePersistence* CFileRepositoryComp::GetObjectPersistence(const Q
 			}
 		}
 	}
-	
+
 	if ((persistenceIndex >= 0) && persistenceIndex < m_objectPersistenceListCompPtr.GetCount()){
 		return m_objectPersistenceListCompPtr[persistenceIndex];
 	}
-	
+
 	return nullptr;
 }
 
@@ -870,7 +870,7 @@ QString CFileRepositoryComp::CalculateFolderPathInRepository(
 
 		return QString();
 	}
-	
+
 	QString targetDirPath = inputFileInfo.absoluteDir().absolutePath();
 
 	QString repositoryDirPath = GetCollectionRootFolder();
@@ -879,11 +879,11 @@ QString CFileRepositoryComp::CalculateFolderPathInRepository(
 	}
 
 	targetDirPath = repositoryDirPath;
-	
+
 	// If object-ID is non empty, create subfolder for this:
 	if (!typeId.isEmpty()){
 		Q_ASSERT(m_resourceTypesCompPtr.IsValid());
-		
+
 		if (m_resourceTypesCompPtr->GetOptionsCount() > 1){
 			targetDirPath += QString("/") + typeId.constData();
 		}
@@ -902,7 +902,7 @@ QString CFileRepositoryComp::CalculateFolderPathInRepository(
 	while (QFileInfo::exists(newDirPath)){
 		newDirPath = QString("%1 - %2").arg(targetDirPath).arg(++count);
 	}
-	
+
 	if (newDirPath != targetDirPath){
 		QString warning = QT_TR_NOOP(QString("Input file name %1 renamed to %2").arg(QDir(targetDirPath).dirName()).arg(QDir(newDirPath).dirName()));
 
@@ -983,11 +983,11 @@ bool CFileRepositoryComp::FinishInsertFileTransaction(
 				istd::CChangeNotifier changeNotifier(this, &changes);
 
 				QByteArray documentId = m_documentInfoCollectionCompPtr->InsertNewObject(
-					*m_infoItemTypeIdAttrPtr,
-					collectionItem.GetName(),
-					"",
-					&collectionItem,
-					fileId);
+							*m_infoItemTypeIdAttrPtr,
+							collectionItem.GetName(),
+							"",
+							&collectionItem,
+							fileId);
 
 				Q_ASSERT(documentId == fileId);
 
