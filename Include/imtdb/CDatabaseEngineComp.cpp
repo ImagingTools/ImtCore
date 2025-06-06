@@ -596,10 +596,10 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 bool CDatabaseEngineComp::IsSslConnectionRequired() const
 {
 	if (!m_databaseAccessSettingsCompPtr.IsValid()){
-		return m_databaseAccessSettingsCompPtr->GetConnectionFlags() & IDatabaseLoginSettings::COF_SSL;
+		return false;
 	}
 
-	return false;
+	return m_databaseAccessSettingsCompPtr->GetConnectionFlags() & IDatabaseLoginSettings::COF_SSL;
 }
 
 
