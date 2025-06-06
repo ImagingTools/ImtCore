@@ -187,7 +187,8 @@ TableRowCanvasViewer 1.0 ./Views/TableRowCanvasViewer.qml
 
 GraphicsView 1.0 ./GraphicsView/GraphicsView.qml
 GraphicsLayer 1.0 ./GraphicsView/GraphicsLayer.qml
-GraphicsShape 1.0 ./GraphicsView/GraphicsShape.qml
+GraphicsShapeBase 1.0 ./GraphicsView/GraphicsShapeBase.qml
+CanvasMatrix 1.0 ./GraphicsView/CanvasMatrix.qml
 
 PolygonShape 1.0 ./GraphicsView/PolygonShape.qml
 RectangleShape 1.0 ./GraphicsView/RectangleShape.qml

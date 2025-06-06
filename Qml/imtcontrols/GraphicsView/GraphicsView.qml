@@ -6,7 +6,7 @@ import imtcontrols 1.0
 
 
 Rectangle {
-	id: canvasPage;
+	id: graphicsView;
 
 	clip: true;
 
@@ -27,7 +27,16 @@ Rectangle {
 
 	property real scaleStep: 0.1;
 
-	property bool autoFit: true;
+	property bool autoFit: false;
+
+	property bool isSelectionMode: true;
+	property bool isEditMode: false;
+	property bool isMultiSelection: true;
+
+	property real drawingAreaWidth: width//1024;
+	property real drawingAreaHeight: height//768;
+
+	property var layerModel: []
 
 	signal copySignal(int index);
 	signal pasteSignal(int index);
@@ -40,9 +49,22 @@ Rectangle {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
 		Events.subscribeEvent("AppSizeChanged", appSizeChanged)
 
-		let layer = layerComp.createObject(this);
-		layer.layerId = "selection";
-		layerModel.push(layer);
+		let layerBackground = layerComp.createObject(this);
+		layerBackground.layerId = "background";
+		layerModel.push(layerBackground);
+
+		let layerInactive = layerComp.createObject(this);
+		layerInactive.layerId = "inactive";
+		layerModel.push(layerInactive);
+
+		let layerActive = layerComp.createObject(this);
+		layerActive.layerId = "active";
+		layerModel.push(layerActive);
+
+		let layerInstrumental = layerComp.createObject(this);
+		layerInstrumental.layerId = "instrumental";
+		layerModel.push(layerInstrumental);
+
 	}
 
 	Component.onDestruction: {
@@ -55,7 +77,7 @@ Rectangle {
 	}
 
 	onContentYChanged: {
-		canvas.deltaY = -canvasPage.contentY
+		canvas.deltaY = -graphicsView.contentY
 	}
 
 	onObjectsModelChanged: {
@@ -67,8 +89,6 @@ Rectangle {
 			appSizeChanged();
 		}
 	}
-
-	property var layerModel: []
 
 	function createLayer(layerId){
 		let layer = layerComp.createObject(this);
@@ -88,13 +108,28 @@ Rectangle {
 				return layerModel[i];
 			}
 		}
-
 		return null;
+	}
+
+	function getActiveLayer(){
+		return getLayer("active");
+	}
+	function getInactiveLayer(){
+		return getLayer("inactive");
+	}
+	function getBackgroundLayer(){
+		return getLayer("background");
+	}
+	function getInstrumentalLayer(){
+		return getLayer("instrumental");
 	}
 
 	Component{
 		id: layerComp;
 		GraphicsLayer{
+			onLoadImageSignal:{
+				canvas.loadImage(source);
+			}
 		}
 	}
 
@@ -111,7 +146,7 @@ Rectangle {
 	}
 
 	function setAutoFit(autoFit){
-		canvasPage.autoFit = autoFit;
+		graphicsView.autoFit = autoFit;
 	}
 
 	function zoomIn(){
@@ -147,10 +182,11 @@ Rectangle {
 		if (scaleCoeff_ > scaleCoeff_h){
 			scaleCoeff_ = scaleCoeff_h
 		}
+
 		canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
 
-		canvas.deltaX = canvasPage.width / 2 - backgroundRec.width / 2
-		canvas.deltaY = canvasPage.height / 2 - backgroundRec.height / 2
+		canvas.deltaX = graphicsView.width / 2 - backgroundRec.width / 2
+		canvas.deltaY = graphicsView.height / 2 - backgroundRec.height / 2
 	}
 
 	function requestPaint(){
@@ -182,13 +218,13 @@ Rectangle {
 	}
 
 	function correctPosition(addX, addY){
-		for(let i = 0; i < canvasPage.objectsModel.count; i++){
-			let item = canvasPage.objectsModel.get(i).item;
+		for(let i = 0; i < graphicsView.objectsModel.count; i++){
+			let item = graphicsView.objectsModel.get(i).item;
 
 			item.m_x = item.m_x + addX;
 			item.m_y = item.m_y + addY;
 
-			// canvasPage.objectsModel.set(i, item);
+			// graphicsView.objectsModel.set(i, item);
 		}
 	}
 
@@ -199,13 +235,13 @@ Rectangle {
 			let newWidth = scale_ * item.m_width;
 			item.m_width = newWidth;
 
-			// canvasPage.objectsModel.set(i, item);
+			// graphicsView.objectsModel.set(i, item);
 		}
 	}
 
 	function findSelectionIndex(mouseX, mouseY){
 		let selectionIndex = -1;
-		let layer = canvasPage.layerModel[canvasPage.layerModel.length - 1];
+		let layer = graphicsView.layerModel[graphicsView.layerModel.length - 1];
 		let shapeModel = layer.shapeModel;
 		for(let j = 0; j < shapeModel.length; j++){
 			let shape = shapeModel[j];
@@ -230,27 +266,24 @@ Rectangle {
 	function findObject(mouseX, mouseY){
 		//console.log("findObject", mouseX, mouseY)
 
-		for(let i = 0; i < canvasPage.layerModel.length - 1; i++){
-			let layer = canvasPage.layerModel[i];
-			let shapeModel = layer.shapeModel;
-			for(let j = 0; j < shapeModel.length; j++){
-				let shape = shapeModel[j];
-				let params = shape.getParams(layer.layerId);
-				let point = params.point;
-				let width_ = params.width * canvas.scaleCoeff;
-				let height_ = params.height * canvas.scaleCoeff;
-				let x_ = point.x * canvas.scaleCoeff + canvas.deltaX;
-				let y_ = point.y * canvas.scaleCoeff + canvas.deltaY;
-				let isInside =
-					mouseX > x_
-					&& mouseX < x_ + width_
-					&& mouseY > y_
-					&& mouseY < y_ + height_
-				if(isInside){
-					//console.log("COLOR::", params.color, j)
-					return shape;
+		for(let i = 0; i < graphicsView.layerModel.length ; i++){
+			let layer = graphicsView.layerModel[i];
+			if(layer.layerId == "active" || layer.layerId == "inactive"){
+				let shapeModel = layer.shapeModel;
+				for(let j = 0; j < shapeModel.length; j++){
+					let shape = shapeModel[j];
+
+					canvasMatrix.xTranslation = canvas.deltaX;
+					canvasMatrix.yTranslation = canvas.deltaY;
+					canvasMatrix.xScale = canvas.scaleCoeff;
+					let isInside =  shape.isInside(mouseX, mouseY, canvasMatrix)
+
+					if(isInside){
+						return shape;
+					}
 				}
 			}
+
 
 		}
 
@@ -259,19 +292,17 @@ Rectangle {
 
 
 	function clearSelection(){
-		layerModel.pop();
-		let layer = layerComp.createObject(this);
-		layer.layerId = "selection";
-		layerModel.push(layer);
-	}
-
-
-	function moveShape(shape, deltaX, deltaY){
-		// let point = shape.params[0].point
-		// point.x += deltaX
-		// point.y += deltaY
-		// shape.params[0].point = point;
-		// canvas.requestPaint();
+		for(let i = 0; i < graphicsView.layerModel.length ; i++){
+			let layer = graphicsView.layerModel[i];
+			if(layer.layerId == "active" || layer.layerId == "inactive"){
+				let shapeModel = layer.shapeModel;
+				for(let j = 0; j < shapeModel.length; j++){
+					let shape = shapeModel[j];
+					shape.isSelected = false;
+				}
+			}
+		}
+		canvas.currentTouchedShape = null
 	}
 
 
@@ -295,105 +326,71 @@ Rectangle {
 			cursorShape: Qt.ArrowCursor//Qt.OpenHandCursor;
 
 			onClicked: {
-				// let shape = canvasPage.findObject(mouse.x, mouse.y)
-				// let selectionLayer = canvasPage.getLayer("selection");
-				// if(shape !== null){
-				// 	let selection = shape.createSelection()
-				// 	selectionLayer.addShape(selection);
-				// }
-				// else {
-				// 	canvasPage.clearSelection()
-				// 	//selectionLayer.clear();
-				// }
-				// canvas.requestPaint();
-
-				// if(!wasMoving){
-				// 	if(canvas.selectedIndex >= 0){
-				// 		for(let i = 0; i < canvasPage.objectsModel.count; i++){
-				// 			let item = canvasPage.objectsModel.get(i).item;
-				// 			item.m_selected = (i == canvas.selectedIndex);
-				// 		}
-				// 	}
-				// 	else {
-				// 		for(let i = 0; i < canvasPage.objectsModel.count; i++){
-				// 			let item = canvasPage.objectsModel.get(i).item;
-				// 			item.m_selected = false;
-				// 		}
-				// 	}
-				// 	canvas.requestPaint();
-				// }
+				//console.log("CLICKED!!!")
 			}
 
+			PauseAnimation {
+				id: removingSelectionBlockPause;
+				duration: 200
+				property bool blocked: false;
+				onFinished: {
+					blocked = false;
+				}
+			}
+
+
 			onPressed: {
-				//canvas.selectedIndex = -1;
-				// for(let i = 0; i < canvasPage.objectsModel.count; i++){
-				// 	let item = canvasPage.objectsModel.get(i).item;
-				// 	let x_ = item.m_x;
-				// 	let y_ = item.m_y;
+				//console.log("PRESSED!!!")
 
-				// 	let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
-				// 	let height_ = canvas.mainRec_height;
-
-				// 	x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
-				// 	y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
-				// 	width_ = width_ * canvas.scaleCoeff;
-				// 	height_ = height_  * canvas.scaleCoeff;
-
-				// 	let ok = checkInsideMovingItem(x_, y_, width_, height_);
-
-				// 	if(ok){
-				// 		canvas.selectedIndex = i;
-				// 	}
-				// }
-				// if(canvas.selectedIndex == -1){
-				// 	controlArea.cursorShape = Qt.ClosedHandCursor;
-				// }
-
-				let shape = canvasPage.findObject(mouse.x, mouse.y)
-				let selectionLayer = canvasPage.getLayer("selection");
-				if(shape !== null){
-					let selectionIndex = canvasPage.findSelectionIndex(mouse.x, mouse.y);
-					if(selectionIndex < 0){
-						let selection = shape.createSelection()
-						selectionLayer.addShape(selection);
+				//singleSelection
+				if(!(mouse.modifiers & Qt.ControlModifier)){
+					//graphicsView.clearSelection()
+					//canvas.currentTouchedShape = null;
+					if(canvas.currentTouchedShape && canvas.currentTouchedShape.isSelected && !removingSelectionBlockPause.blocked){
+						canvas.currentTouchedShape.isSelected = false;
+						canvas.currentTouchedShape = null;
+						canvas.selectedShapeCount--;
 					}
-					else {
-						//selectionLayer.removeShape(selectionIndex);
+
+				}
+
+				let found = false;
+				let shape = graphicsView.findObject(mouse.x, mouse.y)
+				if(shape !== null){
+					found = true;
+					canvas.currentTouchedShape = shape;
+					if(!shape.isSelected){
+						shape.isSelected = true;
+						canvas.selectedShapeCount++
+						removingSelectionBlockPause.blocked = true;
+						removingSelectionBlockPause.restart();
 					}
 				}
 				else {
-					canvasPage.clearSelection()
+					graphicsView.clearSelection()
+					canvas.selectedShapeCount = 0;
 				}
+
 				canvas.requestPaint();
+
+				if(!found){
+					controlArea.cursorShape = Qt.ClosedHandCursor;
+				}
+
 			}
 
 			onReleased: {
-				// if(canvas.selectedIndex >= 0){
-				// 	controlArea.cursorShape = Qt.ArrowCursor;
-				// }
-				// else {
-				// 	controlArea.cursorShape = Qt.OpenHandCursor
-				// }
-
-				let selectionLayer = canvasPage.getLayer("selection");
-
+				//console.log("RELEASED!!!")
+				controlArea.cursorShape = Qt.ArrowCursor;
 				//DESELECT
-				// let selectionIndex = findSelectionIndex(mouse.x, mouse.y);
-				// if(selectionIndex > -1){
-				// 	console.log("findSelectionIndex:: ", selectionIndex)
-				// 	let foundSelection = selectionLayer.shapeModel[selectionIndex];
-				// 	let coord = foundSelection.coordinate
-				// 	let sourceCoord = foundSelection.source.getParams("selection").point
-				// 	if(Math.abs(coord.x - sourceCoord.x) < 0.0001 && Math.abs(coord.y - sourceCoord.y) < 0.0001){
-				// 		selectionLayer.removeShape(selectionIndex);
-				// 	}
-				// }
-
-				for (let i = 0; i < selectionLayer.shapeModel.length; i++){
-					let obj = selectionLayer.shapeModel[i];
-					obj.source.setCoordinate(obj.coordinate)
+				if(canvas.currentTouchedShape && canvas.currentTouchedShape.isSelected && !removingSelectionBlockPause.blocked){
+					canvas.currentTouchedShape.isSelected = false;
+					canvas.currentTouchedShape = null;
+					canvas.selectedShapeCount--
+					canvas.requestPaint()
 				}
-				canvas.requestPaint();
+				removingSelectionBlockPause.blocked = false;
+
 			}
 
 			onDoubleClicked: {
@@ -401,34 +398,81 @@ Rectangle {
 				isPressed = false;
 
 				if(canvas.selectedIndex >= 0){
-					canvasPage.goInside();
+					graphicsView.goInside();
 				}
 			}
 
 			onDeltaSignal: {
-				//let shape = findObject(mouseX, mouseY)
-				//canvasPage.moveShape(shape, delta.x, delta.y)
 
-				let selectedLayer = canvasPage.getLayer("selection")
-				for (let i = 0; i < selectedLayer.shapeModel.length; i++){
-					let obj = selectedLayer.shapeModel[i];
-					let point = obj.coordinate
-					point.x += delta.x
-					point.y += delta.y
-					obj.coordinate = point;
+				removingSelectionBlockPause.blocked = true;
+				let found = false;
+				let activeLayer = graphicsView.getLayer("active")
+				for (let i = 0; i < activeLayer.shapeModel.length; i++){
+					let shape = activeLayer.shapeModel[i];
+					if(shape.isSelected){
+						found = true;
 
+						//correction of position relative to borders
+						let topLeftPoint = shape.getBoundingBoxCoordinate()
+						let x_ = topLeftPoint.x;
+						let y_ = topLeftPoint.y;
+
+						let width_ = shape.getBoundingBoxWidth();
+						let height_ = shape.getBoundingBoxHeight();
+
+						x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
+						y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
+						width_ = width_ * canvas.scaleCoeff;
+						height_ = height_  * canvas.scaleCoeff;
+
+						if (canvas.scaleCoeff < 0.0000001){
+							return;
+						}
+
+						let newX = (topLeftPoint.x + delta.x / canvas.scaleCoeff);
+						let newY = (topLeftPoint.y + delta.y / canvas.scaleCoeff);
+
+						//fit to borders
+						let margin_ = Style.marginM;
+						if(newX < margin_){
+							newX = margin_;
+						}
+						if(newY < margin_){
+							newY = margin_;
+						}
+
+						if (canvas.scaleCoeff - margin_ === 0){
+							return;
+						}
+
+						if(newX > (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_){
+							newX = (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_
+						}
+						if(newY > (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_){
+							newY = (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_
+						}
+
+						// let deltaX_ = delta.x / canvas.scaleCoeff
+						// let deltaY_ = delta.y / canvas.scaleCoeff
+
+						let deltaX_ = newX - topLeftPoint.x
+						let deltaY_ = newY - topLeftPoint.y
+						//correction of position relative to borders
+
+						shape.setCoordinateShift(deltaX_, deltaY_)
+
+					}
 				}
-				canvas.requestPaint();
-				// if(canvas.selectedIndex < 0){
-				// 	canvasPage.autoFit = false;
 
-				// 	canvas.deltaX += delta.x
-				// 	canvas.deltaY += delta.y
-				// 	canvas.requestPaint();
-				// }
-				// else {
-				// 	movingFunction(delta);
-				// }
+				if(!found){
+					graphicsView.autoFit = false;
+
+					canvas.deltaX += delta.x
+					canvas.deltaY += delta.y
+				}
+
+
+				canvas.requestPaint();
 			}
 
 			onWheel: {
@@ -436,7 +480,7 @@ Rectangle {
 					return
 				}
 
-				canvasPage.autoFit = false;
+				graphicsView.autoFit = false;
 
 				let deltaX = (wheel.x + canvas.deltaX) / canvas.scaleCoeff
 				let wheelDelta = wheel.angleDelta.y
@@ -457,63 +501,6 @@ Rectangle {
 
 
 			function movingFunction(delta){//reimplemented
-				if(canvas.selectedIndex >= 0 && canvas.scaleCoeff != 0){
-					let item = canvasPage.objectsModel.get(canvas.selectedIndex).item;
-					if (!item){
-						return;
-					}
-
-					let x_ = item.m_x;
-					let y_ = item.m_y;
-					let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
-					let height_ = canvas.mainRec_height;
-
-					x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
-					y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
-					width_ = width_ * canvas.scaleCoeff;
-					height_ = height_  * canvas.scaleCoeff;
-
-					let withinBorders_ = true;
-					if(withinBorders_){
-						if (canvas.scaleCoeff < 0.0000001){
-							return;
-						}
-
-						let newX = (item.m_x + delta.x / canvas.scaleCoeff);
-						let newY = (item.m_y + delta.y / canvas.scaleCoeff);
-
-						//fit to borders
-						let margin_ = 10;
-						if(newX < margin_){
-							newX = margin_;
-						}
-						if(newY < margin_){
-							newY = margin_;
-						}
-
-						if (canvas.scaleCoeff - margin_ === 0){
-							return;
-						}
-
-						if(newX > (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_){
-							newX = (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_
-						}
-						if(newY > (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_){
-							newY = (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_
-						}
-
-						item.m_x = newX;
-						item.m_y = newY;
-
-						// canvasPage.objectsModel.set(canvas.selectedIndex, item)
-
-						canvas.requestPaint();
-
-						canvasPage.modelDataChanged()
-
-					}
-				}
-
 			}
 
 			onPositionSignal: {
@@ -532,8 +519,8 @@ Rectangle {
 
 			function hoverReaction(position){
 				canvas.hoverIndex = -1;
-				for(let i = 0; i < canvasPage.objectsModel.count; i++){
-					let item = canvasPage.objectsModel.get(i).item;
+				for(let i = 0; i < graphicsView.objectsModel.count; i++){
+					let item = graphicsView.objectsModel.get(i).item;
 
 					let x_  = item.m_x;
 					let y_  = item.m_y;
@@ -568,6 +555,9 @@ Rectangle {
 			}
 			//hover reaction
 
+
+
+
 		}
 
 		Rectangle{
@@ -593,6 +583,9 @@ Rectangle {
 
 			antialiasing: true;
 
+			property var currentTouchedShape: null
+			property int selectedShapeCount: 0;
+
 			property real scaleCoeff: 1.0;
 			property real scaleCoeffPrev: 1.0;
 			property real deltaX: 0.0;
@@ -614,8 +607,8 @@ Rectangle {
 			property int shadowSize: 6
 
 			property int backgroundStep: 30
-			property int backgroundWidth: 1024
-			property int backgroundHeight: 768
+			property int backgroundWidth: graphicsView.drawingAreaWidth
+			property int backgroundHeight: graphicsView.drawingAreaHeight
 
 			property int intersectionSize: 16
 			property int arcRadius: 8
@@ -653,15 +646,20 @@ Rectangle {
 			}
 
 			onScaleCoeffChanged: {
+				//console.log("scaleCoeff:::", scaleCoeff)
 				requestPaint()
 			}
 
 			onDeltaXChanged: {
-				canvasPage.contentX = -deltaX
+				graphicsView.contentX = -deltaX
 			}
 
 			onDeltaYChanged: {
-				canvasPage.contentY = -canvas.deltaY
+				graphicsView.contentY = -canvas.deltaY
+			}
+
+			CanvasMatrix{
+				id: canvasMatrix;
 			}
 
 			function setScale(newScale, scaleX, scaleY){
@@ -687,531 +685,41 @@ Rectangle {
 
 			onPaint: {
 				//console.log("Canvas::onPaint")
-				if (canvasPage.autoFit){
-					canvasPage.zoomToFit();
+				if (graphicsView.autoFit){
+					graphicsView.zoomToFit();
 				}
 
 				var ctx = canvas.getContext('2d');
 				ctx.reset()
 				ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-				let transtateX = canvas.deltaX
-				let transtateY = canvas.deltaY
-				ctx.translate(transtateX, transtateY)
-				ctx.scale(canvas.scaleCoeff, canvas.scaleCoeff)
+				canvasMatrix.xScale = canvas.scaleCoeff;
+				canvasMatrix.yScale = canvas.scaleCoeff;
+				canvasMatrix.xTranslation = canvas.deltaX;
+				canvasMatrix.yTranslation = canvas.deltaY;
 
-				drawBackground(ctx);
+				canvasMatrix.setContextTransform(ctx);
 
-				for(let i = 0; i < canvasPage.layerModel.length; i++){
-					let layer = canvasPage.layerModel[i];
+				//Deprecated!!!
+				// let transtateX = canvas.deltaX
+				// let transtateY = canvas.deltaY
+				// ctx.translate(transtateX, transtateY)
+				// ctx.scale(canvas.scaleCoeff, canvas.scaleCoeff)
+
+				for(let i = 0; i < graphicsView.layerModel.length; i++){
+					let layer = graphicsView.layerModel[i];
 					layer.draw(ctx);
 				}
 
-				//width calculation
-				// for(let i = 0; i < canvasPage.objectsModel.count; i++){
-				// 	setObjectWidth(ctx, i);
-				// }
-
-				// //drawLink
-				// for(let i = 0; i < canvasPage.objectsModel.count; i++){
-				// 	let item = canvasPage.objectsModel.get(i).item;
-
-				// 	let links = item.m_links;
-				// 	for(let k = 0; k < links.count; k++){
-				// 		let objectId = links.get(k).item.m_id;
-				// 		let ind = canvasPage.findModelIndex(objectId);
-				// 		if(ind === -1) continue
-				// 		canvas.drawLink(ctx, ind, i);
-				// 	}
-				// }
-
-
-				// //drawObject
-				// for(let i = 0; i < canvasPage.objectsModel.count; i++){
-				// 	console.log("Canvas::drawObject")
-				// 	if(i !== canvas.selectedIndex){
-				// 		drawObject(ctx, i);
-				// 	}
-				// }
-				// if(canvas.selectedIndex >= 0){
-				// 	drawObject(ctx, canvas.selectedIndex);
-				// }
 			}//onPaint
 
-
-			function drawBackground(ctx){
-				let step = canvas.backgroundStep;
-
-				ctx.lineCap = "round"
-				ctx.lineJoin = "round"
-				ctx.lineWidth = 1;
-
-				ctx.fillStyle = canvas.gridColor;
-				ctx.strokeStyle = canvas.gridColor;
-
-
-				for(let i = 0; i * step < canvas.backgroundWidth; i++){//vertical lines
-					let x1 = i * step;
-					let y1 =  0 ;
-					let x2 = i * step;
-					let y2 = canvas.backgroundHeight ;
-
-					ctx.beginPath()
-					ctx.moveTo(x1, y1);
-					ctx.lineTo(x2, y2);
-					ctx.stroke();
-				}
-
-				for(let i = 0; i * step < canvas.backgroundHeight; i++){//horizontal lines
-					let x1 = 0 ;
-					let y1 =  i * step ;
-					let x2 =  canvas.backgroundWidth;
-					let y2 =  i * step;
-
-					ctx.beginPath()
-					ctx.moveTo(x1, y1);
-					ctx.lineTo(x2, y2);
-					ctx.stroke();
-				}
-
-				ctx.strokeStyle = canvas.backgroundBorderColor;
-				ctx.lineWidth = 2;
-				ctx.beginPath()
-				ctx.moveTo(1, 1);
-				ctx.lineTo(canvas.backgroundWidth, 1);
-				ctx.lineTo(canvas.backgroundWidth, canvas.backgroundHeight - 1);
-				ctx.lineTo(1, canvas.backgroundHeight - 1);
-				ctx.lineTo(1, 1);
-				ctx.stroke();
-			}
-
-			function setObjectWidth(ctx, index){
-				//width calculation
-				let item = canvasPage.objectsModel.get(index).item;
-
-				let mainText  = item.m_mainText
-				let secondText  = item.m_secondText
-				let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
-
-				ctx.lineWidth = 1;
-				let fontStr_main = String(canvas.fontSize) + "px sans-serif"
-				ctx.font = fontStr_main; //"20px sans-serif";
-				let textStr_main = mainText
-				let textWidth_main = ctx.measureText(mainText).width
-
-				ctx.lineWidth = 0.5;
-				let fontStr_second = String(canvas.fontSizeS) + "px sans-serif"
-				ctx.font = fontStr_second;
-				let textStr_second = secondText;
-				let textWidth_second = ctx.measureText(secondText).width
-
-				let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30 /** scaleCoeff*/;
-				let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, width_)
-				// canvasPage.objectsModel.setData("width", mainRecWidth /*/ scaleCoeff*/, index);
-
-				item.m_width = mainRecWidth;
-
-				return mainRecWidth;
-			}
-
-			function drawObject(ctx, index){
-				console.log("drawObject::::")
-				let item = canvasPage.objectsModel.get(index).item;
-
-				let x_  = item.m_x
-				let y_  = item.m_y
-				let width_ = item.m_width ? item.m_width : canvas.mainRec_width;
-				let mainText  =  item.m_mainText
-				let secondText  = item.m_secondText
-				let thirdText  = item.m_thirdText
-				let backgroundColor = item.m_backgroundColor ? item.m_backgroundColor : canvas.backgroundColor;
-				let icon = item.m_icon1
-				let iconUrl_1  = icon === "" ? "" : "../../../" + Style.getIconPath(icon, Icon.State.On, Icon.Mode.Normal)
-				icon = item.m_icon2
-				let iconUrl_2  = icon === "" ? "" : "../../../" + Style.getIconPath(icon, Icon.State.On, Icon.Mode.Normal)
-				// for future multiselect
-				// let selected = item.m_selected ? item.m_selected : false;
-				let selected = index === canvasPage.selectedIndex
-
-				let hasError = item.m_hasError
-				let isComposite = item.m_isComposite
-
-				isComposite = false
-
-				ctx.lineCap = "round"
-				ctx.lineJoin = "round"
-
-				//width calculation
-				let mainRecWidth = setObjectWidth(ctx, index);
-
-				//shadow rectangle
-				let shadowSize = canvas.shadowSize;
-				ctx.lineWidth = 2 ;
-				// ctx.fillStyle = selected ? Qt.rgba(0.2, 0.8, 0, 0.3) : Qt.rgba(0, 0, 0, 0.2);
-				ctx.fillStyle = Qt.rgba(0, 0, 0, 0.2);
-				ctx.beginPath()
-				ctx.roundedRect(x_ + shadowSize, y_ + shadowSize, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
-				ctx.fill();
-
-				//main rectangle
-				ctx.lineWidth = 2 ;
-				ctx.strokeStyle = hasError ? canvas.errorColor : canvas.mainColor;
-				ctx.fillStyle = (!selected && !isComposite) ? backgroundColor :
-															  (!selected && isComposite) ? canvas.compositeColor:
-																						   (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : backgroundColor;
-				ctx.beginPath()
-				ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
-				ctx.fill();
-				ctx.stroke();
-
-				//inner rectangle
-				ctx.strokeStyle = canvas.innerFrameColor;
-
-				ctx.beginPath()
-				ctx.roundedRect(x_ + canvas.borderShift, y_ + canvas.borderShift, mainRecWidth - 2 * canvas.borderShift, canvas.mainRec_height  - 2 * canvas.borderShift, canvas.radius_, canvas.radius_);
-				ctx.stroke();
-
-				//Main text
-				ctx.strokeStyle = canvas.mainTextColor;
-				ctx.fillStyle = canvas.mainTextColor;
-				ctx.lineWidth = 1;
-				let fontStr = "bold " + String(canvas.fontSize) + "px sans-serif"
-				ctx.font = fontStr; //"20px sans-serif";
-				let textStr = mainText
-				let textWidth = ctx.measureText(mainText).width
-
-				let text_x = x_ + canvas.borderShift + canvas.textMargin;
-				let text_y = y_ + canvas.borderShift + canvas.textVerticalOffset;
-
-				ctx.beginPath()
-				ctx.fillText(textStr, text_x, text_y);
-				//                ctx.strokeText(textStr, text_x, text_y);
-
-				//Second text
-				ctx.strokeStyle = canvas.secondTextColor;
-				ctx.fillStyle = canvas.secondTextColor;
-				ctx.lineWidth = 0.5;
-				let fontStr2 = String(canvas.fontSizeS) + "px sans-serif"
-				ctx.font = fontStr2;
-				let textStr2 = secondText;
-				let textWidth2 = ctx.measureText(secondText).width
-
-				let text_x2 = x_ + canvas.borderShift + canvas.textMargin;
-				let text_y2 = y_ + canvas.mainRec_height - canvas.borderShift - canvas.textMargin;
-
-				ctx.beginPath()
-				ctx.fillText(textStr2, text_x2, text_y2);
-				ctx.strokeText(textStr2, text_x2, text_y2);
-
-				//Third text
-				ctx.strokeStyle = canvas.secondTextColor;
-				ctx.fillStyle = canvas.secondTextColor;
-				ctx.lineWidth = 0.5;
-				ctx.font = fontStr2;
-				let textStr3 = thirdText;
-				let textWidth3 = ctx.measureText(thirdText).width
-
-				let text_x3 = x_ + mainRecWidth - textWidth3 - canvas.borderShift - canvas.textMargin ;
-				let text_y3 = y_ + canvas.mainRec_height - canvas.borderShift - canvas.textMargin;
-
-				ctx.beginPath()
-				ctx.fillText(textStr3, text_x3, text_y3);
-				ctx.strokeText(textStr3, text_x3, text_y3);
-
-				//images
-				let image1_x = x_ + mainRecWidth - canvas.borderShift - canvas.imageSize - canvas.imageMargin;
-				let image1_y = text_y - canvas.imageSize + canvas.imageMargin;
-				let image2_x = image1_x - canvas.imageSize - canvas.imageMargin;
-				let image2_y = text_y - canvas.imageSize + canvas.imageMargin;
-				ctx.beginPath()
-				if (iconUrl_1 !== ""){
-					ctx.drawImage(iconUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
-				}
-				if (iconUrl_2 !== ""){
-					ctx.drawImage(iconUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
-				}
-
-			}
-
-			function drawLink(ctx, fromIndex, toIndex){
-				let fromItem = canvasPage.objectsModel.get(fromIndex).item;
-				let toItem = canvasPage.objectsModel.get(toIndex).item;
-
-				let x1 = fromItem.m_x;
-				let y1 = fromItem.m_y;
-				let x2 = toItem.m_x;
-				let y2 = toItem.m_y;
-
-				let width1 = fromItem.m_width ? fromItem.m_width : canvas.mainRec_width;
-				let width2 = toItem.m_width ? toItem.m_width : canvas.mainRec_width;
-
-				let x1_link = x1 + width1/2;
-				let y1_link = y1 + canvas.mainRec_height/2;
-				let x2_link = x2 + width2/2;
-				let y2_link = y2 + canvas.mainRec_height/2;
-
-				ctx.lineCap = "round"
-				ctx.lineJoin = "round"
-				ctx.lineWidth = 2;
-
-				ctx.strokeStyle = canvas.hoverIndex === fromIndex ? canvas.selectedLinkFromColor : canvas.hoverIndex === toIndex ? canvas.selectedLinkToColor : canvas.linkColor;
-				ctx.fillStyle = ctx.strokeStyle
-
-				ctx.beginPath()
-				ctx.moveTo(x1_link, y1_link);
-				ctx.lineTo(x2_link, y2_link);
-				ctx.stroke();
-
-				//draw intersection
-				let x1_rec2;
-				let y1_rec2;
-				let x2_rec2;
-				let y2_rec2;
-
-				let intersection;
-
-				if(y1 > y2){
-					//bottom line
-					x1_rec2 = x2;
-					y1_rec2 = y2 + canvas.mainRec_height;
-					x2_rec2 = x2 + width2;
-					y2_rec2 = y2 + canvas.mainRec_height;
-
-					intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
-
-					if(intersection.x < x2 + width2 && intersection.x > x2){
-						//bottom line
-						x1_rec2 = x2;
-						y1_rec2 = y2 + canvas.mainRec_height;
-						x2_rec2 = x2 + width2;
-						y2_rec2 = y2 + canvas.mainRec_height;
-					}
-					else if(intersection.x >= x2 + width2){
-						//right line
-						x1_rec2 = x2  + width2;
-						y1_rec2 = y2 + canvas.mainRec_height;
-						x2_rec2 = x2 + width2;
-						y2_rec2 = y2;
-					}
-					else if(intersection.x <= x2){
-						//left line
-						x1_rec2 = x2;
-						y1_rec2 = y2 + canvas.mainRec_height;
-						x2_rec2 = x2;
-						y2_rec2 = y2;
-					}
-				}//y1 > y2
-
-				else if (y1 < y2){
-					//top line
-					x1_rec2 = x2;
-					y1_rec2 = y2;
-					x2_rec2 = x2 + width2;
-					y2_rec2 = y2;
-
-					intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
-
-					if(intersection.x < x2 + width2 && intersection.x > x2){
-						//top line
-						x1_rec2 = x2;
-						y1_rec2 = y2;
-						x2_rec2 = x2 + width2;
-						y2_rec2 = y2;
-					}
-					else if(intersection.x >= x2 + width2){
-						//right line
-						x1_rec2 = x2  + width2;
-						y1_rec2 = y2 + canvas.mainRec_height;
-						x2_rec2 = x2 + width2;
-						y2_rec2 = y2;
-					}
-					else if(intersection.x <= x2){
-						//left line
-						x1_rec2 = x2;
-						y1_rec2 = y2 + canvas.mainRec_height;
-						x2_rec2 = x2;
-						y2_rec2 = y2;
-					}
-
-				}//y1 < y2
-
-				else if(y1 == y2){
-					if(x1 >= x2){
-						//right line
-						x1_rec2 = x2  + width2;
-						y1_rec2 = y2 + canvas.mainRec_height;
-						x2_rec2 = x2 + width2;
-						y2_rec2 = y2;
-
-
-					}
-					else {
-						//left line
-						x1_rec2 = x2;
-						y1_rec2 = y2 + canvas.mainRec_height;
-						x2_rec2 = x2;
-						y2_rec2 = y2;
-
-					}
-				}//y1 == y2
-
-				intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
-
-				//for intersection margin
-				let angle
-				let offset
-
-				let hasMargin = true;
-				let complexIntersection = true;
-				if(hasMargin){
-					angle = findAngle(x1_link, y1_link,intersection.x, intersection.y)
-					//console.log("angle: ", angle)
-
-					let quarter =  Math.trunc(angle/(Math.PI/2))
-					let add = 0;
-
-					//offset length correction
-					if(quarter % 2){
-						add = angle  - quarter * Math.PI/2  < Math.PI/4 ? Math.abs(Math.sin(angle)) : Math.abs(Math.cos(angle))
-					}
-					else {
-						add = angle  - quarter * Math.PI/2  < Math.PI/4 ? Math.abs(Math.cos(angle)) : Math.abs(Math.sin(angle))
-					}
-
-					let smallAngle = Math.abs(angle  - (quarter + 0) * Math.PI/2) < (Math.PI/180) * 30
-						|| Math.abs(angle  - (quarter + 1) * Math.PI/2) < (Math.PI/180) * 30;
-					if(smallAngle){
-						//add = 0.5;
-					}
-					//offset length correction
-
-					offset = 20 * (1 + add);
-
-					let newX = intersection.x + offset * Math.cos(angle)
-					let newY = intersection.y + offset * Math.sin(angle)
-
-					intersection = Qt.point(newX, newY);
-
-				}//for intersection margin
-
-				if(complexIntersection && hasMargin){
-					drawIntersectionExt(ctx, intersection,angle, false);
-					drawIntersectionArc(ctx, intersection, angle + Math.PI, offset, false)
-
-				}
-				else {//simple
-					drawIntersection(ctx, intersection, false);
-				}
-			}
-
-			function drawIntersection(ctx, intersection, selected){
-				let size = canvas.intersectionSize;
-
-				ctx.lineWidth = 0.5;
-				ctx.beginPath()
-				ctx.roundedRect(intersection.x - size/2, intersection.y  - size/2, size, size, size, size);
-				ctx.fill();
-				ctx.stroke();
-			}
-
-			function drawIntersectionExt(ctx, intersection, angle, selected){
-				let size = canvas.intersectionSize;
-				let sizeSmall = size/2;
-
-				ctx.beginPath()
-				ctx.roundedRect(intersection.x - sizeSmall/2, intersection.y  - sizeSmall/2, sizeSmall, sizeSmall, sizeSmall, sizeSmall);
-				ctx.fill();
-				ctx.stroke();
-
-				//draw tail
-
-				ctx.beginPath();
-				ctx.moveTo(intersection.x, intersection.y)
-				ctx.lineWidth = 0.5;
-				let offset = size/2;
-				let newX = intersection.x + offset * Math.cos(angle)
-				let newY = intersection.y + offset * Math.sin(angle)
-				ctx.lineTo(newX, newY);
-				ctx.stroke();
-
-
-			}
-
-			function drawIntersectionArc(ctx, point, angle, offset, selected){
-				let rad = canvas.arcRadius;
-				let endAngle = 0.6 * Math.PI;
-				ctx.lineWidth = 2;
-				ctx.beginPath()
-				ctx.arc(point.x, point.y, rad, angle , angle - endAngle, true);
-				ctx.stroke();
-				ctx.beginPath()
-				ctx.arc(point.x, point.y, rad, angle , angle + endAngle, false);
-				ctx.stroke();
-
-				ctx.beginPath();//draw tail
-				let startX = point.x + rad * Math.cos(angle);
-				let startY = point.y  + rad * Math.sin(angle);
-				ctx.moveTo(startX, startY);
-				ctx.lineWidth = 0.6;
-				let finishX = startX + offset * Math.cos(angle)
-				let finishY = startY + offset * Math.sin(angle)
-				ctx.lineTo(finishX, finishY);
-				ctx.stroke();
-
-			}
-
-			function findIntersection(x1, y1, x2, y2, x3, y3, x4, y4){
-
-				let px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) /
-					((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
-
-				let py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) /
-					((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
-
-
-				return Qt.point(px, py);
-			}
-
-			function findAngle(x1, y1, x2, y2){
-				if (x2 - x1 == 0){
-					return 0
-				}
-
-				let angle;
-				angle = Math.atan((y2 - y1) / (x2 - x1))
-
-				if((x2 == x1) && (y1 == y2)){
-					angle = 0;
-				}
-				else {
-					let angleBase = Math.atan((y2 - y1) / (x2 - x1))
-
-					if((y1 == y2) && (x1 > x2)){
-						angle = 0
-					}
-					else if((y1 == y2) && (x1 < x2)){
-						angle = Math.PI;
-					}
-					else if((y1 < y2) && (x1 == x2)){
-						angle = 1.5 * Math.PI;
-					}
-					else if((y1 > y2) && (x1 == x2)){
-						angle = Math.PI/2;
-					}
-					//
-					else if((y1 > y2) && (x1 < x2)){//boottom left
-						angle = angleBase + Math.PI;
-					}
-					else if((y1 < y2) && (x1 < x2)){//top left
-						angle = angleBase + Math.PI;
-					}
-					else if((y1 < y2) && (x1 > x2)){//top right
-						angle = angleBase + 2 * Math.PI;
-					}
-				}
-				return angle;
-			}
 		}//canvas
+
+		// Rectangle{
+		// 	anchors.fill: canvas;
+		// 	color: "transparent"
+		// 	border.color: "red"
+		// }
 	}//mainContainer
 
 
@@ -1220,7 +728,7 @@ Rectangle {
 		enabled: true;
 		onActivated: {
 			console.log("Ctrl+C");
-			canvasPage.copySignal(canvas.selectedIndex);
+			graphicsView.copySignal(canvas.selectedIndex);
 		}
 	}
 
@@ -1231,7 +739,7 @@ Rectangle {
 		enabled: true;
 		onActivated: {
 			console.log("Ctrl+V");
-			canvasPage.pasteSignal(canvas.selectedIndex);
+			graphicsView.pasteSignal(canvas.selectedIndex);
 		}
 	}
 
@@ -1241,7 +749,7 @@ Rectangle {
 		enabled: true;
 		onActivated: {
 			console.log("Delete");
-			canvasPage.deleteSignal(canvas.selectedIndex);
+			graphicsView.deleteSignal(canvas.selectedIndex);
 		}
 	}
 
@@ -1250,7 +758,7 @@ Rectangle {
 		enabled: true;
 		onActivated: {
 			console.log("Ctrl+Z");
-			canvasPage.revertSignal();
+			graphicsView.revertSignal();
 		}
 	}
 
@@ -1259,7 +767,7 @@ Rectangle {
 		enabled: true;
 		onActivated: {
 			console.log("F2");
-			canvasPage.renameSignal(canvas.selectedIndex);
+			graphicsView.renameSignal(canvas.selectedIndex);
 		}
 	}
 
@@ -1267,7 +775,7 @@ Rectangle {
 	function copyObjectFunc(index){
 		if(index >= 0){
 			// bufferModel.clear();
-			// bufferModel.copyItemDataFromModel(0, canvasPage.objectsModel, index);
+			// bufferModel.copyItemDataFromModel(0, graphicsView.objectsModel, index);
 		}
 	}
 
@@ -1289,8 +797,8 @@ Rectangle {
 			bufferModel.setData("x", x_, 0);
 			bufferModel.setData("y", y_, 0);
 			bufferModel.setData("Selected", false, 0);
-			// let index = canvasPage.objectsModel.insertNewItem();
-			// canvasPage.objectsModel.copyItemDataFromModel(index, bufferModel,0);
+			// let index = graphicsView.objectsModel.insertNewItem();
+			// graphicsView.objectsModel.copyItemDataFromModel(index, bufferModel,0);
 
 			canvas.selectedIndex = 100//index;
 
@@ -1300,11 +808,11 @@ Rectangle {
 
 	function deleteObjectFunc(index){
 		console.log("DELETE OBJECT: ", index);
-		let id = canvasPage.objectsModel.get(index).item.m_id;
+		let id = graphicsView.objectsModel.get(index).item.m_id;
 
 		//remove links
-		for(let i = 0; i < canvasPage.objectsModel.count; i++){
-			let item = canvasPage.objectsModel.get(i).item;
+		for(let i = 0; i < graphicsView.objectsModel.count; i++){
+			let item = graphicsView.objectsModel.get(i).item;
 			let links = item.m_links;
 			if(links !== undefined){
 				for(let k = 0; k < links.count; k++){
@@ -1319,7 +827,7 @@ Rectangle {
 		}
 
 		//remove object
-		canvasPage.objectsModel.removeItem(index);
+		graphicsView.objectsModel.removeItem(index);
 
 		canvas.selectedIndex = -1;
 
@@ -1335,7 +843,7 @@ Rectangle {
 		anchors.bottom: parent.bottom;
 
 		secondSize: 12;
-		visible: (backgroundRec.topY >=0 && backgroundRec.bottomY <= canvasPage.height) ? false : true;
+		visible: (backgroundRec.topY >=0 && backgroundRec.bottomY <= graphicsView.height) ? false : true;
 		alwaysVisible: true;
 		canDragOutOfBounds: true;
 		targetItem: parent;
@@ -1360,7 +868,7 @@ Rectangle {
 
 		secondSize: 12;
 
-		visible: (backgroundRec.leftX >=0 && backgroundRec.rightX <= canvasPage.width) ? false : true;
+		visible: (backgroundRec.leftX >=0 && backgroundRec.rightX <= graphicsView.width) ? false : true;
 		alwaysVisible: true;
 		canDragOutOfBounds: true;
 

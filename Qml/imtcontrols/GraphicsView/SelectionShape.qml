@@ -2,10 +2,9 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
-GraphicsShape {
+GraphicsShapeBase {
 
 	property QtObject source: null;
-	property var coordinate
 
 	function draw(ctx, layerId){
 		drawSelection(ctx, layerId);
@@ -67,18 +66,18 @@ GraphicsShape {
 
 	}
 
-	function getPoint(params_){
-		if(coordinate == undefined){
-			coordinate = {}
-			coordinate.x = params_.point.x
-			coordinate.y = params_.point.y
-			//coordinate = params_.point
-			return coordinate
-		}
-		else {
-			return coordinate
-		}
+	// function getPoint(params_){
+	// 	if(coordinate == undefined){
+	// 		coordinate = {}
+	// 		coordinate.x = params_.point.x
+	// 		coordinate.y = params_.point.y
+	// 		//coordinate = params_.point
+	// 		return coordinate
+	// 	}
+	// 	else {
+	// 		return coordinate
+	// 	}
 
-	}
+	// }
 }
 

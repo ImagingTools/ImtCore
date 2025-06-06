@@ -186,7 +186,7 @@
 
 		<file alias="imtcontrols/GraphicsView/GraphicsView.qml">GraphicsView/GraphicsView.qml</file>
 		<file alias="imtcontrols/GraphicsView/GraphicsLayer.qml">GraphicsView/GraphicsLayer.qml</file>
-		<file alias="imtcontrols/GraphicsView/GraphicsShape.qml">GraphicsView/GraphicsShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/GraphicsShapeBase.qml">GraphicsView/GraphicsShapeBase.qml</file>
 
 		<file alias="imtcontrols/GraphicsView/PolygonShape.qml">GraphicsView/PolygonShape.qml</file>
 		<file alias="imtcontrols/GraphicsView/RectangleShape.qml">GraphicsView/RectangleShape.qml</file>
@@ -210,6 +210,8 @@
 
 		<file alias="imtcontrols/GraphicsView/ComplexShape.qml">GraphicsView/ComplexShape.qml</file>
 		<file alias="imtcontrols/GraphicsView/SelectionShape.qml">GraphicsView/SelectionShape.qml</file>
+
+		<file alias="imtcontrols/GraphicsView/CanvasMatrix.qml">GraphicsView/CanvasMatrix.qml</file>
 
     </qresource>
     <qresource prefix="/"/>
