@@ -359,11 +359,20 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 		}
 	}
 
+
 	QString timeFilterQuery;
-	if (paramIds.contains("TimeFilter")){
-		iprm::TParamsPtr<imtbase::ITimeFilterParam> timeFilterParamPtr(&filterParams, "TimeFilter");
-		if (timeFilterParamPtr.IsValid()){
-			retVal = CreateTimeFilterQuery(*timeFilterParamPtr, timeFilterQuery);
+	if (paramIds.contains("ComplexFilter")){
+		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(&filterParams, "ComplexFilter");
+		if (complexFilterParamPtr.IsValid()){
+			retVal = BaseClass::CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
+
+			if (!retVal){
+				return false;
+			}
+
+			SubstituteFieldIds(textFilterQuery);
+
+			retVal = CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
 			if (!retVal){
 				return false;
 			}
