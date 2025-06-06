@@ -23,6 +23,7 @@ Item {
 
 
 	property string color_positive: Style.positiveAccentColor;
+	property string backgroundColor: "#000000";
 
 	property bool hasTooltip: true;
 
