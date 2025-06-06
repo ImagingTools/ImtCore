@@ -29,7 +29,6 @@ bool CWebSocketServletComp::IsCommandSupported(const QByteArray& /*commandId*/) 
 imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::IRequest& request, const QByteArray& subCommandId) const
 {
 	QByteArray commandId = subCommandId.isEmpty() ? request.GetCommandId() : subCommandId;
-
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 
 	if (webSocketRequest != nullptr){
@@ -144,9 +143,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	QByteArray commandId = gqlRequest.GetCommandId();
 
 	if (commandId.isEmpty()){
-		QByteArray errorMessage = QByteArray("Unable to register subscription with empty command id");
-
-		return CreateErrorResponse(errorMessage, request);
+		return CreateErrorResponse(QByteArrayLiteral("Unable to register subscription with empty command-ID"), request);
 	}
 
 	imtgql::IGqlSubscriberController* subscriberControllerPtr = nullptr;
@@ -232,8 +229,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(QByteArray 
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
 	QString body = QString(R"({"id": "%1","type": "error","payload": {"errors": [{"errorType": "ProcessRequestError","message": "%2"}]}})")
-							.arg(object["id"].toString())
-							.arg(QString(errorMessage));
+							.arg(object["id"].toString(), QString(errorMessage));
 	
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 

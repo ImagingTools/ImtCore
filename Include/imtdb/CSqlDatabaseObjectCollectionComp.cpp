@@ -37,7 +37,7 @@ const imtbase::IRevisionController* CSqlDatabaseObjectCollectionComp::GetRevisio
 	if (m_objectDelegateCompPtr.IsValid()){
 		return CompCastPtr<imtbase::IRevisionController>(m_objectDelegateCompPtr.GetPtr());
 	}
-	
+
 	return nullptr;
 }
 
@@ -55,30 +55,30 @@ int CSqlDatabaseObjectCollectionComp::GetOperationFlags(const QByteArray& /*obje
 
 
 QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
-	const QByteArray& typeId,
-	const QString& name,
-	const QString& description,
-	const istd::IChangeable* defaultValuePtr,
-	const QByteArray& proposedObjectId,
-	const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-	const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
-	const imtbase::IOperationContext* operationContextPtr)
+			const QByteArray& typeId,
+			const QString& name,
+			const QString& description,
+			const istd::IChangeable* defaultValuePtr,
+			const QByteArray& proposedObjectId,
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
+			const imtbase::IOperationContext* operationContextPtr)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return nullptr;
 	}
-	
+
 	QByteArray objectId = proposedObjectId;
 	if (objectId.isEmpty()){
 		objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
-	
+
 	if (!IsObjectTypeSupported(typeId)){
 		SendErrorMessage(0, QString("Object type ID \"%1\" not supported").arg(qPrintable(typeId)));
 	
 		return QByteArray();
 	}
-	
+
 	imtdb::IDatabaseObjectDelegate::NewObjectQuery objectQuery = m_objectDelegateCompPtr->CreateNewObjectQuery(
 				typeId,
 				objectId,
@@ -88,29 +88,29 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 				operationContextPtr);
 	if (objectQuery.query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
-		
+
 		return nullptr;
 	}
-	
+
 	istd::IChangeable::ChangeSet changeSet(CF_ADDED);
 	changeSet.SetChangeInfo(CN_ELEMENT_INSERTED, objectId);
-	
+
 	if (operationContextPtr != nullptr){
 		AddOperationContextToChangeSet(*operationContextPtr, changeSet);
 	}
-	
+
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
-	
+
 	QVariantMap bindValues = objectQuery.bindValues;
 	bool transactionSuccess = false;
-	
+
 	if(bindValues.isEmpty()){
 		transactionSuccess = ExecuteTransaction(objectQuery.query);
 	}
 	else{
 		transactionSuccess = ExecuteTransaction(objectQuery.query, bindValues);
 	}
-	
+
 	if (!transactionSuccess){
 		changeNotifier.Abort();
 	}
@@ -137,10 +137,10 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 				}
 			}
 		}
-		
+
 		return objectId;
 	}
-	
+
 	return QByteArray();
 }
 
@@ -150,24 +150,24 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElements(const Ids& elementIds, con
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
 	}
-	
+
 	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectsQuery(*this, elementIds, operationContextPtr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 		
 		return false;
 	}
-	
+
 	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
 	notifierInfo.elementIds = elementIds;
-	
+
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 	
 	if (operationContextPtr != nullptr){
 		AddOperationContextToChangeSet(*operationContextPtr, changeSet);
 	}
-	
+
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 	
 	if (ExecuteTransaction(query)){
@@ -176,7 +176,7 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElements(const Ids& elementIds, con
 	else{
 		changeNotifier.Abort();
 	}
-	
+
 	return false;
 }
 
@@ -224,24 +224,24 @@ bool CSqlDatabaseObjectCollectionComp::RestoreObjects(
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
 	}
-	
+
 	QByteArray query = m_objectDelegateCompPtr->CreateRestoreObjectsQuery(*this, objectIds, operationContextPtr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 		
 		return false;
 	}
-	
+
 	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
 	notifierInfo.elementIds = objectIds;
-	
-	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
+
+	istd::IChangeable::ChangeSet changeSet(CF_RESTORED);
+	changeSet.SetChangeInfo(CN_ELEMENTS_RESTORED, QVariant::fromValue(notifierInfo));
 	
 	if (operationContextPtr != nullptr){
 		AddOperationContextToChangeSet(*operationContextPtr, changeSet);
 	}
-	
+
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 	
 	if (ExecuteTransaction(query)){
@@ -250,7 +250,7 @@ bool CSqlDatabaseObjectCollectionComp::RestoreObjects(
 	else{
 		changeNotifier.Abort();
 	}
-	
+
 	return false;
 }
 
@@ -273,7 +273,7 @@ bool CSqlDatabaseObjectCollectionComp::RestoreObjectSet(
 	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
 	notifierInfo.elementIds = imtbase::ICollectionInfo::Ids();
 
-	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
+	istd::IChangeable::ChangeSet changeSet(CF_RESTORED);
 	changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));
 
 	if (operationContextPtr != nullptr){
@@ -301,108 +301,108 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
 	}
-	
+
 	if (!m_dbEngineCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
 		
 		return 0;
 	}
-	
+
 	if (objectId.isEmpty()){
 		return false;
 	}
-	
+
 	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, -1, -1, nullptr);
 	if (objectSelectionQuery.isEmpty()){
 		return false;
 	}
-	
+
 	QSqlError sqlError;
 	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "Database collection");
-		
+
 		return false;
 	}
-	
+
 	if (!sqlQuery.next()){
 		return false;
 	}
-	
+
 	istd::IChangeableUniquePtr objectPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
 	dataPtr.FromUnique(objectPtr);
-	
+
 	return dataPtr.IsValid();
 }
 
 
 bool CSqlDatabaseObjectCollectionComp::SetObjectData(
-	const Id& objectId,
-	const istd::IChangeable& object,
-	CompatibilityMode /*mode*/,
-	const imtbase::IOperationContext* operationContextPtr)
+			const Id& objectId,
+			const istd::IChangeable& object,
+			CompatibilityMode /*mode*/,
+			const imtbase::IOperationContext* operationContextPtr)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
 	}
-	
+
 	QByteArray query = m_objectDelegateCompPtr->CreateUpdateObjectQuery(*this, objectId, object, operationContextPtr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 		
 		return false;
 	}
-	
+
 	istd::IChangeable::ChangeSet changeSet(CF_OBJECT_DATA_CHANGED);
 	changeSet.SetChangeInfo(CN_OBJECT_DATA_CHANGED, objectId);
-	
+
 	if (operationContextPtr != nullptr){
 		AddOperationContextToChangeSet(*operationContextPtr, changeSet);
 	}
-	
+
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
-	
+
 	if (ExecuteTransaction(query)){
 		return true;
 	}
 	else{
 		changeNotifier.Abort();
 	}
-	
+
 	return false;
 }
 
 
 imtbase::IObjectCollectionUniquePtr CSqlDatabaseObjectCollectionComp::CreateSubCollection(
-	int offset,
-	int count,
-	const iprm::IParamsSet* selectionParamsPtr) const
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	if (!m_objectCollectionFactoryCompPtr.IsValid()){
 		return nullptr;
 	}
-	
+
 	if (!m_dbEngineCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
-		
+
 		return 0;
 	}
-	
+
 	imtbase::IObjectCollectionUniquePtr collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
-	
+
 	if (m_objectDelegateCompPtr.IsValid()){
 		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
 		if (objectSelectionQuery.isEmpty()){
 			return nullptr;
 		}
-		
+
 		QSqlError sqlError;
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
-		
+
 		while (sqlQuery.next()){
 			istd::IChangeableUniquePtr dataPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
-			
+
 			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(sqlQuery.record());
 			QByteArray typeId = m_objectDelegateCompPtr->GetObjectTypeId(objectId);
 			if (collectionPtr.IsValid()){
@@ -410,7 +410,7 @@ imtbase::IObjectCollectionUniquePtr CSqlDatabaseObjectCollectionComp::CreateSubC
 			}
 		}
 	}
-	
+
 	return collectionPtr;
 }
 
@@ -425,7 +425,7 @@ const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo()
 	else {
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
 	}
-	
+
 	return nullptr;
 }
 
@@ -438,7 +438,7 @@ imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(c
 	else{
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
 	}
-	
+
 	return QByteArray();
 }
 
@@ -450,16 +450,16 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const Id& ob
 		if (!record.isEmpty()){
 			idoc::MetaInfoPtr objectMetaInfoPtr;
 			idoc::MetaInfoPtr collectionMetaInfoPtr;
-			
+
 			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(record, objectMetaInfoPtr, collectionMetaInfoPtr);
-			
+
 			return objectMetaInfoPtr;
 		}
 	}
 	else{
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
 	}
-	
+
 	return idoc::MetaInfoPtr();
 }
 
@@ -470,23 +470,23 @@ int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* s
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
-		
+
 		return 0;
 	}
 	
 	if (!m_dbEngineCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
-		
+
 		return 0;
 	}
-	
+
 	imtbase::CParamsSetJoiner filterParams(selectionParamPtr, m_filterParamsCompPtr.GetPtr());
-	
+
 	QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(&filterParams);
 	if (!countQuery.isEmpty()){
 		QSqlError sqlError;
 		QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(countQuery, &sqlError);
-		
+
 		if (sqlError.type() == QSqlError::NoError){
 			if (result.first()){
 				return result.value(0).toInt();
@@ -499,81 +499,81 @@ int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* s
 	else{
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 	}
-	
+
 	return 0;
 }
 
 
 imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
-	int offset,
-	int count,
-	const iprm::IParamsSet* selectionParamsPtr,
-	ilog::IMessageConsumer* /*logPtr*/) const
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	Ids retVal;
-	
+
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
-	
+
 	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
 		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
 		if (objectSelectionQuery.isEmpty()){
 			return Ids();
 		}
-		
+
 		QSqlError sqlError;
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
-		
+
 		while (sqlQuery.next()){
 			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(sqlQuery.record());
 			Q_ASSERT(!objectId.isEmpty());
-			
+
 			retVal.push_back(objectId);
 		}
 	}
-	
+
 	return retVal;
 }
 
 
 bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(
-	imtbase::ICollectionInfo& /*subsetInfo*/,
-	int /*offset*/,
-	int /*count*/,
-	const iprm::IParamsSet* /*selectionParamsPtr*/,
-	ilog::IMessageConsumer* /*logPtr*/) const
+			imtbase::ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
 imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObjectCollectionIterator(
-	const QByteArray& objectId,
-	int offset,
-	int count,
-	const iprm::IParamsSet* selectionParamsPtr) const
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
-	
+
 	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
 		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, offset, count, &filterParams);
 		if (objectSelectionQuery.isEmpty()){
 			return nullptr;
 		}
-		
+
 		QSqlError sqlError;
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
-		
+
 		if (sqlError.type() != QSqlError::NoError){
 			SendErrorMessage(0, sqlError.text(), "Database collection");
-			
+
 			qDebug() << "SQL-error" << objectSelectionQuery;
-			
+
 			return nullptr;
 		}
-		
+
 		return new CSqlDatabaseObjectCollectionIterator(sqlQuery, m_objectDelegateCompPtr.GetPtr());
 	}
-	
+
 	return nullptr;
 }
 
@@ -585,13 +585,13 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 		if (!record.isEmpty()){
 			idoc::MetaInfoPtr objectMetaInfoPtr;
 			idoc::MetaInfoPtr collectionMetaInfoPtr;
-			
+
 			if (bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(record, objectMetaInfoPtr, collectionMetaInfoPtr))
 			{
 				// #10856
 				int metaInfoType = 0;
 				QString result;
-				
+
 				switch (infoType){
 				case EIT_NAME:
 					metaInfoType = idoc::IDocumentMetaInfo::MIT_TITLE;
@@ -602,12 +602,12 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 				default:
 					return {};
 				}
-				
+
 				if (collectionMetaInfoPtr.IsValid())
 					result = collectionMetaInfoPtr->GetMetaInfo(metaInfoType).toString();
 				if (result.isEmpty() && objectMetaInfoPtr.IsValid())
 					result = objectMetaInfoPtr->GetMetaInfo(metaInfoType).toString();
-				
+
 				return result;
 			}
 		}
@@ -615,7 +615,7 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 	else{
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
 	}
-	
+
 	return QVariant();
 }
 
@@ -627,16 +627,16 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id&
 		if (!record.isEmpty()){
 			idoc::MetaInfoPtr objectMetaInfoPtr;
 			idoc::MetaInfoPtr collectionMetaInfoPtr;
-			
+
 			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(record, objectMetaInfoPtr, collectionMetaInfoPtr);
-			
+
 			return collectionMetaInfoPtr;
 		}
 	}
 	else{
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
 	}
-	
+
 	return idoc::MetaInfoPtr();
 }
 
@@ -645,37 +645,37 @@ bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
-		
+
 		return false;
 	}
-	
+
 	if (elementId.isEmpty()){
 		return false;
 	}
-	
+
 	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, elementId, name, nullptr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
-		
+
 		return false;
 	}
-	
+
 	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(elementId, -1, -1, nullptr);
 	if (objectSelectionQuery.isEmpty()){
 		return false;
 	}
-	
+
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_RENAMED);
 	changeSet.SetChangeInfo(CN_ELEMENT_RENAMED, elementId);
-	
+
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
-	
+
 	if (!ExecuteTransaction(query)){
 		changeNotifier.Abort();
-		
+
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -684,28 +684,28 @@ bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
-		
+
 		return false;
 	}
 	
-	QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, description, nullptr);
+QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, description, nullptr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
-		
+
 		return false;
 	}
-	
+
 	istd::IChangeable::ChangeSet changeSet(CF_ELEMENT_DESCRIPTION_CHANGED);
 	changeSet.SetChangeInfo(CN_ELEMENT_DESCRIPTION_CHANGED, elementId);
-	
+
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
-	
+
 	if (!ExecuteTransaction(query)){
 		changeNotifier.Abort();
-		
+
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -722,22 +722,22 @@ bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
-		
+
 		return false;
 	}
-	
+
 	QByteArray resetQuery = m_objectDelegateCompPtr->CreateResetQuery(*this);
 	if (resetQuery.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
-		
+
 		return false;
 	}
 	if (ExecuteTransaction(resetQuery)){
 		istd::CChangeNotifier changeNotifier(this);
-		
+
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -751,23 +751,23 @@ bool CSqlDatabaseObjectCollectionComp::IsObjectTypeSupported(const QByteArray& t
 	if (typeId == "DocumentInfo"){
 		return true;
 	}
-	
+
 	if (m_objectDelegateCompPtr.IsValid()){
 		const iprm::IOptionsList* infosPtr = m_objectDelegateCompPtr->GetObjectTypeInfos();
 		if (infosPtr == nullptr){
 			return true;
 		}
-		
+
 		int count = infosPtr->GetOptionsCount();
 		for (int i = 0; i < count; i++){
 			if (infosPtr->GetOptionId(i) == typeId){
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	return false;
 }
 
@@ -776,10 +776,10 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 {
 	if (!m_dbEngineCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
-		
+
 		return false;
 	}
-	
+
 	QStringList queryList = QString::fromUtf8(sqlQuery).split(';');
 
 	if(!m_dbEngineCompPtr->BeginTransaction()){
@@ -793,16 +793,16 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 			m_dbEngineCompPtr->ExecSqlQuery(singleQuery.toUtf8(), &error);
 			if (error.type() != QSqlError::NoError){
 				SendErrorMessage(0, error.text(), "Database collection");
-				
+
 				qDebug() << "SQL-error: " << singleQuery;
-				
+
 				m_dbEngineCompPtr->CancelTransaction();
-				
+
 				return false;
 			}
 		}
 	}
-	
+
 	const bool transactionSuccess = m_dbEngineCompPtr->FinishTransaction();
 	if(!transactionSuccess){
 		qCritical() << "Failed to finish SQL transaction with queries:" << sqlQuery;
@@ -816,28 +816,28 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 {
 	if (!m_dbEngineCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
-		
+
 		return false;
 	}
-	
+
 	if(!m_dbEngineCompPtr->BeginTransaction()){
 		qCritical() << "Failed to begin SQL transaction with queries:" << sqlQuery;
 	}
 
 	QSqlError error;
 	m_dbEngineCompPtr->ExecSqlQuery(sqlQuery, bindValues, &error);
-	
+
 	if (error.type() != QSqlError::NoError){
 		SendErrorMessage(0, error.text(), "Database collection");
-		
+
 		// qDebug() << "SQL-error: " << singleQuery;
 		qDebug() << "SQL-error: " << sqlQuery;
-		
+
 		m_dbEngineCompPtr->CancelTransaction();
-		
+
 		return false;
 	}
-	
+
 	const bool transactionSuccess = m_dbEngineCompPtr->FinishTransaction();
 	if(!transactionSuccess){
 		qCritical() << "Failed to finish SQL transaction with queries:" << sqlQuery;
@@ -851,16 +851,16 @@ QSqlRecord CSqlDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& o
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
-		
+
 		return QSqlRecord();
 	}
-	
+
 	if (!m_dbEngineCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
-		
+
 		return QSqlRecord();
 	}
-	
+
 	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId);
 	if (!objectSelectionQuery.isEmpty()){
 		QSqlError sqlError;
@@ -868,12 +868,12 @@ QSqlRecord CSqlDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& o
 		if (sqlError.type() != QSqlError::NoError){
 			SendErrorMessage(0, sqlError.text(), "Database collection");
 		}
-		
+
 		if (sqlQuery.next()){
 			return sqlQuery.record();
 		}
 	}
-	
+
 	return QSqlRecord();
 }
 
@@ -895,15 +895,15 @@ void CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged(const istd::IChan
 void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-	
+
 	m_dbEngineCompPtr.EnsureInitialized();
 	m_objectDelegateCompPtr.EnsureInitialized();
-	
+
 	m_isInitialized = false;
-	
+
 	m_filterParamsObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged);
 	m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged);
-	
+
 	m_isInitialized = true;
 }
 
@@ -912,7 +912,7 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 {
 	m_filterParamsObserver.UnregisterAllObjects();
 	m_databaseAccessObserver.UnregisterAllObjects();
-	
+
 	BaseClass::OnComponentDestroyed();
 }
 

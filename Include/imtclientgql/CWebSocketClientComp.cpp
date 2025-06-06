@@ -230,7 +230,6 @@ void CWebSocketClientComp::OnTimeout()
 
 void CWebSocketClientComp::OnWebSocketConnected()
 {
-
 	QString clientId;
 	if (m_clientIdAttrPtr.IsValid()){
 		clientId = *m_clientIdAttrPtr;

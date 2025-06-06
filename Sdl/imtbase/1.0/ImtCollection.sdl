@@ -8,7 +8,7 @@ schema {
 
 import {
 	"../../imtbase/1.0/ComplexCollectionFilter.sdl"
-	#"../../imtbase/1.0/DocumentCollectionFilter.sdl"
+	"../../imtbase/1.0/DocumentCollectionFilter.sdl"
 }
 
 type HeaderInfo {
@@ -26,7 +26,7 @@ type CollectionViewParams {
 	count: Int
 	offset: Int
 	filterModel: ComplexCollectionFilter
-	#documentFilterModel: DocumentCollectionFilter
+	documentFilterModel: DocumentCollectionFilter
 }
 
 type NotificationItem {

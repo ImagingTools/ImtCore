@@ -55,6 +55,9 @@ public:
 	static const QByteArray CN_ELEMENTS_REMOVED;
 	typedef MultiElementNotifierInfo ElementsRemoveInfo;
 
+	static const QByteArray CN_ELEMENTS_RESTORED;
+	typedef MultiElementNotifierInfo ElementsRestoreInfo;
+
 	/**
 		Change notification flags.
 	*/
@@ -84,6 +87,11 @@ public:
 			Element was removed.
 		*/
 		CF_REMOVED,
+
+		/**
+			Element was restored.
+		*/
+		CF_RESTORED,
 
 		CF_LAST
 	};

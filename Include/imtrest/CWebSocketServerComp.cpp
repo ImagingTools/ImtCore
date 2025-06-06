@@ -132,7 +132,7 @@ void CWebSocketServerComp::OnComponentCreated()
 
 	connect(&m_timer, &QTimer::timeout, this, &CWebSocketServerComp::OnTimeout);
 
-	m_timer.start(3000);
+	m_timer.start(5000);
 }
 
 
@@ -267,6 +267,7 @@ void CWebSocketServerComp::HandleNewConnections()
 				break;
 			}
 		}
+
 		if (!find){
 			CWebSocketThread* webSocketThreadPtr = new CWebSocketThread(this);
 			m_webSocketThreadList.append(webSocketThreadPtr);
@@ -288,6 +289,7 @@ void CWebSocketServerComp::OnSocketDisconnected()
 
 	for (const QByteArray& key: m_senders.keys()){
 		if (socketObjectPtr == m_senders[key]->GetSocket()){
+			qDebug() << "Test: m_senders remove" << key << socketObjectPtr;
 			m_senders.remove(key);
 
 			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));

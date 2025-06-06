@@ -26,6 +26,7 @@
 namespace imtrest
 {
 
+
 class CWebSocketThread;
 
 /**
@@ -118,6 +119,7 @@ protected:
 	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 	QMap <QByteArray, imtcom::IConnectionStatusProvider::ConnectionStatus> m_senderLoginStatusMap;
 	mutable QReadWriteLock m_sendersLock;
+
 private:
 	I_REF(imtrest::IRequestServlet, m_requestServerHandlerCompPtr);
 	I_REF(imtrest::IRequestServlet, m_requestClientHandlerCompPtr);

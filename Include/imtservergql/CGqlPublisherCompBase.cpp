@@ -42,7 +42,7 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	if (!IsRequestSupported(gqlRequest)){
 		errorMessage = QString("Request with command-ID: '%1 'is not supported").arg(qPrintable(gqlRequest.GetCommandId()));
 		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
-		
+
 		return false;
 	}
 
@@ -51,16 +51,15 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	if (webSocketRequest == nullptr){
 		errorMessage = QString("Internal error");
 		SendErrorMessage(0, errorMessage, "CGqlPublisherCompBase");
-		
+
 		return false;
 	}
 
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
-		if (requestNetworks.gqlRequest.IsEqual(gqlRequest)){
+		if (requestNetworks.gqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
 			requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
-			
 			webSocketRequest->RegisterRequestEventHandler(this);
-			
+
 			return true;
 		}
 	}
@@ -69,7 +68,7 @@ bool CGqlPublisherCompBase::RegisterSubscription(
 	requestNetworks.gqlRequest.CopyFrom(gqlRequest);
 	requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
 	m_registeredSubscribers.append(requestNetworks);
-	
+
 	webSocketRequest->RegisterRequestEventHandler(this);
 
 	return true;
@@ -144,7 +143,7 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 	bool retVal = sender->SendResponse(responsePtr);
 	if (!retVal){
 		QString message = QString("Unable to send response to subscriber. Data: '%1'").arg(qPrintable(data));
-		
+
 		SendErrorMessage(0, message, "CGqlPublisherCompBase");
 	}
 
