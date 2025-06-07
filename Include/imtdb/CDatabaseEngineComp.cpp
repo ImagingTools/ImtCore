@@ -309,7 +309,15 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 	int newRevision;
 	int databaseVersion = GetDatabaseVersion();
 
-	BeginTransaction();
+	if(!BeginTransaction()){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| what(): Transaction could not be started"
+					<< "\n\t| Error: " << QSqlDatabase::database(GetConnectionName()).lastError().text();
+
+		SendErrorMessage(0, QStringLiteral("Transaction could not be started: %1").arg(QSqlDatabase::database(GetConnectionName()).lastError().text()), __FILE__);
+
+		return false;
+	}
 
 	bool retVal = m_migrationControllerCompPtr->DoMigration(newRevision, istd::CIntRange(databaseVersion + 1, -1));
 	if (!retVal){
@@ -332,7 +340,15 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 		}
 	}
 
-	FinishTransaction();
+	if(!FinishTransaction()){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| what(): Transaction could not be finished"
+					<< "\n\t| Error: " << QSqlDatabase::database(GetConnectionName()).lastError().text();
+
+		SendErrorMessage(0, QStringLiteral("Transaction could not be finished: %1").arg(QSqlDatabase::database(GetConnectionName()).lastError().text()), __FILE__);
+
+		return false;
+	}
 
 	return retVal;
 }
@@ -679,7 +695,15 @@ QString CDatabaseEngineComp::GetConnectionOptionsString(const QByteArray& databa
 
 bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 {
-	BeginTransaction();
+	if(!BeginTransaction()){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| what(): Transaction could not be started"
+					<< "\n\t| Error: " << QSqlDatabase::database(GetConnectionName()).lastError().text();
+
+		SendErrorMessage(0, QStringLiteral("Transaction could not be started: %1").arg(QSqlDatabase::database(GetConnectionName()).lastError().text()), __FILE__);
+
+		return false;
+	}
 
 	QByteArray singleQuery;
 
@@ -717,8 +741,15 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 		}
 	}
 
-	FinishTransaction();
+	if(!FinishTransaction()){
+		qCritical() << __FILE__ << __LINE__
+					<< "\n\t| what(): Transaction could not be finished"
+					<< "\n\t| Error: " << QSqlDatabase::database(GetConnectionName()).lastError().text();
 
+		SendErrorMessage(0, QStringLiteral("Transaction could not be finished: %1").arg(QSqlDatabase::database(GetConnectionName()).lastError().text()), __FILE__);
+
+		return false;
+	}
 	return true;
 }
 
