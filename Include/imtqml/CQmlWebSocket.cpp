@@ -17,7 +17,7 @@ CQmlWebSocket::CQmlWebSocket(QObject* parent)
 	connect(&m_socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred),
 			this,& CQmlWebSocket::onError);
 #else
-	connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CQmlWebSocket::onError);
+	connect(&m_socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CQmlWebSocket::onError);
 #endif
 	connect(&m_socket, &QWebSocket::sslErrors, this, &CQmlWebSocket::onSslErrors);
 }
