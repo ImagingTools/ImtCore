@@ -107,15 +107,15 @@ inline QByteArray TSpecificationBasedDocumentEditorCompWrap<BaseClass>::CreateNe
 		return retVal;
 	}
 
-	std::unique_ptr<istd::IChangeable> specPtr(m_specFactPtr.CreateInstance());
-	imod::IModel* specModelPtr = dynamic_cast<imod::IModel*>(specPtr.get());
+	istd::TUniqueInterfacePtr<istd::IChangeable> specPtr(m_specFactPtr.CreateInstance());
+	imod::IModel* specModelPtr = dynamic_cast<imod::IModel*>(specPtr.GetPtr());
 	if (specModelPtr != nullptr){
 		if (specModelPtr->AttachObserver(m_specObserverCompPtr.GetPtr())){
 			if (m_specDialogCompPtr->ExecuteDialog(this) == QDialog::Accepted){
-				QString name = CreateSpecificationName(specPtr.get());
+				QString name = CreateSpecificationName(specPtr.GetPtr());
 				if (!name.isEmpty()){
 					retVal =
-						m_specCollectionCompPtr->InsertNewObject(*m_specObjectTypeIdAttrPtr, name, "", specPtr.get());
+						m_specCollectionCompPtr->InsertNewObject(*m_specObjectTypeIdAttrPtr, name, "", specPtr.GetPtr());
 				}
 			}
 
@@ -162,14 +162,14 @@ inline void TSpecificationBasedDocumentEditorCompWrap<BaseClass>::OnSpecificatio
 	Q_ASSERT(collectionPtr != nullptr);
 
 	if (m_collectionFilterFactPtr.IsValid()){
-		std::unique_ptr<iprm::IParamsSet> filterPtr(m_collectionFilterFactPtr.CreateInstance());
-		Q_ASSERT(filterPtr != nullptr);
+		istd::TUniqueInterfacePtr<iprm::IParamsSet> filterPtr(m_collectionFilterFactPtr.CreateInstance());
+		Q_ASSERT(filterPtr.IsValid());
 
-		iprm::TEditableParamsPtr<imtcol::IObjectTypeIdFilter> objectTypeIdFilter(filterPtr.get(), "ObjectTypeIdFilter");
+		iprm::TEditableParamsPtr<imtcol::IObjectTypeIdFilter> objectTypeIdFilter(filterPtr.GetPtr(), "ObjectTypeIdFilter");
 		Q_ASSERT(objectTypeIdFilter.IsValid());
 
 		if (PrepareSpecificationCollectionFilter(*filterPtr)){
-			QByteArrayList ids = collectionPtr->GetElementIds(0, -1, filterPtr.get());
+			QByteArrayList ids = collectionPtr->GetElementIds(0, -1, filterPtr.GetPtr());
 
 			SpecificationList specList;
 
