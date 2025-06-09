@@ -86,6 +86,7 @@ private:
 	Status m_status;
 	QPointer<QWebSocket> m_socket;
 	bool m_isSecureConnection;
+	istd::TDelPtr<CWebSocket> m_webSocket;
 
 	imtrest::IProtocolEngine* m_httpEnginePtr;
 	imtrest::IRequestServlet* m_requestServerHandlerPtr;

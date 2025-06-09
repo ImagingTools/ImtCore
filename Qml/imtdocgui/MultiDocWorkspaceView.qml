@@ -105,7 +105,7 @@ Item {
 		
 		function onDocumentOpeningFailed(documentId, message){
 			Events.sendEvent("StopLoading")
-			workspaceView.openErrorDialog(message)
+			// workspaceView.openErrorDialog(message)
 		}
 		
 		function onTryCloseDirtyDocument(documentId, callback){

@@ -45,20 +45,25 @@ Item {
 	
 	property GuiElementContainer commandsModel: GuiElementContainer {};
 	onCommandsModelChanged: {
+		console.log("CommandsPanel.qml onCommandsModelChanged", commandsModel, commandsModel.toJson())
 		updateGui()
 	}
 	
 	function updateGui(){
+		console.log("CommandsView.qml updateGui", commandsModel)
 		if (!commandsModel){
 			return;
 		}
 		
 		clearModel();
-		
+		console.log("CommandsView.qml  commandsModel.m_elements", commandsModel.m_elements)
+		console.log("CommandsView.qml count", commandsModel.m_elements.count)
 		for (let i = 0; i < commandsModel.m_elements.count; i++){
 			let group = commandsModel.m_elements.get(i).item;
+			console.log("CommandsView.qml group", group)
 			if (group){
 				let alignment = group.m_alignment;
+				console.log("CommandsView.qml alignment", alignment)
 				if (alignment === 1){
 					leftCommands.addCommandGroup(group);
 				}

@@ -86,6 +86,8 @@ QtObject {
 	property UserTokenProvider userTokenProvider: UserTokenProvider {
 		productId: root.productId;
 		onAccepted: {
+			console.log("onAccepted", productId);
+			
 			if (Qt.platform.os == "web"){
 				root.saveDataToStorage();
 			}

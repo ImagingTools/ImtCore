@@ -1,6 +1,5 @@
 #include <imtrest/CWebSocketThread.h>
 
-
 // Qt includes
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMutableListIterator>
@@ -17,7 +16,6 @@
 namespace imtrest
 {
 
-
 CWebSocket::CWebSocket(CWebSocketThread *parent)
 {
 	Q_ASSERT(parent);
@@ -25,11 +23,11 @@ CWebSocket::CWebSocket(CWebSocketThread *parent)
 	m_parent = parent;
 }
 
-
 void CWebSocket::OnWebSocketTextMessage(const QString& textMessage)
 {
 	m_parent->OnWebSocketTextMessage(textMessage);
 }
+
 
 
 CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
@@ -50,11 +48,13 @@ CWebSocketThread::CWebSocketThread(CWebSocketServerComp* parent)
 }
 
 
+
+
 void CWebSocketThread::SetWebSocket(QWebSocket* webSocketPtr)
 {
 	m_socket = webSocketPtr;
 
-	if (webSocketPtr != nullptr){
+	if (!m_webSocket.IsValid()){
 		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketThread::OnWebSocketTextMessage);
 	}
 
@@ -96,11 +96,17 @@ void CWebSocketThread::EnableSecureConnection(bool isSecureConnection)
 
 void CWebSocketThread::run()
 {
-	if (!m_socket->isValid()){
+	if (m_server == nullptr || !m_socket->isValid()){
 		return;
 	}
 
 	QWebSocket* webSocketPtr = m_socket.data();
+	if (!m_webSocket.IsValid()){
+		m_webSocket.SetPtr(new CWebSocket(this));
+	}
+	else{
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, m_webSocket.GetPtr(), &CWebSocket::OnWebSocketTextMessage, Qt::QueuedConnection);
+	}
 
 	connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketThread::OnWebSocketBinaryMessage);
 	connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketThread::OnSocketDisconnected);
@@ -116,6 +122,7 @@ void CWebSocketThread::run()
 
 // public slots
 
+
 void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 {
 	if (m_requestServerHandlerPtr == nullptr || m_server == nullptr || textMessage.isEmpty()){
@@ -128,6 +135,7 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 	}
 
 	QString message = QString("Web socket text message received: %1").arg(textMessage);
+	qDebug() << "OnWebSocketTextMessage" << message;
 	m_server->SendVerboseMessage(message, "CWebSocketServerComp");
 
 	imtrest::IRequestUniquePtr newRequestPtr = m_enginePtr->CreateRequest(*m_requestServerHandlerPtr);
