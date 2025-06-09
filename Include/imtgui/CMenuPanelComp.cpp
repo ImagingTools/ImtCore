@@ -45,10 +45,10 @@ void CMenuPanelComp::OnPageIdChanged(const QByteArray& selectedPageId, const QBy
 					Q_ASSERT(subSelectionParamPtr != nullptr);
 
 					subSelectionParamPtr->SetSelectedOptionIndex(subPageInfo.pageIndex);
-					
+
 					parentPageId = m_pagesInfoMap[parentPageId].parentPageId;
 				}
-				
+
 				PageInfo currentPageInfo = m_pagesInfoMap[selectedPageId];
 
 				iprm::ISelectionParam* currentSelectionParamPtr = const_cast<iprm::ISelectionParam*>(currentPageInfo.selectionPtr);
@@ -153,7 +153,7 @@ void CMenuPanelComp::OnGuiRetranslate()
 
 	if (!IsUpdateBlocked()){
 		UpdateBlocker blockUpdate(this);
-	
+
 		UpdateGui(istd::IChangeable::GetAnyChange());
 	}
 }
@@ -167,7 +167,7 @@ void CMenuPanelComp::OnGuiDesignChanged()
 
 	if (!IsUpdateBlocked()){
 		UpdateBlocker blockUpdate(this);
-	
+
 		UpdateGui(istd::IChangeable::GetAnyChange());
 	}
 }
@@ -200,6 +200,8 @@ bool CMenuPanelComp::IsPageEnabled(const QByteArray& pageId) const
 
 void CMenuPanelComp::UpdateSelection(const iprm::ISelectionParam& selection, const QByteArray& /*parentId*/)
 {
+	const bool hideDisabled = m_hideDisabledAttrPtr.IsValid() && *m_hideDisabledAttrPtr;
+
 	imtwidgets::CMenuPanel* panelPtr = GetQtWidget();
 	Q_ASSERT(panelPtr != nullptr);
 
@@ -217,16 +219,17 @@ void CMenuPanelComp::UpdateSelection(const iprm::ISelectionParam& selection, con
 
 			bool isPageEnabled = IsPageEnabled(pageId);
 			panelPtr->SetPageEnabled(pageId, isPageEnabled);
+			panelPtr->SetPageVisible(pageId, hideDisabled ? isPageEnabled : true);
 
 			const iqtgui::IVisualStatus* visualStatusPtr = visualStatusProviderPtr->GetVisualStatus(pageIndex);
-			if (visualStatusPtr != nullptr){
+			if (visualStatusPtr != nullptr) {
 				QIcon icon = visualStatusPtr->GetStatusIcon();
 
 				panelPtr->SetPageIcon(pageId, icon);
 			}
 
 			const iprm::ISelectionParam* subSelectionPtr = selection.GetSubselection(pageIndex);
-			if (subSelectionPtr != nullptr){
+			if (subSelectionPtr != nullptr) {
 				UpdateSelection(*subSelectionPtr, pageId);
 			}
 		}
@@ -248,7 +251,7 @@ void CMenuPanelComp::CreatePageTree(const iprm::ISelectionParam& selection, cons
 	if (visualStatusProviderPtr != nullptr){
 		for (int i = 0; i < visualStatusProviderPtr->GetStatusesCount(); i++){
 			const iqtgui::IVisualStatus* visualStatusPtr = visualStatusProviderPtr->GetVisualStatus(i);
-			
+
 			if (visualStatusPtr != nullptr){
 				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(const_cast<iqtgui::IVisualStatus*>(visualStatusPtr));
 				if (modelPtr != nullptr){
@@ -351,7 +354,7 @@ void CMenuPanelComp::UpdateMonitorsInfo()
 	double resolutionX = 0;
 	double resolutionY = 0;
 	double scale = 0;
-	
+
 	if (m_monitorInfoProviderCompPtr.IsValid()){
 		resolutionX = m_monitorInfoProviderCompPtr->GetPhysicalResolutionX(0);
 		resolutionY = m_monitorInfoProviderCompPtr->GetPhysicalResolutionY(0);

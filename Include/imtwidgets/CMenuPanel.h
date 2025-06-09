@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QPropertyAnimation>
+#include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QTreeView>
 
@@ -112,7 +113,7 @@ protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 	virtual void timerEvent(QTimerEvent* event) override;
 
-	// reimplemented (QWidget)
+// reimplemented (QWidget)
 #if QT_VERSION < 0x060000
 	virtual void enterEvent(QEvent* event) override;
 #else
@@ -122,6 +123,14 @@ protected:
 	virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
+	class VisibleFilterModel : public QSortFilterProxyModel
+	{
+	public:
+		VisibleFilterModel(QObject* parent = nullptr);
+		// reimplemented (QSortFilterProxyModel)
+		bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+	};
+
 	int m_cachedItemHeight;
 	double m_cachedIconSizeRatio;
 	double m_cachedFontSizeRatio;
@@ -139,6 +148,7 @@ private:
 	bool m_guiCreated;
 
 	QStandardItemModel m_model;
+	VisibleFilterModel m_filterModel;
 	QStandardItemModel m_bottomModel;
 	QPropertyAnimation m_animationWidth;
 	QPropertyAnimation m_animationIndent;
@@ -159,7 +169,7 @@ private:
 	int CalculateMaxItemWith();
 	int CalculateMaxItemWithByModel(const QStandardItemModel& model);
 	void CheckButtonsVisible();
-	
+
 	void StartTimer(int time = -1);
 	void StopTimer();
 	void StartAnimation();

@@ -47,7 +47,7 @@ void CSelection::SetSelectionConstraints(ICollectionInfo* selectionConstraintsPt
 
 const ICollectionInfo* CSelection::GetSelectionConstraints() const
 {
-	return dynamic_cast<const ICollectionInfo*>(m_constraintsObserver.GetObjectAt(0));
+	return m_constraintsObserver.GetObjectAt(0);
 }
 
 

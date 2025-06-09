@@ -123,7 +123,7 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 {
 	QSize size;
 
-	if (index.row() == 0 && !index.parent().isValid()){
+	if (index.row() == 0 && !index.parent().isValid()) {
 		size.setHeight(m_height + m_topPadding);
 	}
 	else{
@@ -230,32 +230,31 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 		iconRect.setRight(backgroundSingleEllipse.right() + offset);
 	}
 
+	bool isEnabled = index.data(imtwidgets::CMenuPanel::DR_PAGE_ENABLED).toBool();
+
 	// Draw icon:
 	QIcon::Mode iconMode = QIcon::Mode::Normal;
-	if (!index.data(imtwidgets::CMenuPanel::DR_PAGE_ENABLED).toBool()){
+	if (!isEnabled){
 		iconMode = QIcon::Mode::Disabled;
 	}
 
 	int iconSize = m_iconHeight;
 	if (option.state & QStyle::State_MouseOver){
-		const QStandardItemModel* modelPtr = dynamic_cast<const QStandardItemModel*>(index.model());
-		Q_ASSERT(modelPtr != nullptr);
-
-		if (modelPtr->itemFromIndex(index)->isEnabled()){
+		if (isEnabled){
 			iconSize = m_iconHeightHover;
 		}
 	}
 
 	QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
 	QPixmap iconPixmap = icon.pixmap(
-				iconSize,
-				iconSize,
-				iconMode);
+		iconSize,
+		iconSize,
+		iconMode);
 
 	option.widget->style()->drawItemPixmap(
-				painter, iconRect,
-				Qt::AlignHCenter | Qt::AlignVCenter,
-				iconPixmap);
+		painter, iconRect,
+		Qt::AlignHCenter | Qt::AlignVCenter,
+		iconPixmap);
 
 	// Draw text:
 	QString text = index.data(Qt::DisplayRole).toString();

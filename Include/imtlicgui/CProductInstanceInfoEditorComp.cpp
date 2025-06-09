@@ -165,7 +165,7 @@ void CProductInstanceInfoEditorComp::on_LicenseInstancesEdit_itemChanged(QTreeWi
 			item->setText(1, tr("Unlimited"));
 		}
 	}
-	
+
 	if (column == 1){
 		if (licenseDateTime.isValid()){
 			m_cachedLicenseExpiration[licenseId] = licenseDateTime;
@@ -297,7 +297,7 @@ void CProductInstanceInfoEditorComp::UpdateProductsCombo()
 				ProductCombo->setCurrentText(productName);
 				newSelectedProductId = selectedProductId;
 
-				m_licenseCollectionObserver.RegisterObject(productsCollectionPtr->GetObjectPtr(productId), &CProductInstanceInfoEditorComp::OnLicensesUpdated);
+				m_licenseCollectionObserver.RegisterObject(dynamic_cast<const imtbase::IObjectCollection*>(productsCollectionPtr->GetObjectPtr(productId)), &CProductInstanceInfoEditorComp::OnLicensesUpdated);
 			}
 		}
 	}

@@ -54,7 +54,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	setMouseTracking(true);
 	PageTree->installEventFilter(this);
 
-	PageTree->setModel(&m_model);
+	PageTree->setModel(&m_filterModel);
 	PageTree->setSelectionMode(QAbstractItemView::SingleSelection);
 	PageTree->selectionModel()->clearSelection();
 	connect(PageTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CMenuPanel::OnPageIdChanged);
@@ -113,6 +113,8 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	pushBottom->setIcon(QIcon(":/Icons/Down"));
 	pushBottom->setAutoRepeat(true);
 
+	m_filterModel.setSourceModel(&m_model);
+
 	SetMinimumPanelWidth(0);
 	m_guiCreated = true;
 }
@@ -146,6 +148,9 @@ void CMenuPanel::SetActivePage(const QByteArray& pageId)
 	}
 
 	QTreeView* activePageTree = activeModelPtr == &m_model ? PageTree : BottomPageTree;
+	if (activeModelPtr == &m_model) {
+		index = m_filterModel.mapFromSource(index);
+	}
 
 	QModelIndex prevIndex = PageTree->currentIndex().isValid() ? PageTree->currentIndex() : BottomPageTree->currentIndex();
 
@@ -500,7 +505,7 @@ void CMenuPanel::SetItemLeftPadding(int padding)
 	if (m_delegatePtr != nullptr){
 		m_delegatePtr->SetLeftPadding(padding);
 	}
-	AfterSizesChanged(); 
+	AfterSizesChanged();
 }
 
 
@@ -509,7 +514,7 @@ void CMenuPanel::SetItemRightPadding(int padding)
 	if (m_delegatePtr != nullptr){
 		m_delegatePtr->SetRightPadding(padding);
 	}
-	AfterSizesChanged(); 
+	AfterSizesChanged();
 }
 
 
@@ -561,7 +566,7 @@ void CMenuPanel::SetMainWidget(QWidget* mainWidget)
 		//shadowPtr->setColor(qRgba(74, 149, 217, 128));
 		this->setGraphicsEffect(m_shadowPtr);
 	}
-	
+
 	SetMinimumPanelWidth(0);
 }
 
@@ -627,7 +632,7 @@ void CMenuPanel::SetDelegate(IMenuPanelDelegate* menuPanelDelegate)
 
 void CMenuPanel::OnPageIdChanged(const QModelIndex& selected, const QModelIndex& deselected)
 {
-	QTreeView* activeTreeView = selected.model() != &m_model ? PageTree : BottomPageTree;
+	QTreeView* activeTreeView = selected.model() != &m_filterModel ? PageTree : BottomPageTree;
 	activeTreeView->selectionModel()->clearSelection();
 	activeTreeView->selectionModel()->clearCurrentIndex();
 
@@ -710,9 +715,9 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 	int eventType = event->type();
 
 	// #10702
-	if (eventType == QEvent::KeyPress){
+	if (eventType == QEvent::KeyPress) {
 		auto keyEvent = dynamic_cast<QKeyEvent*>(event);
-		if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab){
+		if (keyEvent->key() == Qt::Key_Tab || keyEvent->key() == Qt::Key_Backtab) {
 			return true;
 		}
 		return QObject::eventFilter(watched, event);
@@ -728,10 +733,10 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 		return QObject::eventFilter(watched, event);
 	}
 
-	if (watched == PageTree){
-		if (eventType == QEvent::HoverMove){
+	if (watched == PageTree) {
+		if (eventType == QEvent::HoverMove) {
 			QHoverEvent* hoverEvent = dynamic_cast<QHoverEvent*>(event);
-			if (hoverEvent != nullptr){
+			if (hoverEvent != nullptr) {
 				HoverMoveEvent(hoverEvent);
 			}
 		}
@@ -740,19 +745,19 @@ bool CMenuPanel::eventFilter(QObject* watched, QEvent* event)
 		case QEvent::Show:
 		case QEvent::Hide:
 			CheckButtonsVisible();
-		break;
+			break;
 
 		default:
-		break;
+			break;
 		}
 
 		return QObject::eventFilter(watched, event);
 	}
 
-	if (watched == BottomPageTree){
-		if (eventType == QEvent::HoverMove){
+	if (watched == BottomPageTree) {
+		if (eventType == QEvent::HoverMove) {
 			QHoverEvent* hoverEvent = dynamic_cast<QHoverEvent*>(event);
-			if (hoverEvent != nullptr){
+			if (hoverEvent != nullptr) {
 				HoverMoveEvent(hoverEvent);
 			}
 		}
@@ -786,7 +791,7 @@ void CMenuPanel::enterEvent(QEnterEvent* /*event*/)
 	if (m_animationEnabled == false)
 		return;
 	if (!PageTree->currentIndex().isValid()){
-		m_animationAction = AA_EXPAND; 
+		m_animationAction = AA_EXPAND;
 		return;
 	}
 
@@ -840,15 +845,15 @@ void CMenuPanel::resizeEvent(QResizeEvent* event)
 
 void CMenuPanel::HoverMoveEvent(QHoverEvent* event)
 {
-	if (!PageTree->currentIndex().isValid()){
+	if (!PageTree->currentIndex().isValid()) {
 		return;
 	}
 
 	int dx = event->oldPos().x() - event->pos().x();
 	int dy = event->oldPos().y() - event->pos().y();
 
-	if (dx > 2 || dx < -2 || dy > 2 || dy < -2){
-		if (m_animationWidth.state() == QPropertyAnimation::Stopped){
+	if (dx > 2 || dx < -2 || dy > 2 || dy < -2) {
+		if (m_animationWidth.state() == QPropertyAnimation::Stopped) {
 			StartTimer();
 		}
 	}
@@ -940,10 +945,10 @@ void CMenuPanel::SetMinimumPanelWidth(int width)
 int CMenuPanel::CalculateMaxItemWith()
 {
 	int maxWidth = std::max(1,
-				std::max(this->CalculateMaxItemWithByModel(m_model),
-				this->CalculateMaxItemWithByModel(m_bottomModel)
-				)
-				);
+							std::max(this->CalculateMaxItemWithByModel(m_model),
+									 this->CalculateMaxItemWithByModel(m_bottomModel)
+									 )
+							);
 
 	return maxWidth;
 }
@@ -1065,7 +1070,7 @@ void CMenuPanel::StartAnimation()
 			}
 		}
 	}
-	
+
 	if (m_animationAction == AA_COLLAPSE && this->width() != m_minWidth){
 		if (m_mainWidgetPtr != nullptr){
 			m_animationWidth.setStartValue(QRect(0, 0, width(), height()));
@@ -1107,7 +1112,7 @@ void CMenuPanel::ReconnectModel()
 {
 	disconnect(PageTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CMenuPanel::OnPageIdChanged);
 	PageTree->setModel(nullptr);
-	PageTree->setModel(&m_model);
+	PageTree->setModel(&m_filterModel);
 	connect(PageTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CMenuPanel::OnPageIdChanged);
 
 	disconnect(BottomPageTree->selectionModel(), &QItemSelectionModel::currentChanged, this, &CMenuPanel::OnPageIdChanged);
@@ -1145,6 +1150,16 @@ void CMenuPanel::AfterSizesChanged()
 	StartAnimation();
 }
 
+
+CMenuPanel::VisibleFilterModel::VisibleFilterModel(QObject * parent)
+	: QSortFilterProxyModel(parent)
+{
+}
+
+bool CMenuPanel::VisibleFilterModel::filterAcceptsRow(int sourceRow, const QModelIndex & sourceParent) const
+{
+	return sourceModel()->index(sourceRow, 0, sourceParent).data(DR_PAGE_VISIBLE).toBool();
+}
 
 } // namespace imtwidgets
 

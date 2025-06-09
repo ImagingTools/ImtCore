@@ -4,6 +4,10 @@
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>
 
+// Qt
+#include <QtCore/QMap>
+#include <QtCore/QtGlobal>
+
 
 namespace imtbase
 {
@@ -60,13 +64,12 @@ public:
 
 	TModelUpdateBinder(Parent& parent);
 
-	bool RegisterObject(const istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId = 0);
-	bool RegisterObject(istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId = 0);
+	bool RegisterObject(const ModelInterface* dataPtr, CallbackMethod callbackMethod, int modelId = 0);
+	bool RegisterObject(ModelInterface* dataPtr, CallbackMethod callbackMethod, int modelId = 0);
 	void UnregisterObject(int modelId);
 	void UnregisterAllObjects();
 
-	template <typename Object = istd::IChangeable>
-	Object* GetObjectAt(int modelId) const;
+	ModelInterface* GetObjectAt(int modelId) const;
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
@@ -87,16 +90,17 @@ TModelUpdateBinder<ModelInterface, Parent>::TModelUpdateBinder(Parent& parent)
 
 
 template <typename ModelInterface, typename Parent>
-bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(const istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId)
+bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(const ModelInterface* dataPtr, CallbackMethod callbackMethod, int modelId)
 {
-	return RegisterObject(const_cast<istd::IChangeable*>(dataPtr), callbackMethod, modelId);
+	return RegisterObject(const_cast<ModelInterface*>(dataPtr), callbackMethod, modelId);
 }
 
 
 template <typename ModelInterface, typename Parent>
-bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(istd::IChangeable* dataPtr, CallbackMethod callbackMethod, int modelId)
+bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(ModelInterface* dataPtr, CallbackMethod callbackMethod, int modelId)
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(dataPtr);
+	Q_ASSERT(modelPtr != nullptr);
 	if (modelPtr != nullptr){
 		m_callbackMap[modelId] = callbackMethod;
 		if (BaseClass::RegisterModel(modelPtr, modelId)){
@@ -129,10 +133,9 @@ void TModelUpdateBinder<ModelInterface, Parent>::UnregisterAllObjects()
 
 
 template<typename ModelInterface, typename Parent>
-template<typename Object>
-Object* TModelUpdateBinder<ModelInterface, Parent>::GetObjectAt(int modelId) const
+ModelInterface* TModelUpdateBinder<ModelInterface, Parent>::GetObjectAt(int modelId) const
 {
-	return BaseClass::GetObjectAt<Object>(modelId);
+	return BaseClass::GetObjectAt<ModelInterface>(modelId);
 }
 
 
@@ -144,11 +147,10 @@ void TModelUpdateBinder<ModelInterface, Parent>::OnModelChanged(int modelId, con
 	if (m_callbackMap.contains(modelId)){
 		const CallbackMethod& method = m_callbackMap[modelId];
 
-		(m_parent.*method)(changeSet, GetObjectAt<ModelInterface>(modelId));
+		(m_parent.*method)(changeSet, GetObjectAt(modelId));
 	}
 }
 
 
 } // namespace imtbase
-
 

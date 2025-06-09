@@ -91,37 +91,37 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	iconRect.setTop(option.rect.bottom() - m_height + 1);
 	iconRect.setBottom(option.rect.bottom() - m_height * 0.21);
 
+	bool isEnabled = index.data(imtwidgets::CMenuPanel::DR_PAGE_ENABLED).toBool();
+
 	// Draw icon:
 	QIcon::Mode iconMode = QIcon::Mode::Normal;
-	if (!index.data(imtwidgets::CMenuPanel::DR_PAGE_ENABLED).toBool()){
+	if (!isEnabled){
 		iconMode = QIcon::Mode::Disabled;
 	}
 
 	int iconSize = m_iconHeight;
 
-	const QStandardItemModel* modelPtr = dynamic_cast<const QStandardItemModel*>(index.model());
-	Q_ASSERT(modelPtr != nullptr);
-	if (modelPtr != nullptr && modelPtr->itemFromIndex(index)->isEnabled()){
-		if (option.state & QStyle::State_MouseOver){
+	if (isEnabled) {
+		if (option.state & QStyle::State_MouseOver) {
 			iconSize = m_iconHeightHover;
 			iconMode = QIcon::Mode::Active;
 		}
 
-		if (option.state & QStyle::State_Selected){
+		if (option.state & QStyle::State_Selected) {
 			iconMode = QIcon::Mode::Selected;
 		}
 	}
 
 	QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
 	QPixmap iconPixmap = icon.pixmap(
-				iconSize,
-				iconSize,
-				iconMode);
+		iconSize,
+		iconSize,
+		iconMode);
 
 	option.widget->style()->drawItemPixmap(
-				painter, iconRect,
-				Qt::AlignHCenter | Qt::AlignVCenter,
-				iconPixmap);
+		painter, iconRect,
+		Qt::AlignHCenter | Qt::AlignVCenter,
+		iconPixmap);
 
 	// Draw text:
 	QString text = index.data(Qt::DisplayRole).toString();
@@ -138,12 +138,12 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	text = fontMetrics.elidedText(text,Qt::ElideRight,textRect.width());
 
 	option.widget->style()->drawItemText(
-				painter,
-				textRect,
-				Qt::AlignHCenter | Qt::AlignBottom,
-				palette,
-				true,
-				text);
+		painter,
+		textRect,
+		Qt::AlignHCenter | Qt::AlignBottom,
+		palette,
+		true,
+		text);
 
 	painter->restore();
 }

@@ -88,7 +88,7 @@ void CProductInstanceInfoViewComp::OnGuiRetranslate()
 
 	LicenseRequestDescriptionLabel->setText(*m_licenseRequestDescriptionTextAttrPtr);
 
-	imtlic::ILicenseStatus* licenseStatusPtr = m_licenseStatusObserver.GetObjectAt<imtlic::ILicenseStatus>(0);
+	imtlic::ILicenseStatus* licenseStatusPtr = m_licenseStatusObserver.GetObjectAt(0);
 	if (licenseStatusPtr != nullptr){
 		OnLicenseStatusChanged(istd::IChangeable::GetAnyChange(), licenseStatusPtr);
 	}
@@ -166,8 +166,8 @@ void CProductInstanceInfoViewComp::UpdateFeatureTree()
 
 
 void CProductInstanceInfoViewComp::OnImportLicenseEnabled(
-			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const iprm::IEnableableParam* licenseImportEnablerPtr)
+	const istd::IChangeable::ChangeSet& /*changeSet*/,
+	const iprm::IEnableableParam* licenseImportEnablerPtr)
 {
 	Q_ASSERT(licenseImportEnablerPtr != nullptr);
 
@@ -176,8 +176,8 @@ void CProductInstanceInfoViewComp::OnImportLicenseEnabled(
 
 
 void CProductInstanceInfoViewComp::OnLicenseRequestEnabled(
-			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const iprm::IEnableableParam* licenseRequstEnablerPtr)
+	const istd::IChangeable::ChangeSet& /*changeSet*/,
+	const iprm::IEnableableParam* licenseRequstEnablerPtr)
 {
 	Q_ASSERT(licenseRequstEnablerPtr != nullptr);
 
@@ -217,7 +217,7 @@ void CProductInstanceInfoViewComp::on_NewLicenseRequestButton_clicked()
 		QString defaultFileName = QString("Transaction_Code_%1").arg(QDateTime::currentDateTime().toString("dd_MM_yyyy hh_mm_ss"));
 
 		QString defaultExportPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-		
+
 		defaultExportPath += "/" + defaultFileName;
 
 		QString licenseKeyFilePath = QFileDialog::getSaveFileName(GetWidget(), tr("Create Transaction Code"), defaultExportPath, filterList.join("\n"));
