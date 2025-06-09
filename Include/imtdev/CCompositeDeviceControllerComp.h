@@ -10,6 +10,7 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <imod/TModelWrap.h>
 #include <imod/IModel.h>
+#include <imod/CModelUpdateBridge.h>
 
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
@@ -158,6 +159,8 @@ protected:
 	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceList;
 	imod::TModelWrap<imtbase::CCollectionInfo> m_extendedDeviceList;
 	imod::TModelWrap<DeviceStateProvider> m_deviceStateProvider;
+
+	imod::CModelUpdateBridge m_deviceStateProviderUpdateBridge;
 
 	int m_enumeratorIndex;
 	QTimer m_intervalTimer;

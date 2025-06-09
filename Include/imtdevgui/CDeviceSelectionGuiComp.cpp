@@ -78,7 +78,7 @@ void CDeviceSelectionGuiComp::UpdateDeviceStateIcons()
 	if (m_measurementDeviceStateCompPtr.IsValid()) {
 		for (int i = 0; i < DeviceListComboBox->count(); ++i) {
 			bool isConnected =
-				m_measurementDeviceStateCompPtr->GetDeviceState(DeviceListComboBox->itemData(i).toByteArray()) == imtdev::IDeviceStateProvider::DS_OPENED;
+				m_measurementDeviceStateCompPtr->GetDeviceState(DeviceListComboBox->itemData(i).toByteArray()) != imtdev::IDeviceStateProvider::DS_NONE;
 			DeviceListComboBox->setItemIcon(i, isConnected ? m_iconConnected : m_iconNotConnected);
 		}
 	}

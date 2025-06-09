@@ -16,7 +16,8 @@ namespace imtdev
 
 CCompositeDeviceControllerComp::CCompositeDeviceControllerComp()
 	:m_enumeratorIndex(-1),
-	m_resultHandlerPtr(nullptr)
+	m_resultHandlerPtr(nullptr),
+	m_deviceStateProviderUpdateBridge(&m_deviceStateProvider)
 {
 	m_deviceStateProvider.SetParent(*this);
 }
@@ -164,6 +165,19 @@ void CCompositeDeviceControllerComp::OnComponentCreated()
 
 	if (*m_enableAttrPtr){
 		StartEnumeration();
+	}
+
+	if (m_deviceControllerCompPtr.IsValid()){
+		int count = m_deviceControllerCompPtr.GetCount();
+		for (int i = 0; i < count; i++){
+			IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
+			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(
+				const_cast<IDeviceStateProvider*>(&controllerPtr->GetDeviceStateProvider()));
+
+			if (modelPtr != nullptr){
+				modelPtr->AttachObserver(&m_deviceStateProviderUpdateBridge);
+			}
+		}
 	}
 }
 
@@ -386,7 +400,7 @@ IDeviceStateProvider::DeviceState CCompositeDeviceControllerComp::DeviceStatePro
 	if (m_parentPtr != nullptr){
 		IDeviceController* controllerPtr = m_parentPtr->FindDeviceController(deviceId);
 		if (controllerPtr != nullptr){
-			controllerPtr->GetDeviceStateProvider().GetDeviceState(deviceId);
+			return controllerPtr->GetDeviceStateProvider().GetDeviceState(deviceId);
 		}
 	}
 

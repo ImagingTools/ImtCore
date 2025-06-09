@@ -21,6 +21,12 @@ namespace imtdev
 
 // public methods
 
+CDeviceControllerCompBase::CDeviceControllerCompBase()
+{
+	m_deviceStateProvider.SetParent(*this);
+}
+
+
 // reimplemented (IDeviceController)
 
 const imtbase::ICollectionInfo& CDeviceControllerCompBase::GetDeviceInstanceList() const
@@ -55,6 +61,8 @@ void CDeviceControllerCompBase::UpdateDeviceList(EnumeratedDeviceList& enumerate
 
 		if (!m_deviceList.IsEqual(tempDeviceList)){
 			m_deviceList.CopyFrom(tempDeviceList);
+
+			istd::CChangeNotifier notifier(&m_deviceStateProvider);
 		}
 	}
 

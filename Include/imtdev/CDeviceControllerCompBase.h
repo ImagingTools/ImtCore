@@ -40,6 +40,8 @@ public:
 		I_ASSIGN(m_isAutoCloseEnabledAttrPtr, "AutoClose", "Automatically close an opened device if it is not found during the next enumeration", true, "true");
 	I_END_COMPONENT;
 
+	CDeviceControllerCompBase();
+
 	// reimplemented (IDeviceController)
 	virtual const imtbase::ICollectionInfo& GetDeviceInstanceList() const override;
 	virtual const IDeviceStateProvider& GetDeviceStateProvider() const override;

@@ -30,7 +30,7 @@ bool CDeviceDataFilePersistenceComp::IsOperationSupported(
 }
 
 
-ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::LoadFromFile(
+int CDeviceDataFilePersistenceComp::LoadFromFile(
 			istd::IChangeable& data,
 			const QString& /*filePath*/,
 			ibase::IProgressManager* progressManagerPtr) const
@@ -88,7 +88,7 @@ ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::LoadFrom
 }
 
 
-ifile::IFilePersistence::OperationState CDeviceDataFilePersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& /*filePath*/, ibase::IProgressManager* progressManagerPtr) const
+int CDeviceDataFilePersistenceComp::SaveToFile(const istd::IChangeable& data, const QString& /*filePath*/, ibase::IProgressManager* progressManagerPtr) const
 {
 	if (!m_deviceDataPersistenceCompPtr.IsValid()){
 		return OS_FAILED;
