@@ -27,8 +27,6 @@ QtObject {
     }
 
     function authorization(loginF, passwordF){
-		console.log("authorization", loginF, passwordF, container.productId);
-		
         request.addInputParam(AuthorizationInputTypeMetaInfo.s_login, loginF);
         request.addInputParam(AuthorizationInputTypeMetaInfo.s_password, passwordF);
         request.addInputParam(AuthorizationInputTypeMetaInfo.s_productId, container.productId);
@@ -42,7 +40,6 @@ QtObject {
             Component {
             AuthorizationPayload {
                 onFinished: {
-					console.log("AuthorizationPayload", toJson())
 					container.refreshToken = m_refreshToken;
 					container.accessToken = m_token;
 

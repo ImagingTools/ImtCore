@@ -412,6 +412,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		FeedStream(ifStream, 1, false);
 
+#if 0
 		imtsdl::CSdlType foundType;
 		[[maybe_unused]]const bool isTypeFound = GetSdlTypeForField(
 			sdlField,
@@ -424,6 +425,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
 		ifStream << BuildQmlImportDeclarationFromParams(foundType.GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
 		ifStream << convertedType << QStringLiteral(".qml')");
+#endif
 	}
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 2);

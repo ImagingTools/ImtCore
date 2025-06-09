@@ -32,10 +32,10 @@ ParamEditorBase {
 		
 		onStateChanged: {
 			if (remoteFileController.state === "Loading"){
-				EventManager.sendEvent("StartLoading");
+				Events.sendEvent("StartLoading");
 			}
 			else{
-				EventManager.sendEvent("StopLoading");
+				Events.sendEvent("StopLoading");
 			}
 		}
 	}
@@ -178,38 +178,38 @@ ParamEditorBase {
 				}
 			} // GroupElementView
 			
-			GroupHeaderView {
-				id: headerView;
-				width: parent.width;
-				title: qsTr("Backup Information");
-				groupView: group;
-			}
+			// GroupHeaderView {
+			// 	id: headerView;
+			// 	width: parent.width;
+			// 	title: qsTr("Backup Information");
+			// 	groupView: group;
+			// }
 			
-			GroupElementView {
-				id: group;
-				width: parent.width;
+			// GroupElementView {
+			// 	id: group;
+			// 	width: parent.width;
 				
-				ButtonElementView {
-					id: backupButton;
-					width: parent.width;
-					name: qsTr("Backup data");
-					description: qsTr("Before performing the operation, check the connection to the server");
-					text: qsTr("Backup");
-					onClicked: {
-						fileDialogSave.open();
-					}
-				}
+			// 	ButtonElementView {
+			// 		id: backupButton;
+			// 		width: parent.width;
+			// 		name: qsTr("Backup data");
+			// 		description: qsTr("Before performing the operation, check the connection to the server");
+			// 		text: qsTr("Backup");
+			// 		onClicked: {
+			// 			fileDialogSave.open();
+			// 		}
+			// 	}
 				
-				ButtonElementView {
-					width: parent.width;
-					name: qsTr("Restore data from backup");
-					text: qsTr("Restore");
-					description: backupButton.description;
-					onClicked: {
-						fileDialog.open();
-					}
-				}
-			} // GroupElementView
+			// 	ButtonElementView {
+			// 		width: parent.width;
+			// 		name: qsTr("Restore data from backup");
+			// 		text: qsTr("Restore");
+			// 		description: backupButton.description;
+			// 		onClicked: {
+			// 			fileDialog.open();
+			// 		}
+			// 	}
+			// } // GroupElementView
 		}
 	}
 }
