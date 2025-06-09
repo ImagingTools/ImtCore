@@ -34,10 +34,10 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, imtbase::ICollectionInfo, ExtractExtendedDeviceList);
 		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, istd::IChangeable, ExtractExtendedDeviceList);
 		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, imod::IModel, ExtractExtendedDeviceList);
-		I_REGISTER_SUBELEMENT(DeviceConnectionState);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, IDeviceConnectionState, ExtractDeviceConnectionState);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, istd::IChangeable, ExtractDeviceConnectionState);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, imod::IModel, ExtractDeviceConnectionState);
+		I_REGISTER_SUBELEMENT(DeviceStateProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, IDeviceStateProvider, ExtractDeviceStateProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, istd::IChangeable, ExtractDeviceStateProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, imod::IModel, ExtractDeviceStateProvider);
 		I_REGISTER_SUBELEMENT(DeviceController);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceController, IDeviceController, ExtractDeviceController);
 		I_ASSIGN(m_deviceFrameworkCompPtr, "DeviceFramework", "Device framework", false, "DeviceFramework");
@@ -46,10 +46,11 @@ public:
 	CDeviceFrameworkProxyComp();
 
 protected:
+	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
-protected:
+private:
 	enum ModelId
 	{
 		MI_TYPE_LIST = 0,
@@ -69,13 +70,13 @@ protected:
 		CDeviceFrameworkProxyComp& m_parent;
 	};
 
-	class DeviceConnectionState : virtual public IDeviceConnectionState
+	class DeviceStateProvider : virtual public IDeviceStateProvider
 	{
 	public:
 		void SetParent(CDeviceFrameworkProxyComp* parentPtr);
 
 		// reimplemented (IDeviceConnectionState)
-		virtual bool IsDeviceConnected(const QByteArray& deviceId) override;
+		virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
 
 	private:
 		CDeviceFrameworkProxyComp* m_parentPtr = nullptr;
@@ -89,13 +90,10 @@ protected:
 		// reimplemented (IDeviceController)
 		virtual const QByteArrayList& GetSupportedDeviceTypeIds() const override;
 		virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const override;
-		virtual const imtbase::ICollectionInfo& GetAvailableDeviceList() const override;
-		virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
-		virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(
-			const QByteArray& deviceTypeId,
-			const QByteArray& deviceId) const override;
+		virtual const imtbase::ICollectionInfo& GetDeviceInstanceList() const override;
+		virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const override;
+		virtual const IDeviceStateProvider& GetDeviceStateProvider() const override;
 		virtual DeviceAccessorPtr OpenDevice(
-			const QByteArray& deviceTypeId,
 			const QByteArray& deviceId,
 			const iprm::IParamsSet* paramsPtr) override;
 		virtual bool CloseDevice(const QByteArray& deviceId) override;
@@ -111,7 +109,7 @@ protected:
 		CDeviceFrameworkProxyComp& m_parent;
 	};
 
-
+private:
 	template<class Interface>
 	static Interface* ExtractDeviceTypeList(CDeviceFrameworkProxyComp& parent)
 	{
@@ -131,9 +129,9 @@ protected:
 	}
 
 	template<class Interface>
-	static Interface* ExtractDeviceConnectionState(CDeviceFrameworkProxyComp& parent)
+	static Interface* ExtractDeviceStateProvider(CDeviceFrameworkProxyComp& parent)
 	{
-		return &parent.m_deviceConnectionState;
+		return &parent.m_deviceStateProvider;
 	}
 
 	template<class Interface>
@@ -148,7 +146,7 @@ private:
 	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceTypeList;
 	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceList;
 	imod::TModelWrap<imtbase::CCollectionInfo> m_extendedDeviceList;
-	imod::TModelWrap<DeviceConnectionState> m_deviceConnectionState;
+	imod::TModelWrap<DeviceStateProvider> m_deviceStateProvider;
 	DeviceController m_deviceController;
 
 	Observer m_observer;

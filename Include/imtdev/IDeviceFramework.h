@@ -7,7 +7,7 @@
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 #include <imtdev/IDeviceController.h>
-#include <imtdev/IDeviceConnectionState.h>
+#include <imtdev/IDeviceStateProvider.h>
 
 
 namespace imtdev
@@ -20,7 +20,7 @@ public:
 	virtual imtbase::ICollectionInfo* GetDeviceTypeList() const = 0;
 	virtual imtbase::ICollectionInfo* GetDeviceList() const = 0;
 	virtual imtbase::ICollectionInfo* GetExtendedDeviceList() const = 0;
-	virtual IDeviceConnectionState* GetDeviceConnectionState() const = 0;
+	virtual IDeviceStateProvider* GetDeviceStateProvider() const = 0;
 	virtual IDeviceController* GetDeviceController() const= 0;
 };
 

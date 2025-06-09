@@ -10,13 +10,15 @@ namespace imtdev
 CDeviceFrameworkProxyComp::CDeviceFrameworkProxyComp()
 	:m_deviceController(*this),
 	m_observer(*this),
-	m_updateBridge(&m_deviceConnectionState, imod::CModelUpdateBridge::UF_SOURCE)
+	m_updateBridge(&m_deviceStateProvider, imod::CModelUpdateBridge::UF_SOURCE)
 {
-	m_deviceConnectionState.SetParent(this);
+	m_deviceStateProvider.SetParent(this);
 }
 
 
 // protected methods
+
+// reimplemented (icomp::CComponentBase)
 
 void CDeviceFrameworkProxyComp::OnComponentCreated()
 {
@@ -40,7 +42,7 @@ void CDeviceFrameworkProxyComp::OnComponentCreated()
 			m_observer.RegisterModel(modelPtr, MI_EXTENDED_DEVICE_LIST);
 		}
 
-		modelPtr = dynamic_cast<imod::IModel*>(m_deviceFrameworkCompPtr->GetDeviceConnectionState());
+		modelPtr = dynamic_cast<imod::IModel*>(m_deviceFrameworkCompPtr->GetDeviceStateProvider());
 		if (modelPtr != nullptr){
 			modelPtr->AttachObserver(&m_updateBridge);
 		}
@@ -86,7 +88,7 @@ void CDeviceFrameworkProxyComp::Observer::OnModelChanged(int modelId, const istd
 
 // public methods of the embedded class DeviceConnectionState
 
-void CDeviceFrameworkProxyComp::DeviceConnectionState::SetParent(CDeviceFrameworkProxyComp* parentPtr)
+void CDeviceFrameworkProxyComp::DeviceStateProvider::SetParent(CDeviceFrameworkProxyComp* parentPtr)
 {
 	m_parentPtr = parentPtr;
 }
@@ -94,18 +96,18 @@ void CDeviceFrameworkProxyComp::DeviceConnectionState::SetParent(CDeviceFramewor
 
 // reimplemented (IDeviceConnectionState)
 
-bool CDeviceFrameworkProxyComp::DeviceConnectionState::IsDeviceConnected(const QByteArray& deviceId)
+IDeviceStateProvider::DeviceState CDeviceFrameworkProxyComp::DeviceStateProvider::GetDeviceState(const QByteArray& deviceId) const
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 
 	if (m_parentPtr->m_deviceFrameworkCompPtr.IsValid()){
-		IDeviceConnectionState* deviceConnectionStatePtr = m_parentPtr->m_deviceFrameworkCompPtr->GetDeviceConnectionState();
-		if (deviceConnectionStatePtr != nullptr){
-			return deviceConnectionStatePtr->IsDeviceConnected(deviceId);
+		IDeviceStateProvider* providerPtr = m_parentPtr->m_deviceFrameworkCompPtr->GetDeviceStateProvider();
+		if (providerPtr != nullptr){
+			return providerPtr->GetDeviceState(deviceId);
 		}
 	}
 
-	return false;
+	return DS_NONE;
 }
 
 
@@ -143,12 +145,12 @@ const IDeviceStaticInfo* CDeviceFrameworkProxyComp::DeviceController::GetDeviceS
 }
 
 
-const imtbase::ICollectionInfo& CDeviceFrameworkProxyComp::DeviceController::GetAvailableDeviceList() const
+const imtbase::ICollectionInfo& CDeviceFrameworkProxyComp::DeviceController::GetDeviceInstanceList() const
 {
 	IDeviceController* controllerPtr = GetDeviceController();
 
 	if (controllerPtr != nullptr){
-		return controllerPtr->GetAvailableDeviceList();
+		return controllerPtr->GetDeviceInstanceList();
 	}
 
 	static imtbase::CCollectionInfo emptyList;
@@ -157,36 +159,39 @@ const imtbase::ICollectionInfo& CDeviceFrameworkProxyComp::DeviceController::Get
 }
 
 
-IDeviceController::DeviceState CDeviceFrameworkProxyComp::DeviceController::GetDeviceState(const QByteArray& deviceId) const
+DeviceInstanceInfoPtr CDeviceFrameworkProxyComp::DeviceController::GetDeviceInstanceInfo(const QByteArray& deviceId) const
 {
 	IDeviceController* controllerPtr = GetDeviceController();
 
 	if (controllerPtr != nullptr){
-		return controllerPtr->GetDeviceState(deviceId);
-	}
-
-	return DeviceState::DS_NONE;
-}
-
-
-DeviceInstanceInfoPtr CDeviceFrameworkProxyComp::DeviceController::GetDeviceInstanceInfo(const QByteArray& deviceTypeId, const QByteArray& deviceId) const
-{
-	IDeviceController* controllerPtr = GetDeviceController();
-
-	if (controllerPtr != nullptr){
-		return controllerPtr->GetDeviceInstanceInfo(deviceTypeId, deviceId);
+		return controllerPtr->GetDeviceInstanceInfo(deviceId);
 	}
 
 	return nullptr;
 }
 
 
-DeviceAccessorPtr CDeviceFrameworkProxyComp::DeviceController::OpenDevice(const QByteArray& deviceTypeId, const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr)
+const IDeviceStateProvider& CDeviceFrameworkProxyComp::DeviceController::GetDeviceStateProvider() const
+{
+	IDeviceController* controllerPtr = GetDeviceController();
+
+	Q_ASSERT(controllerPtr != nullptr);
+	if (controllerPtr != nullptr){
+		return controllerPtr->GetDeviceStateProvider();
+	}
+
+	static imod::TModelWrap<DeviceStateProvider> stateProvider;
+
+	return stateProvider;
+}
+
+
+DeviceAccessorPtr CDeviceFrameworkProxyComp::DeviceController::OpenDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr)
 {
 	IDeviceController* controllerPtr = GetDeviceController();
 
 	if (controllerPtr != nullptr){
-		return controllerPtr->OpenDevice(deviceTypeId, deviceId, paramsPtr);
+		return controllerPtr->OpenDevice(deviceId, paramsPtr);
 	}
 
 	return nullptr;
@@ -225,6 +230,8 @@ IDeviceController* CDeviceFrameworkProxyComp::DeviceController::GetDeviceControl
 	if (m_parent.m_deviceFrameworkCompPtr.IsValid()){
 		return m_parent.m_deviceFrameworkCompPtr->GetDeviceController();
 	}
+
+	return nullptr;
 }
 
 

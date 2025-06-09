@@ -103,6 +103,13 @@ SUBDIRS += ImtDevPck
 ImtDevPck.file = ../../Impl/ImtDevPck/QMake/ImtDevPck.pro
 ImtDevPck.depends = imtdev
 
+SUBDIRS += imtdevgui
+imtdevgui.file = ../../Include/imtdevgui/QMake/imtdevgui.pro
+
+SUBDIRS += ImtDevGuiPck
+ImtDevGuiPck.file = ../../Impl/ImtDevGuiPck/QMake/ImtDevGuiPck.pro
+ImtDevGuiPck.depends = imtdevgui
+
 SUBDIRS += imtstyle
 imtstyle.file = ../../Include/imtstyle/QMake/imtstyle.pro
 imtstyle.depends = DesignTokenCreator

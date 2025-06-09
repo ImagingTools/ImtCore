@@ -34,9 +34,14 @@ public:
 	virtual QString GetTypeName() const = 0;
 
 	/**
-		Create device attributes manager
+		Get device static attributes provider
 	*/
-	virtual iattr::IAttributesProvider* CreateAttributes() const = 0;
+	virtual const iattr::IAttributesProvider* GetAttributes() const = 0;
+
+	/**
+		Create device instance attributes manager
+	*/
+	virtual iattr::IAttributesProvider* CreateInstanceAttributes() const = 0;
 
 	/**
 		Get the default device configuration

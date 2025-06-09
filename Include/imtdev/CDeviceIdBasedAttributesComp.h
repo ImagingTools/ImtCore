@@ -9,7 +9,6 @@
 #include <imtbase/ISelection.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdev/IDeviceController.h>
-#include <imtdev/IDeviceConnectionState.h>
 
 
 namespace imtdev
@@ -27,7 +26,7 @@ public:
 		I_REGISTER_INTERFACE(iattr::IAttributesManager);
 		I_ASSIGN(m_selectionCompPtr, "DeviceSelection", "ID of the selected device", false, "DeviceSelection");
 		I_ASSIGN(m_controllerCompPtr, "DeviceController", "Device controller", false, "DeviceController");
-		I_ASSIGN(m_connectionStateCompPtr, "DeviceConnectionState", "Device connection state", false, "DeviceConnectionState");
+		I_ASSIGN(m_stateProviderCompPtr, "DeviceStateProvider", "Device state provider", false, "DeviceStateProvider");
 	I_END_COMPONENT;
 
 	CDeviceIdBasedAttributesComp();
@@ -42,15 +41,15 @@ private:
 	void UpdateModel();
 
 	void OnSelectionChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::ISelection* objectPtr);
-	void OnConnectionStateChanged(const istd::IChangeable::ChangeSet& changeSet, const IDeviceConnectionState* objectPtr);
+	void OnDeviceStateChanged(const istd::IChangeable::ChangeSet& changeSet, const IDeviceStateProvider* objectPtr);
 
 private:
 	I_REF(imtbase::ISelection, m_selectionCompPtr);
 	I_REF(IDeviceController, m_controllerCompPtr);
-	I_REF(IDeviceConnectionState, m_connectionStateCompPtr);
+	I_REF(IDeviceStateProvider, m_stateProviderCompPtr);
 
 	imtbase::TModelUpdateBinder<imtbase::ISelection, CDeviceIdBasedAttributesComp> m_selectionObserver;
-	imtbase::TModelUpdateBinder<IDeviceConnectionState, CDeviceIdBasedAttributesComp> m_connectionStateObserver;
+	imtbase::TModelUpdateBinder<IDeviceStateProvider, CDeviceIdBasedAttributesComp> m_stateProviderObserver;
 
 	bool m_isConfigurationStoreBlocked = false;
 };

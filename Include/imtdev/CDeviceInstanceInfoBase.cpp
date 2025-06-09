@@ -133,7 +133,7 @@ bool CDeviceInstanceInfoBase::ResetData(CompatibilityMode /*mode*/)
 bool CDeviceInstanceInfoBase::EnsureAttributesCreated() const
 {
 	if (m_attributesPtr == nullptr){
-		m_attributesPtr.reset(GetStaticInfo().CreateAttributes());
+		m_attributesPtr.reset(GetStaticInfo().CreateInstanceAttributes());
 	}
 
 	return m_attributesPtr != nullptr;

@@ -18,7 +18,7 @@ namespace imtdev
 
 CDeviceIdBasedAttributesComp::CDeviceIdBasedAttributesComp()
 	:m_selectionObserver(*this),
-	m_connectionStateObserver(*this)
+	m_stateProviderObserver(*this)
 {
 }
 
@@ -35,15 +35,15 @@ void CDeviceIdBasedAttributesComp::OnComponentCreated()
 		m_selectionObserver.RegisterObject(m_selectionCompPtr.GetPtr(), &CDeviceIdBasedAttributesComp::OnSelectionChanged);
 	}
 
-	if (m_connectionStateCompPtr.IsValid()){
-		m_connectionStateObserver.RegisterObject(m_connectionStateCompPtr.GetPtr(), &CDeviceIdBasedAttributesComp::OnConnectionStateChanged);
+	if (m_stateProviderCompPtr.IsValid()){
+		m_stateProviderObserver.RegisterObject(m_stateProviderCompPtr.GetPtr(), &CDeviceIdBasedAttributesComp::OnDeviceStateChanged);
 	}
 }
 
 
 void CDeviceIdBasedAttributesComp::OnComponentDestroyed()
 {
-	m_connectionStateObserver.UnregisterAllObjects();
+	m_stateProviderObserver.UnregisterAllObjects();
 	m_selectionObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
@@ -55,15 +55,15 @@ void CDeviceIdBasedAttributesComp::OnComponentDestroyed()
 DeviceInstanceInfoPtr CDeviceIdBasedAttributesComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
 {
 	if (!deviceId.isEmpty() && m_controllerCompPtr.IsValid()){
-		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_controllerCompPtr->GetDeviceInstanceInfo("", deviceId);
+		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
 		if (deviceInstanceInfoPtr != nullptr){
 			return deviceInstanceInfoPtr;
 		}
 
-		return m_controllerCompPtr->GetDeviceInstanceInfo(deviceId, "");
+		return m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
 	}
 
-	return DeviceInstanceInfoPtr();
+	return nullptr;
 }
 
 
@@ -98,7 +98,7 @@ void CDeviceIdBasedAttributesComp::OnSelectionChanged(const istd::IChangeable::C
 }
 
 
-void CDeviceIdBasedAttributesComp::OnConnectionStateChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdev::IDeviceConnectionState* objectPtr)
+void CDeviceIdBasedAttributesComp::OnDeviceStateChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdev::IDeviceStateProvider* objectPtr)
 {
 	UpdateModel();
 }

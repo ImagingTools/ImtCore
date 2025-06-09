@@ -27,15 +27,15 @@ imtbase::ICollectionInfo* CDeviceFrameworkComp::GetExtendedDeviceList() const
 }
 
 
-IDeviceConnectionState* CDeviceFrameworkComp::GetDeviceConnectionState() const
+IDeviceStateProvider* CDeviceFrameworkComp::GetDeviceStateProvider() const
 {
-	return m_connectionStateCompPtr.GetPtr();
+	return m_stateProviderCompPtr.GetPtr();
 }
 
 
 IDeviceController* CDeviceFrameworkComp::GetDeviceController() const
 {
-	return m_deviceControllerCompPtr.GetPtr();
+	return m_controllerCompPtr.GetPtr();
 }
 
 

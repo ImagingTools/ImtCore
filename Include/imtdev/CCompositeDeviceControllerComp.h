@@ -16,7 +16,6 @@
 #include <imtdev/IDeviceController.h>
 #include <imtdev/IDeviceInstanceInfo.h>
 #include <imtdev/IDeviceStaticInfo.h>
-#include <imtdev/IDeviceConnectionState.h>
 
 
 namespace imtdev
@@ -47,10 +46,10 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, imtbase::ICollectionInfo, ExtractExtendedDeviceList);
 		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, istd::IChangeable, ExtractExtendedDeviceList);
 		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, imod::IModel, ExtractExtendedDeviceList);
-		I_REGISTER_SUBELEMENT(DeviceConnectionState);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, IDeviceConnectionState, ExtractDeviceConnectionState);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, istd::IChangeable, ExtractDeviceConnectionState);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, imod::IModel, ExtractDeviceConnectionState);
+		I_REGISTER_SUBELEMENT(DeviceStateProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, IDeviceStateProvider, ExtractDeviceStateProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, istd::IChangeable, ExtractDeviceStateProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, imod::IModel, ExtractDeviceStateProvider);
 		I_REGISTER_INTERFACE(IDeviceController);
 		I_ASSIGN_MULTI_0(m_deviceControllerCompPtr, "DeviceControllers", "Device controllers", false);
 		I_ASSIGN_TO(m_deviceEnumeratorCompPtr, m_deviceControllerCompPtr, true);
@@ -63,13 +62,10 @@ public:
 	// reimplemented (IDeviceController)
 	virtual const QByteArrayList& GetSupportedDeviceTypeIds() const override;
 	virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const override;
-	virtual const imtbase::ICollectionInfo& GetAvailableDeviceList() const override;
-	virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
-	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(
-				const QByteArray& deviceTypeId,
-				const QByteArray& deviceId) const override;
+	virtual const imtbase::ICollectionInfo& GetDeviceInstanceList() const override;
+	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const override;
+	virtual const IDeviceStateProvider& GetDeviceStateProvider() const override;
 	virtual imtdev::DeviceAccessorPtr OpenDevice(
-				const QByteArray& deviceTypeId,
 				const QByteArray& deviceId,
 				const iprm::IParamsSet* paramsPtr) override;
 	virtual bool CloseDevice(const QByteArray& deviceId) override;
@@ -102,6 +98,7 @@ protected:
 	virtual void UpdateDeviceTypeIdList();
 	virtual void UpdateDeviceList();
 	virtual void UpdateExtendedDeviceList();
+	virtual IDeviceController* FindDeviceController(const QByteArray& deviceId) const;
 	virtual QByteArray GetDeviceTypeId(const QByteArray& deviceId) const;
 
 	template <class InteraceType>
@@ -123,9 +120,9 @@ protected:
 	}
 
 	template <class InteraceType>
-	static InteraceType* ExtractDeviceConnectionState(CCompositeDeviceControllerComp& parent)
+	static InteraceType* ExtractDeviceStateProvider(CCompositeDeviceControllerComp& parent)
 	{
-		return &parent.m_deviceConnectionState;
+		return &parent.m_deviceStateProvider;
 	}
 
 protected:
@@ -134,14 +131,14 @@ protected:
 		MI_DEVICE_LIST_BASE = 0
 	};
 
-	class DeviceConnectionState: virtual public IDeviceConnectionState
+	class DeviceStateProvider : virtual public IDeviceStateProvider
 	{
 	public:
-		DeviceConnectionState();
+		DeviceStateProvider();
 		void SetParent(CCompositeDeviceControllerComp& parent);
 
-		// reimplemented (IDeviceState)
-		virtual bool IsDeviceConnected(const QByteArray& deviceId) override;
+		// reimplemented (IDeviceStateProvider)
+		virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
 
 	private:
 		CCompositeDeviceControllerComp* m_parentPtr;
@@ -160,7 +157,7 @@ protected:
 	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceTypeList;
 	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceList;
 	imod::TModelWrap<imtbase::CCollectionInfo> m_extendedDeviceList;
-	imod::TModelWrap<DeviceConnectionState> m_deviceConnectionState;
+	imod::TModelWrap<DeviceStateProvider> m_deviceStateProvider;
 
 	int m_enumeratorIndex;
 	QTimer m_intervalTimer;

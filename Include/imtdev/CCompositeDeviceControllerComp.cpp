@@ -18,7 +18,7 @@ CCompositeDeviceControllerComp::CCompositeDeviceControllerComp()
 	:m_enumeratorIndex(-1),
 	m_resultHandlerPtr(nullptr)
 {
-	m_deviceConnectionState.SetParent(*this);
+	m_deviceStateProvider.SetParent(*this);
 }
 
 
@@ -32,76 +32,45 @@ const QByteArrayList& CCompositeDeviceControllerComp::GetSupportedDeviceTypeIds(
 
 const IDeviceStaticInfo* CCompositeDeviceControllerComp::GetDeviceStaticInfo(const QByteArray& deviceTypeId) const
 {
-	if (m_deviceControllerCompPtr.IsValid()){
-		int count = m_deviceControllerCompPtr.GetCount();
-		for (int i = 0; i < count; i++){
-			IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
-			if (controllerPtr != nullptr){
-				if (controllerPtr->GetSupportedDeviceTypeIds().contains(deviceTypeId)){
-					return controllerPtr->GetDeviceStaticInfo(deviceTypeId);
-				}
-			}
-		}
+	IDeviceController* controllerPtr = FindDeviceController(deviceTypeId);
+	if (controllerPtr != nullptr){
+		return controllerPtr->GetDeviceStaticInfo(deviceTypeId);
 	}
 
 	return nullptr;
 }
 
 
-const imtbase::ICollectionInfo& CCompositeDeviceControllerComp::GetAvailableDeviceList() const
+const imtbase::ICollectionInfo& CCompositeDeviceControllerComp::GetDeviceInstanceList() const
 {
 	return m_deviceList;
 }
 
 
-IDeviceController::DeviceState CCompositeDeviceControllerComp::GetDeviceState(const QByteArray& deviceId) const
+DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
 {
-	if (m_deviceControllerMap.contains(deviceId)){
-		return m_deviceControllerMap[deviceId]->GetDeviceState(deviceId);
+	IDeviceController* controllerPtr = FindDeviceController(deviceId);
+	if (controllerPtr != nullptr){
+		return controllerPtr->GetDeviceInstanceInfo(deviceId);
 	}
 
-	return DS_NONE;
+	return nullptr;
 }
 
 
-DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(
-			const QByteArray& deviceTypeId,
-			const QByteArray& deviceId) const
+const IDeviceStateProvider& CCompositeDeviceControllerComp::GetDeviceStateProvider() const
 {
-	if (!deviceId.isEmpty() && m_deviceControllerMap.contains(deviceId)){
-		return m_deviceControllerMap[deviceId]->GetDeviceInstanceInfo(deviceTypeId, deviceId);
-	}
-
-	if (!deviceTypeId.isEmpty()){
-		for (int i = 0; i < m_deviceControllerCompPtr.GetCount(); i++){
-			if (m_deviceControllerCompPtr[i] != nullptr){
-				if (m_deviceControllerCompPtr[i]->GetSupportedDeviceTypeIds().contains(deviceTypeId)){
-					return m_deviceControllerCompPtr[i]->GetDeviceInstanceInfo(deviceTypeId, deviceId);
-				}
-			}
-		}
-	}
-
-	return DeviceInstanceInfoPtr();
+	return m_deviceStateProvider;
 }
 
 
 DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(
-			const QByteArray& deviceTypeId,
 			const QByteArray& deviceId,
 			const iprm::IParamsSet* paramsPtr)
 {
-	if (GetSupportedDeviceTypeIds().contains(deviceTypeId)){
-		int count = m_deviceControllerCompPtr.GetCount();
-		for (int i = 0; i < count; i++){
-			IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
-			if (controllerPtr != nullptr){
-				QByteArrayList deviceTypeIds = controllerPtr->GetSupportedDeviceTypeIds();
-				if (deviceTypeIds.contains(deviceTypeId)){
-					return controllerPtr->OpenDevice(deviceTypeId, deviceId, paramsPtr);
-				}
-			}
-		}
+	IDeviceController* controllerPtr = FindDeviceController(deviceId);
+	if (controllerPtr != nullptr){
+		return controllerPtr->OpenDevice(deviceId, paramsPtr);
 	}
 
 	return DeviceAccessorPtr();
@@ -110,8 +79,9 @@ DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(
 
 bool CCompositeDeviceControllerComp::CloseDevice(const QByteArray& deviceId)
 {
-	if (m_deviceControllerMap.contains(deviceId)){
-		return m_deviceControllerMap[deviceId]->CloseDevice(deviceId);
+	IDeviceController* controllerPtr = FindDeviceController(deviceId);
+	if (controllerPtr != nullptr){
+		return controllerPtr->CloseDevice(deviceId);
 	}
 
 	return false;
@@ -173,8 +143,8 @@ void CCompositeDeviceControllerComp::OnModelChanged(int /*modelId*/, const istd:
 	UpdateDeviceList();
 	UpdateExtendedDeviceList();
 
-	istd::IChangeable::ChangeSet localChangeSet(imtdev::IDeviceConnectionState::CF_CONNECTION_STATE_CHANGED);
-	istd::CChangeNotifier notifier(&m_deviceConnectionState, &localChangeSet);
+	istd::IChangeable::ChangeSet localChangeSet(imtdev::IDeviceStateProvider::CF_STATE_CHANGED);
+	istd::CChangeNotifier notifier(&m_deviceStateProvider, &localChangeSet);
 }
 
 
@@ -282,7 +252,7 @@ void CCompositeDeviceControllerComp::UpdateDeviceTypeIdList()
 
 				m_supportedDeviceTypeIds += ids;
 
-				imod::IModel* modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&deviceControllerPtr->GetAvailableDeviceList()));
+				imod::IModel* modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&deviceControllerPtr->GetDeviceInstanceList()));
 				Q_ASSERT(modelPtr != nullptr);
 
 				if (modelPtr != nullptr){
@@ -306,7 +276,7 @@ void CCompositeDeviceControllerComp::UpdateDeviceList()
 		for (int i = 0; i < count; i++){
 			IDeviceController* deviceControllerPtr = m_deviceControllerCompPtr[i];
 			if (deviceControllerPtr != nullptr){
-				const imtbase::ICollectionInfo& deviceList = deviceControllerPtr->GetAvailableDeviceList();
+				const imtbase::ICollectionInfo& deviceList = deviceControllerPtr->GetDeviceInstanceList();
 
 				imtbase::ICollectionInfo::Ids ids = deviceList.GetElementIds();
 				for (const imtbase::ICollectionInfo::Id id : ids){
@@ -357,10 +327,34 @@ void CCompositeDeviceControllerComp::UpdateExtendedDeviceList()
 	}
 }
 
+IDeviceController* CCompositeDeviceControllerComp::FindDeviceController(const QByteArray& deviceId) const
+{
+	if (deviceId.isEmpty()){
+		return nullptr;
+	}
+
+	if (m_deviceControllerMap.contains(deviceId)){
+		return m_deviceControllerMap[deviceId];
+	}
+
+	int count = m_deviceControllerCompPtr.GetCount();
+	for (int i = 0; i < count; i++){
+		IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
+		if (controllerPtr != nullptr){
+			QByteArrayList typeIds = controllerPtr->GetSupportedDeviceTypeIds();
+			if (typeIds.contains(deviceId)){
+				return controllerPtr;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 
 QByteArray CCompositeDeviceControllerComp::GetDeviceTypeId(const QByteArray& deviceId) const
 {
-	DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo("", deviceId);
+	DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
 	if (instanceInfoPtr != nullptr){
 		QByteArray deviceTypeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
 
@@ -371,46 +365,32 @@ QByteArray CCompositeDeviceControllerComp::GetDeviceTypeId(const QByteArray& dev
 }
 
 
-// public methods of the embedded class DeviceConnectionState
+// public methods of the embedded class DeviceStateProvider
 
-CCompositeDeviceControllerComp::DeviceConnectionState::DeviceConnectionState()
+CCompositeDeviceControllerComp::DeviceStateProvider::DeviceStateProvider()
 	:m_parentPtr(nullptr)
 {
 }
 
 
-void CCompositeDeviceControllerComp::DeviceConnectionState::SetParent(CCompositeDeviceControllerComp& parent)
+void CCompositeDeviceControllerComp::DeviceStateProvider::SetParent(CCompositeDeviceControllerComp& parent)
 {
 	m_parentPtr = &parent;
 }
 
 
-// reimplemented (IDeviceState)
+// reimplemented (IDeviceStateProvider)
 
-bool CCompositeDeviceControllerComp::DeviceConnectionState::IsDeviceConnected(const QByteArray& deviceId)
+IDeviceStateProvider::DeviceState CCompositeDeviceControllerComp::DeviceStateProvider::GetDeviceState(const QByteArray& deviceId) const
 {
 	if (m_parentPtr != nullptr){
-		QByteArrayList typeIds = m_parentPtr->GetSupportedDeviceTypeIds();
-		if (typeIds.contains(deviceId)){
-			QByteArrayList deviceIds = m_parentPtr->m_deviceControllerMap.keys();
-			for (int i = 0; i < deviceIds.count(); i++){
-				DeviceInstanceInfoPtr instancePtr = m_parentPtr->GetDeviceInstanceInfo("", deviceIds[i]);
-				Q_ASSERT(instancePtr != nullptr);
-
-				if (instancePtr != nullptr){
-					if (instancePtr->GetStaticInfo().GetTypeId() == deviceId){
-						return true;
-					}
-				}
-			}
-
-			return false;
+		IDeviceController* controllerPtr = m_parentPtr->FindDeviceController(deviceId);
+		if (controllerPtr != nullptr){
+			controllerPtr->GetDeviceStateProvider().GetDeviceState(deviceId);
 		}
-
-		return m_parentPtr->m_deviceControllerMap.contains(deviceId);
 	}
 
-	return false;
+	return DS_NONE;
 }
 
 

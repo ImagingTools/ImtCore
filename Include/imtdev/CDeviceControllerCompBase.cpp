@@ -23,28 +23,15 @@ namespace imtdev
 
 // reimplemented (IDeviceController)
 
-const imtbase::ICollectionInfo& CDeviceControllerCompBase::GetAvailableDeviceList() const
+const imtbase::ICollectionInfo& CDeviceControllerCompBase::GetDeviceInstanceList() const
 {
 	return m_deviceList;
 }
 
 
-IDeviceController::DeviceState CDeviceControllerCompBase::GetDeviceState(const QByteArray& deviceId) const
+const IDeviceStateProvider& CDeviceControllerCompBase::GetDeviceStateProvider() const
 {
-	QMutexLocker listLocker(&m_deviceListMutex);
-	QMutexLocker mapLocker(&m_openedDevicesMutex);
-
-	imtbase::ICollectionInfo::Ids ids = m_deviceList.GetElementIds();
-
-	if (ids.contains(deviceId)){
-		if (m_openedDevices.contains(deviceId)){
-			return DS_OPENED;
-		}
-
-		return DS_CLOSED;
-	}
-
-	return DS_NONE;
+	return m_deviceStateProvider;
 }
 
 
@@ -77,14 +64,6 @@ void CDeviceControllerCompBase::UpdateDeviceList(EnumeratedDeviceList& enumerate
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CDeviceControllerCompBase::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-}
-
-
 // private methods
 
 void CDeviceControllerCompBase::AutoCloseDisconnectedDevices()
@@ -106,6 +85,43 @@ void CDeviceControllerCompBase::AutoCloseDisconnectedDevices()
 
 		m_openedDevices.remove(id);
 	}
+}
+
+
+// public methods of the embedded class DeviceStateProvider
+
+CDeviceControllerCompBase::DeviceStateProvider::DeviceStateProvider()
+	:m_parentPtr(nullptr)
+{
+}
+
+
+void CDeviceControllerCompBase::DeviceStateProvider::SetParent(CDeviceControllerCompBase& parent)
+{
+	m_parentPtr = &parent;
+}
+
+
+// reimplemented (IDeviceStateProvider)
+
+IDeviceStateProvider::DeviceState CDeviceControllerCompBase::DeviceStateProvider::GetDeviceState(const QByteArray& deviceId) const
+{
+	Q_ASSERT(m_parentPtr != nullptr);
+	if (m_parentPtr != nullptr){
+		QMutexLocker listLocker(&m_parentPtr->m_deviceListMutex);
+		QMutexLocker mapLocker(&m_parentPtr->m_openedDevicesMutex);
+
+		imtbase::ICollectionInfo::Ids ids = m_parentPtr->m_deviceList.GetElementIds();
+		if (ids.contains(deviceId)){
+			if (m_parentPtr->m_openedDevices.contains(deviceId)){
+				return DS_OPENED;
+			}
+
+			return DS_CLOSED;
+		}
+	}
+
+	return DS_NONE;
 }
 
 

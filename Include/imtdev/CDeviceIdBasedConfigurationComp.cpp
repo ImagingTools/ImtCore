@@ -19,7 +19,7 @@ namespace imtdev
 CDeviceIdBasedConfigurationComp::CDeviceIdBasedConfigurationComp()
 	:m_selectionObserver(*this),
 	m_configurationObserver(*this),
-	m_connectionStateObserver(*this)
+	m_stateProviderObserver(*this)
 {
 }
 
@@ -38,15 +38,15 @@ void CDeviceIdBasedConfigurationComp::OnComponentCreated()
 
 	m_configurationObserver.RegisterObject(this, &CDeviceIdBasedConfigurationComp::OnConfigurationChanged);
 
-	if (m_connectionStateCompPtr.IsValid()){
-		m_connectionStateObserver.RegisterObject(m_connectionStateCompPtr.GetPtr(), &CDeviceIdBasedConfigurationComp::OnConnectionStateChanged);
+	if (m_stateProviderCompPtr.IsValid()){
+		m_stateProviderObserver.RegisterObject(m_stateProviderCompPtr.GetPtr(), &CDeviceIdBasedConfigurationComp::OnDeviceStateChanged);
 	}
 }
 
 
 void CDeviceIdBasedConfigurationComp::OnComponentDestroyed()
 {
-	m_connectionStateObserver.UnregisterAllObjects();
+	m_stateProviderObserver.UnregisterAllObjects();
 	m_configurationObserver.UnregisterAllObjects();
 	m_selectionObserver.UnregisterAllObjects();
 
@@ -58,23 +58,19 @@ void CDeviceIdBasedConfigurationComp::OnComponentDestroyed()
 
 DeviceInstanceInfoPtr CDeviceIdBasedConfigurationComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
 {
-	if (!deviceId.isEmpty() && m_deviceControllerCompPtr.IsValid()){
-		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_deviceControllerCompPtr->GetDeviceInstanceInfo("", deviceId);
-		if (deviceInstanceInfoPtr != nullptr){
-			return deviceInstanceInfoPtr;
-		}
+	if (!deviceId.isEmpty() && m_controllerCompPtr.IsValid()){
+		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
 
-		return m_deviceControllerCompPtr->GetDeviceInstanceInfo(deviceId, "");
+		return deviceInstanceInfoPtr;
 	}
 
-	return DeviceInstanceInfoPtr();
+	return nullptr;
 }
 
 
 void CDeviceIdBasedConfigurationComp::UpdateModel()
 {
 	FlagLocker(m_isConfigurationStoreBlocked);
-
 
 	istd::CChangeNotifier notifier(this);
 
@@ -136,7 +132,7 @@ void CDeviceIdBasedConfigurationComp::OnConfigurationChanged(const istd::IChange
 }
 
 
-void CDeviceIdBasedConfigurationComp::OnConnectionStateChanged(const istd::IChangeable::ChangeSet& changeSet, const IDeviceConnectionState* objectPtr)
+void CDeviceIdBasedConfigurationComp::OnDeviceStateChanged(const istd::IChangeable::ChangeSet& changeSet, const IDeviceStateProvider* objectPtr)
 {
 	UpdateModel();
 }

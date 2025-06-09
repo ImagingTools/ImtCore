@@ -41,8 +41,8 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDeviceController)
-	virtual const imtbase::ICollectionInfo& GetAvailableDeviceList() const override;
-	virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
+	virtual const imtbase::ICollectionInfo& GetDeviceInstanceList() const override;
+	virtual const IDeviceStateProvider& GetDeviceStateProvider() const override;
 
 protected:
 	struct EnumeratedDeviceInfo
@@ -53,23 +53,23 @@ protected:
 	};
 	typedef QVector<EnumeratedDeviceInfo> EnumeratedDeviceList;
 
+	class DeviceStateProvider : virtual public IDeviceStateProvider
+	{
+	public:
+		DeviceStateProvider();
+		void SetParent(CDeviceControllerCompBase& parent);
+
+		// reimplemented (IDeviceStateProvider)
+		virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
+
+	private:
+		CDeviceControllerCompBase* m_parentPtr;
+	};
+
+protected:
 	// Must be called from the main thread!!!
-	virtual void UpdateDeviceList(EnumeratedDeviceList& enumeratedDeviceList);
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
-
-protected:
-	QMap<QByteArray, DeviceAccessorPtr> m_openedDevices;
-
-#if QT_VERSION < 0x060000
-	mutable QMutex m_openedDevicesMutex;
-#else
-	mutable QRecursiveMutex m_openedDevicesMutex;
-#endif
-
-protected:
-	virtual void AutoCloseDisconnectedDevices();
+	void UpdateDeviceList(EnumeratedDeviceList& enumeratedDeviceList);
+	void AutoCloseDisconnectedDevices();
 
 	template <class InteraceType>
 	static InteraceType* ExtractDeviceInfoList(CDeviceControllerCompBase& parent)
@@ -80,9 +80,17 @@ protected:
 protected:
 	I_ATTR(bool, m_isAutoCloseEnabledAttrPtr);
 
-	typedef imod::TModelWrap<imtbase::CCollectionInfo> DeviceInfoList;
-	DeviceInfoList m_deviceList;
+	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceList;
+	imod::TModelWrap<DeviceStateProvider> m_deviceStateProvider;
+	QMap<QByteArray, DeviceAccessorPtr> m_openedDevices;
+
+#if QT_VERSION < 0x060000
 	mutable QMutex m_deviceListMutex;
+	mutable QMutex m_openedDevicesMutex;
+#else
+	mutable QRecursiveMutex m_deviceListMutex;
+	mutable QRecursiveMutex m_openedDevicesMutex;
+#endif
 };
 
 
