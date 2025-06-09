@@ -291,18 +291,26 @@ Rectangle {
 	}
 
 
-	function clearSelection(){
+	function clearSelection(exeptShape){
 		for(let i = 0; i < graphicsView.layerModel.length ; i++){
 			let layer = graphicsView.layerModel[i];
 			if(layer.layerId == "active" || layer.layerId == "inactive"){
 				let shapeModel = layer.shapeModel;
 				for(let j = 0; j < shapeModel.length; j++){
 					let shape = shapeModel[j];
+					if(exeptShape !==undefined && exeptShape == shape){
+						continue;
+					}
 					shape.isSelected = false;
 				}
 			}
 		}
-		canvas.currentTouchedShape = null
+		if(exeptShape ==undefined){
+			canvas.currentTouchedShape = null
+		}
+		else {
+			canvas.currentTouchedShape = exeptShape
+		}
 	}
 
 
@@ -329,68 +337,66 @@ Rectangle {
 				//console.log("CLICKED!!!")
 			}
 
-			PauseAnimation {
-				id: removingSelectionBlockPause;
-				duration: 200
-				property bool blocked: false;
-				onFinished: {
-					blocked = false;
-				}
-			}
-
-
 			onPressed: {
 				//console.log("PRESSED!!!")
-
-				//singleSelection
-				if(!(mouse.modifiers & Qt.ControlModifier)){
-					//graphicsView.clearSelection()
-					//canvas.currentTouchedShape = null;
-					if(canvas.currentTouchedShape && canvas.currentTouchedShape.isSelected && !removingSelectionBlockPause.blocked){
-						canvas.currentTouchedShape.isSelected = false;
-						canvas.currentTouchedShape = null;
-						canvas.selectedShapeCount--;
-					}
-
-				}
-
 				let found = false;
-				let shape = graphicsView.findObject(mouse.x, mouse.y)
-				if(shape !== null){
-					found = true;
-					canvas.currentTouchedShape = shape;
-					if(!shape.isSelected){
+				if(!(mouse.modifiers & Qt.ControlModifier)){// without Ctrl
+					let shape = graphicsView.findObject(mouse.x, mouse.y)
+					if(shape !== null){
+						found = true;
+						canvas.currentTouchedShape = shape;
+						if(canvas.selectedShapeCount < 2){
+							graphicsView.clearSelection(shape)
+							canvas.selectedShapeCount = 1;
+						}
 						shape.isSelected = true;
-						canvas.selectedShapeCount++
-						removingSelectionBlockPause.blocked = true;
-						removingSelectionBlockPause.restart();
 					}
-				}
-				else {
-					graphicsView.clearSelection()
-					canvas.selectedShapeCount = 0;
-				}
+					else {
+						graphicsView.clearSelection()
+						canvas.selectedShapeCount = 0;
+					}
 
-				canvas.requestPaint();
+					canvas.requestPaint();
 
-				if(!found){
-					controlArea.cursorShape = Qt.ClosedHandCursor;
+					if(!found){
+						controlArea.cursorShape = Qt.ClosedHandCursor;
+					}
+
 				}
-
 			}
 
 			onReleased: {
 				//console.log("RELEASED!!!")
-				controlArea.cursorShape = Qt.ArrowCursor;
-				//DESELECT
-				if(canvas.currentTouchedShape && canvas.currentTouchedShape.isSelected && !removingSelectionBlockPause.blocked){
-					canvas.currentTouchedShape.isSelected = false;
-					canvas.currentTouchedShape = null;
-					canvas.selectedShapeCount--
-					canvas.requestPaint()
+				let shape = graphicsView.findObject(mouse.x, mouse.y)
+				if(mouse.modifiers & Qt.ControlModifier){//Ctrl
+					console.log("RELEASED_CTRL!!!")
+					if(shape !== null){
+						if(!shape.isSelected){
+							shape.isSelected = true;
+							canvas.selectedShapeCount++
+						}
+						else {
+							shape.isSelected = false;
+							canvas.selectedShapeCount--
+						}
+					}
+					else {
+						graphicsView.clearSelection()
+						canvas.selectedShapeCount = 0;
+					}
 				}
-				removingSelectionBlockPause.blocked = false;
-
+				else {//without Ctrl
+					console.log("RELEASED!!!")
+					if(!wasMoving && shape !== null){
+						if(canvas.selectedShapeCount > 1){
+							graphicsView.clearSelection(shape)
+							canvas.selectedShapeCount = 1;
+						}
+						shape.isSelected = true;
+					}
+				}
+				canvas.requestPaint();
+				controlArea.cursorShape = Qt.ArrowCursor;
 			}
 
 			onDoubleClicked: {
@@ -404,7 +410,6 @@ Rectangle {
 
 			onDeltaSignal: {
 
-				removingSelectionBlockPause.blocked = true;
 				let found = false;
 				let activeLayer = graphicsView.getLayer("active")
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
@@ -554,9 +559,6 @@ Rectangle {
 				}
 			}
 			//hover reaction
-
-
-
 
 		}
 
