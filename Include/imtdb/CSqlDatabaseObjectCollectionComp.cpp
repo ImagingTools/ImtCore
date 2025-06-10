@@ -904,8 +904,13 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 
 	m_isInitialized = false;
 
-	m_filterParamsObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged);
-	m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged);
+	if (m_filterParamsCompPtr.IsValid()){
+		m_filterParamsObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged);
+	}
+
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged);
+	}
 
 	m_isInitialized = true;
 }
