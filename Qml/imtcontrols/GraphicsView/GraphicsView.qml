@@ -38,6 +38,9 @@ Rectangle {
 
 	property var layerModel: []
 
+	property Component controlPanelComp: null
+	property Item controlPanelItem: null
+
 	signal copySignal(int index);
 	signal pasteSignal(int index);
 	signal deleteSignal(int index);

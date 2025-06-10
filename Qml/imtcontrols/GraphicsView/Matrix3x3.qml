@@ -145,7 +145,7 @@ QtObject {
 		matrix = externMatrix;
 	}
 
-	function  reset(ctx){
+	function  reset(){
 		let matrix1 = [
 				[1, 0, 0],
 				[0, 1, 0],
