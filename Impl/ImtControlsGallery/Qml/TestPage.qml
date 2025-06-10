@@ -31,10 +31,15 @@ Rectangle {
 			height: 30;
 			text: "Test";
 			onClicked: {
-				treeItemModel.createFromJson(testPage.json)
-				console.log("treeItemModel", treeItemModel.toJson())
-				treeItemModel2.copy(treeItemModel)
-				console.log("treeItemModel2", treeItemModel2.toJson())
+				// treeItemModel.createFromJson(testPage.json)
+				// console.log("treeItemModel", treeItemModel.toJson())
+				// treeItemModel2.copy(treeItemModel)
+				// console.log("treeItemModel2", treeItemModel2.toJson())
+
+
+				console.log("requestPaint!!!!!!")
+				canvas.isReverse = true;
+				canvas.requestPaint()
 			}
 		}
 	}
@@ -66,32 +71,36 @@ Rectangle {
 			requestPaint()
 		}
 
+		property bool isReverse: false;
+
 		onPaint: {
 			console.log("ON_PAINT")
 			var ctx = getContext('2d');
 
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 			canvas.imageX = (canvas.width/3 + canvas.width/8);
 			canvas.imageY = (canvas.height/3 + canvas.height/8);
 
-			matrix.rotateContext(ctx, Math.PI/2, Qt.point(canvas.imageX, canvas.imageY))
-
-			// matrix.setContextTransform(ctx);
-			// ctx.translate(-canvas.imageX, -canvas.imageY)
-
-			// matrix.reset()
-			// matrix.xTranslation = - canvas.imageX
-			// matrix.yTranslation = - canvas.imageY
-			// matrix.transformContext(ctx);
+			if(!isReverse){
+				canvasMatrix.rotateContext(ctx, Math.PI/2, Qt.point(canvas.imageX, canvas.imageY))
+				//canvasMatrix.translateContext(ctx, 100, 100)
+			}
+			else {
+				let invertedMatrix = canvasMatrix.getInvertedMatrix(canvasMatrix.matrix)
+				canvasMatrix.matrix = canvasMatrix.multiplyByMatrix(canvasMatrix.matrix, invertedMatrix);
+				canvasMatrix.setContextTransform(ctx)
+			}
 
 			ctx.drawImage("/Images/testImage", canvas.width/3, canvas.height/3, canvas.width/4, canvas.height/4)
 
 		}
 
+		CanvasMatrix{
+			id: canvasMatrix;
+		}
 	}
 
-	CanvasMatrix{
-		id: matrix;
-	}
 
 	Rectangle{
 		x:canvas.width/3
