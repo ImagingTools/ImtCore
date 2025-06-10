@@ -110,7 +110,7 @@ Matrix3x3 {
 			center = Qt.point(0,0);
 		}
 
-		let rotateMatrix = [
+		let rotationMatrix = [
 				[Math.cos(angle), -1*Math.sin(angle), center.x],
 				[Math.sin(angle), Math.cos(angle), center.y],
 				[0, 0, 1]
@@ -120,7 +120,13 @@ Matrix3x3 {
 				[0, 1, -center.y],
 				[0, 0, 1]
 			  ];
-		matrix = multiplyByMatrix(rotateMatrix, translateMatrix)
+
+		if(center.x == 0 && center.y == 0){
+			matrix = rotationMatrix
+		}
+		else {
+			matrix = multiplyByMatrix(rotationMatrix, translateMatrix)
+		}
 		setContextTransform(ctx);
 	}
 

@@ -213,3 +213,4 @@ ImageParams 1.0 ./GraphicsView/ImageParams.qml
 
 ComplexShape 1.0 ./GraphicsView/ComplexShape.qml
 SelectionShape 1.0 ./GraphicsView/SelectionShape.qml
+BoundingBox 1.0 ./GraphicsView/BoundingBox.qml
