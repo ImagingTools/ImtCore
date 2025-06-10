@@ -716,12 +716,12 @@ ViewCommandsDelegateBase {
 			width: 400;
 			title: qsTr("Deleting elements");
 			onFinished: {
-				if (buttonId == Enums.yes){
-					let collectionView = collectionViewCommandsDelegate.collectionView
-					if (!collectionView){
-						return
-					}
+				let collectionView = collectionViewCommandsDelegate.collectionView
+				if (!collectionView){
+					return
+				}
 
+				if (buttonId == Enums.yes){
 					if (collectionView.hasActiveFilter()){
 						collectionView.removeElementSet(collectionView.collectionFilter)
 					}
@@ -743,12 +743,12 @@ ViewCommandsDelegateBase {
 			width: 400;
 			title: qsTr("Restoring elements");
 			onFinished: {
-				if (buttonId == Enums.yes){
-					let collectionView = collectionViewCommandsDelegate.collectionView
-					if (!collectionView){
-						return
-					}
+				let collectionView = collectionViewCommandsDelegate.collectionView
+				if (!collectionView){
+					return
+				}
 
+				if (buttonId == Enums.yes){
 					if (collectionView.hasActiveFilter()){
 						collectionView.restoreObjectSet(collectionView.collectionFilter)
 					}

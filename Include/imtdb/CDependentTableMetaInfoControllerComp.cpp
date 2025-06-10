@@ -14,7 +14,7 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 	if (!m_dependentMetaInfoControllerCompPtr.IsValid()){
 		return;
 	}
-	
+
 	if (!changeSet.Contains(imtbase::ICollectionInfo::CF_ADDED) &&
 		!changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_DESCRIPTION_CHANGED) &&
 		!changeSet.Contains(imtbase::ICollectionInfo::CF_ELEMENT_RENAMED) &&
@@ -23,8 +23,28 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 		!changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
 		return;
 	}
-	
-	bool isRemoved = false;
+
+	if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
+		QVariant changeInfo = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED);
+		if (changeInfo.isValid()){
+			imtbase::ICollectionInfo::MultiElementNotifierInfo info = changeInfo.value<imtbase::ICollectionInfo::MultiElementNotifierInfo>();
+
+			imtdb::IDependentMetaInfoController::MetaFieldCleanupPlan metaFieldCleanupPlan;
+			metaFieldCleanupPlan.objectIds = info.elementIds;
+			metaFieldCleanupPlan.dependentKey = *m_metaInfoIdAttrPtr;
+
+			for (int i = 0; i < m_metaInfoNameAttrPtr.GetCount(); i++){
+				metaFieldCleanupPlan.metaInfoIds << m_metaInfoNameAttrPtr[i];
+			}
+
+			if (!m_dependentMetaInfoControllerCompPtr->ClearDependentMetaInfo(metaFieldCleanupPlan)){
+				SendErrorMessage(0, QString("Unable to clear dependent meta info"), "CDependentTableMetaInfoControllerComp");
+			}
+
+			return;
+		}
+	}
+
 	QByteArray elementId;
 	if (changeSet.Contains(imtbase::ICollectionInfo::CF_ADDED)){
 		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED).toByteArray();
@@ -41,49 +61,35 @@ void CDependentTableMetaInfoControllerComp::OnUpdate(const istd::IChangeable::Ch
 	else if (changeSet.Contains(imtbase::IObjectCollection::CF_OBJECT_DATA_CHANGED)){
 		elementId = changeSet.GetChangeInfo(imtbase::IObjectCollection::CN_OBJECT_DATA_CHANGED).toByteArray();
 	}
-	else if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
-		elementId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENTS_REMOVED).toByteArray();
-		
-		isRemoved = true;
-	}
-	
+
 	if (elementId.isEmpty()){
 		return;
 	}
-	
+
 	imtdb::IDependentMetaInfoController::DependentMetaInfo dependentMetaInfo;
-	
+
 	dependentMetaInfo.objectId = elementId;
 	dependentMetaInfo.dependentKey = *m_metaInfoIdAttrPtr;
-	
+
 	bool isDocumentSource = m_isDocumentSourceAttrPtr.IsValid() ? *m_isDocumentSourceAttrPtr : true;
-	
+
 	for (int i = 0; i < m_metaInfoNameAttrPtr.GetCount(); i++){
 		QString metaInfoName = m_metaInfoNameAttrPtr[i];
 		QString dependentMetaInfoName = m_dependentMetaInfoNameAttrPtr[i];
-		dependentMetaInfo.metaInfoIds << metaInfoName;
 
-		if (!isRemoved){
-			QString selectValue =
-				QString(R"((SELECT "%0"->>'%1' FROM "%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
-						)").arg(isDocumentSource ? "Document" : "DataMetaInfo",
-								dependentMetaInfoName,
-								*m_dependentTableNameAttrPtr,
-								qPrintable(elementId));
-			
-			dependentMetaInfo.metaInfoValues << selectValue;
-		}
+		dependentMetaInfo.metaInfoIds << metaInfoName;
+		QString selectValue =
+			QString(R"((SELECT "%0"->>'%1' FROM "%2" WHERE "State" = 'Active' AND "DocumentId" = '%3' LIMIT 1)
+					)").arg(isDocumentSource ? "Document" : "DataMetaInfo",
+							dependentMetaInfoName,
+							*m_dependentTableNameAttrPtr,
+							qPrintable(elementId));
+
+		dependentMetaInfo.metaInfoValues << selectValue;
 	}
-	
-	if (isRemoved){
-		if (!m_dependentMetaInfoControllerCompPtr->ClearDependentMetaInfo(dependentMetaInfo)){
-			SendErrorMessage(0, QString("Unable to clear dependent meta info"), "CDependentTableMetaInfoControllerComp");
-		}
-	}
-	else{
-		if (!m_dependentMetaInfoControllerCompPtr->UpdateDependentMetaInfo(dependentMetaInfo)){
-			SendErrorMessage(0, QString("Unable to update dependent meta info"), "CDependentTableMetaInfoControllerComp");
-		}
+
+	if (!m_dependentMetaInfoControllerCompPtr->UpdateDependentMetaInfo(dependentMetaInfo)){
+		SendErrorMessage(0, QString("Unable to update dependent meta info"), "CDependentTableMetaInfoControllerComp");
 	}
 }
 

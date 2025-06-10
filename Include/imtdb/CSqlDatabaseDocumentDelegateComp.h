@@ -135,7 +135,7 @@ public:
 	
 	// reimplemented (imtdb::IDependentMetaInfoController)
 	virtual bool UpdateDependentMetaInfo(const DependentMetaInfo& metaInfo) const override;
-	virtual bool ClearDependentMetaInfo(const DependentMetaInfo& metaInfo) const override;
+	virtual bool ClearDependentMetaInfo(const MetaFieldCleanupPlan& metaInfo) const override;
 
 protected:
 	virtual QByteArray PrepareInsertNewObjectQuery(

@@ -169,7 +169,7 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElements(const Ids& elementIds, con
 	}
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
-	
+
 	if (ExecuteTransaction(query)){
 		return true;
 	}
@@ -197,10 +197,10 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElementSet(
 	}
 
 	imtbase::ICollectionInfo::MultiElementNotifierInfo notifierInfo;
-	notifierInfo.elementIds = imtbase::ICollectionInfo::Ids();
+	notifierInfo.elementIds = GetElementIds(0, -1, selectionParamsPtr);
 
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-	changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));
+	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 
 	if (operationContextPtr != nullptr){
 		AddOperationContextToChangeSet(*operationContextPtr, changeSet);
@@ -211,10 +211,12 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElementSet(
 	if (ExecuteTransaction(query)){
 		return true;
 	}
+	else{
+		changeNotifier.Abort();
+	}
 
 	return false;
 }
-
 
 
 bool CSqlDatabaseObjectCollectionComp::RestoreObjects(
@@ -228,7 +230,7 @@ bool CSqlDatabaseObjectCollectionComp::RestoreObjects(
 	QByteArray query = m_objectDelegateCompPtr->CreateRestoreObjectsQuery(*this, objectIds, operationContextPtr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
-		
+
 		return false;
 	}
 
@@ -237,13 +239,13 @@ bool CSqlDatabaseObjectCollectionComp::RestoreObjects(
 
 	istd::IChangeable::ChangeSet changeSet(CF_RESTORED);
 	changeSet.SetChangeInfo(CN_ELEMENTS_RESTORED, QVariant::fromValue(notifierInfo));
-	
+
 	if (operationContextPtr != nullptr){
 		AddOperationContextToChangeSet(*operationContextPtr, changeSet);
 	}
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
-	
+
 	if (ExecuteTransaction(query)){
 		return true;
 	}
@@ -285,6 +287,9 @@ bool CSqlDatabaseObjectCollectionComp::RestoreObjectSet(
 	if (ExecuteTransaction(query)){
 		return true;
 	}
+	else{
+		changeNotifier.Abort();
+	}
 
 	return false;
 }
@@ -304,7 +309,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 
 	if (!m_dbEngineCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
-		
+
 		return 0;
 	}
 
@@ -829,8 +834,6 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 
 	if (error.type() != QSqlError::NoError){
 		SendErrorMessage(0, error.text(), "Database collection");
-
-		// qDebug() << "SQL-error: " << singleQuery;
 		qDebug() << "SQL-error: " << sqlQuery;
 
 		m_dbEngineCompPtr->CancelTransaction();
@@ -923,8 +926,8 @@ void CSqlDatabaseObjectCollectionComp::AddOperationContextToChangeSet(const imtb
 {
 	imtbase::IOperationContext::OperationContextInfo info = operationContext.GetOperationOwnerId();
 	changeSet.SetChangeInfo(
-		imtbase::IOperationContext::OPERATION_CONTEXT_INFO,
-		QVariant::fromValue<imtbase::IOperationContext::OperationContextInfo>(info));
+				imtbase::IOperationContext::OPERATION_CONTEXT_INFO,
+				QVariant::fromValue<imtbase::IOperationContext::OperationContextInfo>(info));
 }
 
 

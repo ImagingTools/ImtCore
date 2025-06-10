@@ -337,7 +337,9 @@ bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlR
 			}
 			const auto& collectionIdOpt = argsOpt->collectionId;
 			const QByteArray collectionId = collectionIdOpt.value_or(QByteArray());
-			return *m_collectionIdAttrPtr == collectionId;
+			if (m_collectionIdAttrPtr.IsValid()){
+				return *m_collectionIdAttrPtr == collectionId;
+			}
 		}
 
 		return false;
