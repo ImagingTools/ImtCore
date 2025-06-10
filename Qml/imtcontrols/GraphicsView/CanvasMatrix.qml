@@ -2,96 +2,160 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
-QtObject {
+Matrix3x3 {
 	id: canvasMatrix
 
-	property real xScale: 1				// a
-	property real ySkew: 0				// b
-	property real xSkew: 0				// c
-	property real yScale: 1				// d
-	property real xTranslation: 0		// e
-	property real yTranslation: 0		// f
-
-
 	// matrix:
-	// a	c	e
-	// b	d	f
-	// 0	0	1
+	// a	c	e			xScale	xSkew	xTranslation
+	// b	d	f			ySkew	yScale	yTranslation
+	// 0	0	1			0		0		1
 
-	Component.onCompleted: {
-		saveInitialData()
+	//getters
+	function xScale(){
+		if(matrix == undefined){
+			return 1
+		}
+		return matrix[0][0]
+	}
+
+	function ySkew(){
+		if(matrix == undefined){
+			return 0
+		}
+		return matrix[1][0]
+	}
+
+	function xSkew(){
+		if(matrix == undefined){
+			return 0
+		}
+		return matrix[0][1]
+	}
+
+	function yScale(){
+		if(matrix == undefined){
+			return 1
+		}
+		return matrix[1][1]
+	}
+
+	function xTranslation(){
+		if(matrix == undefined){
+			return 0
+		}
+		return matrix[0][2]
+	}
+
+	function yTranslation(){
+		if(matrix == undefined){
+			return 0
+		}
+		return matrix[1][2]
+	}
+
+	//setters
+	function setXScale(xScaleArg){
+		matrix[0][0] = xScaleArg
+	}
+
+	function setYSkew(ySkewArg){
+		matrix[1][0] = ySkewArg
+	}
+
+	function setXSkew(xSkewArg){
+		matrix[0][1] = xSkewArg
+	}
+
+	function setYScale(yScaleArg){
+		matrix[1][1] = yScaleArg
+	}
+
+	function setXTranslation(xTranslationArg){
+		matrix[0][2] = xTranslationArg
+	}
+
+	function setYTranslation(yTranslationArg){
+		matrix[1][2] = yTranslationArg
 	}
 
 	function setContextTransform(ctx){
 		ctx.setTransform(
-					canvasMatrix.xScale,
-					canvasMatrix.ySkew,
-					canvasMatrix.xSkew,
-					canvasMatrix.yScale,
-					canvasMatrix.xTranslation,
-					canvasMatrix.yTranslation
+					canvasMatrix.xScale(),
+					canvasMatrix.ySkew(),
+					canvasMatrix.xSkew(),
+					canvasMatrix.yScale(),
+					canvasMatrix.xTranslation(),
+					canvasMatrix.yTranslation()
 					);
 	}
 
 	function transformContext(ctx){
 		ctx.transform(
-					canvasMatrix.xScale,
-					canvasMatrix.ySkew,
-					canvasMatrix.xSkew,
-					canvasMatrix.yScale,
-					canvasMatrix.xTranslation,
-					canvasMatrix.yTranslation
+					canvasMatrix.xScale(),
+					canvasMatrix.ySkew(),
+					canvasMatrix.xSkew(),
+					canvasMatrix.yScale(),
+					canvasMatrix.xTranslation(),
+					canvasMatrix.yTranslation()
 					);
 	}
-
-
 
 	//	Rotation matrix:
 	//	cos(angle)	-sin(angle)		0
 	//	sin(angle)	cos(angle)		0
 	//	0			0				1
-
 	function rotateContext(ctx, angle, center){
+		//console.log("rotateContext")
 		if(center == undefined){
 			center = Qt.point(0,0);
 		}
-		xTranslation = center.x
-		yTranslation = center.y
-		xScale = Math.cos(angle)
-		yScale = Math.cos(angle)
-		xSkew = -1*Math.sin(angle)
-		ySkew = Math.sin(angle)
 
+		let rotateMatrix = [
+				[Math.cos(angle), -1*Math.sin(angle), center.x],
+				[Math.sin(angle), Math.cos(angle), center.y],
+				[0, 0, 1]
+			  ];
+		let translateMatrix = [
+				[1, 0, -center.x],
+				[0, 1, -center.y],
+				[0, 0, 1]
+			  ];
+		matrix = multiplyByMatrix(rotateMatrix, translateMatrix)
 		setContextTransform(ctx);
-
-		ctx.translate(-center.x, -center.y)
 	}
 
-	function  reset(ctx){
-		xScale = 1
-		ySkew = 0
-		xSkew = 0
-		yScale = 1
-		xTranslation = 0
-		yTranslation = 0
+	function translateContext(ctx, xArg, yArg){
+		//console.log("translateContext")
+		let matrix1 = [
+				[1, 0, 0],
+				[0, 1, 0],
+				[0, 0, 1]
+			  ];
+		let translateMatrix = [
+				[1, 0, xArg],
+				[0, 1, yArg],
+				[0, 0, 1]
+			  ];
+		matrix = multiplyByMatrix(matrix1, translateMatrix)
+		setContextTransform(ctx);
 	}
 
 	function restore(){
-		xScale = _xScaleInitial
-		ySkew = _ySkewInitial
-		xSkew = _xSkewInitial
-		yScale = _yScaleInitial
-		xTranslation = _xTranslationInitial
-		yTranslation = _yTranslationInitial
+		setXScale(_xScaleInitial)
+		setYSkew(_ySkewInitial)
+		setXSkew(_xSkewInitial)
+		setYScale(_yScaleInitial)
+		setXTranslation(_xTranslationInitial)
+		setYTranslation(_yTranslationInitial)
 	}
 
 	function saveInitialData(){
-		_xScaleInitial = xScale
-		_ySkewInitial = ySkew
-		_xSkewInitial = xSkew
-		_yScaleInitial = yScale
-		_xTranslationInitial = xTranslation
-		_yTranslationInitial = yTranslation
+		_xScaleInitial = xScale()
+		_ySkewInitial = ySkew()
+		_xSkewInitial = xSkew()
+		_yScaleInitial = yScale()
+		_xTranslationInitial = xTranslation()
+		_yTranslationInitial = yTranslation()
 	}
 
 	property real _xScaleInitial: 1

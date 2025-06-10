@@ -212,6 +212,7 @@
 		<file alias="imtcontrols/GraphicsView/SelectionShape.qml">GraphicsView/SelectionShape.qml</file>
 
 		<file alias="imtcontrols/GraphicsView/CanvasMatrix.qml">GraphicsView/CanvasMatrix.qml</file>
+		<file alias="imtcontrols/GraphicsView/Matrix3x3.qml">GraphicsView/Matrix3x3.qml</file>
 
     </qresource>
     <qresource prefix="/"/>

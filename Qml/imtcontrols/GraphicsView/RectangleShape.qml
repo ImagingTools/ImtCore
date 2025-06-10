@@ -66,9 +66,9 @@ GraphicsShapeBase {
 	function isInside(x_, y_, matrix){
 		let topLeftPoint = getBoundingBoxCoordinate();
 
-		let scaleCoeff = matrix.xScale
-		let deltaX = matrix.xTranslation
-		let deltaY = matrix.yTranslation
+		let scaleCoeff = matrix.xScale()
+		let deltaX = matrix.xTranslation()
+		let deltaY = matrix.yTranslation()
 
 		let width_ = getBoundingBoxWidth()
 		let height_ = getBoundingBoxHeight()

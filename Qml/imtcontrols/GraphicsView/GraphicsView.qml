@@ -273,9 +273,9 @@ Rectangle {
 				for(let j = 0; j < shapeModel.length; j++){
 					let shape = shapeModel[j];
 
-					canvasMatrix.xTranslation = canvas.deltaX;
-					canvasMatrix.yTranslation = canvas.deltaY;
-					canvasMatrix.xScale = canvas.scaleCoeff;
+					canvasMatrix.setXTranslation(canvas.deltaX);
+					canvasMatrix.setYTranslation(canvas.deltaY);
+					canvasMatrix.setXScale(canvas.scaleCoeff);
 					let isInside =  shape.isInside(mouseX, mouseY, canvasMatrix)
 
 					if(isInside){
@@ -636,20 +636,20 @@ Rectangle {
 			property string innerFrameColor: "transparent";
 
 			onWidthChanged: {
-				requestPaint()
+				requestPaintPause.restart();
 			}
 
 			onHeightChanged: {
-				requestPaint()
+				requestPaintPause.restart();
 			}
 
 			onImageLoaded: {
-				requestPaint()
+				requestPaintPause.restart();
 			}
 
 			onScaleCoeffChanged: {
 				//console.log("scaleCoeff:::", scaleCoeff)
-				requestPaint()
+				requestPaintPause.restart();
 			}
 
 			onDeltaXChanged: {
@@ -658,6 +658,15 @@ Rectangle {
 
 			onDeltaYChanged: {
 				graphicsView.contentY = -canvas.deltaY
+			}
+
+
+			PauseAnimation {
+				id: requestPaintPause;
+				duration: 50
+				onFinished: {
+					canvas.requestPaint();
+				}
 			}
 
 			CanvasMatrix{
@@ -695,10 +704,10 @@ Rectangle {
 				ctx.reset()
 				ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-				canvasMatrix.xScale = canvas.scaleCoeff;
-				canvasMatrix.yScale = canvas.scaleCoeff;
-				canvasMatrix.xTranslation = canvas.deltaX;
-				canvasMatrix.yTranslation = canvas.deltaY;
+				canvasMatrix.setXScale(canvas.scaleCoeff);
+				canvasMatrix.setYScale(canvas.scaleCoeff);
+				canvasMatrix.setXTranslation(canvas.deltaX);
+				canvasMatrix.setYTranslation(canvas.deltaY);
 
 				canvasMatrix.setContextTransform(ctx);
 
