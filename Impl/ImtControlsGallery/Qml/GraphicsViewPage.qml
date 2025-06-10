@@ -19,6 +19,8 @@ GraphicsView{
 		background.addShape(imageShape);
 		background.addShape(gridShape);
 
+		background.addShape(boundingBox);//remove
+
 		let layer = view.getActiveLayer();
 
 		layer.addShape(rec1);
@@ -130,6 +132,20 @@ GraphicsView{
 		imageSource: "/Images/testImage";
 		function getParams(layerId){
 			return imageParams;
+		}
+	}
+
+	BoundingBox{
+		id: boundingBox;
+
+		function getBoundingBoxCornerPoints(){
+			let points = [];
+			points.push(Qt.point(200,200))
+			points.push(Qt.point(300, 200))
+			points.push(Qt.point(300,400))
+			points.push(Qt.point(200, 400))
+
+			return points;
 		}
 	}
 

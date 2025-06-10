@@ -38,7 +38,7 @@ Rectangle {
 
 
 				console.log("requestPaint!!!!!!")
-				canvas.isReverse = true;
+				canvas.isReverse = !canvas.isReverse;
 				canvas.requestPaint()
 			}
 		}
