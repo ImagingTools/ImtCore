@@ -665,7 +665,7 @@ Rectangle {
 
 			PauseAnimation {
 				id: requestPaintPause;
-				duration: 50
+				duration: 10
 				onFinished: {
 					canvas.requestPaint();
 				}

@@ -35,7 +35,7 @@ BoundingBox {
 	}
 
 
-	function isInside(x_, y_, matrix/*deltaX, deltaY, scaleCoeff*/){
+	function isInside(x_, y_, matrix){
 		return false;
 	}
 
