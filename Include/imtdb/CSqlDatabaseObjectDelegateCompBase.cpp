@@ -388,12 +388,29 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 		return false;
 	}
 
+	QString timeFilterQuery;
 	QString textFilterQuery;
+
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
-	if (paramIds.contains("Filter")){
-		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
+	if (paramIds.contains(QByteArrayLiteral("Filter"))){
+		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, QByteArrayLiteral("Filter"), false);
 		if (collectionFilterParamPtr.IsValid()){
 			retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
+			if (!retVal){
+				return false;
+			}
+		}
+	}
+	else if (paramIds.contains(QByteArrayLiteral("ComplexFilter"))){
+		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(&filterParams, QByteArrayLiteral("ComplexFilter"), false);
+		if(complexFilterParamPtr.IsValid()){
+			retVal = CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
+
+			if (!retVal){
+				return false;
+			}
+
+			retVal = CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
 			if (!retVal){
 				return false;
 			}
@@ -403,24 +420,32 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 	QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
 
 	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !additionalFilters.isEmpty()){
-		filterQuery = " WHERE ";
+		filterQuery = QStringLiteral(" WHERE ");
 	}
 
 	filterQuery += objectFilterQuery;
 	if (!objectFilterQuery.isEmpty() && !textFilterQuery.isEmpty()){
-		filterQuery += " AND ";
+		filterQuery += QStringLiteral(" AND ");
 	}
 
 	if (!textFilterQuery.isEmpty()){
-		filterQuery += "(" + textFilterQuery + ")";
+		filterQuery += '(' + textFilterQuery + ')';
 	}
 
-	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !additionalFilters.isEmpty()){
-		filterQuery += " AND ";
+	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !timeFilterQuery.isEmpty()){
+		filterQuery += QStringLiteral(" AND ");
+	}
+
+	if (!timeFilterQuery.isEmpty()){
+		filterQuery += '(' + timeFilterQuery + ')';
+	}
+
+	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !timeFilterQuery.isEmpty()) && !additionalFilters.isEmpty()){
+		filterQuery += QStringLiteral(" AND ");
 	}
 
 	if(!additionalFilters.isEmpty()){
-		filterQuery += "(" + additionalFilters + ")";
+		filterQuery += '(' + additionalFilters + ')';
 	}
 
 	return true;
@@ -482,11 +507,19 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 }
 
 
+bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
+{
+	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, false);
+
+	return true;
+}
+
+
 bool CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/) const
 {
-	Q_ASSERT_X(false, "CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery", "Method not implemented");
+	/// Implementation meant for derived classes
 
-	return false;
+	return true;
 }
 
 
