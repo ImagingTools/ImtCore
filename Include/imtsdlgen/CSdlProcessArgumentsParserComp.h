@@ -9,7 +9,7 @@
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
-#include <imtsdl/ISdlProcessArgumentsParser.h>
+#include <imtsdl/ISdlEditableProcessArgumentsParser.h>
 
 
 class QCommandLineParser;
@@ -21,7 +21,7 @@ namespace imtsdlgen
 
 class CSdlProcessArgumentsParserComp:
 			public ilog::CLoggerComponentBase,
-			virtual public imtsdl::ISdlProcessArgumentsParser
+			virtual public imtsdl::ISdlEditableProcessArgumentsParser
 {
 
 
@@ -30,12 +30,13 @@ public:
 
 	I_BEGIN_COMPONENT(CSdlProcessArgumentsParserComp)
 		I_REGISTER_INTERFACE(imtsdl::ISdlProcessArgumentsParser)
+		I_REGISTER_INTERFACE(imtsdl::ISdlEditableProcessArgumentsParser)
 	I_END_COMPONENT;
 
 	CSdlProcessArgumentsParserComp();
 
 	// reimplemented (imtsdl::ISdlProcessArgumentsParser)
-	virtual bool SetArguments(int argc, char** argv) override;
+	virtual bool SetArguments(const QStringList& arguments) override;
 	virtual QString GetSchemaFilePath() const override;
 	virtual QString GetOutputDirectoryPath() const override;
 	virtual QString GetNamespace() const override;
@@ -57,7 +58,32 @@ public:
 	virtual QStringList GetModuleIncludePaths() const override;
 	virtual QString GetDepFilePath() const override;
 	virtual QString GetModuleOutputFilePath() const override;
-	virtual bool IsModileGenerateEnabled() const override;
+	virtual bool IsModuleGenerateEnabled() const override;
+
+	// reimplemented (imtsdl::ISdlEditableProcessArgumentsParser)
+	virtual void SetSchemaFilePath(const QString& schemaFilePath) override;
+	virtual void SetOutputDirectoryPath(const QString& outputDirectoryPath) override;
+	virtual void SetNamespace(const QString& aNamespace) override;
+	virtual void SetNamespacePrefix(const QString& namespacePrefix) override;
+	virtual void SetDependenciesModeEnabled(bool enabled = true) override;
+	virtual void SetGenerateModeEnabled(bool enabled = true) override;
+	virtual void SetEnabledModificators(const QStringList& modificators) override;
+	virtual void SetCppEnabled(bool enabled = true) override;
+	virtual void SetQmlEnabled(bool enabled = true) override;
+	virtual void SetGqlEnabled(bool enabled = true) override;
+	virtual void SetSchemaDependencyModeEnabled(bool enabled = true) override;
+	virtual void SetBaseClassList(const QMap<QString, QString>& baseClassList) override;
+	virtual void SetJoinRules(const QMap<QString, QString>& rules) override;
+	virtual void SetIncludePaths(const QStringList & includePaths) override;
+	virtual void SetGeneratorType(GeneratorType type) override;
+	virtual void SetAutoJoinEnabled(bool enable = true) override;
+	virtual void SetAutoLinkLevel(AutoLinkLevel level) override;
+	virtual void SetHeadersIncludePaths(const QStringList& includePaths) override;
+	virtual void SetModuleIncludePaths(const QStringList& includePaths) override;
+	virtual void SetDepFilePath(const QString& path) override;
+	virtual void SetModuleOutputFilePath(const QString& path) override;
+	virtual void SetModuleGenerateEnabled(bool enable = true) override;
+
 
 protected:
 	/**

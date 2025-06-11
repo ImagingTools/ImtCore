@@ -144,7 +144,7 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 	}
 
 	// create module
-	if (m_sdlArgumentParserCompPtr->IsModileGenerateEnabled()){
+	if (m_sdlArgumentParserCompPtr->IsModuleGenerateEnabled()){
 		if (!m_sdlModuleManaerCompPtr->CreateModuleFile()){
 			SendErrorMessage(
 				0, QString("Unable to create module for schema '%1'")

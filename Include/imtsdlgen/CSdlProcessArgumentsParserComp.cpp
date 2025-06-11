@@ -52,13 +52,8 @@ CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
 
 // reimplemented (imtsdl::ISdlProcessArgumentsParser)
 
-bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
+bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 {
-	QStringList arguments;
-	for (int i = 0; i < argc; ++i){
-		arguments << QString(argv[i]);
-	}
-
 	QCommandLineParser commandLineParser;
 	commandLineParser.addHelpOption();
 	commandLineParser.addVersionOption();
@@ -507,20 +502,6 @@ QStringList CSdlProcessArgumentsParserComp::GetHeadersIncludePaths() const
 }
 
 
-// pseudo-implemented (protected) methods
-
-QList<QCommandLineOption> CSdlProcessArgumentsParserComp::PrepareCommandLineOptions()
-{
-	return QList<QCommandLineOption>();
-}
-
-
-bool CSdlProcessArgumentsParserComp::ProcessCommandLineOptions(const QCommandLineParser& /*commandLineParser*/)
-{
-	return true;
-}
-
-
 QStringList CSdlProcessArgumentsParserComp::GetModuleIncludePaths() const
 {
 	return m_moduleIncludePathList;
@@ -539,9 +520,201 @@ QString CSdlProcessArgumentsParserComp::GetModuleOutputFilePath() const
 }
 
 
-bool CSdlProcessArgumentsParserComp::IsModileGenerateEnabled() const
+bool CSdlProcessArgumentsParserComp::IsModuleGenerateEnabled() const
 {
 	return m_isModuleGenerationEnabled;
+}
+
+
+// reimplemented (imtsdl::ISdlEditableProcessArgumentsParser)
+
+void CSdlProcessArgumentsParserComp::SetSchemaFilePath(const QString& schemaFilePath)
+{
+	if (m_schemaFilePath != schemaFilePath){
+		m_schemaFilePath = schemaFilePath;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetOutputDirectoryPath(const QString& outputDirectoryPath)
+{
+	if (m_outputDirectoryPath != outputDirectoryPath){
+		m_outputDirectoryPath = outputDirectoryPath;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetNamespace(const QString& aNamespace)
+{
+	if (m_namespace != aNamespace){
+		m_namespace = aNamespace;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetNamespacePrefix(const QString& namespacePrefix)
+{
+	if (m_namespacePrefix != namespacePrefix){
+		m_namespacePrefix = namespacePrefix;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetDependenciesModeEnabled(bool enabled)
+{
+	if (m_isDependenciesMode != enabled){
+		m_isDependenciesMode = enabled;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetGenerateModeEnabled(bool enabled)
+{
+	if (m_isGenerateMode != enabled){
+		m_isGenerateMode = enabled;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetEnabledModificators(const QStringList& modificators)
+{
+	if (m_usedModificators != modificators){
+		m_usedModificators = modificators;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetCppEnabled(bool enabled)
+{
+	if (m_cppEnabled != enabled){
+		m_cppEnabled = enabled;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetQmlEnabled(bool enabled)
+{
+	if (m_qmlEnabled != enabled){
+		m_qmlEnabled = enabled;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetGqlEnabled(bool enabled)
+{
+	if (m_gqlEnabled != enabled){
+		m_gqlEnabled = enabled;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetSchemaDependencyModeEnabled(bool enabled)
+{
+	if (m_schemaDependencyModeEnabled != enabled){
+		m_schemaDependencyModeEnabled = enabled;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetBaseClassList(const QMap<QString, QString>& baseClassList)
+{
+	if (m_baseClassList != baseClassList){
+		m_baseClassList = baseClassList;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetJoinRules(const QMap<QString, QString>& rules)
+{
+	if (m_joinRules != rules){
+		m_joinRules = rules;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetIncludePaths(const QStringList& includePaths)
+{
+	if (m_includePaths != includePaths){
+		m_includePaths = includePaths;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetGeneratorType(GeneratorType type)
+{
+	if (m_generatorType != type){
+		m_generatorType = type;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetAutoJoinEnabled(bool enabled)
+{
+	if (m_autoJoinEnabled != enabled){
+		m_autoJoinEnabled = enabled;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetAutoLinkLevel(AutoLinkLevel level)
+{
+	if (m_autolinkLevel != level){
+		m_autolinkLevel = level;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetHeadersIncludePaths(const QStringList& includePaths)
+{
+	if (m_headersIncludePaths != includePaths){
+		m_headersIncludePaths = includePaths;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetModuleIncludePaths(const QStringList& includePaths)
+{
+	if (m_moduleIncludePathList != includePaths){
+		m_moduleIncludePathList = includePaths;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetDepFilePath(const QString& path)
+{
+	if (m_depFilePath != path){
+		m_depFilePath = path;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetModuleOutputFilePath(const QString& path)
+{
+	if (m_moduleOutputFilePath != path){
+		m_moduleOutputFilePath = path;
+	}
+}
+
+
+void CSdlProcessArgumentsParserComp::SetModuleGenerateEnabled(bool enabled)
+{
+	if (m_isModuleGenerationEnabled != enabled){
+		m_isModuleGenerationEnabled = enabled;
+	}
+}
+
+
+// pseudo-implemented (protected) methods
+
+QList<QCommandLineOption> CSdlProcessArgumentsParserComp::PrepareCommandLineOptions()
+{
+	return QList<QCommandLineOption>();
+}
+
+
+bool CSdlProcessArgumentsParserComp::ProcessCommandLineOptions(const QCommandLineParser& /*commandLineParser*/)
+{
+	return true;
 }
 
 

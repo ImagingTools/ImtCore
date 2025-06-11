@@ -34,7 +34,8 @@ public:
 		ALL_ONLY_FILE = 2,				///< Compile only input file
 	};
 
-	virtual bool SetArguments(int argc, char** argv) = 0;
+	virtual bool SetArguments(int argc, char** argv);
+	virtual bool SetArguments(const QStringList& arguments) = 0;
 	virtual QString GetSchemaFilePath() const = 0;
 	virtual QString GetOutputDirectoryPath() const = 0;
 	virtual QString GetNamespace() const = 0;
@@ -57,8 +58,19 @@ public:
 	virtual QStringList GetModuleIncludePaths() const = 0;
 	virtual QString GetDepFilePath() const = 0;
 	virtual QString GetModuleOutputFilePath() const = 0;
-	virtual bool IsModileGenerateEnabled() const = 0;
+	virtual bool IsModuleGenerateEnabled() const = 0;
 };
+
+
+inline bool ISdlProcessArgumentsParser::SetArguments(int argc, char** argv)
+{
+	QStringList arguments;
+	for (int i = 0; i < argc; ++i){
+		arguments << QString(argv[i]);
+	}
+
+	return SetArguments(arguments);
+}
 
 
 } // namespace imtsdl
