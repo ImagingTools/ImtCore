@@ -1,0 +1,13 @@
+module imtbaseComplexCollectionFilterSdl
+
+TimeFilter 1.0 TimeFilter.qml 
+FieldSortingInfo 1.0 FieldSortingInfo.qml 
+FieldFilter 1.0 FieldFilter.qml 
+GroupFilter 1.0 GroupFilter.qml 
+ComplexCollectionFilter 1.0 ComplexCollectionFilter.qml 
+singleton TimeFilterTypeMetaInfo 1.0 TimeFilterTypeMetaInfo.qml 
+singleton FieldSortingInfoTypeMetaInfo 1.0 FieldSortingInfoTypeMetaInfo.qml 
+singleton FieldFilterTypeMetaInfo 1.0 FieldFilterTypeMetaInfo.qml 
+singleton GroupFilterTypeMetaInfo 1.0 GroupFilterTypeMetaInfo.qml 
+singleton ComplexCollectionFilterTypeMetaInfo 1.0 ComplexCollectionFilterTypeMetaInfo.qml 
+singleton ImtbaseComplexCollectionFilterSdlCommandIds  1.0  ImtbaseComplexCollectionFilterSdlCommandIds.qml 

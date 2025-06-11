@@ -1,0 +1,71 @@
+schema {
+	name: ComplexCollectionFilter
+	namespace: imtbase
+	version: 1.0
+}
+
+
+import {
+	"ImtBaseTypes.sdl"
+}
+
+enum ValueType
+{
+	Integer
+	Number
+	String
+	Bool
+}
+
+enum FilterOperation
+{
+	Not
+	Equal
+	Less
+	Greater
+	Contains
+}
+
+enum LogicalOperation
+{
+	And
+	Or
+}
+
+type TimeFilter
+{
+	timeRange: TimeRange
+	timeUnit: String
+	interpretationMode: String
+	unitMultiplier: Integer
+}
+
+type FieldSortingInfo
+{
+	fieldId: String!
+	sortingOrder: String!
+}
+
+type FieldFilter
+{
+	fieldId: ID!
+	filterValue: String!
+	filterValueType: ValueType!
+	filterOperations: [FilterOperation]!
+}
+
+type GroupFilter
+{
+	fieldFilters: [FieldFilter]
+	groupFilters: [GroupFilter]
+	logicalOperation: LogicalOperation!
+}
+
+type ComplexCollectionFilter {
+	sortingInfo: [FieldSortingInfo]
+	fieldsFilter: GroupFilter
+	timeFilter: TimeFilter
+	distinctFields: [ID]
+}
+
+

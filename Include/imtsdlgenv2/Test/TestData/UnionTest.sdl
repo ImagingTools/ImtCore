@@ -1,0 +1,27 @@
+schema {
+	name: UnionTest
+	namespace: modsdl
+	version: 1.0
+}
+
+type Coords{
+	X: Double!
+	Y: Double!
+}
+
+type PrinterSpecificationBase {
+	name: String
+}
+
+type Link {
+	link: ID!
+}
+
+union PrinterSpecification = PrinterSpecificationBase | Link
+
+type PrinterBase {
+	name: String
+	specification: PrinterSpecification
+}
+
+
