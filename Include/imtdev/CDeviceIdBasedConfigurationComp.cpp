@@ -70,27 +70,37 @@ DeviceInstanceInfoPtr CDeviceIdBasedConfigurationComp::GetDeviceInstanceInfo(con
 
 void CDeviceIdBasedConfigurationComp::UpdateModel()
 {
-	FlagLocker(m_isConfigurationStoreBlocked);
+	FlagLocker locker(m_isConfigurationStoreBlocked);
 
-	istd::CChangeNotifier notifier(this);
+	{
+		istd::CChangeNotifier notifier(this);
 
-	ResetData();
+		ResetData();
 
-	if (m_deviceSelectionCompPtr.IsValid() && m_configurationManagerCompPtr.IsValid()){
+		if (m_deviceSelectionCompPtr.IsValid() && m_configurationManagerCompPtr.IsValid()){
 
-		imtbase::ISelection::Ids ids = m_deviceSelectionCompPtr->GetSelectedIds();
-		if (ids.count() != 1){
-			return;
-		}
+			imtbase::ISelection::Ids ids = m_deviceSelectionCompPtr->GetSelectedIds();
+			if (ids.count() != 1){
+				return;
+			}
 
-		QByteArray id = *ids.begin();
+			QByteArray deviceId = *ids.begin();
+			QByteArray deviceTypeId;
 
-		DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(id);
-		if (instanceInfoPtr != nullptr && m_configurationManagerCompPtr.IsValid()){
-			QByteArray deviceTypeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
+			DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
+			if (instanceInfoPtr != nullptr){
+				deviceTypeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
+			}
+
+			if (deviceTypeId.isEmpty() && m_controllerCompPtr.IsValid()){
+				if (m_controllerCompPtr->GetSupportedDeviceTypeIds().contains(deviceId)){
+					deviceTypeId = deviceId;
+				}
+			}
+
 			if (!deviceTypeId.isEmpty()){
 				DeviceConfigurationPtr configurationPtr =
-					m_configurationManagerCompPtr->GetDeviceConfiguration(*ids.begin(), deviceTypeId);
+					m_configurationManagerCompPtr->GetDeviceConfiguration(deviceId, deviceTypeId);
 				if (configurationPtr != nullptr){
 					CopyFrom(*configurationPtr);
 				}
@@ -112,7 +122,7 @@ void CDeviceIdBasedConfigurationComp::OnConfigurationChanged(const istd::IChange
 		return;
 	}
 
-	if (!m_deviceSelectionCompPtr.IsValid()){
+	if (!m_deviceSelectionCompPtr.IsValid() || !m_configurationManagerCompPtr.IsValid() || !m_controllerCompPtr.IsValid()){
 		return;
 	}
 
@@ -122,9 +132,19 @@ void CDeviceIdBasedConfigurationComp::OnConfigurationChanged(const istd::IChange
 
 		if (m_configurationManagerCompPtr.IsValid()){
 			DeviceInstanceInfoPtr deviceInstanceInfoPtr = GetDeviceInstanceInfo(deviceId);
-			if (deviceInstanceInfoPtr != nullptr){
-				QByteArray deviceTypeId = deviceInstanceInfoPtr->GetStaticInfo().GetTypeId();
 
+			QByteArray deviceTypeId;
+			if (deviceInstanceInfoPtr != nullptr){
+				deviceTypeId = deviceInstanceInfoPtr->GetStaticInfo().GetTypeId();
+			}
+
+			if (deviceTypeId.isEmpty()){
+				if (m_controllerCompPtr->GetSupportedDeviceTypeIds().contains(deviceId)){
+					deviceTypeId = deviceId;
+				}
+			}
+
+			if (!deviceTypeId.isEmpty()){
 				m_configurationManagerCompPtr->SetDeviceConfiguration(deviceId, deviceTypeId, *this);
 			}
 		}

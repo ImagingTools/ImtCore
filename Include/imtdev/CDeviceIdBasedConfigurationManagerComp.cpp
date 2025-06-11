@@ -24,11 +24,16 @@ DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfigur
 	DeviceConfigurationPtr configurationPtr;
 
 	if (!deviceId.isEmpty() && !deviceTypeId.isEmpty()){
-		DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
-		
 		QByteArray typeId;
-		if (instanceInfoPtr != nullptr){
-			typeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
+
+		if (deviceId == deviceTypeId){
+			typeId = deviceTypeId;
+		}
+		else {
+			DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
+			if (instanceInfoPtr != nullptr){
+				typeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
+			}
 		}
 
 		if (!typeId.isEmpty() && deviceTypeId == typeId){
