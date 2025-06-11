@@ -22,7 +22,7 @@ const QtLocation = require('../QtLocation/QtLocation')
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\Qml\\web\\imtcore.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\lisa.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\agentino.json'//process.argv.slice(2)[0]
-// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\jq.json'
+// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\test\\jq.json'
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\Rosa\\rosa.json'
 const argv = process.argv
 const env = process.env
@@ -425,7 +425,9 @@ class Instruction {
                         stat.value.add(`=`)
                     }
                     this.prepare(tree[3], stat)
-                    stat.value.add(`;`)
+
+                    if(!stat.isMissingEnd) stat.value.add(`;`)
+                    
                     return stat
                 }
                 case 'name': {
@@ -560,7 +562,8 @@ class Instruction {
                     }
 
                     if (tree[1][0] === 'dot' && tree[1][1][1] === 'Qt' && tree[1][2] === 'createComponent') {
-                        stat.value.add(',__currentModule')
+                        // stat.value.add(',__currentModule')
+                        stat.value.add(`,${this.qmlFile.moduleName ? "JQModules['" + this.qmlFile.moduleName + "']" : 'null'}`)
                     }
 
                     stat.value.add(')\n')
@@ -697,8 +700,10 @@ class Instruction {
                     this.prepare(tree[1], stat)
                     this.prepare(tree[2], stat)
                     stat.value.add(`;`)
+                    stat.isMissingEnd = true
                     this.prepare(tree[3], stat)
-                    if (stat.value[stat.value.length - 1] === ';') stat.value.pop()
+                    // if (stat.value[stat.value.length - 1] === ';') stat.value.pop()
+                    stat.isMissingEnd = false
                     stat.value.add(`){`)
                     this.prepare(tree[4], stat)
                     stat.value.add(`};`)
@@ -1542,7 +1547,7 @@ class QmlFile {
         code.add(`let __root = this`)
         code.add(`let __context = JQContext.create()`)
         
-        code.add(`let __currentModule=${this.moduleName ? "JQModules['" + this.moduleName + "']" : 'null'}`)
+        // code.add(`let __currentModule=${this.moduleName ? "JQModules['" + this.moduleName + "']" : 'null'}`)
 
         code.add(`let ${this.instruction.name} = super.create(parent,properties,context,false)`)
         code.add(`${this.instruction.name}.__${this.getContextName()} = __context`)

@@ -68,6 +68,8 @@ class LinkedBool extends Property {
                     func: value,
                 })
                 target.__self[name].value = value.call(target)
+            } catch(error) {
+                console.error(error)
             } finally {
                 this.queueLink.pop()
             }

@@ -14,15 +14,23 @@ class Signal extends BaseObject {
             let slotName = 'SLOT_' + name
 
             if(slotName in target){
-                target[slotName].call(target.__proxy, ...args)
+                try {
+                    target[slotName].call(target.__proxy, ...args)
+                } catch (error) {
+                    console.error(error)
+                }  
             }
 
             if(name in target.__connections){
                 for(let connection of target.__connections[name].slice()){
-                    if(connection.target){
-                        connection.slot.call(connection.target.__proxy, ...args)  
-                    } else {
-                        connection.slot(...args)
+                    try {
+                        if(connection.target){
+                            connection.slot.call(connection.target.__proxy, ...args)  
+                        } else {
+                            connection.slot(...args)
+                        }
+                    } catch (error) {
+                        console.error(error)
                     }
                 }
             }

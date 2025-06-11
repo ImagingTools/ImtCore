@@ -39,18 +39,20 @@ class Loader extends Item {
         let item = this.sourceComponent.createObject(this, {}, true)
         this.item = item
 
-        this.item.widthChanged.connect(()=>{
+        if(this.item instanceof Item){
+            this.item.widthChanged.connect(()=>{
+                Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
+            })
+            this.item.heightChanged.connect(()=>{
+                Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+            })
+    
             Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
-        })
-        this.item.heightChanged.connect(()=>{
             Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
-        })
-
-        Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
-        Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
-        
-        // Geometry.setAuto(this.item.__self, 'width', this.width, this.item.__self.constructor.meta.width)
-        // Geometry.setAuto(this.item.__self, 'height', this.height, this.item.__self.constructor.meta.height)
+    
+            Geometry.setAuto(this.item.__self, 'width', this.width, this.item.__self.constructor.meta.width)
+            Geometry.setAuto(this.item.__self, 'height', this.height, this.item.__self.constructor.meta.height)
+        }
 
         this.loaded()
     }
@@ -85,37 +87,42 @@ class Loader extends Item {
         let item = cls.create(this)
         this.item = item
 
-        this.item.widthChanged.connect(()=>{
+        if(this.item instanceof Item){
+            this.item.widthChanged.connect(()=>{
+                Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
+            })
+            this.item.heightChanged.connect(()=>{
+                Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
+            })
+    
             Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
-        })
-        this.item.heightChanged.connect(()=>{
             Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
-        })
-
-        Geometry.setAuto(this.__self, 'width', this.item.width, this.__self.constructor.meta.width)
-        Geometry.setAuto(this.__self, 'height', this.item.height, this.__self.constructor.meta.height)
-
-        // Geometry.setAuto(this.item.__self, 'width', this.width, this.item.__self.constructor.meta.width)
-        // Geometry.setAuto(this.item.__self, 'height', this.height, this.item.__self.constructor.meta.height)
+    
+            Geometry.setAuto(this.item.__self, 'width', this.width, this.item.__self.constructor.meta.width)
+            Geometry.setAuto(this.item.__self, 'height', this.height, this.item.__self.constructor.meta.height)
+        }
+        
 
         this.loaded()
     }
 
-    // SLOT_widthChanged(oldValue, newValue){
-    //     super.SLOT_widthChanged()
+    SLOT_widthChanged(oldValue, newValue){
+        super.SLOT_widthChanged(oldValue, newValue)
 
-    //     if(this.item){
-    //         Geometry.setAuto(this.item.__self, 'width', newValue, this.item.__self.constructor.meta.width)
-    //     }
-    // }
+        if(this.item){
+            // this.item.width = newValue
+            Geometry.setAuto(this.item.__self, 'width', newValue, this.item.__self.constructor.meta.width)
+        }
+    }
 
-    // SLOT_heightChanged(oldValue, newValue){
-    //     super.SLOT_heightChanged()
+    SLOT_heightChanged(oldValue, newValue){
+        super.SLOT_heightChanged(oldValue, newValue)
         
-    //     if(this.item){
-    //         Geometry.setAuto(this.item.__self, 'height', newValue, this.item.__self.constructor.meta.height)
-    //     }
-    // }
+        if(this.item){
+            // this.item.height = newValue
+            Geometry.setAuto(this.item.__self, 'height', newValue, this.item.__self.constructor.meta.height)
+        }
+    }
 }
 
 

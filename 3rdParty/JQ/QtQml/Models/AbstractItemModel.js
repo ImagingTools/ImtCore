@@ -36,7 +36,8 @@ class AbstractItemModel {
                 target[key] = value
 
                 for(let property of properties){
-                    property.__update()
+                    // property.__update()
+                    property.target[property.name] = property.func()
                 }
 
                 parent.__propogate()

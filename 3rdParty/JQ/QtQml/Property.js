@@ -63,11 +63,17 @@ class Property extends BaseObject {
                     func: value,
                 })
                 target[name] = this.typeCasting(value.call(target))
+            } catch(error) {
+                console.error(error)
             } finally {
                 this.queueLink.pop()
             }
         } else {
-            target[name] = this.typeCasting(value)
+            try {
+                target[name] = this.typeCasting(value)
+            } catch (error) {
+                console.error(error)
+            }
         }  
 
         let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())

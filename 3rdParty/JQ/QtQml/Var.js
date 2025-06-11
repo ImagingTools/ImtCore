@@ -27,6 +27,8 @@ class Var extends Property {
                     func: value,
                 })
                 target[name] = value.call(target)
+            } catch(error) {
+                console.error(error)
             } finally {
                 this.queueLink.pop()
             }

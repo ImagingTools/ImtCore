@@ -250,40 +250,66 @@ module.exports = {
         let className = path[path.length-1]
 
         let cls = currentModule
-        try {
-            cls = eval(className)
-        } catch (error) {
-            for(let i = 0; i < path.length; i++){
-                if(cls){
-                    let name = path[i]
-                    if(name in cls){
-                        cls = cls[name]
-                    }
-                } else {
-                    cls = JQModules[path[i]]
+
+        for(let i = 0; i < path.length; i++){
+            if(cls){
+                let name = path[i]
+                if(name in cls){
+                    cls = cls[name]
+                } else if(name in JQModules){
+                    cls = JQModules[name]
                 }
+            } else {
+                cls = JQModules[path[i]]
             }
         }
 
-        if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, cls)
-
-        cls = null
-        try {
-            cls = eval(className)
-        } catch (error) {
-            for(let i = 0; i < path.length; i++){
-                if(cls){
-                    let name = path[i]
-                    if(name in cls){
-                        cls = cls[name]
-                    }
-                } else {
-                    cls = JQModules[path[i]]
-                }
+        if(!cls){
+            try {
+                cls = eval(className)
+            } catch (error) {
+    
             }
         }
+        
 
-        if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, cls)
+        if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, {}, cls)
+
+        // let cls = currentModule
+        // try {
+        //     cls = eval(className)
+        // } catch (error) {
+        //     for(let i = 0; i < path.length; i++){
+        //         if(cls){
+        //             let name = path[i]
+        //             if(name in cls){
+        //                 cls = cls[name]
+        //             }
+        //         } else {
+        //             cls = JQModules[path[i]]
+        //         }
+        //     }
+        // }
+
+        // if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, {}, cls)
+
+        // cls = null
+        // try {
+        //     cls = eval(className)
+        // } catch (error) {
+        //     for(let i = 0; i < path.length; i++){
+        //         if(cls){
+        //             let name = path[i]
+        //             if(name in cls){
+        //                 cls = cls[name]
+        //             }
+        //         } else {
+        //             cls = JQModules[path[i]]
+        //         }
+        //     }
+        // }
+
+        // if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, {}, cls)
     },
 
     get localStorage(){return global.localStorage},

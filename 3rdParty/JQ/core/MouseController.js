@@ -277,6 +277,8 @@ module.exports = {
 
     click: function(e){
         if(this.event && this.event.target){
+            JQApplication.beginUpdate()
+
             this.event.originX = e.pageX
             this.event.originY = e.pageY
             this.event.relative(this.event.target)
@@ -288,6 +290,8 @@ module.exports = {
             }
             
             this.event.target.__onMouseLeave(this.event)
+
+            JQApplication.endUpdate()
         }
 
         this.event = null
