@@ -373,7 +373,6 @@ Rectangle {
 				//console.log("RELEASED!!!")
 				let shape = graphicsView.findObject(mouse.x, mouse.y)
 				if(mouse.modifiers & Qt.ControlModifier){//Ctrl
-					console.log("RELEASED_CTRL!!!")
 					if(shape !== null){
 						if(!shape.isSelected){
 							shape.isSelected = true;
@@ -390,7 +389,6 @@ Rectangle {
 					}
 				}
 				else {//without Ctrl
-					console.log("RELEASED!!!")
 					if(!wasMoving && shape !== null){
 						if(canvas.selectedShapeCount > 1){
 							graphicsView.clearSelection(shape)
