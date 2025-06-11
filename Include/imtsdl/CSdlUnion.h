@@ -31,6 +31,7 @@ public:
 	[[nodiscard]] QString GetName() const;
 	void SetName(const QString& name);
 
+	/// \todo rename it to _TypeName and add methods , that returns \c CSdlType
 	[[nodiscard]] QList<QString> GetTypes() const;
 	void SetTypes(const QList<QString>& types);
 	void AddType(const QString& type);
