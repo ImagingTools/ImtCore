@@ -4,5 +4,3 @@ project(imtsdlgenv2 DESCRIPTION "Library for generating files according to the S
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-
-
