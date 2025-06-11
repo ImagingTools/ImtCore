@@ -134,14 +134,20 @@ void ExecuteTest(CImtSdlGenTest& testSuite, const QString& schemaFileName, const
 	GetPrecessorAndExec(testSuite, "GqlWrapClassCodeGenerator");
 	GetPrecessorAndExec(testSuite, "GqlHandlerBaseClassGenerator");
 	GetPrecessorAndExec(testSuite, "GqlCollectionControllerBaseClassGenerator");
-	// QML
+#if IMT_QML_FINAL_APPROVED /// QML disabled until the final generation choice is approved.
 	GetPrecessorAndExec(testSuite, "QmlCodeGenerator");
 	GetPrecessorAndExec(testSuite, "QmlCodeMetaGenerator");
 	GetPrecessorAndExec(testSuite, "QmlCodeCommandIdGenerator");
-
+#endif
 	if (!referenceDataDirName.isEmpty()){
 		const QString referenceDataAbsolutePath = s_testReferenceDataDirectoryPath + '/' + referenceDataDirName;
-		bool isDataEqual = CompareDirectories(outDirPath, referenceDataAbsolutePath);
+
+#if not IMT_QML_FINAL_APPROVED /// QML -> set CPP directly until the final generation choice is approved.
+			bool isDataEqual = CompareDirectories(outDirPath + "/1.0/CPP", referenceDataAbsolutePath + "/1.0/CPP");
+#else
+			bool isDataEqual = CompareDirectories(outDirPath, referenceDataAbsolutePath);
+#endif
+
 		if (!isDataEqual){
 			qWarning() << outDirPath << "and" << referenceDataAbsolutePath << "are not equal";
 		}
@@ -166,7 +172,6 @@ void CSdlGenTest::initTestCase()
 
 void CSdlGenTest::TestBasicSchema()
 {
-	QSKIP("[BASIC] The test will be disabled until the generator code is synchronized.");
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite);
 
@@ -180,7 +185,6 @@ void CSdlGenTest::TestBasicSchema()
 
 void CSdlGenTest::TestComplexCollectionFilter()
 {
-	QSKIP("[COMPLEX] The test will be disabled until the generator code is synchronized.");
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite);
 
@@ -194,7 +198,6 @@ void CSdlGenTest::TestComplexCollectionFilter()
 
 void CSdlGenTest::TestUnion()
 {
-	QSKIP("[ENUM] The test will be disabled until the generator code is synchronized.");
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite);
 

@@ -4,8 +4,8 @@ import imtcontrols 1.0
 BaseClass {
 	id: printerBase
 	readonly property string __typename: 'PrinterBase'
-	property var m_name: null
-	property var m_specification: null
+	property var m_name
+	property var m_specification
 
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){

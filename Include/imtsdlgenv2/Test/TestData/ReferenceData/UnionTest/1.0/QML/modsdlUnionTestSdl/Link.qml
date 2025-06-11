@@ -4,7 +4,7 @@ import imtcontrols 1.0
 BaseClass {
 	id: link
 	readonly property string __typename: 'Link'
-	property var m_link: null
+	property var m_link
 
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){

@@ -4,8 +4,16 @@ import imtcontrols 1.0
 BaseClass {
 	id: coords
 	readonly property string __typename: 'Coords'
-	property var m_x: null
-	property var m_y: null
+	property var m_x
+	property var m_y
+
+	function hasX() {
+		return (m_x !== undefined && m_x !== null)
+	}
+
+	function hasY() {
+		return (m_y !== undefined && m_y !== null)
+	}
 
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){
@@ -16,7 +24,7 @@ BaseClass {
 
 	function createComponent(propertyId, typename){
 		switch (propertyId){
-
+			case 'm_filterInfo': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/FieldSortingInfo.qml')
 		}
 	}
 

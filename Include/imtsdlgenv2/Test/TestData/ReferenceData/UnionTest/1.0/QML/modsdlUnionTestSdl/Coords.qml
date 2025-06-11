@@ -4,8 +4,8 @@ import imtcontrols 1.0
 BaseClass {
 	id: coords
 	readonly property string __typename: 'Coords'
-	property var m_x: null
-	property var m_y: null
+	property var m_x
+	property var m_y
 
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){

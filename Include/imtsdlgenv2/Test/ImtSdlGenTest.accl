@@ -11,10 +11,10 @@
         <Element ComponentName="ConsoleLog" X="126.866065983" Y="150" Note=""/>
         <Element ComponentName="CppCodeGeneratorFrameworkV2" X="550" Y="650" Note=""/>
         <Element ComponentName="FileFinalizer" X="775" Y="400" Note=""/>
-        <Element ComponentName="OptionsManager" X="500" Y="800" Note=""/>
         <Element ComponentName="QmlCodeGenFramework" X="525" Y="275" Note=""/>
         <Element ComponentName="SdlCoreFramework" X="550" Y="525" Note=""/>
         <Element ComponentName="SdlProcessArgumentsParser" X="1000" Y="150" Note=""/>
+        <Element ComponentName="_Workaround" X="325" Y="575" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="FileFinalizer">
