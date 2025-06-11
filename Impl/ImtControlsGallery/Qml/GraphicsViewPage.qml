@@ -181,11 +181,11 @@ GraphicsView{
 		id: boundingBox;
 
 		function getBoundingBoxCornerPoints(){
-			let points = [];
-			points.push(Qt.point(200,200))
-			points.push(Qt.point(300, 200))
-			points.push(Qt.point(300,400))
-			points.push(Qt.point(200, 400))
+			let points = {};
+			points.topLeftPoint = Qt.point(200,200)
+			points.topRightPoint = Qt.point(300, 200)
+			points.bottomRightPoint = Qt.point(300,400)
+			points.bottomLeftPoint = Qt.point(200, 400)
 
 			return points;
 		}
