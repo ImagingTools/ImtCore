@@ -8,10 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="SdlClassCodeGenerator" X="600" Y="225" Note=""/>
-        <Element ComponentName="SdlEnumGenerator" X="325" Y="425" Note=""/>
-        <Element ComponentName="SdlGqlCodeGeneratorFramework" X="600" Y="425" Note=""/>
-        <Element ComponentName="SdlUnionGenerator" X="850" Y="425" Note=""/>
+        <Element ComponentName="SdlCodeCreatorProcessorsController" X="875" Y="375" Note=""/>
+        <Element ComponentName="SdlCoreFramework" X="500" Y="500" Note=""/>
+        <Element ComponentName="SdlProcessArgumentsParser" X="500" Y="275" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

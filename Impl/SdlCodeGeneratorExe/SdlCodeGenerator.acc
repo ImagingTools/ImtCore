@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5351" Description="ACF"/>
-            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5389" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -163,16 +163,16 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/BaseClassExtender"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore/BaseClassExtender"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore/SchemaCustomParams"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/DependentSchemaList"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore/DependentSchemaList"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                                     <Data IsEnabled="false"/>
@@ -181,25 +181,25 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/OriginalNamespace"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore/OriginalNamespace"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlBaseRequestListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/BasicRequestsProvider"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore/BasicRequestsProvider"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                                     <Data IsEnabled="false"/>
@@ -232,13 +232,13 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CleanupProcessor" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="FileCleanupProcessor"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore/SchemaCustomParams"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                                     <Data IsEnabled="false"/>
@@ -259,13 +259,13 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore/SchemaCustomParams"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/DependentSchemaList"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore/DependentSchemaList"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                                     <Data IsEnabled="false"/>
@@ -274,16 +274,16 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                                     <Data IsEnabled="false"/>
@@ -294,7 +294,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="SdlCoreFramework" PackageId="ImtSdlV2Voce" ComponentId="SdlCoreFramework">
+                    <Element Id="SdlAppCore" PackageId="ImtSdlV2Voce" ComponentId="SdlAppCore">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
@@ -338,14 +338,14 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="SdlCoreFramework"/>
-                    <Interface InterfaceId="imtsdl::ISdlEnumListProvider" ComponentId="SdlCoreFramework"/>
-                    <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlCoreFramework"/>
-                    <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="SdlCoreFramework"/>
-                    <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="SdlCoreFramework"/>
-                    <Interface InterfaceId="imtsdl::ISdlUnionListProvider" ComponentId="SdlCoreFramework"/>
-                    <Interface InterfaceId="imtsdlgenv2::ISdlProcessArgumentsParser" ComponentId="SdlCoreFramework"/>
-                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlCoreFramework"/>
+                    <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="SdlAppCore"/>
+                    <Interface InterfaceId="imtsdl::ISdlEnumListProvider" ComponentId="SdlAppCore"/>
+                    <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlAppCore"/>
+                    <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="SdlAppCore"/>
+                    <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="SdlAppCore"/>
+                    <Interface InterfaceId="imtsdl::ISdlUnionListProvider" ComponentId="SdlAppCore"/>
+                    <Interface InterfaceId="imtsdlgenv2::ISdlProcessArgumentsParser" ComponentId="SdlAppCore"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlAppCore"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>
             </Data>
