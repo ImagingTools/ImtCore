@@ -27,6 +27,9 @@ GraphicsView{
 		layer.addShape(rec2);
 		layer.addShape(rec3);
 
+		let instrumentalLayer = view.getInstrumentalLayer()
+		instrumentalLayer.addShape(rulerShape)
+
 
 		// layer.addShape(polygon);
 
@@ -61,6 +64,7 @@ GraphicsView{
 
 		//Text
 		//drawModel.push({"point": Qt.point(300, 300), "color": "red", "fontSize": 20, "text": "TEXT"})
+
 
 		view.requestPaint();
 
@@ -113,6 +117,44 @@ GraphicsView{
 			ctx.lineTo(view.drawingAreaWidth, view.drawingAreaHeight - 1);
 			ctx.lineTo(1, view.drawingAreaHeight - 1);
 			ctx.lineTo(1, 1);
+			ctx.stroke();
+		}
+	}
+
+	GraphicsShapeBase{
+		id: rulerShape;
+
+		function drawBase(ctx, layerId){
+
+			ctx.lineCap = "round"
+			ctx.lineJoin = "round"
+			ctx.lineWidth = 2;
+
+			ctx.strokeStyle = "green";
+
+
+			let width_ = 500
+			let height_ =  50
+			let step = 10;
+			let x0= 500//view.drawingAreaWidth/3
+			let y0 = 800//view.drawingAreaHeight - 150
+
+			for(let i = 0; i * step <= width_; i++){//vertical lines
+				let x1 = x0 + i * step;
+				let y1 =  y0 + height_ ;
+				let x2 = x0 + i * step;
+				let coeff_ = i % 10 ? 1 : 0
+				let y2 = y0 + coeff_ * height_/2 ;
+
+				ctx.beginPath()
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.stroke();
+			}
+
+			ctx.moveTo(x0, y0 + 7 * height_/8);
+			ctx.lineTo(x0 + width_, y0 + 7 * height_/8);
+
 			ctx.stroke();
 		}
 	}

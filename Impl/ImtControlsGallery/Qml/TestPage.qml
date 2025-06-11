@@ -37,7 +37,7 @@ Rectangle {
 				// console.log("treeItemModel2", treeItemModel2.toJson())
 
 
-				console.log("requestPaint!!!!!!")
+				//console.log("requestPaint!!!!!!")
 				canvas.isReverse = !canvas.isReverse;
 				canvas.requestPaint()
 			}
@@ -74,7 +74,7 @@ Rectangle {
 		property bool isReverse: false;
 
 		onPaint: {
-			console.log("ON_PAINT")
+			//console.log("ON_PAINT")
 			var ctx = getContext('2d');
 
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
