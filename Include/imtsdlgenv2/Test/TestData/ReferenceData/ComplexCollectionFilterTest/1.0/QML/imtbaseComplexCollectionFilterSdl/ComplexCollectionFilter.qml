@@ -4,10 +4,10 @@ import imtcontrols 1.0
 BaseClass {
 	id: complexCollectionFilter
 	readonly property string __typename: 'ComplexCollectionFilter'
-	property BaseModel m_sortingInfo: BaseModel {owner: complexCollectionFilter}
+	property BaseModel m_sortingInfo
 	property var m_fieldsFilter
 	property var m_timeFilter
-	property BaseModel m_distinctFields: []
+	property var m_distinctFields
 
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){
@@ -43,9 +43,20 @@ BaseClass {
 		m_timeFilter = createComponent('m_timeFilter', typename)
 	}
 
-	function createComponent(propertyId, typename){
+	function createElement(propertyId, typename){
 		switch (propertyId){
 			case 'm_sortingInfo': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/FieldSortingInfo.qml')
+		}
+	}
+
+	function createComponent(propertyId, typename){
+		switch (propertyId){
+			case 'm_sortingInfo':{
+				let retVal =  Qt.createComponent('qrc:/qml/imtcontrols/Base/BaseModel.qml')
+				retVal.owner =  complexCollectionFilter
+
+				return retVal
+			}
 			case 'm_fieldsFilter': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/GroupFilter.qml')
 			case 'm_timeFilter': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/TimeFilter.qml')
 		}
