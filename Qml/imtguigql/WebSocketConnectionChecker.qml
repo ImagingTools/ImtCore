@@ -38,7 +38,6 @@ SubscriptionClient {
 	}
 	
 	onMessageReceived: {
-		console.log("onMessageReceived", data.toJson())
 		let ok = false
 		if (data.containsKey("status")){
 			let status = data.getData("status")

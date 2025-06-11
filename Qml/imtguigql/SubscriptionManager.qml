@@ -61,10 +61,8 @@ WebSocket {
 	}
 
 	onTextMessageReceived:{
-		console.log("onTextMessageReceived", message)
 		socketModel.createFromJson(message)
-		
-		console.log("socketModel", socketModel.toJson())
+
 		if (socketModel.getData("type") === "connection_ask"){
 			registerSubscriptionToServer()
 		}

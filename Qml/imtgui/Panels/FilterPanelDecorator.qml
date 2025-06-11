@@ -77,6 +77,7 @@ DecoratorBase {
 			width: 250;
 			currentIndex: 0;
 			radius: 3;
+			visible: filterPanelDecorator.documentFilter != null
 			
 			TreeItemModel {
 				id: stateModel

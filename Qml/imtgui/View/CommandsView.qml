@@ -213,7 +213,6 @@ Item {
 									
 									onWidthChanged: {
 										maxWidth = Math.max(maxWidth, width);
-										console.log("onWidthChanged", element.m_elementId, maxWidth)
 									}
 								}
 							}

@@ -342,7 +342,7 @@ Item {
 			
 			if (dataController){
 				let documentFilter = null
-				if (!documentCollectionFilter.isEmpty()){
+				if (documentCollectionFilter && !documentCollectionFilter.isEmpty()){
 					documentFilter = documentCollectionFilter
 				}
 
