@@ -66,6 +66,7 @@ Rectangle {
 
 		let layerInstrumental = layerComp.createObject(this);
 		layerInstrumental.layerId = "instrumental";
+		layerInstrumental.canApplyViewTransform = false;
 		layerModel.push(layerInstrumental);
 
 	}
@@ -675,6 +676,9 @@ Rectangle {
 			CanvasMatrix{
 				id: canvasMatrix;
 			}
+			CanvasMatrix{
+				id: canvasMatrixDefault;
+			}
 
 			function setScale(newScale, scaleX, scaleY){
 				if (newScale < 0.0000001){
@@ -714,14 +718,14 @@ Rectangle {
 
 				canvasMatrix.setContextTransform(ctx);
 
-				//Deprecated!!!
-				// let transtateX = canvas.deltaX
-				// let transtateY = canvas.deltaY
-				// ctx.translate(transtateX, transtateY)
-				// ctx.scale(canvas.scaleCoeff, canvas.scaleCoeff)
-
 				for(let i = 0; i < graphicsView.layerModel.length; i++){
 					let layer = graphicsView.layerModel[i];
+					if(layer.canApplyViewTransform){
+						canvasMatrix.setContextTransform(ctx);
+					}
+					else {
+						canvasMatrixDefault.setContextTransform(ctx);
+					}
 					layer.draw(ctx);
 				}
 
@@ -729,11 +733,7 @@ Rectangle {
 
 		}//canvas
 
-		// Rectangle{
-		// 	anchors.fill: canvas;
-		// 	color: "transparent"
-		// 	border.color: "red"
-		// }
+
 	}//mainContainer
 
 
