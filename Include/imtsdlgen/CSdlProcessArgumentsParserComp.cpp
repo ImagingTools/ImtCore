@@ -584,6 +584,14 @@ void CSdlProcessArgumentsParserComp::SetEnabledModificators(const QStringList& m
 }
 
 
+void CSdlProcessArgumentsParserComp::SetEnabledAllModificators(bool enable)
+{
+	if (m_useAllModificators != enable){
+		m_useAllModificators = enable;
+	}
+}
+
+
 void CSdlProcessArgumentsParserComp::SetCppEnabled(bool enabled)
 {
 	if (m_cppEnabled != enabled){
