@@ -6,6 +6,10 @@ BaseClass {
 	readonly property string __typename: 'PrinterSpecificationBase'
 	property var m_name
 
+	function hasName(){
+		return (m_name !== undefined && m_name !== null)
+	}
+
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){
 			case 'm_name': return 'name'

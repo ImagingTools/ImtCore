@@ -4,10 +4,42 @@ import imtcontrols 1.0
 BaseClass {
 	id: complexCollectionFilter
 	readonly property string __typename: 'ComplexCollectionFilter'
-	property BaseModel m_sortingInfo
+	property var m_sortingInfo
 	property var m_fieldsFilter
 	property var m_timeFilter
 	property var m_distinctFields
+
+	function hasSortingInfo(){
+		return (m_sortingInfo !== undefined && m_sortingInfo !== null)
+	}
+
+	function hasFieldsFilter(){
+		return (m_fieldsFilter !== undefined && m_fieldsFilter !== null)
+	}
+
+	function hasTimeFilter(){
+		return (m_timeFilter !== undefined && m_timeFilter !== null)
+	}
+
+	function hasDistinctFields(){
+		return (m_distinctFields !== undefined && m_distinctFields !== null)
+	}
+
+	function createSortingInfo(typename){
+		m_sortingInfo = createComponent('m_sortingInfo', typename)
+	}
+
+	function createFieldsFilter(typename){
+		m_fieldsFilter = createComponent('m_fieldsFilter', typename)
+	}
+
+	function createTimeFilter(typename){
+		m_timeFilter = createComponent('m_timeFilter', typename)
+	}
+
+	function createDistinctFields(typename){
+		m_distinctFields = createComponent('m_distinctFields', typename)
+	}
 
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){
@@ -16,31 +48,6 @@ BaseClass {
 			case 'm_timeFilter': return 'timeFilter'
 			case 'm_distinctFields': return 'distinctFields'
 		}
-	}
-
-	function hasSortingInfo() {
-		return (m_sortingInfo !== undefined && m_sortingInfo != null)
-	}
-
-	function hasFieldsFilter() {
-		return (m_fieldsFilter !== undefined && m_fieldsFilter != null)
-	}
-
-	function hasTimeFilter() {
-		return (m_timeFilter !== undefined && m_timeFilter != null)
-	}
-
-
-	function createSortingInfo(typename) {
-		m_sortingInfo = createComponent('m_sortingInfo', typename)
-	}
-
-	function createFieldsFilter(typename) {
-		m_fieldsFilter = createComponent('m_fieldsFilter', typename)
-	}
-
-	function createTimeFilter(typename) {
-		m_timeFilter = createComponent('m_timeFilter', typename)
 	}
 
 	function createElement(propertyId, typename){
@@ -52,13 +59,19 @@ BaseClass {
 	function createComponent(propertyId, typename){
 		switch (propertyId){
 			case 'm_sortingInfo':{
-				let retVal =  Qt.createComponent('qrc:/qml/imtcontrols/Base/BaseModel.qml')
-				retVal.owner =  complexCollectionFilter
+				let retVal = Qt.createComponent('qrc:/qml/imtcontrols/Base/BaseModel.qml')
+				retVal.owner = complexCollectionFilter
 
 				return retVal
 			}
 			case 'm_fieldsFilter': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/GroupFilter.qml')
 			case 'm_timeFilter': return Qt.createComponent('qrc:/qml/imtbaseComplexCollectionFilterSdl/TimeFilter.qml')
+			case 'm_distinctFields':{
+				let retVal = Qt.createComponent('qrc:/qml/imtcontrols/Base/BaseModel.qml')
+				retVal.owner = complexCollectionFilter
+
+				return retVal
+			}
 		}
 	}
 

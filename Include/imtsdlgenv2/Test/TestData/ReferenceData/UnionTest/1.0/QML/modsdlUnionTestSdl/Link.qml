@@ -6,6 +6,10 @@ BaseClass {
 	readonly property string __typename: 'Link'
 	property var m_link
 
+	function hasLink(){
+		return (m_link !== undefined && m_link !== null)
+	}
+
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){
 			case 'm_link': return 'link'

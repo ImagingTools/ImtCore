@@ -7,6 +7,14 @@ BaseClass {
 	property var m_x
 	property var m_y
 
+	function hasX(){
+		return (m_x !== undefined && m_x !== null)
+	}
+
+	function hasY(){
+		return (m_y !== undefined && m_y !== null)
+	}
+
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){
 			case 'm_x': return 'X'

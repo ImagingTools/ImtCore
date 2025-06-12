@@ -7,6 +7,18 @@ BaseClass {
 	property var m_name
 	property var m_specification
 
+	function hasName(){
+		return (m_name !== undefined && m_name !== null)
+	}
+
+	function hasSpecification(){
+		return (m_specification !== undefined && m_specification !== null)
+	}
+
+	function createSpecification(typename){
+		m_specification = createComponent('m_specification', typename)
+	}
+
 	function getJSONKeyForProperty(propertyId){
 		switch (propertyId){
 			case 'm_name': return 'name'
