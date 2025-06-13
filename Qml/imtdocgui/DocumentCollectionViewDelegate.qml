@@ -336,11 +336,8 @@ CollectionViewCommandsDelegateBase {
 
 					SplitView {
 						id: splitView;
-						anchors.left: parent.left;
-						anchors.leftMargin: Style.marginM;
-						anchors.right: parent.right;
-						anchors.rightMargin: Style.marginM;
-						height: parent.height;
+						anchors.fill: parent
+						anchors.margins: Style.marginM
 						orientation: Qt.Vertical
 
 						Table {
