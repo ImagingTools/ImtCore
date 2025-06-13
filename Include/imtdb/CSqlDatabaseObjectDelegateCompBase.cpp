@@ -509,7 +509,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
 {
-	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, false);
+	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
 
 	return true;
 }
@@ -529,7 +529,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(
 {
 	QByteArray columnId;
 	QByteArray sortOrder;
-	
+
 	if (!collectionFilter.GetSortingInfoIds().isEmpty()){
 		columnId = collectionFilter.GetSortingInfoIds().first();
 	}
