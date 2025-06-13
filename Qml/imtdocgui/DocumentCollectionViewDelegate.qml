@@ -37,6 +37,10 @@ CollectionViewCommandsDelegateBase {
 	}
 	
 	onDocumentManagerChanged: {
+		if (!documentManager){
+			return
+		}
+
 		for (let i = 0; i < documentTypeIds.length; i++){
 			let documentTypeId = documentTypeIds[i];
 			if (documentViewsComp.length > i && documentViewTypeIds.length > i){
