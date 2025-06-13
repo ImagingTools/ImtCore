@@ -3,7 +3,6 @@
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
-#include <iser/CJsonMemWriteArchive.h>
 
 // ImtCore includes
 #include <imtbase/IComplexCollectionFilter.h>
@@ -17,15 +16,15 @@ namespace imtdb
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
 QByteArray CSqliteDatabaseDocumentDelegateComp::GetSelectionQuery(
-	const QByteArray& objectId,
-	int offset,
-	int count,
-	const iprm::IParamsSet* paramsPtr) const
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
 		return GetObjectSelectionQuery(objectId, paramsPtr);
 	}
-	
+
 	QString sortQuery;
 	QString filterQuery;
 	if (count == 0){
@@ -35,7 +34,7 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::GetSelectionQuery(
 		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
 			return QByteArray();
 		}
-		
+
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
 		if (complexFilterParamPtr.IsValid()){
 			if (!CreateSortQuery(*complexFilterParamPtr, sortQuery)){
@@ -43,20 +42,20 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::GetSelectionQuery(
 			}
 		}
 	}
-	
+
 	QByteArray paginationQuery;
 	if (!CreatePaginationQuery(offset, count, paginationQuery)){
 		return QByteArray();
 	}
-	
+
 	QString baseSelelectionQuery = GetBaseSelectionQuery();
-	
+
 	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
 	QString retVal = baseSelelectionQuery;
 	retVal += QString(" ") + filterQuery;
 	retVal += QString(" ") + sortQuery;
 	retVal += QString(" ") + qPrintable(paginationQuery);
-	
+
 	return retVal.toUtf8();
 }
 
@@ -67,17 +66,17 @@ QString CSqliteDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 	if (m_tableSchemaAttrPtr.IsValid()){
 		schema = *m_tableSchemaAttrPtr + ".";
 	}
-	
+
 	Q_ASSERT(!(*m_tableNameAttrPtr).isEmpty());
-	
+
 	QString tableName = *m_tableNameAttrPtr;
 	QByteArray joinTablesQuery = CreateJoinTablesQuery();
-	
+
 	QString customColumns = GetCustomColumnsQuery();
 	if (!customColumns.isEmpty()){
 		customColumns = ", " + customColumns;
 	}
-	
+
 	QString query = QString(R"(
 			SELECT
 				root.*,
@@ -108,14 +107,14 @@ QString CSqliteDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 QByteArray CSqliteDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const
 {
 	QString revisionInfo = QString(R"(json_object()");
-	
+
 	QStringList keys = paramMap.keys();
-	
+
 	for (int i = 0; i < keys.size(); i++){
 		if (i > 0){
 			revisionInfo += ", ";
 		}
-		
+
 		QString key = keys[i];
 		QVariant value = paramMap[key];
 		if (value.canConvert<RawSqlExpression>()){
@@ -132,9 +131,9 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const
 			revisionInfo += QString("'%1', %2").arg(key).arg(value.toBool());
 		}
 	}
-	
+
 	revisionInfo += ")";
-	
+
 	return revisionInfo.toUtf8();
 }
 
@@ -143,11 +142,11 @@ QByteArray CSqliteDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const
 bool CSqliteDatabaseDocumentDelegateComp::CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const
 {
 	paginationQuery.clear();
-	
+
 	if (offset >= 0 && count > 0){
 		paginationQuery = QString("LIMIT %1 OFFSET %2").arg(count).arg(offset).toUtf8();
 	}
-	
+
 	return true;
 }
 
@@ -159,7 +158,7 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 		qPrintable(*m_tableNameAttrPtr),
 		CreateJsonExtractSql("RevisionInfo", "RevisionNumber", QMetaType::Int)
 		);
-	
+
 	switch (timeFilter.GetTimeUnit()){
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
 		break;
@@ -229,7 +228,7 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 		}
 		break;
 	}
-	
+
 	if (timeFilterQuery.isEmpty()){
 		imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
 		if (!timeRange.IsNull()){
@@ -237,15 +236,15 @@ bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::I
 			.arg(addedStrQuery, timeRange.GetBeginTime().toString(Qt::ISODate), timeRange.GetEndTime().toString(Qt::ISODate));
 		}
 	}
-	
+
 	return true;
 }
 
 
 bool CSqliteDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
 {
-	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, false);
-	
+	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
+
 	return true;
 }
 

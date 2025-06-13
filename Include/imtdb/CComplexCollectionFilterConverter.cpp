@@ -71,9 +71,9 @@ QString CComplexCollectionFilterConverter::CreateSqlSortQuery(const imtbase::ICo
 }
 
 
-QString CComplexCollectionFilterConverter::CreateSqlFilterQuery(const imtbase::IComplexCollectionFilter& filter, bool castTypes)
+QString CComplexCollectionFilterConverter::CreateSqlFilterQuery(const imtbase::IComplexCollectionFilter& filter, SqlContext sqlContext)
 {
-	QString retVal = ProcessGroup(filter.GetFieldsFilter(), castTypes);
+	QString retVal = ProcessGroup(filter.GetFieldsFilter(), sqlContext);
 
 	retVal = retVal.mid(1, retVal.length() - 2);
 
@@ -81,7 +81,7 @@ QString CComplexCollectionFilterConverter::CreateSqlFilterQuery(const imtbase::I
 }
 
 
-QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplexCollectionFilter::FieldFilter& filter, bool castTypes)
+QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplexCollectionFilter::FieldFilter& filter, SqlContext sqlContext)
 {
 	QString retVal;
 	bool isOk = false;
@@ -108,7 +108,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 		}
 
 		if (isOk){
-			QString columnExpr = castTypes ? QString("(\"%1\")::%2").arg(qPrintable(filter.fieldId), type)
+			QString columnExpr = sqlContext == SC_POSTGRES ? QString("(\"%1\")::%2").arg(qPrintable(filter.fieldId), type)
 											: QString("\"%1\"").arg(qPrintable(filter.fieldId));
 			retVal = QString("%1 %2 %3").arg(columnExpr, numericOperations[filter.filterOperation], filterValue);
 		}
@@ -118,14 +118,23 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 		if (filter.filterOperation == imtbase::IComplexCollectionFilter::FO_CONTAINS){
 			filterValue.prepend("%");
 			filterValue.append("%");
+
+			switch (sqlContext){
+			case SC_GENERAL:
+				stringOperations[filter.filterOperation] = "LIKE";
+				break;
+			case SC_POSTGRES:
+				stringOperations[filter.filterOperation] = "ILIKE";
+				break;
+			}
 		}
-		
-		retVal = castTypes ? QString("lower((\"%1\")::text) %2 lower('%3')").arg(qPrintable(filter.fieldId), stringOperations[filter.filterOperation], filterValue)
-							: QString("lower(\"%1\") %2 lower('%3')").arg(qPrintable(filter.fieldId), stringOperations[filter.filterOperation], filterValue);
+
+		retVal = sqlContext == SC_POSTGRES ? QString("(\"%1\")::text %2 '%3'").arg(qPrintable(filter.fieldId), stringOperations[filter.filterOperation], filterValue)
+							: QString("\"%1\" %2 '%3'").arg(qPrintable(filter.fieldId), stringOperations[filter.filterOperation], filterValue);
 	}
 	else if (boolTypes.contains(filter.filterValue.type()) && boolOperations.contains(filter.filterOperation)){
 		bool value = filter.filterValue.toBool();
-		QString columnExpr = castTypes ? QString("(\"%1\")::bool").arg(qPrintable(filter.fieldId))
+		QString columnExpr = sqlContext == SC_POSTGRES ? QString("(\"%1\")::bool").arg(qPrintable(filter.fieldId))
 										: QString("\"%1\"").arg(qPrintable(filter.fieldId));
 		retVal = QString("%1 %2 %3").arg(columnExpr, boolOperations[filter.filterOperation], value ? "true" : "false");
 	}
@@ -134,7 +143,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 };
 
 
-QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexCollectionFilter::GroupFilter& filter, bool castTypes)
+QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexCollectionFilter::GroupFilter& filter, SqlContext sqlContext)
 {
 	QString retVal;
 	QString logicOperation;
@@ -153,7 +162,7 @@ QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexC
 	}
 
 	for (const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : filter.fieldFilters){
-		QString retValPart = ProcessColumn(fieldFilter, castTypes);
+		QString retValPart = ProcessColumn(fieldFilter, sqlContext);
 		if (retValPart.isEmpty()){
 			continue;
 		}
@@ -162,7 +171,7 @@ QString CComplexCollectionFilterConverter::ProcessGroup(const imtbase::IComplexC
 	}
 
 	for (const imtbase::IComplexCollectionFilter::GroupFilter& groupFilter : filter.groupFilters){
-		QString retValPart = ProcessGroup(groupFilter, castTypes);
+		QString retValPart = ProcessGroup(groupFilter, sqlContext);
 		if (retValPart.isEmpty()){
 			continue;
 		}
