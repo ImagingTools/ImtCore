@@ -67,7 +67,7 @@ QLabel[Header=true]
 	color: ${Active.BlueLabel}; 
 }
 
-QToolButton 
+QToolButton
 {
 	color: ${Active.Text}; 
 }
@@ -95,11 +95,6 @@ QToolBar[ImtToolBar=true]::separator
 	background: transparent;
 }
 
-QTableView[ImtMenu=true]
-{
-	color: palette(background);
-	background: palette(background);
-}
 
 QAbstractItemView::item::selected
 {
@@ -107,10 +102,13 @@ QAbstractItemView::item::selected
 	background-color: ${Active.ItemSelected};
 }
 
-QAbstractItemView::branch::selected
+
+QTableView[ImtMenu=true]
 {
-	background: ${Active.ItemSelected};
+	color: palette(background);
+	background: palette(background);
 }
+
 
 QComboBox::item:selected 
 {
