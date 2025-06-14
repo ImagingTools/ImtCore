@@ -80,13 +80,11 @@ type ProductExportResponse {
 type Query {
 	ProductsList (input:ProductsListInput): ProductsListPayload!
 	ProductItem (input: ProductItemInput): ProductData!
-	ProductsExport (input: ProductExportInput): ProductExportResponse!
 }
 
 type Mutation {
 	ProductUpdate (input: ProductDataInput): UpdatedNotificationPayload!
 	ProductAdd (input: ProductDataInput): AddedNotificationPayload!
-	ProductsImport (input: ProductImportInput): ProductImportResponse!
 }
 
 collectionSchema {

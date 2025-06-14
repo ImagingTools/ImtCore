@@ -35,7 +35,7 @@ public:
 	virtual const IFeatureInfo* GetSubFeature(const QByteArray& subfeatureId, int maxDepth = -1) const override;
 	virtual const istd::TPointerVector<const IFeatureInfo>& GetSubFeatures() const override;
 	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) override;
-	virtual void DeleteSubFeature(const QByteArray &subFeatureId) override;
+	virtual void DeleteSubFeature(const QByteArray& subFeatureId) override;
 	virtual QByteArrayList GetDependencies() const override;
 
 	// reimplemented (iser::IObject)

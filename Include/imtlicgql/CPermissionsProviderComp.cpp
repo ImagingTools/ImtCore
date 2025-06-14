@@ -1,6 +1,10 @@
 #include <imtlicgql/CPermissionsProviderComp.h>
 
 
+// ACF includes
+#include <iqt/iqt.h>
+
+
 namespace imtlicgql
 {
 
@@ -19,9 +23,23 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 	QByteArray featureId = featureInfo.GetFeatureId();
 
 	representationModel.SetData("FeatureId", featureId);
-	representationModel.SetData("FeatureName", featureInfo.GetFeatureName());
+
+	QString featureName = featureInfo.GetFeatureName();
+	if (m_translationManagerCompPtr.IsValid()){
+		QString featureNameTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), featureName.toUtf8(), "ru_RU", QByteArrayLiteral("Feature"));
+		featureName = featureNameTr;
+	}
+
+	representationModel.SetData("FeatureName", featureName);
 	representationModel.SetData("Optional", featureInfo.IsOptional());
-	representationModel.SetData("FeatureDescription", featureInfo.GetFeatureDescription());
+
+	QString featureDescription = featureInfo.GetFeatureDescription();
+	if (m_translationManagerCompPtr.IsValid()){
+		QString featureDescriptionTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), featureDescription.toUtf8(), "ru_RU", QByteArrayLiteral("Feature"));
+		featureDescription = featureDescriptionTr;
+	}
+
+	representationModel.SetData("FeatureDescription", featureDescription);
 	representationModel.SetData("Dependencies", featureInfo.GetDependencies().join(';'));
 	representationModel.SetData("ChildModel", 0);
 

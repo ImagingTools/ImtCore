@@ -6,6 +6,8 @@ import Qt.labs.platform 1.1
 import imtcolgui 1.0
 import imtdocgui 1.0
 import imtcontrols 1.0
+import imtlicProductsSdl 1.0
+import imtguigql 1.0
 
 DocumentCollectionViewDelegate {
 	id: container;
@@ -13,14 +15,14 @@ DocumentCollectionViewDelegate {
 	removeDialogTitle: qsTr("Deleting a product");
 	removeMessage: qsTr("Delete the selected product ?");
 	
-	exportFileDialog.nameFilters: ["Xml files (*.xml)"];
+	exportFileDialog.nameFilters: ["Xml files (*.xml)", "H files (*.h)"];
 	importFileDialog.nameFilters: ["Xml files (*.xml)"];
 	importDialogMimeTypes: ["application/xml"]
-	exportDialogMimeTypes: ["application/xml"]
+	exportDialogMimeTypes: ["application/xml", "text/x-c"]
 	exportFileDialog.title: qsTr("Select product");
 	
 	importObjectTypeId: "Product";
-	
+
 	property bool force: false;
 	
 	function updateItemSelection(selectedItems){
@@ -74,11 +76,11 @@ DocumentCollectionViewDelegate {
 			}
 		}
 	}
-	
+
 	function onImport(){
 		ModalDialogManager.openDialog(messageDialogComp, {});
 	}
-	
+
 	function onImportDialogResult(name, fileData, mimeType){
 		console.log("onImportDialogResult", name, mimeType)
 		if (collectionView && collectionView.dataController){

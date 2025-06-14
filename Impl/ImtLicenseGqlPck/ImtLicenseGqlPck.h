@@ -21,6 +21,7 @@
 #include <imtlicgql/CFeatureMetaInfoDelegateComp.h>
 #include <imtlicgql/CProductMetaInfoDelegateComp.h>
 #include <imtlicgql/CLicenseMetaInfoDelegateComp.h>
+#include <imtlicgql/CProductInfoFileGeneratorComp.h>
 
 
 /**
@@ -44,6 +45,7 @@ typedef imtlicgql::CPermissionsProviderComp PermissionsProvider;
 typedef imtlicgql::CFeatureMetaInfoDelegateComp FeatureMetaInfoDelegate;
 typedef imtlicgql::CProductMetaInfoDelegateComp ProductMetaInfoDelegate;
 typedef imtlicgql::CLicenseMetaInfoDelegateComp LicenseMetaInfoDelegate;
+typedef imtlicgql::CProductInfoFileGeneratorComp ProductInfoFileGenerator;
 
 
 } // namespace ImtLicenseGqlPck

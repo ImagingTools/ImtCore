@@ -416,6 +416,9 @@ QString CProductCollectionControllerComp::GetExtensionFromMimeType(const imtbase
 	if (mimeType.GetSubType() == "xml"){
 		return mimeType.GetSubType();
 	}
+	else if (mimeType.GetSubType() == "x-c"){
+		return QStringLiteral("h");
+	}
 
 	return QString();
 }
