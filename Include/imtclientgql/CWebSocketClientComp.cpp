@@ -339,7 +339,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 				newHttpRequestPtr->SetMethodType(imtrest::CHttpRequest::MT_POST);
 				newHttpRequestPtr->SetCommandId("/" + *m_productId + "/graphql");
 
-				responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*newHttpRequestPtr);
+				responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*requestPtr.PopInterfacePtr());
 			}
 		}
 	}
