@@ -40,31 +40,30 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 
 	if (username.isEmpty()){
 		errorMessage = QT_TR_NOOP("Username can't be empty!");
-
 		return false;
 	}
-	
+
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = username;
-	
+	fieldFilter.filterOperation = imtbase::IComplexCollectionFilter::FO_CONTAINS;
+
 	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
 	groupFilter.fieldFilters << fieldFilter;
-	
+
 	imtbase::CComplexCollectionFilter complexFilter;
 	complexFilter.SetFieldsFilter(groupFilter);
-	
+
 	iprm::CParamsSet filterParam;
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
-	
-	imtbase::IObjectCollection::Ids userIds = userCollection.GetElementIds(0, -1, &filterParam);
-	if (!userIds.isEmpty()){
-		QByteArray userObjectId = userIds[0];
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (userCollection.GetObjectData(userObjectId, dataPtr)){
-			const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
-			if (currentUserInfoPtr != nullptr){
-				if (userObjectId != userId){
+
+	imtbase::IObjectCollection::Ids userElementIds = userCollection.GetElementIds(0, -1, &filterParam);
+	for (const imtbase::IObjectCollection::Id& userElementId : userElementIds){
+		if (userElementId != userId){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (userCollection.GetObjectData(userElementId, dataPtr)){
+				const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+				if (currentUserInfoPtr != nullptr){
 					QByteArray currentUsername = currentUserInfoPtr->GetId();
 					if (currentUsername.toLower() == username.toLower()){
 						errorMessage = QT_TR_NOOP("Username already exists");

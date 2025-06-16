@@ -196,8 +196,16 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 
 	userIdentifierPtr->SetObjectUuid(userId);
 
+	imtbase::ICollectionInfo::Ids elementIds = m_userCollectionCompPtr->GetElementIds();
+	if (elementIds.contains(userId)){
+		errorMessage = QString("Unable to register user. Error: User with ID: '%1' already exists")
+					.arg(QString::fromUtf8(userId)).arg(errorMessage);
+
+		return sdl::imtauth::Users::CRegisterUserPayload();
+	}
+
 	if (!m_userRepresentationController.FillUserInfoFromRepresentation(userData, *userInfoPtr, *m_userCollectionCompPtr, userId, errorMessage)){
-		errorMessage = QString("Unable to register user. Error: '%1'").arg(errorMessage);
+		errorMessage = QString("Unable to register user. Error: %1").arg(errorMessage);
 
 		return sdl::imtauth::Users::CRegisterUserPayload();
 	}
