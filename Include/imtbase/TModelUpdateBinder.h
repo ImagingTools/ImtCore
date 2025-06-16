@@ -100,7 +100,6 @@ template <typename ModelInterface, typename Parent>
 bool TModelUpdateBinder<ModelInterface, Parent>::RegisterObject(ModelInterface* dataPtr, CallbackMethod callbackMethod, int modelId)
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(dataPtr);
-	Q_ASSERT(modelPtr != nullptr);
 	if (modelPtr != nullptr){
 		m_callbackMap[modelId] = callbackMethod;
 		if (BaseClass::RegisterModel(modelPtr, modelId)){
