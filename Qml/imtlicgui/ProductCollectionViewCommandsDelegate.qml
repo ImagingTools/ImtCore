@@ -15,7 +15,7 @@ DocumentCollectionViewDelegate {
 	removeDialogTitle: qsTr("Deleting a product");
 	removeMessage: qsTr("Delete the selected product ?");
 	
-	exportFileDialog.nameFilters: ["Xml files (*.xml)", "H files (*.h)"];
+	exportFileDialog.nameFilters: ["Xml files (*.xml)", "C++ Header Files (*.h)"];
 	importFileDialog.nameFilters: ["Xml files (*.xml)"];
 	importDialogMimeTypes: ["application/xml"]
 	exportDialogMimeTypes: ["application/xml", "text/x-c"]

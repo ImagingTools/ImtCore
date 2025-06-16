@@ -64,6 +64,10 @@ ViewBase {
 	}
 	
 	function checkChangePasswordLogic(){
+		if (!userData){
+			return;
+		}
+
 		userGeneralEditor.passwordInput.visible = userData.m_id == "";
 		userGeneralEditor.changePasswordButton.visible = !userGeneralEditor.passwordInput.visible;
 	}
