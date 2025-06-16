@@ -91,6 +91,7 @@ void PrepareSuite(CImtSdlGenTest& testSuite)
 	argParserPtr->SetAutoLinkLevel(imtsdl::ISdlProcessArgumentsParser::ALL_ONLY_FILE);
 	argParserPtr->SetGenerateModeEnabled();
 	argParserPtr->SetModuleGenerateEnabled(false);
+	argParserPtr->SetEnabledAllModificators();
 }
 
 
@@ -177,7 +178,7 @@ void CSdlGenTest::TestBasicSchema()
 
 	imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 	argParserPtr->SetCppEnabled();
-	argParserPtr->SetGqlEnabled(false);
+	argParserPtr->SetGqlEnabled();
 	argParserPtr->SetQmlEnabled(false);
 	ExecuteTest(testSuite, "ImtBaseTypes.sdl", "BasicSchemaTest", &m_tempDirPtrList);
 }
@@ -203,7 +204,7 @@ void CSdlGenTest::TestUnion()
 
 	imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 	argParserPtr->SetCppEnabled();
-	argParserPtr->SetGqlEnabled(false);
+	argParserPtr->SetGqlEnabled();
 	argParserPtr->SetQmlEnabled();
 
 	ExecuteTest(testSuite, "UnionTest.sdl", "UnionTest", &m_tempDirPtrList);
