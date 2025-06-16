@@ -27,6 +27,7 @@ class ImtCoreConan(ConanFile):
         "USE_QT3D": [True, False],
         "USE_QTDB": [True, False],
         "USE_QTQML": [True, False],
+        "BUILD_TESTING": [True, False]
     }
 
     default_options = {
@@ -35,6 +36,7 @@ class ImtCoreConan(ConanFile):
         "USE_QT3D": True,
         "USE_QTDB": True,
         "USE_QTQML": True,
+        "BUILD_TESTING": False
     }
 
     description = "ImagingTools Core Framework"
@@ -159,6 +161,7 @@ class ImtCoreConan(ConanFile):
         tc.variables["USE_QT3D"] = self.options.USE_QT3D
         tc.variables["USE_QTDB"] = self.options.USE_QTDB
         tc.variables["USE_QTQML"] = self.options.USE_QTQML
+        tc.variables["BUILD_TESTING"] = self.options.BUILD_TESTING
         tc.variables["USE_EJ"] = False
         tc.variables["USE_GEO"] = False
         tc.variables["USE_FIND_PACKAGE"] = True

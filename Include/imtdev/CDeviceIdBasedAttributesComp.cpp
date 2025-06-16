@@ -54,24 +54,19 @@ void CDeviceIdBasedAttributesComp::OnComponentDestroyed()
 
 DeviceInstanceInfoPtr CDeviceIdBasedAttributesComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
 {
-	if (!deviceId.isEmpty() && m_controllerCompPtr.IsValid()){
-		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
-		if (deviceInstanceInfoPtr != nullptr){
-			return deviceInstanceInfoPtr;
-		}
-
-		return m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
+	DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
+	if (deviceInstanceInfoPtr != nullptr){
+		return deviceInstanceInfoPtr;
 	}
 
-	return nullptr;
+	return m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
 }
 
 
 void CDeviceIdBasedAttributesComp::UpdateModel()
 {
-	istd::CChangeNotifier notifier(this);
-
-	ResetData();
+	m_staticAttrs.ResetData();
+	m_instanceAttrs.ResetData();
 
 	if (m_selectionCompPtr.IsValid() && m_controllerCompPtr.IsValid()){
 		imtbase::ISelection::Ids ids = m_selectionCompPtr->GetSelectedIds();
@@ -81,11 +76,26 @@ void CDeviceIdBasedAttributesComp::UpdateModel()
 
 		QByteArray deviceId = *ids.begin();
 
+		const IDeviceStaticInfo* staticInfoPtr = nullptr;
+
 		DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
 		if (instanceInfoPtr != nullptr){
+			staticInfoPtr = &instanceInfoPtr->GetStaticInfo();
+
 			const iattr::IAttributesProvider* attributesPtr = instanceInfoPtr->GetAttributes();
 			if (attributesPtr != nullptr){
-				CopyFrom(*attributesPtr);
+				m_instanceAttrs.CopyFrom(*attributesPtr);
+			}
+		}
+
+		if (staticInfoPtr == nullptr){
+			staticInfoPtr = m_controllerCompPtr->GetDeviceStaticInfo(deviceId);
+		}
+
+		if (staticInfoPtr != nullptr){
+			const iattr::IAttributesProvider* attributesPtr = staticInfoPtr->GetAttributes();
+			if (attributesPtr != nullptr){
+				m_staticAttrs.CopyFrom(*attributesPtr);
 			}
 		}
 	}

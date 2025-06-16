@@ -26,7 +26,7 @@ typedef imtdev::CCompositeDeviceControllerComp CompositeDeviceController;
 typedef imtdev::CDeviceDataFilePersistenceComp DeviceDataFilePersistence;
 typedef icomp::TModelCompWrap<imtdev::CDeviceIdBasedConfigurationManagerComp> DeviceIdBasedConfigurationManager;
 typedef icomp::TModelCompWrap<imtdev::CDeviceIdBasedConfigurationComp> DeviceIdBasedConfiguration;
-typedef icomp::TModelCompWrap<imtdev::CDeviceIdBasedAttributesComp> DeviceIdBasedAttributes;
+typedef imtdev::CDeviceIdBasedAttributesComp DeviceIdBasedAttributes;
 typedef imtdev::CDeviceFrameworkComp DeviceFramework;
 typedef imtdev::CDeviceFrameworkProxyComp DeviceFrameworkProxy;
 
