@@ -69,7 +69,7 @@ bool CDocumentCollectionFilter::RemoveDocumentState(DocumentState state)
 
 // reimplemented (iser::ISerializable)
 
-bool CDocumentCollectionFilter::Serialize(iser::IArchive& archive)
+bool CDocumentCollectionFilter::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }
@@ -83,7 +83,7 @@ int CDocumentCollectionFilter::GetSupportedOperations() const
 }
 
 
-bool CDocumentCollectionFilter::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CDocumentCollectionFilter::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	istd::CChangeGroup changeGroup(this);
 
@@ -112,7 +112,7 @@ istd::IChangeable* CDocumentCollectionFilter::CloneMe(CompatibilityMode mode) co
 }
 
 
-bool CDocumentCollectionFilter::ResetData(CompatibilityMode mode)
+bool CDocumentCollectionFilter::ResetData(CompatibilityMode /*mode*/)
 {
 	m_documentId.clear();
 	m_states.clear();

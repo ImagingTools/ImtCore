@@ -46,7 +46,7 @@ QWidget#RightFrame
 	border-left: 1px solid ${Active.Text}; 
 }
 
-QWidget#StatusFrame 
+QWidget#StatusFrame
 {
 	border-bottom: 1px solid ${Active.Text}; 
 }
@@ -102,9 +102,25 @@ QAbstractItemView::item::selected
 	background-color: ${Active.ItemSelected};
 }
 
-
-QTableView[ImtMenu=true]
+QAbstractItemView::branch::selected
 {
+	background: ${Active.ItemSelected};
+}
+
+QAbstractItemView::branch:has-children:!has-siblings:closed,
+QAbstractItemView::branch:closed:has-children:has-siblings {
+	border-image: none;
+	image: url(:/${Scheme}/Icons/ArrowRight);
+}
+
+QAbstractItemView::branch:open:has-children:!has-siblings,
+QAbstractItemView::branch:open:has-children:has-siblings {
+	border-image: none;
+	image: url(:/${Scheme}/Icons/ArrowDown);
+}
+
+
+QTableView[ImtMenu=true] {
 	color: palette(background);
 	background: palette(background);
 }

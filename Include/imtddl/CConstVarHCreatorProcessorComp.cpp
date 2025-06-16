@@ -75,7 +75,7 @@ QString CConstVarHCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* pa
 
 
 bool CConstVarHCreatorProcessorComp::CreateBody(
-			const QString moduleName,
+			const QString /*moduleName*/,
 			const QJsonDocument& templateDocument,
 			const iprm::IParamsSet* /*paramsPtr*/)
 {

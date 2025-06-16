@@ -31,7 +31,7 @@ QByteArray CDesignTokenStyleSheetProcessorComp::GetHelpString() const
 int CDesignTokenStyleSheetProcessorComp::Exec()
 {
 	if(m_argumentParserCompPtr->GetStyleSheetsInputDirectoryPath().isEmpty()){
-		qDebug() << "Style sheets dir is not set skipping...";
+		qDebug() << "Folder containing style sheets was not set, processing skipped";
 		return 0;
 	}
 
@@ -50,7 +50,7 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 	m_outputDirName = m_argumentParserCompPtr->GetOutputDirectoryPath();
 	m_inputDirName = m_argumentParserCompPtr->GetStyleSheetsInputDirectoryPath();
 	if(!m_inputDirName.length()){
-		qInfo() << "Styles dir is not set skipping...";
+		qInfo() << "Folder containing styles was not set, processing skipping...";
 		return 0;
 	}
 
@@ -138,12 +138,9 @@ bool CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 		return true;
 	}
 
-//	while (this->SetVariableColor(fileData, m_currentPalette));
 	CDesignTokenStyleUtils::SetVariablesFromDualVariable(fileData, '$', '{', '}', m_currentPalette);
 	CDesignTokenStyleUtils::SetVariables(fileData, '$', '{', '}', m_currentBasePalette);
-
 	CDesignTokenStyleUtils::SetVariables(fileData, '$', '(', ')', m_currentFontsCss);
-
 	CDesignTokenStyleUtils::SetVariables(fileData, '$', '{', '}', QVariantMap({ std::make_pair("Scheme", m_currentTheme) }));
 
 	// ensure, all variables is setted

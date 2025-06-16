@@ -99,7 +99,7 @@ QString CConstVarCreatorProcessorCompBase::GetModuleName(const iprm::IParamsSet*
 }
 
 
-bool CConstVarCreatorProcessorCompBase::CreateBody(const QString moduleName, const QJsonDocument& /*templateDocument*/, const iprm::IParamsSet* /*paramsPtr*/)
+bool CConstVarCreatorProcessorCompBase::CreateBody(const QString /*moduleName*/, const QJsonDocument& /*templateDocument*/, const iprm::IParamsSet* /*paramsPtr*/)
 {
 	return false;
 }
