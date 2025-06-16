@@ -59,6 +59,10 @@ I_EXPORT_COMPONENT(
 			"The SSL Configuration's verify mode",
 			"SSL Secure Connection Server Client Network Networking" IM_AUTHOR("Sergey Zastrovnyh"));
 
+I_EXPORT_COMPONENT(
+			ServerConnectionInterfaceParam,
+			"Server connection configuration",
+			"SSL Secure Connection Server Interface Host" IM_AUTHOR("Kirill Lepskiy"));
 
 
 } // namespace ImtComPck
