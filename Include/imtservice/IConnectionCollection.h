@@ -37,7 +37,6 @@ public:
 				const QString& description = QString() ) = 0;
 };
 
-// CUrlConnectionParam
 
 } // namespace imtservice
 

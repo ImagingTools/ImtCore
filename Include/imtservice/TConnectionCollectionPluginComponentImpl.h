@@ -44,8 +44,6 @@ const imtservice::IConnectionCollectionPlugin::IConnectionCollectionFactory* TCo
 }
 
 
-
-
 } // namespace imtservice
 
 

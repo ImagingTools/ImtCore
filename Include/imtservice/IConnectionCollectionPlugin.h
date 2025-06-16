@@ -18,6 +18,8 @@ class IConnectionCollectionPlugin: virtual public imtbase::IPluginInfo
 {
 public:
 	typedef istd::TIFactory<imtservice::IConnectionCollection> IConnectionCollectionFactory;
+	typedef istd::TUniqueInterfacePtr<imtservice::IConnectionCollection> IConnectionCollectionUniquePtr;
+	typedef istd::TSharedInterfacePtr<imtservice::IConnectionCollection> IConnectionCollectionSharedPtr;
 
 	/**
 		Get access to the ConnectionCollection factory.
