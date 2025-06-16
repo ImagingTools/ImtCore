@@ -73,10 +73,10 @@ static bool CompareDirectories(const QString& dir1, const QString& dir2) {
 void GetPrecessorAndExec(CImtSdlGenTest& testSuite, const QByteArray& processorName)
 {
 	iproc::IProcessor* processorPtr = testSuite.GetInterface<iproc::IProcessor>(processorName);
-	QCOMPARE_NE(processorPtr, nullptr);
+	QVERIFY(processorPtr != nullptr);
 
 	iproc::IProcessor::TaskState execResult = processorPtr->DoProcessing(nullptr, nullptr, nullptr);
-	QCOMPARE_EQ(execResult, iproc::IProcessor::TS_OK);
+	QVERIFY(execResult == iproc::IProcessor::TS_OK);
 }
 
 
@@ -85,7 +85,7 @@ void PrepareSuite(CImtSdlGenTest& testSuite)
 	testSuite.EnsureAutoInitComponentsCreated();
 
 	imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
-	QCOMPARE_NE(argParserPtr, nullptr);
+	QVERIFY(argParserPtr != nullptr);
 
 	argParserPtr->SetAutoJoinEnabled();
 	argParserPtr->SetAutoLinkLevel(imtsdl::ISdlProcessArgumentsParser::ALL_ONLY_FILE);
@@ -97,7 +97,7 @@ void PrepareSuite(CImtSdlGenTest& testSuite)
 
 void ExecuteTest(CImtSdlGenTest& testSuite, const QString& schemaFileName, const QString& referenceDataDirName = QString(), QList<std::shared_ptr<QTemporaryDir>>* tempDirPtrList = nullptr)
 {
-	QCOMPARE_NE(schemaFileName.length(), 0);
+	QVERIFY(schemaFileName.length() != 0);
 	QVERIFY(QFileInfo::exists(s_testDataDirectoryPath + '/' + schemaFileName));
 
 	std::shared_ptr<QTemporaryDir> tempOutputDir(new QTemporaryDir("SdlGenTest"));
@@ -106,7 +106,7 @@ void ExecuteTest(CImtSdlGenTest& testSuite, const QString& schemaFileName, const
 	QString outDirPath = QDir(tempOutputDir->path()).absolutePath();
 
 	imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
-	QCOMPARE_NE(argParserPtr, nullptr);
+	QVERIFY(argParserPtr != nullptr);
 
 	if (tempDirPtrList != nullptr){
 		QStringList includePaths;
