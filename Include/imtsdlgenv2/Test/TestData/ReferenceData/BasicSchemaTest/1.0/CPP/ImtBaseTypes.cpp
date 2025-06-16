@@ -1,6 +1,12 @@
 #include "ImtBaseTypes.h"
 
 
+#include "ImtBaseTypes.h"
+
+
+#include "ImtBaseTypes.h"
+
+
 /// \file CTimeRange.cpp
 
 namespace sdl::imtbase::ImtBaseTypes
@@ -18,6 +24,142 @@ bool CTimeRange::V1_0::operator==(const V1_0& other) const
 	return 
 				Begin == other.Begin &&
 				End == other.End;
+}
+
+
+bool CTimeRange::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (Begin){
+		model.SetData("Begin", *Begin, modelIndex);
+	}
+
+	if (End){
+		model.SetData("End", *End, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CTimeRange::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant beginData = model.GetData("Begin", modelIndex);
+	if (!beginData.isNull()){
+		Begin = beginData.toString();
+	}
+
+	QVariant endData = model.GetData("End", modelIndex);
+	if (!endData.isNull()){
+		End = endData.toString();
+	}
+
+	return true;
+}
+
+
+bool CTimeRange::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant beginData = model.GetData("Begin", modelIndex);
+	if (!beginData.isNull()){
+		Begin = beginData.toString();
+	}
+
+	QVariant endData = model.GetData("End", modelIndex);
+	if (!endData.isNull()){
+		End = endData.toString();
+	}
+
+	return true;
+}
+
+
+bool CTimeRange::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (Begin){
+		request.InsertParam("Begin", QVariant(*Begin));
+	}
+
+	if (End){
+		request.InsertParam("End", QVariant(*End));
+	}
+
+	return true;
+}
+
+bool CTimeRange::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant beginData = request.GetParamArgumentValue("Begin");
+	if (!beginData.isNull()){
+		Begin = beginData.toString();
+	}
+
+	QVariant endData = request.GetParamArgumentValue("End");
+	if (!endData.isNull()){
+		End = endData.toString();
+	}
+
+	return true;
+}
+
+
+bool CTimeRange::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant beginData = request.GetParamArgumentValue("Begin");
+	if (!beginData.isNull()){
+		Begin = beginData.toString();
+	}
+
+	QVariant endData = request.GetParamArgumentValue("End");
+	if (!endData.isNull()){
+		End = endData.toString();
+	}
+
+	return true;
+}
+
+
+bool CTimeRange::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (Begin){
+		jsonObject["Begin"] = QJsonValue::fromVariant(*Begin);
+		}
+
+
+	if (End){
+		jsonObject["End"] = QJsonValue::fromVariant(*End);
+		}
+
+
+	return true;
+}
+
+
+bool CTimeRange::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("Begin") && jsonObject["Begin"].isString()){
+		Begin = jsonObject["Begin"].toString();
+	}
+
+	if (jsonObject.contains("End") && jsonObject["End"].isString()){
+		End = jsonObject["End"].toString();
+	}
+
+	return true;
+}
+
+
+bool CTimeRange::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("Begin") && jsonObject["Begin"].isString()){
+		Begin = jsonObject["Begin"].toString();
+	}
+
+	if (jsonObject.contains("End") && jsonObject["End"].isString()){
+		End = jsonObject["End"].toString();
+	}
+
+	return true;
 }
 
 
@@ -274,6 +416,152 @@ bool CSdlSize::V1_0::operator==(const V1_0& other) const
 }
 
 
+bool CSdlSize::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!width){
+		return false;
+	}
+	model.SetData("width", *width, modelIndex);
+
+	if (!height){
+		return false;
+	}
+	model.SetData("height", *height, modelIndex);
+
+
+	return true;
+}
+
+
+bool CSdlSize::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant widthData = model.GetData("width", modelIndex);
+	if (widthData.isNull()){
+		return false;
+	}
+	width = widthData.toDouble();
+
+	QVariant heightData = model.GetData("height", modelIndex);
+	if (heightData.isNull()){
+		return false;
+	}
+	height = heightData.toDouble();
+
+	return true;
+}
+
+
+bool CSdlSize::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant widthData = model.GetData("width", modelIndex);
+	if (!widthData.isNull()){
+		width = widthData.toDouble();
+	}
+
+	QVariant heightData = model.GetData("height", modelIndex);
+	if (!heightData.isNull()){
+		height = heightData.toDouble();
+	}
+
+	return true;
+}
+
+
+bool CSdlSize::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (!width){
+		return false;
+	}
+	request.InsertParam("width", QVariant(*width));
+
+	if (!height){
+		return false;
+	}
+	request.InsertParam("height", QVariant(*height));
+
+	return true;
+}
+
+bool CSdlSize::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant widthData = request.GetParamArgumentValue("width");
+	if (widthData.isNull()){
+		return false;
+	}
+	width = widthData.toDouble();
+
+	QVariant heightData = request.GetParamArgumentValue("height");
+	if (heightData.isNull()){
+		return false;
+	}
+	height = heightData.toDouble();
+
+	return true;
+}
+
+
+bool CSdlSize::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant widthData = request.GetParamArgumentValue("width");
+	if (!widthData.isNull()){
+		width = widthData.toDouble();
+	}
+
+	QVariant heightData = request.GetParamArgumentValue("height");
+	if (!heightData.isNull()){
+		height = heightData.toDouble();
+	}
+
+	return true;
+}
+
+
+bool CSdlSize::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!width){
+		return false;
+	}
+	jsonObject["width"] = QJsonValue::fromVariant(*width);
+
+	if (!height){
+		return false;
+	}
+	jsonObject["height"] = QJsonValue::fromVariant(*height);
+
+	return true;
+}
+
+
+bool CSdlSize::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("width") || ! jsonObject["width"].isDouble()){
+		return false;
+	}
+	width = jsonObject["width"].toDouble();
+
+	if (!jsonObject.contains("height") || ! jsonObject["height"].isDouble()){
+		return false;
+	}
+	height = jsonObject["height"].toDouble();
+
+	return true;
+}
+
+
+bool CSdlSize::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("width") && jsonObject["width"].isDouble()){
+		width = jsonObject["width"].toDouble();
+	}
+
+	if (jsonObject.contains("height") && jsonObject["height"].isDouble()){
+		height = jsonObject["height"].toDouble();
+	}
+
+	return true;
+}
+
+
 // serialize methods
 
 bool CSdlSize::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
@@ -524,6 +812,152 @@ bool CSdlPoint::V1_0::operator==(const V1_0& other) const
 				y.has_value() == other.y.has_value() &&
 				((y.has_value() && other.y.has_value()) ?
 					qFuzzyCompare(*y, *other.y) : true);
+}
+
+
+bool CSdlPoint::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!x){
+		return false;
+	}
+	model.SetData("x", *x, modelIndex);
+
+	if (!y){
+		return false;
+	}
+	model.SetData("y", *y, modelIndex);
+
+
+	return true;
+}
+
+
+bool CSdlPoint::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant xData = model.GetData("x", modelIndex);
+	if (xData.isNull()){
+		return false;
+	}
+	x = xData.toDouble();
+
+	QVariant yData = model.GetData("y", modelIndex);
+	if (yData.isNull()){
+		return false;
+	}
+	y = yData.toDouble();
+
+	return true;
+}
+
+
+bool CSdlPoint::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant xData = model.GetData("x", modelIndex);
+	if (!xData.isNull()){
+		x = xData.toDouble();
+	}
+
+	QVariant yData = model.GetData("y", modelIndex);
+	if (!yData.isNull()){
+		y = yData.toDouble();
+	}
+
+	return true;
+}
+
+
+bool CSdlPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (!x){
+		return false;
+	}
+	request.InsertParam("x", QVariant(*x));
+
+	if (!y){
+		return false;
+	}
+	request.InsertParam("y", QVariant(*y));
+
+	return true;
+}
+
+bool CSdlPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant xData = request.GetParamArgumentValue("x");
+	if (xData.isNull()){
+		return false;
+	}
+	x = xData.toDouble();
+
+	QVariant yData = request.GetParamArgumentValue("y");
+	if (yData.isNull()){
+		return false;
+	}
+	y = yData.toDouble();
+
+	return true;
+}
+
+
+bool CSdlPoint::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant xData = request.GetParamArgumentValue("x");
+	if (!xData.isNull()){
+		x = xData.toDouble();
+	}
+
+	QVariant yData = request.GetParamArgumentValue("y");
+	if (!yData.isNull()){
+		y = yData.toDouble();
+	}
+
+	return true;
+}
+
+
+bool CSdlPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!x){
+		return false;
+	}
+	jsonObject["x"] = QJsonValue::fromVariant(*x);
+
+	if (!y){
+		return false;
+	}
+	jsonObject["y"] = QJsonValue::fromVariant(*y);
+
+	return true;
+}
+
+
+bool CSdlPoint::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("x") || ! jsonObject["x"].isDouble()){
+		return false;
+	}
+	x = jsonObject["x"].toDouble();
+
+	if (!jsonObject.contains("y") || ! jsonObject["y"].isDouble()){
+		return false;
+	}
+	y = jsonObject["y"].toDouble();
+
+	return true;
+}
+
+
+bool CSdlPoint::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("x") && jsonObject["x"].isDouble()){
+		x = jsonObject["x"].toDouble();
+	}
+
+	if (jsonObject.contains("y") && jsonObject["y"].isDouble()){
+		y = jsonObject["y"].toDouble();
+	}
+
+	return true;
 }
 
 
@@ -788,6 +1222,634 @@ bool CParamTypeIds::V1_0::operator==(const V1_0& other) const
 }
 
 
+bool CParamTypeIds::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (UrlParam){
+		model.SetData("UrlParam", *UrlParam, modelIndex);
+	}
+
+	if (IdParam){
+		model.SetData("IdParam", *IdParam, modelIndex);
+	}
+
+	if (TextParam){
+		model.SetData("TextParam", *TextParam, modelIndex);
+	}
+
+	if (TextView){
+		model.SetData("TextView", *TextView, modelIndex);
+	}
+
+	if (SelectionParam){
+		model.SetData("SelectionParam", *SelectionParam, modelIndex);
+	}
+
+	if (SchedulerParam){
+		model.SetData("SchedulerParam", *SchedulerParam, modelIndex);
+	}
+
+	if (BackupSettings){
+		model.SetData("BackupSettings", *BackupSettings, modelIndex);
+	}
+
+	if (DatabaseAccessSettings){
+		model.SetData("DatabaseAccessSettings", *DatabaseAccessSettings, modelIndex);
+	}
+
+	if (ParamsSet){
+		model.SetData("ParamsSet", *ParamsSet, modelIndex);
+	}
+
+	if (FileNameParam){
+		model.SetData("FileNameParam", *FileNameParam, modelIndex);
+	}
+
+	if (IntegerParam){
+		model.SetData("IntegerParam", *IntegerParam, modelIndex);
+	}
+
+	if (DoubleParam){
+		model.SetData("DoubleParam", *DoubleParam, modelIndex);
+	}
+
+	if (PasswordParam){
+		model.SetData("PasswordParam", *PasswordParam, modelIndex);
+	}
+
+	if (EnableableParam){
+		model.SetData("EnableableParam", *EnableableParam, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CParamTypeIds::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant urlParamData = model.GetData("UrlParam", modelIndex);
+	if (!urlParamData.isNull()){
+		UrlParam = urlParamData.toByteArray();
+	}
+
+	QVariant idParamData = model.GetData("IdParam", modelIndex);
+	if (!idParamData.isNull()){
+		IdParam = idParamData.toByteArray();
+	}
+
+	QVariant textParamData = model.GetData("TextParam", modelIndex);
+	if (!textParamData.isNull()){
+		TextParam = textParamData.toByteArray();
+	}
+
+	QVariant textViewData = model.GetData("TextView", modelIndex);
+	if (!textViewData.isNull()){
+		TextView = textViewData.toByteArray();
+	}
+
+	QVariant selectionParamData = model.GetData("SelectionParam", modelIndex);
+	if (!selectionParamData.isNull()){
+		SelectionParam = selectionParamData.toByteArray();
+	}
+
+	QVariant schedulerParamData = model.GetData("SchedulerParam", modelIndex);
+	if (!schedulerParamData.isNull()){
+		SchedulerParam = schedulerParamData.toByteArray();
+	}
+
+	QVariant backupSettingsData = model.GetData("BackupSettings", modelIndex);
+	if (!backupSettingsData.isNull()){
+		BackupSettings = backupSettingsData.toByteArray();
+	}
+
+	QVariant databaseAccessSettingsData = model.GetData("DatabaseAccessSettings", modelIndex);
+	if (!databaseAccessSettingsData.isNull()){
+		DatabaseAccessSettings = databaseAccessSettingsData.toByteArray();
+	}
+
+	QVariant paramsSetData = model.GetData("ParamsSet", modelIndex);
+	if (!paramsSetData.isNull()){
+		ParamsSet = paramsSetData.toByteArray();
+	}
+
+	QVariant fileNameParamData = model.GetData("FileNameParam", modelIndex);
+	if (!fileNameParamData.isNull()){
+		FileNameParam = fileNameParamData.toByteArray();
+	}
+
+	QVariant integerParamData = model.GetData("IntegerParam", modelIndex);
+	if (!integerParamData.isNull()){
+		IntegerParam = integerParamData.toByteArray();
+	}
+
+	QVariant doubleParamData = model.GetData("DoubleParam", modelIndex);
+	if (!doubleParamData.isNull()){
+		DoubleParam = doubleParamData.toByteArray();
+	}
+
+	QVariant passwordParamData = model.GetData("PasswordParam", modelIndex);
+	if (!passwordParamData.isNull()){
+		PasswordParam = passwordParamData.toByteArray();
+	}
+
+	QVariant enableableParamData = model.GetData("EnableableParam", modelIndex);
+	if (!enableableParamData.isNull()){
+		EnableableParam = enableableParamData.toByteArray();
+	}
+
+	return true;
+}
+
+
+bool CParamTypeIds::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant urlParamData = model.GetData("UrlParam", modelIndex);
+	if (!urlParamData.isNull()){
+		UrlParam = urlParamData.toByteArray();
+	}
+
+	QVariant idParamData = model.GetData("IdParam", modelIndex);
+	if (!idParamData.isNull()){
+		IdParam = idParamData.toByteArray();
+	}
+
+	QVariant textParamData = model.GetData("TextParam", modelIndex);
+	if (!textParamData.isNull()){
+		TextParam = textParamData.toByteArray();
+	}
+
+	QVariant textViewData = model.GetData("TextView", modelIndex);
+	if (!textViewData.isNull()){
+		TextView = textViewData.toByteArray();
+	}
+
+	QVariant selectionParamData = model.GetData("SelectionParam", modelIndex);
+	if (!selectionParamData.isNull()){
+		SelectionParam = selectionParamData.toByteArray();
+	}
+
+	QVariant schedulerParamData = model.GetData("SchedulerParam", modelIndex);
+	if (!schedulerParamData.isNull()){
+		SchedulerParam = schedulerParamData.toByteArray();
+	}
+
+	QVariant backupSettingsData = model.GetData("BackupSettings", modelIndex);
+	if (!backupSettingsData.isNull()){
+		BackupSettings = backupSettingsData.toByteArray();
+	}
+
+	QVariant databaseAccessSettingsData = model.GetData("DatabaseAccessSettings", modelIndex);
+	if (!databaseAccessSettingsData.isNull()){
+		DatabaseAccessSettings = databaseAccessSettingsData.toByteArray();
+	}
+
+	QVariant paramsSetData = model.GetData("ParamsSet", modelIndex);
+	if (!paramsSetData.isNull()){
+		ParamsSet = paramsSetData.toByteArray();
+	}
+
+	QVariant fileNameParamData = model.GetData("FileNameParam", modelIndex);
+	if (!fileNameParamData.isNull()){
+		FileNameParam = fileNameParamData.toByteArray();
+	}
+
+	QVariant integerParamData = model.GetData("IntegerParam", modelIndex);
+	if (!integerParamData.isNull()){
+		IntegerParam = integerParamData.toByteArray();
+	}
+
+	QVariant doubleParamData = model.GetData("DoubleParam", modelIndex);
+	if (!doubleParamData.isNull()){
+		DoubleParam = doubleParamData.toByteArray();
+	}
+
+	QVariant passwordParamData = model.GetData("PasswordParam", modelIndex);
+	if (!passwordParamData.isNull()){
+		PasswordParam = passwordParamData.toByteArray();
+	}
+
+	QVariant enableableParamData = model.GetData("EnableableParam", modelIndex);
+	if (!enableableParamData.isNull()){
+		EnableableParam = enableableParamData.toByteArray();
+	}
+
+	return true;
+}
+
+
+bool CParamTypeIds::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (UrlParam){
+		request.InsertParam("UrlParam", QVariant(*UrlParam));
+	}
+
+	if (IdParam){
+		request.InsertParam("IdParam", QVariant(*IdParam));
+	}
+
+	if (TextParam){
+		request.InsertParam("TextParam", QVariant(*TextParam));
+	}
+
+	if (TextView){
+		request.InsertParam("TextView", QVariant(*TextView));
+	}
+
+	if (SelectionParam){
+		request.InsertParam("SelectionParam", QVariant(*SelectionParam));
+	}
+
+	if (SchedulerParam){
+		request.InsertParam("SchedulerParam", QVariant(*SchedulerParam));
+	}
+
+	if (BackupSettings){
+		request.InsertParam("BackupSettings", QVariant(*BackupSettings));
+	}
+
+	if (DatabaseAccessSettings){
+		request.InsertParam("DatabaseAccessSettings", QVariant(*DatabaseAccessSettings));
+	}
+
+	if (ParamsSet){
+		request.InsertParam("ParamsSet", QVariant(*ParamsSet));
+	}
+
+	if (FileNameParam){
+		request.InsertParam("FileNameParam", QVariant(*FileNameParam));
+	}
+
+	if (IntegerParam){
+		request.InsertParam("IntegerParam", QVariant(*IntegerParam));
+	}
+
+	if (DoubleParam){
+		request.InsertParam("DoubleParam", QVariant(*DoubleParam));
+	}
+
+	if (PasswordParam){
+		request.InsertParam("PasswordParam", QVariant(*PasswordParam));
+	}
+
+	if (EnableableParam){
+		request.InsertParam("EnableableParam", QVariant(*EnableableParam));
+	}
+
+	return true;
+}
+
+bool CParamTypeIds::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant urlParamData = request.GetParamArgumentValue("UrlParam");
+	if (!urlParamData.isNull()){
+		UrlParam = urlParamData.toByteArray();
+	}
+
+	QVariant idParamData = request.GetParamArgumentValue("IdParam");
+	if (!idParamData.isNull()){
+		IdParam = idParamData.toByteArray();
+	}
+
+	QVariant textParamData = request.GetParamArgumentValue("TextParam");
+	if (!textParamData.isNull()){
+		TextParam = textParamData.toByteArray();
+	}
+
+	QVariant textViewData = request.GetParamArgumentValue("TextView");
+	if (!textViewData.isNull()){
+		TextView = textViewData.toByteArray();
+	}
+
+	QVariant selectionParamData = request.GetParamArgumentValue("SelectionParam");
+	if (!selectionParamData.isNull()){
+		SelectionParam = selectionParamData.toByteArray();
+	}
+
+	QVariant schedulerParamData = request.GetParamArgumentValue("SchedulerParam");
+	if (!schedulerParamData.isNull()){
+		SchedulerParam = schedulerParamData.toByteArray();
+	}
+
+	QVariant backupSettingsData = request.GetParamArgumentValue("BackupSettings");
+	if (!backupSettingsData.isNull()){
+		BackupSettings = backupSettingsData.toByteArray();
+	}
+
+	QVariant databaseAccessSettingsData = request.GetParamArgumentValue("DatabaseAccessSettings");
+	if (!databaseAccessSettingsData.isNull()){
+		DatabaseAccessSettings = databaseAccessSettingsData.toByteArray();
+	}
+
+	QVariant paramsSetData = request.GetParamArgumentValue("ParamsSet");
+	if (!paramsSetData.isNull()){
+		ParamsSet = paramsSetData.toByteArray();
+	}
+
+	QVariant fileNameParamData = request.GetParamArgumentValue("FileNameParam");
+	if (!fileNameParamData.isNull()){
+		FileNameParam = fileNameParamData.toByteArray();
+	}
+
+	QVariant integerParamData = request.GetParamArgumentValue("IntegerParam");
+	if (!integerParamData.isNull()){
+		IntegerParam = integerParamData.toByteArray();
+	}
+
+	QVariant doubleParamData = request.GetParamArgumentValue("DoubleParam");
+	if (!doubleParamData.isNull()){
+		DoubleParam = doubleParamData.toByteArray();
+	}
+
+	QVariant passwordParamData = request.GetParamArgumentValue("PasswordParam");
+	if (!passwordParamData.isNull()){
+		PasswordParam = passwordParamData.toByteArray();
+	}
+
+	QVariant enableableParamData = request.GetParamArgumentValue("EnableableParam");
+	if (!enableableParamData.isNull()){
+		EnableableParam = enableableParamData.toByteArray();
+	}
+
+	return true;
+}
+
+
+bool CParamTypeIds::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant urlParamData = request.GetParamArgumentValue("UrlParam");
+	if (!urlParamData.isNull()){
+		UrlParam = urlParamData.toByteArray();
+	}
+
+	QVariant idParamData = request.GetParamArgumentValue("IdParam");
+	if (!idParamData.isNull()){
+		IdParam = idParamData.toByteArray();
+	}
+
+	QVariant textParamData = request.GetParamArgumentValue("TextParam");
+	if (!textParamData.isNull()){
+		TextParam = textParamData.toByteArray();
+	}
+
+	QVariant textViewData = request.GetParamArgumentValue("TextView");
+	if (!textViewData.isNull()){
+		TextView = textViewData.toByteArray();
+	}
+
+	QVariant selectionParamData = request.GetParamArgumentValue("SelectionParam");
+	if (!selectionParamData.isNull()){
+		SelectionParam = selectionParamData.toByteArray();
+	}
+
+	QVariant schedulerParamData = request.GetParamArgumentValue("SchedulerParam");
+	if (!schedulerParamData.isNull()){
+		SchedulerParam = schedulerParamData.toByteArray();
+	}
+
+	QVariant backupSettingsData = request.GetParamArgumentValue("BackupSettings");
+	if (!backupSettingsData.isNull()){
+		BackupSettings = backupSettingsData.toByteArray();
+	}
+
+	QVariant databaseAccessSettingsData = request.GetParamArgumentValue("DatabaseAccessSettings");
+	if (!databaseAccessSettingsData.isNull()){
+		DatabaseAccessSettings = databaseAccessSettingsData.toByteArray();
+	}
+
+	QVariant paramsSetData = request.GetParamArgumentValue("ParamsSet");
+	if (!paramsSetData.isNull()){
+		ParamsSet = paramsSetData.toByteArray();
+	}
+
+	QVariant fileNameParamData = request.GetParamArgumentValue("FileNameParam");
+	if (!fileNameParamData.isNull()){
+		FileNameParam = fileNameParamData.toByteArray();
+	}
+
+	QVariant integerParamData = request.GetParamArgumentValue("IntegerParam");
+	if (!integerParamData.isNull()){
+		IntegerParam = integerParamData.toByteArray();
+	}
+
+	QVariant doubleParamData = request.GetParamArgumentValue("DoubleParam");
+	if (!doubleParamData.isNull()){
+		DoubleParam = doubleParamData.toByteArray();
+	}
+
+	QVariant passwordParamData = request.GetParamArgumentValue("PasswordParam");
+	if (!passwordParamData.isNull()){
+		PasswordParam = passwordParamData.toByteArray();
+	}
+
+	QVariant enableableParamData = request.GetParamArgumentValue("EnableableParam");
+	if (!enableableParamData.isNull()){
+		EnableableParam = enableableParamData.toByteArray();
+	}
+
+	return true;
+}
+
+
+bool CParamTypeIds::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (UrlParam){
+		jsonObject["UrlParam"] = QJsonValue::fromVariant(*UrlParam);
+		}
+
+
+	if (IdParam){
+		jsonObject["IdParam"] = QJsonValue::fromVariant(*IdParam);
+		}
+
+
+	if (TextParam){
+		jsonObject["TextParam"] = QJsonValue::fromVariant(*TextParam);
+		}
+
+
+	if (TextView){
+		jsonObject["TextView"] = QJsonValue::fromVariant(*TextView);
+		}
+
+
+	if (SelectionParam){
+		jsonObject["SelectionParam"] = QJsonValue::fromVariant(*SelectionParam);
+		}
+
+
+	if (SchedulerParam){
+		jsonObject["SchedulerParam"] = QJsonValue::fromVariant(*SchedulerParam);
+		}
+
+
+	if (BackupSettings){
+		jsonObject["BackupSettings"] = QJsonValue::fromVariant(*BackupSettings);
+		}
+
+
+	if (DatabaseAccessSettings){
+		jsonObject["DatabaseAccessSettings"] = QJsonValue::fromVariant(*DatabaseAccessSettings);
+		}
+
+
+	if (ParamsSet){
+		jsonObject["ParamsSet"] = QJsonValue::fromVariant(*ParamsSet);
+		}
+
+
+	if (FileNameParam){
+		jsonObject["FileNameParam"] = QJsonValue::fromVariant(*FileNameParam);
+		}
+
+
+	if (IntegerParam){
+		jsonObject["IntegerParam"] = QJsonValue::fromVariant(*IntegerParam);
+		}
+
+
+	if (DoubleParam){
+		jsonObject["DoubleParam"] = QJsonValue::fromVariant(*DoubleParam);
+		}
+
+
+	if (PasswordParam){
+		jsonObject["PasswordParam"] = QJsonValue::fromVariant(*PasswordParam);
+		}
+
+
+	if (EnableableParam){
+		jsonObject["EnableableParam"] = QJsonValue::fromVariant(*EnableableParam);
+		}
+
+
+	return true;
+}
+
+
+bool CParamTypeIds::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("UrlParam") && jsonObject["UrlParam"].isString()){
+		UrlParam = jsonObject["UrlParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("IdParam") && jsonObject["IdParam"].isString()){
+		IdParam = jsonObject["IdParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("TextParam") && jsonObject["TextParam"].isString()){
+		TextParam = jsonObject["TextParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("TextView") && jsonObject["TextView"].isString()){
+		TextView = jsonObject["TextView"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("SelectionParam") && jsonObject["SelectionParam"].isString()){
+		SelectionParam = jsonObject["SelectionParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("SchedulerParam") && jsonObject["SchedulerParam"].isString()){
+		SchedulerParam = jsonObject["SchedulerParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("BackupSettings") && jsonObject["BackupSettings"].isString()){
+		BackupSettings = jsonObject["BackupSettings"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("DatabaseAccessSettings") && jsonObject["DatabaseAccessSettings"].isString()){
+		DatabaseAccessSettings = jsonObject["DatabaseAccessSettings"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("ParamsSet") && jsonObject["ParamsSet"].isString()){
+		ParamsSet = jsonObject["ParamsSet"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("FileNameParam") && jsonObject["FileNameParam"].isString()){
+		FileNameParam = jsonObject["FileNameParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("IntegerParam") && jsonObject["IntegerParam"].isString()){
+		IntegerParam = jsonObject["IntegerParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("DoubleParam") && jsonObject["DoubleParam"].isString()){
+		DoubleParam = jsonObject["DoubleParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("PasswordParam") && jsonObject["PasswordParam"].isString()){
+		PasswordParam = jsonObject["PasswordParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("EnableableParam") && jsonObject["EnableableParam"].isString()){
+		EnableableParam = jsonObject["EnableableParam"].toString().toUtf8();
+	}
+
+	return true;
+}
+
+
+bool CParamTypeIds::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("UrlParam") && jsonObject["UrlParam"].isString()){
+		UrlParam = jsonObject["UrlParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("IdParam") && jsonObject["IdParam"].isString()){
+		IdParam = jsonObject["IdParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("TextParam") && jsonObject["TextParam"].isString()){
+		TextParam = jsonObject["TextParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("TextView") && jsonObject["TextView"].isString()){
+		TextView = jsonObject["TextView"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("SelectionParam") && jsonObject["SelectionParam"].isString()){
+		SelectionParam = jsonObject["SelectionParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("SchedulerParam") && jsonObject["SchedulerParam"].isString()){
+		SchedulerParam = jsonObject["SchedulerParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("BackupSettings") && jsonObject["BackupSettings"].isString()){
+		BackupSettings = jsonObject["BackupSettings"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("DatabaseAccessSettings") && jsonObject["DatabaseAccessSettings"].isString()){
+		DatabaseAccessSettings = jsonObject["DatabaseAccessSettings"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("ParamsSet") && jsonObject["ParamsSet"].isString()){
+		ParamsSet = jsonObject["ParamsSet"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("FileNameParam") && jsonObject["FileNameParam"].isString()){
+		FileNameParam = jsonObject["FileNameParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("IntegerParam") && jsonObject["IntegerParam"].isString()){
+		IntegerParam = jsonObject["IntegerParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("DoubleParam") && jsonObject["DoubleParam"].isString()){
+		DoubleParam = jsonObject["DoubleParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("PasswordParam") && jsonObject["PasswordParam"].isString()){
+		PasswordParam = jsonObject["PasswordParam"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("EnableableParam") && jsonObject["EnableableParam"].isString()){
+		EnableableParam = jsonObject["EnableableParam"].toString().toUtf8();
+	}
+
+	return true;
+}
+
+
 // serialize methods
 
 bool CParamTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
@@ -1039,6 +2101,224 @@ bool CUrlParam::V1_0::operator==(const V1_0& other) const
 }
 
 
+bool CUrlParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (scheme){
+		model.SetData("scheme", *scheme, modelIndex);
+	}
+
+	if (host){
+		model.SetData("host", *host, modelIndex);
+	}
+
+	if (port){
+		model.SetData("port", *port, modelIndex);
+	}
+
+	if (path){
+		model.SetData("path", *path, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CUrlParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant schemeData = model.GetData("scheme", modelIndex);
+	if (!schemeData.isNull()){
+		scheme = schemeData.toString();
+	}
+
+	QVariant hostData = model.GetData("host", modelIndex);
+	if (!hostData.isNull()){
+		host = hostData.toString();
+	}
+
+	QVariant portData = model.GetData("port", modelIndex);
+	if (!portData.isNull()){
+		port = portData.toInt();
+	}
+
+	QVariant pathData = model.GetData("path", modelIndex);
+	if (!pathData.isNull()){
+		path = pathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CUrlParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant schemeData = model.GetData("scheme", modelIndex);
+	if (!schemeData.isNull()){
+		scheme = schemeData.toString();
+	}
+
+	QVariant hostData = model.GetData("host", modelIndex);
+	if (!hostData.isNull()){
+		host = hostData.toString();
+	}
+
+	QVariant portData = model.GetData("port", modelIndex);
+	if (!portData.isNull()){
+		port = portData.toInt();
+	}
+
+	QVariant pathData = model.GetData("path", modelIndex);
+	if (!pathData.isNull()){
+		path = pathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CUrlParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (scheme){
+		request.InsertParam("scheme", QVariant(*scheme));
+	}
+
+	if (host){
+		request.InsertParam("host", QVariant(*host));
+	}
+
+	if (port){
+		request.InsertParam("port", QVariant(*port));
+	}
+
+	if (path){
+		request.InsertParam("path", QVariant(*path));
+	}
+
+	return true;
+}
+
+bool CUrlParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant schemeData = request.GetParamArgumentValue("scheme");
+	if (!schemeData.isNull()){
+		scheme = schemeData.toString();
+	}
+
+	QVariant hostData = request.GetParamArgumentValue("host");
+	if (!hostData.isNull()){
+		host = hostData.toString();
+	}
+
+	QVariant portData = request.GetParamArgumentValue("port");
+	if (!portData.isNull()){
+		port = portData.toInt();
+	}
+
+	QVariant pathData = request.GetParamArgumentValue("path");
+	if (!pathData.isNull()){
+		path = pathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CUrlParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant schemeData = request.GetParamArgumentValue("scheme");
+	if (!schemeData.isNull()){
+		scheme = schemeData.toString();
+	}
+
+	QVariant hostData = request.GetParamArgumentValue("host");
+	if (!hostData.isNull()){
+		host = hostData.toString();
+	}
+
+	QVariant portData = request.GetParamArgumentValue("port");
+	if (!portData.isNull()){
+		port = portData.toInt();
+	}
+
+	QVariant pathData = request.GetParamArgumentValue("path");
+	if (!pathData.isNull()){
+		path = pathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CUrlParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (scheme){
+		jsonObject["scheme"] = QJsonValue::fromVariant(*scheme);
+		}
+
+
+	if (host){
+		jsonObject["host"] = QJsonValue::fromVariant(*host);
+		}
+
+
+	if (port){
+		jsonObject["port"] = QJsonValue::fromVariant(*port);
+		}
+
+
+	if (path){
+		jsonObject["path"] = QJsonValue::fromVariant(*path);
+		}
+
+
+	return true;
+}
+
+
+bool CUrlParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("scheme") && jsonObject["scheme"].isString()){
+		scheme = jsonObject["scheme"].toString();
+	}
+
+	if (jsonObject.contains("host") && jsonObject["host"].isString()){
+		host = jsonObject["host"].toString();
+	}
+
+	if (jsonObject.contains("port") && jsonObject["port"].isDouble()){
+		port = jsonObject["port"].toInt();
+	}
+
+	if (jsonObject.contains("path") && jsonObject["path"].isString()){
+		path = jsonObject["path"].toString();
+	}
+
+	return true;
+}
+
+
+bool CUrlParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("scheme") && jsonObject["scheme"].isString()){
+		scheme = jsonObject["scheme"].toString();
+	}
+
+	if (jsonObject.contains("host") && jsonObject["host"].isString()){
+		host = jsonObject["host"].toString();
+	}
+
+	if (jsonObject.contains("port") && jsonObject["port"].isDouble()){
+		port = jsonObject["port"].toInt();
+	}
+
+	if (jsonObject.contains("path") && jsonObject["path"].isString()){
+		path = jsonObject["path"].toString();
+	}
+
+	return true;
+}
+
+
 // serialize methods
 
 bool CUrlParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
@@ -1284,6 +2564,101 @@ bool CIdParam::V1_0::operator==(const V1_0& other) const
 {
 	return 
 				id == other.id;
+}
+
+
+bool CIdParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (id){
+		model.SetData("id", *id, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CIdParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant idData = model.GetData("id", modelIndex);
+	if (!idData.isNull()){
+		id = idData.toByteArray();
+	}
+
+	return true;
+}
+
+
+bool CIdParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant idData = model.GetData("id", modelIndex);
+	if (!idData.isNull()){
+		id = idData.toByteArray();
+	}
+
+	return true;
+}
+
+
+bool CIdParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (id){
+		request.InsertParam("id", QVariant(*id));
+	}
+
+	return true;
+}
+
+bool CIdParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant idData = request.GetParamArgumentValue("id");
+	if (!idData.isNull()){
+		id = idData.toByteArray();
+	}
+
+	return true;
+}
+
+
+bool CIdParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant idData = request.GetParamArgumentValue("id");
+	if (!idData.isNull()){
+		id = idData.toByteArray();
+	}
+
+	return true;
+}
+
+
+bool CIdParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (id){
+		jsonObject["id"] = QJsonValue::fromVariant(*id);
+		}
+
+
+	return true;
+}
+
+
+bool CIdParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("id") && jsonObject["id"].isString()){
+		id = jsonObject["id"].toString().toUtf8();
+	}
+
+	return true;
+}
+
+
+bool CIdParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("id") && jsonObject["id"].isString()){
+		id = jsonObject["id"].toString().toUtf8();
+	}
+
+	return true;
 }
 
 
@@ -1535,6 +2910,101 @@ bool CTextParam::V1_0::operator==(const V1_0& other) const
 }
 
 
+bool CTextParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (text){
+		model.SetData("text", *text, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CTextParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant textData = model.GetData("text", modelIndex);
+	if (!textData.isNull()){
+		text = textData.toString();
+	}
+
+	return true;
+}
+
+
+bool CTextParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant textData = model.GetData("text", modelIndex);
+	if (!textData.isNull()){
+		text = textData.toString();
+	}
+
+	return true;
+}
+
+
+bool CTextParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (text){
+		request.InsertParam("text", QVariant(*text));
+	}
+
+	return true;
+}
+
+bool CTextParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant textData = request.GetParamArgumentValue("text");
+	if (!textData.isNull()){
+		text = textData.toString();
+	}
+
+	return true;
+}
+
+
+bool CTextParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant textData = request.GetParamArgumentValue("text");
+	if (!textData.isNull()){
+		text = textData.toString();
+	}
+
+	return true;
+}
+
+
+bool CTextParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (text){
+		jsonObject["text"] = QJsonValue::fromVariant(*text);
+		}
+
+
+	return true;
+}
+
+
+bool CTextParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("text") && jsonObject["text"].isString()){
+		text = jsonObject["text"].toString();
+	}
+
+	return true;
+}
+
+
+bool CTextParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("text") && jsonObject["text"].isString()){
+		text = jsonObject["text"].toString();
+	}
+
+	return true;
+}
+
+
 // serialize methods
 
 bool CTextParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
@@ -1780,6 +3250,101 @@ bool CEnableableParam::V1_0::operator==(const V1_0& other) const
 {
 	return 
 				value == other.value;
+}
+
+
+bool CEnableableParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (value){
+		model.SetData("value", *value, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CEnableableParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant valueData = model.GetData("value", modelIndex);
+	if (!valueData.isNull()){
+		value = valueData.toBool();
+	}
+
+	return true;
+}
+
+
+bool CEnableableParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant valueData = model.GetData("value", modelIndex);
+	if (!valueData.isNull()){
+		value = valueData.toBool();
+	}
+
+	return true;
+}
+
+
+bool CEnableableParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (value){
+		request.InsertParam("value", QVariant(*value));
+	}
+
+	return true;
+}
+
+bool CEnableableParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant valueData = request.GetParamArgumentValue("value");
+	if (!valueData.isNull()){
+		value = valueData.toBool();
+	}
+
+	return true;
+}
+
+
+bool CEnableableParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant valueData = request.GetParamArgumentValue("value");
+	if (!valueData.isNull()){
+		value = valueData.toBool();
+	}
+
+	return true;
+}
+
+
+bool CEnableableParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (value){
+		jsonObject["value"] = QJsonValue::fromVariant(*value);
+		}
+
+
+	return true;
+}
+
+
+bool CEnableableParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("value") && jsonObject["value"].isBool()){
+		value = jsonObject["value"].toBool();
+	}
+
+	return true;
+}
+
+
+bool CEnableableParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("value") && jsonObject["value"].isBool()){
+		value = jsonObject["value"].toBool();
+	}
+
+	return true;
 }
 
 
@@ -2031,6 +3596,101 @@ bool CIntegerParam::V1_0::operator==(const V1_0& other) const
 }
 
 
+bool CIntegerParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (value){
+		model.SetData("value", *value, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CIntegerParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant valueData = model.GetData("value", modelIndex);
+	if (!valueData.isNull()){
+		value = valueData.toInt();
+	}
+
+	return true;
+}
+
+
+bool CIntegerParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant valueData = model.GetData("value", modelIndex);
+	if (!valueData.isNull()){
+		value = valueData.toInt();
+	}
+
+	return true;
+}
+
+
+bool CIntegerParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (value){
+		request.InsertParam("value", QVariant(*value));
+	}
+
+	return true;
+}
+
+bool CIntegerParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant valueData = request.GetParamArgumentValue("value");
+	if (!valueData.isNull()){
+		value = valueData.toInt();
+	}
+
+	return true;
+}
+
+
+bool CIntegerParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant valueData = request.GetParamArgumentValue("value");
+	if (!valueData.isNull()){
+		value = valueData.toInt();
+	}
+
+	return true;
+}
+
+
+bool CIntegerParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (value){
+		jsonObject["value"] = QJsonValue::fromVariant(*value);
+		}
+
+
+	return true;
+}
+
+
+bool CIntegerParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
+		value = jsonObject["value"].toInt();
+	}
+
+	return true;
+}
+
+
+bool CIntegerParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
+		value = jsonObject["value"].toInt();
+	}
+
+	return true;
+}
+
+
 // serialize methods
 
 bool CIntegerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
@@ -2278,6 +3938,101 @@ bool CDoubleParam::V1_0::operator==(const V1_0& other) const
 				value.has_value() == other.value.has_value() &&
 				((value.has_value() && other.value.has_value()) ?
 					qFuzzyCompare(*value, *other.value) : true);
+}
+
+
+bool CDoubleParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (value){
+		model.SetData("value", *value, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CDoubleParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant valueData = model.GetData("value", modelIndex);
+	if (!valueData.isNull()){
+		value = valueData.toDouble();
+	}
+
+	return true;
+}
+
+
+bool CDoubleParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant valueData = model.GetData("value", modelIndex);
+	if (!valueData.isNull()){
+		value = valueData.toDouble();
+	}
+
+	return true;
+}
+
+
+bool CDoubleParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (value){
+		request.InsertParam("value", QVariant(*value));
+	}
+
+	return true;
+}
+
+bool CDoubleParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant valueData = request.GetParamArgumentValue("value");
+	if (!valueData.isNull()){
+		value = valueData.toDouble();
+	}
+
+	return true;
+}
+
+
+bool CDoubleParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant valueData = request.GetParamArgumentValue("value");
+	if (!valueData.isNull()){
+		value = valueData.toDouble();
+	}
+
+	return true;
+}
+
+
+bool CDoubleParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (value){
+		jsonObject["value"] = QJsonValue::fromVariant(*value);
+		}
+
+
+	return true;
+}
+
+
+bool CDoubleParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
+		value = jsonObject["value"].toDouble();
+	}
+
+	return true;
+}
+
+
+bool CDoubleParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("value") && jsonObject["value"].isDouble()){
+		value = jsonObject["value"].toDouble();
+	}
+
+	return true;
 }
 
 
@@ -2532,6 +4287,224 @@ bool COption::V1_0::operator==(const V1_0& other) const
 }
 
 
+bool COption::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (id){
+		model.SetData("id", *id, modelIndex);
+	}
+
+	if (name){
+		model.SetData("name", *name, modelIndex);
+	}
+
+	if (description){
+		model.SetData("description", *description, modelIndex);
+	}
+
+	if (enabled){
+		model.SetData("enabled", *enabled, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool COption::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant idData = model.GetData("id", modelIndex);
+	if (!idData.isNull()){
+		id = idData.toByteArray();
+	}
+
+	QVariant nameData = model.GetData("name", modelIndex);
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant descriptionData = model.GetData("description", modelIndex);
+	if (!descriptionData.isNull()){
+		description = descriptionData.toString();
+	}
+
+	QVariant enabledData = model.GetData("enabled", modelIndex);
+	if (!enabledData.isNull()){
+		enabled = enabledData.toBool();
+	}
+
+	return true;
+}
+
+
+bool COption::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant idData = model.GetData("id", modelIndex);
+	if (!idData.isNull()){
+		id = idData.toByteArray();
+	}
+
+	QVariant nameData = model.GetData("name", modelIndex);
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant descriptionData = model.GetData("description", modelIndex);
+	if (!descriptionData.isNull()){
+		description = descriptionData.toString();
+	}
+
+	QVariant enabledData = model.GetData("enabled", modelIndex);
+	if (!enabledData.isNull()){
+		enabled = enabledData.toBool();
+	}
+
+	return true;
+}
+
+
+bool COption::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (id){
+		request.InsertParam("id", QVariant(*id));
+	}
+
+	if (name){
+		request.InsertParam("name", QVariant(*name));
+	}
+
+	if (description){
+		request.InsertParam("description", QVariant(*description));
+	}
+
+	if (enabled){
+		request.InsertParam("enabled", QVariant(*enabled));
+	}
+
+	return true;
+}
+
+bool COption::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant idData = request.GetParamArgumentValue("id");
+	if (!idData.isNull()){
+		id = idData.toByteArray();
+	}
+
+	QVariant nameData = request.GetParamArgumentValue("name");
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant descriptionData = request.GetParamArgumentValue("description");
+	if (!descriptionData.isNull()){
+		description = descriptionData.toString();
+	}
+
+	QVariant enabledData = request.GetParamArgumentValue("enabled");
+	if (!enabledData.isNull()){
+		enabled = enabledData.toBool();
+	}
+
+	return true;
+}
+
+
+bool COption::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant idData = request.GetParamArgumentValue("id");
+	if (!idData.isNull()){
+		id = idData.toByteArray();
+	}
+
+	QVariant nameData = request.GetParamArgumentValue("name");
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant descriptionData = request.GetParamArgumentValue("description");
+	if (!descriptionData.isNull()){
+		description = descriptionData.toString();
+	}
+
+	QVariant enabledData = request.GetParamArgumentValue("enabled");
+	if (!enabledData.isNull()){
+		enabled = enabledData.toBool();
+	}
+
+	return true;
+}
+
+
+bool COption::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (id){
+		jsonObject["id"] = QJsonValue::fromVariant(*id);
+		}
+
+
+	if (name){
+		jsonObject["name"] = QJsonValue::fromVariant(*name);
+		}
+
+
+	if (description){
+		jsonObject["description"] = QJsonValue::fromVariant(*description);
+		}
+
+
+	if (enabled){
+		jsonObject["enabled"] = QJsonValue::fromVariant(*enabled);
+		}
+
+
+	return true;
+}
+
+
+bool COption::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("id") && jsonObject["id"].isString()){
+		id = jsonObject["id"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("name") && jsonObject["name"].isString()){
+		name = jsonObject["name"].toString();
+	}
+
+	if (jsonObject.contains("description") && jsonObject["description"].isString()){
+		description = jsonObject["description"].toString();
+	}
+
+	if (jsonObject.contains("enabled") && jsonObject["enabled"].isBool()){
+		enabled = jsonObject["enabled"].toBool();
+	}
+
+	return true;
+}
+
+
+bool COption::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("id") && jsonObject["id"].isString()){
+		id = jsonObject["id"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("name") && jsonObject["name"].isString()){
+		name = jsonObject["name"].toString();
+	}
+
+	if (jsonObject.contains("description") && jsonObject["description"].isString()){
+		description = jsonObject["description"].toString();
+	}
+
+	if (jsonObject.contains("enabled") && jsonObject["enabled"].isBool()){
+		enabled = jsonObject["enabled"].toBool();
+	}
+
+	return true;
+}
+
+
 // serialize methods
 
 bool COption::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
@@ -2779,6 +4752,268 @@ bool COptionsList::V1_0::operator==(const V1_0& other) const
 				totalCount == other.totalCount &&
 				offset == other.offset &&
 				options == other.options;
+}
+
+
+bool COptionsList::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (totalCount){
+		model.SetData("totalCount", *totalCount, modelIndex);
+	}
+
+	if (offset){
+		model.SetData("offset", *offset, modelIndex);
+	}
+
+	if (options){
+		::imtbase::CTreeItemModel* newOptionsModelPtr = model.AddTreeModel("options", modelIndex);
+		newOptionsModelPtr->setIsArray(true);
+		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
+			newOptionsModelPtr->InsertNewItem();
+			if (!(options->at(optionsIndex).WriteToModel(*newOptionsModelPtr, optionsIndex))){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool COptionsList::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant totalCountData = model.GetData("totalCount", modelIndex);
+	if (!totalCountData.isNull()){
+		totalCount = totalCountData.toInt();
+	}
+
+	QVariant offsetData = model.GetData("offset", modelIndex);
+	if (!offsetData.isNull()){
+		offset = offsetData.toInt();
+	}
+
+	::imtbase::CTreeItemModel* optionsModel = model.GetTreeItemModel("options", modelIndex);
+	if (optionsModel != nullptr){
+		int optionsCount = optionsModel->GetItemsCount();
+		QList<COption::V1_0> optionsList;
+		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
+			COption::V1_0 options;
+			if (!options.ReadFromModel(*optionsModel, optionsIndex)){
+				return false;
+			}
+			optionsList << options;
+		}
+		options = optionsList;
+
+	}
+
+	return true;
+}
+
+
+bool COptionsList::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant totalCountData = model.GetData("totalCount", modelIndex);
+	if (!totalCountData.isNull()){
+		totalCount = totalCountData.toInt();
+	}
+
+	QVariant offsetData = model.GetData("offset", modelIndex);
+	if (!offsetData.isNull()){
+		offset = offsetData.toInt();
+	}
+
+	::imtbase::CTreeItemModel* optionsModel = model.GetTreeItemModel("options", modelIndex);
+	if (optionsModel != nullptr){
+		int optionsCount = optionsModel->GetItemsCount();
+		QList<COption::V1_0> optionsList;
+		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
+			COption::V1_0 options;
+			if (!options.OptReadFromModel(*optionsModel, optionsIndex)){
+				return false;
+			}
+			optionsList << options;
+		}
+		options = optionsList;
+
+	}
+
+	return true;
+}
+
+
+bool COptionsList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (totalCount){
+		request.InsertParam("totalCount", QVariant(*totalCount));
+	}
+
+	if (offset){
+		request.InsertParam("offset", QVariant(*offset));
+	}
+
+	if (options){
+		QList<::imtgql::CGqlParamObject> optionsDataObjectList;
+		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
+			::imtgql::CGqlParamObject optionsDataObject;
+			if (!options->at(optionsIndex).WriteToGraphQlObject(optionsDataObject)){
+				return false;
+			}
+			optionsDataObjectList << optionsDataObject;
+		}
+		request.InsertParam("options", optionsDataObjectList);
+	}
+
+	return true;
+}
+
+bool COptionsList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant totalCountData = request.GetParamArgumentValue("totalCount");
+	if (!totalCountData.isNull()){
+		totalCount = totalCountData.toInt();
+	}
+
+	QVariant offsetData = request.GetParamArgumentValue("offset");
+	if (!offsetData.isNull()){
+		offset = offsetData.toInt();
+	}
+
+	int optionsCount = request.GetObjectsCount("options");
+	if (optionsCount > 0){
+		QList<COption::V1_0> optionsList;
+		for (int optionsIndex = 0; optionsIndex != optionsCount ; ++optionsIndex){
+			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = request.GetParamArgumentObjectPtr("options",optionsIndex);
+			if (optionsDataObjectPtr == nullptr){
+				return false;
+			}
+			COption::V1_0 options;
+			if (!options.ReadFromGraphQlObject(*optionsDataObjectPtr)){
+				return false;
+			}
+			optionsList << options;
+		}
+		options = optionsList;
+
+	}
+
+	return true;
+}
+
+
+bool COptionsList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant totalCountData = request.GetParamArgumentValue("totalCount");
+	if (!totalCountData.isNull()){
+		totalCount = totalCountData.toInt();
+	}
+
+	QVariant offsetData = request.GetParamArgumentValue("offset");
+	if (!offsetData.isNull()){
+		offset = offsetData.toInt();
+	}
+
+	int optionsCount = request.GetObjectsCount("options");
+	if (optionsCount > 0){
+		QList<COption::V1_0> optionsList;
+		for (int optionsIndex = 0; optionsIndex != optionsCount ; ++optionsIndex){
+			const ::imtgql::CGqlParamObject* optionsDataObjectPtr = request.GetParamArgumentObjectPtr("options",optionsIndex);
+			if (optionsDataObjectPtr == nullptr){
+				return false;
+			}
+			COption::V1_0 options;
+			if (!options.OptReadFromGraphQlObject(*optionsDataObjectPtr)){
+				return false;
+			}
+			optionsList << options;
+		}
+		options = optionsList;
+
+	}
+
+	return true;
+}
+
+
+bool COptionsList::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (totalCount){
+		jsonObject["totalCount"] = QJsonValue::fromVariant(*totalCount);
+		}
+
+
+	if (offset){
+		jsonObject["offset"] = QJsonValue::fromVariant(*offset);
+		}
+
+
+	if (options){
+		QJsonArray newOptionsArray;
+		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
+			QJsonObject newOptionsJsonObject;
+			if (!options->at(optionsIndex).WriteToJsonObject(newOptionsJsonObject)){
+				return false;
+			}
+			newOptionsArray << newOptionsJsonObject;
+		}
+		jsonObject["options"] = newOptionsArray;
+	}
+
+	return true;
+}
+
+
+bool COptionsList::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("totalCount") && jsonObject["totalCount"].isDouble()){
+		totalCount = jsonObject["totalCount"].toInt();
+	}
+
+	if (jsonObject.contains("offset") && jsonObject["offset"].isDouble()){
+		offset = jsonObject["offset"].toInt();
+	}
+
+	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
+		const QJsonArray optionsjsonArray = jsonObject["options"].toArray();
+		const qsizetype optionsArrayCount = optionsjsonArray.size();
+		options = QList<COption::V1_0>();
+		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
+			COption::V1_0 tempOptions;
+			if (!tempOptions.ReadFromJsonObject(optionsjsonArray[optionsIndex].toObject())){
+				return false;
+			}
+			options->append(tempOptions);
+		}
+	}
+
+	return true;
+}
+
+
+bool COptionsList::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("totalCount") && jsonObject["totalCount"].isDouble()){
+		totalCount = jsonObject["totalCount"].toInt();
+	}
+
+	if (jsonObject.contains("offset") && jsonObject["offset"].isDouble()){
+		offset = jsonObject["offset"].toInt();
+	}
+
+	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
+		const QJsonArray optionsjsonArray = jsonObject["options"].toArray();
+		const qsizetype optionsArrayCount = optionsjsonArray.size();
+		options = QList<COption::V1_0>();
+		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
+			COption::V1_0 tempOptions;
+			if (!tempOptions.OptReadFromJsonObject(optionsjsonArray[optionsIndex].toObject())){
+				return false;
+			}
+			options->append(tempOptions);
+		}
+	}
+
+	return true;
 }
 
 
@@ -3031,6 +5266,181 @@ bool CSelectionParam::V1_0::operator==(const V1_0& other) const
 }
 
 
+bool CSelectionParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (selectedIndex){
+		model.SetData("selectedIndex", *selectedIndex, modelIndex);
+	}
+
+
+	if (constraints){
+		::imtbase::CTreeItemModel* constraintsNewModelPtr = model.AddTreeModel("constraints", modelIndex);
+		const bool isConstraintsAdded = constraints->WriteToModel(*constraintsNewModelPtr, 0);
+		if (!isConstraintsAdded){
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+
+bool CSelectionParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant selectedIndexData = model.GetData("selectedIndex", modelIndex);
+	if (!selectedIndexData.isNull()){
+		selectedIndex = selectedIndexData.toInt();
+	}
+
+	::imtbase::CTreeItemModel* constraintsDataModelPtr = model.GetTreeItemModel("constraints", modelIndex);
+	if (constraintsDataModelPtr != nullptr){
+		constraints = COptionsList::V1_0();
+		const bool isConstraintsReaded = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
+		if (!isConstraintsReaded){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CSelectionParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant selectedIndexData = model.GetData("selectedIndex", modelIndex);
+	if (!selectedIndexData.isNull()){
+		selectedIndex = selectedIndexData.toInt();
+	}
+
+	::imtbase::CTreeItemModel* constraintsDataModelPtr = model.GetTreeItemModel("constraints", modelIndex);
+	if (constraintsDataModelPtr != nullptr){
+		constraints = COptionsList::V1_0();
+		const bool isConstraintsReaded = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
+		if (!isConstraintsReaded){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CSelectionParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (selectedIndex){
+		request.InsertParam("selectedIndex", QVariant(*selectedIndex));
+	}
+
+	if (constraints){
+		::imtgql::CGqlParamObject constraintsDataObject;
+		if (!constraints->WriteToGraphQlObject(constraintsDataObject)){
+			return false;
+		}
+		request.InsertParam("constraints", constraintsDataObject);
+	}
+
+	return true;
+}
+
+bool CSelectionParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant selectedIndexData = request.GetParamArgumentValue("selectedIndex");
+	if (!selectedIndexData.isNull()){
+		selectedIndex = selectedIndexData.toInt();
+	}
+
+	const ::imtgql::CGqlParamObject* constraintsDataObjectPtr = request.GetParamArgumentObjectPtr("constraints");
+	if (constraintsDataObjectPtr != nullptr){
+		constraints = COptionsList::V1_0();
+		const bool isConstraintsRead = constraints->ReadFromGraphQlObject(*constraintsDataObjectPtr);
+		if (!isConstraintsRead){
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+
+bool CSelectionParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant selectedIndexData = request.GetParamArgumentValue("selectedIndex");
+	if (!selectedIndexData.isNull()){
+		selectedIndex = selectedIndexData.toInt();
+	}
+
+	const ::imtgql::CGqlParamObject* constraintsDataObjectPtr = request.GetParamArgumentObjectPtr("constraints");
+	if (constraintsDataObjectPtr != nullptr){
+		constraints = COptionsList::V1_0();
+		const bool isConstraintsRead = constraints->OptReadFromGraphQlObject(*constraintsDataObjectPtr);
+		if (!isConstraintsRead){
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+
+bool CSelectionParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (selectedIndex){
+		jsonObject["selectedIndex"] = QJsonValue::fromVariant(*selectedIndex);
+		}
+
+
+	if (constraints){
+		QJsonObject constraintsjsonObject;
+		const bool isConstraintsAdded = constraints->WriteToJsonObject(constraintsjsonObject);
+		if (!isConstraintsAdded){
+			return false;
+		}
+		jsonObject["constraints"] = constraintsjsonObject;
+	}
+
+	return true;
+}
+
+
+bool CSelectionParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("selectedIndex") && jsonObject["selectedIndex"].isDouble()){
+		selectedIndex = jsonObject["selectedIndex"].toInt();
+	}
+
+	if (jsonObject.contains("constraints") && jsonObject["constraints"].isObject()){
+		constraints = COptionsList::V1_0();
+		const bool isConstraintsReaded = constraints->ReadFromJsonObject(jsonObject["constraints"].toObject());
+		if (!isConstraintsReaded){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CSelectionParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("selectedIndex") && jsonObject["selectedIndex"].isDouble()){
+		selectedIndex = jsonObject["selectedIndex"].toInt();
+	}
+
+	if (jsonObject.contains("constraints") && jsonObject["constraints"].isObject()){
+		constraints = COptionsList::V1_0();
+		const bool isConstraintsReaded = constraints->OptReadFromJsonObject(jsonObject["constraints"].toObject());
+		if (!isConstraintsReaded){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 // serialize methods
 
 bool CSelectionParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
@@ -3280,6 +5690,142 @@ bool CSchedulerParam::V1_0::operator==(const V1_0& other) const
 }
 
 
+bool CSchedulerParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (startTime){
+		model.SetData("startTime", *startTime, modelIndex);
+	}
+
+	if (interval){
+		model.SetData("interval", *interval, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CSchedulerParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant startTimeData = model.GetData("startTime", modelIndex);
+	if (!startTimeData.isNull()){
+		startTime = startTimeData.toString();
+	}
+
+	QVariant intervalData = model.GetData("interval", modelIndex);
+	if (!intervalData.isNull()){
+		interval = intervalData.toInt();
+	}
+
+	return true;
+}
+
+
+bool CSchedulerParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant startTimeData = model.GetData("startTime", modelIndex);
+	if (!startTimeData.isNull()){
+		startTime = startTimeData.toString();
+	}
+
+	QVariant intervalData = model.GetData("interval", modelIndex);
+	if (!intervalData.isNull()){
+		interval = intervalData.toInt();
+	}
+
+	return true;
+}
+
+
+bool CSchedulerParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (startTime){
+		request.InsertParam("startTime", QVariant(*startTime));
+	}
+
+	if (interval){
+		request.InsertParam("interval", QVariant(*interval));
+	}
+
+	return true;
+}
+
+bool CSchedulerParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant startTimeData = request.GetParamArgumentValue("startTime");
+	if (!startTimeData.isNull()){
+		startTime = startTimeData.toString();
+	}
+
+	QVariant intervalData = request.GetParamArgumentValue("interval");
+	if (!intervalData.isNull()){
+		interval = intervalData.toInt();
+	}
+
+	return true;
+}
+
+
+bool CSchedulerParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant startTimeData = request.GetParamArgumentValue("startTime");
+	if (!startTimeData.isNull()){
+		startTime = startTimeData.toString();
+	}
+
+	QVariant intervalData = request.GetParamArgumentValue("interval");
+	if (!intervalData.isNull()){
+		interval = intervalData.toInt();
+	}
+
+	return true;
+}
+
+
+bool CSchedulerParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (startTime){
+		jsonObject["startTime"] = QJsonValue::fromVariant(*startTime);
+		}
+
+
+	if (interval){
+		jsonObject["interval"] = QJsonValue::fromVariant(*interval);
+		}
+
+
+	return true;
+}
+
+
+bool CSchedulerParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("startTime") && jsonObject["startTime"].isString()){
+		startTime = jsonObject["startTime"].toString();
+	}
+
+	if (jsonObject.contains("interval") && jsonObject["interval"].isDouble()){
+		interval = jsonObject["interval"].toInt();
+	}
+
+	return true;
+}
+
+
+bool CSchedulerParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("startTime") && jsonObject["startTime"].isString()){
+		startTime = jsonObject["startTime"].toString();
+	}
+
+	if (jsonObject.contains("interval") && jsonObject["interval"].isDouble()){
+		interval = jsonObject["interval"].toInt();
+	}
+
+	return true;
+}
+
+
 // serialize methods
 
 bool CSchedulerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
@@ -3526,6 +6072,181 @@ bool CBackupSettings::V1_0::operator==(const V1_0& other) const
 	return 
 				schedulerParam == other.schedulerParam &&
 				folderPath == other.folderPath;
+}
+
+
+bool CBackupSettings::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+
+	if (schedulerParam){
+		::imtbase::CTreeItemModel* schedulerParamNewModelPtr = model.AddTreeModel("schedulerParam", modelIndex);
+		const bool isSchedulerParamAdded = schedulerParam->WriteToModel(*schedulerParamNewModelPtr, 0);
+		if (!isSchedulerParamAdded){
+			return false;
+		}
+
+	}
+	if (folderPath){
+		model.SetData("folderPath", *folderPath, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CBackupSettings::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
+	if (schedulerParamDataModelPtr != nullptr){
+		schedulerParam = CSchedulerParam::V1_0();
+		const bool isSchedulerParamReaded = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
+		if (!isSchedulerParamReaded){
+			return false;
+		}
+	}
+
+	QVariant folderPathData = model.GetData("folderPath", modelIndex);
+	if (!folderPathData.isNull()){
+		folderPath = folderPathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CBackupSettings::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
+	if (schedulerParamDataModelPtr != nullptr){
+		schedulerParam = CSchedulerParam::V1_0();
+		const bool isSchedulerParamReaded = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
+		if (!isSchedulerParamReaded){
+			return false;
+		}
+	}
+
+	QVariant folderPathData = model.GetData("folderPath", modelIndex);
+	if (!folderPathData.isNull()){
+		folderPath = folderPathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CBackupSettings::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (schedulerParam){
+		::imtgql::CGqlParamObject schedulerParamDataObject;
+		if (!schedulerParam->WriteToGraphQlObject(schedulerParamDataObject)){
+			return false;
+		}
+		request.InsertParam("schedulerParam", schedulerParamDataObject);
+	}
+
+	if (folderPath){
+		request.InsertParam("folderPath", QVariant(*folderPath));
+	}
+
+	return true;
+}
+
+bool CBackupSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	const ::imtgql::CGqlParamObject* schedulerParamDataObjectPtr = request.GetParamArgumentObjectPtr("schedulerParam");
+	if (schedulerParamDataObjectPtr != nullptr){
+		schedulerParam = CSchedulerParam::V1_0();
+		const bool isSchedulerParamRead = schedulerParam->ReadFromGraphQlObject(*schedulerParamDataObjectPtr);
+		if (!isSchedulerParamRead){
+			return false;
+		}
+
+	}
+
+	QVariant folderPathData = request.GetParamArgumentValue("folderPath");
+	if (!folderPathData.isNull()){
+		folderPath = folderPathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CBackupSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	const ::imtgql::CGqlParamObject* schedulerParamDataObjectPtr = request.GetParamArgumentObjectPtr("schedulerParam");
+	if (schedulerParamDataObjectPtr != nullptr){
+		schedulerParam = CSchedulerParam::V1_0();
+		const bool isSchedulerParamRead = schedulerParam->OptReadFromGraphQlObject(*schedulerParamDataObjectPtr);
+		if (!isSchedulerParamRead){
+			return false;
+		}
+
+	}
+
+	QVariant folderPathData = request.GetParamArgumentValue("folderPath");
+	if (!folderPathData.isNull()){
+		folderPath = folderPathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CBackupSettings::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (schedulerParam){
+		QJsonObject schedulerParamjsonObject;
+		const bool isSchedulerParamAdded = schedulerParam->WriteToJsonObject(schedulerParamjsonObject);
+		if (!isSchedulerParamAdded){
+			return false;
+		}
+		jsonObject["schedulerParam"] = schedulerParamjsonObject;
+	}
+
+	if (folderPath){
+		jsonObject["folderPath"] = QJsonValue::fromVariant(*folderPath);
+		}
+
+
+	return true;
+}
+
+
+bool CBackupSettings::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
+		schedulerParam = CSchedulerParam::V1_0();
+		const bool isSchedulerParamReaded = schedulerParam->ReadFromJsonObject(jsonObject["schedulerParam"].toObject());
+		if (!isSchedulerParamReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("folderPath") && jsonObject["folderPath"].isString()){
+		folderPath = jsonObject["folderPath"].toString();
+	}
+
+	return true;
+}
+
+
+bool CBackupSettings::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
+		schedulerParam = CSchedulerParam::V1_0();
+		const bool isSchedulerParamReaded = schedulerParam->OptReadFromJsonObject(jsonObject["schedulerParam"].toObject());
+		if (!isSchedulerParamReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("folderPath") && jsonObject["folderPath"].isString()){
+		folderPath = jsonObject["folderPath"].toString();
+	}
+
+	return true;
 }
 
 
@@ -3782,6 +6503,306 @@ bool CDatabaseAccessSettings::V1_0::operator==(const V1_0& other) const
 }
 
 
+bool CDatabaseAccessSettings::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (dbName){
+		model.SetData("dbName", *dbName, modelIndex);
+	}
+
+	if (host){
+		model.SetData("host", *host, modelIndex);
+	}
+
+	if (port){
+		model.SetData("port", *port, modelIndex);
+	}
+
+	if (dbPath){
+		model.SetData("dbPath", *dbPath, modelIndex);
+	}
+
+	if (username){
+		model.SetData("username", *username, modelIndex);
+	}
+
+	if (password){
+		model.SetData("password", *password, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CDatabaseAccessSettings::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant dbNameData = model.GetData("dbName", modelIndex);
+	if (!dbNameData.isNull()){
+		dbName = dbNameData.toString();
+	}
+
+	QVariant hostData = model.GetData("host", modelIndex);
+	if (!hostData.isNull()){
+		host = hostData.toString();
+	}
+
+	QVariant portData = model.GetData("port", modelIndex);
+	if (!portData.isNull()){
+		port = portData.toInt();
+	}
+
+	QVariant dbPathData = model.GetData("dbPath", modelIndex);
+	if (!dbPathData.isNull()){
+		dbPath = dbPathData.toString();
+	}
+
+	QVariant usernameData = model.GetData("username", modelIndex);
+	if (!usernameData.isNull()){
+		username = usernameData.toString();
+	}
+
+	QVariant passwordData = model.GetData("password", modelIndex);
+	if (!passwordData.isNull()){
+		password = passwordData.toString();
+	}
+
+	return true;
+}
+
+
+bool CDatabaseAccessSettings::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant dbNameData = model.GetData("dbName", modelIndex);
+	if (!dbNameData.isNull()){
+		dbName = dbNameData.toString();
+	}
+
+	QVariant hostData = model.GetData("host", modelIndex);
+	if (!hostData.isNull()){
+		host = hostData.toString();
+	}
+
+	QVariant portData = model.GetData("port", modelIndex);
+	if (!portData.isNull()){
+		port = portData.toInt();
+	}
+
+	QVariant dbPathData = model.GetData("dbPath", modelIndex);
+	if (!dbPathData.isNull()){
+		dbPath = dbPathData.toString();
+	}
+
+	QVariant usernameData = model.GetData("username", modelIndex);
+	if (!usernameData.isNull()){
+		username = usernameData.toString();
+	}
+
+	QVariant passwordData = model.GetData("password", modelIndex);
+	if (!passwordData.isNull()){
+		password = passwordData.toString();
+	}
+
+	return true;
+}
+
+
+bool CDatabaseAccessSettings::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (dbName){
+		request.InsertParam("dbName", QVariant(*dbName));
+	}
+
+	if (host){
+		request.InsertParam("host", QVariant(*host));
+	}
+
+	if (port){
+		request.InsertParam("port", QVariant(*port));
+	}
+
+	if (dbPath){
+		request.InsertParam("dbPath", QVariant(*dbPath));
+	}
+
+	if (username){
+		request.InsertParam("username", QVariant(*username));
+	}
+
+	if (password){
+		request.InsertParam("password", QVariant(*password));
+	}
+
+	return true;
+}
+
+bool CDatabaseAccessSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant dbNameData = request.GetParamArgumentValue("dbName");
+	if (!dbNameData.isNull()){
+		dbName = dbNameData.toString();
+	}
+
+	QVariant hostData = request.GetParamArgumentValue("host");
+	if (!hostData.isNull()){
+		host = hostData.toString();
+	}
+
+	QVariant portData = request.GetParamArgumentValue("port");
+	if (!portData.isNull()){
+		port = portData.toInt();
+	}
+
+	QVariant dbPathData = request.GetParamArgumentValue("dbPath");
+	if (!dbPathData.isNull()){
+		dbPath = dbPathData.toString();
+	}
+
+	QVariant usernameData = request.GetParamArgumentValue("username");
+	if (!usernameData.isNull()){
+		username = usernameData.toString();
+	}
+
+	QVariant passwordData = request.GetParamArgumentValue("password");
+	if (!passwordData.isNull()){
+		password = passwordData.toString();
+	}
+
+	return true;
+}
+
+
+bool CDatabaseAccessSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant dbNameData = request.GetParamArgumentValue("dbName");
+	if (!dbNameData.isNull()){
+		dbName = dbNameData.toString();
+	}
+
+	QVariant hostData = request.GetParamArgumentValue("host");
+	if (!hostData.isNull()){
+		host = hostData.toString();
+	}
+
+	QVariant portData = request.GetParamArgumentValue("port");
+	if (!portData.isNull()){
+		port = portData.toInt();
+	}
+
+	QVariant dbPathData = request.GetParamArgumentValue("dbPath");
+	if (!dbPathData.isNull()){
+		dbPath = dbPathData.toString();
+	}
+
+	QVariant usernameData = request.GetParamArgumentValue("username");
+	if (!usernameData.isNull()){
+		username = usernameData.toString();
+	}
+
+	QVariant passwordData = request.GetParamArgumentValue("password");
+	if (!passwordData.isNull()){
+		password = passwordData.toString();
+	}
+
+	return true;
+}
+
+
+bool CDatabaseAccessSettings::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (dbName){
+		jsonObject["dbName"] = QJsonValue::fromVariant(*dbName);
+		}
+
+
+	if (host){
+		jsonObject["host"] = QJsonValue::fromVariant(*host);
+		}
+
+
+	if (port){
+		jsonObject["port"] = QJsonValue::fromVariant(*port);
+		}
+
+
+	if (dbPath){
+		jsonObject["dbPath"] = QJsonValue::fromVariant(*dbPath);
+		}
+
+
+	if (username){
+		jsonObject["username"] = QJsonValue::fromVariant(*username);
+		}
+
+
+	if (password){
+		jsonObject["password"] = QJsonValue::fromVariant(*password);
+		}
+
+
+	return true;
+}
+
+
+bool CDatabaseAccessSettings::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("dbName") && jsonObject["dbName"].isString()){
+		dbName = jsonObject["dbName"].toString();
+	}
+
+	if (jsonObject.contains("host") && jsonObject["host"].isString()){
+		host = jsonObject["host"].toString();
+	}
+
+	if (jsonObject.contains("port") && jsonObject["port"].isDouble()){
+		port = jsonObject["port"].toInt();
+	}
+
+	if (jsonObject.contains("dbPath") && jsonObject["dbPath"].isString()){
+		dbPath = jsonObject["dbPath"].toString();
+	}
+
+	if (jsonObject.contains("username") && jsonObject["username"].isString()){
+		username = jsonObject["username"].toString();
+	}
+
+	if (jsonObject.contains("password") && jsonObject["password"].isString()){
+		password = jsonObject["password"].toString();
+	}
+
+	return true;
+}
+
+
+bool CDatabaseAccessSettings::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("dbName") && jsonObject["dbName"].isString()){
+		dbName = jsonObject["dbName"].toString();
+	}
+
+	if (jsonObject.contains("host") && jsonObject["host"].isString()){
+		host = jsonObject["host"].toString();
+	}
+
+	if (jsonObject.contains("port") && jsonObject["port"].isDouble()){
+		port = jsonObject["port"].toInt();
+	}
+
+	if (jsonObject.contains("dbPath") && jsonObject["dbPath"].isString()){
+		dbPath = jsonObject["dbPath"].toString();
+	}
+
+	if (jsonObject.contains("username") && jsonObject["username"].isString()){
+		username = jsonObject["username"].toString();
+	}
+
+	if (jsonObject.contains("password") && jsonObject["password"].isString()){
+		password = jsonObject["password"].toString();
+	}
+
+	return true;
+}
+
+
 // serialize methods
 
 bool CDatabaseAccessSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
@@ -4028,6 +7049,142 @@ bool CFileNameParam::V1_0::operator==(const V1_0& other) const
 	return 
 				pathType == other.pathType &&
 				path == other.path;
+}
+
+
+bool CFileNameParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (pathType){
+		model.SetData("pathType", *pathType, modelIndex);
+	}
+
+	if (path){
+		model.SetData("path", *path, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CFileNameParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant pathTypeData = model.GetData("pathType", modelIndex);
+	if (!pathTypeData.isNull()){
+		pathType = pathTypeData.toInt();
+	}
+
+	QVariant pathData = model.GetData("path", modelIndex);
+	if (!pathData.isNull()){
+		path = pathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CFileNameParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant pathTypeData = model.GetData("pathType", modelIndex);
+	if (!pathTypeData.isNull()){
+		pathType = pathTypeData.toInt();
+	}
+
+	QVariant pathData = model.GetData("path", modelIndex);
+	if (!pathData.isNull()){
+		path = pathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CFileNameParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (pathType){
+		request.InsertParam("pathType", QVariant(*pathType));
+	}
+
+	if (path){
+		request.InsertParam("path", QVariant(*path));
+	}
+
+	return true;
+}
+
+bool CFileNameParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant pathTypeData = request.GetParamArgumentValue("pathType");
+	if (!pathTypeData.isNull()){
+		pathType = pathTypeData.toInt();
+	}
+
+	QVariant pathData = request.GetParamArgumentValue("path");
+	if (!pathData.isNull()){
+		path = pathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CFileNameParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant pathTypeData = request.GetParamArgumentValue("pathType");
+	if (!pathTypeData.isNull()){
+		pathType = pathTypeData.toInt();
+	}
+
+	QVariant pathData = request.GetParamArgumentValue("path");
+	if (!pathData.isNull()){
+		path = pathData.toString();
+	}
+
+	return true;
+}
+
+
+bool CFileNameParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (pathType){
+		jsonObject["pathType"] = QJsonValue::fromVariant(*pathType);
+		}
+
+
+	if (path){
+		jsonObject["path"] = QJsonValue::fromVariant(*path);
+		}
+
+
+	return true;
+}
+
+
+bool CFileNameParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("pathType") && jsonObject["pathType"].isDouble()){
+		pathType = jsonObject["pathType"].toInt();
+	}
+
+	if (jsonObject.contains("path") && jsonObject["path"].isString()){
+		path = jsonObject["path"].toString();
+	}
+
+	return true;
+}
+
+
+bool CFileNameParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("pathType") && jsonObject["pathType"].isDouble()){
+		pathType = jsonObject["pathType"].toInt();
+	}
+
+	if (jsonObject.contains("path") && jsonObject["path"].isString()){
+		path = jsonObject["path"].toString();
+	}
+
+	return true;
 }
 
 
@@ -4280,6 +7437,535 @@ bool CParamsSet::V1_0::operator==(const V1_0& other) const
 				paramNames == other.paramNames &&
 				paramDescriptions == other.paramDescriptions &&
 				parameters == other.parameters;
+}
+
+
+bool CParamsSet::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (paramIds){
+		::imtbase::CTreeItemModel* newParamIdsModelPtr = model.AddTreeModel("paramIds", modelIndex);
+		newParamIdsModelPtr->setIsArray(true);
+		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIds->size(); ++paramIdsIndex){
+			newParamIdsModelPtr->InsertNewItem();
+			newParamIdsModelPtr->SetData(QByteArray(), paramIds->at(paramIdsIndex), paramIdsIndex);
+		}
+	}
+
+	if (paramTypeIds){
+		::imtbase::CTreeItemModel* newParamTypeIdsModelPtr = model.AddTreeModel("paramTypeIds", modelIndex);
+		newParamTypeIdsModelPtr->setIsArray(true);
+		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIds->size(); ++paramTypeIdsIndex){
+			newParamTypeIdsModelPtr->InsertNewItem();
+			newParamTypeIdsModelPtr->SetData(QByteArray(), paramTypeIds->at(paramTypeIdsIndex), paramTypeIdsIndex);
+		}
+	}
+
+	if (paramNames){
+		::imtbase::CTreeItemModel* newParamNamesModelPtr = model.AddTreeModel("paramNames", modelIndex);
+		newParamNamesModelPtr->setIsArray(true);
+		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNames->size(); ++paramNamesIndex){
+			newParamNamesModelPtr->InsertNewItem();
+			newParamNamesModelPtr->SetData(QByteArray(), paramNames->at(paramNamesIndex), paramNamesIndex);
+		}
+	}
+
+	if (paramDescriptions){
+		::imtbase::CTreeItemModel* newParamDescriptionsModelPtr = model.AddTreeModel("paramDescriptions", modelIndex);
+		newParamDescriptionsModelPtr->setIsArray(true);
+		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptions->size(); ++paramDescriptionsIndex){
+			newParamDescriptionsModelPtr->InsertNewItem();
+			newParamDescriptionsModelPtr->SetData(QByteArray(), paramDescriptions->at(paramDescriptionsIndex), paramDescriptionsIndex);
+		}
+	}
+
+	if (parameters){
+		::imtbase::CTreeItemModel* newParametersModelPtr = model.AddTreeModel("parameters", modelIndex);
+		newParametersModelPtr->setIsArray(true);
+		for (qsizetype parametersIndex = 0; parametersIndex < parameters->size(); ++parametersIndex){
+			newParametersModelPtr->InsertNewItem();
+			newParametersModelPtr->SetData(QByteArray(), parameters->at(parametersIndex), parametersIndex);
+		}
+	}
+
+
+	return true;
+}
+
+
+bool CParamsSet::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	::imtbase::CTreeItemModel* paramIdsModel = model.GetTreeItemModel("paramIds", modelIndex);
+	if (paramIdsModel != nullptr){
+		int paramIdsCount = paramIdsModel->GetItemsCount();
+		QList<QByteArray> paramIdsList;
+		for (int paramIdsIndex = 0; paramIdsIndex < paramIdsCount; ++paramIdsIndex){
+			QByteArray paramIds = paramIdsModel->GetData(QByteArray(), paramIdsIndex).toByteArray();
+			paramIdsList << paramIds;
+		}
+		paramIds = paramIdsList;
+
+	}
+
+	::imtbase::CTreeItemModel* paramTypeIdsModel = model.GetTreeItemModel("paramTypeIds", modelIndex);
+	if (paramTypeIdsModel != nullptr){
+		int paramTypeIdsCount = paramTypeIdsModel->GetItemsCount();
+		QList<QByteArray> paramTypeIdsList;
+		for (int paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsCount; ++paramTypeIdsIndex){
+			QByteArray paramTypeIds = paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).toByteArray();
+			paramTypeIdsList << paramTypeIds;
+		}
+		paramTypeIds = paramTypeIdsList;
+
+	}
+
+	::imtbase::CTreeItemModel* paramNamesModel = model.GetTreeItemModel("paramNames", modelIndex);
+	if (paramNamesModel != nullptr){
+		int paramNamesCount = paramNamesModel->GetItemsCount();
+		QList<QString> paramNamesList;
+		for (int paramNamesIndex = 0; paramNamesIndex < paramNamesCount; ++paramNamesIndex){
+			QString paramNames = paramNamesModel->GetData(QByteArray(), paramNamesIndex).toString();
+			paramNamesList << paramNames;
+		}
+		paramNames = paramNamesList;
+
+	}
+
+	::imtbase::CTreeItemModel* paramDescriptionsModel = model.GetTreeItemModel("paramDescriptions", modelIndex);
+	if (paramDescriptionsModel != nullptr){
+		int paramDescriptionsCount = paramDescriptionsModel->GetItemsCount();
+		QList<QString> paramDescriptionsList;
+		for (int paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsCount; ++paramDescriptionsIndex){
+			QString paramDescriptions = paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).toString();
+			paramDescriptionsList << paramDescriptions;
+		}
+		paramDescriptions = paramDescriptionsList;
+
+	}
+
+	::imtbase::CTreeItemModel* parametersModel = model.GetTreeItemModel("parameters", modelIndex);
+	if (parametersModel != nullptr){
+		int parametersCount = parametersModel->GetItemsCount();
+		QList<QString> parametersList;
+		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
+			QString parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
+			parametersList << parameters;
+		}
+		parameters = parametersList;
+
+	}
+
+	return true;
+}
+
+
+bool CParamsSet::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	::imtbase::CTreeItemModel* paramIdsModel = model.GetTreeItemModel("paramIds", modelIndex);
+	if (paramIdsModel != nullptr){
+		int paramIdsCount = paramIdsModel->GetItemsCount();
+		QList<QByteArray> paramIdsList;
+		for (int paramIdsIndex = 0; paramIdsIndex < paramIdsCount; ++paramIdsIndex){
+			QByteArray paramIds = paramIdsModel->GetData(QByteArray(), paramIdsIndex).toByteArray();
+			paramIdsList << paramIds;
+		}
+		paramIds = paramIdsList;
+
+	}
+
+	::imtbase::CTreeItemModel* paramTypeIdsModel = model.GetTreeItemModel("paramTypeIds", modelIndex);
+	if (paramTypeIdsModel != nullptr){
+		int paramTypeIdsCount = paramTypeIdsModel->GetItemsCount();
+		QList<QByteArray> paramTypeIdsList;
+		for (int paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsCount; ++paramTypeIdsIndex){
+			QByteArray paramTypeIds = paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).toByteArray();
+			paramTypeIdsList << paramTypeIds;
+		}
+		paramTypeIds = paramTypeIdsList;
+
+	}
+
+	::imtbase::CTreeItemModel* paramNamesModel = model.GetTreeItemModel("paramNames", modelIndex);
+	if (paramNamesModel != nullptr){
+		int paramNamesCount = paramNamesModel->GetItemsCount();
+		QList<QString> paramNamesList;
+		for (int paramNamesIndex = 0; paramNamesIndex < paramNamesCount; ++paramNamesIndex){
+			QString paramNames = paramNamesModel->GetData(QByteArray(), paramNamesIndex).toString();
+			paramNamesList << paramNames;
+		}
+		paramNames = paramNamesList;
+
+	}
+
+	::imtbase::CTreeItemModel* paramDescriptionsModel = model.GetTreeItemModel("paramDescriptions", modelIndex);
+	if (paramDescriptionsModel != nullptr){
+		int paramDescriptionsCount = paramDescriptionsModel->GetItemsCount();
+		QList<QString> paramDescriptionsList;
+		for (int paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsCount; ++paramDescriptionsIndex){
+			QString paramDescriptions = paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).toString();
+			paramDescriptionsList << paramDescriptions;
+		}
+		paramDescriptions = paramDescriptionsList;
+
+	}
+
+	::imtbase::CTreeItemModel* parametersModel = model.GetTreeItemModel("parameters", modelIndex);
+	if (parametersModel != nullptr){
+		int parametersCount = parametersModel->GetItemsCount();
+		QList<QString> parametersList;
+		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
+			QString parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
+			parametersList << parameters;
+		}
+		parameters = parametersList;
+
+	}
+
+	return true;
+}
+
+
+bool CParamsSet::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+{
+	if (paramIds){
+		QVariantList paramIdsTempList;
+		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIds->size(); ++paramIdsIndex){
+			paramIdsTempList << paramIds->at(paramIdsIndex);
+		}
+		request.InsertParam("paramIds", QVariant(paramIdsTempList));
+	}
+
+	if (paramTypeIds){
+		QVariantList paramTypeIdsTempList;
+		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIds->size(); ++paramTypeIdsIndex){
+			paramTypeIdsTempList << paramTypeIds->at(paramTypeIdsIndex);
+		}
+		request.InsertParam("paramTypeIds", QVariant(paramTypeIdsTempList));
+	}
+
+	if (paramNames){
+		QVariantList paramNamesTempList;
+		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNames->size(); ++paramNamesIndex){
+			paramNamesTempList << paramNames->at(paramNamesIndex);
+		}
+		request.InsertParam("paramNames", QVariant(paramNamesTempList));
+	}
+
+	if (paramDescriptions){
+		QVariantList paramDescriptionsTempList;
+		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptions->size(); ++paramDescriptionsIndex){
+			paramDescriptionsTempList << paramDescriptions->at(paramDescriptionsIndex);
+		}
+		request.InsertParam("paramDescriptions", QVariant(paramDescriptionsTempList));
+	}
+
+	if (parameters){
+		QVariantList parametersTempList;
+		for (qsizetype parametersIndex = 0; parametersIndex < parameters->size(); ++parametersIndex){
+			parametersTempList << parameters->at(parametersIndex);
+		}
+		request.InsertParam("parameters", QVariant(parametersTempList));
+	}
+
+	return true;
+}
+
+bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant paramIdsData = request.GetParamArgumentValue("paramIds");
+	if (!paramIdsData.isNull()){
+		QList<QByteArray> paramIdsList;
+		QVariantList paramIdsDataList = paramIdsData.toList();
+		qsizetype paramIdsCount = paramIdsDataList.size();
+		for (qsizetype paramIdsIndex = 0; paramIdsIndex != paramIdsCount ; ++paramIdsIndex){
+			QByteArray paramIds = paramIdsDataList[paramIdsIndex].toByteArray();
+			paramIdsList << paramIds;
+		}
+		paramIds = paramIdsList;
+
+	}
+
+	QVariant paramTypeIdsData = request.GetParamArgumentValue("paramTypeIds");
+	if (!paramTypeIdsData.isNull()){
+		QList<QByteArray> paramTypeIdsList;
+		QVariantList paramTypeIdsDataList = paramTypeIdsData.toList();
+		qsizetype paramTypeIdsCount = paramTypeIdsDataList.size();
+		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex != paramTypeIdsCount ; ++paramTypeIdsIndex){
+			QByteArray paramTypeIds = paramTypeIdsDataList[paramTypeIdsIndex].toByteArray();
+			paramTypeIdsList << paramTypeIds;
+		}
+		paramTypeIds = paramTypeIdsList;
+
+	}
+
+	QVariant paramNamesData = request.GetParamArgumentValue("paramNames");
+	if (!paramNamesData.isNull()){
+		QList<QString> paramNamesList;
+		QVariantList paramNamesDataList = paramNamesData.toList();
+		qsizetype paramNamesCount = paramNamesDataList.size();
+		for (qsizetype paramNamesIndex = 0; paramNamesIndex != paramNamesCount ; ++paramNamesIndex){
+			QString paramNames = paramNamesDataList[paramNamesIndex].toString();
+			paramNamesList << paramNames;
+		}
+		paramNames = paramNamesList;
+
+	}
+
+	QVariant paramDescriptionsData = request.GetParamArgumentValue("paramDescriptions");
+	if (!paramDescriptionsData.isNull()){
+		QList<QString> paramDescriptionsList;
+		QVariantList paramDescriptionsDataList = paramDescriptionsData.toList();
+		qsizetype paramDescriptionsCount = paramDescriptionsDataList.size();
+		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex != paramDescriptionsCount ; ++paramDescriptionsIndex){
+			QString paramDescriptions = paramDescriptionsDataList[paramDescriptionsIndex].toString();
+			paramDescriptionsList << paramDescriptions;
+		}
+		paramDescriptions = paramDescriptionsList;
+
+	}
+
+	QVariant parametersData = request.GetParamArgumentValue("parameters");
+	if (!parametersData.isNull()){
+		QList<QString> parametersList;
+		QVariantList parametersDataList = parametersData.toList();
+		qsizetype parametersCount = parametersDataList.size();
+		for (qsizetype parametersIndex = 0; parametersIndex != parametersCount ; ++parametersIndex){
+			QString parameters = parametersDataList[parametersIndex].toString();
+			parametersList << parameters;
+		}
+		parameters = parametersList;
+
+	}
+
+	return true;
+}
+
+
+bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+{
+	QVariant paramIdsData = request.GetParamArgumentValue("paramIds");
+	if (!paramIdsData.isNull()){
+		QList<QByteArray> paramIdsList;
+		QVariantList paramIdsDataList = paramIdsData.toList();
+		qsizetype paramIdsCount = paramIdsDataList.size();
+		for (qsizetype paramIdsIndex = 0; paramIdsIndex != paramIdsCount ; ++paramIdsIndex){
+			QByteArray paramIds = paramIdsDataList[paramIdsIndex].toByteArray();
+			paramIdsList << paramIds;
+		}
+		paramIds = paramIdsList;
+
+	}
+
+	QVariant paramTypeIdsData = request.GetParamArgumentValue("paramTypeIds");
+	if (!paramTypeIdsData.isNull()){
+		QList<QByteArray> paramTypeIdsList;
+		QVariantList paramTypeIdsDataList = paramTypeIdsData.toList();
+		qsizetype paramTypeIdsCount = paramTypeIdsDataList.size();
+		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex != paramTypeIdsCount ; ++paramTypeIdsIndex){
+			QByteArray paramTypeIds = paramTypeIdsDataList[paramTypeIdsIndex].toByteArray();
+			paramTypeIdsList << paramTypeIds;
+		}
+		paramTypeIds = paramTypeIdsList;
+
+	}
+
+	QVariant paramNamesData = request.GetParamArgumentValue("paramNames");
+	if (!paramNamesData.isNull()){
+		QList<QString> paramNamesList;
+		QVariantList paramNamesDataList = paramNamesData.toList();
+		qsizetype paramNamesCount = paramNamesDataList.size();
+		for (qsizetype paramNamesIndex = 0; paramNamesIndex != paramNamesCount ; ++paramNamesIndex){
+			QString paramNames = paramNamesDataList[paramNamesIndex].toString();
+			paramNamesList << paramNames;
+		}
+		paramNames = paramNamesList;
+
+	}
+
+	QVariant paramDescriptionsData = request.GetParamArgumentValue("paramDescriptions");
+	if (!paramDescriptionsData.isNull()){
+		QList<QString> paramDescriptionsList;
+		QVariantList paramDescriptionsDataList = paramDescriptionsData.toList();
+		qsizetype paramDescriptionsCount = paramDescriptionsDataList.size();
+		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex != paramDescriptionsCount ; ++paramDescriptionsIndex){
+			QString paramDescriptions = paramDescriptionsDataList[paramDescriptionsIndex].toString();
+			paramDescriptionsList << paramDescriptions;
+		}
+		paramDescriptions = paramDescriptionsList;
+
+	}
+
+	QVariant parametersData = request.GetParamArgumentValue("parameters");
+	if (!parametersData.isNull()){
+		QList<QString> parametersList;
+		QVariantList parametersDataList = parametersData.toList();
+		qsizetype parametersCount = parametersDataList.size();
+		for (qsizetype parametersIndex = 0; parametersIndex != parametersCount ; ++parametersIndex){
+			QString parameters = parametersDataList[parametersIndex].toString();
+			parametersList << parameters;
+		}
+		parameters = parametersList;
+
+	}
+
+	return true;
+}
+
+
+bool CParamsSet::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (paramIds){
+		QJsonArray newParamIdsArray;
+		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIds->size(); ++paramIdsIndex){
+			newParamIdsArray << QString(paramIds->at(paramIdsIndex));
+		}
+		jsonObject["paramIds"] = newParamIdsArray;
+	}
+
+	if (paramTypeIds){
+		QJsonArray newParamTypeIdsArray;
+		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIds->size(); ++paramTypeIdsIndex){
+			newParamTypeIdsArray << QString(paramTypeIds->at(paramTypeIdsIndex));
+		}
+		jsonObject["paramTypeIds"] = newParamTypeIdsArray;
+	}
+
+	if (paramNames){
+		QJsonArray newParamNamesArray;
+		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNames->size(); ++paramNamesIndex){
+			newParamNamesArray << paramNames->at(paramNamesIndex);
+		}
+		jsonObject["paramNames"] = newParamNamesArray;
+	}
+
+	if (paramDescriptions){
+		QJsonArray newParamDescriptionsArray;
+		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptions->size(); ++paramDescriptionsIndex){
+			newParamDescriptionsArray << paramDescriptions->at(paramDescriptionsIndex);
+		}
+		jsonObject["paramDescriptions"] = newParamDescriptionsArray;
+	}
+
+	if (parameters){
+		QJsonArray newParametersArray;
+		for (qsizetype parametersIndex = 0; parametersIndex < parameters->size(); ++parametersIndex){
+			newParametersArray << parameters->at(parametersIndex);
+		}
+		jsonObject["parameters"] = newParametersArray;
+	}
+
+	return true;
+}
+
+
+bool CParamsSet::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
+		const QJsonArray paramIdsjsonArray = jsonObject["paramIds"].toArray();
+		const qsizetype paramIdsArrayCount = paramIdsjsonArray.size();
+		paramIds = QList<QByteArray>();
+		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsArrayCount; ++paramIdsIndex){
+			QByteArray tempParamIds = paramIdsjsonArray[paramIdsIndex].toString().toUtf8();
+			paramIds->append(tempParamIds);
+		}
+	}
+
+	if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isArray()){
+		const QJsonArray paramTypeIdsjsonArray = jsonObject["paramTypeIds"].toArray();
+		const qsizetype paramTypeIdsArrayCount = paramTypeIdsjsonArray.size();
+		paramTypeIds = QList<QByteArray>();
+		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsArrayCount; ++paramTypeIdsIndex){
+			QByteArray tempParamTypeIds = paramTypeIdsjsonArray[paramTypeIdsIndex].toString().toUtf8();
+			paramTypeIds->append(tempParamTypeIds);
+		}
+	}
+
+	if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isArray()){
+		const QJsonArray paramNamesjsonArray = jsonObject["paramNames"].toArray();
+		const qsizetype paramNamesArrayCount = paramNamesjsonArray.size();
+		paramNames = QList<QString>();
+		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesArrayCount; ++paramNamesIndex){
+			QString tempParamNames = paramNamesjsonArray[paramNamesIndex].toString();
+			paramNames->append(tempParamNames);
+		}
+	}
+
+	if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isArray()){
+		const QJsonArray paramDescriptionsjsonArray = jsonObject["paramDescriptions"].toArray();
+		const qsizetype paramDescriptionsArrayCount = paramDescriptionsjsonArray.size();
+		paramDescriptions = QList<QString>();
+		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsArrayCount; ++paramDescriptionsIndex){
+			QString tempParamDescriptions = paramDescriptionsjsonArray[paramDescriptionsIndex].toString();
+			paramDescriptions->append(tempParamDescriptions);
+		}
+	}
+
+	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
+		const QJsonArray parametersjsonArray = jsonObject["parameters"].toArray();
+		const qsizetype parametersArrayCount = parametersjsonArray.size();
+		parameters = QList<QString>();
+		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
+			QString tempParameters = parametersjsonArray[parametersIndex].toString();
+			parameters->append(tempParameters);
+		}
+	}
+
+	return true;
+}
+
+
+bool CParamsSet::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
+		const QJsonArray paramIdsjsonArray = jsonObject["paramIds"].toArray();
+		const qsizetype paramIdsArrayCount = paramIdsjsonArray.size();
+		paramIds = QList<QByteArray>();
+		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsArrayCount; ++paramIdsIndex){
+			QByteArray tempParamIds = paramIdsjsonArray[paramIdsIndex].toString().toUtf8();
+			paramIds->append(tempParamIds);
+		}
+	}
+
+	if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isArray()){
+		const QJsonArray paramTypeIdsjsonArray = jsonObject["paramTypeIds"].toArray();
+		const qsizetype paramTypeIdsArrayCount = paramTypeIdsjsonArray.size();
+		paramTypeIds = QList<QByteArray>();
+		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsArrayCount; ++paramTypeIdsIndex){
+			QByteArray tempParamTypeIds = paramTypeIdsjsonArray[paramTypeIdsIndex].toString().toUtf8();
+			paramTypeIds->append(tempParamTypeIds);
+		}
+	}
+
+	if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isArray()){
+		const QJsonArray paramNamesjsonArray = jsonObject["paramNames"].toArray();
+		const qsizetype paramNamesArrayCount = paramNamesjsonArray.size();
+		paramNames = QList<QString>();
+		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesArrayCount; ++paramNamesIndex){
+			QString tempParamNames = paramNamesjsonArray[paramNamesIndex].toString();
+			paramNames->append(tempParamNames);
+		}
+	}
+
+	if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isArray()){
+		const QJsonArray paramDescriptionsjsonArray = jsonObject["paramDescriptions"].toArray();
+		const qsizetype paramDescriptionsArrayCount = paramDescriptionsjsonArray.size();
+		paramDescriptions = QList<QString>();
+		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsArrayCount; ++paramDescriptionsIndex){
+			QString tempParamDescriptions = paramDescriptionsjsonArray[paramDescriptionsIndex].toString();
+			paramDescriptions->append(tempParamDescriptions);
+		}
+	}
+
+	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
+		const QJsonArray parametersjsonArray = jsonObject["parameters"].toArray();
+		const qsizetype parametersArrayCount = parametersjsonArray.size();
+		parameters = QList<QString>();
+		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
+			QString tempParameters = parametersjsonArray[parametersIndex].toString();
+			parameters->append(tempParameters);
+		}
+	}
+
+	return true;
 }
 
 

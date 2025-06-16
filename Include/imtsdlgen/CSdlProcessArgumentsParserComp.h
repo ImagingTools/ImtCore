@@ -68,7 +68,7 @@ public:
 	virtual void SetDependenciesModeEnabled(bool enabled = true) override;
 	virtual void SetGenerateModeEnabled(bool enabled = true) override;
 	virtual void SetEnabledModificators(const QStringList& modificators) override;
-	virtual void SetEnabledAllModificators(bool enable) override;
+	virtual void SetEnabledAllModificators(bool enable = true) override;
 	virtual void SetCppEnabled(bool enabled = true) override;
 	virtual void SetQmlEnabled(bool enabled = true) override;
 	virtual void SetGqlEnabled(bool enabled = true) override;

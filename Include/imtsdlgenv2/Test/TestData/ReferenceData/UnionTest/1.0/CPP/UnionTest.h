@@ -62,8 +62,17 @@ public:
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
 
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
 
+		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 	};
 
 	// available version members
@@ -146,8 +155,17 @@ public:
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
 
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
 
+		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 	};
 
 	// available version members
@@ -230,8 +248,17 @@ public:
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
 
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
 
+		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 	};
 
 	// available version members
@@ -316,8 +343,17 @@ public:
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
 
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
 
+		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
 	};
 
 	// available version members
