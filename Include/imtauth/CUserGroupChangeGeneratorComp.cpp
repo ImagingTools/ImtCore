@@ -16,6 +16,10 @@ namespace imtauth
 
 QString CUserGroupChangeGeneratorComp::GetRoleName(const QByteArray& roleId) const
 {
+	if (!IsUuid(roleId)){
+		return roleId;
+	}
+
 	if (m_roleCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_roleCollectionCompPtr->GetObjectData(roleId, dataPtr)){
@@ -32,6 +36,10 @@ QString CUserGroupChangeGeneratorComp::GetRoleName(const QByteArray& roleId) con
 
 QString CUserGroupChangeGeneratorComp::GetUserName(const QByteArray& userId) const
 {
+	if (!IsUuid(userId)){
+		return userId;
+	}
+
 	if (m_userCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
@@ -48,6 +56,10 @@ QString CUserGroupChangeGeneratorComp::GetUserName(const QByteArray& userId) con
 
 QString CUserGroupChangeGeneratorComp::GetGroupName(const QByteArray& groupId) const
 {
+	if (!IsUuid(groupId)){
+		return groupId;
+	}
+
 	if (m_objectCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(groupId, dataPtr)){

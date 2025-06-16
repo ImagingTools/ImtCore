@@ -52,6 +52,23 @@ void CDocumentChangeGeneratorCompBase::GenerateChanges(
 }
 
 
+bool CDocumentChangeGeneratorCompBase::IsUuid(const QByteArray& data) const
+{
+	if (data.size() == 16){
+		QUuid uuid = QUuid::fromRfc4122(data);
+		return !uuid.isNull();
+	}
+
+	if (data.size() == 36){
+		QString str = QString::fromUtf8(data);
+		QUuid uuid = QUuid(str);
+		return !uuid.isNull();
+	}
+
+	return false;
+}
+
+
 // reimplemented (imtbase::IDocumentChangeGenerator)
 
 bool CDocumentChangeGeneratorCompBase::GenerateDocumentChanges(

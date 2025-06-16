@@ -41,6 +41,7 @@ protected:
 		const QByteArrayList& newValueList,
 		QByteArrayList& addedValueList,
 		QByteArrayList& removedValueList) const;
+	bool IsUuid(const QByteArray& data) const;
 
 	virtual bool CompareDocuments(
 		const istd::IChangeable& oldDocument,

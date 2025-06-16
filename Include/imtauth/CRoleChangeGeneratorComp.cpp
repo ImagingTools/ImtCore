@@ -14,6 +14,10 @@ namespace imtauth
 
 QString CRoleChangeGeneratorComp::GetRoleName(const QByteArray& roleId) const
 {
+	if (!IsUuid(roleId)){
+		return roleId;
+	}
+
 	if (m_objectCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(roleId, dataPtr)){
