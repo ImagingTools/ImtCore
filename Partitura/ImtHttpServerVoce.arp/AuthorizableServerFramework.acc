@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5394" Description="ACF"/>
+            <Version Id="0" Number="5395" Description="ACF"/>
             <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
@@ -59,7 +59,7 @@
             </Data>
         </Element>
         <Element Id="IdentifiableProductInfo" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap/>
             </Data>
         </Element>
@@ -158,25 +158,14 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="PumaClientEngine"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="Backup" ComponentId="ServerSettings/Backup"/>
-        <Component ExportedId="DatabaseAccessSettings" ComponentId="ServerSettings/DatabaseAccessSettings"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="PumaClientEngine/GroupRemoteRepository"/>
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
-        <Component ExportedId="LoggingParams" ComponentId="ServerSettings/LoggingParams"/>
         <Component ExportedId="PumaGQLClientEngine" ComponentId="PumaClientEngine"/>
-        <Component ExportedId="PumaUrl" ComponentId="ServerSettings/PumaUrl"/>
-        <Component ExportedId="PumaWebSocketPort" ComponentId="ServerSettings/PumaWebSocketPort"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
-        <Component ExportedId="ServerPort" ComponentId="ServerSettings/ServerPort"/>
-        <Component ExportedId="SmtpPasswordParam" ComponentId="ServerSettings/SmtpPasswordParam"/>
-        <Component ExportedId="SmtpPortParam" ComponentId="ServerSettings/SmtpPortParam"/>
-        <Component ExportedId="SmtpServerAddressParam" ComponentId="ServerSettings/SmtpServerAddressParam"/>
-        <Component ExportedId="SmtpUsernameParam" ComponentId="ServerSettings/SmtpUsernameParam"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="PumaClientEngine/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaClientEngine/UserSessionRemoteRepository"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
-        <Component ExportedId="WebSocketServerPort" ComponentId="ServerSettings/WebSocketServerPort"/>
     </ExportedComponents>
 </Acf>
