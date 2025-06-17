@@ -9,7 +9,7 @@ int ProductFeatureRun(int argc, char* argv[])
 	ApplicationComposite instance;
 
 	imtlic::IProductInfo* productInfoPtr = instance.template GetInterface<imtlic::IProductInfo>();
-	if (productInfoPtr != nullptr){
+	if (productInfoPtr != nullptr && ProductFiller != nullptr){
 		ProductFiller(*productInfoPtr);
 	}
 
