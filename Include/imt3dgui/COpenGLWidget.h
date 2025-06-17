@@ -28,6 +28,12 @@ class COpenGLWidget: public QOpenGLWidget, protected QOpenGLFunctions
 	Q_OBJECT
 
 public:
+	enum ProjectionMode
+	{
+		PM_PERSPECTIVE,
+		PM_ORTHO
+	};
+
 	enum ViewDirection
 	{
 		VD_DEFAULT = 0,
@@ -85,6 +91,7 @@ public:
 	void SetRenderHint(RenderHint renderHint, bool on = true);
 	void SetCameraView(ViewDirection viewDirection, bool animated = true);
 	void SetViewMode(ViewMode viewMode);
+	void SetProjectionMode(ProjectionMode projectionMode);
 	void SetSelectionMode(SelectionMode selectionMode);
 	void SetRotationMode(RotationMode rotationMode);
 	void ClearSelection();
@@ -125,6 +132,7 @@ private:
 	void SetGlFlags();
 	void SetGlUniformValues();
 	QMatrix4x4 GetProjectionMatrix() const;
+	static void GetFovRect(float aspectRatio, float nearPlane, float& width, float& height);
 
 private:
 	QPoint m_mouseClickPosition;
@@ -142,6 +150,7 @@ private:
 	QOpenGLShaderProgram* m_programPtr;
 	imt3dview::IScene3dCamera* m_cameraPtr;
 	QColor m_backgroundColor;
+	ProjectionMode m_projectionMode = PM_PERSPECTIVE;
 
 	static const float s_verticalAngle;
 	static const float s_nearPlane;

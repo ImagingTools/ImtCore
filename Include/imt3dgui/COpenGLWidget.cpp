@@ -1,6 +1,8 @@
 #include <imt3dgui/COpenGLWidget.h>
 
 
+#include <cmath>
+
 // Qt includes
 #include <QtCore/QElapsedTimer>
 #include <QtGui/QMouseEvent>
@@ -229,6 +231,14 @@ void COpenGLWidget::SetViewMode(ViewMode viewMode)
 		SetSelectionMode(SelectionMode::SM_POINT);
 		break;
 	}
+}
+
+
+void COpenGLWidget::SetProjectionMode(ProjectionMode projectionMode)
+{
+	m_projectionMode = projectionMode;
+
+	update();
 }
 
 
@@ -476,7 +486,9 @@ void COpenGLWidget::OnZoomOut()
 
 void COpenGLWidget::OnInternalTimer()
 {
-	if (isVisible()) update();
+	if (isVisible()){
+		update();
+	}
 }
 
 
@@ -493,6 +505,7 @@ void COpenGLWidget::OnCameraPositionAnimation(const QVariant& value)
 {
 	if (m_cameraPtr){
 		m_cameraPtr->MoveTo(value.value<QVector3D>());
+
 		update();
 	}
 }
@@ -698,9 +711,40 @@ QMatrix4x4 COpenGLWidget::GetProjectionMatrix() const
 	float aspectRatio = width / (height > 0.0f ? height : 1.0f);
 
 	QMatrix4x4 projectionMatrix;
-	projectionMatrix.perspective(s_verticalAngle, aspectRatio, s_nearPlane, s_farPlane);
+	projectionMatrix.setToIdentity();
+
+	double cameraZ = m_cameraPtr->GetPosition().z();
+
+	float w = 0, h = 0;
+	GetFovRect(aspectRatio, cameraZ / 2, w, h);
+
+	double orthoFactor = w / 2;
+
+	switch (m_projectionMode){
+		case PM_ORTHO:
+			projectionMatrix.ortho(-orthoFactor * aspectRatio, orthoFactor * aspectRatio, -orthoFactor, orthoFactor, s_nearPlane, s_farPlane);
+			projectionMatrix.scale(1.0);
+			break;
+		case PM_PERSPECTIVE:
+			projectionMatrix.perspective(s_verticalAngle, aspectRatio, s_nearPlane, s_farPlane);
+			break;
+		default:
+			Q_ASSERT(false);
+	}
 
 	return projectionMatrix;
+}
+
+
+// private static methods
+
+void COpenGLWidget::GetFovRect(float aspectRatio, float nearPlane, float& width, float& height)
+{
+	float fov_y = 45.0 * M_PI / 180.0;
+
+	height = 2.0f * nearPlane * std::tan(fov_y / 2.0);
+
+	width = height * aspectRatio;
 }
 
 
