@@ -4,6 +4,69 @@ const Signal = require("./Signal")
 class Property extends BaseObject {
     static queueLink = []
 
+
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
+     * @param {Object} meta
+     * @returns {Object}
+     */
+    static simpleGet(target, name, meta){
+        return name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+    }
+
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
+    static simpleSet(target, name, value, meta){
+        let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+
+        if(typeof value === 'function'){
+            try {
+                target[name] = this.typeCasting(value.call(target))
+            } catch(error) {
+                console.error(error)
+            }
+        } else {
+            try {
+                target[name] = this.typeCasting(value)
+            } catch (error) {
+                console.error(error)
+            }
+        }  
+
+        let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+
+        if(oldValue !== currentValue){
+            Signal.get(target, name + 'Changed')(oldValue, currentValue)
+        }
+
+        return true
+    }
+
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
+    static simpleReset(target, name, value, meta){
+        if(target.__depends[name]){
+            for(let connectionObj of target.__depends[name]){
+                Signal.removeConnection(connectionObj)
+            }
+            delete target.__depends[name]
+        }
+
+        if(target.__properties) delete target.__properties[name]
+
+        return this.simpleSet(target, name, value, meta)
+    }
+
     /**
      * 
      * @param {Object} target 

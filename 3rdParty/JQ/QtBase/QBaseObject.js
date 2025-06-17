@@ -49,6 +49,27 @@ class QBaseObject extends BaseObject {
     __depends = {}
     __properties = {}
 
+    __getPropertyValue(name){
+        if(this.__self.constructor.meta.hasOwnProperty(name)){
+            let node = this.__self.constructor.meta[name]
+            return node.type.simpleGet(this.__self, name, node)
+        }
+    }
+
+    __setPropertyValue(name, value){
+        if(this.__self.constructor.meta.hasOwnProperty(name)){
+            let node = this.__self.constructor.meta[name]
+            return node.type.simpleSet(this.__self, name, value, node)
+        }
+    }
+
+    __resetPropertyValue(name, value){
+        if(this.__self.constructor.meta.hasOwnProperty(name)){
+            let node = this.__self.constructor.meta[name]
+            return node.type.simpleReset(this.__self, name, value, node)
+        }
+    }
+
     __beginUpdate(){
 
     }

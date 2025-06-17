@@ -2,6 +2,79 @@ const Property = require("./Property")
 const Signal = require("./Signal")
 
 class LinkedBool extends Property {
+
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
+     * @param {Object} meta
+     * @returns {Object}
+     */
+    static simpleGet(target, name, meta){
+        return target.__self[name].value && target.__self[name].parentValue
+    }
+
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
+    static simpleSet(target, name, value, meta){
+        let oldValue = target.__self[name].value && target.__self[name].parentValue
+
+        if(typeof value === 'function'){
+            try {
+                target.__self[name].value = value.call(target)
+            } catch(error) {
+                console.error(error)
+            }
+        } else {
+            target.__self[name].value = value
+        }  
+
+        let currentValue = target.__self[name].value && target.__self[name].parentValue
+
+        if(oldValue !== currentValue){
+            Signal.get(target, name + 'Changed')(oldValue, currentValue)
+        }
+    }
+
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
+    static simpleReset(target, name, value, meta){
+        if(target.__depends[name]){
+            for(let connectionObj of target.__depends[name]){
+                Signal.removeConnection(connectionObj)
+            }
+            delete target.__depends[name]
+        }
+
+        if(target.__properties) delete target.__properties[name]
+        
+        let oldValue = target.__self[name].value && target.__self[name].parentValue
+
+        if(typeof value === 'function'){
+            try {
+                target.__self[name].value = value.call(target)
+            } catch(error) {
+                console.error(error)
+            }
+        } else {
+            target.__self[name].value = value
+        }  
+
+        let currentValue = target.__self[name].value && target.__self[name].parentValue
+
+        if(oldValue !== currentValue){
+            Signal.get(target, name + 'Changed')(oldValue, currentValue)
+        }
+    }
+
     /**
      * 
      * @param {Object} target 

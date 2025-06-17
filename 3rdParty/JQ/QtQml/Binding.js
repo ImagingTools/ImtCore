@@ -4,6 +4,8 @@ const String = require("./String")
 const Var = require("./Var")
 const Signal = require("./Signal")
 
+const Property = require("./Property")
+
 class Binding extends QtObject {
     static RestoreNone = 0
     static RestoreBinding = 1
@@ -56,20 +58,20 @@ class Binding extends QtObject {
     }  
 
     __update(){
-        if(this.target && this.property){
+        if(this.__getPropertyValue('target') && this.__getPropertyValue('property')){
             // if(this.$prop) this.getProperty('value').removeSubscriber(this.$prop)
             
-            let path = this.property.split('.')
+            let path = this.__getPropertyValue('property').split('.')
             let propName = path.pop()
 
-            let obj = this.target
+            let obj = this.__getPropertyValue('target')
 
             while(path.length){
                 let name = path.shift()
-                obj = obj[name]
+                obj = obj.__getPropertyValue(name)
             }
 
-            obj[propName] = this.value
+            obj.__resetPropertyValue(propName, this.__getPropertyValue('value'))
 
             // this.$prop = prop
             // prop.subscribe(this.getProperty('value'))

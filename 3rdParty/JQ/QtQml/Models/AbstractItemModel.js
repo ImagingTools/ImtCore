@@ -23,8 +23,20 @@ class AbstractItemModel {
             },
             get(target, key){
                 let caller = Property.queueLink[Property.queueLink.length-1]
-                if(caller && properties.indexOf(caller) < 0) {
-                    properties.push(caller)
+                if(caller) {
+                    let found = false
+
+                    for(let _caller of properties){
+                        if(caller.name === _caller.name && caller.target === _caller.target){
+                            found = true
+                            break
+                        }
+                    }
+
+                    if(!found){
+                        properties.push(caller)
+                    }
+                    
                 }
 
                 if(key === 'index') {
@@ -37,7 +49,7 @@ class AbstractItemModel {
 
                 for(let property of properties){
                     // property.__update()
-                    property.target[property.name] = property.func()
+                    property.target.__proxy[property.name] = property.func()
                 }
 
                 parent.__propogate()

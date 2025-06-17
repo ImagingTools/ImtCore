@@ -12,6 +12,9 @@ const KeyNavigation = require("../QtQml/KeyNavigation")
 const Anchors = require("../QtQml/Anchors")
 const AnchorLine = require("../QtQml/AnchorLine")
 
+
+const Property = require("../QtQml/Property")
+
 class Item extends QtObject {
     static TopLeft = 0
     static Top = 1
@@ -200,9 +203,9 @@ class Item extends QtObject {
     }
 
     __checkVisibility(){
-        if(this.__proxy.visible){
+        if(this.__getPropertyValue('visible')){
             this.__proxy.__DOM.removeAttribute('invisible')
-            if(this.__proxy.width > 0 && this.__proxy.height > 0){
+            if(this.__getPropertyValue('width') > 0 && this.__getPropertyValue('height') > 0){
                 this.__proxy.__DOM.removeAttribute('no-view')
             } else {
                 this.__proxy.__DOM.setAttribute('no-view', '')

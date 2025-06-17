@@ -7,6 +7,44 @@ class Alias extends Property {
      * 
      * @param {Object} target 
      * @param {String} name
+     * @param {Object} meta
+     * @returns {Object}
+     */
+    static simpleGet(target, name, meta){      
+        return target[name].getter.call(target)
+    }
+
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
+    static simpleSet(target, name, value, meta){
+        let oldValue = target[name].getter.call(target)
+        let currentValue = oldValue
+
+        if(typeof value === 'function'){
+            try {
+                currentValue = value.call(target)
+            } finally {
+                this.queueLink.pop()
+            }
+        } else {
+            currentValue = value
+        }  
+
+        if(oldValue !== currentValue){
+            target[name].setter.call(target, value)
+        }
+
+        return true
+    }
+
+    /**
+     * 
+     * @param {Object} target 
+     * @param {String} name
      * @param {Object} obj 
      * @param {String} propName
      */
