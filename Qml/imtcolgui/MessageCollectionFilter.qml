@@ -19,18 +19,6 @@ CollectionFilter {
     }
 
     function setMessageStatusFilter(messageKey, status){
-        console.log("*DEBUG* setMessageStatusFilter")
-        let objectFilter = filterModel.getData("ObjectFilter");
-        if (!objectFilter){
-            objectFilter = filterModel.addTreeModel("ObjectFilter")
-        }
-        let categoryFilter = objectFilter.getData("Category");
-        if (!categoryFilter){
-            categoryFilter = objectFilter.addTreeModel("Category")
-        }
-        categoryFilter.setData(messageKey, status);
-        console.log("*DEBUG* filterModel", filterModel.toJson())
-
         filterChanged();
     }
 }

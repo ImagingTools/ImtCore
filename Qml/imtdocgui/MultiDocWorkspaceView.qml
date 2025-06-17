@@ -27,7 +27,7 @@ Item {
 		}
 		
 		function onVisualStatusReceiveFailed(objectId, errorMessage){
-			tabView.setTabName(objectId, root.documentManager.defaultDocumentName)
+			tabView.setTabName(objectId, workspaceView.documentManager.defaultDocumentName)
 			tabView.setTabDescription(objectId, "")
 			tabView.setTabIcon(objectId, "")
 		}

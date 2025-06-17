@@ -227,7 +227,7 @@ ViewBase {
 				let selectedIndexes = []
 				for (let i = 0; i < elementsModel.getItemsCount(); i++){
 					let elementId = elementsModel.getData("id", i)
-					if (container.selectionManager.isSelected(elementId)){
+					if (collectionViewBaseContainer.selectionManager.isSelected(elementId)){
 						selectedIndexes.push(i)
 					}
 				}
