@@ -1,6 +1,8 @@
 #include <imt3dview/CTrackballCameraComp.h>
-#include <cfloat>
 
+
+// STL includes
+#include <cfloat>
 
 // Qt includes
 #include <QtCore/QtMath>
@@ -12,7 +14,7 @@ namespace imt3dview
 
 // static members
 
-const double CTrackballCameraComp::s_zoomSpeed = 0.05;
+const double CTrackballCameraComp::s_zoomSpeed = 0.2;
 const double CTrackballCameraComp::s_moveSpeed = 0.005;
 const double CTrackballCameraComp::s_rotationSpeed = 1.0;
 

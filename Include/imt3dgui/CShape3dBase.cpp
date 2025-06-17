@@ -4,7 +4,9 @@
 namespace imt3dgui
 {
 
-QVector3D extractPosition(const imt3d::IPointsBasedObject& points, int index){
+
+QVector3D ExtractPosition(const imt3d::IPointsBasedObject& points, int index)
+{
 	QVector3D result;
 
 	switch (points.GetPointFormat())
@@ -114,7 +116,7 @@ int CShape3dBase::FindVertex(const QPoint& point, bool limitDistance, QVector3D*
 	int retVal = -1;
 
 	for (int i = 0; i < m_pointsDataPtr->GetPointsCount(); ++i){
-		QVector3D vertPosition = extractPosition(*m_pointsDataPtr, i);
+		QVector3D vertPosition = ExtractPosition(*m_pointsDataPtr, i);
 		float distanceToRay = qAbs(vertPosition.distanceToLine(rayFrom, rayDirection));
 
 		// if epsilon is given, we search for a vertex lying at that distance from the ray, closest to the beginning of the ray (to the camera)
@@ -135,7 +137,7 @@ int CShape3dBase::FindVertex(const QPoint& point, bool limitDistance, QVector3D*
 	}
 
 	if (retVal >= 0 && positionPtr){
-		*positionPtr = extractPosition(*m_pointsDataPtr, retVal);
+		*positionPtr = ExtractPosition(*m_pointsDataPtr, retVal);
 	}
 
 	return retVal;
@@ -389,6 +391,7 @@ QPoint CShape3dBase::ModelToWindow(const QVector3D& modelCoordinate) const
 
 	QMatrix4x4 modelMatrix = GetModelMatrix();
 	QMatrix4x4 viewMatrix = m_cameraPtr->GetViewMatrix();
+	viewMatrix.translate(QVector3D(0,0,0));
 
 	QVector3D windowCoordinate = modelCoordinate.project(viewMatrix * modelMatrix, m_projection, m_viewPort);
 

@@ -48,7 +48,9 @@ CView3dProviderComp::CView3dProviderComp()
 	m_rotationAroundYCommand("Rotation around Y", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
 	m_rotationAroundZCommand("Rotation around Z", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_ROTATION),
 	m_viewModeCommand("View Mode", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE),
-	m_selectionModeCommand("Selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE)
+	m_selectionModeCommand("Selection", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_VIEW_MODE),
+	m_perspectiveModeCommand("Perspective", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_PROJECTION_MODE),
+	m_orthoModeCommand("Orthogonal", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR | ibase::ICommand::CF_ONOFF | ibase::ICommand::CF_EXCLUSIVE, CG_PROJECTION_MODE)
 {
 	connect(&m_zoomInCommand, SIGNAL(triggered()), this, SLOT(OnZoomIn()));
 	connect(&m_zoomOutCommand, SIGNAL(triggered()), this, SLOT(OnZoomOut()));
@@ -77,6 +79,9 @@ CView3dProviderComp::CView3dProviderComp()
 	connect(&m_rotationAroundZCommand, SIGNAL(triggered(bool)), this, SLOT(OnRotationAroundZCommand()));
 	connect(&m_viewModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnViewModeCommand()));
 	connect(&m_selectionModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnSelectionModeCommand()));
+	
+	connect(&m_perspectiveModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnPerspectiveModeCommand()));
+	connect(&m_orthoModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnOrthoModeCommand()));
 }
 
 
@@ -263,6 +268,9 @@ void CView3dProviderComp::OnGuiCreated()
 			if (*m_showSelectionModeCommandAttrPtr){
 				m_viewCommands.InsertChild(&m_selectionModeCommand);
 			}
+
+			m_viewCommands.InsertChild(&m_perspectiveModeCommand);
+			m_viewCommands.InsertChild(&m_orthoModeCommand);
 		}
 
 		if (*m_showRotationCommandsAttrPtr){
@@ -683,6 +691,23 @@ void CView3dProviderComp::OnSelectionModeCommand()
 	widgetPtr->SetViewMode(COpenGLWidget::ViewMode::VM_SELECTION);
 
 	EnableCommands(COpenGLWidget::ViewMode::VM_SELECTION);
+}
+
+void CView3dProviderComp::OnPerspectiveModeCommand()
+{
+	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
+	Q_ASSERT(widgetPtr != NULL);
+
+	widgetPtr->SetProjectionMode(COpenGLWidget::ProjectionMode::PM_PERSPECTIVE);
+}
+
+
+void CView3dProviderComp::OnOrthoModeCommand()
+{
+	COpenGLWidget* widgetPtr = dynamic_cast<COpenGLWidget*>(GetWidget());
+	Q_ASSERT(widgetPtr != NULL);
+
+	widgetPtr->SetProjectionMode(COpenGLWidget::ProjectionMode::PM_ORTHO);
 }
 
 

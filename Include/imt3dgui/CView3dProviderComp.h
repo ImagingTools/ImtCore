@@ -158,6 +158,7 @@ public:
 		CG_SELECTION_ACTIONS,
 		CG_ROTATION,
 		CG_VIEW_MODE,
+		CG_PROJECTION_MODE,
 		CG_OTHER
 	};
 
@@ -234,6 +235,8 @@ protected Q_SLOTS:
 	void OnRotationAroundZCommand();
 	void OnViewModeCommand();
 	void OnSelectionModeCommand();
+	void OnPerspectiveModeCommand();
+	void OnOrthoModeCommand();
 
 private:
 	// static template methods for subelement access
@@ -297,6 +300,10 @@ private:
 	// view mode commands
 	iqtgui::CHierarchicalCommand m_viewModeCommand;
 	iqtgui::CHierarchicalCommand m_selectionModeCommand;
+
+	// projection mode commands
+	iqtgui::CHierarchicalCommand m_perspectiveModeCommand;
+	iqtgui::CHierarchicalCommand m_orthoModeCommand;
 
 protected:
 	I_REF(imt3dview::IScene3dCamera, m_cameraCompPtr);
