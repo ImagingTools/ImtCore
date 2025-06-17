@@ -28,7 +28,7 @@ public:
 		I_ASSIGN(m_deviceSelectionCompPtr, "DeviceSelection", "ID of the selected device", false, "DeviceSelection");
 		I_ASSIGN(m_controllerCompPtr, "DeviceController", "Device controller", false, "DeviceController");
 		I_ASSIGN(m_configurationManagerCompPtr, "DeviceConfigurationManager", "Configuration manager of the devices", false, "DeviceConfigurationManager");
-		I_ASSIGN(m_stateProviderCompPtr, "DeviceConnectionState", "Device connection state", false, "DeviceConnectionState");
+		I_ASSIGN(m_stateProviderCompPtr, "DeviceStateProvider", "Device state provider", false, "DeviceStateProvider");
 	I_END_COMPONENT;
 
 	CDeviceIdBasedConfigurationComp();

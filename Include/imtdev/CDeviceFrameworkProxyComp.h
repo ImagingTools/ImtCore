@@ -75,7 +75,7 @@ private:
 	public:
 		void SetParent(CDeviceFrameworkProxyComp* parentPtr);
 
-		// reimplemented (IDeviceConnectionState)
+		// reimplemented (IDeviceStateProvider)
 		virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
 
 	private:

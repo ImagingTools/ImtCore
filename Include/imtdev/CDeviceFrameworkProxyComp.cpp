@@ -86,7 +86,7 @@ void CDeviceFrameworkProxyComp::Observer::OnModelChanged(int modelId, const istd
 }
 
 
-// public methods of the embedded class DeviceConnectionState
+// public methods of the embedded class DeviceStateProvider
 
 void CDeviceFrameworkProxyComp::DeviceStateProvider::SetParent(CDeviceFrameworkProxyComp* parentPtr)
 {
@@ -94,7 +94,7 @@ void CDeviceFrameworkProxyComp::DeviceStateProvider::SetParent(CDeviceFrameworkP
 }
 
 
-// reimplemented (IDeviceConnectionState)
+// reimplemented (IDeviceStateProvider)
 
 IDeviceStateProvider::DeviceState CDeviceFrameworkProxyComp::DeviceStateProvider::GetDeviceState(const QByteArray& deviceId) const
 {
