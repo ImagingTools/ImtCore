@@ -2,19 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5352" Description="ACF"/>
-            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5394" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="FeatureContainer" PackageId="ImtLicensePck" ComponentId="IdentifiableProductInfo">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
         <Element Id="PermissionsProvider" PackageId="ImtLicenseGqlPck" ComponentId="PermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -25,8 +20,8 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FeatureContainer"/>
+                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="FeatureContainer">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -37,25 +32,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="QtResourceLoaderComp" PackageId="ImtCorePck" ComponentId="QtResourceLoaderComp">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="PathToFile" Type="Id" ExportId="PathToPermissionsFile">
-                        <Data IsEnabled="true" Value=":/Features/Features"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TargetCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FeatureContainer"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PermissionsProvider"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="PermissionsProvider"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="FeatureContainer" ComponentId="FeatureContainer"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5385" Description="ACF"/>
-            <Version Id="1" Number="2247" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5394" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -102,18 +102,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="QtResourceLoaderComp" PackageId="ImtCorePck" ComponentId="QtResourceLoaderComp">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="PathToFile" Type="Id" ExportId="PathToPermissionsFile">
-                        <Data IsEnabled="true" Value=":/Features/Features"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TargetCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="IdentifiableProductInfo"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="SlaveSubscriberController" PackageId="ImtServerGqlPck" ComponentId="SlaveSubscriberController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -166,6 +154,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="PumaClientEngine"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PumaClientEngine"/>
+        <Interface InterfaceId="imtlic::IProductInfo" ComponentId="IdentifiableProductInfo"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="PumaClientEngine"/>
     </ExportedInterfaces>
     <ExportedComponents>

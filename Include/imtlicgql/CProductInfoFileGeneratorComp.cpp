@@ -53,11 +53,13 @@ ifile::IFilePersistence::OperationState CProductInfoFileGeneratorComp::SaveToFil
 		return ifile::IFilePersistence::OS_FAILED;
 	}
 
+	QString productName = productInfoPtr->GetName();
+
 	QTextStream textStream(&file);
 
 	WriteIncludes(textStream);
 	WriteNewLine(textStream, 2);
-	WriteNamespaceHeader(textStream);
+	WriteNamespaceHeader(textStream, productName);
 	WriteNewLine(textStream, 2);
 	WriteFunction(textStream, *productInfoPtr);
 	WriteNewLine(textStream, 2);
@@ -106,9 +108,9 @@ void CProductInfoFileGeneratorComp::WriteIncludes(QTextStream& out) const
 }
 
 
-void CProductInfoFileGeneratorComp::WriteNamespaceHeader(QTextStream& out) const
+void CProductInfoFileGeneratorComp::WriteNamespaceHeader(QTextStream& out, const QString& productName) const
 {
-	out << QStringLiteral("namespace imtlic");
+	out << QStringLiteral("namespace %1").arg(productName.toLower());
 	WriteNewLine(out, 1);
 	out << QStringLiteral("{");
 	WriteNewLine(out, 1);

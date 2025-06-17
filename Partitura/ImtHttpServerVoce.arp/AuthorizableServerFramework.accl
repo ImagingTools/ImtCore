@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5385" Description="ACF"/>
-            <Version Id="1" Number="2247" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5394" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -12,7 +12,6 @@
         <Element ComponentName="HttpServerFramework" X="150" Y="125" Note=""/>
         <Element ComponentName="IdentifiableProductInfo" X="850" Y="625" Note=""/>
         <Element ComponentName="PumaClientEngine" X="850" Y="500" Note=""/>
-        <Element ComponentName="QtResourceLoaderComp" X="850" Y="725" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="675" Y="350" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="825" Y="125" Note=""/>
     </PositionMap>

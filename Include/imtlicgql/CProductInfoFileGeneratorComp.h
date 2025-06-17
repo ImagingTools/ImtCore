@@ -44,7 +44,7 @@ public:
 
 private:
 	void WriteIncludes(QTextStream& textStream) const;
-	void WriteNamespaceHeader(QTextStream& textStream) const;
+	void WriteNamespaceHeader(QTextStream& textStream, const QString& productName) const;
 	void WriteNamespaceFooter(QTextStream& textStream) const;
 	void WriteFunction(QTextStream& textStream, imtlic::IProductInfo& productInfo) const;
 	void WriteFeatureInfo(
