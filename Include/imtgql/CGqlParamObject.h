@@ -40,6 +40,7 @@ public:
 
 	// comfort
 	Q_REQUIRED_RESULT QVariant operator[](const QByteArray& paramId) const;
+	Q_REQUIRED_RESULT bool ContainsParam(const QByteArray& paramId) const;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -65,6 +66,22 @@ protected:
 inline QVariant CGqlParamObject::operator[](const QByteArray& paramId) const
 {
 	return GetParamArgumentValue(paramId);
+}
+
+
+inline bool CGqlParamObject::ContainsParam(const QByteArray& paramId) const
+{
+	if (m_simpleParams.contains(paramId)){
+		return true;
+	}
+	if (m_objectParams.contains(paramId)){
+		return true;
+	}
+	if (m_objectParamsArray.contains(paramId)){
+		return true;
+	}
+
+	return false;
 }
 
 
