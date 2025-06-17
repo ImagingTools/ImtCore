@@ -5,10 +5,11 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCoreSdlCustomConfig.cmake)
 
 add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
-			${CMAKE_CURRENT_LIST_DIR}/../1.0/ComplexCollectionFilter.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtBaseTypes.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/ComplexCollectionFilter.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtCollection.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentRevision.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/MimeType.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentCollectionFilter.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Search.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Commands.sdl
