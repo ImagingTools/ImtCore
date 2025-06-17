@@ -84,7 +84,8 @@ imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const 
 
 	imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();
 	if (featureCollectionPtr != nullptr){
-		for (imtbase::ICollectionInfo::Id& elementId : featureCollectionPtr->GetElementIds()){
+		imtbase::ICollectionInfo::Ids elementIds = featureCollectionPtr->GetElementIds();
+		for (imtbase::ICollectionInfo::Id& elementId : elementIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (featureCollectionPtr->GetObjectData(elementId, dataPtr)){
 				const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(dataPtr.GetPtr());

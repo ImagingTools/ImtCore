@@ -191,6 +191,7 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 	const QString featureDescription = featureInfo.GetFeatureDescription();
 	const bool isOptional = featureInfo.IsOptional();
 	const bool isPermission = featureInfo.IsPermission();
+	QByteArrayList dependencyList = featureInfo.GetDependencies();
 
 	const QString featureVarName = CreateFeatureVarName(featureId);
 
@@ -243,6 +244,15 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 				.arg(featureVarName, isPermission ? QStringLiteral("true") : QStringLiteral("false"));
 	WriteNewLine(out, 1);
 
+	if (!dependencyList.isEmpty()){
+		QByteArray dependencies = dependencyList.join(';');
+		if (!dependencies.isEmpty()){
+			WriteTab(out, 1);
+			out << QStringLiteral("%1->SetDependencies(%2);").arg(featureVarName, QString("QByteArray(\"%1\").split(';')").arg(QString::fromUtf8(dependencies)));
+			WriteNewLine(out, 1);
+		}
+	}
+	
 	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	if (!subFeatures.IsEmpty()){
 		for (int i = 0; i < subFeatures.GetCount(); i++){
