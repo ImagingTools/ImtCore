@@ -8484,11 +8484,11 @@ bool CExtendedMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 	return true;
 }
 
+
 bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant keyData = gqlObject.GetParamArgumentValue("key");
-	if (!keyData.isNull()){
-		key = keyData.toString();
+	if (gqlObject.ContainsParam("key") && gqlObject["key"].userType() == QMetaType::QString){
+		key = gqlObject["key"].toString();
 	}
 
 	QVariant valueData = gqlObject.GetParamArgumentValue("value");
@@ -8554,8 +8554,7 @@ bool CExtendedMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (key){
 		jsonObject["key"] = QJsonValue::fromVariant(*key);
-		}
-
+	}
 
 	if (value){
 		if (const CCoordinates* val = std::get_if<CCoordinates>((*value).get())){
@@ -8585,8 +8584,7 @@ bool CExtendedMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 			jsonObject["value"] = QJsonValue::fromVariant(*val);
 		}
 		
-		}
-
+	}
 
 	return true;
 }
@@ -8878,14 +8876,14 @@ bool CExtendedMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject, Pro
 }
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
 
 /// \file CResultMetaData.cpp
 
-namespace sdl::rtv::ProductionResults
+namespace sdl::complextest::CTImpl
 {
 
 
