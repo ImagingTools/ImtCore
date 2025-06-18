@@ -41,7 +41,8 @@ protected:
 		\c listVariableName				- a name of variable, that defines a storage list
 		\c listCountVariableName		- a name of variable, that defines a  number of elements
 		\c listCountVariableType		- a type of \c listCountVariableName
-		\c customListAccessMethodName	- a method name, used to access items by index of \c listVariableName it can be a NULL string if a container supports operator[](e.g. \c QList or \c QJsonArray)
+		\c customListAccessCode			- a code, used to access items, by index it can be a NULL; \warning MUST contain placeholder $(index) - will be replaced to correct index
+		\c customAccessedElementName	- a name of element, extracted, by \c customListAccessCode \warning MUST be non-empty if \c customAccessedElementName is non-empty
 		\c toObjectTransformMethod		- a method, used to convert a 'object_value' to 'object_type'. Can be NULL if no convertation is required (if container a \c QList). The returned type of a method MUST be same as in \c GetContainerObjectClassName()
 		\warning \c customListAccessMethodName MUST NOT contain endian brackets! \example "at"; NOT ".at"; NOT "at()"; NOT ".at()"
 		\warning \c toObjectTransformMethod MUST be complete! WITH endian brackets! \example ".toJsonObject()" - for \c QJsonArray \c QJsonObject \sa QJsonValue
@@ -51,7 +52,9 @@ protected:
 		QString listVariableName;
 		QString listCountVariableName;
 		QString listCountVariableType;
-		QString customListAccessMethodName;
+		QString customListAccessCode;
+		QString customAccessedElementName;
+		bool isCustomAccessedElementPointer = false;
 		QString toObjectTransformMethod;
 	};
 

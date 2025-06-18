@@ -34,14 +34,12 @@ void CObjectModificatorCompBase::WriteMethodCall(QTextStream& stream, MetdodType
 	case MT_OPT_READ:
 		stream << QStringLiteral("Opt");
 	case MT_READ:
-		stream << QStringLiteral("ReadFrom");
-		stream << GetCapitalizedValue(GetContainerObjectVariableName());
+		stream << GetCapitalizedValue(GetReadMethodName());
 		break;
 	case MT_OPT_WRITE:
 		stream << QStringLiteral("Opt");
 	case MT_WRITE:
-		stream << QStringLiteral("WriteTo");
-		stream << GetCapitalizedValue(GetContainerObjectVariableName());
+		stream << GetCapitalizedValue(GetWriteMethodName());
 		break;
 	default:
 		I_CRITICAL();
@@ -176,7 +174,7 @@ bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& 
 	ofStream << '{';
 	FeedStream(ofStream, 1, false);
 
-	// add write logic for each field
+	// add read logic for each field
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
 		AddFieldReadFromObjectCode(ofStream, field, false);
 		FeedStream(ofStream, 1, false);
@@ -205,7 +203,7 @@ bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& 
 	ofStream << '{';
 	FeedStream(ofStream, 1, false);
 
-	// add write logic for each field
+	// add OPT read logic for each field
 	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
 		AddFieldReadFromObjectCode(ofStream, field, true);
 		FeedStream(ofStream, 1, false);
@@ -356,9 +354,8 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 
 	if (!isStrict){
 		FeedStream(stream, 1, false);
-		FeedStreamHorizontally(stream, hIndents);
+		FeedStreamHorizontally(stream);
 		stream << '}';
-		FeedStream(stream, 1, false);
 	}
 	FeedStream(stream, 1, false);
 }
@@ -404,7 +401,7 @@ void CObjectModificatorCompBase::AddCustomFieldWriteToObjectImplCode(
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 	// Create an object container
-	const QString objectContainerVariableName = GetDecapitalizedValue(field.GetId()) + GetContainerObjectVariableName();
+	const QString objectContainerVariableName = GetDecapitalizedValue(field.GetId()) + GetCapitalizedValue(GetContainerObjectVariableName());
 	FeedStreamHorizontally(stream, hIndents);
 	stream << GetContainerObjectClassName();
 	stream << ' ' << objectContainerVariableName;
@@ -678,7 +675,7 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 	FeedStreamHorizontally(stream, hhIndents);
 	if (isEnum){
 		// declare temp value, to store string equivalent
-		stream << QStringLiteral("QString ");
+		stream << QStringLiteral("const QString ");
 		stream << enumSourceVarName;
 	}
 	else if (isUnion){
@@ -838,7 +835,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& st
 void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			bool optional,
+			bool /*optional*/,
 			bool isEnum,
 			bool isUnion,
 			quint16 hIndents)
@@ -884,7 +881,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
 	if (isEnum){
-		stream << QStringLiteral("QString");
+		stream << QStringLiteral("const QString");
 	}
 	else if (isUnion){
 		stream << QStringLiteral("QVariant");
@@ -892,21 +889,19 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	else{
 		stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
 	}
-	stream << QStringLiteral(" temp") << GetCapitalizedValue(field.GetId());
-	stream << ' ' << '=' << ' ';
-	stream << result.listVariableName;
-	if(result.customListAccessMethodName.isEmpty()){
+	if(result.customListAccessCode.isEmpty()){
+		stream << QStringLiteral(" temp") << GetCapitalizedValue(field.GetId());
+		stream << ' ' << '=' << ' ';
+		stream << result.listVariableName;
 		stream << '[';
 	}
 	else {
-		stream << '.' << result.customListAccessMethodName << '(';
+		stream << result.customListAccessCode;
+		Q_ASSERT(!result.customAccessedElementName.isEmpty());
 	}
 	stream << indexVariableName;
-	if(result.customListAccessMethodName.isEmpty()){
+	if(result.customListAccessCode.isEmpty()){
 		stream << ']';
-	}
-	else {
-		stream << ')';
 	}
 	if (!result.toObjectTransformMethod.isEmpty()){
 		stream << result.toObjectTransformMethod;
@@ -979,7 +974,12 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << field.GetId();
 		stream << QStringLiteral("->append(");
-		stream <<  QStringLiteral("temp") << GetCapitalizedValue(field.GetId());
+		if (!result.customAccessedElementName.isEmpty()){
+			stream << result.customAccessedElementName;
+		}
+		else {
+			stream << QStringLiteral("temp") << GetCapitalizedValue(field.GetId());
+		}
 		stream << ')' << ';';
 		FeedStream(stream, 1, false);
 	}
@@ -1066,6 +1066,14 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 	stream << QStringLiteral("; ++") << indexVariableName << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
+	// if custom access
+	if (!result.customListAccessCode.isEmpty()){
+		FeedStreamHorizontally(stream, hIndents + 1);
+		Q_ASSERT(result.customListAccessCode.contains("$(index)"));
+		Q_ASSERT(!result.customAccessedElementName.isEmpty());
+		stream << result.customListAccessCode.replace("$(index)", indexVariableName);
+	}
+
 	// inLoop: declare temp var
 	FeedStreamHorizontally(stream, hIndents + 1);
 	structNameConverter.listWrap = false;
@@ -1075,24 +1083,17 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 
 	// inLoop: read and checks
 	FeedStreamHorizontally(stream, hIndents + 1);
+
 	stream << QStringLiteral("if (!");
 	WriteMethodCall(stream, (!optional ? MT_READ : MT_OPT_READ), QStringLiteral("temp") + GetCapitalizedValue(field.GetId()));
 	stream << '(' << result.listVariableName;
-	if(result.customListAccessMethodName.isEmpty()){
+	if (result.customListAccessCode.isEmpty()){
 		stream << '[';
-	}
-	else {
-		stream << '.' << result.customListAccessMethodName << '(';
-	}
-	stream << indexVariableName;
-	if(result.customListAccessMethodName.isEmpty()){
+		stream << indexVariableName;
 		stream << ']';
-	}
-	else {
-		stream << ')';
-	}
-	if (!result.toObjectTransformMethod.isEmpty()){
-		stream << result.toObjectTransformMethod;
+		if (!result.toObjectTransformMethod.isEmpty()){
+			stream << result.toObjectTransformMethod;
+		}
 	}
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
