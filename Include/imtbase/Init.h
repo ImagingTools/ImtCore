@@ -1,3 +1,6 @@
+#pragma once
+
+
 // Qt includes
 #include <QtCore/QDirIterator>
 #include <QtCore/QCoreApplication>
