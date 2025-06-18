@@ -18,7 +18,7 @@ namespace imtsdl
 {
 
 
-class CSdlUnionConverter
+class CSdlUnionConverter: private CSdlTools
 {
 
 public:
