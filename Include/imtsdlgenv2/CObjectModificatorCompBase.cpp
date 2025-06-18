@@ -342,10 +342,9 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 			*m_sdlEnumListCompPtr,
 			*m_sdlUnionListCompPtr,
 			hIndents,
-			imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_SCALAR);
+			GetUnionScalarConversionType());
 
 		FeedStreamHorizontally(stream, hIndents);
-
 	}
 	else{
 		FeedStreamHorizontally(stream, hIndents);
@@ -533,7 +532,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 			*m_sdlEnumListCompPtr,
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
-			imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_ARRAY);
+			GetUnionArrayConversionType());
 	}
 
 	// inLoop: add item
@@ -715,7 +714,7 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 			*m_sdlEnumListCompPtr,
 			*m_sdlUnionListCompPtr,
 			hhIndents,
-			imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_SCALAR);
+			GetUnionScalarConversionType());
 	}
 
 
@@ -960,7 +959,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 			*m_sdlEnumListCompPtr,
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
-			imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_ARRAY,
+			GetUnionArrayConversionType(),
 			GetDecapitalizedValue(field.GetId()) + QStringLiteral("jsonArray"));
 
 		FeedStreamHorizontally(stream, hIndents + 1);

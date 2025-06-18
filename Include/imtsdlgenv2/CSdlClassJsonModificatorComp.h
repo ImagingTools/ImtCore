@@ -47,6 +47,8 @@ protected:
 	virtual bool AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) override;
 	virtual bool AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents) override;
 	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) override;
+	virtual imtsdl::CSdlUnionConverter::ConversionType GetUnionScalarConversionType() const override;
+	virtual imtsdl::CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const override;
 
 private:
 	/// writes end for convert 'value' to 'dest' \example String() (if string) \example Integer (if long)

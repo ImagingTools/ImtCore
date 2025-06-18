@@ -219,6 +219,9 @@ protected:
 	 */
 	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) = 0;
 
+	virtual imtsdl::CSdlUnionConverter::ConversionType GetUnionScalarConversionType() const = 0;
+	virtual imtsdl::CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const = 0;
+
 	// comfort methods
 	void WriteMethodCall(QTextStream& stream, MetdodType type, const QString& objectName = QString(), bool isPointer = false) const;
 

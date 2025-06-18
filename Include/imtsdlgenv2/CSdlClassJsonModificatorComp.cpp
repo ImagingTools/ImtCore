@@ -29,6 +29,33 @@ QList<imtsdl::IncludeDirective> CSdlClassJsonModificatorComp::GetIncludeDirectiv
 }
 
 
+// reimplemented (ICxxModifier)
+
+QString CSdlClassJsonModificatorComp::GetReadMethodName() const
+{
+	return QStringLiteral("ReadFromJsonObject");
+}
+
+
+QString CSdlClassJsonModificatorComp::GetWriteMethodName() const
+{
+	return QStringLiteral("WriteToJsonObject");
+}
+
+
+imtsdlgen::ICxxModifier::ArgumentList CSdlClassJsonModificatorComp::GetArguments() const
+{
+	ArgumentList retVal;
+
+	Argument arg;
+	arg.Name = QStringLiteral("jsonObject");
+	arg.Type = QStringLiteral("QJsonObject");
+	retVal << arg;
+
+	return retVal;
+}
+
+
 // protected methods
 
 // reimplemented (CObjectModificatorCompBase)
@@ -266,6 +293,18 @@ bool CSdlClassJsonModificatorComp::AddContainerListAccessCode(QTextStream& strea
 }
 
 
+imtsdl::CSdlUnionConverter::ConversionType CSdlClassJsonModificatorComp::GetUnionScalarConversionType() const
+{
+	return imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_SCALAR;
+}
+
+
+imtsdl::CSdlUnionConverter::ConversionType CSdlClassJsonModificatorComp::GetUnionArrayConversionType() const
+{
+	return imtsdl::CSdlUnionConverter::ConversionType::CT_JSON_ARRAY;
+}
+
+
 // private methods
 
 QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::CSdlField& field, bool forType) const
@@ -318,31 +357,6 @@ QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::
 		return QString();
 	}
 	retVal += QStringLiteral("()");
-
-	return retVal;
-}
-
-
-QString CSdlClassJsonModificatorComp::GetReadMethodName() const
-{
-	return QStringLiteral("ReadFromJsonObject");
-}
-
-
-QString CSdlClassJsonModificatorComp::GetWriteMethodName() const
-{
-	return QStringLiteral("WriteToJsonObject");
-}
-
-
-imtsdlgen::ICxxModifier::ArgumentList CSdlClassJsonModificatorComp::GetArguments() const
-{
-	ArgumentList retVal;
-
-	Argument arg;
-	arg.Name = QStringLiteral("jsonObject");
-	arg.Type = QStringLiteral("QJsonObject");
-	retVal << arg;
 
 	return retVal;
 }
