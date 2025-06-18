@@ -117,87 +117,79 @@ bool CTimeFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 }
 
 
-bool CTimeFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+bool CTimeFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (timeRange){
-		::imtgql::CGqlParamObject timeRangeDataObject;
-		if (!timeRange->WriteToGraphQlObject(timeRangeDataObject)){
+		::imtgql::CGqlParamObject timeRangeGqlObject;
+		const bool isTimeRangeAdded = timeRange->WriteToGraphQlObject(timeRangeGqlObject);
+		if (!isTimeRangeAdded){
 			return false;
 		}
-		request.InsertParam("timeRange", timeRangeDataObject);
+		gqlObject.InsertParam("timeRange", timeRangeGqlObject);
 	}
 
 	if (timeUnit){
-		request.InsertParam("timeUnit", QVariant(*timeUnit));
+		gqlObject.InsertParam("timeUnit", QVariant(*timeUnit));
 	}
 
 	if (interpretationMode){
-		request.InsertParam("interpretationMode", QVariant(*interpretationMode));
+		gqlObject.InsertParam("interpretationMode", QVariant(*interpretationMode));
 	}
 
 	if (unitMultiplier){
-		request.InsertParam("unitMultiplier", QVariant(*unitMultiplier));
-	}
-
-	return true;
-}
-
-bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
-{
-	const ::imtgql::CGqlParamObject* timeRangeDataObjectPtr = request.GetParamArgumentObjectPtr("timeRange");
-	if (timeRangeDataObjectPtr != nullptr){
-		timeRange = ImtBaseTypes::CTimeRange::V1_0();
-		const bool isTimeRangeRead = timeRange->ReadFromGraphQlObject(*timeRangeDataObjectPtr);
-		if (!isTimeRangeRead){
-			return false;
-		}
-
-	}
-
-	QVariant timeUnitData = request.GetParamArgumentValue("timeUnit");
-	if (!timeUnitData.isNull()){
-		timeUnit = timeUnitData.toString();
-	}
-
-	QVariant interpretationModeData = request.GetParamArgumentValue("interpretationMode");
-	if (!interpretationModeData.isNull()){
-		interpretationMode = interpretationModeData.toString();
-	}
-
-	QVariant unitMultiplierData = request.GetParamArgumentValue("unitMultiplier");
-	if (!unitMultiplierData.isNull()){
-		unitMultiplier = unitMultiplierData.toInt();
+		gqlObject.InsertParam("unitMultiplier", QVariant(*unitMultiplier));
 	}
 
 	return true;
 }
 
 
-bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	const ::imtgql::CGqlParamObject* timeRangeDataObjectPtr = request.GetParamArgumentObjectPtr("timeRange");
-	if (timeRangeDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("timeRange") && gqlObject.GetParamArgumentObjectPtr("timeRange") == nullptr){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
-		const bool isTimeRangeRead = timeRange->OptReadFromGraphQlObject(*timeRangeDataObjectPtr);
-		if (!isTimeRangeRead){
+		const bool isTimeRangeReaded = timeRange->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
+		if (!isTimeRangeReaded){
 			return false;
 		}
-
 	}
 
-	QVariant timeUnitData = request.GetParamArgumentValue("timeUnit");
-	if (!timeUnitData.isNull()){
-		timeUnit = timeUnitData.toString();
+	if (gqlObject.ContainsParam("timeUnit") && gqlObject["timeUnit"].userType() == QMetaType::QString){
+		timeUnit = gqlObject["timeUnit"].toString();
 	}
 
-	QVariant interpretationModeData = request.GetParamArgumentValue("interpretationMode");
-	if (!interpretationModeData.isNull()){
-		interpretationMode = interpretationModeData.toString();
+	if (gqlObject.ContainsParam("interpretationMode") && gqlObject["interpretationMode"].userType() == QMetaType::QString){
+		interpretationMode = gqlObject["interpretationMode"].toString();
 	}
 
-	QVariant unitMultiplierData = request.GetParamArgumentValue("unitMultiplier");
-	if (!unitMultiplierData.isNull()){
-		unitMultiplier = unitMultiplierData.toInt();
+	if (gqlObject.ContainsParam("unitMultiplier") && gqlObject["unitMultiplier"].userType() == QMetaType::Double){
+		unitMultiplier = gqlObject["unitMultiplier"].toInt();
+	}
+
+	return true;
+}
+
+
+bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("timeRange") && gqlObject.GetParamArgumentObjectPtr("timeRange") == nullptr){
+		timeRange = ImtBaseTypes::CTimeRange::V1_0();
+		const bool isTimeRangeReaded = timeRange->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
+		if (!isTimeRangeReaded){
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("timeUnit") && gqlObject["timeUnit"].userType() == QMetaType::QString){
+		timeUnit = gqlObject["timeUnit"].toString();
+	}
+
+	if (gqlObject.ContainsParam("interpretationMode") && gqlObject["interpretationMode"].userType() == QMetaType::QString){
+		interpretationMode = gqlObject["interpretationMode"].toString();
+	}
+
+	if (gqlObject.ContainsParam("unitMultiplier") && gqlObject["unitMultiplier"].userType() == QMetaType::Double){
+		unitMultiplier = gqlObject["unitMultiplier"].toInt();
 	}
 
 	return true;
@@ -207,28 +199,25 @@ bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 bool CTimeFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (timeRange){
-		QJsonObject timeRangejsonObject;
-		const bool isTimeRangeAdded = timeRange->WriteToJsonObject(timeRangejsonObject);
+		QJsonObject timeRangeJsonObject;
+		const bool isTimeRangeAdded = timeRange->WriteToJsonObject(timeRangeJsonObject);
 		if (!isTimeRangeAdded){
 			return false;
 		}
-		jsonObject["timeRange"] = timeRangejsonObject;
+		jsonObject["timeRange"] = timeRangeJsonObject;
 	}
 
 	if (timeUnit){
 		jsonObject["timeUnit"] = QJsonValue::fromVariant(*timeUnit);
-		}
-
+	}
 
 	if (interpretationMode){
 		jsonObject["interpretationMode"] = QJsonValue::fromVariant(*interpretationMode);
-		}
-
+	}
 
 	if (unitMultiplier){
 		jsonObject["unitMultiplier"] = QJsonValue::fromVariant(*unitMultiplier);
-		}
-
+	}
 
 	return true;
 }
@@ -586,49 +575,46 @@ bool CFieldSortingInfo::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 }
 
 
-bool CFieldSortingInfo::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+bool CFieldSortingInfo::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!fieldId){
 		return false;
 	}
-	request.InsertParam("fieldId", QVariant(*fieldId));
+	gqlObject.InsertParam("fieldId", QVariant(*fieldId));
 
 	if (!sortingOrder){
 		return false;
 	}
-	request.InsertParam("sortingOrder", QVariant(*sortingOrder));
-
-	return true;
-}
-
-bool CFieldSortingInfo::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
-{
-	QVariant fieldIdData = request.GetParamArgumentValue("fieldId");
-	if (fieldIdData.isNull()){
-		return false;
-	}
-	fieldId = fieldIdData.toString();
-
-	QVariant sortingOrderData = request.GetParamArgumentValue("sortingOrder");
-	if (sortingOrderData.isNull()){
-		return false;
-	}
-	sortingOrder = sortingOrderData.toString();
+	gqlObject.InsertParam("sortingOrder", QVariant(*sortingOrder));
 
 	return true;
 }
 
 
-bool CFieldSortingInfo::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+bool CFieldSortingInfo::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant fieldIdData = request.GetParamArgumentValue("fieldId");
-	if (!fieldIdData.isNull()){
-		fieldId = fieldIdData.toString();
+	if (!gqlObject.ContainsParam("fieldId") || gqlObject["fieldId"].userType() != QMetaType::QString){
+		return false;
+	}
+	fieldId = gqlObject["fieldId"].toString();
+
+	if (!gqlObject.ContainsParam("sortingOrder") || gqlObject["sortingOrder"].userType() != QMetaType::QString){
+		return false;
+	}
+	sortingOrder = gqlObject["sortingOrder"].toString();
+
+	return true;
+}
+
+
+bool CFieldSortingInfo::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("fieldId") && gqlObject["fieldId"].userType() == QMetaType::QString){
+		fieldId = gqlObject["fieldId"].toString();
 	}
 
-	QVariant sortingOrderData = request.GetParamArgumentValue("sortingOrder");
-	if (!sortingOrderData.isNull()){
-		sortingOrder = sortingOrderData.toString();
+	if (gqlObject.ContainsParam("sortingOrder") && gqlObject["sortingOrder"].userType() == QMetaType::QString){
+		sortingOrder = gqlObject["sortingOrder"].toString();
 	}
 
 	return true;
@@ -1139,17 +1125,17 @@ bool CFieldFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!fieldId){
 		return false;
 	}
-	request.InsertParam("fieldId", QVariant(*fieldId));
+	gqlObject.InsertParam("fieldId", QVariant(*fieldId));
 
 	if (!filterValue){
 		return false;
 	}
-	request.InsertParam("filterValue", QVariant(*filterValue));
+	gqlObject.InsertParam("filterValue", QVariant(*filterValue));
 
 	if (!filterValueType){
 		return false;
@@ -1172,12 +1158,9 @@ bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request
 		Q_ASSERT(false);
 		break;
 	}
-	request.InsertParam("filterValueType", QVariant(filterValueTypeStringValue));
+	gqlObject.InsertParam("filterValueType", QVariant(filterValueTypeStringValue));
 
-	if (!filterOperations){
-		return false;
-	}
-	QVariantList filterOperationsTempList;
+	QVariantList filterOperationsDataObjectList;
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperations->size(); ++filterOperationsIndex){
 		QString filterOperationsStringValue;
 		switch (filterOperations->at(filterOperationsIndex)){
@@ -1200,32 +1183,30 @@ bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request
 			Q_ASSERT(false);
 			break;
 		}
-		filterOperationsTempList << filterOperationsStringValue;
+		filterOperationsDataObjectList << filterOperationsStringValue;
 	}
-	request.InsertParam("filterOperations", QVariant(filterOperationsTempList));
+	gqlObject.InsertParam("filterOperations", filterOperationsDataObjectList);
 
 	return true;
 }
 
-bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+
+bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant fieldIdData = request.GetParamArgumentValue("fieldId");
-	if (fieldIdData.isNull()){
+	if (!gqlObject.ContainsParam("fieldId") || gqlObject["fieldId"].userType() != QMetaType::QByteArray){
 		return false;
 	}
-	fieldId = fieldIdData.toByteArray();
+	fieldId = gqlObject["fieldId"].toByteArray();
 
-	QVariant filterValueData = request.GetParamArgumentValue("filterValue");
-	if (filterValueData.isNull()){
+	if (!gqlObject.ContainsParam("filterValue") || gqlObject["filterValue"].userType() != QMetaType::QString){
 		return false;
 	}
-	filterValue = filterValueData.toString();
+	filterValue = gqlObject["filterValue"].toString();
 
-	QVariant filterValueTypeData = request.GetParamArgumentValue("filterValueType");
-	if (filterValueTypeData.isNull()){
+	if (!gqlObject.ContainsParam("filterValueType") || gqlObject["filterValueType"].userType() != QMetaType::QString){
 		return false;
 	}
-	QString filterValueTypeStringValue = filterValueTypeData.toString();
+	const QString filterValueTypeStringValue = gqlObject["filterValueType"].toString();
 	if(filterValueTypeStringValue == "Integer"){
 		filterValueType = ValueType::Integer;
 	}
@@ -1242,58 +1223,53 @@ bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		return false;
 	}
 
-	QVariant filterOperationsData = request.GetParamArgumentValue("filterOperations");
-	if (filterOperationsData.isNull()){
+	if (!gqlObject.ContainsParam("filterOperations") || gqlObject["filterOperations"].isNull()){
 		return false;
 	}
-	QList<FilterOperation> filterOperationsList;
-	QVariantList filterOperationsDataList = filterOperationsData.toList();
-	qsizetype filterOperationsCount = filterOperationsDataList.size();
-	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex != filterOperationsCount ; ++filterOperationsIndex){
-		FilterOperation filterOperationsData;
-		QString filterOperationsStringValue = filterOperationsDataList[filterOperationsIndex].toString();
-		if(filterOperationsStringValue == "Not"){
-			filterOperationsData = FilterOperation::Not;
+	const QVariant filterOperationsData = gqlObject["filterOperations"];
+	const QVariantList filterOperationsDataList = filterOperationsData.toList();
+	const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
+	filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
+	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
+		const QString tempFilterOperations = filterOperationsDataList[filterOperationsIndex].toString();
+		imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
+		if(tempFilterOperations == "Not"){
+			filterOperationsDataValue = FilterOperation::Not;
 		}
-		else if(filterOperationsStringValue == "Equal"){
-			filterOperationsData = FilterOperation::Equal;
+		else if(tempFilterOperations == "Equal"){
+			filterOperationsDataValue = FilterOperation::Equal;
 		}
-		else if(filterOperationsStringValue == "Less"){
-			filterOperationsData = FilterOperation::Less;
+		else if(tempFilterOperations == "Less"){
+			filterOperationsDataValue = FilterOperation::Less;
 		}
-		else if(filterOperationsStringValue == "Greater"){
-			filterOperationsData = FilterOperation::Greater;
+		else if(tempFilterOperations == "Greater"){
+			filterOperationsDataValue = FilterOperation::Greater;
 		}
-		else if(filterOperationsStringValue == "Contains"){
-			filterOperationsData = FilterOperation::Contains;
+		else if(tempFilterOperations == "Contains"){
+			filterOperationsDataValue = FilterOperation::Contains;
 		}
 		else {
 			return false;
 		}
-		filterOperationsList << filterOperationsData;
+		filterOperations->append(filterOperationsDataValue);
 	}
-	filterOperations = filterOperationsList;
-
 
 	return true;
 }
 
 
-bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant fieldIdData = request.GetParamArgumentValue("fieldId");
-	if (!fieldIdData.isNull()){
-		fieldId = fieldIdData.toByteArray();
+	if (gqlObject.ContainsParam("fieldId") && gqlObject["fieldId"].userType() == QMetaType::QByteArray){
+		fieldId = gqlObject["fieldId"].toByteArray();
 	}
 
-	QVariant filterValueData = request.GetParamArgumentValue("filterValue");
-	if (!filterValueData.isNull()){
-		filterValue = filterValueData.toString();
+	if (gqlObject.ContainsParam("filterValue") && gqlObject["filterValue"].userType() == QMetaType::QString){
+		filterValue = gqlObject["filterValue"].toString();
 	}
 
-	QVariant filterValueTypeData = request.GetParamArgumentValue("filterValueType");
-	if (!filterValueTypeData.isNull()){
-QString filterValueTypeStringValue = filterValueTypeData.toString();
+	if (gqlObject.ContainsParam("filterValueType") && gqlObject["filterValueType"].userType() == QMetaType::QString){
+		const QString filterValueTypeStringValue = gqlObject["filterValueType"].toString();
 		if(filterValueTypeStringValue == "Integer"){
 			filterValueType = ValueType::Integer;
 		}
@@ -1311,36 +1287,34 @@ QString filterValueTypeStringValue = filterValueTypeData.toString();
 		}
 	}
 
-	QVariant filterOperationsData = request.GetParamArgumentValue("filterOperations");
-	if (!filterOperationsData.isNull()){
-		QList<FilterOperation> filterOperationsList;
-		QVariantList filterOperationsDataList = filterOperationsData.toList();
-		qsizetype filterOperationsCount = filterOperationsDataList.size();
-		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex != filterOperationsCount ; ++filterOperationsIndex){
-			FilterOperation filterOperationsData;
-			QString filterOperationsStringValue = filterOperationsDataList[filterOperationsIndex].toString();
-			if(filterOperationsStringValue == "Not"){
-				filterOperationsData = FilterOperation::Not;
+	if (gqlObject.ContainsParam("filterOperations") && !gqlObject["filterOperations"].isNull()){
+		const QVariant filterOperationsData = gqlObject["filterOperations"];
+		const QVariantList filterOperationsDataList = filterOperationsData.toList();
+		const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
+		filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
+		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
+			const QString tempFilterOperations = filterOperationsDataList[filterOperationsIndex].toString();
+			imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
+			if(tempFilterOperations == "Not"){
+				filterOperationsDataValue = FilterOperation::Not;
 			}
-			else if(filterOperationsStringValue == "Equal"){
-				filterOperationsData = FilterOperation::Equal;
+			else if(tempFilterOperations == "Equal"){
+				filterOperationsDataValue = FilterOperation::Equal;
 			}
-			else if(filterOperationsStringValue == "Less"){
-				filterOperationsData = FilterOperation::Less;
+			else if(tempFilterOperations == "Less"){
+				filterOperationsDataValue = FilterOperation::Less;
 			}
-			else if(filterOperationsStringValue == "Greater"){
-				filterOperationsData = FilterOperation::Greater;
+			else if(tempFilterOperations == "Greater"){
+				filterOperationsDataValue = FilterOperation::Greater;
 			}
-			else if(filterOperationsStringValue == "Contains"){
-				filterOperationsData = FilterOperation::Contains;
+			else if(tempFilterOperations == "Contains"){
+				filterOperationsDataValue = FilterOperation::Contains;
 			}
 			else {
 				return false;
 			}
-			filterOperationsList << filterOperationsData;
+			filterOperations->append(filterOperationsDataValue);
 		}
-		filterOperations = filterOperationsList;
-
 	}
 
 	return true;
@@ -1428,7 +1402,7 @@ bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (!jsonObject.contains("filterValueType") || ! jsonObject["filterValueType"].isString()){
 		return false;
 	}
-	QString filterValueTypeStringValue = jsonObject["filterValueType"].toString();
+	const QString filterValueTypeStringValue = jsonObject["filterValueType"].toString();
 	if(filterValueTypeStringValue == "Integer"){
 		filterValueType = ValueType::Integer;
 	}
@@ -1452,7 +1426,7 @@ bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	const qsizetype filterOperationsArrayCount = filterOperationsjsonArray.size();
 	filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
-		QString tempFilterOperations = filterOperationsjsonArray[filterOperationsIndex].toString();
+		const QString tempFilterOperations = filterOperationsjsonArray[filterOperationsIndex].toString();
 		imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
 		if(tempFilterOperations == "Not"){
 			filterOperationsDataValue = FilterOperation::Not;
@@ -1490,7 +1464,7 @@ bool CFieldFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("filterValueType") && jsonObject["filterValueType"].isString()){
-		QString filterValueTypeStringValue = jsonObject["filterValueType"].toString();
+		const QString filterValueTypeStringValue = jsonObject["filterValueType"].toString();
 		if(filterValueTypeStringValue == "Integer"){
 			filterValueType = ValueType::Integer;
 		}
@@ -1513,7 +1487,7 @@ bool CFieldFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		const qsizetype filterOperationsArrayCount = filterOperationsjsonArray.size();
 		filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
 		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
-			QString tempFilterOperations = filterOperationsjsonArray[filterOperationsIndex].toString();
+			const QString tempFilterOperations = filterOperationsjsonArray[filterOperationsIndex].toString();
 			imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
 			if(tempFilterOperations == "Not"){
 				filterOperationsDataValue = FilterOperation::Not;
@@ -1936,30 +1910,30 @@ bool CGroupFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (fieldFilters){
 		QList<::imtgql::CGqlParamObject> fieldFiltersDataObjectList;
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
-			::imtgql::CGqlParamObject fieldFiltersDataObject;
-			if (!fieldFilters->at(fieldFiltersIndex).WriteToGraphQlObject(fieldFiltersDataObject)){
+			::imtgql::CGqlParamObject newFieldFiltersGqlObject;
+			if (!fieldFilters->at(fieldFiltersIndex).WriteToGraphQlObject(newFieldFiltersGqlObject)){
 				return false;
 			}
-			fieldFiltersDataObjectList << fieldFiltersDataObject;
+			fieldFiltersDataObjectList << newFieldFiltersGqlObject;
 		}
-		request.InsertParam("fieldFilters", fieldFiltersDataObjectList);
+		gqlObject.InsertParam("fieldFilters", fieldFiltersDataObjectList);
 	}
 
 	if (groupFilters){
 		QList<::imtgql::CGqlParamObject> groupFiltersDataObjectList;
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
-			::imtgql::CGqlParamObject groupFiltersDataObject;
-			if (!groupFilters->at(groupFiltersIndex).WriteToGraphQlObject(groupFiltersDataObject)){
+			::imtgql::CGqlParamObject newGroupFiltersGqlObject;
+			if (!groupFilters->at(groupFiltersIndex).WriteToGraphQlObject(newGroupFiltersGqlObject)){
 				return false;
 			}
-			groupFiltersDataObjectList << groupFiltersDataObject;
+			groupFiltersDataObjectList << newGroupFiltersGqlObject;
 		}
-		request.InsertParam("groupFilters", groupFiltersDataObjectList);
+		gqlObject.InsertParam("groupFilters", groupFiltersDataObjectList);
 	}
 
 	if (!logicalOperation){
@@ -1977,54 +1951,50 @@ bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request
 		Q_ASSERT(false);
 		break;
 	}
-	request.InsertParam("logicalOperation", QVariant(logicalOperationStringValue));
+	gqlObject.InsertParam("logicalOperation", QVariant(logicalOperationStringValue));
 
 	return true;
 }
 
-bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+
+bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	int fieldFiltersCount = request.GetObjectsCount("fieldFilters");
-	if (fieldFiltersCount > 0){
-		QList<CFieldFilter::V1_0> fieldFiltersList;
-		for (int fieldFiltersIndex = 0; fieldFiltersIndex != fieldFiltersCount ; ++fieldFiltersIndex){
-			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = request.GetParamArgumentObjectPtr("fieldFilters",fieldFiltersIndex);
+	if (gqlObject.ContainsParam("fieldFilters") && gqlObject.GetObjectsCount("fieldFilters") > 0){
+		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
+		fieldFilters = QList<CFieldFilter::V1_0>();
+		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
+			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
 			if (fieldFiltersDataObjectPtr == nullptr){
 				return false;
 			}
-			CFieldFilter::V1_0 fieldFilters;
-			if (!fieldFilters.ReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
+			CFieldFilter::V1_0 tempFieldFilters;
+			if (!tempFieldFilters.ReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
 				return false;
 			}
-			fieldFiltersList << fieldFilters;
+			fieldFilters->append(tempFieldFilters);
 		}
-		fieldFilters = fieldFiltersList;
-
 	}
 
-	int groupFiltersCount = request.GetObjectsCount("groupFilters");
-	if (groupFiltersCount > 0){
-		QList<CGroupFilter::V1_0> groupFiltersList;
-		for (int groupFiltersIndex = 0; groupFiltersIndex != groupFiltersCount ; ++groupFiltersIndex){
-			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = request.GetParamArgumentObjectPtr("groupFilters",groupFiltersIndex);
+	if (gqlObject.ContainsParam("groupFilters") && gqlObject.GetObjectsCount("groupFilters") > 0){
+		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
+		groupFilters = QList<CGroupFilter::V1_0>();
+		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
+			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
 			if (groupFiltersDataObjectPtr == nullptr){
 				return false;
 			}
-			CGroupFilter::V1_0 groupFilters;
-			if (!groupFilters.ReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
+			CGroupFilter::V1_0 tempGroupFilters;
+			if (!tempGroupFilters.ReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
 				return false;
 			}
-			groupFiltersList << groupFilters;
+			groupFilters->append(tempGroupFilters);
 		}
-		groupFilters = groupFiltersList;
-
 	}
 
-	QVariant logicalOperationData = request.GetParamArgumentValue("logicalOperation");
-	if (logicalOperationData.isNull()){
+	if (!gqlObject.ContainsParam("logicalOperation") || gqlObject["logicalOperation"].userType() != QMetaType::QString){
 		return false;
 	}
-	QString logicalOperationStringValue = logicalOperationData.toString();
+	const QString logicalOperationStringValue = gqlObject["logicalOperation"].toString();
 	if(logicalOperationStringValue == "And"){
 		logicalOperation = LogicalOperation::And;
 	}
@@ -2039,47 +2009,42 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 }
 
 
-bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	int fieldFiltersCount = request.GetObjectsCount("fieldFilters");
-	if (fieldFiltersCount > 0){
-		QList<CFieldFilter::V1_0> fieldFiltersList;
-		for (int fieldFiltersIndex = 0; fieldFiltersIndex != fieldFiltersCount ; ++fieldFiltersIndex){
-			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = request.GetParamArgumentObjectPtr("fieldFilters",fieldFiltersIndex);
+	if (gqlObject.ContainsParam("fieldFilters") && gqlObject.GetObjectsCount("fieldFilters") > 0){
+		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
+		fieldFilters = QList<CFieldFilter::V1_0>();
+		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
+			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
 			if (fieldFiltersDataObjectPtr == nullptr){
 				return false;
 			}
-			CFieldFilter::V1_0 fieldFilters;
-			if (!fieldFilters.OptReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
+			CFieldFilter::V1_0 tempFieldFilters;
+			if (!tempFieldFilters.OptReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
 				return false;
 			}
-			fieldFiltersList << fieldFilters;
+			fieldFilters->append(tempFieldFilters);
 		}
-		fieldFilters = fieldFiltersList;
-
 	}
 
-	int groupFiltersCount = request.GetObjectsCount("groupFilters");
-	if (groupFiltersCount > 0){
-		QList<CGroupFilter::V1_0> groupFiltersList;
-		for (int groupFiltersIndex = 0; groupFiltersIndex != groupFiltersCount ; ++groupFiltersIndex){
-			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = request.GetParamArgumentObjectPtr("groupFilters",groupFiltersIndex);
+	if (gqlObject.ContainsParam("groupFilters") && gqlObject.GetObjectsCount("groupFilters") > 0){
+		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
+		groupFilters = QList<CGroupFilter::V1_0>();
+		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
+			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
 			if (groupFiltersDataObjectPtr == nullptr){
 				return false;
 			}
-			CGroupFilter::V1_0 groupFilters;
-			if (!groupFilters.OptReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
+			CGroupFilter::V1_0 tempGroupFilters;
+			if (!tempGroupFilters.OptReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
 				return false;
 			}
-			groupFiltersList << groupFilters;
+			groupFilters->append(tempGroupFilters);
 		}
-		groupFilters = groupFiltersList;
-
 	}
 
-	QVariant logicalOperationData = request.GetParamArgumentValue("logicalOperation");
-	if (!logicalOperationData.isNull()){
-QString logicalOperationStringValue = logicalOperationData.toString();
+	if (gqlObject.ContainsParam("logicalOperation") && gqlObject["logicalOperation"].userType() == QMetaType::QString){
+		const QString logicalOperationStringValue = gqlObject["logicalOperation"].toString();
 		if(logicalOperationStringValue == "And"){
 			logicalOperation = LogicalOperation::And;
 		}
@@ -2173,7 +2138,7 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (!jsonObject.contains("logicalOperation") || ! jsonObject["logicalOperation"].isString()){
 		return false;
 	}
-	QString logicalOperationStringValue = jsonObject["logicalOperation"].toString();
+	const QString logicalOperationStringValue = jsonObject["logicalOperation"].toString();
 	if(logicalOperationStringValue == "And"){
 		logicalOperation = LogicalOperation::And;
 	}
@@ -2217,7 +2182,7 @@ bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("logicalOperation") && jsonObject["logicalOperation"].isString()){
-		QString logicalOperationStringValue = jsonObject["logicalOperation"].toString();
+		const QString logicalOperationStringValue = jsonObject["logicalOperation"].toString();
 		if(logicalOperationStringValue == "And"){
 			logicalOperation = LogicalOperation::And;
 		}
@@ -2630,155 +2595,142 @@ bool CComplexCollectionFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItem
 }
 
 
-bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (sortingInfo){
 		QList<::imtgql::CGqlParamObject> sortingInfoDataObjectList;
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
-			::imtgql::CGqlParamObject sortingInfoDataObject;
-			if (!sortingInfo->at(sortingInfoIndex).WriteToGraphQlObject(sortingInfoDataObject)){
+			::imtgql::CGqlParamObject newSortingInfoGqlObject;
+			if (!sortingInfo->at(sortingInfoIndex).WriteToGraphQlObject(newSortingInfoGqlObject)){
 				return false;
 			}
-			sortingInfoDataObjectList << sortingInfoDataObject;
+			sortingInfoDataObjectList << newSortingInfoGqlObject;
 		}
-		request.InsertParam("sortingInfo", sortingInfoDataObjectList);
+		gqlObject.InsertParam("sortingInfo", sortingInfoDataObjectList);
 	}
 
 	if (fieldsFilter){
-		::imtgql::CGqlParamObject fieldsFilterDataObject;
-		if (!fieldsFilter->WriteToGraphQlObject(fieldsFilterDataObject)){
+		::imtgql::CGqlParamObject fieldsFilterGqlObject;
+		const bool isFieldsFilterAdded = fieldsFilter->WriteToGraphQlObject(fieldsFilterGqlObject);
+		if (!isFieldsFilterAdded){
 			return false;
 		}
-		request.InsertParam("fieldsFilter", fieldsFilterDataObject);
+		gqlObject.InsertParam("fieldsFilter", fieldsFilterGqlObject);
 	}
 
 	if (timeFilter){
-		::imtgql::CGqlParamObject timeFilterDataObject;
-		if (!timeFilter->WriteToGraphQlObject(timeFilterDataObject)){
+		::imtgql::CGqlParamObject timeFilterGqlObject;
+		const bool isTimeFilterAdded = timeFilter->WriteToGraphQlObject(timeFilterGqlObject);
+		if (!isTimeFilterAdded){
 			return false;
 		}
-		request.InsertParam("timeFilter", timeFilterDataObject);
+		gqlObject.InsertParam("timeFilter", timeFilterGqlObject);
 	}
 
 	if (distinctFields){
-		QVariantList distinctFieldsTempList;
+		QVariantList distinctFieldsDataObjectList;
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFields->size(); ++distinctFieldsIndex){
-			distinctFieldsTempList << distinctFields->at(distinctFieldsIndex);
+			distinctFieldsDataObjectList << distinctFields->at(distinctFieldsIndex);
 		}
-		request.InsertParam("distinctFields", QVariant(distinctFieldsTempList));
-	}
-
-	return true;
-}
-
-bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
-{
-	int sortingInfoCount = request.GetObjectsCount("sortingInfo");
-	if (sortingInfoCount > 0){
-		QList<CFieldSortingInfo::V1_0> sortingInfoList;
-		for (int sortingInfoIndex = 0; sortingInfoIndex != sortingInfoCount ; ++sortingInfoIndex){
-			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = request.GetParamArgumentObjectPtr("sortingInfo",sortingInfoIndex);
-			if (sortingInfoDataObjectPtr == nullptr){
-				return false;
-			}
-			CFieldSortingInfo::V1_0 sortingInfo;
-			if (!sortingInfo.ReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
-				return false;
-			}
-			sortingInfoList << sortingInfo;
-		}
-		sortingInfo = sortingInfoList;
-
-	}
-
-	const ::imtgql::CGqlParamObject* fieldsFilterDataObjectPtr = request.GetParamArgumentObjectPtr("fieldsFilter");
-	if (fieldsFilterDataObjectPtr != nullptr){
-		fieldsFilter = CGroupFilter::V1_0();
-		const bool isFieldsFilterRead = fieldsFilter->ReadFromGraphQlObject(*fieldsFilterDataObjectPtr);
-		if (!isFieldsFilterRead){
-			return false;
-		}
-
-	}
-
-	const ::imtgql::CGqlParamObject* timeFilterDataObjectPtr = request.GetParamArgumentObjectPtr("timeFilter");
-	if (timeFilterDataObjectPtr != nullptr){
-		timeFilter = CTimeFilter::V1_0();
-		const bool isTimeFilterRead = timeFilter->ReadFromGraphQlObject(*timeFilterDataObjectPtr);
-		if (!isTimeFilterRead){
-			return false;
-		}
-
-	}
-
-	QVariant distinctFieldsData = request.GetParamArgumentValue("distinctFields");
-	if (!distinctFieldsData.isNull()){
-		QList<QByteArray> distinctFieldsList;
-		QVariantList distinctFieldsDataList = distinctFieldsData.toList();
-		qsizetype distinctFieldsCount = distinctFieldsDataList.size();
-		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex != distinctFieldsCount ; ++distinctFieldsIndex){
-			QByteArray distinctFields = distinctFieldsDataList[distinctFieldsIndex].toByteArray();
-			distinctFieldsList << distinctFields;
-		}
-		distinctFields = distinctFieldsList;
-
+		gqlObject.InsertParam("distinctFields", distinctFieldsDataObjectList);
 	}
 
 	return true;
 }
 
 
-bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	int sortingInfoCount = request.GetObjectsCount("sortingInfo");
-	if (sortingInfoCount > 0){
-		QList<CFieldSortingInfo::V1_0> sortingInfoList;
-		for (int sortingInfoIndex = 0; sortingInfoIndex != sortingInfoCount ; ++sortingInfoIndex){
-			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = request.GetParamArgumentObjectPtr("sortingInfo",sortingInfoIndex);
+	if (gqlObject.ContainsParam("sortingInfo") && gqlObject.GetObjectsCount("sortingInfo") > 0){
+		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
+		sortingInfo = QList<CFieldSortingInfo::V1_0>();
+		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
+			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
 			if (sortingInfoDataObjectPtr == nullptr){
 				return false;
 			}
-			CFieldSortingInfo::V1_0 sortingInfo;
-			if (!sortingInfo.OptReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
+			CFieldSortingInfo::V1_0 tempSortingInfo;
+			if (!tempSortingInfo.ReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
 				return false;
 			}
-			sortingInfoList << sortingInfo;
+			sortingInfo->append(tempSortingInfo);
 		}
-		sortingInfo = sortingInfoList;
-
 	}
 
-	const ::imtgql::CGqlParamObject* fieldsFilterDataObjectPtr = request.GetParamArgumentObjectPtr("fieldsFilter");
-	if (fieldsFilterDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("fieldsFilter") && gqlObject.GetParamArgumentObjectPtr("fieldsFilter") == nullptr){
 		fieldsFilter = CGroupFilter::V1_0();
-		const bool isFieldsFilterRead = fieldsFilter->OptReadFromGraphQlObject(*fieldsFilterDataObjectPtr);
-		if (!isFieldsFilterRead){
+		const bool isFieldsFilterReaded = fieldsFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
+		if (!isFieldsFilterReaded){
 			return false;
 		}
-
 	}
 
-	const ::imtgql::CGqlParamObject* timeFilterDataObjectPtr = request.GetParamArgumentObjectPtr("timeFilter");
-	if (timeFilterDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("timeFilter") && gqlObject.GetParamArgumentObjectPtr("timeFilter") == nullptr){
 		timeFilter = CTimeFilter::V1_0();
-		const bool isTimeFilterRead = timeFilter->OptReadFromGraphQlObject(*timeFilterDataObjectPtr);
-		if (!isTimeFilterRead){
+		const bool isTimeFilterReaded = timeFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
+		if (!isTimeFilterReaded){
 			return false;
 		}
-
 	}
 
-	QVariant distinctFieldsData = request.GetParamArgumentValue("distinctFields");
-	if (!distinctFieldsData.isNull()){
-		QList<QByteArray> distinctFieldsList;
-		QVariantList distinctFieldsDataList = distinctFieldsData.toList();
-		qsizetype distinctFieldsCount = distinctFieldsDataList.size();
-		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex != distinctFieldsCount ; ++distinctFieldsIndex){
-			QByteArray distinctFields = distinctFieldsDataList[distinctFieldsIndex].toByteArray();
-			distinctFieldsList << distinctFields;
+	if (gqlObject.ContainsParam("distinctFields") && !gqlObject["distinctFields"].isNull()){
+		const QVariant distinctFieldsData = gqlObject["distinctFields"];
+		const QVariantList distinctFieldsDataList = distinctFieldsData.toList();
+		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();
+		distinctFields = QList<QByteArray>();
+		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsElementsCount; ++distinctFieldsIndex){
+			QByteArray tempDistinctFields = distinctFieldsDataList[distinctFieldsIndex].toByteArray();
+			distinctFields->append(tempDistinctFields);
 		}
-		distinctFields = distinctFieldsList;
+	}
 
+	return true;
+}
+
+
+bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("sortingInfo") && gqlObject.GetObjectsCount("sortingInfo") > 0){
+		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
+		sortingInfo = QList<CFieldSortingInfo::V1_0>();
+		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
+			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
+			if (sortingInfoDataObjectPtr == nullptr){
+				return false;
+			}
+			CFieldSortingInfo::V1_0 tempSortingInfo;
+			if (!tempSortingInfo.OptReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
+				return false;
+			}
+			sortingInfo->append(tempSortingInfo);
+		}
+	}
+
+	if (gqlObject.ContainsParam("fieldsFilter") && gqlObject.GetParamArgumentObjectPtr("fieldsFilter") == nullptr){
+		fieldsFilter = CGroupFilter::V1_0();
+		const bool isFieldsFilterReaded = fieldsFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
+		if (!isFieldsFilterReaded){
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("timeFilter") && gqlObject.GetParamArgumentObjectPtr("timeFilter") == nullptr){
+		timeFilter = CTimeFilter::V1_0();
+		const bool isTimeFilterReaded = timeFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
+		if (!isTimeFilterReaded){
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("distinctFields") && !gqlObject["distinctFields"].isNull()){
+		const QVariant distinctFieldsData = gqlObject["distinctFields"];
+		const QVariantList distinctFieldsDataList = distinctFieldsData.toList();
+		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();
+		distinctFields = QList<QByteArray>();
+		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsElementsCount; ++distinctFieldsIndex){
+			QByteArray tempDistinctFields = distinctFieldsDataList[distinctFieldsIndex].toByteArray();
+			distinctFields->append(tempDistinctFields);
+		}
 	}
 
 	return true;
@@ -2800,21 +2752,21 @@ bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) 
 	}
 
 	if (fieldsFilter){
-		QJsonObject fieldsFilterjsonObject;
-		const bool isFieldsFilterAdded = fieldsFilter->WriteToJsonObject(fieldsFilterjsonObject);
+		QJsonObject fieldsFilterJsonObject;
+		const bool isFieldsFilterAdded = fieldsFilter->WriteToJsonObject(fieldsFilterJsonObject);
 		if (!isFieldsFilterAdded){
 			return false;
 		}
-		jsonObject["fieldsFilter"] = fieldsFilterjsonObject;
+		jsonObject["fieldsFilter"] = fieldsFilterJsonObject;
 	}
 
 	if (timeFilter){
-		QJsonObject timeFilterjsonObject;
-		const bool isTimeFilterAdded = timeFilter->WriteToJsonObject(timeFilterjsonObject);
+		QJsonObject timeFilterJsonObject;
+		const bool isTimeFilterAdded = timeFilter->WriteToJsonObject(timeFilterJsonObject);
 		if (!isTimeFilterAdded){
 			return false;
 		}
-		jsonObject["timeFilter"] = timeFilterjsonObject;
+		jsonObject["timeFilter"] = timeFilterJsonObject;
 	}
 
 	if (distinctFields){

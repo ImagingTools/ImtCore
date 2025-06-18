@@ -1,0 +1,13357 @@
+#include "CTImpl.h"
+
+
+#include "CTImpl.h"
+
+
+#include "CTImpl.h"
+
+
+#include "CTImpl.h"
+
+
+/// \file CResult.cpp
+
+namespace sdl::complextest::CTImpl
+{
+
+
+QByteArray CResult::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CResult::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				AreaResult == other.AreaResult &&
+				ExpectedMinValue.has_value() == other.ExpectedMinValue.has_value() &&
+				((ExpectedMinValue.has_value() && other.ExpectedMinValue.has_value()) ?
+					qFuzzyCompare(*ExpectedMinValue, *other.ExpectedMinValue) : true) &&
+				ExpectedMaxValue.has_value() == other.ExpectedMaxValue.has_value() &&
+				((ExpectedMaxValue.has_value() && other.ExpectedMaxValue.has_value()) ?
+					qFuzzyCompare(*ExpectedMaxValue, *other.ExpectedMaxValue) : true) &&
+				MeasuredValue.has_value() == other.MeasuredValue.has_value() &&
+				((MeasuredValue.has_value() && other.MeasuredValue.has_value()) ?
+					qFuzzyCompare(*MeasuredValue, *other.MeasuredValue) : true) &&
+				MinMeasuredValue.has_value() == other.MinMeasuredValue.has_value() &&
+				((MinMeasuredValue.has_value() && other.MinMeasuredValue.has_value()) ?
+					qFuzzyCompare(*MinMeasuredValue, *other.MinMeasuredValue) : true) &&
+				MaxMeasuredValue.has_value() == other.MaxMeasuredValue.has_value() &&
+				((MaxMeasuredValue.has_value() && other.MaxMeasuredValue.has_value()) ?
+					qFuzzyCompare(*MaxMeasuredValue, *other.MaxMeasuredValue) : true) &&
+				MeanMeasuredValue.has_value() == other.MeanMeasuredValue.has_value() &&
+				((MeanMeasuredValue.has_value() && other.MeanMeasuredValue.has_value()) ?
+					qFuzzyCompare(*MeanMeasuredValue, *other.MeanMeasuredValue) : true) &&
+				MeasurementType == other.MeasurementType &&
+				MeasurementUnit == other.MeasurementUnit &&
+				Length.has_value() == other.Length.has_value() &&
+				((Length.has_value() && other.Length.has_value()) ?
+					qFuzzyCompare(*Length, *other.Length) : true) &&
+				ErrorType == other.ErrorType &&
+				Geometry == other.Geometry;
+}
+
+
+bool CResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!AreaResult){
+		return false;
+	}
+	QString areaResultStringValue;
+	switch (*AreaResult){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		areaResultStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		areaResultStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		areaResultStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		areaResultStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		areaResultStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	model.SetData("AreaResult", areaResultStringValue, modelIndex);
+
+	if (!ExpectedMinValue){
+		return false;
+	}
+	model.SetData("ExpectedMinValue", *ExpectedMinValue, modelIndex);
+
+	if (!ExpectedMaxValue){
+		return false;
+	}
+	model.SetData("ExpectedMaxValue", *ExpectedMaxValue, modelIndex);
+
+	if (!MeasuredValue){
+		return false;
+	}
+	model.SetData("MeasuredValue", *MeasuredValue, modelIndex);
+
+	if (!MinMeasuredValue){
+		return false;
+	}
+	model.SetData("MinMeasuredValue", *MinMeasuredValue, modelIndex);
+
+	if (!MaxMeasuredValue){
+		return false;
+	}
+	model.SetData("MaxMeasuredValue", *MaxMeasuredValue, modelIndex);
+
+	if (!MeanMeasuredValue){
+		return false;
+	}
+	model.SetData("MeanMeasuredValue", *MeanMeasuredValue, modelIndex);
+
+	if (!MeasurementType){
+		return false;
+	}
+	QString measurementTypeStringValue;
+	switch (*MeasurementType){
+	case ::sdl::complextest::CTTypes::MeasurementType::NONE:
+		measurementTypeStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::WIDTH:
+		measurementTypeStringValue = "WIDTH";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::BRIGHTNESS:
+		measurementTypeStringValue = "BRIGHTNESS";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::DISTANCE:
+		measurementTypeStringValue = "DISTANCE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::DISPLACEMENT:
+		measurementTypeStringValue = "DISPLACEMENT";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::HEIGHT:
+		measurementTypeStringValue = "HEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::SYMMETRY:
+		measurementTypeStringValue = "SYMMETRY";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::VOLUME:
+		measurementTypeStringValue = "VOLUME";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::VOLUMERATE:
+		measurementTypeStringValue = "VOLUMERATE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::LENGTH:
+		measurementTypeStringValue = "LENGTH";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND:
+		measurementTypeStringValue = "OUT_OF_BOUND";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	model.SetData("MeasurementType", measurementTypeStringValue, modelIndex);
+
+	if (!MeasurementUnit){
+		return false;
+	}
+	QString measurementUnitStringValue;
+	switch (*MeasurementUnit){
+	case ::sdl::complextest::CTTypes::MeasurementUnit::NONE:
+		measurementUnitStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::mm:
+		measurementUnitStringValue = "mm";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::mm3:
+		measurementUnitStringValue = "mm3";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::mm3_mm:
+		measurementUnitStringValue = "mm3_mm";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::pixel:
+		measurementUnitStringValue = "pixel";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	model.SetData("MeasurementUnit", measurementUnitStringValue, modelIndex);
+
+	if (!Length){
+		return false;
+	}
+	model.SetData("Length", *Length, modelIndex);
+
+	if (!ErrorType){
+		return false;
+	}
+	QString errorTypeStringValue;
+	switch (*ErrorType){
+	case ::sdl::complextest::CTTypes::ErrorCode::OK:
+		errorTypeStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE:
+		errorTypeStringValue = "TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE:
+		errorTypeStringValue = "TOLERANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW:
+		errorTypeStringValue = "TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP:
+		errorTypeStringValue = "NO_DATA_GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::GAP:
+		errorTypeStringValue = "GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH:
+		errorTypeStringValue = "TOO_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW:
+		errorTypeStringValue = "TOO_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW:
+		errorTypeStringValue = "TOO_FEW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH:
+		errorTypeStringValue = "TOO_MUCH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER:
+		errorTypeStringValue = "WRONG_DOT_DIAMETER";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION:
+		errorTypeStringValue = "WRONG_DOT_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS:
+		errorTypeStringValue = "MISSING_DOTS";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE:
+		errorTypeStringValue = "WRONG_DOT_DISTANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE:
+		errorTypeStringValue = "AREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE:
+		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE:
+		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA:
+		errorTypeStringValue = "WRONG_DOT_AREA";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME:
+		errorTypeStringValue = "WRONG_DOT_VOLUME";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT:
+		errorTypeStringValue = "WRONG_DOT_HEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT:
+		errorTypeStringValue = "TOO_BRIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK:
+		errorTypeStringValue = "TOO_DARK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR:
+		errorTypeStringValue = "COUNT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH:
+		errorTypeStringValue = "Z_DISTANCE_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW:
+		errorTypeStringValue = "Z_DISTANCE_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL:
+		errorTypeStringValue = "NOT_SYMMETRICAL";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR:
+		errorTypeStringValue = "REFERENCE_3D_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR:
+		errorTypeStringValue = "COLOR_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT:
+		errorTypeStringValue = "PATTERN_COUNT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION:
+		errorTypeStringValue = "PATTERN_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION:
+		errorTypeStringValue = "PATTERN_ROTATION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE:
+		errorTypeStringValue = "CENTERLINE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP:
+		errorTypeStringValue = "CALIB_ERROR_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP:
+		errorTypeStringValue = "CALIB_INVALID_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED:
+		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND:
+		errorTypeStringValue = "CONTOUR_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE:
+		errorTypeStringValue = "CONTOUR_TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW:
+		errorTypeStringValue = "CONTOUR_TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED:
+		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY:
+		errorTypeStringValue = "CONTOUR_INVALID_POLY";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND:
+		errorTypeStringValue = "REFERENCE_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF:
+		errorTypeStringValue = "REFERENCE_INVALID_REF";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED:
+		errorTypeStringValue = "REFERENCE_POS_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED:
+		errorTypeStringValue = "REFERENCE_DIST_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND:
+		errorTypeStringValue = "AREA_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND:
+		errorTypeStringValue = "AREA_GLUE_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED:
+		errorTypeStringValue = "AREA_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH:
+		errorTypeStringValue = "AREA_GAP_LENGTH";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	model.SetData("ErrorType", errorTypeStringValue, modelIndex);
+
+
+	if (!Geometry){
+		return false;
+	}
+	::imtbase::CTreeItemModel* geometryNewModelPtr = model.AddTreeModel("Geometry", modelIndex);
+	const bool isGeometryAdded = Geometry->WriteToModel(*geometryNewModelPtr, 0);
+	if (!isGeometryAdded){
+		return false;
+	}
+
+
+	return true;
+}
+
+
+bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant areaResultData = model.GetData("AreaResult", modelIndex);
+	if (areaResultData.isNull()){
+		return false;
+	}
+	QString areaResultStringValue = areaResultData.toString();
+	if(areaResultStringValue == "NONE"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(areaResultStringValue == "OK"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(areaResultStringValue == "WARNING"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(areaResultStringValue == "NOK"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(areaResultStringValue == "FAILED"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	QVariant expectedMinValueData = model.GetData("ExpectedMinValue", modelIndex);
+	if (expectedMinValueData.isNull()){
+		return false;
+	}
+	ExpectedMinValue = expectedMinValueData.toFloat();
+
+	QVariant expectedMaxValueData = model.GetData("ExpectedMaxValue", modelIndex);
+	if (expectedMaxValueData.isNull()){
+		return false;
+	}
+	ExpectedMaxValue = expectedMaxValueData.toFloat();
+
+	QVariant measuredValueData = model.GetData("MeasuredValue", modelIndex);
+	if (measuredValueData.isNull()){
+		return false;
+	}
+	MeasuredValue = measuredValueData.toFloat();
+
+	QVariant minMeasuredValueData = model.GetData("MinMeasuredValue", modelIndex);
+	if (minMeasuredValueData.isNull()){
+		return false;
+	}
+	MinMeasuredValue = minMeasuredValueData.toFloat();
+
+	QVariant maxMeasuredValueData = model.GetData("MaxMeasuredValue", modelIndex);
+	if (maxMeasuredValueData.isNull()){
+		return false;
+	}
+	MaxMeasuredValue = maxMeasuredValueData.toFloat();
+
+	QVariant meanMeasuredValueData = model.GetData("MeanMeasuredValue", modelIndex);
+	if (meanMeasuredValueData.isNull()){
+		return false;
+	}
+	MeanMeasuredValue = meanMeasuredValueData.toFloat();
+
+	QVariant measurementTypeData = model.GetData("MeasurementType", modelIndex);
+	if (measurementTypeData.isNull()){
+		return false;
+	}
+	QString measurementTypeStringValue = measurementTypeData.toString();
+	if(measurementTypeStringValue == "NONE"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::NONE;
+	}
+	else if(measurementTypeStringValue == "WIDTH"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::WIDTH;
+	}
+	else if(measurementTypeStringValue == "BRIGHTNESS"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::BRIGHTNESS;
+	}
+	else if(measurementTypeStringValue == "DISTANCE"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISTANCE;
+	}
+	else if(measurementTypeStringValue == "DISPLACEMENT"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISPLACEMENT;
+	}
+	else if(measurementTypeStringValue == "HEIGHT"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::HEIGHT;
+	}
+	else if(measurementTypeStringValue == "SYMMETRY"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::SYMMETRY;
+	}
+	else if(measurementTypeStringValue == "VOLUME"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUME;
+	}
+	else if(measurementTypeStringValue == "VOLUMERATE"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUMERATE;
+	}
+	else if(measurementTypeStringValue == "LENGTH"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::LENGTH;
+	}
+	else if(measurementTypeStringValue == "OUT_OF_BOUND"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
+	}
+	else {
+		return false;
+	}
+
+	QVariant measurementUnitData = model.GetData("MeasurementUnit", modelIndex);
+	if (measurementUnitData.isNull()){
+		return false;
+	}
+	QString measurementUnitStringValue = measurementUnitData.toString();
+	if(measurementUnitStringValue == "NONE"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::NONE;
+	}
+	else if(measurementUnitStringValue == "mm"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm;
+	}
+	else if(measurementUnitStringValue == "mm3"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3;
+	}
+	else if(measurementUnitStringValue == "mm3_mm"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3_mm;
+	}
+	else if(measurementUnitStringValue == "pixel"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
+	}
+	else {
+		return false;
+	}
+
+	QVariant lengthData = model.GetData("Length", modelIndex);
+	if (lengthData.isNull()){
+		return false;
+	}
+	Length = lengthData.toFloat();
+
+	QVariant errorTypeData = model.GetData("ErrorType", modelIndex);
+	if (errorTypeData.isNull()){
+		return false;
+	}
+	QString errorTypeStringValue = errorTypeData.toString();
+	if(errorTypeStringValue == "OK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+	}
+	else if(errorTypeStringValue == "TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "TOLERANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+	}
+	else if(errorTypeStringValue == "TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "NO_DATA_GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+	}
+	else if(errorTypeStringValue == "GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+	}
+	else if(errorTypeStringValue == "TOO_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+	}
+	else if(errorTypeStringValue == "TOO_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+	}
+	else if(errorTypeStringValue == "TOO_FEW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+	}
+	else if(errorTypeStringValue == "TOO_MUCH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+	}
+	else if(errorTypeStringValue == "MISSING_DOTS"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+	}
+	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+	}
+	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+	}
+	else if(errorTypeStringValue == "TOO_BRIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+	}
+	else if(errorTypeStringValue == "TOO_DARK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+	}
+	else if(errorTypeStringValue == "COUNT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+	}
+	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+	}
+	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+	}
+	else if(errorTypeStringValue == "COLOR_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+	}
+	else if(errorTypeStringValue == "PATTERN_COUNT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+	}
+	else if(errorTypeStringValue == "PATTERN_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+	}
+	else if(errorTypeStringValue == "PATTERN_ROTATION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+	}
+	else if(errorTypeStringValue == "CENTERLINE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+	}
+	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+	}
+	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+	}
+	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+	}
+	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+	}
+	else {
+		return false;
+	}
+
+	::imtbase::CTreeItemModel* geometryDataModelPtr = model.GetTreeItemModel("Geometry", modelIndex);
+	if (geometryDataModelPtr == nullptr){
+		return false;
+	}
+	Geometry = CTTypes::CGeometry::V1_0();
+	const bool isGeometryReaded = Geometry->ReadFromModel(*geometryDataModelPtr, modelIndex);
+	if (!isGeometryReaded){
+		return false;
+	}
+
+
+	return true;
+}
+
+
+bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant areaResultData = model.GetData("AreaResult", modelIndex);
+	if (!areaResultData.isNull()){
+		QString areaResultStringValue = areaResultData.toString();
+		if(areaResultStringValue == "NONE"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(areaResultStringValue == "OK"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(areaResultStringValue == "WARNING"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(areaResultStringValue == "NOK"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(areaResultStringValue == "FAILED"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	QVariant expectedMinValueData = model.GetData("ExpectedMinValue", modelIndex);
+	if (!expectedMinValueData.isNull()){
+		ExpectedMinValue = expectedMinValueData.toFloat();
+	}
+
+	QVariant expectedMaxValueData = model.GetData("ExpectedMaxValue", modelIndex);
+	if (!expectedMaxValueData.isNull()){
+		ExpectedMaxValue = expectedMaxValueData.toFloat();
+	}
+
+	QVariant measuredValueData = model.GetData("MeasuredValue", modelIndex);
+	if (!measuredValueData.isNull()){
+		MeasuredValue = measuredValueData.toFloat();
+	}
+
+	QVariant minMeasuredValueData = model.GetData("MinMeasuredValue", modelIndex);
+	if (!minMeasuredValueData.isNull()){
+		MinMeasuredValue = minMeasuredValueData.toFloat();
+	}
+
+	QVariant maxMeasuredValueData = model.GetData("MaxMeasuredValue", modelIndex);
+	if (!maxMeasuredValueData.isNull()){
+		MaxMeasuredValue = maxMeasuredValueData.toFloat();
+	}
+
+	QVariant meanMeasuredValueData = model.GetData("MeanMeasuredValue", modelIndex);
+	if (!meanMeasuredValueData.isNull()){
+		MeanMeasuredValue = meanMeasuredValueData.toFloat();
+	}
+
+	QVariant measurementTypeData = model.GetData("MeasurementType", modelIndex);
+	if (!measurementTypeData.isNull()){
+		QString measurementTypeStringValue = measurementTypeData.toString();
+		if(measurementTypeStringValue == "NONE"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::NONE;
+		}
+		else if(measurementTypeStringValue == "WIDTH"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::WIDTH;
+		}
+		else if(measurementTypeStringValue == "BRIGHTNESS"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::BRIGHTNESS;
+		}
+		else if(measurementTypeStringValue == "DISTANCE"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISTANCE;
+		}
+		else if(measurementTypeStringValue == "DISPLACEMENT"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISPLACEMENT;
+		}
+		else if(measurementTypeStringValue == "HEIGHT"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::HEIGHT;
+		}
+		else if(measurementTypeStringValue == "SYMMETRY"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::SYMMETRY;
+		}
+		else if(measurementTypeStringValue == "VOLUME"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUME;
+		}
+		else if(measurementTypeStringValue == "VOLUMERATE"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUMERATE;
+		}
+		else if(measurementTypeStringValue == "LENGTH"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::LENGTH;
+		}
+		else if(measurementTypeStringValue == "OUT_OF_BOUND"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
+		}
+		else {
+			return false;
+		}
+	}
+
+	QVariant measurementUnitData = model.GetData("MeasurementUnit", modelIndex);
+	if (!measurementUnitData.isNull()){
+		QString measurementUnitStringValue = measurementUnitData.toString();
+		if(measurementUnitStringValue == "NONE"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::NONE;
+		}
+		else if(measurementUnitStringValue == "mm"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm;
+		}
+		else if(measurementUnitStringValue == "mm3"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3;
+		}
+		else if(measurementUnitStringValue == "mm3_mm"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3_mm;
+		}
+		else if(measurementUnitStringValue == "pixel"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
+		}
+		else {
+			return false;
+		}
+	}
+
+	QVariant lengthData = model.GetData("Length", modelIndex);
+	if (!lengthData.isNull()){
+		Length = lengthData.toFloat();
+	}
+
+	QVariant errorTypeData = model.GetData("ErrorType", modelIndex);
+	if (!errorTypeData.isNull()){
+		QString errorTypeStringValue = errorTypeData.toString();
+		if(errorTypeStringValue == "OK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+		}
+		else if(errorTypeStringValue == "TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "TOLERANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+		}
+		else if(errorTypeStringValue == "TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "NO_DATA_GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+		}
+		else if(errorTypeStringValue == "GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+		}
+		else if(errorTypeStringValue == "TOO_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+		}
+		else if(errorTypeStringValue == "TOO_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+		}
+		else if(errorTypeStringValue == "TOO_FEW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+		}
+		else if(errorTypeStringValue == "TOO_MUCH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+		}
+		else if(errorTypeStringValue == "MISSING_DOTS"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+		}
+		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+		}
+		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		}
+		else if(errorTypeStringValue == "TOO_BRIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+		}
+		else if(errorTypeStringValue == "TOO_DARK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+		}
+		else if(errorTypeStringValue == "COUNT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+		}
+		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+		}
+		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+		}
+		else if(errorTypeStringValue == "COLOR_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+		}
+		else if(errorTypeStringValue == "PATTERN_COUNT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+		}
+		else if(errorTypeStringValue == "PATTERN_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+		}
+		else if(errorTypeStringValue == "PATTERN_ROTATION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+		}
+		else if(errorTypeStringValue == "CENTERLINE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+		}
+		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+		}
+		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+		}
+		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+		}
+		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+		}
+		else {
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* geometryDataModelPtr = model.GetTreeItemModel("Geometry", modelIndex);
+	if (geometryDataModelPtr != nullptr){
+		Geometry = CTTypes::CGeometry::V1_0();
+		const bool isGeometryReaded = Geometry->ReadFromModel(*geometryDataModelPtr, modelIndex);
+		if (!isGeometryReaded){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!AreaResult){
+		return false;
+	}
+	QString areaResultStringValue;
+	switch (*AreaResult){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		areaResultStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		areaResultStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		areaResultStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		areaResultStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		areaResultStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	gqlObject.InsertParam("AreaResult", QVariant(areaResultStringValue));
+
+	if (!ExpectedMinValue){
+		return false;
+	}
+	gqlObject.InsertParam("ExpectedMinValue", QVariant(*ExpectedMinValue));
+
+	if (!ExpectedMaxValue){
+		return false;
+	}
+	gqlObject.InsertParam("ExpectedMaxValue", QVariant(*ExpectedMaxValue));
+
+	if (!MeasuredValue){
+		return false;
+	}
+	gqlObject.InsertParam("MeasuredValue", QVariant(*MeasuredValue));
+
+	if (!MinMeasuredValue){
+		return false;
+	}
+	gqlObject.InsertParam("MinMeasuredValue", QVariant(*MinMeasuredValue));
+
+	if (!MaxMeasuredValue){
+		return false;
+	}
+	gqlObject.InsertParam("MaxMeasuredValue", QVariant(*MaxMeasuredValue));
+
+	if (!MeanMeasuredValue){
+		return false;
+	}
+	gqlObject.InsertParam("MeanMeasuredValue", QVariant(*MeanMeasuredValue));
+
+	if (!MeasurementType){
+		return false;
+	}
+	QString measurementTypeStringValue;
+	switch (*MeasurementType){
+	case ::sdl::complextest::CTTypes::MeasurementType::NONE:
+		measurementTypeStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::WIDTH:
+		measurementTypeStringValue = "WIDTH";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::BRIGHTNESS:
+		measurementTypeStringValue = "BRIGHTNESS";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::DISTANCE:
+		measurementTypeStringValue = "DISTANCE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::DISPLACEMENT:
+		measurementTypeStringValue = "DISPLACEMENT";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::HEIGHT:
+		measurementTypeStringValue = "HEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::SYMMETRY:
+		measurementTypeStringValue = "SYMMETRY";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::VOLUME:
+		measurementTypeStringValue = "VOLUME";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::VOLUMERATE:
+		measurementTypeStringValue = "VOLUMERATE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::LENGTH:
+		measurementTypeStringValue = "LENGTH";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND:
+		measurementTypeStringValue = "OUT_OF_BOUND";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	gqlObject.InsertParam("MeasurementType", QVariant(measurementTypeStringValue));
+
+	if (!MeasurementUnit){
+		return false;
+	}
+	QString measurementUnitStringValue;
+	switch (*MeasurementUnit){
+	case ::sdl::complextest::CTTypes::MeasurementUnit::NONE:
+		measurementUnitStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::mm:
+		measurementUnitStringValue = "mm";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::mm3:
+		measurementUnitStringValue = "mm3";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::mm3_mm:
+		measurementUnitStringValue = "mm3_mm";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::pixel:
+		measurementUnitStringValue = "pixel";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	gqlObject.InsertParam("MeasurementUnit", QVariant(measurementUnitStringValue));
+
+	if (!Length){
+		return false;
+	}
+	gqlObject.InsertParam("Length", QVariant(*Length));
+
+	if (!ErrorType){
+		return false;
+	}
+	QString errorTypeStringValue;
+	switch (*ErrorType){
+	case ::sdl::complextest::CTTypes::ErrorCode::OK:
+		errorTypeStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE:
+		errorTypeStringValue = "TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE:
+		errorTypeStringValue = "TOLERANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW:
+		errorTypeStringValue = "TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP:
+		errorTypeStringValue = "NO_DATA_GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::GAP:
+		errorTypeStringValue = "GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH:
+		errorTypeStringValue = "TOO_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW:
+		errorTypeStringValue = "TOO_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW:
+		errorTypeStringValue = "TOO_FEW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH:
+		errorTypeStringValue = "TOO_MUCH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER:
+		errorTypeStringValue = "WRONG_DOT_DIAMETER";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION:
+		errorTypeStringValue = "WRONG_DOT_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS:
+		errorTypeStringValue = "MISSING_DOTS";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE:
+		errorTypeStringValue = "WRONG_DOT_DISTANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE:
+		errorTypeStringValue = "AREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE:
+		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE:
+		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA:
+		errorTypeStringValue = "WRONG_DOT_AREA";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME:
+		errorTypeStringValue = "WRONG_DOT_VOLUME";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT:
+		errorTypeStringValue = "WRONG_DOT_HEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT:
+		errorTypeStringValue = "TOO_BRIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK:
+		errorTypeStringValue = "TOO_DARK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR:
+		errorTypeStringValue = "COUNT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH:
+		errorTypeStringValue = "Z_DISTANCE_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW:
+		errorTypeStringValue = "Z_DISTANCE_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL:
+		errorTypeStringValue = "NOT_SYMMETRICAL";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR:
+		errorTypeStringValue = "REFERENCE_3D_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR:
+		errorTypeStringValue = "COLOR_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT:
+		errorTypeStringValue = "PATTERN_COUNT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION:
+		errorTypeStringValue = "PATTERN_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION:
+		errorTypeStringValue = "PATTERN_ROTATION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE:
+		errorTypeStringValue = "CENTERLINE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP:
+		errorTypeStringValue = "CALIB_ERROR_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP:
+		errorTypeStringValue = "CALIB_INVALID_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED:
+		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND:
+		errorTypeStringValue = "CONTOUR_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE:
+		errorTypeStringValue = "CONTOUR_TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW:
+		errorTypeStringValue = "CONTOUR_TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED:
+		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY:
+		errorTypeStringValue = "CONTOUR_INVALID_POLY";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND:
+		errorTypeStringValue = "REFERENCE_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF:
+		errorTypeStringValue = "REFERENCE_INVALID_REF";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED:
+		errorTypeStringValue = "REFERENCE_POS_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED:
+		errorTypeStringValue = "REFERENCE_DIST_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND:
+		errorTypeStringValue = "AREA_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND:
+		errorTypeStringValue = "AREA_GLUE_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED:
+		errorTypeStringValue = "AREA_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH:
+		errorTypeStringValue = "AREA_GAP_LENGTH";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	gqlObject.InsertParam("ErrorType", QVariant(errorTypeStringValue));
+
+	if (!Geometry){
+		return false;
+	}
+	::imtgql::CGqlParamObject geometryGqlObject;
+	const bool isGeometryAdded = Geometry->WriteToGraphQlObject(geometryGqlObject);
+	if (!isGeometryAdded){
+		return false;
+	}
+	gqlObject.InsertParam("Geometry", geometryGqlObject);
+
+	return true;
+}
+
+
+bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (!gqlObject.ContainsParam("AreaResult") || gqlObject["AreaResult"].userType() != QMetaType::QString){
+		return false;
+	}
+	const QString areaResultStringValue = gqlObject["AreaResult"].toString();
+	if(areaResultStringValue == "NONE"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(areaResultStringValue == "OK"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(areaResultStringValue == "WARNING"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(areaResultStringValue == "NOK"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(areaResultStringValue == "FAILED"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (!gqlObject.ContainsParam("ExpectedMinValue") || gqlObject["ExpectedMinValue"].userType() != QMetaType::Double){
+		return false;
+	}
+	ExpectedMinValue = gqlObject["ExpectedMinValue"].toDouble();
+
+	if (!gqlObject.ContainsParam("ExpectedMaxValue") || gqlObject["ExpectedMaxValue"].userType() != QMetaType::Double){
+		return false;
+	}
+	ExpectedMaxValue = gqlObject["ExpectedMaxValue"].toDouble();
+
+	if (!gqlObject.ContainsParam("MeasuredValue") || gqlObject["MeasuredValue"].userType() != QMetaType::Double){
+		return false;
+	}
+	MeasuredValue = gqlObject["MeasuredValue"].toDouble();
+
+	if (!gqlObject.ContainsParam("MinMeasuredValue") || gqlObject["MinMeasuredValue"].userType() != QMetaType::Double){
+		return false;
+	}
+	MinMeasuredValue = gqlObject["MinMeasuredValue"].toDouble();
+
+	if (!gqlObject.ContainsParam("MaxMeasuredValue") || gqlObject["MaxMeasuredValue"].userType() != QMetaType::Double){
+		return false;
+	}
+	MaxMeasuredValue = gqlObject["MaxMeasuredValue"].toDouble();
+
+	if (!gqlObject.ContainsParam("MeanMeasuredValue") || gqlObject["MeanMeasuredValue"].userType() != QMetaType::Double){
+		return false;
+	}
+	MeanMeasuredValue = gqlObject["MeanMeasuredValue"].toDouble();
+
+	if (!gqlObject.ContainsParam("MeasurementType") || gqlObject["MeasurementType"].userType() != QMetaType::QString){
+		return false;
+	}
+	const QString measurementTypeStringValue = gqlObject["MeasurementType"].toString();
+	if(measurementTypeStringValue == "NONE"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::NONE;
+	}
+	else if(measurementTypeStringValue == "WIDTH"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::WIDTH;
+	}
+	else if(measurementTypeStringValue == "BRIGHTNESS"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::BRIGHTNESS;
+	}
+	else if(measurementTypeStringValue == "DISTANCE"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISTANCE;
+	}
+	else if(measurementTypeStringValue == "DISPLACEMENT"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISPLACEMENT;
+	}
+	else if(measurementTypeStringValue == "HEIGHT"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::HEIGHT;
+	}
+	else if(measurementTypeStringValue == "SYMMETRY"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::SYMMETRY;
+	}
+	else if(measurementTypeStringValue == "VOLUME"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUME;
+	}
+	else if(measurementTypeStringValue == "VOLUMERATE"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUMERATE;
+	}
+	else if(measurementTypeStringValue == "LENGTH"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::LENGTH;
+	}
+	else if(measurementTypeStringValue == "OUT_OF_BOUND"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
+	}
+	else {
+		return false;
+	}
+
+	if (!gqlObject.ContainsParam("MeasurementUnit") || gqlObject["MeasurementUnit"].userType() != QMetaType::QString){
+		return false;
+	}
+	const QString measurementUnitStringValue = gqlObject["MeasurementUnit"].toString();
+	if(measurementUnitStringValue == "NONE"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::NONE;
+	}
+	else if(measurementUnitStringValue == "mm"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm;
+	}
+	else if(measurementUnitStringValue == "mm3"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3;
+	}
+	else if(measurementUnitStringValue == "mm3_mm"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3_mm;
+	}
+	else if(measurementUnitStringValue == "pixel"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
+	}
+	else {
+		return false;
+	}
+
+	if (!gqlObject.ContainsParam("Length") || gqlObject["Length"].userType() != QMetaType::Double){
+		return false;
+	}
+	Length = gqlObject["Length"].toDouble();
+
+	if (!gqlObject.ContainsParam("ErrorType") || gqlObject["ErrorType"].userType() != QMetaType::QString){
+		return false;
+	}
+	const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
+	if(errorTypeStringValue == "OK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+	}
+	else if(errorTypeStringValue == "TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "TOLERANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+	}
+	else if(errorTypeStringValue == "TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "NO_DATA_GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+	}
+	else if(errorTypeStringValue == "GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+	}
+	else if(errorTypeStringValue == "TOO_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+	}
+	else if(errorTypeStringValue == "TOO_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+	}
+	else if(errorTypeStringValue == "TOO_FEW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+	}
+	else if(errorTypeStringValue == "TOO_MUCH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+	}
+	else if(errorTypeStringValue == "MISSING_DOTS"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+	}
+	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+	}
+	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+	}
+	else if(errorTypeStringValue == "TOO_BRIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+	}
+	else if(errorTypeStringValue == "TOO_DARK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+	}
+	else if(errorTypeStringValue == "COUNT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+	}
+	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+	}
+	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+	}
+	else if(errorTypeStringValue == "COLOR_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+	}
+	else if(errorTypeStringValue == "PATTERN_COUNT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+	}
+	else if(errorTypeStringValue == "PATTERN_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+	}
+	else if(errorTypeStringValue == "PATTERN_ROTATION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+	}
+	else if(errorTypeStringValue == "CENTERLINE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+	}
+	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+	}
+	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+	}
+	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+	}
+	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+	}
+	else {
+		return false;
+	}
+
+	if (!gqlObject.ContainsParam("Geometry") || gqlObject.GetParamArgumentObjectPtr("Geometry") != nullptr){
+		return false;
+	}
+	Geometry = CTTypes::CGeometry::V1_0();
+	const bool isGeometryReaded = Geometry->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
+	if (!isGeometryReaded){
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("AreaResult") && gqlObject["AreaResult"].userType() == QMetaType::QString){
+		const QString areaResultStringValue = gqlObject["AreaResult"].toString();
+		if(areaResultStringValue == "NONE"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(areaResultStringValue == "OK"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(areaResultStringValue == "WARNING"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(areaResultStringValue == "NOK"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(areaResultStringValue == "FAILED"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("ExpectedMinValue") && gqlObject["ExpectedMinValue"].userType() == QMetaType::Double){
+		ExpectedMinValue = gqlObject["ExpectedMinValue"].toDouble();
+	}
+
+	if (gqlObject.ContainsParam("ExpectedMaxValue") && gqlObject["ExpectedMaxValue"].userType() == QMetaType::Double){
+		ExpectedMaxValue = gqlObject["ExpectedMaxValue"].toDouble();
+	}
+
+	if (gqlObject.ContainsParam("MeasuredValue") && gqlObject["MeasuredValue"].userType() == QMetaType::Double){
+		MeasuredValue = gqlObject["MeasuredValue"].toDouble();
+	}
+
+	if (gqlObject.ContainsParam("MinMeasuredValue") && gqlObject["MinMeasuredValue"].userType() == QMetaType::Double){
+		MinMeasuredValue = gqlObject["MinMeasuredValue"].toDouble();
+	}
+
+	if (gqlObject.ContainsParam("MaxMeasuredValue") && gqlObject["MaxMeasuredValue"].userType() == QMetaType::Double){
+		MaxMeasuredValue = gqlObject["MaxMeasuredValue"].toDouble();
+	}
+
+	if (gqlObject.ContainsParam("MeanMeasuredValue") && gqlObject["MeanMeasuredValue"].userType() == QMetaType::Double){
+		MeanMeasuredValue = gqlObject["MeanMeasuredValue"].toDouble();
+	}
+
+	if (gqlObject.ContainsParam("MeasurementType") && gqlObject["MeasurementType"].userType() == QMetaType::QString){
+		const QString measurementTypeStringValue = gqlObject["MeasurementType"].toString();
+		if(measurementTypeStringValue == "NONE"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::NONE;
+		}
+		else if(measurementTypeStringValue == "WIDTH"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::WIDTH;
+		}
+		else if(measurementTypeStringValue == "BRIGHTNESS"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::BRIGHTNESS;
+		}
+		else if(measurementTypeStringValue == "DISTANCE"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISTANCE;
+		}
+		else if(measurementTypeStringValue == "DISPLACEMENT"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISPLACEMENT;
+		}
+		else if(measurementTypeStringValue == "HEIGHT"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::HEIGHT;
+		}
+		else if(measurementTypeStringValue == "SYMMETRY"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::SYMMETRY;
+		}
+		else if(measurementTypeStringValue == "VOLUME"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUME;
+		}
+		else if(measurementTypeStringValue == "VOLUMERATE"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUMERATE;
+		}
+		else if(measurementTypeStringValue == "LENGTH"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::LENGTH;
+		}
+		else if(measurementTypeStringValue == "OUT_OF_BOUND"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("MeasurementUnit") && gqlObject["MeasurementUnit"].userType() == QMetaType::QString){
+		const QString measurementUnitStringValue = gqlObject["MeasurementUnit"].toString();
+		if(measurementUnitStringValue == "NONE"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::NONE;
+		}
+		else if(measurementUnitStringValue == "mm"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm;
+		}
+		else if(measurementUnitStringValue == "mm3"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3;
+		}
+		else if(measurementUnitStringValue == "mm3_mm"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3_mm;
+		}
+		else if(measurementUnitStringValue == "pixel"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("Length") && gqlObject["Length"].userType() == QMetaType::Double){
+		Length = gqlObject["Length"].toDouble();
+	}
+
+	if (gqlObject.ContainsParam("ErrorType") && gqlObject["ErrorType"].userType() == QMetaType::QString){
+		const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
+		if(errorTypeStringValue == "OK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+		}
+		else if(errorTypeStringValue == "TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "TOLERANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+		}
+		else if(errorTypeStringValue == "TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "NO_DATA_GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+		}
+		else if(errorTypeStringValue == "GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+		}
+		else if(errorTypeStringValue == "TOO_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+		}
+		else if(errorTypeStringValue == "TOO_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+		}
+		else if(errorTypeStringValue == "TOO_FEW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+		}
+		else if(errorTypeStringValue == "TOO_MUCH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+		}
+		else if(errorTypeStringValue == "MISSING_DOTS"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+		}
+		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+		}
+		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		}
+		else if(errorTypeStringValue == "TOO_BRIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+		}
+		else if(errorTypeStringValue == "TOO_DARK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+		}
+		else if(errorTypeStringValue == "COUNT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+		}
+		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+		}
+		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+		}
+		else if(errorTypeStringValue == "COLOR_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+		}
+		else if(errorTypeStringValue == "PATTERN_COUNT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+		}
+		else if(errorTypeStringValue == "PATTERN_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+		}
+		else if(errorTypeStringValue == "PATTERN_ROTATION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+		}
+		else if(errorTypeStringValue == "CENTERLINE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+		}
+		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+		}
+		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+		}
+		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+		}
+		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("Geometry") && gqlObject.GetParamArgumentObjectPtr("Geometry") == nullptr){
+		Geometry = CTTypes::CGeometry::V1_0();
+		const bool isGeometryReaded = Geometry->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
+		if (!isGeometryReaded){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!AreaResult){
+		return false;
+	}
+	QString areaResultStringValue;
+	switch (*AreaResult){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		areaResultStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		areaResultStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		areaResultStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		areaResultStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		areaResultStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	jsonObject["AreaResult"] = QJsonValue::fromVariant(areaResultStringValue);
+
+	if (!ExpectedMinValue){
+		return false;
+	}
+	jsonObject["ExpectedMinValue"] = QJsonValue::fromVariant(*ExpectedMinValue);
+
+	if (!ExpectedMaxValue){
+		return false;
+	}
+	jsonObject["ExpectedMaxValue"] = QJsonValue::fromVariant(*ExpectedMaxValue);
+
+	if (!MeasuredValue){
+		return false;
+	}
+	jsonObject["MeasuredValue"] = QJsonValue::fromVariant(*MeasuredValue);
+
+	if (!MinMeasuredValue){
+		return false;
+	}
+	jsonObject["MinMeasuredValue"] = QJsonValue::fromVariant(*MinMeasuredValue);
+
+	if (!MaxMeasuredValue){
+		return false;
+	}
+	jsonObject["MaxMeasuredValue"] = QJsonValue::fromVariant(*MaxMeasuredValue);
+
+	if (!MeanMeasuredValue){
+		return false;
+	}
+	jsonObject["MeanMeasuredValue"] = QJsonValue::fromVariant(*MeanMeasuredValue);
+
+	if (!MeasurementType){
+		return false;
+	}
+	QString measurementTypeStringValue;
+	switch (*MeasurementType){
+	case ::sdl::complextest::CTTypes::MeasurementType::NONE:
+		measurementTypeStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::WIDTH:
+		measurementTypeStringValue = "WIDTH";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::BRIGHTNESS:
+		measurementTypeStringValue = "BRIGHTNESS";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::DISTANCE:
+		measurementTypeStringValue = "DISTANCE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::DISPLACEMENT:
+		measurementTypeStringValue = "DISPLACEMENT";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::HEIGHT:
+		measurementTypeStringValue = "HEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::SYMMETRY:
+		measurementTypeStringValue = "SYMMETRY";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::VOLUME:
+		measurementTypeStringValue = "VOLUME";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::VOLUMERATE:
+		measurementTypeStringValue = "VOLUMERATE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::LENGTH:
+		measurementTypeStringValue = "LENGTH";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND:
+		measurementTypeStringValue = "OUT_OF_BOUND";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	jsonObject["MeasurementType"] = QJsonValue::fromVariant(measurementTypeStringValue);
+
+	if (!MeasurementUnit){
+		return false;
+	}
+	QString measurementUnitStringValue;
+	switch (*MeasurementUnit){
+	case ::sdl::complextest::CTTypes::MeasurementUnit::NONE:
+		measurementUnitStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::mm:
+		measurementUnitStringValue = "mm";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::mm3:
+		measurementUnitStringValue = "mm3";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::mm3_mm:
+		measurementUnitStringValue = "mm3_mm";
+		break;
+	case ::sdl::complextest::CTTypes::MeasurementUnit::pixel:
+		measurementUnitStringValue = "pixel";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	jsonObject["MeasurementUnit"] = QJsonValue::fromVariant(measurementUnitStringValue);
+
+	if (!Length){
+		return false;
+	}
+	jsonObject["Length"] = QJsonValue::fromVariant(*Length);
+
+	if (!ErrorType){
+		return false;
+	}
+	QString errorTypeStringValue;
+	switch (*ErrorType){
+	case ::sdl::complextest::CTTypes::ErrorCode::OK:
+		errorTypeStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE:
+		errorTypeStringValue = "TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE:
+		errorTypeStringValue = "TOLERANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW:
+		errorTypeStringValue = "TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP:
+		errorTypeStringValue = "NO_DATA_GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::GAP:
+		errorTypeStringValue = "GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH:
+		errorTypeStringValue = "TOO_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW:
+		errorTypeStringValue = "TOO_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW:
+		errorTypeStringValue = "TOO_FEW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH:
+		errorTypeStringValue = "TOO_MUCH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER:
+		errorTypeStringValue = "WRONG_DOT_DIAMETER";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION:
+		errorTypeStringValue = "WRONG_DOT_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS:
+		errorTypeStringValue = "MISSING_DOTS";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE:
+		errorTypeStringValue = "WRONG_DOT_DISTANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE:
+		errorTypeStringValue = "AREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE:
+		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE:
+		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA:
+		errorTypeStringValue = "WRONG_DOT_AREA";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME:
+		errorTypeStringValue = "WRONG_DOT_VOLUME";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT:
+		errorTypeStringValue = "WRONG_DOT_HEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT:
+		errorTypeStringValue = "TOO_BRIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK:
+		errorTypeStringValue = "TOO_DARK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR:
+		errorTypeStringValue = "COUNT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH:
+		errorTypeStringValue = "Z_DISTANCE_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW:
+		errorTypeStringValue = "Z_DISTANCE_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL:
+		errorTypeStringValue = "NOT_SYMMETRICAL";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR:
+		errorTypeStringValue = "REFERENCE_3D_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR:
+		errorTypeStringValue = "COLOR_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT:
+		errorTypeStringValue = "PATTERN_COUNT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION:
+		errorTypeStringValue = "PATTERN_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION:
+		errorTypeStringValue = "PATTERN_ROTATION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE:
+		errorTypeStringValue = "CENTERLINE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP:
+		errorTypeStringValue = "CALIB_ERROR_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP:
+		errorTypeStringValue = "CALIB_INVALID_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED:
+		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND:
+		errorTypeStringValue = "CONTOUR_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE:
+		errorTypeStringValue = "CONTOUR_TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW:
+		errorTypeStringValue = "CONTOUR_TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED:
+		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY:
+		errorTypeStringValue = "CONTOUR_INVALID_POLY";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND:
+		errorTypeStringValue = "REFERENCE_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF:
+		errorTypeStringValue = "REFERENCE_INVALID_REF";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED:
+		errorTypeStringValue = "REFERENCE_POS_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED:
+		errorTypeStringValue = "REFERENCE_DIST_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND:
+		errorTypeStringValue = "AREA_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND:
+		errorTypeStringValue = "AREA_GLUE_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED:
+		errorTypeStringValue = "AREA_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH:
+		errorTypeStringValue = "AREA_GAP_LENGTH";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	jsonObject["ErrorType"] = QJsonValue::fromVariant(errorTypeStringValue);
+
+	if (!Geometry){
+		return false;
+	}
+	QJsonObject geometryJsonObject;
+	const bool isGeometryAdded = Geometry->WriteToJsonObject(geometryJsonObject);
+	if (!isGeometryAdded){
+		return false;
+	}
+	jsonObject["Geometry"] = geometryJsonObject;
+
+	return true;
+}
+
+
+bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("AreaResult") || ! jsonObject["AreaResult"].isString()){
+		return false;
+	}
+	const QString areaResultStringValue = jsonObject["AreaResult"].toString();
+	if(areaResultStringValue == "NONE"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(areaResultStringValue == "OK"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(areaResultStringValue == "WARNING"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(areaResultStringValue == "NOK"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(areaResultStringValue == "FAILED"){
+		AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (!jsonObject.contains("ExpectedMinValue") || ! jsonObject["ExpectedMinValue"].isDouble()){
+		return false;
+	}
+	ExpectedMinValue = jsonObject["ExpectedMinValue"].toDouble();
+
+	if (!jsonObject.contains("ExpectedMaxValue") || ! jsonObject["ExpectedMaxValue"].isDouble()){
+		return false;
+	}
+	ExpectedMaxValue = jsonObject["ExpectedMaxValue"].toDouble();
+
+	if (!jsonObject.contains("MeasuredValue") || ! jsonObject["MeasuredValue"].isDouble()){
+		return false;
+	}
+	MeasuredValue = jsonObject["MeasuredValue"].toDouble();
+
+	if (!jsonObject.contains("MinMeasuredValue") || ! jsonObject["MinMeasuredValue"].isDouble()){
+		return false;
+	}
+	MinMeasuredValue = jsonObject["MinMeasuredValue"].toDouble();
+
+	if (!jsonObject.contains("MaxMeasuredValue") || ! jsonObject["MaxMeasuredValue"].isDouble()){
+		return false;
+	}
+	MaxMeasuredValue = jsonObject["MaxMeasuredValue"].toDouble();
+
+	if (!jsonObject.contains("MeanMeasuredValue") || ! jsonObject["MeanMeasuredValue"].isDouble()){
+		return false;
+	}
+	MeanMeasuredValue = jsonObject["MeanMeasuredValue"].toDouble();
+
+	if (!jsonObject.contains("MeasurementType") || ! jsonObject["MeasurementType"].isString()){
+		return false;
+	}
+	const QString measurementTypeStringValue = jsonObject["MeasurementType"].toString();
+	if(measurementTypeStringValue == "NONE"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::NONE;
+	}
+	else if(measurementTypeStringValue == "WIDTH"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::WIDTH;
+	}
+	else if(measurementTypeStringValue == "BRIGHTNESS"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::BRIGHTNESS;
+	}
+	else if(measurementTypeStringValue == "DISTANCE"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISTANCE;
+	}
+	else if(measurementTypeStringValue == "DISPLACEMENT"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISPLACEMENT;
+	}
+	else if(measurementTypeStringValue == "HEIGHT"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::HEIGHT;
+	}
+	else if(measurementTypeStringValue == "SYMMETRY"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::SYMMETRY;
+	}
+	else if(measurementTypeStringValue == "VOLUME"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUME;
+	}
+	else if(measurementTypeStringValue == "VOLUMERATE"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUMERATE;
+	}
+	else if(measurementTypeStringValue == "LENGTH"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::LENGTH;
+	}
+	else if(measurementTypeStringValue == "OUT_OF_BOUND"){
+		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
+	}
+	else {
+		return false;
+	}
+
+	if (!jsonObject.contains("MeasurementUnit") || ! jsonObject["MeasurementUnit"].isString()){
+		return false;
+	}
+	const QString measurementUnitStringValue = jsonObject["MeasurementUnit"].toString();
+	if(measurementUnitStringValue == "NONE"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::NONE;
+	}
+	else if(measurementUnitStringValue == "mm"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm;
+	}
+	else if(measurementUnitStringValue == "mm3"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3;
+	}
+	else if(measurementUnitStringValue == "mm3_mm"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3_mm;
+	}
+	else if(measurementUnitStringValue == "pixel"){
+		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
+	}
+	else {
+		return false;
+	}
+
+	if (!jsonObject.contains("Length") || ! jsonObject["Length"].isDouble()){
+		return false;
+	}
+	Length = jsonObject["Length"].toDouble();
+
+	if (!jsonObject.contains("ErrorType") || ! jsonObject["ErrorType"].isString()){
+		return false;
+	}
+	const QString errorTypeStringValue = jsonObject["ErrorType"].toString();
+	if(errorTypeStringValue == "OK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+	}
+	else if(errorTypeStringValue == "TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "TOLERANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+	}
+	else if(errorTypeStringValue == "TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "NO_DATA_GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+	}
+	else if(errorTypeStringValue == "GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+	}
+	else if(errorTypeStringValue == "TOO_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+	}
+	else if(errorTypeStringValue == "TOO_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+	}
+	else if(errorTypeStringValue == "TOO_FEW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+	}
+	else if(errorTypeStringValue == "TOO_MUCH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+	}
+	else if(errorTypeStringValue == "MISSING_DOTS"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+	}
+	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+	}
+	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+	}
+	else if(errorTypeStringValue == "TOO_BRIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+	}
+	else if(errorTypeStringValue == "TOO_DARK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+	}
+	else if(errorTypeStringValue == "COUNT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+	}
+	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+	}
+	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+	}
+	else if(errorTypeStringValue == "COLOR_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+	}
+	else if(errorTypeStringValue == "PATTERN_COUNT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+	}
+	else if(errorTypeStringValue == "PATTERN_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+	}
+	else if(errorTypeStringValue == "PATTERN_ROTATION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+	}
+	else if(errorTypeStringValue == "CENTERLINE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+	}
+	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+	}
+	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+	}
+	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+	}
+	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+	}
+	else {
+		return false;
+	}
+
+	if (!jsonObject.contains("Geometry") || ! jsonObject["Geometry"].isObject()){
+		return false;
+	}
+	Geometry = CTTypes::CGeometry::V1_0();
+	const bool isGeometryReaded = Geometry->ReadFromJsonObject(jsonObject["Geometry"].toObject());
+	if (!isGeometryReaded){
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("AreaResult") && jsonObject["AreaResult"].isString()){
+		const QString areaResultStringValue = jsonObject["AreaResult"].toString();
+		if(areaResultStringValue == "NONE"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(areaResultStringValue == "OK"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(areaResultStringValue == "WARNING"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(areaResultStringValue == "NOK"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(areaResultStringValue == "FAILED"){
+			AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("ExpectedMinValue") && jsonObject["ExpectedMinValue"].isDouble()){
+		ExpectedMinValue = jsonObject["ExpectedMinValue"].toDouble();
+	}
+
+	if (jsonObject.contains("ExpectedMaxValue") && jsonObject["ExpectedMaxValue"].isDouble()){
+		ExpectedMaxValue = jsonObject["ExpectedMaxValue"].toDouble();
+	}
+
+	if (jsonObject.contains("MeasuredValue") && jsonObject["MeasuredValue"].isDouble()){
+		MeasuredValue = jsonObject["MeasuredValue"].toDouble();
+	}
+
+	if (jsonObject.contains("MinMeasuredValue") && jsonObject["MinMeasuredValue"].isDouble()){
+		MinMeasuredValue = jsonObject["MinMeasuredValue"].toDouble();
+	}
+
+	if (jsonObject.contains("MaxMeasuredValue") && jsonObject["MaxMeasuredValue"].isDouble()){
+		MaxMeasuredValue = jsonObject["MaxMeasuredValue"].toDouble();
+	}
+
+	if (jsonObject.contains("MeanMeasuredValue") && jsonObject["MeanMeasuredValue"].isDouble()){
+		MeanMeasuredValue = jsonObject["MeanMeasuredValue"].toDouble();
+	}
+
+	if (jsonObject.contains("MeasurementType") && jsonObject["MeasurementType"].isString()){
+		const QString measurementTypeStringValue = jsonObject["MeasurementType"].toString();
+		if(measurementTypeStringValue == "NONE"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::NONE;
+		}
+		else if(measurementTypeStringValue == "WIDTH"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::WIDTH;
+		}
+		else if(measurementTypeStringValue == "BRIGHTNESS"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::BRIGHTNESS;
+		}
+		else if(measurementTypeStringValue == "DISTANCE"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISTANCE;
+		}
+		else if(measurementTypeStringValue == "DISPLACEMENT"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::DISPLACEMENT;
+		}
+		else if(measurementTypeStringValue == "HEIGHT"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::HEIGHT;
+		}
+		else if(measurementTypeStringValue == "SYMMETRY"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::SYMMETRY;
+		}
+		else if(measurementTypeStringValue == "VOLUME"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUME;
+		}
+		else if(measurementTypeStringValue == "VOLUMERATE"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::VOLUMERATE;
+		}
+		else if(measurementTypeStringValue == "LENGTH"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::LENGTH;
+		}
+		else if(measurementTypeStringValue == "OUT_OF_BOUND"){
+			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("MeasurementUnit") && jsonObject["MeasurementUnit"].isString()){
+		const QString measurementUnitStringValue = jsonObject["MeasurementUnit"].toString();
+		if(measurementUnitStringValue == "NONE"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::NONE;
+		}
+		else if(measurementUnitStringValue == "mm"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm;
+		}
+		else if(measurementUnitStringValue == "mm3"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3;
+		}
+		else if(measurementUnitStringValue == "mm3_mm"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::mm3_mm;
+		}
+		else if(measurementUnitStringValue == "pixel"){
+			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("Length") && jsonObject["Length"].isDouble()){
+		Length = jsonObject["Length"].toDouble();
+	}
+
+	if (jsonObject.contains("ErrorType") && jsonObject["ErrorType"].isString()){
+		const QString errorTypeStringValue = jsonObject["ErrorType"].toString();
+		if(errorTypeStringValue == "OK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+		}
+		else if(errorTypeStringValue == "TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "TOLERANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+		}
+		else if(errorTypeStringValue == "TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "NO_DATA_GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+		}
+		else if(errorTypeStringValue == "GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+		}
+		else if(errorTypeStringValue == "TOO_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+		}
+		else if(errorTypeStringValue == "TOO_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+		}
+		else if(errorTypeStringValue == "TOO_FEW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+		}
+		else if(errorTypeStringValue == "TOO_MUCH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+		}
+		else if(errorTypeStringValue == "MISSING_DOTS"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+		}
+		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+		}
+		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		}
+		else if(errorTypeStringValue == "TOO_BRIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+		}
+		else if(errorTypeStringValue == "TOO_DARK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+		}
+		else if(errorTypeStringValue == "COUNT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+		}
+		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+		}
+		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+		}
+		else if(errorTypeStringValue == "COLOR_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+		}
+		else if(errorTypeStringValue == "PATTERN_COUNT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+		}
+		else if(errorTypeStringValue == "PATTERN_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+		}
+		else if(errorTypeStringValue == "PATTERN_ROTATION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+		}
+		else if(errorTypeStringValue == "CENTERLINE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+		}
+		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+		}
+		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+		}
+		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+		}
+		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("Geometry") && jsonObject["Geometry"].isObject()){
+		Geometry = CTTypes::CGeometry::V1_0();
+		const bool isGeometryReaded = Geometry->OptReadFromJsonObject(jsonObject["Geometry"].toObject());
+		if (!isGeometryReaded){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResult::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResult::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResult::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::complextest::CTImpl
+
+
+
+
+/// \file CArea.cpp
+
+namespace sdl::complextest::CTImpl
+{
+
+
+QByteArray CArea::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CArea::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				AreaName == other.AreaName &&
+				Status == other.Status &&
+				IconPosition == other.IconPosition &&
+				ErrorType == other.ErrorType &&
+				Results == other.Results;
+}
+
+
+bool CArea::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!AreaName){
+		return false;
+	}
+	model.SetData("AreaName", *AreaName, modelIndex);
+
+	if (!Status){
+		return false;
+	}
+	QString statusStringValue;
+	switch (*Status){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		statusStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		statusStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		statusStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		statusStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		statusStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	model.SetData("Status", statusStringValue, modelIndex);
+
+
+	if (!IconPosition){
+		return false;
+	}
+	::imtbase::CTreeItemModel* iconPositionNewModelPtr = model.AddTreeModel("IconPosition", modelIndex);
+	const bool isIconPositionAdded = IconPosition->WriteToModel(*iconPositionNewModelPtr, 0);
+	if (!isIconPositionAdded){
+		return false;
+	}
+
+	if (!ErrorType){
+		return false;
+	}
+	QString errorTypeStringValue;
+	switch (*ErrorType){
+	case ::sdl::complextest::CTTypes::ErrorCode::OK:
+		errorTypeStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE:
+		errorTypeStringValue = "TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE:
+		errorTypeStringValue = "TOLERANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW:
+		errorTypeStringValue = "TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP:
+		errorTypeStringValue = "NO_DATA_GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::GAP:
+		errorTypeStringValue = "GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH:
+		errorTypeStringValue = "TOO_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW:
+		errorTypeStringValue = "TOO_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW:
+		errorTypeStringValue = "TOO_FEW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH:
+		errorTypeStringValue = "TOO_MUCH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER:
+		errorTypeStringValue = "WRONG_DOT_DIAMETER";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION:
+		errorTypeStringValue = "WRONG_DOT_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS:
+		errorTypeStringValue = "MISSING_DOTS";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE:
+		errorTypeStringValue = "WRONG_DOT_DISTANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE:
+		errorTypeStringValue = "AREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE:
+		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE:
+		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA:
+		errorTypeStringValue = "WRONG_DOT_AREA";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME:
+		errorTypeStringValue = "WRONG_DOT_VOLUME";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT:
+		errorTypeStringValue = "WRONG_DOT_HEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT:
+		errorTypeStringValue = "TOO_BRIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK:
+		errorTypeStringValue = "TOO_DARK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR:
+		errorTypeStringValue = "COUNT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH:
+		errorTypeStringValue = "Z_DISTANCE_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW:
+		errorTypeStringValue = "Z_DISTANCE_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL:
+		errorTypeStringValue = "NOT_SYMMETRICAL";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR:
+		errorTypeStringValue = "REFERENCE_3D_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR:
+		errorTypeStringValue = "COLOR_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT:
+		errorTypeStringValue = "PATTERN_COUNT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION:
+		errorTypeStringValue = "PATTERN_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION:
+		errorTypeStringValue = "PATTERN_ROTATION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE:
+		errorTypeStringValue = "CENTERLINE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP:
+		errorTypeStringValue = "CALIB_ERROR_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP:
+		errorTypeStringValue = "CALIB_INVALID_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED:
+		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND:
+		errorTypeStringValue = "CONTOUR_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE:
+		errorTypeStringValue = "CONTOUR_TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW:
+		errorTypeStringValue = "CONTOUR_TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED:
+		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY:
+		errorTypeStringValue = "CONTOUR_INVALID_POLY";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND:
+		errorTypeStringValue = "REFERENCE_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF:
+		errorTypeStringValue = "REFERENCE_INVALID_REF";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED:
+		errorTypeStringValue = "REFERENCE_POS_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED:
+		errorTypeStringValue = "REFERENCE_DIST_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND:
+		errorTypeStringValue = "AREA_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND:
+		errorTypeStringValue = "AREA_GLUE_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED:
+		errorTypeStringValue = "AREA_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH:
+		errorTypeStringValue = "AREA_GAP_LENGTH";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	model.SetData("ErrorType", errorTypeStringValue, modelIndex);
+
+	if (!Results){
+		return false;
+	}
+	::imtbase::CTreeItemModel* newResultsModelPtr = model.AddTreeModel("Results", modelIndex);
+	newResultsModelPtr->setIsArray(true);
+	for (qsizetype resultsIndex = 0; resultsIndex < Results->size(); ++resultsIndex){
+		newResultsModelPtr->InsertNewItem();
+		if (!(Results->at(resultsIndex).WriteToModel(*newResultsModelPtr, resultsIndex))){
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+bool CArea::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant areaNameData = model.GetData("AreaName", modelIndex);
+	if (areaNameData.isNull()){
+		return false;
+	}
+	AreaName = areaNameData.toString();
+
+	QVariant statusData = model.GetData("Status", modelIndex);
+	if (statusData.isNull()){
+		return false;
+	}
+	QString statusStringValue = statusData.toString();
+	if(statusStringValue == "NONE"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(statusStringValue == "OK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(statusStringValue == "WARNING"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(statusStringValue == "NOK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(statusStringValue == "FAILED"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	::imtbase::CTreeItemModel* iconPositionDataModelPtr = model.GetTreeItemModel("IconPosition", modelIndex);
+	if (iconPositionDataModelPtr == nullptr){
+		return false;
+	}
+	IconPosition = CTTypes::CPoint::V1_0();
+	const bool isIconPositionReaded = IconPosition->ReadFromModel(*iconPositionDataModelPtr, modelIndex);
+	if (!isIconPositionReaded){
+		return false;
+	}
+
+
+	QVariant errorTypeData = model.GetData("ErrorType", modelIndex);
+	if (errorTypeData.isNull()){
+		return false;
+	}
+	QString errorTypeStringValue = errorTypeData.toString();
+	if(errorTypeStringValue == "OK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+	}
+	else if(errorTypeStringValue == "TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "TOLERANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+	}
+	else if(errorTypeStringValue == "TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "NO_DATA_GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+	}
+	else if(errorTypeStringValue == "GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+	}
+	else if(errorTypeStringValue == "TOO_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+	}
+	else if(errorTypeStringValue == "TOO_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+	}
+	else if(errorTypeStringValue == "TOO_FEW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+	}
+	else if(errorTypeStringValue == "TOO_MUCH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+	}
+	else if(errorTypeStringValue == "MISSING_DOTS"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+	}
+	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+	}
+	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+	}
+	else if(errorTypeStringValue == "TOO_BRIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+	}
+	else if(errorTypeStringValue == "TOO_DARK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+	}
+	else if(errorTypeStringValue == "COUNT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+	}
+	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+	}
+	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+	}
+	else if(errorTypeStringValue == "COLOR_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+	}
+	else if(errorTypeStringValue == "PATTERN_COUNT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+	}
+	else if(errorTypeStringValue == "PATTERN_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+	}
+	else if(errorTypeStringValue == "PATTERN_ROTATION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+	}
+	else if(errorTypeStringValue == "CENTERLINE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+	}
+	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+	}
+	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+	}
+	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+	}
+	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+	}
+	else {
+		return false;
+	}
+
+	::imtbase::CTreeItemModel* resultsModel = model.GetTreeItemModel("Results", modelIndex);
+	if (resultsModel == nullptr){
+		return false;
+	}
+	int resultsCount = resultsModel->GetItemsCount();
+	QList<CResult::V1_0> resultsList;
+	for (int resultsIndex = 0; resultsIndex < resultsCount; ++resultsIndex){
+		CResult::V1_0 results;
+		if (!results.ReadFromModel(*resultsModel, resultsIndex)){
+			return false;
+		}
+		resultsList << results;
+	}
+	Results = resultsList;
+
+
+	return true;
+}
+
+
+bool CArea::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant areaNameData = model.GetData("AreaName", modelIndex);
+	if (!areaNameData.isNull()){
+		AreaName = areaNameData.toString();
+	}
+
+	QVariant statusData = model.GetData("Status", modelIndex);
+	if (!statusData.isNull()){
+		QString statusStringValue = statusData.toString();
+		if(statusStringValue == "NONE"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(statusStringValue == "OK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(statusStringValue == "WARNING"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(statusStringValue == "NOK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(statusStringValue == "FAILED"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* iconPositionDataModelPtr = model.GetTreeItemModel("IconPosition", modelIndex);
+	if (iconPositionDataModelPtr != nullptr){
+		IconPosition = CTTypes::CPoint::V1_0();
+		const bool isIconPositionReaded = IconPosition->ReadFromModel(*iconPositionDataModelPtr, modelIndex);
+		if (!isIconPositionReaded){
+			return false;
+		}
+	}
+
+	QVariant errorTypeData = model.GetData("ErrorType", modelIndex);
+	if (!errorTypeData.isNull()){
+		QString errorTypeStringValue = errorTypeData.toString();
+		if(errorTypeStringValue == "OK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+		}
+		else if(errorTypeStringValue == "TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "TOLERANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+		}
+		else if(errorTypeStringValue == "TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "NO_DATA_GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+		}
+		else if(errorTypeStringValue == "GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+		}
+		else if(errorTypeStringValue == "TOO_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+		}
+		else if(errorTypeStringValue == "TOO_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+		}
+		else if(errorTypeStringValue == "TOO_FEW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+		}
+		else if(errorTypeStringValue == "TOO_MUCH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+		}
+		else if(errorTypeStringValue == "MISSING_DOTS"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+		}
+		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+		}
+		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		}
+		else if(errorTypeStringValue == "TOO_BRIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+		}
+		else if(errorTypeStringValue == "TOO_DARK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+		}
+		else if(errorTypeStringValue == "COUNT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+		}
+		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+		}
+		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+		}
+		else if(errorTypeStringValue == "COLOR_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+		}
+		else if(errorTypeStringValue == "PATTERN_COUNT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+		}
+		else if(errorTypeStringValue == "PATTERN_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+		}
+		else if(errorTypeStringValue == "PATTERN_ROTATION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+		}
+		else if(errorTypeStringValue == "CENTERLINE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+		}
+		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+		}
+		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+		}
+		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+		}
+		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+		}
+		else {
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* resultsModel = model.GetTreeItemModel("Results", modelIndex);
+	if (resultsModel != nullptr){
+		int resultsCount = resultsModel->GetItemsCount();
+		QList<CResult::V1_0> resultsList;
+		for (int resultsIndex = 0; resultsIndex < resultsCount; ++resultsIndex){
+			CResult::V1_0 results;
+			if (!results.OptReadFromModel(*resultsModel, resultsIndex)){
+				return false;
+			}
+			resultsList << results;
+		}
+		Results = resultsList;
+
+	}
+
+	return true;
+}
+
+
+bool CArea::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!AreaName){
+		return false;
+	}
+	gqlObject.InsertParam("AreaName", QVariant(*AreaName));
+
+	if (!Status){
+		return false;
+	}
+	QString statusStringValue;
+	switch (*Status){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		statusStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		statusStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		statusStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		statusStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		statusStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	gqlObject.InsertParam("Status", QVariant(statusStringValue));
+
+	if (!IconPosition){
+		return false;
+	}
+	::imtgql::CGqlParamObject iconPositionGqlObject;
+	const bool isIconPositionAdded = IconPosition->WriteToGraphQlObject(iconPositionGqlObject);
+	if (!isIconPositionAdded){
+		return false;
+	}
+	gqlObject.InsertParam("IconPosition", iconPositionGqlObject);
+
+	if (!ErrorType){
+		return false;
+	}
+	QString errorTypeStringValue;
+	switch (*ErrorType){
+	case ::sdl::complextest::CTTypes::ErrorCode::OK:
+		errorTypeStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE:
+		errorTypeStringValue = "TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE:
+		errorTypeStringValue = "TOLERANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW:
+		errorTypeStringValue = "TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP:
+		errorTypeStringValue = "NO_DATA_GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::GAP:
+		errorTypeStringValue = "GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH:
+		errorTypeStringValue = "TOO_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW:
+		errorTypeStringValue = "TOO_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW:
+		errorTypeStringValue = "TOO_FEW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH:
+		errorTypeStringValue = "TOO_MUCH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER:
+		errorTypeStringValue = "WRONG_DOT_DIAMETER";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION:
+		errorTypeStringValue = "WRONG_DOT_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS:
+		errorTypeStringValue = "MISSING_DOTS";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE:
+		errorTypeStringValue = "WRONG_DOT_DISTANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE:
+		errorTypeStringValue = "AREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE:
+		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE:
+		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA:
+		errorTypeStringValue = "WRONG_DOT_AREA";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME:
+		errorTypeStringValue = "WRONG_DOT_VOLUME";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT:
+		errorTypeStringValue = "WRONG_DOT_HEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT:
+		errorTypeStringValue = "TOO_BRIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK:
+		errorTypeStringValue = "TOO_DARK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR:
+		errorTypeStringValue = "COUNT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH:
+		errorTypeStringValue = "Z_DISTANCE_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW:
+		errorTypeStringValue = "Z_DISTANCE_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL:
+		errorTypeStringValue = "NOT_SYMMETRICAL";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR:
+		errorTypeStringValue = "REFERENCE_3D_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR:
+		errorTypeStringValue = "COLOR_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT:
+		errorTypeStringValue = "PATTERN_COUNT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION:
+		errorTypeStringValue = "PATTERN_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION:
+		errorTypeStringValue = "PATTERN_ROTATION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE:
+		errorTypeStringValue = "CENTERLINE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP:
+		errorTypeStringValue = "CALIB_ERROR_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP:
+		errorTypeStringValue = "CALIB_INVALID_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED:
+		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND:
+		errorTypeStringValue = "CONTOUR_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE:
+		errorTypeStringValue = "CONTOUR_TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW:
+		errorTypeStringValue = "CONTOUR_TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED:
+		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY:
+		errorTypeStringValue = "CONTOUR_INVALID_POLY";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND:
+		errorTypeStringValue = "REFERENCE_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF:
+		errorTypeStringValue = "REFERENCE_INVALID_REF";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED:
+		errorTypeStringValue = "REFERENCE_POS_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED:
+		errorTypeStringValue = "REFERENCE_DIST_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND:
+		errorTypeStringValue = "AREA_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND:
+		errorTypeStringValue = "AREA_GLUE_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED:
+		errorTypeStringValue = "AREA_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH:
+		errorTypeStringValue = "AREA_GAP_LENGTH";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	gqlObject.InsertParam("ErrorType", QVariant(errorTypeStringValue));
+
+	if (!Results){
+		return false;
+	}
+	QList<::imtgql::CGqlParamObject> resultsDataObjectList;
+	for (qsizetype resultsIndex = 0; resultsIndex < Results->size(); ++resultsIndex){
+		::imtgql::CGqlParamObject newResultsGqlObject;
+		if (!Results->at(resultsIndex).WriteToGraphQlObject(newResultsGqlObject)){
+			return false;
+		}
+		resultsDataObjectList << newResultsGqlObject;
+	}
+	gqlObject.InsertParam("Results", resultsDataObjectList);
+
+	return true;
+}
+
+
+bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (!gqlObject.ContainsParam("AreaName") || gqlObject["AreaName"].userType() != QMetaType::QString){
+		return false;
+	}
+	AreaName = gqlObject["AreaName"].toString();
+
+	if (!gqlObject.ContainsParam("Status") || gqlObject["Status"].userType() != QMetaType::QString){
+		return false;
+	}
+	const QString statusStringValue = gqlObject["Status"].toString();
+	if(statusStringValue == "NONE"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(statusStringValue == "OK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(statusStringValue == "WARNING"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(statusStringValue == "NOK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(statusStringValue == "FAILED"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (!gqlObject.ContainsParam("IconPosition") || gqlObject.GetParamArgumentObjectPtr("IconPosition") != nullptr){
+		return false;
+	}
+	IconPosition = CTTypes::CPoint::V1_0();
+	const bool isIconPositionReaded = IconPosition->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
+	if (!isIconPositionReaded){
+		return false;
+	}
+
+	if (!gqlObject.ContainsParam("ErrorType") || gqlObject["ErrorType"].userType() != QMetaType::QString){
+		return false;
+	}
+	const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
+	if(errorTypeStringValue == "OK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+	}
+	else if(errorTypeStringValue == "TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "TOLERANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+	}
+	else if(errorTypeStringValue == "TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "NO_DATA_GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+	}
+	else if(errorTypeStringValue == "GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+	}
+	else if(errorTypeStringValue == "TOO_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+	}
+	else if(errorTypeStringValue == "TOO_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+	}
+	else if(errorTypeStringValue == "TOO_FEW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+	}
+	else if(errorTypeStringValue == "TOO_MUCH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+	}
+	else if(errorTypeStringValue == "MISSING_DOTS"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+	}
+	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+	}
+	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+	}
+	else if(errorTypeStringValue == "TOO_BRIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+	}
+	else if(errorTypeStringValue == "TOO_DARK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+	}
+	else if(errorTypeStringValue == "COUNT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+	}
+	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+	}
+	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+	}
+	else if(errorTypeStringValue == "COLOR_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+	}
+	else if(errorTypeStringValue == "PATTERN_COUNT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+	}
+	else if(errorTypeStringValue == "PATTERN_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+	}
+	else if(errorTypeStringValue == "PATTERN_ROTATION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+	}
+	else if(errorTypeStringValue == "CENTERLINE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+	}
+	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+	}
+	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+	}
+	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+	}
+	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+	}
+	else {
+		return false;
+	}
+
+	if (!gqlObject.ContainsParam("Results") || gqlObject.GetObjectsCount("Results") <= 0){
+		return false;
+	}
+	const qsizetype resultsElementsCount = gqlObject.GetObjectsCount("results");
+	Results = QList<CResult::V1_0>();
+	for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
+		const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
+		if (resultsDataObjectPtr == nullptr){
+			return false;
+		}
+		CResult::V1_0 tempResults;
+		if (!tempResults.ReadFromGraphQlObject(*resultsDataObjectPtr)){
+			return false;
+		}
+		Results->append(tempResults);
+	}
+
+	return true;
+}
+
+
+bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("AreaName") && gqlObject["AreaName"].userType() == QMetaType::QString){
+		AreaName = gqlObject["AreaName"].toString();
+	}
+
+	if (gqlObject.ContainsParam("Status") && gqlObject["Status"].userType() == QMetaType::QString){
+		const QString statusStringValue = gqlObject["Status"].toString();
+		if(statusStringValue == "NONE"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(statusStringValue == "OK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(statusStringValue == "WARNING"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(statusStringValue == "NOK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(statusStringValue == "FAILED"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("IconPosition") && gqlObject.GetParamArgumentObjectPtr("IconPosition") == nullptr){
+		IconPosition = CTTypes::CPoint::V1_0();
+		const bool isIconPositionReaded = IconPosition->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
+		if (!isIconPositionReaded){
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("ErrorType") && gqlObject["ErrorType"].userType() == QMetaType::QString){
+		const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
+		if(errorTypeStringValue == "OK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+		}
+		else if(errorTypeStringValue == "TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "TOLERANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+		}
+		else if(errorTypeStringValue == "TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "NO_DATA_GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+		}
+		else if(errorTypeStringValue == "GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+		}
+		else if(errorTypeStringValue == "TOO_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+		}
+		else if(errorTypeStringValue == "TOO_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+		}
+		else if(errorTypeStringValue == "TOO_FEW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+		}
+		else if(errorTypeStringValue == "TOO_MUCH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+		}
+		else if(errorTypeStringValue == "MISSING_DOTS"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+		}
+		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+		}
+		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		}
+		else if(errorTypeStringValue == "TOO_BRIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+		}
+		else if(errorTypeStringValue == "TOO_DARK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+		}
+		else if(errorTypeStringValue == "COUNT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+		}
+		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+		}
+		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+		}
+		else if(errorTypeStringValue == "COLOR_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+		}
+		else if(errorTypeStringValue == "PATTERN_COUNT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+		}
+		else if(errorTypeStringValue == "PATTERN_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+		}
+		else if(errorTypeStringValue == "PATTERN_ROTATION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+		}
+		else if(errorTypeStringValue == "CENTERLINE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+		}
+		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+		}
+		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+		}
+		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+		}
+		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("Results") && gqlObject.GetObjectsCount("Results") > 0){
+		const qsizetype resultsElementsCount = gqlObject.GetObjectsCount("results");
+		Results = QList<CResult::V1_0>();
+		for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
+			const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
+			if (resultsDataObjectPtr == nullptr){
+				return false;
+			}
+			CResult::V1_0 tempResults;
+			if (!tempResults.OptReadFromGraphQlObject(*resultsDataObjectPtr)){
+				return false;
+			}
+			Results->append(tempResults);
+		}
+	}
+
+	return true;
+}
+
+
+bool CArea::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!AreaName){
+		return false;
+	}
+	jsonObject["AreaName"] = QJsonValue::fromVariant(*AreaName);
+
+	if (!Status){
+		return false;
+	}
+	QString statusStringValue;
+	switch (*Status){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		statusStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		statusStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		statusStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		statusStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		statusStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	jsonObject["Status"] = QJsonValue::fromVariant(statusStringValue);
+
+	if (!IconPosition){
+		return false;
+	}
+	QJsonObject iconPositionJsonObject;
+	const bool isIconPositionAdded = IconPosition->WriteToJsonObject(iconPositionJsonObject);
+	if (!isIconPositionAdded){
+		return false;
+	}
+	jsonObject["IconPosition"] = iconPositionJsonObject;
+
+	if (!ErrorType){
+		return false;
+	}
+	QString errorTypeStringValue;
+	switch (*ErrorType){
+	case ::sdl::complextest::CTTypes::ErrorCode::OK:
+		errorTypeStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE:
+		errorTypeStringValue = "TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE:
+		errorTypeStringValue = "TOLERANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW:
+		errorTypeStringValue = "TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP:
+		errorTypeStringValue = "NO_DATA_GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::GAP:
+		errorTypeStringValue = "GAP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH:
+		errorTypeStringValue = "TOO_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW:
+		errorTypeStringValue = "TOO_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW:
+		errorTypeStringValue = "TOO_FEW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH:
+		errorTypeStringValue = "TOO_MUCH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER:
+		errorTypeStringValue = "WRONG_DOT_DIAMETER";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION:
+		errorTypeStringValue = "WRONG_DOT_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS:
+		errorTypeStringValue = "MISSING_DOTS";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE:
+		errorTypeStringValue = "WRONG_DOT_DISTANCE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE:
+		errorTypeStringValue = "AREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE:
+		errorTypeStringValue = "TOTALAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE:
+		errorTypeStringValue = "BORDERAREA_TOO_LARGE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA:
+		errorTypeStringValue = "WRONG_DOT_AREA";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT:
+		errorTypeStringValue = "WRONG_DOT_AREA_ONHEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME:
+		errorTypeStringValue = "WRONG_DOT_VOLUME";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT:
+		errorTypeStringValue = "WRONG_DOT_HEIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR:
+		errorTypeStringValue = "CONTOUR_MEASUREMENT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT:
+		errorTypeStringValue = "TOO_BRIGHT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK:
+		errorTypeStringValue = "TOO_DARK";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR:
+		errorTypeStringValue = "COUNT_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH:
+		errorTypeStringValue = "Z_DISTANCE_HIGH";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW:
+		errorTypeStringValue = "Z_DISTANCE_LOW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL:
+		errorTypeStringValue = "NOT_SYMMETRICAL";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR:
+		errorTypeStringValue = "REFERENCE_3D_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR:
+		errorTypeStringValue = "COLOR_ERROR";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT:
+		errorTypeStringValue = "PATTERN_COUNT";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION:
+		errorTypeStringValue = "PATTERN_POSITION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION:
+		errorTypeStringValue = "PATTERN_ROTATION";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE:
+		errorTypeStringValue = "CENTERLINE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP:
+		errorTypeStringValue = "CALIB_ERROR_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP:
+		errorTypeStringValue = "CALIB_INVALID_COMP";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED:
+		errorTypeStringValue = "CALIB_NOZZLE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND:
+		errorTypeStringValue = "CONTOUR_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE:
+		errorTypeStringValue = "CONTOUR_TOO_WIDE";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW:
+		errorTypeStringValue = "CONTOUR_TOO_NARROW";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED:
+		errorTypeStringValue = "CONTOUR_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY:
+		errorTypeStringValue = "CONTOUR_INVALID_POLY";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND:
+		errorTypeStringValue = "REFERENCE_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF:
+		errorTypeStringValue = "REFERENCE_INVALID_REF";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED:
+		errorTypeStringValue = "REFERENCE_POS_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED:
+		errorTypeStringValue = "REFERENCE_DIST_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND:
+		errorTypeStringValue = "AREA_NOT_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND:
+		errorTypeStringValue = "AREA_GLUE_FOUND";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED:
+		errorTypeStringValue = "AREA_GLUE_MOVED";
+		break;
+	case ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH:
+		errorTypeStringValue = "AREA_GAP_LENGTH";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	jsonObject["ErrorType"] = QJsonValue::fromVariant(errorTypeStringValue);
+
+	if (!Results){
+		return false;
+	}
+	QJsonArray newResultsArray;
+	for (qsizetype resultsIndex = 0; resultsIndex < Results->size(); ++resultsIndex){
+		QJsonObject newResultsJsonObject;
+		if (!Results->at(resultsIndex).WriteToJsonObject(newResultsJsonObject)){
+			return false;
+		}
+		newResultsArray << newResultsJsonObject;
+	}
+	jsonObject["Results"] = newResultsArray;
+
+	return true;
+}
+
+
+bool CArea::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("AreaName") || ! jsonObject["AreaName"].isString()){
+		return false;
+	}
+	AreaName = jsonObject["AreaName"].toString();
+
+	if (!jsonObject.contains("Status") || ! jsonObject["Status"].isString()){
+		return false;
+	}
+	const QString statusStringValue = jsonObject["Status"].toString();
+	if(statusStringValue == "NONE"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(statusStringValue == "OK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(statusStringValue == "WARNING"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(statusStringValue == "NOK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(statusStringValue == "FAILED"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (!jsonObject.contains("IconPosition") || ! jsonObject["IconPosition"].isObject()){
+		return false;
+	}
+	IconPosition = CTTypes::CPoint::V1_0();
+	const bool isIconPositionReaded = IconPosition->ReadFromJsonObject(jsonObject["IconPosition"].toObject());
+	if (!isIconPositionReaded){
+		return false;
+	}
+
+	if (!jsonObject.contains("ErrorType") || ! jsonObject["ErrorType"].isString()){
+		return false;
+	}
+	const QString errorTypeStringValue = jsonObject["ErrorType"].toString();
+	if(errorTypeStringValue == "OK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+	}
+	else if(errorTypeStringValue == "TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "TOLERANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+	}
+	else if(errorTypeStringValue == "TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "NO_DATA_GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+	}
+	else if(errorTypeStringValue == "GAP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+	}
+	else if(errorTypeStringValue == "TOO_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+	}
+	else if(errorTypeStringValue == "TOO_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+	}
+	else if(errorTypeStringValue == "TOO_FEW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+	}
+	else if(errorTypeStringValue == "TOO_MUCH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+	}
+	else if(errorTypeStringValue == "MISSING_DOTS"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+	}
+	else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+	}
+	else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+	}
+	else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+	}
+	else if(errorTypeStringValue == "TOO_BRIGHT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+	}
+	else if(errorTypeStringValue == "TOO_DARK"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+	}
+	else if(errorTypeStringValue == "COUNT_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+	}
+	else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+	}
+	else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+	}
+	else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+	}
+	else if(errorTypeStringValue == "COLOR_ERROR"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+	}
+	else if(errorTypeStringValue == "PATTERN_COUNT"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+	}
+	else if(errorTypeStringValue == "PATTERN_POSITION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+	}
+	else if(errorTypeStringValue == "PATTERN_ROTATION"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+	}
+	else if(errorTypeStringValue == "CENTERLINE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+	}
+	else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+	}
+	else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+	}
+	else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+	}
+	else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+	}
+	else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+	}
+	else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+	}
+	else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+	}
+	else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+	}
+	else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+	}
+	else {
+		return false;
+	}
+
+	if (!jsonObject.contains("Results") || ! jsonObject["Results"].isArray()){
+		return false;
+	}
+	const QJsonArray resultsjsonArray = jsonObject["Results"].toArray();
+	const qsizetype resultsArrayCount = resultsjsonArray.size();
+	Results = QList<CResult::V1_0>();
+	for (qsizetype resultsIndex = 0; resultsIndex < resultsArrayCount; ++resultsIndex){
+		CResult::V1_0 tempResults;
+		if (!tempResults.ReadFromJsonObject(resultsjsonArray[resultsIndex].toObject())){
+			return false;
+		}
+		Results->append(tempResults);
+	}
+
+	return true;
+}
+
+
+bool CArea::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("AreaName") && jsonObject["AreaName"].isString()){
+		AreaName = jsonObject["AreaName"].toString();
+	}
+
+	if (jsonObject.contains("Status") && jsonObject["Status"].isString()){
+		const QString statusStringValue = jsonObject["Status"].toString();
+		if(statusStringValue == "NONE"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(statusStringValue == "OK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(statusStringValue == "WARNING"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(statusStringValue == "NOK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(statusStringValue == "FAILED"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("IconPosition") && jsonObject["IconPosition"].isObject()){
+		IconPosition = CTTypes::CPoint::V1_0();
+		const bool isIconPositionReaded = IconPosition->OptReadFromJsonObject(jsonObject["IconPosition"].toObject());
+		if (!isIconPositionReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("ErrorType") && jsonObject["ErrorType"].isString()){
+		const QString errorTypeStringValue = jsonObject["ErrorType"].toString();
+		if(errorTypeStringValue == "OK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
+		}
+		else if(errorTypeStringValue == "TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "TOLERANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOLERANCE;
+		}
+		else if(errorTypeStringValue == "TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "NO_DATA_GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NO_DATA_GAP;
+		}
+		else if(errorTypeStringValue == "GAP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::GAP;
+		}
+		else if(errorTypeStringValue == "TOO_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_HIGH;
+		}
+		else if(errorTypeStringValue == "TOO_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_LOW;
+		}
+		else if(errorTypeStringValue == "TOO_FEW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_FEW;
+		}
+		else if(errorTypeStringValue == "TOO_MUCH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_MUCH;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DIAMETER"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DIAMETER;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_POSITION;
+		}
+		else if(errorTypeStringValue == "MISSING_DOTS"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::MISSING_DOTS;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_DISTANCE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_DISTANCE;
+		}
+		else if(errorTypeStringValue == "AREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "TOTALAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOTALAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "BORDERAREA_TOO_LARGE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::BORDERAREA_TOO_LARGE;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_AREA_ONHEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_AREA_ONHEIGHT;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_VOLUME"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_VOLUME;
+		}
+		else if(errorTypeStringValue == "WRONG_DOT_HEIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::WRONG_DOT_HEIGHT;
+		}
+		else if(errorTypeStringValue == "CONTOUR_MEASUREMENT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_MEASUREMENT_ERROR;
+		}
+		else if(errorTypeStringValue == "TOO_BRIGHT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_BRIGHT;
+		}
+		else if(errorTypeStringValue == "TOO_DARK"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::TOO_DARK;
+		}
+		else if(errorTypeStringValue == "COUNT_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COUNT_ERROR;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_HIGH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_HIGH;
+		}
+		else if(errorTypeStringValue == "Z_DISTANCE_LOW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::Z_DISTANCE_LOW;
+		}
+		else if(errorTypeStringValue == "NOT_SYMMETRICAL"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::NOT_SYMMETRICAL;
+		}
+		else if(errorTypeStringValue == "REFERENCE_3D_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_3D_ERROR;
+		}
+		else if(errorTypeStringValue == "COLOR_ERROR"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::COLOR_ERROR;
+		}
+		else if(errorTypeStringValue == "PATTERN_COUNT"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_COUNT;
+		}
+		else if(errorTypeStringValue == "PATTERN_POSITION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_POSITION;
+		}
+		else if(errorTypeStringValue == "PATTERN_ROTATION"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::PATTERN_ROTATION;
+		}
+		else if(errorTypeStringValue == "CENTERLINE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CENTERLINE;
+		}
+		else if(errorTypeStringValue == "CALIB_ERROR_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_ERROR_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_INVALID_COMP"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_INVALID_COMP;
+		}
+		else if(errorTypeStringValue == "CALIB_NOZZLE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CALIB_NOZZLE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_WIDE"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_WIDE;
+		}
+		else if(errorTypeStringValue == "CONTOUR_TOO_NARROW"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_TOO_NARROW;
+		}
+		else if(errorTypeStringValue == "CONTOUR_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "CONTOUR_INVALID_POLY"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::CONTOUR_INVALID_POLY;
+		}
+		else if(errorTypeStringValue == "REFERENCE_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "REFERENCE_INVALID_REF"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_INVALID_REF;
+		}
+		else if(errorTypeStringValue == "REFERENCE_POS_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_POS_MOVED;
+		}
+		else if(errorTypeStringValue == "REFERENCE_DIST_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::REFERENCE_DIST_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_NOT_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_NOT_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_FOUND"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_FOUND;
+		}
+		else if(errorTypeStringValue == "AREA_GLUE_MOVED"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GLUE_MOVED;
+		}
+		else if(errorTypeStringValue == "AREA_GAP_LENGTH"){
+			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("Results") && jsonObject["Results"].isArray()){
+		const QJsonArray resultsjsonArray = jsonObject["Results"].toArray();
+		const qsizetype resultsArrayCount = resultsjsonArray.size();
+		Results = QList<CResult::V1_0>();
+		for (qsizetype resultsIndex = 0; resultsIndex < resultsArrayCount; ++resultsIndex){
+			CResult::V1_0 tempResults;
+			if (!tempResults.OptReadFromJsonObject(resultsjsonArray[resultsIndex].toObject())){
+				return false;
+			}
+			Results->append(tempResults);
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CArea::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CArea::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CArea::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CArea::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CArea::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CArea::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CArea::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CArea::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::complextest::CTImpl
+
+
+
+
+/// \file CAnalyzer.cpp
+
+namespace sdl::complextest::CTImpl
+{
+
+
+QByteArray CAnalyzer::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CAnalyzer::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				AnalyzerName == other.AnalyzerName &&
+				AnalyzerResult == other.AnalyzerResult &&
+				Areas == other.Areas;
+}
+
+
+bool CAnalyzer::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!AnalyzerName){
+		return false;
+	}
+	model.SetData("AnalyzerName", *AnalyzerName, modelIndex);
+
+	if (!AnalyzerResult){
+		return false;
+	}
+	QString analyzerResultStringValue;
+	switch (*AnalyzerResult){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		analyzerResultStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		analyzerResultStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		analyzerResultStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		analyzerResultStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		analyzerResultStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	model.SetData("AnalyzerResult", analyzerResultStringValue, modelIndex);
+
+	if (Areas){
+		::imtbase::CTreeItemModel* newAreasModelPtr = model.AddTreeModel("Areas", modelIndex);
+		newAreasModelPtr->setIsArray(true);
+		for (qsizetype areasIndex = 0; areasIndex < Areas->size(); ++areasIndex){
+			newAreasModelPtr->InsertNewItem();
+			if (!(Areas->at(areasIndex).WriteToModel(*newAreasModelPtr, areasIndex))){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CAnalyzer::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant analyzerNameData = model.GetData("AnalyzerName", modelIndex);
+	if (analyzerNameData.isNull()){
+		return false;
+	}
+	AnalyzerName = analyzerNameData.toString();
+
+	QVariant analyzerResultData = model.GetData("AnalyzerResult", modelIndex);
+	if (analyzerResultData.isNull()){
+		return false;
+	}
+	QString analyzerResultStringValue = analyzerResultData.toString();
+	if(analyzerResultStringValue == "NONE"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(analyzerResultStringValue == "OK"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(analyzerResultStringValue == "WARNING"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(analyzerResultStringValue == "NOK"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(analyzerResultStringValue == "FAILED"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	::imtbase::CTreeItemModel* areasModel = model.GetTreeItemModel("Areas", modelIndex);
+	if (areasModel != nullptr){
+		int areasCount = areasModel->GetItemsCount();
+		QList<CArea::V1_0> areasList;
+		for (int areasIndex = 0; areasIndex < areasCount; ++areasIndex){
+			CArea::V1_0 areas;
+			if (!areas.ReadFromModel(*areasModel, areasIndex)){
+				return false;
+			}
+			areasList << areas;
+		}
+		Areas = areasList;
+
+	}
+
+	return true;
+}
+
+
+bool CAnalyzer::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant analyzerNameData = model.GetData("AnalyzerName", modelIndex);
+	if (!analyzerNameData.isNull()){
+		AnalyzerName = analyzerNameData.toString();
+	}
+
+	QVariant analyzerResultData = model.GetData("AnalyzerResult", modelIndex);
+	if (!analyzerResultData.isNull()){
+		QString analyzerResultStringValue = analyzerResultData.toString();
+		if(analyzerResultStringValue == "NONE"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(analyzerResultStringValue == "OK"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(analyzerResultStringValue == "WARNING"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(analyzerResultStringValue == "NOK"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(analyzerResultStringValue == "FAILED"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* areasModel = model.GetTreeItemModel("Areas", modelIndex);
+	if (areasModel != nullptr){
+		int areasCount = areasModel->GetItemsCount();
+		QList<CArea::V1_0> areasList;
+		for (int areasIndex = 0; areasIndex < areasCount; ++areasIndex){
+			CArea::V1_0 areas;
+			if (!areas.OptReadFromModel(*areasModel, areasIndex)){
+				return false;
+			}
+			areasList << areas;
+		}
+		Areas = areasList;
+
+	}
+
+	return true;
+}
+
+
+bool CAnalyzer::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!AnalyzerName){
+		return false;
+	}
+	gqlObject.InsertParam("AnalyzerName", QVariant(*AnalyzerName));
+
+	if (!AnalyzerResult){
+		return false;
+	}
+	QString analyzerResultStringValue;
+	switch (*AnalyzerResult){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		analyzerResultStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		analyzerResultStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		analyzerResultStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		analyzerResultStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		analyzerResultStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	gqlObject.InsertParam("AnalyzerResult", QVariant(analyzerResultStringValue));
+
+	if (Areas){
+		QList<::imtgql::CGqlParamObject> areasDataObjectList;
+		for (qsizetype areasIndex = 0; areasIndex < Areas->size(); ++areasIndex){
+			::imtgql::CGqlParamObject newAreasGqlObject;
+			if (!Areas->at(areasIndex).WriteToGraphQlObject(newAreasGqlObject)){
+				return false;
+			}
+			areasDataObjectList << newAreasGqlObject;
+		}
+		gqlObject.InsertParam("Areas", areasDataObjectList);
+	}
+
+	return true;
+}
+
+
+bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (!gqlObject.ContainsParam("AnalyzerName") || gqlObject["AnalyzerName"].userType() != QMetaType::QString){
+		return false;
+	}
+	AnalyzerName = gqlObject["AnalyzerName"].toString();
+
+	if (!gqlObject.ContainsParam("AnalyzerResult") || gqlObject["AnalyzerResult"].userType() != QMetaType::QString){
+		return false;
+	}
+	const QString analyzerResultStringValue = gqlObject["AnalyzerResult"].toString();
+	if(analyzerResultStringValue == "NONE"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(analyzerResultStringValue == "OK"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(analyzerResultStringValue == "WARNING"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(analyzerResultStringValue == "NOK"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(analyzerResultStringValue == "FAILED"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (gqlObject.ContainsParam("Areas") && gqlObject.GetObjectsCount("Areas") > 0){
+		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("areas");
+		Areas = QList<CArea::V1_0>();
+		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
+			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
+			if (areasDataObjectPtr == nullptr){
+				return false;
+			}
+			CArea::V1_0 tempAreas;
+			if (!tempAreas.ReadFromGraphQlObject(*areasDataObjectPtr)){
+				return false;
+			}
+			Areas->append(tempAreas);
+		}
+	}
+
+	return true;
+}
+
+
+bool CAnalyzer::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("AnalyzerName") && gqlObject["AnalyzerName"].userType() == QMetaType::QString){
+		AnalyzerName = gqlObject["AnalyzerName"].toString();
+	}
+
+	if (gqlObject.ContainsParam("AnalyzerResult") && gqlObject["AnalyzerResult"].userType() == QMetaType::QString){
+		const QString analyzerResultStringValue = gqlObject["AnalyzerResult"].toString();
+		if(analyzerResultStringValue == "NONE"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(analyzerResultStringValue == "OK"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(analyzerResultStringValue == "WARNING"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(analyzerResultStringValue == "NOK"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(analyzerResultStringValue == "FAILED"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("Areas") && gqlObject.GetObjectsCount("Areas") > 0){
+		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("areas");
+		Areas = QList<CArea::V1_0>();
+		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
+			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
+			if (areasDataObjectPtr == nullptr){
+				return false;
+			}
+			CArea::V1_0 tempAreas;
+			if (!tempAreas.OptReadFromGraphQlObject(*areasDataObjectPtr)){
+				return false;
+			}
+			Areas->append(tempAreas);
+		}
+	}
+
+	return true;
+}
+
+
+bool CAnalyzer::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!AnalyzerName){
+		return false;
+	}
+	jsonObject["AnalyzerName"] = QJsonValue::fromVariant(*AnalyzerName);
+
+	if (!AnalyzerResult){
+		return false;
+	}
+	QString analyzerResultStringValue;
+	switch (*AnalyzerResult){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		analyzerResultStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		analyzerResultStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		analyzerResultStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		analyzerResultStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		analyzerResultStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	jsonObject["AnalyzerResult"] = QJsonValue::fromVariant(analyzerResultStringValue);
+
+	if (Areas){
+		QJsonArray newAreasArray;
+		for (qsizetype areasIndex = 0; areasIndex < Areas->size(); ++areasIndex){
+			QJsonObject newAreasJsonObject;
+			if (!Areas->at(areasIndex).WriteToJsonObject(newAreasJsonObject)){
+				return false;
+			}
+			newAreasArray << newAreasJsonObject;
+		}
+		jsonObject["Areas"] = newAreasArray;
+	}
+
+	return true;
+}
+
+
+bool CAnalyzer::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("AnalyzerName") || ! jsonObject["AnalyzerName"].isString()){
+		return false;
+	}
+	AnalyzerName = jsonObject["AnalyzerName"].toString();
+
+	if (!jsonObject.contains("AnalyzerResult") || ! jsonObject["AnalyzerResult"].isString()){
+		return false;
+	}
+	const QString analyzerResultStringValue = jsonObject["AnalyzerResult"].toString();
+	if(analyzerResultStringValue == "NONE"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(analyzerResultStringValue == "OK"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(analyzerResultStringValue == "WARNING"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(analyzerResultStringValue == "NOK"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(analyzerResultStringValue == "FAILED"){
+		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (jsonObject.contains("Areas") && jsonObject["Areas"].isArray()){
+		const QJsonArray areasjsonArray = jsonObject["Areas"].toArray();
+		const qsizetype areasArrayCount = areasjsonArray.size();
+		Areas = QList<CArea::V1_0>();
+		for (qsizetype areasIndex = 0; areasIndex < areasArrayCount; ++areasIndex){
+			CArea::V1_0 tempAreas;
+			if (!tempAreas.ReadFromJsonObject(areasjsonArray[areasIndex].toObject())){
+				return false;
+			}
+			Areas->append(tempAreas);
+		}
+	}
+
+	return true;
+}
+
+
+bool CAnalyzer::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("AnalyzerName") && jsonObject["AnalyzerName"].isString()){
+		AnalyzerName = jsonObject["AnalyzerName"].toString();
+	}
+
+	if (jsonObject.contains("AnalyzerResult") && jsonObject["AnalyzerResult"].isString()){
+		const QString analyzerResultStringValue = jsonObject["AnalyzerResult"].toString();
+		if(analyzerResultStringValue == "NONE"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(analyzerResultStringValue == "OK"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(analyzerResultStringValue == "WARNING"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(analyzerResultStringValue == "NOK"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(analyzerResultStringValue == "FAILED"){
+			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("Areas") && jsonObject["Areas"].isArray()){
+		const QJsonArray areasjsonArray = jsonObject["Areas"].toArray();
+		const qsizetype areasArrayCount = areasjsonArray.size();
+		Areas = QList<CArea::V1_0>();
+		for (qsizetype areasIndex = 0; areasIndex < areasArrayCount; ++areasIndex){
+			CArea::V1_0 tempAreas;
+			if (!tempAreas.OptReadFromJsonObject(areasjsonArray[areasIndex].toObject())){
+				return false;
+			}
+			Areas->append(tempAreas);
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CAnalyzer::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CAnalyzer::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CAnalyzer::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CAnalyzer::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CAnalyzer::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CAnalyzer::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CAnalyzer::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CAnalyzer::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CAnalyzer::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::complextest::CTImpl
+
+
+
+
+/// \file CInspection.cpp
+
+namespace sdl::complextest::CTImpl
+{
+
+
+QByteArray CInspection::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CInspection::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				ID == other.ID &&
+				TypeID == other.TypeID &&
+				Name == other.Name &&
+				Status == other.Status &&
+				Analyzers == other.Analyzers;
+}
+
+
+bool CInspection::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!ID){
+		return false;
+	}
+	model.SetData("ID", *ID, modelIndex);
+
+	if (!TypeID){
+		return false;
+	}
+	model.SetData("TypeID", *TypeID, modelIndex);
+
+	if (!Name){
+		return false;
+	}
+	model.SetData("Name", *Name, modelIndex);
+
+	if (!Status){
+		return false;
+	}
+	QString statusStringValue;
+	switch (*Status){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		statusStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		statusStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		statusStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		statusStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		statusStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	model.SetData("Status", statusStringValue, modelIndex);
+
+	if (Analyzers){
+		::imtbase::CTreeItemModel* newAnalyzersModelPtr = model.AddTreeModel("Analyzers", modelIndex);
+		newAnalyzersModelPtr->setIsArray(true);
+		for (qsizetype analyzersIndex = 0; analyzersIndex < Analyzers->size(); ++analyzersIndex){
+			newAnalyzersModelPtr->InsertNewItem();
+			if (!(Analyzers->at(analyzersIndex).WriteToModel(*newAnalyzersModelPtr, analyzersIndex))){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CInspection::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant iDData = model.GetData("ID", modelIndex);
+	if (iDData.isNull()){
+		return false;
+	}
+	ID = iDData.toString();
+
+	QVariant typeIDData = model.GetData("TypeID", modelIndex);
+	if (typeIDData.isNull()){
+		return false;
+	}
+	TypeID = typeIDData.toString();
+
+	QVariant nameData = model.GetData("Name", modelIndex);
+	if (nameData.isNull()){
+		return false;
+	}
+	Name = nameData.toString();
+
+	QVariant statusData = model.GetData("Status", modelIndex);
+	if (statusData.isNull()){
+		return false;
+	}
+	QString statusStringValue = statusData.toString();
+	if(statusStringValue == "NONE"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(statusStringValue == "OK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(statusStringValue == "WARNING"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(statusStringValue == "NOK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(statusStringValue == "FAILED"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	::imtbase::CTreeItemModel* analyzersModel = model.GetTreeItemModel("Analyzers", modelIndex);
+	if (analyzersModel != nullptr){
+		int analyzersCount = analyzersModel->GetItemsCount();
+		QList<CAnalyzer::V1_0> analyzersList;
+		for (int analyzersIndex = 0; analyzersIndex < analyzersCount; ++analyzersIndex){
+			CAnalyzer::V1_0 analyzers;
+			if (!analyzers.ReadFromModel(*analyzersModel, analyzersIndex)){
+				return false;
+			}
+			analyzersList << analyzers;
+		}
+		Analyzers = analyzersList;
+
+	}
+
+	return true;
+}
+
+
+bool CInspection::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant iDData = model.GetData("ID", modelIndex);
+	if (!iDData.isNull()){
+		ID = iDData.toString();
+	}
+
+	QVariant typeIDData = model.GetData("TypeID", modelIndex);
+	if (!typeIDData.isNull()){
+		TypeID = typeIDData.toString();
+	}
+
+	QVariant nameData = model.GetData("Name", modelIndex);
+	if (!nameData.isNull()){
+		Name = nameData.toString();
+	}
+
+	QVariant statusData = model.GetData("Status", modelIndex);
+	if (!statusData.isNull()){
+		QString statusStringValue = statusData.toString();
+		if(statusStringValue == "NONE"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(statusStringValue == "OK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(statusStringValue == "WARNING"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(statusStringValue == "NOK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(statusStringValue == "FAILED"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* analyzersModel = model.GetTreeItemModel("Analyzers", modelIndex);
+	if (analyzersModel != nullptr){
+		int analyzersCount = analyzersModel->GetItemsCount();
+		QList<CAnalyzer::V1_0> analyzersList;
+		for (int analyzersIndex = 0; analyzersIndex < analyzersCount; ++analyzersIndex){
+			CAnalyzer::V1_0 analyzers;
+			if (!analyzers.OptReadFromModel(*analyzersModel, analyzersIndex)){
+				return false;
+			}
+			analyzersList << analyzers;
+		}
+		Analyzers = analyzersList;
+
+	}
+
+	return true;
+}
+
+
+bool CInspection::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!ID){
+		return false;
+	}
+	gqlObject.InsertParam("ID", QVariant(*ID));
+
+	if (!TypeID){
+		return false;
+	}
+	gqlObject.InsertParam("TypeID", QVariant(*TypeID));
+
+	if (!Name){
+		return false;
+	}
+	gqlObject.InsertParam("Name", QVariant(*Name));
+
+	if (!Status){
+		return false;
+	}
+	QString statusStringValue;
+	switch (*Status){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		statusStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		statusStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		statusStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		statusStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		statusStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	gqlObject.InsertParam("Status", QVariant(statusStringValue));
+
+	if (Analyzers){
+		QList<::imtgql::CGqlParamObject> analyzersDataObjectList;
+		for (qsizetype analyzersIndex = 0; analyzersIndex < Analyzers->size(); ++analyzersIndex){
+			::imtgql::CGqlParamObject newAnalyzersGqlObject;
+			if (!Analyzers->at(analyzersIndex).WriteToGraphQlObject(newAnalyzersGqlObject)){
+				return false;
+			}
+			analyzersDataObjectList << newAnalyzersGqlObject;
+		}
+		gqlObject.InsertParam("Analyzers", analyzersDataObjectList);
+	}
+
+	return true;
+}
+
+
+bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (!gqlObject.ContainsParam("ID") || gqlObject["ID"].userType() != QMetaType::QString){
+		return false;
+	}
+	ID = gqlObject["ID"].toString();
+
+	if (!gqlObject.ContainsParam("TypeID") || gqlObject["TypeID"].userType() != QMetaType::QString){
+		return false;
+	}
+	TypeID = gqlObject["TypeID"].toString();
+
+	if (!gqlObject.ContainsParam("Name") || gqlObject["Name"].userType() != QMetaType::QString){
+		return false;
+	}
+	Name = gqlObject["Name"].toString();
+
+	if (!gqlObject.ContainsParam("Status") || gqlObject["Status"].userType() != QMetaType::QString){
+		return false;
+	}
+	const QString statusStringValue = gqlObject["Status"].toString();
+	if(statusStringValue == "NONE"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(statusStringValue == "OK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(statusStringValue == "WARNING"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(statusStringValue == "NOK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(statusStringValue == "FAILED"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (gqlObject.ContainsParam("Analyzers") && gqlObject.GetObjectsCount("Analyzers") > 0){
+		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("analyzers");
+		Analyzers = QList<CAnalyzer::V1_0>();
+		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
+			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
+			if (analyzersDataObjectPtr == nullptr){
+				return false;
+			}
+			CAnalyzer::V1_0 tempAnalyzers;
+			if (!tempAnalyzers.ReadFromGraphQlObject(*analyzersDataObjectPtr)){
+				return false;
+			}
+			Analyzers->append(tempAnalyzers);
+		}
+	}
+
+	return true;
+}
+
+
+bool CInspection::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("ID") && gqlObject["ID"].userType() == QMetaType::QString){
+		ID = gqlObject["ID"].toString();
+	}
+
+	if (gqlObject.ContainsParam("TypeID") && gqlObject["TypeID"].userType() == QMetaType::QString){
+		TypeID = gqlObject["TypeID"].toString();
+	}
+
+	if (gqlObject.ContainsParam("Name") && gqlObject["Name"].userType() == QMetaType::QString){
+		Name = gqlObject["Name"].toString();
+	}
+
+	if (gqlObject.ContainsParam("Status") && gqlObject["Status"].userType() == QMetaType::QString){
+		const QString statusStringValue = gqlObject["Status"].toString();
+		if(statusStringValue == "NONE"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(statusStringValue == "OK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(statusStringValue == "WARNING"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(statusStringValue == "NOK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(statusStringValue == "FAILED"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("Analyzers") && gqlObject.GetObjectsCount("Analyzers") > 0){
+		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("analyzers");
+		Analyzers = QList<CAnalyzer::V1_0>();
+		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
+			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
+			if (analyzersDataObjectPtr == nullptr){
+				return false;
+			}
+			CAnalyzer::V1_0 tempAnalyzers;
+			if (!tempAnalyzers.OptReadFromGraphQlObject(*analyzersDataObjectPtr)){
+				return false;
+			}
+			Analyzers->append(tempAnalyzers);
+		}
+	}
+
+	return true;
+}
+
+
+bool CInspection::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!ID){
+		return false;
+	}
+	jsonObject["ID"] = QJsonValue::fromVariant(*ID);
+
+	if (!TypeID){
+		return false;
+	}
+	jsonObject["TypeID"] = QJsonValue::fromVariant(*TypeID);
+
+	if (!Name){
+		return false;
+	}
+	jsonObject["Name"] = QJsonValue::fromVariant(*Name);
+
+	if (!Status){
+		return false;
+	}
+	QString statusStringValue;
+	switch (*Status){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		statusStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		statusStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		statusStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		statusStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		statusStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	jsonObject["Status"] = QJsonValue::fromVariant(statusStringValue);
+
+	if (Analyzers){
+		QJsonArray newAnalyzersArray;
+		for (qsizetype analyzersIndex = 0; analyzersIndex < Analyzers->size(); ++analyzersIndex){
+			QJsonObject newAnalyzersJsonObject;
+			if (!Analyzers->at(analyzersIndex).WriteToJsonObject(newAnalyzersJsonObject)){
+				return false;
+			}
+			newAnalyzersArray << newAnalyzersJsonObject;
+		}
+		jsonObject["Analyzers"] = newAnalyzersArray;
+	}
+
+	return true;
+}
+
+
+bool CInspection::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("ID") || ! jsonObject["ID"].isString()){
+		return false;
+	}
+	ID = jsonObject["ID"].toString();
+
+	if (!jsonObject.contains("TypeID") || ! jsonObject["TypeID"].isString()){
+		return false;
+	}
+	TypeID = jsonObject["TypeID"].toString();
+
+	if (!jsonObject.contains("Name") || ! jsonObject["Name"].isString()){
+		return false;
+	}
+	Name = jsonObject["Name"].toString();
+
+	if (!jsonObject.contains("Status") || ! jsonObject["Status"].isString()){
+		return false;
+	}
+	const QString statusStringValue = jsonObject["Status"].toString();
+	if(statusStringValue == "NONE"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(statusStringValue == "OK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(statusStringValue == "WARNING"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(statusStringValue == "NOK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(statusStringValue == "FAILED"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (jsonObject.contains("Analyzers") && jsonObject["Analyzers"].isArray()){
+		const QJsonArray analyzersjsonArray = jsonObject["Analyzers"].toArray();
+		const qsizetype analyzersArrayCount = analyzersjsonArray.size();
+		Analyzers = QList<CAnalyzer::V1_0>();
+		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersArrayCount; ++analyzersIndex){
+			CAnalyzer::V1_0 tempAnalyzers;
+			if (!tempAnalyzers.ReadFromJsonObject(analyzersjsonArray[analyzersIndex].toObject())){
+				return false;
+			}
+			Analyzers->append(tempAnalyzers);
+		}
+	}
+
+	return true;
+}
+
+
+bool CInspection::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("ID") && jsonObject["ID"].isString()){
+		ID = jsonObject["ID"].toString();
+	}
+
+	if (jsonObject.contains("TypeID") && jsonObject["TypeID"].isString()){
+		TypeID = jsonObject["TypeID"].toString();
+	}
+
+	if (jsonObject.contains("Name") && jsonObject["Name"].isString()){
+		Name = jsonObject["Name"].toString();
+	}
+
+	if (jsonObject.contains("Status") && jsonObject["Status"].isString()){
+		const QString statusStringValue = jsonObject["Status"].toString();
+		if(statusStringValue == "NONE"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(statusStringValue == "OK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(statusStringValue == "WARNING"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(statusStringValue == "NOK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(statusStringValue == "FAILED"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("Analyzers") && jsonObject["Analyzers"].isArray()){
+		const QJsonArray analyzersjsonArray = jsonObject["Analyzers"].toArray();
+		const qsizetype analyzersArrayCount = analyzersjsonArray.size();
+		Analyzers = QList<CAnalyzer::V1_0>();
+		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersArrayCount; ++analyzersIndex){
+			CAnalyzer::V1_0 tempAnalyzers;
+			if (!tempAnalyzers.OptReadFromJsonObject(analyzersjsonArray[analyzersIndex].toObject())){
+				return false;
+			}
+			Analyzers->append(tempAnalyzers);
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CInspection::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CInspection::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CInspection::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CInspection::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CInspection::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CInspection::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CInspection::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CInspection::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CInspection::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::complextest::CTImpl
+
+
+
+
+/// \file CProductOverview.cpp
+
+namespace sdl::complextest::CTImpl
+{
+
+
+QByteArray CProductOverview::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CProductOverview::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				ProductID == other.ProductID &&
+				Name == other.Name &&
+				Status == other.Status &&
+				PartSerialNumber == other.PartSerialNumber &&
+				Timestamp == other.Timestamp &&
+				ProductImage == other.ProductImage &&
+				Inspections == other.Inspections;
+}
+
+
+bool CProductOverview::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!ProductID){
+		return false;
+	}
+	model.SetData("ProductID", *ProductID, modelIndex);
+
+	if (!Name){
+		return false;
+	}
+	model.SetData("Name", *Name, modelIndex);
+
+	if (!Status){
+		return false;
+	}
+	QString statusStringValue;
+	switch (*Status){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		statusStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		statusStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		statusStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		statusStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		statusStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	model.SetData("Status", statusStringValue, modelIndex);
+
+	if (!PartSerialNumber){
+		return false;
+	}
+	model.SetData("PartSerialNumber", *PartSerialNumber, modelIndex);
+
+	if (!Timestamp){
+		return false;
+	}
+	model.SetData("Timestamp", *Timestamp, modelIndex);
+
+	if (!ProductImage){
+		return false;
+	}
+	model.SetData("ProductImage", *ProductImage, modelIndex);
+
+	if (Inspections){
+		::imtbase::CTreeItemModel* newInspectionsModelPtr = model.AddTreeModel("Inspections", modelIndex);
+		newInspectionsModelPtr->setIsArray(true);
+		for (qsizetype inspectionsIndex = 0; inspectionsIndex < Inspections->size(); ++inspectionsIndex){
+			newInspectionsModelPtr->InsertNewItem();
+			if (!(Inspections->at(inspectionsIndex).WriteToModel(*newInspectionsModelPtr, inspectionsIndex))){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CProductOverview::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant productIDData = model.GetData("ProductID", modelIndex);
+	if (productIDData.isNull()){
+		return false;
+	}
+	ProductID = productIDData.toInt();
+
+	QVariant nameData = model.GetData("Name", modelIndex);
+	if (nameData.isNull()){
+		return false;
+	}
+	Name = nameData.toString();
+
+	QVariant statusData = model.GetData("Status", modelIndex);
+	if (statusData.isNull()){
+		return false;
+	}
+	QString statusStringValue = statusData.toString();
+	if(statusStringValue == "NONE"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(statusStringValue == "OK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(statusStringValue == "WARNING"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(statusStringValue == "NOK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(statusStringValue == "FAILED"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	QVariant partSerialNumberData = model.GetData("PartSerialNumber", modelIndex);
+	if (partSerialNumberData.isNull()){
+		return false;
+	}
+	PartSerialNumber = partSerialNumberData.toString();
+
+	QVariant timestampData = model.GetData("Timestamp", modelIndex);
+	if (timestampData.isNull()){
+		return false;
+	}
+	Timestamp = timestampData.toString();
+
+	QVariant productImageData = model.GetData("ProductImage", modelIndex);
+	if (productImageData.isNull()){
+		return false;
+	}
+	ProductImage = productImageData.toString();
+
+	::imtbase::CTreeItemModel* inspectionsModel = model.GetTreeItemModel("Inspections", modelIndex);
+	if (inspectionsModel != nullptr){
+		int inspectionsCount = inspectionsModel->GetItemsCount();
+		QList<CInspection::V1_0> inspectionsList;
+		for (int inspectionsIndex = 0; inspectionsIndex < inspectionsCount; ++inspectionsIndex){
+			CInspection::V1_0 inspections;
+			if (!inspections.ReadFromModel(*inspectionsModel, inspectionsIndex)){
+				return false;
+			}
+			inspectionsList << inspections;
+		}
+		Inspections = inspectionsList;
+
+	}
+
+	return true;
+}
+
+
+bool CProductOverview::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant productIDData = model.GetData("ProductID", modelIndex);
+	if (!productIDData.isNull()){
+		ProductID = productIDData.toInt();
+	}
+
+	QVariant nameData = model.GetData("Name", modelIndex);
+	if (!nameData.isNull()){
+		Name = nameData.toString();
+	}
+
+	QVariant statusData = model.GetData("Status", modelIndex);
+	if (!statusData.isNull()){
+		QString statusStringValue = statusData.toString();
+		if(statusStringValue == "NONE"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(statusStringValue == "OK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(statusStringValue == "WARNING"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(statusStringValue == "NOK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(statusStringValue == "FAILED"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	QVariant partSerialNumberData = model.GetData("PartSerialNumber", modelIndex);
+	if (!partSerialNumberData.isNull()){
+		PartSerialNumber = partSerialNumberData.toString();
+	}
+
+	QVariant timestampData = model.GetData("Timestamp", modelIndex);
+	if (!timestampData.isNull()){
+		Timestamp = timestampData.toString();
+	}
+
+	QVariant productImageData = model.GetData("ProductImage", modelIndex);
+	if (!productImageData.isNull()){
+		ProductImage = productImageData.toString();
+	}
+
+	::imtbase::CTreeItemModel* inspectionsModel = model.GetTreeItemModel("Inspections", modelIndex);
+	if (inspectionsModel != nullptr){
+		int inspectionsCount = inspectionsModel->GetItemsCount();
+		QList<CInspection::V1_0> inspectionsList;
+		for (int inspectionsIndex = 0; inspectionsIndex < inspectionsCount; ++inspectionsIndex){
+			CInspection::V1_0 inspections;
+			if (!inspections.OptReadFromModel(*inspectionsModel, inspectionsIndex)){
+				return false;
+			}
+			inspectionsList << inspections;
+		}
+		Inspections = inspectionsList;
+
+	}
+
+	return true;
+}
+
+
+bool CProductOverview::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!ProductID){
+		return false;
+	}
+	gqlObject.InsertParam("ProductID", QVariant(*ProductID));
+
+	if (!Name){
+		return false;
+	}
+	gqlObject.InsertParam("Name", QVariant(*Name));
+
+	if (!Status){
+		return false;
+	}
+	QString statusStringValue;
+	switch (*Status){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		statusStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		statusStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		statusStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		statusStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		statusStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	gqlObject.InsertParam("Status", QVariant(statusStringValue));
+
+	if (!PartSerialNumber){
+		return false;
+	}
+	gqlObject.InsertParam("PartSerialNumber", QVariant(*PartSerialNumber));
+
+	if (!Timestamp){
+		return false;
+	}
+	gqlObject.InsertParam("Timestamp", QVariant(*Timestamp));
+
+	if (!ProductImage){
+		return false;
+	}
+	gqlObject.InsertParam("ProductImage", QVariant(*ProductImage));
+
+	if (Inspections){
+		QList<::imtgql::CGqlParamObject> inspectionsDataObjectList;
+		for (qsizetype inspectionsIndex = 0; inspectionsIndex < Inspections->size(); ++inspectionsIndex){
+			::imtgql::CGqlParamObject newInspectionsGqlObject;
+			if (!Inspections->at(inspectionsIndex).WriteToGraphQlObject(newInspectionsGqlObject)){
+				return false;
+			}
+			inspectionsDataObjectList << newInspectionsGqlObject;
+		}
+		gqlObject.InsertParam("Inspections", inspectionsDataObjectList);
+	}
+
+	return true;
+}
+
+
+bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (!gqlObject.ContainsParam("ProductID") || gqlObject["ProductID"].userType() != QMetaType::Double){
+		return false;
+	}
+	ProductID = gqlObject["ProductID"].toInt();
+
+	if (!gqlObject.ContainsParam("Name") || gqlObject["Name"].userType() != QMetaType::QString){
+		return false;
+	}
+	Name = gqlObject["Name"].toString();
+
+	if (!gqlObject.ContainsParam("Status") || gqlObject["Status"].userType() != QMetaType::QString){
+		return false;
+	}
+	const QString statusStringValue = gqlObject["Status"].toString();
+	if(statusStringValue == "NONE"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(statusStringValue == "OK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(statusStringValue == "WARNING"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(statusStringValue == "NOK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(statusStringValue == "FAILED"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (!gqlObject.ContainsParam("PartSerialNumber") || gqlObject["PartSerialNumber"].userType() != QMetaType::QString){
+		return false;
+	}
+	PartSerialNumber = gqlObject["PartSerialNumber"].toString();
+
+	if (!gqlObject.ContainsParam("Timestamp") || gqlObject["Timestamp"].userType() != QMetaType::QString){
+		return false;
+	}
+	Timestamp = gqlObject["Timestamp"].toString();
+
+	if (!gqlObject.ContainsParam("ProductImage") || gqlObject["ProductImage"].userType() != QMetaType::QString){
+		return false;
+	}
+	ProductImage = gqlObject["ProductImage"].toString();
+
+	if (gqlObject.ContainsParam("Inspections") && gqlObject.GetObjectsCount("Inspections") > 0){
+		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("inspections");
+		Inspections = QList<CInspection::V1_0>();
+		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
+			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
+			if (inspectionsDataObjectPtr == nullptr){
+				return false;
+			}
+			CInspection::V1_0 tempInspections;
+			if (!tempInspections.ReadFromGraphQlObject(*inspectionsDataObjectPtr)){
+				return false;
+			}
+			Inspections->append(tempInspections);
+		}
+	}
+
+	return true;
+}
+
+
+bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("ProductID") && gqlObject["ProductID"].userType() == QMetaType::Double){
+		ProductID = gqlObject["ProductID"].toInt();
+	}
+
+	if (gqlObject.ContainsParam("Name") && gqlObject["Name"].userType() == QMetaType::QString){
+		Name = gqlObject["Name"].toString();
+	}
+
+	if (gqlObject.ContainsParam("Status") && gqlObject["Status"].userType() == QMetaType::QString){
+		const QString statusStringValue = gqlObject["Status"].toString();
+		if(statusStringValue == "NONE"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(statusStringValue == "OK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(statusStringValue == "WARNING"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(statusStringValue == "NOK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(statusStringValue == "FAILED"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (gqlObject.ContainsParam("PartSerialNumber") && gqlObject["PartSerialNumber"].userType() == QMetaType::QString){
+		PartSerialNumber = gqlObject["PartSerialNumber"].toString();
+	}
+
+	if (gqlObject.ContainsParam("Timestamp") && gqlObject["Timestamp"].userType() == QMetaType::QString){
+		Timestamp = gqlObject["Timestamp"].toString();
+	}
+
+	if (gqlObject.ContainsParam("ProductImage") && gqlObject["ProductImage"].userType() == QMetaType::QString){
+		ProductImage = gqlObject["ProductImage"].toString();
+	}
+
+	if (gqlObject.ContainsParam("Inspections") && gqlObject.GetObjectsCount("Inspections") > 0){
+		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("inspections");
+		Inspections = QList<CInspection::V1_0>();
+		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
+			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
+			if (inspectionsDataObjectPtr == nullptr){
+				return false;
+			}
+			CInspection::V1_0 tempInspections;
+			if (!tempInspections.OptReadFromGraphQlObject(*inspectionsDataObjectPtr)){
+				return false;
+			}
+			Inspections->append(tempInspections);
+		}
+	}
+
+	return true;
+}
+
+
+bool CProductOverview::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!ProductID){
+		return false;
+	}
+	jsonObject["ProductID"] = QJsonValue::fromVariant(*ProductID);
+
+	if (!Name){
+		return false;
+	}
+	jsonObject["Name"] = QJsonValue::fromVariant(*Name);
+
+	if (!Status){
+		return false;
+	}
+	QString statusStringValue;
+	switch (*Status){
+	case ::sdl::complextest::CTTypes::StatusCode::NONE:
+		statusStringValue = "NONE";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::OK:
+		statusStringValue = "OK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::WARNING:
+		statusStringValue = "WARNING";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::NOK:
+		statusStringValue = "NOK";
+		break;
+	case ::sdl::complextest::CTTypes::StatusCode::FAILED:
+		statusStringValue = "FAILED";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+	jsonObject["Status"] = QJsonValue::fromVariant(statusStringValue);
+
+	if (!PartSerialNumber){
+		return false;
+	}
+	jsonObject["PartSerialNumber"] = QJsonValue::fromVariant(*PartSerialNumber);
+
+	if (!Timestamp){
+		return false;
+	}
+	jsonObject["Timestamp"] = QJsonValue::fromVariant(*Timestamp);
+
+	if (!ProductImage){
+		return false;
+	}
+	jsonObject["ProductImage"] = QJsonValue::fromVariant(*ProductImage);
+
+	if (Inspections){
+		QJsonArray newInspectionsArray;
+		for (qsizetype inspectionsIndex = 0; inspectionsIndex < Inspections->size(); ++inspectionsIndex){
+			QJsonObject newInspectionsJsonObject;
+			if (!Inspections->at(inspectionsIndex).WriteToJsonObject(newInspectionsJsonObject)){
+				return false;
+			}
+			newInspectionsArray << newInspectionsJsonObject;
+		}
+		jsonObject["Inspections"] = newInspectionsArray;
+	}
+
+	return true;
+}
+
+
+bool CProductOverview::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("ProductID") || ! jsonObject["ProductID"].isDouble()){
+		return false;
+	}
+	ProductID = jsonObject["ProductID"].toInt();
+
+	if (!jsonObject.contains("Name") || ! jsonObject["Name"].isString()){
+		return false;
+	}
+	Name = jsonObject["Name"].toString();
+
+	if (!jsonObject.contains("Status") || ! jsonObject["Status"].isString()){
+		return false;
+	}
+	const QString statusStringValue = jsonObject["Status"].toString();
+	if(statusStringValue == "NONE"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+	}
+	else if(statusStringValue == "OK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+	}
+	else if(statusStringValue == "WARNING"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+	}
+	else if(statusStringValue == "NOK"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+	}
+	else if(statusStringValue == "FAILED"){
+		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+	}
+	else {
+		return false;
+	}
+
+	if (!jsonObject.contains("PartSerialNumber") || ! jsonObject["PartSerialNumber"].isString()){
+		return false;
+	}
+	PartSerialNumber = jsonObject["PartSerialNumber"].toString();
+
+	if (!jsonObject.contains("Timestamp") || ! jsonObject["Timestamp"].isString()){
+		return false;
+	}
+	Timestamp = jsonObject["Timestamp"].toString();
+
+	if (!jsonObject.contains("ProductImage") || ! jsonObject["ProductImage"].isString()){
+		return false;
+	}
+	ProductImage = jsonObject["ProductImage"].toString();
+
+	if (jsonObject.contains("Inspections") && jsonObject["Inspections"].isArray()){
+		const QJsonArray inspectionsjsonArray = jsonObject["Inspections"].toArray();
+		const qsizetype inspectionsArrayCount = inspectionsjsonArray.size();
+		Inspections = QList<CInspection::V1_0>();
+		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsArrayCount; ++inspectionsIndex){
+			CInspection::V1_0 tempInspections;
+			if (!tempInspections.ReadFromJsonObject(inspectionsjsonArray[inspectionsIndex].toObject())){
+				return false;
+			}
+			Inspections->append(tempInspections);
+		}
+	}
+
+	return true;
+}
+
+
+bool CProductOverview::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("ProductID") && jsonObject["ProductID"].isDouble()){
+		ProductID = jsonObject["ProductID"].toInt();
+	}
+
+	if (jsonObject.contains("Name") && jsonObject["Name"].isString()){
+		Name = jsonObject["Name"].toString();
+	}
+
+	if (jsonObject.contains("Status") && jsonObject["Status"].isString()){
+		const QString statusStringValue = jsonObject["Status"].toString();
+		if(statusStringValue == "NONE"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
+		}
+		else if(statusStringValue == "OK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::OK;
+		}
+		else if(statusStringValue == "WARNING"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::WARNING;
+		}
+		else if(statusStringValue == "NOK"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::NOK;
+		}
+		else if(statusStringValue == "FAILED"){
+			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
+		}
+		else {
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("PartSerialNumber") && jsonObject["PartSerialNumber"].isString()){
+		PartSerialNumber = jsonObject["PartSerialNumber"].toString();
+	}
+
+	if (jsonObject.contains("Timestamp") && jsonObject["Timestamp"].isString()){
+		Timestamp = jsonObject["Timestamp"].toString();
+	}
+
+	if (jsonObject.contains("ProductImage") && jsonObject["ProductImage"].isString()){
+		ProductImage = jsonObject["ProductImage"].toString();
+	}
+
+	if (jsonObject.contains("Inspections") && jsonObject["Inspections"].isArray()){
+		const QJsonArray inspectionsjsonArray = jsonObject["Inspections"].toArray();
+		const qsizetype inspectionsArrayCount = inspectionsjsonArray.size();
+		Inspections = QList<CInspection::V1_0>();
+		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsArrayCount; ++inspectionsIndex){
+			CInspection::V1_0 tempInspections;
+			if (!tempInspections.OptReadFromJsonObject(inspectionsjsonArray[inspectionsIndex].toObject())){
+				return false;
+			}
+			Inspections->append(tempInspections);
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CProductOverview::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CProductOverview::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CProductOverview::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CProductOverview::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CProductOverview::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CProductOverview::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CProductOverview::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CProductOverview::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CProductOverview::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::complextest::CTImpl
+
+
+
+
+/// \file CLocalizedText.cpp
+
+namespace sdl::complextest::CTImpl
+{
+
+
+QByteArray CLocalizedText::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CLocalizedText::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				text == other.text &&
+				locale == other.locale;
+}
+
+
+bool CLocalizedText::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!text){
+		return false;
+	}
+	model.SetData("text", *text, modelIndex);
+
+	if (!locale){
+		return false;
+	}
+	model.SetData("locale", *locale, modelIndex);
+
+
+	return true;
+}
+
+
+bool CLocalizedText::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant textData = model.GetData("text", modelIndex);
+	if (textData.isNull()){
+		return false;
+	}
+	text = textData.toString();
+
+	QVariant localeData = model.GetData("locale", modelIndex);
+	if (localeData.isNull()){
+		return false;
+	}
+	locale = localeData.toString();
+
+	return true;
+}
+
+
+bool CLocalizedText::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant textData = model.GetData("text", modelIndex);
+	if (!textData.isNull()){
+		text = textData.toString();
+	}
+
+	QVariant localeData = model.GetData("locale", modelIndex);
+	if (!localeData.isNull()){
+		locale = localeData.toString();
+	}
+
+	return true;
+}
+
+
+bool CLocalizedText::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!text){
+		return false;
+	}
+	gqlObject.InsertParam("text", QVariant(*text));
+
+	if (!locale){
+		return false;
+	}
+	gqlObject.InsertParam("locale", QVariant(*locale));
+
+	return true;
+}
+
+
+bool CLocalizedText::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (!gqlObject.ContainsParam("text") || gqlObject["text"].userType() != QMetaType::QString){
+		return false;
+	}
+	text = gqlObject["text"].toString();
+
+	if (!gqlObject.ContainsParam("locale") || gqlObject["locale"].userType() != QMetaType::QString){
+		return false;
+	}
+	locale = gqlObject["locale"].toString();
+
+	return true;
+}
+
+
+bool CLocalizedText::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("text") && gqlObject["text"].userType() == QMetaType::QString){
+		text = gqlObject["text"].toString();
+	}
+
+	if (gqlObject.ContainsParam("locale") && gqlObject["locale"].userType() == QMetaType::QString){
+		locale = gqlObject["locale"].toString();
+	}
+
+	return true;
+}
+
+
+bool CLocalizedText::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!text){
+		return false;
+	}
+	jsonObject["text"] = QJsonValue::fromVariant(*text);
+
+	if (!locale){
+		return false;
+	}
+	jsonObject["locale"] = QJsonValue::fromVariant(*locale);
+
+	return true;
+}
+
+
+bool CLocalizedText::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("text") || ! jsonObject["text"].isString()){
+		return false;
+	}
+	text = jsonObject["text"].toString();
+
+	if (!jsonObject.contains("locale") || ! jsonObject["locale"].isString()){
+		return false;
+	}
+	locale = jsonObject["locale"].toString();
+
+	return true;
+}
+
+
+bool CLocalizedText::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("text") && jsonObject["text"].isString()){
+		text = jsonObject["text"].toString();
+	}
+
+	if (jsonObject.contains("locale") && jsonObject["locale"].isString()){
+		locale = jsonObject["locale"].toString();
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CLocalizedText::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CLocalizedText::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CLocalizedText::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CLocalizedText::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CLocalizedText::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CLocalizedText::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CLocalizedText::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CLocalizedText::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CLocalizedText::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::complextest::CTImpl
+
+
+
+
+/// \file CCoordinates.cpp
+
+namespace sdl::complextest::CTImpl
+{
+
+
+QByteArray CCoordinates::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CCoordinates::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				x.has_value() == other.x.has_value() &&
+				((x.has_value() && other.x.has_value()) ?
+					qFuzzyCompare(*x, *other.x) : true) &&
+				y.has_value() == other.y.has_value() &&
+				((y.has_value() && other.y.has_value()) ?
+					qFuzzyCompare(*y, *other.y) : true) &&
+				z.has_value() == other.z.has_value() &&
+				((z.has_value() && other.z.has_value()) ?
+					qFuzzyCompare(*z, *other.z) : true);
+}
+
+
+bool CCoordinates::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!x){
+		return false;
+	}
+	model.SetData("x", *x, modelIndex);
+
+	if (!y){
+		return false;
+	}
+	model.SetData("y", *y, modelIndex);
+
+	if (!z){
+		return false;
+	}
+	model.SetData("z", *z, modelIndex);
+
+
+	return true;
+}
+
+
+bool CCoordinates::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant xData = model.GetData("x", modelIndex);
+	if (xData.isNull()){
+		return false;
+	}
+	x = xData.toFloat();
+
+	QVariant yData = model.GetData("y", modelIndex);
+	if (yData.isNull()){
+		return false;
+	}
+	y = yData.toFloat();
+
+	QVariant zData = model.GetData("z", modelIndex);
+	if (zData.isNull()){
+		return false;
+	}
+	z = zData.toFloat();
+
+	return true;
+}
+
+
+bool CCoordinates::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant xData = model.GetData("x", modelIndex);
+	if (!xData.isNull()){
+		x = xData.toFloat();
+	}
+
+	QVariant yData = model.GetData("y", modelIndex);
+	if (!yData.isNull()){
+		y = yData.toFloat();
+	}
+
+	QVariant zData = model.GetData("z", modelIndex);
+	if (!zData.isNull()){
+		z = zData.toFloat();
+	}
+
+	return true;
+}
+
+
+bool CCoordinates::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!x){
+		return false;
+	}
+	gqlObject.InsertParam("x", QVariant(*x));
+
+	if (!y){
+		return false;
+	}
+	gqlObject.InsertParam("y", QVariant(*y));
+
+	if (!z){
+		return false;
+	}
+	gqlObject.InsertParam("z", QVariant(*z));
+
+	return true;
+}
+
+
+bool CCoordinates::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (!gqlObject.ContainsParam("x") || gqlObject["x"].userType() != QMetaType::Double){
+		return false;
+	}
+	x = gqlObject["x"].toDouble();
+
+	if (!gqlObject.ContainsParam("y") || gqlObject["y"].userType() != QMetaType::Double){
+		return false;
+	}
+	y = gqlObject["y"].toDouble();
+
+	if (!gqlObject.ContainsParam("z") || gqlObject["z"].userType() != QMetaType::Double){
+		return false;
+	}
+	z = gqlObject["z"].toDouble();
+
+	return true;
+}
+
+
+bool CCoordinates::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("x") && gqlObject["x"].userType() == QMetaType::Double){
+		x = gqlObject["x"].toDouble();
+	}
+
+	if (gqlObject.ContainsParam("y") && gqlObject["y"].userType() == QMetaType::Double){
+		y = gqlObject["y"].toDouble();
+	}
+
+	if (gqlObject.ContainsParam("z") && gqlObject["z"].userType() == QMetaType::Double){
+		z = gqlObject["z"].toDouble();
+	}
+
+	return true;
+}
+
+
+bool CCoordinates::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!x){
+		return false;
+	}
+	jsonObject["x"] = QJsonValue::fromVariant(*x);
+
+	if (!y){
+		return false;
+	}
+	jsonObject["y"] = QJsonValue::fromVariant(*y);
+
+	if (!z){
+		return false;
+	}
+	jsonObject["z"] = QJsonValue::fromVariant(*z);
+
+	return true;
+}
+
+
+bool CCoordinates::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("x") || ! jsonObject["x"].isDouble()){
+		return false;
+	}
+	x = jsonObject["x"].toDouble();
+
+	if (!jsonObject.contains("y") || ! jsonObject["y"].isDouble()){
+		return false;
+	}
+	y = jsonObject["y"].toDouble();
+
+	if (!jsonObject.contains("z") || ! jsonObject["z"].isDouble()){
+		return false;
+	}
+	z = jsonObject["z"].toDouble();
+
+	return true;
+}
+
+
+bool CCoordinates::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("x") && jsonObject["x"].isDouble()){
+		x = jsonObject["x"].toDouble();
+	}
+
+	if (jsonObject.contains("y") && jsonObject["y"].isDouble()){
+		y = jsonObject["y"].toDouble();
+	}
+
+	if (jsonObject.contains("z") && jsonObject["z"].isDouble()){
+		z = jsonObject["z"].toDouble();
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CCoordinates::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCoordinates::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCoordinates::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCoordinates::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCoordinates::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCoordinates::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCoordinates::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCoordinates::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCoordinates::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::complextest::CTImpl
+
+
+
+
+/// \file CExtendedMetaData.cpp
+
+namespace sdl::complextest::CTImpl
+{
+
+
+QByteArray CExtendedMetaData::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CExtendedMetaData::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				key == other.key &&
+				value == other.value;
+}
+
+
+bool CExtendedMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (key){
+		model.SetData("key", *key, modelIndex);
+	}
+
+	if (value){
+		QVariant valueVariantValue;
+		if (const CCoordinates* val = std::get_if<CCoordinates>((*value).get())){
+			if (!val->WriteToModel(*(model.AddTreeModel("value", modelIndex)), 0)){
+				return false;
+			}
+		}
+		else if (const double* val = std::get_if<double>((*value).get())){
+			valueVariantValue = *val;
+			model.SetData("value", valueVariantValue, modelIndex);
+		}
+		else if (const bool* val = std::get_if<bool>((*value).get())){
+			valueVariantValue = *val;
+			model.SetData("value", valueVariantValue, modelIndex);
+		}
+		else if (const QString* val = std::get_if<QString>((*value).get())){
+			valueVariantValue = *val;
+			model.SetData("value", valueVariantValue, modelIndex);
+		}
+
+	}
+
+
+	return true;
+}
+
+
+bool CExtendedMetaData::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant keyData = model.GetData("key", modelIndex);
+	if (!keyData.isNull()){
+		key = keyData.toString();
+	}
+
+	QVariant valueData = model.GetData("value", modelIndex);
+	if (!valueData.isNull()){
+		if (valueData.canConvert<CCoordinates>()){
+			CCoordinates valueConvert;
+			const bool isvalueRead = valueConvert.ReadFromModel(*model.GetTreeItemModel("value", modelIndex)); 
+			if (!isvalueRead){
+				return false;
+			}
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueConvert);
+		}
+		else if (valueData.canConvert<double>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<double>());
+		}
+		else if (valueData.canConvert<bool>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<bool>());
+		}
+		else if (valueData.canConvert<QString>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<QString>());
+		}
+	}
+
+	return true;
+}
+
+
+bool CExtendedMetaData::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant keyData = model.GetData("key", modelIndex);
+	if (!keyData.isNull()){
+		key = keyData.toString();
+	}
+
+	QVariant valueData = model.GetData("value", modelIndex);
+	if (!valueData.isNull()){
+		if (valueData.canConvert<CCoordinates>()){
+			CCoordinates valueConvert;
+			const bool isvalueRead = valueConvert.ReadFromModel(*model.GetTreeItemModel("value", modelIndex)); 
+			if (!isvalueRead){
+				return false;
+			}
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueConvert);
+		}
+		else if (valueData.canConvert<double>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<double>());
+		}
+		else if (valueData.canConvert<bool>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<bool>());
+		}
+		else if (valueData.canConvert<QString>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<QString>());
+		}
+	}
+
+	return true;
+}
+
+
+bool CExtendedMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (key){
+		gqlObject.InsertParam("key", QVariant(*key));
+	}
+
+	if (value){
+		::imtgql::CGqlParamObject valueDataObject;
+		if (const CCoordinates* val = std::get_if<CCoordinates>((*value).get())){
+			const bool isvalueAdded = val->WriteToGraphQlObject(valueDataObject)
+			if (!isvalueAdded){
+				return false;
+			}
+		}
+		else if (const double* val = std::get_if<double>((*value).get())){
+			valueDataObject.InsertParam("value", *val);
+		}
+		else if (const bool* val = std::get_if<bool>((*value).get())){
+			valueDataObject.InsertParam("value", *val);
+		}
+		else if (const QString* val = std::get_if<QString>((*value).get())){
+			valueDataObject.InsertParam("value", *val);
+		}
+		gqlObject.InsertParam("value", valueDataObject);
+	}
+
+	return true;
+}
+
+bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant keyData = gqlObject.GetParamArgumentValue("key");
+	if (!keyData.isNull()){
+		key = keyData.toString();
+	}
+
+	QVariant valueData = gqlObject.GetParamArgumentValue("value");
+	if (!valueData.isNull()){
+		if (valueData.canConvert<CCoordinates>()){
+			CCoordinates valueConvert;
+			const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
+			const bool isvalueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
+			if (!isvalueRead){
+				return false;
+			}
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueConvert);
+		}
+		else if (valueData.canConvert<double>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<double>());
+		}
+		else if (valueData.canConvert<bool>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<bool>());
+		}
+		else if (valueData.canConvert<QString>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<QString>());
+		}
+	}
+
+	return true;
+}
+
+
+bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant keyData = gqlObject.GetParamArgumentValue("key");
+	if (!keyData.isNull()){
+		key = keyData.toString();
+	}
+
+	QVariant valueData = gqlObject.GetParamArgumentValue("value");
+	if (!valueData.isNull()){
+		if (valueData.canConvert<CCoordinates>()){
+			CCoordinates valueConvert;
+			const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
+			const bool isvalueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
+			if (!isvalueRead){
+				return false;
+			}
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueConvert);
+		}
+		else if (valueData.canConvert<double>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<double>());
+		}
+		else if (valueData.canConvert<bool>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<bool>());
+		}
+		else if (valueData.canConvert<QString>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<QString>());
+		}
+	}
+
+	return true;
+}
+
+
+bool CExtendedMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (key){
+		jsonObject["key"] = QJsonValue::fromVariant(*key);
+		}
+
+
+	if (value){
+		if (const CCoordinates* val = std::get_if<CCoordinates>((*value).get())){
+			QJsonObject valueJsonObject;
+			const bool isvalueAdded = val->WriteToJsonObject(valueJsonObject);
+			if (!isvalueAdded){
+				return false;
+			}
+			jsonObject["value"] = valueJsonObject;
+		}
+		else if (const double* val = std::get_if<double>((*value).get())){
+			if (!value){
+				return false;
+			}
+			jsonObject["value"] = QJsonValue::fromVariant(*val);
+		}
+		else if (const bool* val = std::get_if<bool>((*value).get())){
+			if (!value){
+				return false;
+			}
+			jsonObject["value"] = QJsonValue::fromVariant(*val);
+		}
+		else if (const QString* val = std::get_if<QString>((*value).get())){
+			if (!value){
+				return false;
+			}
+			jsonObject["value"] = QJsonValue::fromVariant(*val);
+		}
+		
+		}
+
+
+	return true;
+}
+
+
+bool CExtendedMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("key") && jsonObject["key"].isString()){
+		key = jsonObject["key"].toString();
+	}
+
+	if (jsonObject.contains("value") && jsonObject["value"].isObject()){
+		QVariant valueVariantValue = jsonObject["value"].toVariant();
+		if (valueVariantValue.canConvert<CCoordinates>()){
+			CCoordinates valueConvert;
+			const bool isvalueRead = valueConvert.ReadFromJsonObject(jsonObject["value"].toObject());
+			if (!isvalueRead){
+				return false;
+			}
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueConvert);
+		}
+		else if (valueVariantValue.canConvert<double>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<double>());
+		}
+		else if (valueVariantValue.canConvert<bool>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<bool>());
+		}
+		else if (valueVariantValue.canConvert<QString>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<QString>());
+		}
+	}
+
+	return true;
+}
+
+
+bool CExtendedMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("key") && jsonObject["key"].isString()){
+		key = jsonObject["key"].toString();
+	}
+
+	if (jsonObject.contains("value") && jsonObject["value"].isObject()){
+		QVariant valueVariantValue = jsonObject["value"].toVariant();
+		if (valueVariantValue.canConvert<CCoordinates>()){
+			CCoordinates valueConvert;
+			const bool isvalueRead = valueConvert.ReadFromJsonObject(jsonObject["value"].toObject());
+			if (!isvalueRead){
+				return false;
+			}
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueConvert);
+		}
+		else if (valueVariantValue.canConvert<double>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<double>());
+		}
+		else if (valueVariantValue.canConvert<bool>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<bool>());
+		}
+		else if (valueVariantValue.canConvert<QString>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<QString>());
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CExtendedMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CExtendedMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CExtendedMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CExtendedMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CExtendedMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CExtendedMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CExtendedMetaData::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CExtendedMetaData::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CExtendedMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+
+
+/// \file CResultMetaData.cpp
+
+namespace sdl::rtv::ProductionResults
+{
+
+
+QByteArray CResultMetaData::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CResultMetaData::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				resultId == other.resultId &&
+				creationTime == other.creationTime &&
+				partId == other.partId &&
+				productId == other.productId &&
+				name == other.name &&
+				classification == other.classification &&
+				description == other.description &&
+				extendedMetaData == other.extendedMetaData;
+}
+
+
+bool CResultMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!resultId){
+		return false;
+	}
+	model.SetData("resultId", *resultId, modelIndex);
+
+	if (creationTime){
+		model.SetData("creationTime", *creationTime, modelIndex);
+	}
+
+	if (partId){
+		model.SetData("partId", *partId, modelIndex);
+	}
+
+	if (productId){
+		model.SetData("productId", *productId, modelIndex);
+	}
+
+	if (name){
+		model.SetData("name", *name, modelIndex);
+	}
+
+	if (classification){
+		model.SetData("classification", *classification, modelIndex);
+	}
+
+
+	if (description){
+		::imtbase::CTreeItemModel* descriptionNewModelPtr = model.AddTreeModel("description", modelIndex);
+		const bool isDescriptionAdded = description->WriteToModel(*descriptionNewModelPtr, 0);
+		if (!isDescriptionAdded){
+			return false;
+		}
+
+	}
+	if (extendedMetaData){
+		::imtbase::CTreeItemModel* newExtendedMetaDataModelPtr = model.AddTreeModel("extendedMetaData", modelIndex);
+		newExtendedMetaDataModelPtr->setIsArray(true);
+		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaData->size(); ++extendedMetaDataIndex){
+			newExtendedMetaDataModelPtr->InsertNewItem();
+			if (!(extendedMetaData->at(extendedMetaDataIndex).WriteToModel(*newExtendedMetaDataModelPtr, extendedMetaDataIndex))){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CResultMetaData::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant resultIdData = model.GetData("resultId", modelIndex);
+	if (resultIdData.isNull()){
+		return false;
+	}
+	resultId = resultIdData.toByteArray();
+
+	QVariant creationTimeData = model.GetData("creationTime", modelIndex);
+	if (!creationTimeData.isNull()){
+		creationTime = creationTimeData.toString();
+	}
+
+	QVariant partIdData = model.GetData("partId", modelIndex);
+	if (!partIdData.isNull()){
+		partId = partIdData.toString();
+	}
+
+	QVariant productIdData = model.GetData("productId", modelIndex);
+	if (!productIdData.isNull()){
+		productId = productIdData.toString();
+	}
+
+	QVariant nameData = model.GetData("name", modelIndex);
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant classificationData = model.GetData("classification", modelIndex);
+	if (!classificationData.isNull()){
+		classification = classificationData.toInt();
+	}
+
+	::imtbase::CTreeItemModel* descriptionDataModelPtr = model.GetTreeItemModel("description", modelIndex);
+	if (descriptionDataModelPtr != nullptr){
+		description = CLocalizedText::V1_0();
+		const bool isDescriptionReaded = description->ReadFromModel(*descriptionDataModelPtr, modelIndex);
+		if (!isDescriptionReaded){
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* extendedMetaDataModel = model.GetTreeItemModel("extendedMetaData", modelIndex);
+	if (extendedMetaDataModel != nullptr){
+		int extendedMetaDataCount = extendedMetaDataModel->GetItemsCount();
+		QList<CExtendedMetaData::V1_0> extendedMetaDataList;
+		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataCount; ++extendedMetaDataIndex){
+			CExtendedMetaData::V1_0 extendedMetaData;
+			if (!extendedMetaData.ReadFromModel(*extendedMetaDataModel, extendedMetaDataIndex)){
+				return false;
+			}
+			extendedMetaDataList << extendedMetaData;
+		}
+		extendedMetaData = extendedMetaDataList;
+
+	}
+
+	return true;
+}
+
+
+bool CResultMetaData::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant resultIdData = model.GetData("resultId", modelIndex);
+	if (!resultIdData.isNull()){
+		resultId = resultIdData.toByteArray();
+	}
+
+	QVariant creationTimeData = model.GetData("creationTime", modelIndex);
+	if (!creationTimeData.isNull()){
+		creationTime = creationTimeData.toString();
+	}
+
+	QVariant partIdData = model.GetData("partId", modelIndex);
+	if (!partIdData.isNull()){
+		partId = partIdData.toString();
+	}
+
+	QVariant productIdData = model.GetData("productId", modelIndex);
+	if (!productIdData.isNull()){
+		productId = productIdData.toString();
+	}
+
+	QVariant nameData = model.GetData("name", modelIndex);
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant classificationData = model.GetData("classification", modelIndex);
+	if (!classificationData.isNull()){
+		classification = classificationData.toInt();
+	}
+
+	::imtbase::CTreeItemModel* descriptionDataModelPtr = model.GetTreeItemModel("description", modelIndex);
+	if (descriptionDataModelPtr != nullptr){
+		description = CLocalizedText::V1_0();
+		const bool isDescriptionReaded = description->ReadFromModel(*descriptionDataModelPtr, modelIndex);
+		if (!isDescriptionReaded){
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* extendedMetaDataModel = model.GetTreeItemModel("extendedMetaData", modelIndex);
+	if (extendedMetaDataModel != nullptr){
+		int extendedMetaDataCount = extendedMetaDataModel->GetItemsCount();
+		QList<CExtendedMetaData::V1_0> extendedMetaDataList;
+		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataCount; ++extendedMetaDataIndex){
+			CExtendedMetaData::V1_0 extendedMetaData;
+			if (!extendedMetaData.OptReadFromModel(*extendedMetaDataModel, extendedMetaDataIndex)){
+				return false;
+			}
+			extendedMetaDataList << extendedMetaData;
+		}
+		extendedMetaData = extendedMetaDataList;
+
+	}
+
+	return true;
+}
+
+
+bool CResultMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!resultId){
+		return false;
+	}
+	gqlObject.InsertParam("resultId", QVariant(*resultId));
+
+	if (creationTime){
+		gqlObject.InsertParam("creationTime", QVariant(*creationTime));
+	}
+
+	if (partId){
+		gqlObject.InsertParam("partId", QVariant(*partId));
+	}
+
+	if (productId){
+		gqlObject.InsertParam("productId", QVariant(*productId));
+	}
+
+	if (name){
+		gqlObject.InsertParam("name", QVariant(*name));
+	}
+
+	if (classification){
+		gqlObject.InsertParam("classification", QVariant(*classification));
+	}
+
+	if (description){
+		::imtgql::CGqlParamObject descriptionDataObject;
+		if (!description->WriteToGraphQlObject(descriptionDataObject)){
+			return false;
+		}
+		gqlObject.InsertParam("description", descriptionDataObject);
+	}
+
+	if (extendedMetaData){
+		QList<::imtgql::CGqlParamObject> extendedMetaDataDataObjectList;
+		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaData->size(); ++extendedMetaDataIndex){
+			::imtgql::CGqlParamObject extendedMetaDataDataObject;
+			if (!extendedMetaData->at(extendedMetaDataIndex).WriteToGraphQlObject(extendedMetaDataDataObject)){
+				return false;
+			}
+			extendedMetaDataDataObjectList << extendedMetaDataDataObject;
+		}
+		gqlObject.InsertParam("extendedMetaData", extendedMetaDataDataObjectList);
+	}
+
+	return true;
+}
+
+bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant resultIdData = gqlObject.GetParamArgumentValue("resultId");
+	if (resultIdData.isNull()){
+		return false;
+	}
+	resultId = resultIdData.toByteArray();
+
+	QVariant creationTimeData = gqlObject.GetParamArgumentValue("creationTime");
+	if (!creationTimeData.isNull()){
+		creationTime = creationTimeData.toString();
+	}
+
+	QVariant partIdData = gqlObject.GetParamArgumentValue("partId");
+	if (!partIdData.isNull()){
+		partId = partIdData.toString();
+	}
+
+	QVariant productIdData = gqlObject.GetParamArgumentValue("productId");
+	if (!productIdData.isNull()){
+		productId = productIdData.toString();
+	}
+
+	QVariant nameData = gqlObject.GetParamArgumentValue("name");
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant classificationData = gqlObject.GetParamArgumentValue("classification");
+	if (!classificationData.isNull()){
+		classification = classificationData.toInt();
+	}
+
+	const ::imtgql::CGqlParamObject* descriptionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("description");
+	if (descriptionDataObjectPtr != nullptr){
+		description = CLocalizedText::V1_0();
+		const bool isDescriptionRead = description->ReadFromGraphQlObject(*descriptionDataObjectPtr);
+		if (!isDescriptionRead){
+			return false;
+		}
+
+	}
+
+	int extendedMetaDataCount = gqlObject.GetObjectsCount("extendedMetaData");
+	if (extendedMetaDataCount > 0){
+		QList<CExtendedMetaData::V1_0> extendedMetaDataList;
+		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex != extendedMetaDataCount ; ++extendedMetaDataIndex){
+			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData",extendedMetaDataIndex);
+			if (extendedMetaDataDataObjectPtr == nullptr){
+				return false;
+			}
+			CExtendedMetaData::V1_0 extendedMetaData;
+			if (!extendedMetaData.ReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
+				return false;
+			}
+			extendedMetaDataList << extendedMetaData;
+		}
+		extendedMetaData = extendedMetaDataList;
+
+	}
+
+	return true;
+}
+
+
+bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant resultIdData = gqlObject.GetParamArgumentValue("resultId");
+	if (!resultIdData.isNull()){
+		resultId = resultIdData.toByteArray();
+	}
+
+	QVariant creationTimeData = gqlObject.GetParamArgumentValue("creationTime");
+	if (!creationTimeData.isNull()){
+		creationTime = creationTimeData.toString();
+	}
+
+	QVariant partIdData = gqlObject.GetParamArgumentValue("partId");
+	if (!partIdData.isNull()){
+		partId = partIdData.toString();
+	}
+
+	QVariant productIdData = gqlObject.GetParamArgumentValue("productId");
+	if (!productIdData.isNull()){
+		productId = productIdData.toString();
+	}
+
+	QVariant nameData = gqlObject.GetParamArgumentValue("name");
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant classificationData = gqlObject.GetParamArgumentValue("classification");
+	if (!classificationData.isNull()){
+		classification = classificationData.toInt();
+	}
+
+	const ::imtgql::CGqlParamObject* descriptionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("description");
+	if (descriptionDataObjectPtr != nullptr){
+		description = CLocalizedText::V1_0();
+		const bool isDescriptionRead = description->OptReadFromGraphQlObject(*descriptionDataObjectPtr);
+		if (!isDescriptionRead){
+			return false;
+		}
+
+	}
+
+	int extendedMetaDataCount = gqlObject.GetObjectsCount("extendedMetaData");
+	if (extendedMetaDataCount > 0){
+		QList<CExtendedMetaData::V1_0> extendedMetaDataList;
+		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex != extendedMetaDataCount ; ++extendedMetaDataIndex){
+			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData",extendedMetaDataIndex);
+			if (extendedMetaDataDataObjectPtr == nullptr){
+				return false;
+			}
+			CExtendedMetaData::V1_0 extendedMetaData;
+			if (!extendedMetaData.OptReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
+				return false;
+			}
+			extendedMetaDataList << extendedMetaData;
+		}
+		extendedMetaData = extendedMetaDataList;
+
+	}
+
+	return true;
+}
+
+
+bool CResultMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!resultId){
+		return false;
+	}
+	jsonObject["resultId"] = QJsonValue::fromVariant(*resultId);
+
+	if (creationTime){
+		jsonObject["creationTime"] = QJsonValue::fromVariant(*creationTime);
+		}
+
+
+	if (partId){
+		jsonObject["partId"] = QJsonValue::fromVariant(*partId);
+		}
+
+
+	if (productId){
+		jsonObject["productId"] = QJsonValue::fromVariant(*productId);
+		}
+
+
+	if (name){
+		jsonObject["name"] = QJsonValue::fromVariant(*name);
+		}
+
+
+	if (classification){
+		jsonObject["classification"] = QJsonValue::fromVariant(*classification);
+		}
+
+
+	if (description){
+		QJsonObject descriptionjsonObject;
+		const bool isDescriptionAdded = description->WriteToJsonObject(descriptionjsonObject);
+		if (!isDescriptionAdded){
+			return false;
+		}
+		jsonObject["description"] = descriptionjsonObject;
+	}
+
+	if (extendedMetaData){
+		QJsonArray newExtendedMetaDataArray;
+		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaData->size(); ++extendedMetaDataIndex){
+			QJsonObject newExtendedMetaDataJsonObject;
+			if (!extendedMetaData->at(extendedMetaDataIndex).WriteToJsonObject(newExtendedMetaDataJsonObject)){
+				return false;
+			}
+			newExtendedMetaDataArray << newExtendedMetaDataJsonObject;
+		}
+		jsonObject["extendedMetaData"] = newExtendedMetaDataArray;
+	}
+
+	return true;
+}
+
+
+bool CResultMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("resultId") || ! jsonObject["resultId"].isString()){
+		return false;
+	}
+	resultId = jsonObject["resultId"].toString().toUtf8();
+
+	if (jsonObject.contains("creationTime") && jsonObject["creationTime"].isString()){
+		creationTime = jsonObject["creationTime"].toString();
+	}
+
+	if (jsonObject.contains("partId") && jsonObject["partId"].isString()){
+		partId = jsonObject["partId"].toString();
+	}
+
+	if (jsonObject.contains("productId") && jsonObject["productId"].isString()){
+		productId = jsonObject["productId"].toString();
+	}
+
+	if (jsonObject.contains("name") && jsonObject["name"].isString()){
+		name = jsonObject["name"].toString();
+	}
+
+	if (jsonObject.contains("classification") && jsonObject["classification"].isDouble()){
+		classification = jsonObject["classification"].toInt();
+	}
+
+	if (jsonObject.contains("description") && jsonObject["description"].isObject()){
+		description = CLocalizedText::V1_0();
+		const bool isDescriptionReaded = description->ReadFromJsonObject(jsonObject["description"].toObject());
+		if (!isDescriptionReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("extendedMetaData") && jsonObject["extendedMetaData"].isArray()){
+		const QJsonArray extendedMetaDatajsonArray = jsonObject["extendedMetaData"].toArray();
+		const qsizetype extendedMetaDataArrayCount = extendedMetaDatajsonArray.size();
+		extendedMetaData = QList<CExtendedMetaData::V1_0>();
+		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataArrayCount; ++extendedMetaDataIndex){
+			CExtendedMetaData::V1_0 tempExtendedMetaData;
+			if (!tempExtendedMetaData.ReadFromJsonObject(extendedMetaDatajsonArray[extendedMetaDataIndex].toObject())){
+				return false;
+			}
+			extendedMetaData->append(tempExtendedMetaData);
+		}
+	}
+
+	return true;
+}
+
+
+bool CResultMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("resultId") && jsonObject["resultId"].isString()){
+		resultId = jsonObject["resultId"].toString().toUtf8();
+	}
+
+	if (jsonObject.contains("creationTime") && jsonObject["creationTime"].isString()){
+		creationTime = jsonObject["creationTime"].toString();
+	}
+
+	if (jsonObject.contains("partId") && jsonObject["partId"].isString()){
+		partId = jsonObject["partId"].toString();
+	}
+
+	if (jsonObject.contains("productId") && jsonObject["productId"].isString()){
+		productId = jsonObject["productId"].toString();
+	}
+
+	if (jsonObject.contains("name") && jsonObject["name"].isString()){
+		name = jsonObject["name"].toString();
+	}
+
+	if (jsonObject.contains("classification") && jsonObject["classification"].isDouble()){
+		classification = jsonObject["classification"].toInt();
+	}
+
+	if (jsonObject.contains("description") && jsonObject["description"].isObject()){
+		description = CLocalizedText::V1_0();
+		const bool isDescriptionReaded = description->OptReadFromJsonObject(jsonObject["description"].toObject());
+		if (!isDescriptionReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("extendedMetaData") && jsonObject["extendedMetaData"].isArray()){
+		const QJsonArray extendedMetaDatajsonArray = jsonObject["extendedMetaData"].toArray();
+		const qsizetype extendedMetaDataArrayCount = extendedMetaDatajsonArray.size();
+		extendedMetaData = QList<CExtendedMetaData::V1_0>();
+		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataArrayCount; ++extendedMetaDataIndex){
+			CExtendedMetaData::V1_0 tempExtendedMetaData;
+			if (!tempExtendedMetaData.OptReadFromJsonObject(extendedMetaDatajsonArray[extendedMetaDataIndex].toObject())){
+				return false;
+			}
+			extendedMetaData->append(tempExtendedMetaData);
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CResultMetaData::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResultMetaData::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResultMetaData::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResultMetaData::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResultMetaData::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResultMetaData::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResultMetaData::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResultMetaData::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+
+
+/// \file COverallResultValues.cpp
+
+namespace sdl::rtv::ProductionResults
+{
+
+
+QByteArray COverallResultValues::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool COverallResultValues::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				name == other.name &&
+				valueId == other.valueId &&
+				measuredValue.has_value() == other.measuredValue.has_value() &&
+				((measuredValue.has_value() && other.measuredValue.has_value()) ?
+					qFuzzyCompare(*measuredValue, *other.measuredValue) : true) &&
+				lowLimit.has_value() == other.lowLimit.has_value() &&
+				((lowLimit.has_value() && other.lowLimit.has_value()) ?
+					qFuzzyCompare(*lowLimit, *other.lowLimit) : true) &&
+				highLimit.has_value() == other.highLimit.has_value() &&
+				((highLimit.has_value() && other.highLimit.has_value()) ?
+					qFuzzyCompare(*highLimit, *other.highLimit) : true);
+}
+
+
+bool COverallResultValues::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (name){
+		model.SetData("name", *name, modelIndex);
+	}
+
+	if (!valueId){
+		return false;
+	}
+	model.SetData("valueId", *valueId, modelIndex);
+
+	if (!measuredValue){
+		return false;
+	}
+	model.SetData("measuredValue", *measuredValue, modelIndex);
+
+	if (lowLimit){
+		model.SetData("lowLimit", *lowLimit, modelIndex);
+	}
+
+	if (highLimit){
+		model.SetData("highLimit", *highLimit, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool COverallResultValues::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant nameData = model.GetData("name", modelIndex);
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant valueIdData = model.GetData("valueId", modelIndex);
+	if (valueIdData.isNull()){
+		return false;
+	}
+	valueId = valueIdData.toString();
+
+	QVariant measuredValueData = model.GetData("measuredValue", modelIndex);
+	if (measuredValueData.isNull()){
+		return false;
+	}
+	measuredValue = measuredValueData.toFloat();
+
+	QVariant lowLimitData = model.GetData("lowLimit", modelIndex);
+	if (!lowLimitData.isNull()){
+		lowLimit = lowLimitData.toFloat();
+	}
+
+	QVariant highLimitData = model.GetData("highLimit", modelIndex);
+	if (!highLimitData.isNull()){
+		highLimit = highLimitData.toFloat();
+	}
+
+	return true;
+}
+
+
+bool COverallResultValues::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant nameData = model.GetData("name", modelIndex);
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant valueIdData = model.GetData("valueId", modelIndex);
+	if (!valueIdData.isNull()){
+		valueId = valueIdData.toString();
+	}
+
+	QVariant measuredValueData = model.GetData("measuredValue", modelIndex);
+	if (!measuredValueData.isNull()){
+		measuredValue = measuredValueData.toFloat();
+	}
+
+	QVariant lowLimitData = model.GetData("lowLimit", modelIndex);
+	if (!lowLimitData.isNull()){
+		lowLimit = lowLimitData.toFloat();
+	}
+
+	QVariant highLimitData = model.GetData("highLimit", modelIndex);
+	if (!highLimitData.isNull()){
+		highLimit = highLimitData.toFloat();
+	}
+
+	return true;
+}
+
+
+bool COverallResultValues::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (name){
+		gqlObject.InsertParam("name", QVariant(*name));
+	}
+
+	if (!valueId){
+		return false;
+	}
+	gqlObject.InsertParam("valueId", QVariant(*valueId));
+
+	if (!measuredValue){
+		return false;
+	}
+	gqlObject.InsertParam("measuredValue", QVariant(*measuredValue));
+
+	if (lowLimit){
+		gqlObject.InsertParam("lowLimit", QVariant(*lowLimit));
+	}
+
+	if (highLimit){
+		gqlObject.InsertParam("highLimit", QVariant(*highLimit));
+	}
+
+	return true;
+}
+
+bool COverallResultValues::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant nameData = gqlObject.GetParamArgumentValue("name");
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant valueIdData = gqlObject.GetParamArgumentValue("valueId");
+	if (valueIdData.isNull()){
+		return false;
+	}
+	valueId = valueIdData.toString();
+
+	QVariant measuredValueData = gqlObject.GetParamArgumentValue("measuredValue");
+	if (measuredValueData.isNull()){
+		return false;
+	}
+	measuredValue = measuredValueData.toFloat();
+
+	QVariant lowLimitData = gqlObject.GetParamArgumentValue("lowLimit");
+	if (!lowLimitData.isNull()){
+		lowLimit = lowLimitData.toFloat();
+	}
+
+	QVariant highLimitData = gqlObject.GetParamArgumentValue("highLimit");
+	if (!highLimitData.isNull()){
+		highLimit = highLimitData.toFloat();
+	}
+
+	return true;
+}
+
+
+bool COverallResultValues::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant nameData = gqlObject.GetParamArgumentValue("name");
+	if (!nameData.isNull()){
+		name = nameData.toString();
+	}
+
+	QVariant valueIdData = gqlObject.GetParamArgumentValue("valueId");
+	if (!valueIdData.isNull()){
+		valueId = valueIdData.toString();
+	}
+
+	QVariant measuredValueData = gqlObject.GetParamArgumentValue("measuredValue");
+	if (!measuredValueData.isNull()){
+		measuredValue = measuredValueData.toFloat();
+	}
+
+	QVariant lowLimitData = gqlObject.GetParamArgumentValue("lowLimit");
+	if (!lowLimitData.isNull()){
+		lowLimit = lowLimitData.toFloat();
+	}
+
+	QVariant highLimitData = gqlObject.GetParamArgumentValue("highLimit");
+	if (!highLimitData.isNull()){
+		highLimit = highLimitData.toFloat();
+	}
+
+	return true;
+}
+
+
+bool COverallResultValues::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (name){
+		jsonObject["name"] = QJsonValue::fromVariant(*name);
+		}
+
+
+	if (!valueId){
+		return false;
+	}
+	jsonObject["valueId"] = QJsonValue::fromVariant(*valueId);
+
+	if (!measuredValue){
+		return false;
+	}
+	jsonObject["measuredValue"] = QJsonValue::fromVariant(*measuredValue);
+
+	if (lowLimit){
+		jsonObject["lowLimit"] = QJsonValue::fromVariant(*lowLimit);
+		}
+
+
+	if (highLimit){
+		jsonObject["highLimit"] = QJsonValue::fromVariant(*highLimit);
+		}
+
+
+	return true;
+}
+
+
+bool COverallResultValues::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("name") && jsonObject["name"].isString()){
+		name = jsonObject["name"].toString();
+	}
+
+	if (!jsonObject.contains("valueId") || ! jsonObject["valueId"].isString()){
+		return false;
+	}
+	valueId = jsonObject["valueId"].toString();
+
+	if (!jsonObject.contains("measuredValue") || ! jsonObject["measuredValue"].isDouble()){
+		return false;
+	}
+	measuredValue = jsonObject["measuredValue"].toDouble();
+
+	if (jsonObject.contains("lowLimit") && jsonObject["lowLimit"].isDouble()){
+		lowLimit = jsonObject["lowLimit"].toDouble();
+	}
+
+	if (jsonObject.contains("highLimit") && jsonObject["highLimit"].isDouble()){
+		highLimit = jsonObject["highLimit"].toDouble();
+	}
+
+	return true;
+}
+
+
+bool COverallResultValues::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("name") && jsonObject["name"].isString()){
+		name = jsonObject["name"].toString();
+	}
+
+	if (jsonObject.contains("valueId") && jsonObject["valueId"].isString()){
+		valueId = jsonObject["valueId"].toString();
+	}
+
+	if (jsonObject.contains("measuredValue") && jsonObject["measuredValue"].isDouble()){
+		measuredValue = jsonObject["measuredValue"].toDouble();
+	}
+
+	if (jsonObject.contains("lowLimit") && jsonObject["lowLimit"].isDouble()){
+		lowLimit = jsonObject["lowLimit"].toDouble();
+	}
+
+	if (jsonObject.contains("highLimit") && jsonObject["highLimit"].isDouble()){
+		highLimit = jsonObject["highLimit"].toDouble();
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool COverallResultValues::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool COverallResultValues::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool COverallResultValues::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool COverallResultValues::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool COverallResultValues::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool COverallResultValues::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool COverallResultValues::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool COverallResultValues::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool COverallResultValues::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+
+
+/// \file CCDMResultVarRecursive.cpp
+
+namespace sdl::rtv::ProductionResults
+{
+
+
+QByteArray CCDMResultVarRecursive::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CCDMResultVarRecursive::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				dataModelTitle == other.dataModelTitle &&
+				dataModelVersion == other.dataModelVersion &&
+				resultMetaData == other.resultMetaData &&
+				resultContent == other.resultContent &&
+				overallResultValues == other.overallResultValues;
+}
+
+
+bool CCDMResultVarRecursive::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!dataModelTitle){
+		return false;
+	}
+	model.SetData("dataModelTitle", *dataModelTitle, modelIndex);
+
+	if (!dataModelVersion){
+		return false;
+	}
+	model.SetData("dataModelVersion", *dataModelVersion, modelIndex);
+
+
+	if (resultMetaData){
+		::imtbase::CTreeItemModel* resultMetaDataNewModelPtr = model.AddTreeModel("resultMetaData", modelIndex);
+		const bool isResultMetaDataAdded = resultMetaData->WriteToModel(*resultMetaDataNewModelPtr, 0);
+		if (!isResultMetaDataAdded){
+			return false;
+		}
+
+	}
+	if (resultContent){
+		::imtbase::CTreeItemModel* newResultContentModelPtr = model.AddTreeModel("resultContent", modelIndex);
+		newResultContentModelPtr->setIsArray(true);
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
+			QVariant resultContentVariantValue;
+			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((resultContent->at(resultContentIndex)).get())){
+				newResultContentModelPtr->InsertNewItem();
+				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
+					return false;
+				}
+			}
+			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((resultContent->at(resultContentIndex)).get())){
+				newResultContentModelPtr->InsertNewItem();
+				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
+					return false;
+				}
+			}
+		}
+	}
+
+	if (overallResultValues){
+		::imtbase::CTreeItemModel* newOverallResultValuesModelPtr = model.AddTreeModel("overallResultValues", modelIndex);
+		newOverallResultValuesModelPtr->setIsArray(true);
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
+			newOverallResultValuesModelPtr->InsertNewItem();
+			if (!(overallResultValues->at(overallResultValuesIndex).WriteToModel(*newOverallResultValuesModelPtr, overallResultValuesIndex))){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarRecursive::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
+	if (dataModelTitleData.isNull()){
+		return false;
+	}
+	dataModelTitle = dataModelTitleData.toString();
+
+	QVariant dataModelVersionData = model.GetData("dataModelVersion", modelIndex);
+	if (dataModelVersionData.isNull()){
+		return false;
+	}
+	dataModelVersion = dataModelVersionData.toString();
+
+	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
+	if (resultMetaDataDataModelPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
+	if (resultContentModel != nullptr){
+		int resultContentCount = resultContentModel->GetItemsCount();
+		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
+		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
+			std::shared_ptr<CDMResultUnionType> resultContentData;
+			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
+			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataConvert;
+				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
+				if (!isresultContentDataRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataConvert;
+				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
+				if (!isresultContentDataRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else{
+				return false;
+			}
+
+			resultContentList << resultContentData;
+		}
+		resultContent = resultContentList;
+
+	}
+
+	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
+	if (overallResultValuesModel != nullptr){
+		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.ReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarRecursive::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
+	if (!dataModelTitleData.isNull()){
+		dataModelTitle = dataModelTitleData.toString();
+	}
+
+	QVariant dataModelVersionData = model.GetData("dataModelVersion", modelIndex);
+	if (!dataModelVersionData.isNull()){
+		dataModelVersion = dataModelVersionData.toString();
+	}
+
+	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
+	if (resultMetaDataDataModelPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
+	if (resultContentModel != nullptr){
+		int resultContentCount = resultContentModel->GetItemsCount();
+		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
+		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
+			std::shared_ptr<CDMResultUnionType> resultContentData;
+			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
+			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataConvert;
+				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
+				if (!isresultContentDataRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataConvert;
+				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
+				if (!isresultContentDataRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else{
+				return false;
+			}
+
+			resultContentList << resultContentData;
+		}
+		resultContent = resultContentList;
+
+	}
+
+	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
+	if (overallResultValuesModel != nullptr){
+		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.OptReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!dataModelTitle){
+		return false;
+	}
+	gqlObject.InsertParam("dataModelTitle", QVariant(*dataModelTitle));
+
+	if (!dataModelVersion){
+		return false;
+	}
+	gqlObject.InsertParam("dataModelVersion", QVariant(*dataModelVersion));
+
+	if (resultMetaData){
+		::imtgql::CGqlParamObject resultMetaDataDataObject;
+		if (!resultMetaData->WriteToGraphQlObject(resultMetaDataDataObject)){
+			return false;
+		}
+		gqlObject.InsertParam("resultMetaData", resultMetaDataDataObject);
+	}
+
+	if (resultContent){
+		QList<::imtgql::CGqlParamObject> resultContentDataObjectList;
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
+			::imtgql::CGqlParamObject resultContentGqlValue;
+			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((resultContent->at(resultContentIndex)).get())){
+				if (!val->WriteToGraphQlObject(resultContentGqlValue)){
+					return false;
+				}
+			}
+			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((resultContent->at(resultContentIndex)).get())){
+				if (!val->WriteToGraphQlObject(resultContentGqlValue)){
+					return false;
+				}
+			}
+			resultContentDataObjectList << resultContentGqlValue;
+		}
+		gqlObject.InsertParam("resultContent", resultContentDataObjectList);
+	}
+
+	if (overallResultValues){
+		QList<::imtgql::CGqlParamObject> overallResultValuesDataObjectList;
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
+			::imtgql::CGqlParamObject overallResultValuesDataObject;
+			if (!overallResultValues->at(overallResultValuesIndex).WriteToGraphQlObject(overallResultValuesDataObject)){
+				return false;
+			}
+			overallResultValuesDataObjectList << overallResultValuesDataObject;
+		}
+		gqlObject.InsertParam("overallResultValues", overallResultValuesDataObjectList);
+	}
+
+	return true;
+}
+
+bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
+	if (dataModelTitleData.isNull()){
+		return false;
+	}
+	dataModelTitle = dataModelTitleData.toString();
+
+	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
+	if (dataModelVersionData.isNull()){
+		return false;
+	}
+	dataModelVersion = dataModelVersionData.toString();
+
+	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
+	if (resultMetaDataDataObjectPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		if (!isResultMetaDataRead){
+			return false;
+		}
+
+	}
+
+	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
+	if (!resultContentData.isNull()){
+		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
+		QVariantList resultContentDataList = resultContentData.toList();
+		qsizetype resultContentCount = resultContentDataList.size();
+		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
+			std::shared_ptr<CDMResultUnionType> resultContentData;
+			QVariant resultContentVariantValue = resultContentDataList[resultContentIndex];
+			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataConvert;
+				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
+				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isresultContentRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataConvert;
+				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
+				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isresultContentRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else{
+				return false;
+			}
+			resultContentList << resultContentData;
+		}
+		resultContent.emplace(resultContentList);
+
+	}
+
+	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
+	if (overallResultValuesCount > 0){
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+			if (overallResultValuesDataObjectPtr == nullptr){
+				return false;
+			}
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
+	if (!dataModelTitleData.isNull()){
+		dataModelTitle = dataModelTitleData.toString();
+	}
+
+	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
+	if (!dataModelVersionData.isNull()){
+		dataModelVersion = dataModelVersionData.toString();
+	}
+
+	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
+	if (resultMetaDataDataObjectPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		if (!isResultMetaDataRead){
+			return false;
+		}
+
+	}
+
+	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
+	if (!resultContentData.isNull()){
+		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
+		QVariantList resultContentDataList = resultContentData.toList();
+		qsizetype resultContentCount = resultContentDataList.size();
+		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
+			std::shared_ptr<CDMResultUnionType> resultContentData;
+			QVariant resultContentVariantValue = resultContentDataList[resultContentIndex];
+			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataConvert;
+				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
+				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isresultContentRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataConvert;
+				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
+				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isresultContentRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else{
+				return false;
+			}
+			resultContentList << resultContentData;
+		}
+		resultContent.emplace(resultContentList);
+
+	}
+
+	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
+	if (overallResultValuesCount > 0){
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+			if (overallResultValuesDataObjectPtr == nullptr){
+				return false;
+			}
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarRecursive::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!dataModelTitle){
+		return false;
+	}
+	jsonObject["dataModelTitle"] = QJsonValue::fromVariant(*dataModelTitle);
+
+	if (!dataModelVersion){
+		return false;
+	}
+	jsonObject["dataModelVersion"] = QJsonValue::fromVariant(*dataModelVersion);
+
+	if (resultMetaData){
+		QJsonObject resultMetaDatajsonObject;
+		const bool isResultMetaDataAdded = resultMetaData->WriteToJsonObject(resultMetaDatajsonObject);
+		if (!isResultMetaDataAdded){
+			return false;
+		}
+		jsonObject["resultMetaData"] = resultMetaDatajsonObject;
+	}
+
+	if (resultContent){
+		QJsonArray newResultContentArray;
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
+			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((resultContent->at(resultContentIndex)).get())){
+				QJsonObject resultContentJsonObject;
+				const bool isresultContentAdded = val->WriteToJsonObject(resultContentJsonObject);
+				if (!isresultContentAdded){
+					return false;
+				}
+				newResultContentArray << resultContentJsonObject;
+			}
+			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((resultContent->at(resultContentIndex)).get())){
+				QJsonObject resultContentJsonObject;
+				const bool isresultContentAdded = val->WriteToJsonObject(resultContentJsonObject);
+				if (!isresultContentAdded){
+					return false;
+				}
+				newResultContentArray << resultContentJsonObject;
+			}
+		}
+		jsonObject["resultContent"] = newResultContentArray;
+	}
+
+	if (overallResultValues){
+		QJsonArray newOverallResultValuesArray;
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
+			QJsonObject newOverallResultValuesJsonObject;
+			if (!overallResultValues->at(overallResultValuesIndex).WriteToJsonObject(newOverallResultValuesJsonObject)){
+				return false;
+			}
+			newOverallResultValuesArray << newOverallResultValuesJsonObject;
+		}
+		jsonObject["overallResultValues"] = newOverallResultValuesArray;
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("dataModelTitle") || ! jsonObject["dataModelTitle"].isString()){
+		return false;
+	}
+	dataModelTitle = jsonObject["dataModelTitle"].toString();
+
+	if (!jsonObject.contains("dataModelVersion") || ! jsonObject["dataModelVersion"].isString()){
+		return false;
+	}
+	dataModelVersion = jsonObject["dataModelVersion"].toString();
+
+	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
+		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		resultContent = QList<std::shared_ptr<rtv::ProductionResults::CDMResultUnionType>>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
+			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
+			std::shared_ptr<rtv::ProductionResults::CDMResultUnionType> resultContentDataValue;
+			if (tempResultContent.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataValueConvert;
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				if (!isresultContentDataValueRead){
+					return false;
+				}
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
+			}
+			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataValueConvert;
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				if (!isresultContentDataValueRead){
+					return false;
+				}
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
+			}
+			else{
+				return false;
+			}
+			resultContent->append(resultContentDataValue);
+		}
+	}
+
+	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
+		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+				return false;
+			}
+			overallResultValues->append(tempOverallResultValues);
+		}
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("dataModelTitle") && jsonObject["dataModelTitle"].isString()){
+		dataModelTitle = jsonObject["dataModelTitle"].toString();
+	}
+
+	if (jsonObject.contains("dataModelVersion") && jsonObject["dataModelVersion"].isString()){
+		dataModelVersion = jsonObject["dataModelVersion"].toString();
+	}
+
+	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
+		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		resultContent = QList<std::shared_ptr<rtv::ProductionResults::CDMResultUnionType>>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
+			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
+			std::shared_ptr<rtv::ProductionResults::CDMResultUnionType> resultContentDataValue;
+			if (tempResultContent.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataValueConvert;
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				if (!isresultContentDataValueRead){
+					return false;
+				}
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
+			}
+			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataValueConvert;
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				if (!isresultContentDataValueRead){
+					return false;
+				}
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
+			}
+			else{
+				return false;
+			}
+			resultContent->append(resultContentDataValue);
+		}
+	}
+
+	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
+		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+				return false;
+			}
+			overallResultValues->append(tempOverallResultValues);
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CCDMResultVarRecursive::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarRecursive::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarRecursive::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarRecursive::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarRecursive::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarRecursive::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarRecursive::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarRecursive::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+
+
+/// \file CCDMResultVarString.cpp
+
+namespace sdl::rtv::ProductionResults
+{
+
+
+QByteArray CCDMResultVarString::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CCDMResultVarString::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				dataModelTitle == other.dataModelTitle &&
+				dataModelVersion == other.dataModelVersion &&
+				resultMetaData == other.resultMetaData &&
+				resultContent == other.resultContent &&
+				overallResultValues == other.overallResultValues;
+}
+
+
+bool CCDMResultVarString::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!dataModelTitle){
+		return false;
+	}
+	model.SetData("dataModelTitle", *dataModelTitle, modelIndex);
+
+	if (!dataModelVersion){
+		return false;
+	}
+	model.SetData("dataModelVersion", *dataModelVersion, modelIndex);
+
+
+	if (resultMetaData){
+		::imtbase::CTreeItemModel* resultMetaDataNewModelPtr = model.AddTreeModel("resultMetaData", modelIndex);
+		const bool isResultMetaDataAdded = resultMetaData->WriteToModel(*resultMetaDataNewModelPtr, 0);
+		if (!isResultMetaDataAdded){
+			return false;
+		}
+
+	}
+	if (resultContent){
+		::imtbase::CTreeItemModel* newResultContentModelPtr = model.AddTreeModel("resultContent", modelIndex);
+		newResultContentModelPtr->setIsArray(true);
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
+			newResultContentModelPtr->InsertNewItem();
+			newResultContentModelPtr->SetData(QByteArray(), resultContent->at(resultContentIndex), resultContentIndex);
+		}
+	}
+
+	if (overallResultValues){
+		::imtbase::CTreeItemModel* newOverallResultValuesModelPtr = model.AddTreeModel("overallResultValues", modelIndex);
+		newOverallResultValuesModelPtr->setIsArray(true);
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
+			newOverallResultValuesModelPtr->InsertNewItem();
+			if (!(overallResultValues->at(overallResultValuesIndex).WriteToModel(*newOverallResultValuesModelPtr, overallResultValuesIndex))){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarString::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
+	if (dataModelTitleData.isNull()){
+		return false;
+	}
+	dataModelTitle = dataModelTitleData.toString();
+
+	QVariant dataModelVersionData = model.GetData("dataModelVersion", modelIndex);
+	if (dataModelVersionData.isNull()){
+		return false;
+	}
+	dataModelVersion = dataModelVersionData.toString();
+
+	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
+	if (resultMetaDataDataModelPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
+	if (resultContentModel != nullptr){
+		int resultContentCount = resultContentModel->GetItemsCount();
+		QList<QString> resultContentList;
+		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
+			QString resultContent = resultContentModel->GetData(QByteArray(), resultContentIndex).toString();
+			resultContentList << resultContent;
+		}
+		resultContent = resultContentList;
+
+	}
+
+	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
+	if (overallResultValuesModel != nullptr){
+		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.ReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarString::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
+	if (!dataModelTitleData.isNull()){
+		dataModelTitle = dataModelTitleData.toString();
+	}
+
+	QVariant dataModelVersionData = model.GetData("dataModelVersion", modelIndex);
+	if (!dataModelVersionData.isNull()){
+		dataModelVersion = dataModelVersionData.toString();
+	}
+
+	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
+	if (resultMetaDataDataModelPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
+	if (resultContentModel != nullptr){
+		int resultContentCount = resultContentModel->GetItemsCount();
+		QList<QString> resultContentList;
+		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
+			QString resultContent = resultContentModel->GetData(QByteArray(), resultContentIndex).toString();
+			resultContentList << resultContent;
+		}
+		resultContent = resultContentList;
+
+	}
+
+	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
+	if (overallResultValuesModel != nullptr){
+		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.OptReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarString::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!dataModelTitle){
+		return false;
+	}
+	gqlObject.InsertParam("dataModelTitle", QVariant(*dataModelTitle));
+
+	if (!dataModelVersion){
+		return false;
+	}
+	gqlObject.InsertParam("dataModelVersion", QVariant(*dataModelVersion));
+
+	if (resultMetaData){
+		::imtgql::CGqlParamObject resultMetaDataDataObject;
+		if (!resultMetaData->WriteToGraphQlObject(resultMetaDataDataObject)){
+			return false;
+		}
+		gqlObject.InsertParam("resultMetaData", resultMetaDataDataObject);
+	}
+
+	if (resultContent){
+		QVariantList resultContentTempList;
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
+			resultContentTempList << resultContent->at(resultContentIndex);
+		}
+		gqlObject.InsertParam("resultContent", QVariant(resultContentTempList));
+	}
+
+	if (overallResultValues){
+		QList<::imtgql::CGqlParamObject> overallResultValuesDataObjectList;
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
+			::imtgql::CGqlParamObject overallResultValuesDataObject;
+			if (!overallResultValues->at(overallResultValuesIndex).WriteToGraphQlObject(overallResultValuesDataObject)){
+				return false;
+			}
+			overallResultValuesDataObjectList << overallResultValuesDataObject;
+		}
+		gqlObject.InsertParam("overallResultValues", overallResultValuesDataObjectList);
+	}
+
+	return true;
+}
+
+bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
+	if (dataModelTitleData.isNull()){
+		return false;
+	}
+	dataModelTitle = dataModelTitleData.toString();
+
+	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
+	if (dataModelVersionData.isNull()){
+		return false;
+	}
+	dataModelVersion = dataModelVersionData.toString();
+
+	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
+	if (resultMetaDataDataObjectPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		if (!isResultMetaDataRead){
+			return false;
+		}
+
+	}
+
+	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
+	if (!resultContentData.isNull()){
+		QList<QString> resultContentList;
+		QVariantList resultContentDataList = resultContentData.toList();
+		qsizetype resultContentCount = resultContentDataList.size();
+		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
+			QString resultContent = resultContentDataList[resultContentIndex].toString();
+			resultContentList << resultContent;
+		}
+		resultContent = resultContentList;
+
+	}
+
+	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
+	if (overallResultValuesCount > 0){
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+			if (overallResultValuesDataObjectPtr == nullptr){
+				return false;
+			}
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
+	if (!dataModelTitleData.isNull()){
+		dataModelTitle = dataModelTitleData.toString();
+	}
+
+	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
+	if (!dataModelVersionData.isNull()){
+		dataModelVersion = dataModelVersionData.toString();
+	}
+
+	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
+	if (resultMetaDataDataObjectPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		if (!isResultMetaDataRead){
+			return false;
+		}
+
+	}
+
+	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
+	if (!resultContentData.isNull()){
+		QList<QString> resultContentList;
+		QVariantList resultContentDataList = resultContentData.toList();
+		qsizetype resultContentCount = resultContentDataList.size();
+		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
+			QString resultContent = resultContentDataList[resultContentIndex].toString();
+			resultContentList << resultContent;
+		}
+		resultContent = resultContentList;
+
+	}
+
+	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
+	if (overallResultValuesCount > 0){
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+			if (overallResultValuesDataObjectPtr == nullptr){
+				return false;
+			}
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarString::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!dataModelTitle){
+		return false;
+	}
+	jsonObject["dataModelTitle"] = QJsonValue::fromVariant(*dataModelTitle);
+
+	if (!dataModelVersion){
+		return false;
+	}
+	jsonObject["dataModelVersion"] = QJsonValue::fromVariant(*dataModelVersion);
+
+	if (resultMetaData){
+		QJsonObject resultMetaDatajsonObject;
+		const bool isResultMetaDataAdded = resultMetaData->WriteToJsonObject(resultMetaDatajsonObject);
+		if (!isResultMetaDataAdded){
+			return false;
+		}
+		jsonObject["resultMetaData"] = resultMetaDatajsonObject;
+	}
+
+	if (resultContent){
+		QJsonArray newResultContentArray;
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
+			newResultContentArray << resultContent->at(resultContentIndex);
+		}
+		jsonObject["resultContent"] = newResultContentArray;
+	}
+
+	if (overallResultValues){
+		QJsonArray newOverallResultValuesArray;
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
+			QJsonObject newOverallResultValuesJsonObject;
+			if (!overallResultValues->at(overallResultValuesIndex).WriteToJsonObject(newOverallResultValuesJsonObject)){
+				return false;
+			}
+			newOverallResultValuesArray << newOverallResultValuesJsonObject;
+		}
+		jsonObject["overallResultValues"] = newOverallResultValuesArray;
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarString::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("dataModelTitle") || ! jsonObject["dataModelTitle"].isString()){
+		return false;
+	}
+	dataModelTitle = jsonObject["dataModelTitle"].toString();
+
+	if (!jsonObject.contains("dataModelVersion") || ! jsonObject["dataModelVersion"].isString()){
+		return false;
+	}
+	dataModelVersion = jsonObject["dataModelVersion"].toString();
+
+	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
+		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		resultContent = QList<QString>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
+			QString tempResultContent = resultContentjsonArray[resultContentIndex].toString();
+			resultContent->append(tempResultContent);
+		}
+	}
+
+	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
+		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+				return false;
+			}
+			overallResultValues->append(tempOverallResultValues);
+		}
+	}
+
+	return true;
+}
+
+
+bool CCDMResultVarString::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("dataModelTitle") && jsonObject["dataModelTitle"].isString()){
+		dataModelTitle = jsonObject["dataModelTitle"].toString();
+	}
+
+	if (jsonObject.contains("dataModelVersion") && jsonObject["dataModelVersion"].isString()){
+		dataModelVersion = jsonObject["dataModelVersion"].toString();
+	}
+
+	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
+		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		resultContent = QList<QString>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
+			QString tempResultContent = resultContentjsonArray[resultContentIndex].toString();
+			resultContent->append(tempResultContent);
+		}
+	}
+
+	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
+		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+				return false;
+			}
+			overallResultValues->append(tempOverallResultValues);
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CCDMResultVarString::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarString::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarString::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarString::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarString::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarString::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarString::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarString::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+
+
+/// \file CCDMResult.cpp
+
+namespace sdl::rtv::ProductionResults
+{
+
+
+QByteArray CCDMResult::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CCDMResult::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				dataModelTitle == other.dataModelTitle &&
+				dataModelVersion == other.dataModelVersion &&
+				resultMetaData == other.resultMetaData &&
+				resultContent == other.resultContent &&
+				overallResultValues == other.overallResultValues;
+}
+
+
+bool CCDMResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (!dataModelTitle){
+		return false;
+	}
+	model.SetData("dataModelTitle", *dataModelTitle, modelIndex);
+
+	if (!dataModelVersion){
+		return false;
+	}
+	model.SetData("dataModelVersion", *dataModelVersion, modelIndex);
+
+
+	if (resultMetaData){
+		::imtbase::CTreeItemModel* resultMetaDataNewModelPtr = model.AddTreeModel("resultMetaData", modelIndex);
+		const bool isResultMetaDataAdded = resultMetaData->WriteToModel(*resultMetaDataNewModelPtr, 0);
+		if (!isResultMetaDataAdded){
+			return false;
+		}
+
+	}
+	if (resultContent){
+		::imtbase::CTreeItemModel* newResultContentModelPtr = model.AddTreeModel("resultContent", modelIndex);
+		newResultContentModelPtr->setIsArray(true);
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
+			QVariant resultContentVariantValue;
+			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((resultContent->at(resultContentIndex)).get())){
+				newResultContentModelPtr->InsertNewItem();
+				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
+					return false;
+				}
+			}
+			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((resultContent->at(resultContentIndex)).get())){
+				newResultContentModelPtr->InsertNewItem();
+				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
+					return false;
+				}
+			}
+		}
+	}
+
+	if (overallResultValues){
+		::imtbase::CTreeItemModel* newOverallResultValuesModelPtr = model.AddTreeModel("overallResultValues", modelIndex);
+		newOverallResultValuesModelPtr->setIsArray(true);
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
+			newOverallResultValuesModelPtr->InsertNewItem();
+			if (!(overallResultValues->at(overallResultValuesIndex).WriteToModel(*newOverallResultValuesModelPtr, overallResultValuesIndex))){
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CCDMResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
+	if (dataModelTitleData.isNull()){
+		return false;
+	}
+	dataModelTitle = dataModelTitleData.toString();
+
+	QVariant dataModelVersionData = model.GetData("dataModelVersion", modelIndex);
+	if (dataModelVersionData.isNull()){
+		return false;
+	}
+	dataModelVersion = dataModelVersionData.toString();
+
+	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
+	if (resultMetaDataDataModelPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
+	if (resultContentModel != nullptr){
+		int resultContentCount = resultContentModel->GetItemsCount();
+		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
+		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
+			std::shared_ptr<CDMResultUnionType> resultContentData;
+			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
+			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataConvert;
+				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
+				if (!isresultContentDataRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataConvert;
+				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
+				if (!isresultContentDataRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else{
+				return false;
+			}
+
+			resultContentList << resultContentData;
+		}
+		resultContent = resultContentList;
+
+	}
+
+	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
+	if (overallResultValuesModel != nullptr){
+		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.ReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant dataModelTitleData = model.GetData("dataModelTitle", modelIndex);
+	if (!dataModelTitleData.isNull()){
+		dataModelTitle = dataModelTitleData.toString();
+	}
+
+	QVariant dataModelVersionData = model.GetData("dataModelVersion", modelIndex);
+	if (!dataModelVersionData.isNull()){
+		dataModelVersion = dataModelVersionData.toString();
+	}
+
+	::imtbase::CTreeItemModel* resultMetaDataDataModelPtr = model.GetTreeItemModel("resultMetaData", modelIndex);
+	if (resultMetaDataDataModelPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->ReadFromModel(*resultMetaDataDataModelPtr, modelIndex);
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	::imtbase::CTreeItemModel* resultContentModel = model.GetTreeItemModel("resultContent", modelIndex);
+	if (resultContentModel != nullptr){
+		int resultContentCount = resultContentModel->GetItemsCount();
+		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
+		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
+			std::shared_ptr<CDMResultUnionType> resultContentData;
+			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
+			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataConvert;
+				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
+				if (!isresultContentDataRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataConvert;
+				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
+				if (!isresultContentDataRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else{
+				return false;
+			}
+
+			resultContentList << resultContentData;
+		}
+		resultContent = resultContentList;
+
+	}
+
+	::imtbase::CTreeItemModel* overallResultValuesModel = model.GetTreeItemModel("overallResultValues", modelIndex);
+	if (overallResultValuesModel != nullptr){
+		int overallResultValuesCount = overallResultValuesModel->GetItemsCount();
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.OptReadFromModel(*overallResultValuesModel, overallResultValuesIndex)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (!dataModelTitle){
+		return false;
+	}
+	gqlObject.InsertParam("dataModelTitle", QVariant(*dataModelTitle));
+
+	if (!dataModelVersion){
+		return false;
+	}
+	gqlObject.InsertParam("dataModelVersion", QVariant(*dataModelVersion));
+
+	if (resultMetaData){
+		::imtgql::CGqlParamObject resultMetaDataDataObject;
+		if (!resultMetaData->WriteToGraphQlObject(resultMetaDataDataObject)){
+			return false;
+		}
+		gqlObject.InsertParam("resultMetaData", resultMetaDataDataObject);
+	}
+
+	if (resultContent){
+		QList<::imtgql::CGqlParamObject> resultContentDataObjectList;
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
+			::imtgql::CGqlParamObject resultContentGqlValue;
+			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((resultContent->at(resultContentIndex)).get())){
+				if (!val->WriteToGraphQlObject(resultContentGqlValue)){
+					return false;
+				}
+			}
+			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((resultContent->at(resultContentIndex)).get())){
+				if (!val->WriteToGraphQlObject(resultContentGqlValue)){
+					return false;
+				}
+			}
+			resultContentDataObjectList << resultContentGqlValue;
+		}
+		gqlObject.InsertParam("resultContent", resultContentDataObjectList);
+	}
+
+	if (overallResultValues){
+		QList<::imtgql::CGqlParamObject> overallResultValuesDataObjectList;
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
+			::imtgql::CGqlParamObject overallResultValuesDataObject;
+			if (!overallResultValues->at(overallResultValuesIndex).WriteToGraphQlObject(overallResultValuesDataObject)){
+				return false;
+			}
+			overallResultValuesDataObjectList << overallResultValuesDataObject;
+		}
+		gqlObject.InsertParam("overallResultValues", overallResultValuesDataObjectList);
+	}
+
+	return true;
+}
+
+bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
+	if (dataModelTitleData.isNull()){
+		return false;
+	}
+	dataModelTitle = dataModelTitleData.toString();
+
+	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
+	if (dataModelVersionData.isNull()){
+		return false;
+	}
+	dataModelVersion = dataModelVersionData.toString();
+
+	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
+	if (resultMetaDataDataObjectPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		if (!isResultMetaDataRead){
+			return false;
+		}
+
+	}
+
+	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
+	if (!resultContentData.isNull()){
+		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
+		QVariantList resultContentDataList = resultContentData.toList();
+		qsizetype resultContentCount = resultContentDataList.size();
+		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
+			std::shared_ptr<CDMResultUnionType> resultContentData;
+			QVariant resultContentVariantValue = resultContentDataList[resultContentIndex];
+			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataConvert;
+				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
+				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isresultContentRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataConvert;
+				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
+				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isresultContentRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else{
+				return false;
+			}
+			resultContentList << resultContentData;
+		}
+		resultContent.emplace(resultContentList);
+
+	}
+
+	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
+	if (overallResultValuesCount > 0){
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+			if (overallResultValuesDataObjectPtr == nullptr){
+				return false;
+			}
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
+	if (!dataModelTitleData.isNull()){
+		dataModelTitle = dataModelTitleData.toString();
+	}
+
+	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
+	if (!dataModelVersionData.isNull()){
+		dataModelVersion = dataModelVersionData.toString();
+	}
+
+	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
+	if (resultMetaDataDataObjectPtr != nullptr){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		if (!isResultMetaDataRead){
+			return false;
+		}
+
+	}
+
+	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
+	if (!resultContentData.isNull()){
+		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
+		QVariantList resultContentDataList = resultContentData.toList();
+		qsizetype resultContentCount = resultContentDataList.size();
+		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
+			std::shared_ptr<CDMResultUnionType> resultContentData;
+			QVariant resultContentVariantValue = resultContentDataList[resultContentIndex];
+			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataConvert;
+				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
+				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isresultContentRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataConvert;
+				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
+				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isresultContentRead){
+					return false;
+				}
+				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+			}
+			else{
+				return false;
+			}
+			resultContentList << resultContentData;
+		}
+		resultContent.emplace(resultContentList);
+
+	}
+
+	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
+	if (overallResultValuesCount > 0){
+		QList<COverallResultValues::V1_0> overallResultValuesList;
+		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+			if (overallResultValuesDataObjectPtr == nullptr){
+				return false;
+			}
+			COverallResultValues::V1_0 overallResultValues;
+			if (!overallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+				return false;
+			}
+			overallResultValuesList << overallResultValues;
+		}
+		overallResultValues = overallResultValuesList;
+
+	}
+
+	return true;
+}
+
+
+bool CCDMResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (!dataModelTitle){
+		return false;
+	}
+	jsonObject["dataModelTitle"] = QJsonValue::fromVariant(*dataModelTitle);
+
+	if (!dataModelVersion){
+		return false;
+	}
+	jsonObject["dataModelVersion"] = QJsonValue::fromVariant(*dataModelVersion);
+
+	if (resultMetaData){
+		QJsonObject resultMetaDatajsonObject;
+		const bool isResultMetaDataAdded = resultMetaData->WriteToJsonObject(resultMetaDatajsonObject);
+		if (!isResultMetaDataAdded){
+			return false;
+		}
+		jsonObject["resultMetaData"] = resultMetaDatajsonObject;
+	}
+
+	if (resultContent){
+		QJsonArray newResultContentArray;
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
+			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((resultContent->at(resultContentIndex)).get())){
+				QJsonObject resultContentJsonObject;
+				const bool isresultContentAdded = val->WriteToJsonObject(resultContentJsonObject);
+				if (!isresultContentAdded){
+					return false;
+				}
+				newResultContentArray << resultContentJsonObject;
+			}
+			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((resultContent->at(resultContentIndex)).get())){
+				QJsonObject resultContentJsonObject;
+				const bool isresultContentAdded = val->WriteToJsonObject(resultContentJsonObject);
+				if (!isresultContentAdded){
+					return false;
+				}
+				newResultContentArray << resultContentJsonObject;
+			}
+		}
+		jsonObject["resultContent"] = newResultContentArray;
+	}
+
+	if (overallResultValues){
+		QJsonArray newOverallResultValuesArray;
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
+			QJsonObject newOverallResultValuesJsonObject;
+			if (!overallResultValues->at(overallResultValuesIndex).WriteToJsonObject(newOverallResultValuesJsonObject)){
+				return false;
+			}
+			newOverallResultValuesArray << newOverallResultValuesJsonObject;
+		}
+		jsonObject["overallResultValues"] = newOverallResultValuesArray;
+	}
+
+	return true;
+}
+
+
+bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (!jsonObject.contains("dataModelTitle") || ! jsonObject["dataModelTitle"].isString()){
+		return false;
+	}
+	dataModelTitle = jsonObject["dataModelTitle"].toString();
+
+	if (!jsonObject.contains("dataModelVersion") || ! jsonObject["dataModelVersion"].isString()){
+		return false;
+	}
+	dataModelVersion = jsonObject["dataModelVersion"].toString();
+
+	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
+		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		resultContent = QList<std::shared_ptr<rtv::ProductionResults::CDMResultUnionType>>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
+			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
+			std::shared_ptr<rtv::ProductionResults::CDMResultUnionType> resultContentDataValue;
+			if (tempResultContent.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataValueConvert;
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				if (!isresultContentDataValueRead){
+					return false;
+				}
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
+			}
+			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataValueConvert;
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				if (!isresultContentDataValueRead){
+					return false;
+				}
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
+			}
+			else{
+				return false;
+			}
+			resultContent->append(resultContentDataValue);
+		}
+	}
+
+	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
+		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+				return false;
+			}
+			overallResultValues->append(tempOverallResultValues);
+		}
+	}
+
+	return true;
+}
+
+
+bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("dataModelTitle") && jsonObject["dataModelTitle"].isString()){
+		dataModelTitle = jsonObject["dataModelTitle"].toString();
+	}
+
+	if (jsonObject.contains("dataModelVersion") && jsonObject["dataModelVersion"].isString()){
+		dataModelVersion = jsonObject["dataModelVersion"].toString();
+	}
+
+	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
+		resultMetaData = CResultMetaData::V1_0();
+		const bool isResultMetaDataReaded = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataReaded){
+			return false;
+		}
+	}
+
+	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
+		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		resultContent = QList<std::shared_ptr<rtv::ProductionResults::CDMResultUnionType>>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
+			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
+			std::shared_ptr<rtv::ProductionResults::CDMResultUnionType> resultContentDataValue;
+			if (tempResultContent.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataValueConvert;
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				if (!isresultContentDataValueRead){
+					return false;
+				}
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
+			}
+			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataValueConvert;
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				if (!isresultContentDataValueRead){
+					return false;
+				}
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
+			}
+			else{
+				return false;
+			}
+			resultContent->append(resultContentDataValue);
+		}
+	}
+
+	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
+		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+				return false;
+			}
+			overallResultValues->append(tempOverallResultValues);
+		}
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CCDMResult::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResult::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResult::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResult::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResult::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResult::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResult::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResult::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+
+
+/// \file CPointsInCoordinateFormat.cpp
+
+namespace sdl::rtv::ProductionResults
+{
+
+
+QByteArray CPointsInCoordinateFormat::V1_0::GetVersionId()
+{
+	return QByteArrayLiteral("1.0");
+}
+
+
+bool CPointsInCoordinateFormat::V1_0::operator==(const V1_0& other) const
+{
+	return 
+				pointAsCoordinates == other.pointAsCoordinates;
+}
+
+
+bool CPointsInCoordinateFormat::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex) const
+{
+	if (pointAsCoordinates){
+		model.SetData("pointAsCoordinates", *pointAsCoordinates, modelIndex);
+	}
+
+
+	return true;
+}
+
+
+bool CPointsInCoordinateFormat::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant pointAsCoordinatesData = model.GetData("pointAsCoordinates", modelIndex);
+	if (!pointAsCoordinatesData.isNull()){
+		pointAsCoordinates = pointAsCoordinatesData.toBool();
+	}
+
+	return true;
+}
+
+
+bool CPointsInCoordinateFormat::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex)
+{
+	QVariant pointAsCoordinatesData = model.GetData("pointAsCoordinates", modelIndex);
+	if (!pointAsCoordinatesData.isNull()){
+		pointAsCoordinates = pointAsCoordinatesData.toBool();
+	}
+
+	return true;
+}
+
+
+bool CPointsInCoordinateFormat::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
+{
+	if (pointAsCoordinates){
+		gqlObject.InsertParam("pointAsCoordinates", QVariant(*pointAsCoordinates));
+	}
+
+	return true;
+}
+
+bool CPointsInCoordinateFormat::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant pointAsCoordinatesData = gqlObject.GetParamArgumentValue("pointAsCoordinates");
+	if (!pointAsCoordinatesData.isNull()){
+		pointAsCoordinates = pointAsCoordinatesData.toBool();
+	}
+
+	return true;
+}
+
+
+bool CPointsInCoordinateFormat::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	QVariant pointAsCoordinatesData = gqlObject.GetParamArgumentValue("pointAsCoordinates");
+	if (!pointAsCoordinatesData.isNull()){
+		pointAsCoordinates = pointAsCoordinatesData.toBool();
+	}
+
+	return true;
+}
+
+
+bool CPointsInCoordinateFormat::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
+{
+	if (pointAsCoordinates){
+		jsonObject["pointAsCoordinates"] = QJsonValue::fromVariant(*pointAsCoordinates);
+		}
+
+
+	return true;
+}
+
+
+bool CPointsInCoordinateFormat::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("pointAsCoordinates") && jsonObject["pointAsCoordinates"].isBool()){
+		pointAsCoordinates = jsonObject["pointAsCoordinates"].toBool();
+	}
+
+	return true;
+}
+
+
+bool CPointsInCoordinateFormat::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
+{
+	if (jsonObject.contains("pointAsCoordinates") && jsonObject["pointAsCoordinates"].isBool()){
+		pointAsCoordinates = jsonObject["pointAsCoordinates"].toBool();
+	}
+
+	return true;
+}
+
+
+// serialize methods
+
+bool CPointsInCoordinateFormat::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToModel(model, modelIndex);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CPointsInCoordinateFormat::ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CPointsInCoordinateFormat::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromModel(model, modelIndex);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CPointsInCoordinateFormat::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToGraphQlObject(gqlObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CPointsInCoordinateFormat::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CPointsInCoordinateFormat::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromGraphQlObject(gqlObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CPointsInCoordinateFormat::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) const
+{
+	if (version == PV_AUTO){
+		if (Version_1_0){
+			return Version_1_0->WriteToJsonObject(jsonObject);
+		}
+		else {
+			return false;
+		}
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			qCritical() << "Uninitialized version member";
+			Q_ASSERT_X(false, __func__, "Uninitialized version member");
+
+			return false;
+		}
+
+		return Version_1_0->WriteToJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CPointsInCoordinateFormat::ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->ReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+bool CPointsInCoordinateFormat::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version)
+{
+	if (version == PV_AUTO){
+		qCritical() << "AUTO protocol is NOT supported for read methods!";
+		Q_ASSERT_X(false, __func__, "AUTO protocol is NOT supported for read methods!");
+
+		return false;
+	}
+	else if (version == PV_1_0){
+		if (!Version_1_0){
+			Version_1_0 = V1_0();
+		}
+
+		return Version_1_0->OptReadFromJsonObject(jsonObject);
+	}
+
+	qCritical() << "Invalid version";
+	Q_ASSERT_X(false, __func__, "Invalid version");
+
+	return false;
+}
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+
+
+/// \file CGetLastProductionResultsGqlgqlObject.cpp
+
+
+namespace sdl::rtv::ProductionResults
+{
+
+
+QByteArray CGetLastProductionResultsGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("GetLastProductionResults");
+}
+
+
+bool CGetLastProductionResultsGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetLastProductionResultsRequestArguments& requestArguments, const GetLastProductionResultsRequestInfo& /*requestInfo*/)
+{
+	gqlgqlObject.SetCommandId(GetCommandId());
+
+	// writting input arguments
+
+	return true;
+}
+
+
+CGetLastProductionResultsGqlRequest::CGetLastProductionResultsGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	Q_UNUSED(optRead)
+	m_isValid = true;
+	m_gqlContextPtr = gqlgqlObject.GetRequestContext();
+
+	const QByteArray protocolVersion = gqlgqlObject.GetProtocolVersion();
+
+	// reading input arguments
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlgqlObject.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = gqlgqlObject.GetFields().GetFieldArgumentObjectPtr(gqlgqlObject.GetFields().GetFieldIds().constFirst());
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+			if (!requestedIds.isEmpty()){
+				m_requestInfo.isProductIDRequested = true;
+				m_requestInfo.isNameRequested = true;
+				m_requestInfo.isStatusRequested = true;
+				m_requestInfo.isPartSerialNumberRequested = true;
+				m_requestInfo.isTimestampRequested = true;
+				m_requestInfo.isProductImageRequested = true;
+				m_requestInfo.isInspectionsRequested = requestedIds.contains("Inspections");
+				const imtgql::CGqlFieldObject* inspectionsRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("Inspections");
+				if (inspectionsRequestedFieldsPtr != nullptr){
+					const QByteArrayList inspectionsRequestedIds = inspectionsRequestedFieldsPtr->GetFieldIds();
+					if (!inspectionsRequestedIds.isEmpty()){
+						m_requestInfo.Inspections.isIDRequested = true;
+						m_requestInfo.Inspections.isTypeIDRequested = true;
+						m_requestInfo.Inspections.isNameRequested = true;
+						m_requestInfo.Inspections.isStatusRequested = true;
+						m_requestInfo.Inspections.isAnalyzersRequested = inspectionsRequestedIds.contains("Analyzers");
+						const imtgql::CGqlFieldObject* analyzersRequestedFieldsPtr = inspectionsRequestedFieldsPtr->GetFieldArgumentObjectPtr("Analyzers");
+						if (analyzersRequestedFieldsPtr != nullptr){
+							const QByteArrayList analyzersRequestedIds = analyzersRequestedFieldsPtr->GetFieldIds();
+							if (!analyzersRequestedIds.isEmpty()){
+								m_requestInfo.Inspections.Analyzers.isAnalyzerNameRequested = true;
+								m_requestInfo.Inspections.Analyzers.isAnalyzerResultRequested = true;
+								m_requestInfo.Inspections.Analyzers.isAreasRequested = analyzersRequestedIds.contains("Areas");
+								const imtgql::CGqlFieldObject* areasRequestedFieldsPtr = analyzersRequestedFieldsPtr->GetFieldArgumentObjectPtr("Areas");
+								if (areasRequestedFieldsPtr != nullptr){
+									const QByteArrayList areasRequestedIds = areasRequestedFieldsPtr->GetFieldIds();
+									if (!areasRequestedIds.isEmpty()){
+										m_requestInfo.Inspections.Analyzers.Areas.isAreaNameRequested = true;
+										m_requestInfo.Inspections.Analyzers.Areas.isStatusRequested = true;
+										m_requestInfo.Inspections.Analyzers.Areas.isIconPositionRequested = true;
+										m_requestInfo.Inspections.Analyzers.Areas.isErrorTypeRequested = true;
+										m_requestInfo.Inspections.Analyzers.Areas.isResultsRequested = true;
+										const imtgql::CGqlFieldObject* iconPositionRequestedFieldsPtr = areasRequestedFieldsPtr->GetFieldArgumentObjectPtr("IconPosition");
+										if (iconPositionRequestedFieldsPtr != nullptr){
+											const QByteArrayList iconPositionRequestedIds = iconPositionRequestedFieldsPtr->GetFieldIds();
+											if (!iconPositionRequestedIds.isEmpty()){
+												m_requestInfo.Inspections.Analyzers.Areas.IconPosition.isXRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.IconPosition.isYRequested = true;
+											}
+										}
+										const imtgql::CGqlFieldObject* resultsRequestedFieldsPtr = areasRequestedFieldsPtr->GetFieldArgumentObjectPtr("Results");
+										if (resultsRequestedFieldsPtr != nullptr){
+											const QByteArrayList resultsRequestedIds = resultsRequestedFieldsPtr->GetFieldIds();
+											if (!resultsRequestedIds.isEmpty()){
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isAreaResultRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isExpectedMinValueRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isExpectedMaxValueRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isMeasuredValueRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isMinMeasuredValueRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isMaxMeasuredValueRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isMeanMeasuredValueRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isMeasurementTypeRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isMeasurementUnitRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isLengthRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isErrorTypeRequested = true;
+												m_requestInfo.Inspections.Analyzers.Areas.Results.isGeometryRequested = true;
+												const imtgql::CGqlFieldObject* geometryRequestedFieldsPtr = resultsRequestedFieldsPtr->GetFieldArgumentObjectPtr("Geometry");
+												if (geometryRequestedFieldsPtr != nullptr){
+													const QByteArrayList geometryRequestedIds = geometryRequestedFieldsPtr->GetFieldIds();
+													if (!geometryRequestedIds.isEmpty()){
+														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isGeometryTypeRequested = true;
+														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isRadiusRequested = geometryRequestedIds.contains("Radius");
+														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isPointsRequested = true;
+														const imtgql::CGqlFieldObject* pointsRequestedFieldsPtr = geometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("Points");
+														if (pointsRequestedFieldsPtr != nullptr){
+															const QByteArrayList pointsRequestedIds = pointsRequestedFieldsPtr->GetFieldIds();
+															if (!pointsRequestedIds.isEmpty()){
+																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.Points.isXRequested = true;
+																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.Points.isYRequested = true;
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+bool CGetLastProductionResultsGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CGetLastProductionResultsGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const GetLastProductionResultsRequestArguments& CGetLastProductionResultsGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+GetLastProductionResultsRequestInfo CGetLastProductionResultsGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+
+/// \file CGetLastProductionResultsCDMGqlgqlObject.cpp
+
+
+namespace sdl::rtv::ProductionResults
+{
+
+
+QByteArray CGetLastProductionResultsCDMGqlRequest::GetCommandId()
+{
+	return QByteArrayLiteral("GetLastProductionResultsCDM");
+}
+
+
+bool CGetLastProductionResultsCDMGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetLastProductionResultsCDMRequestArguments& requestArguments, const GetLastProductionResultsCDMRequestInfo& /*requestInfo*/)
+{
+	gqlgqlObject.SetCommandId(GetCommandId());
+
+	// writting input arguments
+	::imtgql::CGqlParamObject pointAsCoordinatesDataObject;
+	if (!requestArguments.pointAsCoordinates.WriteToGraphQlObject(pointAsCoordinatesDataObject)){
+		return false;
+	}
+	gqlgqlObject.AddParam("pointAsCoordinates", pointAsCoordinatesDataObject);
+
+	return true;
+}
+
+
+CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
+	: m_isValid(true)
+{
+	m_gqlContextPtr = gqlgqlObject.GetRequestContext();
+
+	const QByteArray protocolVersion = gqlgqlObject.GetProtocolVersion();
+
+	// reading input arguments
+	const ::imtgql::CGqlParamObject* pointAsCoordinatesDataObjectPtr = gqlgqlObject.GetParamObject("pointAsCoordinates");
+	if (pointAsCoordinatesDataObjectPtr != nullptr){
+		if (!protocolVersion.isEmpty()){
+			if (protocolVersion == "1.0"){
+				bool isPointAsCoordinatesRead;
+				if (optRead){
+					isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.OptReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr, CPointsInCoordinateFormat::PV_1_0);
+				}
+				else {
+					isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.ReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr, CPointsInCoordinateFormat::PV_1_0);
+				}
+				m_isValid = isPointAsCoordinatesRead;
+				if (!isPointAsCoordinatesRead){
+					return;
+				}
+			}
+			else {
+				qWarning() << QString("Bad gqlObject. Version %1 is not supported").arg(qPrintable(protocolVersion));
+				m_isValid = false;
+
+				return;
+			}
+		}
+		else {
+			bool isPointAsCoordinatesRead;
+			if (optRead){
+				isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.OptReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr);
+			}
+			else {
+				isPointAsCoordinatesRead = m_requestedArguments.pointAsCoordinates.ReadFromGraphQlObject(*pointAsCoordinatesDataObjectPtr);
+			}
+			m_isValid = isPointAsCoordinatesRead;
+			if (!isPointAsCoordinatesRead){
+				return;
+			}
+		}
+	}
+
+	// reading requested fields
+	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
+	if (!gqlgqlObject.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = gqlgqlObject.GetFields().GetFieldArgumentObjectPtr(gqlgqlObject.GetFields().GetFieldIds().constFirst());
+		if (requestedFieldsObjectPtr != nullptr){
+			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
+			if (!requestedIds.isEmpty()){
+				m_requestInfo.isDataModelTitleRequested = true;
+				m_requestInfo.isDataModelVersionRequested = true;
+				m_requestInfo.isResultMetaDataRequested = requestedIds.contains("resultMetaData");
+				m_requestInfo.isResultContentRequested = requestedIds.contains("resultContent");
+				m_requestInfo.isOverallResultValuesRequested = requestedIds.contains("overallResultValues");
+				const imtgql::CGqlFieldObject* resultMetaDataRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("resultMetaData");
+				if (resultMetaDataRequestedFieldsPtr != nullptr){
+					const QByteArrayList resultMetaDataRequestedIds = resultMetaDataRequestedFieldsPtr->GetFieldIds();
+					if (!resultMetaDataRequestedIds.isEmpty()){
+						m_requestInfo.resultMetaData.isResultIdRequested = true;
+						m_requestInfo.resultMetaData.isCreationTimeRequested = resultMetaDataRequestedIds.contains("creationTime");
+						m_requestInfo.resultMetaData.isPartIdRequested = resultMetaDataRequestedIds.contains("partId");
+						m_requestInfo.resultMetaData.isProductIdRequested = resultMetaDataRequestedIds.contains("productId");
+						m_requestInfo.resultMetaData.isNameRequested = resultMetaDataRequestedIds.contains("name");
+						m_requestInfo.resultMetaData.isClassificationRequested = resultMetaDataRequestedIds.contains("classification");
+						m_requestInfo.resultMetaData.isDescriptionRequested = resultMetaDataRequestedIds.contains("description");
+						m_requestInfo.resultMetaData.isExtendedMetaDataRequested = resultMetaDataRequestedIds.contains("extendedMetaData");
+						const imtgql::CGqlFieldObject* descriptionRequestedFieldsPtr = resultMetaDataRequestedFieldsPtr->GetFieldArgumentObjectPtr("description");
+						if (descriptionRequestedFieldsPtr != nullptr){
+							const QByteArrayList descriptionRequestedIds = descriptionRequestedFieldsPtr->GetFieldIds();
+							if (!descriptionRequestedIds.isEmpty()){
+								m_requestInfo.resultMetaData.description.isTextRequested = true;
+								m_requestInfo.resultMetaData.description.isLocaleRequested = true;
+							}
+						}
+						const imtgql::CGqlFieldObject* extendedMetaDataRequestedFieldsPtr = resultMetaDataRequestedFieldsPtr->GetFieldArgumentObjectPtr("extendedMetaData");
+						if (extendedMetaDataRequestedFieldsPtr != nullptr){
+							const QByteArrayList extendedMetaDataRequestedIds = extendedMetaDataRequestedFieldsPtr->GetFieldIds();
+							if (!extendedMetaDataRequestedIds.isEmpty()){
+								m_requestInfo.resultMetaData.extendedMetaData.isKeyRequested = extendedMetaDataRequestedIds.contains("key");
+								m_requestInfo.resultMetaData.extendedMetaData.isValueRequested = extendedMetaDataRequestedIds.contains("value");
+							}
+						}
+					}
+				}
+				const imtgql::CGqlFieldObject* overallResultValuesRequestedFieldsPtr = requestedFieldsObjectPtr->GetFieldArgumentObjectPtr("overallResultValues");
+				if (overallResultValuesRequestedFieldsPtr != nullptr){
+					const QByteArrayList overallResultValuesRequestedIds = overallResultValuesRequestedFieldsPtr->GetFieldIds();
+					if (!overallResultValuesRequestedIds.isEmpty()){
+						m_requestInfo.overallResultValues.isNameRequested = overallResultValuesRequestedIds.contains("name");
+						m_requestInfo.overallResultValues.isValueIdRequested = true;
+						m_requestInfo.overallResultValues.isMeasuredValueRequested = true;
+						m_requestInfo.overallResultValues.isLowLimitRequested = overallResultValuesRequestedIds.contains("lowLimit");
+						m_requestInfo.overallResultValues.isHighLimitRequested = overallResultValuesRequestedIds.contains("highLimit");
+					}
+				}
+			}
+		}
+	}
+}
+
+
+bool CGetLastProductionResultsCDMGqlRequest::IsValid() const
+{
+	return m_isValid;
+}
+
+
+const ::imtgql::IGqlContext* CGetLastProductionResultsCDMGqlRequest::GetRequestContext() const
+{
+	return m_gqlContextPtr;
+}
+
+
+const GetLastProductionResultsCDMRequestArguments& CGetLastProductionResultsCDMGqlRequest::GetRequestedArguments() const
+{
+	return m_requestedArguments;
+}
+
+
+GetLastProductionResultsCDMRequestInfo CGetLastProductionResultsCDMGqlRequest::GetRequestInfo() const
+{
+	return m_requestInfo;
+}
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+
+/// \file CGraphQlHandlerCompBase.cpp
+
+
+namespace sdl::rtv::ProductionResults
+{
+
+
+bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const QByteArray commandId = gqlgqlObject.GetCommandId();
+	if (commandId == CGetLastProductionResultsGqlRequest::GetCommandId()){
+		return true;
+	}
+	else if (commandId == CGetLastProductionResultsCDMGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	const QByteArray commandId = gqlgqlObject.GetCommandId();
+	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
+	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
+
+	// GetLastProductionResults
+	if (commandId == CGetLastProductionResultsGqlRequest::GetCommandId()){
+		CGetLastProductionResultsGqlRequest getLastProductionResultsGqlRequest(gqlRequest, false);
+		if (!getLastProductionResultsGqlgqlObject.IsValid()){
+			errorMessage = QString("Bad gqlObject. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			SendErrorMessage(0, errorMessage);
+
+			return nullptr;
+		}
+
+		CProductOverview replyPayload = OnGetLastProductionResults(getLastProductionResultsGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QString("The derived call [OnGetLastProductionResults] returned an error: %1").arg(errorMessage));
+
+			return nullptr;
+		}
+
+		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		if (!isModelCreated){
+			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			SendCriticalMessage(0, errorMessage);
+
+			return nullptr;
+		}
+
+		return modelPtr.PopPtr();
+	}
+
+	// GetLastProductionResultsCDM
+	if (commandId == CGetLastProductionResultsCDMGqlRequest::GetCommandId()){
+		CGetLastProductionResultsCDMGqlRequest getLastProductionResultsCDMGqlRequest(gqlRequest, false);
+		if (!getLastProductionResultsCDMGqlgqlObject.IsValid()){
+			errorMessage = QString("Bad gqlObject. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			SendErrorMessage(0, errorMessage);
+
+			return nullptr;
+		}
+
+		CCDMResult replyPayload = OnGetLastProductionResultsCDM(getLastProductionResultsCDMGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QString("The derived call [OnGetLastProductionResultsCDM] returned an error: %1").arg(errorMessage));
+
+			return nullptr;
+		}
+
+		const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);
+		if (!isModelCreated){
+			errorMessage = QString("Internal error. Unable to create response for command-ID: '%1'").arg(qPrintable(commandId));
+			SendCriticalMessage(0, errorMessage);
+
+			return nullptr;
+		}
+
+		return modelPtr.PopPtr();
+	}
+
+	errorMessage = QString("Bad gqlObject. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	SendErrorMessage(0, errorMessage);
+
+	return nullptr;
+}
+
+
+
+
+} // namespace sdl::rtv::ProductionResults
+
+
+

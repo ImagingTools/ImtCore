@@ -6,7 +6,7 @@
 
 // Qt includes
 #include <QtCore/QObject>
-#include <QtCore/QTemporaryDir>
+#include <QtCore/QDir>
 
 // ImtCore includes
 #include <imtsdl/ISdlEditableProcessArgumentsParser.h>
@@ -26,11 +26,13 @@ private Q_SLOTS:
 	void TestBasicSchema();
 	void TestComplexCollectionFilter();
 	void TestUnion();
+	void TestComplexUnion1();
+	void TestComplexUnion2();
 
 	void cleanupTestCase();
 
 private:
-	QList<std::shared_ptr<QTemporaryDir>> m_tempDirPtrList;
+	QList<std::shared_ptr<QDir>> m_tempDirPtrList;
 
 };
 

@@ -132,3 +132,11 @@ type ParamsSet
 	parameters: [String]
 }
 
+type MimeType
+{
+	type: String!
+	tree: [String]
+	subType: String!
+	suffix: String
+	parameters: [String]
+}

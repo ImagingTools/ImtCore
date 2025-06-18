@@ -125,9 +125,9 @@ public:
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
@@ -220,9 +220,9 @@ public:
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
@@ -321,9 +321,9 @@ public:
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
@@ -418,9 +418,9 @@ public:
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
@@ -518,9 +518,9 @@ public:
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 
-		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const;
-		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
-		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request);
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);

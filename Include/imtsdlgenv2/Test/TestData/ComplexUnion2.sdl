@@ -1,0 +1,130 @@
+schema {
+	query: Query
+	mutation: Mutation
+	name: CTImpl
+	namespace: complextest
+	version: 1.0
+}
+
+import{
+	"ComplexUnion1.sdl"
+}
+
+type Result{
+	AreaResult: StatusCode!
+	ExpectedMinValue: Float!
+	ExpectedMaxValue: Float!
+	MeasuredValue: Float!
+	MinMeasuredValue: Float!
+	MaxMeasuredValue: Float!
+	MeanMeasuredValue: Float!
+	MeasurementType: MeasurementType!
+	MeasurementUnit: MeasurementUnit!
+	Length: Float!
+	ErrorType: ErrorCode!
+	Geometry: Geometry!
+}
+
+type Area{
+	AreaName: String!
+	Status: StatusCode!
+	IconPosition: Point!
+	ErrorType: ErrorCode!
+	Results: [Result]!
+}
+
+type Analyzer{
+	AnalyzerName: String!
+	AnalyzerResult: StatusCode!
+	Areas: [Area]
+}
+
+type Inspection{
+	ID: String!
+	TypeID: String!
+	Name: String!
+	Status: StatusCode!
+	Analyzers: [Analyzer]
+}
+
+type ProductOverview{
+	ProductID: Int!
+	Name: String!
+	Status: StatusCode!
+	PartSerialNumber: String!
+	Timestamp: String!
+	ProductImage: String!
+	Inspections: [Inspection]
+}
+
+type LocalizedText {
+	text: String!
+	locale: String!
+}
+
+type Coordinates {
+	x: Float!
+	y: Float!
+	z: Float!
+}
+
+union ExtendedMetaDataUnionType = Coordinates | Float | Boolean | String
+
+type ExtendedMetaData {
+	key: String
+	value: ExtendedMetaDataUnionType
+}
+
+type ResultMetaData {
+	resultId: ID!
+	creationTime: String
+	partId: String
+	productId: String
+	name: String
+	classification: Int
+	description: LocalizedText
+	extendedMetaData: [ExtendedMetaData]
+}
+
+type OverallResultValues {
+	name: String
+	valueId: String!
+	measuredValue: Float!
+	lowLimit: Float
+	highLimit: Float
+}
+
+union CDMResultUnionType = CDMResultVarString | CDMResultVarRecursive
+
+type CDMResultVarRecursive {
+	dataModelTitle: String!
+	dataModelVersion: String!
+	resultMetaData: ResultMetaData
+	resultContent: [CDMResultUnionType]
+	overallResultValues: [OverallResultValues]
+}
+
+type CDMResultVarString {
+	dataModelTitle: String!
+	dataModelVersion: String!
+	resultMetaData: ResultMetaData
+	resultContent: [String]
+	overallResultValues: [OverallResultValues]
+}
+
+type CDMResult {
+	dataModelTitle: String!
+	dataModelVersion: String!
+	resultMetaData: ResultMetaData
+	resultContent: [CDMResultUnionType]
+	overallResultValues: [OverallResultValues]
+}
+
+type PointsInCoordinateFormat {
+	pointAsCoordinates: Boolean
+}
+
+type Query {
+	GetLastProductionResults: ProductOverview!
+	GetLastProductionResultsCDM (pointAsCoordinates: PointsInCoordinateFormat) : CDMResult
+}
