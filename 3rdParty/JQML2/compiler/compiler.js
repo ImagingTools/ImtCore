@@ -1506,8 +1506,8 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     }
     
     if(innerComponent) {
-        code.push(`TransactionController.add(el${currentInstructions.UID})`)
-        code.push(`if(forceUpdate)for(let update of updateList.splice(0, updateList.length)){update()}`)
+        // code.push(`TransactionController.add(el${currentInstructions.UID})`)
+        code.push(`if(forceUpdate){for(let update of updateList.splice(0, updateList.length)){update()};el${currentInstructions.UID}.$complete()}`)
         code.push(`return el${currentInstructions.UID}`)
     }
 }
