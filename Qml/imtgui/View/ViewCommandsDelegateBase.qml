@@ -3,21 +3,21 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 
 Item {
-    id: container;
+	id: container;
 
-    property Item view: null;
+	property Item view: null;
 
-    signal commandActivated(string commandId);
+	signal commandActivated(string commandId);
+	
+	function commandHandle(commandId, params){
+		commandActivated(commandId);
+	}
 
-    function commandHandle(commandId, params){
-        commandActivated(commandId);
-    }
-
-    Shortcut {
-        sequence: "Ctrl+S";
-        enabled: container.view ? container.view.visible : false;
-        onActivated: {
-            container.commandHandle("Save");
-        }
-    }
+	Shortcut {
+		sequence: "Ctrl+S";
+		enabled: container.view ? container.view.visible : false;
+		onActivated: {
+			container.commandHandle("Save");
+		}
+	}
 }

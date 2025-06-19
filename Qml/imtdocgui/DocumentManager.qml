@@ -393,8 +393,9 @@ QtObject {
 
 		let documentIndex = getDocumentIndexByDocumentId(documentId);
 		if (documentIndex >= 0){
-			let documentData = documentsModel.get(documentIndex);
+			let documentData = documentsModel.get(documentIndex).documentData;
 			if (documentData && documentData.isNew){
+				documentData.isNew = false
 				documentsModel.setProperty(documentIndex, "isNew", false);
 			}
 		}
@@ -424,6 +425,30 @@ QtObject {
 		}
 
 		return null;
+	}
+	
+	function documentIsNew(documentId){
+		let documentIndex = getDocumentIndexByDocumentId(documentId);
+		if (documentIndex >= 0){
+			let documentData = documentsModel.get(documentIndex).documentData;
+			if (documentData){
+				return documentData.isNew
+			}
+		}
+		
+		return false
+	}
+	
+	function documentIsDirty(documentId){
+		let documentIndex = getDocumentIndexByDocumentId(documentId);
+		if (documentIndex >= 0){
+			let documentData = documentsModel.get(documentIndex).documentData;
+			if (documentData){
+				return documentData.isDirty
+			}
+		}
+		
+		return false
 	}
 
 	// soon

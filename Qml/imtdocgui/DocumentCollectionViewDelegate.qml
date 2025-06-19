@@ -199,6 +199,10 @@ CollectionViewCommandsDelegateBase {
 				addButton(Enums.cancel, qsTr("Close"), true)
 			}
 
+			signal revisionModelReceived()
+			signal receiveRevisionModelStarted()
+			signal receiveRevisionModelFailed()
+
 			onFinished: {
 				if (buttonId == Enums.save){
 					setRevisionRequest.send();
@@ -206,6 +210,11 @@ CollectionViewCommandsDelegateBase {
 				else if (buttonId == Enums.no){
 					ModalDialogManager.openDialog(removeRevisionConfirmDialog, {});
 				}
+			}
+			
+			function getRevisionList(){
+				receiveRevisionModelStarted()
+				request.send();
 			}
 
 			GqlSdlRequestSender {
@@ -222,6 +231,8 @@ CollectionViewCommandsDelegateBase {
 						onFinished: {
 							documentRevisionDialog.revisionsModel = m_revisions;
 							documentRevisionDialog.currentRevision = m_activeRevision;
+							
+							documentRevisionDialog.revisionModelReceived()
 						}
 					}
 				}
@@ -244,7 +255,7 @@ CollectionViewCommandsDelegateBase {
 
 				sdlObjectComp: Component { DeleteRevisionResponse {
 						onFinished: {
-							request.send();
+							documentRevisionDialog.getRevisionList()
 							ModalDialogManager.showInfoDialog(qsTr("The document revision has been successfully delete"));
 						}
 					}
@@ -269,7 +280,7 @@ CollectionViewCommandsDelegateBase {
 
 				sdlObjectComp: Component { RestoreRevisionResponse {
 						onFinished: {
-							request.send();
+							documentRevisionDialog.getRevisionList()
 							ModalDialogManager.showInfoDialog(qsTr("The document revision has been successfully set"));
 						}
 					}
@@ -304,7 +315,19 @@ CollectionViewCommandsDelegateBase {
 						target: documentRevisionDialog;
 
 						function onStarted(){
-							request.send();
+							documentRevisionDialog.getRevisionList()
+						}
+						
+						function onReceiveRevisionModelStarted(){
+							loading.start()
+						}
+						
+						function onReceiveRevisionModelFailed(){
+							loading.stop()
+						}
+						
+						function onRevisionModelReceived(){
+							loading.stop()
 						}
 					}
 
