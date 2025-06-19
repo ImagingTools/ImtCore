@@ -104,6 +104,18 @@ class BaseClass extends QtObject {
 		finished: { params: [] },
 	}
 
+	$propertiesMember = []
+
+	createProperty(name, type, value){
+		if(name[0] === 'm' && name[1] === '_' && this.$propertiesMember.indexOf(name) < 0) this.$propertiesMember.push(name)
+        super.createProperty(name, type, value)
+    }
+
+    createVariantProperty(name, type, value){
+		if(name[0] === 'm' && name[1] === '_' && this.$propertiesMember.indexOf(name) < 0) this.$propertiesMember.push(name)
+        super.createVariantProperty(name, type, value)
+    }
+
 	$onModelChanged(changeSet){
 		if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
 			if (this.owner._internal.isTransaction){
@@ -235,15 +247,7 @@ class BaseClass extends QtObject {
 	}
 
 	getProperties() {
-		let list = []
-
-		for (let key in this.$properties) {
-			if (key[0] === 'm' && key[1] === '_') {
-				list.push(key)
-			}
-		}
-
-		return list
+		return this.$propertiesMember
 	}
 
 	createFromJson(json) {
