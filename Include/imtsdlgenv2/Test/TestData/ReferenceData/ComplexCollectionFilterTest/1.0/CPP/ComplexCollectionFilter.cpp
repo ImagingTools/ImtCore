@@ -148,8 +148,8 @@ bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 {
 	if (gqlObject.ContainsParam("timeRange") && gqlObject.GetParamArgumentObjectPtr("timeRange") == nullptr){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
-		const bool isTimeRangeReaded = timeRange->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
-		if (!isTimeRangeReaded){
+		const bool isTimeRangeRead = timeRange->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
+		if (!isTimeRangeRead){
 			return false;
 		}
 	}
@@ -174,8 +174,8 @@ bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 {
 	if (gqlObject.ContainsParam("timeRange") && gqlObject.GetParamArgumentObjectPtr("timeRange") == nullptr){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
-		const bool isTimeRangeReaded = timeRange->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
-		if (!isTimeRangeReaded){
+		const bool isTimeRangeRead = timeRange->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
+		if (!isTimeRangeRead){
 			return false;
 		}
 	}
@@ -227,8 +227,8 @@ bool CTimeFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("timeRange") && jsonObject["timeRange"].isObject()){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
-		const bool isTimeRangeReaded = timeRange->ReadFromJsonObject(jsonObject["timeRange"].toObject());
-		if (!isTimeRangeReaded){
+		const bool isTimeRangeRead = timeRange->ReadFromJsonObject(jsonObject["timeRange"].toObject());
+		if (!isTimeRangeRead){
 			return false;
 		}
 	}
@@ -253,8 +253,8 @@ bool CTimeFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("timeRange") && jsonObject["timeRange"].isObject()){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
-		const bool isTimeRangeReaded = timeRange->OptReadFromJsonObject(jsonObject["timeRange"].toObject());
-		if (!isTimeRangeReaded){
+		const bool isTimeRangeRead = timeRange->OptReadFromJsonObject(jsonObject["timeRange"].toObject());
+		if (!isTimeRangeRead){
 			return false;
 		}
 	}
@@ -1422,11 +1422,11 @@ bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (!jsonObject.contains("filterOperations") || ! jsonObject["filterOperations"].isArray()){
 		return false;
 	}
-	const QJsonArray filterOperationsjsonArray = jsonObject["filterOperations"].toArray();
-	const qsizetype filterOperationsArrayCount = filterOperationsjsonArray.size();
+	const QJsonArray filterOperationsJsonArray = jsonObject["filterOperations"].toArray();
+	const qsizetype filterOperationsArrayCount = filterOperationsJsonArray.size();
 	filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
-		const QString tempFilterOperations = filterOperationsjsonArray[filterOperationsIndex].toString();
+		const QString tempFilterOperations = filterOperationsJsonArray[filterOperationsIndex].toString();
 		imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
 		if(tempFilterOperations == "Not"){
 			filterOperationsDataValue = FilterOperation::Not;
@@ -1483,11 +1483,11 @@ bool CFieldFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("filterOperations") && jsonObject["filterOperations"].isArray()){
-		const QJsonArray filterOperationsjsonArray = jsonObject["filterOperations"].toArray();
-		const qsizetype filterOperationsArrayCount = filterOperationsjsonArray.size();
+		const QJsonArray filterOperationsJsonArray = jsonObject["filterOperations"].toArray();
+		const qsizetype filterOperationsArrayCount = filterOperationsJsonArray.size();
 		filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
 		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
-			const QString tempFilterOperations = filterOperationsjsonArray[filterOperationsIndex].toString();
+			const QString tempFilterOperations = filterOperationsJsonArray[filterOperationsIndex].toString();
 			imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
 			if(tempFilterOperations == "Not"){
 				filterOperationsDataValue = FilterOperation::Not;
@@ -2110,12 +2110,12 @@ bool CGroupFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
-		const QJsonArray fieldFiltersjsonArray = jsonObject["fieldFilters"].toArray();
-		const qsizetype fieldFiltersArrayCount = fieldFiltersjsonArray.size();
+		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
+		const qsizetype fieldFiltersArrayCount = fieldFiltersJsonArray.size();
 		fieldFilters = QList<CFieldFilter::V1_0>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 tempFieldFilters;
-			if (!tempFieldFilters.ReadFromJsonObject(fieldFiltersjsonArray[fieldFiltersIndex].toObject())){
+			if (!tempFieldFilters.ReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
 				return false;
 			}
 			fieldFilters->append(tempFieldFilters);
@@ -2123,12 +2123,12 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
-		const QJsonArray groupFiltersjsonArray = jsonObject["groupFilters"].toArray();
-		const qsizetype groupFiltersArrayCount = groupFiltersjsonArray.size();
+		const QJsonArray groupFiltersJsonArray = jsonObject["groupFilters"].toArray();
+		const qsizetype groupFiltersArrayCount = groupFiltersJsonArray.size();
 		groupFilters = QList<CGroupFilter::V1_0>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 tempGroupFilters;
-			if (!tempGroupFilters.ReadFromJsonObject(groupFiltersjsonArray[groupFiltersIndex].toObject())){
+			if (!tempGroupFilters.ReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
 				return false;
 			}
 			groupFilters->append(tempGroupFilters);
@@ -2156,12 +2156,12 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
-		const QJsonArray fieldFiltersjsonArray = jsonObject["fieldFilters"].toArray();
-		const qsizetype fieldFiltersArrayCount = fieldFiltersjsonArray.size();
+		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
+		const qsizetype fieldFiltersArrayCount = fieldFiltersJsonArray.size();
 		fieldFilters = QList<CFieldFilter::V1_0>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 tempFieldFilters;
-			if (!tempFieldFilters.OptReadFromJsonObject(fieldFiltersjsonArray[fieldFiltersIndex].toObject())){
+			if (!tempFieldFilters.OptReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
 				return false;
 			}
 			fieldFilters->append(tempFieldFilters);
@@ -2169,12 +2169,12 @@ bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
-		const QJsonArray groupFiltersjsonArray = jsonObject["groupFilters"].toArray();
-		const qsizetype groupFiltersArrayCount = groupFiltersjsonArray.size();
+		const QJsonArray groupFiltersJsonArray = jsonObject["groupFilters"].toArray();
+		const qsizetype groupFiltersArrayCount = groupFiltersJsonArray.size();
 		groupFilters = QList<CGroupFilter::V1_0>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 tempGroupFilters;
-			if (!tempGroupFilters.OptReadFromJsonObject(groupFiltersjsonArray[groupFiltersIndex].toObject())){
+			if (!tempGroupFilters.OptReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
 				return false;
 			}
 			groupFilters->append(tempGroupFilters);
@@ -2659,16 +2659,16 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 
 	if (gqlObject.ContainsParam("fieldsFilter") && gqlObject.GetParamArgumentObjectPtr("fieldsFilter") == nullptr){
 		fieldsFilter = CGroupFilter::V1_0();
-		const bool isFieldsFilterReaded = fieldsFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
-		if (!isFieldsFilterReaded){
+		const bool isFieldsFilterRead = fieldsFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
+		if (!isFieldsFilterRead){
 			return false;
 		}
 	}
 
 	if (gqlObject.ContainsParam("timeFilter") && gqlObject.GetParamArgumentObjectPtr("timeFilter") == nullptr){
 		timeFilter = CTimeFilter::V1_0();
-		const bool isTimeFilterReaded = timeFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
-		if (!isTimeFilterReaded){
+		const bool isTimeFilterRead = timeFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
+		if (!isTimeFilterRead){
 			return false;
 		}
 	}
@@ -2708,16 +2708,16 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 
 	if (gqlObject.ContainsParam("fieldsFilter") && gqlObject.GetParamArgumentObjectPtr("fieldsFilter") == nullptr){
 		fieldsFilter = CGroupFilter::V1_0();
-		const bool isFieldsFilterReaded = fieldsFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
-		if (!isFieldsFilterReaded){
+		const bool isFieldsFilterRead = fieldsFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
+		if (!isFieldsFilterRead){
 			return false;
 		}
 	}
 
 	if (gqlObject.ContainsParam("timeFilter") && gqlObject.GetParamArgumentObjectPtr("timeFilter") == nullptr){
 		timeFilter = CTimeFilter::V1_0();
-		const bool isTimeFilterReaded = timeFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
-		if (!isTimeFilterReaded){
+		const bool isTimeFilterRead = timeFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
+		if (!isTimeFilterRead){
 			return false;
 		}
 	}
@@ -2784,12 +2784,12 @@ bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) 
 bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
-		const QJsonArray sortingInfojsonArray = jsonObject["sortingInfo"].toArray();
-		const qsizetype sortingInfoArrayCount = sortingInfojsonArray.size();
+		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
+		const qsizetype sortingInfoArrayCount = sortingInfoJsonArray.size();
 		sortingInfo = QList<CFieldSortingInfo::V1_0>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 tempSortingInfo;
-			if (!tempSortingInfo.ReadFromJsonObject(sortingInfojsonArray[sortingInfoIndex].toObject())){
+			if (!tempSortingInfo.ReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
 				return false;
 			}
 			sortingInfo->append(tempSortingInfo);
@@ -2798,26 +2798,26 @@ bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonO
 
 	if (jsonObject.contains("fieldsFilter") && jsonObject["fieldsFilter"].isObject()){
 		fieldsFilter = CGroupFilter::V1_0();
-		const bool isFieldsFilterReaded = fieldsFilter->ReadFromJsonObject(jsonObject["fieldsFilter"].toObject());
-		if (!isFieldsFilterReaded){
+		const bool isFieldsFilterRead = fieldsFilter->ReadFromJsonObject(jsonObject["fieldsFilter"].toObject());
+		if (!isFieldsFilterRead){
 			return false;
 		}
 	}
 
 	if (jsonObject.contains("timeFilter") && jsonObject["timeFilter"].isObject()){
 		timeFilter = CTimeFilter::V1_0();
-		const bool isTimeFilterReaded = timeFilter->ReadFromJsonObject(jsonObject["timeFilter"].toObject());
-		if (!isTimeFilterReaded){
+		const bool isTimeFilterRead = timeFilter->ReadFromJsonObject(jsonObject["timeFilter"].toObject());
+		if (!isTimeFilterRead){
 			return false;
 		}
 	}
 
 	if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isArray()){
-		const QJsonArray distinctFieldsjsonArray = jsonObject["distinctFields"].toArray();
-		const qsizetype distinctFieldsArrayCount = distinctFieldsjsonArray.size();
+		const QJsonArray distinctFieldsJsonArray = jsonObject["distinctFields"].toArray();
+		const qsizetype distinctFieldsArrayCount = distinctFieldsJsonArray.size();
 		distinctFields = QList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsArrayCount; ++distinctFieldsIndex){
-			QByteArray tempDistinctFields = distinctFieldsjsonArray[distinctFieldsIndex].toString().toUtf8();
+			QByteArray tempDistinctFields = distinctFieldsJsonArray[distinctFieldsIndex].toString().toUtf8();
 			distinctFields->append(tempDistinctFields);
 		}
 	}
@@ -2829,12 +2829,12 @@ bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonO
 bool CComplexCollectionFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
-		const QJsonArray sortingInfojsonArray = jsonObject["sortingInfo"].toArray();
-		const qsizetype sortingInfoArrayCount = sortingInfojsonArray.size();
+		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
+		const qsizetype sortingInfoArrayCount = sortingInfoJsonArray.size();
 		sortingInfo = QList<CFieldSortingInfo::V1_0>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 tempSortingInfo;
-			if (!tempSortingInfo.OptReadFromJsonObject(sortingInfojsonArray[sortingInfoIndex].toObject())){
+			if (!tempSortingInfo.OptReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
 				return false;
 			}
 			sortingInfo->append(tempSortingInfo);
@@ -2843,26 +2843,26 @@ bool CComplexCollectionFilter::V1_0::OptReadFromJsonObject(const QJsonObject& js
 
 	if (jsonObject.contains("fieldsFilter") && jsonObject["fieldsFilter"].isObject()){
 		fieldsFilter = CGroupFilter::V1_0();
-		const bool isFieldsFilterReaded = fieldsFilter->OptReadFromJsonObject(jsonObject["fieldsFilter"].toObject());
-		if (!isFieldsFilterReaded){
+		const bool isFieldsFilterRead = fieldsFilter->OptReadFromJsonObject(jsonObject["fieldsFilter"].toObject());
+		if (!isFieldsFilterRead){
 			return false;
 		}
 	}
 
 	if (jsonObject.contains("timeFilter") && jsonObject["timeFilter"].isObject()){
 		timeFilter = CTimeFilter::V1_0();
-		const bool isTimeFilterReaded = timeFilter->OptReadFromJsonObject(jsonObject["timeFilter"].toObject());
-		if (!isTimeFilterReaded){
+		const bool isTimeFilterRead = timeFilter->OptReadFromJsonObject(jsonObject["timeFilter"].toObject());
+		if (!isTimeFilterRead){
 			return false;
 		}
 	}
 
 	if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isArray()){
-		const QJsonArray distinctFieldsjsonArray = jsonObject["distinctFields"].toArray();
-		const qsizetype distinctFieldsArrayCount = distinctFieldsjsonArray.size();
+		const QJsonArray distinctFieldsJsonArray = jsonObject["distinctFields"].toArray();
+		const qsizetype distinctFieldsArrayCount = distinctFieldsJsonArray.size();
 		distinctFields = QList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsArrayCount; ++distinctFieldsIndex){
-			QByteArray tempDistinctFields = distinctFieldsjsonArray[distinctFieldsIndex].toString().toUtf8();
+			QByteArray tempDistinctFields = distinctFieldsJsonArray[distinctFieldsIndex].toString().toUtf8();
 			distinctFields->append(tempDistinctFields);
 		}
 	}

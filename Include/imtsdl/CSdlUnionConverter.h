@@ -24,6 +24,7 @@ class CSdlUnionConverter: private CSdlTools
 public:
 	enum ConversionType
 	{
+		/// \todo rename it to 'CT_MODEL_SINGLE'
 		CT_MODEL_SCALAR = 2,
 		CT_MODEL_ARRAY = 3,
 		CT_GQL_SCALAR = 8,
@@ -47,7 +48,7 @@ public:
 				uint hIndents = 1,
 				const ConversionType& conversionType = CT_MODEL_SCALAR,
 				const QString& addCommand = QString());
-	static void WriteUnionConversionFromString(
+	static void WriteUnionConversionFromData(
 				QTextStream& stream,
 				const CSdlUnion& sdlUnion,
 				const QString& sourceVariableName,

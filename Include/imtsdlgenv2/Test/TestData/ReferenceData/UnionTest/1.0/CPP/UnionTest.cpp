@@ -82,49 +82,46 @@ bool CCoords::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 }
 
 
-bool CCoords::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+bool CCoords::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!X){
 		return false;
 	}
-	request.InsertParam("X", QVariant(*X));
+	gqlObject.InsertParam("X", QVariant(*X));
 
 	if (!Y){
 		return false;
 	}
-	request.InsertParam("Y", QVariant(*Y));
-
-	return true;
-}
-
-bool CCoords::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
-{
-	QVariant xData = request.GetParamArgumentValue("X");
-	if (xData.isNull()){
-		return false;
-	}
-	X = xData.toDouble();
-
-	QVariant yData = request.GetParamArgumentValue("Y");
-	if (yData.isNull()){
-		return false;
-	}
-	Y = yData.toDouble();
+	gqlObject.InsertParam("Y", QVariant(*Y));
 
 	return true;
 }
 
 
-bool CCoords::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+bool CCoords::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant xData = request.GetParamArgumentValue("X");
-	if (!xData.isNull()){
-		X = xData.toDouble();
+	if (!gqlObject.ContainsParam("X") || gqlObject["X"].userType() != QMetaType::Double){
+		return false;
+	}
+	X = gqlObject["X"].toDouble();
+
+	if (!gqlObject.ContainsParam("Y") || gqlObject["Y"].userType() != QMetaType::Double){
+		return false;
+	}
+	Y = gqlObject["Y"].toDouble();
+
+	return true;
+}
+
+
+bool CCoords::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("X") && gqlObject["X"].userType() == QMetaType::Double){
+		X = gqlObject["X"].toDouble();
 	}
 
-	QVariant yData = request.GetParamArgumentValue("Y");
-	if (!yData.isNull()){
-		Y = yData.toDouble();
+	if (gqlObject.ContainsParam("Y") && gqlObject["Y"].userType() == QMetaType::Double){
+		Y = gqlObject["Y"].toDouble();
 	}
 
 	return true;
@@ -458,31 +455,30 @@ bool CPrinterSpecificationBase::V1_0::OptReadFromModel(const ::imtbase::CTreeIte
 }
 
 
-bool CPrinterSpecificationBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+bool CPrinterSpecificationBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (name){
-		request.InsertParam("name", QVariant(*name));
-	}
-
-	return true;
-}
-
-bool CPrinterSpecificationBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
-{
-	QVariant nameData = request.GetParamArgumentValue("name");
-	if (!nameData.isNull()){
-		name = nameData.toString();
+		gqlObject.InsertParam("name", QVariant(*name));
 	}
 
 	return true;
 }
 
 
-bool CPrinterSpecificationBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+bool CPrinterSpecificationBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant nameData = request.GetParamArgumentValue("name");
-	if (!nameData.isNull()){
-		name = nameData.toString();
+	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+		name = gqlObject["name"].toString();
+	}
+
+	return true;
+}
+
+
+bool CPrinterSpecificationBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+		name = gqlObject["name"].toString();
 	}
 
 	return true;
@@ -493,8 +489,7 @@ bool CPrinterSpecificationBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 {
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
-		}
-
+	}
 
 	return true;
 }
@@ -803,33 +798,32 @@ bool CLink::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 }
 
 
-bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (!link){
 		return false;
 	}
-	request.InsertParam("link", QVariant(*link));
+	gqlObject.InsertParam("link", QVariant(*link));
 
 	return true;
 }
 
-bool CLink::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+
+bool CLink::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant linkData = request.GetParamArgumentValue("link");
-	if (linkData.isNull()){
+	if (!gqlObject.ContainsParam("link") || gqlObject["link"].userType() != QMetaType::QByteArray){
 		return false;
 	}
-	link = linkData.toByteArray();
+	link = gqlObject["link"].toByteArray();
 
 	return true;
 }
 
 
-bool CLink::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+bool CLink::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant linkData = request.GetParamArgumentValue("link");
-	if (!linkData.isNull()){
-		link = linkData.toByteArray();
+	if (gqlObject.ContainsParam("link") && gqlObject["link"].userType() == QMetaType::QByteArray){
+		link = gqlObject["link"].toByteArray();
 	}
 
 	return true;
@@ -1205,10 +1199,10 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 }
 
 
-bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request) const
+bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const
 {
 	if (name){
-		request.InsertParam("name", QVariant(*name));
+		gqlObject.InsertParam("name", QVariant(*name));
 	}
 
 	if (specification){
@@ -1223,68 +1217,67 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& request
 				return false;
 			}
 		}
-		request.InsertParam("specification", specificationDataObject);
-	}
-
-	return true;
-}
-
-bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
-{
-	QVariant nameData = request.GetParamArgumentValue("name");
-	if (!nameData.isNull()){
-		name = nameData.toString();
-	}
-
-	QVariant specificationData = request.GetParamArgumentValue("specification");
-	if (!specificationData.isNull()){
-		if (specificationData.canConvert<CPrinterSpecificationBase>()){
-			CPrinterSpecificationBase specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = request.GetParamArgumentObjectPtr("specification");
-			const bool isspecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
-			if (!isspecificationRead){
-				return false;
-			}
-			specification = std::make_shared<PrinterSpecification>(specificationConvert);
-		}
-		else if (specificationData.canConvert<CLink>()){
-			CLink specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = request.GetParamArgumentObjectPtr("specification");
-			const bool isspecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
-			if (!isspecificationRead){
-				return false;
-			}
-			specification = std::make_shared<PrinterSpecification>(specificationConvert);
-		}
+		gqlObject.InsertParam("specification", specificationDataObject);
 	}
 
 	return true;
 }
 
 
-bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& request)
+bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant nameData = request.GetParamArgumentValue("name");
-	if (!nameData.isNull()){
-		name = nameData.toString();
+	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+		name = gqlObject["name"].toString();
 	}
 
-	QVariant specificationData = request.GetParamArgumentValue("specification");
-	if (!specificationData.isNull()){
-		if (specificationData.canConvert<CPrinterSpecificationBase>()){
+	if (gqlObject.ContainsParam("specification") && !gqlObject["specification"].isNull()){
+		const QVariant specificationVariantValue = gqlObject["specification"];
+		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
 			CPrinterSpecificationBase specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = request.GetParamArgumentObjectPtr("specification");
-			const bool isspecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
-			if (!isspecificationRead){
+			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
+			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
+			if (!isSpecificationRead){
 				return false;
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (specificationData.canConvert<CLink>()){
+		else if (specificationVariantValue.canConvert<CLink>()){
 			CLink specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = request.GetParamArgumentObjectPtr("specification");
-			const bool isspecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
-			if (!isspecificationRead){
+			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
+			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
+			if (!isSpecificationRead){
+				return false;
+			}
+			specification = std::make_shared<PrinterSpecification>(specificationConvert);
+		}
+	}
+
+	return true;
+}
+
+
+bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
+{
+	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+		name = gqlObject["name"].toString();
+	}
+
+	if (gqlObject.ContainsParam("specification") && !gqlObject["specification"].isNull()){
+		const QVariant specificationVariantValue = gqlObject["specification"];
+		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
+			CPrinterSpecificationBase specificationConvert;
+			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
+			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
+			if (!isSpecificationRead){
+				return false;
+			}
+			specification = std::make_shared<PrinterSpecification>(specificationConvert);
+		}
+		else if (specificationVariantValue.canConvert<CLink>()){
+			CLink specificationConvert;
+			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
+			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
+			if (!isSpecificationRead){
 				return false;
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
@@ -1299,8 +1292,7 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 {
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
-		}
-
+	}
 
 	if (specification){
 		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((*specification).get())){
@@ -1319,9 +1311,8 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 			}
 			jsonObject["specification"] = specificationJsonObject;
 		}
-		
-		}
 
+	}
 
 	return true;
 }
@@ -1334,7 +1325,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("specification") && jsonObject["specification"].isObject()){
-		QVariant specificationVariantValue = jsonObject["specification"].toVariant();
+		const QVariant specificationVariantValue = jsonObject["specification"].toVariant();
 		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());
@@ -1364,7 +1355,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("specification") && jsonObject["specification"].isObject()){
-		QVariant specificationVariantValue = jsonObject["specification"].toVariant();
+		const QVariant specificationVariantValue = jsonObject["specification"].toVariant();
 		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());

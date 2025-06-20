@@ -4721,12 +4721,12 @@ bool CArea::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (!jsonObject.contains("Results") || ! jsonObject["Results"].isArray()){
 		return false;
 	}
-	const QJsonArray resultsjsonArray = jsonObject["Results"].toArray();
-	const qsizetype resultsArrayCount = resultsjsonArray.size();
+	const QJsonArray resultsJsonArray = jsonObject["Results"].toArray();
+	const qsizetype resultsArrayCount = resultsJsonArray.size();
 	Results = QList<CResult::V1_0>();
 	for (qsizetype resultsIndex = 0; resultsIndex < resultsArrayCount; ++resultsIndex){
 		CResult::V1_0 tempResults;
-		if (!tempResults.ReadFromJsonObject(resultsjsonArray[resultsIndex].toObject())){
+		if (!tempResults.ReadFromJsonObject(resultsJsonArray[resultsIndex].toObject())){
 			return false;
 		}
 		Results->append(tempResults);
@@ -4930,12 +4930,12 @@ bool CArea::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("Results") && jsonObject["Results"].isArray()){
-		const QJsonArray resultsjsonArray = jsonObject["Results"].toArray();
-		const qsizetype resultsArrayCount = resultsjsonArray.size();
+		const QJsonArray resultsJsonArray = jsonObject["Results"].toArray();
+		const qsizetype resultsArrayCount = resultsJsonArray.size();
 		Results = QList<CResult::V1_0>();
 		for (qsizetype resultsIndex = 0; resultsIndex < resultsArrayCount; ++resultsIndex){
 			CResult::V1_0 tempResults;
-			if (!tempResults.OptReadFromJsonObject(resultsjsonArray[resultsIndex].toObject())){
+			if (!tempResults.OptReadFromJsonObject(resultsJsonArray[resultsIndex].toObject())){
 				return false;
 			}
 			Results->append(tempResults);
@@ -5571,12 +5571,12 @@ bool CAnalyzer::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("Areas") && jsonObject["Areas"].isArray()){
-		const QJsonArray areasjsonArray = jsonObject["Areas"].toArray();
-		const qsizetype areasArrayCount = areasjsonArray.size();
+		const QJsonArray areasJsonArray = jsonObject["Areas"].toArray();
+		const qsizetype areasArrayCount = areasJsonArray.size();
 		Areas = QList<CArea::V1_0>();
 		for (qsizetype areasIndex = 0; areasIndex < areasArrayCount; ++areasIndex){
 			CArea::V1_0 tempAreas;
-			if (!tempAreas.ReadFromJsonObject(areasjsonArray[areasIndex].toObject())){
+			if (!tempAreas.ReadFromJsonObject(areasJsonArray[areasIndex].toObject())){
 				return false;
 			}
 			Areas->append(tempAreas);
@@ -5616,12 +5616,12 @@ bool CAnalyzer::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("Areas") && jsonObject["Areas"].isArray()){
-		const QJsonArray areasjsonArray = jsonObject["Areas"].toArray();
-		const qsizetype areasArrayCount = areasjsonArray.size();
+		const QJsonArray areasJsonArray = jsonObject["Areas"].toArray();
+		const qsizetype areasArrayCount = areasJsonArray.size();
 		Areas = QList<CArea::V1_0>();
 		for (qsizetype areasIndex = 0; areasIndex < areasArrayCount; ++areasIndex){
 			CArea::V1_0 tempAreas;
-			if (!tempAreas.OptReadFromJsonObject(areasjsonArray[areasIndex].toObject())){
+			if (!tempAreas.OptReadFromJsonObject(areasJsonArray[areasIndex].toObject())){
 				return false;
 			}
 			Areas->append(tempAreas);
@@ -6339,12 +6339,12 @@ bool CInspection::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("Analyzers") && jsonObject["Analyzers"].isArray()){
-		const QJsonArray analyzersjsonArray = jsonObject["Analyzers"].toArray();
-		const qsizetype analyzersArrayCount = analyzersjsonArray.size();
+		const QJsonArray analyzersJsonArray = jsonObject["Analyzers"].toArray();
+		const qsizetype analyzersArrayCount = analyzersJsonArray.size();
 		Analyzers = QList<CAnalyzer::V1_0>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersArrayCount; ++analyzersIndex){
 			CAnalyzer::V1_0 tempAnalyzers;
-			if (!tempAnalyzers.ReadFromJsonObject(analyzersjsonArray[analyzersIndex].toObject())){
+			if (!tempAnalyzers.ReadFromJsonObject(analyzersJsonArray[analyzersIndex].toObject())){
 				return false;
 			}
 			Analyzers->append(tempAnalyzers);
@@ -6392,12 +6392,12 @@ bool CInspection::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("Analyzers") && jsonObject["Analyzers"].isArray()){
-		const QJsonArray analyzersjsonArray = jsonObject["Analyzers"].toArray();
-		const qsizetype analyzersArrayCount = analyzersjsonArray.size();
+		const QJsonArray analyzersJsonArray = jsonObject["Analyzers"].toArray();
+		const qsizetype analyzersArrayCount = analyzersJsonArray.size();
 		Analyzers = QList<CAnalyzer::V1_0>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersArrayCount; ++analyzersIndex){
 			CAnalyzer::V1_0 tempAnalyzers;
-			if (!tempAnalyzers.OptReadFromJsonObject(analyzersjsonArray[analyzersIndex].toObject())){
+			if (!tempAnalyzers.OptReadFromJsonObject(analyzersJsonArray[analyzersIndex].toObject())){
 				return false;
 			}
 			Analyzers->append(tempAnalyzers);
@@ -7197,12 +7197,12 @@ bool CProductOverview::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	ProductImage = jsonObject["ProductImage"].toString();
 
 	if (jsonObject.contains("Inspections") && jsonObject["Inspections"].isArray()){
-		const QJsonArray inspectionsjsonArray = jsonObject["Inspections"].toArray();
-		const qsizetype inspectionsArrayCount = inspectionsjsonArray.size();
+		const QJsonArray inspectionsJsonArray = jsonObject["Inspections"].toArray();
+		const qsizetype inspectionsArrayCount = inspectionsJsonArray.size();
 		Inspections = QList<CInspection::V1_0>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsArrayCount; ++inspectionsIndex){
 			CInspection::V1_0 tempInspections;
-			if (!tempInspections.ReadFromJsonObject(inspectionsjsonArray[inspectionsIndex].toObject())){
+			if (!tempInspections.ReadFromJsonObject(inspectionsJsonArray[inspectionsIndex].toObject())){
 				return false;
 			}
 			Inspections->append(tempInspections);
@@ -7258,12 +7258,12 @@ bool CProductOverview::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject
 	}
 
 	if (jsonObject.contains("Inspections") && jsonObject["Inspections"].isArray()){
-		const QJsonArray inspectionsjsonArray = jsonObject["Inspections"].toArray();
-		const qsizetype inspectionsArrayCount = inspectionsjsonArray.size();
+		const QJsonArray inspectionsJsonArray = jsonObject["Inspections"].toArray();
+		const qsizetype inspectionsArrayCount = inspectionsJsonArray.size();
 		Inspections = QList<CInspection::V1_0>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsArrayCount; ++inspectionsIndex){
 			CInspection::V1_0 tempInspections;
-			if (!tempInspections.OptReadFromJsonObject(inspectionsjsonArray[inspectionsIndex].toObject())){
+			if (!tempInspections.OptReadFromJsonObject(inspectionsJsonArray[inspectionsIndex].toObject())){
 				return false;
 			}
 			Inspections->append(tempInspections);
@@ -9326,12 +9326,12 @@ bool CResultMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("extendedMetaData") && jsonObject["extendedMetaData"].isArray()){
-		const QJsonArray extendedMetaDatajsonArray = jsonObject["extendedMetaData"].toArray();
-		const qsizetype extendedMetaDataArrayCount = extendedMetaDatajsonArray.size();
+		const QJsonArray extendedMetaDataJsonArray = jsonObject["extendedMetaData"].toArray();
+		const qsizetype extendedMetaDataArrayCount = extendedMetaDataJsonArray.size();
 		extendedMetaData = QList<CExtendedMetaData::V1_0>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataArrayCount; ++extendedMetaDataIndex){
 			CExtendedMetaData::V1_0 tempExtendedMetaData;
-			if (!tempExtendedMetaData.ReadFromJsonObject(extendedMetaDatajsonArray[extendedMetaDataIndex].toObject())){
+			if (!tempExtendedMetaData.ReadFromJsonObject(extendedMetaDataJsonArray[extendedMetaDataIndex].toObject())){
 				return false;
 			}
 			extendedMetaData->append(tempExtendedMetaData);
@@ -9377,12 +9377,12 @@ bool CResultMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("extendedMetaData") && jsonObject["extendedMetaData"].isArray()){
-		const QJsonArray extendedMetaDatajsonArray = jsonObject["extendedMetaData"].toArray();
-		const qsizetype extendedMetaDataArrayCount = extendedMetaDatajsonArray.size();
+		const QJsonArray extendedMetaDataJsonArray = jsonObject["extendedMetaData"].toArray();
+		const qsizetype extendedMetaDataArrayCount = extendedMetaDataJsonArray.size();
 		extendedMetaData = QList<CExtendedMetaData::V1_0>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataArrayCount; ++extendedMetaDataIndex){
 			CExtendedMetaData::V1_0 tempExtendedMetaData;
-			if (!tempExtendedMetaData.OptReadFromJsonObject(extendedMetaDatajsonArray[extendedMetaDataIndex].toObject())){
+			if (!tempExtendedMetaData.OptReadFromJsonObject(extendedMetaDataJsonArray[extendedMetaDataIndex].toObject())){
 				return false;
 			}
 			extendedMetaData->append(tempExtendedMetaData);
@@ -10388,18 +10388,18 @@ bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 	if (resultContent){
 		QList<::imtgql::CGqlParamObject> resultContentDataObjectList;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
-			::imtgql::CGqlParamObject resultContentGqlValue;
+			::imtgql::CGqlParamObject resultContentDataObject;
 			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((resultContent->at(resultContentIndex)).get())){
-				if (!val->WriteToGraphQlObject(resultContentGqlValue)){
+				if (!val->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 			}
 			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((resultContent->at(resultContentIndex)).get())){
-				if (!val->WriteToGraphQlObject(resultContentGqlValue)){
+				if (!val->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 			}
-			resultContentDataObjectList << resultContentGqlValue;
+			resultContentDataObjectList << resultContentDataObject;
 		}
 		gqlObject.InsertParam("resultContent", resultContentDataObjectList);
 	}
@@ -10407,11 +10407,11 @@ bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 	if (overallResultValues){
 		QList<::imtgql::CGqlParamObject> overallResultValuesDataObjectList;
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
-			::imtgql::CGqlParamObject overallResultValuesDataObject;
-			if (!overallResultValues->at(overallResultValuesIndex).WriteToGraphQlObject(overallResultValuesDataObject)){
+			::imtgql::CGqlParamObject newOverallResultValuesGqlObject;
+			if (!overallResultValues->at(overallResultValuesIndex).WriteToGraphQlObject(newOverallResultValuesGqlObject)){
 				return false;
 			}
-			overallResultValuesDataObjectList << overallResultValuesDataObject;
+			overallResultValuesDataObjectList << newOverallResultValuesGqlObject;
 		}
 		gqlObject.InsertParam("overallResultValues", overallResultValuesDataObjectList);
 	}
@@ -10419,81 +10419,74 @@ bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 	return true;
 }
 
+
 bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
-	if (dataModelTitleData.isNull()){
+	if (!gqlObject.ContainsParam("dataModelTitle") || gqlObject["dataModelTitle"].userType() != QMetaType::QString){
 		return false;
 	}
-	dataModelTitle = dataModelTitleData.toString();
+	dataModelTitle = gqlObject["dataModelTitle"].toString();
 
-	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
-	if (dataModelVersionData.isNull()){
+	if (!gqlObject.ContainsParam("dataModelVersion") || gqlObject["dataModelVersion"].userType() != QMetaType::QString){
 		return false;
 	}
-	dataModelVersion = dataModelVersionData.toString();
+	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
-	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
-	if (resultMetaDataDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			return false;
 		}
-
 	}
 
-	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
-	if (!resultContentData.isNull()){
-		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
-		QVariantList resultContentDataList = resultContentData.toList();
-		qsizetype resultContentCount = resultContentDataList.size();
-		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
-			std::shared_ptr<CDMResultUnionType> resultContentData;
-			QVariant resultContentVariantValue = resultContentDataList[resultContentIndex];
-			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
-				CCDMResultVarString resultContentDataConvert;
+	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+		const QVariant resultContentData = gqlObject["resultContent"];
+		const QVariantList resultContentDataList = resultContentData.toList();
+		const qsizetype resultContentElementsCount = resultContentDataList.size();
+		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
+			QVariant tempResultContent = resultContentDataList[resultContentIndex];
+			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
+			if (tempResultContent.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
-				if (!isresultContentRead){
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isResultContentRead){
 					return false;
 				}
-				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
-				CCDMResultVarRecursive resultContentDataConvert;
+			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
-				if (!isresultContentRead){
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isResultContentRead){
 					return false;
 				}
-				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
 			else{
 				return false;
 			}
-			resultContentList << resultContentData;
+			resultContent->append(resultContentDataValue);
 		}
-		resultContent.emplace(resultContentList);
-
 	}
 
-	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
-	if (overallResultValuesCount > 0){
-		QList<COverallResultValues::V1_0> overallResultValuesList;
-		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
-			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				return false;
 			}
-			COverallResultValues::V1_0 overallResultValues;
-			if (!overallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				return false;
 			}
-			overallResultValuesList << overallResultValues;
+			overallResultValues->append(tempOverallResultValues);
 		}
-		overallResultValues = overallResultValuesList;
-
 	}
 
 	return true;
@@ -10502,77 +10495,69 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 
 bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
-	if (!dataModelTitleData.isNull()){
-		dataModelTitle = dataModelTitleData.toString();
+	if (gqlObject.ContainsParam("dataModelTitle") && gqlObject["dataModelTitle"].userType() == QMetaType::QString){
+		dataModelTitle = gqlObject["dataModelTitle"].toString();
 	}
 
-	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
-	if (!dataModelVersionData.isNull()){
-		dataModelVersion = dataModelVersionData.toString();
+	if (gqlObject.ContainsParam("dataModelVersion") && gqlObject["dataModelVersion"].userType() == QMetaType::QString){
+		dataModelVersion = gqlObject["dataModelVersion"].toString();
 	}
 
-	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
-	if (resultMetaDataDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			return false;
 		}
-
 	}
 
-	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
-	if (!resultContentData.isNull()){
-		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
-		QVariantList resultContentDataList = resultContentData.toList();
-		qsizetype resultContentCount = resultContentDataList.size();
-		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
-			std::shared_ptr<CDMResultUnionType> resultContentData;
-			QVariant resultContentVariantValue = resultContentDataList[resultContentIndex];
-			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
-				CCDMResultVarString resultContentDataConvert;
+	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+		const QVariant resultContentData = gqlObject["resultContent"];
+		const QVariantList resultContentDataList = resultContentData.toList();
+		const qsizetype resultContentElementsCount = resultContentDataList.size();
+		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
+			QVariant tempResultContent = resultContentDataList[resultContentIndex];
+			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
+			if (tempResultContent.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
-				if (!isresultContentRead){
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isResultContentRead){
 					return false;
 				}
-				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
-				CCDMResultVarRecursive resultContentDataConvert;
+			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
-				if (!isresultContentRead){
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isResultContentRead){
 					return false;
 				}
-				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
 			else{
 				return false;
 			}
-			resultContentList << resultContentData;
+			resultContent->append(resultContentDataValue);
 		}
-		resultContent.emplace(resultContentList);
-
 	}
 
-	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
-	if (overallResultValuesCount > 0){
-		QList<COverallResultValues::V1_0> overallResultValuesList;
-		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
-			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				return false;
 			}
-			COverallResultValues::V1_0 overallResultValues;
-			if (!overallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				return false;
 			}
-			overallResultValuesList << overallResultValues;
+			overallResultValues->append(tempOverallResultValues);
 		}
-		overallResultValues = overallResultValuesList;
-
 	}
 
 	return true;
@@ -10660,15 +10645,15 @@ bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObj
 	}
 
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
-		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
-		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
+			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (tempResultContent.canConvert<CCDMResultVarString>()){
 				CCDMResultVarString resultContentDataValueConvert;
-				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
 				}
@@ -10676,7 +10661,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObj
 			}
 			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
 				CCDMResultVarRecursive resultContentDataValueConvert;
-				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
 				}
@@ -10690,12 +10675,12 @@ bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObj
 	}
 
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
-		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
-		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
 			COverallResultValues::V1_0 tempOverallResultValues;
-			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				return false;
 			}
 			overallResultValues->append(tempOverallResultValues);
@@ -10725,15 +10710,15 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& json
 	}
 
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
-		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
-		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
+			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (tempResultContent.canConvert<CCDMResultVarString>()){
 				CCDMResultVarString resultContentDataValueConvert;
-				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
 				}
@@ -10741,7 +10726,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& json
 			}
 			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
 				CCDMResultVarRecursive resultContentDataValueConvert;
-				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
 				}
@@ -10755,12 +10740,12 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& json
 	}
 
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
-		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
-		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
 			COverallResultValues::V1_0 tempOverallResultValues;
-			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				return false;
 			}
 			overallResultValues->append(tempOverallResultValues);
@@ -11187,29 +11172,30 @@ bool CCDMResultVarString::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 	gqlObject.InsertParam("dataModelVersion", QVariant(*dataModelVersion));
 
 	if (resultMetaData){
-		::imtgql::CGqlParamObject resultMetaDataDataObject;
-		if (!resultMetaData->WriteToGraphQlObject(resultMetaDataDataObject)){
+		::imtgql::CGqlParamObject resultMetaDataGqlObject;
+		const bool isResultMetaDataAdded = resultMetaData->WriteToGraphQlObject(resultMetaDataGqlObject);
+		if (!isResultMetaDataAdded){
 			return false;
 		}
-		gqlObject.InsertParam("resultMetaData", resultMetaDataDataObject);
+		gqlObject.InsertParam("resultMetaData", resultMetaDataGqlObject);
 	}
 
 	if (resultContent){
-		QVariantList resultContentTempList;
+		QVariantList resultContentDataObjectList;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
-			resultContentTempList << resultContent->at(resultContentIndex);
+			resultContentDataObjectList << resultContent->at(resultContentIndex);
 		}
-		gqlObject.InsertParam("resultContent", QVariant(resultContentTempList));
+		gqlObject.InsertParam("resultContent", resultContentDataObjectList);
 	}
 
 	if (overallResultValues){
 		QList<::imtgql::CGqlParamObject> overallResultValuesDataObjectList;
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
-			::imtgql::CGqlParamObject overallResultValuesDataObject;
-			if (!overallResultValues->at(overallResultValuesIndex).WriteToGraphQlObject(overallResultValuesDataObject)){
+			::imtgql::CGqlParamObject newOverallResultValuesGqlObject;
+			if (!overallResultValues->at(overallResultValuesIndex).WriteToGraphQlObject(newOverallResultValuesGqlObject)){
 				return false;
 			}
-			overallResultValuesDataObjectList << overallResultValuesDataObject;
+			overallResultValuesDataObjectList << newOverallResultValuesGqlObject;
 		}
 		gqlObject.InsertParam("overallResultValues", overallResultValuesDataObjectList);
 	}
@@ -11217,59 +11203,52 @@ bool CCDMResultVarString::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 	return true;
 }
 
+
 bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
-	if (dataModelTitleData.isNull()){
+	if (!gqlObject.ContainsParam("dataModelTitle") || gqlObject["dataModelTitle"].userType() != QMetaType::QString){
 		return false;
 	}
-	dataModelTitle = dataModelTitleData.toString();
+	dataModelTitle = gqlObject["dataModelTitle"].toString();
 
-	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
-	if (dataModelVersionData.isNull()){
+	if (!gqlObject.ContainsParam("dataModelVersion") || gqlObject["dataModelVersion"].userType() != QMetaType::QString){
 		return false;
 	}
-	dataModelVersion = dataModelVersionData.toString();
+	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
-	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
-	if (resultMetaDataDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			return false;
 		}
-
 	}
 
-	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
-	if (!resultContentData.isNull()){
-		QList<QString> resultContentList;
-		QVariantList resultContentDataList = resultContentData.toList();
-		qsizetype resultContentCount = resultContentDataList.size();
-		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
-			QString resultContent = resultContentDataList[resultContentIndex].toString();
-			resultContentList << resultContent;
+	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+		const QVariant resultContentData = gqlObject["resultContent"];
+		const QVariantList resultContentDataList = resultContentData.toList();
+		const qsizetype resultContentElementsCount = resultContentDataList.size();
+		resultContent = QList<QString>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
+			QString tempResultContent = resultContentDataList[resultContentIndex].toString();
+			resultContent->append(tempResultContent);
 		}
-		resultContent = resultContentList;
-
 	}
 
-	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
-	if (overallResultValuesCount > 0){
-		QList<COverallResultValues::V1_0> overallResultValuesList;
-		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
-			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				return false;
 			}
-			COverallResultValues::V1_0 overallResultValues;
-			if (!overallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				return false;
 			}
-			overallResultValuesList << overallResultValues;
+			overallResultValues->append(tempOverallResultValues);
 		}
-		overallResultValues = overallResultValuesList;
-
 	}
 
 	return true;
@@ -11278,55 +11257,47 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 
 bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
-	if (!dataModelTitleData.isNull()){
-		dataModelTitle = dataModelTitleData.toString();
+	if (gqlObject.ContainsParam("dataModelTitle") && gqlObject["dataModelTitle"].userType() == QMetaType::QString){
+		dataModelTitle = gqlObject["dataModelTitle"].toString();
 	}
 
-	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
-	if (!dataModelVersionData.isNull()){
-		dataModelVersion = dataModelVersionData.toString();
+	if (gqlObject.ContainsParam("dataModelVersion") && gqlObject["dataModelVersion"].userType() == QMetaType::QString){
+		dataModelVersion = gqlObject["dataModelVersion"].toString();
 	}
 
-	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
-	if (resultMetaDataDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			return false;
 		}
-
 	}
 
-	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
-	if (!resultContentData.isNull()){
-		QList<QString> resultContentList;
-		QVariantList resultContentDataList = resultContentData.toList();
-		qsizetype resultContentCount = resultContentDataList.size();
-		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
-			QString resultContent = resultContentDataList[resultContentIndex].toString();
-			resultContentList << resultContent;
+	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+		const QVariant resultContentData = gqlObject["resultContent"];
+		const QVariantList resultContentDataList = resultContentData.toList();
+		const qsizetype resultContentElementsCount = resultContentDataList.size();
+		resultContent = QList<QString>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
+			QString tempResultContent = resultContentDataList[resultContentIndex].toString();
+			resultContent->append(tempResultContent);
 		}
-		resultContent = resultContentList;
-
 	}
 
-	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
-	if (overallResultValuesCount > 0){
-		QList<COverallResultValues::V1_0> overallResultValuesList;
-		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
-			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				return false;
 			}
-			COverallResultValues::V1_0 overallResultValues;
-			if (!overallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				return false;
 			}
-			overallResultValuesList << overallResultValues;
+			overallResultValues->append(tempOverallResultValues);
 		}
-		overallResultValues = overallResultValuesList;
-
 	}
 
 	return true;
@@ -11399,22 +11370,22 @@ bool CCDMResultVarString::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject
 	}
 
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
-		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
-		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<QString>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QString tempResultContent = resultContentjsonArray[resultContentIndex].toString();
+			QString tempResultContent = resultContentJsonArray[resultContentIndex].toString();
 			resultContent->append(tempResultContent);
 		}
 	}
 
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
-		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
-		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
 			COverallResultValues::V1_0 tempOverallResultValues;
-			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				return false;
 			}
 			overallResultValues->append(tempOverallResultValues);
@@ -11444,22 +11415,22 @@ bool CCDMResultVarString::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObj
 	}
 
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
-		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
-		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<QString>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QString tempResultContent = resultContentjsonArray[resultContentIndex].toString();
+			QString tempResultContent = resultContentJsonArray[resultContentIndex].toString();
 			resultContent->append(tempResultContent);
 		}
 	}
 
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
-		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
-		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
 			COverallResultValues::V1_0 tempOverallResultValues;
-			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				return false;
 			}
 			overallResultValues->append(tempOverallResultValues);
@@ -11939,28 +11910,29 @@ bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 	gqlObject.InsertParam("dataModelVersion", QVariant(*dataModelVersion));
 
 	if (resultMetaData){
-		::imtgql::CGqlParamObject resultMetaDataDataObject;
-		if (!resultMetaData->WriteToGraphQlObject(resultMetaDataDataObject)){
+		::imtgql::CGqlParamObject resultMetaDataGqlObject;
+		const bool isResultMetaDataAdded = resultMetaData->WriteToGraphQlObject(resultMetaDataGqlObject);
+		if (!isResultMetaDataAdded){
 			return false;
 		}
-		gqlObject.InsertParam("resultMetaData", resultMetaDataDataObject);
+		gqlObject.InsertParam("resultMetaData", resultMetaDataGqlObject);
 	}
 
 	if (resultContent){
 		QList<::imtgql::CGqlParamObject> resultContentDataObjectList;
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContent->size(); ++resultContentIndex){
-			::imtgql::CGqlParamObject resultContentGqlValue;
+			::imtgql::CGqlParamObject resultContentDataObject;
 			if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((resultContent->at(resultContentIndex)).get())){
-				if (!val->WriteToGraphQlObject(resultContentGqlValue)){
+				if (!val->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 			}
 			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((resultContent->at(resultContentIndex)).get())){
-				if (!val->WriteToGraphQlObject(resultContentGqlValue)){
+				if (!val->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
 			}
-			resultContentDataObjectList << resultContentGqlValue;
+			resultContentDataObjectList << resultContentDataObject;
 		}
 		gqlObject.InsertParam("resultContent", resultContentDataObjectList);
 	}
@@ -11968,11 +11940,11 @@ bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 	if (overallResultValues){
 		QList<::imtgql::CGqlParamObject> overallResultValuesDataObjectList;
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValues->size(); ++overallResultValuesIndex){
-			::imtgql::CGqlParamObject overallResultValuesDataObject;
-			if (!overallResultValues->at(overallResultValuesIndex).WriteToGraphQlObject(overallResultValuesDataObject)){
+			::imtgql::CGqlParamObject newOverallResultValuesGqlObject;
+			if (!overallResultValues->at(overallResultValuesIndex).WriteToGraphQlObject(newOverallResultValuesGqlObject)){
 				return false;
 			}
-			overallResultValuesDataObjectList << overallResultValuesDataObject;
+			overallResultValuesDataObjectList << newOverallResultValuesGqlObject;
 		}
 		gqlObject.InsertParam("overallResultValues", overallResultValuesDataObjectList);
 	}
@@ -11980,81 +11952,74 @@ bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 	return true;
 }
 
+
 bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
-	if (dataModelTitleData.isNull()){
+	if (!gqlObject.ContainsParam("dataModelTitle") || gqlObject["dataModelTitle"].userType() != QMetaType::QString){
 		return false;
 	}
-	dataModelTitle = dataModelTitleData.toString();
+	dataModelTitle = gqlObject["dataModelTitle"].toString();
 
-	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
-	if (dataModelVersionData.isNull()){
+	if (!gqlObject.ContainsParam("dataModelVersion") || gqlObject["dataModelVersion"].userType() != QMetaType::QString){
 		return false;
 	}
-	dataModelVersion = dataModelVersionData.toString();
+	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
-	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
-	if (resultMetaDataDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			return false;
 		}
-
 	}
 
-	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
-	if (!resultContentData.isNull()){
-		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
-		QVariantList resultContentDataList = resultContentData.toList();
-		qsizetype resultContentCount = resultContentDataList.size();
-		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
-			std::shared_ptr<CDMResultUnionType> resultContentData;
-			QVariant resultContentVariantValue = resultContentDataList[resultContentIndex];
-			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
-				CCDMResultVarString resultContentDataConvert;
+	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+		const QVariant resultContentData = gqlObject["resultContent"];
+		const QVariantList resultContentDataList = resultContentData.toList();
+		const qsizetype resultContentElementsCount = resultContentDataList.size();
+		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
+			QVariant tempResultContent = resultContentDataList[resultContentIndex];
+			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
+			if (tempResultContent.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
-				if (!isresultContentRead){
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isResultContentRead){
 					return false;
 				}
-				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
-				CCDMResultVarRecursive resultContentDataConvert;
+			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
-				if (!isresultContentRead){
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isResultContentRead){
 					return false;
 				}
-				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
 			else{
 				return false;
 			}
-			resultContentList << resultContentData;
+			resultContent->append(resultContentDataValue);
 		}
-		resultContent.emplace(resultContentList);
-
 	}
 
-	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
-	if (overallResultValuesCount > 0){
-		QList<COverallResultValues::V1_0> overallResultValuesList;
-		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
-			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				return false;
 			}
-			COverallResultValues::V1_0 overallResultValues;
-			if (!overallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.ReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				return false;
 			}
-			overallResultValuesList << overallResultValues;
+			overallResultValues->append(tempOverallResultValues);
 		}
-		overallResultValues = overallResultValuesList;
-
 	}
 
 	return true;
@@ -12063,77 +12028,69 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 
 bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant dataModelTitleData = gqlObject.GetParamArgumentValue("dataModelTitle");
-	if (!dataModelTitleData.isNull()){
-		dataModelTitle = dataModelTitleData.toString();
+	if (gqlObject.ContainsParam("dataModelTitle") && gqlObject["dataModelTitle"].userType() == QMetaType::QString){
+		dataModelTitle = gqlObject["dataModelTitle"].toString();
 	}
 
-	QVariant dataModelVersionData = gqlObject.GetParamArgumentValue("dataModelVersion");
-	if (!dataModelVersionData.isNull()){
-		dataModelVersion = dataModelVersionData.toString();
+	if (gqlObject.ContainsParam("dataModelVersion") && gqlObject["dataModelVersion"].userType() == QMetaType::QString){
+		dataModelVersion = gqlObject["dataModelVersion"].toString();
 	}
 
-	const ::imtgql::CGqlParamObject* resultMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultMetaData");
-	if (resultMetaDataDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*resultMetaDataDataObjectPtr);
+		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
 			return false;
 		}
-
 	}
 
-	QVariant resultContentData = gqlObject.GetParamArgumentValue("resultContent");
-	if (!resultContentData.isNull()){
-		QList<std::shared_ptr<CDMResultUnionType>> resultContentList;
-		QVariantList resultContentDataList = resultContentData.toList();
-		qsizetype resultContentCount = resultContentDataList.size();
-		for (qsizetype resultContentIndex = 0; resultContentIndex != resultContentCount ; ++resultContentIndex){
-			std::shared_ptr<CDMResultUnionType> resultContentData;
-			QVariant resultContentVariantValue = resultContentDataList[resultContentIndex];
-			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
-				CCDMResultVarString resultContentDataConvert;
+	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+		const QVariant resultContentData = gqlObject["resultContent"];
+		const QVariantList resultContentDataList = resultContentData.toList();
+		const qsizetype resultContentElementsCount = resultContentDataList.size();
+		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
+		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
+			QVariant tempResultContent = resultContentDataList[resultContentIndex];
+			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
+			if (tempResultContent.canConvert<CCDMResultVarString>()){
+				CCDMResultVarString resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
-				if (!isresultContentRead){
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isResultContentRead){
 					return false;
 				}
-				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
-				CCDMResultVarRecursive resultContentDataConvert;
+			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+				CCDMResultVarRecursive resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isresultContentRead = resultContentDataConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
-				if (!isresultContentRead){
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				if (!isResultContentRead){
 					return false;
 				}
-				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
+				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
 			else{
 				return false;
 			}
-			resultContentList << resultContentData;
+			resultContent->append(resultContentDataValue);
 		}
-		resultContent.emplace(resultContentList);
-
 	}
 
-	int overallResultValuesCount = gqlObject.GetObjectsCount("overallResultValues");
-	if (overallResultValuesCount > 0){
-		QList<COverallResultValues::V1_0> overallResultValuesList;
-		for (int overallResultValuesIndex = 0; overallResultValuesIndex != overallResultValuesCount ; ++overallResultValuesIndex){
-			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues",overallResultValuesIndex);
+	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
+		overallResultValues = QList<COverallResultValues::V1_0>();
+		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
+			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
 				return false;
 			}
-			COverallResultValues::V1_0 overallResultValues;
-			if (!overallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
+			COverallResultValues::V1_0 tempOverallResultValues;
+			if (!tempOverallResultValues.OptReadFromGraphQlObject(*overallResultValuesDataObjectPtr)){
 				return false;
 			}
-			overallResultValuesList << overallResultValues;
+			overallResultValues->append(tempOverallResultValues);
 		}
-		overallResultValues = overallResultValuesList;
-
 	}
 
 	return true;
@@ -12221,15 +12178,15 @@ bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
-		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
-		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
+			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (tempResultContent.canConvert<CCDMResultVarString>()){
 				CCDMResultVarString resultContentDataValueConvert;
-				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
 				}
@@ -12237,7 +12194,7 @@ bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 			}
 			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
 				CCDMResultVarRecursive resultContentDataValueConvert;
-				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
 				}
@@ -12251,12 +12208,12 @@ bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
-		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
-		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
 			COverallResultValues::V1_0 tempOverallResultValues;
-			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+			if (!tempOverallResultValues.ReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				return false;
 			}
 			overallResultValues->append(tempOverallResultValues);
@@ -12286,15 +12243,15 @@ bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
-		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
-		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
+		const QJsonArray resultContentJsonArray = jsonObject["resultContent"].toArray();
+		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
+			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (tempResultContent.canConvert<CCDMResultVarString>()){
 				CCDMResultVarString resultContentDataValueConvert;
-				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
 				}
@@ -12302,7 +12259,7 @@ bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			}
 			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
 				CCDMResultVarRecursive resultContentDataValueConvert;
-				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
+				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
 					return false;
 				}
@@ -12316,12 +12273,12 @@ bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("overallResultValues") && jsonObject["overallResultValues"].isArray()){
-		const QJsonArray overallResultValuesjsonArray = jsonObject["overallResultValues"].toArray();
-		const qsizetype overallResultValuesArrayCount = overallResultValuesjsonArray.size();
+		const QJsonArray overallResultValuesJsonArray = jsonObject["overallResultValues"].toArray();
+		const qsizetype overallResultValuesArrayCount = overallResultValuesJsonArray.size();
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesArrayCount; ++overallResultValuesIndex){
 			COverallResultValues::V1_0 tempOverallResultValues;
-			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesjsonArray[overallResultValuesIndex].toObject())){
+			if (!tempOverallResultValues.OptReadFromJsonObject(overallResultValuesJsonArray[overallResultValuesIndex].toObject())){
 				return false;
 			}
 			overallResultValues->append(tempOverallResultValues);

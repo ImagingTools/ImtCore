@@ -146,8 +146,8 @@ bool CModule::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CModule::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("Types") && jsonObject["Types"].isArray()){
-		const QJsonArray typesjsonArray = jsonObject["Types"].toArray();
-		const qsizetype typesArrayCount = typesjsonArray.size();
+		const QJsonArray typesJsonArray = jsonObject["Types"].toArray();
+		const qsizetype typesArrayCount = typesJsonArray.size();
 		if (typesArrayCount <= 0){
 			return false;
 		}
@@ -155,7 +155,7 @@ bool CModule::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 		for (qsizetype typesIndex = 0; typesIndex < typesArrayCount; ++typesIndex){
 			CEntity tempType;
-			if (!tempType.ReadFromJsonObject(typesjsonArray[typesIndex].toObject())){
+			if (!tempType.ReadFromJsonObject(typesJsonArray[typesIndex].toObject())){
 				return false;
 			}
 			Types->append(tempType);

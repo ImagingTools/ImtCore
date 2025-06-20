@@ -394,7 +394,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			WriteUnionConversionFromString(stream,
+			WriteUnionConversionFromData(stream,
 				foundUnion,
 				dataVarName,
 				field.GetId(),
@@ -444,7 +444,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			WriteUnionConversionFromString(stream,
+			WriteUnionConversionFromData(stream,
 				foundUnion,
 				dataVarName,
 				field.GetId(),
@@ -911,7 +911,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 		imtsdl::CSdlUnion foundUnion;
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-		WriteUnionConversionFromString(stream,
+		WriteUnionConversionFromData(stream,
 			foundUnion,
 			unionSourceVarName,
 			dataVarName,

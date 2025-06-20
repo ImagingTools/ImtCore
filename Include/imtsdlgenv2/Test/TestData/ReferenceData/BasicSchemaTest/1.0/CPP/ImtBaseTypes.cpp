@@ -4881,12 +4881,12 @@ bool COptionsList::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
-		const QJsonArray optionsjsonArray = jsonObject["options"].toArray();
-		const qsizetype optionsArrayCount = optionsjsonArray.size();
+		const QJsonArray optionsJsonArray = jsonObject["options"].toArray();
+		const qsizetype optionsArrayCount = optionsJsonArray.size();
 		options = QList<COption::V1_0>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
 			COption::V1_0 tempOptions;
-			if (!tempOptions.ReadFromJsonObject(optionsjsonArray[optionsIndex].toObject())){
+			if (!tempOptions.ReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
 				return false;
 			}
 			options->append(tempOptions);
@@ -4908,12 +4908,12 @@ bool COptionsList::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("options") && jsonObject["options"].isArray()){
-		const QJsonArray optionsjsonArray = jsonObject["options"].toArray();
-		const qsizetype optionsArrayCount = optionsjsonArray.size();
+		const QJsonArray optionsJsonArray = jsonObject["options"].toArray();
+		const qsizetype optionsArrayCount = optionsJsonArray.size();
 		options = QList<COption::V1_0>();
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
 			COption::V1_0 tempOptions;
-			if (!tempOptions.OptReadFromJsonObject(optionsjsonArray[optionsIndex].toObject())){
+			if (!tempOptions.OptReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
 				return false;
 			}
 			options->append(tempOptions);
@@ -5260,8 +5260,8 @@ bool CSelectionParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 
 	if (gqlObject.ContainsParam("constraints") && gqlObject.GetParamArgumentObjectPtr("constraints") == nullptr){
 		constraints = COptionsList::V1_0();
-		const bool isConstraintsReaded = constraints->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
-		if (!isConstraintsReaded){
+		const bool isConstraintsRead = constraints->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
+		if (!isConstraintsRead){
 			return false;
 		}
 	}
@@ -5278,8 +5278,8 @@ bool CSelectionParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 
 	if (gqlObject.ContainsParam("constraints") && gqlObject.GetParamArgumentObjectPtr("constraints") == nullptr){
 		constraints = COptionsList::V1_0();
-		const bool isConstraintsReaded = constraints->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
-		if (!isConstraintsReaded){
+		const bool isConstraintsRead = constraints->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
+		if (!isConstraintsRead){
 			return false;
 		}
 	}
@@ -5315,8 +5315,8 @@ bool CSelectionParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("constraints") && jsonObject["constraints"].isObject()){
 		constraints = COptionsList::V1_0();
-		const bool isConstraintsReaded = constraints->ReadFromJsonObject(jsonObject["constraints"].toObject());
-		if (!isConstraintsReaded){
+		const bool isConstraintsRead = constraints->ReadFromJsonObject(jsonObject["constraints"].toObject());
+		if (!isConstraintsRead){
 			return false;
 		}
 	}
@@ -5333,8 +5333,8 @@ bool CSelectionParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("constraints") && jsonObject["constraints"].isObject()){
 		constraints = COptionsList::V1_0();
-		const bool isConstraintsReaded = constraints->OptReadFromJsonObject(jsonObject["constraints"].toObject());
-		if (!isConstraintsReaded){
+		const bool isConstraintsRead = constraints->OptReadFromJsonObject(jsonObject["constraints"].toObject());
+		if (!isConstraintsRead){
 			return false;
 		}
 	}
@@ -6055,8 +6055,8 @@ bool CBackupSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 {
 	if (gqlObject.ContainsParam("schedulerParam") && gqlObject.GetParamArgumentObjectPtr("schedulerParam") == nullptr){
 		schedulerParam = CSchedulerParam::V1_0();
-		const bool isSchedulerParamReaded = schedulerParam->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
-		if (!isSchedulerParamReaded){
+		const bool isSchedulerParamRead = schedulerParam->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
+		if (!isSchedulerParamRead){
 			return false;
 		}
 	}
@@ -6073,8 +6073,8 @@ bool CBackupSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 {
 	if (gqlObject.ContainsParam("schedulerParam") && gqlObject.GetParamArgumentObjectPtr("schedulerParam") == nullptr){
 		schedulerParam = CSchedulerParam::V1_0();
-		const bool isSchedulerParamReaded = schedulerParam->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
-		if (!isSchedulerParamReaded){
+		const bool isSchedulerParamRead = schedulerParam->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
+		if (!isSchedulerParamRead){
 			return false;
 		}
 	}
@@ -6110,8 +6110,8 @@ bool CBackupSettings::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
 		schedulerParam = CSchedulerParam::V1_0();
-		const bool isSchedulerParamReaded = schedulerParam->ReadFromJsonObject(jsonObject["schedulerParam"].toObject());
-		if (!isSchedulerParamReaded){
+		const bool isSchedulerParamRead = schedulerParam->ReadFromJsonObject(jsonObject["schedulerParam"].toObject());
+		if (!isSchedulerParamRead){
 			return false;
 		}
 	}
@@ -6128,8 +6128,8 @@ bool CBackupSettings::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("schedulerParam") && jsonObject["schedulerParam"].isObject()){
 		schedulerParam = CSchedulerParam::V1_0();
-		const bool isSchedulerParamReaded = schedulerParam->OptReadFromJsonObject(jsonObject["schedulerParam"].toObject());
-		if (!isSchedulerParamReaded){
+		const bool isSchedulerParamRead = schedulerParam->OptReadFromJsonObject(jsonObject["schedulerParam"].toObject());
+		if (!isSchedulerParamRead){
 			return false;
 		}
 	}
@@ -7711,51 +7711,51 @@ bool CParamsSet::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CParamsSet::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
-		const QJsonArray paramIdsjsonArray = jsonObject["paramIds"].toArray();
-		const qsizetype paramIdsArrayCount = paramIdsjsonArray.size();
+		const QJsonArray paramIdsJsonArray = jsonObject["paramIds"].toArray();
+		const qsizetype paramIdsArrayCount = paramIdsJsonArray.size();
 		paramIds = QList<QByteArray>();
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsArrayCount; ++paramIdsIndex){
-			QByteArray tempParamIds = paramIdsjsonArray[paramIdsIndex].toString().toUtf8();
+			QByteArray tempParamIds = paramIdsJsonArray[paramIdsIndex].toString().toUtf8();
 			paramIds->append(tempParamIds);
 		}
 	}
 
 	if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isArray()){
-		const QJsonArray paramTypeIdsjsonArray = jsonObject["paramTypeIds"].toArray();
-		const qsizetype paramTypeIdsArrayCount = paramTypeIdsjsonArray.size();
+		const QJsonArray paramTypeIdsJsonArray = jsonObject["paramTypeIds"].toArray();
+		const qsizetype paramTypeIdsArrayCount = paramTypeIdsJsonArray.size();
 		paramTypeIds = QList<QByteArray>();
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsArrayCount; ++paramTypeIdsIndex){
-			QByteArray tempParamTypeIds = paramTypeIdsjsonArray[paramTypeIdsIndex].toString().toUtf8();
+			QByteArray tempParamTypeIds = paramTypeIdsJsonArray[paramTypeIdsIndex].toString().toUtf8();
 			paramTypeIds->append(tempParamTypeIds);
 		}
 	}
 
 	if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isArray()){
-		const QJsonArray paramNamesjsonArray = jsonObject["paramNames"].toArray();
-		const qsizetype paramNamesArrayCount = paramNamesjsonArray.size();
+		const QJsonArray paramNamesJsonArray = jsonObject["paramNames"].toArray();
+		const qsizetype paramNamesArrayCount = paramNamesJsonArray.size();
 		paramNames = QList<QString>();
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesArrayCount; ++paramNamesIndex){
-			QString tempParamNames = paramNamesjsonArray[paramNamesIndex].toString();
+			QString tempParamNames = paramNamesJsonArray[paramNamesIndex].toString();
 			paramNames->append(tempParamNames);
 		}
 	}
 
 	if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isArray()){
-		const QJsonArray paramDescriptionsjsonArray = jsonObject["paramDescriptions"].toArray();
-		const qsizetype paramDescriptionsArrayCount = paramDescriptionsjsonArray.size();
+		const QJsonArray paramDescriptionsJsonArray = jsonObject["paramDescriptions"].toArray();
+		const qsizetype paramDescriptionsArrayCount = paramDescriptionsJsonArray.size();
 		paramDescriptions = QList<QString>();
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsArrayCount; ++paramDescriptionsIndex){
-			QString tempParamDescriptions = paramDescriptionsjsonArray[paramDescriptionsIndex].toString();
+			QString tempParamDescriptions = paramDescriptionsJsonArray[paramDescriptionsIndex].toString();
 			paramDescriptions->append(tempParamDescriptions);
 		}
 	}
 
 	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
-		const QJsonArray parametersjsonArray = jsonObject["parameters"].toArray();
-		const qsizetype parametersArrayCount = parametersjsonArray.size();
+		const QJsonArray parametersJsonArray = jsonObject["parameters"].toArray();
+		const qsizetype parametersArrayCount = parametersJsonArray.size();
 		parameters = QList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
-			QString tempParameters = parametersjsonArray[parametersIndex].toString();
+			QString tempParameters = parametersJsonArray[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
 	}
@@ -7767,51 +7767,51 @@ bool CParamsSet::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 bool CParamsSet::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (jsonObject.contains("paramIds") && jsonObject["paramIds"].isArray()){
-		const QJsonArray paramIdsjsonArray = jsonObject["paramIds"].toArray();
-		const qsizetype paramIdsArrayCount = paramIdsjsonArray.size();
+		const QJsonArray paramIdsJsonArray = jsonObject["paramIds"].toArray();
+		const qsizetype paramIdsArrayCount = paramIdsJsonArray.size();
 		paramIds = QList<QByteArray>();
 		for (qsizetype paramIdsIndex = 0; paramIdsIndex < paramIdsArrayCount; ++paramIdsIndex){
-			QByteArray tempParamIds = paramIdsjsonArray[paramIdsIndex].toString().toUtf8();
+			QByteArray tempParamIds = paramIdsJsonArray[paramIdsIndex].toString().toUtf8();
 			paramIds->append(tempParamIds);
 		}
 	}
 
 	if (jsonObject.contains("paramTypeIds") && jsonObject["paramTypeIds"].isArray()){
-		const QJsonArray paramTypeIdsjsonArray = jsonObject["paramTypeIds"].toArray();
-		const qsizetype paramTypeIdsArrayCount = paramTypeIdsjsonArray.size();
+		const QJsonArray paramTypeIdsJsonArray = jsonObject["paramTypeIds"].toArray();
+		const qsizetype paramTypeIdsArrayCount = paramTypeIdsJsonArray.size();
 		paramTypeIds = QList<QByteArray>();
 		for (qsizetype paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsArrayCount; ++paramTypeIdsIndex){
-			QByteArray tempParamTypeIds = paramTypeIdsjsonArray[paramTypeIdsIndex].toString().toUtf8();
+			QByteArray tempParamTypeIds = paramTypeIdsJsonArray[paramTypeIdsIndex].toString().toUtf8();
 			paramTypeIds->append(tempParamTypeIds);
 		}
 	}
 
 	if (jsonObject.contains("paramNames") && jsonObject["paramNames"].isArray()){
-		const QJsonArray paramNamesjsonArray = jsonObject["paramNames"].toArray();
-		const qsizetype paramNamesArrayCount = paramNamesjsonArray.size();
+		const QJsonArray paramNamesJsonArray = jsonObject["paramNames"].toArray();
+		const qsizetype paramNamesArrayCount = paramNamesJsonArray.size();
 		paramNames = QList<QString>();
 		for (qsizetype paramNamesIndex = 0; paramNamesIndex < paramNamesArrayCount; ++paramNamesIndex){
-			QString tempParamNames = paramNamesjsonArray[paramNamesIndex].toString();
+			QString tempParamNames = paramNamesJsonArray[paramNamesIndex].toString();
 			paramNames->append(tempParamNames);
 		}
 	}
 
 	if (jsonObject.contains("paramDescriptions") && jsonObject["paramDescriptions"].isArray()){
-		const QJsonArray paramDescriptionsjsonArray = jsonObject["paramDescriptions"].toArray();
-		const qsizetype paramDescriptionsArrayCount = paramDescriptionsjsonArray.size();
+		const QJsonArray paramDescriptionsJsonArray = jsonObject["paramDescriptions"].toArray();
+		const qsizetype paramDescriptionsArrayCount = paramDescriptionsJsonArray.size();
 		paramDescriptions = QList<QString>();
 		for (qsizetype paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsArrayCount; ++paramDescriptionsIndex){
-			QString tempParamDescriptions = paramDescriptionsjsonArray[paramDescriptionsIndex].toString();
+			QString tempParamDescriptions = paramDescriptionsJsonArray[paramDescriptionsIndex].toString();
 			paramDescriptions->append(tempParamDescriptions);
 		}
 	}
 
 	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
-		const QJsonArray parametersjsonArray = jsonObject["parameters"].toArray();
-		const qsizetype parametersArrayCount = parametersjsonArray.size();
+		const QJsonArray parametersJsonArray = jsonObject["parameters"].toArray();
+		const qsizetype parametersArrayCount = parametersJsonArray.size();
 		parameters = QList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
-			QString tempParameters = parametersjsonArray[parametersIndex].toString();
+			QString tempParameters = parametersJsonArray[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
 	}
@@ -8365,11 +8365,11 @@ bool CMimeType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	type = jsonObject["type"].toString();
 
 	if (jsonObject.contains("tree") && jsonObject["tree"].isArray()){
-		const QJsonArray treejsonArray = jsonObject["tree"].toArray();
-		const qsizetype treeArrayCount = treejsonArray.size();
+		const QJsonArray treeJsonArray = jsonObject["tree"].toArray();
+		const qsizetype treeArrayCount = treeJsonArray.size();
 		tree = QList<QString>();
 		for (qsizetype treeIndex = 0; treeIndex < treeArrayCount; ++treeIndex){
-			QString tempTree = treejsonArray[treeIndex].toString();
+			QString tempTree = treeJsonArray[treeIndex].toString();
 			tree->append(tempTree);
 		}
 	}
@@ -8384,11 +8384,11 @@ bool CMimeType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
-		const QJsonArray parametersjsonArray = jsonObject["parameters"].toArray();
-		const qsizetype parametersArrayCount = parametersjsonArray.size();
+		const QJsonArray parametersJsonArray = jsonObject["parameters"].toArray();
+		const qsizetype parametersArrayCount = parametersJsonArray.size();
 		parameters = QList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
-			QString tempParameters = parametersjsonArray[parametersIndex].toString();
+			QString tempParameters = parametersJsonArray[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
 	}
@@ -8404,11 +8404,11 @@ bool CMimeType::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("tree") && jsonObject["tree"].isArray()){
-		const QJsonArray treejsonArray = jsonObject["tree"].toArray();
-		const qsizetype treeArrayCount = treejsonArray.size();
+		const QJsonArray treeJsonArray = jsonObject["tree"].toArray();
+		const qsizetype treeArrayCount = treeJsonArray.size();
 		tree = QList<QString>();
 		for (qsizetype treeIndex = 0; treeIndex < treeArrayCount; ++treeIndex){
-			QString tempTree = treejsonArray[treeIndex].toString();
+			QString tempTree = treeJsonArray[treeIndex].toString();
 			tree->append(tempTree);
 		}
 	}
@@ -8422,11 +8422,11 @@ bool CMimeType::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("parameters") && jsonObject["parameters"].isArray()){
-		const QJsonArray parametersjsonArray = jsonObject["parameters"].toArray();
-		const qsizetype parametersArrayCount = parametersjsonArray.size();
+		const QJsonArray parametersJsonArray = jsonObject["parameters"].toArray();
+		const qsizetype parametersArrayCount = parametersJsonArray.size();
 		parameters = QList<QString>();
 		for (qsizetype parametersIndex = 0; parametersIndex < parametersArrayCount; ++parametersIndex){
-			QString tempParameters = parametersjsonArray[parametersIndex].toString();
+			QString tempParameters = parametersJsonArray[parametersIndex].toString();
 			parameters->append(tempParameters);
 		}
 	}

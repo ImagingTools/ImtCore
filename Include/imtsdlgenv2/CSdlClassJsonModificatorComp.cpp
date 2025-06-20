@@ -265,7 +265,7 @@ bool CSdlClassJsonModificatorComp::AddContainerListAccessCode(QTextStream& strea
 {
 	stream << QStringLiteral("const QJsonArray ");
 	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral("jsonArray = ");
+	stream << QStringLiteral("JsonArray = ");
 	if (variableName.isEmpty()){
 		stream << GetContainerObjectVariableName();
 	}
@@ -282,9 +282,9 @@ bool CSdlClassJsonModificatorComp::AddContainerListAccessCode(QTextStream& strea
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("ArrayCount = ");
 	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral("jsonArray.size();");
+	stream << QStringLiteral("JsonArray.size();");
 
-	result.listVariableName					= GetDecapitalizedValue(field.GetId()) + QStringLiteral("jsonArray");
+	result.listVariableName					= GetDecapitalizedValue(field.GetId()) + QStringLiteral("JsonArray");
 	result.listCountVariableName			= GetDecapitalizedValue(field.GetId()) + QStringLiteral("ArrayCount");
 	result.listCountVariableType			= QStringLiteral("qsizetype");
 	result.toObjectTransformMethod			= QStringLiteral(".to") + GetConvertEndForFieldString(field, true);

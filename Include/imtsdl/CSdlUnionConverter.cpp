@@ -14,7 +14,12 @@
 namespace imtsdl
 {
 
-
+/**
+	\todo make a refactoring replace 'text' types and methods to static values.
+		\example 'WriteToJsonObject' -> 'CSdlClassJsonModificatorComp::s_writeMethodName'
+		\example 'QJsonObject' -> 'CSdlClassJsonModificatorComp::s_classVariableName'
+		\example 'jsonObject' -> 'CSdlClassJsonModificatorComp::s_containerVariableName'
+*/
 void CSdlUnionConverter::WriteConversionFromUnion(
 			QTextStream& stream,
 			const CSdlUnion& sdlUnion,
@@ -44,6 +49,15 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 		typeNamespace.clear();
 	}
 	const QString completeTypeName = typeNamespace + sdlUnion.GetName();
+
+	// for GQL create a container object (GQL Spec limitaion?)
+	if (conversionType == CT_GQL_SCALAR || conversionType == CT_GQL_ARRAY){
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("::imtgql::CGqlParamObject ");
+		stream << targetName;
+		stream << QStringLiteral("DataObject;");
+		FeedStream(stream, 1, false);
+	}
 
 	bool isFirstIteration = true;
 	for (const auto& sdlType : sdlUnion.GetTypes()){
@@ -109,9 +123,11 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 				stream << QStringLiteral("}");
 				FeedStream(stream, 1, false);
 			}
-			else if (conversionType == CT_GQL_SCALAR){
+			else if (conversionType == CT_GQL_SCALAR || conversionType == CT_GQL_ARRAY){
 				FeedStreamHorizontally(stream, hIndents + 1);
-				stream << QStringLiteral("if (!val->WriteToGraphQlObject(") << targetVariableName << QStringLiteral(")){");
+				stream << QStringLiteral("if (!val->WriteToGraphQlObject(");
+				stream << targetName;
+				stream << QStringLiteral("DataObject)){");
 				FeedStream(stream, 1, false);
 
 				FeedStreamHorizontally(stream, hIndents + 2);
@@ -182,10 +198,10 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 		else{
 			if (conversionType == CT_GQL_SCALAR){
 				FeedStreamHorizontally(stream, hIndents + 1);
-				stream << targetVariableName;
+				stream << targetName;
+				stream << QStringLiteral("DataObject");
 				stream << QStringLiteral(".InsertParam(\"") << targetName << QStringLiteral("\", *val);");
 				FeedStream(stream, 1, false);
-
 			}
 			else if (conversionType == CT_JSON_SCALAR){
 				FeedStreamHorizontally(stream, hIndents + 1);
@@ -243,10 +259,29 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 
 		isFirstIteration = false;
 	}
+
+	if (conversionType == CT_GQL_ARRAY){
+		FeedStreamHorizontally(stream, hIndents);
+		stream << targetVariableName;
+		stream << QStringLiteral(" << ");
+		stream << targetName;
+		stream << QStringLiteral("DataObject;");
+		FeedStream(stream, 1, false);
+	}
+
+	// and finally for GQL write a *container*
+	if (conversionType == CT_GQL_SCALAR){
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("gqlObject.InsertParam(\"");
+		stream << targetName;
+		stream << QStringLiteral("\", ");
+		stream << targetName;
+		stream << QStringLiteral("DataObject);");
+	}
 }
 
 
-void CSdlUnionConverter::WriteUnionConversionFromString(
+void CSdlUnionConverter::WriteUnionConversionFromData(
 			QTextStream& stream,
 			const CSdlUnion& sdlUnion,
 			const QString& sourceVariableName,
@@ -335,7 +370,7 @@ void CSdlUnionConverter::WriteUnionConversionFromString(
 					stream << QStringLiteral("jsonObject[\"") << targetVariableName << QStringLiteral("\"");
 				}
 				else{
-					stream << targetName << QStringLiteral("[") << modelIndex;
+					stream << targetName << QStringLiteral("JsonArray[") << modelIndex;
 				}
 				stream << QStringLiteral("].toObject());");
 				FeedStream(stream, 1, false);
@@ -362,7 +397,7 @@ void CSdlUnionConverter::WriteUnionConversionFromString(
 				QString gqlVariable = targetName + QString("DataObjectPtr");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const ::imtgql::CGqlParamObject* ") << gqlVariable;
-				stream << QStringLiteral(" = request.GetParamArgumentObjectPtr(\"");
+				stream << QStringLiteral(" = gqlObject.GetParamArgumentObjectPtr(\"");
 				if (conversionType == CT_GQL_SCALAR){
 					stream << targetVariableName;
 				}
@@ -372,7 +407,7 @@ void CSdlUnionConverter::WriteUnionConversionFromString(
 				stream << QStringLiteral("\");");
 				FeedStream(stream, 1, false);
 
-				QString readVariable = QString("is") + targetName + QString("Read");
+				QString readVariable = QString("is") + GetCapitalizedValue(targetName) + QString("Read");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
 				stream << tempVar << QStringLiteral(".ReadFromGraphQlObject(*") << gqlVariable << QStringLiteral(");");

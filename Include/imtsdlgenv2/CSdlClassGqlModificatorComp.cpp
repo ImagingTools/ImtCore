@@ -13,1172 +13,9 @@ namespace imtsdlgenv2
 {
 
 
-// protected methods
+// public methods
 
-// reimplemented (CSdlClassModificatorBaseComp)
-
-bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType)
-{
-	if (m_headerFilePtr == nullptr){
-		SendCriticalMessage(0, "Unable to process header file. Pointer is not set!");
-		I_CRITICAL();
-
-		return false;
-	}
-
-	QTextStream ofStream(m_headerFilePtr);
-
-	// add method definitions
-	ofStream << QStringLiteral("\t\t[[nodiscard]] bool WriteToGraphQlObject(");
-	ofStream << ("::imtgql::CGqlParamObject& request) const;");
-	FeedStream(ofStream, 1, false);
-	
-	ofStream << QStringLiteral("\t\t[[nodiscard]] bool ReadFromGraphQlObject(");
-	ofStream << QStringLiteral("const ::imtgql::CGqlParamObject& request);");
-	FeedStream(ofStream, 1);
-	
-	ofStream << QStringLiteral("\t\t[[nodiscard]] bool OptReadFromGraphQlObject(");
-	ofStream << QStringLiteral("const ::imtgql::CGqlParamObject& request);");
-	FeedStream(ofStream, 1);
-
-	return true;
-}
-
-
-bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType)
-{
-	if (m_sourceFilePtr == nullptr){
-		SendCriticalMessage(0, "Unable to process source file. Pointer is not set!");
-		I_CRITICAL();
-
-		return false;
-	}
-
-	QTextStream ofStream(m_sourceFilePtr);
-
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	structNameConverter.addVersion = true;
-
-	// add method implementation
-	ofStream << QStringLiteral("bool ");
-	ofStream << structNameConverter.GetString();
-	ofStream << QStringLiteral("::WriteToGraphQlObject(");
-	ofStream << ("::imtgql::CGqlParamObject& request) const\n{");
-	FeedStream(ofStream, 1, false);
-
-	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
-		AddFieldWriteToRequestCode(ofStream, field, false);
-		FeedStream(ofStream, 1, false);
-	}
-	ofStream << QStringLiteral("\treturn true;\n}");
-	FeedStream(ofStream, 2);
-
-	// read method implementation
-	ofStream << QStringLiteral("bool ");
-	ofStream << structNameConverter.GetString();
-	ofStream << QStringLiteral("::ReadFromGraphQlObject(");
-	ofStream << QStringLiteral("const ::imtgql::CGqlParamObject& request)\n{");
-	FeedStream(ofStream, 1, false);
-
-	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
-		AddFieldReadFromRequestCode(ofStream, field, false);
-		FeedStream(ofStream, 1, false);
-	}
-	ofStream << QStringLiteral("\treturn true;\n}");
-	FeedStream(ofStream, 3);
-
-	// Opt read method implementation
-	ofStream << QStringLiteral("bool ");
-	ofStream << structNameConverter.GetString();
-	ofStream << QStringLiteral("::OptReadFromGraphQlObject(");
-	ofStream << QStringLiteral("const ::imtgql::CGqlParamObject& request)\n{");
-	FeedStream(ofStream, 1, false);
-
-	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
-		AddFieldReadFromRequestCode(ofStream, field, true);
-		FeedStream(ofStream, 1, false);
-	}
-	ofStream << QStringLiteral("\treturn true;\n}");
-	FeedStream(ofStream, 3);
-
-	return true;
-}
-
-
-// private methods
-
-// read methods
-
-void CSdlClassGqlModificatorComp::AddFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
-{
-	bool isCustom = false;
-	bool isArray = false;
-	bool isEnum = false;
-	bool isUnion = false;
-	ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-
-	if ((isCustom && !isEnum && !isUnion) && isArray){
-		AddCustomListFieldReadFromRequestCode(stream, field, optional);
-	}
-	else if ((isCustom && !isEnum && !isUnion) && !isArray){
-		AddCustomFieldReadFromRequestCode(stream, field, optional);
-	}
-	else if ((!isCustom || isEnum || isUnion) && isArray){
-		AddScalarListFieldReadFromRequestCode(stream, field, isEnum, isUnion, optional);
-	}
-	else {
-		AddScalarFieldReadFromRequestCode(stream, field, optional, isEnum, isUnion);
-	}
-}
-
-
-void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion)
-{
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	const QString tempVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data.") + GetFromVariantConversionStringExt(field);
-
-	AddExtractValueFromRequestCode(stream, field);
-	FeedStreamHorizontally(stream);
-
-	if (!optional && field.IsRequired()){
-		AddDataCheckRequiredValueCode(stream, field);
-
-		FeedStreamHorizontally(stream);
-
-		if (isEnum){
-			AddSetValueToObjectCode(stream, field);
-		}
-		else if (isUnion){
-			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
-
-			imtsdl::CSdlUnion foundUnion;
-			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
-
-			WriteUnionConversionFromString(stream,
-				foundUnion,
-				dataVarName,
-				field.GetId(),
-				m_originalSchemaNamespaceCompPtr->GetText(),
-				"modelIndex",
-				*m_sdlTypeListCompPtr,
-				*m_sdlEnumListCompPtr,
-				*m_sdlUnionListCompPtr,
-				3);
-		}
-		else {
-			stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, tempVarName);
-			FeedStream(stream, 1, false);
-		}
-	}
-	else {
-		stream << QStringLiteral("if (!") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
-		FeedStream(stream, 1, false);
-
-		if (isEnum){
-			AddSetValueToObjectCode(stream, field, 2);
-		}
-		else if (isUnion){
-			const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
-
-			imtsdl::CSdlUnion foundUnion;
-			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
-
-			WriteUnionConversionFromString(stream,
-				foundUnion,
-				dataVarName,
-				field.GetId(),
-				m_originalSchemaNamespaceCompPtr->GetText(),
-				"modelIndex",
-				*m_sdlTypeListCompPtr,
-				*m_sdlEnumListCompPtr,
-				*m_sdlUnionListCompPtr,
-				2,
-				imtsdl::CSdlUnionConverter::ConversionType::CT_GQL_SCALAR,
-				field.GetId());
-		}
-		else{
-			FeedStreamHorizontally(stream, 2);
-			stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, tempVarName);
-			FeedStream(stream, 1, false);
-		}
-
-		FeedStreamHorizontally(stream);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-}
-
-
-void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool isUnion, bool optional)
-{
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetParamArgumentValue(");
-	stream << '"' << field.GetId() << '"';
-	stream << QStringLiteral(");");
-	FeedStream(stream, 1, false);
-
-	if (!optional && field.IsRequired()){
-		AddCheckScalarListRequiredValueCode(stream, field);
-
-		AddSetScalarListValueToObjectCode(stream, field, isEnum, isUnion);
-		FeedStream(stream, 1, false);
-	}
-	else {
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (!") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
-		FeedStream(stream, 1, false);
-
-		AddSetScalarListValueToObjectCode(stream, field,isEnum, isUnion, 2);
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-}
-
-
-void CSdlClassGqlModificatorComp::AddCustomFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
-{
-	AddExtractCustomValueFromRequestCode(stream, field);
-	FeedStreamHorizontally(stream);
-
-	if (!optional && field.IsRequired()){
-		AddCheckCustomRequiredValueCode(stream, field);
-
-		AddSetCustomValueToObjectCode(stream, field, optional);
-
-		FeedStream(stream, 1, false);
-	}
-	else {
-		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr != nullptr){");
-		FeedStream(stream, 1, false);
-
-		AddSetCustomValueToObjectCode(stream, field, optional, 2);
-
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-}
-
-
-void CSdlClassGqlModificatorComp::AddCustomListFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
-{
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("int ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count = request.GetObjectsCount(");
-	stream << '"' << field.GetId() << '"';
-	stream << QStringLiteral(");");
-	FeedStream(stream, 1, false);
-
-	if (!optional && field.IsRequired()){
-		if (field.IsNonEmpty()){
-			AddCheckCustomListRequiredValueCode(stream, field);
-		}
-
-		AddSetCustomListValueToObjectCode(stream, field, optional);
-		FeedStream(stream, 1, false);
-	}
-	else {
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count > 0){");
-		FeedStream(stream, 1, false);
-
-		AddSetCustomListValueToObjectCode(stream, field, optional, 2);
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-}
-
-
-// write methods
-
-void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
-{
-	bool isCustom = false;
-	bool isArray = false;
-	bool isEnum = false;
-	bool isUnion = false;
-	ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-
-	const bool isFieldRequired = field.IsRequired();
-	if (isFieldRequired){
-		if (field.IsArray()){
-			AddArrayInternalChecksFail(stream, field, field.IsNonEmpty());
-		}
-		else {
-			AddArrayInternalChecksFail(stream, field, false);
-		}
-	}
-	else {
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (");
-		stream << GetNullCheckString(field, false);
-		stream << ')' << '{';
-		FeedStream(stream, 1, false);
-	}
-
-	const int hIndents = (isFieldRequired ? 1 : 2);
-	if ((isCustom && !isEnum) && isArray){
-		AddCustomListFieldWriteToRequestCode(stream, field, optional, isUnion, hIndents);
-	}
-	else if ((isCustom && !isEnum) && !isArray){
-		AddCustomFieldWriteToRequestCode(stream, field, optional, isUnion, hIndents);
-	}
-	else if ((!isCustom || isEnum) && isArray){
-		AddScalarListFieldWriteToRequestCode(stream, field, isEnum, optional, hIndents);
-	}
-	else {
-		AddScalarFieldWriteToRequestCode(stream, field, optional, hIndents);
-	}
-
-	if (!isFieldRequired){
-		FeedStreamHorizontally(stream);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-}
-
-
-void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents)
-{
-
-	bool isEnum = false;
-	bool isUnion = false;
-	ConvertTypeOrEnumOrUnion(
-		field,
-		m_sdlEnumListCompPtr->GetEnums(false),
-		m_sdlUnionListCompPtr->GetUnions(false),
-		nullptr,
-		nullptr,
-		nullptr,
-		&isEnum,
-		&isUnion);
-
-	QString tempListVarName;
-	if (!isEnum){
-		GenerateListTempValueCode(stream, field, tempListVarName, hIndents);
-	}
-	if (isEnum){
-		FeedStreamHorizontally(stream, hIndents);
-		const QString enumSourceVarName = '*' +  field.GetId();
-		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
-
-		// declare target value, to store value
-		stream << QStringLiteral("QString ");
-		stream << enumConvertedVarName << ';';
-		FeedStream(stream, 1, false);
-
-		imtsdl::CSdlEnum foundEnum;
-		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
-		Q_ASSERT(found);
-
-		WriteConversionFromEnum(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents);
-
-		FeedStreamHorizontally(stream, hIndents);
-
-		stream << QStringLiteral("request.InsertParam(");
-		stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
-		if (!isEnum && field.IsArray()){
-			stream << tempListVarName;
-		}
-		else {
-			stream << QStringLiteral("QVariant(") << enumConvertedVarName << ')';
-		}
-		stream << QStringLiteral(");");
-		FeedStream(stream, 1, false);
-	}
-	else if (isUnion){
-		FeedStreamHorizontally(stream, hIndents);
-		const QString unionSourceVarName = '*' + field.GetId();
-		const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
-
-		// declare target value, to store value
-		stream << QStringLiteral("QVariant ");
-		stream << unionConvertedVarName << ';';
-		FeedStream(stream, 1, false);
-
-		imtsdl::CSdlUnion foundUnion;
-		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
-		Q_ASSERT(found);
-
-		WriteConversionFromUnion(stream,
-			foundUnion,
-			unionSourceVarName,
-			unionConvertedVarName,
-			m_originalSchemaNamespaceCompPtr->GetText(),
-			field.GetId(),
-			"0",
-			*m_sdlTypeListCompPtr,
-			*m_sdlEnumListCompPtr,
-			*m_sdlUnionListCompPtr,
-			hIndents);
-
-		FeedStreamHorizontally(stream, hIndents);
-
-		stream << QStringLiteral("request.InsertParam(");
-		stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
-		if (!isUnion && field.IsArray()){
-			stream << tempListVarName;
-		}
-		else {
-			stream << unionConvertedVarName;
-		}
-		stream << QStringLiteral(");");
-		FeedStream(stream, 1, false);
-	}
-	else {
-		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("request.InsertParam(");
-		stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
-		stream << QStringLiteral("QVariant(*") << field.GetId() << ')';
-		stream << QStringLiteral(");");
-		FeedStream(stream, 1, false);
-	}
-}
-
-
-void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool optional, uint hIndents)
-{
-	const QString tempListVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("TempList");
-
-	// declare temp variant list
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("QVariantList ");
-	stream << tempListVarName << ';';
-	FeedStream(stream, 1, false);
-
-	// transfer all values to tempList
-	// declare loop
-	FeedStreamHorizontally(stream, hIndents);
-	const QString dataIndexVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
-	stream << QStringLiteral("for (qsizetype ") << dataIndexVarName;
-	stream << QStringLiteral(" = 0; ") << dataIndexVarName;
-	stream << QStringLiteral(" < ") << field.GetId();
-	stream << QStringLiteral("->size(); ++") << dataIndexVarName;
-	stream << QStringLiteral("){");
-	FeedStream(stream, 1, false);
-
-	if (isEnum){
-		FeedStreamHorizontally(stream, hIndents + 1);
-		const QString enumSourceVarName =  field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')';
-		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
-
-		// declare target value, to store value
-		stream << QStringLiteral("QString ");
-		stream << enumConvertedVarName << ';';
-		FeedStream(stream, 1, false);
-
-		imtsdl::CSdlEnum foundEnum;
-		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
-		Q_ASSERT(found);
-
-		WriteConversionFromEnum(stream, foundEnum, enumSourceVarName, enumConvertedVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << tempListVarName;
-		stream << QStringLiteral(" << ");
-		stream << enumConvertedVarName << ';';
-		FeedStream(stream, 1, false);
-	}
-	else{
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << tempListVarName;
-		stream << QStringLiteral(" << ");
-		stream << field.GetId();
-		stream << QStringLiteral("->at(");
-		stream << dataIndexVarName;
-		stream << QStringLiteral(");");
-		FeedStream(stream, 1, false);
-	}
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	// add values to request
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("request.InsertParam(");
-	stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
-	stream << QStringLiteral("QVariant(") << tempListVarName;
-	stream << QStringLiteral("));");
-	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isUnion, uint hIndents)
-{
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
-
-	// declare temp GQL object
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("::imtgql::CGqlParamObject ") << dataObjectVariableName << ';';
-	FeedStream(stream, 1, false);
-	if (isUnion){
-		const QString unionSourceVarName = '*' + field.GetId();
-
-		imtsdl::CSdlUnion foundUnion;
-		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
-		Q_ASSERT(found);
-
-		WriteConversionFromUnion(stream,
-			foundUnion,
-			unionSourceVarName,
-			dataObjectVariableName,
-			m_originalSchemaNamespaceCompPtr->GetText(),
-			field.GetId(),
-			QString(),
-			*m_sdlTypeListCompPtr,
-			*m_sdlEnumListCompPtr,
-			*m_sdlUnionListCompPtr,
-			hIndents,
-			imtsdl::CSdlUnionConverter::CT_GQL_SCALAR);
-	}
-	else{
-		// add me to temp object and checks
-		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("if (!");
-		stream << field.GetId();
-		stream << QStringLiteral("->WriteToGraphQlObject(");
-		stream << dataObjectVariableName;
-		stream << QStringLiteral(")){");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents);
-		stream << '}';
-		FeedStream(stream, 1, false);
-	}
-	// insert temp GQL object
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("request.InsertParam(");
-	stream << '"' << field.GetId() << '"';
-	stream << ',' << ' ';
-	stream << dataObjectVariableName;
-	stream << ')' << ';';
-	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isUnion, uint hIndents)
-{
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-
-	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
-	const QString dataObjectListVariableName = dataObjectVariableName + QStringLiteral("List");
-
-	// declare temp GQL object list
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("QList<::imtgql::CGqlParamObject> ") << dataObjectListVariableName << ';';
-	FeedStream(stream, 1, false);
-
-	// declare loop
-	FeedStreamHorizontally(stream, hIndents);
-	const QString dataIndexVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
-	stream << QStringLiteral("for (qsizetype ") << dataIndexVarName;
-	stream << QStringLiteral(" = 0; ") << dataIndexVarName;
-	stream << QStringLiteral(" < ") << field.GetId();
-	stream << QStringLiteral("->size(); ++") << dataIndexVarName;
-	stream << QStringLiteral("){");
-	FeedStream(stream, 1, false);
-	if (isUnion){
-		FeedStreamHorizontally(stream, hIndents + 1);
-		const QString unionSourceVarName = field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')';
-		const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("GqlValue");
-
-		// declare target value, to store value
-		stream << QStringLiteral("::imtgql::CGqlParamObject ");
-		stream << unionConvertedVarName << ';';
-		FeedStream(stream, 1, false);
-
-		imtsdl::CSdlUnion foundUnion;
-		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
-		Q_ASSERT(found);
-
-		WriteConversionFromUnion(stream,
-			foundUnion,
-			unionSourceVarName,
-			unionConvertedVarName,
-			m_originalSchemaNamespaceCompPtr->GetText(),
-			field.GetId(),
-			QString(),
-			*m_sdlTypeListCompPtr,
-			*m_sdlEnumListCompPtr,
-			*m_sdlUnionListCompPtr,
-			hIndents + 1,
-			imtsdl::CSdlUnionConverter::CT_GQL_SCALAR);
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << dataObjectListVariableName;
-		stream << QStringLiteral(" << ");
-		stream << unionConvertedVarName << ';';
-		FeedStream(stream, 1, false);
-	}
-	else{
-		// inLoop: declare temp object (inserted to list)
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("::imtgql::CGqlParamObject ") << dataObjectVariableName << ';';
-		FeedStream(stream, 1, false);
-
-		// inLoop: add me to temp object and checks
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("if (!");
-		stream << field.GetId();
-		stream << QStringLiteral("->at(");
-		stream << dataIndexVarName;
-		stream << QStringLiteral(")");
-		stream << QStringLiteral(".WriteToGraphQlObject(");
-		stream << dataObjectVariableName;
-		stream << QStringLiteral(")){");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 2);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << '}';
-		FeedStream(stream, 1, false);
-
-		// inLoop: add temp object to list
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << dataObjectListVariableName;
-		stream << QStringLiteral(" << ");
-		stream << dataObjectVariableName << ';';
-		FeedStream(stream, 1, false);
-
-	}
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	// and finally add list to GQL
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("request.InsertParam(");
-	stream << '"' << field.GetId() << '"';
-	stream << ',' << ' ' << dataObjectListVariableName;
-	stream << ')' << ';';
-	FeedStream(stream, 1, false);
-}
-
-
-// help methods
-
-
-// general help methods for scalar
-
-void CSdlClassGqlModificatorComp::AddExtractValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, quint32 hIndents)
-{
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetParamArgumentValue(");
-	stream << '"' << field.GetId() << '"';
-	stream << QStringLiteral(");");
-	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassGqlModificatorComp::AddDataCheckRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, quint32 hIndents)
-{
-	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
-{
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	bool isEnum = false;
-
-	ConvertTypeWithNamespace(
-		field,
-		sdlNamespace,
-		*m_sdlTypeListCompPtr,
-		*m_sdlEnumListCompPtr,
-		*m_sdlUnionListCompPtr,
-		nullptr,
-		nullptr,
-		nullptr,
-		&isEnum);
-
-	if (!isEnum){
-		SendCriticalMessage(0, "GQL Potential generation error! AddSetValueToObjectCode called for NON ENUM!!!");
-
-		return;
-	}
-
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	structNameConverter.addVersion = true;
-
-	const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
-	const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
-
-	// declare temp value, to store string equivalent
-	stream << QStringLiteral("QString ");
-	stream << enumSourceVarName;
-	stream << QStringLiteral(" = ");
-	stream << dataVarName;
-	stream << QStringLiteral(".toString();");
-	FeedStream(stream, 1, false);
-
-	imtsdl::CSdlEnum foundEnum;
-	[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
-	Q_ASSERT(found);
-
-	WriteEnumConversionFromString(stream, foundEnum, enumSourceVarName, field.GetId(), m_originalSchemaNamespaceCompPtr->GetText(), hIndents);
-}
-
-
-// general help methods for custom
-
-void CSdlClassGqlModificatorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
-{
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const ::imtgql::CGqlParamObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetParamArgumentObjectPtr(");
-	stream << '"' << field.GetId() << '"';
-	stream << QStringLiteral(");");
-	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassGqlModificatorComp::AddCheckCustomRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
-{
-	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr == nullptr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents)
-{
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-
-	// reset pointer for object
-	FeedStreamHorizontally(stream, hIndents);
-	stream << field.GetId();
-	stream << QStringLiteral(" = ");
-	structNameConverter.addVersion = true;
-	stream << structNameConverter.GetString();
-	stream << QStringLiteral("();");
-	FeedStream(stream, 1, false);
-
-	// declare bool variable and read data method
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
-	stream << field.GetId();
-	stream << QStringLiteral("->");
-
-	if (optional){
-		stream << QStringLiteral("Opt");
-	}
-
-	stream << QStringLiteral("ReadFromGraphQlObject(*");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr);");
-	FeedStream(stream, 1, false);
-
-	// check the result of reading
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-}
-
-
-// general help methods for custom list
-
-void CSdlClassGqlModificatorComp::AddCheckCustomListRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
-{
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count <= 0){");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream);
-	stream << '}';
-	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, uint hIndents)
-{
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-	structNameConverter.addVersion = true;
-	structNameConverter.listWrap = true;
-
-	// declare list
-	FeedStreamHorizontally(stream, hIndents);
-	stream << structNameConverter.GetString();
-	stream << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
-	FeedStream(stream, 1, false);
-
-	// declare 'for(;;)' loop
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("for (int ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index = 0; ");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index != ");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count ; ++");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index){");
-	FeedStream(stream, 1, false);
-
-	// declare iteration var
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("const ::imtgql::CGqlParamObject* ");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetParamArgumentObjectPtr(");
-	stream << '"' << field.GetId() << '"' << ',' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index);");
-	FeedStream(stream, 1, false);
-
-	// checks for itaration var
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr == nullptr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	// declare read variable
-	// inLoop: declare temp var
-	FeedStreamHorizontally(stream, hIndents + 1);
-	structNameConverter.listWrap = false;
-	stream << structNameConverter.GetString();
-	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
-	FeedStream(stream, 1, false);
-
-	// read
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (!");
-	stream << GetDecapitalizedValue(field.GetId());
-	stream << QStringLiteral(".");
-
-	if (optional){
-		stream << QStringLiteral("Opt");
-	}
-
-	stream << QStringLiteral("ReadFromGraphQlObject(*");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr)){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	// add to temp list
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List");
-	stream << QStringLiteral(" << ");
-	stream << GetDecapitalizedValue(field.GetId()) << ';';
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	// set value
-	FeedStreamHorizontally(stream, hIndents);
-	stream << GetSettingValueString(
-				field,
-				sdlNamespace,
-				*m_sdlTypeListCompPtr,
-				GetDecapitalizedValue(field.GetId()) + QStringLiteral("List"));
-	FeedStream(stream, 1, false);
-}
-
-
-// general help methods for scalar list
-
-void CSdlClassGqlModificatorComp::AddCheckScalarListRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
-{
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream);
-	stream << '}';
-	FeedStream(stream, 1, false);
-}
-
-
-void CSdlClassGqlModificatorComp::AddSetScalarListValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool isEnum, bool isUnion, uint hIndents)
-{
-	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, true);
-	structNameConverter.addVersion = true;
-
-	// declare list to sotre extracted values
-	if (!isEnum && !isUnion){
-		FeedStreamHorizontally(stream, hIndents);
-		stream << ConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
-		stream << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
-		FeedStream(stream, 1, false);
-	}
-	else if (isEnum){
-		FeedStreamHorizontally(stream, hIndents);
-		stream  << structNameConverter.GetString();
-		stream << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
-		FeedStream(stream, 1, false);
-	} 
-	else{
-		FeedStreamHorizontally(stream, hIndents);
-		stream << structNameConverter.GetString();
-		stream << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
-		FeedStream(stream, 1, false);
-	}
-
-	// extract values from GQL object
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("QVariantList ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataList = ");
-	stream << GetDecapitalizedValue(field.GetId()) <<  QStringLiteral("Data.toList();");
-	FeedStream(stream, 1, false);
-
-	// Get count of list
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("qsizetype ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count = ");
-	stream << GetDecapitalizedValue(field.GetId()) <<  QStringLiteral("DataList.size();");
-	FeedStream(stream, 1, false);
-
-	// declare 'for(;;)' loop
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("for (qsizetype ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index = 0; ");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index != ");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count ; ++");
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index){");
-	FeedStream(stream, 1, false);
-
-	// declare read variable
-	if (!isEnum && !isUnion){
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << OptListConvertTypeWithNamespace(field, m_originalSchemaNamespaceCompPtr->GetText(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-		stream << ' ' << GetDecapitalizedValue(field.GetId());
-		stream << QStringLiteral(" = ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataList[");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index].");
-		stream << GetFromVariantConversionStringExt(field, true) << ';';
-		FeedStream(stream, 1, false);
-	}
-	else if (isEnum){
-		const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
-		const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
-		structNameConverter.listWrap = false;
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << structNameConverter.GetString();
-		stream << ' ' << dataVarName << ';';
-		FeedStream(stream, 1, false);
-
-		// declare temp value, to store string equivalent
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("QString ");
-		stream << enumSourceVarName;
-		stream << QStringLiteral(" = ");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataList[");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index].toString();");
-		FeedStream(stream, 1, false);
-
-		imtsdl::CSdlEnum foundEnum;
-		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), foundEnum);
-		Q_ASSERT(found);
-
-		WriteEnumConversionFromString(stream, foundEnum, enumSourceVarName, dataVarName, m_originalSchemaNamespaceCompPtr->GetText(), hIndents + 1);
-	}
-	else if (isUnion){
-		const QString dataVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data");
-		const QString unionSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
-		structNameConverter.listWrap = false;
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << structNameConverter.GetString();
-		stream << ' ' << dataVarName << ';';
-		FeedStream(stream, 1, false);
-
-		// declare temp value, to store string equivalent
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("QVariant ");
-		stream << unionSourceVarName;
-		stream << QStringLiteral(" = ");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataList[");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index];");
-		FeedStream(stream, 1, false);
-
-		imtsdl::CSdlUnion foundUnion;
-		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
-		Q_ASSERT(found);
-
-		WriteUnionConversionFromString(stream,
-			foundUnion,
-			unionSourceVarName,
-			dataVarName,
-			m_originalSchemaNamespaceCompPtr->GetText(),
-			GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index"),
-			*m_sdlTypeListCompPtr,
-			*m_sdlEnumListCompPtr,
-			*m_sdlUnionListCompPtr,
-			hIndents + 1,
-			imtsdl::CSdlUnionConverter::ConversionType::CT_GQL_ARRAY,
-			field.GetId());
-
-	}
-	else{
-		const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-		CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-		structNameConverter.addVersion = true;
-		structNameConverter.listWrap = true;
-
-		// declare list
-		FeedStreamHorizontally(stream, hIndents);
-		stream << structNameConverter.GetString();
-		stream << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
-		FeedStream(stream, 1, false);
-
-		// declare 'for(;;)' loop
-		FeedStreamHorizontally(stream, hIndents);
-		stream << QStringLiteral("for (int ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index = 0; ");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index != ");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count ; ++");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index){");
-		FeedStream(stream, 1, false);
-
-		// declare iteration var
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("const ::imtgql::CGqlParamObject* ");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetParamArgumentObjectPtr(");
-		stream << '"' << field.GetId() << '"' << ',' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index);");
-		FeedStream(stream, 1, false);
-
-		// checks for itaration var
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("if (");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr == nullptr){");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 2);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << '}';
-		FeedStream(stream, 1, false);
-
-		// declare read variable
-		// inLoop: declare temp var
-		FeedStreamHorizontally(stream, hIndents + 1);
-		structNameConverter.listWrap = false;
-		stream << structNameConverter.GetString();
-		stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
-		FeedStream(stream, 1, false);
-
-		// read
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("if (!");
-		stream << GetDecapitalizedValue(field.GetId());
-		stream << QStringLiteral(".");
-
-		stream << QStringLiteral("ReadFromGraphQlObject(*");
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr)){");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 2);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << '}';
-		FeedStream(stream, 1, false);
-
-		// add to temp list
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List");
-		stream << QStringLiteral(" << ");
-		stream << GetDecapitalizedValue(field.GetId()) << ';';
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, hIndents);
-		stream << '}';
-		FeedStream(stream, 1, false);
-
-		// set value
-		FeedStreamHorizontally(stream, hIndents);
-		stream << GetSettingValueString(
-			field,
-			sdlNamespace,
-			*m_sdlTypeListCompPtr,
-			GetDecapitalizedValue(field.GetId()) + QStringLiteral("List"));
-		FeedStream(stream, 1, false);
-	}
-
-	// add to temp list
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List");
-	stream << QStringLiteral(" << ");
-	if (!isEnum && !isUnion){
-		stream << GetDecapitalizedValue(field.GetId()) << ';';
-	}
-	else {
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data") << ';';
-	}
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, hIndents);
-	stream << '}';
-	FeedStream(stream, 1, false);
-
-	// set value
-	FeedStreamHorizontally(stream, hIndents);
-	if (isUnion){
-		stream << field.GetId() << QStringLiteral(".emplace(") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List);");
-	}
-	else{
-		stream << GetSettingValueString(field, sdlNamespace, *m_sdlTypeListCompPtr, GetDecapitalizedValue(field.GetId()) + QStringLiteral("List"));
-	}
-	FeedStream(stream, 1, false);
-}
+// reimplemented (IIncludeDirectivesProvider)
 
 QList<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirectives() const
 {
@@ -1187,6 +24,8 @@ QList<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirective
 	return retVal;
 }
 
+
+// reimplemented (ICxxModifier)
 
 QString CSdlClassGqlModificatorComp::GetReadMethodName() const
 {
@@ -1213,6 +52,434 @@ imtsdlgen::ICxxModifier::ArgumentList CSdlClassGqlModificatorComp::GetArguments(
 }
 
 
-} // namespace imtsdlgenv2
+// protected methods
 
+// reimplemented (CObjectModificatorCompBase)
+
+QString CSdlClassGqlModificatorComp::GetContainerObjectClassName() const
+{
+	return QStringLiteral("::imtgql::CGqlParamObject");
+}
+
+
+QString CSdlClassGqlModificatorComp::GetContainerObjectVariableName() const
+{
+	return QStringLiteral("gqlObject");
+}
+
+
+QString CSdlClassGqlModificatorComp::GetScalarArrayContainerObjectClassName() const
+{
+	return QStringLiteral("QVariantList");
+}
+
+
+QString CSdlClassGqlModificatorComp::GetCustomArrayContainerObjectClassName() const
+{
+	return QStringLiteral("QList<::imtgql::CGqlParamObject>");
+}
+
+
+QString CSdlClassGqlModificatorComp::GetArrayContainerObjectVariableName() const
+{
+	return QStringLiteral("gqlArray");
+}
+
+
+bool CSdlClassGqlModificatorComp::AddFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, uint /*horizontalIndents*/) const
+{
+	stream << GetContainerObjectVariableName();
+	stream << QStringLiteral(".InsertParam(");
+	stream << '"' << field.GetId() << '"' << QStringLiteral(", ");
+	stream << QStringLiteral("QVariant(") << variableName << ')';
+	stream << QStringLiteral(");");
+
+	return true;
+}
+
+
+bool CSdlClassGqlModificatorComp::AddObjectValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, uint /*horizontalIndents*/) const
+{
+	stream << GetContainerObjectVariableName();
+	stream << QStringLiteral(".InsertParam(");
+	stream << '"' << field.GetId() << '"';
+	stream << ',' << ' ';
+	stream << variableName;
+	stream << ')' << ';';
+
+	return true;
+}
+
+
+QString CSdlClassGqlModificatorComp::AddCreationOfTemporaryArray(QTextStream& stream, const imtsdl::CSdlField& field) const
+{
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+	ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, nullptr, &isEnum, &isUnion);
+
+	if (isCustom && !isEnum){
+		stream << GetCustomArrayContainerObjectClassName();
+	}
+	else {
+		stream << GetScalarArrayContainerObjectClassName();
+	}
+	stream << ' ';
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral("DataObjectList;");
+
+	return GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectList");
+}
+
+
+bool CSdlClassGqlModificatorComp::AddFieldValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, const QString& variableName, uint horizontalIndents) const
+{
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+	ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, nullptr, &isEnum, &isUnion);
+
+	stream << arrayContainerVariableName;
+	if (isCustom && !isEnum && !isUnion){
+		stream << QStringLiteral(" << ");
+		stream << variableName;
+		stream << ';';
+	}
+	else {
+		stream << QStringLiteral(" << ") << variableName << ';';
+	}
+
+	return true;
+}
+
+
+bool CSdlClassGqlModificatorComp::AddArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, const QString& targetObjectVariableName, uint /*horizontalIndents*/) const
+{
+	if (targetObjectVariableName.isEmpty()){
+		stream << GetContainerObjectVariableName();
+	}
+	else {
+		stream << targetObjectVariableName;
+	}
+	stream << QStringLiteral(".InsertParam(");
+	stream << '"' << field.GetId() << '"';
+	stream << ',' << ' ';
+	stream << variableName;
+	stream << ')' << ';';
+
+	return true;
+}
+
+
+bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents)
+{
+	bool isArray = false;
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+	bool isUserType = (isCustom && !isEnum && !isUnion);
+
+	uint hIndents = horizontalIndents;
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (");
+	if (!expected){
+		stream << '!';
+	}
+
+	stream << GetContainerObjectVariableName();
+	stream << QStringLiteral(".ContainsParam(\"");
+	stream << field.GetId();
+	stream << QStringLiteral("\")");
+	if (expected){
+		stream << QStringLiteral(" && ");
+	}
+	else {
+		stream << QStringLiteral(" || ");
+	}
+
+	if (isArray && !isUserType){ // array of scalars
+		if (expected){
+			stream << '!';
+		}
+
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral("[\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\"].isNull()");
+	}
+	else if (isArray){
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".GetObjectsCount(\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\") ");
+		if (expected){
+			stream << '>';
+		}
+		else {
+			stream << '<' << '=';
+		}
+		stream << QStringLiteral(" 0");
+	}
+
+	else if (isUserType){
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\") ");
+		if (!expected){
+			stream << '!';
+		}
+		else {
+			stream << '=';
+		}
+		stream << QStringLiteral("= nullptr");
+	}
+	else if (isUnion){
+		if(expected){
+			stream << '!';
+		}
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral("[\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\"].isNull()");
+	}
+	else {
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral("[\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\"].userType() ");
+		if(!expected){
+			stream << '!';
+		}
+		else{
+			stream << '=';
+		}
+
+		stream << QStringLiteral("= QMetaType::");
+		if (	isEnum ||
+			convertedType == QStringLiteral("QString"))
+		{
+			stream << QStringLiteral("QString");
+		}
+		else if (convertedType == QStringLiteral("QByteArray")){
+			stream << QStringLiteral("QByteArray");
+		}
+		else if (	convertedType == QStringLiteral("int") ||
+				 convertedType == QStringLiteral("long") ||
+				 convertedType == QStringLiteral("qlonglong"))
+		{
+			stream << QStringLiteral("Double");
+		}
+		else if (	convertedType == QStringLiteral("float") ||
+				 convertedType == QStringLiteral("double"))
+		{
+			stream << QStringLiteral("Double");
+		}
+		else if (convertedType == QStringLiteral("bool")){
+			stream << QStringLiteral("Bool");
+		}
+		else {
+			SendCriticalMessage(0, QString("Unexpected type for field '%1'").arg(field.GetId()));
+			I_CRITICAL();
+
+			return false;
+		}
+	}
+
+	stream << QStringLiteral("){");
+
+	return true;
+}
+
+
+bool CSdlClassGqlModificatorComp::AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents)
+{
+	bool isArray = false;
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+	bool isUserType = (isCustom && !isEnum && !isUnion);
+
+	if (isUserType && !field.IsArray()){
+		stream << '*';
+	}
+
+	if (variableName.isEmpty()){
+		stream << GetContainerObjectVariableName();
+	}
+	else {
+		stream << variableName;
+	}
+
+	if (isUserType){
+		stream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\")");
+	}
+	else {
+		stream << '[' << '"';
+		stream << field.GetId();
+		stream << QStringLiteral("\"]");
+		if (!isUnion){
+			stream << QStringLiteral(".to");
+			stream << GetConvertEndForFieldString(field, false);
+		}
+	}
+
+	return true;
+}
+
+
+bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result)
+{
+	result.listCountVariableName			= GetDecapitalizedValue(field.GetId()) + QStringLiteral("ElementsCount");
+	result.listCountVariableType			= QStringLiteral("qsizetype");
+
+	bool isArray = false;
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+	bool isUserType = (isCustom && !isEnum && !isUnion);
+
+	if (isUserType){
+		stream << QStringLiteral("const qsizetype ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("ElementsCount = ");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".GetObjectsCount(\"");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("\");");
+
+		result.listVariableName = '*' + GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
+		result.customAccessedElementName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
+		result.isCustomAccessedElementPointer	= true;
+		result.customListAccessCode.clear();
+		QTextStream accessCodeStream(&result.customListAccessCode);
+		accessCodeStream << QStringLiteral("const ");
+		accessCodeStream << GetContainerObjectClassName();
+		accessCodeStream << QStringLiteral("* ") << result.customAccessedElementName;
+		accessCodeStream << QStringLiteral(" = ");
+		accessCodeStream << GetContainerObjectVariableName();
+		accessCodeStream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
+		accessCodeStream << field.GetId();
+		accessCodeStream << QStringLiteral("\", $(index));");
+		FeedStream(accessCodeStream, 1, false);
+
+		// check NULL
+		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 1);
+		accessCodeStream << QStringLiteral("if (");
+		accessCodeStream << result.customAccessedElementName;
+		accessCodeStream << QStringLiteral(" == nullptr){");
+		FeedStream(accessCodeStream, 1, false);
+
+		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 2);
+		accessCodeStream << QStringLiteral("return false;");
+		FeedStream(accessCodeStream, 1, false);
+
+		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 1);
+		accessCodeStream << '}';
+		FeedStream(accessCodeStream, 1, false);
+	}
+	else{
+		stream << QStringLiteral("const QVariant ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("Data = ");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral("[\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\"];");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, horizontalIndents);
+		stream << QStringLiteral("const QVariantList ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("DataList = ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("Data.toList();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, horizontalIndents);
+		stream << QStringLiteral("const qsizetype ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("ElementsCount = ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("DataList.size();");
+		if (!isUnion){
+			result.toObjectTransformMethod		= QStringLiteral(".to") + GetConvertEndForFieldString(field, true);
+		}
+		result.listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataList");
+	}
+
+	return true;
+}
+
+
+// private methods
+
+QString CSdlClassGqlModificatorComp::GetConvertEndForFieldString(const imtsdl::CSdlField& field, bool forType) const
+{
+	QString retVal;
+
+	bool isArray = false;
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+
+	if(!forType && isArray){
+		retVal += QStringLiteral("Array");
+	}
+	else if (	isEnum ||
+				convertedType == QStringLiteral("QString"))
+	{
+		retVal += QStringLiteral("String");
+	}
+	else if (convertedType == QStringLiteral("QByteArray")){
+		retVal += QStringLiteral("ByteArray");
+	}
+	else if (	convertedType == QStringLiteral("float") ||
+				convertedType == QStringLiteral("double"))
+	{
+		retVal += QStringLiteral("Double");
+	}
+	else if (convertedType == QStringLiteral("int")){
+		retVal += QStringLiteral("Int");
+	}
+	else if (	convertedType == QStringLiteral("long") ||
+				convertedType == QStringLiteral("qlonglong"))
+	{
+		retVal += QStringLiteral("Integer");
+	}
+	else if (convertedType == QStringLiteral("bool")){
+		retVal += QStringLiteral("Bool");
+	}
+	else {
+		SendCriticalMessage(0, QString("Unexpected type for field %1").arg(field.GetId()));
+		I_CRITICAL();
+
+		return QString();
+	}
+	retVal += QStringLiteral("()");
+
+	return retVal;
+}
+
+
+imtsdl::CSdlUnionConverter::ConversionType CSdlClassGqlModificatorComp::GetUnionScalarConversionType() const
+{
+	return imtsdl::CSdlUnionConverter::ConversionType::CT_GQL_SCALAR;
+}
+
+
+imtsdl::CSdlUnionConverter::ConversionType CSdlClassGqlModificatorComp::GetUnionArrayConversionType() const
+{
+	return imtsdl::CSdlUnionConverter::ConversionType::CT_GQL_ARRAY;
+}
+
+
+
+} // namespace imtsdlgenv2
 

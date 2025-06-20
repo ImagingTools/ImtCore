@@ -177,7 +177,6 @@ void CSdlGenTest::initTestCase()
 
 void CSdlGenTest::TestBasicSchema()
 {
-	QSKIP("BASIC SKIP");
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite);
 
@@ -191,7 +190,6 @@ void CSdlGenTest::TestBasicSchema()
 
 void CSdlGenTest::TestComplexCollectionFilter()
 {
-	QSKIP("COMPLEX SKIP");
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite);
 
@@ -205,7 +203,6 @@ void CSdlGenTest::TestComplexCollectionFilter()
 
 void CSdlGenTest::TestUnion()
 {
-	QSKIP("UNION SKIP");
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite);
 
@@ -220,7 +217,6 @@ void CSdlGenTest::TestUnion()
 
 void CSdlGenTest::TestComplexUnion1()
 {
-	QSKIP("TestComplexUnion1 SKIP");
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite);
 
@@ -235,7 +231,6 @@ void CSdlGenTest::TestComplexUnion1()
 
 void CSdlGenTest::TestComplexUnion2()
 {
-	QSKIP("TestComplexUnion2 SKIP");
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite);
 
@@ -250,10 +245,14 @@ void CSdlGenTest::TestComplexUnion2()
 
 void CSdlGenTest::cleanupTestCase()
 {
-	for (const std::shared_ptr<QDir>& tempDirPtr: std::as_const(m_tempDirPtrList)){
-		const bool isRemoved = 1;//tempDirPtr->removeRecursively();
-		QVERIFY(isRemoved);
-	}
+	// for (const std::shared_ptr<QDir>& tempDirPtr: std::as_const(m_tempDirPtrList)){
+	// 	const bool isRemoved = tempDirPtr->removeRecursively();
+	// 	QVERIFY(isRemoved);
+	// }
+	// QDir rootTestDir = QDir(QString("SdlGenTest"));
+	// if (rootTestDir.exists()){
+	// 	QVERIFY(rootTestDir.removeRecursively());
+	// }
 }
 
 

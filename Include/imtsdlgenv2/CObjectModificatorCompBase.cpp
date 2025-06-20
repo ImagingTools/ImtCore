@@ -343,8 +343,6 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 			*m_sdlUnionListCompPtr,
 			hIndents,
 			GetUnionScalarConversionType());
-
-		FeedStreamHorizontally(stream, hIndents);
 	}
 	else{
 		FeedStreamHorizontally(stream, hIndents);
@@ -679,7 +677,7 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 	}
 	else if (isUnion){
 		// declare temp value, to store variant equivalent
-		stream << QStringLiteral("QVariant ");
+		stream << QStringLiteral("const QVariant ");
 		stream << unionSourceVarName;
 	}
 	else{
@@ -704,7 +702,7 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		Q_ASSERT(found);
 
-		WriteUnionConversionFromString(stream,
+		WriteUnionConversionFromData(stream,
 			foundUnion,
 			unionSourceVarName,
 			field.GetId(),
@@ -714,7 +712,8 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 			*m_sdlEnumListCompPtr,
 			*m_sdlUnionListCompPtr,
 			hhIndents,
-			GetUnionScalarConversionType());
+			GetUnionScalarConversionType(),
+			field.GetId());
 	}
 
 
@@ -776,7 +775,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("const bool is");
 	stream << GetCapitalizedValue(field.GetId());
-	stream << QStringLiteral("Readed = ");
+	stream << QStringLiteral("Read = ");
 
 	WriteMethodCall(stream, (optional ? MT_OPT_READ : MT_READ), field.GetId(), true);
 	stream << '(' ;
@@ -789,7 +788,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("if (!is");
 	stream << GetCapitalizedValue(field.GetId());
-	stream << QStringLiteral("Readed){");
+	stream << QStringLiteral("Read){");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -949,7 +948,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		stream << QStringLiteral("> ") << dataVarName << QStringLiteral(";");
 		FeedStream(stream, 1, false);
 
-		WriteUnionConversionFromString(stream,
+		WriteUnionConversionFromData(stream,
 			foundUnion,
 			unionSourceVarName,
 			dataVarName,
@@ -960,7 +959,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
 			GetUnionArrayConversionType(),
-			GetDecapitalizedValue(field.GetId()) + QStringLiteral("jsonArray"));
+			GetDecapitalizedValue(field.GetId()));
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << field.GetId();

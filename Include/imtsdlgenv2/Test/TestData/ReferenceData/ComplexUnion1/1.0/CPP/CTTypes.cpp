@@ -754,12 +754,12 @@ bool CGeometry::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (!jsonObject.contains("Points") || ! jsonObject["Points"].isArray()){
 		return false;
 	}
-	const QJsonArray pointsjsonArray = jsonObject["Points"].toArray();
-	const qsizetype pointsArrayCount = pointsjsonArray.size();
+	const QJsonArray pointsJsonArray = jsonObject["Points"].toArray();
+	const qsizetype pointsArrayCount = pointsJsonArray.size();
 	Points = QList<CPoint::V1_0>();
 	for (qsizetype pointsIndex = 0; pointsIndex < pointsArrayCount; ++pointsIndex){
 		CPoint::V1_0 tempPoints;
-		if (!tempPoints.ReadFromJsonObject(pointsjsonArray[pointsIndex].toObject())){
+		if (!tempPoints.ReadFromJsonObject(pointsJsonArray[pointsIndex].toObject())){
 			return false;
 		}
 		Points->append(tempPoints);
@@ -792,12 +792,12 @@ bool CGeometry::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("Points") && jsonObject["Points"].isArray()){
-		const QJsonArray pointsjsonArray = jsonObject["Points"].toArray();
-		const qsizetype pointsArrayCount = pointsjsonArray.size();
+		const QJsonArray pointsJsonArray = jsonObject["Points"].toArray();
+		const qsizetype pointsArrayCount = pointsJsonArray.size();
 		Points = QList<CPoint::V1_0>();
 		for (qsizetype pointsIndex = 0; pointsIndex < pointsArrayCount; ++pointsIndex){
 			CPoint::V1_0 tempPoints;
-			if (!tempPoints.OptReadFromJsonObject(pointsjsonArray[pointsIndex].toObject())){
+			if (!tempPoints.OptReadFromJsonObject(pointsJsonArray[pointsIndex].toObject())){
 				return false;
 			}
 			Points->append(tempPoints);
