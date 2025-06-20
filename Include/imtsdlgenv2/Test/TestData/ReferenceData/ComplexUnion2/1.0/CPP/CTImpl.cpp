@@ -1560,8 +1560,8 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		return false;
 	}
 	Geometry = CTTypes::CGeometry::V1_0();
-	const bool isGeometryReaded = Geometry->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
-	if (!isGeometryReaded){
+	const bool isGeometryRead = Geometry->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
+	if (!isGeometryRead){
 		return false;
 	}
 
@@ -1842,8 +1842,8 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 
 	if (gqlObject.ContainsParam("Geometry") && gqlObject.GetParamArgumentObjectPtr("Geometry") == nullptr){
 		Geometry = CTTypes::CGeometry::V1_0();
-		const bool isGeometryReaded = Geometry->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
-		if (!isGeometryReaded){
+		const bool isGeometryRead = Geometry->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
+		if (!isGeometryRead){
 			return false;
 		}
 	}
@@ -2446,8 +2446,8 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		return false;
 	}
 	Geometry = CTTypes::CGeometry::V1_0();
-	const bool isGeometryReaded = Geometry->ReadFromJsonObject(jsonObject["Geometry"].toObject());
-	if (!isGeometryReaded){
+	const bool isGeometryRead = Geometry->ReadFromJsonObject(jsonObject["Geometry"].toObject());
+	if (!isGeometryRead){
 		return false;
 	}
 
@@ -2728,8 +2728,8 @@ bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("Geometry") && jsonObject["Geometry"].isObject()){
 		Geometry = CTTypes::CGeometry::V1_0();
-		const bool isGeometryReaded = Geometry->OptReadFromJsonObject(jsonObject["Geometry"].toObject());
-		if (!isGeometryReaded){
+		const bool isGeometryRead = Geometry->OptReadFromJsonObject(jsonObject["Geometry"].toObject());
+		if (!isGeometryRead){
 			return false;
 		}
 	}
@@ -3903,8 +3903,8 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 	IconPosition = CTTypes::CPoint::V1_0();
-	const bool isIconPositionReaded = IconPosition->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
-	if (!isIconPositionReaded){
+	const bool isIconPositionRead = IconPosition->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
+	if (!isIconPositionRead){
 		return false;
 	}
 
@@ -4117,8 +4117,8 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 
 	if (gqlObject.ContainsParam("IconPosition") && gqlObject.GetParamArgumentObjectPtr("IconPosition") == nullptr){
 		IconPosition = CTTypes::CPoint::V1_0();
-		const bool isIconPositionReaded = IconPosition->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
-		if (!isIconPositionReaded){
+		const bool isIconPositionRead = IconPosition->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
+		if (!isIconPositionRead){
 			return false;
 		}
 	}
@@ -4555,8 +4555,8 @@ bool CArea::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		return false;
 	}
 	IconPosition = CTTypes::CPoint::V1_0();
-	const bool isIconPositionReaded = IconPosition->ReadFromJsonObject(jsonObject["IconPosition"].toObject());
-	if (!isIconPositionReaded){
+	const bool isIconPositionRead = IconPosition->ReadFromJsonObject(jsonObject["IconPosition"].toObject());
+	if (!isIconPositionRead){
 		return false;
 	}
 
@@ -4766,8 +4766,8 @@ bool CArea::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("IconPosition") && jsonObject["IconPosition"].isObject()){
 		IconPosition = CTTypes::CPoint::V1_0();
-		const bool isIconPositionReaded = IconPosition->OptReadFromJsonObject(jsonObject["IconPosition"].toObject());
-		if (!isIconPositionReaded){
+		const bool isIconPositionRead = IconPosition->OptReadFromJsonObject(jsonObject["IconPosition"].toObject());
+		if (!isIconPositionRead){
 			return false;
 		}
 	}
@@ -8464,8 +8464,7 @@ bool CExtendedMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 	if (value){
 		::imtgql::CGqlParamObject valueDataObject;
 		if (const CCoordinates* val = std::get_if<CCoordinates>((*value).get())){
-			const bool isvalueAdded = val->WriteToGraphQlObject(valueDataObject)
-			if (!isvalueAdded){
+			if (!val->WriteToGraphQlObject(valueDataObject)){
 				return false;
 			}
 		}
@@ -8491,25 +8490,25 @@ bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		key = gqlObject["key"].toString();
 	}
 
-	QVariant valueData = gqlObject.GetParamArgumentValue("value");
-	if (!valueData.isNull()){
-		if (valueData.canConvert<CCoordinates>()){
+	if (gqlObject.ContainsParam("value") && !gqlObject["value"].isNull()){
+		const QVariant valueVariantValue = gqlObject["value"];
+		if (valueVariantValue.canConvert<CCoordinates>()){
 			CCoordinates valueConvert;
 			const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
-			const bool isvalueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
-			if (!isvalueRead){
+			const bool isValueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
+			if (!isValueRead){
 				return false;
 			}
 			value = std::make_shared<ExtendedMetaDataUnionType>(valueConvert);
 		}
-		else if (valueData.canConvert<double>()){
-			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<double>());
+		else if (valueVariantValue.canConvert<double>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<double>());
 		}
-		else if (valueData.canConvert<bool>()){
-			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<bool>());
+		else if (valueVariantValue.canConvert<bool>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<bool>());
 		}
-		else if (valueData.canConvert<QString>()){
-			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<QString>());
+		else if (valueVariantValue.canConvert<QString>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<QString>());
 		}
 	}
 
@@ -8519,30 +8518,29 @@ bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 
 bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant keyData = gqlObject.GetParamArgumentValue("key");
-	if (!keyData.isNull()){
-		key = keyData.toString();
+	if (gqlObject.ContainsParam("key") && gqlObject["key"].userType() == QMetaType::QString){
+		key = gqlObject["key"].toString();
 	}
 
-	QVariant valueData = gqlObject.GetParamArgumentValue("value");
-	if (!valueData.isNull()){
-		if (valueData.canConvert<CCoordinates>()){
+	if (gqlObject.ContainsParam("value") && !gqlObject["value"].isNull()){
+		const QVariant valueVariantValue = gqlObject["value"];
+		if (valueVariantValue.canConvert<CCoordinates>()){
 			CCoordinates valueConvert;
 			const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
-			const bool isvalueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
-			if (!isvalueRead){
+			const bool isValueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
+			if (!isValueRead){
 				return false;
 			}
 			value = std::make_shared<ExtendedMetaDataUnionType>(valueConvert);
 		}
-		else if (valueData.canConvert<double>()){
-			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<double>());
+		else if (valueVariantValue.canConvert<double>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<double>());
 		}
-		else if (valueData.canConvert<bool>()){
-			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<bool>());
+		else if (valueVariantValue.canConvert<bool>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<bool>());
 		}
-		else if (valueData.canConvert<QString>()){
-			value = std::make_shared<ExtendedMetaDataUnionType>(valueData.value<QString>());
+		else if (valueVariantValue.canConvert<QString>()){
+			value = std::make_shared<ExtendedMetaDataUnionType>(valueVariantValue.value<QString>());
 		}
 	}
 
@@ -8583,7 +8581,7 @@ bool CExtendedMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 			}
 			jsonObject["value"] = QJsonValue::fromVariant(*val);
 		}
-		
+
 	}
 
 	return true;
@@ -8597,7 +8595,7 @@ bool CExtendedMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("value") && jsonObject["value"].isObject()){
-		QVariant valueVariantValue = jsonObject["value"].toVariant();
+		const QVariant valueVariantValue = jsonObject["value"].toVariant();
 		if (valueVariantValue.canConvert<CCoordinates>()){
 			CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromJsonObject(jsonObject["value"].toObject());
@@ -8628,7 +8626,7 @@ bool CExtendedMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObjec
 	}
 
 	if (jsonObject.contains("value") && jsonObject["value"].isObject()){
-		QVariant valueVariantValue = jsonObject["value"].toVariant();
+		const QVariant valueVariantValue = jsonObject["value"].toVariant();
 		if (valueVariantValue.canConvert<CCoordinates>()){
 			CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromJsonObject(jsonObject["value"].toObject());
@@ -9107,21 +9105,22 @@ bool CResultMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 	}
 
 	if (description){
-		::imtgql::CGqlParamObject descriptionDataObject;
-		if (!description->WriteToGraphQlObject(descriptionDataObject)){
+		::imtgql::CGqlParamObject descriptionGqlObject;
+		const bool isDescriptionAdded = description->WriteToGraphQlObject(descriptionGqlObject);
+		if (!isDescriptionAdded){
 			return false;
 		}
-		gqlObject.InsertParam("description", descriptionDataObject);
+		gqlObject.InsertParam("description", descriptionGqlObject);
 	}
 
 	if (extendedMetaData){
 		QList<::imtgql::CGqlParamObject> extendedMetaDataDataObjectList;
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaData->size(); ++extendedMetaDataIndex){
-			::imtgql::CGqlParamObject extendedMetaDataDataObject;
-			if (!extendedMetaData->at(extendedMetaDataIndex).WriteToGraphQlObject(extendedMetaDataDataObject)){
+			::imtgql::CGqlParamObject newExtendedMetaDataGqlObject;
+			if (!extendedMetaData->at(extendedMetaDataIndex).WriteToGraphQlObject(newExtendedMetaDataGqlObject)){
 				return false;
 			}
-			extendedMetaDataDataObjectList << extendedMetaDataDataObject;
+			extendedMetaDataDataObjectList << newExtendedMetaDataGqlObject;
 		}
 		gqlObject.InsertParam("extendedMetaData", extendedMetaDataDataObjectList);
 	}
@@ -9129,65 +9128,56 @@ bool CResultMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 	return true;
 }
 
+
 bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant resultIdData = gqlObject.GetParamArgumentValue("resultId");
-	if (resultIdData.isNull()){
+	if (!gqlObject.ContainsParam("resultId") || gqlObject["resultId"].userType() != QMetaType::QByteArray){
 		return false;
 	}
-	resultId = resultIdData.toByteArray();
+	resultId = gqlObject["resultId"].toByteArray();
 
-	QVariant creationTimeData = gqlObject.GetParamArgumentValue("creationTime");
-	if (!creationTimeData.isNull()){
-		creationTime = creationTimeData.toString();
+	if (gqlObject.ContainsParam("creationTime") && gqlObject["creationTime"].userType() == QMetaType::QString){
+		creationTime = gqlObject["creationTime"].toString();
 	}
 
-	QVariant partIdData = gqlObject.GetParamArgumentValue("partId");
-	if (!partIdData.isNull()){
-		partId = partIdData.toString();
+	if (gqlObject.ContainsParam("partId") && gqlObject["partId"].userType() == QMetaType::QString){
+		partId = gqlObject["partId"].toString();
 	}
 
-	QVariant productIdData = gqlObject.GetParamArgumentValue("productId");
-	if (!productIdData.isNull()){
-		productId = productIdData.toString();
+	if (gqlObject.ContainsParam("productId") && gqlObject["productId"].userType() == QMetaType::QString){
+		productId = gqlObject["productId"].toString();
 	}
 
-	QVariant nameData = gqlObject.GetParamArgumentValue("name");
-	if (!nameData.isNull()){
-		name = nameData.toString();
+	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+		name = gqlObject["name"].toString();
 	}
 
-	QVariant classificationData = gqlObject.GetParamArgumentValue("classification");
-	if (!classificationData.isNull()){
-		classification = classificationData.toInt();
+	if (gqlObject.ContainsParam("classification") && gqlObject["classification"].userType() == QMetaType::Double){
+		classification = gqlObject["classification"].toInt();
 	}
 
-	const ::imtgql::CGqlParamObject* descriptionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("description");
-	if (descriptionDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("description") && gqlObject.GetParamArgumentObjectPtr("description") == nullptr){
 		description = CLocalizedText::V1_0();
-		const bool isDescriptionRead = description->ReadFromGraphQlObject(*descriptionDataObjectPtr);
+		const bool isDescriptionRead = description->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
 			return false;
 		}
-
 	}
 
-	int extendedMetaDataCount = gqlObject.GetObjectsCount("extendedMetaData");
-	if (extendedMetaDataCount > 0){
-		QList<CExtendedMetaData::V1_0> extendedMetaDataList;
-		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex != extendedMetaDataCount ; ++extendedMetaDataIndex){
-			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData",extendedMetaDataIndex);
+	if (gqlObject.ContainsParam("extendedMetaData") && gqlObject.GetObjectsCount("extendedMetaData") > 0){
+		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
+		extendedMetaData = QList<CExtendedMetaData::V1_0>();
+		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
+			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
 			if (extendedMetaDataDataObjectPtr == nullptr){
 				return false;
 			}
-			CExtendedMetaData::V1_0 extendedMetaData;
-			if (!extendedMetaData.ReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
+			CExtendedMetaData::V1_0 tempExtendedMetaData;
+			if (!tempExtendedMetaData.ReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
 				return false;
 			}
-			extendedMetaDataList << extendedMetaData;
+			extendedMetaData->append(tempExtendedMetaData);
 		}
-		extendedMetaData = extendedMetaDataList;
-
 	}
 
 	return true;
@@ -9196,62 +9186,52 @@ bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 
 bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant resultIdData = gqlObject.GetParamArgumentValue("resultId");
-	if (!resultIdData.isNull()){
-		resultId = resultIdData.toByteArray();
+	if (gqlObject.ContainsParam("resultId") && gqlObject["resultId"].userType() == QMetaType::QByteArray){
+		resultId = gqlObject["resultId"].toByteArray();
 	}
 
-	QVariant creationTimeData = gqlObject.GetParamArgumentValue("creationTime");
-	if (!creationTimeData.isNull()){
-		creationTime = creationTimeData.toString();
+	if (gqlObject.ContainsParam("creationTime") && gqlObject["creationTime"].userType() == QMetaType::QString){
+		creationTime = gqlObject["creationTime"].toString();
 	}
 
-	QVariant partIdData = gqlObject.GetParamArgumentValue("partId");
-	if (!partIdData.isNull()){
-		partId = partIdData.toString();
+	if (gqlObject.ContainsParam("partId") && gqlObject["partId"].userType() == QMetaType::QString){
+		partId = gqlObject["partId"].toString();
 	}
 
-	QVariant productIdData = gqlObject.GetParamArgumentValue("productId");
-	if (!productIdData.isNull()){
-		productId = productIdData.toString();
+	if (gqlObject.ContainsParam("productId") && gqlObject["productId"].userType() == QMetaType::QString){
+		productId = gqlObject["productId"].toString();
 	}
 
-	QVariant nameData = gqlObject.GetParamArgumentValue("name");
-	if (!nameData.isNull()){
-		name = nameData.toString();
+	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+		name = gqlObject["name"].toString();
 	}
 
-	QVariant classificationData = gqlObject.GetParamArgumentValue("classification");
-	if (!classificationData.isNull()){
-		classification = classificationData.toInt();
+	if (gqlObject.ContainsParam("classification") && gqlObject["classification"].userType() == QMetaType::Double){
+		classification = gqlObject["classification"].toInt();
 	}
 
-	const ::imtgql::CGqlParamObject* descriptionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("description");
-	if (descriptionDataObjectPtr != nullptr){
+	if (gqlObject.ContainsParam("description") && gqlObject.GetParamArgumentObjectPtr("description") == nullptr){
 		description = CLocalizedText::V1_0();
-		const bool isDescriptionRead = description->OptReadFromGraphQlObject(*descriptionDataObjectPtr);
+		const bool isDescriptionRead = description->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
 			return false;
 		}
-
 	}
 
-	int extendedMetaDataCount = gqlObject.GetObjectsCount("extendedMetaData");
-	if (extendedMetaDataCount > 0){
-		QList<CExtendedMetaData::V1_0> extendedMetaDataList;
-		for (int extendedMetaDataIndex = 0; extendedMetaDataIndex != extendedMetaDataCount ; ++extendedMetaDataIndex){
-			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData",extendedMetaDataIndex);
+	if (gqlObject.ContainsParam("extendedMetaData") && gqlObject.GetObjectsCount("extendedMetaData") > 0){
+		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
+		extendedMetaData = QList<CExtendedMetaData::V1_0>();
+		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
+			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
 			if (extendedMetaDataDataObjectPtr == nullptr){
 				return false;
 			}
-			CExtendedMetaData::V1_0 extendedMetaData;
-			if (!extendedMetaData.OptReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
+			CExtendedMetaData::V1_0 tempExtendedMetaData;
+			if (!tempExtendedMetaData.OptReadFromGraphQlObject(*extendedMetaDataDataObjectPtr)){
 				return false;
 			}
-			extendedMetaDataList << extendedMetaData;
+			extendedMetaData->append(tempExtendedMetaData);
 		}
-		extendedMetaData = extendedMetaDataList;
-
 	}
 
 	return true;
@@ -9267,36 +9247,31 @@ bool CResultMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 
 	if (creationTime){
 		jsonObject["creationTime"] = QJsonValue::fromVariant(*creationTime);
-		}
-
+	}
 
 	if (partId){
 		jsonObject["partId"] = QJsonValue::fromVariant(*partId);
-		}
-
+	}
 
 	if (productId){
 		jsonObject["productId"] = QJsonValue::fromVariant(*productId);
-		}
-
+	}
 
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
-		}
-
+	}
 
 	if (classification){
 		jsonObject["classification"] = QJsonValue::fromVariant(*classification);
-		}
-
+	}
 
 	if (description){
-		QJsonObject descriptionjsonObject;
-		const bool isDescriptionAdded = description->WriteToJsonObject(descriptionjsonObject);
+		QJsonObject descriptionJsonObject;
+		const bool isDescriptionAdded = description->WriteToJsonObject(descriptionJsonObject);
 		if (!isDescriptionAdded){
 			return false;
 		}
-		jsonObject["description"] = descriptionjsonObject;
+		jsonObject["description"] = descriptionJsonObject;
 	}
 
 	if (extendedMetaData){
@@ -9344,8 +9319,8 @@ bool CResultMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("description") && jsonObject["description"].isObject()){
 		description = CLocalizedText::V1_0();
-		const bool isDescriptionReaded = description->ReadFromJsonObject(jsonObject["description"].toObject());
-		if (!isDescriptionReaded){
+		const bool isDescriptionRead = description->ReadFromJsonObject(jsonObject["description"].toObject());
+		if (!isDescriptionRead){
 			return false;
 		}
 	}
@@ -9395,8 +9370,8 @@ bool CResultMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("description") && jsonObject["description"].isObject()){
 		description = CLocalizedText::V1_0();
-		const bool isDescriptionReaded = description->OptReadFromJsonObject(jsonObject["description"].toObject());
-		if (!isDescriptionReaded){
+		const bool isDescriptionRead = description->OptReadFromJsonObject(jsonObject["description"].toObject());
+		if (!isDescriptionRead){
 			return false;
 		}
 	}
@@ -9642,14 +9617,14 @@ bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject, Proto
 }
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
 
 /// \file COverallResultValues.cpp
 
-namespace sdl::rtv::ProductionResults
+namespace sdl::complextest::CTImpl
 {
 
 
@@ -9796,33 +9771,29 @@ bool COverallResultValues::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject&
 	return true;
 }
 
+
 bool COverallResultValues::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant nameData = gqlObject.GetParamArgumentValue("name");
-	if (!nameData.isNull()){
-		name = nameData.toString();
+	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+		name = gqlObject["name"].toString();
 	}
 
-	QVariant valueIdData = gqlObject.GetParamArgumentValue("valueId");
-	if (valueIdData.isNull()){
+	if (!gqlObject.ContainsParam("valueId") || gqlObject["valueId"].userType() != QMetaType::QString){
 		return false;
 	}
-	valueId = valueIdData.toString();
+	valueId = gqlObject["valueId"].toString();
 
-	QVariant measuredValueData = gqlObject.GetParamArgumentValue("measuredValue");
-	if (measuredValueData.isNull()){
+	if (!gqlObject.ContainsParam("measuredValue") || gqlObject["measuredValue"].userType() != QMetaType::Double){
 		return false;
 	}
-	measuredValue = measuredValueData.toFloat();
+	measuredValue = gqlObject["measuredValue"].toDouble();
 
-	QVariant lowLimitData = gqlObject.GetParamArgumentValue("lowLimit");
-	if (!lowLimitData.isNull()){
-		lowLimit = lowLimitData.toFloat();
+	if (gqlObject.ContainsParam("lowLimit") && gqlObject["lowLimit"].userType() == QMetaType::Double){
+		lowLimit = gqlObject["lowLimit"].toDouble();
 	}
 
-	QVariant highLimitData = gqlObject.GetParamArgumentValue("highLimit");
-	if (!highLimitData.isNull()){
-		highLimit = highLimitData.toFloat();
+	if (gqlObject.ContainsParam("highLimit") && gqlObject["highLimit"].userType() == QMetaType::Double){
+		highLimit = gqlObject["highLimit"].toDouble();
 	}
 
 	return true;
@@ -9831,29 +9802,24 @@ bool COverallResultValues::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 
 bool COverallResultValues::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant nameData = gqlObject.GetParamArgumentValue("name");
-	if (!nameData.isNull()){
-		name = nameData.toString();
+	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+		name = gqlObject["name"].toString();
 	}
 
-	QVariant valueIdData = gqlObject.GetParamArgumentValue("valueId");
-	if (!valueIdData.isNull()){
-		valueId = valueIdData.toString();
+	if (gqlObject.ContainsParam("valueId") && gqlObject["valueId"].userType() == QMetaType::QString){
+		valueId = gqlObject["valueId"].toString();
 	}
 
-	QVariant measuredValueData = gqlObject.GetParamArgumentValue("measuredValue");
-	if (!measuredValueData.isNull()){
-		measuredValue = measuredValueData.toFloat();
+	if (gqlObject.ContainsParam("measuredValue") && gqlObject["measuredValue"].userType() == QMetaType::Double){
+		measuredValue = gqlObject["measuredValue"].toDouble();
 	}
 
-	QVariant lowLimitData = gqlObject.GetParamArgumentValue("lowLimit");
-	if (!lowLimitData.isNull()){
-		lowLimit = lowLimitData.toFloat();
+	if (gqlObject.ContainsParam("lowLimit") && gqlObject["lowLimit"].userType() == QMetaType::Double){
+		lowLimit = gqlObject["lowLimit"].toDouble();
 	}
 
-	QVariant highLimitData = gqlObject.GetParamArgumentValue("highLimit");
-	if (!highLimitData.isNull()){
-		highLimit = highLimitData.toFloat();
+	if (gqlObject.ContainsParam("highLimit") && gqlObject["highLimit"].userType() == QMetaType::Double){
+		highLimit = gqlObject["highLimit"].toDouble();
 	}
 
 	return true;
@@ -9864,8 +9830,7 @@ bool COverallResultValues::V1_0::WriteToJsonObject(QJsonObject& jsonObject) cons
 {
 	if (name){
 		jsonObject["name"] = QJsonValue::fromVariant(*name);
-		}
-
+	}
 
 	if (!valueId){
 		return false;
@@ -9879,13 +9844,11 @@ bool COverallResultValues::V1_0::WriteToJsonObject(QJsonObject& jsonObject) cons
 
 	if (lowLimit){
 		jsonObject["lowLimit"] = QJsonValue::fromVariant(*lowLimit);
-		}
-
+	}
 
 	if (highLimit){
 		jsonObject["highLimit"] = QJsonValue::fromVariant(*highLimit);
-		}
-
+	}
 
 	return true;
 }
@@ -10169,14 +10132,14 @@ bool COverallResultValues::OptReadFromJsonObject(const QJsonObject& jsonObject, 
 }
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
 
 /// \file CCDMResultVarRecursive.cpp
 
-namespace sdl::rtv::ProductionResults
+namespace sdl::complextest::CTImpl
 {
 
 
@@ -10414,11 +10377,12 @@ bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 	gqlObject.InsertParam("dataModelVersion", QVariant(*dataModelVersion));
 
 	if (resultMetaData){
-		::imtgql::CGqlParamObject resultMetaDataDataObject;
-		if (!resultMetaData->WriteToGraphQlObject(resultMetaDataDataObject)){
+		::imtgql::CGqlParamObject resultMetaDataGqlObject;
+		const bool isResultMetaDataAdded = resultMetaData->WriteToGraphQlObject(resultMetaDataGqlObject);
+		if (!isResultMetaDataAdded){
 			return false;
 		}
-		gqlObject.InsertParam("resultMetaData", resultMetaDataDataObject);
+		gqlObject.InsertParam("resultMetaData", resultMetaDataGqlObject);
 	}
 
 	if (resultContent){
@@ -10628,12 +10592,12 @@ bool CCDMResultVarRecursive::V1_0::WriteToJsonObject(QJsonObject& jsonObject) co
 	jsonObject["dataModelVersion"] = QJsonValue::fromVariant(*dataModelVersion);
 
 	if (resultMetaData){
-		QJsonObject resultMetaDatajsonObject;
-		const bool isResultMetaDataAdded = resultMetaData->WriteToJsonObject(resultMetaDatajsonObject);
+		QJsonObject resultMetaDataJsonObject;
+		const bool isResultMetaDataAdded = resultMetaData->WriteToJsonObject(resultMetaDataJsonObject);
 		if (!isResultMetaDataAdded){
 			return false;
 		}
-		jsonObject["resultMetaData"] = resultMetaDatajsonObject;
+		jsonObject["resultMetaData"] = resultMetaDataJsonObject;
 	}
 
 	if (resultContent){
@@ -10689,8 +10653,8 @@ bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObj
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataReaded = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
-		if (!isResultMetaDataReaded){
+		const bool isResultMetaDataRead = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataRead){
 			return false;
 		}
 	}
@@ -10698,10 +10662,10 @@ bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObj
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
 		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
-		resultContent = QList<std::shared_ptr<rtv::ProductionResults::CDMResultUnionType>>();
+		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
-			std::shared_ptr<rtv::ProductionResults::CDMResultUnionType> resultContentDataValue;
+			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (tempResultContent.canConvert<CCDMResultVarString>()){
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
@@ -10754,8 +10718,8 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& json
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataReaded = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
-		if (!isResultMetaDataReaded){
+		const bool isResultMetaDataRead = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataRead){
 			return false;
 		}
 	}
@@ -10763,10 +10727,10 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& json
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
 		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
-		resultContent = QList<std::shared_ptr<rtv::ProductionResults::CDMResultUnionType>>();
+		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
-			std::shared_ptr<rtv::ProductionResults::CDMResultUnionType> resultContentDataValue;
+			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (tempResultContent.canConvert<CCDMResultVarString>()){
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
@@ -11031,14 +10995,14 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 }
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
 
 /// \file CCDMResultVarString.cpp
 
-namespace sdl::rtv::ProductionResults
+namespace sdl::complextest::CTImpl
 {
 
 
@@ -11382,12 +11346,12 @@ bool CCDMResultVarString::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	jsonObject["dataModelVersion"] = QJsonValue::fromVariant(*dataModelVersion);
 
 	if (resultMetaData){
-		QJsonObject resultMetaDatajsonObject;
-		const bool isResultMetaDataAdded = resultMetaData->WriteToJsonObject(resultMetaDatajsonObject);
+		QJsonObject resultMetaDataJsonObject;
+		const bool isResultMetaDataAdded = resultMetaData->WriteToJsonObject(resultMetaDataJsonObject);
 		if (!isResultMetaDataAdded){
 			return false;
 		}
-		jsonObject["resultMetaData"] = resultMetaDatajsonObject;
+		jsonObject["resultMetaData"] = resultMetaDataJsonObject;
 	}
 
 	if (resultContent){
@@ -11428,8 +11392,8 @@ bool CCDMResultVarString::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataReaded = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
-		if (!isResultMetaDataReaded){
+		const bool isResultMetaDataRead = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataRead){
 			return false;
 		}
 	}
@@ -11473,8 +11437,8 @@ bool CCDMResultVarString::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObj
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataReaded = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
-		if (!isResultMetaDataReaded){
+		const bool isResultMetaDataRead = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataRead){
 			return false;
 		}
 	}
@@ -11730,14 +11694,14 @@ bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject, P
 }
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
 
 /// \file CCDMResult.cpp
 
-namespace sdl::rtv::ProductionResults
+namespace sdl::complextest::CTImpl
 {
 
 
@@ -12189,12 +12153,12 @@ bool CCDMResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	jsonObject["dataModelVersion"] = QJsonValue::fromVariant(*dataModelVersion);
 
 	if (resultMetaData){
-		QJsonObject resultMetaDatajsonObject;
-		const bool isResultMetaDataAdded = resultMetaData->WriteToJsonObject(resultMetaDatajsonObject);
+		QJsonObject resultMetaDataJsonObject;
+		const bool isResultMetaDataAdded = resultMetaData->WriteToJsonObject(resultMetaDataJsonObject);
 		if (!isResultMetaDataAdded){
 			return false;
 		}
-		jsonObject["resultMetaData"] = resultMetaDatajsonObject;
+		jsonObject["resultMetaData"] = resultMetaDataJsonObject;
 	}
 
 	if (resultContent){
@@ -12250,8 +12214,8 @@ bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataReaded = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
-		if (!isResultMetaDataReaded){
+		const bool isResultMetaDataRead = resultMetaData->ReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataRead){
 			return false;
 		}
 	}
@@ -12259,10 +12223,10 @@ bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
 		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
-		resultContent = QList<std::shared_ptr<rtv::ProductionResults::CDMResultUnionType>>();
+		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
-			std::shared_ptr<rtv::ProductionResults::CDMResultUnionType> resultContentDataValue;
+			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (tempResultContent.canConvert<CCDMResultVarString>()){
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
@@ -12315,8 +12279,8 @@ bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 
 	if (jsonObject.contains("resultMetaData") && jsonObject["resultMetaData"].isObject()){
 		resultMetaData = CResultMetaData::V1_0();
-		const bool isResultMetaDataReaded = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
-		if (!isResultMetaDataReaded){
+		const bool isResultMetaDataRead = resultMetaData->OptReadFromJsonObject(jsonObject["resultMetaData"].toObject());
+		if (!isResultMetaDataRead){
 			return false;
 		}
 	}
@@ -12324,10 +12288,10 @@ bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("resultContent") && jsonObject["resultContent"].isArray()){
 		const QJsonArray resultContentjsonArray = jsonObject["resultContent"].toArray();
 		const qsizetype resultContentArrayCount = resultContentjsonArray.size();
-		resultContent = QList<std::shared_ptr<rtv::ProductionResults::CDMResultUnionType>>();
+		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentjsonArray[resultContentIndex].toVariant();
-			std::shared_ptr<rtv::ProductionResults::CDMResultUnionType> resultContentDataValue;
+			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (tempResultContent.canConvert<CCDMResultVarString>()){
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentjsonArray[resultContentIndex].toObject());
@@ -12592,14 +12556,14 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVe
 }
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
 
 /// \file CPointsInCoordinateFormat.cpp
 
-namespace sdl::rtv::ProductionResults
+namespace sdl::complextest::CTImpl
 {
 
 
@@ -12658,11 +12622,11 @@ bool CPointsInCoordinateFormat::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 	return true;
 }
 
+
 bool CPointsInCoordinateFormat::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant pointAsCoordinatesData = gqlObject.GetParamArgumentValue("pointAsCoordinates");
-	if (!pointAsCoordinatesData.isNull()){
-		pointAsCoordinates = pointAsCoordinatesData.toBool();
+	if (gqlObject.ContainsParam("pointAsCoordinates") && gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool){
+		pointAsCoordinates = gqlObject["pointAsCoordinates"].toBool();
 	}
 
 	return true;
@@ -12671,9 +12635,8 @@ bool CPointsInCoordinateFormat::V1_0::ReadFromGraphQlObject(const ::imtgql::CGql
 
 bool CPointsInCoordinateFormat::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	QVariant pointAsCoordinatesData = gqlObject.GetParamArgumentValue("pointAsCoordinates");
-	if (!pointAsCoordinatesData.isNull()){
-		pointAsCoordinates = pointAsCoordinatesData.toBool();
+	if (gqlObject.ContainsParam("pointAsCoordinates") && gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool){
+		pointAsCoordinates = gqlObject["pointAsCoordinates"].toBool();
 	}
 
 	return true;
@@ -12684,8 +12647,7 @@ bool CPointsInCoordinateFormat::V1_0::WriteToJsonObject(QJsonObject& jsonObject)
 {
 	if (pointAsCoordinates){
 		jsonObject["pointAsCoordinates"] = QJsonValue::fromVariant(*pointAsCoordinates);
-		}
-
+	}
 
 	return true;
 }
@@ -12935,15 +12897,15 @@ bool CPointsInCoordinateFormat::OptReadFromJsonObject(const QJsonObject& jsonObj
 }
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
 
-/// \file CGetLastProductionResultsGqlgqlObject.cpp
+/// \file CGetLastProductionResultsGqlRequest.cpp
 
 
-namespace sdl::rtv::ProductionResults
+namespace sdl::complextest::CTImpl
 {
 
 
@@ -12955,7 +12917,7 @@ QByteArray CGetLastProductionResultsGqlRequest::GetCommandId()
 
 bool CGetLastProductionResultsGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetLastProductionResultsRequestArguments& requestArguments, const GetLastProductionResultsRequestInfo& /*requestInfo*/)
 {
-	gqlgqlObject.SetCommandId(GetCommandId());
+	gqlRequest.SetCommandId(GetCommandId());
 
 	// writting input arguments
 
@@ -12968,16 +12930,16 @@ CGetLastProductionResultsGqlRequest::CGetLastProductionResultsGqlRequest(const :
 {
 	Q_UNUSED(optRead)
 	m_isValid = true;
-	m_gqlContextPtr = gqlgqlObject.GetRequestContext();
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
 
-	const QByteArray protocolVersion = gqlgqlObject.GetProtocolVersion();
+	const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();
 
 	// reading input arguments
 
 	// reading requested fields
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlgqlObject.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlgqlObject.GetFields().GetFieldArgumentObjectPtr(gqlgqlObject.GetFields().GetFieldIds().constFirst());
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 			if (!requestedIds.isEmpty()){
@@ -13092,14 +13054,14 @@ GetLastProductionResultsRequestInfo CGetLastProductionResultsGqlRequest::GetRequ
 }
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
-/// \file CGetLastProductionResultsCDMGqlgqlObject.cpp
+/// \file CGetLastProductionResultsCDMGqlRequest.cpp
 
 
-namespace sdl::rtv::ProductionResults
+namespace sdl::complextest::CTImpl
 {
 
 
@@ -13111,14 +13073,14 @@ QByteArray CGetLastProductionResultsCDMGqlRequest::GetCommandId()
 
 bool CGetLastProductionResultsCDMGqlRequest::SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetLastProductionResultsCDMRequestArguments& requestArguments, const GetLastProductionResultsCDMRequestInfo& /*requestInfo*/)
 {
-	gqlgqlObject.SetCommandId(GetCommandId());
+	gqlRequest.SetCommandId(GetCommandId());
 
 	// writting input arguments
 	::imtgql::CGqlParamObject pointAsCoordinatesDataObject;
 	if (!requestArguments.pointAsCoordinates.WriteToGraphQlObject(pointAsCoordinatesDataObject)){
 		return false;
 	}
-	gqlgqlObject.AddParam("pointAsCoordinates", pointAsCoordinatesDataObject);
+	gqlRequest.AddParam("pointAsCoordinates", pointAsCoordinatesDataObject);
 
 	return true;
 }
@@ -13127,12 +13089,12 @@ bool CGetLastProductionResultsCDMGqlRequest::SetupGqlRequest(::imtgql::CGqlReque
 CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead)
 	: m_isValid(true)
 {
-	m_gqlContextPtr = gqlgqlObject.GetRequestContext();
+	m_gqlContextPtr = gqlRequest.GetRequestContext();
 
-	const QByteArray protocolVersion = gqlgqlObject.GetProtocolVersion();
+	const QByteArray protocolVersion = gqlRequest.GetProtocolVersion();
 
 	// reading input arguments
-	const ::imtgql::CGqlParamObject* pointAsCoordinatesDataObjectPtr = gqlgqlObject.GetParamObject("pointAsCoordinates");
+	const ::imtgql::CGqlParamObject* pointAsCoordinatesDataObjectPtr = gqlRequest.GetParamObject("pointAsCoordinates");
 	if (pointAsCoordinatesDataObjectPtr != nullptr){
 		if (!protocolVersion.isEmpty()){
 			if (protocolVersion == "1.0"){
@@ -13149,7 +13111,7 @@ CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(c
 				}
 			}
 			else {
-				qWarning() << QString("Bad gqlObject. Version %1 is not supported").arg(qPrintable(protocolVersion));
+				qWarning() << QString("Bad request. Version %1 is not supported").arg(qPrintable(protocolVersion));
 				m_isValid = false;
 
 				return;
@@ -13172,8 +13134,8 @@ CGetLastProductionResultsCDMGqlRequest::CGetLastProductionResultsCDMGqlRequest(c
 
 	// reading requested fields
 	const imtgql::CGqlFieldObject* requestedFieldsObjectPtr = nullptr;
-	if (!gqlgqlObject.GetFields().GetFieldIds().isEmpty()){
-		requestedFieldsObjectPtr = gqlgqlObject.GetFields().GetFieldArgumentObjectPtr(gqlgqlObject.GetFields().GetFieldIds().constFirst());
+	if (!gqlRequest.GetFields().GetFieldIds().isEmpty()){
+		requestedFieldsObjectPtr = gqlRequest.GetFields().GetFieldArgumentObjectPtr(gqlRequest.GetFields().GetFieldIds().constFirst());
 		if (requestedFieldsObjectPtr != nullptr){
 			const QByteArrayList requestedIds = requestedFieldsObjectPtr->GetFieldIds();
 			if (!requestedIds.isEmpty()){
@@ -13253,20 +13215,20 @@ GetLastProductionResultsCDMRequestInfo CGetLastProductionResultsCDMGqlRequest::G
 }
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
 /// \file CGraphQlHandlerCompBase.cpp
 
 
-namespace sdl::rtv::ProductionResults
+namespace sdl::complextest::CTImpl
 {
 
 
 bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	const QByteArray commandId = gqlgqlObject.GetCommandId();
+	const QByteArray commandId = gqlRequest.GetCommandId();
 	if (commandId == CGetLastProductionResultsGqlRequest::GetCommandId()){
 		return true;
 	}
@@ -13280,15 +13242,15 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 
 ::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	const QByteArray commandId = gqlgqlObject.GetCommandId();
+	const QByteArray commandId = gqlRequest.GetCommandId();
 	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
 	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
 
 	// GetLastProductionResults
 	if (commandId == CGetLastProductionResultsGqlRequest::GetCommandId()){
 		CGetLastProductionResultsGqlRequest getLastProductionResultsGqlRequest(gqlRequest, false);
-		if (!getLastProductionResultsGqlgqlObject.IsValid()){
-			errorMessage = QString("Bad gqlObject. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+		if (!getLastProductionResultsGqlRequest.IsValid()){
+			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
 			return nullptr;
@@ -13315,8 +13277,8 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 	// GetLastProductionResultsCDM
 	if (commandId == CGetLastProductionResultsCDMGqlRequest::GetCommandId()){
 		CGetLastProductionResultsCDMGqlRequest getLastProductionResultsCDMGqlRequest(gqlRequest, false);
-		if (!getLastProductionResultsCDMGqlgqlObject.IsValid()){
-			errorMessage = QString("Bad gqlObject. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+		if (!getLastProductionResultsCDMGqlRequest.IsValid()){
+			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
 			SendErrorMessage(0, errorMessage);
 
 			return nullptr;
@@ -13340,7 +13302,7 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 		return modelPtr.PopPtr();
 	}
 
-	errorMessage = QString("Bad gqlObject. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
 	SendErrorMessage(0, errorMessage);
 
 	return nullptr;
@@ -13349,7 +13311,7 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 
 
 
-} // namespace sdl::rtv::ProductionResults
+} // namespace sdl::complextest::CTImpl
 
 
 
