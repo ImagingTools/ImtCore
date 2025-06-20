@@ -66,6 +66,7 @@ protected:
 	};
 
 	mutable imod::CModelUpdateBridge m_updateBridge;
+	mutable std::unique_ptr<iattr::IAttributesProvider> m_attributesPtr;
 
 private:
 	bool EnsureAttributesCreated() const;
@@ -73,7 +74,6 @@ private:
 private:
 	QMap<int, QByteArray> m_identifiers;
 	imod::TModelWrap<VersionInfo> m_versionInfo;
-	mutable std::unique_ptr<iattr::IAttributesProvider> m_attributesPtr;
 };
 
 
