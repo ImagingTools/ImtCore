@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5137" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394753" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -34,10 +34,10 @@
         <Element Id="GraphQLClientEngine" PackageId="ImtClientGqlPck" ComponentId="GraphQLClientEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
+                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="ServerConnectionInterface">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="ServerUrl">
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

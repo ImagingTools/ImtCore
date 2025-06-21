@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -152,7 +152,13 @@
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="ServerConnectionInterface">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StyleFileNamePrefix" Type="String" ExportId="StyleFileNamePrefix">
@@ -165,9 +171,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -225,6 +228,9 @@
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="ServerConnectionInterface">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="StyleFileNamePrefix" Type="String" ExportId="StyleFileNamePrefix">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -243,15 +249,15 @@
                                 <AttributeInfo Id="UserSettingsRepresentationController" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="UserSettingsRepresentation"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="WebSocketUrlParam">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
                     </Element>
                     <Element Id="TableViewParamController" PackageId="ImtGraphQlVoce" ComponentId="TableViewParamController">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -269,7 +275,11 @@
                     </Element>
                     <Element Id="UserSettings" PackageId="ImtAuthVoce" ComponentId="UserSettings">
                         <Data IsEnabled="true" Flags="2">
-                            <AttributeInfoMap/>
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
                         </Data>
                     </Element>
                     <Element Id="UserSettingsRepresentation" PackageId="ImtAuthVoce" ComponentId="UserSettingsRepresentation">
@@ -305,7 +315,6 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="FeatureContainer" ComponentId="PermissionsController/FeatureContainer"/>
         <Component ExportedId="UserSettingsRepository" ComponentId="UserSettings/UserSettingsRepository"/>
     </ExportedComponents>
 </Acf>

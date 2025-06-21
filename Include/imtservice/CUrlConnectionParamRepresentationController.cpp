@@ -36,18 +36,56 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 		return false;
 	}
 
-	QUrl defaultUrl  = urlConnectionParamPtr->GetDefaultUrl();
+	const imtcom::IServerConnectionInterface& defaultInterface  = urlConnectionParamPtr->GetDefaultInterface();
 	QByteArray usageId = urlConnectionParamPtr->GetUsageId();
 	QByteArray serviceTypeName = urlConnectionParamPtr->GetServiceTypeName();
 
 	representation.SetData("Id", usageId);
 	representation.SetData("UsageId", usageId);
 	representation.SetData("ServiceTypeName", serviceTypeName);
-	representation.SetData("DefaultUrl", defaultUrl.toString());
 
-	QUrl url = urlConnectionParamPtr->GetUrl();
-	representation.SetData("Host", url.host());
-	representation.SetData("Port", url.port());
+	imtcom::IServerConnectionInterface::ProtocolTypes defaultProtocols = defaultInterface.GetSupportedProtocols();
+
+	for (imtcom::IServerConnectionInterface::ProtocolType protocolType : defaultProtocols){
+		switch (protocolType){
+		case imtcom::IServerConnectionInterface::PT_HTTP:
+			{
+				QUrl url;
+				bool success = defaultInterface.GetUrl(imtcom::IServerConnectionInterface::PT_HTTP, url);
+				if (!success){
+					return false;
+				}
+
+				representation.SetData("DefaultHttpUrl", url.toString());
+			}
+			break;
+			case imtcom::IServerConnectionInterface::PT_WEBSOCKET:
+			{
+				QUrl url;
+				bool success = defaultInterface.GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url);
+				if (!success){
+					return false;
+				}
+
+				representation.SetData("DefaultWsUrl", url.toString());
+			}
+			break;
+		}
+	}
+
+	imtcom::IServerConnectionInterface::ProtocolTypes protocols = urlConnectionParamPtr->GetSupportedProtocols();
+	representation.SetData("Host", defaultInterface.GetHost());
+
+	for (imtcom::IServerConnectionInterface::ProtocolType protocolType : protocols){
+		switch (protocolType){
+		case imtcom::IServerConnectionInterface::PT_HTTP:
+			representation.SetData("HttpPort", defaultInterface.GetPort(imtcom::IServerConnectionInterface::PT_HTTP));
+			break;
+		case imtcom::IServerConnectionInterface::PT_WEBSOCKET:
+			representation.SetData("WsPort", defaultInterface.GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET));
+			break;
+		}
+	}
 
 	imtbase::CTreeItemModel* externPortsModelPtr = representation.AddTreeModel("ExternPorts");
 
@@ -94,20 +132,23 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 		urlConnectionParamPtr->SetServiceTypeName(serviceTypeName);
 	}
 
-	QUrl url;
 	if (representation.ContainsKey("Host")){
 		QString host = representation.GetData("Host").toString();
 
-		url.setHost(host);
+		urlConnectionParamPtr->SetHost(host);
 	}
 
-	if (representation.ContainsKey("Port")){
-		int port = representation.GetData("Port").toInt();
+	if (representation.ContainsKey("WsPort")){
+		int port = representation.GetData("WsPort").toInt();
 
-		url.setPort(port);
+		urlConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, port);
 	}
 
-	urlConnectionParamPtr->SetUrl(url);
+	if (representation.ContainsKey("HttpPort")){
+		int port = representation.GetData("HttpPort").toInt();
+
+		urlConnectionParamPtr->SetPort(imtcom::IServerConnectionInterface::PT_HTTP, port);
+	}
 
 	if (representation.ContainsKey("ExternPorts")){
 		imtbase::CTreeItemModel* externPortsModelPtr = representation.GetTreeItemModel("ExternPorts");

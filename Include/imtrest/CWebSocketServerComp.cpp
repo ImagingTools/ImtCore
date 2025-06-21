@@ -189,8 +189,8 @@ bool CWebSocketServerComp::EnsureServerStarted()
 	bool retVal = false;
 
 	if (m_protocolEngineCompPtr.IsValid()){
-		if (m_webSocketServerPortCompPtr.IsValid()){
-			int port = m_webSocketServerPortCompPtr->GetUrl().port();
+		if (m_webServerInterfaceCompPtr.IsValid()){
+			int port = m_webServerInterfaceCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
 
 			retVal = StartListening(QHostAddress::Any, port);
 		}
@@ -217,7 +217,7 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 					imtcom::ISslConfigurationManager::ParamKeys::s_enableSslModeParamKey);
 		if (sslEnableParamPtr.IsValid() && sslEnableParamPtr->IsEnabled()){
 			if (m_sslConfigurationManagerCompPtr->CreateSslConfiguration(*m_sslConfigurationCompPtr, sslConfiguration)){
-				m_webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::SecureMode,this));
+				m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::SecureMode, this));
 				m_webSocketServerPtr->setSslConfiguration(sslConfiguration);
 
 				SendInfoMessage(0, QString("Secure connection (SSL) enabled on web socket server"));
@@ -228,7 +228,7 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 	}
 
 	if (!isSecureConnection){
-		m_webSocketServerPtr.SetPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
+		m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::NonSecureMode, this));
 	}
 
 	if (m_webSocketServerPtr->listen(address, port)){
@@ -267,7 +267,6 @@ void CWebSocketServerComp::HandleNewConnections()
 				break;
 			}
 		}
-
 		if (!find){
 			CWebSocketThread* webSocketThreadPtr = new CWebSocketThread(this);
 			m_webSocketThreadList.append(webSocketThreadPtr);
@@ -289,7 +288,6 @@ void CWebSocketServerComp::OnSocketDisconnected()
 
 	for (const QByteArray& key: m_senders.keys()){
 		if (socketObjectPtr == m_senders[key]->GetSocket()){
-			qDebug() << "Test: m_senders remove" << key << socketObjectPtr;
 			m_senders.remove(key);
 
 			istd::IChangeable::ChangeSet loginChangeSet(imtcom::IConnectionStatusProvider::CS_UNKNOWN, QString("Logout"));

@@ -10,7 +10,7 @@
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
 #include <imtservice/IConnectionCollection.h>
-#include <imtservice/CUrlConnectionParam.h>
+#include <imtcom/IServerConnectionInterface.h>
 
 
 namespace imtservice
@@ -33,7 +33,7 @@ public:
 		I_ASSIGN_MULTI_0(m_connectionUsageIds, "ConnectionUsageIds", "Service connection usage ids", true);
 		I_ASSIGN_MULTI_0(m_connectionDescriptions, "ConnectionDescriptions", "Service connection descriptions", true);
 		I_ASSIGN_MULTI_0(m_connectionTypes, "ConnectionTypes", "Service connection types: 0 - input, 1 - output", true);
-		I_ASSIGN_MULTI_0(m_connectionUrlListCompPtr, "ConnectionUrlListCompPtr", "Parameter providing the server ports", true);
+		I_ASSIGN_MULTI_0(m_serverInterfaceListCompPtr, "ServerInterfaces", "List of server connection interfaces", true);
 		I_ASSIGN(m_tracingConfigurationCompPtr, "TracingConfiguration", "Tracing configuration of verbose messages", true, "TracingConfiguration");
 	I_END_COMPONENT;
 
@@ -41,10 +41,10 @@ public:
 	virtual QString GetServiceVersion() const override;
 	virtual QString GetServiceTypeName() const override;
 	virtual bool SetServiceTypeName(const QString& serviceTypeName) const override;
-	virtual const imtbase::ICollectionInfo* GetUrlList() const override;
-	virtual const QUrl* GetUrl(const QByteArray& id) const override;
+	virtual const imtbase::ICollectionInfo* GetServerConnectionList() const override;
+	virtual const imtcom::IServerConnectionInterface* GetServerConnection(const QByteArray& id) const override;
 	virtual const IServiceConnectionInfo* GetConnectionMetaInfo(const QByteArray& id) const override;
-	virtual bool SetUrl(const QByteArray& id, const QUrl& url) const override;
+	virtual bool SetServerConnectionInterface(const QByteArray& id, const imtcom::IServerConnectionInterface& connectionInterface) override;
 	virtual QByteArray InsertNewConnection(
 						const QByteArray& connectionId,
 						const QUrl& url,
@@ -68,7 +68,7 @@ private:
 	I_MULTIATTR(QByteArray, m_connectionUsageIds);
 	I_MULTIATTR(QByteArray, m_connectionDescriptions);
 	I_MULTIATTR(int, m_connectionTypes);
-	I_MULTIREF(imtbase::IUrlParam, m_connectionUrlListCompPtr);
+	I_MULTIREF(imtcom::IServerConnectionInterface, m_serverInterfaceListCompPtr);
 	I_REF(ilog::ITracingConfiguration, m_tracingConfigurationCompPtr);
 
 	imtbase::CObjectCollection m_collection;

@@ -101,27 +101,27 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 
 	int iconSize = m_iconHeight;
 
-	if (isEnabled) {
-		if (option.state & QStyle::State_MouseOver) {
+	if (isEnabled){
+		if (option.state & QStyle::State_MouseOver){
 			iconSize = m_iconHeightHover;
 			iconMode = QIcon::Mode::Active;
 		}
 
-		if (option.state & QStyle::State_Selected) {
+		if (option.state & QStyle::State_Selected){
 			iconMode = QIcon::Mode::Selected;
 		}
 	}
 
 	QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
 	QPixmap iconPixmap = icon.pixmap(
-		iconSize,
-		iconSize,
-		iconMode);
+				iconSize,
+				iconSize,
+				iconMode);
 
 	option.widget->style()->drawItemPixmap(
-		painter, iconRect,
-		Qt::AlignHCenter | Qt::AlignVCenter,
-		iconPixmap);
+				painter, iconRect,
+				Qt::AlignHCenter | Qt::AlignVCenter,
+				iconPixmap);
 
 	// Draw text:
 	QString text = index.data(Qt::DisplayRole).toString();
@@ -138,12 +138,12 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	text = fontMetrics.elidedText(text,Qt::ElideRight,textRect.width());
 
 	option.widget->style()->drawItemText(
-		painter,
-		textRect,
-		Qt::AlignHCenter | Qt::AlignBottom,
-		palette,
-		true,
-		text);
+				painter,
+				textRect,
+				Qt::AlignHCenter | Qt::AlignBottom,
+				palette,
+				true,
+				text);
 
 	painter->restore();
 }

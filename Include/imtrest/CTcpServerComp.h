@@ -15,7 +15,7 @@
 #include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
-#include <imtbase/IUrlParam.h>
+#include <imtcom/IServerConnectionInterface.h>
 #include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
@@ -54,7 +54,7 @@ public:
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
 		I_ASSIGN(m_threadsLimitAttrPtr, "ThreadsLimit", "Limit of threads", true, 5);
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
-		I_ASSIGN(m_serverPortCompPtr, "ServerPort", "Parameter providing the server port to be listened", true, "ServerPort");
+		I_ASSIGN(m_serverConnnectionInterfaceCompPtr, "ServerInterface", "Parameter providing the server connection interface to be listened", true, "ServerInterface");
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
 		I_ASSIGN_TO(m_sslConfigurationModelCompPtr, m_sslConfigurationCompPtr, false)
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
@@ -95,7 +95,7 @@ private Q_SLOTS:
 private:
 	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
-	I_REF(imtbase::IUrlParam, m_serverPortCompPtr);
+	I_REF(imtcom::IServerConnectionInterface, m_serverConnnectionInterfaceCompPtr);
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
 	I_REF(imod::IModel, m_sslConfigurationModelCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);

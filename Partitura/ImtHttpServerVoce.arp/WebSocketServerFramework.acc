@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5385" Description="ACF"/>
-            <Version Id="1" Number="2247" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>WebSocket server framework</Description>
@@ -94,7 +94,7 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerPort" Type="Reference" ExportId="WebSocketServerPort">
+                    <AttributeInfo Id="WebServerConnectionInterface" Type="Reference" ExportId="WebServerConnectionInterface">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

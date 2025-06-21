@@ -401,7 +401,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	int rightGroupId = *m_rightToolBarCommandGroupIdAttrPtr;
 
 	if (leftGroupId < 0 && centerGroupId < 0 && rightGroupId < 0){
-		m_collectionCommandsLeftToolBar.RegisterCommands(LeftCommandsFrame, &m_commands, -1);
+		TopFrame->setVisible(false);
 	}
 	else{
 		if (leftGroupId >= 0){

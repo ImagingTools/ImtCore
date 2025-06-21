@@ -53,12 +53,12 @@ void CServiceConnectionInfo::SetUsageId(const QByteArray& usageId)
 }
 
 
-void CServiceConnectionInfo::SetDefaultUrl(const QUrl& url)
+void CServiceConnectionInfo::SetDefaultServiceInterface(const imtcom::IServerConnectionInterface& defaultInterface)
 {
-	if (m_defaultUrl != url){
+	if (!m_defaultConnection.IsEqual(defaultInterface)){
 		istd::CChangeNotifier changeNotifier(this);
-		
-		m_defaultUrl = url;
+
+		m_defaultConnection.CopyFrom(defaultInterface);
 	}
 }
 
@@ -83,9 +83,9 @@ QByteArray CServiceConnectionInfo::GetUsageId() const
 }
 
 
-QUrl CServiceConnectionInfo::GetDefaultUrl() const
+const imtcom::IServerConnectionInterface& CServiceConnectionInfo::GetDefaultInterface() const
 {
-	return m_defaultUrl;
+	return m_defaultConnection;
 }
 
 
@@ -103,9 +103,12 @@ bool CServiceConnectionInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = true;
+	bool retVal = BaseClass::Serialize(archive);
 
-	retVal = retVal && BaseClass::Serialize(archive);
+	iser::CArchiveTag defaultConnectionInterfaceTag("DefaultConnectionInterface", "Default interface for the service connection", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(defaultConnectionInterfaceTag);
+	retVal = retVal && m_defaultConnection.Serialize(archive);
+	retVal = retVal && archive.EndTag(defaultConnectionInterfaceTag);
 
 	iser::CArchiveTag serviceTypeNameTag("ServiceTypeName", "Service TypeName", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(serviceTypeNameTag);
@@ -124,17 +127,6 @@ bool CServiceConnectionInfo::Serialize(iser::IArchive& archive)
 				 IServiceConnectionInfo::ToString,
 				 IServiceConnectionInfo::FromString>(archive, m_connectionType);
 	retVal = retVal && archive.EndTag(connectionTypeTag);
-
-	iser::CArchiveTag defaultUrlTag("DefaultUrl", "DefaultUrl", iser::CArchiveTag::TT_LEAF);
-	QString defaultUrlStr = m_defaultUrl.toString();
-
-	retVal = retVal && archive.BeginTag(defaultUrlTag);
-	retVal = retVal && archive.Process(defaultUrlStr);
-	retVal = retVal && archive.EndTag(defaultUrlTag);
-
-	if (retVal && !archive.IsStoring()){
-		m_defaultUrl = QUrl(defaultUrlStr);
-	}
 	
 	iser::CArchiveTag connectionStatusTag("ConnectionStatus", "Connection Status", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(connectionStatusTag);
@@ -165,7 +157,7 @@ bool CServiceConnectionInfo::CopyFrom(const IChangeable& object, CompatibilityMo
 		m_serviceTypeName = sourcePtr->m_serviceTypeName;
 		m_usageId = sourcePtr->m_usageId;
 		m_connectionType = sourcePtr->m_connectionType;
-		m_defaultUrl = sourcePtr->m_defaultUrl;
+		m_defaultConnection.CopyFrom(sourcePtr->m_defaultConnection);
 		m_connectionStatus = sourcePtr->m_connectionStatus;
 
 		return true;
@@ -189,19 +181,17 @@ istd::IChangeable* CServiceConnectionInfo::CloneMe(CompatibilityMode mode) const
 bool CServiceConnectionInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
-	
-	bool retVal = BaseClass::ResetData(mode);
 
 	m_serviceTypeName.clear();
 	m_usageId.clear();
 	m_connectionType = CT_INPUT;
-	m_defaultUrl.clear();
+	m_defaultConnection.ResetData();
 	m_connectionStatus = CS_OK;
 
-	return retVal;
+	return BaseClass::ResetData(mode);
 }
 
 
-} // namespace agentinodata
+} // namespace imtservice
 
 

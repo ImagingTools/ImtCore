@@ -107,22 +107,34 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	if (object.value("type") == "connection_init"){
 		m_type = MT_CONNECTION_INIT;
 	}
-	if (object.value("type") == "connection_ask"){
-		m_type = MT_CONNECTION_ASK;
+	if (object.value("type") == "connection_ack"){
+		m_type = MT_CONNECTION_ACK;
 	}
 	if (object.value("type") == "start"){
 		m_type = MT_START;
 	}
-	if (object.value("type") == "start_ask"){
-		m_type = MT_START_ASK;
+	if (object.value("type") == "subscribe"){
+		m_type = MT_START;
+	}
+	if (object.value("type") == "start_ack"){
+		m_type = MT_START_ACK;
 	}
 	if (object.value("type") == "error"){
+		m_type = MT_ERROR;
+	}
+	if (object.value("type") == "connection_error"){
 		m_type = MT_ERROR;
 	}
 	if (object.value("type") == "stop"){
 		m_type = MT_STOP;
 	}
+	if (object.value("type") == "unsubscribe"){
+		m_type = MT_STOP;
+	}
 	if (object.value("type") == "data"){
+		m_type = MT_DATA;
+	}
+	if (object.value("type") == "next"){
 		m_type = MT_DATA;
 	}
 	if (object.value("type") == "query"){
@@ -132,6 +144,12 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 		m_type = MT_QUERY_DATA;
 	}
 	if (object.value("type") == "keep_alive"){
+		m_type = MT_KEEP_ALIVE;
+	}
+	if (object.value("type") == "ping"){
+		m_type = MT_KEEP_ALIVE;
+	}
+	if (object.value("type") == "pong"){
 		m_type = MT_KEEP_ALIVE;
 	}
 

@@ -1,11 +1,11 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QUrl>
-
 // ACF includes
 #include <iser/ISerializable.h>
+
+// ImtCore includes
+#include <imtcom/IServerConnectionInterface.h>
 
 
 namespace imtservice
@@ -40,10 +40,11 @@ public:
 		Get connection usage id.
 	*/
 	virtual QByteArray GetUsageId() const = 0;
+
 	/**
-		Get default url params.
+		Get default service interface.
 	*/
-	virtual QUrl GetDefaultUrl() const = 0;
+	virtual const imtcom::IServerConnectionInterface& GetDefaultInterface() const = 0;
 };
 
 

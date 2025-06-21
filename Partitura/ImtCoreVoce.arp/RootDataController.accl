@@ -2,30 +2,30 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfoController" X="150" Y="525" Note=""/>
-        <Element ComponentName="AuthorizationOptions" X="350" Y="375" Note=""/>
-        <Element ComponentName="Demultiplexer" X="575" Y="125" Note=""/>
-        <Element ComponentName="PagesController" X="824" Y="379" Note=""/>
-        <Element ComponentName="PermissionsController" X="125" Y="375" Note=""/>
-        <Element ComponentName="ProfileController" X="850" Y="525" Note=""/>
-        <Element ComponentName="SlaveDemultiplexer" X="1050" Y="375" Note=""/>
-        <Element ComponentName="UserSettings" X="475" Y="525" Note=""/>
+        <Element ComponentName="ApplicationInfoController" X="160" Y="20" Note=""/>
+        <Element ComponentName="AuthorizationOptions" X="340" Y="-140" Note=""/>
+        <Element ComponentName="Demultiplexer" X="640" Y="-220" Note=""/>
+        <Element ComponentName="PagesController" X="1020" Y="120" Note=""/>
+        <Element ComponentName="PermissionsController" X="-60" Y="-140" Note=""/>
+        <Element ComponentName="ProfileController" X="760" Y="120" Note=""/>
+        <Element ComponentName="SlaveDemultiplexer" X="1180" Y="-240" Note=""/>
+        <Element ComponentName="UserSettings" X="460" Y="120" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="UserSettings">
             <PositionMap>
-                <Element ComponentName="DatabaseUserSettings" X="600" Y="625" Note=""/>
-                <Element ComponentName="Demultiplexer" X="625" Y="100" Note=""/>
-                <Element ComponentName="SettingsController" X="250" Y="100" Note=""/>
-                <Element ComponentName="TableViewParamController" X="750" Y="375" Note=""/>
-                <Element ComponentName="UserSettings" X="125" Y="375" Note=""/>
-                <Element ComponentName="UserSettingsRepresentation" X="425" Y="375" Note=""/>
+                <Element ComponentName="DatabaseUserSettings" X="560" Y="-40" Note=""/>
+                <Element ComponentName="Demultiplexer" X="1080" Y="-260" Note=""/>
+                <Element ComponentName="SettingsController" X="500" Y="-260" Note=""/>
+                <Element ComponentName="TableViewParamController" X="1020" Y="240" Note=""/>
+                <Element ComponentName="UserSettings" X="-100" Y="-40" Note=""/>
+                <Element ComponentName="UserSettingsRepresentation" X="220" Y="-40" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

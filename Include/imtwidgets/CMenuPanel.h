@@ -113,7 +113,7 @@ protected:
 	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 	virtual void timerEvent(QTimerEvent* event) override;
 
-// reimplemented (QWidget)
+	// reimplemented (QWidget)
 #if QT_VERSION < 0x060000
 	virtual void enterEvent(QEvent* event) override;
 #else

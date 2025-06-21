@@ -2,40 +2,40 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Connection parameters for the server side</Description>
     <Keywords>Port Host Server</Keywords>
     <ElementsList>
-        <Element Id="PumaUrl" PackageId="ImtCorePck" ComponentId="UrlParam">
+        <Element Id="PumaConnectionInterface" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="localhost"/>
+                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="DefaultPumaHost">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="">
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="DefaultPumaHttpPort">
                         <Data IsEnabled="true" Value="7788"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="http"/>
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="DefaultPumaWebSocketPort">
+                        <Data IsEnabled="true" Value="8788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PumaWebSocketPort" PackageId="ImtCorePck" ComponentId="UrlParam">
+        <Element Id="ServerConnectionInterface" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DefaultHost" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="localhost"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="8788"/>
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="DefaultHttpPort">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="ws"/>
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="DefaultWebSocketPort">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -46,49 +46,21 @@
                     <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServerPort</Value>
-                                <Value>WebSocketServerPort</Value>
-                                <Value>PumaUrl</Value>
-                                <Value>PumaWebSocketPort</Value>
+                                <Value>PumaConnectionInterface</Value>
+                                <Value>ServerConnectionInterface</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServerPort</Value>
-                                <Value>WebSocketServerPort</Value>
-                                <Value>PumaUrl</Value>
-                                <Value>PumaWebSocketPort</Value>
+                                <Value>PumaConnectionInterface</Value>
+                                <Value>ServerConnectionInterface</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Default"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ServerPort" PackageId="ImtCorePck" ComponentId="UrlParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="DefaultPort">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="http"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="WebSocketServerPort" PackageId="ImtCorePck" ComponentId="UrlParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="WebSocketDefaultPort">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="ws"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -104,9 +76,7 @@
         <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="ServerConnectionParams"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="PumaUrl" ComponentId="PumaUrl"/>
-        <Component ExportedId="PumaWebSocketPort" ComponentId="PumaWebSocketPort"/>
-        <Component ExportedId="ServerPort" ComponentId="ServerPort"/>
-        <Component ExportedId="WebSocketServerPort" ComponentId="WebSocketServerPort"/>
+        <Component ExportedId="PumaConnectionInterface" ComponentId="PumaConnectionInterface"/>
+        <Component ExportedId="ServerConnectionInterface" ComponentId="ServerConnectionInterface"/>
     </ExportedComponents>
 </Acf>

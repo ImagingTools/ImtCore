@@ -1,6 +1,10 @@
 #include <imtservice/CConnectionCollectionComp.h>
 
 
+// ImtCore includes
+#include <imtservice/CUrlConnectionParam.h>
+
+
 namespace imtservice
 {
 
@@ -37,22 +41,14 @@ bool CConnectionCollectionComp::SetServiceTypeName(const QString& /*serviceTypeN
 }
 
 
-const imtbase::ICollectionInfo* CConnectionCollectionComp::GetUrlList() const
+const imtbase::ICollectionInfo* CConnectionCollectionComp::GetServerConnectionList() const
 {
 	return &m_collection;
 }
 
-
-const QUrl* CConnectionCollectionComp::GetUrl(const QByteArray& id) const
+const imtcom::IServerConnectionInterface* CConnectionCollectionComp::GetServerConnection(const QByteArray& id) const
 {
-	CUrlConnectionParam* urlConnectionParam =  dynamic_cast<CUrlConnectionParam*>(const_cast<istd::IChangeable*>(m_collection.GetObjectPtr(id)));
-	if (urlConnectionParam != nullptr){
-		QUrl* url = new QUrl(urlConnectionParam->GetUrl());
-
-		return url;
-	}
-
-	return nullptr;
+	return dynamic_cast<imtcom::IServerConnectionInterface*>(const_cast<istd::IChangeable*>(m_collection.GetObjectPtr(id)));
 }
 
 
@@ -68,7 +64,7 @@ const IServiceConnectionInfo* CConnectionCollectionComp::GetConnectionMetaInfo(c
 }
 
 
-bool CConnectionCollectionComp::SetUrl(const QByteArray& id, const QUrl& url) const
+bool CConnectionCollectionComp::SetServerConnectionInterface(const QByteArray& id, const imtcom::IServerConnectionInterface& connectionInterface)
 {
 	const istd::IChangeable* objectPtr = m_collection.GetObjectPtr(id);
 	if (objectPtr == nullptr){
@@ -80,15 +76,16 @@ bool CConnectionCollectionComp::SetUrl(const QByteArray& id, const QUrl& url) co
 		return false;
 	}
 
-	CUrlConnectionParam* urlConnectionParam =  dynamic_cast<CUrlConnectionParam*>(notConstObjectPtr);
+	imtcom::IServerConnectionInterface* urlConnectionParam =  dynamic_cast<imtcom::IServerConnectionInterface*>(notConstObjectPtr);
 	if (urlConnectionParam != nullptr){
 		bool retVal = true;
 
 		for (int index = 0; index < m_connectionUsageIds.GetCount(); index++){
 			if (id == m_connectionUsageIds[index]){
-				if (index < m_connectionUrlListCompPtr.GetCount()){
-					retVal = retVal && m_connectionUrlListCompPtr[index]->SetUrl(url);
-					retVal = retVal && urlConnectionParam->SetUrl(url);
+				if (index < m_serverInterfaceListCompPtr.GetCount()){
+					retVal = retVal && m_serverInterfaceListCompPtr[index]->CopyFrom(connectionInterface);
+
+					retVal = retVal && urlConnectionParam->CopyFrom(connectionInterface);
 
 					break;
 				}
@@ -141,12 +138,12 @@ void CConnectionCollectionComp::OnComponentCreated()
 	m_collection.RegisterFactory<FactoryConnectionImpl>("ConnectionInfo");
 
 	if (
-		m_connectionUrlListCompPtr.IsValid() &&
+		m_serverInterfaceListCompPtr.IsValid() &&
 		m_connectionUsageIds.GetCount() == m_connectionNames.GetCount() &&
 		m_connectionUsageIds.GetCount() == m_connectionServiceTypeNames.GetCount() &&
 		m_connectionUsageIds.GetCount() == m_connectionDescriptions.GetCount() &&
 		m_connectionUsageIds.GetCount() == m_connectionTypes.GetCount() &&
-		m_connectionUsageIds.GetCount() == m_connectionUrlListCompPtr.GetCount()){
+		m_connectionUsageIds.GetCount() == m_serverInterfaceListCompPtr.GetCount()){
 		for (int index = 0; index < m_connectionUsageIds.GetCount(); index++){
 			IServiceConnectionInfo::ConnectionType connectionType = IServiceConnectionInfo::CT_INPUT;
 			if (m_connectionTypes[index] == 1){
@@ -154,7 +151,6 @@ void CConnectionCollectionComp::OnComponentCreated()
 			}
 			QByteArray name = m_connectionNames[index];
 			QByteArray serviceTypeName = m_connectionServiceTypeNames[index];
-			QUrl url = m_connectionUrlListCompPtr[index]->GetUrl();
 			QByteArray connectionUsageId = m_connectionUsageIds[index];
 			QByteArray description = m_connectionDescriptions[index];
 
@@ -162,7 +158,7 @@ void CConnectionCollectionComp::OnComponentCreated()
 			urlConnectionParam.SetServiceTypeName(serviceTypeName);
 			urlConnectionParam.SetUsageId(connectionUsageId);
 			urlConnectionParam.SetConnectionType(connectionType);
-			urlConnectionParam.SetUrl(url);
+			urlConnectionParam.SetDefaultServiceInterface(*m_serverInterfaceListCompPtr[index]);
 			
 			QByteArray retVal = m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, connectionUsageId);
 			if (retVal.isEmpty()){

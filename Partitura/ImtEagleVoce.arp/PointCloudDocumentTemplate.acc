@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5347" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2248" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -102,8 +102,14 @@
                     <Element Id="PointCloudView" PackageId="Imt3dGuiPck" ComponentId="PointCloudView">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="AxisLengthWidth" Type="Real" ExportId="">
+                                    <Data IsEnabled="true" Value="4"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Camera" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="Camera"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="PointSize" Type="Real" ExportId="">
+                                    <Data IsEnabled="true" Value="4"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                                     <Data IsEnabled="false"/>

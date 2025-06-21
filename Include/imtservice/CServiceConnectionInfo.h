@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/CUrlParam.h>
+#include <imtcom/CServerConnectionInterfaceParam.h>
 #include <imtservice/IServiceConnectionInfo.h>
 #include <imtservice/IConnectionStatus.h>
 
@@ -12,26 +12,26 @@ namespace imtservice
 
 
 class CServiceConnectionInfo:
-			public imtbase::CUrlParam,
+			public imtcom::CServerConnectionInterfaceParam,
 			virtual public IServiceConnectionInfo,
 			virtual public imtservice::IConnectionStatus
 {
 public:
-	typedef imtbase::CUrlParam BaseClass;
-	
+	typedef imtcom::CServerConnectionInterfaceParam BaseClass;
+
 	CServiceConnectionInfo();
 	
 	void SetConnectionType(ConnectionType connectionType);
 	void SetServiceTypeName(const QByteArray& serviceTypeName);
 	void SetUsageId(const QByteArray& usageId);
-	void SetDefaultUrl(const QUrl& url);
+	void SetDefaultServiceInterface(const imtcom::IServerConnectionInterface& defaultInterface);
 	
 	// reimplemented (imtservice::IServiceConnectionInfo)
 	virtual ConnectionType GetConnectionType() const override;
 	virtual QByteArray GetServiceTypeName() const override;
 	virtual QByteArray GetUsageId() const override;
-	virtual QUrl GetDefaultUrl() const override;
-	
+	virtual const imtcom::IServerConnectionInterface& GetDefaultInterface() const override;
+
 	// reimplemented (imtservice::IConnectionStatus)
 	virtual ConnectionStatus GetConnectionStatus() const override;
 	
@@ -47,7 +47,7 @@ protected:
 	ConnectionType m_connectionType;
 	QByteArray m_serviceTypeName;
 	QByteArray m_usageId;
-	QUrl m_defaultUrl;
+	imtcom::CServerConnectionInterfaceParam m_defaultConnection;
 	ConnectionStatus m_connectionStatus;
 };
 

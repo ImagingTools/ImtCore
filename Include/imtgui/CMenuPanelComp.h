@@ -20,33 +20,33 @@ namespace imtgui
 
 
 class CMenuPanelCompBase:
-						   public ibase::TModelObserverCompBaseWrap<
-							   iqtgui::TGuiObserverWrap<
-								   iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
-								   imod::TSingleModelObserverBase<iprm::ISelectionParam>>>
+			public ibase::TModelObserverCompBaseWrap<
+						iqtgui::TGuiObserverWrap<
+									iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
+									imod::TSingleModelObserverBase<iprm::ISelectionParam>>>
 {
 public:
 	typedef ibase::TModelObserverCompBaseWrap<
-		iqtgui::TGuiObserverWrap<
-			iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
-			imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
+				iqtgui::TGuiObserverWrap<
+							iqtgui::TGuiComponentBase<imtwidgets::CMenuPanel>,
+							imod::TSingleModelObserverBase<iprm::ISelectionParam>>> BaseClass;
 
 	I_BEGIN_COMPONENT(CMenuPanelCompBase);
-	I_ASSIGN(m_animationDelayAttrPtr, "AnimationDelay", "Animation delay", true, 800);
-	I_ASSIGN(m_animationDurationAttrPtr, "AnimationDuration", "Animation duration", true, 150);
-	I_ASSIGN(m_animationEnabledAttrPtr, "AnimationEnabled", "Animation enabled", true, true);
-	I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", true, true);
-	I_ASSIGN(m_physicalResolutionAttrPtr, "PhysicalResolution", "Physical monitor resolution", true, 3.5);
-	I_ASSIGN(m_indentAttrPtr, "Indent", "Item indentation", true, 6);
-	I_ASSIGN(m_itemHeightAttrPtr, "ItemHeight", "Item Height", true, 15);
-	I_ASSIGN(m_iconSizeRatioAttrPtr, "IconSizeRatio", "Icon size ratio relative to item height", true, 1);
-	I_ASSIGN(m_iconSizeHoverRatioAttrPtr, "IconSizeHoverRatio", "Icon size ratio under mouse (relative to item normal size)", true, 1.2);
-	I_ASSIGN(m_fontSizeRatioAttrPtr, "FontSizeRatio", "Font pixel size ratio relative to icon size", true, 0.3);
-	I_ASSIGN(m_topPaddingAttrPtr, "TopPadding", "Top panel padding", true, 1);
-	I_ASSIGN(m_leftPaddingAttrPtr, "LeftPadding", "Left item padding", true, 0);
-	I_ASSIGN(m_rightPaddingAttrPtr, "RightPadding", "Right item padding", true, 20);
-	I_ASSIGN(m_iconToTextPaddingAttrPtr, "IconToTextPadding", "Icon to text item padding", true, 1);
-	I_ASSIGN_MULTI_0(m_bottomPagesIdsAttrPtr, "BottomPagesIds", "The list of pages ids that should be placed at bottom of the page", false);
+		I_ASSIGN(m_animationDelayAttrPtr, "AnimationDelay", "Animation delay", true, 800);
+		I_ASSIGN(m_animationDurationAttrPtr, "AnimationDuration", "Animation duration", true, 150);
+		I_ASSIGN(m_animationEnabledAttrPtr, "AnimationEnabled", "Animation enabled", true, true);
+		I_ASSIGN(m_isShowOverAttrPtr, "ShowOver", "Show expanded menu over the underlaying widget", true, true);
+		I_ASSIGN(m_physicalResolutionAttrPtr, "PhysicalResolution", "Physical monitor resolution", true, 3.5);
+		I_ASSIGN(m_indentAttrPtr, "Indent", "Item indentation", true, 6);
+		I_ASSIGN(m_itemHeightAttrPtr, "ItemHeight", "Item Height", true, 15);
+		I_ASSIGN(m_iconSizeRatioAttrPtr, "IconSizeRatio", "Icon size ratio relative to item height", true, 1);
+		I_ASSIGN(m_iconSizeHoverRatioAttrPtr, "IconSizeHoverRatio", "Icon size ratio under mouse (relative to item normal size)", true, 1.2);
+		I_ASSIGN(m_fontSizeRatioAttrPtr, "FontSizeRatio", "Font pixel size ratio relative to icon size", true, 0.3);
+		I_ASSIGN(m_topPaddingAttrPtr, "TopPadding", "Top panel padding", true, 1);
+		I_ASSIGN(m_leftPaddingAttrPtr, "LeftPadding", "Left item padding", true, 0);
+		I_ASSIGN(m_rightPaddingAttrPtr, "RightPadding", "Right item padding", true, 20);
+		I_ASSIGN(m_iconToTextPaddingAttrPtr, "IconToTextPadding", "Icon to text item padding", true, 1);
+		I_ASSIGN_MULTI_0(m_bottomPagesIdsAttrPtr, "BottomPagesIds", "The list of pages ids that should be placed at bottom of the page", false);
 	I_END_COMPONENT;
 
 protected:
@@ -74,13 +74,13 @@ public:
 	typedef CMenuPanelCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CMenuPanelComp);
-	I_ASSIGN(m_menuPanelVisibilityCompPtr, "MenuPanelVisibility", "Menu panel visibility status", false, "MenuPanelVisibility");
-	I_ASSIGN_TO(m_menuPanelVisibilityModelCompPtr, m_menuPanelVisibilityCompPtr, false);
-	I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
-	I_ASSIGN(m_monitorInfoProviderCompPtr, "MonitorInfoProvider", "Monitor info provider (count, size, resolution, etc.)", false, "MonitorInfoProvider");
-	I_ASSIGN_TO(m_monitorInfoProviderModelPtr, m_monitorInfoProviderCompPtr, false);
-	I_ASSIGN(m_menuPanelDelegateCompPtr, "MenuPanelDelegate", "Delegate for menu panel", true, "MenuPanelDelegate");
-	I_ASSIGN(m_hideDisabledAttrPtr, "HideDisabled", "Hide disabled items", true, false);
+		I_ASSIGN(m_menuPanelVisibilityCompPtr, "MenuPanelVisibility", "Menu panel visibility status", false, "MenuPanelVisibility");
+		I_ASSIGN_TO(m_menuPanelVisibilityModelCompPtr, m_menuPanelVisibilityCompPtr, false);
+		I_ASSIGN(m_widgetProviderCompPtr, "WidgetProvider", "Widget provider for parent widget", false, "WidgetProvider");
+		I_ASSIGN(m_monitorInfoProviderCompPtr, "MonitorInfoProvider", "Monitor info provider (count, size, resolution, etc.)", false, "MonitorInfoProvider");
+		I_ASSIGN_TO(m_monitorInfoProviderModelPtr, m_monitorInfoProviderCompPtr, false);
+		I_ASSIGN(m_menuPanelDelegateCompPtr, "MenuPanelDelegate", "Delegate for menu panel", true, "MenuPanelDelegate");
+		I_ASSIGN(m_hideDisabledAttrPtr, "HideDisabled", "Hide disabled items", true, false);
 	I_END_COMPONENT;
 
 	CMenuPanelComp();

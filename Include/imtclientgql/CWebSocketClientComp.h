@@ -15,7 +15,7 @@
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
-#include <imtbase/IUrlParam.h>
+#include <imtcom/IServerConnectionInterface.h>
 #include <imtcom/IConnectionController.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtrest/IRequestServlet.h>
@@ -71,7 +71,7 @@ public:
 		I_ASSIGN(m_httpProtocolEngineCompPtr, "HttpProtocolEngine", "Http Protocol engine used in the http client", false, "ProtocolEngine");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the client", true, "ProtocolEngine");
 		I_ASSIGN(m_connectOnCreateAttrPtr, "ConnectOnCreate", "If enabled, the client will be connect to server on after component creation", true, true);
-		I_ASSIGN(m_webSocketServerAddressCompPtr, "WebSocketServerAddress", "Parameter providing the websocket-server address to be connected", true, "WebSocketServerAddress");
+		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Parameter of the server communication interface", true, "ServerConnectionInterface");
 		I_ASSIGN(m_serverLoginAttrPtr, "ServerLoginParam", "Parameter providing the server login to be connected", false, "");
 		I_ASSIGN(m_serverPasswordAttrPtr, "ServerPasswordParam", "Parameter providing the server password to be connected", false, "");
 		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
@@ -164,7 +164,7 @@ private:
 	I_REF(imtrest::IRequestServlet, m_clientRequestHandlerCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_httpProtocolEngineCompPtr);
-	I_REF(imtbase::IUrlParam, m_webSocketServerAddressCompPtr);
+	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerLoginCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerPasswordCompPtr);
 	I_REF(iprm::ITextParam, m_clientIdCompPtr);

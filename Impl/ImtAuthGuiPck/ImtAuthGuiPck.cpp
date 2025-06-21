@@ -59,6 +59,11 @@ I_EXPORT_COMPONENT(
 			"Administration observer qml",
 			"Administration Observer Qm");
 
+I_EXPORT_COMPONENT(
+			ServerConnectionEditor,
+			"Server connection editor",
+			"Server connection editor");
+
 
 } // namespace ImtAuthGuiPck
 

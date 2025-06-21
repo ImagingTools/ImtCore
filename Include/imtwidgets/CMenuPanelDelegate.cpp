@@ -123,7 +123,7 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 {
 	QSize size;
 
-	if (index.row() == 0 && !index.parent().isValid()) {
+	if (index.row() == 0 && !index.parent().isValid()){
 		size.setHeight(m_height + m_topPadding);
 	}
 	else{
@@ -247,14 +247,14 @@ void CMenuPanelDelegate::paint(QPainter* painter, const QStyleOptionViewItem& op
 
 	QIcon icon = index.data(Qt::DecorationRole).value<QIcon>();
 	QPixmap iconPixmap = icon.pixmap(
-		iconSize,
-		iconSize,
-		iconMode);
+				iconSize,
+				iconSize,
+				iconMode);
 
 	option.widget->style()->drawItemPixmap(
-		painter, iconRect,
-		Qt::AlignHCenter | Qt::AlignVCenter,
-		iconPixmap);
+				painter, iconRect,
+				Qt::AlignHCenter | Qt::AlignVCenter,
+				iconPixmap);
 
 	// Draw text:
 	QString text = index.data(Qt::DisplayRole).toString();

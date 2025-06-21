@@ -20,7 +20,7 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUrlConnectionParamComp);
-		I_REGISTER_INTERFACE(imtbase::IUrlParam);
+		I_REGISTER_INTERFACE(imtcom::IServerConnectionInterface);
 		I_REGISTER_INTERFACE(imtservice::IServiceConnectionParam);
 		I_REGISTER_INTERFACE(istd::IChangeable);
 	I_END_COMPONENT;

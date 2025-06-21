@@ -19,6 +19,7 @@
 #include <imtrest/IRequestManager.h>
 #include <imtrest/CWebSocketSender.h>
 #include <imtrest/IServer.h>
+#include <imtcom/IServerConnectionInterface.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtcom/ISslConfigurationManager.h>
 
@@ -29,8 +30,9 @@ namespace imtrest
 
 class CWebSocketThread;
 
+
 /**
-	TCP-based communication server.
+	WebSocket-based communication server.
 	The server uses the underlaying protocol engine for creation of requests and responses.
 */
 class CWebSocketServerComp:
@@ -38,7 +40,6 @@ class CWebSocketServerComp:
 			public ilog::CLoggerComponentBase,
 			virtual public IRequestManager,
 			virtual public imtcom::IConnectionStatusProvider,
-			virtual public istd::IChangeable,
 			virtual public IServer
 {
 	Q_OBJECT
@@ -55,10 +56,10 @@ public:
 		I_ASSIGN(m_httpProtocolEngineCompPtr, "HttpProtocolEngine", "Http Protocol engine used in the server", false, "HttpProtocolEngine");
 		I_ASSIGN(m_subscriberEngineCompPtr, "SubscriberEngine", "Subscriber engine used in the server", false, "SubscriberEngine");
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
-		I_ASSIGN(m_webSocketServerPortCompPtr, "WebSocketServerPort", "Parameter providing the WebSocket-server port to be listened", false, "WebSocketServerPort");
+		I_ASSIGN(m_webServerInterfaceCompPtr, "WebServerConnectionInterface", "Parameter providing the WebSocket-server port to be listened", true, "WebServerConnectionInterface");
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
-		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded grapgQl requests", false, "");
+		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded GraphQL-requests", false, "");
 	I_END_COMPONENT
 
 	IProtocolEngine* GetProtocolEngine();
@@ -119,14 +120,13 @@ protected:
 	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 	QMap <QByteArray, imtcom::IConnectionStatusProvider::ConnectionStatus> m_senderLoginStatusMap;
 	mutable QReadWriteLock m_sendersLock;
-
 private:
 	I_REF(imtrest::IRequestServlet, m_requestServerHandlerCompPtr);
 	I_REF(imtrest::IRequestServlet, m_requestClientHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(ISubscriberEngine, m_subscriberEngineCompPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
-	I_REF(imtbase::IUrlParam, m_webSocketServerPortCompPtr);
+	I_REF(imtcom::IServerConnectionInterface, m_webServerInterfaceCompPtr);
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 	I_REF(IProtocolEngine, m_httpProtocolEngineCompPtr);

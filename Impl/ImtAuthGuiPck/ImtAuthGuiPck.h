@@ -15,6 +15,7 @@
 #include <imtauthgui/CStandardLoginGuiComp.h>
 #include <imtauthgui/CRemoteStandardLoginGuiComp.h>
 #include <imtauthgui/CAdministrationObserverQmlComp.h>
+#include <imtauthgui/CServerConnectionEditorComp.h>
 
 
 namespace ImtAuthGuiPck
@@ -30,6 +31,7 @@ typedef imtauthgui::CStandardAccountMenuComp StandardAccountMenu;
 typedef imtauthgui::CStandardLoginGuiComp StandardLoginGui;
 typedef imtauthgui::CRemoteStandardLoginGuiComp RemoteStandardLoginGui;
 typedef imtauthgui::CAdministrationObserverQmlComp AdministrationObserverQml;
+typedef imtauthgui::CServerConnectionEditorComp ServerConnectionEditor;
 
 
 } // namespace ImtAuthGuiPck

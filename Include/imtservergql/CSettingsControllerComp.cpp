@@ -214,9 +214,9 @@ sdl::imtbase::Settings::CStyleData CSettingsControllerComp::OnGetStyleData(
 sdl::imtbase::ImtBaseTypes::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl(
 			const sdl::imtbase::Settings::CGetWebSocketUrlGqlRequest& /*getWebSocketUrlRequest*/,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
-	if (!m_webSocketUrlParamCompPtr.IsValid()){
+	if (!m_serverInterfaceCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'WebSocketUrlParam' was not set", "CSettingsControllerComp");
 		return sdl::imtbase::ImtBaseTypes::CUrlParam();
 	}
@@ -224,13 +224,19 @@ sdl::imtbase::ImtBaseTypes::CUrlParam CSettingsControllerComp::OnGetWebSocketUrl
 	sdl::imtbase::ImtBaseTypes::CUrlParam response;
 	response.Version_1_0.emplace();
 	
-	QUrl url = m_webSocketUrlParamCompPtr->GetUrl();
+	QUrl url;
 	
-	response.Version_1_0->host = url.host();
-	response.Version_1_0->port = url.port();
-	response.Version_1_0->scheme = url.scheme();
-	
-	return response;
+	if (m_serverInterfaceCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url)){
+		response.Version_1_0->host = url.host();
+		response.Version_1_0->port = url.port();
+		response.Version_1_0->scheme = url.scheme();
+
+		return response;
+	}
+
+	errorMessage = "Websocket URL could not be provided";
+
+	return sdl::imtbase::ImtBaseTypes::CUrlParam();
 }
 
 

@@ -50,6 +50,14 @@ void CProductInstanceInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet&
 	//CustomerNameEdit->setText(productInstanceInfoPtr->GetCustomerId());
 }
 
+void CProductInstanceInfoViewComp::OnGuiDesignChanged()
+{
+	BaseClass::OnGuiDesignChanged();
+
+	LoadLicenseButton->setIcon(GetIcon(":/Icons/Import"));
+	NewLicenseRequestButton->setIcon(GetIcon(":/Icons/DocumentExport"));
+}
+
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
@@ -166,8 +174,8 @@ void CProductInstanceInfoViewComp::UpdateFeatureTree()
 
 
 void CProductInstanceInfoViewComp::OnImportLicenseEnabled(
-	const istd::IChangeable::ChangeSet& /*changeSet*/,
-	const iprm::IEnableableParam* licenseImportEnablerPtr)
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const iprm::IEnableableParam* licenseImportEnablerPtr)
 {
 	Q_ASSERT(licenseImportEnablerPtr != nullptr);
 
@@ -176,8 +184,8 @@ void CProductInstanceInfoViewComp::OnImportLicenseEnabled(
 
 
 void CProductInstanceInfoViewComp::OnLicenseRequestEnabled(
-	const istd::IChangeable::ChangeSet& /*changeSet*/,
-	const iprm::IEnableableParam* licenseRequstEnablerPtr)
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const iprm::IEnableableParam* licenseRequstEnablerPtr)
 {
 	Q_ASSERT(licenseRequstEnablerPtr != nullptr);
 

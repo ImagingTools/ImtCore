@@ -2,35 +2,51 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4937" Description="ACF"/>
-            <Version Id="1" Number="2148" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ComposedGui" PackageId="QtGuiPck" ComponentId="ComposedGui">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Guis" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ToolBar</Value>
-                                <Value>ObjectCollectionView</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ObjectCollectionView" PackageId="ImtGuiPck" ComponentId="ObjectCollectionView">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CenterToolBarCommandGroupId" Type="Integer" ExportId="CenterToolBarCommandGroupId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ColumnSettingsKey" Type="Id" ExportId="ColumnSettingsKey">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompelxCollectionFilter" Type="Reference" ExportId="CompelxCollectionFilter">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="ObjectCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="FilterParamsGui" Type="Reference" ExportId="FilterParamsGui">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FilterSelection" Type="Reference" ExportId="FilterSelection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LeftToolBarCommandGroupId" Type="Integer" ExportId="LeftToolBarCommandGroupId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PaginationGui" Type="Reference" ExportId="PaginationGui">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RightToolBarCommandGroupId" Type="Integer" ExportId="RightToolBarCommandGroupId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseCloseButton" Type="Boolean" ExportId="UseCloseButton">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseSearchWidget" Type="Boolean" ExportId="UseSearchWidget">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ViewDelegates" Type="Reference[]" ExportId="ViewDelegates">
@@ -39,6 +55,12 @@
                                 <Value>StandardCollectionViewDelegate</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewFilter" Type="Boolean" ExportId="ViewFilter">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewRightPanel" Type="Boolean" ExportId="ViewRightPanel">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -55,32 +77,16 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ToolBar" PackageId="QtGuiPck" ComponentId="CommandsToolBar">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ButtonStyle" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="3"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandsProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ObjectCollectionView/Commands"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IconSize" Type="Integer" ExportId="IconSize">
-                        <Data IsEnabled="true" Value="24"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="ibase::IProgressManager" ComponentId="ObjectCollectionView"/>
         <Interface InterfaceId="imod::IModelEditor" ComponentId="ObjectCollectionView"/>
         <Interface InterfaceId="imod::IObserver" ComponentId="ObjectCollectionView"/>
-        <Interface InterfaceId="imtbase::IObjectCollectionEventHandler" ComponentId="ObjectCollectionView"/>
-        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="ComposedGui"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="ObjectCollectionView"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ObjectCollectionView"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="Commands" ComponentId="ObjectCollectionView/Commands"/>
-        <Component ExportedId="VisualStatus" ComponentId="ComposedGui/VisualStatus"/>
+        <Component ExportedId="VisualStatus" ComponentId="ObjectCollectionView/VisualStatus"/>
     </ExportedComponents>
 </Acf>

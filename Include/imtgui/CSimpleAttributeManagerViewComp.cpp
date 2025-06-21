@@ -17,7 +17,7 @@ namespace imtgui
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
-void CSimpleAttributeManagerViewComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
+void CSimpleAttributeManagerViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	iwidgets::ClearLayout(Infos->layout());
 

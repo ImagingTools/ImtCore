@@ -35,7 +35,6 @@ iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 	Q_ASSERT(m_customSchemaParamsCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-
 	if (!m_argumentParserCompPtr->IsCppEnabled()){
 		return TS_OK;
 	}

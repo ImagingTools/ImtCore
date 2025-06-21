@@ -141,7 +141,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 
 		switch (webSocketRequest->GetMethodType())
 		{
-		case imtrest::CWebSocketRequest::MT_CONNECTION_ASK:
+		case imtrest::CWebSocketRequest::MT_CONNECTION_ACK:
 			for (const QByteArray& subscriptionId : m_registeredClients.keys()){
 				if (m_registeredClients[subscriptionId].m_status == imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION){
 					istd::TDelPtr<istd::IChangeable> objectPtr(m_registeredClients[subscriptionId].m_request.CloneMe());
@@ -155,7 +155,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			}
 		break;
 
-		case imtrest::CWebSocketRequest::MT_START_ASK:{
+		case imtrest::CWebSocketRequest::MT_START_ACK:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
 			if (m_registeredClients.contains(subscriptionId)){
 				m_registeredClients[subscriptionId].m_status = imtclientgql::IGqlSubscriptionClient::SS_REGISTERED;

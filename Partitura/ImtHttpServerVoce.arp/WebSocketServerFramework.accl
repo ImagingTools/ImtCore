@@ -2,18 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5385" Description="ACF"/>
-            <Version Id="1" Number="2247" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="SslConfigurationManager" X="225" Y="300" Note=""/>
-        <Element ComponentName="SubscriptionManager" X="920" Y="620" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="280" Y="620" Note=""/>
-        <Element ComponentName="WebSocketServer" X="580" Y="440" Note=""/>
-        <Element ComponentName="WebSocketServlet" X="550" Y="325" Note=""/>
-        <Element ComponentName="WorkerManager" X="850" Y="350" Note=""/>
+        <Element ComponentName="SslConfigurationManager" X="80" Y="0" Note=""/>
+        <Element ComponentName="SubscriptionManager" X="740" Y="160" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="1000" Y="0" Note=""/>
+        <Element ComponentName="WebSocketServer" X="360" Y="0" Note=""/>
+        <Element ComponentName="WebSocketServlet" X="740" Y="-220" Note=""/>
+        <Element ComponentName="WorkerManager" X="360" Y="-120" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

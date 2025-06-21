@@ -5,8 +5,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtbase/IUrlParam.h>
-#include <imtbase/TModelUpdateBinder.h>
+#include <imtcom/IServerConnectionInterface.h>
 #include <imtclientgql/IClientProtocolEngine.h>
 
 
@@ -23,7 +22,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlClientEngineComp);
 		I_REGISTER_INTERFACE(imtclientgql::IClientProtocolEngine);
-		I_ASSIGN(m_urlParamCompPtr, "UrlParam", "The object holds connection's URL", false, "UrlParam");
+		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Server connnection settings", true, "ServerConnectionInterface");
 		I_ASSIGN(m_prefixServerAttrPtr, "ServerPrefix", "Prefix Server", false, "/");
 	I_END_COMPONENT;
 
@@ -32,20 +31,9 @@ public:
 	// reimplemented (imtclientgql::IClientProtocolEngine)
 	virtual QNetworkRequest* CreateNetworkRequest(const imtgql::IGqlRequest& request, imtbase::IUrlParam* = nullptr) const override;
 
-protected:
-	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr);
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
-
 private:
 	I_ATTR(QByteArray, m_prefixServerAttrPtr);
-	I_REF(imtbase::IUrlParam, m_urlParamCompPtr);
-
-	imtbase::TModelUpdateBinder<imtbase::IUrlParam, CGqlClientEngineComp> m_urlParamObserver;
-
-	mutable QUrl m_workingUrl;
+	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionCompPtr);
 };
 
 

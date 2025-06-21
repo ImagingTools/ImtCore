@@ -110,6 +110,7 @@ const ISender* CTcpServerComp::GetSender(const QByteArray& requestId) const
 
 
 // reimplemented (imtrest::IServer)
+
 bool CTcpServerComp::StartServer()
 {
 	return EnsureServerStarted();
@@ -139,7 +140,6 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 	if (m_serverPtr->listen(address, port)){
 		QString message = QString("Tcp server successfully started on port %1").arg(port);
 
-		qDebug() << message;
 		SendInfoMessage(0, message);
 
 		connect(m_serverPtr.GetPtr(), &CMultiThreadServer::NewThreadConnection, this, &CTcpServerComp::OnNewThreadConnection);
@@ -181,14 +181,13 @@ bool CTcpServerComp::EnsureServerStarted()
 
 			m_serverPtr->SetSslConfiguration(sslConfiguration);
 
-			QString message = QString("Secure connection (SSL) enabled on TCP server");
-			qDebug() << message;
+			QString message = QString("Secure connection (SSL) enabled on Tcp server");
 			SendInfoMessage(0, message);
 		}
 	}
 
-	if (m_serverPortCompPtr.IsValid()){
-		int port = m_serverPortCompPtr->GetUrl().port();
+	if (m_serverConnnectionInterfaceCompPtr.IsValid()){
+		int port = m_serverConnnectionInterfaceCompPtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP);
 
 		return StartListening(QHostAddress::Any, port);
 	}

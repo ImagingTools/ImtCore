@@ -2,15 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5385" Description="ACF"/>
-            <Version Id="1" Number="2247" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5387" Description="ACF"/>
+            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApiClient" X="225" Y="325" Note=""/>
         <Element ComponentName="CheckPermissionOr" X="950" Y="775" Note=""/>
-        <Element ComponentName="ConnectionStatusSubscriberController" X="975" Y="450" Note=""/>
+        <Element ComponentName="ConnectionStatusSubscriberController" X="1080" Y="400" Note=""/>
         <Element ComponentName="Demultiplexer" X="650" Y="150" Note=""/>
         <Element ComponentName="GqlJwtSessionController" X="725" Y="275" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="125" Y="500" Note=""/>
@@ -18,12 +18,12 @@
         <Element ComponentName="RemoteDocumentRevisionController" X="650" Y="675" Note=""/>
         <Element ComponentName="RemoteJwtSessionController" X="450" Y="275" Note=""/>
         <Element ComponentName="RemoteObjectVisualStatusController" X="450" Y="375" Note=""/>
-        <Element ComponentName="RemoteRepositories" X="975" Y="200" Note=""/>
+        <Element ComponentName="RemoteRepositories" X="1060" Y="160" Note=""/>
         <Element ComponentName="RemoteRepresentationController" X="225" Y="150" Note=""/>
         <Element ComponentName="RevisionPermissions" X="325" Y="775" Note=""/>
         <Element ComponentName="RoleMetaInfoControllerProxy" X="550" Y="450" Note=""/>
-        <Element ComponentName="SlaveSubscriberController" X="975" Y="325" Note=""/>
-        <Element ComponentName="Subscription" X="975" Y="600" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="1060" Y="280" Note=""/>
+        <Element ComponentName="Subscription" X="1080" Y="520" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

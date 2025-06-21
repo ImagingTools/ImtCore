@@ -230,6 +230,8 @@ void CWebSocketClientComp::OnTimeout()
 
 void CWebSocketClientComp::OnWebSocketConnected()
 {
+	SendInfoMessage(0, "WebSocket connected", "CWebSocketClientComp");
+
 	QString clientId;
 	if (m_clientIdAttrPtr.IsValid()){
 		clientId = *m_clientIdAttrPtr;
@@ -254,6 +256,8 @@ void CWebSocketClientComp::OnWebSocketConnected()
 
 void CWebSocketClientComp::OnWebSocketDisconnected()
 {
+	SendInfoMessage(0, "WebSocket disconnected", "CWebSocketClientComp");
+
 	m_connectionStatusProvider.SetConnectionStatus(imtcom::IConnectionStatusProvider::CS_DISCONNECTED);
 	m_startQueries.Reset();
 	m_refreshTimer.start();
@@ -303,7 +307,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 	imtrest::ConstResponsePtr responsePtr;
 	imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 	if (
-			methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ASK ||
+			methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ACK ||
 			methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE
 			){
 	}
@@ -315,7 +319,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 		emit EmitQueryDataReceived(1);
 	}
 	else if (	methodType == imtrest::CWebSocketRequest::MT_ERROR ||
-				methodType == imtrest::CWebSocketRequest::MT_START_ASK ||
+				methodType == imtrest::CWebSocketRequest::MT_START_ACK ||
 				methodType == imtrest::CWebSocketRequest::MT_START ||
 				methodType == imtrest::CWebSocketRequest::MT_DATA){
 		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
@@ -393,11 +397,13 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 	QString path;
 	int port = 0;
 
-	if (m_webSocketServerAddressCompPtr.IsValid()){
-		QUrl url = m_webSocketServerAddressCompPtr->GetUrl();
-		host = url.host();
-		port = url.port();
-		path = url.path();
+	if (m_serverConnectionCompPtr.IsValid()){
+		QUrl url;
+		if (m_serverConnectionCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url)){
+			host = url.host();
+			port = url.port();
+			path = url.path();
+		}
 	}
 
 	QJsonObject authorization;
@@ -428,6 +434,8 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 			}
 		}
 	}
+
+	SendInfoMessage(0, QString("Try connect to the WebSocket-server: %1").arg(url.toString()));
 
 	m_webSocket.open(url);
 }

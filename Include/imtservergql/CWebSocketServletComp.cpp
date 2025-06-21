@@ -83,7 +83,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 {
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest != nullptr){
-		QByteArray data = QString(R"({"type": "connection_ask","payload": {"connectionTimeoutMs": 300000}})").toUtf8();
+		QByteArray data = QString(R"({"type": "connection_ack","payload": {"connectionTimeoutMs": 300000}})").toUtf8();
 
 		return CreateDataResponse(data, request);
 	}
@@ -161,7 +161,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	if (subscriberControllerPtr != nullptr){
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscription(webSocketRequest->GetRequestId(), gqlRequest, request, errorMessage)){
-			QByteArray data = QString(R"({"type": "start_ask","id": "%1"})")
+			QByteArray data = QString(R"({"type": "start_ack","id": "%1"})")
 						.arg(QString(webSocketRequest->GetRequestId())).toUtf8();
 
 			return CreateDataResponse(data, request);
@@ -229,7 +229,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(QByteArray 
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
 	QString body = QString(R"({"id": "%1","type": "error","payload": {"errors": [{"errorType": "ProcessRequestError","message": "%2"}]}})")
-							.arg(object["id"].toString(), QString(errorMessage));
+							.arg(object["id"].toString())
+							.arg(QString(errorMessage));
 	
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 

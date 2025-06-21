@@ -287,8 +287,16 @@ bool CLicenseControllerComp::ReadLicenseFromFile(imtlic::IProductInstanceInfo& l
 	if (state != ifile::IFilePersistence::OS_OK){
 		int daysUntilExpire = -1;
 		if (LoadFingerprint(fingerprintFilePath, license, daysUntilExpire)){
-			SendWarningMessage(0, QT_TR_NOOP(QString("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license").arg(daysUntilExpire)), "License Management");
-
+			QByteArray publicKey;
+			if (m_licenseKeysProviderCompPtr.IsValid()){
+				publicKey = m_licenseKeysProviderCompPtr->GetEncryptionKey(imtcrypt::IEncryptionKeysProvider::KT_PUBLIC);
+			}
+			if (!publicKey.isEmpty()){
+				SendWarningMessage(0, QT_TR_NOOP(QString("You have no valid license to run this software anymore. You have %1 day(s) to update your system with a valid license").arg(daysUntilExpire)), "License Management");
+			}
+			else{
+				SendWarningMessage(0, QT_TR_NOOP(QString("Sensor is not connected. You have %1 day(s) for running the software without the sensor.").arg(daysUntilExpire)), "License Management");
+			}
 			m_licenseStatus.SetLicenseStatusFlags(imtlic::ILicenseStatus::LSF_LICENSE_INVALID | imtlic::ILicenseStatus::LSF_GOODWILL);
 
 			m_licenseStatus.SetGoodwillRemainingDays(daysUntilExpire);
