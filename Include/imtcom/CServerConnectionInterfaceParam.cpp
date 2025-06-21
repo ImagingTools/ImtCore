@@ -134,7 +134,7 @@ bool CServerConnectionInterfaceParam::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_host);
 	retVal = retVal && archive.EndTag(hostTag);
 
-	static iser::CArchiveTag connectionFlagsTag("Host", "Name of the host");
+	static iser::CArchiveTag connectionFlagsTag("ConnectionFlags", "Connection settings");
 	retVal = retVal && archive.BeginTag(connectionFlagsTag);
 	retVal = retVal && I_SERIALIZE_FLAG(ConnectionFlags, archive, m_connectionFlags);
 	retVal = retVal && archive.EndTag(connectionFlagsTag);
@@ -163,6 +163,7 @@ int CServerConnectionInterfaceParam::GetSupportedOperations() const
 {
 	return SO_COPY | SO_CLONE | SO_RESET | SO_COMPARE;
 }
+
 
 bool CServerConnectionInterfaceParam::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
