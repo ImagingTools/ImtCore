@@ -194,7 +194,7 @@ void CPointCloudViewComp::SetupGridShape(CGridShape& gridShape) const
 {
 	gridShape.SetGridValue(0.1);
 	gridShape.SetCount(10);
-	gridShape.SetPlanePositionZ(*m_zRangeMinAttrPtr);
+	gridShape.SetPlanePosition(*m_zRangeMinAttrPtr);
 
 	gridShape.SetVisible(*m_defaultShowGridAttrPtr);
 }

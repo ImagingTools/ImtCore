@@ -15,13 +15,19 @@ class CGridShape: public CShape3dBase
 	typedef CShape3dBase BaseClass;
 
 public:
+	enum PlaneMode
+	{
+		PM_XY,
+		PM_XZ,
+		PM_YZ
+	};
+
 	CGridShape();
 
 	void SetGridValue(double gridValue);
 	void SetCount(int count);
-	void SetPlanePositionX(double position);
-	void SetPlanePositionY(double position);
-	void SetPlanePositionZ(double position);
+	void SetPlanePosition(double position);
+	void SetPlaneMode(PlaneMode planeMode);
 
 protected:
 	// reimplement (imt3dgui::CShape3dBase)
@@ -32,14 +38,19 @@ protected:
 	virtual QVector3D GetColor() const override { return QVector3D(0.5, 0.5, 0.5); }
 
 private:
+	typedef std::vector<imt3d::CPointCloud3d::PointXyz32> Vertices;
+	void CreateXyPlane(Vertices& vertices, double planePosition) const;
+	void CreateXzPlane(Vertices& vertices, double planePosition) const;
+	void CreateYzPlane(Vertices& vertices, double planePosition) const;
+
+private:
 	double m_gridValue = 10;
 	int m_count = 10;
 	imt3d::CPointCloud3d m_data;
 	bool m_doUpdate = false;
+	PlaneMode m_planeMode = PM_XY;
 
-	std::optional<double> m_planePositionX;
-	std::optional<double> m_planePositionY;
-	std::optional<double> m_planePositionZ;
+	std::optional<double> m_planePosition;
 };
 
 

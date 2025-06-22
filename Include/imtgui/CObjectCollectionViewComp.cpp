@@ -332,7 +332,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	ItemList->setModel(&m_tableModel);
 
 	m_searchShortCutPtr = new QShortcut(GetQtWidget());
-	m_searchShortCutPtr->setKey(Qt::CTRL + Qt::Key_F);
+	m_searchShortCutPtr->setKey(Qt::CTRL | Qt::Key_F);
 	m_escShortCutPtr = new QShortcut(GetQtWidget());
 	m_escShortCutPtr->setKey(Qt::Key_Escape);
 	m_delShortCutPtr = new QShortcut(GetQtWidget());
@@ -834,7 +834,7 @@ void CObjectCollectionViewComp::UpdateTypeStatus()
 }
 
 
-void CObjectCollectionViewComp::OnComplexFilterUpdate(const istd::IChangeable::ChangeSet&, const imtbase::IComplexCollectionFilter* filterPtr)
+void CObjectCollectionViewComp::OnComplexFilterUpdate(const istd::IChangeable::ChangeSet&, const imtbase::IComplexCollectionFilter* /*filterPtr*/)
 {
 	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 	if (collectionPtr != nullptr){
@@ -1090,7 +1090,7 @@ void CObjectCollectionViewComp::OnTextFilterTimer()
 }
 
 
-void CObjectCollectionViewComp::OnFilterChanged(const QString& text)
+void CObjectCollectionViewComp::OnFilterChanged(const QString& /*text*/)
 {
 	m_textFilterTimer.start();
 }

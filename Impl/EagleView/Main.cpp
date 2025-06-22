@@ -8,17 +8,28 @@
 #include <ibase/IApplication.h>
 #include <GeneratedFiles/EagleView/CEagleView.h>
 
+// ImtCore includes
+#include <imtbase/Init.h>
+#include <imtstyle/CImtStyle.h>
+
 
 int main(int argc, char *argv[])
 {
-	Q_INIT_RESOURCE(AcfLoc);
-	Q_INIT_RESOURCE(AcfSlnLoc);
 	Q_INIT_RESOURCE(EagleView);
+
 	Q_INIT_RESOURCE(imt3dgui);
 	Q_INIT_RESOURCE(imt3dguilight);
 	Q_INIT_RESOURCE(imt3dguidark);
+
+	Q_INIT_RESOURCE(imtguiTheme);
+
+	Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtguilight);
 	Q_INIT_RESOURCE(imtguidark);
+
+	Q_INIT_RESOURCE(imtstyle);
+	Q_INIT_RESOURCE(imtstylelight);
+	Q_INIT_RESOURCE(imtstyledark);
 
 	CEagleView instance;
 

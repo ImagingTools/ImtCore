@@ -8,9 +8,7 @@ namespace imt3dgui
 // public methods
 
 CGridShape::CGridShape()
-	:m_gridValue(0.2),
-	m_count(50),
-	m_doUpdate(true)
+	:m_doUpdate(true)
 {
 	m_pointsDataPtr = &m_data;
 }
@@ -33,30 +31,23 @@ void CGridShape::SetCount(int count)
 	m_doUpdate = true;
 }
 
-void CGridShape::SetPlanePositionX(double position)
+
+void CGridShape::SetPlanePosition(double position)
 {
-	m_planePositionX.emplace();
-	*m_planePositionX = position;
+	m_planePosition.emplace();
+	*m_planePosition = position;
 
 	m_doUpdate = true;
 }
 
 
-void CGridShape::SetPlanePositionY(double position)
+void CGridShape::SetPlaneMode(PlaneMode planeMode)
 {
-	m_planePositionY.emplace();
-	*m_planePositionY = position;
+	if (m_planeMode != planeMode){
+		m_planeMode = planeMode;
 
-	m_doUpdate = true;
-}
-
-
-void CGridShape::SetPlanePositionZ(double position)
-{
-	m_planePositionZ.emplace();
-	*m_planePositionZ = position;
-
-	m_doUpdate = true;
+		m_doUpdate = true;
+	}
 }
 
 
@@ -70,110 +61,26 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 		return;
 	}
 
-	double xPlanePosition = m_gridValue * m_count;
-	if (m_planePositionX.has_value()){
-		xPlanePosition = *m_planePositionX;
-	}
-
-	double yPlanePosition = m_gridValue * m_count;
-	if (m_planePositionY.has_value()){
-		yPlanePosition = *m_planePositionY;
-	}
-
-	double zPlanePosition = m_gridValue * m_count;
-	if (m_planePositionZ.has_value()){
-		zPlanePosition = *m_planePositionZ;
+	double planePosition = m_gridValue * m_count;
+	if (m_planePosition.has_value()){
+		planePosition = *m_planePosition;
 	}
 
 	std::vector<imt3d::CPointCloud3d::PointXyz32> vertices;
-	vertices.reserve(3 * (m_count * 2 + 1));
+	vertices.reserve(3 * (2 * m_count + 1));
 
-	// Draw XY-plane
-	for(int i = -m_count; i <= m_count; ++i){
-		imt3d::CPointCloud3d::PointXyz32 a;
-		a.data[0] = -m_gridValue * i;
-		a.data[1] = -m_gridValue * m_count;
-		a.data[2] = -zPlanePosition;
-		vertices.emplace_back(a);
-
-		imt3d::CPointCloud3d::PointXyz32 b;
-		b.data[0] = -m_gridValue * i;
-		b.data[1] = m_gridValue * m_count;
-		b.data[2] = -zPlanePosition;
-		vertices.emplace_back(b);
-	}
-
-	for(int i = -m_count; i <= m_count; ++i){
-		imt3d::CPointCloud3d::PointXyz32 a;
-		a.data[0] = -m_gridValue * m_count;
-		a.data[1] = -m_gridValue * i;
-		a.data[2] = -zPlanePosition;
-		vertices.emplace_back(a);
-
-		imt3d::CPointCloud3d::PointXyz32 b;
-		b.data[0] = m_gridValue * m_count;
-		b.data[1] = -m_gridValue * i;
-		b.data[2] = -zPlanePosition;
-		vertices.emplace_back(b);
-	}
-
-	//// Draw YZ-plane
-	for(int i = -m_count; i <= m_count; ++i){
-		imt3d::CPointCloud3d::PointXyz32 a;
-		a.data[0] = -xPlanePosition;
-		a.data[1] = -m_gridValue * m_count;
-		a.data[2] = -m_gridValue * i;
-		vertices.emplace_back(a);
-
-		imt3d::CPointCloud3d::PointXyz32 b;
-		b.data[0] = -xPlanePosition;
-		b.data[1] = m_gridValue * m_count;
-		b.data[2] = -m_gridValue * i;
-		vertices.emplace_back(b);
-	}
-
-	for(int i = -m_count; i <= m_count; ++i){
-		imt3d::CPointCloud3d::PointXyz32 a;
-		a.data[0] = -xPlanePosition;
-		a.data[1] = -m_gridValue * i;
-		a.data[2] = -m_gridValue * m_count;
-		vertices.emplace_back(a);
-
-		imt3d::CPointCloud3d::PointXyz32 b;
-		b.data[0] = -xPlanePosition;
-		b.data[1] = -m_gridValue * i;
-		b.data[2] = m_gridValue * m_count;
-		vertices.emplace_back(b);
-	}
-
-
-	// Draw XZ-plane:
-	for (int i = -m_count; i <= m_count; ++i){
-		imt3d::CPointCloud3d::PointXyz32 a;
-		a.data[0] = -m_gridValue * i;
-		a.data[1] = -yPlanePosition;
-		a.data[2] = -m_gridValue * m_count;
-		vertices.emplace_back(a);
-
-		imt3d::CPointCloud3d::PointXyz32 b;
-		b.data[0] = -m_gridValue * i;
-		b.data[1] = -yPlanePosition;
-		b.data[2] = m_gridValue * m_count;
-		vertices.emplace_back(b);
-	}
-
-	for (int i = -m_count; i <= m_count; ++i){
-		imt3d::CPointCloud3d::PointXyz32 a;
-		a.data[0] = -m_gridValue * m_count;
-		a.data[1] = -yPlanePosition;
-		a.data[2] = -m_gridValue * i;
-		vertices.emplace_back(a);
-
-		imt3d::CPointCloud3d::PointXyz32 b;
-		b.data[0] = m_gridValue * m_count;
-		b.data[1] = -yPlanePosition;
-		b.data[2] = -m_gridValue * i;
-		vertices.emplace_back(b);
+	switch (m_planeMode){
+	case PM_XY:
+		CreateXyPlane(vertices, planePosition);
+		break;
+	case PM_XZ:
+		CreateXzPlane(vertices, planePosition);
+		break;
+	case PM_YZ:
+		CreateYzPlane(vertices, planePosition);
+		break;
+	default:
+		Q_ASSERT(false);
 	}
 
 	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZ_32, vertices.size(), vertices.data());
@@ -197,6 +104,104 @@ void CGridShape::DrawShapeGl(QOpenGLShaderProgram& /*program*/, QOpenGLFunctions
 {
 	functions.glLineWidth(1.0f);
 	functions.glDrawElements(GL_LINES, m_indices.count(), GL_UNSIGNED_INT, 0);
+}
+
+
+// private methods
+
+void CGridShape::CreateXyPlane(Vertices& vertices, double planePosition) const
+{
+	for (int i = -m_count; i <= m_count; ++i) {
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = -m_gridValue * i;
+		a.data[1] = -m_gridValue * m_count;
+		a.data[2] = planePosition;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = -m_gridValue * i;
+		b.data[1] = m_gridValue * m_count;
+		b.data[2] = planePosition;
+		vertices.emplace_back(b);
+	}
+
+	for (int i = -m_count; i <= m_count; ++i) {
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = -m_gridValue * m_count;
+		a.data[1] = -m_gridValue * i;
+		a.data[2] = planePosition;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = m_gridValue * m_count;
+		b.data[1] = -m_gridValue * i;
+		b.data[2] = planePosition;
+		vertices.emplace_back(b);
+	}
+}
+
+
+void CGridShape::CreateXzPlane(Vertices& vertices, double planePosition) const
+{
+	for (int i = -m_count; i <= m_count; ++i) {
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = -m_gridValue * i;
+		a.data[1] = planePosition;
+		a.data[2] = -m_gridValue * m_count;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = -m_gridValue * i;
+		b.data[1] = planePosition;
+		b.data[2] = m_gridValue * m_count;
+		vertices.emplace_back(b);
+	}
+
+	for (int i = -m_count; i <= m_count; ++i) {
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = -m_gridValue * m_count;
+		a.data[1] = planePosition;
+		a.data[2] = -m_gridValue * i;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = m_gridValue * m_count;
+		b.data[1] = planePosition;
+		b.data[2] = -m_gridValue * i;
+		vertices.emplace_back(b);
+	}
+}
+
+
+void CGridShape::CreateYzPlane(Vertices& vertices, double planePosition) const
+{
+	for (int i = -m_count; i <= m_count; ++i) {
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = planePosition;
+		a.data[1] = -m_gridValue * m_count;
+		a.data[2] = -m_gridValue * i;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = planePosition;
+		b.data[1] = m_gridValue * m_count;
+		b.data[2] = -m_gridValue * i;
+		vertices.emplace_back(b);
+	}
+
+	for (int i = -m_count; i <= m_count; ++i) {
+		imt3d::CPointCloud3d::PointXyz32 a;
+		a.data[0] = planePosition;
+		a.data[1] = -m_gridValue * i;
+		a.data[2] = -m_gridValue * m_count;
+		vertices.emplace_back(a);
+
+		imt3d::CPointCloud3d::PointXyz32 b;
+		b.data[0] = planePosition;
+		b.data[1] = -m_gridValue * i;
+		b.data[2] = m_gridValue * m_count;
+		vertices.emplace_back(b);
+	}
 }
 
 

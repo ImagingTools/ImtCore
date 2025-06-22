@@ -26,8 +26,9 @@ void CMeshViewComp::OnGuiCreated()
 
 		scenePtr->AddShapeToScene(meshShapePtr);
 
-		m_gridShape.SetGridValue(0.2);
-		m_gridShape.SetCount(15);
+		m_gridShape.SetGridValue(0.1);
+		m_gridShape.SetCount(10);
+		m_gridShape.SetPlanePosition(0.0);
 		m_gridShape.SetVisible(*m_defaultShowGridAttrPtr);
 		scenePtr->AddShapeToScene(&m_gridShape);
 
