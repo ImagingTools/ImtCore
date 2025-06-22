@@ -63,10 +63,10 @@ WebSocket {
 	onTextMessageReceived:{
 		socketModel.createFromJson(message)
 
-		if (socketModel.getData("type") === "connection_ask"){
+		if (socketModel.getData("type") === "connection_ack"){
 			registerSubscriptionToServer()
 		}
-		else if (socketModel.getData("type") === "start_ask"){
+		else if (socketModel.getData("type") === "start_ack"){
 			for (let index = 0; index < subscriptionModel.length; index++){
 				if (subscriptionModel[index]["subscriptionId"] === socketModel.getData("id")){
 					let subscription = subscriptionModel[index]["subscription"]
