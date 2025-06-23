@@ -258,12 +258,13 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 
 		stream << QStringLiteral("= QMetaType::");
 		if (	isEnum ||
-			convertedType == QStringLiteral("QString"))
+				convertedType == QStringLiteral("QString"))
 		{
 			stream << QStringLiteral("QString");
 		}
 		else if (convertedType == QStringLiteral("QByteArray")){
-			stream << QStringLiteral("QByteArray");
+			// known-limitation text protocols do not support the "byte" type. for byte array also use string
+			stream << QStringLiteral("QString");
 		}
 		else if (convertedType == QStringLiteral("int")){
 			stream << QStringLiteral("Double");
