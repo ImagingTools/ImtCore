@@ -133,7 +133,7 @@ Item {
 	}
 	
 	onVisibleChanged: {
-		if (commandsController && visible && internal.localizationChanged){
+		if (commandsController && visible && viewBase.internal__.localizationChanged){
 			commandsController.getCommands()
 		}
 	}
@@ -143,22 +143,22 @@ Item {
 		function onCommandsReceived(typeId, commands){
 			viewBase.commandsView.commandsModel = commands
 			
-			if (viewBase.visible || internal.localizationChanged){
-				internal.updateStatesFromCache()
-				internal.localizationChanged = false
+			if (viewBase.visible || viewBase.internal__.localizationChanged){
+				viewBase.internal__.updateStatesFromCache()
+				viewBase.internal__.localizationChanged = false
 			}
 		}
 	}
 	
 	ApplicationEvents {
 		onLocalizationChanged: {
-			internal.cacheCommandsState();
+			viewBase.internal__.cacheCommandsState();
 			
 			if (viewBase.visible && viewBase.commandsController){
 				viewBase.commandsController.getCommands();
 			}
 			else{
-				internal.localizationChanged = true
+				viewBase.internal__.localizationChanged = true
 			}
 		}
 	}
@@ -179,11 +179,12 @@ Item {
 	// Update representation model from GUI
 	function doUpdateModel()
 	{
-		if (!model){
+		console.debug("doUpdateModel", model, viewBase.internal__);
+		if (!model || !viewBase.internal__){
 			return;
 		}
 		
-		if (readOnly || internal.blockingUpdateModel || internal.blockingUpdateGui){
+		if (readOnly || viewBase.internal__.blockingUpdateModel || viewBase.internal__.blockingUpdateGui){
 			return;
 		}
 		
@@ -193,11 +194,11 @@ Item {
 			model.beginChanges();
 		}
 		
-		internal.blockingUpdateGui = true;
+		viewBase.internal__.blockingUpdateGui = true;
 		
 		updateModel();
 		
-		internal.blockingUpdateGui = false;
+		viewBase.internal__.blockingUpdateGui = false;
 		
 		if (model.endChanges !== undefined){
 			model.endChanges();
@@ -207,38 +208,44 @@ Item {
 	// Update GUI from representation model
 	function doUpdateGui()
 	{
-		if (!model){
+		console.debug("doUpdateGui");
+		console.debug("viewBase.internal__", viewBase.internal__);
+		
+		if (!model || !viewBase.internal__){
 			return;
 		}
 		
-		if (internal.blockingUpdateGui || internal.blockingUpdateModel){
+		if (viewBase.internal__.blockingUpdateGui || viewBase.internal__.blockingUpdateModel){
 			return;
 		}
 		
-		console.debug("doUpdateGui", model);
 		
-		internal.blockingUpdateModel = true;
+		viewBase.internal__.blockingUpdateModel = true;
 		
 		updateGui();
 		
-		internal.blockingUpdateModel = false;
+		viewBase.internal__.blockingUpdateModel = false;
 	}
 	
 	function setBlockingUpdateModel(value){
-		internal.blockingUpdateModel = value;
+		viewBase.internal__.blockingUpdateModel = value;
 	}
 	
 	function setBlockingUpdateGui(value){
-		internal.blockingUpdateGui = value;
+		if (viewBase.internal__){
+			viewBase.internal__.blockingUpdateGui = value;
+		}
 	}
 	
 	function guiIsBlocked(){
-		return internal.blockingUpdateGui;
+		if (!viewBase.internal__){
+			return false
+		}
+
+		return viewBase.internal__.blockingUpdateGui;
 	}
 	
-	QtObject {
-		id: internal;
-		
+	property QtObject internal__: QtObject {
 		property bool localizationChanged: false;
 		property bool blockingUpdateGui: false;
 		property bool blockingUpdateModel: false;
