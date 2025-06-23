@@ -30,14 +30,14 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 		Q_ASSERT_X(false, "Attribute 'UserCollection' was not set", "CProfileControllerComp");
 		return sdl::imtauth::Profile::CProfileData();
 	}
-	
+
 	sdl::imtauth::Profile::GetProfileRequestArguments arguments = getProfileRequest.GetRequestedArguments();
 
 	if (!arguments.input.Version_1_0.has_value()){
 		Q_ASSERT(false);
 		return sdl::imtauth::Profile::CProfileData();
 	}
-	
+
 	QByteArray objectId;
 	if (arguments.input.Version_1_0->id){
 		objectId = *arguments.input.Version_1_0->id;

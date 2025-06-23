@@ -43,7 +43,7 @@
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPort" Type="Reference" ExportId="ServerPort">
+                    <AttributeInfo Id="ServerInterface" Type="Reference" ExportId="ServerInterface">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="SslConfiguration">
@@ -66,9 +66,6 @@
         <Element Id="PumaClientEngine" PackageId="ImtGraphQlVoce" ComponentId="PumaGQLClientEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="HttpUrlParam" Type="Reference" ExportId="PumaUrlParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -84,6 +81,9 @@
                     <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionInterface" Type="Reference" ExportId="PumaServerConnectionInterface">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="SslConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -94,9 +94,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WebSocketUrlParam" Type="Reference" ExportId="PumaWebSocketUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -143,7 +140,7 @@
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerPort" Type="Reference" ExportId="WebSocketServerPort">
+                    <AttributeInfo Id="WebServerConnectionInterface" Type="Reference" ExportId="ServerInterface">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
