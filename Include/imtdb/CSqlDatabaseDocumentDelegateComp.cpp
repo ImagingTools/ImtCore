@@ -1215,13 +1215,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICol
 
 bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
 {
-	QString addedStrQuery = QString(R"((SELECT "%1" FROM "%2" as temp WHERE %3 = 1 AND root."%4" = temp."%4" LIMIT 1))")
-							.arg(
-								qPrintable(s_lastModifiedColumn),
-								qPrintable(*m_tableNameAttrPtr),
-								CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
-								qPrintable(s_documentIdColumn)
-								);
+	QString addedStrQuery = QString(R"(root1."%1")").arg(QString::fromUtf8(s_lastModifiedColumn));
 
 	switch (timeFilter.GetTimeUnit()){
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
