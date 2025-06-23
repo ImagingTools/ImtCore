@@ -265,14 +265,19 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		else if (convertedType == QStringLiteral("QByteArray")){
 			stream << QStringLiteral("QByteArray");
 		}
-		else if (	convertedType == QStringLiteral("int") ||
-				 convertedType == QStringLiteral("long") ||
-				 convertedType == QStringLiteral("qlonglong"))
-		{
+		else if (convertedType == QStringLiteral("int")){
 			stream << QStringLiteral("Double");
 		}
-		else if (	convertedType == QStringLiteral("float") ||
-				 convertedType == QStringLiteral("double"))
+		else if (convertedType == QStringLiteral("long")){
+			stream << QStringLiteral("Long");
+		}
+		else if (convertedType == QStringLiteral("qlonglong")){
+			stream << QStringLiteral("LongLong");
+		}
+		else if (	convertedType == QStringLiteral("float")){
+			stream << QStringLiteral("Float");
+		}
+		else if (convertedType == QStringLiteral("double"))
 		{
 			stream << QStringLiteral("Double");
 		}
@@ -440,18 +445,20 @@ QString CSdlClassGqlModificatorComp::GetConvertEndForFieldString(const imtsdl::C
 	else if (convertedType == QStringLiteral("QByteArray")){
 		retVal += QStringLiteral("ByteArray");
 	}
-	else if (	convertedType == QStringLiteral("float") ||
-				convertedType == QStringLiteral("double"))
-	{
+	else if (convertedType == QStringLiteral("float")){
+		retVal += QStringLiteral("Float");
+	}
+	else if (convertedType == QStringLiteral("double")){
 		retVal += QStringLiteral("Double");
 	}
 	else if (convertedType == QStringLiteral("int")){
 		retVal += QStringLiteral("Int");
 	}
-	else if (	convertedType == QStringLiteral("long") ||
-				convertedType == QStringLiteral("qlonglong"))
-	{
-		retVal += QStringLiteral("Integer");
+	else if (convertedType == QStringLiteral("long")){
+		retVal += QStringLiteral("Long");
+	}
+	else if (convertedType == QStringLiteral("qlonglong")){
+		retVal += QStringLiteral("LongLong");
 	}
 	else if (convertedType == QStringLiteral("bool")){
 		retVal += QStringLiteral("Bool");

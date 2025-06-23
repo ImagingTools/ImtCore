@@ -27,7 +27,6 @@ namespace imtsdlgenv2
 */
 class  CSdlUnionGeneratorComp:
 			public iproc::CSyncProcessorCompBase,
-			private imtsdl::CSdlTools,
 			private imtsdlgenv2::CSdlGenTools,
 			private imtsdl::CSdlUnionConverter
 {
