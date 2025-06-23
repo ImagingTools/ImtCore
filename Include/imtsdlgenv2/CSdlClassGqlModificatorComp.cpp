@@ -227,7 +227,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		stream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
 		stream << field.GetId();
 		stream << QStringLiteral("\") ");
-		if (!expected){
+		if (expected){
 			stream << '!';
 		}
 		else {
