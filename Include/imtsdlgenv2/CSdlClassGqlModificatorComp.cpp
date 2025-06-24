@@ -267,7 +267,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 			stream << QStringLiteral("QString");
 		}
 		else if (convertedType == QStringLiteral("int")){
-			stream << QStringLiteral("Double");
+			stream << QStringLiteral("Int");
 		}
 		else if (convertedType == QStringLiteral("long")){
 			stream << QStringLiteral("Long");
