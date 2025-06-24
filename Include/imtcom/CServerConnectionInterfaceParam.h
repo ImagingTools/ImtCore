@@ -40,7 +40,7 @@ protected:
 	typedef QMap<ProtocolType, int> InterfaceMap;
 	InterfaceMap m_interfaceMap;
 
-	int m_connectionFlags = 0;
+	int m_connectionFlags = CF_DEFAULT;
 	QString m_host;
 };
 
