@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5349" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5398" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -18,9 +18,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="ControlsGallery"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="BaseUrlParam" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LocalSettings/ServerUrl"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -46,6 +43,9 @@
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="ControlsGallery"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerConnectionParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LocalSettings/ServerConnectionInterfaceParam"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Settings" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LocalSettings"/>
                     </AttributeInfo>
@@ -67,8 +67,8 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ClientApplication/TextFileLog"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPort" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LocalSettings/ServerUrl"/>
+                    <AttributeInfo Id="ServerInterface" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LocalSettings/ServerConnectionInterfaceParam"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -84,8 +84,11 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ClientApplication/ApplicationInfo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultServerPort" Type="Integer" ExportId="">
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="5555"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="6666"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ClientApplication/TextFileLog"/>

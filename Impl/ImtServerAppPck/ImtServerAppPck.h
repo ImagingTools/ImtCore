@@ -30,6 +30,7 @@
 #include <imtserverapp/CGuiElementModelComp.h>
 #include <imtserverapp/CGuiElementContainerComp.h>
 #include <imtserverapp/CEnableableParamRepresentationControllerComp.h>
+#include <imtserverapp/CServerConnectionParamRepresentationControllerComp.h>
 
 
 /**
@@ -62,6 +63,7 @@ typedef imtserverapp::CDoubleParamRepresentationControllerComp DoubleParamRepres
 typedef imtserverapp::CPasswordParamRepresentationControllerComp PasswordParamRepresentationController;
 typedef imtserverapp::CServerLogDataProviderComp ServerLogDataProvider;
 typedef imtserverapp::CEnableableParamRepresentationControllerComp EnableableParamRepresentationController;
+typedef imtserverapp::CServerConnectionParamRepresentationControllerComp ServerConnectionParamRepresentationController;
 typedef imtbase::TComponentFactoryComp<imtserverapp::IJsonRepresentationController> RepresentationControllerFactory;
 
 
