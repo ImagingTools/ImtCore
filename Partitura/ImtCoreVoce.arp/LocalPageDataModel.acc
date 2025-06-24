@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5398" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -16,41 +16,30 @@
                     <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServerUrl</Value>
-                                <Value>WebSocketServerUrl</Value>
+                                <Value>ServerConnectionInterfaceParam</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServerUrl</Value>
-                                <Value>WebSocketServerUrl</Value>
+                                <Value>ServerConnectionInterface</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerUrl" PackageId="ImtCorePck" ComponentId="UrlParam">
+        <Element Id="ServerConnectionInterfaceParam" PackageId="ImtComPck" ComponentId="ServerConnectionInterfaceParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="DefaultServerHost">
-                        <Data IsEnabled="true" Value="localhost"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="DefaultServerPort">
+                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="DefaultHost">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="WebSocketServerUrl" PackageId="ImtCorePck" ComponentId="UrlParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="DefaultWebSocketServerHost">
-                        <Data IsEnabled="true" Value="localhost"/>
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="DefaultHttpPort">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="DefaultWebSocketServerPort">
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="DefaultWebSocketPort">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -64,7 +53,6 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Local"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="ServerUrl" ComponentId="ServerUrl"/>
-        <Component ExportedId="WebSocketServerUr" ComponentId="WebSocketServerUrl"/>
+        <Component ExportedId="ServerConnectionInterfaceParam" ComponentId="ServerConnectionInterfaceParam"/>
     </ExportedComponents>
 </Acf>

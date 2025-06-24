@@ -27,6 +27,7 @@ QtObject {
 	property Component integerParamEditorComp: Component { IntegerParamEditor {}}
 	property Component doubleParamEditorComp: Component { DoubleParamEditor {}}
 	property Component enableableParamEditorComp: Component { EnableableParamEditor {}}
+	property Component serverConnectionParamEditorComp: Component { ServerConnectionParamEditor {}}
 	
 	Component.onCompleted: {
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_textParam, textParamEditorComp)
@@ -42,6 +43,7 @@ QtObject {
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_integerParam, integerParamEditorComp)
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_doubleParam, doubleParamEditorComp)
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_enableableParam, enableableParamEditorComp)
+		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_serverConnectionParam, serverConnectionParamEditorComp)
 	}
 	
 	function addParamsSet(id, name, paramsSet){

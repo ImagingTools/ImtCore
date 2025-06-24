@@ -7,7 +7,7 @@
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
-#include <imtbase/IUrlParam.h>
+#include <imtcom/IServerConnectionInterface.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtqml/CQuickObjectCompBase.h>
 
@@ -31,7 +31,7 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(QuickItemCreated, imod::IModel, ExtractEnableableParam);
 		I_REGISTER_SUBELEMENT_INTERFACE(QuickItemCreated, istd::IChangeable, ExtractEnableableParam);
 		I_ASSIGN(m_baseUrlAttrPtr, "BaseUrl", "BaseUrl for AccessManager", false, "");
-		I_ASSIGN(m_urlParamPtr, "BaseUrlParam", "Server URL param", false, "BaseUrlParam");
+		I_ASSIGN(m_serverConnectionParamPtr, "ServerConnectionParam", "ServerConnectionParam", false, "ServerConnectionParam");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
@@ -48,7 +48,7 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr);
+	void OnServerConnectionParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IServerConnectionInterface* serverConnectionParamPtr);
 	virtual void SetBaseUrl(QQmlEngine& qmlEngine) const;
 
 private:
@@ -85,10 +85,10 @@ protected:
 	I_ATTR(QString, m_baseUrlAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelQueriesAttrPtr);
-	I_REF(imtbase::IUrlParam, m_urlParamPtr);
+	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionParamPtr);
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 
-	imtbase::TModelUpdateBinder<imtbase::IUrlParam, CGqlQuickObjectComp> m_urlParamObserver;
+	imtbase::TModelUpdateBinder<imtcom::IServerConnectionInterface, CGqlQuickObjectComp> m_serverConnectionObserver;
 };
 
 

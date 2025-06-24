@@ -3,8 +3,6 @@
 
 // Qt includes
 #include <QtQml/QQmlEngine>
-#include <QtQml/QQmlComponent>
-#include <QtQml/QQmlContext>
 
 
 namespace imtqml
@@ -14,7 +12,7 @@ namespace imtqml
 // public methods
 
 CGqlQuickObjectComp::CGqlQuickObjectComp()
-	:m_urlParamObserver(*this)
+	:m_serverConnectionObserver(*this)
 {
 }
 
@@ -33,8 +31,8 @@ void CGqlQuickObjectComp::OnItemCreated()
 {
 	m_itemCreated.SetQuickItemCreated(true);
 
-	if (m_urlParamPtr.IsValid()){
-		OnUrlParamChanged(istd::IChangeable::GetAnyChange(), m_urlParamPtr.GetPtr());
+	if (m_serverConnectionParamPtr.IsValid()){
+		OnServerConnectionParamChanged(istd::IChangeable::GetAnyChange(), m_serverConnectionParamPtr.GetPtr());
 	}
 }
 
@@ -53,15 +51,15 @@ void CGqlQuickObjectComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_urlParamPtr.IsValid()){
-		m_urlParamObserver.RegisterObject(m_urlParamPtr.GetPtr(), &CGqlQuickObjectComp::OnUrlParamChanged);
+	if (m_serverConnectionParamPtr.IsValid()){
+		m_serverConnectionObserver.RegisterObject(m_serverConnectionParamPtr.GetPtr(), &CGqlQuickObjectComp::OnServerConnectionParamChanged);
 	}
 }
 
 
 void CGqlQuickObjectComp::OnComponentDestroyed()
 {
-	m_urlParamObserver.UnregisterAllObjects();
+	m_serverConnectionObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -69,13 +67,13 @@ void CGqlQuickObjectComp::OnComponentDestroyed()
 
 // private methods
 
-void CGqlQuickObjectComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IUrlParam* urlParamPtr)
+void CGqlQuickObjectComp::OnServerConnectionParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtcom::IServerConnectionInterface* serverConnectionParamPtr)
 {
 	if (!m_applicationInfoCompPtr.IsValid()){
 		return;
 	}
 
-	if (urlParamPtr != nullptr){
+	if (serverConnectionParamPtr != nullptr){
 		if (m_quickItemPtr != nullptr){
 			QQmlEngine* qmlEnginePtr = qmlEngine(m_quickItemPtr);
 			if (qmlEnginePtr != nullptr){
@@ -88,10 +86,14 @@ void CGqlQuickObjectComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet& 
 void CGqlQuickObjectComp::SetBaseUrl(QQmlEngine& qmlEngine) const
 {
 	QString baseUrl;
-	if (m_urlParamPtr.IsValid()){
-		baseUrl = m_urlParamPtr->GetUrl().toString();
+	if (m_serverConnectionParamPtr.IsValid()){
+		QUrl url;
+		if (m_serverConnectionParamPtr->GetUrl(imtcom::IServerConnectionInterface::PT_HTTP, url)){
+			baseUrl = url.toString();
+		}
 	}
-	else if (m_baseUrlAttrPtr.IsValid()){
+
+	if (baseUrl.isEmpty() && m_baseUrlAttrPtr.IsValid()){
 		baseUrl = *m_baseUrlAttrPtr;
 	}
 

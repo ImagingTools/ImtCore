@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5349" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5395" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -124,10 +124,10 @@
                     <AttributeInfo Id="BaseUrl" Type="String" ExportId="BaseUrl">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="BaseUrlParam" Type="Reference" ExportId="BaseUrlParam">
+                    <AttributeInfo Id="QmlFilePath" Type="String" ExportId="MainQmlPath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="QmlFilePath" Type="String" ExportId="MainQmlPath">
+                    <AttributeInfo Id="ServerConnectionParam" Type="Reference" ExportId="ServerConnectionParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

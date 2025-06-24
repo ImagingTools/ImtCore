@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5398" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -60,17 +60,14 @@
         <Element Id="LocalPageData" PackageId="ImtCoreVoce" ComponentId="LocalPageDataModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultServerHost" Type="String" ExportId="DefaultServerHost">
+                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="DefaultHost">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultServerPort" Type="Integer" ExportId="DefaultServerPort">
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="DefaultHttpPort">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultWebSocketServerHost" Type="String" ExportId="DefaultWebSocketServerHost">
-                        <Data IsEnabled="true" Value=""/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultWebSocketServerPort" Type="Integer" ExportId="DefaultWebSocketServerPort">
-                        <Data IsEnabled="true" Value="0"/>
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="DefaultWebSocketPort">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -150,6 +147,6 @@
     <ExportedComponents>
         <Component ExportedId="Design" ComponentId="GeneralPageData/Design"/>
         <Component ExportedId="Language" ComponentId="GeneralPageData/Language"/>
-        <Component ExportedId="ServerUrl" ComponentId="LocalPageData/ServerUrl"/>
+        <Component ExportedId="ServerConnectionInterfaceParam" ComponentId="LocalPageData/ServerConnectionInterfaceParam"/>
     </ExportedComponents>
 </Acf>

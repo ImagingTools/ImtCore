@@ -13,14 +13,14 @@ ParamsSetController {
 	signal saveSettings()
 	signal urlChanged();
 	
-	property UrlParam urlParam: UrlParam {
+	property ServerConnectionParam serverConnectionParam: ServerConnectionParam {
 		onFinished: {
 			container.urlChanged()
 		}
 	}
-	
+
 	function saveParam(){
-		updateUrlParam()
+		updateConnectionParam()
 		saveSettings()
 	}
 	
@@ -31,18 +31,23 @@ ParamsSetController {
 	}
 	
 	onParamModelCreated: {
-		updateUrlParam()
+		updateConnectionParam()
 	}
 	
-	function updateUrlParam(){
-		let urlParamter = getParamJsonByPath(["ServerUrl"]);
-		if (urlParamter != container.urlParam.toJson()){
-			container.urlParam.createFromJson(urlParamter)
+	function updateConnectionParam(){
+		let urlParamter = getParamJsonByPath(["ServerConnectionInterface"]);
+		if (urlParamter != container.serverConnectionParam.toJson()){
+			container.serverConnectionParam.createFromJson(urlParamter)
 		}
 	}
 
 	function getServerUrl(){
-		return urlParam.m_scheme + "://" + urlParam.m_host + ":" + urlParam.m_port
+		let scheme = "http"
+		if (serverConnectionParam.m_isSecure){
+			scheme = "https"
+		}
+
+		return scheme + "://" + serverConnectionParam.m_host + ":" + serverConnectionParam.m_httpPort
 	}
 }
 

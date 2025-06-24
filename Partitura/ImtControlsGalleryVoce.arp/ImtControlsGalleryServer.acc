@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5253" Description="ACF"/>
-            <Version Id="1" Number="2217" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5398" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -31,7 +31,10 @@
                     <AttributeInfo Id="RequestHandler" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="ControlsGalleryHandlers"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPort" Type="Reference" ExportId="ServerPort">
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerInterface" Type="Reference" ExportId="ServerInterface">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="">
@@ -39,6 +42,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

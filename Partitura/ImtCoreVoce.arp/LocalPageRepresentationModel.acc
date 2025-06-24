@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5398" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -25,7 +25,7 @@
                     <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServerUrl</Value>
+                                <Value>ServerConnectionParamRepresentationController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -35,17 +35,17 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerUrl" PackageId="ImtServerAppPck" ComponentId="UrlParamRepresentationController">
+        <Element Id="ServerConnectionParamRepresentationController" PackageId="ImtServerAppPck" ComponentId="ServerConnectionParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ModelId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="ServerUrl"/>
+                        <Data IsEnabled="true" Value="ServerConnectionInterface"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Name" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Server Url"/>
+                        <Data IsEnabled="true" Value="Server Connection Interface"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>

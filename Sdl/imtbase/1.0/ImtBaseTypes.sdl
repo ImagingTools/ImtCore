@@ -39,6 +39,7 @@ type ParamTypeIds
 	DoubleParam: ID
 	PasswordParam: ID
 	EnableableParam: ID
+	ServerConnectionParam: ID
 }
 
 type UrlParam
@@ -47,6 +48,22 @@ type UrlParam
 	host: String
 	port: Integer
 	path: String
+}
+
+enum ProtocolType
+{
+	Unknown
+	Http
+	WebSocket
+	File
+}
+
+type ServerConnectionParam
+{
+	host: String
+	httpPort: Integer
+	wsPort: Integer
+	isSecure: Boolean
 }
 
 type IdParam
