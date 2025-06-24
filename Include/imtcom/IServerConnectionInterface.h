@@ -28,10 +28,10 @@ public:
 
 	enum ConnectionFlags
 	{
-		CF_NONE = 0,
-		CF_SECURE = 1
+		CF_DEFAULT = 0x1,
+		CF_SECURE = 0x2
 	};
-	I_DECLARE_FLAGS(ConnectionFlags, CF_SECURE);
+	I_DECLARE_FLAGS(ConnectionFlags, CF_DEFAULT, CF_SECURE);
 
 	typedef QList<ProtocolType> ProtocolTypes;
 
