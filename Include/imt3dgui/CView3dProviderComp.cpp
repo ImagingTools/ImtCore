@@ -81,6 +81,7 @@ CView3dProviderComp::CView3dProviderComp()
 	connect(&m_selectionModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnSelectionModeCommand()));
 	
 	m_perspectiveModeCommand.setChecked(true);
+
 	connect(&m_perspectiveModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnPerspectiveModeCommand()));
 	connect(&m_orthoModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnOrthoModeCommand()));
 }
@@ -414,6 +415,9 @@ void CView3dProviderComp::OnGuiRetranslate()
 	m_rotationAroundZCommand.SetVisuals(tr("Rotation around Z-Axis"), tr("Z-Rotation"), tr("Set Rotation around Z-Axis Mode"), GetIcon(":/Icons/RotationAroundZ"));
 	m_viewModeCommand.SetVisuals(tr("View"), tr("View Mode"), tr("Set View Mode"), GetIcon(":/Icons/View"));
 	m_selectionModeCommand.SetVisuals(tr("Selection"), tr("Selection Mode"), tr("Set Selection Mode"), GetIcon(":/Icons/Selection"));
+
+	m_orthoModeCommand.SetVisuals(tr("Orthogonal View Mode"), tr("Orthogonal"), tr("Select orthogonal view mode"), GetIcon(":/Icons/Ortho"));
+	m_perspectiveModeCommand.SetVisuals(tr("Perspective View Mode"), tr("Perspective"), tr("Select perspective view mode"), GetIcon(":/Icons/Perspective"));
 }
 
 
