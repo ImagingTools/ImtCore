@@ -34,7 +34,6 @@ class CSdlClassModificatorBaseComp:
 			public IIncludeDirectivesProvider,
 			public ICxxFileProcessor,
 			public ICxxModifier,
-			protected imtsdl::CSdlTools,
 			protected imtsdl::CSdlEnumConverter,
 			protected imtsdl::CSdlUnionConverter
 {

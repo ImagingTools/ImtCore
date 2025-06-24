@@ -4,6 +4,10 @@
 // ACF includes
 #include <iser/ISerializable.h>
 
+#ifdef Q_OS_WIN
+#undef SetPort
+#endif
+
 
 namespace imtcom
 {

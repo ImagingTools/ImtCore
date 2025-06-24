@@ -70,7 +70,7 @@ CDeviceFrameworkProxyComp::Observer::Observer(CDeviceFrameworkProxyComp& parent)
 
 // protected methods of the embedded class Observer
 
-void CDeviceFrameworkProxyComp::Observer::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CDeviceFrameworkProxyComp::Observer::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	switch (modelId){
 	case MI_TYPE_LIST:
@@ -129,7 +129,9 @@ const QByteArrayList& CDeviceFrameworkProxyComp::DeviceController::GetSupportedD
 		return controllerPtr->GetSupportedDeviceTypeIds();
 	}
 
-	return QByteArrayList();
+	static QByteArrayList empty;
+
+	return empty;
 }
 
 
@@ -212,7 +214,7 @@ bool CDeviceFrameworkProxyComp::DeviceController::CloseDevice(const QByteArray& 
 
 // reimplemented (IDeviceEnumerator)
 
-IDeviceEnumerator::StartResult CDeviceFrameworkProxyComp::DeviceController::StartEnumeration(IResultHandler* resultHandlerPtr)
+IDeviceEnumerator::StartResult CDeviceFrameworkProxyComp::DeviceController::StartEnumeration(IResultHandler* /*resultHandlerPtr*/)
 {
 	return SR_FAILED;
 }

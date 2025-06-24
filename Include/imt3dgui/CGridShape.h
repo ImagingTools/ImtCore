@@ -1,6 +1,9 @@
 #pragma once
 
 
+// STL includes
+#include <optional>
+
 // ImtCore includes
 #include <imt3dgui/CShape3dBase.h>
 #include <imt3d/CPointCloud3d.h>
@@ -44,7 +47,7 @@ private:
 	void CreateYzPlane(Vertices& vertices, double planePosition) const;
 
 private:
-	double m_gridValue = 10;
+	double m_gridValue = 0.1;
 	int m_count = 10;
 	imt3d::CPointCloud3d m_data;
 	bool m_doUpdate = false;

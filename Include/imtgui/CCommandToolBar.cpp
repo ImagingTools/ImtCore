@@ -51,6 +51,12 @@ void CCommandToolBar::UnregisterCommands()
 }
 
 
+QToolBar* CCommandToolBar::GetToolBar() const
+{
+	return m_commandsToolBar;
+}
+
+
 // protected methods
 
 void CCommandToolBar::OnCommandsChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const ibase::ICommandsProvider* commandsPtr)

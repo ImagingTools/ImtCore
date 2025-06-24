@@ -102,13 +102,13 @@ void CDeviceIdBasedAttributesComp::UpdateModel()
 }
 
 
-void CDeviceIdBasedAttributesComp::OnSelectionChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::ISelection* objectPtr)
+void CDeviceIdBasedAttributesComp::OnSelectionChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::ISelection* /*objectPtr*/)
 {
 	UpdateModel();
 }
 
 
-void CDeviceIdBasedAttributesComp::OnDeviceStateChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdev::IDeviceStateProvider* objectPtr)
+void CDeviceIdBasedAttributesComp::OnDeviceStateChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdev::IDeviceStateProvider* /*objectPtr*/)
 {
 	UpdateModel();
 }

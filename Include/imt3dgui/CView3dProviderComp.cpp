@@ -80,6 +80,7 @@ CView3dProviderComp::CView3dProviderComp()
 	connect(&m_viewModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnViewModeCommand()));
 	connect(&m_selectionModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnSelectionModeCommand()));
 	
+	m_perspectiveModeCommand.setChecked(true);
 	connect(&m_perspectiveModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnPerspectiveModeCommand()));
 	connect(&m_orthoModeCommand, SIGNAL(triggered(bool)), this, SLOT(OnOrthoModeCommand()));
 }

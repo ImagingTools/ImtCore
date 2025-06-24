@@ -66,7 +66,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CView3dProviderCompAttrPart2);
 		I_ASSIGN(m_showSetViewFromRightCommandAttrPtr, "ShowSetViewFromRightCommand", "Enable command for view from right", true, false);
-		I_ASSIGN(m_showSetViewFromFrontCommandAttrPtr, "ShowSetViewFromRightCommand", "Enable command for view from front", true, false);
+		I_ASSIGN(m_showSetViewFromFrontCommandAttrPtr, "ShowSetViewFromFrontCommand", "Enable command for view from front", true, false);
 		I_ASSIGN(m_showSetViewFromTopCommandAttrPtr, "ShowSetViewFromTopCommand", "Enable command for view from top", true, false);
 		I_ASSIGN(m_showSetViewFromLeftCommandAttrPtr, "ShowSetViewFromLeftCommand", "Enable command for view from left", true, false);
 		I_ASSIGN(m_showSetViewFromBottomCommandAttrPtr, "ShowSetViewFromBottomCommand", "Enable command for view from bottom", true, false);

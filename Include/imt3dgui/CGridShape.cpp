@@ -61,7 +61,7 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*chang
 		return;
 	}
 
-	double planePosition = m_gridValue * m_count;
+	double planePosition = 0.0;
 	if (m_planePosition.has_value()){
 		planePosition = *m_planePosition;
 	}

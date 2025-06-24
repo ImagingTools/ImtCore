@@ -37,7 +37,7 @@ bool CDeviceInstanceInfoBase::SetIdentifier(IdentifierTypes idType, const QByteA
 }
 
 
-bool CDeviceInstanceInfoBase::SetVersion(int versionId, quint32 version, const QString& name, const QString& description)
+bool CDeviceInstanceInfoBase::SetVersion(int /*versionId*/, quint32 /*version*/, const QString& /*name*/, const QString& /*description*/)
 {
 	return false;
 }
@@ -85,7 +85,7 @@ int CDeviceInstanceInfoBase::GetSupportedOperations() const
 }
 
 
-bool CDeviceInstanceInfoBase::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CDeviceInstanceInfoBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CDeviceInstanceInfoBase* sourcePtr = dynamic_cast<const CDeviceInstanceInfoBase*>(&object);
 	if (sourcePtr != nullptr){

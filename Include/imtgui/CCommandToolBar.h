@@ -25,6 +25,8 @@ public:
 	void RegisterCommands(QWidget* parentWidgetPtr, const ibase::ICommandsProvider* commandsPtr, int commandGroupId = -1);
 	void UnregisterCommands();
 
+	QToolBar* GetToolBar() const;
+
 protected:
 	virtual void OnCommandsChanged(const istd::IChangeable::ChangeSet& changeSet, const ibase::ICommandsProvider* commandsPtr);
 
