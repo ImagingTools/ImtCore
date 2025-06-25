@@ -59,8 +59,7 @@ class Binding extends QtObject {
 
     __update(){
         if(this.__getPropertyValue('target') && this.__getPropertyValue('property')){
-            // if(this.$prop) this.getProperty('value').removeSubscriber(this.$prop)
-            
+           
             let path = this.__getPropertyValue('property').split('.')
             let propName = path.pop()
 
@@ -72,12 +71,6 @@ class Binding extends QtObject {
             }
 
             obj.__resetPropertyValue(propName, this.__getPropertyValue('value'))
-
-            // this.$prop = prop
-            // prop.subscribe(this.getProperty('value'))
-            // prop.setCompute(()=>{return this.getPropertyValue('value')})
-            // this.getProperty('value').update()
-            // prop.update()
         }
     }
 }

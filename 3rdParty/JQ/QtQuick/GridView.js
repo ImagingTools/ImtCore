@@ -146,6 +146,7 @@ class GridView extends Flickable {
 
         if (Array.isArray(this.model)) {
             properties.modelData = this.model[index]
+            properties.model = {index:index}
         } else if(typeof this.model === 'object'){
             properties.model = this.model.data[index]
         } else {

@@ -49,7 +49,10 @@ class QtObject extends QObject {
             obj.JQAbstractModel = properties.model
             delete properties.model
         } else {
-            obj.JQAbstractModel = ()=>{return obj.parent ? obj.parent.JQAbstractModel : undefined}
+            if(!(this.isAssignableFrom(JQModules.QtQuick.Repeater) || this.isAssignableFrom(JQModules.QtQuick.ListView) || 
+                this.isAssignableFrom(JQModules.QtQuick.GridView) || this.isAssignableFrom(JQModules.QtQuick.MapItemView))){
+                    obj.JQAbstractModel = ()=>{return obj.parent ? obj.parent.JQAbstractModel : undefined}
+                }
         }
 
         if(properties.modelData){
