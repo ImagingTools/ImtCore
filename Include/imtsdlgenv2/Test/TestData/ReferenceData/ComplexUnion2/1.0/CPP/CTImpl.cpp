@@ -1556,7 +1556,7 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("Geometry") || gqlObject.GetParamArgumentObjectPtr("Geometry") != nullptr){
+	if (!gqlObject.ContainsParam("Geometry") || gqlObject.GetParamArgumentObjectPtr("Geometry") == nullptr){
 		return false;
 	}
 	Geometry = CTTypes::CGeometry::V1_0();
@@ -1840,7 +1840,7 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("Geometry") && gqlObject.GetParamArgumentObjectPtr("Geometry") == nullptr){
+	if (gqlObject.ContainsParam("Geometry") && gqlObject.GetParamArgumentObjectPtr("Geometry") != nullptr){
 		Geometry = CTTypes::CGeometry::V1_0();
 		const bool isGeometryRead = Geometry->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
 		if (!isGeometryRead){
@@ -3899,7 +3899,7 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("IconPosition") || gqlObject.GetParamArgumentObjectPtr("IconPosition") != nullptr){
+	if (!gqlObject.ContainsParam("IconPosition") || gqlObject.GetParamArgumentObjectPtr("IconPosition") == nullptr){
 		return false;
 	}
 	IconPosition = CTTypes::CPoint::V1_0();
@@ -4115,7 +4115,7 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 		}
 	}
 
-	if (gqlObject.ContainsParam("IconPosition") && gqlObject.GetParamArgumentObjectPtr("IconPosition") == nullptr){
+	if (gqlObject.ContainsParam("IconPosition") && gqlObject.GetParamArgumentObjectPtr("IconPosition") != nullptr){
 		IconPosition = CTTypes::CPoint::V1_0();
 		const bool isIconPositionRead = IconPosition->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
 		if (!isIconPositionRead){
@@ -6945,7 +6945,7 @@ bool CProductOverview::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gql
 
 bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("ProductID") || gqlObject["ProductID"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("ProductID") || gqlObject["ProductID"].userType() != QMetaType::Int){
 		return false;
 	}
 	ProductID = gqlObject["ProductID"].toInt();
@@ -7015,7 +7015,7 @@ bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 
 bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("ProductID") && gqlObject["ProductID"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("ProductID") && gqlObject["ProductID"].userType() == QMetaType::Int){
 		ProductID = gqlObject["ProductID"].toInt();
 	}
 
@@ -9131,7 +9131,7 @@ bool CResultMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 
 bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("resultId") || gqlObject["resultId"].userType() != QMetaType::QByteArray){
+	if (!gqlObject.ContainsParam("resultId") || gqlObject["resultId"].userType() != QMetaType::QString){
 		return false;
 	}
 	resultId = gqlObject["resultId"].toByteArray();
@@ -9152,11 +9152,11 @@ bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("classification") && gqlObject["classification"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("classification") && gqlObject["classification"].userType() == QMetaType::Int){
 		classification = gqlObject["classification"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("description") && gqlObject.GetParamArgumentObjectPtr("description") == nullptr){
+	if (gqlObject.ContainsParam("description") && gqlObject.GetParamArgumentObjectPtr("description") != nullptr){
 		description = CLocalizedText::V1_0();
 		const bool isDescriptionRead = description->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
@@ -9186,7 +9186,7 @@ bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 
 bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("resultId") && gqlObject["resultId"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("resultId") && gqlObject["resultId"].userType() == QMetaType::QString){
 		resultId = gqlObject["resultId"].toByteArray();
 	}
 
@@ -9206,11 +9206,11 @@ bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("classification") && gqlObject["classification"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("classification") && gqlObject["classification"].userType() == QMetaType::Int){
 		classification = gqlObject["classification"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("description") && gqlObject.GetParamArgumentObjectPtr("description") == nullptr){
+	if (gqlObject.ContainsParam("description") && gqlObject.GetParamArgumentObjectPtr("description") != nullptr){
 		description = CLocalizedText::V1_0();
 		const bool isDescriptionRead = description->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
@@ -10432,7 +10432,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 	}
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -10503,7 +10503,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 		dataModelVersion = gqlObject["dataModelVersion"].toString();
 	}
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -11216,7 +11216,7 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 	}
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -11265,7 +11265,7 @@ bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		dataModelVersion = gqlObject["dataModelVersion"].toString();
 	}
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -11965,7 +11965,7 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 	}
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -12036,7 +12036,7 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		dataModelVersion = gqlObject["dataModelVersion"].toString();
 	}
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") == nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){

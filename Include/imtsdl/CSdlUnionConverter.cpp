@@ -33,7 +33,9 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			const imtsdl::ISdlUnionListProvider& unionlistProvider,
 			uint hIndents,
 			const ConversionType& conversionType,
-			const QString& addCommand)
+			const QString& addCommand,
+			const QString& customModelTarget,
+			const QString returnOnFail)
 {
 	QString typeNamespace = BuildNamespaceFromParams(sdlUnion.GetSchemaParams(), false, true);
 	if (typeNamespace != relatedNamespace){
@@ -111,12 +113,20 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			}
 			else if (conversionType == CT_MODEL_SCALAR){
 				FeedStreamHorizontally(stream, hIndents + 1);
-				stream << QStringLiteral("if (!val->WriteToModel(*");
-				stream << QStringLiteral("(model.AddTreeModel(\"") << targetName << QStringLiteral("\", ") << modelIndex << QStringLiteral(")), 0)){");
+				stream << QStringLiteral("if (!val->WriteToModel(");
+				if (!customModelTarget.isEmpty()){
+					stream << customModelTarget;
+				}
+				else{
+					stream << QStringLiteral("*(model.AddTreeModel(\"") << targetName << QStringLiteral("\", ") << modelIndex << QStringLiteral(")), 0");
+				}
+				stream << QStringLiteral(")){");
 				FeedStream(stream, 1, false);
 
 				FeedStreamHorizontally(stream, hIndents + 2);
-				stream << QStringLiteral("return false;");
+				stream << QStringLiteral("return ");
+				stream << returnOnFail;
+				stream << ';';
 				FeedStream(stream, 1, false);
 
 				FeedStreamHorizontally(stream, hIndents + 1);

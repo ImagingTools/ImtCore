@@ -28,15 +28,8 @@ public:
 
 	CSdlType();
 
-	[[nodiscard]] QString GetName() const;
-	void SetName(const QString& name);
-
 	[[nodiscard]] SdlFieldList GetFields() const;
 	void SetFields(const SdlFieldList& fields);
-
-	/// \todo remove it \deprecated. Build namespace from \c m_schemaParamsPtr instead. \sa GetSchemaParams
-	[[nodiscard]] QString GetNamespace() const;
-	void SetNamespace(const QString& aNamespace);
 
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -46,9 +39,7 @@ public:
 	[[nodiscard]] bool operator!=(const CSdlType& other) const { return !(operator==(other)); }
 
 private:
-	QString m_name;
 	SdlFieldList m_fields;
-	QString m_namespace;
 };
 
 

@@ -12,6 +12,21 @@ imtsdl::CSdlEntryBase::CSdlEntryBase()
 }
 
 
+QString imtsdl::CSdlEntryBase::GetName() const
+{
+	return m_name;
+}
+
+
+void imtsdl::CSdlEntryBase::SetName(const QString& name)
+{
+	if (m_name != name){
+		istd::CChangeNotifier notifier(this);
+		m_name = name;
+	}
+}
+
+
 QString imtsdl::CSdlEntryBase::GetTargetHeaderFilePath() const
 {
 	return m_targetHeaderFilePath;

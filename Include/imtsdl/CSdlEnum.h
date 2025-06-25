@@ -17,9 +17,6 @@ public:
 
 	CSdlEnum();
 
-	[[nodiscard]] QString GetName() const;
-	void SetName(const QString& name);
-
 	[[nodiscard]] QList<QPair<QString, QString>> GetValues() const;
 	void SetValues(const QList<QPair<QString, QString>>& name);
 	void AddValue(const QPair<QString, QString>& value);
@@ -32,7 +29,6 @@ public:
 	[[nodiscard]] bool operator!=(const CSdlEnum& other) const { return !(operator==(other)); }
 
 private:
-	QString m_name;
 	QList<QPair<QString/*OriginalName*/, QString/*StringEquivalent*/>> m_values;
 };
 

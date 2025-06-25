@@ -35,9 +35,6 @@ public:
 	Type GetType() const;
 	void SetType(Type type);
 
-	QString GetName() const;
-	void SetName(const QString& name);
-
 	SdlFieldList GetInputArguments() const;
 	void SetInputArguments(const SdlFieldList& inputArguments);
 
@@ -53,7 +50,6 @@ public:
 
 private:
 	Type m_type;
-	QString m_name;
 	SdlFieldList m_inputArguments;
 	CSdlField m_outputArgument;
 };

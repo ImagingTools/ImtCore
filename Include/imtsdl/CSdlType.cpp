@@ -23,21 +23,6 @@ CSdlType::CSdlType() :CSdlEntryBase()
 }
 
 
-QString CSdlType::GetName() const
-{
-	return m_name;
-}
-
-
-void CSdlType::SetName(const QString& name)
-{
-	if (m_name != name){
-		istd::CChangeNotifier notifier(this);
-		m_name = name;
-	}
-}
-
-
 SdlFieldList CSdlType::GetFields() const
 {
 	return m_fields;
@@ -49,21 +34,6 @@ void CSdlType::SetFields(const SdlFieldList& fields)
 	if (fields != m_fields){
 		istd::CChangeNotifier notifier(this);
 		m_fields = fields;
-	}
-}
-
-
-QString CSdlType::GetNamespace() const
-{
-	return m_namespace;
-}
-
-
-void CSdlType::SetNamespace(const QString& aNamespace)
-{
-	if (m_namespace != aNamespace){
-		istd::CChangeNotifier notifier(this);
-		m_namespace = aNamespace;
 	}
 }
 
@@ -80,11 +50,6 @@ bool CSdlType::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
-
-	iser::CArchiveTag namespaceTag("Namespace", "", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(namespaceTag);
-	retVal = retVal && archive.Process(m_namespace);
-	retVal = retVal && archive.EndTag(namespaceTag);
 
 	iser::CArchiveTag targetHeaderFileTag("TargetHeaderFile", "", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(targetHeaderFileTag);
@@ -116,7 +81,6 @@ bool CSdlType::operator==(const CSdlType& other) const
 {
 	bool retVal = m_name == other.m_name;
 	retVal = retVal && m_fields == other.m_fields;
-	retVal = retVal && m_namespace == other.m_namespace;
 	retVal = retVal && m_targetHeaderFilePath == other.m_targetHeaderFilePath;
 	retVal = retVal && m_schemaFilePath == other.m_schemaFilePath;
 	retVal = retVal && m_isExternal == other.m_isExternal;

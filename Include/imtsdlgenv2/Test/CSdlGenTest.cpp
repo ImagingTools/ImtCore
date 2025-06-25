@@ -242,6 +242,34 @@ void CSdlGenTest::TestComplexUnion2()
 	ExecuteTest(testSuite, "ComplexUnion2.sdl", "ComplexUnion2", &m_tempDirPtrList);
 }
 
+void CSdlGenTest::PrinterTest()
+{
+	// printer test
+	{
+		CImtSdlGenTest testSuite;
+		PrepareSuite(testSuite);
+
+		imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+		argParserPtr->SetCppEnabled();
+		argParserPtr->SetGqlEnabled();
+		argParserPtr->SetQmlEnabled(false);
+
+		ExecuteTest(testSuite, "PrinterBase.sdl", "PrinterBase", &m_tempDirPtrList);
+	}
+	// digital printer
+	{
+		CImtSdlGenTest testSuite;
+		PrepareSuite(testSuite);
+
+		imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+		argParserPtr->SetCppEnabled();
+		argParserPtr->SetGqlEnabled();
+		argParserPtr->SetQmlEnabled(false);
+
+		ExecuteTest(testSuite, "DigitalPrinter.sdl", "DigitalPrinter", &m_tempDirPtrList);
+	}
+}
+
 
 void CSdlGenTest::cleanupTestCase()
 {

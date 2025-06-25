@@ -24,21 +24,6 @@ CSdlUnion::CSdlUnion()
 }
 
 
-QString CSdlUnion::GetName() const
-{
-	return m_name;
-}
-
-
-void CSdlUnion::SetName(const QString& name)
-{
-	if (m_name != name){
-		istd::CChangeNotifier notifier(this);
-		m_name = name;
-	}
-}
-
-
 QList<QString> CSdlUnion::GetTypes() const
 {
 	return m_types;
@@ -130,7 +115,7 @@ bool CSdlUnion::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.BeginMultiTag(elementsTag, elementNameTag, elementsCount);
 	if (isStoring){
-		for (int i = 0; i < elementsCount; +i){
+		for (int i = 0; i < elementsCount; ++i){
 			auto sdlType = m_types[i];
 
 			retVal = retVal && archive.BeginTag(elementNameTag);

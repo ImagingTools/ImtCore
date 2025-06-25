@@ -144,10 +144,28 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 				return false;
 			}
 
+
+			std::unique_ptr<CSdlEntryBase> foundEntryPtr;
 			auto foundIterator = std::find_if(m_sdlTypes.cbegin(), m_sdlTypes.cend(), [&typeRefName](const CSdlType& type){
 				return (type.GetName() == typeRefName);
 			});
-			if (foundIterator == m_sdlTypes.cend()){
+			if (foundIterator != m_sdlTypes.cend()){
+				CSdlType type = *foundIterator;
+				documentType.SetReferenceType(type);
+				foundEntryPtr = std::make_unique<CSdlType>(type);
+			}
+			else { // check if a union
+				auto foundUnionIterator = std::find_if(m_unions.cbegin(), m_unions.cend(), [&typeRefName](const CSdlUnion& aUnion){
+					return (aUnion.GetName() == typeRefName);
+				});
+				if (foundUnionIterator != m_unions.cend()){
+					CSdlUnion vUinon = *foundUnionIterator;
+					documentType.SetReferenceType(vUinon);
+					foundEntryPtr = std::make_unique<CSdlUnion>(vUinon);
+				}
+			}
+
+			if (!foundEntryPtr){
 				SendLogMessage(
 							istd::IInformationProvider::IC_ERROR,
 							0,
@@ -156,7 +174,6 @@ bool CGqlExtSchemaParser::ExtractDocumentTypeFromCurrentEntry(CSdlDocumentType& 
 
 				return false;
 			}
-			documentType.SetReferenceType(*foundIterator);
 		}
 		// extract operations
 		else if (keyword == QByteArrayLiteral("operations")){
@@ -276,21 +293,16 @@ bool CGqlExtSchemaParser::ValidateSchema()
 			SendLogMessage(
 				istd::IInformationProvider::IC_ERROR,
 				0,
-				"Document type '%1' does not have a reference! define 'ref' for it.",
+				QString("Document type '%1' does not have a reference! define 'ref' for it.").arg(sdlDocumentType.GetName()),
 				"ValidateDocumentSchema");
 			return false;
 		}
 	}
 
-	const QString fieldNamespace = CSdlTools::BuildNamespaceFromParams(*m_schemaParamsPtr);
 	/// \todo don't use a suffix. Instead, define it elsewhere...
 	const QString fieldQmlImportDeclaration = CSdlTools::BuildQmlImportDeclarationFromParams(*m_schemaParamsPtr, QStringLiteral("Sdl"));
 	// set namespace and QML import for all types
 	for (CSdlType& sdlType: m_sdlTypes){
-		if (!sdlType.IsExternal() || sdlType.GetNamespace().isEmpty()){
-			sdlType.SetNamespace(fieldNamespace);
-		}
-
 		if (!sdlType.IsExternal() || sdlType.GetQmlImportDeclaration().isEmpty()){
 			sdlType.SetQmlImportDeclaration(fieldQmlImportDeclaration);
 		}

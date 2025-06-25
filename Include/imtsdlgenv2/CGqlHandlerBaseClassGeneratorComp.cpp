@@ -18,6 +18,7 @@
 // ImtCore includes
 #include <imtfile/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlRequest.h>
+#include <imtsdl/CSdlUnionConverter.h>
 
 
 namespace imtsdlgenv2
@@ -610,36 +611,59 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	stream << '}';
 	FeedStream(stream, 2, false);
 
-	// [1] write payload variable in model and create variable, to check if it success
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("const bool isModelCreated = ");
-	stream << QStringLiteral("replyPayload.WriteToModel(*dataModelPtr);");
-	FeedStream(stream, 1, false);
+	imtsdl::CSdlUnion foundUnion;
+	const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+	if (isUnion){
+		const static QString unionSourceVarName = QStringLiteral("replyPayload");
+		imtsdl::CSdlUnionConverter::WriteConversionFromUnion(stream,
+					foundUnion,
+					unionSourceVarName,
+					outputArgument.GetId(),
+					m_originalSchemaNamespaceCompPtr->GetText(),
+					outputArgument.GetId(),
+					QString(),
+					*m_sdlTypeListCompPtr,
+					*m_sdlEnumListCompPtr,
+					*m_sdlUnionListCompPtr,
+					hIndents + 1,
+					imtsdl::CSdlUnionConverter::CT_MODEL_SCALAR,
+					QString(),
+					QStringLiteral("*dataModelPtr"),
+					QStringLiteral("nullptr"));
+	}
+	else{
+		// [1] write payload variable in model and create variable, to check if it success
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("const bool isModelCreated = ");
+		stream << QStringLiteral("replyPayload.WriteToModel(*dataModelPtr);");
+		FeedStream(stream, 1, false);
 
-	// [1->2] check if payload write to TreeModel is failed
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (!isModelCreated){");
-	FeedStream(stream, 1, false);
+		// [1->2] check if payload write to TreeModel is failed
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("if (!isModelCreated){");
+		FeedStream(stream, 1, false);
 
-	// [2] set error message
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("errorMessage = QString(\"Internal error. Unable to create response for command-ID: '%1'\").arg(qPrintable(commandId));");
-	FeedStream(stream, 1, false);
+		// [2] set error message
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("errorMessage = QString(\"Internal error. Unable to create response for command-ID: '%1'\").arg(qPrintable(commandId));");
+		FeedStream(stream, 1, false);
 
-	// [2] add log message
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("SendCriticalMessage(0, errorMessage);");
-	FeedStream(stream, 2, false);
+		// [2] add log message
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("SendCriticalMessage(0, errorMessage);");
+		FeedStream(stream, 2, false);
 
-	// [2] return
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("return nullptr;");
-	FeedStream(stream, 1, false);
+		// [2] return
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("return nullptr;");
+		FeedStream(stream, 1, false);
 
-	// [2->1] end of payload write to TreeModel checks
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << '}';
-	FeedStream(stream, 2, false);
+		// [2->1] end of payload write to TreeModel checks
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << '}';
+		FeedStream(stream, 2, false);
+	}
+
 
 	// [1] return pop ptr
 	FeedStreamHorizontally(stream, hIndents + 1);

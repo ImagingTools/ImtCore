@@ -520,7 +520,8 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 
 		const QString unionSourceVarName = variableName;
 
-		WriteConversionFromUnion(stream, sdlUnion,
+		WriteConversionFromUnion(stream,
+			sdlUnion,
 			unionSourceVarName,
 			newObjectArrayVarName,
 			m_originalSchemaNamespaceCompPtr->GetText(),

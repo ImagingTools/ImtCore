@@ -47,7 +47,9 @@ public:
 				const imtsdl::ISdlUnionListProvider& unionlistProvider,
 				uint hIndents = 1,
 				const ConversionType& conversionType = CT_MODEL_SCALAR,
-				const QString& addCommand = QString());
+				const QString& addCommand = QString(),
+				const QString& customModelTarget = QString(),
+				const QString returnOnFail = QStringLiteral("false"));
 	static void WriteUnionConversionFromData(
 				QTextStream& stream,
 				const CSdlUnion& sdlUnion,

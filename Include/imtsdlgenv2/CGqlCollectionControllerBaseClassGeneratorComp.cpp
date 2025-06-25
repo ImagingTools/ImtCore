@@ -18,6 +18,7 @@
 // ImtCore includes
 #include <imtfile/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlRequest.h>
+#include <imtsdl/CSdlUnionConverter.h>
 
 
 namespace imtsdlgenv2
@@ -575,7 +576,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodDeclarationForOper
 	imtsdl::CSdlField type = sdlRequest.GetOutputArgument();
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
 		&sdlRequest.GetSchemaParams(),
-		m_argumentParserCompPtr,
+		m_argumentParserCompPtr.GetPtr(),
 		false);
 	CStructNamespaceConverter structNamespaceConverter(
 		type,
@@ -697,7 +698,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 {
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
 				&sdlRequest.GetSchemaParams(),
-				m_argumentParserCompPtr,
+				m_argumentParserCompPtr.GetPtr(),
 				false);
 
 	CStructNamespaceConverter structNameConverter;
@@ -750,7 +751,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 			stream << QStringLiteral("Request,");
 			FeedStream(stream, 1, false);
 
-			imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
+			const imtsdl::CSdlEntryBase& referenceType = sdlDocumentType.GetReferenceType();
 			structNameConverter.sdlEntryPtr = &referenceType;
 			structNameConverter.sdlFieldPtr = nullptr;
 
@@ -770,7 +771,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 		stream << QStringLiteral("virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(");
 		FeedStream(stream, 1, false);
 
-		imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
+		const imtsdl::CSdlEntryBase& referenceType = sdlDocumentType.GetReferenceType();
 		structNameConverter.sdlEntryPtr = &referenceType;
 		structNameConverter.sdlFieldPtr = nullptr;
 
@@ -906,9 +907,9 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 	stream << '}';
 	FeedStream(stream, 2, false);
 
-	imtsdl::CSdlField type = sdlRequest.GetOutputArgument();
+	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
 	CStructNamespaceConverter structNamespaceConverter(
-				type,
+				outputArgument,
 				sdlNamespace,
 				*m_sdlTypeListCompPtr,
 				*m_sdlEnumListCompPtr,
@@ -946,30 +947,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 	stream << '}';
 	FeedStream(stream, 2, false);
 
-	// [1] write payload variable in model and create variable, to check if it success
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);");
-	FeedStream(stream, 1, false);
-
-	// [1->2] check if payload write to TreeModel is failed
-	FeedStreamHorizontally(stream, hIndents + 1);
-	stream << QStringLiteral("if (!isModelCreated){");
-	FeedStream(stream, 1, false);
-
-	// [2] set error message
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("errorMessage = QString(\"Internal error. Unable to create response for command-ID: '%1'\").arg(qPrintable(commandId));");
-	FeedStream(stream, 1, false);
-
-	// [2] add log message
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("SendCriticalMessage(0, errorMessage);");
-	FeedStream(stream, 2, false);
-
-	// [2] return
-	FeedStreamHorizontally(stream, hIndents + 2);
-	stream << QStringLiteral("return nullptr;");
-	FeedStream(stream, 1, false);
+	AddPayloadModelWriteCode(stream, sdlRequest, operationType, hIndents);
 
 	// [2->1] end of payload write to TreeModel checks
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -985,6 +963,56 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 2, false);
+}
+
+
+void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, uint hIndents)
+{
+	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
+
+	imtsdl::CSdlUnion foundUnion;
+	const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+	if (isUnion){
+		const static QString unionSourceVarName = QStringLiteral("replyPayload");
+		imtsdl::CSdlUnionConverter::WriteConversionFromUnion(stream,
+			foundUnion,
+			unionSourceVarName,
+			outputArgument.GetId(),
+			m_originalSchemaNamespaceCompPtr->GetText(),
+			outputArgument.GetId(),
+			QString(),
+			*m_sdlTypeListCompPtr,
+			*m_sdlEnumListCompPtr,
+			*m_sdlUnionListCompPtr,
+			hIndents,
+			imtsdl::CSdlUnionConverter::CT_MODEL_SCALAR);
+	}
+	else{
+		// [1] write payload variable in model and create variable, to check if it success
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("const bool isModelCreated = replyPayload.WriteToModel(*dataModelPtr);");
+		FeedStream(stream, 1, false);
+
+		// [1->2] check if payload write to TreeModel is failed
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("if (!isModelCreated){");
+		FeedStream(stream, 1, false);
+
+		// [2] set error message
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("errorMessage = QString(\"Internal error. Unable to create response for command-ID: '%1'\").arg(qPrintable(commandId));");
+		FeedStream(stream, 1, false);
+
+		// [2] add log message
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("SendCriticalMessage(0, errorMessage);");
+		FeedStream(stream, 2, false);
+
+		// [2] return
+		FeedStreamHorizontally(stream, hIndents + 2);
+		stream << QStringLiteral("return nullptr;");
+		FeedStream(stream, 1, false);
+	}
 }
 
 
@@ -1261,7 +1289,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 	case imtsdl::CSdlDocumentType::OT_LIST:
 	case imtsdl::CSdlDocumentType::OT_GET:
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("return true;");
+		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command-ID: '%1'\").arg(qPrintable(commandId));");
+		FeedStream(stream, 2, false);
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return false;");
 		break;
 	case imtsdl::CSdlDocumentType::OT_INSERT:
 		// create default section
@@ -1274,6 +1305,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
 		FeedStream(stream, 2, false);
+
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("return nullptr;");
 		break;
@@ -1414,10 +1446,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 {
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
 				&sdlRequestInfo.request.GetSchemaParams(),
-				m_argumentParserCompPtr,
+				m_argumentParserCompPtr.GetPtr(),
 				false);
 
-	imtsdl::CSdlType referenceType = sdlDocumentType.GetReferenceType();
+	const imtsdl::CSdlEntryBase& referenceType = sdlDocumentType.GetReferenceType();
 	CStructNamespaceConverter structNameConverter(
 				referenceType,
 				sdlNamespace,
@@ -1509,31 +1541,59 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		stream << '}';
 		FeedStream(stream, 2, false);
 
-		// [1] create write check variable
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("const bool isRepresentationWritten = ");
-
-		stream << QStringLiteral("representationObject.WriteToModel(dataModel");
-		// [-||-] add index for list
-		if (operationType == imtsdl::CSdlDocumentType::OT_LIST){
-			stream << QStringLiteral(", itemIndex");
+		imtsdl::CSdlUnion foundUnion;
+		const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+		if (isUnion){
+			const static QString unionSourceVarName = QStringLiteral("representationObject");
+			imtsdl::CSdlUnionConverter::WriteConversionFromUnion(stream,
+						foundUnion,
+						unionSourceVarName,
+						outputArgument.GetId(),
+						m_originalSchemaNamespaceCompPtr->GetText(),
+						QStringLiteral("representationObject"),
+						QString(),
+						*m_sdlTypeListCompPtr,
+						*m_sdlEnumListCompPtr,
+						*m_sdlUnionListCompPtr,
+						hIndents + 1,
+						imtsdl::CSdlUnionConverter::CT_MODEL_SCALAR,
+						QString(),
+						QStringLiteral("dataModel"));
 		}
-		stream << QStringLiteral(");");
-		FeedStream(stream, 1, false);
+		else{
+			// [1] create write check variable
+			FeedStreamHorizontally(stream, hIndents + 1);
+			stream << QStringLiteral("const bool isRepresentationWritten = ");
 
-		// [1->2] checks write validate
+			stream << QStringLiteral("representationObject.WriteToModel(dataModel");
+			// [-||-] add index for list
+			if (operationType == imtsdl::CSdlDocumentType::OT_LIST){
+				stream << QStringLiteral(", itemIndex");
+			}
+			stream << QStringLiteral(");");
+			FeedStream(stream, 1, false);
+
+			// [1->2] checks write validate
+			FeedStreamHorizontally(stream, hIndents + 1);
+			stream << QStringLiteral("if (!isRepresentationWritten){");
+			FeedStream(stream, 1, false);
+
+			// [2] return
+			FeedStreamHorizontally(stream, hIndents + 2);
+			stream << QStringLiteral("return false;");
+			FeedStream(stream, 1, false);
+
+			// [2->1] end of write validate
+			FeedStreamHorizontally(stream, hIndents + 1);
+			stream << '}';
+			FeedStream(stream, 1, false);
+		}
+
+
+		FeedStream(stream, 1, false);
+		// [1] error respond
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("if (!isRepresentationWritten){");
-		FeedStream(stream, 1, false);
-
-		// [2] return
-		FeedStreamHorizontally(stream, hIndents + 2);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
-		// [2->1] end of write validate
-		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << '}';
+		stream <<  QStringLiteral("return true;");
 		FeedStream(stream, 1, false);
 	}
 

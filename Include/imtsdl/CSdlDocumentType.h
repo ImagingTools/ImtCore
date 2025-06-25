@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlUnion.h>
 #include <imtsdl/CSdlRequest.h>
 
 
@@ -65,8 +66,9 @@ public:
 	QString GetName() const;
 	void SetName(const QString& name);
 
-	CSdlType GetReferenceType() const;
+	const CSdlEntryBase& GetReferenceType() const;
 	void SetReferenceType(const CSdlType& referenceType);
+	void SetReferenceType(const CSdlUnion& referenceType);
 
 	QMultiMap<OperationType, CSdlRequest> GetOperationsList() const;
 	bool HasRequest(OperationType operationType) const;
@@ -102,6 +104,7 @@ public:
 private:
 	QString m_name;
 	CSdlType m_referenceType;
+	CSdlUnion m_referenceUnionType;
 	QMultiMap<OperationType, CSdlRequest> m_operationsList;
 	SdlDocumentTypeList m_subtypes;
 };

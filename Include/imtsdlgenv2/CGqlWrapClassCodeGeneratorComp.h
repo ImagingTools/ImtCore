@@ -58,7 +58,7 @@ private:
 	bool ProcessFiles(const imtsdl::CSdlRequest& sdlRequest, bool addDependenciesInclude, bool addSelfHeaderInclude);
 	bool ProcessHeaderClassFile(const imtsdl::CSdlRequest& sdlRequest, bool addDependenciesInclude);
 	bool ProcessSourceClassFile(const imtsdl::CSdlRequest& sdlRequest, bool addSelfHeaderInclude);
-	void GenerateFieldRequestInfo(QTextStream& stream, const imtsdl::CSdlField& sdlField, uint hIndents = 1, bool createStructDefinition = false);
+	bool GenerateFieldRequestInfo(QTextStream& stream, const imtsdl::CSdlField& sdlField, uint hIndents = 1, bool createStructDefinition = false);
 	void GenerateRequestParsing(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents = 1);
 	void GenerateRequestedFieldsParsing(QTextStream& stream, const imtsdl::CSdlField& sdlField, const QString& idListContainerParamName, const QString& gqlObjectVarName, const QString& complexFieldName = QString(), uint hIndents = 1);
 	void GenerateRequestedFieldsParsing(QTextStream& stream, const imtsdl::CSdlType& sdlType, const QString& idListContainerParamName, const QString& gqlObjectVarName, const QString& complexFieldName = QString(), uint hIndents = 1);

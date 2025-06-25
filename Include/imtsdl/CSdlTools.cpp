@@ -109,7 +109,7 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 
 		QString typeNamespace;
 		if (isType){
-			typeNamespace = typeForField.GetNamespace();
+			typeNamespace = BuildNamespaceFromParams(typeForField.GetSchemaParams(), false);
 		}
 		else if (isEnum){
 			typeNamespace = BuildNamespaceFromParams(enumForField.GetSchemaParams(), false);
@@ -847,24 +847,24 @@ QString CSdlTools::GetNamespaceFromParamsOrArguments(
 {
 	return GetNamespaceFromParamsOrArguments(
 				(schemaParamsCompPtr.IsValid() ? schemaParamsCompPtr.GetPtr() : nullptr),
-				argumentParamsCompPtr,
+				(argumentParamsCompPtr.IsValid() ? argumentParamsCompPtr.GetPtr() : nullptr),
 				addVersion);
 }
 
 
 QString CSdlTools::GetNamespaceFromParamsOrArguments(
-			const iprm::IParamsSet* schemaParamsCompPtr,
-			const ArgumentParserCompPtr& argumentParamsCompPtr,
+			const iprm::IParamsSet* schemaParamsPtr,
+			const ISdlProcessArgumentsParser* argumentParamsPtr,
 			bool addVersion)
 {
 	QString sdlNamespace;
-	if (schemaParamsCompPtr != nullptr){
-		sdlNamespace = BuildNamespaceFromParams(*schemaParamsCompPtr, addVersion, true);
+	if (schemaParamsPtr != nullptr){
+		sdlNamespace = BuildNamespaceFromParams(*schemaParamsPtr, addVersion, true);
 	}
 
 	// we should override nmespace from agrs if it porvided
-	if (argumentParamsCompPtr.IsValid()){
-		QString argNamespace = argumentParamsCompPtr->GetNamespace();
+	if (argumentParamsPtr != nullptr){
+		QString argNamespace = argumentParamsPtr->GetNamespace();
 		if (!argNamespace.isEmpty()){
 			sdlNamespace = argNamespace;
 		}

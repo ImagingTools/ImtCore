@@ -2,6 +2,7 @@ schema {
 	name: UnionTest
 	namespace: modsdl
 	version: 1.0
+	query: Query
 }
 
 type Coords{
@@ -24,4 +25,15 @@ type PrinterBase {
 	specification: PrinterSpecification
 }
 
+type Query {
+	GetSpecifications(input: Link): PrinterSpecification
+}
 
+collectionSchema {
+	type Printer {
+		ref: PrinterSpecification
+		operations {
+			get: GetSpecifications
+		}
+	}
+}

@@ -78,7 +78,7 @@ public:
 	static QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr);
 	static QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr);
 	static QString ConvertTypeOrEnum(const CSdlField& sdlField, const SdlEnumList& enumList, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr, bool* isEnumPtr = nullptr);
-	/// \todo renamt it and make a structure with result
+	/// \todo rename it and make a structure with result
 	static QString ConvertTypeOrEnumOrUnion(const CSdlField& sdlField, const SdlEnumList& enumList, const SdlUnionList& unionList, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr, bool* isEnumPtr = nullptr, bool* isUnion = nullptr);
 
 	static QString QmlConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr);
@@ -112,8 +112,8 @@ public:
 				const SchemaParamsCompPtr& schemaParamsCompPtr,
 				const ArgumentParserCompPtr& argumentParamsCompPtr, bool addVersion = true);
 	[[nodiscard]] static QString GetNamespaceFromParamsOrArguments(
-				const iprm::IParamsSet* schemaParamsCompPtr,
-				const ArgumentParserCompPtr& argumentParamsCompPtr, bool addVersion = true);
+				const iprm::IParamsSet* schemaParamsPtr,
+				const ISdlProcessArgumentsParser* argumentParamsPtr, bool addVersion = true);
 
 	/// \sa imtsdlgen::ISdlProcessArgumentsParser::s_headerFileType imtsdlgen::ISdlProcessArgumentsParser::s_sourceFileType
 	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());

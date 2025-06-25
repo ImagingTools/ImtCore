@@ -29,6 +29,9 @@ class CSdlEntryBase: virtual public iser::ISerializable
 public:
 	CSdlEntryBase();
 
+	[[nodiscard]] virtual QString GetName() const;
+	virtual void SetName(const QString& name);
+
 	[[nodiscard]] virtual QString GetTargetHeaderFilePath() const;
 	virtual void SetTargetHeaderFilePath(const QString& headerFile);
 
@@ -45,6 +48,7 @@ public:
 	virtual void SetSchemaParamsPtr(const std::shared_ptr<iprm::IParamsSet>& schemaParamsPtr);
 
 protected:
+	QString m_name;
 	QString m_targetHeaderFilePath;
 	QString m_schemaFilePath;
 	bool m_isExternal;

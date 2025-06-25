@@ -19,21 +19,6 @@ CSdlEnum::CSdlEnum() :CSdlEntryBase()
 }
 
 
-QString CSdlEnum::GetName() const
-{
-	return m_name;
-}
-
-
-void CSdlEnum::SetName(const QString& name)
-{
-	if (m_name != name){
-		istd::CChangeNotifier notifier(this);
-		m_name = name;
-	}
-}
-
-
 QList<QPair<QString, QString>> CSdlEnum::GetValues() const
 {
 	return m_values;

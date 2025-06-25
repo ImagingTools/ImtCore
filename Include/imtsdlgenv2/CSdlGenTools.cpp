@@ -85,63 +85,61 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 	}
 
 	QString retVal;
+	const imtsdl::CSdlEntryBase* namespaceEntryPtr = sdlEntryPtr;
+	std::shared_ptr<imtsdl::CSdlEntryBase> typeForFieldPtr;
+
+	if (sdlFieldPtr != nullptr){
+		typeForFieldPtr = imtsdl::CSdlTools::GetSdlTypeOrEnumOrUnionForField(
+			*sdlFieldPtr,
+			typeListProviderPtr->GetSdlTypes(false),
+			enumListProviderPtr->GetEnums(false),
+			unionListProviderPtr->GetUnions(false));
+		if (!typeForFieldPtr){
+			qCritical() << "Unable to find enum or type for" << sdlFieldPtr->GetId() << "of" << sdlFieldPtr->GetType();
+			I_CRITICAL();
+
+			return QString();
+		}
+		namespaceEntryPtr = typeForFieldPtr.get();
+	}
+
+	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<const imtsdl::CSdlType*>(namespaceEntryPtr);
+	if (sdlTypePtr != nullptr){
+		retVal += 'C';
+		retVal +=  imtsdl::CSdlTools::GetCapitalizedValue(sdlTypePtr->GetName());
+	}
+
+	const imtsdl::CSdlDocumentType* sdlDocumentTypePtr = dynamic_cast<const imtsdl::CSdlDocumentType*>(namespaceEntryPtr);
+	if (sdlDocumentTypePtr != nullptr){
+		retVal += 'C';
+		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlDocumentTypePtr->GetName());
+	}
+
+	const imtsdl::CSdlRequest* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(namespaceEntryPtr);
+	if (sdlRequestPtr != nullptr){
+
+		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlRequestPtr->GetName());
+		retVal += QStringLiteral("GqlRequest");
+	}
+
+	const imtsdl::CSdlEnum* sdlEnumPtr = dynamic_cast<const imtsdl::CSdlEnum*>(namespaceEntryPtr);
+	if (sdlEnumPtr != nullptr){
+		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlEnumPtr->GetName());
+	}
+
+	const imtsdl::CSdlUnion* sdlUnionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(namespaceEntryPtr);
+	if (sdlUnionPtr != nullptr){
+		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlUnionPtr->GetName());
+	}
+	// versions does NOT exists for enumerators and unions
+	if ((sdlEnumPtr == nullptr && sdlUnionPtr == nullptr) && addVersion){
+		retVal += QStringLiteral("::");
+		retVal += GetSdlEntryVersion(*namespaceEntryPtr);
+	}
+
 	if (!relatedNamespace.isEmpty()){
-
-		const imtsdl::CSdlEntryBase* namespaceEntryPtr = sdlEntryPtr;
-		std::shared_ptr<imtsdl::CSdlEntryBase> typeForFieldPtr;
-
-		QString typeNamespace;
-		if (sdlFieldPtr != nullptr){
-			typeForFieldPtr = imtsdl::CSdlTools::GetSdlTypeOrEnumOrUnionForField(
-				*sdlFieldPtr,
-				typeListProviderPtr->GetSdlTypes(false),
-				enumListProviderPtr->GetEnums(false),
-				unionListProviderPtr->GetUnions(false));
-			if (!typeForFieldPtr){
-				qCritical() << "Unable to find enum or type for" << sdlFieldPtr->GetId() << "of" << sdlFieldPtr->GetType();
-				I_CRITICAL();
-
-				return QString();
-			}
-			namespaceEntryPtr = typeForFieldPtr.get();
-		}
-
-		typeNamespace = GetNamespaceFromSchemaParams(namespaceEntryPtr->GetSchemaParams());
-
-		const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<const imtsdl::CSdlType*>(namespaceEntryPtr);
-		if (sdlTypePtr != nullptr){
-			typeNamespace += QStringLiteral("::C") + imtsdl::CSdlTools::GetCapitalizedValue(sdlTypePtr->GetName());
-		}
-
-		const imtsdl::CSdlDocumentType* sdlDocumentTypePtr = dynamic_cast<const imtsdl::CSdlDocumentType*>(namespaceEntryPtr);
-		if (sdlDocumentTypePtr != nullptr){
-			typeNamespace += QStringLiteral("::C") + imtsdl::CSdlTools::GetCapitalizedValue(sdlDocumentTypePtr->GetName());
-		}
-
-		const imtsdl::CSdlRequest* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(namespaceEntryPtr);
-		if (sdlRequestPtr != nullptr){
-			typeNamespace += QStringLiteral("::C") + imtsdl::CSdlTools::GetCapitalizedValue(sdlRequestPtr->GetName());
-			typeNamespace += QStringLiteral("GqlRequest");
-		}
-
-		const imtsdl::CSdlEnum* sdlEnumPtr = dynamic_cast<const imtsdl::CSdlEnum*>(namespaceEntryPtr);
-		if (sdlEnumPtr != nullptr){
-			typeNamespace += QStringLiteral("::");
-			typeNamespace += imtsdl::CSdlTools::GetCapitalizedValue(sdlEnumPtr->GetName());
-		}
-
-		const imtsdl::CSdlUnion* sdlUnionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(namespaceEntryPtr);
-		if (sdlUnionPtr != nullptr){
-			typeNamespace += QStringLiteral("::");
-			typeNamespace += imtsdl::CSdlTools::GetCapitalizedValue(sdlUnionPtr->GetName());
-		}
-
+		QString typeNamespace = GetNamespaceFromSchemaParams(namespaceEntryPtr->GetSchemaParams());
 		if (typeNamespace != relatedNamespace){
-			// versions does NOT exists for enumerators and unions
-			if ((sdlEnumPtr == nullptr && sdlUnionPtr == nullptr) && addVersion){
-				typeNamespace += QStringLiteral("::");
-				typeNamespace += GetSdlEntryVersion(*namespaceEntryPtr);
-			}
 
 			bool namespaceCleaned = false;
 			// clean namespace
@@ -177,18 +175,19 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 					namespaceCleaned = true;
 					typeNamespacePartsIter.remove();
 				}
-				typeNamespace = typeNamespaceParts.join(QStringLiteral("::"));
+				typeNamespace = typeNamespaceParts.join(QStringLiteral("::")) + QStringLiteral("::");
 
-				retVal = typeNamespace;
+				retVal.prepend(typeNamespace);
 			}
 			// use global namespace
 			if (!namespaceCleaned && !retVal.startsWith(QStringLiteral("::"))){
 				retVal.prepend(QStringLiteral("::"));
 			}
-			if (sdlUnionPtr != nullptr){
-				retVal = QStringLiteral("std::shared_ptr<") + retVal + QStringLiteral(">");
-			}
 		}
+	}
+
+	if (sdlUnionPtr != nullptr){
+		retVal = QStringLiteral("std::shared_ptr<") + retVal + QStringLiteral(">");
 	}
 
 	if (sdlFieldPtr != nullptr && listWrap && sdlFieldPtr->IsArray()){

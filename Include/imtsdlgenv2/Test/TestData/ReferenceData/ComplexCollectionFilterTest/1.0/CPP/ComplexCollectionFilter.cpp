@@ -146,7 +146,7 @@ bool CTimeFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 
 bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("timeRange") && gqlObject.GetParamArgumentObjectPtr("timeRange") == nullptr){
+	if (gqlObject.ContainsParam("timeRange") && gqlObject.GetParamArgumentObjectPtr("timeRange") != nullptr){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
 		const bool isTimeRangeRead = timeRange->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
 		if (!isTimeRangeRead){
@@ -162,7 +162,7 @@ bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		interpretationMode = gqlObject["interpretationMode"].toString();
 	}
 
-	if (gqlObject.ContainsParam("unitMultiplier") && gqlObject["unitMultiplier"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("unitMultiplier") && gqlObject["unitMultiplier"].userType() == QMetaType::Int){
 		unitMultiplier = gqlObject["unitMultiplier"].toInt();
 	}
 
@@ -172,7 +172,7 @@ bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 
 bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("timeRange") && gqlObject.GetParamArgumentObjectPtr("timeRange") == nullptr){
+	if (gqlObject.ContainsParam("timeRange") && gqlObject.GetParamArgumentObjectPtr("timeRange") != nullptr){
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
 		const bool isTimeRangeRead = timeRange->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
 		if (!isTimeRangeRead){
@@ -188,7 +188,7 @@ bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 		interpretationMode = gqlObject["interpretationMode"].toString();
 	}
 
-	if (gqlObject.ContainsParam("unitMultiplier") && gqlObject["unitMultiplier"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("unitMultiplier") && gqlObject["unitMultiplier"].userType() == QMetaType::Int){
 		unitMultiplier = gqlObject["unitMultiplier"].toInt();
 	}
 
@@ -1193,7 +1193,7 @@ bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 
 bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("fieldId") || gqlObject["fieldId"].userType() != QMetaType::QByteArray){
+	if (!gqlObject.ContainsParam("fieldId") || gqlObject["fieldId"].userType() != QMetaType::QString){
 		return false;
 	}
 	fieldId = gqlObject["fieldId"].toByteArray();
@@ -1260,7 +1260,7 @@ bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 
 bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("fieldId") && gqlObject["fieldId"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("fieldId") && gqlObject["fieldId"].userType() == QMetaType::QString){
 		fieldId = gqlObject["fieldId"].toByteArray();
 	}
 
@@ -2657,7 +2657,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 		}
 	}
 
-	if (gqlObject.ContainsParam("fieldsFilter") && gqlObject.GetParamArgumentObjectPtr("fieldsFilter") == nullptr){
+	if (gqlObject.ContainsParam("fieldsFilter") && gqlObject.GetParamArgumentObjectPtr("fieldsFilter") != nullptr){
 		fieldsFilter = CGroupFilter::V1_0();
 		const bool isFieldsFilterRead = fieldsFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
 		if (!isFieldsFilterRead){
@@ -2665,7 +2665,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 		}
 	}
 
-	if (gqlObject.ContainsParam("timeFilter") && gqlObject.GetParamArgumentObjectPtr("timeFilter") == nullptr){
+	if (gqlObject.ContainsParam("timeFilter") && gqlObject.GetParamArgumentObjectPtr("timeFilter") != nullptr){
 		timeFilter = CTimeFilter::V1_0();
 		const bool isTimeFilterRead = timeFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
 		if (!isTimeFilterRead){
@@ -2706,7 +2706,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 		}
 	}
 
-	if (gqlObject.ContainsParam("fieldsFilter") && gqlObject.GetParamArgumentObjectPtr("fieldsFilter") == nullptr){
+	if (gqlObject.ContainsParam("fieldsFilter") && gqlObject.GetParamArgumentObjectPtr("fieldsFilter") != nullptr){
 		fieldsFilter = CGroupFilter::V1_0();
 		const bool isFieldsFilterRead = fieldsFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
 		if (!isFieldsFilterRead){
@@ -2714,7 +2714,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 		}
 	}
 
-	if (gqlObject.ContainsParam("timeFilter") && gqlObject.GetParamArgumentObjectPtr("timeFilter") == nullptr){
+	if (gqlObject.ContainsParam("timeFilter") && gqlObject.GetParamArgumentObjectPtr("timeFilter") != nullptr){
 		timeFilter = CTimeFilter::V1_0();
 		const bool isTimeFilterRead = timeFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
 		if (!isTimeFilterRead){

@@ -28,6 +28,7 @@ private Q_SLOTS:
 	void TestUnion();
 	void TestComplexUnion1();
 	void TestComplexUnion2();
+	void PrinterTest();
 
 	void cleanupTestCase();
 

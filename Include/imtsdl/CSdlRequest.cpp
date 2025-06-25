@@ -27,20 +27,6 @@ void CSdlRequest::SetType(Type type)
 	}
 }
 
-QString CSdlRequest::GetName() const
-{
-	return m_name;
-}
-
-
-void CSdlRequest::SetName(const QString& name)
-{
-	if (m_name != name){
-		istd::CChangeNotifier notifier(this);
-		m_name = name;
-	}
-}
-
 
 SdlFieldList CSdlRequest::GetInputArguments() const
 {

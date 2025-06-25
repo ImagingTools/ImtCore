@@ -1490,59 +1490,59 @@ bool CParamTypeIds::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObj
 
 bool CParamTypeIds::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("UrlParam") && gqlObject["UrlParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("UrlParam") && gqlObject["UrlParam"].userType() == QMetaType::QString){
 		UrlParam = gqlObject["UrlParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("IdParam") && gqlObject["IdParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("IdParam") && gqlObject["IdParam"].userType() == QMetaType::QString){
 		IdParam = gqlObject["IdParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("TextParam") && gqlObject["TextParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("TextParam") && gqlObject["TextParam"].userType() == QMetaType::QString){
 		TextParam = gqlObject["TextParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("TextView") && gqlObject["TextView"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("TextView") && gqlObject["TextView"].userType() == QMetaType::QString){
 		TextView = gqlObject["TextView"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("SelectionParam") && gqlObject["SelectionParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("SelectionParam") && gqlObject["SelectionParam"].userType() == QMetaType::QString){
 		SelectionParam = gqlObject["SelectionParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("SchedulerParam") && gqlObject["SchedulerParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("SchedulerParam") && gqlObject["SchedulerParam"].userType() == QMetaType::QString){
 		SchedulerParam = gqlObject["SchedulerParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("BackupSettings") && gqlObject["BackupSettings"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("BackupSettings") && gqlObject["BackupSettings"].userType() == QMetaType::QString){
 		BackupSettings = gqlObject["BackupSettings"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("DatabaseAccessSettings") && gqlObject["DatabaseAccessSettings"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("DatabaseAccessSettings") && gqlObject["DatabaseAccessSettings"].userType() == QMetaType::QString){
 		DatabaseAccessSettings = gqlObject["DatabaseAccessSettings"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("ParamsSet") && gqlObject["ParamsSet"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("ParamsSet") && gqlObject["ParamsSet"].userType() == QMetaType::QString){
 		ParamsSet = gqlObject["ParamsSet"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("FileNameParam") && gqlObject["FileNameParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("FileNameParam") && gqlObject["FileNameParam"].userType() == QMetaType::QString){
 		FileNameParam = gqlObject["FileNameParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("IntegerParam") && gqlObject["IntegerParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("IntegerParam") && gqlObject["IntegerParam"].userType() == QMetaType::QString){
 		IntegerParam = gqlObject["IntegerParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("DoubleParam") && gqlObject["DoubleParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("DoubleParam") && gqlObject["DoubleParam"].userType() == QMetaType::QString){
 		DoubleParam = gqlObject["DoubleParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("PasswordParam") && gqlObject["PasswordParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("PasswordParam") && gqlObject["PasswordParam"].userType() == QMetaType::QString){
 		PasswordParam = gqlObject["PasswordParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("EnableableParam") && gqlObject["EnableableParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("EnableableParam") && gqlObject["EnableableParam"].userType() == QMetaType::QString){
 		EnableableParam = gqlObject["EnableableParam"].toByteArray();
 	}
 
@@ -1552,59 +1552,59 @@ bool CParamTypeIds::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 
 bool CParamTypeIds::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("UrlParam") && gqlObject["UrlParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("UrlParam") && gqlObject["UrlParam"].userType() == QMetaType::QString){
 		UrlParam = gqlObject["UrlParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("IdParam") && gqlObject["IdParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("IdParam") && gqlObject["IdParam"].userType() == QMetaType::QString){
 		IdParam = gqlObject["IdParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("TextParam") && gqlObject["TextParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("TextParam") && gqlObject["TextParam"].userType() == QMetaType::QString){
 		TextParam = gqlObject["TextParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("TextView") && gqlObject["TextView"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("TextView") && gqlObject["TextView"].userType() == QMetaType::QString){
 		TextView = gqlObject["TextView"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("SelectionParam") && gqlObject["SelectionParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("SelectionParam") && gqlObject["SelectionParam"].userType() == QMetaType::QString){
 		SelectionParam = gqlObject["SelectionParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("SchedulerParam") && gqlObject["SchedulerParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("SchedulerParam") && gqlObject["SchedulerParam"].userType() == QMetaType::QString){
 		SchedulerParam = gqlObject["SchedulerParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("BackupSettings") && gqlObject["BackupSettings"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("BackupSettings") && gqlObject["BackupSettings"].userType() == QMetaType::QString){
 		BackupSettings = gqlObject["BackupSettings"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("DatabaseAccessSettings") && gqlObject["DatabaseAccessSettings"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("DatabaseAccessSettings") && gqlObject["DatabaseAccessSettings"].userType() == QMetaType::QString){
 		DatabaseAccessSettings = gqlObject["DatabaseAccessSettings"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("ParamsSet") && gqlObject["ParamsSet"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("ParamsSet") && gqlObject["ParamsSet"].userType() == QMetaType::QString){
 		ParamsSet = gqlObject["ParamsSet"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("FileNameParam") && gqlObject["FileNameParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("FileNameParam") && gqlObject["FileNameParam"].userType() == QMetaType::QString){
 		FileNameParam = gqlObject["FileNameParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("IntegerParam") && gqlObject["IntegerParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("IntegerParam") && gqlObject["IntegerParam"].userType() == QMetaType::QString){
 		IntegerParam = gqlObject["IntegerParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("DoubleParam") && gqlObject["DoubleParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("DoubleParam") && gqlObject["DoubleParam"].userType() == QMetaType::QString){
 		DoubleParam = gqlObject["DoubleParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("PasswordParam") && gqlObject["PasswordParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("PasswordParam") && gqlObject["PasswordParam"].userType() == QMetaType::QString){
 		PasswordParam = gqlObject["PasswordParam"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("EnableableParam") && gqlObject["EnableableParam"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("EnableableParam") && gqlObject["EnableableParam"].userType() == QMetaType::QString){
 		EnableableParam = gqlObject["EnableableParam"].toByteArray();
 	}
 
@@ -2156,7 +2156,7 @@ bool CUrlParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		host = gqlObject["host"].toString();
 	}
 
-	if (gqlObject.ContainsParam("port") && gqlObject["port"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("port") && gqlObject["port"].userType() == QMetaType::Int){
 		port = gqlObject["port"].toInt();
 	}
 
@@ -2178,7 +2178,7 @@ bool CUrlParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		host = gqlObject["host"].toString();
 	}
 
-	if (gqlObject.ContainsParam("port") && gqlObject["port"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("port") && gqlObject["port"].userType() == QMetaType::Int){
 		port = gqlObject["port"].toInt();
 	}
 
@@ -2549,7 +2549,7 @@ bool CIdParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) 
 
 bool CIdParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("id") && gqlObject["id"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("id") && gqlObject["id"].userType() == QMetaType::QString){
 		id = gqlObject["id"].toByteArray();
 	}
 
@@ -2559,7 +2559,7 @@ bool CIdParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 
 bool CIdParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("id") && gqlObject["id"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("id") && gqlObject["id"].userType() == QMetaType::QString){
 		id = gqlObject["id"].toByteArray();
 	}
 
@@ -3572,7 +3572,7 @@ bool CIntegerParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObj
 
 bool CIntegerParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("value") && gqlObject["value"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("value") && gqlObject["value"].userType() == QMetaType::Int){
 		value = gqlObject["value"].toInt();
 	}
 
@@ -3582,7 +3582,7 @@ bool CIntegerParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 
 bool CIntegerParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("value") && gqlObject["value"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("value") && gqlObject["value"].userType() == QMetaType::Int){
 		value = gqlObject["value"].toInt();
 	}
 
@@ -4313,7 +4313,7 @@ bool COption::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 
 bool COption::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("id") && gqlObject["id"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("id") && gqlObject["id"].userType() == QMetaType::QString){
 		id = gqlObject["id"].toByteArray();
 	}
 
@@ -4335,7 +4335,7 @@ bool COption::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 
 bool COption::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("id") && gqlObject["id"].userType() == QMetaType::QByteArray){
+	if (gqlObject.ContainsParam("id") && gqlObject["id"].userType() == QMetaType::QString){
 		id = gqlObject["id"].toByteArray();
 	}
 
@@ -4786,11 +4786,11 @@ bool COptionsList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 
 bool COptionsList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("totalCount") && gqlObject["totalCount"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("totalCount") && gqlObject["totalCount"].userType() == QMetaType::Int){
 		totalCount = gqlObject["totalCount"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("offset") && gqlObject["offset"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("offset") && gqlObject["offset"].userType() == QMetaType::Int){
 		offset = gqlObject["offset"].toInt();
 	}
 
@@ -4816,11 +4816,11 @@ bool COptionsList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 
 bool COptionsList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("totalCount") && gqlObject["totalCount"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("totalCount") && gqlObject["totalCount"].userType() == QMetaType::Int){
 		totalCount = gqlObject["totalCount"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("offset") && gqlObject["offset"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("offset") && gqlObject["offset"].userType() == QMetaType::Int){
 		offset = gqlObject["offset"].toInt();
 	}
 
@@ -5254,11 +5254,11 @@ bool CSelectionParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 
 bool CSelectionParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("selectedIndex") && gqlObject["selectedIndex"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("selectedIndex") && gqlObject["selectedIndex"].userType() == QMetaType::Int){
 		selectedIndex = gqlObject["selectedIndex"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("constraints") && gqlObject.GetParamArgumentObjectPtr("constraints") == nullptr){
+	if (gqlObject.ContainsParam("constraints") && gqlObject.GetParamArgumentObjectPtr("constraints") != nullptr){
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
@@ -5272,11 +5272,11 @@ bool CSelectionParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 
 bool CSelectionParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("selectedIndex") && gqlObject["selectedIndex"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("selectedIndex") && gqlObject["selectedIndex"].userType() == QMetaType::Int){
 		selectedIndex = gqlObject["selectedIndex"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("constraints") && gqlObject.GetParamArgumentObjectPtr("constraints") == nullptr){
+	if (gqlObject.ContainsParam("constraints") && gqlObject.GetParamArgumentObjectPtr("constraints") != nullptr){
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
@@ -5659,7 +5659,7 @@ bool CSchedulerParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		startTime = gqlObject["startTime"].toString();
 	}
 
-	if (gqlObject.ContainsParam("interval") && gqlObject["interval"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("interval") && gqlObject["interval"].userType() == QMetaType::Int){
 		interval = gqlObject["interval"].toInt();
 	}
 
@@ -5673,7 +5673,7 @@ bool CSchedulerParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		startTime = gqlObject["startTime"].toString();
 	}
 
-	if (gqlObject.ContainsParam("interval") && gqlObject["interval"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("interval") && gqlObject["interval"].userType() == QMetaType::Int){
 		interval = gqlObject["interval"].toInt();
 	}
 
@@ -6053,7 +6053,7 @@ bool CBackupSettings::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 
 bool CBackupSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("schedulerParam") && gqlObject.GetParamArgumentObjectPtr("schedulerParam") == nullptr){
+	if (gqlObject.ContainsParam("schedulerParam") && gqlObject.GetParamArgumentObjectPtr("schedulerParam") != nullptr){
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
@@ -6071,7 +6071,7 @@ bool CBackupSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 
 bool CBackupSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("schedulerParam") && gqlObject.GetParamArgumentObjectPtr("schedulerParam") == nullptr){
+	if (gqlObject.ContainsParam("schedulerParam") && gqlObject.GetParamArgumentObjectPtr("schedulerParam") != nullptr){
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
@@ -6538,7 +6538,7 @@ bool CDatabaseAccessSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPa
 		host = gqlObject["host"].toString();
 	}
 
-	if (gqlObject.ContainsParam("port") && gqlObject["port"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("port") && gqlObject["port"].userType() == QMetaType::Int){
 		port = gqlObject["port"].toInt();
 	}
 
@@ -6568,7 +6568,7 @@ bool CDatabaseAccessSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGq
 		host = gqlObject["host"].toString();
 	}
 
-	if (gqlObject.ContainsParam("port") && gqlObject["port"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("port") && gqlObject["port"].userType() == QMetaType::Int){
 		port = gqlObject["port"].toInt();
 	}
 
@@ -6990,7 +6990,7 @@ bool CFileNameParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlOb
 
 bool CFileNameParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("pathType") && gqlObject["pathType"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("pathType") && gqlObject["pathType"].userType() == QMetaType::Int){
 		pathType = gqlObject["pathType"].toInt();
 	}
 
@@ -7004,7 +7004,7 @@ bool CFileNameParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 
 bool CFileNameParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("pathType") && gqlObject["pathType"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("pathType") && gqlObject["pathType"].userType() == QMetaType::Int){
 		pathType = gqlObject["pathType"].toInt();
 	}
 

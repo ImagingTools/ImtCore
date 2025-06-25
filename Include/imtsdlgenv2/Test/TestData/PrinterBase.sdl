@@ -1,0 +1,22 @@
+schema {
+	name: PrinterBase
+	namespace: modsdl
+	version: 1.0
+}
+
+type PrinterSpecificationBase{
+	name: String
+}
+
+type Link {
+	link: ID!
+}
+
+union PrinterSpecification = PrinterSpecificationBase | Link
+
+type PrinterBase {
+	name: String
+	specification: PrinterSpecification!
+}
+
+

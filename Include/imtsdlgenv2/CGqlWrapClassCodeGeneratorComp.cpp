@@ -262,7 +262,12 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 
 	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
 	// RequestInfo struct props
-	GenerateFieldRequestInfo(ifStream, outputArgument);
+	const bool isRequestInfoCreated = GenerateFieldRequestInfo(ifStream, outputArgument);
+	if (!isRequestInfoCreated){
+		SendErrorMessage(0, QString("Unable to create request info for request %1").arg(sdlRequest.GetName()));
+
+		return false;
+	}
 
 	// RequestInfo struct End
 	ifStream << '}' << ';';
@@ -489,15 +494,26 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
+bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 			QTextStream& stream,
 			const imtsdl::CSdlField& sdlField,
 			uint hIndents,
 			bool createStructDefinition)
 {
+	bool isUnion = false;
 	imtsdl::CSdlType sdlType;
-	[[maybe_unused]]bool isTypeFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), sdlType);
-	Q_ASSERT(isTypeFound);
+	bool isTypeFound = GetSdlTypeForField(sdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), sdlType);
+	if (!isTypeFound){
+		imtsdl::CSdlUnion sdlUnion;
+		isTypeFound = GetSdlUnionForField(sdlField, m_sdlUnionListCompPtr->GetUnions(false), sdlUnion);
+		isUnion = isTypeFound;
+	}
+
+	if (!isTypeFound){
+		SendErrorMessage(0, QString("Field %1 is not custom. Only cutom field allowed").arg(sdlField.GetType()));
+
+		return false;
+	}
 
 	if (createStructDefinition ){
 		FeedStreamHorizontally(stream, hIndents);
@@ -512,34 +528,44 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 
 	// then add general props
 	imtsdl::SdlFieldList customTypes;
-	for (const imtsdl::CSdlField& fieldFromType: sdlType.GetFields()){
-		FeedStreamHorizontally(stream, hIndents + createStructDefinition);
-		stream << QStringLiteral("bool is") << GetCapitalizedValue(fieldFromType.GetId()) << QStringLiteral("Requested = ");
-		stream << QStringLiteral("true");
-		stream << ';';
-		FeedStream(stream, 1, false);
+	if (isUnion){
+		/// \todo implement it
+	}
+	else{
+		for (const imtsdl::CSdlField& fieldFromType: sdlType.GetFields()){
+			FeedStreamHorizontally(stream, hIndents + createStructDefinition);
+			stream << QStringLiteral("bool is") << GetCapitalizedValue(fieldFromType.GetId()) << QStringLiteral("Requested = ");
+			stream << QStringLiteral("true");
+			stream << ';';
+			FeedStream(stream, 1, false);
 
-		// add custom types for nested structs creation
-		bool isCustom = false;
-		bool isEnum = false;
-		bool isUnion = false;
-		ConvertTypeOrEnumOrUnion(fieldFromType,
-			m_sdlEnumListCompPtr->GetEnums(false),
-			m_sdlUnionListCompPtr->GetUnions(false),
-			&isCustom,
-			nullptr,
-			nullptr,
-			&isEnum,
-			&isUnion);
-		if (isCustom && !isEnum && !isUnion){
-			customTypes << fieldFromType;
+			// add custom types for nested structs creation
+			bool isCustom = false;
+			bool isEnum = false;
+			bool isUnion = false;
+			ConvertTypeOrEnumOrUnion(fieldFromType,
+									 m_sdlEnumListCompPtr->GetEnums(false),
+									 m_sdlUnionListCompPtr->GetUnions(false),
+									 &isCustom,
+									 nullptr,
+									 nullptr,
+									 &isEnum,
+									 &isUnion);
+			if (isCustom && !isEnum && !isUnion){
+				customTypes << fieldFromType;
+			}
 		}
 	}
 
 	// and finally create all custom types;
 	for (const imtsdl::CSdlField& customType: customTypes){
 		if (customType.GetType() != sdlField.GetType()){
-			GenerateFieldRequestInfo(stream, customType, hIndents + 1, true);
+			const bool isRequestInfoCreated = GenerateFieldRequestInfo(stream, customType, hIndents + 1, true);
+			if (!isRequestInfoCreated){
+				SendErrorMessage(0, QString("Unable to create request info for type %1").arg(customType.GetType()));
+
+				return false;
+			}
 		}
 	}
 
@@ -549,6 +575,8 @@ void CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 		stream << sdlField.GetId() << ';';
 		FeedStream(stream, 1, false);
 	}
+
+	return true;
 }
 
 
@@ -643,13 +671,17 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 		m_sdlEnumListCompPtr->GetEnums(false),
 		m_sdlUnionListCompPtr->GetUnions(false));
 	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
-	if(sdlTypePtr == nullptr){
+	const imtsdl::CSdlUnion* sdlUnionPtr = dynamic_cast<imtsdl::CSdlUnion*>(foundEntry.get());
+	if(sdlTypePtr == nullptr && sdlUnionPtr == nullptr){
 		I_CRITICAL();
 
 		return;
 	}
 
-	GenerateRequestedFieldsParsing(stream, *sdlTypePtr, idListContainerParamName, gqlObjectVarName, complexFieldName, hIndents);
+	// GenerateRequestedFieldsParsing(stream, foundEntry.get(), idListContainerParamName, gqlObjectVarName, complexFieldName, hIndents);
+	if (sdlTypePtr != nullptr){
+		GenerateRequestedFieldsParsing(stream, *sdlTypePtr, idListContainerParamName, gqlObjectVarName, complexFieldName, hIndents);
+	}
 }
 
 

@@ -28,9 +28,6 @@ public:
 
 	CSdlUnion();
 
-	[[nodiscard]] QString GetName() const;
-	void SetName(const QString& name);
-
 	/// \todo rename it to _TypeName and add methods , that returns \c CSdlType
 	[[nodiscard]] QList<QString> GetTypes() const;
 	void SetTypes(const QList<QString>& types);
@@ -48,7 +45,6 @@ public:
 	[[nodiscard]] bool operator!=(const CSdlUnion& other) const { return !(operator==(other)); }
 
 private:
-	QString m_name;
 	QList<QString> m_types;
 	QString m_namespace;
 };
