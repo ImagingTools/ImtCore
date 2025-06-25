@@ -213,7 +213,7 @@ bool CServerConnectionInterfaceParam::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_interfaceMap.clear();
-	m_connectionFlags = CF_NONE;
+	m_connectionFlags = CF_DEFAULT;
 	m_host.clear();
 
 	return true;
