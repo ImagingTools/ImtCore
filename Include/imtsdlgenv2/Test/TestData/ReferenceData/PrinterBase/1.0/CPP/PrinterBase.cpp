@@ -71,7 +71,7 @@ bool CPrinterSpecificationBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 
 bool CPrinterSpecificationBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
 	}
 
@@ -81,7 +81,7 @@ bool CPrinterSpecificationBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGql
 
 bool CPrinterSpecificationBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
 	}
 
@@ -415,7 +415,7 @@ bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 
 bool CLink::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("link") || gqlObject["link"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("link") || (gqlObject["link"].userType() != QMetaType::QString && gqlObject["link"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	link = gqlObject["link"].toByteArray();
@@ -426,7 +426,7 @@ bool CLink::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 
 bool CLink::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("link") && gqlObject["link"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("link") && (gqlObject["link"].userType() == QMetaType::QString || gqlObject["link"].userType() == QMetaType::QByteArray)){
 		link = gqlObject["link"].toByteArray();
 	}
 
@@ -833,11 +833,11 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 
 bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
 	}
 
-	if (!gqlObject.ContainsParam("specification") || gqlObject["specification"].isNull()){
+	if (!gqlObject.ContainsParam("specification") || (gqlObject["specification"].isNull())){
 		return false;
 	}
 	const QVariant specificationVariantValue = gqlObject["specification"];
@@ -866,11 +866,11 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 
 bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("specification") && !gqlObject["specification"].isNull()){
+	if (gqlObject.ContainsParam("specification") && (!gqlObject["specification"].isNull())){
 		const QVariant specificationVariantValue = gqlObject["specification"];
 		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
 			CPrinterSpecificationBase specificationConvert;

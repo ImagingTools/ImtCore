@@ -150,7 +150,7 @@ bool CDigitalPrinterSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGqlPara
 
 bool CDigitalPrinterSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("base") && gqlObject.GetParamArgumentObjectPtr("base") != nullptr){
+	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
@@ -158,7 +158,7 @@ bool CDigitalPrinterSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::C
 		}
 	}
 
-	if (gqlObject.ContainsParam("printingTechnology") && gqlObject["printingTechnology"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("printingTechnology") && (gqlObject["printingTechnology"].userType() == QMetaType::QString || gqlObject["printingTechnology"].userType() == QMetaType::QByteArray)){
 		const QString printingTechnologyStringValue = gqlObject["printingTechnology"].toString();
 		if(printingTechnologyStringValue == "Inkjet"){
 			printingTechnology = PrintingTechnology::Inkjet;
@@ -177,7 +177,7 @@ bool CDigitalPrinterSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::C
 
 bool CDigitalPrinterSpecification::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("base") && gqlObject.GetParamArgumentObjectPtr("base") != nullptr){
+	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
@@ -185,7 +185,7 @@ bool CDigitalPrinterSpecification::V1_0::OptReadFromGraphQlObject(const ::imtgql
 		}
 	}
 
-	if (gqlObject.ContainsParam("printingTechnology") && gqlObject["printingTechnology"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("printingTechnology") && (gqlObject["printingTechnology"].userType() == QMetaType::QString || gqlObject["printingTechnology"].userType() == QMetaType::QByteArray)){
 		const QString printingTechnologyStringValue = gqlObject["printingTechnology"].toString();
 		if(printingTechnologyStringValue == "Inkjet"){
 			printingTechnology = PrintingTechnology::Inkjet;
@@ -659,7 +659,7 @@ bool CDigitalPrinter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 
 bool CDigitalPrinter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("base") && gqlObject.GetParamArgumentObjectPtr("base") != nullptr){
+	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
 		base = PrinterBase::CPrinterBase::V1_0();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
@@ -667,7 +667,7 @@ bool CDigitalPrinter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
-	if (gqlObject.ContainsParam("printingTechnology") && gqlObject["printingTechnology"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("printingTechnology") && (gqlObject["printingTechnology"].userType() == QMetaType::QString || gqlObject["printingTechnology"].userType() == QMetaType::QByteArray)){
 		const QString printingTechnologyStringValue = gqlObject["printingTechnology"].toString();
 		if(printingTechnologyStringValue == "Inkjet"){
 			printingTechnology = PrintingTechnology::Inkjet;
@@ -686,7 +686,7 @@ bool CDigitalPrinter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 
 bool CDigitalPrinter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("base") && gqlObject.GetParamArgumentObjectPtr("base") != nullptr){
+	if (gqlObject.ContainsParam("base") && (gqlObject.GetParamArgumentObjectPtr("base") != nullptr)){
 		base = PrinterBase::CPrinterBase::V1_0();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
@@ -694,7 +694,7 @@ bool CDigitalPrinter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		}
 	}
 
-	if (gqlObject.ContainsParam("printingTechnology") && gqlObject["printingTechnology"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("printingTechnology") && (gqlObject["printingTechnology"].userType() == QMetaType::QString || gqlObject["printingTechnology"].userType() == QMetaType::QByteArray)){
 		const QString printingTechnologyStringValue = gqlObject["printingTechnology"].toString();
 		if(printingTechnologyStringValue == "Inkjet"){
 			printingTechnology = PrintingTechnology::Inkjet;

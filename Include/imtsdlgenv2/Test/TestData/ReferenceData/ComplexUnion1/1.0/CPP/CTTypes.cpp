@@ -100,12 +100,12 @@ bool CPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) co
 
 bool CPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("X") || gqlObject["X"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("X") || (gqlObject["X"].userType() != QMetaType::Float && gqlObject["X"].userType() != QMetaType::Double)){
 		return false;
 	}
 	X = gqlObject["X"].toDouble();
 
-	if (!gqlObject.ContainsParam("Y") || gqlObject["Y"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("Y") || (gqlObject["Y"].userType() != QMetaType::Float && gqlObject["Y"].userType() != QMetaType::Double)){
 		return false;
 	}
 	Y = gqlObject["Y"].toDouble();
@@ -116,11 +116,11 @@ bool CPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObj
 
 bool CPoint::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("X") && gqlObject["X"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("X") && (gqlObject["X"].userType() == QMetaType::Float || gqlObject["X"].userType() == QMetaType::Double)){
 		X = gqlObject["X"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("Y") && gqlObject["Y"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("Y") && (gqlObject["Y"].userType() == QMetaType::Float || gqlObject["Y"].userType() == QMetaType::Double)){
 		Y = gqlObject["Y"].toDouble();
 	}
 
@@ -601,7 +601,7 @@ bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 
 bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("GeometryType") || gqlObject["GeometryType"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("GeometryType") || (gqlObject["GeometryType"].userType() != QMetaType::QString && gqlObject["GeometryType"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString geometryTypeStringValue = gqlObject["GeometryType"].toString();
@@ -618,11 +618,11 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		return false;
 	}
 
-	if (gqlObject.ContainsParam("Radius") && gqlObject["Radius"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("Radius") && (gqlObject["Radius"].userType() == QMetaType::Float || gqlObject["Radius"].userType() == QMetaType::Double)){
 		Radius = gqlObject["Radius"].toDouble();
 	}
 
-	if (!gqlObject.ContainsParam("Points") || gqlObject.GetObjectsCount("Points") <= 0){
+	if (!gqlObject.ContainsParam("Points") || (gqlObject.GetObjectsCount("Points") <= 0)){
 		return false;
 	}
 	const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("points");
@@ -645,7 +645,7 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 
 bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("GeometryType") && gqlObject["GeometryType"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("GeometryType") && (gqlObject["GeometryType"].userType() == QMetaType::QString || gqlObject["GeometryType"].userType() == QMetaType::QByteArray)){
 		const QString geometryTypeStringValue = gqlObject["GeometryType"].toString();
 		if(geometryTypeStringValue == "LINE"){
 			GeometryType = GeometryType::LINE;
@@ -661,11 +661,11 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		}
 	}
 
-	if (gqlObject.ContainsParam("Radius") && gqlObject["Radius"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("Radius") && (gqlObject["Radius"].userType() == QMetaType::Float || gqlObject["Radius"].userType() == QMetaType::Double)){
 		Radius = gqlObject["Radius"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("Points") && gqlObject.GetObjectsCount("Points") > 0){
+	if (gqlObject.ContainsParam("Points") && (gqlObject.GetObjectsCount("Points") > 0)){
 		const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("points");
 		Points = QList<CPoint::V1_0>();
 		for (qsizetype pointsIndex = 0; pointsIndex < pointsElementsCount; ++pointsIndex){

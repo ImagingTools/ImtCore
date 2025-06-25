@@ -198,6 +198,8 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		stream << QStringLiteral(" || ");
 	}
 
+	stream << '(';
+
 	if (isArray && !isUserType){ // array of scalars
 		if (expected){
 			stream << '!';
@@ -257,14 +259,30 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		}
 
 		stream << QStringLiteral("= QMetaType::");
+
+		// known-limitation text protocols do not support the "byte" type. for byte array also use string
 		if (	isEnum ||
-				convertedType == QStringLiteral("QString"))
+				convertedType == QStringLiteral("QString") ||
+				convertedType == QStringLiteral("QByteArray"))
 		{
 			stream << QStringLiteral("QString");
-		}
-		else if (convertedType == QStringLiteral("QByteArray")){
-			// known-limitation text protocols do not support the "byte" type. for byte array also use string
-			stream << QStringLiteral("QString");
+			if (expected){
+				stream << QStringLiteral(" || ");
+			}
+			else {
+				stream << QStringLiteral(" && ");
+			}
+			stream << GetContainerObjectVariableName();
+			stream << QStringLiteral("[\"");
+			stream << field.GetId();
+			stream << QStringLiteral("\"].userType() ");
+			if(expected){
+				stream << '=';
+			}
+			else{
+				stream << '!';
+			}
+			stream << QStringLiteral("= QMetaType::QByteArray");
 		}
 		else if (convertedType == QStringLiteral("int")){
 			stream << QStringLiteral("Int");
@@ -275,13 +293,28 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		else if (convertedType == QStringLiteral("qlonglong")){
 			stream << QStringLiteral("LongLong");
 		}
-		else if (convertedType == QStringLiteral("float")){
+		// known-limitation for text protocols, there is no difference between float and double numbers.
+		else if (convertedType == QStringLiteral("float") || convertedType == QStringLiteral("double")){
 			stream << QStringLiteral("Float");
+			if (expected){
+				stream << QStringLiteral(" || ");
+			}
+			else {
+				stream << QStringLiteral(" && ");
+			}
+			stream << GetContainerObjectVariableName();
+			stream << QStringLiteral("[\"");
+			stream << field.GetId();
+			stream << QStringLiteral("\"].userType() ");
+			if(expected){
+				stream << '=';
+			}
+			else{
+				stream << '!';
+			}
+			stream << QStringLiteral("= QMetaType::Double");
 		}
-		else if (convertedType == QStringLiteral("double"))
-		{
-			stream << QStringLiteral("Double");
-		}
+
 		else if (convertedType == QStringLiteral("bool")){
 			stream << QStringLiteral("Bool");
 		}
@@ -293,7 +326,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		}
 	}
 
-	stream << QStringLiteral("){");
+	stream << QStringLiteral(")){");
 
 	return true;
 }

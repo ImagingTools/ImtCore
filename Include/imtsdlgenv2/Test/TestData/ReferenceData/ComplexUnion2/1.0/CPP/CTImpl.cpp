@@ -1276,7 +1276,7 @@ bool CResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) c
 
 bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("AreaResult") || gqlObject["AreaResult"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("AreaResult") || (gqlObject["AreaResult"].userType() != QMetaType::QString && gqlObject["AreaResult"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString areaResultStringValue = gqlObject["AreaResult"].toString();
@@ -1299,37 +1299,37 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("ExpectedMinValue") || gqlObject["ExpectedMinValue"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("ExpectedMinValue") || (gqlObject["ExpectedMinValue"].userType() != QMetaType::Float && gqlObject["ExpectedMinValue"].userType() != QMetaType::Double)){
 		return false;
 	}
 	ExpectedMinValue = gqlObject["ExpectedMinValue"].toDouble();
 
-	if (!gqlObject.ContainsParam("ExpectedMaxValue") || gqlObject["ExpectedMaxValue"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("ExpectedMaxValue") || (gqlObject["ExpectedMaxValue"].userType() != QMetaType::Float && gqlObject["ExpectedMaxValue"].userType() != QMetaType::Double)){
 		return false;
 	}
 	ExpectedMaxValue = gqlObject["ExpectedMaxValue"].toDouble();
 
-	if (!gqlObject.ContainsParam("MeasuredValue") || gqlObject["MeasuredValue"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("MeasuredValue") || (gqlObject["MeasuredValue"].userType() != QMetaType::Float && gqlObject["MeasuredValue"].userType() != QMetaType::Double)){
 		return false;
 	}
 	MeasuredValue = gqlObject["MeasuredValue"].toDouble();
 
-	if (!gqlObject.ContainsParam("MinMeasuredValue") || gqlObject["MinMeasuredValue"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("MinMeasuredValue") || (gqlObject["MinMeasuredValue"].userType() != QMetaType::Float && gqlObject["MinMeasuredValue"].userType() != QMetaType::Double)){
 		return false;
 	}
 	MinMeasuredValue = gqlObject["MinMeasuredValue"].toDouble();
 
-	if (!gqlObject.ContainsParam("MaxMeasuredValue") || gqlObject["MaxMeasuredValue"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("MaxMeasuredValue") || (gqlObject["MaxMeasuredValue"].userType() != QMetaType::Float && gqlObject["MaxMeasuredValue"].userType() != QMetaType::Double)){
 		return false;
 	}
 	MaxMeasuredValue = gqlObject["MaxMeasuredValue"].toDouble();
 
-	if (!gqlObject.ContainsParam("MeanMeasuredValue") || gqlObject["MeanMeasuredValue"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("MeanMeasuredValue") || (gqlObject["MeanMeasuredValue"].userType() != QMetaType::Float && gqlObject["MeanMeasuredValue"].userType() != QMetaType::Double)){
 		return false;
 	}
 	MeanMeasuredValue = gqlObject["MeanMeasuredValue"].toDouble();
 
-	if (!gqlObject.ContainsParam("MeasurementType") || gqlObject["MeasurementType"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("MeasurementType") || (gqlObject["MeasurementType"].userType() != QMetaType::QString && gqlObject["MeasurementType"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString measurementTypeStringValue = gqlObject["MeasurementType"].toString();
@@ -1370,7 +1370,7 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("MeasurementUnit") || gqlObject["MeasurementUnit"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("MeasurementUnit") || (gqlObject["MeasurementUnit"].userType() != QMetaType::QString && gqlObject["MeasurementUnit"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString measurementUnitStringValue = gqlObject["MeasurementUnit"].toString();
@@ -1393,12 +1393,12 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("Length") || gqlObject["Length"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("Length") || (gqlObject["Length"].userType() != QMetaType::Float && gqlObject["Length"].userType() != QMetaType::Double)){
 		return false;
 	}
 	Length = gqlObject["Length"].toDouble();
 
-	if (!gqlObject.ContainsParam("ErrorType") || gqlObject["ErrorType"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("ErrorType") || (gqlObject["ErrorType"].userType() != QMetaType::QString && gqlObject["ErrorType"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
@@ -1556,7 +1556,7 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("Geometry") || gqlObject.GetParamArgumentObjectPtr("Geometry") == nullptr){
+	if (!gqlObject.ContainsParam("Geometry") || (gqlObject.GetParamArgumentObjectPtr("Geometry") == nullptr)){
 		return false;
 	}
 	Geometry = CTTypes::CGeometry::V1_0();
@@ -1571,7 +1571,7 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 
 bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("AreaResult") && gqlObject["AreaResult"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("AreaResult") && (gqlObject["AreaResult"].userType() == QMetaType::QString || gqlObject["AreaResult"].userType() == QMetaType::QByteArray)){
 		const QString areaResultStringValue = gqlObject["AreaResult"].toString();
 		if(areaResultStringValue == "NONE"){
 			AreaResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
@@ -1593,31 +1593,31 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("ExpectedMinValue") && gqlObject["ExpectedMinValue"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("ExpectedMinValue") && (gqlObject["ExpectedMinValue"].userType() == QMetaType::Float || gqlObject["ExpectedMinValue"].userType() == QMetaType::Double)){
 		ExpectedMinValue = gqlObject["ExpectedMinValue"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("ExpectedMaxValue") && gqlObject["ExpectedMaxValue"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("ExpectedMaxValue") && (gqlObject["ExpectedMaxValue"].userType() == QMetaType::Float || gqlObject["ExpectedMaxValue"].userType() == QMetaType::Double)){
 		ExpectedMaxValue = gqlObject["ExpectedMaxValue"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("MeasuredValue") && gqlObject["MeasuredValue"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("MeasuredValue") && (gqlObject["MeasuredValue"].userType() == QMetaType::Float || gqlObject["MeasuredValue"].userType() == QMetaType::Double)){
 		MeasuredValue = gqlObject["MeasuredValue"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("MinMeasuredValue") && gqlObject["MinMeasuredValue"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("MinMeasuredValue") && (gqlObject["MinMeasuredValue"].userType() == QMetaType::Float || gqlObject["MinMeasuredValue"].userType() == QMetaType::Double)){
 		MinMeasuredValue = gqlObject["MinMeasuredValue"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("MaxMeasuredValue") && gqlObject["MaxMeasuredValue"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("MaxMeasuredValue") && (gqlObject["MaxMeasuredValue"].userType() == QMetaType::Float || gqlObject["MaxMeasuredValue"].userType() == QMetaType::Double)){
 		MaxMeasuredValue = gqlObject["MaxMeasuredValue"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("MeanMeasuredValue") && gqlObject["MeanMeasuredValue"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("MeanMeasuredValue") && (gqlObject["MeanMeasuredValue"].userType() == QMetaType::Float || gqlObject["MeanMeasuredValue"].userType() == QMetaType::Double)){
 		MeanMeasuredValue = gqlObject["MeanMeasuredValue"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("MeasurementType") && gqlObject["MeasurementType"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("MeasurementType") && (gqlObject["MeasurementType"].userType() == QMetaType::QString || gqlObject["MeasurementType"].userType() == QMetaType::QByteArray)){
 		const QString measurementTypeStringValue = gqlObject["MeasurementType"].toString();
 		if(measurementTypeStringValue == "NONE"){
 			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::NONE;
@@ -1657,7 +1657,7 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("MeasurementUnit") && gqlObject["MeasurementUnit"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("MeasurementUnit") && (gqlObject["MeasurementUnit"].userType() == QMetaType::QString || gqlObject["MeasurementUnit"].userType() == QMetaType::QByteArray)){
 		const QString measurementUnitStringValue = gqlObject["MeasurementUnit"].toString();
 		if(measurementUnitStringValue == "NONE"){
 			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::NONE;
@@ -1679,11 +1679,11 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("Length") && gqlObject["Length"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("Length") && (gqlObject["Length"].userType() == QMetaType::Float || gqlObject["Length"].userType() == QMetaType::Double)){
 		Length = gqlObject["Length"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("ErrorType") && gqlObject["ErrorType"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("ErrorType") && (gqlObject["ErrorType"].userType() == QMetaType::QString || gqlObject["ErrorType"].userType() == QMetaType::QByteArray)){
 		const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
 		if(errorTypeStringValue == "OK"){
 			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
@@ -1840,7 +1840,7 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("Geometry") && gqlObject.GetParamArgumentObjectPtr("Geometry") != nullptr){
+	if (gqlObject.ContainsParam("Geometry") && (gqlObject.GetParamArgumentObjectPtr("Geometry") != nullptr)){
 		Geometry = CTTypes::CGeometry::V1_0();
 		const bool isGeometryRead = Geometry->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("Geometry"));
 		if (!isGeometryRead){
@@ -3871,12 +3871,12 @@ bool CArea::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 
 bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("AreaName") || gqlObject["AreaName"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("AreaName") || (gqlObject["AreaName"].userType() != QMetaType::QString && gqlObject["AreaName"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	AreaName = gqlObject["AreaName"].toString();
 
-	if (!gqlObject.ContainsParam("Status") || gqlObject["Status"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("Status") || (gqlObject["Status"].userType() != QMetaType::QString && gqlObject["Status"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString statusStringValue = gqlObject["Status"].toString();
@@ -3899,7 +3899,7 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("IconPosition") || gqlObject.GetParamArgumentObjectPtr("IconPosition") == nullptr){
+	if (!gqlObject.ContainsParam("IconPosition") || (gqlObject.GetParamArgumentObjectPtr("IconPosition") == nullptr)){
 		return false;
 	}
 	IconPosition = CTTypes::CPoint::V1_0();
@@ -3908,7 +3908,7 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("ErrorType") || gqlObject["ErrorType"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("ErrorType") || (gqlObject["ErrorType"].userType() != QMetaType::QString && gqlObject["ErrorType"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
@@ -4066,7 +4066,7 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("Results") || gqlObject.GetObjectsCount("Results") <= 0){
+	if (!gqlObject.ContainsParam("Results") || (gqlObject.GetObjectsCount("Results") <= 0)){
 		return false;
 	}
 	const qsizetype resultsElementsCount = gqlObject.GetObjectsCount("results");
@@ -4089,11 +4089,11 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 
 bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("AreaName") && gqlObject["AreaName"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("AreaName") && (gqlObject["AreaName"].userType() == QMetaType::QString || gqlObject["AreaName"].userType() == QMetaType::QByteArray)){
 		AreaName = gqlObject["AreaName"].toString();
 	}
 
-	if (gqlObject.ContainsParam("Status") && gqlObject["Status"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("Status") && (gqlObject["Status"].userType() == QMetaType::QString || gqlObject["Status"].userType() == QMetaType::QByteArray)){
 		const QString statusStringValue = gqlObject["Status"].toString();
 		if(statusStringValue == "NONE"){
 			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
@@ -4115,7 +4115,7 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 		}
 	}
 
-	if (gqlObject.ContainsParam("IconPosition") && gqlObject.GetParamArgumentObjectPtr("IconPosition") != nullptr){
+	if (gqlObject.ContainsParam("IconPosition") && (gqlObject.GetParamArgumentObjectPtr("IconPosition") != nullptr)){
 		IconPosition = CTTypes::CPoint::V1_0();
 		const bool isIconPositionRead = IconPosition->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("IconPosition"));
 		if (!isIconPositionRead){
@@ -4123,7 +4123,7 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 		}
 	}
 
-	if (gqlObject.ContainsParam("ErrorType") && gqlObject["ErrorType"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("ErrorType") && (gqlObject["ErrorType"].userType() == QMetaType::QString || gqlObject["ErrorType"].userType() == QMetaType::QByteArray)){
 		const QString errorTypeStringValue = gqlObject["ErrorType"].toString();
 		if(errorTypeStringValue == "OK"){
 			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::OK;
@@ -4280,7 +4280,7 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 		}
 	}
 
-	if (gqlObject.ContainsParam("Results") && gqlObject.GetObjectsCount("Results") > 0){
+	if (gqlObject.ContainsParam("Results") && (gqlObject.GetObjectsCount("Results") > 0)){
 		const qsizetype resultsElementsCount = gqlObject.GetObjectsCount("results");
 		Results = QList<CResult::V1_0>();
 		for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
@@ -5395,12 +5395,12 @@ bool CAnalyzer::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 
 bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("AnalyzerName") || gqlObject["AnalyzerName"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("AnalyzerName") || (gqlObject["AnalyzerName"].userType() != QMetaType::QString && gqlObject["AnalyzerName"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	AnalyzerName = gqlObject["AnalyzerName"].toString();
 
-	if (!gqlObject.ContainsParam("AnalyzerResult") || gqlObject["AnalyzerResult"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("AnalyzerResult") || (gqlObject["AnalyzerResult"].userType() != QMetaType::QString && gqlObject["AnalyzerResult"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString analyzerResultStringValue = gqlObject["AnalyzerResult"].toString();
@@ -5423,7 +5423,7 @@ bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		return false;
 	}
 
-	if (gqlObject.ContainsParam("Areas") && gqlObject.GetObjectsCount("Areas") > 0){
+	if (gqlObject.ContainsParam("Areas") && (gqlObject.GetObjectsCount("Areas") > 0)){
 		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("areas");
 		Areas = QList<CArea::V1_0>();
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
@@ -5445,11 +5445,11 @@ bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 
 bool CAnalyzer::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("AnalyzerName") && gqlObject["AnalyzerName"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("AnalyzerName") && (gqlObject["AnalyzerName"].userType() == QMetaType::QString || gqlObject["AnalyzerName"].userType() == QMetaType::QByteArray)){
 		AnalyzerName = gqlObject["AnalyzerName"].toString();
 	}
 
-	if (gqlObject.ContainsParam("AnalyzerResult") && gqlObject["AnalyzerResult"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("AnalyzerResult") && (gqlObject["AnalyzerResult"].userType() == QMetaType::QString || gqlObject["AnalyzerResult"].userType() == QMetaType::QByteArray)){
 		const QString analyzerResultStringValue = gqlObject["AnalyzerResult"].toString();
 		if(analyzerResultStringValue == "NONE"){
 			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::NONE;
@@ -5471,7 +5471,7 @@ bool CAnalyzer::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		}
 	}
 
-	if (gqlObject.ContainsParam("Areas") && gqlObject.GetObjectsCount("Areas") > 0){
+	if (gqlObject.ContainsParam("Areas") && (gqlObject.GetObjectsCount("Areas") > 0)){
 		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("areas");
 		Areas = QList<CArea::V1_0>();
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
@@ -6125,22 +6125,22 @@ bool CInspection::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 
 bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("ID") || gqlObject["ID"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("ID") || (gqlObject["ID"].userType() != QMetaType::QString && gqlObject["ID"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	ID = gqlObject["ID"].toString();
 
-	if (!gqlObject.ContainsParam("TypeID") || gqlObject["TypeID"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("TypeID") || (gqlObject["TypeID"].userType() != QMetaType::QString && gqlObject["TypeID"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	TypeID = gqlObject["TypeID"].toString();
 
-	if (!gqlObject.ContainsParam("Name") || gqlObject["Name"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("Name") || (gqlObject["Name"].userType() != QMetaType::QString && gqlObject["Name"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	Name = gqlObject["Name"].toString();
 
-	if (!gqlObject.ContainsParam("Status") || gqlObject["Status"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("Status") || (gqlObject["Status"].userType() != QMetaType::QString && gqlObject["Status"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString statusStringValue = gqlObject["Status"].toString();
@@ -6163,7 +6163,7 @@ bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		return false;
 	}
 
-	if (gqlObject.ContainsParam("Analyzers") && gqlObject.GetObjectsCount("Analyzers") > 0){
+	if (gqlObject.ContainsParam("Analyzers") && (gqlObject.GetObjectsCount("Analyzers") > 0)){
 		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("analyzers");
 		Analyzers = QList<CAnalyzer::V1_0>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
@@ -6185,19 +6185,19 @@ bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 
 bool CInspection::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("ID") && gqlObject["ID"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("ID") && (gqlObject["ID"].userType() == QMetaType::QString || gqlObject["ID"].userType() == QMetaType::QByteArray)){
 		ID = gqlObject["ID"].toString();
 	}
 
-	if (gqlObject.ContainsParam("TypeID") && gqlObject["TypeID"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("TypeID") && (gqlObject["TypeID"].userType() == QMetaType::QString || gqlObject["TypeID"].userType() == QMetaType::QByteArray)){
 		TypeID = gqlObject["TypeID"].toString();
 	}
 
-	if (gqlObject.ContainsParam("Name") && gqlObject["Name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("Name") && (gqlObject["Name"].userType() == QMetaType::QString || gqlObject["Name"].userType() == QMetaType::QByteArray)){
 		Name = gqlObject["Name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("Status") && gqlObject["Status"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("Status") && (gqlObject["Status"].userType() == QMetaType::QString || gqlObject["Status"].userType() == QMetaType::QByteArray)){
 		const QString statusStringValue = gqlObject["Status"].toString();
 		if(statusStringValue == "NONE"){
 			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
@@ -6219,7 +6219,7 @@ bool CInspection::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 		}
 	}
 
-	if (gqlObject.ContainsParam("Analyzers") && gqlObject.GetObjectsCount("Analyzers") > 0){
+	if (gqlObject.ContainsParam("Analyzers") && (gqlObject.GetObjectsCount("Analyzers") > 0)){
 		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("analyzers");
 		Analyzers = QList<CAnalyzer::V1_0>();
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
@@ -6945,17 +6945,17 @@ bool CProductOverview::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gql
 
 bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("ProductID") || gqlObject["ProductID"].userType() != QMetaType::Int){
+	if (!gqlObject.ContainsParam("ProductID") || (gqlObject["ProductID"].userType() != QMetaType::Int)){
 		return false;
 	}
 	ProductID = gqlObject["ProductID"].toInt();
 
-	if (!gqlObject.ContainsParam("Name") || gqlObject["Name"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("Name") || (gqlObject["Name"].userType() != QMetaType::QString && gqlObject["Name"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	Name = gqlObject["Name"].toString();
 
-	if (!gqlObject.ContainsParam("Status") || gqlObject["Status"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("Status") || (gqlObject["Status"].userType() != QMetaType::QString && gqlObject["Status"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	const QString statusStringValue = gqlObject["Status"].toString();
@@ -6978,22 +6978,22 @@ bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("PartSerialNumber") || gqlObject["PartSerialNumber"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("PartSerialNumber") || (gqlObject["PartSerialNumber"].userType() != QMetaType::QString && gqlObject["PartSerialNumber"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	PartSerialNumber = gqlObject["PartSerialNumber"].toString();
 
-	if (!gqlObject.ContainsParam("Timestamp") || gqlObject["Timestamp"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("Timestamp") || (gqlObject["Timestamp"].userType() != QMetaType::QString && gqlObject["Timestamp"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	Timestamp = gqlObject["Timestamp"].toString();
 
-	if (!gqlObject.ContainsParam("ProductImage") || gqlObject["ProductImage"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("ProductImage") || (gqlObject["ProductImage"].userType() != QMetaType::QString && gqlObject["ProductImage"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	ProductImage = gqlObject["ProductImage"].toString();
 
-	if (gqlObject.ContainsParam("Inspections") && gqlObject.GetObjectsCount("Inspections") > 0){
+	if (gqlObject.ContainsParam("Inspections") && (gqlObject.GetObjectsCount("Inspections") > 0)){
 		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("inspections");
 		Inspections = QList<CInspection::V1_0>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
@@ -7015,15 +7015,15 @@ bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 
 bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("ProductID") && gqlObject["ProductID"].userType() == QMetaType::Int){
+	if (gqlObject.ContainsParam("ProductID") && (gqlObject["ProductID"].userType() == QMetaType::Int)){
 		ProductID = gqlObject["ProductID"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("Name") && gqlObject["Name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("Name") && (gqlObject["Name"].userType() == QMetaType::QString || gqlObject["Name"].userType() == QMetaType::QByteArray)){
 		Name = gqlObject["Name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("Status") && gqlObject["Status"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("Status") && (gqlObject["Status"].userType() == QMetaType::QString || gqlObject["Status"].userType() == QMetaType::QByteArray)){
 		const QString statusStringValue = gqlObject["Status"].toString();
 		if(statusStringValue == "NONE"){
 			Status = ::sdl::complextest::CTTypes::StatusCode::NONE;
@@ -7045,19 +7045,19 @@ bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		}
 	}
 
-	if (gqlObject.ContainsParam("PartSerialNumber") && gqlObject["PartSerialNumber"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("PartSerialNumber") && (gqlObject["PartSerialNumber"].userType() == QMetaType::QString || gqlObject["PartSerialNumber"].userType() == QMetaType::QByteArray)){
 		PartSerialNumber = gqlObject["PartSerialNumber"].toString();
 	}
 
-	if (gqlObject.ContainsParam("Timestamp") && gqlObject["Timestamp"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("Timestamp") && (gqlObject["Timestamp"].userType() == QMetaType::QString || gqlObject["Timestamp"].userType() == QMetaType::QByteArray)){
 		Timestamp = gqlObject["Timestamp"].toString();
 	}
 
-	if (gqlObject.ContainsParam("ProductImage") && gqlObject["ProductImage"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("ProductImage") && (gqlObject["ProductImage"].userType() == QMetaType::QString || gqlObject["ProductImage"].userType() == QMetaType::QByteArray)){
 		ProductImage = gqlObject["ProductImage"].toString();
 	}
 
-	if (gqlObject.ContainsParam("Inspections") && gqlObject.GetObjectsCount("Inspections") > 0){
+	if (gqlObject.ContainsParam("Inspections") && (gqlObject.GetObjectsCount("Inspections") > 0)){
 		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("inspections");
 		Inspections = QList<CInspection::V1_0>();
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
@@ -7592,12 +7592,12 @@ bool CLocalizedText::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlOb
 
 bool CLocalizedText::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("text") || gqlObject["text"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("text") || (gqlObject["text"].userType() != QMetaType::QString && gqlObject["text"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	text = gqlObject["text"].toString();
 
-	if (!gqlObject.ContainsParam("locale") || gqlObject["locale"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("locale") || (gqlObject["locale"].userType() != QMetaType::QString && gqlObject["locale"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	locale = gqlObject["locale"].toString();
@@ -7608,11 +7608,11 @@ bool CLocalizedText::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 
 bool CLocalizedText::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("text") && gqlObject["text"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("text") && (gqlObject["text"].userType() == QMetaType::QString || gqlObject["text"].userType() == QMetaType::QByteArray)){
 		text = gqlObject["text"].toString();
 	}
 
-	if (gqlObject.ContainsParam("locale") && gqlObject["locale"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("locale") && (gqlObject["locale"].userType() == QMetaType::QString || gqlObject["locale"].userType() == QMetaType::QByteArray)){
 		locale = gqlObject["locale"].toString();
 	}
 
@@ -8012,17 +8012,17 @@ bool CCoordinates::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 
 bool CCoordinates::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("x") || gqlObject["x"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("x") || (gqlObject["x"].userType() != QMetaType::Float && gqlObject["x"].userType() != QMetaType::Double)){
 		return false;
 	}
 	x = gqlObject["x"].toDouble();
 
-	if (!gqlObject.ContainsParam("y") || gqlObject["y"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("y") || (gqlObject["y"].userType() != QMetaType::Float && gqlObject["y"].userType() != QMetaType::Double)){
 		return false;
 	}
 	y = gqlObject["y"].toDouble();
 
-	if (!gqlObject.ContainsParam("z") || gqlObject["z"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("z") || (gqlObject["z"].userType() != QMetaType::Float && gqlObject["z"].userType() != QMetaType::Double)){
 		return false;
 	}
 	z = gqlObject["z"].toDouble();
@@ -8033,15 +8033,15 @@ bool CCoordinates::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 
 bool CCoordinates::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("x") && gqlObject["x"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("x") && (gqlObject["x"].userType() == QMetaType::Float || gqlObject["x"].userType() == QMetaType::Double)){
 		x = gqlObject["x"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("y") && gqlObject["y"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("y") && (gqlObject["y"].userType() == QMetaType::Float || gqlObject["y"].userType() == QMetaType::Double)){
 		y = gqlObject["y"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("z") && gqlObject["z"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("z") && (gqlObject["z"].userType() == QMetaType::Float || gqlObject["z"].userType() == QMetaType::Double)){
 		z = gqlObject["z"].toDouble();
 	}
 
@@ -8486,11 +8486,11 @@ bool CExtendedMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 
 bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("key") && gqlObject["key"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("key") && (gqlObject["key"].userType() == QMetaType::QString || gqlObject["key"].userType() == QMetaType::QByteArray)){
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && !gqlObject["value"].isNull()){
+	if (gqlObject.ContainsParam("value") && (!gqlObject["value"].isNull())){
 		const QVariant valueVariantValue = gqlObject["value"];
 		if (valueVariantValue.canConvert<CCoordinates>()){
 			CCoordinates valueConvert;
@@ -8518,11 +8518,11 @@ bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 
 bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("key") && gqlObject["key"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("key") && (gqlObject["key"].userType() == QMetaType::QString || gqlObject["key"].userType() == QMetaType::QByteArray)){
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && !gqlObject["value"].isNull()){
+	if (gqlObject.ContainsParam("value") && (!gqlObject["value"].isNull())){
 		const QVariant valueVariantValue = gqlObject["value"];
 		if (valueVariantValue.canConvert<CCoordinates>()){
 			CCoordinates valueConvert;
@@ -9131,32 +9131,32 @@ bool CResultMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 
 bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("resultId") || gqlObject["resultId"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("resultId") || (gqlObject["resultId"].userType() != QMetaType::QString && gqlObject["resultId"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	resultId = gqlObject["resultId"].toByteArray();
 
-	if (gqlObject.ContainsParam("creationTime") && gqlObject["creationTime"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("creationTime") && (gqlObject["creationTime"].userType() == QMetaType::QString || gqlObject["creationTime"].userType() == QMetaType::QByteArray)){
 		creationTime = gqlObject["creationTime"].toString();
 	}
 
-	if (gqlObject.ContainsParam("partId") && gqlObject["partId"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("partId") && (gqlObject["partId"].userType() == QMetaType::QString || gqlObject["partId"].userType() == QMetaType::QByteArray)){
 		partId = gqlObject["partId"].toString();
 	}
 
-	if (gqlObject.ContainsParam("productId") && gqlObject["productId"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("productId") && (gqlObject["productId"].userType() == QMetaType::QString || gqlObject["productId"].userType() == QMetaType::QByteArray)){
 		productId = gqlObject["productId"].toString();
 	}
 
-	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("classification") && gqlObject["classification"].userType() == QMetaType::Int){
+	if (gqlObject.ContainsParam("classification") && (gqlObject["classification"].userType() == QMetaType::Int)){
 		classification = gqlObject["classification"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("description") && gqlObject.GetParamArgumentObjectPtr("description") != nullptr){
+	if (gqlObject.ContainsParam("description") && (gqlObject.GetParamArgumentObjectPtr("description") != nullptr)){
 		description = CLocalizedText::V1_0();
 		const bool isDescriptionRead = description->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
@@ -9164,7 +9164,7 @@ bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
-	if (gqlObject.ContainsParam("extendedMetaData") && gqlObject.GetObjectsCount("extendedMetaData") > 0){
+	if (gqlObject.ContainsParam("extendedMetaData") && (gqlObject.GetObjectsCount("extendedMetaData") > 0)){
 		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
 		extendedMetaData = QList<CExtendedMetaData::V1_0>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
@@ -9186,31 +9186,31 @@ bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 
 bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("resultId") && gqlObject["resultId"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("resultId") && (gqlObject["resultId"].userType() == QMetaType::QString || gqlObject["resultId"].userType() == QMetaType::QByteArray)){
 		resultId = gqlObject["resultId"].toByteArray();
 	}
 
-	if (gqlObject.ContainsParam("creationTime") && gqlObject["creationTime"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("creationTime") && (gqlObject["creationTime"].userType() == QMetaType::QString || gqlObject["creationTime"].userType() == QMetaType::QByteArray)){
 		creationTime = gqlObject["creationTime"].toString();
 	}
 
-	if (gqlObject.ContainsParam("partId") && gqlObject["partId"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("partId") && (gqlObject["partId"].userType() == QMetaType::QString || gqlObject["partId"].userType() == QMetaType::QByteArray)){
 		partId = gqlObject["partId"].toString();
 	}
 
-	if (gqlObject.ContainsParam("productId") && gqlObject["productId"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("productId") && (gqlObject["productId"].userType() == QMetaType::QString || gqlObject["productId"].userType() == QMetaType::QByteArray)){
 		productId = gqlObject["productId"].toString();
 	}
 
-	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("classification") && gqlObject["classification"].userType() == QMetaType::Int){
+	if (gqlObject.ContainsParam("classification") && (gqlObject["classification"].userType() == QMetaType::Int)){
 		classification = gqlObject["classification"].toInt();
 	}
 
-	if (gqlObject.ContainsParam("description") && gqlObject.GetParamArgumentObjectPtr("description") != nullptr){
+	if (gqlObject.ContainsParam("description") && (gqlObject.GetParamArgumentObjectPtr("description") != nullptr)){
 		description = CLocalizedText::V1_0();
 		const bool isDescriptionRead = description->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("description"));
 		if (!isDescriptionRead){
@@ -9218,7 +9218,7 @@ bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		}
 	}
 
-	if (gqlObject.ContainsParam("extendedMetaData") && gqlObject.GetObjectsCount("extendedMetaData") > 0){
+	if (gqlObject.ContainsParam("extendedMetaData") && (gqlObject.GetObjectsCount("extendedMetaData") > 0)){
 		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
 		extendedMetaData = QList<CExtendedMetaData::V1_0>();
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
@@ -9774,25 +9774,25 @@ bool COverallResultValues::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject&
 
 bool COverallResultValues::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
 	}
 
-	if (!gqlObject.ContainsParam("valueId") || gqlObject["valueId"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("valueId") || (gqlObject["valueId"].userType() != QMetaType::QString && gqlObject["valueId"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	valueId = gqlObject["valueId"].toString();
 
-	if (!gqlObject.ContainsParam("measuredValue") || gqlObject["measuredValue"].userType() != QMetaType::Double){
+	if (!gqlObject.ContainsParam("measuredValue") || (gqlObject["measuredValue"].userType() != QMetaType::Float && gqlObject["measuredValue"].userType() != QMetaType::Double)){
 		return false;
 	}
 	measuredValue = gqlObject["measuredValue"].toDouble();
 
-	if (gqlObject.ContainsParam("lowLimit") && gqlObject["lowLimit"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("lowLimit") && (gqlObject["lowLimit"].userType() == QMetaType::Float || gqlObject["lowLimit"].userType() == QMetaType::Double)){
 		lowLimit = gqlObject["lowLimit"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("highLimit") && gqlObject["highLimit"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("highLimit") && (gqlObject["highLimit"].userType() == QMetaType::Float || gqlObject["highLimit"].userType() == QMetaType::Double)){
 		highLimit = gqlObject["highLimit"].toDouble();
 	}
 
@@ -9802,23 +9802,23 @@ bool COverallResultValues::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParam
 
 bool COverallResultValues::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("name") && gqlObject["name"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("name") && (gqlObject["name"].userType() == QMetaType::QString || gqlObject["name"].userType() == QMetaType::QByteArray)){
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("valueId") && gqlObject["valueId"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("valueId") && (gqlObject["valueId"].userType() == QMetaType::QString || gqlObject["valueId"].userType() == QMetaType::QByteArray)){
 		valueId = gqlObject["valueId"].toString();
 	}
 
-	if (gqlObject.ContainsParam("measuredValue") && gqlObject["measuredValue"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("measuredValue") && (gqlObject["measuredValue"].userType() == QMetaType::Float || gqlObject["measuredValue"].userType() == QMetaType::Double)){
 		measuredValue = gqlObject["measuredValue"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("lowLimit") && gqlObject["lowLimit"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("lowLimit") && (gqlObject["lowLimit"].userType() == QMetaType::Float || gqlObject["lowLimit"].userType() == QMetaType::Double)){
 		lowLimit = gqlObject["lowLimit"].toDouble();
 	}
 
-	if (gqlObject.ContainsParam("highLimit") && gqlObject["highLimit"].userType() == QMetaType::Double){
+	if (gqlObject.ContainsParam("highLimit") && (gqlObject["highLimit"].userType() == QMetaType::Float || gqlObject["highLimit"].userType() == QMetaType::Double)){
 		highLimit = gqlObject["highLimit"].toDouble();
 	}
 
@@ -10422,17 +10422,17 @@ bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 
 bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("dataModelTitle") || gqlObject["dataModelTitle"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("dataModelTitle") || (gqlObject["dataModelTitle"].userType() != QMetaType::QString && gqlObject["dataModelTitle"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	dataModelTitle = gqlObject["dataModelTitle"].toString();
 
-	if (!gqlObject.ContainsParam("dataModelVersion") || gqlObject["dataModelVersion"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("dataModelVersion") || (gqlObject["dataModelVersion"].userType() != QMetaType::QString && gqlObject["dataModelVersion"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -10440,7 +10440,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -10473,7 +10473,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
-	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
@@ -10495,15 +10495,15 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 
 bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("dataModelTitle") && gqlObject["dataModelTitle"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("dataModelTitle") && (gqlObject["dataModelTitle"].userType() == QMetaType::QString || gqlObject["dataModelTitle"].userType() == QMetaType::QByteArray)){
 		dataModelTitle = gqlObject["dataModelTitle"].toString();
 	}
 
-	if (gqlObject.ContainsParam("dataModelVersion") && gqlObject["dataModelVersion"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("dataModelVersion") && (gqlObject["dataModelVersion"].userType() == QMetaType::QString || gqlObject["dataModelVersion"].userType() == QMetaType::QByteArray)){
 		dataModelVersion = gqlObject["dataModelVersion"].toString();
 	}
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -10511,7 +10511,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -10544,7 +10544,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 		}
 	}
 
-	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
@@ -11206,17 +11206,17 @@ bool CCDMResultVarString::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 
 bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("dataModelTitle") || gqlObject["dataModelTitle"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("dataModelTitle") || (gqlObject["dataModelTitle"].userType() != QMetaType::QString && gqlObject["dataModelTitle"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	dataModelTitle = gqlObject["dataModelTitle"].toString();
 
-	if (!gqlObject.ContainsParam("dataModelVersion") || gqlObject["dataModelVersion"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("dataModelVersion") || (gqlObject["dataModelVersion"].userType() != QMetaType::QString && gqlObject["dataModelVersion"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -11224,7 +11224,7 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -11235,7 +11235,7 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		}
 	}
 
-	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
@@ -11257,15 +11257,15 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 
 bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("dataModelTitle") && gqlObject["dataModelTitle"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("dataModelTitle") && (gqlObject["dataModelTitle"].userType() == QMetaType::QString || gqlObject["dataModelTitle"].userType() == QMetaType::QByteArray)){
 		dataModelTitle = gqlObject["dataModelTitle"].toString();
 	}
 
-	if (gqlObject.ContainsParam("dataModelVersion") && gqlObject["dataModelVersion"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("dataModelVersion") && (gqlObject["dataModelVersion"].userType() == QMetaType::QString || gqlObject["dataModelVersion"].userType() == QMetaType::QByteArray)){
 		dataModelVersion = gqlObject["dataModelVersion"].toString();
 	}
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -11273,7 +11273,7 @@ bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -11284,7 +11284,7 @@ bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
-	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
@@ -11955,17 +11955,17 @@ bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 
 bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (!gqlObject.ContainsParam("dataModelTitle") || gqlObject["dataModelTitle"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("dataModelTitle") || (gqlObject["dataModelTitle"].userType() != QMetaType::QString && gqlObject["dataModelTitle"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	dataModelTitle = gqlObject["dataModelTitle"].toString();
 
-	if (!gqlObject.ContainsParam("dataModelVersion") || gqlObject["dataModelVersion"].userType() != QMetaType::QString){
+	if (!gqlObject.ContainsParam("dataModelVersion") || (gqlObject["dataModelVersion"].userType() != QMetaType::QString && gqlObject["dataModelVersion"].userType() != QMetaType::QByteArray)){
 		return false;
 	}
 	dataModelVersion = gqlObject["dataModelVersion"].toString();
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -11973,7 +11973,7 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -12006,7 +12006,7 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
@@ -12028,15 +12028,15 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 
 bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("dataModelTitle") && gqlObject["dataModelTitle"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("dataModelTitle") && (gqlObject["dataModelTitle"].userType() == QMetaType::QString || gqlObject["dataModelTitle"].userType() == QMetaType::QByteArray)){
 		dataModelTitle = gqlObject["dataModelTitle"].toString();
 	}
 
-	if (gqlObject.ContainsParam("dataModelVersion") && gqlObject["dataModelVersion"].userType() == QMetaType::QString){
+	if (gqlObject.ContainsParam("dataModelVersion") && (gqlObject["dataModelVersion"].userType() == QMetaType::QString || gqlObject["dataModelVersion"].userType() == QMetaType::QByteArray)){
 		dataModelVersion = gqlObject["dataModelVersion"].toString();
 	}
 
-	if (gqlObject.ContainsParam("resultMetaData") && gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr){
+	if (gqlObject.ContainsParam("resultMetaData") && (gqlObject.GetParamArgumentObjectPtr("resultMetaData") != nullptr)){
 		resultMetaData = CResultMetaData::V1_0();
 		const bool isResultMetaDataRead = resultMetaData->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("resultMetaData"));
 		if (!isResultMetaDataRead){
@@ -12044,7 +12044,7 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !gqlObject["resultContent"].isNull()){
+	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -12077,7 +12077,7 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
-	if (gqlObject.ContainsParam("overallResultValues") && gqlObject.GetObjectsCount("overallResultValues") > 0){
+	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = QList<COverallResultValues::V1_0>();
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
@@ -12582,7 +12582,7 @@ bool CPointsInCoordinateFormat::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamOb
 
 bool CPointsInCoordinateFormat::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("pointAsCoordinates") && gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool){
+	if (gqlObject.ContainsParam("pointAsCoordinates") && (gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool)){
 		pointAsCoordinates = gqlObject["pointAsCoordinates"].toBool();
 	}
 
@@ -12592,7 +12592,7 @@ bool CPointsInCoordinateFormat::V1_0::ReadFromGraphQlObject(const ::imtgql::CGql
 
 bool CPointsInCoordinateFormat::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("pointAsCoordinates") && gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool){
+	if (gqlObject.ContainsParam("pointAsCoordinates") && (gqlObject["pointAsCoordinates"].userType() == QMetaType::Bool)){
 		pointAsCoordinates = gqlObject["pointAsCoordinates"].toBool();
 	}
 
