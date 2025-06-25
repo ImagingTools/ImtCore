@@ -171,26 +171,28 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 			}
 
 			if (methodType == CWebSocketRequest::MT_QUERY){
-				imtrest::IRequestUniquePtr requestPtr = m_httpEnginePtr->CreateRequest(*m_requestServerHandlerPtr);
-				CHttpRequest* newHttpRequestPtr = dynamic_cast<CHttpRequest*>(requestPtr.GetPtr());
-				if (newHttpRequestPtr != nullptr){
-					if (!clientId.isEmpty()){
-						m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
+				if (m_httpEnginePtr != nullptr){
+					imtrest::IRequestUniquePtr requestPtr = m_httpEnginePtr->CreateRequest(*m_requestServerHandlerPtr);
+					CHttpRequest* newHttpRequestPtr = dynamic_cast<CHttpRequest*>(requestPtr.GetPtr());
+					if (newHttpRequestPtr != nullptr){
+						if (!clientId.isEmpty()){
+							m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
+						}
+	
+						QJsonDocument document = QJsonDocument::fromJson(textMessage.toUtf8());
+						QJsonObject object = document.object();
+						QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
+	
+						QJsonObject headers = object.value("headers").toObject();
+						for (QString& key: headers.keys()){
+							newHttpRequestPtr->SetHeader(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
+						}
+						newHttpRequestPtr->SetBody(body);
+						newHttpRequestPtr->SetMethodType(CHttpRequest::MT_POST);
+						newHttpRequestPtr->SetCommandId("/" + m_productId + "/graphql");
+	
+						responsePtr = m_requestServerHandlerPtr->ProcessRequest(*requestPtr.PopInterfacePtr());
 					}
-
-					QJsonDocument document = QJsonDocument::fromJson(textMessage.toUtf8());
-					QJsonObject object = document.object();
-					QByteArray body = object.value("payload").toObject().value("data").toString().toUtf8();
-
-					QJsonObject headers = object.value("headers").toObject();
-					for (QString& key: headers.keys()){
-						newHttpRequestPtr->SetHeader(key.toUtf8().toLower(), headers.value(key).toString().toUtf8());
-					}
-					newHttpRequestPtr->SetBody(body);
-					newHttpRequestPtr->SetMethodType(CHttpRequest::MT_POST);
-					newHttpRequestPtr->SetCommandId("/" + m_productId + "/graphql");
-
-					responsePtr = m_requestServerHandlerPtr->ProcessRequest(*requestPtr.PopInterfacePtr());
 				}
 			}
 			else{

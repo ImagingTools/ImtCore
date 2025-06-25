@@ -17,6 +17,8 @@ class CUrlConnectionParam:
 public:
 	typedef CServiceConnectionInfo BaseClass;
 
+	CUrlConnectionParam();
+
 	void AddExternConnection(IncomingConnectionParam IncomingConnectionParam);
 
 	// reimplemented (imtservice::IServiceConnectionParam)

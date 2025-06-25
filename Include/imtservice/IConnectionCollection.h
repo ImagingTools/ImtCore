@@ -22,8 +22,8 @@ class IConnectionCollection: virtual public ilog::ITracingConfiguration
 {
 public:
 	virtual QString GetServiceVersion() const = 0;
-	virtual QString GetServiceTypeName() const = 0;
-	virtual bool SetServiceTypeName(const QString& serviceTypeName) const = 0;
+	virtual QString GetServiceTypeId() const = 0;
+	virtual bool SetServiceTypeId(const QString& serviceTypeName) const = 0;
 	virtual const imtbase::ICollectionInfo* GetServerConnectionList() const = 0;
 	virtual const imtcom::IServerConnectionInterface* GetServerConnection(const QByteArray& id) const = 0;
 	virtual const IServiceConnectionInfo* GetConnectionMetaInfo(const QByteArray& id) const = 0;

@@ -27,10 +27,9 @@ public:
 	I_BEGIN_COMPONENT(CConnectionCollectionComp);
 		I_REGISTER_INTERFACE(imtservice::IConnectionCollection);
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info of the service", true, "ApplicationInfo");
-		I_ASSIGN(m_serviceTypeName, "ServiceTypeName", "Service type name for service", true, "");
+		I_ASSIGN(m_serviceTypeId, "ServiceTypeId", "Service type ID for service", true, "");
 		I_ASSIGN_MULTI_0(m_connectionNames, "ConnectionNames", "Connection names", true);
-		I_ASSIGN_MULTI_0(m_connectionServiceTypeNames, "ConnectionServiceTypeNames", "Service type name for connections", true);
-		I_ASSIGN_MULTI_0(m_connectionUsageIds, "ConnectionUsageIds", "Service connection usage ids", true);
+		I_ASSIGN_MULTI_0(m_connectionServiceTypeIds, "ConnectionServiceTypeIds", "Service type IDs for connections", true);
 		I_ASSIGN_MULTI_0(m_connectionDescriptions, "ConnectionDescriptions", "Service connection descriptions", true);
 		I_ASSIGN_MULTI_0(m_connectionTypes, "ConnectionTypes", "Service connection types: 0 - input, 1 - output", true);
 		I_ASSIGN_MULTI_0(m_serverInterfaceListCompPtr, "ServerInterfaces", "List of server connection interfaces", true);
@@ -39,18 +38,18 @@ public:
 
 	// reimplemented (imtservice::IConnectionCollection)
 	virtual QString GetServiceVersion() const override;
-	virtual QString GetServiceTypeName() const override;
-	virtual bool SetServiceTypeName(const QString& serviceTypeName) const override;
+	virtual QString GetServiceTypeId() const override;
+	virtual bool SetServiceTypeId(const QString& serviceTypeName) const override;
 	virtual const imtbase::ICollectionInfo* GetServerConnectionList() const override;
 	virtual const imtcom::IServerConnectionInterface* GetServerConnection(const QByteArray& id) const override;
 	virtual const IServiceConnectionInfo* GetConnectionMetaInfo(const QByteArray& id) const override;
 	virtual bool SetServerConnectionInterface(const QByteArray& id, const imtcom::IServerConnectionInterface& connectionInterface) override;
 	virtual QByteArray InsertNewConnection(
-						const QByteArray& connectionId,
-						const QUrl& url,
-						imtservice::IServiceConnectionInfo::ConnectionType connectionType,
-						const QString& name = QString(),
-						const QString& description = QString() ) override;
+				const QByteArray& connectionId,
+				const QUrl& url,
+				imtservice::IServiceConnectionInfo::ConnectionType connectionType,
+				const QString& name = QString(),
+				const QString& description = QString() ) override;
 
 	// reimplemented (ilog::ITracingConfiguration)
 	virtual int GetTracingLevel() const override;
@@ -62,10 +61,9 @@ protected:
 
 private:
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
-	I_ATTR(QByteArray, m_serviceTypeName);
+	I_ATTR(QByteArray, m_serviceTypeId);
 	I_MULTIATTR(QByteArray, m_connectionNames);
-	I_MULTIATTR(QByteArray, m_connectionServiceTypeNames);
-	I_MULTIATTR(QByteArray, m_connectionUsageIds);
+	I_MULTIATTR(QByteArray, m_connectionServiceTypeIds);
 	I_MULTIATTR(QByteArray, m_connectionDescriptions);
 	I_MULTIATTR(int, m_connectionTypes);
 	I_MULTIREF(imtcom::IServerConnectionInterface, m_serverInterfaceListCompPtr);

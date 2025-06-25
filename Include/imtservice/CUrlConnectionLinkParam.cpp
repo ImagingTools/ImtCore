@@ -15,6 +15,13 @@ namespace imtservice
 
 // public methods
 
+CUrlConnectionLinkParam::CUrlConnectionLinkParam()
+{
+	RegisterProtocol(imtcom::IServerConnectionInterface::PT_HTTP);
+	RegisterProtocol(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
+}
+
+
 void CUrlConnectionLinkParam::SetDependantServiceConnectionId(const QByteArray& connectionId)
 {
 	if (m_dependantServiceConnectionId != connectionId){

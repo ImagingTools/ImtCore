@@ -5,6 +5,11 @@
 #include <imtcom/IServerConnectionInterface.h>
 
 
+#ifdef Q_OS_WIN
+#undef SetPort
+#endif
+
+
 namespace imtcom
 {
 

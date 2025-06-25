@@ -16,6 +16,13 @@ namespace imtservice
 
 // public methods
 
+CUrlConnectionParam::CUrlConnectionParam()
+{
+	RegisterProtocol(imtcom::IServerConnectionInterface::PT_HTTP);
+	RegisterProtocol(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
+}
+
+
 void CUrlConnectionParam::AddExternConnection(imtservice::IServiceConnectionParam::IncomingConnectionParam externConnection)
 {
 	if (!m_externConnectionList.contains(externConnection)){

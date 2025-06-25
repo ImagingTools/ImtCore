@@ -24,18 +24,18 @@ QString CConnectionCollectionComp::GetServiceVersion() const
 	return version;
 }
 
-QString CConnectionCollectionComp::GetServiceTypeName() const
+QString CConnectionCollectionComp::GetServiceTypeId() const
 {
 	QString retVal;
-	if (m_serviceTypeName.IsValid()){
-		retVal = m_serviceTypeName->GetValue();
+	if (m_serviceTypeId.IsValid()){
+		retVal = m_serviceTypeId->GetValue();
 	}
 
 	return retVal;
 }
 
 
-bool CConnectionCollectionComp::SetServiceTypeName(const QString& /*serviceTypeName*/) const
+bool CConnectionCollectionComp::SetServiceTypeId(const QString& /*serviceTypeName*/) const
 {
 	return false;
 }
@@ -64,9 +64,9 @@ const IServiceConnectionInfo* CConnectionCollectionComp::GetConnectionMetaInfo(c
 }
 
 
-bool CConnectionCollectionComp::SetServerConnectionInterface(const QByteArray& id, const imtcom::IServerConnectionInterface& connectionInterface)
+bool CConnectionCollectionComp::SetServerConnectionInterface(const QByteArray& connectionId, const imtcom::IServerConnectionInterface& connectionInterface)
 {
-	const istd::IChangeable* objectPtr = m_collection.GetObjectPtr(id);
+	const istd::IChangeable* objectPtr = m_collection.GetObjectPtr(connectionId);
 	if (objectPtr == nullptr){
 		return false;
 	}
@@ -79,9 +79,10 @@ bool CConnectionCollectionComp::SetServerConnectionInterface(const QByteArray& i
 	imtcom::IServerConnectionInterface* urlConnectionParam =  dynamic_cast<imtcom::IServerConnectionInterface*>(notConstObjectPtr);
 	if (urlConnectionParam != nullptr){
 		bool retVal = true;
-
-		for (int index = 0; index < m_connectionUsageIds.GetCount(); index++){
-			if (id == m_connectionUsageIds[index]){
+		imtbase::ICollectionInfo::Ids elementIds = m_collection.GetElementIds();
+		for (int index = 0; index < elementIds.size(); index++){
+			imtbase::ICollectionInfo::Id elementId = elementIds[index];
+			if (elementId == connectionId){
 				if (index < m_serverInterfaceListCompPtr.GetCount()){
 					retVal = retVal && m_serverInterfaceListCompPtr[index]->CopyFrom(connectionInterface);
 
@@ -134,37 +135,48 @@ void CConnectionCollectionComp::SetTracingLevel(int tracingLevel)
 
 void CConnectionCollectionComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	typedef istd::TSingleFactory<istd::IChangeable, imtservice::CUrlConnectionParam> FactoryConnectionImpl;
 	m_collection.RegisterFactory<FactoryConnectionImpl>("ConnectionInfo");
 
 	if (
 		m_serverInterfaceListCompPtr.IsValid() &&
-		m_connectionUsageIds.GetCount() == m_connectionNames.GetCount() &&
-		m_connectionUsageIds.GetCount() == m_connectionServiceTypeNames.GetCount() &&
-		m_connectionUsageIds.GetCount() == m_connectionDescriptions.GetCount() &&
-		m_connectionUsageIds.GetCount() == m_connectionTypes.GetCount() &&
-		m_connectionUsageIds.GetCount() == m_serverInterfaceListCompPtr.GetCount()){
-		for (int index = 0; index < m_connectionUsageIds.GetCount(); index++){
+		m_connectionServiceTypeIds.GetCount() == m_connectionNames.GetCount() &&
+		m_connectionServiceTypeIds.GetCount() == m_connectionDescriptions.GetCount() &&
+		m_connectionServiceTypeIds.GetCount() == m_connectionTypes.GetCount() &&
+		m_connectionServiceTypeIds.GetCount() == m_serverInterfaceListCompPtr.GetCount()){
+		for (int index = 0; index < m_connectionServiceTypeIds.GetCount(); index++){
 			IServiceConnectionInfo::ConnectionType connectionType = IServiceConnectionInfo::CT_INPUT;
 			if (m_connectionTypes[index] == 1){
 				connectionType = IServiceConnectionInfo::CT_OUTPUT;
 			}
+
 			QByteArray name = m_connectionNames[index];
-			QByteArray serviceTypeName = m_connectionServiceTypeNames[index];
-			QByteArray connectionUsageId = m_connectionUsageIds[index];
+			QByteArray serviceConnectionTypeId = m_connectionServiceTypeIds[index];
 			QByteArray description = m_connectionDescriptions[index];
 
 			CUrlConnectionParam urlConnectionParam;
-			urlConnectionParam.SetServiceTypeName(serviceTypeName);
-			urlConnectionParam.SetUsageId(connectionUsageId);
+			urlConnectionParam.RegisterProtocol(imtcom::IServerConnectionInterface::PT_HTTP);
+			urlConnectionParam.RegisterProtocol(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
+
+			urlConnectionParam.SetServiceTypeId(serviceConnectionTypeId);
 			urlConnectionParam.SetConnectionType(connectionType);
-			urlConnectionParam.SetDefaultServiceInterface(*m_serverInterfaceListCompPtr[index]);
-			
-			QByteArray retVal = m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, connectionUsageId);
+
+			const imtcom::IServerConnectionInterface* connectionInterfacePtr = m_serverInterfaceListCompPtr[index];
+			if (connectionInterfacePtr != nullptr){
+				urlConnectionParam.SetDefaultServiceInterface(*connectionInterfacePtr);
+
+				urlConnectionParam.SetHost(connectionInterfacePtr->GetHost());
+				urlConnectionParam.SetPort(imtcom::IServerConnectionInterface::PT_HTTP, connectionInterfacePtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP));
+				urlConnectionParam.SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, connectionInterfacePtr->GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET));
+			}
+
+			QByteArray retVal = m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, serviceConnectionTypeId);
 			if (retVal.isEmpty()){
 				SendErrorMessage(
 					0,
-					QString("Unable to insert connection '%1' to collection. Insert to collection failed").arg(qPrintable(connectionUsageId)),
+					QString("Unable to insert connection '%1' to collection. Insert to collection failed").arg(qPrintable(serviceConnectionTypeId)),
 					"CConnectionCollectionComp");
 			}
 		}

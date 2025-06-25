@@ -33,13 +33,9 @@ public:
 	virtual ConnectionType GetConnectionType() const = 0;
 
 	/**
-		Get service type name.
+		Get service type ID.
 	*/
-	virtual QByteArray GetServiceTypeName() const = 0;
-	/**
-		Get connection usage id.
-	*/
-	virtual QByteArray GetUsageId() const = 0;
+	virtual QByteArray GetServiceTypeId() const = 0;
 
 	/**
 		Get default service interface.

@@ -22,14 +22,12 @@ public:
 	CServiceConnectionInfo();
 	
 	void SetConnectionType(ConnectionType connectionType);
-	void SetServiceTypeName(const QByteArray& serviceTypeName);
-	void SetUsageId(const QByteArray& usageId);
+	void SetServiceTypeId(const QByteArray& serviceTypeName);
 	void SetDefaultServiceInterface(const imtcom::IServerConnectionInterface& defaultInterface);
 	
 	// reimplemented (imtservice::IServiceConnectionInfo)
 	virtual ConnectionType GetConnectionType() const override;
-	virtual QByteArray GetServiceTypeName() const override;
-	virtual QByteArray GetUsageId() const override;
+	virtual QByteArray GetServiceTypeId() const override;
 	virtual const imtcom::IServerConnectionInterface& GetDefaultInterface() const override;
 
 	// reimplemented (imtservice::IConnectionStatus)
@@ -45,14 +43,12 @@ public:
 	
 protected:
 	ConnectionType m_connectionType;
-	QByteArray m_serviceTypeName;
-	QByteArray m_usageId;
+	QByteArray m_serviceTypeId;
 	imtcom::CServerConnectionInterfaceParam m_defaultConnection;
 	ConnectionStatus m_connectionStatus;
 };
 
 
 } // namespace imtservice
-
 
 

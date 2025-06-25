@@ -16,7 +16,9 @@ class CUrlConnectionLinkParam:
 {
 public:
 	typedef imtservice::CServiceConnectionInfo BaseClass;
-	
+
+	CUrlConnectionLinkParam();
+
 	void SetDependantServiceConnectionId(const QByteArray& connectionId);
 
 	// reimplemented (imtservice::IServiceConnectionLinkParam)

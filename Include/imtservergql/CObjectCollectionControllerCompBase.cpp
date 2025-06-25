@@ -1684,15 +1684,20 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	if (complexFilterModelPtr != nullptr){
 		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
 		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(*complexFilterModelPtr);
-
 		if (isComplexFilterOk){
 			istd::TDelPtr<imtbase::CComplexCollectionFilter> complexFilterPtr = new imtbase::CComplexCollectionFilter();
 			if (imtcol::CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRepresentationToModel(complexFilterSdl, *complexFilterPtr, GetLogPtr())){
 				ReplaceComplexFilterFields(*complexFilterPtr);
 				SetAdditionalFilters(gqlRequest, *complexFilterPtr);
-				
+
 				filterParams.SetEditableParameter("ComplexFilter", complexFilterPtr.PopPtr(), true);
 			}
+			else{
+				SendErrorMessage(0, QString("Unable to create collection filter from SDL representation"));
+			}
+		}
+		else{
+			SendErrorMessage(0, QString("Unable to read SDL filter model from GraphQL object"));
 		}
 	}
 

@@ -33,22 +33,12 @@ void CServiceConnectionInfo::SetConnectionType(imtservice::IServiceConnectionInf
 }
 
 
-void CServiceConnectionInfo::SetServiceTypeName(const QByteArray& serviceTypeName)
+void CServiceConnectionInfo::SetServiceTypeId(const QByteArray& serviceTypeId)
 {
-	if (m_serviceTypeName != serviceTypeName){
+	if (m_serviceTypeId != serviceTypeId){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_serviceTypeName = serviceTypeName;
-	}
-}
-
-
-void CServiceConnectionInfo::SetUsageId(const QByteArray& usageId)
-{
-	if (m_usageId != usageId){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_usageId = usageId;
+		m_serviceTypeId = serviceTypeId;
 	}
 }
 
@@ -71,15 +61,9 @@ imtservice::IServiceConnectionInfo::ConnectionType CServiceConnectionInfo::GetCo
 }
 
 
-QByteArray CServiceConnectionInfo::GetServiceTypeName() const
+QByteArray CServiceConnectionInfo::GetServiceTypeId() const
 {
-	return m_serviceTypeName;
-}
-
-
-QByteArray CServiceConnectionInfo::GetUsageId() const
-{
-	return m_usageId;
+	return m_serviceTypeId;
 }
 
 
@@ -112,13 +96,8 @@ bool CServiceConnectionInfo::Serialize(iser::IArchive& archive)
 
 	iser::CArchiveTag serviceTypeNameTag("ServiceTypeName", "Service TypeName", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(serviceTypeNameTag);
-	retVal = retVal && archive.Process(m_serviceTypeName);
+	retVal = retVal && archive.Process(m_serviceTypeId);
 	retVal = retVal && archive.EndTag(serviceTypeNameTag);
-
-	iser::CArchiveTag serviceUsageIdTag("UsageId", "UsageId", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(serviceUsageIdTag);
-	retVal = retVal && archive.Process(m_usageId);
-	retVal = retVal && archive.EndTag(serviceUsageIdTag);
 
 	iser::CArchiveTag connectionTypeTag("ConnectionType", "Connection Type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(connectionTypeTag);
@@ -154,8 +133,7 @@ bool CServiceConnectionInfo::CopyFrom(const IChangeable& object, CompatibilityMo
 			return false;
 		}
 
-		m_serviceTypeName = sourcePtr->m_serviceTypeName;
-		m_usageId = sourcePtr->m_usageId;
+		m_serviceTypeId = sourcePtr->m_serviceTypeId;
 		m_connectionType = sourcePtr->m_connectionType;
 		m_defaultConnection.CopyFrom(sourcePtr->m_defaultConnection);
 		m_connectionStatus = sourcePtr->m_connectionStatus;
@@ -182,8 +160,7 @@ bool CServiceConnectionInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_serviceTypeName.clear();
-	m_usageId.clear();
+	m_serviceTypeId.clear();
 	m_connectionType = CT_INPUT;
 	m_defaultConnection.ResetData();
 	m_connectionStatus = CS_OK;

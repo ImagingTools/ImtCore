@@ -37,12 +37,9 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 	}
 
 	const imtcom::IServerConnectionInterface& defaultInterface  = urlConnectionParamPtr->GetDefaultInterface();
-	QByteArray usageId = urlConnectionParamPtr->GetUsageId();
-	QByteArray serviceTypeName = urlConnectionParamPtr->GetServiceTypeName();
+	QByteArray serviceTypeId = urlConnectionParamPtr->GetServiceTypeId();
 
-	representation.SetData("Id", usageId);
-	representation.SetData("UsageId", usageId);
-	representation.SetData("ServiceTypeName", serviceTypeName);
+	representation.SetData("ServiceTypeName", serviceTypeId);
 
 	imtcom::IServerConnectionInterface::ProtocolTypes defaultProtocols = defaultInterface.GetSupportedProtocols();
 
@@ -119,18 +116,6 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 	}
 
 	urlConnectionParamPtr->SetConnectionType(IServiceConnectionInfo::CT_INPUT);
-
-	if (representation.ContainsKey("UsageId")){
-		QByteArray usageId = representation.GetData("UsageId").toByteArray();
-
-		urlConnectionParamPtr->SetUsageId(usageId);
-	}
-
-	if (representation.ContainsKey("ServiceTypeName")){
-		QByteArray serviceTypeName = representation.GetData("ServiceTypeName").toByteArray();
-
-		urlConnectionParamPtr->SetServiceTypeName(serviceTypeName);
-	}
 
 	if (representation.ContainsKey("Host")){
 		QString host = representation.GetData("Host").toString();
