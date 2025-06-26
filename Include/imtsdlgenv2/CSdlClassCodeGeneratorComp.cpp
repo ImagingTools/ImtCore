@@ -17,6 +17,7 @@
 // ImtCore includes
 #include <imtfile/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlType.h>
+#include <imtsdlgenv2/CSdlQObjectGenerator.h>
 
 
 namespace imtsdlgenv2
@@ -656,6 +657,11 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 	// end of class
 	headerStream << QStringLiteral("};");
 
+	// add QtObject class
+	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
+	CSdlQObjectGenerator qObjectGenerator;
+	qObjectGenerator.ProcessHeaderClassFile(headerStream, sdlType);
+
 	// end of namespace
 	QString namespaceString;
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
@@ -716,6 +722,11 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 		FeedStream(sourceStream, 2, false);
 	}
 
+	// add QtObject class impl
+	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
+	qObjectGenerator.ProcessSourceClassFile(headerStream, sdlType);
+
+	// finish namespace 
 	if (!namespaceString.isEmpty()){
 		sourceStream << namespaceString;
 		FeedStream(sourceStream, 2);
