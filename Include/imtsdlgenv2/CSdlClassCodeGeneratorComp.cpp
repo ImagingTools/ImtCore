@@ -724,7 +724,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 
 	// add QtObject class impl
 	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
-	qObjectGenerator.ProcessSourceClassFile(headerStream, sdlType);
+	qObjectGenerator.ProcessSourceClassFile(sourceStream, sdlType);
 
 	// finish namespace 
 	if (!namespaceString.isEmpty()){
