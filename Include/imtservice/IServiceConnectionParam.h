@@ -9,6 +9,9 @@
 // ACF includes
 #include <iser/ISerializable.h>
 
+// ImtCore includes
+#include <imtcom/CServerConnectionInterfaceParam.h>
+
 
 namespace imtservice
 {
@@ -21,23 +24,25 @@ namespace imtservice
 class IServiceConnectionParam: virtual public iser::ISerializable
 {
 public:
-
 	struct IncomingConnectionParam
 	{
 		QByteArray id;
-		QString name;
+		QString host = "localhost";
 		QString description;
-		QUrl url;
+		int wsPort = -1;
+		int httpPort = -1;
 
-		IncomingConnectionParam(){
+		IncomingConnectionParam()
+		{
 			id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 		}
 
 		bool operator==(const IncomingConnectionParam& other) const
 		{
-			return	(url == other.url) &&
+			return	(host == other.host) &&
 					(description == other.description) &&
-					(name == other.name) &&
+					(wsPort == other.wsPort) &&
+					(httpPort == other.httpPort) &&
 					(id == other.id);
 		}
 

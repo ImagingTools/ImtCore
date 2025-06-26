@@ -7,13 +7,13 @@ import imtbaseImtBaseTypesSdl 1.0
 
 ParamEditorBase {
 	id: root
-	
+
 	typeId: ParamTypeIdsTypeMetaInfo.s_serverConnectionParam
-	
+
 	editorModelComp: Component {
 		ServerConnectionParam {}
 	}
-	
+
 	property ServerConnectionParam serverConnectionParam: editorModel
 
 	sourceComp: Component {
@@ -21,59 +21,23 @@ ParamEditorBase {
 			id: content
 			width: root.width
 			spacing: Style.marginXL
-			
+
 			GroupHeaderView {
 				width: parent.width
 				title: root.name
 				groupView: generalGroup
 			}
-			
-			GroupElementView {
+
+			ServerConnectionParamElementView {
 				id: generalGroup
-				width: content.width
+				width: parent.width
 
-				TextInputElementView {
-					id: hostInput
-					name: qsTr("Server Host")
-					text: root.serverConnectionParam ? root.serverConnectionParam.m_host : ""
-					onEditingFinished: {
-						if (root.serverConnectionParam){
-							root.serverConnectionParam.m_host = text
-						}
-					}
-				}
-
-				IntegerInputElementView {
-					id: httpPortInput
-					name: qsTr("Http Port")
-					value: root.serverConnectionParam ? root.serverConnectionParam.m_httpPort : ""
-					onEditingFinished: {
-						if (root.serverConnectionParam){
-							root.serverConnectionParam.m_httpPort = value
-						}
-					}
-				}
-				
-				IntegerInputElementView {
-					id: wsPortInput
-					name: qsTr("Web Socket Port")
-					text: root.serverConnectionParam ? root.serverConnectionParam.m_wsPort : ""
-					onEditingFinished: {
-						if (root.serverConnectionParam){
-							root.serverConnectionParam.m_wsPort = value
-						}
-					}
-				}
-				
-				SwitchElementView {
-					id: switchElementView
-					name: qsTr("Secure Connection")
-					checked: root.serverConnectionParam ? root.serverConnectionParam.m_isSecure : false
-					
-					onCheckedChanged: {
-						if (root.serverConnectionParam){
-							root.serverConnectionParam.m_isSecure = checked
-						}
+				onParamsChanged: {
+					if (root.serverConnectionParam){
+						root.serverConnectionParam.m_host = host
+						root.serverConnectionParam.m_httpPort = httpPort
+						root.serverConnectionParam.m_wsPort = wsPort
+						root.serverConnectionParam.m_isSecure = isSecure
 					}
 				}
 			}

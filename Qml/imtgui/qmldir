@@ -81,6 +81,7 @@ DateTimePickerElementView 1.0 View/DateTimePickerElementView.qml
 StickerView 1.0 View/StickerView.qml
 PopupContainer 1.0 View/PopupContainer.qml
 ObjectVisualStatusProvider 1.0 View/ObjectVisualStatusProvider.qml
+ServerConnectionParamElementView 1.0 View/ServerConnectionParamElementView.qml
 
 singleton PopupManager 1.0 View/PopupManager.qml
 

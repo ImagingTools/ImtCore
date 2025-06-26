@@ -91,11 +91,7 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 		int externIndex = externPortsModelPtr->InsertNewItem();
 
 		externPortsModelPtr->SetData("Id", incomingConnection.id, externIndex);
-		externPortsModelPtr->SetData("Name", incomingConnection.name, externIndex);
 		externPortsModelPtr->SetData("Description", incomingConnection.description, externIndex);
-		externPortsModelPtr->SetData("Host", incomingConnection.url.host(), externIndex);
-		externPortsModelPtr->SetData("Port", incomingConnection.url.port(), externIndex);
-		externPortsModelPtr->SetData("Scheme", incomingConnection.url.scheme(), externIndex);
 	}
 
 	return true;
@@ -149,8 +145,6 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 
 				if (externPortsModelPtr->ContainsKey("Name", i)){
 					QString name = externPortsModelPtr->GetData("Name", i).toString();
-
-					incomingConnection.name = name;
 				}
 
 				if (externPortsModelPtr->ContainsKey("Description", i)){
@@ -178,7 +172,7 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 					externalUrl.setScheme(scheme);
 				}
 
-				incomingConnection.url = externalUrl;
+				// incomingConnection.url = externalUrl;
 
 				urlConnectionParamPtr->AddExternConnection(incomingConnection);
 			}

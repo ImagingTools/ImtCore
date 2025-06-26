@@ -167,9 +167,14 @@ void CConnectionCollectionComp::OnComponentCreated()
 			if (connectionInterfacePtr != nullptr){
 				urlConnectionParam.SetDefaultServiceInterface(*connectionInterfacePtr);
 
-				urlConnectionParam.SetHost(connectionInterfacePtr->GetHost());
-				urlConnectionParam.SetPort(imtcom::IServerConnectionInterface::PT_HTTP, connectionInterfacePtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP));
-				urlConnectionParam.SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, connectionInterfacePtr->GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET));
+				QString defaultHost = connectionInterfacePtr->GetHost();
+				urlConnectionParam.SetHost(defaultHost);
+
+				int defaultHttpPort = connectionInterfacePtr->GetPort(imtcom::IServerConnectionInterface::PT_HTTP);
+				urlConnectionParam.SetPort(imtcom::IServerConnectionInterface::PT_HTTP, defaultHttpPort);
+
+				int defaultWsPort = connectionInterfacePtr->GetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET);
+				urlConnectionParam.SetPort(imtcom::IServerConnectionInterface::PT_WEBSOCKET, defaultWsPort);
 			}
 
 			QByteArray retVal = m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, serviceConnectionTypeId);

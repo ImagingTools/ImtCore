@@ -59,7 +59,7 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 	}
 
 	iser::CArchiveTag objectListTag("ExternConnections", "Extern connections", iser::CArchiveTag::TT_MULTIPLE);
-	iser::CArchiveTag objectTag("Connection", "Connection", iser::CArchiveTag::TT_GROUP, &objectListTag);
+	iser::CArchiveTag objectTag("ExternConnection", "ExternConnection", iser::CArchiveTag::TT_GROUP, &objectListTag);
 
 	retVal = retVal && archive.BeginMultiTag(objectListTag, objectTag, objectCount);
 	for (int i = 0; i < objectCount; i++){
@@ -75,28 +75,29 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(elementInfo.id);
 		retVal = retVal && archive.EndTag(idTag);
 
-		iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF, &objectTag);
-		retVal = retVal && archive.BeginTag(nameTag);
-		retVal = retVal && archive.Process(elementInfo.name);
-		retVal = retVal && archive.EndTag(nameTag);
-
-		iser::CArchiveTag urlTag("Url", "URL", iser::CArchiveTag::TT_LEAF, &objectTag);
-
-		QString urlStr = elementInfo.url.toString();
-
-		retVal = retVal && archive.BeginTag(urlTag);
-		retVal = retVal && archive.Process(urlStr);
-		retVal = retVal && archive.EndTag(urlTag);
-
 		iser::CArchiveTag descriptionTag("Description", "Connection description", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(descriptionTag);
 		retVal = retVal && archive.Process(elementInfo.description);
 		retVal = retVal && archive.EndTag(descriptionTag);
 
+		iser::CArchiveTag hostTag("Host", "Host", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(hostTag);
+		retVal = retVal && archive.Process(elementInfo.host);
+		retVal = retVal && archive.EndTag(hostTag);
+
+		iser::CArchiveTag  wsPortTag("WsPort", "Web Socket Port", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(wsPortTag);
+		retVal = retVal && archive.Process(elementInfo.wsPort);
+		retVal = retVal && archive.EndTag(wsPortTag);
+
+		iser::CArchiveTag  httpPortTag("HttpPort", "Http Socket Port", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(httpPortTag);
+		retVal = retVal && archive.Process(elementInfo.httpPort);
+		retVal = retVal && archive.EndTag(httpPortTag);
+
 		retVal = retVal && archive.EndTag(objectTag);
 
 		if (retVal && !archive.IsStoring()){
-			elementInfo.url = QUrl(urlStr);
 			m_externConnectionList.append(elementInfo);
 		}
 	}
@@ -126,7 +127,9 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 		for (const IncomingConnectionParam& connectionParam : sourcePtr->m_externConnectionList){
 			IncomingConnectionParam newParam;
 			newParam.description = connectionParam.description;
-			newParam.url = connectionParam.url;
+			newParam.host = connectionParam.host;
+			newParam.wsPort = connectionParam.wsPort;
+			newParam.httpPort = connectionParam.httpPort;
 			newParam.id = connectionParam.id;
 
 			m_externConnectionList << newParam;
