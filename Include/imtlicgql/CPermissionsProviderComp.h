@@ -21,7 +21,11 @@ public:
 	I_END_COMPONENT
 
 protected:
-	bool CreateRepresentationModelFromFeatureInfo(const imtlic::CFeatureInfo& featureInfo, imtbase::CTreeItemModel& representationModel, QString& errorMessage) const;
+	bool CreateRepresentationModelFromFeatureInfo(
+				const imtlic::CFeatureInfo& featureInfo,
+				imtbase::CTreeItemModel& representationModel,
+				const QByteArray& languageId,
+				QString& errorMessage) const;
 
 	// reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

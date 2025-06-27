@@ -1,6 +1,9 @@
 #include <imtauthgql/CRoleMetaInfoControllerProxyComp.h>
 
 
+// ACF includes
+#include <iqt/iqt.h>
+
 // ImtCore includes
 #include <imtlic/IFeatureInfo.h>
 
@@ -55,15 +58,25 @@ imtbase::CTreeItemModel* CRoleMetaInfoControllerProxyComp::CreateInternalRespons
 		if (responseModelPtr->ContainsKey("data")){
 			imtbase::CTreeItemModel* dataModelPtr = responseModelPtr->GetTreeItemModel("data");
 			if (dataModelPtr != nullptr){
+				QByteArray languageId;
+				const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+				if (gqlContextPtr != nullptr){
+					languageId = gqlContextPtr->GetLanguageId();
+				}
+
 				for (int i = 0; i < dataModelPtr->GetItemsCount(); i++){
 					QByteArray id = dataModelPtr->GetData("id", i).toByteArray();
-					if (id == QByteArray("permissions")){
+					if (id == QByteArray("Permissions")){
 						imtbase::CTreeItemModel* childrenModelPtr = dataModelPtr->GetTreeItemModel("children", i);
 						if (childrenModelPtr != nullptr){
 							for (int j = 0; j < childrenModelPtr->GetItemsCount(); j++){
 								QByteArray permissionId = childrenModelPtr->GetData("value", j).toByteArray();
 
 								QString permissionName = GetPermissionName(permissionId);
+								if (m_translationManagerCompPtr.IsValid()){
+									permissionName = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), permissionName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
+								}
+
 								if (!permissionName.isEmpty()){
 									childrenModelPtr->SetData("value", permissionName, j);
 								}

@@ -5,11 +5,8 @@
 #include <iqt/iqt.h>
 #include <iprm/CTextParam.h>
 
-
-
-#include <imtbase/CComplexCollectionFilterHelper.h>
-
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilterHelper.h>
 #include <imtauth/CRole.h>
 
 
@@ -145,7 +142,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetO
 	if (!errorMessage.isEmpty()){
 		return sdl::imtbase::ImtCollection::CVisualStatus();
 	}
-	
+
 	if (!response.Version_1_0.has_value()){
 		Q_ASSERT(false);
 		return response;
@@ -159,7 +156,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetO
 	if (response.Version_1_0->text->isEmpty()){
 		response.Version_1_0->text = "<no name>";
 	}
-	
+
 	QByteArray languageId;
 	const imtgql::IGqlContext* gqlContextPtr = getObjectVisualStatusRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
@@ -349,6 +346,12 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 		return nullptr;
 	}
 
+	QByteArray languageId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+	}
+
 	const imtgql::CGqlParamObject paramsPtr = gqlRequest.GetParams();
 
 	QByteArray productId;
@@ -369,13 +372,24 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 
 		int index = dataModelPtr->InsertNewItem();
 		dataModelPtr->SetData("id", "ParentRoles", index);
-		dataModelPtr->SetData("name", "Parent Roles", index);
+
+		QString parentRoles = iqt::GetTranslation(
+					m_translationManagerCompPtr.GetPtr(),
+					QString(QT_TR_NOOP("Parent Roles")).toUtf8(),
+					languageId,
+					"CRoleCollectionControllerComp");
+		dataModelPtr->SetData("name", parentRoles, index);
 		imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("children", index);
 
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
 
 		if (parentRolesIds.isEmpty()){
-			children->SetData("value", "No parent roles");
+			QString noParentRoles = iqt::GetTranslation(
+						m_translationManagerCompPtr.GetPtr(),
+						QString(QT_TR_NOOP("No parent roles")).toUtf8(),
+						languageId,
+						"CRoleCollectionControllerComp");
+			children->SetData("value", noParentRoles);
 		}
 		else{
 			for (const QByteArray& parentRoleId : parentRolesIds){
@@ -396,13 +410,26 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 		index = dataModelPtr->InsertNewItem();
 
 		dataModelPtr->SetData("id", "Permissions", index);
-		dataModelPtr->SetData("name", "Permissions", index);
+
+		QString permissions = iqt::GetTranslation(
+					m_translationManagerCompPtr.GetPtr(),
+					QString(QT_TR_NOOP("Permissions")).toUtf8(),
+					languageId,
+					"CRoleCollectionControllerComp");
+
+		dataModelPtr->SetData("name", permissions, index);
 		children = dataModelPtr->AddTreeModel("children", index);
 
 		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetPermissions();
 
 		if (permissionsIds.isEmpty()){
-			children->SetData("value", "No permissions");
+			QString noPermissions = iqt::GetTranslation(
+						m_translationManagerCompPtr.GetPtr(),
+						QString(QT_TR_NOOP("No permissions")).toUtf8(),
+						languageId,
+						"CRoleCollectionControllerComp");
+
+			children->SetData("value", noPermissions);
 		}
 		else{
 			for (const QByteArray& permissionId : permissionsIds){
@@ -418,19 +445,19 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 
 
 void CRoleCollectionControllerComp::SetAdditionalFilters(
-	const imtgql::CGqlRequest& gqlRequest,
-	imtbase::CComplexCollectionFilter& complexFilter) const
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CComplexCollectionFilter& complexFilter) const
 {
 	QByteArray productId = GetInputArgumentFromRequest(gqlRequest, "productId").toByteArray();
 	if (productId.isEmpty()){
 		SendErrorMessage(0, "Unable to set product-ID to collection filter", "CRoleCollectionControllerComp");
 		return;
 	}
-	
+
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 	fieldFilter.fieldId = "ProductId";
 	fieldFilter.filterValue = productId;
-	
+
 	complexFilter.AddFieldFilter(fieldFilter);
 }
 
@@ -446,12 +473,12 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 		Q_ASSERT(false);
 		return false;
 	}
-	
+
 	if (!arguments.input.Version_1_0->item.has_value()){
 		Q_ASSERT(false);
 		return false;
 	}
-	
+
 	sdl::imtauth::Roles::CRoleData::V1_0 roleDataRepresentation = *roleUpdateRequest.GetRequestedArguments().input.Version_1_0->item;
 	imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(&object);
 	if (roleInfoPtr == nullptr){

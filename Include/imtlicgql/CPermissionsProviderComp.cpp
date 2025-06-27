@@ -14,6 +14,7 @@ namespace imtlicgql
 bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 			const imtlic::CFeatureInfo& featureInfo,
 			imtbase::CTreeItemModel& representationModel,
+			const QByteArray& languageId,
 			QString& errorMessage) const
 {
 	if (!featureInfo.IsPermission()){
@@ -26,7 +27,7 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 
 	QString featureName = featureInfo.GetFeatureName();
 	if (m_translationManagerCompPtr.IsValid()){
-		QString featureNameTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), featureName.toUtf8(), "ru_RU", QByteArrayLiteral("Feature"));
+		QString featureNameTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), featureName.toUtf8(), languageId, QByteArrayLiteral("Feature"));
 		featureName = featureNameTr;
 	}
 
@@ -35,7 +36,7 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 
 	QString featureDescription = featureInfo.GetFeatureDescription();
 	if (m_translationManagerCompPtr.IsValid()){
-		QString featureDescriptionTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), featureDescription.toUtf8(), "ru_RU", QByteArrayLiteral("Feature"));
+		QString featureDescriptionTr = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), featureDescription.toUtf8(), languageId, QByteArrayLiteral("Feature"));
 		featureDescription = featureDescriptionTr;
 	}
 
@@ -59,7 +60,7 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 			Q_ASSERT(subFeatureInfoPtr != nullptr);
 
 			imtbase::CTreeItemModel subFeatureRepresentationModel;
-			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subFeatureRepresentationModel, errorMessage);
+			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subFeatureRepresentationModel, languageId, errorMessage);
 			if (ok){
 				childModelPtr->InsertNewItem();
 				childModelPtr->CopyItemDataFromModel(i, &subFeatureRepresentationModel, 0);
@@ -73,11 +74,17 @@ bool CPermissionsProviderComp::CreateRepresentationModelFromFeatureInfo(
 
 // reimplemented (imtservergql::CGqlRequestHandlerCompBase)
 
-imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
+imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	if (!m_productInfoCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'FeatureContainer' was not set", "CPermissionsProviderComp");
 		return nullptr;
+	}
+
+	QByteArray languageId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> representationModelPtr(new imtbase::CTreeItemModel());
@@ -92,7 +99,7 @@ imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const 
 				if (featureInfoPtr != nullptr){
 					imtbase::CTreeItemModel featureRepresentationModel;
 					QString errorMessage;
-					bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureRepresentationModel, errorMessage);
+					bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureRepresentationModel, languageId, errorMessage);
 					if (ok){
 						int index = representationModelPtr->InsertNewItem();
 						representationModelPtr->CopyItemDataFromModel(index, &featureRepresentationModel, 0);
