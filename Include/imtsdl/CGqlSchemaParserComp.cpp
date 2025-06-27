@@ -35,7 +35,7 @@ const QByteArray CGqlSchemaParserComp::s_unionListParamId = QByteArrayLiteral("U
 
 // static helpers
 template <class T>
-static bool UpdateEntryList(
+[[nodiscard]] static bool UpdateEntryList(
 	QList<T>& listOfEntries,
 	ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel,
 	const QString& currentSchemaFilePath,
@@ -734,13 +734,16 @@ bool CGqlSchemaParserComp::ValidateSchema()
 		}
 	}
 
+	bool isSchemaValid = true;
 	ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel = m_argumentParserCompPtr->GetAutoLinkLevel();
 	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled()){
-		UpdateEntryList(m_sdlTypes, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
-		UpdateEntryList(m_enums, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
-		UpdateEntryList(m_unions, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
-		UpdateEntryList(m_documentTypes, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
-		UpdateEntryList(m_requests, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
+		isSchemaValid = isSchemaValid && UpdateEntryList(m_sdlTypes, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
+		isSchemaValid = isSchemaValid && UpdateEntryList(m_enums, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
+		isSchemaValid = isSchemaValid && UpdateEntryList(m_unions, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
+		isSchemaValid = isSchemaValid && UpdateEntryList(m_documentTypes, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
+
+		/// \todo inspect it and fix
+		// isSchemaValid = isSchemaValid && UpdateEntryList(m_requests, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
 		for (CSdlRequest& sdlRequest: m_requests){
 			bool isExternal = sdlRequest.IsExternal();
 
@@ -783,7 +786,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 		uniqueTypes << sdlType;
 	}
 
-	return true;
+	return isSchemaValid;
 }
 
 

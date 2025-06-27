@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5389" Description="ACF"/>
-            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5399" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -12,16 +12,6 @@
         <Element ComponentName="CodeGenWorker" X="575" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="CodeGenWorker">
-            <PositionMap>
-                <Element ComponentName="CppCodeGeneratorFrameworkV2" X="550" Y="575" Note=""/>
-                <Element ComponentName="FileCleanupProcessor" X="950" Y="225" Note=""/>
-                <Element ComponentName="FileFinalizer" X="950" Y="425" Note=""/>
-                <Element ComponentName="QmlCodeGenFramework" X="550" Y="225" Note=""/>
-                <Element ComponentName="SdlAppCore" X="550" Y="425" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Application">
             <PositionMap>
                 <Element ComponentName="ApplicationInfo" X="475" Y="475" Note=""/>
@@ -29,6 +19,16 @@
                 <Element ComponentName="ConsoleLog" X="900" Y="350" Note=""/>
                 <Element ComponentName="FilteredConsoleLog" X="700" Y="350" Note=""/>
                 <Element ComponentName="VersionInfo" X="475" Y="600" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="CodeGenWorker">
+            <PositionMap>
+                <Element ComponentName="CppCodeGeneratorFrameworkV2" X="550" Y="575" Note=""/>
+                <Element ComponentName="FileCleanupProcessor" X="950" Y="225" Note=""/>
+                <Element ComponentName="FileFinalizer" X="950" Y="425" Note=""/>
+                <Element ComponentName="QmlCodeGenFramework" X="550" Y="225" Note=""/>
+                <Element ComponentName="SdlAppCore" X="550" Y="425" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

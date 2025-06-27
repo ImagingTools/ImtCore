@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5389" Description="ACF"/>
-            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5399" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -309,7 +309,6 @@
                                             <Value>QmlCodeGenFramework/QmlCodeGenerator</Value>
                                             <Value>QmlCodeGenFramework/QmlCodeMetaGenerator</Value>
                                             <Value>QmlCodeGenFramework/QmlCodeCommandIdGenerator</Value>
-                                            <Value>FileFinalizer</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
