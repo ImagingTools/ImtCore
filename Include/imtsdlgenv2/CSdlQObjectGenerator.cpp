@@ -14,7 +14,6 @@ namespace imtsdlgenv2
 
 bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imtsdl::CSdlType& sdlType)
 {
-	stream << QStringLiteral("// here must be a QOBject code))");
 
 	return true;
 }
@@ -22,7 +21,6 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 
 bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imtsdl::CSdlType& sdlType)
 {
-	stream << QStringLiteral("// here must be a QOBject code))");
 
 	return true;
 }
