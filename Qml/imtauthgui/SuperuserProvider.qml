@@ -40,7 +40,7 @@ QtObject {
 		}
 
 		function onError(){
-			root.result(false, "");
+			root.result(false, "", "");
 		}
 	}
 }

@@ -5,128 +5,142 @@ import imtgui 1.0
 import imtcontrols 1.0
 
 Rectangle {
-	id: container;
-	
-	width: Style.sizeHintXXL;
-	height: Style.sizeHintBXS;
+	id: container
 
-	border.width: 1;
-	border.color: Style.borderColor;
-	
-	radius: Style.marginXS;
-	
-	color: Style.baseColor;
-	
-	property int contentHeight: -1;
-	
+	width: Style.sizeHintXXL
+	height: contentHeight > 0 ? contentHeight : Style.sizeHintBXS
+
+	border.width: 1
+	border.color: Style.borderColor
+
+	radius: Style.marginXS
+
+	color: Style.baseColor
+
+	property int contentHeight: -1
+
 	clip: true // is obligatory !
-	
+
 	function calcHeight(){
-		let h = 0;
-		
-		for (let i = 0; i < children.length; i++){
-			if (children[i].visible && children[i].height >= 0){
-				h += children[i].height;
-				
-				if (i > 0){
-					h -= children[i].border.width
+		let h = border.width * 2
+
+		for (let i = 0; i < children.length; i++) {
+			let child = children[i]
+
+			if (!child.visible) continue
+
+			if (child.objectName === "Separator"){
+				h += child.height
+			}
+			else{
+				h += child.height
+
+				if (i > 0 && child.anchors.topMargin !== undefined){
+					h += child.anchors.topMargin
 				}
 			}
 		}
+
+		contentHeight = h
+		height = contentHeight
 		
-		container.contentHeight = h;
-		container.height = container.contentHeight;
+		console.log("calcHeight height", height)
 	}
-	
+
 	QtObject {
-		id: internal;
-		
-		property bool block: false;
-		
-		function onVisibleChanged(){
-			if (!block){
-				container.update();
-			}
-		}
+		id: internal
+		property bool block: false
 	}
-	
+
 	Component.onCompleted: {
 		for (let i = 0; i < children.length; i++){
-			children[i].visibleChanged.connect(internal.onVisibleChanged);
-			children[i].heightChanged.connect(calcHeight);
+			children[i].visibleChanged.connect(update)
+			children[i].heightChanged.connect(update)
 		}
-		
-		update();
+
+		update()
+		calcHeight()
 	}
-	
-	Component.onDestruction:  {
+
+	Component.onDestruction: {
 		for (let i = 0; i < children.length; i++){
-			children[i].visibleChanged.disconnect(internal.onVisibleChanged);
-			children[i].heightChanged.disconnect(calcHeight);
+			children[i].visibleChanged.disconnect(update)
+			children[i].heightChanged.disconnect(update)
 		}
 	}
-	
+
+	Component {
+		id: separatorComp
+		Rectangle {
+			width: container.width
+			height: 1
+			color: Style.borderColor
+			objectName: "Separator"
+		}
+	}
+
 	function update(){
-		internal.block = true;
-	
+		if (internal.block) return
+
+		internal.block = true
+
+		// Remove old separators
+		for (let i = children.length - 1; i >= 0; i--){
+			let child = children[i]
+			if (child.objectName === "Separator"){
+				child.destroy()
+			}
+		}
+
+		// Collect only visible non-separator items
 		let visibleItems = []
 		for (let i = 0; i < children.length; i++){
-			if (children[i].visible){
-				visibleItems.push(children[i])
+			let child = children[i]
+			if (child.visible && child.objectName !== "Separator") {
+				visibleItems.push(child)
 			}
 		}
-	
+
+		// Position items and add separators
 		for (let i = 0; i < visibleItems.length; i++){
-			visibleItems[i].anchors.top = undefined;
-			visibleItems[i].anchors.topMargin = 0;
-	
-			if (visibleItems[i].bottomRoundedCorners !== undefined){
-				visibleItems[i].bottomRoundedCorners = true;
+			let item = visibleItems[i]
+			
+			if (item.border){
+				item.border.width = 0
 			}
-	
-			if (visibleItems[i].topRoundedCorners !== undefined){
-				visibleItems[i].topRoundedCorners = true;
-			}
-	
-			if (visibleItems[i].radius !== undefined){
-				visibleItems[i].radius = 0;
-			}
-	
-			visibleItems[i].anchors.left = container.left;
-			visibleItems[i].anchors.right = container.right;
-	
-			if (i == 0){
-				visibleItems[i].anchors.top = container.top;
-				if (visibleItems[i].radius !== undefined){
-					visibleItems[i].radius = container.radius;
-				}
-			}
-	
-			if (i == 0 && visibleItems.length > 1){
-				if (visibleItems[i].bottomRoundedCorners !== undefined){
-					visibleItems[i].bottomRoundedCorners = false;
-				}
-			}
-	
-			if (i != 0 && i == visibleItems.length - 1){
-				if (visibleItems[i].radius !== undefined){
-					visibleItems[i].radius = container.radius;
-				}
-	
-				if (visibleItems[i].topRoundedCorners !== undefined){
-					visibleItems[i].topRoundedCorners = false;
-				}
-			}
-	
-			if (i > 0){
-				visibleItems[i].anchors.top = visibleItems[i - 1].bottom;
-				visibleItems[i].anchors.topMargin = -visibleItems[i].border.width;
+
+			// Reset anchors
+			item.anchors.top = undefined
+			item.anchors.bottom = undefined
+
+			item.anchors.left = container.left
+			item.anchors.right = container.right
+			item.anchors.margins = container.border.width
+
+			if (i === 0){
+				item.anchors.top = container.top
+				// if (item.hasOwnProperty('topRoundedCorners')) {
+				// 	item.topRoundedCorners = true
+				// }
+			} 
+			else {
+				// Add separator between items
+				let separator = separatorComp.createObject(container)
+
+				separator.anchors.top = visibleItems[i-1].bottom
+				separator.anchors.left = container.left
+				separator.anchors.right = container.right
+
+				item.anchors.top = separator.bottom
+
+				// if (i === visibleItems.length - 1 && item.hasOwnProperty('bottomRoundedCorners')) {
+				// 	item.bottomRoundedCorners = true
+				// }
 			}
 		}
-	
-		internal.block = false;
-	
-		calcHeight();
+
+		internal.block = false
+		calcHeight()
 	}
 }
 

@@ -42,7 +42,6 @@ Rectangle {
 	property int controlHeight: Style.controlHeightM
 	
 	onFocusChanged: {
-		console.log("ElementView.qml onFocusChanged", focus)
 		if (controlItem){
 			controlItem.focus = focus
 		}
@@ -155,10 +154,24 @@ Rectangle {
 			}
 		}
 		
-		Loader {
-			id: bottomLoader
+		Item {
+			id: bottomItem
 			width: parent.width
-			visible: rootElement.bottomComp != null && rootElement.bottomComp != undefined
+			visible: bottomLoader.item !== undefined
+			clip: true
+			Loader {
+				id: bottomLoader
+				width: parent.width
+				onItemChanged: {
+					bottomItem.height = item ? item.height : 0
+				}
+			}
+			Connections {
+				target: bottomLoader.item
+				function onHeightChanged(){
+					bottomItem.height = bottomLoader.item.height
+				}
+			}
 		}
 	}
 }

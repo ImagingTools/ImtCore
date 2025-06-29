@@ -22,7 +22,7 @@ CollectionViewCommandsDelegateBase {
 	property var documentViewsComp: [];
 	property var documentDataControllersComp: [];
 	property var documentValidatorsComp: [];
-	
+
 	Component.onCompleted: {
 		let documentManager = MainDocumentManager.getDocumentManager(collectionViewCommandsDelegateBase.documentManagerId);
 		if (documentManager){
@@ -35,7 +35,7 @@ CollectionViewCommandsDelegateBase {
 			collectionView.dataController.removed.connect(internal.onRemoved);
 		}
 	}
-	
+
 	onDocumentManagerChanged: {
 		if (!documentManager){
 			return
@@ -72,7 +72,7 @@ CollectionViewCommandsDelegateBase {
 
 		return -1;
 	}
-	
+
 	function getHeaders(){
 		return {};
 	}
@@ -110,7 +110,7 @@ CollectionViewCommandsDelegateBase {
 
 	function onEdit(){
 		console.log("onEdit", collectionId, documentManagerId);
-		
+
 		let elementsModel = collectionViewCommandsDelegateBase.collectionView.table.elements;
 		if (!elementsModel){
 			console.error("Unable to edit document. Error: Elements for collection view is invalid");
@@ -172,6 +172,33 @@ CollectionViewCommandsDelegateBase {
 		}
 	}
 
+	TreeItemModel {
+		id: revisionHeadersModel
+		Component.onCompleted: {
+			 updateHeaders()
+		}
+
+		function updateHeaders(){
+			revisionHeadersModel.clear()
+
+			let index = revisionHeadersModel.insertNewItem();
+			revisionHeadersModel.setData("id", "user", index)
+			revisionHeadersModel.setData("name", qsTr("User"), index)
+
+			index = revisionHeadersModel.insertNewItem();
+			revisionHeadersModel.setData("id", "revision", index)
+			revisionHeadersModel.setData("name", qsTr("Revision"), index)
+
+			index = revisionHeadersModel.insertNewItem();
+			revisionHeadersModel.setData("id", "isActive", index)
+			revisionHeadersModel.setData("name", qsTr("Active"), index)
+
+			index = revisionHeadersModel.insertNewItem();
+			revisionHeadersModel.setData("id", "timestamp", index)
+			revisionHeadersModel.setData("name", qsTr("Time"), index)
+		}
+	}
+
 	Component {
 		id: documentRevisionDialogComp;
 
@@ -185,7 +212,7 @@ CollectionViewCommandsDelegateBase {
 			property string documentId;
 			property int selectedRevision: -1;
 			property int currentRevision: -1;
-			property BaseModel revisionsModel;
+			property BaseModel revisionsModel: BaseModel {};
 
 			Component.onCompleted: {
 				if (PermissionsController.checkPermission("RestoreRevision")){
@@ -211,7 +238,7 @@ CollectionViewCommandsDelegateBase {
 					ModalDialogManager.openDialog(removeRevisionConfirmDialog, {});
 				}
 			}
-			
+
 			function getRevisionList(){
 				receiveRevisionModelStarted()
 				request.send();
@@ -231,12 +258,12 @@ CollectionViewCommandsDelegateBase {
 						onFinished: {
 							documentRevisionDialog.revisionsModel = m_revisions;
 							documentRevisionDialog.currentRevision = m_activeRevision;
-							
+
 							documentRevisionDialog.revisionModelReceived()
 						}
 					}
 				}
-				
+
 				function getHeaders(){
 					return collectionViewCommandsDelegateBase.getHeaders();
 				}
@@ -260,7 +287,7 @@ CollectionViewCommandsDelegateBase {
 						}
 					}
 				}
-				
+
 				function getHeaders(){
 					return collectionViewCommandsDelegateBase.getHeaders();
 				}
@@ -285,7 +312,7 @@ CollectionViewCommandsDelegateBase {
 						}
 					}
 				}
-				
+
 				function getHeaders(){
 					return collectionViewCommandsDelegateBase.getHeaders();
 				}
@@ -311,21 +338,25 @@ CollectionViewCommandsDelegateBase {
 					width: Style.sizeHintXXL;
 					height: Style.sizeHintXL;
 
+					Component.onCompleted: {
+						console.log("contentItem onCompleted")
+					}
+
 					Connections {
 						target: documentRevisionDialog;
 
 						function onStarted(){
 							documentRevisionDialog.getRevisionList()
 						}
-						
+
 						function onReceiveRevisionModelStarted(){
 							loading.start()
 						}
-						
+
 						function onReceiveRevisionModelFailed(){
 							loading.stop()
 						}
-						
+
 						function onRevisionModelReceived(){
 							loading.stop()
 						}
@@ -361,17 +392,22 @@ CollectionViewCommandsDelegateBase {
 						}
 					}
 
-					SplitView {
+					Item {
 						id: splitView;
 						anchors.fill: parent
 						anchors.margins: Style.marginM
-						orientation: Qt.Vertical
+
+						Component.onCompleted: {
+							console.log("splitView onCompleted")
+						}
 
 						Table {
 							id: table;
+							anchors.top: parent.top
 							width: parent.width;
 							height: Style.sizeHintM;
-							elements: documentRevisionDialog.revisionsModel;
+							headers: revisionHeadersModel
+							elements: documentRevisionDialog.revisionsModel
 
 							onElementsChanged: {
 								table.resetSelection();
@@ -400,33 +436,11 @@ CollectionViewCommandsDelegateBase {
 									}
 								}
 							}
-
-							TreeItemModel {
-								id: headersModel;
-								Component.onCompleted: {
-									let index = headersModel.insertNewItem();
-									headersModel.setData("id", "user", index)
-									headersModel.setData("name", qsTr("User"), index)
-
-									index = headersModel.insertNewItem();
-									headersModel.setData("id", "revision", index)
-									headersModel.setData("name", qsTr("Revision"), index)
-
-									index = headersModel.insertNewItem();
-									headersModel.setData("id", "isActive", index)
-									headersModel.setData("name", qsTr("Active"), index)
-
-									index = headersModel.insertNewItem();
-									headersModel.setData("id", "timestamp", index)
-									headersModel.setData("name", qsTr("Time"), index)
-
-									table.headers = headersModel;
-								}
-							}
 						}
 
 						Rectangle {
 							id: descriptionItem;
+							anchors.top: table.bottom
 							width: parent.width;
 							height: Style.sizeHintXXS;
 							clip: true
@@ -495,3 +509,4 @@ CollectionViewCommandsDelegateBase {
 		}
 	}
 }
+

@@ -117,10 +117,18 @@ ParamEditorBase {
 						
 						function onWidthChanged(){
 							if (elementLoader.item){
+								if (elementLoader.item.border){
+									elementLoader.item.border.width = 0
+								}
+
 								elementLoader.item.width = paramItem.width
 							}
 							
 							if (groupLoader.item){
+								if (groupLoader.item.border){
+									groupLoader.item.border.width = 0
+								}
+								
 								groupLoader.item.width = paramItem.width
 							}
 						}
@@ -156,8 +164,12 @@ ParamEditorBase {
 								console.error("Unable to create param from json. Param: ", paramId, paramName)
 							}
 						}
-						
-						item.width = paramItem.width
+
+						if (item.border){
+							item.border.width = 0
+						}
+
+						item.width = paramItem.width - 2 * groupElementView.border.width
 					}
 				}
 			}

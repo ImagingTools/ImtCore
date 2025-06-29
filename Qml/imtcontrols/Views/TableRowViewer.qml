@@ -32,7 +32,7 @@ Row {
 			}
 
 			onComplComplChanged: {
-				if(cell.complCompl && dataList && dataList.rowDelegate && dataList.rowDelegate.tableItem){
+				if(cell.complCompl && dataList && dataList.rowDelegate && dataList.rowDelegate.tableItem && dataList.rowDelegate.tableItem.headers){
 					let headerId = dataList.rowDelegate.tableItem.headers.getData("id", model.index)
 					let contents = dataList.rowDelegate.tableItem.columnContentComps;
 					let contentComp = undefined;

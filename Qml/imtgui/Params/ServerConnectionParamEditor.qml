@@ -31,12 +31,31 @@ ParamEditorBase {
 			ServerConnectionParamElementView {
 				id: generalGroup
 				width: parent.width
+				host: root.serverConnectionParam ? root.serverConnectionParam.m_host : ""
+				httpPort: root.serverConnectionParam ? root.serverConnectionParam.m_httpPort : -1
+				wsPort: root.serverConnectionParam ? root.serverConnectionParam.m_wsPort : -1
+				isSecure: root.serverConnectionParam ? root.serverConnectionParam.m_isSecure : false
 
-				onParamsChanged: {
+				onHostChanged: {
 					if (root.serverConnectionParam){
 						root.serverConnectionParam.m_host = host
+					}
+				}
+
+				onHttpPortChanged: {
+					if (root.serverConnectionParam){
 						root.serverConnectionParam.m_httpPort = httpPort
+					}
+				}
+
+				onWsPortChanged: {
+					if (root.serverConnectionParam){
 						root.serverConnectionParam.m_wsPort = wsPort
+					}
+				}
+
+				onIsSecureChanged: {
+					if (root.serverConnectionParam){
 						root.serverConnectionParam.m_isSecure = isSecure
 					}
 				}
