@@ -13,6 +13,81 @@ namespace imtsdlgenv2
 {
 
 
+// static variables
+
+const static QStringList s_integerNumberMetaTypes = {
+		"QMetaType::Int",
+		"QMetaType::UInt",
+		"QMetaType::LongLong",
+		"QMetaType::ULongLong",
+		"QMetaType::Long",
+		"QMetaType::Short",
+		"QMetaType::ULong",
+		"QMetaType::UShort",
+		"QMetaType::UChar"
+};
+
+const static QStringList s_numberMetaTypes = QStringList({
+		"QMetaType::Float",
+		"QMetaType::Double"}) + s_integerNumberMetaTypes;
+
+// static helpers
+
+
+void WriteTypeMultiConditionCheck(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& variableName,
+			const QStringList& metaTypeList,
+			bool expected = false)
+{
+	if (metaTypeList.size() < 2){
+		I_CRITICAL();
+
+		return;
+	}
+	// first
+	stream << metaTypeList.constFirst();
+	if (expected){
+		stream << QStringLiteral(" || ");
+	}
+	else {
+		stream << QStringLiteral(" && ");
+	}
+
+	// [1 : size()-1]
+	for (qsizetype i = 1; i < metaTypeList.size() - 1; ++i){
+		const QString& type = metaTypeList[i];
+		stream << variableName;
+		if(expected){
+			stream << '=';
+		}
+		else{
+			stream << '!';
+		}
+		stream << '=' << ' ';
+		stream << type;
+		if (expected){
+			stream << QStringLiteral(" || ");
+		}
+		else {
+			stream << QStringLiteral(" && ");
+		}
+	}
+
+	// last
+	stream << variableName;
+	if(expected){
+		stream << '=';
+	}
+	else{
+		stream << '!';
+	}
+	stream << '=' << ' ';
+	stream << metaTypeList.constLast();
+}
+
+
 // public methods
 
 // reimplemented (IIncludeDirectivesProvider)
@@ -257,15 +332,14 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		else{
 			stream << '=';
 		}
-
-		stream << QStringLiteral("= QMetaType::");
+		stream << '=' << ' ';
 
 		// known-limitation text protocols do not support the "byte" type. for byte array also use string
 		if (	isEnum ||
 				convertedType == QStringLiteral("QString") ||
 				convertedType == QStringLiteral("QByteArray"))
 		{
-			stream << QStringLiteral("QString");
+			stream << QStringLiteral("QMetaType::QString");
 			if (expected){
 				stream << QStringLiteral(" || ");
 			}
@@ -284,39 +358,28 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 			}
 			stream << QStringLiteral("= QMetaType::QByteArray");
 		}
-		else if (convertedType == QStringLiteral("int")){
-			stream << QStringLiteral("Int");
-		}
-		else if (convertedType == QStringLiteral("long")){
-			stream << QStringLiteral("Long");
-		}
-		else if (convertedType == QStringLiteral("qlonglong")){
-			stream << QStringLiteral("LongLong");
+		else if (	convertedType == QStringLiteral("int")||
+					convertedType == QStringLiteral("long") ||
+					convertedType == QStringLiteral("qlonglong"))
+		{
+			WriteTypeMultiConditionCheck(
+				stream,
+				field, 
+				GetContainerObjectVariableName() + QStringLiteral("[\"") + field.GetId() + QStringLiteral("\"].userType() "),
+				s_integerNumberMetaTypes,
+				expected);
 		}
 		// known-limitation for text protocols, there is no difference between float and double numbers.
 		else if (convertedType == QStringLiteral("float") || convertedType == QStringLiteral("double")){
-			stream << QStringLiteral("Float");
-			if (expected){
-				stream << QStringLiteral(" || ");
-			}
-			else {
-				stream << QStringLiteral(" && ");
-			}
-			stream << GetContainerObjectVariableName();
-			stream << QStringLiteral("[\"");
-			stream << field.GetId();
-			stream << QStringLiteral("\"].userType() ");
-			if(expected){
-				stream << '=';
-			}
-			else{
-				stream << '!';
-			}
-			stream << QStringLiteral("= QMetaType::Double");
+			WriteTypeMultiConditionCheck(
+				stream,
+				field, 
+				GetContainerObjectVariableName() + QStringLiteral("[\"") + field.GetId() + QStringLiteral("\"].userType() "),
+				s_numberMetaTypes,
+				expected);
 		}
-
 		else if (convertedType == QStringLiteral("bool")){
-			stream << QStringLiteral("Bool");
+			stream << QStringLiteral("QMetaType::Bool");
 		}
 		else {
 			SendCriticalMessage(0, QString("Unexpected type for field '%1'").arg(field.GetId()));

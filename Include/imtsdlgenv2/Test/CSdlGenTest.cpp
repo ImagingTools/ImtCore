@@ -273,14 +273,14 @@ void CSdlGenTest::PrinterTest()
 
 void CSdlGenTest::cleanupTestCase()
 {
-	// for (const std::shared_ptr<QDir>& tempDirPtr: std::as_const(m_tempDirPtrList)){
-	// 	const bool isRemoved = tempDirPtr->removeRecursively();
-	// 	QVERIFY(isRemoved);
-	// }
-	// QDir rootTestDir = QDir(QString("SdlGenTest"));
-	// if (rootTestDir.exists()){
-	// 	QVERIFY(rootTestDir.removeRecursively());
-	// }
+	for (const std::shared_ptr<QDir>& tempDirPtr: std::as_const(m_tempDirPtrList)){
+		const bool isRemoved = tempDirPtr->removeRecursively();
+		QVERIFY(isRemoved);
+	}
+	QDir rootTestDir = QDir(QString("SdlGenTest"));
+	if (rootTestDir.exists()){
+		QVERIFY(rootTestDir.removeRecursively());
+	}
 }
 
 

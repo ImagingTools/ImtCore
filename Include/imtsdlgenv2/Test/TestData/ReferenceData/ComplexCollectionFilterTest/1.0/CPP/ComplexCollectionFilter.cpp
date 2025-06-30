@@ -162,7 +162,7 @@ bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		interpretationMode = gqlObject["interpretationMode"].toString();
 	}
 
-	if (gqlObject.ContainsParam("unitMultiplier") && (gqlObject["unitMultiplier"].userType() == QMetaType::Int)){
+	if (gqlObject.ContainsParam("unitMultiplier") && (gqlObject["unitMultiplier"].userType() == QMetaType::Int || gqlObject["unitMultiplier"].userType() == QMetaType::UInt || gqlObject["unitMultiplier"].userType() == QMetaType::LongLong || gqlObject["unitMultiplier"].userType() == QMetaType::ULongLong || gqlObject["unitMultiplier"].userType() == QMetaType::Long || gqlObject["unitMultiplier"].userType() == QMetaType::Short || gqlObject["unitMultiplier"].userType() == QMetaType::ULong || gqlObject["unitMultiplier"].userType() == QMetaType::UShort || gqlObject["unitMultiplier"].userType() == QMetaType::UChar)){
 		unitMultiplier = gqlObject["unitMultiplier"].toInt();
 	}
 
@@ -188,7 +188,7 @@ bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 		interpretationMode = gqlObject["interpretationMode"].toString();
 	}
 
-	if (gqlObject.ContainsParam("unitMultiplier") && (gqlObject["unitMultiplier"].userType() == QMetaType::Int)){
+	if (gqlObject.ContainsParam("unitMultiplier") && (gqlObject["unitMultiplier"].userType() == QMetaType::Int || gqlObject["unitMultiplier"].userType() == QMetaType::UInt || gqlObject["unitMultiplier"].userType() == QMetaType::LongLong || gqlObject["unitMultiplier"].userType() == QMetaType::ULongLong || gqlObject["unitMultiplier"].userType() == QMetaType::Long || gqlObject["unitMultiplier"].userType() == QMetaType::Short || gqlObject["unitMultiplier"].userType() == QMetaType::ULong || gqlObject["unitMultiplier"].userType() == QMetaType::UShort || gqlObject["unitMultiplier"].userType() == QMetaType::UChar)){
 		unitMultiplier = gqlObject["unitMultiplier"].toInt();
 	}
 
