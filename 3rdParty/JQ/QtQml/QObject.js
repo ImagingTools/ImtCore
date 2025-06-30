@@ -72,6 +72,10 @@ class QObject extends QBaseObject {
     }
 
     __updateSimpleProperties(){
+        for(let child of this.__children){
+            child.__updateSimpleProperties()
+        }
+
         if(!this.__simpleProperties) return
         
         for(let func of this.__simpleProperties){
@@ -79,10 +83,6 @@ class QObject extends QBaseObject {
         }
 
         delete this.__simpleProperties
-
-        for(let child of this.__children){
-            child.__updateSimpleProperties()
-        }
     }
 
     __updateProperty(propName){
@@ -104,13 +104,13 @@ class QObject extends QBaseObject {
     }
   
     __updateProperties(){
-        for(let propName in this.__properties){
-            this.__updateProperty(propName)
-        }
-
         for(let child of this.__children){
             child.__updateProperties()
         }
+
+        for(let propName in this.__properties){
+            this.__updateProperty(propName)
+        } 
     }
 }
 

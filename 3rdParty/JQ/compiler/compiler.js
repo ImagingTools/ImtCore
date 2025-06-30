@@ -1092,7 +1092,6 @@ class Instruction {
 
         for (let assignProperty of this.assignProperties) {
             let path = this.resolve(assignProperty.name.split('.')[0], this.name)
-
             if (!path) {
                 console.log(`${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: warning: ${assignProperty.name} is not founded`)
             }
@@ -1172,9 +1171,12 @@ class Instruction {
                 }
 
             } else {
+                let names = assignProperty.name.split('.')
+
                 let stat = this.prepare(assignProperty.value, { isCompute: false, thisKey: this.name, value: new SourceNode(), local: [] })
                 if (stat.isCompute) {
                     if (assignProperty.type === 'alias') {
+                        // console.log('alias')
                         // console.log(assignProperty.name, stat.value.toString())
                         // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',function(){return ${stat.value}},function(newVal){${stat.value}=newVal})`)
                         let aliasPath = stat.value.toString().split('.')
@@ -1182,10 +1184,22 @@ class Instruction {
                         // code.add(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                     } else {
                         // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
-                        code.add(`${this.name}.__properties['${assignProperty.name}']=function(){return ${stat.value}}`)
+                        if(names.length > 1){
+                            code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){return ${stat.value}}`)
+                            code.add(`${this.name}['${names[0]}'].__updateProperties()`)
+                        } else {
+                            code.add(`${this.name}.__properties['${assignProperty.name}']=function(){return ${stat.value}}`)
+                        }
+                        
                     }
                 } else {
-                    code.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
+                    if(names.length > 1){
+                        code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=${stat.value}`)
+                        code.add(`${this.name}['${names[0]}'].__updateProperties()`)
+                    } else {
+                        code.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
+                    }
+                    
                 }
             }
 

@@ -43,6 +43,30 @@ class GroupProperty extends QBaseObject {
         obj.__proxy = proxy
         return proxy
     }
+
+    __updateProperty(propName){
+        let path = propName.split('.')
+        let value = this.__properties[propName]
+
+        if(value instanceof JQModules.QtQml.QObject){
+            value.__updateAliases()
+            value.__updateSimpleProperties()
+            value.__updateProperties()
+            value.__complete()
+        }
+
+        if(path.length === 2){
+            this.__proxy[path[0]][path[1]] = value
+        } else {
+            this.__proxy[path[0]] = value
+        }
+    }
+  
+    __updateProperties(){
+        for(let propName in this.__properties){
+            this.__updateProperty(propName)
+        }
+    }
 }
 
 
