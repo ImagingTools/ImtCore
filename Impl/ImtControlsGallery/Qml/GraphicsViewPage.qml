@@ -312,7 +312,7 @@ GraphicsView{
 	LineParams{
 		id: lineParams;
 	}
-	LineShape{
+	PolyLineShape{
 		id: line;
 
 		Component.onCompleted: {
