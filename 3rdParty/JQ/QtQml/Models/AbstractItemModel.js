@@ -6,7 +6,7 @@ const JQApplication = require("../../core/JQApplication")
 
 class AbstractItemModel {
     static create(parent, index, data){
-        let properties = []
+        let properties = {}
 
         let model = new this()
 
@@ -26,7 +26,9 @@ class AbstractItemModel {
                 if(caller) {
                     let found = false
 
-                    for(let _caller of properties){
+                    if(!properties[key]) properties[key] = []
+
+                    for(let _caller of properties[key]){
                         if(caller.name === _caller.name && caller.target === _caller.target){
                             found = true
                             break
@@ -34,7 +36,7 @@ class AbstractItemModel {
                     }
 
                     if(!found){
-                        properties.push(caller)
+                        properties[key].push(caller)
                     }
                     
                 }
@@ -46,8 +48,9 @@ class AbstractItemModel {
             },
             set(target, key, value){
                 target[key] = value
+                if(!properties[key]) properties[key] = []
 
-                for(let property of properties){
+                for(let property of properties[key]){
                     // property.__update()
                     property.target.__proxy[property.name] = property.func()
                 }
