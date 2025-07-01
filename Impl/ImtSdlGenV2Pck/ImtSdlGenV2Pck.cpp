@@ -69,6 +69,11 @@ I_EXPORT_COMPONENT(
 			"A processor that creating C++ Union from SDL schema",
 			"Schema Definition Language SDL Class Generator Union")
 
+I_EXPORT_COMPONENT(
+			QmlRegisterGenerator,
+			"A processor that creating C++ QML registration functions",
+			"Schema Definition Language SDL QML Class Generator")
+
 
 } // namespace ImtSdlGenV2Pck
 

@@ -166,6 +166,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 		}
 	}
 
+	/// \todo make a new method
 	// join files if required
 	if (!joinRules.isEmpty()){
 		if (m_filesJoinerCompPtr.IsValid()){
@@ -206,6 +207,11 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
 
+				// join QML register file
+				if (m_argumentParserCompPtr->IsCppEnabled() && m_argumentParserCompPtr->IsQmlEnabled()){
+					filterParams.InsertOption(QStringLiteral("QmlRegister.h"), QByteArray::number(filterParams.GetOptionsCount()));
+					SendVerboseMessage(QString("Add QmlRegister enum file '%1. Total: %2").arg("QmlRegister.h", QByteArray::number(filterParams.GetOptionsCount())));
+				}
 
 				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
@@ -223,6 +229,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 					QFile::remove(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 				}
+				QFile::remove(outputDirectoryPath + QStringLiteral("/QmlRegister.h"));
 
 			}
 			if (joinSources){

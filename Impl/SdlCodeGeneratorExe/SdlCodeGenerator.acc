@@ -317,6 +317,7 @@
                                         <Values>
                                             <Value>CppCodeGeneratorFrameworkV2/SdlEnumGenerator</Value>
                                             <Value>CppCodeGeneratorFrameworkV2/SdlUnionGenerator</Value>
+                                            <Value>CppCodeGeneratorFrameworkV2/QmlRegisterGenerator</Value>
                                             <Value>CppCodeGeneratorFrameworkV2/SdlClassCodeGenerator</Value>
                                             <Value>CppCodeGeneratorFrameworkV2/GqlWrapClassCodeGenerator</Value>
                                             <Value>CppCodeGeneratorFrameworkV2/GqlHandlerBaseClassGenerator</Value>

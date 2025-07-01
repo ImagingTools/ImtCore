@@ -133,6 +133,7 @@ void ExecuteTest(
 
 	// do processing
 	// CXX
+	GetPrecessorAndExec(testSuite, "QmlRegisterGenerator");
 	GetPrecessorAndExec(testSuite, "SdlEnumGenerator");
 	GetPrecessorAndExec(testSuite, "SdlUnionGenerator");
 	GetPrecessorAndExec(testSuite, "SdlClassCodeGenerator");
