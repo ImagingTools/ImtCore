@@ -20,7 +20,7 @@ BoundingBox {
 	function drawSelection(ctx, layerId){
 	}
 
-	function drawEditPoints(ctx, layerId){
+	function drawNodes(ctx, layerId){
 	}
 
 	function getParams(layerId){

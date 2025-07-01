@@ -169,46 +169,46 @@ QtObject {
 
 			let margin = 10;
 
-			if(xArg >= cornerPoints.topLeftPoint.x - magrin && xArg <= cornerPoints.topLeftPoint.x + magrin
-					&& yxArg >= cornerPoints.topLeftPoint.y - magrin && yArg <= cornerPoints.topLeftPoint.y + magrin){
+			if(xArg >= cornerPoints.topLeftPoint.x - margin && xArg <= cornerPoints.topLeftPoint.x + margin
+					&& yxArg >= cornerPoints.topLeftPoint.y - margin && yArg <= cornerPoints.topLeftPoint.y + margin){
 
 				topLeftMoving(deltaXArg, deltaYArg);
 
 			}
-			else if(xArg >= cornerPoints.topRightPoint.x - magrin && xArg <= cornerPoints.topRightPoint.x + magrin
-					  && yxArg >= cornerPoints.topRightPoint.y - magrin && yArg <= cornerPoints.topRightPoint.y + magrin){
+			else if(xArg >= cornerPoints.topRightPoint.x - margin && xArg <= cornerPoints.topRightPoint.x + margin
+					  && yxArg >= cornerPoints.topRightPoint.y - margin && yArg <= cornerPoints.topRightPoint.y + margin){
 
 				topRightMoving(deltaXArg, deltaYArg);
 
 			}
-			else if(xArg >= cornerPoints.bottomLeftPoint.x - magrin && xArg <= cornerPoints.bottomLeftPoint.x + magrin
-					  && yxArg >= cornerPoints.bottomLeftPoint.y - magrin && yArg <= cornerPoints.bottomLeftPoint.y + magrin){
+			else if(xArg >= cornerPoints.bottomLeftPoint.x - margin && xArg <= cornerPoints.bottomLeftPoint.x + margin
+					  && yxArg >= cornerPoints.bottomLeftPoint.y - margin && yArg <= cornerPoints.bottomLeftPoint.y + margin){
 
 				bottomLeftMoving(deltaXArg, deltaYArg);
 
 			}
-			else if(xArg >= cornerPoints.bottomRightPoint.x - magrin && xArg <= cornerPoints.bottomRightPoint.x + magrin
-					&& yxArg >= cornerPoints.bottomRightPoint.y - magrin && yArg <= cornerPoints.bottomRightPoint.y + magrin){
+			else if(xArg >= cornerPoints.bottomRightPoint.x - margin && xArg <= cornerPoints.bottomRightPoint.x + margin
+					&& yxArg >= cornerPoints.bottomRightPoint.y - margin && yArg <= cornerPoints.bottomRightPoint.y + margin){
 
 					bottomRightMoving(deltaXArg, deltaYArg);
 			}
-			else if(xArg >= midPoints.leftPoint.x - magrin && xArg <= midPoints.leftPoint.x + magrin
-					&& yxArg >= midPoints.leftPoint.y - magrin && yArg <= midPoints.leftPoint.y + magrin){
+			else if(xArg >= midPoints.leftPoint.x - margin && xArg <= midPoints.leftPoint.x + margin
+					&& yxArg >= midPoints.leftPoint.y - margin && yArg <= midPoints.leftPoint.y + margin){
 
 				leftMoving(deltaXArg, deltaYArg);
 			}
-			else if(xArg >= midPoints.rightPoint.x - magrin && xArg <= midPoints.rightPoint.x + magrin
-					&& yxArg >= midPoints.rightPoint.y - magrin && yArg <= midPoints.rightPoint.y + magrin){
+			else if(xArg >= midPoints.rightPoint.x - margin && xArg <= midPoints.rightPoint.x + margin
+					&& yxArg >= midPoints.rightPoint.y - margin && yArg <= midPoints.rightPoint.y + margin){
 
 				rightMoving(deltaXArg, deltaYArg);
 			}
-			else if(xArg >= midPoints.topPoint.x - magrin && xArg <= midPoints.topPoint.x + magrin
-					&& yxArg >= midPoints.topPoint.y - magrin && yArg <= midPoints.topPoint.y + magrin){
+			else if(xArg >= midPoints.topPoint.x - margin && xArg <= midPoints.topPoint.x + margin
+					&& yxArg >= midPoints.topPoint.y - margin && yArg <= midPoints.topPoint.y + margin){
 
 				topMoving(deltaXArg, deltaYArg);
 			}
-			else if(xArg >= midPoints.bottomPoint.x - magrin && xArg <= midPoints.bottomPoint.x + magrin
-					&& yxArg >= midPoints.bottomPoint.y - magrin && yArg <= midPoints.bottomPoint.y + magrin){
+			else if(xArg >= midPoints.bottomPoint.x - margin && xArg <= midPoints.bottomPoint.x + margin
+					&& yxArg >= midPoints.bottomPoint.y - margin && yArg <= midPoints.bottomPoint.y + margin){
 
 				bottomMoving(deltaXArg, deltaYArg);
 			}

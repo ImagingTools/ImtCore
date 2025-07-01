@@ -194,12 +194,13 @@ Matrix3x3 1.0 ./GraphicsView/Matrix3x3.qml
 PolygonShape 1.0 ./GraphicsView/PolygonShape.qml
 RectangleShape 1.0 ./GraphicsView/RectangleShape.qml
 CircleShape 1.0 ./GraphicsView/CircleShape.qml
-LineShape 1.0 ./GraphicsView/LineShape.qml
+PolyLineShape 1.0 ./GraphicsView/PolyLineShape.qml
 ArcShape 1.0 ./GraphicsView/ArcShape.qml
 BezierCurveShape 1.0 ./GraphicsView/BezierCurveShape.qml
 QuadraticCurveShape 1.0 ./GraphicsView/QuadraticCurveShape.qml
 TextShape 1.0 ./GraphicsView/TextShape.qml
 ImageShape 1.0 ./GraphicsView/ImageShape.qml
+CoordinateGridShape 1.0 ./GraphicsView/CoordinateGridShape.qml
 
 PolygonParams 1.0 ./GraphicsView/PolygonParams.qml
 RectangleParams 1.0 ./GraphicsView/RectangleParams.qml
