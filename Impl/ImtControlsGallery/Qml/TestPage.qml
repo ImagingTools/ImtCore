@@ -134,6 +134,9 @@ Rectangle {
 		width: parent.width/2
 		height: parent.height/2
 
+		minZoomLevel: 1;
+		restrictMove: true;
+
 		Component.onCompleted: {
 			//TEST
 
