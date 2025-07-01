@@ -874,7 +874,7 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 				variantList.append(doubleValue);
 			}
 			else{
-				int intValue = text.toInt(&ok);
+				qint64 intValue = text.toLongLong(&ok);
 				variantList.append(intValue);
 			}
 		}
@@ -913,14 +913,13 @@ void CGqlRequest::SetParseText(const QByteArray& text)
 				value = doubleValue;
 			}
 			else{
-				int intValue = text.toInt(&ok);
+				qint64 intValue = text.toLongLong(&ok);
 				if (QString::number(intValue) == text){
 					value = intValue;
 				}
 				else {
 					value = text;
 				}
-
 			}
 		}
 		m_activeGqlObjectPtr->InsertParam(m_currentField, value);
