@@ -26,6 +26,10 @@ Rectangle {
 	property real originX: 0;
 
 	property real scaleStep: 0.1;
+	property real minZoomLevel: -1;
+	property real maxZoomLevel: 3;
+	property bool restrictMove: false;
+	property int restrictMoveMargin: 80;
 
 	property bool autoFit: false;
 
@@ -177,20 +181,26 @@ Rectangle {
 	}
 
 	function zoomToFit(){
-		if (canvas.backgroundWidth == 0 | canvas.backgroundHeight == 0){
-			return
-		}
+		canvas.scaleCoeff = 1
+		canvas.scaleCoeffPrev = 1
+		canvas.deltaX = 0;
+		canvas.deltaY = 0;
+		canvas.requestPaint();
 
-		let scaleCoeff_ = (canvas.width - Style.marginM * 2) / canvas.backgroundWidth;
-		let scaleCoeff_h = (canvas.height - Style.marginM * 2) / canvas.backgroundHeight;
-		if (scaleCoeff_ > scaleCoeff_h){
-			scaleCoeff_ = scaleCoeff_h
-		}
+		// if (canvas.backgroundWidth == 0 | canvas.backgroundHeight == 0){
+		// 	return
+		// }
 
-		canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
+		// let scaleCoeff_ = (canvas.width - Style.marginM * 2) / canvas.backgroundWidth;
+		// let scaleCoeff_h = (canvas.height - Style.marginM * 2) / canvas.backgroundHeight;
+		// if (scaleCoeff_ > scaleCoeff_h){
+		// 	scaleCoeff_ = scaleCoeff_h
+		// }
 
-		canvas.deltaX = graphicsView.width / 2 - backgroundRec.width / 2
-		canvas.deltaY = graphicsView.height / 2 - backgroundRec.height / 2
+		// canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
+
+		// canvas.deltaX = graphicsView.width / 2 - backgroundRec.width / 2
+		// canvas.deltaY = graphicsView.height / 2 - backgroundRec.height / 2
 	}
 
 	function requestPaint(){
@@ -413,6 +423,7 @@ Rectangle {
 			onDeltaSignal: {
 
 				let found = false;
+				let margin_ = Style.marginM;
 				let activeLayer = graphicsView.getLayer("active")
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
 					let shape = activeLayer.shapeModel[i];
@@ -440,7 +451,7 @@ Rectangle {
 						let newY = (topLeftPoint.y + delta.y / canvas.scaleCoeff);
 
 						//fit to borders
-						let margin_ = Style.marginM;
+
 						if(newX < margin_){
 							newX = margin_;
 						}
@@ -474,8 +485,17 @@ Rectangle {
 				if(!found){
 					graphicsView.autoFit = false;
 
-					canvas.deltaX += delta.x
-					canvas.deltaY += delta.y
+					let borderMargin = graphicsView.restrictMoveMargin;
+
+
+					let ok1 = graphicsView.restrictMove && canvas.scaleCoeff <= graphicsView.minZoomLevel ? false : true
+					let okWidth = canvas.deltaX + delta.x > -1*(canvas.width * canvas.scaleCoeff  - borderMargin)  && canvas.deltaX + delta.x < (canvas.width - borderMargin);
+					let okHeight = canvas.deltaY + delta.y > -1*(canvas.height * canvas.scaleCoeff  - borderMargin)  && canvas.deltaY + delta.y < (canvas.height - borderMargin);
+					let ok = ok1 && okWidth && okHeight;
+					if(ok){
+						canvas.deltaX += delta.x
+						canvas.deltaY += delta.y
+					}
 				}
 
 
@@ -493,13 +513,23 @@ Rectangle {
 				let wheelDelta = wheel.angleDelta.y
 				let scaleCoeff_ = canvas.scaleCoeff;
 				if(wheelDelta > 0){//up
-					if (canvas.scaleCoeff < 3){
+					if (canvas.scaleCoeff < graphicsView.maxZoomLevel){
 						scaleCoeff_ += scaleStep;
+						if(scaleCoeff_ > graphicsView.maxZoomLevel){
+							scaleCoeff_ = graphicsView.maxZoomLevel
+						}
 					}
 				}
 				else{//down
-					if(canvas.scaleCoeff > scaleStep * 2){
+					let minZoom = graphicsView.minZoomLevel > -1 ? graphicsView.minZoomLevel : scaleStep * 2;
+					if(canvas.scaleCoeff > minZoom){
 						scaleCoeff_ -= scaleStep;
+						if(scaleCoeff_ < minZoom){
+							scaleCoeff_ = minZoom;
+						}
+						if(Math.abs(scaleCoeff_ - 1) <  0.000001){
+							graphicsView.zoomToFit()
+						}
 					}
 				}
 
