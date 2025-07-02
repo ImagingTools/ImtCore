@@ -137,6 +137,7 @@ Rectangle {
 		minZoomLevel: 1;
 		restrictMove: true;
 
+
 		Component.onCompleted: {
 			//TEST
 
@@ -145,8 +146,18 @@ Rectangle {
 
 			let activeLayer = getActiveLayer()
 
+			//transformation for the layer
+			activeLayer.layerMatrix.setXTranslation(gridShape.axesMargin)
+			activeLayer.layerMatrix.invertY();
+			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axesMargin)
+
 			let lineObj = polylineComp.createObject(this);
 			activeLayer.addShape(lineObj);
+		}
+
+		onHeightChanged: {
+			let activeLayer = getActiveLayer();
+			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axesMargin)
 		}
 	}
 
@@ -163,20 +174,25 @@ Rectangle {
 				drawNodes(ctx)
 			}
 
-			function translateCoordToGrid(point){
-				let newPoint = Qt.point(0,0);
-				newPoint.x = point.x + gridShape.labelSize;
-				newPoint.y = gridShape.viewItem.height - point.y - gridShape.labelSize
-				return newPoint;
-			}
+			// function translateCoordToGrid(point){
+			// 	let newPoint = Qt.point(0,0);
+			// 	newPoint.x = point.x + gridShape.axesMargin;
+			// 	newPoint.y = gridShape.viewItem.height - point.y - gridShape.axesMargin
+			// 	return newPoint;
+			// }
 
 			function getPoints(){
 				let pointList = []
 
-				let point1 = translateCoordToGrid(Qt.point(40, 40))
-				let point2 = translateCoordToGrid(Qt.point(120,80))
-				let point3 = translateCoordToGrid(Qt.point(200,300))
-				let point4 = translateCoordToGrid(Qt.point(400 ,400))
+				// let point1 = translateCoordToGrid(Qt.point(40, 40))
+				// let point2 = translateCoordToGrid(Qt.point(120,80))
+				// let point3 = translateCoordToGrid(Qt.point(200,300))
+				// let point4 = translateCoordToGrid(Qt.point(400 ,400))
+
+				let point1 = Qt.point(40, 40)
+				let point2 = Qt.point(120,80)
+				let point3 = Qt.point(200,300)
+				let point4 = Qt.point(400 ,400)
 
 				pointList.push(point1)
 				pointList.push(point2)
