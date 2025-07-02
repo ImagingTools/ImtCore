@@ -146,6 +146,14 @@ Matrix3x3 {
 		setContextTransform(ctx);
 	}
 
+	function invertX(){
+		matrix[0][0] = -1 * matrix[0][0]
+	}
+
+	function invertY(){
+		matrix[1][1] = -1 * matrix[1][1]
+	}
+
 	function restore(){
 		setXScale(_xScaleInitial)
 		setYSkew(_ySkewInitial)

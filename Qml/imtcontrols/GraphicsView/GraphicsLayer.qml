@@ -14,7 +14,7 @@ QtObject {
 
 	signal loadImageSignal(string source)
 
-	property CanvasMatrix canvasMatrix: CanvasMatrix{};
+	property CanvasMatrix layerMatrix: CanvasMatrix{};
 
 	function addShape(shape){
 		shapeModel.push(shape)
@@ -35,7 +35,11 @@ QtObject {
 		shapeModel.splice(index, 1);
 	}
 
-	function draw(ctx){
+	function draw(ctx, canvasMatrix){
+		canvasMatrix.matrix = canvasMatrix.multiplyByMatrix(canvasMatrix.matrix, layerMatrix.matrix)
+
+		canvasMatrix.setContextTransform(ctx)
+
 		for(let i = 0; i < shapeModel.length; i++){
 			ctx.globalAlpha = 1
 			let shape = shapeModel[i]

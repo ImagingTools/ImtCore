@@ -142,6 +142,7 @@ Rectangle {
 		}
 	}
 
+
 	function designSchemeChanged(scheme){
 		canvas.requestPaint();
 	}
@@ -750,17 +751,14 @@ Rectangle {
 				canvasMatrix.setXTranslation(canvas.deltaX);
 				canvasMatrix.setYTranslation(canvas.deltaY);
 
-				canvasMatrix.setContextTransform(ctx);
-
 				for(let i = 0; i < graphicsView.layerModel.length; i++){
 					let layer = graphicsView.layerModel[i];
 					if(layer.canApplyViewTransform){
-						canvasMatrix.setContextTransform(ctx);
+						layer.draw(ctx, canvasMatrix)
 					}
 					else {
-						canvasMatrixDefault.setContextTransform(ctx);
+						layer.draw(ctx, canvasMatrixDefault)
 					}
-					layer.draw(ctx);
 				}
 
 			}//onPaint

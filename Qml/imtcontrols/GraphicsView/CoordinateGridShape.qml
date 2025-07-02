@@ -7,12 +7,12 @@ GraphicsShapeBase {
 	id: gridShape;
 
 	property Item viewItem: null
-	property int labelSize: 30;
+	property int axesMargin: 30;
 	property int gridStep: 40;
 
 	function draw(ctx){
 		let step = gridShape.gridStep;
-		let margin = gridShape.labelSize;
+		let margin = gridShape.axesMargin;
 
 		ctx.lineCap = "round"
 		ctx.lineJoin = "round"
