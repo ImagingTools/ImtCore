@@ -1207,6 +1207,18 @@ IncludeDirective CSdlTools::CreateCxxDirective(const QString& path)
 }
 
 
+IncludeDirective CSdlTools::CreateAcfDirective(const QString& path)
+{
+	IncludeDirective retVal;
+	retVal.path = path;
+	retVal.priority = P_ACF;
+	retVal.remark = QStringLiteral("ACF includes");
+	retVal.type = T_HEADER;
+
+	return retVal;
+}
+
+
 IncludeDirective CSdlTools::CreateImtDirective(const QString& path)
 {
 	IncludeDirective retVal;
