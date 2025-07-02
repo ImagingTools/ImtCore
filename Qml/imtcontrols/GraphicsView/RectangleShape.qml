@@ -5,10 +5,19 @@ import com.imtcore.imtqml 1.0
 GraphicsShapeBase {
 
 	//Reimplemented functions
-	function drawBase(ctx, layerId){
+	function draw (ctx){
+		drawBase(ctx)
+		if(isSelected){
+			drawSelection(ctx)
+		}
+		if(showNodes){
+			drawNodes(ctx)
+		}
+	}
+	function drawBase(ctx){
 		//console.log("drawBase")
 		let params_;
-		params_ = getParams(layerId)
+		params_ = getParams()
 
 		if(isSelected){
 			ctx.globalAlpha = 0.7
@@ -18,7 +27,7 @@ GraphicsShapeBase {
 		ctx.strokeStyle = params_.borderColor !== undefined ? params_.borderColor : "transparent";
 		ctx.lineWidth = params_.lineWidth !== undefined ? params_.lineWidth : 0
 		let radius = params_.radius !== undefined ? params_.radius : 0
-		let point_ = getPoints(layerId)[0];
+		let point_ = getPoints()[0];
 		ctx.beginPath()
 		ctx.roundedRect(point_.x , point_.y, params_.width, params_.height, radius, radius)
 		ctx.stroke();
@@ -26,16 +35,16 @@ GraphicsShapeBase {
 		ctx.closePath();
 	}
 
-	function drawSelection(ctx, layerId){
+	function drawSelection(ctx){
 		//console.log("drawSelected")
 		let params_;
-		params_ = getParams(layerId)
+		params_ = getParams()
 
 		ctx.strokeStyle = "yellow";
 		ctx.lineWidth = 4
 		let radius = params_.radius !== undefined ? params_.radius : 0
 
-		let point_ = getPoints(layerId)[0];;
+		let point_ = getPoints()[0];;
 
 		ctx.beginPath()
 		ctx.roundedRect(point_.x , point_.y, params_.width, params_.height, radius, radius)
@@ -43,9 +52,12 @@ GraphicsShapeBase {
 		ctx.closePath();
 	}
 
-	function getPoints(layerId){
+	function drawNodes(ctx){
+	}
+
+	function getPoints(){
 		let pointList = []
-		let params_ = getParams(layerId);
+		let params_ = getParams();
 		pointList.push(params_.point)
 		return pointList;
 	}

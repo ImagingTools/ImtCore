@@ -6,14 +6,14 @@ GraphicsShapeBase {
 
 	property QtObject source: null;
 
-	function draw(ctx, layerId){
-		drawSelection(ctx, layerId);
-		drawBorderPoints(ctx, layerId)
+	function draw(ctx){
+		drawSelection(ctx);
+		drawBorderPoints(ctx)
 	}
 
-	function drawSelection(ctx, layerId){
+	function drawSelection(ctx){
 		let params_;
-		params_ = source.getParams(layerId)
+		params_ = source.getParams()
 
 		ctx.fillStyle = "transparent";
 		ctx.strokeStyle = "yellow";
@@ -30,9 +30,9 @@ GraphicsShapeBase {
 	}
 
 
-	function drawBorderPoints(ctx, layerId){
+	function drawBorderPoints(ctx){
 		let params_;
-		params_ = source.getParams(layerId)
+		params_ = source.getParams()
 		let point = getPoint(params_);
 		let width = params_.width;
 		let height = params_.height;

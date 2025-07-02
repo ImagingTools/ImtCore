@@ -8,13 +8,13 @@ QtObject {
 
 	property bool editMode: false;
 
-	function drawBoundingBox(ctx, layerId){
-		drawBoundingBoxBorder(ctx, layerId);
-		drawBoundingBoxControlPoints(ctx, layerId);
-		drawBoundingBoxRotationControl(ctx, layerId);
+	function drawBoundingBox(ctx){
+		drawBoundingBoxBorder(ctx);
+		drawBoundingBoxControlPoints(ctx);
+		drawBoundingBoxRotationControl(ctx);
 	}
 
-	function drawBoundingBoxBorder(ctx, layerId){
+	function drawBoundingBoxBorder(ctx){
 		let cornerPointList = getBoundingBoxCornerPoints();
 
 		ctx.strokeStyle = "black";
@@ -32,7 +32,7 @@ QtObject {
 		ctx.closePath();
 	}
 
-	function drawBoundingBoxControlPoints(ctx, layerId){
+	function drawBoundingBoxControlPoints(ctx){
 		let cornerPoints = getBoundingBoxCornerPoints()
 		let midPoints  = getBoundingBoxMidPoints()
 
@@ -72,7 +72,7 @@ QtObject {
 		ctx.closePath();
 	}
 
-	function drawBoundingBoxRotationControl(ctx, layerId){
+	function drawBoundingBoxRotationControl(ctx){
 		let cornerPoints = getBoundingBoxCornerPoints();
 
 		ctx.strokeStyle = "black";
@@ -143,8 +143,8 @@ QtObject {
 		return 0;
 	}
 
-	function draw(ctx, layerId){
-		drawBoundingBox(ctx, layerId)
+	function draw(ctx){
+		drawBoundingBox(ctx)
 	}
 
 	function editFunction(xArg, yArg, deltaXArg, deltaYArg, matrix){

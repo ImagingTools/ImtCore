@@ -7,12 +7,19 @@ GraphicsShapeBase {
 
 	property string color: "#000000";
 
-	function drawBase(ctx, layerId){
-		let params = getParams(layerId)
+	function draw(ctx){
+		drawBase(ctx);
+		if(showNodes){
+			drawNodes(ctx)
+		}
+	}
+
+	function drawBase(ctx){
+		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 1
 		ctx.beginPath()
-		let pointList = getPoints(layerId);
+		let pointList = getPoints();
 		for(let i = 0;i < pointList.length; i++){
 			let point = pointList[i];
 			if(i == 0){
@@ -26,14 +33,14 @@ GraphicsShapeBase {
 		ctx.closePath();
 	}
 
-	function drawNodes(ctx, layerId){
-		let params = getParams(layerId)
+	function drawNodes(ctx){
+		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.fillStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
 		let radius = params.radius !== undefined ? params.radius : 4;
 		ctx.beginPath()
-		let pointList = getPoints(layerId);
+		let pointList = getPoints();
 		for(let i = 0;i < pointList.length; i++){
 			let point = pointList[i];
 			ctx.moveTo(point.x, point.y);
@@ -46,9 +53,9 @@ GraphicsShapeBase {
 	}
 
 
-	function getPoints(layerId){
+	function getPoints(){
 		let pointList = []
-		let params_ = getParams(layerId);
+		let params_ = getParams();
 		pointList = params_.points
 		return pointList;
 	}

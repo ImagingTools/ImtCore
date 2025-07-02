@@ -4,10 +4,10 @@ import com.imtcore.imtqml 1.0
 
 Item {
 
-	function draw (ctx, layerId){
+	function draw (ctx){
 	}
 
-	function getParams(layerId){
+	function getParams(){
 		return [];
 	}
 

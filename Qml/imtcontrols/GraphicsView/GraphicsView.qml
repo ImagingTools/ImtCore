@@ -260,30 +260,6 @@ Rectangle {
 		}
 	}
 
-	function findSelectionIndex(mouseX, mouseY){
-		let selectionIndex = -1;
-		let layer = graphicsView.layerModel[graphicsView.layerModel.length - 1];
-		let shapeModel = layer.shapeModel;
-		for(let j = 0; j < shapeModel.length; j++){
-			let shape = shapeModel[j];
-			let params = shape.source.getParams(layer.layerId);
-			let point = params.point;
-			let width_ = params.width * canvas.scaleCoeff;
-			let height_ = params.height * canvas.scaleCoeff;
-			let x_ = point.x * canvas.scaleCoeff + canvas.deltaX;
-			let y_ = point.y * canvas.scaleCoeff + canvas.deltaY;
-			let isInside =
-				mouseX > x_
-				&& mouseX < x_ + width_
-				&& mouseY > y_
-				&& mouseY < y_ + height_
-			if(isInside){
-				return j;
-			}
-		}
-		return selectionIndex
-	}
-
 	function findObject(mouseX, mouseY){
 		//console.log("findObject", mouseX, mouseY)
 
@@ -585,39 +561,40 @@ Rectangle {
 			}
 
 			function hoverReaction(position){
-				canvas.hoverIndex = -1;
-				for(let i = 0; i < graphicsView.objectsModel.count; i++){
-					let item = graphicsView.objectsModel.get(i).item;
+				// canvas.hoverIndex = -1;
+				// for(let i = 0; i < graphicsView.objectsModel.count; i++){
+				// 	let item = graphicsView.objectsModel.get(i).item;
 
-					let x_  = item.m_x;
-					let y_  = item.m_y;
-					let width_ = item.m_width ? item.m_width  : canvas.mainRec_width;
-					let height_ = canvas.mainRec_height ;
+				// 	let x_  = item.m_x;
+				// 	let y_  = item.m_y;
+				// 	let width_ = item.m_width ? item.m_width  : canvas.mainRec_width;
+				// 	let height_ = canvas.mainRec_height ;
 
-					x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
-					y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
-					width_ = width_ * canvas.scaleCoeff;
-					height_ = height_  * canvas.scaleCoeff;
+				// 	x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
+				// 	y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
+				// 	width_ = width_ * canvas.scaleCoeff;
+				// 	height_ = height_  * canvas.scaleCoeff;
 
-					let ok = controlArea.checkHoverItem(x_, y_, width_, height_, position);
+				// 	let ok = controlArea.checkHoverItem(x_, y_, width_, height_, position);
 
-					if(ok){
-						canvas.hoverIndex = i;
+				// 	if(ok){
+				// 		canvas.hoverIndex = i;
 
-					}
-				}
+				// 	}
+				// }
 				if(canvas.hoverIndex >=0){
 					//controlArea.cursorShape = Qt.ArrowCursor;
-					canvas.linkSelected = true;
-					canvas.requestPaint();
+
+					// canvas.linkSelected = true;
+					// canvas.requestPaint();
 				}
 				else {
 					//controlArea.cursorShape = Qt.OpenHandCursor;
-					if(canvas.linkSelected){
-						canvas.linkSelected = false;
-						canvas.requestPaint();
 
-					}
+					// if(canvas.linkSelected){
+					// 	canvas.linkSelected = false;
+					// 	canvas.requestPaint();
+					// }
 				}
 			}
 			//hover reaction
@@ -657,7 +634,6 @@ Rectangle {
 
 			property int selectedIndex: -1;
 			property int hoverIndex: -1;
-			property bool linkSelected: false;
 			property bool hasTailSelection: false;
 
 			//sizes

@@ -10,7 +10,7 @@ GraphicsShapeBase {
 	property int labelSize: 30;
 	property int gridStep: 40;
 
-	function drawBase(ctx, layerId){
+	function draw(ctx){
 		let step = gridShape.gridStep;
 		let margin = gridShape.labelSize;
 

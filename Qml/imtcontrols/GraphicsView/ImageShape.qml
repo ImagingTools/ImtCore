@@ -6,7 +6,7 @@ GraphicsShapeBase {
 
 	property string imageSource: "";
 
-	function drawBase (ctx, layerId) {
+	function draw(ctx) {
 		let params_ = getParams();
 		if(params_.source !== undefined){
 			imageSource = params_.source

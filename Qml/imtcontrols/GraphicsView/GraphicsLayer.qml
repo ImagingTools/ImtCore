@@ -14,6 +14,8 @@ QtObject {
 
 	signal loadImageSignal(string source)
 
+	property CanvasMatrix canvasMatrix: CanvasMatrix{};
+
 	function addShape(shape){
 		shapeModel.push(shape)
 		let index = shapeModel.length -1;
@@ -38,14 +40,14 @@ QtObject {
 			ctx.globalAlpha = 1
 			let shape = shapeModel[i]
 			if(!shape.isSelected){
-				shape.draw(ctx, layerId);
+				shape.draw(ctx);
 			}
 		}
 		for(let i = 0; i < shapeModel.length; i++){
 			ctx.globalAlpha = 1
 			let shape = shapeModel[i]
 			if(shape.isSelected){
-				shape.draw(ctx, layerId);
+				shape.draw(ctx);
 			}
 		}
 	}

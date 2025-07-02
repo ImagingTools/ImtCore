@@ -6,28 +6,28 @@ BoundingBox {
 
 	property bool isTouched: false;
 	property bool isSelected: false;
+	property bool showNodes: false;
 
-	function draw (ctx, layerId){
-		drawBase(ctx, layerId)
-		if(isSelected){
-			drawSelection(ctx, layerId)
-		}
+	function draw (ctx){
 	}
 
-	function drawBase(ctx, layerId){
+	// function drawBase(ctx){
+	// }
+
+	// function drawSelection(ctx){
+	// }
+
+	// function drawNodes(ctx){
+	// }
+
+	function drawSelectedNode(ctx, point){
 	}
 
-	function drawSelection(ctx, layerId){
-	}
-
-	function drawNodes(ctx, layerId){
-	}
-
-	function getParams(layerId){
+	function getParams(){
 		return [];
 	}
 
-	function getPoints(layerId){
+	function getPoints(){
 		return []
 	}
 
