@@ -204,7 +204,7 @@ Item {
 					for (var item = 0; item < comboBoxContainerGql.gettedParams.getItemsCount(); item++){
 						let param = comboBoxContainerGql.gettedParams.getData("name", item);
 						let value = popup.model.getData(param, index);
-						comboBoxContainerGql.gettedParams.setData("value", value, item);
+						comboBoxContainerGql.gettedParams.setData("Value", value, item);
 					}
 				}
 				// comboBoxContainerGql.currentText = popup.model.getData("name", index);
