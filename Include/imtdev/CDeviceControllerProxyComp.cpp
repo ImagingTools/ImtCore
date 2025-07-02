@@ -293,6 +293,13 @@ void CDeviceControllerProxyComp::UpdateDeviceTypeIdList()
 				}
 
 				m_supportedDeviceTypeIds += ids;
+
+				imod::IModel* modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&deviceControllerPtr->GetDeviceInstanceList()));
+				Q_ASSERT(modelPtr != nullptr);
+
+				if (modelPtr != nullptr){
+					RegisterModel(modelPtr, MI_DEVICE_LIST_BASE + i);
+				}
 			}
 		}
 	}

@@ -22,7 +22,7 @@ CDeviceStateProviderAdapterComp::CDeviceStateProviderAdapterComp()
 IDeviceStateProvider::DeviceState CDeviceStateProviderAdapterComp::GetDeviceState(const QByteArray& deviceId) const
 {
 	if (m_deviceControllerCompPtr.IsValid()){
-		m_deviceControllerCompPtr->GetDeviceStateProvider().GetDeviceState(deviceId);
+		return m_deviceControllerCompPtr->GetDeviceStateProvider().GetDeviceState(deviceId);
 	}
 
 	return DeviceState::DS_NONE;
