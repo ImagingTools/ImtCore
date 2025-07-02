@@ -51,18 +51,18 @@ GraphicsShapeBase {
 		ctx.lineCap = 'round'
 
 		// move to first position
-		const firstPoint = polylineGridShape.points[0]
+		let firstPoint = polylineGridShape.points[0]
 		polylineGridShape.drawPoint(ctx, firstPoint.x, firstPoint.y, firstPoint.color, true)
 
 		ctx.beginPath()
 		ctx.moveTo(firstPoint.x, firstPoint.y)
 
 		// draw lines for middle points
-		const pointCount = polylineGridShape.points.length
+		let pointCount = polylineGridShape.points.length
 		for (let i = 1; i < pointCount - 1; i++) {
-			const prevPoint = polylineGridShape.points[i-1]
-			const currentPoint = polylineGridShape.points[i]
-			const contextGradient = ctx.createLinearGradient(prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y)
+			let prevPoint = polylineGridShape.points[i-1]
+			let currentPoint = polylineGridShape.points[i]
+			let contextGradient = ctx.createLinearGradient(prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y)
 			contextGradient.addColorStop(0, prevPoint.color)
 			contextGradient.addColorStop(1, currentPoint.color)
 
@@ -77,9 +77,9 @@ GraphicsShapeBase {
 		}
 
 		// finalize polyline
-		const preLastPoint = polylineGridShape.points[pointCount - 2]
-		const lastPoint = polylineGridShape.points[pointCount - 1]
-		const contextGradient = ctx.createLinearGradient(preLastPoint.x, preLastPoint.y, lastPoint.x, lastPoint.y)
+		let preLastPoint = polylineGridShape.points[pointCount - 2]
+		let lastPoint = polylineGridShape.points[pointCount - 1]
+		let contextGradient = ctx.createLinearGradient(preLastPoint.x, preLastPoint.y, lastPoint.x, lastPoint.y)
 		contextGradient.addColorStop(0, preLastPoint.color)
 		contextGradient.addColorStop(1, lastPoint.color)
 		
