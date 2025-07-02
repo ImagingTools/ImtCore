@@ -195,6 +195,7 @@ PolygonShape 1.0 ./GraphicsView/PolygonShape.qml
 RectangleShape 1.0 ./GraphicsView/RectangleShape.qml
 CircleShape 1.0 ./GraphicsView/CircleShape.qml
 PolyLineShape 1.0 ./GraphicsView/PolyLineShape.qml
+GradientPolyLineShape 1.0 ./GraphicsView/GradientPolyLineShape.qml
 ArcShape 1.0 ./GraphicsView/ArcShape.qml
 BezierCurveShape 1.0 ./GraphicsView/BezierCurveShape.qml
 QuadraticCurveShape 1.0 ./GraphicsView/QuadraticCurveShape.qml

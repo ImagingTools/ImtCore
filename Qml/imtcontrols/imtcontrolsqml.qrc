@@ -192,6 +192,7 @@
 		<file alias="imtcontrols/GraphicsView/RectangleShape.qml">GraphicsView/RectangleShape.qml</file>
 		<file alias="imtcontrols/GraphicsView/CircleShape.qml">GraphicsView/CircleShape.qml</file>
 		<file alias="imtcontrols/GraphicsView/PolyLineShape.qml">GraphicsView/PolyLineShape.qml</file>
+		<file alias="imtcontrols/GraphicsView/GradientPolyLineShape.qml">GraphicsView/GradientPolyLineShape.qml</file>
 		<file alias="imtcontrols/GraphicsView/ArcShape.qml">GraphicsView/ArcShape.qml</file>
 		<file alias="imtcontrols/GraphicsView/BezierCurveShape.qml">GraphicsView/BezierCurveShape.qml</file>
 		<file alias="imtcontrols/GraphicsView/QuadraticCurveShape.qml">GraphicsView/QuadraticCurveShape.qml</file>
