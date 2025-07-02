@@ -30,6 +30,7 @@ Rectangle {
 	property real maxZoomLevel: 3;
 	property bool restrictMove: false;
 	property int restrictMoveMargin: 80;
+	property bool fitToBorders: true;
 
 	property bool autoFit: false;
 
@@ -147,7 +148,7 @@ Rectangle {
 
 	function appSizeChanged(params){
 		if (autoFit){
-			zoomToFit();
+			zoomToFit(false);
 
 			requestPaint()
 		}
@@ -180,12 +181,18 @@ Rectangle {
 		requestPaint()
 	}
 
-	function zoomToFit(){
+	function zoomToFit(requestPaint_){
 		canvas.scaleCoeff = 1
 		canvas.scaleCoeffPrev = 1
 		canvas.deltaX = 0;
 		canvas.deltaY = 0;
-		canvas.requestPaint();
+
+		if(requestPaint_ == undefined){
+			requestPaint_ = false;
+		}
+		if(requestPaint_){
+			canvas.requestPaint();
+		}
 
 		// if (canvas.backgroundWidth == 0 | canvas.backgroundHeight == 0){
 		// 	return
@@ -514,21 +521,44 @@ Rectangle {
 				let scaleCoeff_ = canvas.scaleCoeff;
 				if(wheelDelta > 0){//up
 					if (canvas.scaleCoeff < graphicsView.maxZoomLevel){
-						scaleCoeff_ += scaleStep;
+						if(canvas.scaleCoeff < 1 && (canvas.scaleCoeff + scaleStep) > 1){
+							scaleCoeff_ = 1
+							if(graphicsView.fitToBorders){
+								graphicsView.zoomToFit(false)
+							}
+						}
+						else {
+							scaleCoeff_ += scaleStep;
+						}
 						if(scaleCoeff_ > graphicsView.maxZoomLevel){
 							scaleCoeff_ = graphicsView.maxZoomLevel
+						}
+						if(Math.abs(scaleCoeff_ - 1) <  0.000001){
+							if(graphicsView.fitToBorders){
+								graphicsView.zoomToFit(false)
+							}
 						}
 					}
 				}
 				else{//down
 					let minZoom = graphicsView.minZoomLevel > -1 ? graphicsView.minZoomLevel : scaleStep * 2;
 					if(canvas.scaleCoeff > minZoom){
-						scaleCoeff_ -= scaleStep;
+						if(canvas.scaleCoeff > 1 && (canvas.scaleCoeff - scaleStep) < 1){
+							scaleCoeff_ = 1
+							if(graphicsView.fitToBorders){
+								graphicsView.zoomToFit(false)
+							}
+						}
+						else {
+							scaleCoeff_ -= scaleStep;
+						}
 						if(scaleCoeff_ < minZoom){
 							scaleCoeff_ = minZoom;
 						}
 						if(Math.abs(scaleCoeff_ - 1) <  0.000001){
-							graphicsView.zoomToFit()
+							if(graphicsView.fitToBorders){
+								graphicsView.zoomToFit(false)
+							}
 						}
 					}
 				}
@@ -732,7 +762,7 @@ Rectangle {
 			onPaint: {
 				//console.log("Canvas::onPaint")
 				if (graphicsView.autoFit){
-					graphicsView.zoomToFit();
+					graphicsView.zoomToFit(false);
 				}
 
 				var ctx = canvas.getContext('2d');
