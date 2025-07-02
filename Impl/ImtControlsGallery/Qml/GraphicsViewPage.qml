@@ -74,7 +74,7 @@ GraphicsView{
 	GraphicsShapeBase{
 		id: gridShape;
 
-		function drawBase(ctx, layerId){
+		function draw(ctx){
 			let step = 30;
 
 			ctx.lineCap = "round"
@@ -124,7 +124,7 @@ GraphicsView{
 	GraphicsShapeBase{
 		id: rulerShape;
 
-		function drawBase(ctx, layerId){
+		function draw(ctx){
 
 			ctx.lineCap = "round"
 			ctx.lineJoin = "round"
@@ -172,7 +172,7 @@ GraphicsView{
 		id: imageShape;
 
 		imageSource: "/Images/testImage";
-		function getParams(layerId){
+		function getParams(){
 			return imageParams;
 		}
 	}
@@ -212,7 +212,7 @@ GraphicsView{
 			item.point.y = pointList[0].y;
 		}
 
-		function getParams(layerId){
+		function getParams(){
 			let item = view.drawModel[0];
 
 			recParams1.point = item.point;
@@ -239,7 +239,7 @@ GraphicsView{
 			item.point.y = pointList[0].y;
 		}
 
-		function getParams(layerId){
+		function getParams(){
 			let item = view.drawModel[1];
 
 			recParams2.point = item.point;
@@ -267,7 +267,7 @@ GraphicsView{
 			item.point.y = pointList[0].y;
 		}
 
-		function getParams(layerId){
+		function getParams(){
 			let item = view.drawModel[2];
 
 			recParams3.point = item.point;
@@ -290,7 +290,7 @@ GraphicsView{
 		Component.onCompleted: {
 		}
 
-		function getParams(layerId){
+		function getParams(){
 			return view.drawModel[0];
 		}
 	}
@@ -304,7 +304,7 @@ GraphicsView{
 		Component.onCompleted: {
 		}
 
-		function getParams(layerId){
+		function getParams(){
 			return view.drawModel[0];
 		}
 	}
@@ -318,7 +318,7 @@ GraphicsView{
 		Component.onCompleted: {
 		}
 
-		function getParams(layerId){
+		function getParams(){
 			return view.drawModel[0];
 		}
 	}
@@ -331,7 +331,7 @@ GraphicsView{
 		Component.onCompleted: {
 		}
 
-		function getParams(layerId){
+		function getParams(){
 			return view.drawModel[0];
 		}
 	}
@@ -345,7 +345,7 @@ GraphicsView{
 		Component.onCompleted: {
 		}
 
-		function getParams(layerId){
+		function getParams(){
 			return view.drawModel[0];
 		}
 	}

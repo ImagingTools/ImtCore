@@ -144,6 +144,7 @@ Rectangle {
 			background.addShape(gridShape);
 
 			let activeLayer = getActiveLayer()
+
 			let lineObj = polylineComp.createObject(this);
 			activeLayer.addShape(lineObj);
 		}
@@ -157,9 +158,9 @@ Rectangle {
 
 			color: "blue";
 
-			function draw(ctx, layerId){
-				drawBase(ctx, layerId)
-				drawNodes(ctx, layerId)
+			function draw(ctx){
+				drawBase(ctx)
+				drawNodes(ctx)
 			}
 
 			function translateCoordToGrid(point){
@@ -169,7 +170,7 @@ Rectangle {
 				return newPoint;
 			}
 
-			function getPoints(layerId){
+			function getPoints(){
 				let pointList = []
 
 				let point1 = translateCoordToGrid(Qt.point(40, 40))
