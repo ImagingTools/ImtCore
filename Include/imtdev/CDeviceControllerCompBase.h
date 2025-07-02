@@ -14,6 +14,7 @@
 
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtdev/IDeviceController.h>
 
 
@@ -35,6 +36,10 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, imtbase::ICollectionInfo, ExtractDeviceInfoList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, istd::IChangeable, ExtractDeviceInfoList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, imod::IModel, ExtractDeviceInfoList);
+		I_REGISTER_SUBELEMENT(OverriddenDeviceInfo);
+		I_REGISTER_SUBELEMENT_INTERFACE(OverriddenDeviceInfo, imtbase::ICollectionInfo, ExtractOverriddenDeviceInfo);
+		I_REGISTER_SUBELEMENT_INTERFACE(OverriddenDeviceInfo, imod::IModel, ExtractOverriddenDeviceInfo);
+		I_REGISTER_SUBELEMENT_INTERFACE(OverriddenDeviceInfo, istd::IChangeable, ExtractOverriddenDeviceInfo);
 		I_REGISTER_INTERFACE(IDeviceController);
 		I_REGISTER_INTERFACE(IDeviceEnumerator);
 		I_ASSIGN(m_isAutoCloseEnabledAttrPtr, "AutoClose", "Automatically close an opened device if it is not found during the next enumeration", true, "true");
@@ -44,6 +49,8 @@ public:
 
 	// reimplemented (IDeviceController)
 	virtual const imtbase::ICollectionInfo& GetDeviceInstanceList() const override;
+	virtual bool SetDeviceInstanceName(const QByteArray& deviceId, const QString& name) override;
+	virtual bool SetDeviceInstanceDescription(const QByteArray& deviceId, const QString& description) override;
 	virtual const IDeviceStateProvider& GetDeviceStateProvider() const override;
 
 protected:
@@ -71,6 +78,7 @@ protected:
 protected:
 	// Must be called from the main thread!!!
 	void UpdateDeviceList(EnumeratedDeviceList& enumeratedDeviceList);
+	void UpdateDeviceList();
 	void AutoCloseDisconnectedDevices();
 
 	template <class InteraceType>
@@ -79,10 +87,21 @@ protected:
 		return &parent.m_deviceList;
 	}
 
+	template <class InteraceType>
+	static InteraceType* ExtractOverriddenDeviceInfo(CDeviceControllerCompBase& parent)
+	{
+		return &parent.m_overriddenDeviceInfo;
+	}
+
+	// reimplemened (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
+
 protected:
 	I_ATTR(bool, m_isAutoCloseEnabledAttrPtr);
 
 	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceList;
+	imod::TModelWrap<imtbase::CCollectionInfo> m_overriddenDeviceInfo;
 	imod::TModelWrap<DeviceStateProvider> m_deviceStateProvider;
 	QMap<QByteArray, DeviceAccessorPtr> m_openedDevices;
 
@@ -93,6 +112,12 @@ protected:
 	mutable QRecursiveMutex m_deviceListMutex;
 	mutable QRecursiveMutex m_openedDevicesMutex;
 #endif
+
+private:
+	void OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& changeset, const imtbase::ICollectionInfo* objectPtr);
+
+private:
+	imtbase::TModelUpdateBinder<imtbase::ICollectionInfo, CDeviceControllerCompBase> m_overriddenDeviceInfoObserver;
 };
 
 

@@ -1,4 +1,4 @@
-#include <imtdev/CCompositeDeviceControllerComp.h>
+#include <imtdev/CDeviceControllerProxyComp.h>
 
 
 // Qt includes
@@ -14,10 +14,11 @@ namespace imtdev
 
 // public methods
 
-CCompositeDeviceControllerComp::CCompositeDeviceControllerComp()
+CDeviceControllerProxyComp::CDeviceControllerProxyComp()
 	:m_enumeratorIndex(-1),
 	m_resultHandlerPtr(nullptr),
-	m_deviceStateProviderUpdateBridge(&m_deviceStateProvider)
+	m_deviceStateProviderUpdateBridge(&m_deviceStateProvider),
+	m_overriddenDeviceInfoObserver(*this)
 {
 	m_deviceStateProvider.SetParent(*this);
 }
@@ -25,13 +26,13 @@ CCompositeDeviceControllerComp::CCompositeDeviceControllerComp()
 
 // reimplemented (IDeviceController)
 
-const QByteArrayList& CCompositeDeviceControllerComp::GetSupportedDeviceTypeIds() const
+const QByteArrayList& CDeviceControllerProxyComp::GetSupportedDeviceTypeIds() const
 {
 	return m_supportedDeviceTypeIds;
 }
 
 
-const IDeviceStaticInfo* CCompositeDeviceControllerComp::GetDeviceStaticInfo(const QByteArray& deviceTypeId) const
+const IDeviceStaticInfo* CDeviceControllerProxyComp::GetDeviceStaticInfo(const QByteArray& deviceTypeId) const
 {
 	IDeviceController* controllerPtr = FindDeviceController(deviceTypeId);
 	if (controllerPtr != nullptr){
@@ -42,13 +43,35 @@ const IDeviceStaticInfo* CCompositeDeviceControllerComp::GetDeviceStaticInfo(con
 }
 
 
-const imtbase::ICollectionInfo& CCompositeDeviceControllerComp::GetDeviceInstanceList() const
+const imtbase::ICollectionInfo& CDeviceControllerProxyComp::GetDeviceInstanceList() const
 {
 	return m_deviceList;
 }
 
 
-DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
+bool CDeviceControllerProxyComp::SetDeviceInstanceName(const QByteArray& deviceId, const QString& name)
+{
+	if (!m_overriddenDeviceInfo.GetElementIds().contains(deviceId)){
+		return !m_overriddenDeviceInfo.InsertItem(deviceId, name, "").isEmpty();
+	}
+	else{
+		return m_overriddenDeviceInfo.SetElementName(deviceId, name);
+	}
+}
+
+
+bool CDeviceControllerProxyComp::SetDeviceInstanceDescription(const QByteArray& deviceId, const QString& description)
+{
+	if (!m_overriddenDeviceInfo.GetElementIds().contains(deviceId)){
+		return !m_overriddenDeviceInfo.InsertItem(deviceId, "", description).isEmpty();
+	}
+	else{
+		return m_overriddenDeviceInfo.SetElementDescription(deviceId, description);
+	}
+}
+
+
+DeviceInstanceInfoPtr CDeviceControllerProxyComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
 {
 	IDeviceController* controllerPtr = FindDeviceController(deviceId);
 	if (controllerPtr != nullptr){
@@ -59,13 +82,13 @@ DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(cons
 }
 
 
-const IDeviceStateProvider& CCompositeDeviceControllerComp::GetDeviceStateProvider() const
+const IDeviceStateProvider& CDeviceControllerProxyComp::GetDeviceStateProvider() const
 {
 	return m_deviceStateProvider;
 }
 
 
-DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(
+DeviceAccessorPtr CDeviceControllerProxyComp::OpenDevice(
 			const QByteArray& deviceId,
 			const iprm::IParamsSet* paramsPtr)
 {
@@ -78,7 +101,7 @@ DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(
 }
 
 
-bool CCompositeDeviceControllerComp::CloseDevice(const QByteArray& deviceId)
+bool CDeviceControllerProxyComp::CloseDevice(const QByteArray& deviceId)
 {
 	IDeviceController* controllerPtr = FindDeviceController(deviceId);
 	if (controllerPtr != nullptr){
@@ -91,13 +114,13 @@ bool CCompositeDeviceControllerComp::CloseDevice(const QByteArray& deviceId)
 
 // reimplemented (IDeviceEnumerator)
 
-IDeviceEnumerator::StartResult CCompositeDeviceControllerComp::StartEnumeration(IDeviceEnumerator::IResultHandler* /*resultHandlerPtr*/)
+IDeviceEnumerator::StartResult CDeviceControllerProxyComp::StartEnumeration(IDeviceEnumerator::IResultHandler* /*resultHandlerPtr*/)
 {
 	return SR_FAILED;
 }
 
 
-void CCompositeDeviceControllerComp::CancelEnumeration()
+void CDeviceControllerProxyComp::CancelEnumeration()
 {
 	IDeviceEnumerator* deviceEnumeratorPtr = GetCurrentDeviceEnumerator();
 	if (deviceEnumeratorPtr){
@@ -110,7 +133,7 @@ void CCompositeDeviceControllerComp::CancelEnumeration()
 
 // reimplemented (imtdev::IDeviceEnumerationResultHandler)
 
-void CCompositeDeviceControllerComp::OnEnumerationResult(
+void CDeviceControllerProxyComp::OnEnumerationResult(
 			EnumerationResult /*result*/,
 			const IDeviceEnumerator* /*deviceEnumeratorPtr*/)
 {
@@ -137,12 +160,11 @@ void CCompositeDeviceControllerComp::OnEnumerationResult(
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CCompositeDeviceControllerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CDeviceControllerProxyComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	Q_ASSERT(qApp->thread() == QThread::currentThread());
 
 	UpdateDeviceList();
-	UpdateExtendedDeviceList();
 
 	istd::IChangeable::ChangeSet localChangeSet(imtdev::IDeviceStateProvider::CF_STATE_CHANGED);
 	istd::CChangeNotifier notifier(&m_deviceStateProvider, &localChangeSet);
@@ -151,7 +173,7 @@ void CCompositeDeviceControllerComp::OnModelChanged(int /*modelId*/, const istd:
 
 // reimplemented (icomp::CComponentBase)
 
-void CCompositeDeviceControllerComp::OnComponentCreated()
+void CDeviceControllerProxyComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
@@ -159,7 +181,7 @@ void CCompositeDeviceControllerComp::OnComponentCreated()
 		m_intervalTimer.setInterval(*m_intervalAttrPtr * 1000);
 	}
 
-	connect(&m_intervalTimer, &QTimer::timeout, this, &CCompositeDeviceControllerComp::OnIntervalTimer);
+	connect(&m_intervalTimer, &QTimer::timeout, this, &CDeviceControllerProxyComp::OnIntervalTimer);
 
 	UpdateDeviceTypeIdList();
 
@@ -179,11 +201,15 @@ void CCompositeDeviceControllerComp::OnComponentCreated()
 			}
 		}
 	}
+
+	m_overriddenDeviceInfoObserver.RegisterObject(&m_overriddenDeviceInfo, &CDeviceControllerProxyComp::OnOverriddenDeviceInfoUpdated);
 }
 
 
-void CCompositeDeviceControllerComp::OnComponentDestroyed()
+void CDeviceControllerProxyComp::OnComponentDestroyed()
 {
+	m_overriddenDeviceInfoObserver.UnregisterAllObjects();
+
 	CancelEnumeration();
 
 	m_intervalTimer.stop();
@@ -196,7 +222,7 @@ void CCompositeDeviceControllerComp::OnComponentDestroyed()
 
 // private slots
 
-void CCompositeDeviceControllerComp::OnIntervalTimer()
+void CDeviceControllerProxyComp::OnIntervalTimer()
 {
 	if (GetCurrentDeviceEnumerator() == nullptr){
 		StartEnumeration();
@@ -206,7 +232,7 @@ void CCompositeDeviceControllerComp::OnIntervalTimer()
 
 // private methods
 
-void CCompositeDeviceControllerComp::StartEnumeration()
+void CDeviceControllerProxyComp::StartEnumeration()
 {
 	Q_ASSERT(m_enumeratorIndex == -1);
 
@@ -221,7 +247,7 @@ void CCompositeDeviceControllerComp::StartEnumeration()
 }
 
 
-IDeviceEnumerator* CCompositeDeviceControllerComp::GetCurrentDeviceEnumerator()
+IDeviceEnumerator* CDeviceControllerProxyComp::GetCurrentDeviceEnumerator()
 {
 	if (m_enumeratorIndex >= 0 && m_enumeratorIndex < m_deviceEnumeratorCompPtr.GetCount()){
 		return m_deviceEnumeratorCompPtr[m_enumeratorIndex];
@@ -231,7 +257,7 @@ IDeviceEnumerator* CCompositeDeviceControllerComp::GetCurrentDeviceEnumerator()
 }
 
 
-IDeviceEnumerator* CCompositeDeviceControllerComp::GetNextDeviceEnumerator()
+IDeviceEnumerator* CDeviceControllerProxyComp::GetNextDeviceEnumerator()
 {
 	m_enumeratorIndex++;
 	if (m_enumeratorIndex < m_deviceEnumeratorCompPtr.GetCount()){
@@ -248,8 +274,10 @@ IDeviceEnumerator* CCompositeDeviceControllerComp::GetNextDeviceEnumerator()
 }
 
 
-void CCompositeDeviceControllerComp::UpdateDeviceTypeIdList()
+void CDeviceControllerProxyComp::UpdateDeviceTypeIdList()
 {
+	m_supportedDeviceTypeIds.clear();
+
 	if (m_deviceControllerCompPtr.IsValid()){
 		int count = m_deviceControllerCompPtr.GetCount();
 		for (int i = 0; i < count; i++){
@@ -265,20 +293,13 @@ void CCompositeDeviceControllerComp::UpdateDeviceTypeIdList()
 				}
 
 				m_supportedDeviceTypeIds += ids;
-
-				imod::IModel* modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&deviceControllerPtr->GetDeviceInstanceList()));
-				Q_ASSERT(modelPtr != nullptr);
-
-				if (modelPtr != nullptr){
-					RegisterModel(modelPtr, MI_DEVICE_LIST_BASE + i);
-				}
 			}
 		}
 	}
 }
 
 
-void CCompositeDeviceControllerComp::UpdateDeviceList()
+void CDeviceControllerProxyComp::UpdateDeviceList()
 {
 	istd::CChangeGroup group(&m_deviceList);
 
@@ -297,6 +318,19 @@ void CCompositeDeviceControllerComp::UpdateDeviceList()
 					QString name = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
 					QString description = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
+					if (m_overriddenDeviceInfo.GetElementIds().contains(id)){
+						QString overriddenName = m_overriddenDeviceInfo.GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+						QString overriddenDescription = m_overriddenDeviceInfo.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+						if (!overriddenName.isEmpty()){
+							name = overriddenName;
+						}
+
+						if (!overriddenDescription.isEmpty()){
+							description = overriddenDescription;
+						}
+					}
+
 					m_deviceList.InsertItem(id, name, description);
 					m_deviceControllerMap[id] = deviceControllerPtr;
 				}
@@ -306,42 +340,7 @@ void CCompositeDeviceControllerComp::UpdateDeviceList()
 }
 
 
-void CCompositeDeviceControllerComp::UpdateExtendedDeviceList()
-{
-	istd::CChangeGroup group(&m_extendedDeviceList);
-
-	m_extendedDeviceList.CopyFrom(imtbase::CCollectionInfo());
-
-	QMultiMap<QByteArray, QByteArray> sortedDeviceList;
-	imtbase::ICollectionInfo::Ids deviceIds = m_deviceList.GetElementIds();
-	for (const QByteArray& deviceId : deviceIds){
-		QByteArray deviceTypeId = GetDeviceTypeId(deviceId);
-		if (!deviceTypeId.isEmpty()){
-			sortedDeviceList.insert(deviceTypeId, deviceId);
-		}
-	}
-
-	imtbase::ICollectionInfo::Ids deviceTypeIds = m_deviceTypeList.GetElementIds();
-	for (const QByteArray& deviceTypeId : deviceTypeIds){
-		if (sortedDeviceList.contains(deviceTypeId)){
-			QByteArrayList sortedDeviceIds = sortedDeviceList.values(deviceTypeId);
-			for (const QByteArray& deviceId : sortedDeviceIds){
-				m_extendedDeviceList.InsertItem(
-							deviceId,
-							m_deviceList.GetElementInfo(deviceId, imtbase::ICollectionInfo::EIT_NAME).toString(),
-							m_deviceList.GetElementInfo(deviceId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
-			}
-		}
-		else{
-			m_extendedDeviceList.InsertItem(
-					deviceTypeId,
-					m_deviceTypeList.GetElementInfo(deviceTypeId, imtbase::ICollectionInfo::EIT_NAME).toString(),
-					m_deviceTypeList.GetElementInfo(deviceTypeId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
-		}
-	}
-}
-
-IDeviceController* CCompositeDeviceControllerComp::FindDeviceController(const QByteArray& deviceId) const
+IDeviceController* CDeviceControllerProxyComp::FindDeviceController(const QByteArray& deviceId) const
 {
 	if (deviceId.isEmpty()){
 		return nullptr;
@@ -366,7 +365,7 @@ IDeviceController* CCompositeDeviceControllerComp::FindDeviceController(const QB
 }
 
 
-QByteArray CCompositeDeviceControllerComp::GetDeviceTypeId(const QByteArray& deviceId) const
+QByteArray CDeviceControllerProxyComp::GetDeviceTypeId(const QByteArray& deviceId) const
 {
 	DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
 	if (instanceInfoPtr != nullptr){
@@ -379,15 +378,23 @@ QByteArray CCompositeDeviceControllerComp::GetDeviceTypeId(const QByteArray& dev
 }
 
 
+// private methods
+
+void CDeviceControllerProxyComp::OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& changeset, const imtbase::ICollectionInfo* objectPtr)
+{
+	UpdateDeviceList();
+}
+
+
 // public methods of the embedded class DeviceStateProvider
 
-CCompositeDeviceControllerComp::DeviceStateProvider::DeviceStateProvider()
+CDeviceControllerProxyComp::DeviceStateProvider::DeviceStateProvider()
 	:m_parentPtr(nullptr)
 {
 }
 
 
-void CCompositeDeviceControllerComp::DeviceStateProvider::SetParent(CCompositeDeviceControllerComp& parent)
+void CDeviceControllerProxyComp::DeviceStateProvider::SetParent(CDeviceControllerProxyComp& parent)
 {
 	m_parentPtr = &parent;
 }
@@ -395,7 +402,7 @@ void CCompositeDeviceControllerComp::DeviceStateProvider::SetParent(CCompositeDe
 
 // reimplemented (IDeviceStateProvider)
 
-IDeviceStateProvider::DeviceState CCompositeDeviceControllerComp::DeviceStateProvider::GetDeviceState(const QByteArray& deviceId) const
+IDeviceStateProvider::DeviceState CDeviceControllerProxyComp::DeviceStateProvider::GetDeviceState(const QByteArray& deviceId) const
 {
 	if (m_parentPtr != nullptr){
 		IDeviceController* controllerPtr = m_parentPtr->FindDeviceController(deviceId);

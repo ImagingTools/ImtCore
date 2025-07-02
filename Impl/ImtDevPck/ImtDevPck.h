@@ -6,13 +6,13 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // Acula includes
-#include <imtdev/CCompositeDeviceControllerComp.h>
+#include <imtdev/CDeviceControllerProxyComp.h>
 #include <imtdev/CDeviceDataFilePersistenceComp.h>
 #include <imtdev/CDeviceIdBasedConfigurationManagerComp.h>
 #include <imtdev/CDeviceIdBasedConfigurationComp.h>
 #include <imtdev/CDeviceIdBasedAttributesComp.h>
-#include <imtdev/CDeviceFrameworkComp.h>
-#include <imtdev/CDeviceFrameworkProxyComp.h>
+#include <imtdev/CDeviceInstanceListAdapterComp.h>
+#include <imtdev/CDeviceStateProviderAdapterComp.h>
 
 
 /**
@@ -22,13 +22,13 @@ namespace ImtDevPck
 {
 
 
-typedef imtdev::CCompositeDeviceControllerComp CompositeDeviceController;
+typedef imtdev::CDeviceControllerProxyComp DeviceControllerProxy;
 typedef imtdev::CDeviceDataFilePersistenceComp DeviceDataFilePersistence;
 typedef icomp::TModelCompWrap<imtdev::CDeviceIdBasedConfigurationManagerComp> DeviceIdBasedConfigurationManager;
 typedef icomp::TModelCompWrap<imtdev::CDeviceIdBasedConfigurationComp> DeviceIdBasedConfiguration;
 typedef imtdev::CDeviceIdBasedAttributesComp DeviceIdBasedAttributes;
-typedef imtdev::CDeviceFrameworkComp DeviceFramework;
-typedef imtdev::CDeviceFrameworkProxyComp DeviceFrameworkProxy;
+typedef icomp::TModelCompWrap<imtdev::CDeviceInstanceListAdapterComp> DeviceInstanceListAdapter;
+typedef icomp::TModelCompWrap<imtdev::CDeviceStateProviderAdapterComp> DeviceStateProviderAdapter;
 
 
 } // namespace ImtDevPck

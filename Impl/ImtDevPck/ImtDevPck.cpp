@@ -15,9 +15,9 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("ImtCore") IM_COMPANY("ImagingTools") "Device Hardware");
 
 I_EXPORT_COMPONENT(
-			CompositeDeviceController,
-			"Composite device controller for hierarchical access and enumeration",
-			"Composite Device Controller");
+			DeviceControllerProxy,
+			"Proxy device controller for hierarchical access and enumeration",
+			"Proxy Device Controller");
 
 I_EXPORT_COMPONENT(
 			DeviceDataFilePersistence,
@@ -40,14 +40,14 @@ I_EXPORT_COMPONENT(
 			"Device Attributes");
 
 I_EXPORT_COMPONENT(
-			DeviceFrameworkProxy,
-			"device framework elements proxy",
-			"Device Framework Proxy");
+			DeviceInstanceListAdapter,
+			"Device instance list adapter",
+			"Device Instance List Adapter");
 
 I_EXPORT_COMPONENT(
-			DeviceFramework,
-			"Provider of device framework elements",
-			"Device Framework");
+			DeviceStateProviderAdapter,
+			"Device state provider adapter",
+			"Device State Provider Adapter");
 
 
 } // namespace ImtDevPck

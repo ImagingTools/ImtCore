@@ -14,6 +14,7 @@
 
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtdev/IDeviceController.h>
 #include <imtdev/IDeviceInstanceInfo.h>
 #include <imtdev/IDeviceStaticInfo.h>
@@ -23,7 +24,7 @@ namespace imtdev
 {
 
 
-class CCompositeDeviceControllerComp:
+class CDeviceControllerProxyComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
 			public imod::CMultiModelDispatcherBase,
@@ -34,23 +35,23 @@ class CCompositeDeviceControllerComp:
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CCompositeDeviceControllerComp);
+	I_BEGIN_COMPONENT(CDeviceControllerProxyComp);
 		I_REGISTER_SUBELEMENT(DeviceTypeList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceTypeList, imtbase::ICollectionInfo, ExtractDeviceTypeList);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceTypeList, istd::IChangeable, ExtractDeviceTypeList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceTypeList, imod::IModel, ExtractDeviceTypeList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceTypeList, istd::IChangeable, ExtractDeviceTypeList);
 		I_REGISTER_SUBELEMENT(DeviceList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceList, imtbase::ICollectionInfo, ExtractDeviceList);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceList, istd::IChangeable, ExtractDeviceList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceList, imod::IModel, ExtractDeviceList);
-		I_REGISTER_SUBELEMENT(ExtendedDeviceList);
-		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, imtbase::ICollectionInfo, ExtractExtendedDeviceList);
-		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, istd::IChangeable, ExtractExtendedDeviceList);
-		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, imod::IModel, ExtractExtendedDeviceList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceList, istd::IChangeable, ExtractDeviceList);
 		I_REGISTER_SUBELEMENT(DeviceStateProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, IDeviceStateProvider, ExtractDeviceStateProvider);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, istd::IChangeable, ExtractDeviceStateProvider);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, imod::IModel, ExtractDeviceStateProvider);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceStateProvider, istd::IChangeable, ExtractDeviceStateProvider);
+		I_REGISTER_SUBELEMENT(OverriddenDeviceInfo);
+		I_REGISTER_SUBELEMENT_INTERFACE(OverriddenDeviceInfo, imtbase::ICollectionInfo, ExtractOverriddenDeviceInfo);
+		I_REGISTER_SUBELEMENT_INTERFACE(OverriddenDeviceInfo, imod::IModel, ExtractOverriddenDeviceInfo);
+		I_REGISTER_SUBELEMENT_INTERFACE(OverriddenDeviceInfo, istd::IChangeable, ExtractOverriddenDeviceInfo);
 		I_REGISTER_INTERFACE(IDeviceController);
 		I_ASSIGN_MULTI_0(m_deviceControllerCompPtr, "DeviceControllers", "Device controllers", false);
 		I_ASSIGN_TO(m_deviceEnumeratorCompPtr, m_deviceControllerCompPtr, true);
@@ -58,12 +59,14 @@ public:
 		I_ASSIGN(m_intervalAttrPtr, "EnumerationInterval", "Interval between starts of successive enumeration cycles (secs)\n0 - Continuous enumeration", true, 5);
 	I_END_COMPONENT;
 
-	CCompositeDeviceControllerComp();
+	CDeviceControllerProxyComp();
 
 	// reimplemented (IDeviceController)
 	virtual const QByteArrayList& GetSupportedDeviceTypeIds() const override;
 	virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const override;
 	virtual const imtbase::ICollectionInfo& GetDeviceInstanceList() const override;
+	virtual bool SetDeviceInstanceName(const QByteArray& deviceId, const QString& name) override;
+	virtual bool SetDeviceInstanceDescription(const QByteArray& deviceId, const QString& description) override;
 	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const override;
 	virtual const IDeviceStateProvider& GetDeviceStateProvider() const override;
 	virtual imtdev::DeviceAccessorPtr OpenDevice(
@@ -98,32 +101,31 @@ protected:
 
 	virtual void UpdateDeviceTypeIdList();
 	virtual void UpdateDeviceList();
-	virtual void UpdateExtendedDeviceList();
 	virtual IDeviceController* FindDeviceController(const QByteArray& deviceId) const;
 	virtual QByteArray GetDeviceTypeId(const QByteArray& deviceId) const;
 
 	template <class InteraceType>
-	static InteraceType* ExtractDeviceTypeList(CCompositeDeviceControllerComp& parent)
+	static InteraceType* ExtractDeviceTypeList(CDeviceControllerProxyComp& parent)
 	{
 		return &parent.m_deviceTypeList;
 	}
 
 	template <class InteraceType>
-	static InteraceType* ExtractDeviceList(CCompositeDeviceControllerComp& parent)
+	static InteraceType* ExtractDeviceList(CDeviceControllerProxyComp& parent)
 	{
 		return &parent.m_deviceList;
 	}
 
 	template <class InteraceType>
-	static InteraceType* ExtractExtendedDeviceList(CCompositeDeviceControllerComp& parent)
+	static InteraceType* ExtractDeviceStateProvider(CDeviceControllerProxyComp& parent)
 	{
-		return &parent.m_extendedDeviceList;
+		return &parent.m_deviceStateProvider;
 	}
 
 	template <class InteraceType>
-	static InteraceType* ExtractDeviceStateProvider(CCompositeDeviceControllerComp& parent)
+	static InteraceType* ExtractOverriddenDeviceInfo(CDeviceControllerProxyComp& parent)
 	{
-		return &parent.m_deviceStateProvider;
+		return &parent.m_overriddenDeviceInfo;
 	}
 
 protected:
@@ -136,13 +138,13 @@ protected:
 	{
 	public:
 		DeviceStateProvider();
-		void SetParent(CCompositeDeviceControllerComp& parent);
+		void SetParent(CDeviceControllerProxyComp& parent);
 
 		// reimplemented (IDeviceStateProvider)
 		virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
 
 	private:
-		CCompositeDeviceControllerComp* m_parentPtr;
+		CDeviceControllerProxyComp* m_parentPtr;
 	};
 
 protected:
@@ -157,14 +159,20 @@ protected:
 
 	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceTypeList;
 	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceList;
-	imod::TModelWrap<imtbase::CCollectionInfo> m_extendedDeviceList;
 	imod::TModelWrap<DeviceStateProvider> m_deviceStateProvider;
+	imod::TModelWrap<imtbase::CCollectionInfo> m_overriddenDeviceInfo;
 
 	imod::CModelUpdateBridge m_deviceStateProviderUpdateBridge;
 
 	int m_enumeratorIndex;
 	QTimer m_intervalTimer;
 	IDeviceEnumerator::IResultHandler* m_resultHandlerPtr;
+
+private:
+	void OnOverriddenDeviceInfoUpdated(const istd::IChangeable::ChangeSet& changeset, const imtbase::ICollectionInfo* objectPtr);
+
+private:
+	imtbase::TModelUpdateBinder<imtbase::ICollectionInfo, CDeviceControllerProxyComp> m_overriddenDeviceInfoObserver;
 };
 
 

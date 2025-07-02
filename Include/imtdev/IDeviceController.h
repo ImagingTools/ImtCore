@@ -47,6 +47,16 @@ public:
 	virtual const imtbase::ICollectionInfo& GetDeviceInstanceList() const = 0;
 
 	/**
+		Set device name for the given device ID
+	*/
+	virtual bool SetDeviceInstanceName(const QByteArray& deviceId, const QString& name) = 0;
+
+	/**
+		Set device description for the given device ID
+	*/
+	virtual bool SetDeviceInstanceDescription(const QByteArray& deviceId, const QString& description) = 0;
+
+	/**
 		Get device instance info for the given DeviceId
 		For some devices DeviceInstanceInfo can only be obtained for open devices
 	*/
