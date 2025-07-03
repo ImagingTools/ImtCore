@@ -123,6 +123,32 @@ Rectangle {
 	//////////////////////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////
 
+	Column{
+		visible: false;
+
+		anchors.top: parent.top;
+		anchors.right: parent.right;
+		anchors.topMargin: Style.marginL
+		anchors.rightMargin: Style.marginL
+
+		width: 200;
+		BaseText{
+			font.pixelSize: Style.fontSizeL
+
+			text: "Zoom: " + view.scaleCoeff.toFixed(2)
+		}
+		BaseText{
+			font.pixelSize: Style.fontSizeL
+
+			text: "DeltaX: " + view.deltaX
+		}
+		BaseText{
+			font.pixelSize: Style.fontSizeL
+
+			text: "DeltaY: " + view.deltaY
+		}
+	}
+
 	GraphicsView{
 		id: view;
 
@@ -147,9 +173,9 @@ Rectangle {
 			let activeLayer = getActiveLayer()
 
 			//transformation for the layer
-			activeLayer.layerMatrix.setXTranslation(gridShape.axesMargin)
+			activeLayer.layerMatrix.setXTranslation(gridShape.axeMarginHorizontal)
 			activeLayer.layerMatrix.invertY();
-			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axesMargin)
+			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axeMarginVertical)
 
 			let lineObj = polylineComp.createObject(this);
 			activeLayer.addShape(lineObj);
@@ -158,7 +184,7 @@ Rectangle {
 		onHeightChanged: {
 			let activeLayer = getActiveLayer();
 			if(activeLayer && activeLayer.layerMatrix){
-				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axesMargin)
+				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axeMarginVertical)
 			}
 		}
 	}
@@ -180,8 +206,8 @@ Rectangle {
 
 			// function translateCoordToGrid(point){
 			// 	let newPoint = Qt.point(0,0);
-			// 	newPoint.x = point.x + gridShape.axesMargin;
-			// 	newPoint.y = gridShape.viewItem.height - point.y - gridShape.axesMargin
+			// 	newPoint.x = point.x + gridShape.axeMarginHorizontal;
+			// 	newPoint.y = gridShape.viewItem.height - point.y - gridShape.axeMarginVertical
 			// 	return newPoint;
 			// }
 
