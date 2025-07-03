@@ -8,7 +8,7 @@ BoundingBox {
 	property bool isSelected: false;
 	property bool showNodes: false;
 
-	function draw (ctx){
+	function draw (ctx, layerMatrix){
 	}
 
 	// function drawBase(ctx){

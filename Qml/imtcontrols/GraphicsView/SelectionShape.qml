@@ -6,7 +6,7 @@ GraphicsShapeBase {
 
 	property QtObject source: null;
 
-	function draw(ctx){
+	function draw(ctx, layerMatrix){
 		drawSelection(ctx);
 		drawBorderPoints(ctx)
 	}

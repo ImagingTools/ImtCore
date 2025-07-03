@@ -15,6 +15,7 @@ QtObject {
 	signal loadImageSignal(string source)
 
 	property CanvasMatrix layerMatrix: CanvasMatrix{};
+	property CanvasMatrix tempMatrix: CanvasMatrix{};
 
 	function addShape(shape){
 		shapeModel.push(shape)
@@ -36,22 +37,24 @@ QtObject {
 	}
 
 	function draw(ctx, canvasMatrix){
-		canvasMatrix.matrix = canvasMatrix.multiplyByMatrix(canvasMatrix.matrix, layerMatrix.matrix)
 
-		canvasMatrix.setContextTransform(ctx)
+		tempMatrix.copy(canvasMatrix.matrix);
+		tempMatrix.matrix = tempMatrix.multiplyByMatrix(tempMatrix.matrix, layerMatrix.matrix)
+
+		tempMatrix.setContextTransform(ctx)
 
 		for(let i = 0; i < shapeModel.length; i++){
 			ctx.globalAlpha = 1
 			let shape = shapeModel[i]
 			if(!shape.isSelected){
-				shape.draw(ctx);
+				shape.draw(ctx, tempMatrix);
 			}
 		}
 		for(let i = 0; i < shapeModel.length; i++){
 			ctx.globalAlpha = 1
 			let shape = shapeModel[i]
 			if(shape.isSelected){
-				shape.draw(ctx);
+				shape.draw(ctx, tempMatrix);
 			}
 		}
 	}

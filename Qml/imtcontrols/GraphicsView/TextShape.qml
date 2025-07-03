@@ -3,7 +3,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 
 GraphicsShapeBase {
-	function draw(ctx){
+	function draw(ctx, layerMatrix){
 		let params = getParams()
 		ctx.fillStyle = params.color !== undefined ? params.color : "transparent";
 		ctx.strokeStyle = params.color !== undefined ? params.color : "transparent";

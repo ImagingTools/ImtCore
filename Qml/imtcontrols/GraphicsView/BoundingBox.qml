@@ -143,7 +143,7 @@ QtObject {
 		return 0;
 	}
 
-	function draw(ctx){
+	function draw(ctx, layerMatrix){
 		drawBoundingBox(ctx)
 	}
 

@@ -817,6 +817,14 @@ Rectangle {
 		}
 	}
 
+	Shortcut {
+		sequence: "Ctrl+0";
+		enabled: true;
+		onActivated: {
+			console.log("Ctrl + 0");
+			graphicsView.zoomToFit(true);
+		}
+	}
 
 	function copyObjectFunc(index){
 		if(index >= 0){

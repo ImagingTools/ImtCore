@@ -10,7 +10,7 @@ GraphicsShapeBase {
 	property int axesMargin: 30;
 	property int gridStep: 40;
 
-	function draw(ctx){
+	function draw(ctx, layerMatrix){
 		let step = gridShape.gridStep;
 		let margin = gridShape.axesMargin;
 

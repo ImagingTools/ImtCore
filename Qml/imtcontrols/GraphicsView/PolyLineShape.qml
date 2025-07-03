@@ -7,14 +7,14 @@ GraphicsShapeBase {
 
 	property string color: "#000000";
 
-	function draw(ctx){
+	function draw(ctx, layerMatrix){
 		drawBase(ctx);
 		if(showNodes){
 			drawNodes(ctx)
 		}
 	}
 
-	function drawBase(ctx){
+	function drawBase(ctx, layerMatrix){
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 1
@@ -33,7 +33,7 @@ GraphicsShapeBase {
 		ctx.closePath();
 	}
 
-	function drawNodes(ctx){
+	function drawNodes(ctx, layerMatrix){
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.fillStyle = params.color !== undefined ? params.color : polylineShape.color;
