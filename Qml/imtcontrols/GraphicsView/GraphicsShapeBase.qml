@@ -8,6 +8,9 @@ BoundingBox {
 	property bool isSelected: false;
 	property bool showNodes: false;
 
+	property CanvasMatrix shapeMatrix: CanvasMatrix{};
+	property CanvasMatrix tempMatrix: CanvasMatrix{};
+
 	function draw (ctx, layerMatrix){
 	}
 

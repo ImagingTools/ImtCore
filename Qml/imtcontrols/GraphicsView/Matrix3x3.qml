@@ -141,7 +141,7 @@ QtObject {
 		return transposedMatrix;
 	}
 
-	function copy(externMatrix){
+	function copyFrom(externMatrix){
 		matrix = externMatrix;
 	}
 

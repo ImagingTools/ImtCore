@@ -46,6 +46,10 @@ Rectangle {
 	property Component controlPanelComp: null
 	property Item controlPanelItem: null
 
+	property alias scaleCoeff: canvas.scaleCoeff;
+	property alias deltaX: canvas.deltaX;
+	property alias deltaY: canvas.deltaY;
+
 	signal copySignal(int index);
 	signal pasteSignal(int index);
 	signal deleteSignal(int index);
@@ -615,7 +619,7 @@ Rectangle {
 			property real leftX: x;
 			property real rightX: x + width;
 
-			color: Style.baseColor;
+			color: "transparent";//Style.baseColor;
 		}
 
 		Canvas {
@@ -821,7 +825,7 @@ Rectangle {
 		sequence: "Ctrl+0";
 		enabled: true;
 		onActivated: {
-			console.log("Ctrl + 0");
+			//console.log("Ctrl + 0");
 			graphicsView.zoomToFit(true);
 		}
 	}

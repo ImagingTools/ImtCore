@@ -7,28 +7,43 @@ GraphicsShapeBase {
 	id: gridShape;
 
 	property Item viewItem: null
-	property int axesMargin: 30;
+	property int axeMarginHorizontal: 30;
+	property int axeMarginVertical: 40;
 	property int gridStep: 40;
+	property int fontSize: Style.fontSizeM
+
+	property CanvasMatrix identityMatrix: CanvasMatrix{};
+	property CanvasMatrix labelMatrix: CanvasMatrix{};
 
 	function draw(ctx, layerMatrix){
+		let deltaX = layerMatrix.xTranslation();
+		let deltaY = layerMatrix.yTranslation();
+		let scaleCoeff = layerMatrix.xScale();
+
 		let step = gridShape.gridStep;
-		let margin = gridShape.axesMargin;
 
 		ctx.lineCap = "round"
 		ctx.lineJoin = "round"
 		ctx.lineWidth = 1;
 
-		ctx.fillStyle = Style.imagingToolsGradient1;
+		ctx.fillStyle = Style.baseColor;
 		ctx.strokeStyle = Style.imagingToolsGradient1;
 
+		//background
+		identityMatrix.setContextTransform(ctx);
 
-		let verticalLineTopY = (gridShape.viewItem.drawingAreaHeight - margin) - Math.trunc((gridShape.viewItem.drawingAreaHeight - margin)/ step) * step;
+		ctx.fillRect(0,0, gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight)
 
-		for(let i = 0; i * step < gridShape.viewItem.drawingAreaWidth - margin; i++){//vertical lines
-			let x1 = margin + i * step;
+		layerMatrix.setContextTransform(ctx);
+
+		//grid
+		let verticalLineTopY = (gridShape.viewItem.drawingAreaHeight - axeMarginVertical) - Math.trunc((gridShape.viewItem.drawingAreaHeight - axeMarginVertical)/ step) * step;
+
+		for(let i = 0; i * step < gridShape.viewItem.drawingAreaWidth - axeMarginHorizontal; i++){//vertical lines
+			let x1 = axeMarginHorizontal + i * step;
 			let y1 =  verticalLineTopY ;
 			let x2 = x1;
-			let y2 = gridShape.viewItem.drawingAreaHeight - margin ;
+			let y2 = gridShape.viewItem.drawingAreaHeight - axeMarginVertical ;
 
 			ctx.beginPath()
 			ctx.moveTo(x1, y1);
@@ -37,9 +52,9 @@ GraphicsShapeBase {
 			ctx.stroke();
 		}
 
-		for(let i = 0; i * step < gridShape.viewItem.drawingAreaHeight - margin; i++){//horizontal lines
-			let x1 = margin ;
-			let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - margin;
+		for(let i = 0; i * step < gridShape.viewItem.drawingAreaHeight - axeMarginVertical; i++){//horizontal lines
+			let x1 = axeMarginHorizontal ;
+			let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - axeMarginVertical;
 			let x2 =  gridShape.viewItem.drawingAreaWidth ;
 			let y2 =  y1;
 
@@ -50,19 +65,21 @@ GraphicsShapeBase {
 			ctx.stroke();
 		}
 
-
 		//labels for coordinate axis
 
-		//"10px sans-serif"
-		let fontSize = 14;
 		ctx.font = String(fontSize) + "px sans-serif"//"14px sans-serif"
 
 		ctx.strokeStyle = Style.borderColor;
 		ctx.fillStyle = Style.borderColor2;
 
-		for(let i = 1; i * step < gridShape.viewItem.drawingAreaWidth - margin; i++){
-			let x_ = margin + i * step;
-			let y_ = gridShape.viewItem.drawingAreaHeight  - margin + fontSize + Style.marginXS
+		//label x
+		labelMatrix.setXTranslation(deltaX);
+		labelMatrix.setYTranslation(0);
+		labelMatrix.setContextTransform(ctx);
+
+		for(let i = 1; i * step * scaleCoeff < gridShape.viewItem.drawingAreaWidth - axeMarginHorizontal; i++){
+			let x_ = (axeMarginHorizontal + i * step) * scaleCoeff;
+			let y_ = gridShape.viewItem.drawingAreaHeight  - axeMarginVertical + fontSize + Style.marginXS
 
 			ctx.beginPath()
 			let str = String(i * step)
@@ -74,9 +91,16 @@ GraphicsShapeBase {
 			ctx.closePath()
 		}
 
-		for(let i = 1; i * step < gridShape.viewItem.drawingAreaHeight - margin; i++){
-			let x_ = margin;
-			let y_ = gridShape.viewItem.drawingAreaHeight - i * step  -margin
+
+		//label y
+		labelMatrix.reset()
+		//labelMatrix.setXTranslation(0);
+		labelMatrix.setYTranslation(deltaY);
+		labelMatrix.setContextTransform(ctx);
+
+		for(let i = 1; i * step * scaleCoeff < gridShape.viewItem.drawingAreaHeight - axeMarginVertical; i++){
+			let x_ = axeMarginHorizontal;
+			let y_ = (gridShape.viewItem.drawingAreaHeight - i * step  - axeMarginVertical)* scaleCoeff
 
 			ctx.beginPath()
 			let str = String(i * step)
@@ -90,17 +114,22 @@ GraphicsShapeBase {
 
 
 		//coordinate axis
+
+		identityMatrix.setContextTransform(ctx);
+
+		//horizontal axe
 		ctx.strokeStyle = Style.borderColor;
 		ctx.lineWidth = 2;
 		ctx.beginPath()
-		ctx.moveTo(0, gridShape.viewItem.drawingAreaHeight - margin);
-		ctx.lineTo(gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight - margin);
+		ctx.moveTo(0, gridShape.viewItem.drawingAreaHeight - axeMarginVertical);
+		ctx.lineTo(gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight - axeMarginVertical);
 		ctx.closePath()
 		ctx.stroke();
 
+		//vertical axe
 		ctx.beginPath()
-		ctx.moveTo(margin, 0);
-		ctx.lineTo(margin, gridShape.viewItem.drawingAreaHeight);
+		ctx.moveTo(axeMarginHorizontal, 0);
+		ctx.lineTo(axeMarginHorizontal, gridShape.viewItem.drawingAreaHeight);
 		ctx.closePath()
 		ctx.stroke();
 	}

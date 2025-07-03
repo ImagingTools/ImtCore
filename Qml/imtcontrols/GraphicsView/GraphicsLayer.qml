@@ -38,7 +38,7 @@ QtObject {
 
 	function draw(ctx, canvasMatrix){
 
-		tempMatrix.copy(canvasMatrix.matrix);
+		tempMatrix.copyFrom(canvasMatrix.matrix);
 		tempMatrix.matrix = tempMatrix.multiplyByMatrix(tempMatrix.matrix, layerMatrix.matrix)
 
 		tempMatrix.setContextTransform(ctx)
