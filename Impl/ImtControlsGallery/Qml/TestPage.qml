@@ -134,8 +134,8 @@ Rectangle {
 		width: parent.width/2
 		height: parent.height/2
 
-		minZoomLevel: 1;
-		restrictMove: true;
+		//minZoomLevel: 1;
+		//restrictMove: true;
 
 
 		Component.onCompleted: {
@@ -157,7 +157,9 @@ Rectangle {
 
 		onHeightChanged: {
 			let activeLayer = getActiveLayer();
-			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axesMargin)
+			if(activeLayer && activeLayer.layerMatrix){
+				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axesMargin)
+			}
 		}
 	}
 
@@ -169,10 +171,12 @@ Rectangle {
 
 			color: "blue";
 
-			function draw(ctx){
-				drawBase(ctx)
-				drawNodes(ctx)
-			}
+			showNodes: true;
+
+			// function draw(ctx, layerMatrix){
+			// 	drawBase(ctx)
+			// 	drawNodes(ctx)
+			// }
 
 			// function translateCoordToGrid(point){
 			// 	let newPoint = Qt.point(0,0);
