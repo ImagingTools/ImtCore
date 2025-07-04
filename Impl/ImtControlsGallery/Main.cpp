@@ -2,6 +2,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleFactory>
 #include <QQuickStyle>
+#include <QtQuick/QQuickWindow>
 
 // ACF includes
 #include <ibase/IApplication.h>
@@ -55,8 +56,10 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtauthAuthorizationSdl);
 	Q_INIT_RESOURCE(imtappApplicationSdl);
 
-	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-	
+#ifdef Q_OS_WIN
+	QQuickWindow::setGraphicsApi(QSGRendererInterface::Direct3D12);
+#endif
+
 	CImtControlsGallery instance;
 
 	qmlRegisterType<imtbase::CTreeItemModel>("Acf", 1, 0, "TreeItemModel");

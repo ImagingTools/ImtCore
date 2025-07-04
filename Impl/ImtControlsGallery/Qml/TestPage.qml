@@ -170,6 +170,19 @@ Rectangle {
 			let background = getBackgroundLayer()
 			background.addShape(gridShape);
 
+			let inactiveLayer = getInactiveLayer()
+
+			//transformation for the layer
+			inactiveLayer.layerMatrix.setXTranslation(gridShape.axeMarginHorizontal)
+			inactiveLayer.layerMatrix.invertY();
+			inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.axeMarginVertical)
+
+			let clipRect = Qt.rect(gridShape.axeMarginHorizontal, 0, view.width - gridShape.axeMarginHorizontal, view.height - gridShape.axeMarginVertical)
+			inactiveLayer.clipRect = clipRect
+
+			let lineObjBlue = polylineCompBlue.createObject(this);
+			inactiveLayer.addShape(lineObjBlue);
+
 			let activeLayer = getActiveLayer()
 
 			//transformation for the layer
@@ -177,8 +190,8 @@ Rectangle {
 			activeLayer.layerMatrix.invertY();
 			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axeMarginVertical)
 
-			let lineObj = polylineComp.createObject(this);
-			activeLayer.addShape(lineObj);
+			let lineObjRed = polylineCompRed.createObject(this);
+			activeLayer.addShape(lineObjRed);
 		}
 
 		onHeightChanged: {
@@ -190,7 +203,7 @@ Rectangle {
 	}
 
 	Component{
-		id: polylineComp
+		id: polylineCompBlue
 
 		PolyLineShape{
 			id: line;
@@ -199,31 +212,17 @@ Rectangle {
 
 			showNodes: true;
 
-			// function draw(ctx, layerMatrix){
-			// 	drawBase(ctx)
-			// 	drawNodes(ctx)
-			// }
-
-			// function translateCoordToGrid(point){
-			// 	let newPoint = Qt.point(0,0);
-			// 	newPoint.x = point.x + gridShape.axeMarginHorizontal;
-			// 	newPoint.y = gridShape.viewItem.height - point.y - gridShape.axeMarginVertical
-			// 	return newPoint;
-			// }
-
 			function getPoints(){
 				let pointList = []
 
-				// let point1 = translateCoordToGrid(Qt.point(40, 40))
-				// let point2 = translateCoordToGrid(Qt.point(120,80))
-				// let point3 = translateCoordToGrid(Qt.point(200,300))
-				// let point4 = translateCoordToGrid(Qt.point(400 ,400))
-
+				let point0 = Qt.point(-20, 40)
 				let point1 = Qt.point(40, 40)
 				let point2 = Qt.point(120,80)
 				let point3 = Qt.point(200,300)
 				let point4 = Qt.point(400 ,400)
 
+
+				pointList.push(point0)
 				pointList.push(point1)
 				pointList.push(point2)
 				pointList.push(point3)
@@ -233,6 +232,38 @@ Rectangle {
 			}
 		}
 	}
+
+	Component{
+		id: polylineCompRed
+
+		PolyLineShape{
+			id: line;
+
+			color: "red";
+
+			showNodes: true;
+
+			function getPoints(){
+				let pointList = []
+
+				let point0 = Qt.point(-20, 60)
+				let point1 = Qt.point(40, 60)
+				let point2 = Qt.point(120,100)
+				let point3 = Qt.point(200,320)
+				let point4 = Qt.point(400 ,420)
+
+				pointList.push(point0)
+				pointList.push(point1)
+				pointList.push(point2)
+				pointList.push(point3)
+				pointList.push(point4)
+
+				return pointList
+			}
+		}
+	}
+
+
 
 	CoordinateGridShape{
 		id: gridShape;
