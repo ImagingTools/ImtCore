@@ -102,7 +102,7 @@ class Signal extends BaseObject {
             if(args.length === 1){
                 while(i < target.__connections[name].length){
                     if(target.__connections[name][i].slot.meta && args[0].meta){
-                        if(!target.__connections[name][i].target && target.__connections[name][i].slot.meta.target === args[0].meta.target && target.__connections[name][i].slot.meta.name === args[0].meta.name){
+                        if(!target.__connections[name][i].target && target.__connections[name][i].slot.meta.parent === args[0].meta.parent && target.__connections[name][i].slot.meta.name === args[0].meta.name){
                             let connection = target.__connections[name].splice(i, 1)[0]
 
                             if(connection.slot.meta && !connection.slot.meta.destruction){
