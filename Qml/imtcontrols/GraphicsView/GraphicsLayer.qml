@@ -17,6 +17,8 @@ QtObject {
 	property CanvasMatrix layerMatrix: CanvasMatrix{};
 	property CanvasMatrix tempMatrix: CanvasMatrix{};
 
+	property rect clipRect: Qt.rect(0,0,0,0)
+
 	function addShape(shape){
 		shapeModel.push(shape)
 		let index = shapeModel.length -1;
@@ -38,6 +40,18 @@ QtObject {
 
 	function draw(ctx, canvasMatrix){
 
+		ctx.save();
+
+		if(clipRect.width !== 0 && clipRect.height !== 0){
+			ctx.beginPath()
+			ctx.moveTo(clipRect.x, clipRect.y)
+			ctx.lineTo(clipRect.x + clipRect.width, clipRect.y)
+			ctx.lineTo(clipRect.x + clipRect.width, clipRect.y + clipRect.height)
+			ctx.lineTo(clipRect.x, clipRect.y + clipRect.height)
+			ctx.closePath()
+			ctx.clip()
+		}
+
 		tempMatrix.copyFrom(canvasMatrix.matrix);
 		tempMatrix.matrix = tempMatrix.multiplyByMatrix(tempMatrix.matrix, layerMatrix.matrix)
 
@@ -57,6 +71,8 @@ QtObject {
 				shape.draw(ctx, tempMatrix);
 			}
 		}
+
+		ctx.restore();
 	}
 
 }

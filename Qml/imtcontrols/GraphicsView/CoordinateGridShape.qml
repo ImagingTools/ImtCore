@@ -11,6 +11,7 @@ GraphicsShapeBase {
 	property int axeMarginVertical: 40;
 	property int gridStep: 40;
 	property int fontSize: Style.fontSizeM
+	property string backgroundColor: Style.baseColor;
 
 	property CanvasMatrix identityMatrix: CanvasMatrix{};
 	property CanvasMatrix labelMatrix: CanvasMatrix{};
@@ -26,13 +27,14 @@ GraphicsShapeBase {
 		ctx.lineJoin = "round"
 		ctx.lineWidth = 1;
 
-		ctx.fillStyle = Style.baseColor;
+		ctx.fillStyle = backgroundColor;
 		ctx.strokeStyle = Style.imagingToolsGradient1;
 
 		//background
 		identityMatrix.setContextTransform(ctx);
 
-		ctx.fillRect(0,0, gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight)
+		ctx.fillRect(axeMarginHorizontal,0, gridShape.viewItem.drawingAreaWidth - axeMarginHorizontal, gridShape.viewItem.drawingAreaHeight - axeMarginVertical)
+		// ctx.fillRect(0,0, gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight)
 
 		layerMatrix.setContextTransform(ctx);
 
@@ -64,6 +66,15 @@ GraphicsShapeBase {
 			ctx.closePath()
 			ctx.stroke();
 		}
+
+		//axes background
+		identityMatrix.setContextTransform(ctx);
+
+		ctx.fillStyle = backgroundColor;
+		ctx.fillRect(0,0, axeMarginHorizontal, gridShape.viewItem.drawingAreaHeight)
+		ctx.fillRect(axeMarginHorizontal,gridShape.viewItem.drawingAreaHeight - axeMarginVertical,
+					 gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight)
+
 
 		//labels for coordinate axis
 
@@ -116,6 +127,11 @@ GraphicsShapeBase {
 		//coordinate axis
 
 		identityMatrix.setContextTransform(ctx);
+
+		//axes background
+		ctx.fillStyle = backgroundColor;
+		ctx.fillRect(0,gridShape.viewItem.drawingAreaHeight - axeMarginVertical, axeMarginHorizontal, gridShape.viewItem.drawingAreaHeight)
+
 
 		//horizontal axe
 		ctx.strokeStyle = Style.borderColor;

@@ -15,6 +15,7 @@ GraphicsShapeBase {
 	}
 
 	function drawBase(ctx, layerMatrix){
+
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 1
@@ -49,7 +50,6 @@ GraphicsShapeBase {
 			ctx.fill();
 		}
 		ctx.closePath();
-
 	}
 
 

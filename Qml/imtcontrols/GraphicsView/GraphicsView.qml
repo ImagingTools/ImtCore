@@ -943,4 +943,30 @@ Rectangle {
 		}
 	}
 
+	Column{
+		id: rightButtonColumn;
+
+		anchors.right: parent.right;
+		anchors.top: parent.top;
+		anchors.rightMargin: Style.marginL
+		anchors.topMargin: Style.marginS
+
+		width: Style.iconSizeM
+
+		spacing: Style.marginM;
+
+		Button{
+			id: zoomToFitButton;
+
+			width: parent.width;
+			height: width;
+
+			iconSource: "../../../" + Style.getIconPath("Icons/FitToScreen", Icon.State.On, Icon.Mode.Normal)
+			onClicked: {
+				graphicsView.zoomToFit(true);
+			}
+
+		}
+	}
+
 }
