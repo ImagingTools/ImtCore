@@ -579,6 +579,18 @@ var Qt = {
             y: y,
         }
     },
+    rect(x, y, width, height){
+        return {
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            left: x,
+            top: y,
+            right: x + width,
+            bottom: y + height
+        }
+    },
     rgba(r, g, b, a){
         let _a = Math.trunc(a*255)
         let _r = Math.trunc(r*255)
