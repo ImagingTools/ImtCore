@@ -198,6 +198,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 	#-------- Qml --------
 	if(NOT DEFINED USE_QTQML OR USE_QTQML)
+		# TODO return it when new wrappers will be finished
+		# add_subdirectory("${INCLUDE_DIR}/imtqml2d/CMake" "${AUX_INCLUDE_DIR}/imtqml2d")
 		add_subdirectory("${INCLUDE_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthgui")
 		add_dependencies(imtauthgui DesignTokenCreator)
 		add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")

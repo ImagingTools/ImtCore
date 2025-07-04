@@ -1,0 +1,40 @@
+schema {
+	name: imt2d
+	namespace: imtsdl2d
+	version: 1.0
+}
+
+type Point2d {
+	x: Double!
+	y: Double!
+}
+
+type Line2d {
+	point1: Point2d!
+	point2: Point2d!
+}
+
+type Polyline2d {
+	points: [Point2d]!
+}
+
+type Polygon2d {
+	points: [Point2d]!
+	isClosed: Bool!
+}
+
+type Rectangle2d {
+	topLeft: Point2d!
+	bottomRight: Point2d!
+}
+
+type Circle {
+	center: Point2d!
+	radius: Double!
+}
+
+type Annulus {
+	center: Point2d!
+	innerRadius: Double!
+	outerRadius: Double!
+}
