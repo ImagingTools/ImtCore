@@ -108,9 +108,6 @@ void CAsyncConnectionCheckerComp::ReplyFinished()
 		QByteArray representationData = reply->readAll();
 
 		imtbase::CTreeItemModel representationModel;
-
-		qDebug() << "representationData" << representationData;
-
 		bool result = representationModel.CreateFromJson(representationData);
 		if (result){
 			SetStatus(CS_CONNECTED);

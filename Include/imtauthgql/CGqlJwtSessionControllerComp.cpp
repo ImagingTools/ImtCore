@@ -51,7 +51,7 @@ sdl::imtauth::Sessions::CValidateJwtPayload CGqlJwtSessionControllerComp::OnVali
 		return response;
 	}
 
-	QByteArray jwt;
+	QString jwt;
 	sdl::imtauth::Sessions::ValidateJwtRequestArguments arguments = validateJwtRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->jwt){
 		jwt = *arguments.input.Version_1_0->jwt;
@@ -59,7 +59,7 @@ sdl::imtauth::Sessions::CValidateJwtPayload CGqlJwtSessionControllerComp::OnVali
 
 	response.Version_1_0.emplace();
 
-	imtauth::IJwtSessionController::JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(jwt);
+	imtauth::IJwtSessionController::JwtState state = m_jwtSessionControllerCompPtr->ValidateJwt(jwt.toUtf8());
 
 	response.Version_1_0->state = sdl::imtauth::Sessions::JwtState::NONE;
 
@@ -228,13 +228,13 @@ sdl::imtauth::Sessions::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnG
 		return sdl::imtauth::Sessions::CGetUserFromJwtPayload();
 	}
 
-	QByteArray jwt;
+	QString jwt;
 	sdl::imtauth::Sessions::GetUserFromJwtRequestArguments arguments = getUserFromJwtRequest.GetRequestedArguments();
 	if (arguments.input.Version_1_0->jwt){
 		jwt = *arguments.input.Version_1_0->jwt;
 	}
 
-	response.userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(jwt);
+	response.userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(jwt.toUtf8());
 
 	sdl::imtauth::Sessions::CGetUserFromJwtPayload retVal;
 	retVal.Version_1_0 = std::make_optional(response);

@@ -98,6 +98,9 @@ bool CServerConnectionParamRepresentationControllerComp::GetDataModelFromSdlRepr
 		if (isSecure){
 			serverConnectionParamPtr->SetConnectionFlags(imtcom::IServerConnectionInterface::CF_SECURE);
 		}
+		else{
+			serverConnectionParamPtr->SetConnectionFlags(imtcom::IServerConnectionInterface::CF_DEFAULT);
+		}
 	}
 
 	return true;
