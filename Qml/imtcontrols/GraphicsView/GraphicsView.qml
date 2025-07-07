@@ -20,6 +20,7 @@ Rectangle {
 	property real contentHeight: backgroundRec.height;
 	property real contentY: -canvas.deltaY;
 	property real originY: 0;
+	property bool hideScrollbars: false;
 
 	property real contentWidth: backgroundRec.width;
 	property real contentX: -canvas.deltaX;
@@ -27,7 +28,12 @@ Rectangle {
 
 	property real scaleStep: 0.1;
 	property real minZoomLevel: -1;
-	property real maxZoomLevel: 3;
+	property real maxZoomLevel: 4;
+	property var translateXPositiveLimit;
+	property var translateYPositiveLimit;
+	property var translateXNegativeLimit;
+	property var translateYNegativeLimit;
+	property bool restrictZoom: false;
 	property bool restrictMove: false;
 	property int restrictMoveMargin: 80;
 	property bool fitToBorders: true;
@@ -216,7 +222,7 @@ Rectangle {
 	}
 
 	function requestPaint(){
-		console.log("Canvas::requestPaint")
+		//console.log("Canvas::requestPaint")
 		canvas.requestPaint();
 	}
 
@@ -239,7 +245,7 @@ Rectangle {
 			//     return;
 			// }
 			// let id = objectsModel.getData("id", canvas.selectedIndex);
-			console.log("Go inside");
+			//console.log("Go inside");
 		}
 	}
 
@@ -470,28 +476,31 @@ Rectangle {
 					}
 				}
 
+				//moving all scene
 				if(!found){
 					graphicsView.autoFit = false;
 
 					let borderMargin = graphicsView.restrictMoveMargin;
 
+					let wasLimitCorrection = canvas.deltaCorrection(canvas.deltaX + delta.x, canvas.deltaY + delta.y)
 
-					let ok1 = graphicsView.restrictMove && canvas.scaleCoeff <= graphicsView.minZoomLevel ? false : true
+					let okScale = graphicsView.restrictMove && canvas.scaleCoeff <= graphicsView.minZoomLevel ? false : true
 					let okWidth = canvas.deltaX + delta.x > -1*(canvas.width * canvas.scaleCoeff  - borderMargin)  && canvas.deltaX + delta.x < (canvas.width - borderMargin);
 					let okHeight = canvas.deltaY + delta.y > -1*(canvas.height * canvas.scaleCoeff  - borderMargin)  && canvas.deltaY + delta.y < (canvas.height - borderMargin);
-					let ok = ok1 && okWidth && okHeight;
-					if(ok){
+
+					let ok = okScale && okWidth && okHeight ;
+
+					if(!wasLimitCorrection && ok){
 						canvas.deltaX += delta.x
 						canvas.deltaY += delta.y
 					}
 				}
 
-
 				canvas.requestPaint();
 			}
 
 			onWheel: {
-				if (canvas.scaleCoeff == 0){
+				if (canvas.scaleCoeff == 0 || graphicsView.restrictZoom){
 					return
 				}
 
@@ -627,7 +636,7 @@ Rectangle {
 
 			anchors.fill: parent;
 
-			antialiasing: true;
+			//antialiasing: true;
 
 			property var currentTouchedShape: null
 			property int selectedShapeCount: 0;
@@ -733,11 +742,37 @@ Rectangle {
 
 				let newX = (scaleX - canvas.deltaX) / scaleCoeffBack * newScale + canvas.deltaX
 				let newY = (scaleY - canvas.deltaY) / scaleCoeffBack * newScale + canvas.deltaY
-				canvas.deltaX -= (newX - scaleX)
-				canvas.deltaY -= (newY - scaleY)
+
+				let wasLimitCorrection = deltaCorrection(canvas.deltaX - (newX - scaleX), canvas.deltaY - (newY - scaleY));
+
+				if(!wasLimitCorrection){
+					canvas.deltaX -= (newX - scaleX)
+					canvas.deltaY -= (newY - scaleY)
+				}
 
 				canvas.scaleCoeff = newScale
 				canvas.scaleCoeffPrev = newScale;
+			}
+
+			function deltaCorrection(deltaXArg, deltaYArg){
+				let wasLimitCorrection = false;
+				if(graphicsView.translateXPositiveLimit !== undefined && deltaXArg > -graphicsView.translateXPositiveLimit * (canvas.scaleCoeff - 1)){
+					canvas.deltaX = -graphicsView.translateXPositiveLimit * (canvas.scaleCoeff - 1)
+					wasLimitCorrection = true
+				}
+				if(graphicsView.translateYPositiveLimit !== undefined && deltaYArg > -graphicsView.translateYPositiveLimit * (canvas.scaleCoeff - 1)){
+					canvas.deltaY = -graphicsView.translateYPositiveLimit* (canvas.scaleCoeff - 1)
+					wasLimitCorrection = true
+				}
+				if(graphicsView.translateXNegativeLimit !== undefined && deltaXArg < graphicsView.translateXNegativeLimit * (canvas.scaleCoeff - 1) - canvas.width  *(canvas.scaleCoeff-1)){
+					canvas.deltaX = graphicsView.translateXNegativeLimit * (canvas.scaleCoeff - 1) - canvas.width * (canvas.scaleCoeff-1)
+					wasLimitCorrection = true
+				}
+				if(graphicsView.translateYNegativeLimit !== undefined && deltaYArg < graphicsView.translateYNegativeLimit *(canvas.scaleCoeff-1) - canvas.height  *(canvas.scaleCoeff-1)){
+					canvas.deltaY = graphicsView.translateYNegativeLimit *(canvas.scaleCoeff-1) - canvas.height * (canvas.scaleCoeff-1)
+					wasLimitCorrection = true
+				}
+				return wasLimitCorrection;
 			}
 
 			onPaint: {
@@ -901,7 +936,7 @@ Rectangle {
 		anchors.bottom: parent.bottom;
 
 		secondSize: 12;
-		visible: (backgroundRec.topY >=0 && backgroundRec.bottomY <= graphicsView.height) ? false : true;
+		visible: graphicsView.hideScrollbars ? false : (backgroundRec.topY >=0 && backgroundRec.bottomY <= graphicsView.height) ? false : true;
 		alwaysVisible: true;
 		canDragOutOfBounds: true;
 		targetItem: parent;
@@ -926,7 +961,7 @@ Rectangle {
 
 		secondSize: 12;
 
-		visible: (backgroundRec.leftX >=0 && backgroundRec.rightX <= graphicsView.width) ? false : true;
+		visible: graphicsView.hideScrollbars ? false : (backgroundRec.leftX >=0 && backgroundRec.rightX <= graphicsView.width) ? false : true;
 		alwaysVisible: true;
 		canDragOutOfBounds: true;
 
