@@ -10,6 +10,7 @@
         <file alias="TestPage.qml">Qml/TestPage.qml</file>
         <file alias="CanvasPage.qml">Qml/CanvasPage.qml</file>
 		<file alias="GraphicsViewPage.qml">Qml/GraphicsViewPage.qml</file>
+		<file alias="GrVTestPage.qml">Qml/GrVTestPage.qml</file>
         <file alias="TablePage.qml">Qml/TablePage.qml</file>
         <file alias="GridViewPage.qml">Qml/GridViewPage.qml</file>
         <file alias="TreeViewPage.qml">Qml/TreeViewPage.qml</file>
