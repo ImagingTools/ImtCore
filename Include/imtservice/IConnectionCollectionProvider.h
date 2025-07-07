@@ -18,7 +18,8 @@ namespace imtservice
 class IConnectionCollectionProvider: virtual public istd::IPolymorphic
 {
 public:
-	virtual std::shared_ptr<IConnectionCollection> GetConnectionCollection(const QByteArray& serviceId) const = 0;
+	virtual std::shared_ptr<IConnectionCollection> GetConnectionCollectionByServicePath(const QString& servicePath) const = 0;
+	virtual std::shared_ptr<IConnectionCollection> GetConnectionCollectionByServiceId(const QByteArray& serviceId) const = 0;
 };
 
 

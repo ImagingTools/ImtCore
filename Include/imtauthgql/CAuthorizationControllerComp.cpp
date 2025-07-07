@@ -17,10 +17,10 @@ namespace imtauthgql
 // protected methods
 
 bool CAuthorizationControllerComp::ParseDataFromGqlRequest(
-	const imtgql::CGqlRequest& gqlRequest,
-	QByteArray& login,
-	QByteArray& password,
-	QByteArray& productId) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& login,
+			QByteArray& password,
+			QByteArray& productId) const
 {
 	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
 	if (gqlInputParamPtr == nullptr){
@@ -40,13 +40,13 @@ QByteArray CAuthorizationControllerComp::GetUserObjectId(const QByteArray& login
 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 	fieldFilter.fieldId = "Id";
 	fieldFilter.filterValue = login;
-	
+
 	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
 	groupFilter.fieldFilters << fieldFilter;
-	
+
 	imtbase::CComplexCollectionFilter complexFilter;
 	complexFilter.SetFieldsFilter(groupFilter);
-	
+
 	iprm::CParamsSet filterParam;
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
@@ -86,13 +86,13 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 
 sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::CreateAuthorizationSuccessfulResponse(
-	imtauth::CUserInfo& userInfo,
-	const QByteArray& systemId,
-	const QByteArray& productId,
-	QString& errorMessage) const
+			imtauth::CUserInfo& userInfo,
+			const QByteArray& systemId,
+			const QByteArray& productId,
+			QString& errorMessage) const
 {
 	sdl::imtauth::Authorization::CAuthorizationPayload payload;
-	
+
 	QByteArray login = userInfo.GetId();
 	QByteArray objectId = GetUserObjectId(login);
 	Q_ASSERT(!objectId.isEmpty());
@@ -100,7 +100,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 		errorMessage = QString("Unable to create authorization request. Error: User with login '%1' does not exists").arg(qPrintable(login));
 		return payload;
 	}
-	
+
 	QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
 	payload.Version_1_0.emplace();
@@ -130,23 +130,23 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 	if (m_userConnectionCollectionCompPtr.IsValid()){
 		istd::TDelPtr<imtauth::CUserConnectionInfo> userConnectionInfoPtr;
 		userConnectionInfoPtr.SetPtr(new imtauth::CUserConnectionInfo);
-		
+
 		userConnectionInfoPtr->SetUserId(objectId);
 		userConnectionInfoPtr->SetLastConnection(QDateTime::currentDateTimeUtc());
-		
+
 		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
 		fieldFilter.fieldId = "DocumentId";
 		fieldFilter.filterValue = objectId;
-		
+
 		imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
 		groupFilter.fieldFilters << fieldFilter;
-		
+
 		imtbase::CComplexCollectionFilter complexFilter;
 		complexFilter.SetFieldsFilter(groupFilter);
-		
+
 		iprm::CParamsSet filterParam;
 		filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
-		
+
 		imtbase::ICollectionInfo::Ids ids = m_userConnectionCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 		if (ids.isEmpty()){
 			QByteArray typeId = userConnectionInfoPtr->GetFactoryId();
@@ -171,9 +171,9 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 // reimplemented (sdl::imtauth::Authorization::V1_0::CGraphQlHandlerCompBase)
 
 sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::OnAuthorization(
-	const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
-	const imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& errorMessage) const
+			const sdl::imtauth::Authorization::CAuthorizationGqlRequest& authorizationRequest,
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
@@ -190,12 +190,12 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 	if (inputArgument.Version_1_0->login){
 		login = inputArgument.Version_1_0->login->toUtf8();
 	}
-	
+
 	QByteArray productId;
 	if (inputArgument.Version_1_0->productId){
 		productId = *inputArgument.Version_1_0->productId;
 	}
-	
+
 	QByteArray password;
 	if (inputArgument.Version_1_0->password){
 		password = inputArgument.Version_1_0->password->toUtf8();
@@ -237,9 +237,9 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 
 sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp::OnUserToken(
-	const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& errorMessage) const
+			const sdl::imtauth::Authorization::CUserTokenGqlRequest& userTokenRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
@@ -303,9 +303,9 @@ sdl::imtauth::Authorization::CAuthorizationPayload CAuthorizationControllerComp:
 
 
 sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogout(
-	const sdl::imtauth::Authorization::CLogoutGqlRequest& logoutRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& errorMessage) const
+			const sdl::imtauth::Authorization::CLogoutGqlRequest& logoutRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
 {
 	sdl::imtauth::Authorization::CLogoutPayload response;
 	const imtgql::IGqlContext* gqlContextPtr = logoutRequest.GetRequestContext();
