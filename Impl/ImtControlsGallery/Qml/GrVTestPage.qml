@@ -137,16 +137,16 @@ Rectangle {
 
 			text: "Zoom: " + view.scaleCoeff.toFixed(2)
 		}
-		// BaseText{
-		// 	font.pixelSize: Style.fontSizeL
+		BaseText{
+			font.pixelSize: Style.fontSizeL
 
-		// 	text: "DeltaX: " + view.deltaX
-		// }
-		// BaseText{
-		// 	font.pixelSize: Style.fontSizeL
+			text: "DeltaX: " + view.deltaX
+		}
+		BaseText{
+			font.pixelSize: Style.fontSizeL
 
-		// 	text: "DeltaY: " + view.deltaY
-		// }
+			text: "DeltaY: " + view.deltaY
+		}
 	}
 
 	GraphicsView{
@@ -161,10 +161,10 @@ Rectangle {
 		height: parent.height/2
 
 		hideScrollbars: true;
-		minZoomLevel: 1;
+		//minZoomLevel: 1;
 		restrictMove: true;
-		translateXPositiveLimit: gridShape.axeMarginHorizontal
-		translateYNegativeLimit: gridShape.axeMarginVertical
+		translateXPositiveLimit: gridShape.originX
+		translateYNegativeLimit: gridShape.originY
 
 		Component.onCompleted: {
 			//TEST
@@ -175,31 +175,35 @@ Rectangle {
 			let inactiveLayer = getInactiveLayer()
 
 			//transformation for the layer
-			inactiveLayer.layerMatrix.setXTranslation(gridShape.axeMarginHorizontal)
+			inactiveLayer.layerMatrix.setXTranslation(gridShape.originX)
 			inactiveLayer.layerMatrix.invertY();
-			inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.axeMarginVertical)
+			inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.originY)
 
-			let clipRect = Qt.rect(gridShape.axeMarginHorizontal, 0, view.width - gridShape.axeMarginHorizontal, view.height - gridShape.axeMarginVertical)
-			inactiveLayer.clipRect = clipRect
-
-			let lineObjBlue = polylineCompBlue.createObject(this);
-			inactiveLayer.addShape(lineObjBlue);
+			let lineObjRed = polylineCompRed.createObject(this);
+			inactiveLayer.addShape(lineObjRed);
 
 			let activeLayer = getActiveLayer()
 
 			//transformation for the layer
-			activeLayer.layerMatrix.setXTranslation(gridShape.axeMarginHorizontal)
+			activeLayer.layerMatrix.setXTranslation(gridShape.originX)
 			activeLayer.layerMatrix.invertY();
-			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axeMarginVertical)
+			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.originY)
 
-			let lineObjRed = polylineCompRed.createObject(this);
-			activeLayer.addShape(lineObjRed);
+			let clipRect = Qt.rect(gridShape.originX, 0, view.width - gridShape.originX, view.height - gridShape.originY)
+			activeLayer.clipRect = clipRect
+
+			let lineObjBlue = polylineCompBlue.createObject(this);
+			activeLayer.addShape(lineObjBlue);
+			let lineObjGreen = polylineCompGreen.createObject(this);
+			activeLayer.addShape(lineObjGreen);
+
+
 		}
 
 		onHeightChanged: {
 			let activeLayer = getActiveLayer();
 			if(activeLayer && activeLayer.layerMatrix){
-				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.axeMarginVertical)
+				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.originY)
 			}
 		}
 	}
@@ -220,15 +224,43 @@ Rectangle {
 				let point0 = Qt.point(-20, 40)
 				let point1 = Qt.point(40, 40)
 				let point2 = Qt.point(120,80)
-				let point3 = Qt.point(200,300)
+				let point3 = Qt.point(240,280)
 				let point4 = Qt.point(400 ,400)
-
 
 				pointList.push(point0)
 				pointList.push(point1)
 				pointList.push(point2)
 				pointList.push(point3)
 				pointList.push(point4)
+
+				return pointList
+			}
+		}
+	}
+
+	Component{
+		id: polylineCompGreen
+
+		PolyLineShape{
+			id: line;
+
+			color: "green";
+
+			showNodes: true;
+
+			function getPoints(){
+				let pointList = []
+
+				let point0 = Qt.point(40, 10)
+				let point1 = Qt.point(120, 40)
+				let point2 = Qt.point(240,240)
+				let point3 = Qt.point(400,320)
+
+
+				pointList.push(point0)
+				pointList.push(point1)
+				pointList.push(point2)
+				pointList.push(point3)
 
 				return pointList
 			}
