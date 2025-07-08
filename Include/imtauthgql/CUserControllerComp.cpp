@@ -130,7 +130,7 @@ sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePasswor
 	payload.success = true;
 
 	sdl::imtauth::Users::CChangePasswordPayload retVal;
-	retVal.Version_1_0 = std::make_optional(payload);
+	retVal.Version_1_0 = std::move(payload);
 
 	return retVal;
 }
@@ -411,7 +411,7 @@ sdl::imtauth::Users::CCheckEmailCodePayload CUserControllerComp::OnCheckEmailCod
 	response.correctCode = m_userVerificationControllerCompPtr->VerifyUser(userId, code.toUtf8());
 
 	sdl::imtauth::Users::CCheckEmailCodePayload retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }

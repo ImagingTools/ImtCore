@@ -120,7 +120,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 			}
 		}
 
-		representationObject.licenses = std::make_optional<QList<sdl::imtlic::Products::CLicenseData::V1_0>>(licenseDataList);
+		representationObject.licenses = std::move(licenseDataList);
 	}
 
 	if (requestInfo.items.isAddedRequested){

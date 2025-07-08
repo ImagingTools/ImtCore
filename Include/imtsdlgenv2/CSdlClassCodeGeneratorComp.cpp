@@ -208,7 +208,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 				}
 
 				// join QML register file
-				if (m_argumentParserCompPtr->IsCppEnabled() && m_argumentParserCompPtr->IsQmlEnabled()){
+				if (m_argumentParserCompPtr->IsCppEnabled()){
 					filterParams.InsertOption(QStringLiteral("QmlRegister.h"), QByteArray::number(filterParams.GetOptionsCount()));
 					SendVerboseMessage(QString("Add QmlRegister enum file '%1. Total: %2").arg("QmlRegister.h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
@@ -325,9 +325,18 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 		}
 	}
 
-	// add CXX includes for optional
-	static imtsdl::IncludeDirective memoryIncludeDirective = CreateCxxDirective(QStringLiteral("<optional>"));
+
+	// add ACF includes for nullable
+	static imtsdl::IncludeDirective memoryIncludeDirective = CreateAcfDirective(QStringLiteral("<istd/TSharedNullable.h>"));
 	includeDirectivesList << memoryIncludeDirective;
+
+	/// \todo add it only if QtObject is enabled
+	static imtsdl::IncludeDirective qobjectDirective = CreateQtDirective(QStringLiteral("<QtCore/QObject>"));
+	includeDirectivesList << qobjectDirective;
+	static imtsdl::IncludeDirective cmodelbaseDirective = CreateImtDirective(QStringLiteral("<imtbase/CItemModelBase.h>"));
+	includeDirectivesList << cmodelbaseDirective;
+	static imtsdl::IncludeDirective clistbasemodelDirective = CreateImtDirective(QStringLiteral("<imtbase/TListModelBase.h>"));
+	includeDirectivesList << clistbasemodelDirective;
 
 	QSet<QString> complexTypeList;
 	bool hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList);
@@ -352,6 +361,8 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 		includeDirectivesList << variantMapDirective;
 		static imtsdl::IncludeDirective setDirective = CreateQtDirective(QStringLiteral("<QtCore/QSet>"));
 		includeDirectivesList << setDirective;
+
+
 
 		// save already included files, to avoid duplicates
 		QSet<QString> customIncluded;
@@ -666,7 +677,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 
 	// add QtObject class
 	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
-	CSdlQObjectGenerator qObjectGenerator;
+	CSdlQObjectGenerator qObjectGenerator(*m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, *m_sdlTypeListCompPtr);
 	qObjectGenerator.ProcessHeaderClassFile(headerStream, sdlType);
 
 	// end of namespace
@@ -837,7 +848,7 @@ void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 			nullptr,
 			nullptr);
 		FeedStreamHorizontally(stream, indents + 1);
-		stream << QStringLiteral("std::optional<");
+		stream << QStringLiteral("istd::TSharedNullable<");
 		stream << convertedType;
 		stream << QStringLiteral("> ");
 		stream << field.GetId() << ';';
@@ -982,7 +993,7 @@ void CSdlClassCodeGeneratorComp::GenerateVersionMemberDeclaration(
 			int versionIndex)
 {
 	if (optWrap){
-		stream << QStringLiteral("std::optional<");
+		stream << QStringLiteral("istd::TSharedNullable<");
 	}
 	stream << GetSdlEntryVersion(sdlType);
 	if (optWrap){

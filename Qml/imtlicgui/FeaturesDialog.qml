@@ -25,6 +25,7 @@ Dialog {
 	}
 	
 	onFeaturesModelChanged: {
+		console.log("onFeaturesModelChanged")
 		for (let i = 0; i < featuresModel.getItemsCount(); i++){
 			let featureId = featuresModel.getData("id", i);
 			if (!excludeFeatureIds.includes(featureId)){

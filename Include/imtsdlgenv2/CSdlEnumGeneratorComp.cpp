@@ -100,6 +100,9 @@ iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 		stream << QStringLiteral("#pragma once");
 		FeedStream(stream, 3, false);
 
+		stream << QStringLiteral("#include <QtCore/QMetaEnum>");
+		FeedStream(stream, 3, false);
+
 		// namespace begin
 		QString sdlNamespace = GetNamespaceFromSchemaParams(sdlEnum.GetSchemaParams());
 
@@ -107,6 +110,17 @@ iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 		stream << sdlNamespace;
 		stream << QStringLiteral("\n{");
 		FeedStream(stream, 3, false);
+
+		// Q_NAMESPACE Meta
+		// QString sdlNamespaceNormal = sdlNamespace.replace("::", "_");
+		// stream << QStringLiteral("#ifndef ") << sdlNamespaceNormal << QStringLiteral("_Q_NAMESPACE");
+		// FeedStream(stream, 1, false);
+		// stream << QStringLiteral("#define ") << sdlNamespaceNormal << QStringLiteral("_Q_NAMESPACE");
+		// FeedStream(stream, 1, false);
+		stream << QStringLiteral("Q_NAMESPACE");
+		// FeedStream(stream, 1, false);
+		// stream << QStringLiteral("#endif");
+		FeedStream(stream, 1, false);
 
 		// enum create
 		stream << QStringLiteral("enum class ");
@@ -124,6 +138,59 @@ iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 
 		stream << QStringLiteral("};");
 		FeedStream(stream, 2, false);
+
+		stream << QStringLiteral("Q_ENUM_NS(") << sdlEnum.GetName() << QStringLiteral(")");
+		FeedStream(stream, 3, false);
+
+
+		stream << QStringLiteral("class Enum") << GetCapitalizedValue(sdlEnum.GetName());
+		stream << QStringLiteral(": public QObject");
+		FeedStream(stream, 1, false);
+		stream << QStringLiteral("{");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("Q_OBJECT");
+		FeedStream(stream, 1, false);
+		for (const auto& enumValue: sdlEnum.GetValues()){
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("Q_PROPERTY(QString ") << enumValue.first;
+			stream << QStringLiteral(" READ Get") << GetCapitalizedValue(enumValue.first);
+			stream << QStringLiteral(" NOTIFY ") << GetCapitalizedValue(enumValue.first);
+			stream << QStringLiteral("Changed)");
+			FeedStream(stream, 1, false);
+		}
+		// getters of class
+		stream << QStringLiteral("protected:");
+		FeedStream(stream, 1, false);
+		for (const auto& enumValue: sdlEnum.GetValues()){
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("QString Get") << GetCapitalizedValue(enumValue.first);
+			stream << QStringLiteral("() { return \"") << enumValue.first;
+			stream << QStringLiteral("\"; }");
+			FeedStream(stream, 1, false);
+		}
+		// signals of class
+		stream << QStringLiteral("signals:");
+		FeedStream(stream, 1, false);
+		for (const auto& enumValue: sdlEnum.GetValues()){
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("void ") << GetCapitalizedValue(enumValue.first);
+			stream << QStringLiteral("Changed();");
+			FeedStream(stream, 1, false);
+		}
+		// end of class
+		stream << QStringLiteral("};");
+		FeedStream(stream, 3, false);
+
+		// 	Q_PROPERTY(QString Enteger2 READ GetInteger NOTIFY Enteger2Changed)
+		// 	Q_PROPERTY(QString String2 READ GetString NOTIFY String2Changed)
+		// protected:
+		// 	QString GetInteger() { return "0"; }
+		// 	QString GetString() { return "String"; }
+		// signals:
+		// 	void Enteger2Changed();
+		// 	void String2Changed();
+		// };
 
 		// end of namespace
 		stream << QStringLiteral("} // namespace ");

@@ -9,9 +9,10 @@ QtObject {
 	property var owner
 
 	property QtObject _internal: QtObject{
-		property bool isTransaction: false; // if true - transaction started else stopped
-		property int countChanges: 0; // the number of changes during the transaction
-		property var changeList: [];
+		property bool isTransaction: false // if true - transaction started else stopped
+		property int countChanges: 0 // the number of changes during the transaction
+		property var changeList: []
+		property var removed: [] // removed keys of the root
 		signal internalModelChanged(string name, var sender); // internal modelChanged
 
 		onInternalModelChanged: {
@@ -31,6 +32,7 @@ QtObject {
 		}
 
 		function startTransaction(){
+			console.log("startTransaction")
 			if (isTransaction){
 				console.error("Unable to start transaction. Error: transaction already started.");
 
@@ -42,6 +44,7 @@ QtObject {
 		}
 
 		function stopTransaction(){
+			console.log("stopTransaction")
 			if (!isTransaction){
 				console.error("Unable to stop transaction. Error: there is no active transaction.");
 
@@ -55,6 +58,23 @@ QtObject {
 			}
 
 			isTransaction = false;
+		}
+
+		function removeAt(key){
+		// get index if value found otherwise -1
+			let index = this.removed.indexOf(key)
+			if (index > -1) { //if found
+				this.removed.splice(index, 1)
+			}
+		}
+
+		function containceInRemoved(key){
+			let index = this.removed.indexOf(key)
+			if (index > -1) {
+				return true
+			}
+
+			return false
 		}
 	}
 
@@ -80,6 +100,16 @@ QtObject {
 
 	function endChanges(){
 		this._internal.stopTransaction();
+	}
+
+	function removeKey(key){
+		let selfKeys = this.getProperties()
+
+		if (selfKeys.includes(key)) {
+			// this[key].destroy()
+			this[key] = null
+		}
+		this._internal.removed.push(key)
 	}
 
 	property bool propertiesIsConnected: false
@@ -131,7 +161,7 @@ QtObject {
 			}
 
 			if(typeof this[key] === 'object'){
-				if (this[key].isEqualWithModel){
+				if (this[key] && this[key].isEqualWithModel){
 					let ok = this[key].isEqualWithModel(model[key]);
 					if (!ok){
 						return false;
@@ -179,7 +209,11 @@ QtObject {
 		return true
 	}
 
-	function createComponent(name){
+	function createComponent(propertyId, typename){
+	}
+
+
+	function createElement(propertyId, typename){
 	}
 
 	function getJSONKeyForProperty(propertyId){
@@ -213,18 +247,16 @@ QtObject {
 		let list = getProperties()
 
 		let json = '{'
+		let isFirst = true
 		for(let i = 0; i < list.length; i++){
 			let key = list[i]
-			if (this[key] === undefined){
+			if (this[key] == null && this._internal.containceInRemoved(key)){
 				continue
 			}
-
+			if (!isFirst) json += ','
+			isFirst = false
 			if(typeof this[key] === 'object'){
 				if (Array.isArray(this[key])){
-					if(i > 0){
-						json += ','
-					}
-
 					json += '"' + this.getJSONKeyForProperty(key) + '":'
 
 					json += "["
@@ -247,10 +279,6 @@ QtObject {
 					json += "]"
 				}
 				else if (this[key]){
-					if(i > 0){
-						json += ','
-					}
-
 					json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
 				}
 			} else {
@@ -264,10 +292,6 @@ QtObject {
 					safeValue = safeValue.replace(/\"/g,'\u005C"')
 				}
 
-				if(i > 0){
-					json += ','
-				}
-
 				json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
 			}
 		}
@@ -279,12 +303,14 @@ QtObject {
 		let list = getProperties()
 
 		let graphQL = '{'
+		let isFirst = true
 		for(let i = 0; i < list.length; i++){
 			let key = list[i]
-			if (this[key] === undefined){
+			if (this[key] == null && this._internal.containceInRemoved(key)){
 				continue
 			}
-
+			if (!isFirst) graphQL += ','
+			isFirst = false
 			if(typeof this[key] === 'object'){
 				if (Array.isArray(this[key])){
 					graphQL +=  this.getJSONKeyForProperty(key) + ':'
@@ -333,13 +359,13 @@ QtObject {
 					graphQL += value
 				}
 			}
-			if(i < list.length - 1) graphQL += ','
 		}
 		graphQL +='}'
 		return graphQL
 	}
 
 	function fromJSON(json){
+		console.log("fromJSON", json)
 		let obj;
 		try {
 			obj = JSON.parse(escapeSpecialChars(json));
@@ -359,6 +385,7 @@ QtObject {
 	}
 
 	function fromObject(sourceObject){
+		beginChanges()
 		for(let objKey of this.getProperties()){
 			if (!(this.getJSONKeyForProperty(objKey) in sourceObject)){
 				if(this[objKey] && typeof this[objKey] === "object"){
@@ -368,8 +395,8 @@ QtObject {
 					if (this[objKey].destroy){
 						this[objKey].destroy()
 					}
-					this[objKey] = null
 				}
+				this[objKey] = null
 			}
 		}
 
@@ -380,7 +407,7 @@ QtObject {
 			}
 			else if(typeof sourceObject[key] === "object"){
 				if(Array.isArray(sourceObject[key])){
-					let component = createComponent(_key)
+					let component = createElement(_key)
 
 					if(this[_key]){
 						if (this[_key].clear){
@@ -395,7 +422,7 @@ QtObject {
 
 					if (component){
 						for(let sourceObjectInner of sourceObject[key]){
-							let obj = createComponent(_key).createObject(this)
+							let obj = component.createObject(this)
 							obj.fromObject(sourceObjectInner)
 							this[_key].append({item: obj})
 							obj.owner = this
@@ -425,6 +452,7 @@ QtObject {
 			}
 		}
 
+		endChanges()
 		finished()
 		
 		return true

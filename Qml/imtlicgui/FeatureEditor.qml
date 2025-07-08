@@ -18,6 +18,7 @@ ViewBase {
 	
 	property Component treeItemModelComp: Component {
 		TreeItemModel {}
+
 	}
 	
 	Component.onCompleted: {

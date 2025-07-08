@@ -89,8 +89,8 @@ RemoteCollectionView {
 			property GroupData groupData: documentModel;
 
 			typeId: "Group";
-			documentName: groupData ? groupData.m_name: "";
-			documentDescription: groupData ? groupData.m_description: "";
+			documentName: groupData && groupData.m_name ? groupData.m_name: "";
+			documentDescription: groupData && groupData.m_description ? groupData.m_description: "";
 			
 			gqlGetCommandId: ImtauthGroupsSdlCommandIds.s_groupItem;
 			gqlUpdateCommandId: ImtauthGroupsSdlCommandIds.s_groupUpdate;

@@ -33,7 +33,7 @@ RemoteCollectionView {
 	}
 	
 	Component.onCompleted: {
-		table.setSortingInfo(FeatureItemTypeMetaInfo.s_lastModified, "DESC");
+		table.setSortingInfo(FeatureItemTypeMetaInfo.s_timeStamp, "DESC");
 	}
 	
 	Component {
@@ -61,11 +61,14 @@ RemoteCollectionView {
 						}
 						
 						if (commandId === "InsertFeature"){
+							if (!featureEditor.featureData.hasSubFeatures()){
+								featureEditor.featureData.createSubFeatures()
+							}
+
 							let childModel = featureEditor.featureData.m_subFeatures;
 							if (selectedIndex != null){
 								childModel = selectedIndex.itemData.m_subFeatures;
 							}
-							
 							let newFeatureData = featureDataComp.createObject(childModel)
 							newFeatureData.m_isPermission = true;
 							newFeatureData.m_featureName = qsTr("Feature Name");

@@ -5,6 +5,7 @@ import imtcontrols 1.0
 import imtgui 1.0
 import imtcolgui 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
+import imtbaseImtBaseTypesSdl 1.0
 
 DecoratorBase {
 	id: filterPanelDecorator;
@@ -52,16 +53,18 @@ DecoratorBase {
 			}
 		}
 	}
+
+
 	
 	TimeFilter {
 		id: timeFilter;
 		
 		function clear(){
-			m_timeRange.m_begin = ""
-			m_timeRange.m_end = ""
-			m_timeUnit = ""
-			m_interpretationMode = ""
-			m_unitMultiplier = 0
+			console.log("TimeFilter clear()")
+			removeTimeRange()
+			removeTimeUnit()
+			removeInterpretationMode()
+			removeUnitMultiplier()
 		}
 	}
 	
@@ -104,8 +107,43 @@ DecoratorBase {
 				}
 				
 				filterPanelDecorator.documentFilter.filterChanged()
+				// stateFilter.m_filterValue
+
 			}
+
+			// TimeFilter2{
+			// 	id: timeFilter2
+			// 	// m_timeRange: 30
+			// }
 			
+			// FieldFilter2 {
+			// 	id: stateFilter2
+			// 	m_fieldId: "State"
+			// 	m_filterValueType: EnumValueType.String2
+			// 	m_filterOperations: ["Equal"]
+			// 	Component.onCompleted: {
+			// 		console.log("FieldFilter3", m_filterValueType)
+			// 		m_filterValueType = "String"
+			// 		// ComplexCollectionFilter2
+			// 		// EnumValueType
+			// 		// EnumValueType
+			// 		// timeFilter
+			// 		// timeFilter2.isUndefined()
+
+			// 		console.log("m_timeFilter", m_timeFilter == undefined, m_timeFilter.m_timeRange)
+			// 		m_timeFilter = null
+			// 		console.log("m_timeFilter2", m_timeFilter == null)
+			// 		m_timeFilter = undefined
+			// 		console.log("m_timeFilter3", m_timeFilter == undefined)
+			// 		console.log("m_timeFilter4", m_timeFilter.isValid())
+			// 		var test = ["Equal", EnumValueType.String2]
+			// 		console.log("test property", test)
+
+
+			// 		m_filterOperations = ["Equal", EnumValueType.String2]
+			// 	}
+			// }
+
 			FieldFilter {
 				id: stateFilter
 				m_fieldId: "State"

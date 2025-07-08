@@ -94,7 +94,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 		}
 	}
 
-	profileData.roles = std::make_optional<QList<sdl::imtauth::Profile::CRoleInfo::V1_0>>(roleList);
+	profileData.roles = std::move(roleList);
 
 	QList<sdl::imtauth::Profile::CGroupInfo::V1_0> groupList;
 
@@ -118,7 +118,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 		}
 	}
 
-	profileData.groups = std::make_optional<QList<sdl::imtauth::Profile::CGroupInfo::V1_0>>(groupList);
+	profileData.groups = std::move(groupList);
 
 	QList<sdl::imtauth::Profile::CPermissionInfo::V1_0> permissionList;
 
@@ -151,10 +151,10 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 		}
 	}
 
-	profileData.permissions = std::make_optional<QList<sdl::imtauth::Profile::CPermissionInfo::V1_0>>(permissionList);
+	profileData.permissions = std::move(permissionList);
 
 	sdl::imtauth::Profile::CProfileData retVal;
-	retVal.Version_1_0 = std::make_optional(profileData);
+	retVal.Version_1_0 = std::move(profileData);
 
 	return retVal;
 }
@@ -217,7 +217,7 @@ sdl::imtauth::Profile::CSetProfileResponse CProfileControllerComp::OnSetProfile(
 	response.status = true;
 
 	sdl::imtauth::Profile::CSetProfileResponse retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }

@@ -117,7 +117,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::
 	response.description = description;
 
 	sdl::imtbase::ImtCollection::CVisualStatus retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
@@ -155,7 +155,7 @@ sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControlle
 	response.success = m_objectCollectionCompPtr->RemoveElementSet(filterParamPtr.GetPtr());
 
 	sdl::imtbase::ImtCollection::CRemoveElementSetPayload retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
@@ -181,7 +181,7 @@ sdl::imtbase::ImtCollection::CRestoreObjectsPayload CObjectCollectionControllerC
 	response.success = m_objectCollectionCompPtr->RestoreObjects(imtbase::ICollectionInfo::Ids(objectIds.constBegin(), objectIds.constEnd()));
 	
 	sdl::imtbase::ImtCollection::CRestoreObjectsPayload retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
@@ -219,7 +219,7 @@ sdl::imtbase::ImtCollection::CRestoreObjectSetPayload CObjectCollectionControlle
 	response.success = m_objectCollectionCompPtr->RestoreObjectSet(filterParamPtr.GetPtr());
 
 	sdl::imtbase::ImtCollection::CRestoreObjectSetPayload retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }

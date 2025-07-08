@@ -22,7 +22,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CRemoteObjectVisualStatusControllerCo
 	}
 
 	sdl::imtbase::ImtCollection::CVisualStatus retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }

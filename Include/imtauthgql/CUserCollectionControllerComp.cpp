@@ -542,7 +542,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 		list << info;
 	}
-	representationPayload.systemInfos = std::make_optional<QList<sdl::imtauth::Users::CSystemInfo::V1_0>>(list);
+	representationPayload.systemInfos = std::move(list);
 
 	return true;
 }

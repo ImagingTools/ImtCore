@@ -237,7 +237,7 @@ sdl::imtauth::Sessions::CGetUserFromJwtPayload CGqlJwtSessionControllerComp::OnG
 	response.userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(jwt.toUtf8());
 
 	sdl::imtauth::Sessions::CGetUserFromJwtPayload retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }

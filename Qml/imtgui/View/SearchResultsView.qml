@@ -33,18 +33,19 @@ Item {
 	
 	function updateGui(){
 		if (!searchResults){
-			tabPanel.selectedIndex = -1;
-			tabPanel.visible = false;
+			tabPanelContainer.selectedIndex = -1;
+			tabPanelContainer.visible = false;
 			return;
 		}
 
-		tabPanel.selectedIndex = -1;
+		tabPanelContainer.selectedIndex = -1;
 		let count = searchResults.m_searchResults.count;
-		tabPanel.visible = count > 0;
+		tabPanelContainer.visible = count > 0;
 		
 		if (count > 0){
-			tabPanel.model = searchResults.m_searchResults
-			tabPanel.selectedIndex = 0;
+			console.log("searchResults.m_searchResults", searchResults.m_searchResults.toJson())
+			tabPanelContainer.model = searchResults.m_searchResults
+			tabPanelContainer.selectedIndex = 0;
 		}
 	}
 	
@@ -60,7 +61,7 @@ Item {
 		id: noResultsRect;
 		anchors.fill: parent;
 		color: Style.backgroundColor2;
-		visible: !tabPanel.visible;
+		visible: !tabPanelContainer.visible;
 		
 		BaseText {
 			anchors.centerIn: parent;
@@ -71,10 +72,11 @@ Item {
 	}
 	
 	TabPanel {
-		id: tabPanel;
+		id: tabPanelContainer;
 		anchors.top: parent.top;
 		anchors.topMargin: Style.marginM;
 		anchors.horizontalCenter: parent.horizontalCenter;
+		maxWidth: parent.width
 		height: Style.controlHeightM;
 		visible: false;
 		spacing: Style.marginM;
@@ -88,6 +90,19 @@ Item {
 				table.elements = searchItem.m_items;
 			}
 		}
+		tabDelegate:  Component { TabDelegate {
+				height: tabPanelContainer.height;
+
+				tabPanel: tabPanelContainer;
+				isCloseEnable: tabPanelContainer.isCloseEnable;
+				// listView: ;
+				decorator: tabPanelContainer.tabDelegateDecorator;
+				text: model.item && model.item.m_name ? model.item.m_name : "";
+
+				onCloseSignal: {
+					tabPanelContainer.closeItem(model.index);
+				}
+			} }
 		tabDelegateDecorator: Component {
 			DecoratorBase {
 				id: tabPanelDecorator;
@@ -115,7 +130,9 @@ Item {
 						color: Style.textColor;
 						font.family: Style.fontFamily;
 						font.pixelSize: Style.fontSizeM;
-						text: model.item.m_name;
+						text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
+						// text: model.item && model.item.m_name ? model.item.m_name : "";
+						// text: model.item.name ? model.item.name : "";
 						elide: Text.ElideRight;
 					}
 				}
@@ -125,7 +142,7 @@ Item {
 	
 	Rectangle {
 		id: separator;
-		anchors.top: tabPanel.bottom;
+		anchors.top: tabPanelContainer.bottom;
 		anchors.topMargin: Style.marginM;
 		width: parent.width;
 		height: 1;
@@ -140,7 +157,7 @@ Item {
 		anchors.bottomMargin: Style.marginM;
 		anchors.horizontalCenter: parent.horizontalCenter;
 		width: root.contentWidth;
-		visible: tabPanel.visible;
+		visible: tabPanelContainer.visible;
 		showHeaders: false;
 		backgroundElementsColor: Style.backgroundColor2;
 		elementsSpacing: Style.marginM;
@@ -186,7 +203,7 @@ Item {
 		}
 		
 		onDoubleClicked: {
-			root.itemDoubleClicked(tabPanel.selectedIndex, index);
+			root.itemDoubleClicked(tabPanelContainer.selectedIndex, index);
 		}
 	}
 	

@@ -90,6 +90,7 @@ ComplexCollectionFilter{
 		if (m_fieldsFilter){
 			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
 		}
+		console.log("Component.onCompleted m_fieldsFilter", m_fieldsFilter)
 	}
 	
 	/*!
@@ -113,7 +114,8 @@ ComplexCollectionFilter{
 		Sets a new text filter using OR operation on the fields defined in \c textFilteringInfoIds.
 	*/
 	function setTextFilter(filter){
-		m_fieldsFilter.m_groupFilters.clear()
+		// m_fieldsFilter.m_groupFilters.clear()
+		clearFieldsFilter()
 
 		if (filter !== ""){
 			let fieldsModel = createBaseModel()
@@ -125,6 +127,7 @@ ComplexCollectionFilter{
 			}
 			
 			let textGroupFilter = createGroupFilter(logicalOperation.OR, fieldsModel)
+			console.log("setTextFilter")
 			addGroupFilter(textGroupFilter)
 		}
 	}
@@ -139,6 +142,10 @@ ComplexCollectionFilter{
 		let obj = fieldSortingInfoFact.createObject(m_sortingInfo)
 		obj.m_fieldId = infoId
 		obj.m_sortingOrder = sortOrder
+		if (!hasSortingInfo()){
+			createSortingInfo()
+		}
+
 		m_sortingInfo.addElement(obj)
 	}
 	
@@ -184,6 +191,16 @@ ComplexCollectionFilter{
 		Adds a group filter to the fields filter.
 	*/
 	function addGroupFilter(group){
+		if (!hasFieldsFilter()){
+			createFieldsFilter()
+		}
+		if (!m_fieldsFilter.hasGroupFilters()){
+			m_fieldsFilter.createGroupFilters()
+		}
+		if (!m_fieldsFilter.hasLogicalOperation()){
+			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
+		}
+
 		m_fieldsFilter.m_groupFilters.addElement(group)
 	}
 	
@@ -205,6 +222,14 @@ ComplexCollectionFilter{
 		Adds a field filter to the fields filter.
 	*/
 	function addFieldFilter(field){
+		if (!hasFieldsFilter()){
+			createFieldsFilter()
+		}
+
+		if (!m_fieldsFilter.hasFieldFilters()){
+			m_fieldsFilter.createFieldFilters()
+		}
+
 		m_fieldsFilter.m_fieldFilters.addElement(field)
 	}
 	
@@ -213,6 +238,13 @@ ComplexCollectionFilter{
 		Removes the given field filter. Returns true if found and removed.
 	*/
 	function removeFieldFilter(field){
+		if (!hasFieldsFilter()){
+			return false
+		}
+		if (!m_fieldsFilter.hasFieldFilters()){
+			return false
+		}
+
 		for (let i = 0; i < m_fieldsFilter.m_fieldFilters.count; i++){
 			let item = m_fieldsFilter.m_fieldFilters.get(i).item
 			if (item === field){
@@ -228,6 +260,12 @@ ComplexCollectionFilter{
 		Removes the given group filter. Returns true if found and removed.
 	*/
 	function removeGroupFilter(group){
+		if (!hasFieldsFilter()){
+			return false
+		}
+		if (!m_fieldsFilter.hasGroupFilters()){
+			return false
+		}
 		for (let i = 0; i < m_fieldsFilter.m_groupFilters.count; i++){
 			let item = m_fieldsFilter.m_groupFilters.get(i).item
 			if (item === group){
@@ -245,6 +283,10 @@ ComplexCollectionFilter{
 	function setTimeFilter(timeFilter){
 		clearTimeFilter()
 		if (timeFilter){
+			if (!hasTimeFilter()){
+				createTimeFilter()
+			}
+
 			m_timeFilter.copyFrom(timeFilter)
 		}
 	}
@@ -265,7 +307,10 @@ ComplexCollectionFilter{
 		Clears all sorting filters.
 	*/
 	function clearSortFilter(){
-		m_sortingInfo.clear()
+		if (hasSortingInfo()){
+			m_sortingInfo.clear()
+			removeSortingInfo()
+		}
 	}
 	
 	/*!
@@ -273,8 +318,15 @@ ComplexCollectionFilter{
 		Clears all field and group filters.
 	*/
 	function clearFieldsFilter(){
-		m_fieldsFilter.m_fieldFilters.clear()
-		m_fieldsFilter.m_groupFilters.clear()
+		if (hasFieldsFilter()){
+			if (m_fieldsFilter.hasFieldFilters()){
+				m_fieldsFilter.m_fieldFilters.clear()
+			}
+			if (m_fieldsFilter.hasGroupFilters()){
+				m_fieldsFilter.m_groupFilters.clear()
+			}
+			removeFieldsFilter()
+		}
 	}
 	
 	/*!
@@ -282,11 +334,9 @@ ComplexCollectionFilter{
 		Clears the time filter parameters.
 	*/
 	function clearTimeFilter(){
-		m_timeFilter.m_timeRange.m_begin = ""
-		m_timeFilter.m_timeRange.m_end = ""
-		m_timeFilter.m_timeUnit = ""
-		m_timeFilter.m_interpretationMode = ""
-		m_timeFilter.m_unitMultiplier = 0
+		if (hasTimeFilter()){
+			removeTimeFilter()
+		}
 	}
 	
 	/*!

@@ -33,6 +33,7 @@ CommandsController {
 		sdlObjectComp: Component {
 			GuiElementContainer {
 				onFinished: {
+					console.log("GuiElementContainer onFinished", this.toJson())
 					root.commands = this
 					root.commandsReceived(root.typeId, this);
 				}

@@ -28,6 +28,9 @@ QtObject {
 	}
 	
 	function getCommandIdsRecursive(commands, retVal){
+		if (!commands){
+			return
+		}
 		for (let i = 0; i < commands.count; i++){
 			let element = commands.get(i).item;
 			if (element){
@@ -53,6 +56,10 @@ QtObject {
 	}
 	
 	function findCommandId(elements, commandId){
+		if (!elements){
+			return null
+		}
+
 		for (let i = 0; i < elements.count; i++){
 			let element = elements.get(i).item;
 			if (element){

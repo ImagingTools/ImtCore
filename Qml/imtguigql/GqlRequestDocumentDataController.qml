@@ -87,6 +87,7 @@ DocumentDataController {
 	function createDocumentModel(){
 		if (container.documentModelComp){
 			let objectData = container.documentModelComp.createObject(container);
+			console.log("createDocumentModel", objectData._internal.removed);
 			objectData.connectProperties();
 			documentModel = objectData;
 		}

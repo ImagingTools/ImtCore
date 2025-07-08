@@ -7,6 +7,7 @@ class Internal extends QtObject {
 		isTransaction: { type: QBool, value: false },
 		countChanges: { type: QInt, value: 0 },
 		changeList: { type: QVar, value: null },
+		removed: { type: QVar, value: [] },
 	}
 
 	static defaultSignals = {
@@ -61,6 +62,23 @@ class Internal extends QtObject {
 
 		this.isTransaction = false
 	}
+
+	removeAt(key){
+	// get index if value found otherwise -1
+		let index = this.removed.indexOf(key)
+		if (index > -1) { //if found
+			this.removed.splice(index, 1)
+		}
+	}
+
+	containceInRemoved(key){
+		let index = this.removed.indexOf(key)
+		if (index > -1) {
+			return true
+		}
+
+		return false
+	}
 }
 
 for(let propName in Internal.defaultProperties){
@@ -82,6 +100,7 @@ for(let propName in Internal.defaultProperties){
 							  },
 						  })
 }
+
 for(let sigName in Internal.defaultSignals){
 	Object.defineProperty(Internal.prototype, sigName, {
 							  get: function(){
@@ -95,8 +114,6 @@ class BaseClass extends QtObject {
 		enableNotifications: { type: QBool, value: true },
 		propertiesIsConnected: { type: QBool, value: false },
 		owner: { type: QVar, value: null },
-
-
 	}
 
 	static defaultSignals = {
@@ -130,11 +147,19 @@ class BaseClass extends QtObject {
 
 	$complete() {
 		if (!this.$completed) {
-			this._internal = new Internal(this)
-			this.modelChanged.connect(this, this.$onModelChanged)
+	// 		this._internal = new Internal(this)
+	// 		this.modelChanged.connect(this, this.$onModelChanged)
 			this.connectProperties()
 		}
 		super.$complete()
+	}
+
+	constructor(parent,exCtx,exModel){
+		super(parent,exCtx,exModel)
+
+		this._internal = new Internal(this)
+		this.modelChanged.connect(this, this.$onModelChanged)
+		// this.connectProperties()
 	}
 
 	beginChanges() {
@@ -143,6 +168,18 @@ class BaseClass extends QtObject {
 
 	endChanges() {
 		this._internal.stopTransaction();
+	}
+
+	removeKey(key){
+		let selfKeys = this.getProperties()
+
+		if (selfKeys.includes(key)) {
+			if (this[key] && this[key].destroy){
+				this[key].destroy()
+			}
+			this[key] = null
+		}
+		this._internal.removed.push(key)
 	}
 
 	connectProperties() {
@@ -190,7 +227,7 @@ class BaseClass extends QtObject {
 			}
 
 			if (typeof this[key] === 'object') {
-				if (this[key].isEqualWithModel) {
+				if (this[key] && this[key].isEqualWithModel) {
 					let ok = this[key].isEqualWithModel(model[key])
 					if (!ok) {
 						return false
@@ -238,8 +275,11 @@ class BaseClass extends QtObject {
 		return true
 	}
 
-	createComponent(name) {
+	createComponent(propertyId, typename){
+	}
 
+
+	createElement(propertyId, typename){
 	}
 
 	getJSONKeyForProperty(propertyId) {
@@ -258,13 +298,16 @@ class BaseClass extends QtObject {
 		let list = this.getProperties()
 
 		let json = '{'
+		let isFirst = true
 		for (let i = 0; i < list.length; i++) {
 			let key = list[i]
+			if (this[key] == null && this._internal.containceInRemoved(key)){
+				continue
+			}
+			if (!isFirst) json += ','
+			isFirst = false
 			if (typeof this[key] === 'object') {
 				if (Array.isArray(this[key])) {
-					if (i > 0) {
-						json += ','
-					}
 
 					json += '"' + this.getJSONKeyForProperty(key) + '":'
 
@@ -286,10 +329,6 @@ class BaseClass extends QtObject {
 					json += "]"
 				}
 				else if (this[key]) {
-					if (i > 0) {
-						json += ','
-					}
-
 					json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
 				}
 			} else {
@@ -303,10 +342,6 @@ class BaseClass extends QtObject {
 					safeValue = safeValue.replace(/\"/g, '\u005C"')
 				}
 
-				if (i > 0) {
-					json += ','
-				}
-
 				json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
 			}
 		}
@@ -318,8 +353,14 @@ class BaseClass extends QtObject {
 		let list = this.getProperties()
 
 		let graphQL = '{'
+		let isFirst = true
 		for (let i = 0; i < list.length; i++) {
 			let key = list[i]
+			if (this[key] == null && this._internal.containceInRemoved(key)){
+				continue
+			}
+			if (!isFirst) graphQL += ','
+			isFirst = false
 			if (typeof this[key] === 'object') {
 				if (Array.isArray(this[key])) {
 					graphQL += this.getJSONKeyForProperty(key) + ':'
@@ -368,7 +409,6 @@ class BaseClass extends QtObject {
 					graphQL += value
 				}
 			}
-			if (i < list.length - 1) graphQL += ','
 		}
 		graphQL += '}'
 		return graphQL
@@ -403,8 +443,8 @@ class BaseClass extends QtObject {
 					if (this[objKey].destroy){
 						this[objKey].destroy()
 					}
-					this[objKey] = null
 				}
+				this[objKey] = null
 			}
 		}
 
@@ -430,7 +470,7 @@ class BaseClass extends QtObject {
 
 					if (component) {
 						for (let sourceObjectInner of sourceObject[key]) {
-							let obj = this.createComponent(_key).createObject(this)
+							let obj = this.createElement(_key).createObject(this)
 							obj.fromObject(sourceObjectInner)
 							this[_key].append({ item: obj })
 							obj.owner = this

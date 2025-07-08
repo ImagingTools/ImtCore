@@ -106,24 +106,24 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 			QString& errorMessage) const
 {
 	QByteArray featureId = featureInfo.GetFeatureId();
-	featureRepresentationData.featureId = std::make_optional<QByteArray>(featureId);
+	featureRepresentationData.featureId = std::move(featureId);
 
 	QString featureName = featureInfo.GetFeatureName();
-	featureRepresentationData.featureName = std::make_optional<QString>(featureName);
-	featureRepresentationData.name = std::make_optional<QString>(featureName);
+	featureRepresentationData.featureName = std::move(featureName);
+	featureRepresentationData.name = std::move(featureName);
 
 	QByteArrayList dependencyList = featureInfo.GetDependencies();
 	QByteArray dependencies = dependencyList.join(';');
-	featureRepresentationData.dependencies = std::make_optional<QByteArray>(dependencies);
+	featureRepresentationData.dependencies = std::move(dependencies);
 
 	QString description = featureInfo.GetFeatureDescription();
-	featureRepresentationData.description = std::make_optional<QString>(description);
+	featureRepresentationData.description = std::move(description);
 
 	bool isOptional = featureInfo.IsOptional();
-	featureRepresentationData.optional = std::make_optional<bool>(isOptional);
+	featureRepresentationData.optional = isOptional;
 
 	bool isPermission = featureInfo.IsPermission();
-	featureRepresentationData.isPermission = std::make_optional<bool>(isPermission);
+	featureRepresentationData.isPermission = isPermission;
 
 	QList<sdl::imtlic::Features::CFeatureData::V1_0> subFeatureDataList;
 	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
@@ -148,7 +148,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 		}
 	}
 
-	featureRepresentationData.subFeatures = std::make_optional<QList<sdl::imtlic::Features::CFeatureData::V1_0>>(subFeatureDataList);
+	featureRepresentationData.subFeatures = std::move(subFeatureDataList);
 
 	return true;
 }
@@ -189,42 +189,42 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtlic::Features::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.id = std::make_optional<QByteArray>(objectId);
+		representationObject.id = std::move(objectId);
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
 		QByteArray collectionObjectId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-		representationObject.typeId = std::make_optional<QByteArray>(collectionObjectId);
+		representationObject.typeId = std::move(collectionObjectId);
 	}
 
 	if (requestInfo.items.isFeatureIdRequested){
 		QByteArray featureId = featureInfoPtr->GetFeatureId();
-		representationObject.featureId = std::make_optional<QByteArray>(featureId);
+		representationObject.featureId = std::move(featureId);
 	}
 
 	if (requestInfo.items.isNameRequested){
 		QString featureName = featureInfoPtr->GetFeatureName();
-		representationObject.name = std::make_optional<QString>(featureName);
+		representationObject.name = std::move(featureName);
 	}
 
 	if (requestInfo.items.isFeatureNameRequested){
 		QString featureName = featureInfoPtr->GetFeatureName();
-		representationObject.featureName = std::make_optional<QString>(featureName);
+		representationObject.featureName = std::move(featureName);
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
 		QString descriptions = featureInfoPtr->GetFeatureDescription();
-		representationObject.description = std::make_optional<QString>(descriptions);
+		representationObject.description = std::move(descriptions);
 	}
 
 	if (requestInfo.items.isOptionalRequested){
 		bool isOptional = featureInfoPtr->IsOptional();
-		representationObject.optional = std::make_optional<bool>(isOptional);
+		representationObject.optional = isOptional;
 	}
 
 	if (requestInfo.items.isDependenciesRequested){
 		QByteArray dependencies = featureInfoPtr->GetDependencies().join(';');
-		representationObject.dependencies = std::make_optional<QByteArray>(dependencies);
+		representationObject.dependencies = std::move(dependencies);
 	}
 
 	if (requestInfo.items.isSubFeaturesRequested){
@@ -238,14 +238,14 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	if (requestInfo.items.isAddedRequested){
 		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime().toUTC();
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.added = std::make_optional<QString>(added);
+		representationObject.added = std::move(added);
 	}
 
 	if (requestInfo.items.isTimeStampRequested){
 		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("TimeStamp").toDateTime().toUTC();
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.timeStamp = std::make_optional<QString>(lastModified);
+		representationObject.timeStamp = std::move(lastModified);
 	}
 
 	return true;
@@ -339,7 +339,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	if (arguments.input.Version_1_0->id){
 		id = *arguments.input.Version_1_0->id;
 	}
-	representationPayload.id = std::make_optional<QByteArray>(id);
+	representationPayload.id = std::move(id);
 
 	bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, representationPayload, errorMessage);
 	if (!ok){

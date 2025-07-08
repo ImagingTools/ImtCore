@@ -192,6 +192,10 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 	target.fieldFilters = targetFieldSubFilters;
 	target.groupFilters = targetGroupSubFilters;
 
+	if (!source.groupFilters.has_value() && !source.fieldFilters.has_value()){
+		return true;
+	}
+
 	if (!source.logicalOperation){
 		return false;
 	}

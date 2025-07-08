@@ -746,6 +746,7 @@ QtObject {
 				enabled: false;
 
 				function onModelChanged(){
+					console.log("DocumentManager onModelChanged()")
 					if (singleDocumentData.blockingUpdateModel){
 						return;
 					}
@@ -753,6 +754,7 @@ QtObject {
 					if (singleDocumentData.undoManager && singleDocumentData.undoManager.isTransaction()){
 						return;
 					}
+					console.log("DocumentManager onModelChanged() after check")
 					singleDocumentData.isDirty = documentManager.documentIsValid(singleDocumentData);
 				}
 			}

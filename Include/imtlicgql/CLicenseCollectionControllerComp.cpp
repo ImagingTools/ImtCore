@@ -107,7 +107,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		addedTime.setTimeSpec(Qt::UTC);
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.added = std::make_optional<QString>(added);
+		representationObject.added = std::move(added);
 	}
 
 	if (requestInfo.items.isTimeStampRequested){
@@ -115,7 +115,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 		lastModifiedTime.setTimeSpec(Qt::UTC);
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-		representationObject.timeStamp = std::make_optional<QString>(lastModified);
+		representationObject.timeStamp = std::move(lastModified);
 	}
 
 	return true;
@@ -184,13 +184,13 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.licenseName = QString(name);
 
 	QByteArray licenseId = licenseInfoPtr->GetLicenseId();
-	representationPayload.licenseId = std::make_optional<QByteArray>(licenseId);
+	representationPayload.licenseId = std::move(licenseId);
 
 	QString description = licenseInfoPtr->GetLicenseDescription();
-	representationPayload.description = std::make_optional<QString>(description);
+	representationPayload.description = std::move(description);
 
 	QByteArray productId = licenseInfoPtr->GetProductId();
-	representationPayload.productId = std::make_optional<QByteArray>(productId);
+	representationPayload.productId = std::move(productId);
 
 	QByteArrayList featureUuids;
 	for (const imtlic::ILicenseDefinition::FeatureInfo& featureInfo : licenseInfoPtr->GetFeatureInfos()){
@@ -199,7 +199,7 @@ bool CLicenseCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.features = QByteArray(featureUuids.join(';'));
 
 	QByteArray dependencies = licenseInfoPtr->GetDependencies().join(';');
-	representationPayload.parentLicenses = std::make_optional<QByteArray>(dependencies);
+	representationPayload.parentLicenses = std::move(dependencies);
 
 	return true;
 }

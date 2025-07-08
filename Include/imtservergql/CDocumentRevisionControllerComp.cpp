@@ -98,13 +98,13 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CDocumentRevisionControllerCom
 		sdl::imtbase::DocumentRevision::CRevisionItem::V1_0 revisionItem;
 
 		if (revisionInfo.isRevisionAvailable){
-			response.activeRevision = std::make_optional<int>(revisionInfo.revision);
+			response.activeRevision = std::move(revisionInfo.revision);
 		}
 
-		revisionItem.revision = std::make_optional<int>(revisionInfo.revision);
-		revisionItem.user = std::make_optional<QString>(revisionInfo.user);
+		revisionItem.revision = std::move(revisionInfo.revision);
+		revisionItem.user = std::move(revisionInfo.user);
 		revisionItem.isActive = (revisionInfo.isRevisionAvailable);
-		revisionItem.timestamp = std::make_optional<QString>(revisionInfo.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
+		revisionItem.timestamp = std::move(revisionInfo.timestamp.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
 
 		if (documentChangeGeneratorPtr != nullptr){
 			imtbase::CObjectCollection changeCollection;
@@ -115,17 +115,17 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CDocumentRevisionControllerCom
 			iser::CJsonMemReadArchive archive(revisionInfo.comment.toUtf8());
 			if (changeCollection.Serialize(archive)){
 				QString operationDescription = documentChangeGeneratorPtr->GetOperationDescription(changeCollection, languageId);
-				revisionItem.description = std::make_optional<QString>(operationDescription);
+				revisionItem.description = std::move(operationDescription);
 			}
 		}
 
 		revisionItemList << revisionItem;
 	}
 
-	response.revisions = std::make_optional<QList<sdl::imtbase::DocumentRevision::CRevisionItem::V1_0>>(revisionItemList);
+	response.revisions = std::move(revisionItemList);
 
 	sdl::imtbase::DocumentRevision::CRevisionInfoList retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
@@ -190,7 +190,7 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CDocumentRevisionContro
 	response.result = (ok);
 
 	sdl::imtbase::DocumentRevision::CRestoreRevisionResponse retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
@@ -263,7 +263,7 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse CDocumentRevisionControl
 	response.result = (ok);
 
 	sdl::imtbase::DocumentRevision::CDeleteRevisionResponse retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }

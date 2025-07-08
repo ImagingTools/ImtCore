@@ -20,7 +20,7 @@ Item {
 		
 		anchors.fill: parent;
 		
-		visible: container.dialogsModel.count > 0;
+		visible: container.dialogsModel && container.dialogsModel.count > 0;
 		
 		model: container.dialogsModel;
 		

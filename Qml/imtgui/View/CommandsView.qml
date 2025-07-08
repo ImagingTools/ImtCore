@@ -72,7 +72,9 @@ Item {
 	
 	// Clear view
 	function clear(){
-		commandsModel.m_subElements.clear()
+		if (commandsModel.hasSubElements()){
+			commandsModel.m_subElements.clear()
+		}
 		allElements = []
 		priorityElements = []
 	}

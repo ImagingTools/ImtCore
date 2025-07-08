@@ -260,7 +260,9 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	const imtsdl::SdlTypeList allTypes = m_sdlTypeListCompPtr->GetSdlTypes(false);
 	const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(false);
 	const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(false);
-	for (const imtsdl::CSdlField& field: sdlType.GetFields()){
+	const imtsdl::SdlFieldList typeFieldList = sdlType.GetFields();
+
+	for (const imtsdl::CSdlField& field: typeFieldList){
 		bool isCustom = false;
 		ConvertType(field, &isCustom);
 		if (!isCustom){
@@ -308,9 +310,13 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << QStringLiteral("id: ") << GetDecapitalizedValue(sdlType.GetName());
 
+	// add typename
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("readonly property string __typename: '") << sdlType.GetName() << '\'';
 
 	// container's props
-	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 1);
 
@@ -328,46 +334,148 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			ifStream << QStringLiteral("BaseModel");
 		}
 		else if (isEnum){
-			ifStream << QStringLiteral("string");
+			ifStream << QStringLiteral("var");
 		}
 		else {
-			ifStream << QmlConvertType(sdlField.GetType());
+			// QString type = QmlConvertType(sdlField.GetType());
+			if (!isCustom){
+				if (convertedType == QStringLiteral("int")){
+					convertedType = QStringLiteral("IntType");
+				}
+				else if (convertedType == QStringLiteral("string")){
+					convertedType = QStringLiteral("StringType");
+				}
+				else if (convertedType == QStringLiteral("double")){
+					convertedType = QStringLiteral("DoubleType");
+				}
+				else if (convertedType == QStringLiteral("real")){
+					convertedType = QStringLiteral("DoubleType");
+				}
+				else if (convertedType == QStringLiteral("bool")){
+					convertedType = QStringLiteral("BoolType");
+				}
+				convertedType =  QStringLiteral("var");
+			}
+			ifStream << convertedType;
 		}
 		// use 'm_' prefix to avoid ambiguity
-		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId());
-		ifStream << ':' << ' ';
-		if (sdlField.IsArray() && (!isCustom || isEnum)){
-			ifStream << QStringLiteral("[]");
-		}
-		else if (!isCustom || isEnum){
-			if (convertedType == QStringLiteral("int") ||
-				convertedType == QStringLiteral("real") ||
-				convertedType == QStringLiteral("double"))
-			{
-				ifStream << QStringLiteral("0");
-			}
-			else if (convertedType == QStringLiteral("bool")){
-				ifStream << QStringLiteral("false");
-			}
-			else if (convertedType == QStringLiteral("string") || isEnum)
-			{
-				ifStream << QStringLiteral("''");
-			}
-		}
-		else {
-			if (sdlField.IsArray()){
-				ifStream << QStringLiteral("BaseModel");
-			}
-			else {
-				ifStream << convertedType;
-			}
-			ifStream << ' ' << '{';
-			ifStream << QStringLiteral("owner: ");
-			ifStream << GetDecapitalizedValue(sdlType.GetName());
-			ifStream << '}';
-		}
+		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId()) << QStringLiteral(": null");
 	}
+
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("Component.onCompleted: {");
 	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("this._internal.removed = [");
+	for (int index = 0; index < typeFieldList.count(); index++){
+		if (index > 0){
+			ifStream << QStringLiteral(",");
+		}
+		const imtsdl::CSdlField& sdlField = typeFieldList[index];
+		ifStream << QStringLiteral("\"m_") << GetDecapitalizedValue(sdlField.GetId()) << QStringLiteral("\"");
+	}
+	ifStream << QStringLiteral("]");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("}");
+	FeedStream(ifStream, 1, false);
+
+	// public class comfort methods
+	// has<PROPERTY>()
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
+		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
+
+		bool isCustom = false;
+		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
+
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("function has");
+		ifStream << GetCapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("(){");
+		FeedStream(ifStream, 1, false);
+
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("return (m_");
+		ifStream << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral(" !== undefined && m_");
+		ifStream << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral(" !== null)");
+
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << '}';
+		FeedStream(ifStream, 1, false);
+	}
+
+	// create<PROPERTY>()
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
+
+		bool isEnum = bool (dynamic_cast<imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
+		bool isCustom = false;
+		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
+		const bool isUserType = isCustom && !isEnum;
+
+		if ((!isCustom && !sdlField.IsArray()) || isEnum){
+			continue;
+		}
+
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("function create");
+		ifStream << GetCapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("(typename){");
+		FeedStream(ifStream, 1, false);
+
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("m_");
+		ifStream << GetDecapitalizedValue(sdlField.GetId());
+		if (isUserType || (sdlField.IsArray() && isUserType)){
+			ifStream << QStringLiteral(" = createComponent('");
+			ifStream << QStringLiteral("m_");
+			ifStream << GetDecapitalizedValue(sdlField.GetId());
+			ifStream << QStringLiteral("', typename).createObject()");
+		}
+		else if (sdlField.IsArray()){
+			ifStream << QStringLiteral(" = []");
+		}
+		else{
+			Q_ASSERT_X(0, "CQmlCodeGeneratorComp::BeginQmlFile", "Invalid property");
+		}
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("this._internal.removeAt('");
+		ifStream << QStringLiteral("m_");
+		ifStream << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("')");
+
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << '}';
+		FeedStream(ifStream, 1, false);
+	}
+
+	// remove<PROPERTY>()
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << QStringLiteral("function remove");
+		ifStream << GetCapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("(){");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 2);
+		ifStream << QStringLiteral("removeKey('");
+		ifStream << QStringLiteral("m_");
+		ifStream << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("')");
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 1);
+		ifStream << '}';
+		FeedStream(ifStream, 1, false);
+	}
 
 	// base class reimplementation methods
 	// getJSONKeyForProperty
@@ -377,7 +485,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 2);
 	ifStream << QStringLiteral("switch (propertyId){");
-	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
 		FeedStream(ifStream, 1, false);
 		FeedStreamHorizontally(ifStream, 3);
 		ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
@@ -390,42 +498,142 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << '}'; // end of function
 
-	// createComponent (custom and arrays only)
+	// createElement (arrays of custom only)
 	FeedStream(ifStream, 2, false);
 	FeedStreamHorizontally(ifStream, 1);
-	ifStream << QStringLiteral("function createComponent(propertyId){");
+	ifStream << QStringLiteral("function createElement(propertyId, typename){");
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 2);
 	ifStream << QStringLiteral("switch (propertyId){");
+	FeedStream(ifStream, 1, false);
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
+		bool isCustom = false;
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
+		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
+		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
+		const bool isUserType = isCustom && !isEnum;
 
-	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
+		// skip simple scalars and list of scalars
+		if (!sdlField.IsArray() || !isUserType || (sdlField.IsArray() && !isUserType)){
+			continue;
+		}
+
+		FeedStreamHorizontally(ifStream, 3);
+		ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
+		ifStream << BuildQmlImportDeclarationFromParams(foundEntryPtr->GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
+		ifStream << convertedType << QStringLiteral(".qml')");
+		FeedStream(ifStream, 1, false);
+	}
+
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << '}'; // end of switch
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}'; // end of function
+
+	// createComponent (custom and arrays only)
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function createComponent(propertyId, typename){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("let retVal;");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("switch (propertyId){");
+	FeedStream(ifStream, 1, false);
+
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
 		bool isCustom = false;
 		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
 
 		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
 		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
+		const bool isUserType = isCustom && !isEnum;
 
 		// skip simple scalars and list of scalars
-		if (!isCustom || isEnum){
+		if (!isUserType || (sdlField.IsArray() && !isUserType)){
 			continue;
 		}
 
+		const imtsdl::CSdlUnion* unionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get());
+		if (sdlField.IsArray()){
+			FeedStreamHorizontally(ifStream, 3);
+			ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
+			ifStream << QStringLiteral("':{");
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << QStringLiteral("retVal = Qt.createComponent('qrc:/qml/imtcontrols/Base/BaseModel.qml')");
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << QStringLiteral("retVal.owner = ");
+			ifStream << GetDecapitalizedValue(sdlType.GetName());
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << QStringLiteral("return retVal");
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 3);
+			ifStream << '}';
+		}
+		else if (unionPtr != nullptr){
+			const QStringList typeList = unionPtr->GetTypes();
+
+			FeedStreamHorizontally(ifStream, 3);
+			ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId()) << QStringLiteral("': {");
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << QStringLiteral("switch (typename){");
+			FeedStream(ifStream, 1, false);
+
+			for (const QString& typeName: typeList){
+				imtsdl::CSdlField sdlFieldForType;
+				sdlFieldForType.SetType(typeName);
+				imtsdl::CSdlType foundType;
+				[[maybe_unused]]const bool isTypeFound = GetSdlTypeForField(
+					sdlFieldForType,
+					m_sdlTypeListCompPtr->GetSdlTypes(false),
+					foundType);
+				Q_ASSERT(isTypeFound);
+
+				const QString convertedSubtype = QmlConvertType(sdlFieldForType.GetType());
+				FeedStreamHorizontally(ifStream, 5);
+				ifStream << QStringLiteral("case '") << typeName;
+				ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
+				ifStream << BuildQmlImportDeclarationFromParams(foundType.GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
+				ifStream << convertedSubtype << QStringLiteral(".qml')");
+				FeedStream(ifStream, 1, false);
+			}
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << '}';
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 3);
+			ifStream << '}';
+		}
+		else {
+			imtsdl::CSdlType foundType;
+			[[maybe_unused]]const bool isTypeFound = GetSdlTypeForField(
+				sdlField,
+				m_sdlTypeListCompPtr->GetSdlTypes(false),
+				foundType);
+			Q_ASSERT(isTypeFound);
+
+			FeedStreamHorizontally(ifStream, 3);
+			ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
+			ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
+			ifStream << BuildQmlImportDeclarationFromParams(foundEntryPtr->GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
+			ifStream << convertedType << QStringLiteral(".qml')");
+		}
 		FeedStream(ifStream, 1, false);
-
-		imtsdl::CSdlType foundType;
-		[[maybe_unused]]const bool isTypeFound = GetSdlTypeForField(
-			sdlField,
-			m_sdlTypeListCompPtr->GetSdlTypes(false),
-			foundType);
-		Q_ASSERT(isTypeFound);
-
-		FeedStreamHorizontally(ifStream, 3);
-		ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
-		ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
-		ifStream << BuildQmlImportDeclarationFromParams(foundType.GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
-		ifStream << convertedType << QStringLiteral(".qml')");
 	}
-	FeedStream(ifStream, 1, false);
+
 	FeedStreamHorizontally(ifStream, 2);
 	ifStream << '}'; // end of switch
 	FeedStream(ifStream, 1, false);
@@ -441,6 +649,85 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	ifStream << QStringLiteral("return Qt.createComponent('");
 	ifStream << sdlType.GetName();
 	ifStream << QStringLiteral(".qml').createObject()");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << '}'; // end of function
+
+	// getType
+	FeedStream(ifStream, 2, false);
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("function getPropertyType(propertyId){");
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << QStringLiteral("switch (propertyId){");
+
+	for (const imtsdl::CSdlField& sdlField: typeFieldList){
+		bool isCustom = false;
+		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
+
+		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
+		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
+		const bool isUnion = bool(dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get()) != nullptr);
+
+		const QString propertyName = QStringLiteral("m_") + GetDecapitalizedValue(sdlField.GetId());
+
+		FeedStream(ifStream, 1, false);
+		FeedStreamHorizontally(ifStream, 3);
+		ifStream << QStringLiteral("case '") << propertyName;
+		ifStream << QStringLiteral("': ");
+		if (sdlField.IsArray()){
+			if (isCustom){
+				ifStream << QStringLiteral("return 'BaseModel'");
+			}
+			else{
+				ifStream << QStringLiteral("return 'array'");
+			}
+		}
+		else if (isEnum){
+			ifStream << QStringLiteral("return 'string'");
+		}
+		else if (isUnion){
+			ifStream << '{';
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << QStringLiteral("if (!") << propertyName;
+			ifStream << QStringLiteral(" || !") << propertyName;
+			ifStream << QStringLiteral(".__typename){");
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 5);
+			ifStream << QStringLiteral("return '") << convertedType << '\'';
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << '}';
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << QStringLiteral("else {");
+			FeedStream(ifStream, 1, false);
+
+
+			FeedStreamHorizontally(ifStream, 5);
+			ifStream << QStringLiteral("return ") << propertyName << QStringLiteral(".__typename");
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << '}';
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 3);
+			ifStream << '}';
+		}
+		else {
+			ifStream << QStringLiteral("return '") << convertedType << '\'';
+		}
+	}
+
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 2);
+	ifStream << '}'; // end of switch
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 1);
 	ifStream << '}'; // end of function

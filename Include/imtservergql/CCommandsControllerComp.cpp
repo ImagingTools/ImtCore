@@ -85,7 +85,7 @@ sdl::imtbase::Commands::CGuiElementContainer CCommandsControllerComp::OnGetComma
 	}
 	
 	sdl::imtbase::Commands::CGuiElementContainer retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 	
 	return retVal;
 }

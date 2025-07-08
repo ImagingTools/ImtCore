@@ -23,7 +23,7 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CRemoteDocumentRevisionControl
 	}
 
 	sdl::imtbase::DocumentRevision::CRevisionInfoList retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
@@ -43,7 +43,7 @@ sdl::imtbase::DocumentRevision::CBackupRevisionResponse CRemoteDocumentRevisionC
 	}
 
 	sdl::imtbase::DocumentRevision::CBackupRevisionResponse retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
@@ -63,7 +63,7 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CRemoteDocumentRevision
 	}
 
 	sdl::imtbase::DocumentRevision::CRestoreRevisionResponse retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
@@ -82,7 +82,7 @@ sdl::imtbase::DocumentRevision::CExportRevisionResponse CRemoteDocumentRevisionC
 	}
 
 	sdl::imtbase::DocumentRevision::CExportRevisionResponse retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }
@@ -103,7 +103,7 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse CRemoteDocumentRevisionC
 
 
 	sdl::imtbase::DocumentRevision::CDeleteRevisionResponse retVal;
-	retVal.Version_1_0 = std::make_optional(response);
+	retVal.Version_1_0 = std::move(response);
 
 	return retVal;
 }

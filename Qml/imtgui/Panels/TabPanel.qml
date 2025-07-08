@@ -7,17 +7,19 @@ import imtcontrols 1.0
 Rectangle {
 	id: tabPanelContainer;
 	
-	width: list.contentWidth + externButtons.width;
+	width: list.width + externButtons.width;
 	height: Style.controlHeightL;
 	
 	color: Style.tabPanelBackgroundColor;
-	
+
 	property int selectedIndex: 0;
 	property int count: 0;
 	property alias spacing: list.spacing;
 	property bool isCloseEnable: false;
+	property int maxWidth: width
 	
 	property alias model: list.model;
+	property alias tabDelegate: list.delegate
 	property Component tabDelegateDecorator: Style.tabPanelDecorator;
 	
 	signal closeItem(int index);
@@ -51,7 +53,7 @@ Rectangle {
 		id: list;
 		
 		anchors.left: parent.left;
-		width: externButtons.visible ? tabPanelContainer.width - externButtons.width : contentWidth
+		width: contentWidth > (tabPanelContainer.maxWidth - externButtons.width) ? tabPanelContainer.maxWidth - externButtons.width : contentWidth
 		
 		height: parent.height;
 		
@@ -69,12 +71,12 @@ Rectangle {
 		
 		delegate: TabDelegate {
 			height: list.height;
-			
+
 			tabPanel: tabPanelContainer;
 			isCloseEnable: tabPanelContainer.isCloseEnable;
 			listView: list;
 			decorator: tabPanelContainer.tabDelegateDecorator;
-			
+
 			onCloseSignal: {
 				tabPanelContainer.closeItem(model.index);
 			}
@@ -91,7 +93,7 @@ Rectangle {
 		
 		color: Style.backgroundColor;
 		
-		visible: list.contentWidth > tabPanelContainer.width;
+		visible:  list.contentWidth > tabPanelContainer.maxWidth - height;
 		
 		Button {
 			id: leftButton;

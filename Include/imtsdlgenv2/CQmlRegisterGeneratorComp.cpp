@@ -25,19 +25,50 @@ namespace imtsdlgenv2
 
 
 // static helpers
-void GenerateRegisterFunction(QTextStream& stream, const imtsdl::CSdlEntryBase& entry)
+void GenerateRegisterFunction(QTextStream& stream, const imtsdl::CSdlEntryBase& entry, bool isSingleton)
 {
 	imtsdl::CSdlTools::FeedStreamHorizontally(stream);
-	stream << QStringLiteral("// qmlRegister...");
+
+	const QString sdlNamespace = imtsdl::CSdlTools::BuildQmlImportDeclarationFromParams(entry.GetSchemaParams(), "Sdl", false);
+
+	if (isSingleton){
+		stream << QStringLiteral("qmlRegisterSingletonType<Enum") << imtsdl::CSdlTools::GetCapitalizedValue(entry.GetName());
+		stream << QStringLiteral(">(") ;
+		stream << QStringLiteral("\"") << sdlNamespace << QStringLiteral("\", 1, 0, ");
+		stream << QStringLiteral("\"") << entry.GetName() << QStringLiteral("\"");
+		stream << QStringLiteral(", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {");
+		imtsdl::CSdlTools::FeedStream(stream, 1, false);
+		imtsdl::CSdlTools::FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("Q_UNUSED(engine)");
+		imtsdl::CSdlTools::FeedStream(stream, 1, false);
+		imtsdl::CSdlTools::FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("Q_UNUSED(scriptEngine)");
+		imtsdl::CSdlTools::FeedStream(stream, 2, false);
+		imtsdl::CSdlTools::FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("Enum") << entry.GetName() << QStringLiteral(" *enumType = new ");
+		stream << QStringLiteral("Enum") << entry.GetName() << QStringLiteral("();");
+		imtsdl::CSdlTools::FeedStream(stream, 1, false);
+		imtsdl::CSdlTools::FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return enumType;");
+		imtsdl::CSdlTools::FeedStream(stream, 1, false);
+		imtsdl::CSdlTools::FeedStreamHorizontally(stream);
+		stream << QStringLiteral("});");
+
+	}
+	else{
+		stream << QStringLiteral("qmlRegisterType<C") << entry.GetName() << QStringLiteral("Object>(") ;
+		stream << QStringLiteral("\"") << sdlNamespace << QStringLiteral("\", 1, 0, ");
+		stream << QStringLiteral("\"") << entry.GetName() << QStringLiteral("\");");
+	}
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 }
 
 
 template <class T>
-void GenerateRegisterFunctions(QTextStream& stream, const QList<T>& entryList)
+void GenerateRegisterFunctions(QTextStream& stream, const QList<T>& entryList, bool isSingleton)
 {
 	for (const auto& entry: entryList){
-		GenerateRegisterFunction(stream, entry);
+		GenerateRegisterFunction(stream, entry, isSingleton);
 	}
 }
 
@@ -52,6 +83,7 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
 {
+	qDebug() << "DoProcessing" << __func__;
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
@@ -60,7 +92,7 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 	Q_ASSERT(m_customSchemaParamsCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	if (!m_argumentParserCompPtr->IsCppEnabled() || !m_argumentParserCompPtr->IsQmlEnabled()){
+	if (!m_argumentParserCompPtr->IsCppEnabled()){
 		return TS_OK;
 	}
 
@@ -118,21 +150,24 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 
 	// namespace begin
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
-
+	stream << QStringLiteral("#ifdef QT_QML_LIB");
+	FeedStream(stream, 1, false);
+	stream << QStringLiteral("#include <QtQml/QQmlEngine>");
+	FeedStream(stream, 3, false);
 	stream << QStringLiteral("namespace ");
 	stream << sdlNamespace;
 	stream << QStringLiteral("\n{");
 	FeedStream(stream, 3, false);
 
 	// add function
-	stream << QStringLiteral("void RegisterQmlTypes()");
+	stream << QStringLiteral("static void RegisterQmlTypes()");
 	FeedStream(stream, 1, false);
 
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	GenerateRegisterFunctions(stream, m_sdlTypeListCompPtr->GetSdlTypes(true));
-	GenerateRegisterFunctions(stream, m_sdlEnumListCompPtr->GetEnums(true));
+	GenerateRegisterFunctions(stream, m_sdlTypeListCompPtr->GetSdlTypes(true), false);
+	GenerateRegisterFunctions(stream, m_sdlEnumListCompPtr->GetEnums(true), true);
 
 	stream << '}';
 	FeedStream(stream, 1, false);
@@ -140,7 +175,9 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 	// end of namespace
 	stream << QStringLiteral("} // namespace ");
 	stream << sdlNamespace;
-	FeedStream(stream, 2, true);
+	FeedStream(stream, 1, true);
+	stream << QStringLiteral("#endif");
+	FeedStream(stream, 2, false);
 
 	return TS_OK;
 }

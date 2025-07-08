@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtcom/IServerConnectionInterface.h>
 
+#undef SetPort
 
 #ifdef Q_OS_WIN
 #undef SetPort

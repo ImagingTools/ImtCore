@@ -23,43 +23,43 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 			VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ComplexCollectionFilter.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ComplexCollectionFilter.sdl"
+	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtCollection.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ImtCollection.sdl"
+	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentRevision.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentRevision.sdl"
+	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/MimeType.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/MimeType.sdl"
+	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentCollectionFilter.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentCollectionFilter.sdl"
+	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Search.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Search.sdl"
+	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Commands.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Commands.sdl"
+	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Settings.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/Settings.sdl"
+	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/CollectionImport.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/CollectionImport.sdl"
+	VERSION		"1.0")
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
-			SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ProgressManager.sdl"
-			VERSION		"1.0")
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ProgressManager.sdl"
+	VERSION		"1.0")
 
 

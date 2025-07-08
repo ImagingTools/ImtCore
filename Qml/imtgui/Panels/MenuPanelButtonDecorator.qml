@@ -100,7 +100,7 @@ DecoratorBase {
         source: marker;
         visible: ok;
 
-        property bool ok: leftPanelElement.baseElement && (leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted);
+		property bool ok: leftPanelElement.baseElement && (leftPanelElement.baseElement.selected || leftPanelElement.baseElement.highlighted) ? true : false;
 
         Component.onCompleted: {
             if (Qt.platform.os === "web"){
