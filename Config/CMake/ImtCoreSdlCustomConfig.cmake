@@ -169,7 +169,8 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	list(APPEND CUSTOM_MODIFICATORS "--GQL")
 	list(APPEND CUSTOM_MODIFICATORS "--use-all-modificators")
 	list(APPEND CUSTOM_MODIFICATORS "-Psdl")
-	list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
+	# BUG Base extending error TODO FIXIT
+	# list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
 	list(APPEND CUSTOM_MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
 	list(APPEND CUSTOM_MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
 	list(APPEND CUSTOM_MODIFICATORS "--generate-module") ##< add .jsmi module
@@ -216,6 +217,13 @@ macro (ImtCoreCustomConfigureSdlCpp)
 
 	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
 
+	set(SDL_HEADERS)
+
+	# foreach(SDL_HEADER ${FOUND_DEPS})
+	# 	get_filename_component
+	# 	list(APPEND SDL_HEADERS "-E${SDL_SEARCH_PATH}")
+	# endforeach()
+
 	message(VERBOSE "CPP: FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS}")
 
 	GetSdlGeneratorPath(SDL_GENERATOR_EXE_PATH)
@@ -236,6 +244,27 @@ macro (ImtCoreCustomConfigureSdlCpp)
 		VERBATIM)
 
 	target_sources(${PROJECT_NAME} PRIVATE ${FOUND_DEPS})
+
+	set(HEADER_FILES)
+
+	foreach(SDL_HEADER ${FOUND_DEPS})
+		string(FIND "${SDL_HEADER}" ".h" matchres)
+
+		if (${matchres} GREATER  -1)
+
+			# message("acf_create_moc ${SDL_HEADER}")
+			LIST(APPEND HEADER_FILES ${SDL_HEADER})
+			# acf_create_moc(SDL_HEADER)
+			# target_sources(${PROJECT_NAME} PRIVATE ${FOUND_DEPS})
+		endif ()
+	endforeach()
+
+	message("acf_create_moc ${HEADER_FILES}")
+
+	# acf_create_moc(MOC_SOURCES "${HEADER_FILES}")
+	# qt6_wrap_cpp("${outfiles}" ${ARGN} )
+	qt6_wrap_cpp(MOC_SOURCES "${HEADER_FILES}")
+	target_sources(${PROJECT_NAME} PRIVATE ${MOC_SOURCES})
 
 	message(VERBOSE "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${SDL_OUTPUT_DIRECTORY} ${CUSTOM_MODIFICATORS}")
 
