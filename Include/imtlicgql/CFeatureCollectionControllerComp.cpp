@@ -189,32 +189,32 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 	sdl::imtlic::Features::FeaturesListRequestInfo requestInfo = featuresListRequest.GetRequestInfo();
 
 	if (requestInfo.items.isIdRequested){
-		representationObject.id = std::move(objectId);
+		representationObject.id = objectId;
 	}
 
 	if (requestInfo.items.isTypeIdRequested){
 		QByteArray collectionObjectId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-		representationObject.typeId = std::move(collectionObjectId);
+		representationObject.typeId = collectionObjectId;
 	}
 
 	if (requestInfo.items.isFeatureIdRequested){
 		QByteArray featureId = featureInfoPtr->GetFeatureId();
-		representationObject.featureId = std::move(featureId);
+		representationObject.featureId = featureId;
 	}
 
 	if (requestInfo.items.isNameRequested){
 		QString featureName = featureInfoPtr->GetFeatureName();
-		representationObject.name = std::move(featureName);
+		representationObject.name = featureName;
 	}
 
 	if (requestInfo.items.isFeatureNameRequested){
 		QString featureName = featureInfoPtr->GetFeatureName();
-		representationObject.featureName = std::move(featureName);
+		representationObject.featureName = featureName;
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		QString descriptions = featureInfoPtr->GetFeatureDescription();
-		representationObject.description = std::move(descriptions);
+		QString description = featureInfoPtr->GetFeatureDescription();
+		representationObject.description = description;
 	}
 
 	if (requestInfo.items.isOptionalRequested){
@@ -224,7 +224,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 
 	if (requestInfo.items.isDependenciesRequested){
 		QByteArray dependencies = featureInfoPtr->GetDependencies().join(';');
-		representationObject.dependencies = std::move(dependencies);
+		representationObject.dependencies = dependencies;
 	}
 
 	if (requestInfo.items.isSubFeaturesRequested){

@@ -16,7 +16,6 @@ namespace imtbase
 
 CItemModelBase::CItemModelBase(QObject* parent) : QObject(parent), m_owner(nullptr)
 {
-	connectProperties();
 	QObject::connect(this, &CItemModelBase::modelChanged, this, &CItemModelBase::OnModelChanged);
 }
 
@@ -288,12 +287,14 @@ CItemModelBase* CItemModelBase::CreateItemModel(const QString& jsonKey)
 	return nullptr;
 }
 
+
 // private methods
 
 bool CItemModelBase::connectPropertyChangedToSlot(
-			QObject* sender, 
-			const QString& propName, 
-			QObject* receiver, const char* slot)
+			QObject* sender,
+			const QString& propName,
+			QObject* receiver,
+			const char* slot)
 {
 	const QMetaObject* senderMeta = sender->metaObject();
 
@@ -338,8 +339,7 @@ void CItemModelBase::connectProperties()
 		}
 
 		QString propName = QString::fromLatin1(prop.name());
-		if (propName != "objectName" && !connectPropertyChangedToSlot(this, propName, this,
-										  SLOT(OnInternalModelChanged()))){
+		if (propName != "objectName" && !connectPropertyChangedToSlot(this, propName, this, SLOT(OnInternalModelChanged()))){
 			qWarning() << "Failed to connect property:" << propName;
 		}
 	}

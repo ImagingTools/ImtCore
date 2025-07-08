@@ -32,14 +32,12 @@ signals:
 	void modelChanged(const QVariantList& changes);
 	void finished();
 
-private slots:
+public slots:
 	void OnInternalModelChanged();
 	void OnModelChanged(const QVariantList& changes);
 
 protected:
 	virtual CItemModelBase* CreateItemModel(const QString& jsonKey);
-
-private:
 	bool connectPropertyChangedToSlot(QObject* sender, const QString& propName, QObject* receiver, const char* slot);
 	void connectProperties();
 

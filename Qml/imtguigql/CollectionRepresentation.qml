@@ -413,6 +413,7 @@ Item {
 			
 			queryFields.InsertField("id");
 			queryFields.InsertField("name");
+			queryFields.InsertField("typeId");
 			
 			for(var i = 0; i < root.headersModel.getItemsCount(); i++){
 				let headerId = root.headersModel.getData("id", i);
