@@ -454,16 +454,36 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 					}
 				}
 				else if (field.GetType() == "Integer" || field.GetType() == "Int"){
-					stream << QStringLiteral("0;");
+					if (isArray){
+						stream << QStringLiteral("QList<int>();");
+					}
+					else{
+						stream << QStringLiteral("0;");
+					}
 				}
 				else if (field.GetType() == "LongLong" || field.GetType() == "longLong"){
-					stream << QStringLiteral("0;");
+					if (isArray){
+						stream << QStringLiteral("QList<int>();");
+					}
+					else{
+						stream << QStringLiteral("0;");
+					}
 				}
 				else if (field.GetType() == "Double"){
-					stream << QStringLiteral("0;");
+					if (isArray){
+						stream << QStringLiteral("QList<double>();");
+					}
+					else{
+						stream << QStringLiteral("0;");
+					}
 				}
 				else if (field.GetType() == "Boolean" || field.GetType() == "Bool"){
-					stream << QStringLiteral("false;");
+					if (isArray){
+						stream << QStringLiteral("QList<bool>();");
+					}
+					else{
+						stream << QStringLiteral("false;");
+					}
 				}
 				else if (field.GetType() == "ID"){
 					if (isArray){
