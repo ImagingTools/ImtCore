@@ -47,7 +47,7 @@ QtObject {
 		//matrix * vector
 		let retPoint = Qt.point(0, 0);
 		retPoint.x = matrix[0][0] * pointArg.x + matrix[0][1] * pointArg.y + matrix[0][2]//* 1
-		retPoint.x = matrix[1][0] * pointArg.x + matrix[1][1] * pointArg.y + matrix[1][2]//* 1
+		retPoint.y = matrix[1][0] * pointArg.x + matrix[1][1] * pointArg.y + matrix[1][2]//* 1
 		return retPoint;
 	}
 

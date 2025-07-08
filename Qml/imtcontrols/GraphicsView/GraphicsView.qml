@@ -329,25 +329,43 @@ Rectangle {
 		}
 	}
 
+	Matrix3x3 {
+		id: tempMatrix;
+	}
 	function hoverReaction(position){
-		return;//!!!
-
+		if(!graphicsView.hasHoverReaction){
+			return;
+		}
 		let pointFound = false;
 		let activeLayer = getActiveLayer()
+
+		tempMatrix.matrix = activeLayer.layerMatrix.getInvertedMatrix();
+		position = tempMatrix.transformPoint(position);
+
 		for (let i = 0; i < activeLayer.shapeModel.length; i++){
 			let shape = activeLayer.shapeModel[i];
 			let pointList = shape.getPoints()
-			for(let j = 0; j < pointList.length; j++){
-				let point = shape.getLogPosition(pointList[j]);
-				let pointSize = DesignScheme.shapePointSize;
-				if(point.x >= position.x - pointSize
-					&& point.x <= position.x + pointSize
-					&& point.y >= position.y - pointSize
-					&& point.y <= position.y + pointSize
-					){
-					shape.selectedNodeCoordinate = pointList[j]
-					pointFound = true;
-					break;
+
+			if(pointFound){
+				shape.hasNodeSelection = false;
+			}
+			else {
+				for(let j = 0; j < pointList.length; j++){
+					let point = shape.getScreenPosition(pointList[j]);
+					//point = activeLayer.layerMatrix.transformPoint(point);
+					let pointSize = DesignScheme.shapePointSize + Style.marginXS;
+					if(point.x >= position.x - pointSize
+						&& point.x <= position.x + pointSize
+						&& point.y >= position.y - pointSize
+						&& point.y <= position.y + pointSize
+						){
+						shape.selectedNodeCoordinate = pointList[j]
+						shape.hasNodeSelection = true;
+						pointFound = true;
+					}
+				}
+				if(!pointFound){
+					shape.hasNodeSelection = false;
 				}
 			}
 		}

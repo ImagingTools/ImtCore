@@ -17,6 +17,7 @@ GraphicsShapeBase {
 			drawNodes(ctx)
 		}
 		if(hasNodeSelection && selectedNodeCoordinate !==undefined){
+			drawSelectedNode(ctx, selectedNodeCoordinate)
 		}
 	}
 
@@ -58,6 +59,19 @@ GraphicsShapeBase {
 		ctx.closePath();
 	}
 
+	function drawSelectedNode(ctx, point){
+		let params = getParams()
+		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
+		ctx.fillStyle = params.color !== undefined ? params.color : polylineShape.color;
+		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
+		let radius = params.radius !== undefined ? params.radius : DesignScheme.shapeSelectedPointSize;
+		ctx.beginPath()
+		ctx.moveTo(point.x, point.y);
+		ctx.arc(point.x, point.y, radius,  0, 2 * Math.PI, true)
+		ctx.stroke();
+		ctx.fill();
+		ctx.closePath();
+	}
 
 	function getPoints(){
 		let pointList = []
