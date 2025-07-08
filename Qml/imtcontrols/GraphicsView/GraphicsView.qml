@@ -46,7 +46,7 @@ Rectangle {
 	property bool isPointsAdditionMode: false;
 	property bool isPointsDeletionMode: false;
 
-	property bool hasHoverReaction: true;
+	property bool hasHoverReaction: false;
 
 	property bool isMultiSelection: true;
 
