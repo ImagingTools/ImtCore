@@ -239,6 +239,18 @@ module.exports = {
             y: y,
         }
     },
+    rect(x, y, width, height){
+        return {
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+            left: x,
+            top: y,
+            right: x + width,
+            bottom: y + height
+        }
+    },
     atob: function(data){
         return atob(data)
     },

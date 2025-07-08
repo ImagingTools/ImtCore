@@ -7,6 +7,7 @@ module.exports = {
     Font: require("./Font"),
     LinkedBool: require("./LinkedBool"),
     point: require("./Point"),
+    rect: require("./Rect"),
     date: require("./Date"),
 
     QObject: require("./QObject"),

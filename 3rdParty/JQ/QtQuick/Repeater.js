@@ -113,9 +113,13 @@ class Repeater extends Item {
 
             this.__self.count = length
 
+            JQApplication.beginUpdate()
+
             for (let i = 0; i < length; i++) {
                 this.__createItem(i)
             }
+
+            JQApplication.endUpdate()
 
             if (countChanged) this.countChanged()
         }
@@ -144,6 +148,8 @@ class Repeater extends Item {
 
             this.__self.count = length
 
+            JQApplication.beginUpdate()
+
             for (let change of changeSet) {
                 let leftTop = change[0]
                 let bottomRight = change[1]
@@ -166,6 +172,8 @@ class Repeater extends Item {
                     }
                 }
             }
+
+            JQApplication.endUpdate()
 
             if (countChanged) this.countChanged()
         }
