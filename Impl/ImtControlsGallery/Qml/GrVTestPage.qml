@@ -137,16 +137,16 @@ Rectangle {
 
 			text: "Zoom: " + view.scaleCoeff.toFixed(2)
 		}
-		BaseText{
-			font.pixelSize: Style.fontSizeL
+		// BaseText{
+		// 	font.pixelSize: Style.fontSizeL
 
-			text: "DeltaX: " + view.deltaX
-		}
-		BaseText{
-			font.pixelSize: Style.fontSizeL
+		// 	text: "DeltaX: " + view.deltaX
+		// }
+		// BaseText{
+		// 	font.pixelSize: Style.fontSizeL
 
-			text: "DeltaY: " + view.deltaY
-		}
+		// 	text: "DeltaY: " + view.deltaY
+		// }
 	}
 
 	GraphicsView{
