@@ -2,14 +2,22 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
+import imtcontrols 1.0
+
+
 BoundingBox {
 
 	property bool isTouched: false;
 	property bool isSelected: false;
 	property bool showNodes: false;
+	property bool hasNodeSelection: false;
+
+	property var selectedNodeCoordinate
 
 	property CanvasMatrix shapeMatrix: CanvasMatrix{};
 	property CanvasMatrix tempMatrix: CanvasMatrix{};
+
+	signal shapeChanged();
 
 	function draw (ctx, layerMatrix){
 	}
@@ -40,6 +48,14 @@ BoundingBox {
 
 	function isInside(x_, y_, matrix){
 		return false;
+	}
+
+	function getLogPosition(screenPosition){
+		return screenPosition
+	}
+
+	function getScreenPosition(logPosition){
+		return logPosition
 	}
 
 	function setCoordinateShift(deltaX, deltaY){

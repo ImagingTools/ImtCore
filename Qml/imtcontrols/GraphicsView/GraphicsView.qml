@@ -42,10 +42,16 @@ Rectangle {
 
 	property bool isSelectionMode: true;
 	property bool isEditMode: false;
+	property bool isPointsEditMode: false;
+	property bool isPointsAdditionMode: false;
+	property bool isPointsDeletionMode: false;
+
+	property bool hasHoverReaction: true;
+
 	property bool isMultiSelection: true;
 
-	property real drawingAreaWidth: width//1024;
-	property real drawingAreaHeight: height//768;
+	property real drawingAreaWidth: width;
+	property real drawingAreaHeight: height;
 
 	property var layerModel: []
 
@@ -62,6 +68,8 @@ Rectangle {
 	signal renameSignal(int index);
 	signal revertSignal();
 	signal modelDataChanged();
+
+	signal cursorPosition(point position)
 
 	Component.onCompleted: {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
@@ -321,6 +329,69 @@ Rectangle {
 		}
 	}
 
+	function hoverReaction(position){
+		return;//!!!
+
+		let pointFound = false;
+		let activeLayer = getActiveLayer()
+		for (let i = 0; i < activeLayer.shapeModel.length; i++){
+			let shape = activeLayer.shapeModel[i];
+			let pointList = shape.getPoints()
+			for(let j = 0; j < pointList.length; j++){
+				let point = shape.getLogPosition(pointList[j]);
+				let pointSize = DesignScheme.shapePointSize;
+				if(point.x >= position.x - pointSize
+					&& point.x <= position.x + pointSize
+					&& point.y >= position.y - pointSize
+					&& point.y <= position.y + pointSize
+					){
+					shape.selectedNodeCoordinate = pointList[j]
+					pointFound = true;
+					break;
+				}
+			}
+		}
+		if(pointFound){
+			canvas.requestPaint();
+		}
+
+
+		// canvas.hoverIndex = -1;
+		// for(let i = 0; i < graphicsView.objectsModel.count; i++){
+		// 	let item = graphicsView.objectsModel.get(i).item;
+
+		// 	let x_  = item.m_x;
+		// 	let y_  = item.m_y;
+		// 	let width_ = item.m_width ? item.m_width  : canvas.mainRec_width;
+		// 	let height_ = canvas.mainRec_height ;
+
+		// 	x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
+		// 	y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
+		// 	width_ = width_ * canvas.scaleCoeff;
+		// 	height_ = height_  * canvas.scaleCoeff;
+
+		// 	let ok = controlArea.checkHoverItem(x_, y_, width_, height_, position);
+
+		// 	if(ok){
+		// 		canvas.hoverIndex = i;
+
+		// 	}
+		// }
+		if(canvas.hoverIndex >=0){
+			//controlArea.cursorShape = Qt.ArrowCursor;
+
+			// canvas.linkSelected = true;
+			// canvas.requestPaint();
+		}
+		else {
+			//controlArea.cursorShape = Qt.OpenHandCursor;
+
+			// if(canvas.linkSelected){
+			// 	canvas.linkSelected = false;
+			// 	canvas.requestPaint();
+			// }
+		}
+	}
 
 	TreeItemModel {
 		id: bufferModel;
@@ -570,49 +641,10 @@ Rectangle {
 				duration: 100;
 				property point position;
 				onFinished: {
-					controlArea.hoverReaction(position);
+					graphicsView.hoverReaction(position);
+					graphicsView.cursorPosition(position)
 				}
 			}
-
-			function hoverReaction(position){
-				// canvas.hoverIndex = -1;
-				// for(let i = 0; i < graphicsView.objectsModel.count; i++){
-				// 	let item = graphicsView.objectsModel.get(i).item;
-
-				// 	let x_  = item.m_x;
-				// 	let y_  = item.m_y;
-				// 	let width_ = item.m_width ? item.m_width  : canvas.mainRec_width;
-				// 	let height_ = canvas.mainRec_height ;
-
-				// 	x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
-				// 	y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
-				// 	width_ = width_ * canvas.scaleCoeff;
-				// 	height_ = height_  * canvas.scaleCoeff;
-
-				// 	let ok = controlArea.checkHoverItem(x_, y_, width_, height_, position);
-
-				// 	if(ok){
-				// 		canvas.hoverIndex = i;
-
-				// 	}
-				// }
-				if(canvas.hoverIndex >=0){
-					//controlArea.cursorShape = Qt.ArrowCursor;
-
-					// canvas.linkSelected = true;
-					// canvas.requestPaint();
-				}
-				else {
-					//controlArea.cursorShape = Qt.OpenHandCursor;
-
-					// if(canvas.linkSelected){
-					// 	canvas.linkSelected = false;
-					// 	canvas.requestPaint();
-					// }
-				}
-			}
-			//hover reaction
-
 		}
 
 		Rectangle{
@@ -743,7 +775,7 @@ Rectangle {
 				let newX = (scaleX - canvas.deltaX) / scaleCoeffBack * newScale + canvas.deltaX
 				let newY = (scaleY - canvas.deltaY) / scaleCoeffBack * newScale + canvas.deltaY
 
-				let wasLimitCorrection = deltaCorrection(canvas.deltaX - (newX - scaleX), canvas.deltaY - (newY - scaleY));
+				let wasLimitCorrection = deltaCorrection(canvas.deltaX - (newX - scaleX), canvas.deltaY - (newY - scaleY), newScale);
 
 				if(!wasLimitCorrection){
 					canvas.deltaX -= (newX - scaleX)
@@ -754,22 +786,25 @@ Rectangle {
 				canvas.scaleCoeffPrev = newScale;
 			}
 
-			function deltaCorrection(deltaXArg, deltaYArg){
+			function deltaCorrection(deltaXArg, deltaYArg, scale_){
+				if(scale_ == undefined){
+					scale_ = canvas.scaleCoeff;
+				}
 				let wasLimitCorrection = false;
-				if(graphicsView.translateXPositiveLimit !== undefined && deltaXArg > -graphicsView.translateXPositiveLimit * (canvas.scaleCoeff - 1)){
-					canvas.deltaX = -graphicsView.translateXPositiveLimit * (canvas.scaleCoeff - 1)
+				if(graphicsView.translateXPositiveLimit !== undefined && deltaXArg > -graphicsView.translateXPositiveLimit * (scale_ - 1)){
+					canvas.deltaX = -graphicsView.translateXPositiveLimit * (scale_ - 1)
 					wasLimitCorrection = true
 				}
-				if(graphicsView.translateYPositiveLimit !== undefined && deltaYArg > -graphicsView.translateYPositiveLimit * (canvas.scaleCoeff - 1)){
-					canvas.deltaY = -graphicsView.translateYPositiveLimit* (canvas.scaleCoeff - 1)
+				if(graphicsView.translateYPositiveLimit !== undefined && deltaYArg > -graphicsView.translateYPositiveLimit * (scale_ - 1)){
+					canvas.deltaY = -graphicsView.translateYPositiveLimit* (scale_ - 1)
 					wasLimitCorrection = true
 				}
-				if(graphicsView.translateXNegativeLimit !== undefined && deltaXArg < graphicsView.translateXNegativeLimit * (canvas.scaleCoeff - 1) - canvas.width  *(canvas.scaleCoeff-1)){
-					canvas.deltaX = graphicsView.translateXNegativeLimit * (canvas.scaleCoeff - 1) - canvas.width * (canvas.scaleCoeff-1)
+				if(graphicsView.translateXNegativeLimit !== undefined && deltaXArg < graphicsView.translateXNegativeLimit * (scale_ - 1) - canvas.width  *(scale_-1)){
+					canvas.deltaX = graphicsView.translateXNegativeLimit * (scale_ - 1) - canvas.width * (scale_-1)
 					wasLimitCorrection = true
 				}
-				if(graphicsView.translateYNegativeLimit !== undefined && deltaYArg < graphicsView.translateYNegativeLimit *(canvas.scaleCoeff-1) - canvas.height  *(canvas.scaleCoeff-1)){
-					canvas.deltaY = graphicsView.translateYNegativeLimit *(canvas.scaleCoeff-1) - canvas.height * (canvas.scaleCoeff-1)
+				if(graphicsView.translateYNegativeLimit !== undefined && deltaYArg < graphicsView.translateYNegativeLimit *(scale_-1) - canvas.height  *(scale_-1)){
+					canvas.deltaY = graphicsView.translateYNegativeLimit *(scale_-1) - canvas.height * (scale_-1)
 					wasLimitCorrection = true
 				}
 				return wasLimitCorrection;

@@ -2,15 +2,21 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
+import imtcontrols 1.0
+
+
 GraphicsShapeBase {
 	id: polylineShape;
 
 	property string color: "#000000";
 
 	function draw(ctx, layerMatrix){
+
 		drawBase(ctx);
 		if(showNodes){
 			drawNodes(ctx)
+		}
+		if(hasNodeSelection && selectedNodeCoordinate !==undefined){
 		}
 	}
 
@@ -39,7 +45,7 @@ GraphicsShapeBase {
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.fillStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
-		let radius = params.radius !== undefined ? params.radius : 4;
+		let radius = params.radius !== undefined ? params.radius : DesignScheme.shapePointSize;
 		ctx.beginPath()
 		let pointList = getPoints();
 		for(let i = 0;i < pointList.length; i++){

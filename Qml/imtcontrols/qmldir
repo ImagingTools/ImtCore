@@ -5,6 +5,7 @@ singleton EventManager 1.0 ./Base/EventManager.qml
 singleton Enums 1.0 ./Base/Enums.qml
 singleton Functions 1.0 ./Base/Functions.qml
 singleton RelativePosition 1.0 ./Base/RelativePosition.qml
+singleton DesignScheme 1.0 ./Base/DesignScheme.qml
 
 Icon 1.0 ./Base/Icon.js
 ButtonType 1.0 ./Base/ButtonType.js

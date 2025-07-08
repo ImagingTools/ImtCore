@@ -7,10 +7,11 @@ GraphicsShapeBase {
 	id: gridShape;
 
 	property Item viewItem: null
-	property int axeMarginHorizontal: 30;
-	property int axeMarginVertical: 40;
+	property int originX: 36;
+	property int originY: 40;
 	property int gridStepMajor: 40;
 	property int gridStepMinor: 10;
+	property real thinningZoomLevel: 0.8;
 	property int fontSize: Style.fontSizeM
 	property string backgroundColor: Style.baseColor;
 
@@ -24,6 +25,7 @@ GraphicsShapeBase {
 		let deltaX = layerMatrix.xTranslation();
 		let deltaY = layerMatrix.yTranslation();
 		let scaleCoeff = layerMatrix.xScale();
+		let scaleMax1 = Math.min(1, scaleCoeff)
 
 		let deltaAddX = deltaX > 0 ? 0 : -deltaX
 		let deltaAddY = deltaY <= 0 ? 0 : deltaY
@@ -40,23 +42,23 @@ GraphicsShapeBase {
 		//background
 		identityMatrix.setContextTransform(ctx);
 
-		ctx.fillRect(axeMarginHorizontal,0, gridShape.viewItem.drawingAreaWidth - axeMarginHorizontal, gridShape.viewItem.drawingAreaHeight - axeMarginVertical)
+		ctx.fillRect(originX,0, gridShape.viewItem.drawingAreaWidth - originX, gridShape.viewItem.drawingAreaHeight - originY)
 		// ctx.fillRect(0,0, gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight)
 
 		layerMatrix.setContextTransform(ctx);
 
 		//GRID
-		let verticalLineTopY = (gridShape.viewItem.drawingAreaHeight - axeMarginVertical) - Math.trunc((gridShape.viewItem.drawingAreaHeight - axeMarginVertical)/ step) * step - deltaAddY;
-
+		let verticalLineTopY = (gridShape.viewItem.drawingAreaHeight - originY) - (Math.trunc((gridShape.viewItem.drawingAreaHeight - originY)/ step) * step) - deltaAddY;
+		verticalLineTopY /= scaleMax1
 		//MINOR GRID
 		if(scaleCoeff >= 2){
 			ctx.strokeStyle = Style.imagingToolsGradient0;
 			let step = gridShape.gridStepMinor
-			for(let i = 0; i * step < gridShape.viewItem.drawingAreaWidth - axeMarginHorizontal + deltaAddX; i++){//vertical lines
-				let x1 = axeMarginHorizontal + i * step;
+			for(let i = 0; i * step < gridShape.viewItem.drawingAreaWidth - originX + deltaAddX; i++){//vertical lines
+				let x1 = originX + i * step;
 				let y1 =  verticalLineTopY ;
 				let x2 = x1;
-				let y2 = gridShape.viewItem.drawingAreaHeight - axeMarginVertical ;
+				let y2 = gridShape.viewItem.drawingAreaHeight - originY ;
 
 				ctx.beginPath()
 				ctx.moveTo(x1, y1);
@@ -65,10 +67,10 @@ GraphicsShapeBase {
 				ctx.stroke();
 			}
 
-			for(let i = 0; i * step < gridShape.viewItem.drawingAreaHeight - axeMarginVertical  + deltaAddY; i++){//horizontal lines
+			for(let i = 0; i * step < gridShape.viewItem.drawingAreaHeight - originY  + deltaAddY; i++){//horizontal lines
 
-				let x1 = axeMarginHorizontal ;
-				let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - axeMarginVertical;
+				let x1 = originX ;
+				let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - originY;
 				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
 				let y2 =  y1;
 
@@ -82,11 +84,15 @@ GraphicsShapeBase {
 
 		//MAJOR GRID
 		ctx.strokeStyle = Style.imagingToolsGradient1;
-		for(let i = 0; i * step < gridShape.viewItem.drawingAreaWidth - axeMarginHorizontal + deltaAddX; i++){//vertical lines
-			let x1 = axeMarginHorizontal + i * step;
+		//vertical lines
+		for(let i = 0; i * step  <= (gridShape.viewItem.drawingAreaWidth  /*- originX*/ + deltaAddX)/scaleCoeff; i++){//vertical lines
+			if(gridShape.thinningCheck(scaleCoeff, i)){
+				continue
+			}
+			let x1 = originX + i * step;
 			let y1 =  verticalLineTopY ;
 			let x2 = x1;
-			let y2 = gridShape.viewItem.drawingAreaHeight - axeMarginVertical ;
+			let y2 = gridShape.viewItem.drawingAreaHeight  - originY ;
 
 			ctx.beginPath()
 			ctx.moveTo(x1, y1);
@@ -94,11 +100,14 @@ GraphicsShapeBase {
 			ctx.closePath()
 			ctx.stroke();
 		}
-
-		for(let i = 0; i * step < gridShape.viewItem.drawingAreaHeight - axeMarginVertical  + deltaAddY; i++){//horizontal lines
-			let x1 = axeMarginHorizontal ;
-			let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - axeMarginVertical;
-			let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
+		//horizontal lines
+		for(let i = 0; i * step <= (gridShape.viewItem.drawingAreaHeight - originY + deltaAddY)/ scaleMax1 ; i++){//horizontal lines
+			if(gridShape.thinningCheck(scaleCoeff, i)){
+				continue
+			}
+			let x1 = originX ;
+			let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - originY;
+			let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
 			let y2 =  y1;
 
 			ctx.beginPath()
@@ -113,8 +122,8 @@ GraphicsShapeBase {
 		identityMatrix.setContextTransform(ctx);
 
 		ctx.fillStyle = backgroundColor;
-		ctx.fillRect(0,0, axeMarginHorizontal, gridShape.viewItem.drawingAreaHeight)
-		ctx.fillRect(axeMarginHorizontal,gridShape.viewItem.drawingAreaHeight - axeMarginVertical,
+		ctx.fillRect(0,0, originX, gridShape.viewItem.drawingAreaHeight)
+		ctx.fillRect(originX,gridShape.viewItem.drawingAreaHeight - originY,
 					 gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight)
 
 
@@ -130,9 +139,12 @@ GraphicsShapeBase {
 		labelMatrix.setYTranslation(0);
 		labelMatrix.setContextTransform(ctx);
 
-		for(let i = 1; i * step * scaleCoeff < (gridShape.viewItem.drawingAreaWidth - axeMarginHorizontal + deltaAddX); i++){
-			let x_ = (axeMarginHorizontal + i * step) * scaleCoeff;
-			let y_ = gridShape.viewItem.drawingAreaHeight  - axeMarginVertical + fontSize + Style.marginXS
+		for(let i = 1; i * step  <= (gridShape.viewItem.drawingAreaWidth - originX + deltaAddX)/scaleCoeff; i++){
+			if(gridShape.thinningCheck(scaleCoeff, i)){
+				continue
+			}
+			let x_ = (originX + i * step) * scaleCoeff;
+			let y_ = gridShape.viewItem.drawingAreaHeight  - originY + fontSize + Style.marginXS
 			ctx.beginPath()
 			let str = String(i * step)
 
@@ -150,10 +162,13 @@ GraphicsShapeBase {
 		labelMatrix.setYTranslation(deltaY);
 		labelMatrix.setContextTransform(ctx);
 
-		for(let i = 1; i * step * scaleCoeff < (gridShape.viewItem.drawingAreaHeight - axeMarginVertical + deltaAddY) * scaleCoeff; i++){
-			let x_ = axeMarginHorizontal;
-			let y_ = (gridShape.viewItem.drawingAreaHeight - i * step  - axeMarginVertical)* scaleCoeff
-			//console.log("deltaAddY:: ", y_, deltaAddY, (gridShape.viewItem.drawingAreaHeight - axeMarginVertical + deltaAddY * scaleCoeff))
+		for(let i = 1; i * step * scaleCoeff < (gridShape.viewItem.drawingAreaHeight - originY + deltaAddY) * scaleCoeff / scaleMax1; i++){
+			if(gridShape.thinningCheck(scaleCoeff, i)){
+				continue
+			}
+			let x_ = originX;
+			let y_ = (gridShape.viewItem.drawingAreaHeight - i * step  - originY)* scaleCoeff
+			//console.log("deltaAddY:: ", y_, deltaAddY, (gridShape.viewItem.drawingAreaHeight - originY + deltaAddY * scaleCoeff))
 
 			ctx.beginPath()
 			let str = String(i * step)
@@ -172,38 +187,50 @@ GraphicsShapeBase {
 
 		//axes background
 		ctx.fillStyle = backgroundColor;
-		ctx.fillRect(0,gridShape.viewItem.drawingAreaHeight - axeMarginVertical, axeMarginHorizontal, gridShape.viewItem.drawingAreaHeight)
+		ctx.fillRect(0,gridShape.viewItem.drawingAreaHeight - originY, originX, gridShape.viewItem.drawingAreaHeight)
 
 		//Label names
 		let labelFontSize = fontSize + 2
 		ctx.font = String(labelFontSize) + "px sans-serif"
 		let labelXLength = ctx.measureText(gridShape.labelX).width
 		let labelYLength = ctx.measureText(gridShape.labelY).width
-		let labelXWidth = Math.max(labelXLength + 10, 30)
-		let labelYHeight = 30
+		let labelXWidth = Math.max(labelXLength + 10, 20)
+		let labelYHeight = labelFontSize + 4
 
-		ctx.fillRect(gridShape.viewItem.drawingAreaWidth - labelXWidth ,gridShape.viewItem.drawingAreaHeight - axeMarginVertical, labelXWidth, gridShape.axeMarginVertical)
-		ctx.fillRect(0 ,0, gridShape.axeMarginHorizontal, labelYHeight)
+		ctx.fillRect(gridShape.viewItem.drawingAreaWidth - labelXWidth ,gridShape.viewItem.drawingAreaHeight - originY, labelXWidth, gridShape.originY)
+		ctx.fillRect(0 ,0, gridShape.originX, labelYHeight)
 
 		ctx.fillStyle = Style.borderColor2;
-		ctx.fillText(gridShape.labelX, gridShape.viewItem.drawingAreaWidth - labelXLength, gridShape.viewItem.drawingAreaHeight  - axeMarginVertical + fontSize + Style.marginXS);
+		ctx.fillText(gridShape.labelX, gridShape.viewItem.drawingAreaWidth - labelXLength, gridShape.viewItem.drawingAreaHeight  - originY + fontSize + Style.marginXS);
 		ctx.fillText(gridShape.labelY, Style.marginXS, Style.marginXS + labelFontSize/2);
 
 		//horizontal axe
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = Style.borderColor;
 		ctx.beginPath()
-		ctx.moveTo(0, gridShape.viewItem.drawingAreaHeight - axeMarginVertical);
-		ctx.lineTo(gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight - axeMarginVertical);
+		ctx.moveTo(0, gridShape.viewItem.drawingAreaHeight - originY);
+		ctx.lineTo(gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight - originY);
 		ctx.closePath()
 		ctx.stroke();
 
 		//vertical axe
 		ctx.beginPath()
-		ctx.moveTo(axeMarginHorizontal, 0);
-		ctx.lineTo(axeMarginHorizontal, gridShape.viewItem.drawingAreaHeight);
+		ctx.moveTo(originX, 0);
+		ctx.lineTo(originX, gridShape.viewItem.drawingAreaHeight);
 		ctx.closePath()
 		ctx.stroke();
+	}
+
+	function thinningCheck(scaleCoeff, i){
+		let ok = false;
+		if(scaleCoeff < gridShape.thinningZoomLevel && i%2 !== 0){
+			ok = true
+		}
+		if(scaleCoeff < gridShape.thinningZoomLevel/2 && i%(2*2) !== 0){
+			ok = true;
+		}
+
+		return ok;
 	}
 }
 
