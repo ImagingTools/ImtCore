@@ -167,9 +167,11 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	QString itemClassName = sdlNamespace + QStringLiteral("::C") + sdlType.GetName();
 	QString modelDataTypeName = itemClassName + QStringLiteral("::V1_0");
 	QString modelObjectDataTypeName = itemClassName + QStringLiteral("Object");
+	QString objectListClassName = QStringLiteral("C") + sdlType.GetName() + QStringLiteral("ObjectList");
+	QString objectListClassNameWithNamespace = sdlNamespace + QStringLiteral("::") + objectListClassName;
 
-	stream << QStringLiteral("class C") << sdlType.GetName();
-	stream << QStringLiteral("ObjectList: public ::imtbase::TListModelBase<");
+	stream << QStringLiteral("class ") << objectListClassName;
+	stream << QStringLiteral(": public ::imtbase::TListModelBase<");
 	stream << modelDataTypeName << QStringLiteral(", ") << modelObjectDataTypeName;
 	stream << QStringLiteral(">");
 	FeedStream(stream, 1, false);
@@ -192,8 +194,8 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	FeedStream(stream, 2, false);
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("C") << sdlType.GetName();
-	stream << QStringLiteral("ObjectList(QObject* parent = nullptr): BaseClass(parent) {}");
+	stream << objectListClassName;
+	stream << QStringLiteral("(QObject* parent = nullptr): BaseClass(parent) {}");
 	FeedStream(stream, 2, false);
 
 	FeedStreamHorizontally(stream);
@@ -222,7 +224,7 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 
 	// get method begin
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QVariantMap get(int row) const {");
+	stream << QStringLiteral("Q_INVOKABLE QVariantMap get(int row) const{");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);
@@ -254,7 +256,7 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 
 	// append method begin
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void append(const ") << modelDataTypeName << QStringLiteral("& item){");
+	stream << QStringLiteral("Q_INVOKABLE void append(") << modelObjectDataTypeName << QStringLiteral("* item){");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);
@@ -262,7 +264,7 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("Version_1_0->append(item);");
+	stream << QStringLiteral("Version_1_0->append(*item->Version_1_0);");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);
@@ -278,9 +280,387 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	FeedStream(stream, 1, false);
 	// append method end
 
+	// copyMe method begin
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("Q_INVOKABLE ") << objectListClassNameWithNamespace << QStringLiteral("* copyMe(){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << objectListClassNameWithNamespace << QStringLiteral("* objectListPtr = new ") << objectListClassNameWithNamespace << QStringLiteral("();");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("for (int i = 0; i < this->rowCount(); i++){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("QVariant item = this->getData(\"item\", i);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (!item.canConvert<") + modelObjectDataTypeName + QStringLiteral(">()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream <<  modelObjectDataTypeName + QStringLiteral("* itemObjectPtr = item.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (itemObjectPtr == nullptr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("objectListPtr->addElement(dynamic_cast<") + modelObjectDataTypeName + QStringLiteral("*>(itemObjectPtr->copyMe()));");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("return objectListPtr;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+	// copyMe method end
+
+	// toJson method begin
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("Q_INVOKABLE QString toJson(){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("QString retVal = QStringLiteral(\"[\");");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("for (int i = 0; i < this->rowCount(); i++){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (i > 0 && i < this->rowCount() - 1){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("retVal += QStringLiteral(\", \");");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("QVariant item = this->getData(\"item\", i);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (!item.canConvert<") + modelObjectDataTypeName + QStringLiteral(">()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << modelObjectDataTypeName + QStringLiteral("* itemObjectPtr = item.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (itemObjectPtr == nullptr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return QString();");
+	FeedStream(stream, 1, false);
+	
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("retVal += itemObjectPtr->toJson();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("retVal += QStringLiteral(\"]\");");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("return retVal;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+	// toJson method end
+
+	// toGraphQL method begin
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("Q_INVOKABLE QString toGraphQL(){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("QString retVal = QStringLiteral(\"[\");");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("for (int i = 0; i < this->rowCount(); i++){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (i > 0 && i < this->rowCount() - 1){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("retVal += QStringLiteral(\", \");");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("QVariant item = this->getData(\"item\", i);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (!item.canConvert<") + modelObjectDataTypeName + QStringLiteral(">()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return nullptr;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << modelObjectDataTypeName + QStringLiteral("* itemObjectPtr = item.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (itemObjectPtr == nullptr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return QString();");
+	FeedStream(stream, 1, false);
+	
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("retVal += itemObjectPtr->toGraphQL();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("retVal += QStringLiteral(\"]\");");
+	FeedStream(stream, 2, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("return retVal;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+	// toGraphQL method end
+
+	// addElement method begin
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("Q_INVOKABLE void addElement(") + modelObjectDataTypeName + QStringLiteral("* item){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("append(item);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+	// addElement method end
+
+	// removeElement method begin
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("Q_INVOKABLE void removeElement(int index){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("remove(index);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 2, false);
+	// removeElement method end
+
+	// isEqualWithModel method begin
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("Q_INVOKABLE bool isEqualWithModel(") << objectListClassNameWithNamespace << QStringLiteral("* otherModelPtr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("if (otherModelPtr == nullptr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("if (this == otherModelPtr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("if (this->rowCount() != otherModelPtr->rowCount()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("for (int i = 0; i < this->rowCount(); i++){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("QVariant selfItem = this->getData(\"item\", i);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("QVariant otherItem = otherModelPtr->getData(\"item\", i);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (!selfItem.canConvert<") + modelObjectDataTypeName + QStringLiteral(">()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << modelObjectDataTypeName + QStringLiteral("* selfItemObjectPtr = selfItem.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (selfItemObjectPtr == nullptr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream <<  modelObjectDataTypeName + QStringLiteral("* otherItemObjectPtr = selfItem.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (otherItemObjectPtr == nullptr){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 4);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 3);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("return true;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+	FeedStream(stream, 1, false);
+	// isEqualWithModel method end
+
 	// insert method begin
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void insert(int index, const ") << modelDataTypeName << QStringLiteral("& item){");
+	stream << QStringLiteral("Q_INVOKABLE void insert(int index, ") << modelObjectDataTypeName << QStringLiteral("* item){");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);
@@ -292,7 +672,7 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("Version_1_0->insert(index, item);");
+	stream << QStringLiteral("Version_1_0->insert(index, *item->Version_1_0);");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);

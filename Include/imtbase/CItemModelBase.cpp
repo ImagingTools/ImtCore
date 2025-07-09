@@ -115,13 +115,26 @@ bool CItemModelBase::fromObject(const QJsonObject& jsonObject)
 
 QString CItemModelBase::toGraphQL() const
 {
+	qDebug() << "toGraphQL" << this;
 	QString result = "{";
 	const QStringList keys = getProperties();
 	for (int i = 0; i < keys.size(); ++i){
 		QString key = keys[i];
+		QString jsonKey = getJSONKeyForProperty(key);
 		QVariant value = property(key.toUtf8());
 		result += key + ":";
-		if (value.typeId() == QMetaType::QString){
+
+		qDebug() << "value" << value;
+		if (value.canConvert<CItemModelBase>()){
+			qDebug() << "canConvert" << value;
+			CItemModelBase* objectPtr = value.value<CItemModelBase*>();
+			if (objectPtr == nullptr){
+				return QString();
+			}
+
+			result += jsonKey + ':' + objectPtr->toGraphQL();
+		}
+		else if (value.typeId() == QMetaType::QString || value.typeId() == QMetaType::QByteArray){
 			result += "\"" + value.toString().replace("\"", "\\\"") + "\"";
 		}
 		else{
@@ -263,7 +276,9 @@ QStringList CItemModelBase::getProperties() const
 	for (int i = 0; i < meta->propertyCount(); i++){
 		QMetaProperty prop = meta->property(i);
 		QString name = QString::fromLatin1(prop.name());
-		list.append(name);
+		if (name.startsWith("m_")){
+			list.append(name);
+		}
 	}
 
 	return list;
@@ -272,12 +287,6 @@ QStringList CItemModelBase::getProperties() const
 
 QString CItemModelBase::getJSONKeyForProperty(const QString& propertyName) const
 {
-	if (propertyName.startsWith("m_") && propertyName.length() > 2) {
-		QString transformed = propertyName.mid(2);
-		transformed[0] = transformed[0].toUpper();
-		return transformed;
-	}
-
 	return propertyName;
 }
 
@@ -285,64 +294,6 @@ QString CItemModelBase::getJSONKeyForProperty(const QString& propertyName) const
 CItemModelBase* CItemModelBase::CreateItemModel(const QString& jsonKey)
 {
 	return nullptr;
-}
-
-
-// private methods
-
-bool CItemModelBase::connectPropertyChangedToSlot(
-			QObject* sender,
-			const QString& propName,
-			QObject* receiver,
-			const char* slot)
-{
-	const QMetaObject* senderMeta = sender->metaObject();
-
-	int propIndex = senderMeta->indexOfProperty(propName.toUtf8().constData());
-	if (propIndex == -1) {
-		qWarning() << "Property" << propName << "not found in" << sender;
-		return false;
-	}
-
-	QMetaProperty prop = senderMeta->property(propIndex);
-	if (!prop.hasNotifySignal()) {
-		qWarning() << "Property" << propName << "has no notify signal";
-		return false;
-	}
-
-	QMetaMethod signal = prop.notifySignal();
-
-	int slotIndex = receiver->metaObject()->indexOfSlot(slot);
-	if (slotIndex == -1) {
-		qWarning() << "Slot" << slot << "not found in" << receiver;
-		return false;
-	}
-
-	QMetaMethod slotMethod = receiver->metaObject()->method(slotIndex);
-
-	return QObject::connect(
-				sender, signal,
-				receiver, slotMethod
-				);
-}
-
-
-void CItemModelBase::connectProperties() 
-{
-	const QMetaObject* meta = metaObject();
-	int count = meta->propertyCount();
-
-	for (int i = 0; i < count; ++i) {
-		QMetaProperty prop = meta->property(i);
-		if (!prop.hasNotifySignal()){
-			continue;
-		}
-
-		QString propName = QString::fromLatin1(prop.name());
-		if (propName != "objectName" && !connectPropertyChangedToSlot(this, propName, this, SLOT(OnInternalModelChanged()))){
-			qWarning() << "Failed to connect property:" << propName;
-		}
-	}
 }
 
 

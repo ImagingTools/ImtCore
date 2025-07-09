@@ -38,8 +38,6 @@ public slots:
 
 protected:
 	virtual CItemModelBase* CreateItemModel(const QString& jsonKey);
-	bool connectPropertyChangedToSlot(QObject* sender, const QString& propName, QObject* receiver, const char* slot);
-	void connectProperties();
 
 private:
 	bool m_enableNotifications = true;
