@@ -85,14 +85,7 @@ ComplexCollectionFilter{
 		Emitted when the filter is changed.
 	*/
 	signal filterChanged()
-	
-	Component.onCompleted:{
-		// if (!hasFieldsFilter()){
-		// 	createFieldsFilter()
-		// 	m_fieldsFilter.m_logicalOperation = logicalOperation.AND
-		// }
-	}
-	
+
 	/*!
 		\qmlmethod object createBaseModel()
 		Creates and returns a new base model object.
@@ -114,8 +107,9 @@ ComplexCollectionFilter{
 		Sets a new text filter using OR operation on the fields defined in \c textFilteringInfoIds.
 	*/
 	function setTextFilter(filter){
-		// m_fieldsFilter.m_groupFilters.clear()
-		clearFieldsFilter()
+		if (hasFieldsFilter()){
+			m_fieldsFilter.m_groupFilters.clear()
+		}
 
 		if (filter !== ""){
 			let fieldsModel = createBaseModel()
@@ -127,7 +121,6 @@ ComplexCollectionFilter{
 			}
 			
 			let textGroupFilter = createGroupFilter(logicalOperation.OR, fieldsModel)
-			console.log("setTextFilter")
 			addGroupFilter(textGroupFilter)
 		}
 	}
