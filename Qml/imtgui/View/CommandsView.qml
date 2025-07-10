@@ -44,32 +44,6 @@ Item {
 		}
 	}
 
-	function setCommandData(commandId, key, value){
-		if (!commandsModel){
-			return;
-		}
-
-		for (let j = 0; j < allElements.length; j++){
-			if (allElements[j].element["m_elementId"] === commandId){
-				allElements[j].element[key] = value;
-				
-				break;
-			}
-		}
-	}
-	
-	function getCommandData(commandId, key){
-		for (let j = 0; j < allElements.length; j++){
-			if (allElements[j]){
-				if (allElements[j].element["m_elementId"] === commandId){
-					return allElements[j].element[key];
-				}
-			}
-		}
-		
-		return null;
-	}
-	
 	// Clear view
 	function clear(){
 		if (commandsModel.hasSubElements()){
@@ -145,13 +119,14 @@ Item {
 					property GuiElementModel element: model.item;
 					
 					enabled: element ? element.m_enabled: false;
+
 					text: element ? element.m_elementName : "";
 					widthFromDecorator: true;
 					heightFromDecorator: true;
 					checkable: element ? element.m_toggleable : false;
 					checked: element ? element.m_toggled : false;
 					iconSource: !element ? "" : element.m_elementItemPath === "" ? "" : element.m_enabled ? "../../../../" + Style.getIconPath(element.m_elementItemPath, Icon.State.On, Icon.Mode.Normal) :
-																						 "../../../../" + Style.getIconPath(element.m_elementItemPath, Icon.State.Off, Icon.Mode.Disabled);
+																						"../../../../" + Style.getIconPath(element.m_elementItemPath, Icon.State.Off, Icon.Mode.Disabled);
 					decorator: Component {
 						TopButtonDecorator {
 							property string baseColor: !baseElement ? "transparent" : baseElement.checked ? Style.borderColor : baseElement.mouseArea.containsMouse ? Style.baseColor : Style.backgroundColor2

@@ -11,20 +11,6 @@ Item {
 
 	signal commandActivated(string commandId, var params);
 	
-	function getCommandData(commandId, key){
-		let result = leftCommands.getCommandData(commandId, key);
-		
-		if (result == null){
-			result = centerCommands.getCommandData(commandId, key);
-		}
-		
-		if (result == null){
-			result = rightCommands.getCommandData(commandId, key);
-		}
-		
-		return result;
-	}
-	
 	function setNegativeAccentCommandIds(commandIds){
 		leftCommands.negativeAccentCommandIds = commandIds;
 		centerCommands.negativeAccentCommandIds = commandIds;
@@ -37,12 +23,6 @@ Item {
 		rightCommands.positiveAccentCommandIds = commandIds;
 	}
 	
-	function setCommandData(commandId, key, value){
-		leftCommands.setCommandData(commandId, key, value);
-		centerCommands.setCommandData(commandId, key, value);
-		rightCommands.setCommandData(commandId, key, value);
-	}
-	
 	property GuiElementContainer commandsModel: GuiElementContainer {};
 	onCommandsModelChanged: {
 		updateGui()
@@ -52,9 +32,9 @@ Item {
 		if (!commandsModel){
 			return;
 		}
-		
+
 		clearModel();
-		
+
 		for (let i = 0; i < commandsModel.m_elements.count; i++){
 			let group = commandsModel.m_elements.get(i).item;
 			if (group){

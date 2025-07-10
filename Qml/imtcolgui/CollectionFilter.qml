@@ -87,10 +87,10 @@ ComplexCollectionFilter{
 	signal filterChanged()
 	
 	Component.onCompleted:{
-		if (m_fieldsFilter){
+		if (!hasFieldsFilter()){
+			createFieldsFilter()
 			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
 		}
-		console.log("Component.onCompleted m_fieldsFilter", m_fieldsFilter)
 	}
 	
 	/*!
@@ -146,6 +146,8 @@ ComplexCollectionFilter{
 			createSortingInfo()
 		}
 
+		console.log("m_sortingInfo", m_sortingInfo)
+		console.log("obj", obj)
 		m_sortingInfo.addElement(obj)
 	}
 	
@@ -309,7 +311,6 @@ ComplexCollectionFilter{
 	function clearSortFilter(){
 		if (hasSortingInfo()){
 			m_sortingInfo.clear()
-			removeSortingInfo()
 		}
 	}
 	
