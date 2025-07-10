@@ -9,6 +9,7 @@ import imtcolgui 1.0
 GraphicsView{
 	id: view;
 
+	hasButtonMenu: true;
 	property var drawModel: []
 
 
@@ -49,18 +50,6 @@ GraphicsView{
 		let rec1 = rec1Comp.createObject(this);
 		let rec2 = rec2Comp.createObject(this);
 		let rec3 = rec3Comp.createObject(this);
-
-		// let points1 = []
-		// points1.push(view.drawModel[0].point);
-		// rec1.points = points1
-
-		// let points2 = []
-		// points2.push(view.drawModel[1].point);
-		// rec2.points = points2
-
-		// let points3 = []
-		// points3.push(view.drawModel[2].point);
-		// rec3.points = points3
 
 		rec1.points.push(view.drawModel[0].point);
 		rec2.points.push(view.drawModel[1].point);
