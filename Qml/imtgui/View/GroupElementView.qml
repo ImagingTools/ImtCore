@@ -43,8 +43,6 @@ Rectangle {
 
 		contentHeight = h
 		height = contentHeight
-		
-		console.log("calcHeight height", height)
 	}
 
 	QtObject {

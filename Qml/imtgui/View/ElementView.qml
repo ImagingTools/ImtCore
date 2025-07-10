@@ -155,21 +155,23 @@ Rectangle {
 		}
 		
 		Item {
-			id: bottomItem
+			id: bottomItemPart
 			width: parent.width
 			visible: bottomLoader.item !== undefined
 			clip: true
+
 			Loader {
 				id: bottomLoader
 				width: parent.width
 				onItemChanged: {
-					bottomItem.height = item ? item.height : 0
+					bottomItemconnections.target = item
+					bottomItemPart.height = item ? item.height : 0
 				}
 			}
 			Connections {
-				target: bottomLoader.item
+				id: bottomItemconnections
 				function onHeightChanged(){
-					bottomItem.height = bottomLoader.item.height
+					bottomItemPart.height = bottomLoader.item.height
 				}
 			}
 		}

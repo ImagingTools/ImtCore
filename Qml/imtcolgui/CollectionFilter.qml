@@ -87,10 +87,10 @@ ComplexCollectionFilter{
 	signal filterChanged()
 	
 	Component.onCompleted:{
-		if (!hasFieldsFilter()){
-			createFieldsFilter()
-			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
-		}
+		// if (!hasFieldsFilter()){
+		// 	createFieldsFilter()
+		// 	m_fieldsFilter.m_logicalOperation = logicalOperation.AND
+		// }
 	}
 	
 	/*!
@@ -146,8 +146,6 @@ ComplexCollectionFilter{
 			createSortingInfo()
 		}
 
-		console.log("m_sortingInfo", m_sortingInfo)
-		console.log("obj", obj)
 		m_sortingInfo.addElement(obj)
 	}
 	
@@ -195,6 +193,7 @@ ComplexCollectionFilter{
 	function addGroupFilter(group){
 		if (!hasFieldsFilter()){
 			createFieldsFilter()
+			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
 		}
 		if (!m_fieldsFilter.hasGroupFilters()){
 			m_fieldsFilter.createGroupFilters()
@@ -226,6 +225,7 @@ ComplexCollectionFilter{
 	function addFieldFilter(field){
 		if (!hasFieldsFilter()){
 			createFieldsFilter()
+			m_fieldsFilter.m_logicalOperation = logicalOperation.AND
 		}
 
 		if (!m_fieldsFilter.hasFieldFilters()){

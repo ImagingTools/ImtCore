@@ -91,6 +91,10 @@ DocumentDataController {
 				objectData.connectProperties();
 			}
 
+			if (objectData.m_id !== undefined){
+				objectData.m_id = container.documentId
+			}
+
 			documentModel = objectData;
 		}
 		else{

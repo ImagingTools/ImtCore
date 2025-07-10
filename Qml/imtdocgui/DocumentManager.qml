@@ -218,16 +218,17 @@ QtObject {
 
 	function insertNewDocument(documentTypeId, viewTypeId)
 	{
-		let documentData = createTemplateDocument(UuidGenerator.generateUUID(), documentTypeId, viewTypeId);
+		let documentId = UuidGenerator.generateUUID()
+		let documentData = createTemplateDocument(documentId, documentTypeId, viewTypeId);
 		if (!documentData){
 			return false;
 		}
 
+		addDocumentToModel(documentId, documentTypeId, viewTypeId, documentData);
+
 		if (documentData.documentDataController){
 			documentData.documentDataController.createDocumentModel();
 		}
-
-		addDocumentToModel(documentData.documentId, documentTypeId, viewTypeId, documentData);
 
 		return true;
 	}
@@ -639,6 +640,9 @@ QtObject {
 			property Component viewComp;
 			property ViewBase view;
 			property bool isDirty: false;
+			property bool modelReceived: false;
+			property bool modelInitialized: false;
+			property bool viewRegistered: false;
 
 			Component.onDestruction: {
 				if (documentDataController){
@@ -655,22 +659,15 @@ QtObject {
 			}
 
 			onViewChanged: {
-				let documentModel = documentDataController.documentModel;
-				view.model = documentModel;
-				blockingUpdateModel = true;
-
-				if (isNew){
-					updateModel();
-				}
-				else{
-					updateGui();
-				}
-
-				if (view.commandsDelegate){
+				viewRegistered = view != undefined && view != null
+				
+				if (viewRegistered && view.commandsDelegate){
 					view.commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
 				}
 
-				blockingUpdateModel = false;
+				if (modelReceived && !modelInitialized){
+					initModelForView()
+				}
 			}
 
 			function updateGui(){
@@ -683,6 +680,44 @@ QtObject {
 				if (singleDocumentData.view){
 					singleDocumentData.view.doUpdateModel();
 				}
+			}
+
+			function initModelForView(){
+				if (!singleDocumentData.view){
+					console.error("Unable to init model for view. Error: View is invalid")
+					return;
+				}
+
+				if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
+					documentManager.documentOpeningFailed(singleDocumentData.documentId, qsTr("Internal error"))
+					return;
+				}
+				
+				let documentModel = singleDocumentData.documentDataController.documentModel;
+
+				singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
+
+				singleDocumentData.blockingUpdateModel = true;
+
+				singleDocumentData.view.model = documentModel;
+
+				if (singleDocumentData.isNew){
+					singleDocumentData.updateModel();
+				}
+				else{
+					singleDocumentData.updateGui();
+				}
+
+				singleDocumentData.blockingUpdateModel = false;
+
+				singleDocumentData.undoManager.registerModel(documentModel);
+				singleDocumentData.documentValidator.documentModel = documentModel;
+
+				singleDocumentData.modelInitialized = true
+				singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel
+				singleDocumentData.modelConnections.enabled = true;
+				
+				documentManager.documentOpened(singleDocumentData.documentId)
 			}
 
 			property Connections dataControllerConnections: Connections {
@@ -700,41 +735,11 @@ QtObject {
 				}
 
 				function onModelChanged(){
-					if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
-						documentManager.documentOpeningFailed(singleDocumentData.documentId, qsTr("Internal error"))
-						return;
-					}
+					singleDocumentData.modelReceived = true
 					
-					let documentModel = singleDocumentData.documentDataController.documentModel;
-
-					singleDocumentData.documentId = singleDocumentData.documentDataController.getDocumentId();
-
-					singleDocumentData.blockingUpdateModel = true;
-
-					if (singleDocumentData.view){
-						singleDocumentData.view.model = documentModel;
-
-						if (singleDocumentData.view.commandsDelegate){
-							singleDocumentData.view.commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
-						}
+					if (singleDocumentData.viewRegistered){
+						singleDocumentData.initModelForView()
 					}
-
-					if (singleDocumentData.isNew){
-						singleDocumentData.updateModel();
-					}
-					else{
-						singleDocumentData.updateGui();
-					}
-
-					singleDocumentData.blockingUpdateModel = false;
-
-					singleDocumentData.undoManager.registerModel(documentModel);
-					singleDocumentData.documentValidator.documentModel = documentModel;
-
-					singleDocumentData.modelConnections.target = singleDocumentData.documentDataController.documentModel
-					singleDocumentData.modelConnections.enabled = true;
-					
-					documentManager.documentOpened(singleDocumentData.documentId)
 				}
 
 				function onError(){
@@ -746,7 +751,6 @@ QtObject {
 				enabled: false;
 
 				function onModelChanged(){
-					console.log("DocumentManager onModelChanged()")
 					if (singleDocumentData.blockingUpdateModel){
 						return;
 					}
@@ -754,7 +758,6 @@ QtObject {
 					if (singleDocumentData.undoManager && singleDocumentData.undoManager.isTransaction()){
 						return;
 					}
-					console.log("DocumentManager onModelChanged() after check")
 					singleDocumentData.isDirty = documentManager.documentIsValid(singleDocumentData);
 				}
 			}
