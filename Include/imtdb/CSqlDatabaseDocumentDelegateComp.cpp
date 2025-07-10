@@ -253,18 +253,12 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectsQuery(
 				UPDATE "%1"
 				SET "%2" = 'Active'
 				WHERE "%3" IN (%4)
-				AND %0 = (
-					SELECT MAX(%5)
-					FROM "%1" sub
-					WHERE sub."%3" = "%1"."%3"
-				);)")
+				AND "State" = 'Disabled';)")
 				.arg(
-					CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int),
-					QString::fromUtf8(qPrintable(*m_tableNameAttrPtr)),
+					QString::fromUtf8(*m_tableNameAttrPtr),
 					QString::fromUtf8(s_stateColumn),
 					QString::fromUtf8(s_documentIdColumn),
-					quotedIds,
-					CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, QStringLiteral("sub"))
+					quotedIds
 			).toUtf8();
 }
 
