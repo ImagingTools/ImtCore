@@ -15,34 +15,6 @@ GraphicsView{
 	Component.onCompleted: {
 		//TEST
 
-		let background = view.getBackgroundLayer()
-		background.addShape(imageShape);
-		background.addShape(gridShape);
-
-		background.addShape(boundingBox);//remove
-
-		let layer = view.getActiveLayer();
-
-		layer.addShape(rec1);
-		layer.addShape(rec2);
-		layer.addShape(rec3);
-
-		let instrumentalLayer = view.getInstrumentalLayer()
-		instrumentalLayer.addShape(rulerShape)
-
-
-		// layer.addShape(polygon);
-
-		// layer.addShape(circle);
-		// layer.addShape(circle);
-		// layer.addShape(circle);
-
-		 //layer.addShape(line);
-
-		//layer.addShape(arc);
-
-		// layer.addShape(text);
-
 		//Rectangle
 		drawModel.push({"point": Qt.point(600, 300), "width": 100, "height": 100, "color": "red"})
 		drawModel.push({"point": Qt.point(1200, 300), "width": 100, "height": 100, "color": "green"})
@@ -66,6 +38,56 @@ GraphicsView{
 		//drawModel.push({"point": Qt.point(300, 300), "color": "red", "fontSize": 20, "text": "TEXT"})
 
 
+		let background = view.getBackgroundLayer()
+		background.addShape(imageShape);
+		background.addShape(gridShape);
+
+		background.addShape(boundingBox);//remove
+
+		let layer = view.getActiveLayer();
+
+		let rec1 = rec1Comp.createObject(this);
+		let rec2 = rec2Comp.createObject(this);
+		let rec3 = rec3Comp.createObject(this);
+
+		// let points1 = []
+		// points1.push(view.drawModel[0].point);
+		// rec1.points = points1
+
+		// let points2 = []
+		// points2.push(view.drawModel[1].point);
+		// rec2.points = points2
+
+		// let points3 = []
+		// points3.push(view.drawModel[2].point);
+		// rec3.points = points3
+
+		rec1.points.push(view.drawModel[0].point);
+		rec2.points.push(view.drawModel[1].point);
+		rec3.points.push(view.drawModel[2].point);
+
+		layer.addShape(rec1);
+		layer.addShape(rec2);
+		layer.addShape(rec3);
+
+		let toolsLayer = view.getToolsLayer()
+		toolsLayer.addShape(rulerShape)
+
+
+		// layer.addShape(polygon);
+
+		// layer.addShape(circle);
+		// layer.addShape(circle);
+		// layer.addShape(circle);
+
+		 //layer.addShape(line);
+
+		//layer.addShape(arc);
+
+		// layer.addShape(text);
+
+
+
 		view.requestPaint();
 
 		//TEST
@@ -74,7 +96,7 @@ GraphicsView{
 	GraphicsShapeBase{
 		id: gridShape;
 
-		function draw(ctx, layerMatrix){
+		function draw(ctx, layerMatrixArg){
 			let step = 30;
 
 			ctx.lineCap = "round"
@@ -124,7 +146,7 @@ GraphicsView{
 	GraphicsShapeBase{
 		id: rulerShape;
 
-		function draw(ctx, layerMatrix){
+		function draw(ctx, layerMatrixArg){
 
 			ctx.lineCap = "round"
 			ctx.lineJoin = "round"
@@ -200,86 +222,93 @@ GraphicsView{
 	RectangleParams{
 		id: recParams1;
 	}
-	RectangleShape{
-		id: rec1;
 
-		Component.onCompleted: {
-		}
+	Component{
+		id: rec1Comp;
+		RectangleShape{
+			Component.onCompleted: {
+			}
 
-		function setPoints(pointList){
-			let item = view.drawModel[0];
-			item.point.x = pointList[0].x;
-			item.point.y = pointList[0].y;
-		}
+			function setPoints(pointList){
+				let item = view.drawModel[0];
+				item.point.x = pointList[0].x;
+				item.point.y = pointList[0].y;
+			}
 
-		function getParams(){
-			let item = view.drawModel[0];
+			function getParams(){
+				let item = view.drawModel[0];
 
-			recParams1.point = item.point;
-			recParams1.width = item.width;
-			recParams1.height = item.height;
-			recParams1.radius = item.radius !== undefined ? item.radius : 0;
-			recParams1.color = item.color;
+				recParams1.point = item.point;
+				recParams1.width = item.width;
+				recParams1.height = item.height;
+				recParams1.radius = item.radius !== undefined ? item.radius : 0;
+				recParams1.color = item.color;
 
-			return recParams1;
+				return recParams1;
+			}
 		}
 	}
+
 	RectangleParams{
 		id: recParams2;
 	}
-	RectangleShape{
-		id: rec2;
+	Component{
+		id: rec2Comp;
+		RectangleShape{
 
-		Component.onCompleted: {
-		}
+			Component.onCompleted: {
+			}
 
-		function setPoints(pointList){
-			let item = view.drawModel[1];
-			item.point.x = pointList[0].x;
-			item.point.y = pointList[0].y;
-		}
+			function setPoints(pointList){
+				let item = view.drawModel[1];
+				item.point.x = pointList[0].x;
+				item.point.y = pointList[0].y;
+			}
 
-		function getParams(){
-			let item = view.drawModel[1];
+			function getParams(){
+				let item = view.drawModel[1];
 
-			recParams2.point = item.point;
-			recParams2.width = item.width;
-			recParams2.height = item.height;
-			recParams2.radius = item.radius !== undefined ? item.radius : 0;
-			recParams2.color = item.color;
+				recParams2.point = item.point;
+				recParams2.width = item.width;
+				recParams2.height = item.height;
+				recParams2.radius = item.radius !== undefined ? item.radius : 0;
+				recParams2.color = item.color;
 
-			return recParams2;
+				return recParams2;
+			}
 		}
 	}
+
+
 	RectangleParams{
 		id: recParams3;
 	}
-	RectangleShape{
-		id: rec3;
+	Component{
+		id: rec3Comp;
+		RectangleShape{
 
-		Component.onCompleted: {
-		}
+			Component.onCompleted: {
+			}
 
+			function setPoints(pointList){
+				let item = view.drawModel[2];
+				item.point.x = pointList[0].x;
+				item.point.y = pointList[0].y;
+			}
 
-		function setPoints(pointList){
-			let item = view.drawModel[2];
-			item.point.x = pointList[0].x;
-			item.point.y = pointList[0].y;
-		}
+			function getParams(){
+				let item = view.drawModel[2];
 
-		function getParams(){
-			let item = view.drawModel[2];
+				recParams3.point = item.point;
+				recParams3.width = item.width;
+				recParams3.height = item.height;
+				recParams3.radius = item.radius !== undefined ? item.radius : 0;
+				recParams3.color = item.color;
 
-			recParams3.point = item.point;
-			recParams3.width = item.width;
-			recParams3.height = item.height;
-			recParams3.radius = item.radius !== undefined ? item.radius : 0;
-			recParams3.color = item.color;
-
-			return recParams3;
+				return recParams3;
+			}
 		}
 	}
-
 
 	PolygonParams{
 		id: polygonParams

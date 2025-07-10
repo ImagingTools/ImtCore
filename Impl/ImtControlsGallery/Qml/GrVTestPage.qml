@@ -165,6 +165,7 @@ Rectangle {
 		restrictMove: true;
 		translateXPositiveLimit: gridShape.originX
 		translateYNegativeLimit: gridShape.originY
+		hasHoverReaction: true;
 
 		Component.onCompleted: {
 			//TEST
@@ -197,6 +198,24 @@ Rectangle {
 			let lineObjGreen = polylineCompGreen.createObject(this);
 			activeLayer.addShape(lineObjGreen);
 
+			//PERFORMANCE TEST
+
+			// let lineObj10000 = polylineComp10000.createObject(this);
+			// activeLayer.addShape(lineObj10000);
+
+			// let count = 1000
+			// for(let i = 0; i < count; i++){
+			// 	let testLineObj = testLine.createObject(this);
+			// 	let pointList = []
+
+			// 	for(let j = 0; j < 10; j++){
+			// 		let point = Qt.point(j*70, i)
+			// 		pointList.push(point)
+			// 	}
+
+			// 	testLineObj.points = pointList
+			// 	activeLayer.addShape(testLineObj);
+			// }
 
 		}
 
@@ -212,13 +231,12 @@ Rectangle {
 		id: polylineCompBlue
 
 		PolyLineShape{
-			id: line;
 
 			color: "blue";
 
 			showNodes: true;
 
-			function getPoints(){
+			Component.onCompleted: {
 				let pointList = []
 
 				let point0 = Qt.point(-20, 40)
@@ -233,7 +251,7 @@ Rectangle {
 				pointList.push(point3)
 				pointList.push(point4)
 
-				return pointList
+				points =  pointList
 			}
 		}
 	}
@@ -242,13 +260,12 @@ Rectangle {
 		id: polylineCompGreen
 
 		PolyLineShape{
-			id: line;
 
 			color: "green";
 
 			showNodes: true;
 
-			function getPoints(){
+			Component.onCompleted: {
 				let pointList = []
 
 				let point0 = Qt.point(40, 10)
@@ -262,7 +279,7 @@ Rectangle {
 				pointList.push(point2)
 				pointList.push(point3)
 
-				return pointList
+				points =  pointList
 			}
 		}
 	}
@@ -271,13 +288,12 @@ Rectangle {
 		id: polylineCompRed
 
 		PolyLineShape{
-			id: line;
 
 			color: "red";
 
 			showNodes: true;
 
-			function getPoints(){
+			Component.onCompleted: {
 				let pointList = []
 
 				let point0 = Qt.point(-20, 60)
@@ -292,12 +308,55 @@ Rectangle {
 				pointList.push(point3)
 				pointList.push(point4)
 
-				return pointList
+				points = pointList
 			}
 		}
 	}
 
+	//FOR PERFORMANCE TEST
+	Component{
+		id: polylineComp10000
 
+		PolyLineShape{
+
+			color: "violet";
+
+			showNodes: true;
+
+			property int count: 1000
+			Component.onCompleted: {
+				let pointList = []
+				let date = new Date();
+
+				for(let i = 0; i < count; i++){
+					let point = Qt.point(i*1, 160)
+					pointList.push(point)
+				}
+
+				points = pointList
+
+				let date2 = new Date();
+
+				console.log("TIME:: ", date2.valueOf() - date.valueOf())
+
+			}
+
+		}
+	}
+
+	Component{
+		id: testLine
+
+		PolyLineShape{
+
+			color: "orange";
+
+			showNodes: true;
+
+			property int count: 10
+
+		}
+	}
 
 	CoordinateGridShape{
 		id: gridShape;
