@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
+import Qt5Compat.GraphicalEffects 6.0
 
 import imtcontrols 1.0
 
@@ -66,6 +67,10 @@ Rectangle {
 	property var hintShapePointModel: []
 	property var selectedShapeModel: []
 	property var selectedShapePointModel: []
+
+	property bool hasButtonMenu: false;
+	property var leftMenuCoordinates: Qt.point(Style.marginM, Style.marginS);
+	property var rightMenuCoordinates: Qt.point(width - Style.marginM - Style.buttonWidthM, Style.marginS);
 
 	signal copySignal(int index);
 	signal pasteSignal(int index);
@@ -1056,30 +1061,318 @@ Rectangle {
 		}
 	}
 
-	Column{
-		id: rightButtonColumn;
+	// left button panel
+	Button{
+		id: leftMenuButton;
 
-		anchors.right: parent.right;
-		anchors.top: parent.top;
-		anchors.rightMargin: Style.marginL
-		anchors.topMargin: Style.marginS
+		x: graphicsView.leftMenuCoordinates.x
+		y: graphicsView.leftMenuCoordinates.y
+		// anchors.left: parent.left;
+		// anchors.top: parent.top;
+		// anchors.leftMargin: Style.marginM
+		// anchors.topMargin: Style.marginS
 
-		width: Style.iconSizeM
+		width: Style.buttonWidthM;
+		height: width;
+		visible: graphicsView.hasButtonMenu;
 
-		spacing: Style.marginM;
+		iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+		onClicked: {
+			leftMenuButtonPanel.isOpen = !leftMenuButtonPanel.isOpen
+		}
+	}
 
-		Button{
-			id: resetViewButton;
+	DropShadow {
+		anchors.fill: leftMenuButtonPanel;
 
-			width: parent.width;
-			height: width;
+		horizontalOffset: 1;
+		verticalOffset: 1;
 
-			iconSource: "../../../" + Style.getIconPath("Icons/FitToScreen", Icon.State.On, Icon.Mode.Normal)
-			onClicked: {
-				graphicsView.resetView(true);
+		radius: leftMenuButtonPanel.radius;
+		color: Style.shadowColor;
+		visible: leftMenuButton.visible;
+
+		source: leftMenuButtonPanel;
+	}
+
+	Rectangle{
+		id: leftMenuButtonPanel;
+
+		anchors.left: leftMenuButton.right;
+		anchors.leftMargin: Style.marginXS;
+		anchors.verticalCenter: leftMenuButton.verticalCenter;
+
+		height: Style.buttonWidthM + Style.marginXS;
+		radius: 4;
+
+		color: Style.baseColor;
+		border.color: Style.shadowColor;
+		clip: true;
+		visible: leftMenuButton.visible;
+
+		property bool isOpen: false;
+		onIsOpenChanged: {
+			if(isOpen){
+				leftMenuWidthAnim.from = leftMenuButtonPanel.width;
+				leftMenuWidthAnim.to = leftMenuButtonRow.width + 2*leftMenuButtonRow.anchors.leftMargin;
+				leftMenuWidthAnim.start()
 			}
+			else {
+				leftMenuWidthAnim.from = leftMenuButtonPanel.width;
+				leftMenuWidthAnim.to = 0;
+				leftMenuWidthAnim.start()
+			}
+		}
+
+		NumberAnimation {
+			id: leftMenuWidthAnim
+
+			target: leftMenuButtonPanel
+			property: "width"
+			duration: 100
+		}
+
+		Row{
+			id: leftMenuButtonRow;
+
+			anchors.left: parent.left;
+			anchors.leftMargin: Style.marginXS;
+			anchors.verticalCenter: parent.verticalCenter;
+
+			height: leftMenuButton.height
+			spacing: Style.marginXS;
+
+			Button{
+				id: selectModeButton;
+
+				anchors.verticalCenter: parent.verticalCenter;
+
+				width: Style.buttonWidthM;
+				height: width;
+
+				property bool isActive: graphicsView.isSelectionMode;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/Pointer", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+				onClicked: {
+					graphicsView.isSelectionMode = true;
+					graphicsView.isEditMode = false;
+					graphicsView.isPointsEditMode = false;
+					graphicsView.isPointsAdditionMode = false;
+					graphicsView.isPointsDeletionMode = false;
+				}
+			}
+			Button{
+				id: editModeButton;
+
+				anchors.verticalCenter: parent.verticalCenter;
+
+				width: Style.buttonWidthM;
+				height: width;
+
+				property bool isActive: graphicsView.isEditMode;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/Edit", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+				onClicked: {
+					graphicsView.isSelectionMode = false;
+					graphicsView.isEditMode = true;
+					graphicsView.isPointsEditMode = false;
+					graphicsView.isPointsAdditionMode = false;
+					graphicsView.isPointsDeletionMode = false;
+				}
+			}
+			Button{
+				id: editPointsModeButton;
+
+				anchors.verticalCenter: parent.verticalCenter;
+
+				width: Style.buttonWidthM;
+				height: width;
+
+				property bool isActive: graphicsView.isPointsEditMode;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/PointsMove", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+				onClicked: {
+					graphicsView.isSelectionMode = false;
+					graphicsView.isEditMode = false;
+					graphicsView.isPointsEditMode = true;
+					graphicsView.isPointsAdditionMode = false;
+					graphicsView.isPointsDeletionMode = false;
+				}
+			}
+			Button{
+				id: addPointsModeButton;
+
+				anchors.verticalCenter: parent.verticalCenter;
+
+				width: Style.buttonWidthM;
+				height: width;
+
+				property bool isActive: graphicsView.isPointsAdditionMode;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/PointsAdd", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+				onClicked: {
+					graphicsView.isSelectionMode = false;
+					graphicsView.isEditMode = false;
+					graphicsView.isPointsEditMode = false;
+					graphicsView.isPointsAdditionMode = true;
+					graphicsView.isPointsDeletionMode = false;
+				}
+			}
+			Button{
+				id: deletePointsModeButton;
+
+				anchors.verticalCenter: parent.verticalCenter;
+
+				width: Style.buttonWidthM;
+				height: width;
+
+				property bool isActive: graphicsView.isPointsDeletionMode;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/PointsSub", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+				onClicked: {
+					graphicsView.isSelectionMode = false;
+					graphicsView.isEditMode = false;
+					graphicsView.isPointsEditMode = false;
+					graphicsView.isPointsAdditionMode = false;
+					graphicsView.isPointsDeletionMode = true;
+				}
+			}
+		}
+	}
+
+
+	// right button panel
+	Button{
+		id: rightMenuButton;
+
+		x: graphicsView.rightMenuCoordinates.x
+		y: graphicsView.rightMenuCoordinates.y
+
+		// anchors.right: parent.right;
+		// anchors.top: parent.top;
+		// anchors.rightMargin: Style.marginM
+		// anchors.topMargin: Style.marginS
+
+		width: Style.buttonWidthM;
+		height: width;
+
+		rotation: 90;
+		visible: graphicsView.hasButtonMenu;
+
+		iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
+		onClicked: {
+			rightMenuButtonPanel.isOpen = !rightMenuButtonPanel.isOpen
+		}
+	}
+	DropShadow {
+
+		anchors.fill: rightMenuButtonPanel;
+
+		horizontalOffset: 1;
+		verticalOffset: 1;
+
+		radius: rightMenuButtonPanel.radius;
+		visible: rightMenuButton.visible;
+		color: Style.shadowColor;
+
+		source: rightMenuButtonPanel;
+	}
+	Rectangle{
+		id: rightMenuButtonPanel;
+
+		anchors.top: rightMenuButton.bottom;
+		anchors.topMargin: Style.marginXS;
+		anchors.horizontalCenter: rightMenuButton.horizontalCenter;
+
+		width: Style.buttonWidthM + Style.marginXS;
+		radius: 4;
+
+		color: Style.baseColor;
+		border.color: Style.shadowColor;
+		clip: true;
+		visible: rightMenuButton.visible;
+
+		property bool isOpen: false;
+		onIsOpenChanged: {
+			if(isOpen){
+				rightMenuWidthAnim.from = rightMenuButtonPanel.height;
+				rightMenuWidthAnim.to = rightMenuButtonColumn.height + 2*rightMenuButtonColumn.anchors.topMargin;
+				rightMenuWidthAnim.start()
+			}
+			else {
+				rightMenuWidthAnim.from = rightMenuButtonPanel.height;
+				rightMenuWidthAnim.to = 0;
+				rightMenuWidthAnim.start()
+			}
+		}
+
+		NumberAnimation {
+			id: rightMenuWidthAnim
+
+			target: rightMenuButtonPanel
+			property: "height"
+			duration: 100
+		}
+
+		Column{
+			id: rightMenuButtonColumn;
+
+			anchors.top: parent.top;
+			anchors.topMargin: Style.marginXS;
+			anchors.horizontalCenter: parent.horizontalCenter;
+
+			width: rightMenuButton.width
+			spacing: Style.marginXS;
+
+			Button{
+				id: zoomIncreaseButton;
+
+				width: parent.width;
+				height: width;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/ZoomIn", Icon.State.On, Icon.Mode.Normal)
+				onClicked: {
+				}
+			}
+			Button{
+				id: zoomDecreaseButton;
+
+				width: parent.width;
+				height: width;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/ZoomOut", Icon.State.On, Icon.Mode.Normal)
+				onClicked: {
+				}
+			}
+
+			Button{
+				id: resetViewButton;
+
+				width: parent.width;
+				height: width;
+
+				//iconSource: "../../../" + Style.getIconPath("Icons/ZoomReset", Icon.State.On, Icon.Mode.Normal)
+				iconSource: "../../../" + Style.getIconPath("Icons/FitToScreen", Icon.State.On, Icon.Mode.Normal)
+				onClicked: {
+					graphicsView.resetView(true);
+				}
+
+			}
+
+			Button{
+				id: fitToScreenButton;
+
+				width: parent.width;
+				height: width;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/ZoomToFit", Icon.State.On, Icon.Mode.Normal)
+				onClicked: {
+				}
+			}
+
 
 		}
 	}
+
 
 }
