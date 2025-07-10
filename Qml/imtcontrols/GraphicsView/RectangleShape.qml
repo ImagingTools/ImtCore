@@ -2,19 +2,19 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
-GraphicsShapeBase {
+BoundingBox {
 
 	//Reimplemented functions
-	function draw (ctx){
+	function draw (ctx, layerMatrixArg){
 		drawBase(ctx)
 		if(isSelected){
-			drawSelection(ctx)
+			drawSelection(ctx, layerMatrixArg)
 		}
 		if(showNodes){
-			drawNodes(ctx)
+			drawNodes(ctx, layerMatrixArg)
 		}
 	}
-	function drawBase(ctx){
+	function drawBase(ctx, layerMatrixArg){
 		//console.log("drawBase")
 		let params_;
 		params_ = getParams()
@@ -27,7 +27,7 @@ GraphicsShapeBase {
 		ctx.strokeStyle = params_.borderColor !== undefined ? params_.borderColor : "transparent";
 		ctx.lineWidth = params_.lineWidth !== undefined ? params_.lineWidth : 0
 		let radius = params_.radius !== undefined ? params_.radius : 0
-		let point_ = getPoints()[0];
+		let point_ = points[0];
 		ctx.beginPath()
 		ctx.roundedRect(point_.x , point_.y, params_.width, params_.height, radius, radius)
 		ctx.stroke();
@@ -35,7 +35,7 @@ GraphicsShapeBase {
 		ctx.closePath();
 	}
 
-	function drawSelection(ctx){
+	function drawSelection(ctx, layerMatrixArg){
 		//console.log("drawSelected")
 		let params_;
 		params_ = getParams()
@@ -44,7 +44,7 @@ GraphicsShapeBase {
 		ctx.lineWidth = 4
 		let radius = params_.radius !== undefined ? params_.radius : 0
 
-		let point_ = getPoints()[0];;
+		let point_ = points[0];
 
 		ctx.beginPath()
 		ctx.roundedRect(point_.x , point_.y, params_.width, params_.height, radius, radius)
@@ -52,15 +52,9 @@ GraphicsShapeBase {
 		ctx.closePath();
 	}
 
-	function drawNodes(ctx){
+	function drawNodes(ctx, layerMatrixArg){
 	}
 
-	function getPoints(){
-		let pointList = []
-		let params_ = getParams();
-		pointList.push(params_.point)
-		return pointList;
-	}
 
 	function getBoundingBoxCoordinate(){
 			return getParams().point

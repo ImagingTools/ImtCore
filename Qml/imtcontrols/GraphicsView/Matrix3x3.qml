@@ -11,6 +11,19 @@ QtObject {
 	[0, 0, 1]
   ];
 
+	function isIdentityMatrix(){
+		return (
+				matrix[0][0] == 1
+				&& matrix[1][1] == 1
+				&& matrix[2][2] == 1
+				&& matrix[0][1] == 0
+				&& matrix[0][2] == 0
+				&& matrix[1][0] == 0
+				&& matrix[1][2] == 0
+				&& matrix[2][0] == 0
+				&& matrix[2][1] == 0
+					)
+	}
 
 	function multiplyByMatrix(matrixArg,externMatrix){
 		//console.log("multiplyByMatrix::", matrixArg, externMatrix)
@@ -42,12 +55,15 @@ QtObject {
 		return resultMatrix;
 	}
 
-	function transformPoint(pointArg){
+	function transformPoint(pointArg, matrix_){
 		//vector = [pointArg.x, pointArg.y, 1] - Homogeneous coordinates
 		//matrix * vector
+		if(matrix_==undefined){
+			matrix_ = matrix;
+		}
 		let retPoint = Qt.point(0, 0);
-		retPoint.x = matrix[0][0] * pointArg.x + matrix[0][1] * pointArg.y + matrix[0][2]//* 1
-		retPoint.y = matrix[1][0] * pointArg.x + matrix[1][1] * pointArg.y + matrix[1][2]//* 1
+		retPoint.x = matrix_[0][0] * pointArg.x + matrix_[0][1] * pointArg.y + matrix_[0][2]//* 1
+		retPoint.y = matrix_[1][0] * pointArg.x + matrix_[1][1] * pointArg.y + matrix_[1][2]//* 1
 		return retPoint;
 	}
 

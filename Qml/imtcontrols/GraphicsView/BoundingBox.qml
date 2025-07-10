@@ -2,13 +2,16 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
-QtObject {
+import imtcontrols 1.0
+
+
+GraphicsShapeBase {
 
 	id: root;
 
 	property bool editMode: false;
 
-	function drawBoundingBox(ctx){
+		function drawBoundingBox(ctx){
 		drawBoundingBoxBorder(ctx);
 		drawBoundingBoxControlPoints(ctx);
 		drawBoundingBoxRotationControl(ctx);
@@ -16,82 +19,34 @@ QtObject {
 
 	function drawBoundingBoxBorder(ctx){
 		let cornerPointList = getBoundingBoxCornerPoints();
-
-		ctx.strokeStyle = "black";
-		ctx.lineWidth = 2
-
-		ctx.beginPath()
-		ctx.moveTo(cornerPointList.topLeftPoint.x, cornerPointList.topLeftPoint.y)
-
-		ctx.lineTo(cornerPointList.topRightPoint.x, cornerPointList.topRightPoint.y)
-		ctx.lineTo(cornerPointList.bottomRightPoint.x, cornerPointList.bottomRightPoint.y)
-		ctx.lineTo(cornerPointList.bottomLeftPoint.x, cornerPointList.bottomLeftPoint.y)
-		ctx.lineTo(cornerPointList.topLeftPoint.x, cornerPointList.topLeftPoint.y)
-
-		ctx.stroke();
-		ctx.closePath();
+		DesignScheme.drawBoundingBoxBorder(ctx, cornerPointList)
 	}
 
 	function drawBoundingBoxControlPoints(ctx){
 		let cornerPoints = getBoundingBoxCornerPoints()
 		let midPoints  = getBoundingBoxMidPoints()
 
-		ctx.strokeStyle = "black";
-		ctx.lineWidth = 2
-		let radius = 6;
-
 		ctx.beginPath()
 
 		//corner points
-		ctx.moveTo(cornerPoints.topLeftPoint.x, cornerPoints.topLeftPoint.y)
-		ctx.arc(cornerPoints.topLeftPoint.x, cornerPoints.topLeftPoint.y, radius, 0, 2*Math.PI, true);
-
-		ctx.moveTo(cornerPoints.topRightPoint.x, cornerPoints.topRightPoint.y)
-		ctx.arc(cornerPoints.topRightPoint.x, cornerPoints.topRightPoint.y, radius, 0, 2*Math.PI, true);
-
-		ctx.moveTo(cornerPoints.bottomRightPoint.x, cornerPoints.bottomRightPoint.y)
-		ctx.arc(cornerPoints.bottomRightPoint.x, cornerPoints.bottomRightPoint.y, radius, 0, 2*Math.PI, true);
-
-		ctx.moveTo(cornerPoints.bottomLeftPoint.x, cornerPoints.bottomLeftPoint.y)
-		ctx.arc(cornerPoints.bottomLeftPoint.x, cornerPoints.bottomLeftPoint.y, radius, 0, 2*Math.PI, true);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPoints.topLeftPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPoints.topRightPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPoints.bottomRightPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPoints.bottomLeftPoint);
 
 		//midPoints
-		ctx.moveTo(midPoints.leftPoint.x, midPoints.leftPoint.y)
-		ctx.arc(midPoints.leftPoint.x, midPoints.leftPoint.y, radius, 0, 2*Math.PI, true);
-
-		ctx.moveTo(midPoints.rightPoint.x, midPoints.rightPoint.y)
-		ctx.arc(midPoints.rightPoint.x, midPoints.rightPoint.y, radius, 0, 2*Math.PI, true);
-
-		ctx.moveTo(midPoints.topPoint.x, midPoints.topPoint.y)
-		ctx.arc(midPoints.topPoint.x, midPoints.topPoint.y, radius, 0, 2*Math.PI, true);
-
-		ctx.moveTo(midPoints.bottomPoint.x, midPoints.bottomPoint.y)
-		ctx.arc(midPoints.bottomPoint.x, midPoints.bottomPoint.y, radius, 0, 2*Math.PI, true);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.leftPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.rightPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.topPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.bottomPoint);
 
 		ctx.stroke();
 		ctx.closePath();
 	}
 
 	function drawBoundingBoxRotationControl(ctx){
-		let cornerPoints = getBoundingBoxCornerPoints();
-
-		ctx.strokeStyle = "black";
-		ctx.lineWidth = 2
-
-		let bottomLeftX = cornerPoints.topLeftPoint.x + (cornerPoints.topRightPoint.x - cornerPoints.topLeftPoint.x)/3
-		let bottomLeftY = cornerPoints.topLeftPoint.y + 2 *(cornerPoints.bottomRightPoint.y - cornerPoints.topRightPoint.y)/3
-		let topLeftX = cornerPoints.topLeftPoint.x + (cornerPoints.topRightPoint.x - cornerPoints.topLeftPoint.x)/3
-		let topLeftY = cornerPoints.topLeftPoint.y + (cornerPoints.bottomRightPoint.y - cornerPoints.topRightPoint.y)/3
-		let topRightX = cornerPoints.topLeftPoint.x + 2 * (cornerPoints.topRightPoint.x - cornerPoints.topLeftPoint.x)/3
-		let topRightY = cornerPoints.topLeftPoint.y + (cornerPoints.bottomRightPoint.y - cornerPoints.topRightPoint.y)/3
-
-		ctx.beginPath()
-		ctx.moveTo(bottomLeftX, bottomLeftY);
-		ctx.lineTo(topLeftX, topLeftY);
-		ctx.lineTo(topRightX, topRightY);
-
-		ctx.stroke();
-		ctx.closePath();
+		let cornerPointslist = getBoundingBoxCornerPoints();
+		DesignScheme.drawBoundingBoxRotationControl(ctx, cornerPointslist);
 	}
 
 	function getBoundingBoxCenter(){
@@ -143,7 +98,7 @@ QtObject {
 		return 0;
 	}
 
-	function draw(ctx, layerMatrix){
+	function draw(ctx, layerMatrixArg){
 		drawBoundingBox(ctx)
 	}
 

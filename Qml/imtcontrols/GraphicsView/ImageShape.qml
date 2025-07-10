@@ -2,11 +2,11 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
-GraphicsShapeBase {
+BoundingBox {
 
 	property string imageSource: "";
 
-	function draw(ctx, layerMatrix) {
+	function draw(ctx, layerMatrixArg) {
 		let params_ = getParams();
 		if(params_.source !== undefined){
 			imageSource = params_.source

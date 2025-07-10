@@ -2,11 +2,10 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
-GraphicsShapeBase {
+BoundingBox {
 
 	id: gridShape;
 
-	property Item viewItem: null
 	property int originX: 36;
 	property int originY: 40;
 	property int gridStepMajor: 40;
@@ -21,10 +20,10 @@ GraphicsShapeBase {
 	property CanvasMatrix identityMatrix: CanvasMatrix{};
 	property CanvasMatrix labelMatrix: CanvasMatrix{};
 
-	function draw(ctx, layerMatrix){
-		let deltaX = layerMatrix.xTranslation();
-		let deltaY = layerMatrix.yTranslation();
-		let scaleCoeff = layerMatrix.xScale();
+	function draw(ctx, layerMatrixArg){
+		let deltaX = layerMatrixArg.xTranslation();
+		let deltaY = layerMatrixArg.yTranslation();
+		let scaleCoeff = layerMatrixArg.xScale();
 		let scaleMax1 = Math.min(1, scaleCoeff)
 
 		let deltaAddX = deltaX > 0 ? 0 : -deltaX

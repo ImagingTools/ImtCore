@@ -36,7 +36,7 @@ Rectangle {
 	property bool restrictZoom: false;
 	property bool restrictMove: false;
 	property int restrictMoveMargin: 80;
-	property bool fitToBorders: true;
+	property bool fitToBorders: false;
 
 	property bool autoFit: false;
 
@@ -62,6 +62,11 @@ Rectangle {
 	property alias deltaX: canvas.deltaX;
 	property alias deltaY: canvas.deltaY;
 
+	property var hintShapeModel: []
+	property var hintShapePointModel: []
+	property var selectedShapeModel: []
+	property var selectedShapePointModel: []
+
 	signal copySignal(int index);
 	signal pasteSignal(int index);
 	signal deleteSignal(int index);
@@ -70,6 +75,8 @@ Rectangle {
 	signal modelDataChanged();
 
 	signal cursorPosition(point position)
+	signal hintShape(int shapeIndex)
+	signal hintShapePoint(int shapeIndex,int pointIndex)
 
 	Component.onCompleted: {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
@@ -77,20 +84,25 @@ Rectangle {
 
 		let layerBackground = layerComp.createObject(this);
 		layerBackground.layerId = "background";
+		layerBackground.viewItem = graphicsView;
 		layerModel.push(layerBackground);
 
 		let layerInactive = layerComp.createObject(this);
 		layerInactive.layerId = "inactive";
+		layerInactive.viewItem = graphicsView;
 		layerModel.push(layerInactive);
 
 		let layerActive = layerComp.createObject(this);
 		layerActive.layerId = "active";
+		layerActive.viewItem = graphicsView;
+		layerActive.isActive = true;
 		layerModel.push(layerActive);
 
-		let layerInstrumental = layerComp.createObject(this);
-		layerInstrumental.layerId = "instrumental";
-		layerInstrumental.canApplyViewTransform = false;
-		layerModel.push(layerInstrumental);
+		let layerTools = layerComp.createObject(this);
+		layerTools.layerId = "tools";
+		layerTools.viewItem = graphicsView;
+		layerTools.canApplyViewTransform = false;
+		layerModel.push(layerTools);
 
 	}
 
@@ -115,6 +127,11 @@ Rectangle {
 		if (autoFit){
 			appSizeChanged();
 		}
+	}
+
+	function requestPaint(){
+		//console.log("Canvas::requestPaint")
+		canvas.requestPaint();
 	}
 
 	function createLayer(layerId){
@@ -147,8 +164,8 @@ Rectangle {
 	function getBackgroundLayer(){
 		return getLayer("background");
 	}
-	function getInstrumentalLayer(){
-		return getLayer("instrumental");
+	function getToolsLayer(){
+		return getLayer("tools");
 	}
 
 	Component{
@@ -167,7 +184,7 @@ Rectangle {
 
 	function appSizeChanged(params){
 		if (autoFit){
-			zoomToFit(false);
+			resetView(false);
 
 			requestPaint()
 		}
@@ -200,7 +217,7 @@ Rectangle {
 		requestPaint()
 	}
 
-	function zoomToFit(requestPaint_){
+	function resetView(requestPaint_){
 		canvas.scaleCoeff = 1
 		canvas.scaleCoeffPrev = 1
 		canvas.deltaX = 0;
@@ -229,10 +246,6 @@ Rectangle {
 		// canvas.deltaY = graphicsView.height / 2 - backgroundRec.height / 2
 	}
 
-	function requestPaint(){
-		//console.log("Canvas::requestPaint")
-		canvas.requestPaint();
-	}
 
 	function findModelIndex(id){
 		let ind = -1;
@@ -329,9 +342,7 @@ Rectangle {
 		}
 	}
 
-	Matrix3x3 {
-		id: tempMatrix;
-	}
+
 	function hoverReaction(position){
 		if(!graphicsView.hasHoverReaction){
 			return;
@@ -339,15 +350,17 @@ Rectangle {
 		let pointFound = false;
 		let activeLayer = getActiveLayer()
 
-		tempMatrix.matrix = activeLayer.layerMatrix.getInvertedMatrix();
-		position = tempMatrix.transformPoint(position);
+		let invViewMatrix = canvasMatrix.getInvertedMatrix();
+		position = canvasMatrix.transformPoint(position, invViewMatrix);
+		let invLayerMatrix = activeLayer.layerMatrix.getInvertedMatrix();
+		position = canvasMatrix.transformPoint(position, invLayerMatrix);
 
 		for (let i = 0; i < activeLayer.shapeModel.length; i++){
 			let shape = activeLayer.shapeModel[i];
-			let pointList = shape.getPoints()
+			let pointList = shape.points
 
 			if(pointFound){
-				shape.hasNodeSelection = false;
+				shape.selectedNodeIndex = -1;
 			}
 			else {
 				for(let j = 0; j < pointList.length; j++){
@@ -360,16 +373,28 @@ Rectangle {
 						&& point.y <= position.y + pointSize
 						){
 						shape.selectedNodeCoordinate = pointList[j]
-						shape.hasNodeSelection = true;
+						shape.selectedNodeIndex = j;
 						pointFound = true;
+						let hintObj = {"shapeIndex" : i, "shapePointIndex": j}
+						graphicsView.hintShapePointModel.push(hintObj);
+						graphicsView.hintShapePoint(i, j)
+
+						let pointInfo = shape.getPointDescription(j);
+						for(let key in pointInfo){
+							//console.log(key, ": ", pointInfo[key]);
+						}
 					}
 				}
 				if(!pointFound){
-					shape.hasNodeSelection = false;
+					shape.selectedNodeIndex = -1;
 				}
 			}
 		}
 		if(pointFound){
+			canvas.requestPaint();
+		}
+		else if(graphicsView.hintShapePointModel.length){
+			graphicsView.hintShapePointModel = []
 			canvas.requestPaint();
 		}
 
@@ -603,7 +628,7 @@ Rectangle {
 						if(canvas.scaleCoeff < 1 && (canvas.scaleCoeff + scaleStep) > 1){
 							scaleCoeff_ = 1
 							if(graphicsView.fitToBorders){
-								graphicsView.zoomToFit(false)
+								graphicsView.resetView(false)
 							}
 						}
 						else {
@@ -614,7 +639,7 @@ Rectangle {
 						}
 						if(Math.abs(scaleCoeff_ - 1) <  0.000001){
 							if(graphicsView.fitToBorders){
-								graphicsView.zoomToFit(false)
+								graphicsView.resetView(false)
 							}
 						}
 					}
@@ -625,7 +650,7 @@ Rectangle {
 						if(canvas.scaleCoeff > 1 && (canvas.scaleCoeff - scaleStep) < 1){
 							scaleCoeff_ = 1
 							if(graphicsView.fitToBorders){
-								graphicsView.zoomToFit(false)
+								graphicsView.resetView(false)
 							}
 						}
 						else {
@@ -636,7 +661,7 @@ Rectangle {
 						}
 						if(Math.abs(scaleCoeff_ - 1) <  0.000001){
 							if(graphicsView.fitToBorders){
-								graphicsView.zoomToFit(false)
+								graphicsView.resetView(false)
 							}
 						}
 					}
@@ -831,7 +856,7 @@ Rectangle {
 			onPaint: {
 				//console.log("Canvas::onPaint")
 				if (graphicsView.autoFit){
-					graphicsView.zoomToFit(false);
+					graphicsView.resetView(false);
 				}
 
 				var ctx = canvas.getContext('2d');
@@ -914,7 +939,7 @@ Rectangle {
 		enabled: true;
 		onActivated: {
 			//console.log("Ctrl + 0");
-			graphicsView.zoomToFit(true);
+			graphicsView.resetView(true);
 		}
 	}
 
@@ -1044,14 +1069,14 @@ Rectangle {
 		spacing: Style.marginM;
 
 		Button{
-			id: zoomToFitButton;
+			id: resetViewButton;
 
 			width: parent.width;
 			height: width;
 
 			iconSource: "../../../" + Style.getIconPath("Icons/FitToScreen", Icon.State.On, Icon.Mode.Normal)
 			onClicked: {
-				graphicsView.zoomToFit(true);
+				graphicsView.resetView(true);
 			}
 
 		}

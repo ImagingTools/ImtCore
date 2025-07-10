@@ -2,9 +2,9 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
-GraphicsShapeBase {
+BoundingBox {
 
-	function draw(ctx, layerMatrix){
+	function draw(ctx, layerMatrixArg){
 		let params = getParams()
 		ctx.fillStyle = params.color !== undefined ? params.color : "transparent";
 		ctx.strokeStyle = params.borderColor !== undefined ? params.borderColor : "transparent";

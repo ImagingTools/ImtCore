@@ -5,31 +5,30 @@ import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 
 
-GraphicsShapeBase {
+BoundingBox {
 	id: polylineShape;
 
 	property string color: "#000000";
 
-	function draw(ctx, layerMatrix){
+	function draw(ctx, layerMatrixArg){
 
-		drawBase(ctx);
+		drawBase(ctx, layerMatrixArg);
 		if(showNodes){
-			drawNodes(ctx)
+			drawNodes(ctx, layerMatrixArg)
 		}
-		if(hasNodeSelection && selectedNodeCoordinate !==undefined){
-			drawSelectedNode(ctx, selectedNodeCoordinate)
+		if(selectedNodeIndex >-1  && selectedNodeCoordinate !==undefined){
+			drawSelectedNode(ctx, selectedNodeCoordinate, layerMatrixArg)
 		}
 	}
 
-	function drawBase(ctx, layerMatrix){
+	function drawBase(ctx, layerMatrixArg){
 
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 1
 		ctx.beginPath()
-		let pointList = getPoints();
-		for(let i = 0;i < pointList.length; i++){
-			let point = pointList[i];
+		for(let i = 0;i < points.length; i++){
+			let point = points[i];
 			if(i == 0){
 				ctx.moveTo(point.x, point.y);
 			}
@@ -41,43 +40,32 @@ GraphicsShapeBase {
 		ctx.closePath();
 	}
 
-	function drawNodes(ctx, layerMatrix){
+	function drawNodes(ctx, layerMatrixArg){
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.fillStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
-		let radius = params.radius !== undefined ? params.radius : DesignScheme.shapePointSize;
 		ctx.beginPath()
-		let pointList = getPoints();
-		for(let i = 0;i < pointList.length; i++){
-			let point = pointList[i];
-			ctx.moveTo(point.x, point.y);
-			ctx.arc(point.x, point.y, radius,  0, 2 * Math.PI, true)
-			ctx.stroke();
-			ctx.fill();
+		for(let i = 0;i < points.length; i++){
+			DesignScheme.drawNode(ctx, points[i])
 		}
 		ctx.closePath();
 	}
 
-	function drawSelectedNode(ctx, point){
+	function drawSelectedNode(ctx, point, layerMatrixArg){
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.fillStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
-		let radius = params.radius !== undefined ? params.radius : DesignScheme.shapeSelectedPointSize;
-		ctx.beginPath()
-		ctx.moveTo(point.x, point.y);
-		ctx.arc(point.x, point.y, radius,  0, 2 * Math.PI, true)
-		ctx.stroke();
-		ctx.fill();
-		ctx.closePath();
+		DesignScheme.drawSelectedNode(ctx, point);
 	}
 
-	function getPoints(){
-		let pointList = []
-		let params_ = getParams();
-		pointList = params_.points
-		return pointList;
+	function getPointDescription(pointIndex){
+		let obj = ({})
+		let point = points[pointIndex]
+		obj.x = point.x;
+		obj.y = point.y;
+		return obj
 	}
 }
 

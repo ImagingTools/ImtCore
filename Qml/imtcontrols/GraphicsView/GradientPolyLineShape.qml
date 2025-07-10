@@ -5,7 +5,7 @@ import QtQuick 2.12
 	\brief draws a pointed polyline with a gradient between points
 	\note a color is defined for each point
 */
-GraphicsShapeBase {
+BoundingBox {
 	id: polylineGridShape
 
 	/**
@@ -29,7 +29,7 @@ GraphicsShapeBase {
 	property real lineWidth: 3
 
 	// reimplmented (GraphicsShapeBase)
-	function draw(ctx, layerId){
+	function draw(ctx, layerMatrix){
 		if (!polylineGridShape.points || polylineGridShape.points.length < 2){
 			console.warning('GradientPolyLine: draw: not enough points to draw a line', polylineGridShape.points.length, polylineGridShape.points)
 

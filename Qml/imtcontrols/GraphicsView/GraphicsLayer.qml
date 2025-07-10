@@ -5,21 +5,35 @@ import com.imtcore.imtqml 1.0
 QtObject {
 	id: layer;
 
+	property Item viewItem: null;
 	property string layerId: "";
 	property var shapeModel: [];
 
 	property bool enabled: true;
 	property bool visible: true;
 	property bool canApplyViewTransform: true;
+	property bool isActive: false;
 
 	signal loadImageSignal(string source)
 
+	property CanvasMatrix viewMatrix: CanvasMatrix{};
 	property CanvasMatrix layerMatrix: CanvasMatrix{};
 	property CanvasMatrix tempMatrix: CanvasMatrix{};
 
+	property var viewMode;
+
 	property rect clipRect: Qt.rect(0,0,0,0)
 
+	signal layerChanded()
+
+	onLayerChanded: {
+		viewItem.requestPaint();
+	}
+
 	function addShape(shape){
+		if(shape.viewItem !==undefined){
+			shape.viewItem = viewItem;
+		}
 		shapeModel.push(shape)
 		let index = shapeModel.length -1;
 
@@ -38,8 +52,8 @@ QtObject {
 		shapeModel.splice(index, 1);
 	}
 
-	function draw(ctx, canvasMatrix){
-
+	function draw(ctx, viewMatrixArg){
+		viewMatrix.copyFrom(viewMatrixArg.matrix)
 		ctx.save();
 
 		if(clipRect.width !== 0 && clipRect.height !== 0){
@@ -52,14 +66,16 @@ QtObject {
 			ctx.clip()
 		}
 
-		tempMatrix.copyFrom(canvasMatrix.matrix);
-		tempMatrix.matrix = tempMatrix.multiplyByMatrix(tempMatrix.matrix, layerMatrix.matrix)
+		tempMatrix.matrix = tempMatrix.multiplyByMatrix(viewMatrix.matrix, layerMatrix.matrix)
 
 		tempMatrix.setContextTransform(ctx)
 
 		for(let i = 0; i < shapeModel.length; i++){
 			ctx.globalAlpha = 1
 			let shape = shapeModel[i]
+			if(shape.layerMatrix !==undefined){
+				shape.layerMatrix = tempMatrix
+			}
 			if(!shape.isSelected){
 				shape.draw(ctx, tempMatrix);
 			}
@@ -67,6 +83,9 @@ QtObject {
 		for(let i = 0; i < shapeModel.length; i++){
 			ctx.globalAlpha = 1
 			let shape = shapeModel[i]
+			if(shape.layerMatrix !==undefined){
+				shape.layerMatrix = tempMatrix
+			}
 			if(shape.isSelected){
 				shape.draw(ctx, tempMatrix);
 			}
