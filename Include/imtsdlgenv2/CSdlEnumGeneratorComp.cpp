@@ -142,7 +142,7 @@ iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 		stream << QStringLiteral("Q_ENUM_NS(") << sdlEnum.GetName() << QStringLiteral(")");
 		FeedStream(stream, 3, false);
 
-
+#ifndef DISABLE_CREATE_SDL_QOBJECT
 		stream << QStringLiteral("class Enum") << GetCapitalizedValue(sdlEnum.GetName());
 		stream << QStringLiteral(": public QObject");
 		FeedStream(stream, 1, false);
@@ -181,6 +181,7 @@ iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 		// end of class
 		stream << QStringLiteral("};");
 		FeedStream(stream, 3, false);
+#endif
 
 		// 	Q_PROPERTY(QString Enteger2 READ GetInteger NOTIFY Enteger2Changed)
 		// 	Q_PROPERTY(QString String2 READ GetString NOTIFY String2Changed)

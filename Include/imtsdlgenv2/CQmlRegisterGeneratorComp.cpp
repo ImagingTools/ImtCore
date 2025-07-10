@@ -83,6 +83,7 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
 {
+#ifndef DISABLE_CREATE_SDL_QOBJECT
 	qDebug() << "DoProcessing" << __func__;
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
@@ -178,6 +179,7 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 	FeedStream(stream, 1, true);
 	stream << QStringLiteral("#endif");
 	FeedStream(stream, 2, false);
+#endif
 
 	return TS_OK;
 }

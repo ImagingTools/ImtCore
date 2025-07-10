@@ -207,12 +207,13 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
 
+#ifndef DISABLE_CREATE_SDL_QOBJECT
 				// join QML register file
 				if (m_argumentParserCompPtr->IsCppEnabled()){
 					filterParams.InsertOption(QStringLiteral("QmlRegister.h"), QByteArray::number(filterParams.GetOptionsCount()));
 					SendVerboseMessage(QString("Add QmlRegister enum file '%1. Total: %2").arg("QmlRegister.h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
-
+#endif
 				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
 				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
 				if (joinProcessResult != TS_OK){
@@ -675,11 +676,13 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 	// end of class
 	headerStream << QStringLiteral("};");
 
+#ifndef DISABLE_CREATE_SDL_QOBJECT
 	// add QtObject class
 	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
 	CSdlQObjectGenerator qObjectGenerator(*m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, *m_sdlTypeListCompPtr);
 	qObjectGenerator.ProcessHeaderClassFile(headerStream, sdlType);
-
+#endif
+	
 	// end of namespace
 	QString namespaceString;
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
@@ -740,9 +743,11 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 		FeedStream(sourceStream, 2, false);
 	}
 
+#ifndef DISABLE_CREATE_SDL_QOBJECT
 	// add QtObject class impl
 	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
 	qObjectGenerator.ProcessSourceClassFile(sourceStream, sdlType);
+#endif
 
 	// finish namespace 
 	if (!namespaceString.isEmpty()){

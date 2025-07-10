@@ -1,5 +1,7 @@
 TARGET = imtsdlgenv2
 
+DEFINES += DISABLE_CREATE_SDL_QOBJECT
+
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
