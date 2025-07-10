@@ -90,7 +90,6 @@ ViewCommandsDelegateBase {
 		id: collectionConnections;
 
 		function onSelectionChanged(selectedIds, selectedIndexes){
-			console.log("CollectionViewCommandsDelegateBase.qml onSelectionChanged", selectedIds)
 			collectionViewCommandsDelegate.updateBaseCommandsAccent();
 			collectionViewCommandsDelegate.updateItemSelection(selectedIndexes);
 

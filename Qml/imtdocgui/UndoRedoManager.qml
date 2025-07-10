@@ -44,7 +44,6 @@ Item {
 	
 	function doUndo()
 	{
-		console.log("doUndo", internal.m_observedModel)
 		if (!modelIsRegistered()){
 			return
 		}
@@ -52,9 +51,9 @@ Item {
 		internal.m_isBlocked = true
 		
 		internal.m_redoStack.push(internal.m_observedModel.toJson())
-		
+
 		let prevStateModel = internal.m_undoStack.pop()
-	
+
 		internal.m_observedModel.createFromJson(prevStateModel)
 		
 		internal.m_beginStateModel = prevStateModel
@@ -118,6 +117,7 @@ Item {
 	
 	function registerModel(model)
 	{
+		console.log("registerModel", model.toJson())
 		if (modelIsRegistered()){
 			console.warn("Model is already registered in the undo manager")
 			
@@ -201,13 +201,12 @@ Item {
 			
 			return
 		}
-		
+
 		if (internal.m_beginStateModel != ""){
 			internal.m_undoStack.push(internal.m_beginStateModel)
+
 			internal.m_redoStack = []
-			
-			console.log("UndoRedoManager.qml makeChanges")
-			
+
 			modelChanged()
 		}
 	}

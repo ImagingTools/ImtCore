@@ -15,6 +15,7 @@ Item {
 	property string fontColor: Style.textColor;
 	property alias radius: input.radius;
 	property alias color: input.color;
+	property bool readOnly: false;
 
 	property int timeInputDialogWidth: Style.sizeHintBXS;
 	property int timeInputDialogHeight: 90;
@@ -162,6 +163,7 @@ Item {
 			textSize: timeInput.fontSize;
 			fontColor: timeInput.fontColor;
 			borderColor: Style.iconColorOnSelected;
+			readOnly: timeInput.readOnly
 
 			KeyNavigation.tab: timeInput.tabKeyItem;
 
@@ -267,6 +269,7 @@ Item {
 		TimeInputDialog{
 			width: timeInput.timeInputDialogWidth;
 			height: timeInput.timeInputDialogHeight;
+			readOnly: timeInput.readOnly
 			onTimeChanged: {
 				if(time !== timeInput.selectedTime){
 					timeInput.setTime(time)

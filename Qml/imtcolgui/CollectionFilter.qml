@@ -353,11 +353,15 @@ ComplexCollectionFilter{
 		Returns true if the time filter has no meaningful values.
 	*/
 	function timeFilterIsEmpty(){
-		return m_timeFilter.m_timeRange.m_begin === "" &&
-				m_timeFilter.m_timeRange.m_end === "" &&
-				m_timeFilter.m_timeUnit === "" &&
-				m_timeFilter.m_interpretationMode === "" &&
-				m_timeFilter.m_unitMultiplier === 0
+		if (hasTimeFilter()){
+			return m_timeFilter.m_timeRange.m_begin === "" &&
+					m_timeFilter.m_timeRange.m_end === "" &&
+					m_timeFilter.m_timeUnit === "" &&
+					m_timeFilter.m_interpretationMode === "" &&
+					m_timeFilter.m_unitMultiplier === 0
+		}
+		
+		return true;
 	}
 	
 	/*!
@@ -365,8 +369,12 @@ ComplexCollectionFilter{
 		Returns true if there are no field or group filters set.
 	*/
 	function fieldsFilterIsEmpty(){
-		return m_fieldsFilter.m_fieldFilters.count === 0 &&
-				m_fieldsFilter.m_groupFilters.count === 0
+		if (hasFieldsFilter()){
+			return m_fieldsFilter.m_fieldFilters.count === 0 &&
+					m_fieldsFilter.m_groupFilters.count === 0
+		}
+
+		return true
 	}
 	
 	/*!

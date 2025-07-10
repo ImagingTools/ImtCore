@@ -19,6 +19,7 @@ PopupView {
 
 	property int hours: 0;
 	property int minutes: 0;
+	property bool readOnly: false;
 
 	property string hoursStr: timeInputDialog.hours < 10 ? "0" + String(timeInputDialog.hours) : String(timeInputDialog.hours);
 	property string minutesStr: timeInputDialog.minutes < 10 ? "0" + String(timeInputDialog.minutes) : String(timeInputDialog.minutes);
@@ -120,6 +121,7 @@ PopupView {
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;
+				enabled: !timeInputDialog.readOnly
 
 				iconSource: "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Selected);
 				decorator: Component{IconButtonDecorator{}}
@@ -171,7 +173,7 @@ PopupView {
 				anchors.horizontalCenter: parent.horizontalCenter;
 				anchors.bottom: parent.bottom;
 				anchors.bottomMargin: Style.marginXS;
-
+				enabled: !timeInputDialog.readOnly
 				width: body.buttonWidth;
 				height: body.buttonHeight;
 
@@ -209,6 +211,7 @@ PopupView {
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;
+				enabled: !timeInputDialog.readOnly
 
 				iconSource: "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Selected);
 				decorator: Component{IconButtonDecorator{}}
@@ -261,7 +264,7 @@ PopupView {
 
 				width: body.buttonWidth;
 				height: body.buttonHeight;
-
+				enabled: !timeInputDialog.readOnly
 				iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Selected);
 				decorator: Component{IconButtonDecorator{}}
 

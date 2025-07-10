@@ -13,7 +13,7 @@ Row{
 	property bool canShowCurrentTime: true;
 	property bool hasTitle: true;
 	property string color: Style.baseColor;
-
+	property bool readOnly: false;
 	property var selectedDate;
 
 	property string dateStr: "";
@@ -143,6 +143,7 @@ Row{
 		hasTitle: dateTimeInput.hasTitle;
 		color: dateTimeInput.color;
 		fontSize: dateTimeInput.fontSize
+		readOnly: dateTimeInput.readOnly
 
 		calendarWidth:  dateTimeInput.calendarWidth
 		calendarHeight: dateTimeInput.calendarHeight
@@ -175,6 +176,7 @@ Row{
 		hasTitle: dateTimeInput.hasTitle;
 		color: dateTimeInput.color;
 		fontSize: dateTimeInput.fontSize
+		readOnly: dateTimeInput.readOnly
 
 		timeInputDialogWidth: dateTimeInput.timeInputDialogWidth;
 		timeInputDialogHeight:  dateTimeInput.timeInputDialogHeight;

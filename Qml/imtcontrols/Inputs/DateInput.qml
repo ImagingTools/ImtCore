@@ -26,6 +26,7 @@ Item {
 
 	property bool canShowCurrentDate: true;
 	property bool hasTitle: true;
+	property bool readOnly: false;
 
 	property bool  isError: false;
 	property bool  isMonthError: false;
@@ -278,6 +279,7 @@ Item {
 
 				width: dateInput.width - calendarButtonContainer.width;
 				height: dateInput.inputHeight;
+				readOnly: dateInput.readOnly
 
 				textSize: dateInput.fontSize;
 				fontColor: dateInput.fontColor;
@@ -355,6 +357,7 @@ Item {
 
 					width: parent.width - 8;
 					height: width;
+					enabled: !dateInput.readOnly
 
 					iconSource: "../../../" + Style.getIconPath("Icons/Calendar", Icon.State.Off, Icon.Mode.Normal);
 					decorator: Component{IconButtonDecorator{}}
