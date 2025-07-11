@@ -16,8 +16,8 @@ BoundingBox {
 		if(showNodes){
 			drawNodes(ctx, layerMatrixArg)
 		}
-		if(selectedNodeIndex >-1  && selectedNodeCoordinate !==undefined){
-			drawSelectedNode(ctx, selectedNodeCoordinate, layerMatrixArg)
+		if(highlightedNodeIndex >-1  && highlightedNodeCoordinate !==undefined){
+			drawSelectedNode(ctx, highlightedNodeCoordinate, layerMatrixArg)
 		}
 	}
 
@@ -66,6 +66,17 @@ BoundingBox {
 		obj.x = point.x;
 		obj.y = point.y;
 		return obj
+	}
+
+	onMousePositionChanged: {
+		let foundNodeIndex = findNodeIndex(mouseEvent)
+		if(foundNodeIndex > -1){
+			highlightedNodeCoordinate = points[foundNodeIndex]
+		}
+		highlightedNodeIndex = foundNodeIndex;
+	}
+	onHighlightedNodeIndexChanged: {
+		shapeChanged()
 	}
 }
 

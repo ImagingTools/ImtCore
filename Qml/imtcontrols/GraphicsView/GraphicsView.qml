@@ -47,7 +47,7 @@ Rectangle {
 	property bool isPointsAdditionMode: false;
 	property bool isPointsDeletionMode: false;
 
-	property bool hasHoverReaction: false;
+	property bool hasHoverReaction: true;
 
 	property bool isMultiSelection: true;
 
@@ -302,7 +302,7 @@ Rectangle {
 
 		for(let i = 0; i < graphicsView.layerModel.length ; i++){
 			let layer = graphicsView.layerModel[i];
-			if(layer.layerId == "active" || layer.layerId == "inactive"){
+			if(layer.layerId == "active" /*|| layer.layerId == "inactive"*/){
 				let shapeModel = layer.shapeModel;
 				for(let j = 0; j < shapeModel.length; j++){
 					let shape = shapeModel[j];
@@ -310,6 +310,7 @@ Rectangle {
 					canvasMatrix.setXTranslation(canvas.deltaX);
 					canvasMatrix.setYTranslation(canvas.deltaY);
 					canvasMatrix.setXScale(canvas.scaleCoeff);
+					canvasMatrix.setYScale(canvas.scaleCoeff);
 					let isInside =  shape.isInside(mouseX, mouseY, canvasMatrix)
 
 					if(isInside){
@@ -347,12 +348,10 @@ Rectangle {
 		}
 	}
 
-
 	function hoverReaction(position){
 		if(!graphicsView.hasHoverReaction){
 			return;
 		}
-		let pointFound = false;
 		let activeLayer = getActiveLayer()
 
 		let invViewMatrix = canvasMatrix.getInvertedMatrix();
@@ -362,82 +361,7 @@ Rectangle {
 
 		for (let i = 0; i < activeLayer.shapeModel.length; i++){
 			let shape = activeLayer.shapeModel[i];
-			let pointList = shape.points
-
-			if(pointFound){
-				shape.selectedNodeIndex = -1;
-			}
-			else {
-				for(let j = 0; j < pointList.length; j++){
-					let point = shape.getScreenPosition(pointList[j]);
-					//point = activeLayer.layerMatrix.transformPoint(point);
-					let pointSize = DesignScheme.shapePointSize + Style.marginXS;
-					if(point.x >= position.x - pointSize
-						&& point.x <= position.x + pointSize
-						&& point.y >= position.y - pointSize
-						&& point.y <= position.y + pointSize
-						){
-						shape.selectedNodeCoordinate = pointList[j]
-						shape.selectedNodeIndex = j;
-						pointFound = true;
-						let hintObj = {"shapeIndex" : i, "shapePointIndex": j}
-						graphicsView.hintShapePointModel.push(hintObj);
-						graphicsView.hintShapePoint(i, j)
-
-						let pointInfo = shape.getPointDescription(j);
-						for(let key in pointInfo){
-							//console.log(key, ": ", pointInfo[key]);
-						}
-					}
-				}
-				if(!pointFound){
-					shape.selectedNodeIndex = -1;
-				}
-			}
-		}
-		if(pointFound){
-			canvas.requestPaint();
-		}
-		else if(graphicsView.hintShapePointModel.length){
-			graphicsView.hintShapePointModel = []
-			canvas.requestPaint();
-		}
-
-
-		// canvas.hoverIndex = -1;
-		// for(let i = 0; i < graphicsView.objectsModel.count; i++){
-		// 	let item = graphicsView.objectsModel.get(i).item;
-
-		// 	let x_  = item.m_x;
-		// 	let y_  = item.m_y;
-		// 	let width_ = item.m_width ? item.m_width  : canvas.mainRec_width;
-		// 	let height_ = canvas.mainRec_height ;
-
-		// 	x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
-		// 	y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
-		// 	width_ = width_ * canvas.scaleCoeff;
-		// 	height_ = height_  * canvas.scaleCoeff;
-
-		// 	let ok = controlArea.checkHoverItem(x_, y_, width_, height_, position);
-
-		// 	if(ok){
-		// 		canvas.hoverIndex = i;
-
-		// 	}
-		// }
-		if(canvas.hoverIndex >=0){
-			//controlArea.cursorShape = Qt.ArrowCursor;
-
-			// canvas.linkSelected = true;
-			// canvas.requestPaint();
-		}
-		else {
-			//controlArea.cursorShape = Qt.OpenHandCursor;
-
-			// if(canvas.linkSelected){
-			// 	canvas.linkSelected = false;
-			// 	canvas.requestPaint();
-			// }
+			shape.mousePositionChanged(position)
 		}
 	}
 

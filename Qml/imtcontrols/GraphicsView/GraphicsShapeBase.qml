@@ -13,9 +13,9 @@ QtObject {
 	property bool isSelected: false;
 	property bool showNodes: false;
 	property int touchedNodeIndex: -1;
-	property int selectedNodeIndex: -1;
+	property int highlightedNodeIndex: -1;
 
-	property var selectedNodeCoordinate
+	property var highlightedNodeCoordinate
 	property var touchedNodeCoordinate
 
 	property CanvasMatrix layerMatrix: CanvasMatrix{};
@@ -28,6 +28,13 @@ QtObject {
 	signal shapeChanged();
 	signal shapeInfo(var info);
 	signal pointInfo(var info);
+
+	signal mouseClicked(var mouseEvent)
+	signal mousePressed(var mouseEvent)
+	signal mouseReleased(var mouseEvent)
+	signal mouseDoubleClicked(var mouseEvent)
+	signal mousePositionChanged(var mouseEvent)
+	signal mousePositionShift(real deltaX, real deltaY)
 
 	onShapeChanged: {
 		viewItem.requestPaint();
@@ -52,6 +59,22 @@ QtObject {
 		screenPosition = shapeMatrix.transformPoint(logPosition)
 
 		return screenPosition
+	}
+
+	function findNodeIndex(position){
+		let foundIndex = -1
+		for(let i = 0; i < points.length; i++){
+			let point = points[i];
+			let pointSize = DesignScheme.shapePointSize + Style.marginXS;
+			if(point.x >= position.x - pointSize
+				&& point.x <= position.x + pointSize
+				&& point.y >= position.y - pointSize
+				&& point.y <= position.y + pointSize
+				){
+				foundIndex = i;
+			}
+		}
+		return foundIndex;
 	}
 
 	function getLogPosition(screenPosition){
