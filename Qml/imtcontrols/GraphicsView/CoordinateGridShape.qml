@@ -43,8 +43,8 @@ BoundingBox {
 		// let labelXNameWidth_ = Math.max(labelXNameLength + 10, 20)
 		// let labelYNameHeight_ = labelNameFontSize + 4
 
-		let marginForXNameLabel = labelXNameLength + Style.marginS
-		let marginForYNameLabel = labelNameFontSize + Style.marginS;
+		let marginForXNameLabel = (labelXNameLength + Style.marginS)
+		let marginForYNameLabel = (labelNameFontSize + Style.marginS)
 
 		ctx.lineCap = "round"
 		ctx.lineJoin = "round"
@@ -202,8 +202,9 @@ BoundingBox {
 		ctx.fillStyle = backgroundColor;
 		ctx.fillRect(0, gridShape.viewItem.drawingAreaHeight - labelYHeight, labelXWidth, gridShape.viewItem.drawingAreaHeight)
 
-		ctx.fillRect(0, 0, gridShape.viewItem.drawingAreaWidth, marginForYNameLabel)
-		ctx.fillRect(gridShape.viewItem.drawingAreaWidth - marginForXNameLabel, 0, marginForXNameLabel, gridShape.viewItem.drawingAreaHeight)
+		//legend background
+		ctx.fillRect(0, 0, gridShape.viewItem.drawingAreaWidth, marginForYNameLabel * scaleCoeff)
+		ctx.fillRect(gridShape.viewItem.drawingAreaWidth - marginForXNameLabel* scaleCoeff, 0, marginForXNameLabel * scaleCoeff, gridShape.viewItem.drawingAreaHeight)
 
 		//Legend
 		let strartX = gridShape.axesOrigin.x !== 0 && gridShape.axesOrigin.y !== 0? labelXWidth : 0
