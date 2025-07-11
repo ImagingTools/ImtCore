@@ -20,6 +20,7 @@ BoundingBox {
 
 	property var axesOrigin: Qt.point(0, 0)
 	property bool isFixedOrigin: true;
+	property int legendMargin: -1;
 
 	property CanvasMatrix identityMatrix: CanvasMatrix{};
 	property CanvasMatrix labelMatrix: CanvasMatrix{};
@@ -43,8 +44,8 @@ BoundingBox {
 		// let labelXNameWidth_ = Math.max(labelXNameLength + 10, 20)
 		// let labelYNameHeight_ = labelNameFontSize + 4
 
-		let marginForXNameLabel = (labelXNameLength + Style.marginS)
-		let marginForYNameLabel = (labelNameFontSize + Style.marginS)
+		let marginForXNameLabel = gridShape.legendMargin > -1 ? gridShape.legendMargin : (labelXNameLength + Style.marginS)
+		let marginForYNameLabel = gridShape.legendMargin > -1 ? gridShape.legendMargin : (labelNameFontSize + Style.marginS)
 
 		ctx.lineCap = "round"
 		ctx.lineJoin = "round"
@@ -203,48 +204,43 @@ BoundingBox {
 		ctx.fillRect(0, gridShape.viewItem.drawingAreaHeight - labelYHeight, labelXWidth, gridShape.viewItem.drawingAreaHeight)
 
 		//legend background
-		ctx.fillRect(0, 0, gridShape.viewItem.drawingAreaWidth, marginForYNameLabel * scaleCoeff)
-		ctx.fillRect(gridShape.viewItem.drawingAreaWidth - marginForXNameLabel* scaleCoeff, 0, marginForXNameLabel * scaleCoeff, gridShape.viewItem.drawingAreaHeight)
+		ctx.fillRect(0, 0, gridShape.viewItem.drawingAreaWidth, marginForYNameLabel)
+		ctx.fillRect(gridShape.viewItem.drawingAreaWidth - marginForXNameLabel, 0, marginForXNameLabel, gridShape.viewItem.drawingAreaHeight)
 
 		//Legend
 		let strartX = gridShape.axesOrigin.x !== 0 && gridShape.axesOrigin.y !== 0? labelXWidth : 0
 		let finishY = gridShape.axesOrigin.x !== 0 && gridShape.axesOrigin.y !== 0? labelYHeight : 0;
 
-		let topYAxePoint = Qt.point(0,0);
-		let bottomYAxePoint = Qt.point(0,gridShape.viewItem.drawingAreaHeight - finishY);
-		let leftXAxePoint = Qt.point(strartX,0);
-		let rightXAxePoint = Qt.point(gridShape.viewItem.drawingAreaWidth,0);
+		let topYAxePoint = Qt.point(labelXWidth + gridShape.axesOrigin.x,0);
+		let bottomYAxePoint = Qt.point(labelXWidth + gridShape.axesOrigin.x,gridShape.viewItem.drawingAreaHeight - finishY);
+		let leftXAxePoint = Qt.point(strartX,gridShape.viewItem.drawingAreaHeight - labelYHeight - gridShape.axesOrigin.y);
+		let rightXAxePoint = Qt.point(gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight - labelYHeight - gridShape.axesOrigin.y);
+
+		let topYAxePointTr = Qt.point(topYAxePoint.x,topYAxePoint.y);
+		let bottomYAxePointTr = Qt.point(bottomYAxePoint.x, bottomYAxePoint.y);
+		let leftXAxePointTr = Qt.point(leftXAxePoint.x,leftXAxePoint.y);
+		let rightXAxePointTr = Qt.point(rightXAxePoint.x, rightXAxePoint.y);
 
 		if(!gridShape.isFixedOrigin){
-			layerMatrix.setContextTransform(ctx);
-			let invMatrix = layerMatrix.getInvertedMatrix();
-
-			topYAxePoint = layerMatrix.transformPoint(topYAxePoint, invMatrix)
-			bottomYAxePoint = layerMatrix.transformPoint(bottomYAxePoint, invMatrix)
-			leftXAxePoint = layerMatrix.transformPoint(leftXAxePoint, invMatrix)
-			rightXAxePoint = layerMatrix.transformPoint(rightXAxePoint, invMatrix)
-
-			// topYAxePoint = layerMatrix.transformPoint(topYAxePoint)
-			// bottomYAxePoint = layerMatrix.transformPoint(bottomYAxePoint)
-			// leftXAxePoint = layerMatrix.transformPoint(leftXAxePoint)
-			// rightXAxePoint = layerMatrix.transformPoint(rightXAxePoint)
+			topYAxePointTr = layerMatrix.transformPoint(topYAxePoint)
+			bottomYAxePointTr = layerMatrix.transformPoint(bottomYAxePoint)
+			leftXAxePointTr = layerMatrix.transformPoint(leftXAxePoint)
+			rightXAxePointTr = layerMatrix.transformPoint(rightXAxePoint)
 		}
-		// ctx.fillRect(gridShape.viewItem.drawingAreaWidth - labelXNameWidth_ ,gridShape.viewItem.drawingAreaHeight - labelYHeight, labelXWidth, gridShape.labelYHeight)
-		// ctx.fillRect(0 ,0, gridShape.labelXWidth, labelYNameHeight_)
 
 		//horizontal axe
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = Style.borderColor;
 		ctx.beginPath()
-		ctx.moveTo(leftXAxePoint.x, gridShape.viewItem.drawingAreaHeight - labelYHeight - gridShape.axesOrigin.y);
-		ctx.lineTo(rightXAxePoint.x - marginForXNameLabel, gridShape.viewItem.drawingAreaHeight - labelYHeight - gridShape.axesOrigin.y);
+		ctx.moveTo(leftXAxePoint.x, leftXAxePointTr.y);
+		ctx.lineTo(rightXAxePoint.x - marginForXNameLabel, rightXAxePointTr.y);
 		ctx.closePath()
 		ctx.stroke();
 
 		//vertical axe
 		ctx.beginPath()
-		ctx.moveTo(labelXWidth + gridShape.axesOrigin.x, topYAxePoint.y + marginForXNameLabel);
-		ctx.lineTo(labelXWidth + gridShape.axesOrigin.x, bottomYAxePoint.y);
+		ctx.moveTo(topYAxePointTr.x, topYAxePoint.y + marginForXNameLabel);
+		ctx.lineTo(bottomYAxePointTr.x, bottomYAxePoint.y);
 		ctx.closePath()
 		ctx.stroke();
 
@@ -254,8 +250,9 @@ BoundingBox {
 		ctx.fillStyle = gridShape.fontColor;
 		//ctx.fillText(gridShape.labelX, gridShape.viewItem.drawingAreaWidth - labelXNameLength, gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS);
 		// ctx.fillText(gridShape.labelY, Style.marginXS, Style.marginXS + labelNameFontSize/2);
-		ctx.fillText(gridShape.labelX, rightXAxePoint.x - labelXNameLength -4, gridShape.viewItem.drawingAreaHeight  - labelYHeight  - gridShape.axesOrigin.y + labelNameFontSize/2 - 1);
-		ctx.fillText(gridShape.labelY, gridShape.labelXWidth + gridShape.axesOrigin.x - labelYNameLength/2 -1, topYAxePoint.y + labelNameFontSize);
+
+		ctx.fillText(gridShape.labelX, rightXAxePoint.x - labelXNameLength -4, rightXAxePointTr.y + labelNameFontSize/2 - 1);
+		ctx.fillText(gridShape.labelY, topYAxePointTr.x - labelYNameLength/2 -1, topYAxePoint.y + labelNameFontSize);
 
 	}
 

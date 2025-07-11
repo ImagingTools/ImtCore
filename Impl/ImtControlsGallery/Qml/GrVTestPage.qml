@@ -192,7 +192,7 @@ Rectangle {
 			activeLayer.layerMatrix.invertY();
 			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
 
-			let clipRect = Qt.rect(gridShape.labelXWidth, 0, view.width - gridShape.labelXWidth, view.height - gridShape.labelYHeight)
+			let clipRect = Qt.rect(gridShape.labelXWidth, gridShape.legendMargin, view.width - gridShape.labelXWidth - gridShape.legendMargin, view.height - gridShape.labelYHeight - gridShape.legendMargin)
 			activeLayer.clipRect = clipRect
 
 			let lineObjBlue = polylineCompBlue.createObject(this);
@@ -365,6 +365,7 @@ Rectangle {
 
 		axesOrigin: Qt.point(720, 320);
 		isFixedOrigin: false;
+		legendMargin: 20;
 	}
 
 }
