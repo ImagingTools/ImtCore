@@ -157,16 +157,16 @@ Rectangle {
 		anchors.leftMargin: 50;
 		anchors.topMargin: 50;
 
-		width: parent.width/2
-		height: parent.height/2
+		width: 0.8 * parent.width
+		height: 0.8 * parent.height
 
 		hideScrollbars: true;
 		hasButtonMenu: true;
-		leftMenuCoordinates: Qt.point(gridShape.originX + Style.marginM, Style.marginS)
+		leftMenuCoordinates: Qt.point(gridShape.labelXWidth + Style.marginM, Style.marginS)
 		//minZoomLevel: 1;
 		restrictMove: true;
-		translateXPositiveLimit: gridShape.originX
-		translateYNegativeLimit: gridShape.originY
+		translateXPositiveLimit: gridShape.labelXWidth
+		translateYNegativeLimit: gridShape.labelYHeight
 		hasHoverReaction: true;
 
 		Component.onCompleted: {
@@ -178,9 +178,9 @@ Rectangle {
 			let inactiveLayer = getInactiveLayer()
 
 			//transformation for the layer
-			inactiveLayer.layerMatrix.setXTranslation(gridShape.originX)
+			inactiveLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
 			inactiveLayer.layerMatrix.invertY();
-			inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.originY)
+			inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
 
 			let lineObjRed = polylineCompRed.createObject(this);
 			inactiveLayer.addShape(lineObjRed);
@@ -188,11 +188,11 @@ Rectangle {
 			let activeLayer = getActiveLayer()
 
 			//transformation for the layer
-			activeLayer.layerMatrix.setXTranslation(gridShape.originX)
+			activeLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
 			activeLayer.layerMatrix.invertY();
-			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.originY)
+			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
 
-			let clipRect = Qt.rect(gridShape.originX, 0, view.width - gridShape.originX, view.height - gridShape.originY)
+			let clipRect = Qt.rect(gridShape.labelXWidth, 0, view.width - gridShape.labelXWidth, view.height - gridShape.labelYHeight)
 			activeLayer.clipRect = clipRect
 
 			let lineObjBlue = polylineCompBlue.createObject(this);
@@ -224,7 +224,7 @@ Rectangle {
 		onHeightChanged: {
 			let activeLayer = getActiveLayer();
 			if(activeLayer && activeLayer.layerMatrix){
-				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.originY)
+				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight)
 			}
 		}
 	}
@@ -363,7 +363,7 @@ Rectangle {
 	CoordinateGridShape{
 		id: gridShape;
 
-		viewItem: view;
+		axesOrigin: Qt.point(720, 320);
 	}
 
 }

@@ -125,7 +125,7 @@ Rectangle {
 	}
 
 	onObjectsModelChanged: {
-		canvas.requestPaint();
+		requestPaintPause.restart();
 	}
 
 	onAutoFitChanged: {
@@ -136,7 +136,7 @@ Rectangle {
 
 	function requestPaint(){
 		//console.log("Canvas::requestPaint")
-		canvas.requestPaint();
+		requestPaintPause.restart();
 	}
 
 	function createLayer(layerId){
@@ -184,7 +184,7 @@ Rectangle {
 
 
 	function designSchemeChanged(scheme){
-		canvas.requestPaint();
+		requestPaintPause.restart()
 	}
 
 	function appSizeChanged(params){
@@ -232,8 +232,7 @@ Rectangle {
 			requestPaint_ = false;
 		}
 		if(requestPaint_){
-			canvas.requestPaint();
-		}
+			requestPaintPause.restart()		}
 
 		// if (canvas.backgroundWidth == 0 | canvas.backgroundHeight == 0){
 		// 	return
@@ -340,12 +339,6 @@ Rectangle {
 				}
 			}
 		}
-		if(exeptShape ==undefined){
-			canvas.currentTouchedShape = null
-		}
-		else {
-			canvas.currentTouchedShape = exeptShape
-		}
 	}
 
 	function hoverReaction(position){
@@ -395,7 +388,6 @@ Rectangle {
 					let shape = graphicsView.findObject(mouse.x, mouse.y)
 					if(shape !== null){
 						found = true;
-						canvas.currentTouchedShape = shape;
 						if(canvas.selectedShapeCount < 2){
 							graphicsView.clearSelection(shape)
 							canvas.selectedShapeCount = 1;
@@ -407,7 +399,7 @@ Rectangle {
 						canvas.selectedShapeCount = 0;
 					}
 
-					canvas.requestPaint();
+					requestPaintPause.restart()
 
 					if(!found){
 						controlArea.cursorShape = Qt.ClosedHandCursor;
@@ -444,7 +436,7 @@ Rectangle {
 						shape.isSelected = true;
 					}
 				}
-				canvas.requestPaint();
+				requestPaintPause.restart();
 				controlArea.cursorShape = Qt.ArrowCursor;
 			}
 
@@ -461,7 +453,7 @@ Rectangle {
 
 				let found = false;
 				let margin_ = Style.marginM;
-				let activeLayer = graphicsView.getLayer("active")
+				let activeLayer = graphicsView.getActiveLayer()
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
 					let shape = activeLayer.shapeModel[i];
 					if(shape.isSelected){
@@ -539,7 +531,7 @@ Rectangle {
 					}
 				}
 
-				canvas.requestPaint();
+				requestPaintPause.restart();
 			}
 
 			onWheel: {
@@ -642,7 +634,6 @@ Rectangle {
 
 			//antialiasing: true;
 
-			property var currentTouchedShape: null
 			property int selectedShapeCount: 0;
 
 			property real scaleCoeff: 1.0;
@@ -902,7 +893,7 @@ Rectangle {
 
 			canvas.selectedIndex = 100//index;
 
-			canvas.requestPaint();
+			requestPaintPause.restart();
 		}
 	}
 
@@ -931,7 +922,7 @@ Rectangle {
 
 		canvas.selectedIndex = -1;
 
-		canvas.requestPaint();
+		requestPaintPause.restart();
 	}
 
 
@@ -950,7 +941,7 @@ Rectangle {
 		z: (scrollVert.isOnTop && scrollHoriz.isOnTop) ? 21 : (!scrollVert.isOnTop && !scrollHoriz.isOnTop) ? 21 : 20 + scrollVert.isOnTop;
 		property bool isOnTop: true;
 		onContentYSignal: {
-			canvas.requestPaint();
+			requestPaintPause.restart();
 		}
 		onMovingSignal: {
 			scrollVert.isOnTop = true;
@@ -977,7 +968,7 @@ Rectangle {
 		z: (scrollHoriz.isOnTop && scrollVert.isOnTop) ? 20 : (!scrollHoriz.isOnTop && !scrollVert.isOnTop) ? 20 : 20 + scrollHoriz.isOnTop;
 		property bool isOnTop: false;
 		onContentXSignal: {
-			canvas.requestPaint();
+			requestPaintPause.restart();
 		}
 		onMovingSignal: {
 			scrollVert.isOnTop = false;
@@ -991,10 +982,6 @@ Rectangle {
 
 		x: graphicsView.leftMenuCoordinates.x
 		y: graphicsView.leftMenuCoordinates.y
-		// anchors.left: parent.left;
-		// anchors.top: parent.top;
-		// anchors.leftMargin: Style.marginM
-		// anchors.topMargin: Style.marginS
 
 		width: Style.buttonWidthM;
 		height: width;
@@ -1171,11 +1158,6 @@ Rectangle {
 
 		x: graphicsView.rightMenuCoordinates.x
 		y: graphicsView.rightMenuCoordinates.y
-
-		// anchors.right: parent.right;
-		// anchors.top: parent.top;
-		// anchors.rightMargin: Style.marginM
-		// anchors.topMargin: Style.marginS
 
 		width: Style.buttonWidthM;
 		height: width;
