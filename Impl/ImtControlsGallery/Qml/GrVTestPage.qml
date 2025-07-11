@@ -161,7 +161,7 @@ Rectangle {
 		height: 0.8 * parent.height
 
 		hideScrollbars: true;
-		hasButtonMenu: true;
+		hasRightButtonMenu: true;
 		leftMenuCoordinates: Qt.point(gridShape.labelXWidth + Style.marginM, Style.marginS)
 		//minZoomLevel: 1;
 		restrictMove: true;
@@ -364,6 +364,7 @@ Rectangle {
 		id: gridShape;
 
 		axesOrigin: Qt.point(720, 320);
+		isFixedOrigin: false;
 	}
 
 }

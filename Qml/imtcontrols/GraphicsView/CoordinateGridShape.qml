@@ -19,6 +19,7 @@ BoundingBox {
 	property string labelY: "Y";
 
 	property var axesOrigin: Qt.point(0, 0)
+	property bool isFixedOrigin: true;
 
 	property CanvasMatrix identityMatrix: CanvasMatrix{};
 	property CanvasMatrix labelMatrix: CanvasMatrix{};
@@ -33,6 +34,17 @@ BoundingBox {
 		let deltaAddY = deltaY <= 0 ? 0 : deltaY
 
 		let step = gridShape.gridStepMajor;
+
+		//Label names params
+		let labelNameFontSize = fontSize + 2
+		ctx.font = String(labelNameFontSize) + "px sans-serif"
+		let labelXNameLength = ctx.measureText(gridShape.labelX).width
+		let labelYNameLength = ctx.measureText(gridShape.labelY).width
+		// let labelXNameWidth_ = Math.max(labelXNameLength + 10, 20)
+		// let labelYNameHeight_ = labelNameFontSize + 4
+
+		let marginForXNameLabel = labelXNameLength + Style.marginS
+		let marginForYNameLabel = labelNameFontSize + Style.marginS;
 
 		ctx.lineCap = "round"
 		ctx.lineJoin = "round"
@@ -186,42 +198,64 @@ BoundingBox {
 
 		identityMatrix.setContextTransform(ctx);
 
-		//axes background
+		//labeles background
 		ctx.fillStyle = backgroundColor;
-		ctx.fillRect(0,gridShape.viewItem.drawingAreaHeight - labelYHeight, labelXWidth, gridShape.viewItem.drawingAreaHeight)
+		ctx.fillRect(0, gridShape.viewItem.drawingAreaHeight - labelYHeight, labelXWidth, gridShape.viewItem.drawingAreaHeight)
 
-		//Label names
-		let labelFontSize = fontSize + 2
-		ctx.font = String(labelFontSize) + "px sans-serif"
-		let labelXLength = ctx.measureText(gridShape.labelX).width
-		let labelYLength = ctx.measureText(gridShape.labelY).width
-		let labelXWidth_ = Math.max(labelXLength + 10, 20)
-		let labelYHeight_ = labelFontSize + 4
+		ctx.fillRect(0, 0, gridShape.viewItem.drawingAreaWidth, marginForYNameLabel)
+		ctx.fillRect(gridShape.viewItem.drawingAreaWidth - marginForXNameLabel, 0, marginForXNameLabel, gridShape.viewItem.drawingAreaHeight)
 
-		ctx.fillRect(gridShape.viewItem.drawingAreaWidth - labelXWidth_ ,gridShape.viewItem.drawingAreaHeight - labelYHeight, labelXWidth, gridShape.labelYHeight)
-		ctx.fillRect(0 ,0, gridShape.labelXWidth, labelYHeight_)
+		//Legend
+		let strartX = gridShape.axesOrigin.x !== 0 && gridShape.axesOrigin.y !== 0? labelXWidth : 0
+		let finishY = gridShape.axesOrigin.x !== 0 && gridShape.axesOrigin.y !== 0? labelYHeight : 0;
 
-		ctx.fillStyle = gridShape.fontColor;
-		ctx.fillText(gridShape.labelX, gridShape.viewItem.drawingAreaWidth - labelXLength, gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS);
-		ctx.fillText(gridShape.labelY, Style.marginXS, Style.marginXS + labelFontSize/2);
+		let topYAxePoint = Qt.point(0,0);
+		let bottomYAxePoint = Qt.point(0,gridShape.viewItem.drawingAreaHeight - finishY);
+		let leftXAxePoint = Qt.point(strartX,0);
+		let rightXAxePoint = Qt.point(gridShape.viewItem.drawingAreaWidth,0);
+
+		if(!gridShape.isFixedOrigin){
+			layerMatrix.setContextTransform(ctx);
+			let invMatrix = layerMatrix.getInvertedMatrix();
+
+			topYAxePoint = layerMatrix.transformPoint(topYAxePoint, invMatrix)
+			bottomYAxePoint = layerMatrix.transformPoint(bottomYAxePoint, invMatrix)
+			leftXAxePoint = layerMatrix.transformPoint(leftXAxePoint, invMatrix)
+			rightXAxePoint = layerMatrix.transformPoint(rightXAxePoint, invMatrix)
+
+			// topYAxePoint = layerMatrix.transformPoint(topYAxePoint)
+			// bottomYAxePoint = layerMatrix.transformPoint(bottomYAxePoint)
+			// leftXAxePoint = layerMatrix.transformPoint(leftXAxePoint)
+			// rightXAxePoint = layerMatrix.transformPoint(rightXAxePoint)
+		}
+		// ctx.fillRect(gridShape.viewItem.drawingAreaWidth - labelXNameWidth_ ,gridShape.viewItem.drawingAreaHeight - labelYHeight, labelXWidth, gridShape.labelYHeight)
+		// ctx.fillRect(0 ,0, gridShape.labelXWidth, labelYNameHeight_)
 
 		//horizontal axe
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = Style.borderColor;
 		ctx.beginPath()
-		let strartX = gridShape.axesOrigin.x !== 0 && gridShape.axesOrigin.y !== 0? labelXWidth : 0
-		ctx.moveTo(strartX, gridShape.viewItem.drawingAreaHeight - labelYHeight - gridShape.axesOrigin.y);
-		ctx.lineTo(gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight - labelYHeight - gridShape.axesOrigin.y);
+		ctx.moveTo(leftXAxePoint.x, gridShape.viewItem.drawingAreaHeight - labelYHeight - gridShape.axesOrigin.y);
+		ctx.lineTo(rightXAxePoint.x - marginForXNameLabel, gridShape.viewItem.drawingAreaHeight - labelYHeight - gridShape.axesOrigin.y);
 		ctx.closePath()
 		ctx.stroke();
 
 		//vertical axe
 		ctx.beginPath()
-		let finishY = gridShape.axesOrigin.x !== 0 && gridShape.axesOrigin.y !== 0? labelYHeight : 0;
-		ctx.moveTo(labelXWidth + gridShape.axesOrigin.x, 0);
-		ctx.lineTo(labelXWidth + gridShape.axesOrigin.x, gridShape.viewItem.drawingAreaHeight - finishY);
+		ctx.moveTo(labelXWidth + gridShape.axesOrigin.x, topYAxePoint.y + marginForXNameLabel);
+		ctx.lineTo(labelXWidth + gridShape.axesOrigin.x, bottomYAxePoint.y);
 		ctx.closePath()
 		ctx.stroke();
+
+
+		//Legend
+		ctx.font = String(labelNameFontSize) + "px sans-serif"
+		ctx.fillStyle = gridShape.fontColor;
+		//ctx.fillText(gridShape.labelX, gridShape.viewItem.drawingAreaWidth - labelXNameLength, gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS);
+		// ctx.fillText(gridShape.labelY, Style.marginXS, Style.marginXS + labelNameFontSize/2);
+		ctx.fillText(gridShape.labelX, rightXAxePoint.x - labelXNameLength -4, gridShape.viewItem.drawingAreaHeight  - labelYHeight  - gridShape.axesOrigin.y + labelNameFontSize/2 - 1);
+		ctx.fillText(gridShape.labelY, gridShape.labelXWidth + gridShape.axesOrigin.x - labelYNameLength/2 -1, topYAxePoint.y + labelNameFontSize);
+
 	}
 
 	function thinningCheck(scaleCoeff, i){

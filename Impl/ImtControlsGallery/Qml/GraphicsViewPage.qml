@@ -9,7 +9,8 @@ import imtcolgui 1.0
 GraphicsView{
 	id: view;
 
-	hasButtonMenu: true;
+	hasLeftButtonMenu: true;
+	hasRightButtonMenu: true;
 	property var drawModel: []
 
 

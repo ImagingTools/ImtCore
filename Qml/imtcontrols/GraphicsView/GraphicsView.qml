@@ -68,7 +68,8 @@ Rectangle {
 	property var selectedShapeModel: []
 	property var selectedShapePointModel: []
 
-	property bool hasButtonMenu: false;
+	property bool hasLeftButtonMenu: false;
+	property bool hasRightButtonMenu: false;
 	property var leftMenuCoordinates: Qt.point(Style.marginM, Style.marginS);
 	property var rightMenuCoordinates: Qt.point(width - Style.marginM - Style.buttonWidthM, Style.marginS);
 
@@ -985,7 +986,7 @@ Rectangle {
 
 		width: Style.buttonWidthM;
 		height: width;
-		visible: graphicsView.hasButtonMenu;
+		visible: graphicsView.hasLeftButtonMenu;
 
 		iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
 		onClicked: {
@@ -1163,7 +1164,7 @@ Rectangle {
 		height: width;
 
 		rotation: 90;
-		visible: graphicsView.hasButtonMenu;
+		visible: graphicsView.hasRightButtonMenu;
 
 		iconSource: "../../../" + Style.getIconPath("Icons/More", Icon.State.On, Icon.Mode.Normal)
 		onClicked: {
@@ -1231,6 +1232,20 @@ Rectangle {
 			spacing: Style.marginXS;
 
 			Button{
+				id: resetViewButton;
+
+				width: parent.width;
+				height: width;
+
+				//iconSource: "../../../" + Style.getIconPath("Icons/ZoomReset", Icon.State.On, Icon.Mode.Normal)
+				iconSource: "../../../" + Style.getIconPath("Icons/FitToScreen", Icon.State.On, Icon.Mode.Normal)
+				onClicked: {
+					graphicsView.resetView(true);
+				}
+
+			}
+
+			Button{
 				id: zoomIncreaseButton;
 
 				width: parent.width;
@@ -1251,19 +1266,7 @@ Rectangle {
 				}
 			}
 
-			Button{
-				id: resetViewButton;
 
-				width: parent.width;
-				height: width;
-
-				//iconSource: "../../../" + Style.getIconPath("Icons/ZoomReset", Icon.State.On, Icon.Mode.Normal)
-				iconSource: "../../../" + Style.getIconPath("Icons/FitToScreen", Icon.State.On, Icon.Mode.Normal)
-				onClicked: {
-					graphicsView.resetView(true);
-				}
-
-			}
 
 			Button{
 				id: fitToScreenButton;
