@@ -97,7 +97,7 @@ void CProductInfoFileGeneratorComp::WriteIncludes(QTextStream& out) const
 {
 	out << QStringLiteral("// Qt includes");
 	WriteNewLine(out, 1);
-	out << QStringLiteral("#include <QtCore/QtTranslation>");
+	out << QStringLiteral("#include <QtCore/qglobal.h>");
 	WriteNewLine(out, 2);
 	out << QStringLiteral("// ImtCore includes");
 	WriteNewLine(out, 1);
