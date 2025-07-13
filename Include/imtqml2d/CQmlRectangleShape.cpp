@@ -6,7 +6,7 @@ namespace imtqml2d
 {
 
 
-// reimplemented (imod::IObserver)
+// reimplemented (imod::TSingleModelObserverBase)
 
 bool CQmlRectangleShape::OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask)
 {

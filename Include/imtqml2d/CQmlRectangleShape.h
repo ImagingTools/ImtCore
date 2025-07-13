@@ -25,15 +25,15 @@ public:
 
 	[[nodiscard]] bool IsValid() const;
 
-	// reimplemented (imod::IObserver)
-	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;
-	virtual bool OnModelDetached(imod::IModel* modelPtr) override;
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-
-	// reimplemented CRectangle2d
 public:
 	virtual void SetTopLeft(sdl::imtsdl2d::imt2d::CPoint2d newTopLeft) override;
 	virtual void SetBottomRight(sdl::imtsdl2d::imt2d::CPoint2d newBottomRight) override;
+
+protected:
+	// reimplemented (imod::TSingleModelObserverBase)
+	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask) override;
+	virtual bool OnModelDetached(imod::IModel* modelPtr) override;
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 };
 
 
