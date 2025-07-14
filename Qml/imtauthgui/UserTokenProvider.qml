@@ -47,9 +47,10 @@ QtObject {
                     container.login = m_username;
                     container.systemId = m_systemId;
 					// var str = m_permissions.toString()
-					console.log("m_permissions", m_permissions)
-					container.permissions = m_permissions.split(';')
-
+                    console.log("m_permissions", m_permissions)
+                    if (m_permissions){
+                        container.permissions = m_permissions.split(';')
+                    }
                     container.accepted();
                 }
             }
