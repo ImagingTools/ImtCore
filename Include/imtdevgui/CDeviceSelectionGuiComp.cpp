@@ -56,6 +56,10 @@ void CDeviceSelectionGuiComp::OnDeviceListUpdated(
 	DeviceListComboBox->setCurrentIndex(currentIndex);
 	DeviceListComboBox->blockSignals(false);
 
+	if (deviceIds.isEmpty()){
+		DoUpdateModel();
+	}
+
 	if (currentIndex < 0) {
 		Q_EMIT EmitAutoSelect();
 	}
