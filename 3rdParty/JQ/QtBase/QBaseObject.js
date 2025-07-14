@@ -40,6 +40,7 @@ class QBaseObject extends BaseObject {
         obj.__properties = properties
         // obj.__context = context
         obj.__proxy = proxy
+        // obj.__proxy2 = new Proxy(obj, this.handle)
         obj.__self = obj
         return proxy
     }

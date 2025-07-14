@@ -159,34 +159,32 @@ class Item extends QtObject {
     }
 
     __addChild(child){
-        let index = -1
-
-        index = this.data.indexOf(child)
-        if(index < 0) this.data.__push(child)
+        this.data.__push(child)
 
         if(child instanceof Item){
-            index = this.children.indexOf(child)
-            if(index < 0) this.children.__push(child)
+            this.children.__push(child)
         } else {
-            index = this.resources.indexOf(child)
-            if(index < 0) this.resources.__push(child)
+            this.data.__push(child)
         }
     }
 
     __getDOM(){
-        if(this.__DOM) {
-            return this.__DOM
+        let dom = this.__DOM
+        if(dom) {
+            return dom
         } else {
-            let dom = document.createElement('div')
+            dom = document.createElement('div')
             this.__DOM = dom
             return dom
         }
     }
 
     __setDOMStyle(style){
-        if(this.__DOM) {
+        let dom = this.__DOM
+
+        if(dom) {
             for(let name in style){
-                this.__DOM.style[name] = style[name]
+                dom.style[name] = style[name]
             }
         }
     }
@@ -372,7 +370,8 @@ class Item extends QtObject {
     }
 
     __destroy(){
-        if(this.__DOM) this.__DOM.remove()
+        let dom = this.__DOM
+        if(dom) dom.remove()
         super.__destroy()
     }
 

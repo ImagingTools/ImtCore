@@ -104,9 +104,13 @@ class QObject extends QBaseObject {
     }
   
     __updateProperties(){
+        JQApplication.beginUpdate()
+
         for(let child of this.__children){
             child.__updateProperties()
         }
+
+        JQApplication.endUpdate()
 
         for(let propName in this.__properties){
             this.__updateProperty(propName)

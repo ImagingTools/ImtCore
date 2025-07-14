@@ -35,7 +35,7 @@ class Repeater extends Item {
     }
 
     itemAt(index){
-
+        return this.__items[index]
     }
 
     SLOT_modelChanged(oldValue, newVlaue) {

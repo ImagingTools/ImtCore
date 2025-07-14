@@ -1414,7 +1414,7 @@ class Instruction {
             }
             ${this.getMethods()}
             ${this.getConnectedSignals()}
-        })).create(${this.parent ? this.parent.name : 'null'},{},__context,false)`)
+        })).create(${this.parent ? this.parent.name : 'null'},{JQAbstractModel:()=>{return ${this.targetContext.name}.JQAbstractModel}},__context,false)`)
         
         for (let i = 0; i < this.children.length; i++) {
             // childrenCode.add(`let ${this.children[i].name}=`)

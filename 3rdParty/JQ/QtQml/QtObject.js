@@ -48,7 +48,7 @@ class QtObject extends QObject {
             }
             obj.JQAbstractModel = properties.model
             delete properties.model
-        } else {
+        } else if(!properties.JQAbstractModel){
             if(!(this.isAssignableFrom(JQModules.QtQuick.Repeater) || this.isAssignableFrom(JQModules.QtQuick.ListView) || 
                 this.isAssignableFrom(JQModules.QtQuick.GridView) || this.isAssignableFrom(JQModules.QtQuick.MapItemView))){
                     obj.JQAbstractModel = ()=>{return obj.parent ? obj.parent.JQAbstractModel : undefined}
@@ -105,13 +105,8 @@ class QtObject extends QObject {
     }
 
     __addChild(child){
-        let index = -1
-
-        index = this.data.indexOf(child)
-        if(index < 0) this.data.__push(child)
-
-        index = this.resources.indexOf(child)
-        if(index < 0) this.resources.__push(child)
+        this.data.__push(child)
+        this.resources.__push(child)
     }
 
     SLOT_childrenChanged(...args){

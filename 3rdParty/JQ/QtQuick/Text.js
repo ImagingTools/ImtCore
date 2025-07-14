@@ -146,18 +146,18 @@ class Text extends Item {
     SLOT_widthChanged(oldValue, newValue){
         super.SLOT_widthChanged(oldValue, newValue)
 
-        this.__updateGeometry()
+        JQApplication.updateLater(this)
     }
 
     SLOT_textChanged(oldValue, newValue){
-        this.__updateGeometry()
+        JQApplication.updateLater(this)
     }
 
     SLOT_colorChanged(oldValue, newValue){
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
         this.__setDOMStyle({
             opacity: 1,
-            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${newValue === 'transparent' ? 0 : rgba.a * this.__proxy.opacity})`
         })
     }
 
@@ -165,18 +165,18 @@ class Text extends Item {
         let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
         this.__setDOMStyle({
             opacity: 1,
-            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+            color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * newValue})`
         })
     }
 
     SLOT_visibleChanged(oldValue, newValue){
         super.SLOT_visibleChanged()
 
-        this.__updateGeometry()
+        JQApplication.updateLater(this)
     }
 
     SLOT_elideChanged(oldValue, newValue){
-        if(this.elide === Text.ElideRight){
+        if(newValue === Text.ElideRight){
             this.__setImplStyle({
                 textOverflow: 'ellipsis',
                 overflow: 'auto',
@@ -188,32 +188,32 @@ class Text extends Item {
             })
         }
 
-        this.__updateGeometry()
+        JQApplication.updateLater(this)
     }
 
     SLOT_horizontalAlignmentChanged(oldValue, newValue){
-        switch(this.horizontalAlignment){
+        switch(newValue){
             case Text.AlignLeft: this.__setDOMStyle({ justifyContent: 'flex-start', textAlign: 'start' }); break;
             case Text.AlignRight: this.__setDOMStyle({ justifyContent: 'flex-end', textAlign: 'end' }); break;
             case Text.AlignHCenter: this.__setDOMStyle({ justifyContent: 'center', textAlign: 'center' }); break;
             case Text.AlignJustify: this.__setDOMStyle({ justifyContent: 'normal', textAlign: 'justify' }); break;
         }
 
-        this.__updateGeometry()
+        JQApplication.updateLater(this)
     }
 
     SLOT_verticalAlignmentChanged(oldValue, newValue){
-        switch(this.verticalAlignment){
+        switch(newValue){
             case Text.AlignTop: this.__setDOMStyle({ alignItems: 'flex-start' }); break;
             case Text.AlignBottom: this.__setDOMStyle({ alignItems: 'flex-end' }); break;
             case Text.AlignVCenter: this.__setDOMStyle({ alignItems: 'center' }); break;
         }
 
-        this.__updateGeometry()
+        JQApplication.updateLater(this)
     }
 
     SLOT_wrapModeChanged(oldValue, newValue){
-        switch(this.wrapMode){
+        switch(newValue){
             case Text.NoWrap: this.__setDOMStyle({ whiteSpace: 'pre' }); break;
             case Text.WordWrap: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
             case Text.WrapAnywhere: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }); break;
@@ -221,17 +221,25 @@ class Text extends Item {
             case Text.WrapAtWordBoundaryOrAnywhere: this.__setDOMStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
         }
 
-        this.__updateGeometry()
+        JQApplication.updateLater(this)
     }
 
     onFontChanged(oldValue, newValue){
+        let font = this.font
         this.__setDOMStyle({
-            fontWeight: this.font.bold == true ? 'bold' : 'normal',
-            fontSize: this.font.pixelSize+'px',
-            fontFamily: `'${this.font.family}'`,
-            textDecoration: this.font.underline == true ? 'underline' : 'unset',
+            fontWeight: font.bold == true ? 'bold' : 'normal',
+            fontSize: font.pixelSize+'px',
+            fontFamily: `'${font.family}'`,
+            textDecoration: font.underline == true ? 'underline' : 'unset',
         })
 
+        JQApplication.updateLater(this)
+    }
+
+
+
+    __endUpdate(){
+        super.__endUpdate()
         this.__updateGeometry()
     }
 }
