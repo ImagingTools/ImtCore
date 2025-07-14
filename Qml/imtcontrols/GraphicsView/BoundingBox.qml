@@ -56,18 +56,42 @@ GraphicsShapeBase {
 	}
 
 	function getBoundingBoxPoints(){
-		return [];
+		let pointsObj = {};
+
+		let minX = 1000000;
+		let minY = 1000000;
+		let maxX  = -1000000
+		let maxY = -1000000;
+
+		for(let i = 0; i < points.length; i++){
+			let point = points[i]
+			let x_ = point.x
+			let y_ = point.y
+			if(x_ < minX){
+				minX = x_
+			}
+			if(y_ < minY){
+				minY = y_
+			}
+			if(x_ > maxX){
+				maxX = x_
+			}
+			if(y_ > maxY){
+				maxY = y_
+			}
+		}
+
+		pointsObj.topLeftPoint = Qt.point(minX, minY)
+		pointsObj.topRightPoint = Qt.point(maxX, minY)
+		pointsObj.bottomLeftPoint = Qt.point(minX, maxY)
+		pointsObj.bottomRightPoint = Qt.point(maxX, maxY)
+
+		return pointsObj;
 	}
 
 	function getBoundingBoxCornerPoints(){
-		let points = {};
 
-		points.topLeftPoint = Qt.point(0,0)
-		points.topRightPoint = Qt.point(0, 0)
-		points.bottomRightPoint = Qt.point(0,0)
-		points.bottomLeftPoint = Qt.point(0, 0)
-
-		return points;
+		return getBoundingBoxPoints();
 	}
 
 	function getBoundingBoxMidPoints(){

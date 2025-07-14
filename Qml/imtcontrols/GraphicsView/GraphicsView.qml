@@ -201,7 +201,7 @@ Rectangle {
 	}
 
 	function zoomIn(){
-		if (canvas.scaleCoeff < 3){
+		if (canvas.scaleCoeff < graphicsView.maxZoomLevel){
 			let scaleCoeff_ = canvas.scaleCoeff;
 			scaleCoeff_ += scaleStep;
 			canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
@@ -209,11 +209,21 @@ Rectangle {
 	}
 
 	function zoomOut(){
-		if(canvas.scaleCoeff > scaleStep * 2){
+		if(canvas.scaleCoeff > graphicsView.minZoomLevel){
 			let scaleCoeff_ = canvas.scaleCoeff;
 			scaleCoeff_ -= scaleStep;
 			canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
 		}
+	}
+
+	function setZoom(scaleCoeff_, scaleX, scaleY){
+		if(scaleX == undefined){
+			scaleX = canvas.width / 2;
+		}
+		if(scaleY == undefined){
+			scaleY = canvas.height / 2;
+		}
+		canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
 	}
 
 	function resetZoom(){
@@ -357,6 +367,54 @@ Rectangle {
 			let shape = activeLayer.shapeModel[i];
 			shape.mousePositionChanged(position)
 		}
+	}
+
+	function fitToLayer(layer){
+
+		resetView();
+
+		let minX = 1000000;
+		let minY = 1000000;
+		let maxX  = -1000000
+		let maxY = -1000000;
+
+		let clipRect = layer.clipRect;
+		if(clipRect.width == 0 && clipRect.height == 0){
+			clipRect.width = canvas.width
+			clipRect.height = canvas.height
+		}
+		for (let i = 0; i < layer.shapeModel.length; i++){
+			let shape = layer.shapeModel[i];
+			let boundingBoxPoints = shape.getBoundingBoxPoints();
+
+			if((boundingBoxPoints.topLeftPoint).x < minX){
+				minX = boundingBoxPoints.topLeftPoint.x
+			}
+			if((boundingBoxPoints.topRightPoint).x > maxX){
+				maxX = boundingBoxPoints.topRightPoint.x
+			}
+			if((boundingBoxPoints.topLeftPoint).y < minY){
+				minY = boundingBoxPoints.topLeftPoint.y
+			}
+			if((boundingBoxPoints.bottomRightPoint).y > maxY){
+				maxY = boundingBoxPoints.bottomRightPoint.y
+			}
+		}
+		let margin_ = Style.marginXXL
+		let zoomX = (clipRect.width - margin_)/((maxX - minX)!==0 ? (maxX - minX) : 1)
+		let zoomY = (clipRect.height - margin_)/((maxY - minY)!==0 ? (maxY - minY) : 1)
+		graphicsView.setZoom(Math.min(zoomX, zoomY))
+
+		let screenPointMinXMinY = layer.layerMatrix.transformPoint(Qt.point(minX, minY))
+		let screenPointBottomLeft = Qt.point(clipRect.x + margin_, clipRect.y + clipRect.height - margin_)
+
+		canvas.deltaX += (screenPointBottomLeft.x - screenPointMinXMinY.x)
+		canvas.deltaY += (screenPointBottomLeft.y - screenPointMinXMinY.y)
+	}
+
+	function fitToActiveLayer(){
+		let activeLayer = getActiveLayer();
+		fitToLayer(activeLayer)
 	}
 
 	TreeItemModel {
@@ -1184,6 +1242,7 @@ Rectangle {
 
 		source: rightMenuButtonPanel;
 	}
+
 	Rectangle{
 		id: rightMenuButtonPanel;
 
@@ -1232,6 +1291,56 @@ Rectangle {
 			spacing: Style.marginXS;
 
 			Button{
+				id: zoomIncreaseButton;
+
+				width: parent.width;
+				height: width;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/ZoomIn", Icon.State.On, Icon.Mode.Normal)
+				onClicked: {
+					graphicsView.zoomIn();
+				}
+				onPressed: {
+					graphicsView.zoomIn()
+					zoomInAnim.start();
+				}
+				onReleased: {
+					zoomInAnim.stop();
+				}
+			}
+			Button{
+				id: zoomDecreaseButton;
+
+				width: parent.width;
+				height: width;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/ZoomOut", Icon.State.On, Icon.Mode.Normal)
+				onClicked: {
+
+				}
+				onPressed: {
+					graphicsView.zoomOut()
+					zoomOutAnim.start();
+				}
+				onReleased: {
+					zoomOutAnim.stop();
+				}
+
+			}
+
+			Button{
+				id: fitToScreenButton;
+
+				width: parent.width;
+				height: width;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/ZoomToFit", Icon.State.On, Icon.Mode.Normal)
+				onClicked: {
+					graphicsView.fitToActiveLayer()
+				}
+			}
+
+			Button{
 				id: resetViewButton;
 
 				width: parent.width;
@@ -1245,43 +1354,28 @@ Rectangle {
 
 			}
 
-			Button{
-				id: zoomIncreaseButton;
+		}
 
-				width: parent.width;
-				height: width;
 
-				iconSource: "../../../" + Style.getIconPath("Icons/ZoomIn", Icon.State.On, Icon.Mode.Normal)
-				onClicked: {
-				}
+		PauseAnimation {
+			id: zoomInAnim;
+			duration: 500
+			onFinished: {
+				graphicsView.zoomIn()
+				start()
 			}
-			Button{
-				id: zoomDecreaseButton;
-
-				width: parent.width;
-				height: width;
-
-				iconSource: "../../../" + Style.getIconPath("Icons/ZoomOut", Icon.State.On, Icon.Mode.Normal)
-				onClicked: {
-				}
+		}
+		PauseAnimation {
+			id: zoomOutAnim;
+			duration: 500
+			onFinished: {
+				graphicsView.zoomOut()
+				start()
 			}
-
-
-
-			Button{
-				id: fitToScreenButton;
-
-				width: parent.width;
-				height: width;
-
-				iconSource: "../../../" + Style.getIconPath("Icons/ZoomToFit", Icon.State.On, Icon.Mode.Normal)
-				onClicked: {
-				}
-			}
-
 
 		}
 	}
+
 
 
 }

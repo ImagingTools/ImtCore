@@ -56,9 +56,19 @@ QtObject {
 
 	function getScreenPosition(logPosition){
 		let screenPosition = layerMatrix.transformPoint(logPosition)
-		screenPosition = shapeMatrix.transformPoint(logPosition)
+		screenPosition = shapeMatrix.transformPoint(screenPosition)
 
 		return screenPosition
+	}
+
+	function getLogPosition(screenPosition){
+		let invShapeMatrix = shapeMatrix.getInvertedMatrix();
+		let invLayerMatrix = layerMatrix.getInvertedMatrix();
+
+		let logPosition = tempMatrix.transformPoint(screenPosition, invShapeMatrix)
+		logPosition = tempMatrix.transformPoint(logPosition, invLayerMatrix)
+
+		return logPosition
 	}
 
 	function findNodeIndex(position){
@@ -77,15 +87,7 @@ QtObject {
 		return foundIndex;
 	}
 
-	function getLogPosition(screenPosition){
-		let invShapeMatrix = shapeMatrix.getInvertedMatrix();
-		let invLayerMatrix = layerMatrix.getInvertedMatrix();
 
-		let logPosition = tempMatrix.transformPoint(screenPosition, invShapeMatrix)
-		logPosition = tempMatrix.transformPoint(screenPosition, invLayerMatrix)
-
-		return logPosition
-	}
 
 	function setCoordinateShift(deltaX, deltaY){
 		let pointsListNew = [];

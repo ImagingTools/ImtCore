@@ -172,6 +172,18 @@ Matrix3x3 {
 		_yTranslationInitial = yTranslation()
 	}
 
+	function printMatrix(){
+		console.log("PRINT MATRIX: ",
+					"xScale: ", xScale(),
+					"xSkew: ", xSkew(),
+					"xTranslation: ", xTranslation(),
+					"ySkew: ", ySkew(),
+					"yScale: ", yScale(),
+					"yTranslation: ", yTranslation()
+					)
+
+	}
+
 	property real _xScaleInitial: 1
 	property real _ySkewInitial: 0
 	property real _xSkewInitial: 0

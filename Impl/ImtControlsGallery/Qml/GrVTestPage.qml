@@ -132,11 +132,11 @@ Rectangle {
 		anchors.rightMargin: Style.marginL
 
 		width: 200;
-		BaseText{
-			font.pixelSize: Style.fontSizeL
+		// BaseText{
+		// 	font.pixelSize: Style.fontSizeL
 
-			text: "Zoom: " + view.scaleCoeff.toFixed(2)
-		}
+		// 	text: "Zoom: " + view.scaleCoeff.toFixed(2)
+		// }
 		// BaseText{
 		// 	font.pixelSize: Style.fontSizeL
 
@@ -164,9 +164,9 @@ Rectangle {
 		hasRightButtonMenu: true;
 		leftMenuCoordinates: Qt.point(gridShape.labelXWidth + Style.marginM, Style.marginS)
 		//minZoomLevel: 1;
-		restrictMove: true;
-		translateXPositiveLimit: gridShape.labelXWidth
-		translateYNegativeLimit: gridShape.labelYHeight
+		//restrictMove: true;
+		//translateXPositiveLimit: gridShape.labelXWidth
+		//translateYNegativeLimit: gridShape.labelYHeight
 		hasHoverReaction: true;
 
 		Component.onCompleted: {
@@ -178,22 +178,23 @@ Rectangle {
 			let inactiveLayer = getInactiveLayer()
 
 			//transformation for the layer
-			inactiveLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
 			inactiveLayer.layerMatrix.invertY();
-			inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
-
+			setXTranslation()
+			setYTranslation()
 			let lineObjRed = polylineCompRed.createObject(this);
 			inactiveLayer.addShape(lineObjRed);
 
 			let activeLayer = getActiveLayer()
 
 			//transformation for the layer
-			activeLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
 			activeLayer.layerMatrix.invertY();
-			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
+			setXTranslation()
+			setYTranslation()
 
 			let clipRect = Qt.rect(gridShape.labelXWidth, gridShape.legendMargin, view.width - gridShape.labelXWidth - gridShape.legendMargin, view.height - gridShape.labelYHeight - gridShape.legendMargin)
 			activeLayer.clipRect = clipRect
+
+			//activeLayer.addShape(lineObjRed);
 
 			let lineObjBlue = polylineCompBlue.createObject(this);
 			activeLayer.addShape(lineObjBlue);
@@ -221,11 +222,32 @@ Rectangle {
 
 		}
 
-		onHeightChanged: {
-			let activeLayer = getActiveLayer();
-			if(activeLayer && activeLayer.layerMatrix){
-				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight)
+		function setXTranslation(){
+			let inactiveLayer = getInactiveLayer()
+			let activeLayer = getActiveLayer()
+			if(inactiveLayer && inactiveLayer.layerMatrix){
+				inactiveLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
 			}
+			if(activeLayer && activeLayer.layerMatrix){
+				activeLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
+			}
+		}
+		function setYTranslation(){
+			let inactiveLayer = getInactiveLayer()
+			let activeLayer = getActiveLayer()
+			if(inactiveLayer && inactiveLayer.layerMatrix){
+				inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
+			}
+			if(activeLayer && activeLayer.layerMatrix){
+				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
+			}
+		}
+
+		onHeightChanged: {
+			setYTranslation()
+		}
+		onWidthChanged: {
+			setXTranslation()
 		}
 	}
 
