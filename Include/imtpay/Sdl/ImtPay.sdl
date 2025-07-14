@@ -12,51 +12,51 @@ import {
 }
 
 type Payment {
-	Type: String!
-	Sum: Integer!
+	type: String!
+	sum: Integer!
 }
 
 type Item {
-	Type: String!
-	Name: String!
-	Price: Integer
-	Quantity: Double!
-	Amount: Integer!
-	MeasurementUnit: String
-	PaymentMethod: String
+	type: String!
+	name: String!
+	price: Integer
+	quantity: Double!
+	amount: Integer!
+	measurementUnit: String
+	paymentMethod: String
 }
 
 type Client {
-	Id: String
-	EMail:String
-	PhoneNumber: String
-	Name:String
-	BirthDate: String
-	Citizenship: String
-	IdentityDocumentCode: String
-	IdentityDocumentData: String
-	Address: String
+	id: String
+	eMail:String
+	phoneNumber: String
+	name:String
+	birthDate: String
+	citizenship: String
+	identityDocumentCode: String
+	identityDocumentData: String
+	address: String
 }
 
 type Operator {
-	Id: String
-	Name: String
-	TaxNumber: String
+	id: String
+	name: String
+	taxNumber: String
 }
 
 type Receipt {
-	Type: String
-	PaymentsPlace: String
-	MachineNumber: String
-	OperatorData: Operator
-	Client: Client
-	Items: [Item!]!
-	Payments: [Payment]
+	type: String
+	paymentsPlace: String
+	machineNumber: String
+	operatorData: Operator
+	client: Client
+	items: [Item!]!
+	payments: [Payment]
 }
 
 type RegistrationResult {
-	StatusCode: Int
-	StatusString: String
+	statusCode: Int
+	statusString: String
 }
 
 input ReceiptRequest {
@@ -64,8 +64,8 @@ input ReceiptRequest {
 }
 
 type ReceiptItem {
-	Receipt: Receipt!
-	Date: Integer	#< UNIX TIME
+	receipt: Receipt!
+	date: Integer	#< UNIX TIME
 }
 
 type ReceiptReply {
