@@ -334,32 +334,35 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			ifStream << QStringLiteral("BaseModel");
 		}
 		else if (isEnum){
-			ifStream << QStringLiteral("var");
+			ifStream << QStringLiteral("string");
 		}
 		else {
-			// QString type = QmlConvertType(sdlField.GetType());
-			if (!isCustom){
-				if (convertedType == QStringLiteral("int")){
-					convertedType = QStringLiteral("IntType");
-				}
-				else if (convertedType == QStringLiteral("string")){
-					convertedType = QStringLiteral("StringType");
-				}
-				else if (convertedType == QStringLiteral("double")){
-					convertedType = QStringLiteral("DoubleType");
-				}
-				else if (convertedType == QStringLiteral("real")){
-					convertedType = QStringLiteral("DoubleType");
-				}
-				else if (convertedType == QStringLiteral("bool")){
-					convertedType = QStringLiteral("BoolType");
-				}
-				convertedType =  QStringLiteral("var");
-			}
 			ifStream << convertedType;
 		}
 		// use 'm_' prefix to avoid ambiguity
-		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId()) << QStringLiteral(": null");
+		ifStream << QStringLiteral(" m_") << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << ':' << ' ';
+		if (sdlField.IsArray() && (!isCustom || isEnum)){
+			ifStream << QStringLiteral("[]");
+		}
+		else if (!isCustom || isEnum){
+			if (convertedType == QStringLiteral("int") ||
+				convertedType == QStringLiteral("real") ||
+				convertedType == QStringLiteral("double"))
+			{
+				ifStream << QStringLiteral("0");
+			}
+			else if (convertedType == QStringLiteral("bool")){
+				ifStream << QStringLiteral("false");
+			}
+			else if (convertedType == QStringLiteral("string") || isEnum)
+			{
+				ifStream << QStringLiteral("''");
+			}
+		}
+		else {
+			ifStream << QStringLiteral("null");
+		}
 	}
 
 	FeedStream(ifStream, 2, false);
@@ -438,6 +441,11 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			ifStream << QStringLiteral("m_");
 			ifStream << GetDecapitalizedValue(sdlField.GetId());
 			ifStream << QStringLiteral("', typename).createObject()");
+			FeedStream(ifStream, 1, false);
+			FeedStreamHorizontally(ifStream, 2);
+			ifStream << QStringLiteral("m_");
+			ifStream << GetDecapitalizedValue(sdlField.GetId());
+			ifStream << QStringLiteral(".owner = this");
 		}
 		else if (sdlField.IsArray()){
 			ifStream << QStringLiteral(" = []");
