@@ -113,6 +113,10 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 			stream << QStringLiteral("class ");
 			stream << sdlUnion.GetName();
 			stream << QStringLiteral(";");
+			FeedStream(stream, 1, false);
+
+			stream << QStringLiteral("class ");
+			stream << QStringLiteral("C") << sdlUnion.GetName() << QStringLiteral("Object;");
 			FeedStream(stream, 2, false);
 
 			// end of namespace
@@ -272,7 +276,165 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 			FeedStream(stream, 2, false);
 		}
 		stream << QStringLiteral("};");
+		FeedStream(stream, 2, false);
+		
+		QString unionTypeObjectName = QStringLiteral("C%1Object").arg(sdlUnion.GetName());
+		stream << QStringLiteral("class %1: public ::imtbase::CItemModelBase").arg(unionTypeObjectName);
 		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, 0);
+		stream << QStringLiteral("{");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("Q_OBJECT");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)");
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, 0);
+		stream << QStringLiteral("public:");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("typedef ::imtbase::CItemModelBase BaseClass;");
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("%1(QObject* parent = nullptr): BaseClass(parent) {}").arg(unionTypeObjectName);
+		FeedStream(stream, 2, false);
+
+		// GetType function begin
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("Q_INVOKABLE QString GetType() const{");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return m_type;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("}");
+		FeedStream(stream, 2, false);
+		// GetType function end
+
+		// SetValue function begin
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("Q_INVOKABLE void SetValue(const QVariant& value){");
+		FeedStream(stream, 1, false);
+
+		for (const QString& unionType : convertedTypeList){
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("if (value.canConvert<CType1>()){");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 3);
+			stream << QStringLiteral("m_type = ") << QStringLiteral("\"") << unionType << QStringLiteral("\";");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("}");
+			FeedStream(stream, 2, false);
+		}
+
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("m_value = value;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("}");
+		FeedStream(stream, 2, false);
+		// SetValue function end
+
+		// GetValue function begin
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("Q_INVOKABLE QVariant GetValue(){");
+		FeedStream(stream, 1, false);
+
+		for (const QString& unionType : convertedTypeList){
+			QString unionTypeObjectClassName = unionType + QStringLiteral("Object");
+			QString unionTypeVarName = QStringLiteral("m_%1Object").arg(unionType.toLower());
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("if (const %1* val = std::get_if<%1>((*Version_1_0).get())){").arg(unionType);
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 3);
+			stream << QStringLiteral("if (!%1){").arg(unionTypeVarName);
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 4);
+			stream << unionTypeVarName << QStringLiteral("= new %1(this);").arg(unionTypeObjectClassName);
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 3);
+			stream << QStringLiteral("}");
+			FeedStream(stream, 2, false);
+
+			FeedStreamHorizontally(stream, 3);
+			stream << QStringLiteral("return QVariant::fromValue(%1);").arg(unionTypeVarName);
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("}");
+			FeedStream(stream, 2, false);
+		}
+
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return QVariant();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("}");
+		FeedStream(stream, 2, false);
+		// GetValue function end
+
+		FeedStreamHorizontally(stream, 0);
+		stream << QStringLiteral("signals:");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("void typeChanged();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("void valueChanged();");
+		FeedStream(stream, 2, false);
+
+		FeedStreamHorizontally(stream, 0);
+		stream << QStringLiteral("public:");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("istd::TSharedNullable<std::shared_ptr<%1>> Version_1_0;").arg(sdlUnion.GetName());
+		FeedStream(stream, 1, false);
+
+		for (const QString& unionType : convertedTypeList){
+			QString unionTypeObjectClassName = unionType + QStringLiteral("Object");
+			QString unionTypeVarName = QStringLiteral("m_%1Object").arg(unionType.toLower());
+
+			FeedStreamHorizontally(stream, 1);
+			stream << QStringLiteral("%1* %2;").arg(unionTypeObjectClassName, unionTypeVarName);
+			FeedStream(stream, 1, false);
+		}
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("QVariant m_value;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 1);
+		stream << QStringLiteral("QString m_type;");
+		FeedStream(stream, 1, false);
+	
+		FeedStreamHorizontally(stream, 0);
+		stream << QStringLiteral("};");
+		FeedStream(stream, 2, false);
+		// Union Type end
 
 		// end of namespace
 		stream << QStringLiteral("} // namespace ");

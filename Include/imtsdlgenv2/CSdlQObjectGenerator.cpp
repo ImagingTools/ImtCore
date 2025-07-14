@@ -25,7 +25,6 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 {
 	FeedStream(stream, 3, false);
 
-	QString namespaceString;
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
 
 	stream << QStringLiteral("class C") << sdlType.GetName();
