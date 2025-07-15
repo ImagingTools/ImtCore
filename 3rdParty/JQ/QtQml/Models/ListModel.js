@@ -36,10 +36,23 @@ class ListModel extends QtObject {
     }
 
     __endUpdate(){
+        if(this.signalsBlocked()) return
         // this.dataChanged.blockSignal(false)
 
         let changeSet = this.__changeSet
         this.__changeSet = []
+
+        if(changeSet.length > 0){
+            let i = 0
+            while(i < changeSet.length - 1){
+                if(changeSet[i][0] === changeSet[i+1][0] && changeSet[i][1] === changeSet[i+1][1] && 
+                    (changeSet[i][2] === 'append' || changeSet[i][2] === 'insert') && changeSet[i+1][2] === 'remove'){
+                        changeSet.splice(i, 2)
+                } else {
+                    i++
+                }
+            }
+        }
 
         for(let obj of this.__views){
             obj.__updateView(changeSet)

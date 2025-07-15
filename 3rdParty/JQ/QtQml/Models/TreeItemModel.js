@@ -344,10 +344,14 @@ class TreeItemModel extends JSONListModel {
     copy(obj){
         if(!obj) return false
 
+        this.blockSignals(true)
+
         this.clear()
         for(let i = 0; i < obj.count; i++){
             this.copyItemDataFromModel(this.insertNewItem(), obj, i)
         }
+
+        this.blockSignals(false)
 
         return true
     }
@@ -430,7 +434,7 @@ class TreeItemModel extends JSONListModel {
 
 
     refresh(){
-
+        JQApplication.updateLater(this)
     }
 
 
