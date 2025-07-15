@@ -36,7 +36,7 @@ Rectangle {
 	property var translateYNegativeLimit;
 	property bool restrictZoom: false;
 	property bool restrictMove: false;
-	property int restrictMoveMargin: 80;
+	property int restrictMoveMargin: -1;
 	property bool fitToBorders: false;
 
 	property bool autoFit: false;
@@ -589,10 +589,12 @@ Rectangle {
 					let wasLimitCorrection = canvas.deltaCorrection(canvas.deltaX + delta.x, canvas.deltaY + delta.y)
 
 					let okScale = graphicsView.restrictMove && canvas.scaleCoeff <= graphicsView.minZoomLevel ? false : true
-					let okWidth = canvas.deltaX + delta.x > -1*(canvas.width * canvas.scaleCoeff  - borderMargin)  && canvas.deltaX + delta.x < (canvas.width - borderMargin);
-					let okHeight = canvas.deltaY + delta.y > -1*(canvas.height * canvas.scaleCoeff  - borderMargin)  && canvas.deltaY + delta.y < (canvas.height - borderMargin);
+					let okWidth = borderMargin < 0 ? true : canvas.deltaX + delta.x > -1*(canvas.width * canvas.scaleCoeff  - borderMargin)  && canvas.deltaX + delta.x < (canvas.width - borderMargin);
+					let okHeight = borderMargin < 0 ? true : canvas.deltaY + delta.y > -1*(canvas.height * canvas.scaleCoeff  - borderMargin)  && canvas.deltaY + delta.y < (canvas.height - borderMargin);
 
 					let ok = okScale && okWidth && okHeight ;
+
+					//console.log(wasLimitCorrection, okScale, okWidth, okHeight)
 
 					if(!wasLimitCorrection && ok){
 						canvas.deltaX += delta.x
