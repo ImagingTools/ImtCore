@@ -34,6 +34,9 @@ QtObject {
 		if(shape.viewItem !==undefined){
 			shape.viewItem = viewItem;
 		}
+		if(shape.layer !==undefined){
+			shape.layer = layer;
+		}
 		shapeModel.push(shape)
 		let index = shapeModel.length -1;
 

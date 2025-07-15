@@ -29,7 +29,7 @@ Rectangle {
 
 	property real scaleStep: 0.1;
 	property real minZoomLevel: -1;
-	property real maxZoomLevel: 4;
+	property real maxZoomLevel: 10;
 	property var translateXPositiveLimit;
 	property var translateYPositiveLimit;
 	property var translateXNegativeLimit;
@@ -203,7 +203,7 @@ Rectangle {
 	function zoomIn(){
 		if (canvas.scaleCoeff < graphicsView.maxZoomLevel){
 			let scaleCoeff_ = canvas.scaleCoeff;
-			scaleCoeff_ += scaleStep;
+			scaleCoeff_ += scaleStep * canvas.scaleCoeff;
 			canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
 		}
 	}
@@ -211,7 +211,7 @@ Rectangle {
 	function zoomOut(){
 		if(canvas.scaleCoeff > graphicsView.minZoomLevel){
 			let scaleCoeff_ = canvas.scaleCoeff;
-			scaleCoeff_ -= scaleStep;
+			scaleCoeff_ -= scaleStep * canvas.scaleCoeff;
 			canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
 		}
 	}
@@ -369,8 +369,7 @@ Rectangle {
 		}
 	}
 
-	function fitToLayer(layer){
-
+	function fitToShapeList(shapeList, layer){
 		resetView();
 
 		let minX = 1000000;
@@ -383,8 +382,8 @@ Rectangle {
 			clipRect.width = canvas.width
 			clipRect.height = canvas.height
 		}
-		for (let i = 0; i < layer.shapeModel.length; i++){
-			let shape = layer.shapeModel[i];
+		for (let i = 0; i < shapeList.length; i++){
+			let shape = shapeList[i];
 			let boundingBoxPoints = shape.getBoundingBoxPoints();
 
 			if((boundingBoxPoints.topLeftPoint).x < minX){
@@ -410,6 +409,17 @@ Rectangle {
 
 		canvas.deltaX += (screenPointBottomLeft.x - screenPointMinXMinY.x)
 		canvas.deltaY += (screenPointBottomLeft.y - screenPointMinXMinY.y)
+	}
+
+
+	function fitToLayer(layer){
+		fitToShapeList(layer.shapeModel, layer)
+	}
+
+	function fitToShape(shape){
+		let shapeList = []
+		shapeList.push(shape)
+		fitToShapeList(shapeList, shape.layer)
 	}
 
 	function fitToActiveLayer(){
@@ -607,21 +617,21 @@ Rectangle {
 					if (canvas.scaleCoeff < graphicsView.maxZoomLevel){
 						if(canvas.scaleCoeff < 1 && (canvas.scaleCoeff + scaleStep) > 1){
 							scaleCoeff_ = 1
-							if(graphicsView.fitToBorders){
-								graphicsView.resetView(false)
-							}
+							// if(graphicsView.fitToBorders){
+							// 	graphicsView.resetView(false)
+							// }
 						}
 						else {
-							scaleCoeff_ += scaleStep;
+							scaleCoeff_ += scaleStep  * canvas.scaleCoeff;
 						}
 						if(scaleCoeff_ > graphicsView.maxZoomLevel){
 							scaleCoeff_ = graphicsView.maxZoomLevel
 						}
-						if(Math.abs(scaleCoeff_ - 1) <  0.000001){
-							if(graphicsView.fitToBorders){
-								graphicsView.resetView(false)
-							}
-						}
+						// if(Math.abs(scaleCoeff_ - 1) <  0.000001){
+						// 	if(graphicsView.fitToBorders){
+						// 		graphicsView.resetView(false)
+						// 	}
+						// }
 					}
 				}
 				else{//down
@@ -629,21 +639,21 @@ Rectangle {
 					if(canvas.scaleCoeff > minZoom){
 						if(canvas.scaleCoeff > 1 && (canvas.scaleCoeff - scaleStep) < 1){
 							scaleCoeff_ = 1
-							if(graphicsView.fitToBorders){
-								graphicsView.resetView(false)
-							}
+							// if(graphicsView.fitToBorders){
+							// 	graphicsView.resetView(false)
+							// }
 						}
 						else {
-							scaleCoeff_ -= scaleStep;
+							scaleCoeff_ -= scaleStep * canvas.scaleCoeff;
 						}
 						if(scaleCoeff_ < minZoom){
 							scaleCoeff_ = minZoom;
 						}
-						if(Math.abs(scaleCoeff_ - 1) <  0.000001){
-							if(graphicsView.fitToBorders){
-								graphicsView.resetView(false)
-							}
-						}
+						// if(Math.abs(scaleCoeff_ - 1) <  0.000001){
+						// 	if(graphicsView.fitToBorders){
+						// 		graphicsView.resetView(false)
+						// 	}
+						// }
 					}
 				}
 

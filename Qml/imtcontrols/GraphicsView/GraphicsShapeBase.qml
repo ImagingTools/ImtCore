@@ -8,6 +8,7 @@ import imtcontrols 1.0
 QtObject {
 
 	property Item viewItem: null;
+	property var layer;
 
 	property bool isTouched: false;
 	property bool isSelected: false;
