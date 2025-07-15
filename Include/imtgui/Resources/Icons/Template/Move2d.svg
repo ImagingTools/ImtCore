@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_2"
+   enable-background="new 0 0 512 512"
+   viewBox="0 0 512 512"
+   version="1.1"
+   sodipodi:docname="Move2d.svg"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.2929688"
+     inkscape:cx="255.78194"
+     inkscape:cy="256"
+     inkscape:window-width="2560"
+     inkscape:window-height="1370"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_2" />
+  <g
+     transform="matrix(0.83097544,0,0,0.83097544,-890.74611,43.270287)"
+     id="g1"
+     style="fill:#d9d9d9;fill-opacity:1">
+    <g
+       id="Icons_00000127011568652233575580000002065651602525905828_"
+       style="fill:#d9d9d9;fill-opacity:1">
+      <path
+         clip-rule="evenodd"
+         d="m 1380,496.678 58.477,-116.954 h -116.954 z m 22.656,-140.736 h -45.311 v -49.269 h 45.311 z M 1139.319,256 1256.273,197.523 v 116.954 z m 481.362,0 -116.954,-58.477 v 116.954 z m -140.738,-22.655 v 45.31 h -49.267 v -45.31 z m -150.618,0 v 45.31 h -49.267 v -45.31 z m 73.331,-28.018 h -45.311 v -49.27 h 45.311 z M 1380,15.322 l 58.477,116.954 h -116.954 z"
+         fill-rule="evenodd"
+         id="path1"
+         style="fill:#d9d9d9;fill-opacity:1" />
+    </g>
+  </g>
+</svg>
