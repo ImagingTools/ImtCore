@@ -60,7 +60,7 @@ BoundingBox {
 		ctx.fillRect(labelXWidth,0, gridShape.viewItem.drawingAreaWidth - labelXWidth, gridShape.viewItem.drawingAreaHeight - labelYHeight)
 		// ctx.fillRect(0,0, gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight)
 
-		layerMatrix.setContextTransform(ctx);
+		//layerMatrix.setContextTransform(ctx);
 
 		//GRID
 		let verticalLineTopY = (gridShape.viewItem.drawingAreaHeight - labelYHeight) - (Math.trunc((gridShape.viewItem.drawingAreaHeight - labelYHeight)/ step) * step) - deltaAddY;
@@ -75,6 +75,11 @@ BoundingBox {
 				let x2 = x1;
 				let y2 = gridShape.viewItem.drawingAreaHeight - labelYHeight ;
 
+				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
+				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+				x1 = point1.x; y1 = point1.y
+				x2 = point2.x; y2 = point2.y
+
 				ctx.beginPath()
 				ctx.moveTo(x1, y1);
 				ctx.lineTo(x2, y2);
@@ -88,6 +93,11 @@ BoundingBox {
 				let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - labelYHeight;
 				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
 				let y2 =  y1;
+
+				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
+				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+				x1 = point1.x; y1 = point1.y
+				x2 = point2.x; y2 = point2.y
 
 				ctx.beginPath()
 				ctx.moveTo(x1, y1);
@@ -109,6 +119,11 @@ BoundingBox {
 			let x2 = x1;
 			let y2 = gridShape.viewItem.drawingAreaHeight  - labelYHeight ;
 
+			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
+			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+			x1 = point1.x; y1 = point1.y
+			x2 = point2.x; y2 = point2.y
+
 			ctx.beginPath()
 			ctx.moveTo(x1, y1);
 			ctx.lineTo(x2, y2);
@@ -125,6 +140,11 @@ BoundingBox {
 			let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
 			let y2 =  y1;
 
+			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
+			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+			x1 = point1.x; y1 = point1.y
+			x2 = point2.x; y2 = point2.y
+
 			ctx.beginPath()
 			ctx.moveTo(x1, y1);
 			ctx.lineTo(x2, y2);
@@ -134,7 +154,7 @@ BoundingBox {
 
 
 		//AXES BACKGROUND
-		identityMatrix.setContextTransform(ctx);
+		//identityMatrix.setContextTransform(ctx);
 
 		ctx.fillStyle = backgroundColor;
 		ctx.fillRect(0,0, labelXWidth, gridShape.viewItem.drawingAreaHeight)
