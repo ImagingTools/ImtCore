@@ -15,6 +15,7 @@
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtbase/IUrlParam.h>
 #include <imtqml/IQuickObject.h>
+#include <imtcom/IServerConnectionInterface.h>
 
 
 namespace imtauthgui
@@ -33,7 +34,7 @@ public:
 	I_BEGIN_COMPONENT(CAdministrationObserverQmlComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
 		I_ASSIGN(m_loginCompPtr, "Login", "Login", false, "Login");
-		I_ASSIGN(m_webSocketUrlParamCompPtr, "WebSocketUrlParam", "Web socket URL param", false, "WebSocketUrlParam");
+		I_ASSIGN(m_serverConnectionParamCompPtr, "WebSocketUrlParam", "Web socket URL param", false, "WebSocketUrlParam");
 		I_ASSIGN(m_quickObjectCompPtr, "QuickObject", "Main QML Component", true, "QuickObject");
 		I_ASSIGN(m_quickItemCreatedCompPtr, "QuickItemCreated", "Quick item created", false, "QuickItemCreated");
 		I_ASSIGN_TO(m_quickItemCreatedModelCompPtr, m_quickItemCreatedCompPtr, false);
@@ -63,7 +64,7 @@ private:
 	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
 	I_REF(iprm::IEnableableParam, m_quickItemCreatedCompPtr);
 	I_REF(imod::IModel, m_quickItemCreatedModelCompPtr);
-	I_REF(imtbase::IUrlParam, m_webSocketUrlParamCompPtr);
+	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionParamCompPtr);
 	I_ATTR(QByteArray, m_productIdAttrPtr);
 
 	imtbase::TModelUpdateBinder<iauth::ILogin, CAdministrationObserverQmlComp> m_loginObserver;

@@ -107,7 +107,7 @@ ComplexCollectionFilter{
 		Sets a new text filter using OR operation on the fields defined in \c textFilteringInfoIds.
 	*/
 	function setTextFilter(filter){
-		if (hasFieldsFilter()){
+		if (hasFieldsFilter() && m_fieldsFilter.hasGroupFilters()){
 			m_fieldsFilter.m_groupFilters.clear()
 		}
 
