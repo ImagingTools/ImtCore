@@ -261,6 +261,9 @@ module.exports = {
         let path = source.replaceAll('qrc:/', '').replaceAll('.qml', '').split('/')
         let className = path[path.length-1]
 
+        if(className in JQModules.QtQml) return JQModules.QtQml[className]
+        if(className in JQModules.QtQml.Models) return JQModules.QtQml.Models[className]
+
         let cls = currentModule
 
         for(let i = 0; i < path.length; i++){

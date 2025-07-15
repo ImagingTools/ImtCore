@@ -89,6 +89,8 @@ class QObject extends QBaseObject {
         let path = propName.split('.')
         let value = this.__properties[propName]
 
+        delete this.__properties[propName]
+
         if(value instanceof QObject){
             value.__updateAliases()
             value.__updateSimpleProperties()
