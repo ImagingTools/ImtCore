@@ -222,6 +222,12 @@ Rectangle {
 
 		}
 
+		function setClipRect(){
+			let activeLayer = getActiveLayer()
+			let clipRect = Qt.rect(gridShape.labelXWidth, gridShape.legendMargin, view.width - gridShape.labelXWidth - gridShape.legendMargin, view.height - gridShape.labelYHeight - gridShape.legendMargin)
+			activeLayer.clipRect = clipRect
+		}
+
 		function setXTranslation(){
 			let inactiveLayer = getInactiveLayer()
 			let activeLayer = getActiveLayer()
@@ -244,9 +250,12 @@ Rectangle {
 		}
 
 		onHeightChanged: {
+			setClipRect()
 			setYTranslation()
+
 		}
 		onWidthChanged: {
+			setClipRect()
 			setXTranslation()
 		}
 	}

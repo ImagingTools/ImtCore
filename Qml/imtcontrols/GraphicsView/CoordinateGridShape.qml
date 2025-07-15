@@ -34,6 +34,9 @@ BoundingBox {
 		let deltaAddX = deltaX > 0 ? 0 : -deltaX
 		let deltaAddY = deltaY <= 0 ? 0 : deltaY
 
+		let deltaMinusX = deltaX > 0 ? deltaX : 0
+		let deltaMinusY = deltaY < 0 ? -deltaY : 0
+
 		let step = gridShape.gridStepMajor;
 
 		//Label names params
@@ -65,20 +68,24 @@ BoundingBox {
 		//GRID
 		let verticalLineTopY = (gridShape.viewItem.drawingAreaHeight - labelYHeight) - (Math.trunc((gridShape.viewItem.drawingAreaHeight - labelYHeight)/ step) * step) - deltaAddY;
 		verticalLineTopY /= scaleMax1
+
 		//MINOR GRID
 		if(scaleCoeff >= 2){
 			ctx.strokeStyle = Style.imagingToolsGradient0;
-			let step = gridShape.gridStepMinor
-			for(let i = 0; i * step < gridShape.viewItem.drawingAreaWidth - labelXWidth + deltaAddX; i++){//vertical lines
-				let x1 = labelXWidth + i * step;
+			let stepMinor = gridShape.gridStepMinor
+			//vertical minor lines
+			for(let i = 0; i * stepMinor < gridShape.viewItem.drawingAreaWidth - labelXWidth + deltaAddX; i++){//vertical lines
+				let x1 = labelXWidth + i * stepMinor;
 				let y1 =  verticalLineTopY ;
 				let x2 = x1;
 				let y2 = gridShape.viewItem.drawingAreaHeight - labelYHeight ;
 
 				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
 				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
-				x1 = point1.x; y1 = point1.y
-				x2 = point2.x; y2 = point2.y
+				x1 = point1.x;
+				y1 = point1.y
+				x2 = point2.x;
+				//y2 = point2.y
 
 				ctx.beginPath()
 				ctx.moveTo(x1, y1);
@@ -86,18 +93,19 @@ BoundingBox {
 				ctx.closePath()
 				ctx.stroke();
 			}
-
-			for(let i = 0; i * step < gridShape.viewItem.drawingAreaHeight - labelYHeight  + deltaAddY; i++){//horizontal lines
-
+			//horizontal minor lines
+			for(let i = 0; i * stepMinor < gridShape.viewItem.drawingAreaHeight - labelYHeight  + deltaAddY; i++){//horizontal lines
 				let x1 = labelXWidth ;
-				let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - labelYHeight;
+				let y1 =  gridShape.viewItem.drawingAreaHeight - i * stepMinor - labelYHeight;
 				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
 				let y2 =  y1;
 
 				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
 				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
-				x1 = point1.x; y1 = point1.y
-				x2 = point2.x; y2 = point2.y
+				//x1 = point1.x;
+				y1 = point1.y
+				x2 = point2.x;
+				y2 = point2.y
 
 				ctx.beginPath()
 				ctx.moveTo(x1, y1);
@@ -109,7 +117,7 @@ BoundingBox {
 
 		//MAJOR GRID
 		ctx.strokeStyle = Style.imagingToolsGradient1;
-		//vertical lines
+		//vertical major lines
 		for(let i = 0; i * step  <= (gridShape.viewItem.drawingAreaWidth  /*- labelXWidth*/ + deltaAddX)/scaleCoeff; i++){//vertical lines
 			if(gridShape.thinningCheck(scaleCoeff, i)){
 				continue
@@ -121,8 +129,10 @@ BoundingBox {
 
 			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
 			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
-			x1 = point1.x; y1 = point1.y
-			x2 = point2.x; y2 = point2.y
+			x1 = point1.x;
+			y1 = point1.y
+			x2 = point2.x;
+			//y2 = point2.y
 
 			ctx.beginPath()
 			ctx.moveTo(x1, y1);
@@ -130,7 +140,7 @@ BoundingBox {
 			ctx.closePath()
 			ctx.stroke();
 		}
-		//horizontal lines
+		//horizontal major lines
 		for(let i = 0; i * step <= (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY)/ scaleMax1 ; i++){//horizontal lines
 			if(gridShape.thinningCheck(scaleCoeff, i)){
 				continue
@@ -142,8 +152,111 @@ BoundingBox {
 
 			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
 			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
-			x1 = point1.x; y1 = point1.y
-			x2 = point2.x; y2 = point2.y
+			//x1 = point1.x;
+			y1 = point1.y
+			x2 = point2.x;
+			y2 = point2.y
+
+			ctx.beginPath()
+			ctx.moveTo(x1, y1);
+			ctx.lineTo(x2, y2);
+			ctx.closePath()
+			ctx.stroke();
+		}
+
+		// completing the grid to zero
+		//MINOR GRID
+		if(scaleCoeff >= 2){
+			//ctx.strokeStyle = "violet"
+			ctx.strokeStyle = ctx.strokeStyle = Style.imagingToolsGradient0;
+			let stepMinor = gridShape.gridStepMinor
+			//vertical minor lines
+			for(let i = 1; i * stepMinor <= (deltaMinusX)/scaleCoeff + step; i++){//vertical lines
+				let x1 = labelXWidth - i * stepMinor;
+				let y1 =  verticalLineTopY ;
+				let x2 = x1;
+				let y2 = gridShape.viewItem.drawingAreaHeight - labelYHeight ;
+
+				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
+				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+				x1 = point1.x;
+				y1 = point1.y
+				x2 = point2.x;
+				//y2 = point2.y
+
+				ctx.beginPath()
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.closePath()
+				ctx.stroke();
+			}
+			//horizontal minor lines
+			//ctx.strokeStyle = ctx.strokeStyle = "blue"
+			for(let i = 1; i * stepMinor <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff); i++){//horizontal lines
+
+				let x1 = labelXWidth ;
+				let y1 =  gridShape.viewItem.drawingAreaHeight + i * stepMinor - labelYHeight;
+				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
+				let y2 =  y1;
+
+				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
+				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+				//x1 = point1.x;
+				y1 = point1.y
+				x2 = point2.x;
+				y2 = point2.y
+
+				ctx.beginPath()
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.closePath()
+				ctx.stroke();
+			}
+		}
+
+		//MAJOR GRID
+		//ctx.strokeStyle = "red"
+		ctx.strokeStyle = Style.imagingToolsGradient1;
+		//vertical major lines
+		for(let i = 1; i * step  <= deltaMinusX/scaleCoeff + step; i++){//vertical lines
+			if(gridShape.thinningCheck(scaleCoeff, i)){
+				continue
+			}
+			let x1 = labelXWidth -i * step;
+			let y1 =  verticalLineTopY ;
+			let x2 = x1;
+			let y2 = gridShape.viewItem.drawingAreaHeight  - labelYHeight;
+
+			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
+			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+			x1 = point1.x;
+			y1 = point1.y
+			x2 = point2.x;
+			//y2 = point2.y
+
+			ctx.beginPath()
+			ctx.moveTo(x1, y1);
+			ctx.lineTo(x2, y2);
+			ctx.closePath()
+			ctx.stroke();
+		}
+		//horizontal major lines
+		//ctx.strokeStyle = "green"
+		for(let i = 1; i * step <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff) ; i++){//horizontal lines
+			if(gridShape.thinningCheck(scaleCoeff, i)){
+				continue
+			}
+			let x1 = labelXWidth ;
+			let y1 =  gridShape.viewItem.drawingAreaHeight + i * step - labelYHeight;
+			let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
+			let y2 =  y1;
+
+			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
+			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+			//x1 = point1.x;
+			y1 = point1.y
+			x2 = point2.x;
+			y2 = point2.y
 
 			ctx.beginPath()
 			ctx.moveTo(x1, y1);
@@ -188,6 +301,22 @@ BoundingBox {
 
 			ctx.fillText(str,x_, y_);
 			ctx.closePath()
+		}		
+		// completing label x to zero
+		for(let i = 0; i * step  <= deltaMinusX/scaleCoeff + step; i++){
+			if(gridShape.thinningCheck(scaleCoeff, i)){
+				continue
+			}
+			let x_ = (labelXWidth - i * step) * scaleCoeff;
+			let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
+			ctx.beginPath()
+			let str = String(-i * step - gridShape.axesOrigin.x)
+
+			let textLength = ctx.measureText(str).width
+			x_ = x_ - textLength/2
+
+			ctx.fillText(str,x_, y_);
+			ctx.closePath()
 		}
 
 
@@ -207,6 +336,22 @@ BoundingBox {
 
 			ctx.beginPath()
 			let str = String(i * step - gridShape.axesOrigin.y)
+
+			let textLength = ctx.measureText(str).width
+			x_ = x_ - textLength - Style.marginXS
+
+			ctx.fillText(str,x_, y_);
+			ctx.closePath()
+		}
+		// completing label y to zero
+		for(let i = 0; i * step  <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff); i++){
+			if(gridShape.thinningCheck(scaleCoeff, i)){
+				continue
+			}
+			let x_ = labelXWidth;
+			let y_ = (gridShape.viewItem.drawingAreaHeight + i * step  - labelYHeight)* scaleCoeff
+			ctx.beginPath()
+			let str = String(-i * step - gridShape.axesOrigin.y)
 
 			let textLength = ctx.measureText(str).width
 			x_ = x_ - textLength - Style.marginXS
