@@ -179,6 +179,20 @@ class BaseModel extends ListModel {
 		return true;
 	}
 
+	copyMe(){
+		let retVal = BaseModel.create()
+		if (!retVal){
+			return null
+		}
+		
+		for(let i = 0; i < this.count; i++){
+			let item = this.get(i).item
+			retVal.addElement(item.copyMe())
+		}
+		
+		return retVal
+	}
+
 	addElement(element){
 		element.owner = this.owner
 		element.connectProperties()
@@ -205,6 +219,13 @@ class BaseModel extends ListModel {
 
 	getData(key, index){
 		return this.get(index).item[key]
+	}
+
+	setProperty(index, propName, value){
+		let item = this.get(index).item
+		if (item[propName] !== value){
+			item[propName] = value
+		}
 	}
 }
 

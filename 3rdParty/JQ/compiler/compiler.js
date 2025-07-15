@@ -1186,7 +1186,7 @@ class Instruction {
                         // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
                         if(names.length > 1){
                             code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){return ${stat.value}}`)
-                            code.add(`${this.name}['${names[0]}'].__updateProperties()`)
+                            code.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
                         } else {
                             code.add(`${this.name}.__properties['${assignProperty.name}']=function(){return ${stat.value}}`)
                         }

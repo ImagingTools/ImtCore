@@ -99,7 +99,11 @@ class QObject extends QBaseObject {
         if(path.length === 2){
             this.__proxy[path[0]][path[1]] = value
         } else {
-            this.__proxy[path[0]] = value
+            if(value === 'JQGroup'){
+                this.__proxy[path[0]].__updateProperties()
+            } else {
+                this.__proxy[path[0]] = value
+            }
         }
     }
   

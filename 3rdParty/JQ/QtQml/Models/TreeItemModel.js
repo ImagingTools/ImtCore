@@ -461,6 +461,23 @@ class TreeItemModel extends JSONListModel {
         this.remove(index)
     } 
 
+    swapItems(index1, index2){
+        if (index1 < 0 || index1 >= this.count || index2 < 0 || index2 >= this.count ){
+            return false
+        }
+
+        let item1 = this.getModelFromItem(index1)
+        let item2 = this.getModelFromItem(index2)
+
+        this.copyItemDataFromModel(index1, item2, 0)
+        this.copyItemDataFromModel(index2, item1, 0)
+
+        item1.destroy()
+        item2.destroy()
+
+        return true
+    }
+
     isTreeModel(key, index){
         return this.getTreeItemModel(key, index) != null
     }
