@@ -4,7 +4,7 @@ import com.imtcore.imtqml 1.0
 
 BoundingBox {
 
-	function draw(ctx, layerMatrixArg){
+	function draw(ctx, transformMatrixArg){
 		let params = getParams()
 		ctx.fillStyle = params.color !== undefined ? params.color : "transparent";
 		ctx.strokeStyle = params.borderColor !== undefined ? params.borderColor : "transparent";

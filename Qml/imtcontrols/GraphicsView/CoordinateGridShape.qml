@@ -25,10 +25,10 @@ BoundingBox {
 	property CanvasMatrix identityMatrix: CanvasMatrix{};
 	property CanvasMatrix labelMatrix: CanvasMatrix{};
 
-	function draw(ctx, layerMatrixArg){
-		let deltaX = layerMatrixArg.xTranslation();
-		let deltaY = layerMatrixArg.yTranslation();
-		let scaleCoeff = layerMatrixArg.xScale();
+	function draw(ctx, transformMatrixArg){
+		let deltaX = transformMatrixArg.xTranslation();
+		let deltaY = transformMatrixArg.yTranslation();
+		let scaleCoeff = transformMatrixArg.xScale();
 		let scaleMax1 = Math.min(1, scaleCoeff)
 
 		let deltaAddX = deltaX > 0 ? 0 : -deltaX

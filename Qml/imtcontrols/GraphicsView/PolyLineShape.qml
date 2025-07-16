@@ -10,18 +10,18 @@ BoundingBox {
 
 	property string color: "#000000";
 
-	function draw(ctx, layerMatrixArg){
+	function draw(ctx, transformMatrixArg){
 
-		drawBase(ctx, layerMatrixArg);
+		drawBase(ctx, transformMatrixArg);
 		if(showNodes){
-			drawNodes(ctx, layerMatrixArg)
+			drawNodes(ctx, transformMatrixArg)
 		}
 		if(highlightedNodeIndex >-1  && highlightedNodeCoordinate !==undefined){
-			drawSelectedNode(ctx, highlightedNodeCoordinate, layerMatrixArg)
+			drawSelectedNode(ctx, highlightedNodeCoordinate, transformMatrixArg)
 		}
 	}
 
-	function drawBase(ctx, layerMatrixArg){
+	function drawBase(ctx, transformMatrixArg){
 
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
@@ -40,7 +40,7 @@ BoundingBox {
 		ctx.closePath();
 	}
 
-	function drawNodes(ctx, layerMatrixArg){
+	function drawNodes(ctx, transformMatrixArg){
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.fillStyle = params.color !== undefined ? params.color : polylineShape.color;
@@ -52,7 +52,7 @@ BoundingBox {
 		ctx.closePath();
 	}
 
-	function drawSelectedNode(ctx, point, layerMatrixArg){
+	function drawSelectedNode(ctx, point, transformMatrixArg){
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.fillStyle = params.color !== undefined ? params.color : polylineShape.color;

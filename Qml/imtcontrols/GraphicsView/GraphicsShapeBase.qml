@@ -41,7 +41,7 @@ QtObject {
 		viewItem.requestPaint();
 	}
 
-	function draw (ctx, layerMatrixArg){
+	function draw (ctx, transformMatrixArg){
 	}
 
 	function getParams(){

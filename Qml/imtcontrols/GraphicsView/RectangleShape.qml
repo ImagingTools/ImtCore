@@ -5,16 +5,16 @@ import com.imtcore.imtqml 1.0
 BoundingBox {
 
 	//Reimplemented functions
-	function draw (ctx, layerMatrixArg){
+	function draw (ctx, transformMatrixArg){
 		drawBase(ctx)
 		if(isSelected){
-			drawSelection(ctx, layerMatrixArg)
+			drawSelection(ctx, transformMatrixArg)
 		}
 		if(showNodes){
-			drawNodes(ctx, layerMatrixArg)
+			drawNodes(ctx, transformMatrixArg)
 		}
 	}
-	function drawBase(ctx, layerMatrixArg){
+	function drawBase(ctx, transformMatrixArg){
 		//console.log("drawBase")
 		let params_;
 		params_ = getParams()
@@ -35,7 +35,7 @@ BoundingBox {
 		ctx.closePath();
 	}
 
-	function drawSelection(ctx, layerMatrixArg){
+	function drawSelection(ctx, transformMatrixArg){
 		//console.log("drawSelected")
 		let params_;
 		params_ = getParams()
@@ -52,7 +52,7 @@ BoundingBox {
 		ctx.closePath();
 	}
 
-	function drawNodes(ctx, layerMatrixArg){
+	function drawNodes(ctx, transformMatrixArg){
 	}
 
 

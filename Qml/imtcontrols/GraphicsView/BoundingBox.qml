@@ -122,7 +122,7 @@ GraphicsShapeBase {
 		return 0;
 	}
 
-	function draw(ctx, layerMatrixArg){
+	function draw(ctx, transformMatrixArg){
 		drawBoundingBox(ctx)
 	}
 

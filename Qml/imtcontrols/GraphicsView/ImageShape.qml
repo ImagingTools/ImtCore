@@ -6,7 +6,7 @@ BoundingBox {
 
 	property string imageSource: "";
 
-	function draw(ctx, layerMatrixArg) {
+	function draw(ctx, transformMatrixArg) {
 		let params_ = getParams();
 		if(params_.source !== undefined){
 			imageSource = params_.source

@@ -86,7 +86,7 @@ GraphicsView{
 	GraphicsShapeBase{
 		id: gridShape;
 
-		function draw(ctx, layerMatrixArg){
+		function draw(ctx, transformMatrixArg){
 			let step = 30;
 
 			ctx.lineCap = "round"
@@ -136,7 +136,7 @@ GraphicsView{
 	GraphicsShapeBase{
 		id: rulerShape;
 
-		function draw(ctx, layerMatrixArg){
+		function draw(ctx, transformMatrixArg){
 
 			ctx.lineCap = "round"
 			ctx.lineJoin = "round"

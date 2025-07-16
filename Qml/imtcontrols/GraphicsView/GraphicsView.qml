@@ -402,10 +402,17 @@ Rectangle {
 		let margin_ = Style.marginXXL
 		let zoomX = (clipRect.width - margin_)/((maxX - minX)!==0 ? (maxX - minX) : 1)
 		let zoomY = (clipRect.height - margin_)/((maxY - minY)!==0 ? (maxY - minY) : 1)
-		graphicsView.setZoom(Math.min(zoomX, zoomY))
+		let zoom = Math.min(zoomX, zoomY)
+		graphicsView.setZoom(zoom)
+
+		canvasMatrix.setXScale(zoom)
+		canvasMatrix.setYScale(zoom)
+		canvasMatrix.setXTranslation(canvas.deltaX)
+		canvasMatrix.setYTranslation(canvas.deltaY)
 
 		let screenPointMinXMinY = layer.layerMatrix.transformPoint(Qt.point(minX, minY))
-		let screenPointBottomLeft = Qt.point(clipRect.x + margin_, clipRect.y + clipRect.height - margin_)
+		screenPointMinXMinY = canvasMatrix.transformPoint(screenPointMinXMinY)
+		let screenPointBottomLeft = Qt.point(clipRect.x + margin_/2, clipRect.y + clipRect.height - margin_/2)
 
 		canvas.deltaX += (screenPointBottomLeft.x - screenPointMinXMinY.x)
 		canvas.deltaY += (screenPointBottomLeft.y - screenPointMinXMinY.y)

@@ -3,7 +3,7 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 
 BoundingBox {
-	function draw(ctx, layerMatrixArg){
+	function draw(ctx, transformMatrixArg){
 		let params = getParams()
 		ctx.strokeStyle = params.color !== undefined ? params.color : "transparent";
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 0
