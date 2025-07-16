@@ -609,7 +609,8 @@ Rectangle {
 					}
 				}
 
-				requestPaintPause.restart();
+				canvas.requestPaint()
+				//requestPaintPause.restart();
 			}
 
 			onWheel: {
