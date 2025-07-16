@@ -221,11 +221,7 @@ Rectangle {
 				return
 			}
 
-			let originX = Math.trunc(0.5 * view.width / gridShape.gridStepMajor) * gridShape.gridStepMajor
-			let originY = Math.trunc(0.5 * view.height/ gridShape.gridStepMajor) * gridShape.gridStepMajor
-			// let originX = 0.5 * view.width
-			// let originY = 0.5 * view.height
-			gridShape.axesOrigin = Qt.point(originX, originY);
+			gridShape.axesOrigin = Qt.point(0.5 * view.width, 0.5 * view.height);
 
 			let clipRect = Qt.rect(gridShape.labelXWidth, gridShape.legendMargin, view.width - gridShape.labelXWidth - gridShape.legendMargin, view.height - gridShape.labelYHeight - gridShape.legendMargin)
 			activeLayer.clipRect = clipRect

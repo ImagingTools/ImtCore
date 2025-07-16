@@ -39,6 +39,9 @@ BoundingBox {
 
 		let step = gridShape.gridStepMajor;
 
+		let firstVertLineX = axesOrigin.x / step < 1 ? axesOrigin.x : axesOrigin.x % step
+		let firstHorizLineY = axesOrigin.y / step < 1 ? axesOrigin.y : axesOrigin.y % step
+
 		//Label names params
 		let labelNameFontSize = fontSize + 2
 		ctx.font = String(labelNameFontSize) + "px sans-serif"
@@ -75,7 +78,7 @@ BoundingBox {
 			let stepMinor = gridShape.gridStepMinor
 			//vertical minor lines
 			for(let i = 0; i * stepMinor < gridShape.viewItem.drawingAreaWidth - labelXWidth + deltaAddX; i++){//vertical lines
-				let x1 = labelXWidth + i * stepMinor;
+				let x1 = firstVertLineX + labelXWidth + i * stepMinor;
 				let y1 =  verticalLineTopY ;
 				let x2 = x1;
 				let y2 = gridShape.viewItem.drawingAreaHeight - labelYHeight ;
@@ -96,7 +99,7 @@ BoundingBox {
 			//horizontal minor lines
 			for(let i = 0; i * stepMinor < gridShape.viewItem.drawingAreaHeight - labelYHeight  + deltaAddY; i++){//horizontal lines
 				let x1 = labelXWidth ;
-				let y1 =  gridShape.viewItem.drawingAreaHeight - i * stepMinor - labelYHeight;
+				let y1 =  gridShape.viewItem.drawingAreaHeight - i * stepMinor - labelYHeight - firstHorizLineY;
 				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
 				let y2 =  y1;
 
@@ -122,7 +125,7 @@ BoundingBox {
 			if(gridShape.thinningCheck(scaleCoeff, i)){
 				continue
 			}
-			let x1 = labelXWidth + i * step;
+			let x1 = firstVertLineX + labelXWidth + i * step;
 			let y1 =  verticalLineTopY ;
 			let x2 = x1;
 			let y2 = gridShape.viewItem.drawingAreaHeight  - labelYHeight ;
@@ -141,12 +144,13 @@ BoundingBox {
 			ctx.stroke();
 		}
 		//horizontal major lines
+		//ctx.strokeStyle = Style.imagingToolsGradient1;
 		for(let i = 0; i * step <= (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY)/ scaleMax1 ; i++){//horizontal lines
 			if(gridShape.thinningCheck(scaleCoeff, i)){
 				continue
 			}
 			let x1 = labelXWidth ;
-			let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - labelYHeight;
+			let y1 =  gridShape.viewItem.drawingAreaHeight - i * step - labelYHeight - firstHorizLineY;
 			let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
 			let y2 =  y1;
 
@@ -172,7 +176,7 @@ BoundingBox {
 			let stepMinor = gridShape.gridStepMinor
 			//vertical minor lines
 			for(let i = 1; i * stepMinor <= (deltaMinusX)/scaleCoeff + step; i++){//vertical lines
-				let x1 = labelXWidth - i * stepMinor;
+				let x1 = firstVertLineX + labelXWidth - i * stepMinor;
 				let y1 =  verticalLineTopY ;
 				let x2 = x1;
 				let y2 = gridShape.viewItem.drawingAreaHeight - labelYHeight ;
@@ -195,7 +199,7 @@ BoundingBox {
 			for(let i = 1; i * stepMinor <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff); i++){//horizontal lines
 
 				let x1 = labelXWidth ;
-				let y1 =  gridShape.viewItem.drawingAreaHeight + i * stepMinor - labelYHeight;
+				let y1 =  gridShape.viewItem.drawingAreaHeight + i * stepMinor - labelYHeight - firstHorizLineY;
 				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
 				let y2 =  y1;
 
@@ -222,7 +226,7 @@ BoundingBox {
 			if(gridShape.thinningCheck(scaleCoeff, i)){
 				continue
 			}
-			let x1 = labelXWidth -i * step;
+			let x1 = firstVertLineX + labelXWidth -i * step;
 			let y1 =  verticalLineTopY ;
 			let x2 = x1;
 			let y2 = gridShape.viewItem.drawingAreaHeight  - labelYHeight;
@@ -247,7 +251,7 @@ BoundingBox {
 				continue
 			}
 			let x1 = labelXWidth ;
-			let y1 =  gridShape.viewItem.drawingAreaHeight + i * step - labelYHeight;
+			let y1 =  gridShape.viewItem.drawingAreaHeight + i * step - labelYHeight - firstHorizLineY;
 			let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
 			let y2 =  y1;
 
@@ -291,10 +295,10 @@ BoundingBox {
 			if(gridShape.thinningCheck(scaleCoeff, i)){
 				continue
 			}
-			let x_ = (labelXWidth + i * step) * scaleCoeff;
+			let x_ = (firstVertLineX + labelXWidth + i * step) * scaleCoeff;
 			let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
 			ctx.beginPath()
-			let str = String(i * step - gridShape.axesOrigin.x)
+			let str = String(firstVertLineX + i * step - gridShape.axesOrigin.x)
 
 			let textLength = ctx.measureText(str).width
 			x_ = x_ - textLength/2
@@ -307,10 +311,10 @@ BoundingBox {
 			if(gridShape.thinningCheck(scaleCoeff, i)){
 				continue
 			}
-			let x_ = (labelXWidth - i * step) * scaleCoeff;
+			let x_ = (firstVertLineX + labelXWidth - i * step) * scaleCoeff;
 			let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
 			ctx.beginPath()
-			let str = String(-i * step - gridShape.axesOrigin.x)
+			let str = String(firstVertLineX -i * step - gridShape.axesOrigin.x)
 
 			let textLength = ctx.measureText(str).width
 			x_ = x_ - textLength/2
@@ -331,11 +335,11 @@ BoundingBox {
 				continue
 			}
 			let x_ = labelXWidth;
-			let y_ = (gridShape.viewItem.drawingAreaHeight - i * step  - labelYHeight)* scaleCoeff
+			let y_ = (gridShape.viewItem.drawingAreaHeight - i * step  - labelYHeight - firstHorizLineY)* scaleCoeff
 			//console.log("deltaAddY:: ", y_, deltaAddY, (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY * scaleCoeff))
 
 			ctx.beginPath()
-			let str = String(i * step - gridShape.axesOrigin.y)
+			let str = String(i * step - gridShape.axesOrigin.y + firstHorizLineY)
 
 			let textLength = ctx.measureText(str).width
 			x_ = x_ - textLength - Style.marginXS
@@ -349,9 +353,9 @@ BoundingBox {
 				continue
 			}
 			let x_ = labelXWidth;
-			let y_ = (gridShape.viewItem.drawingAreaHeight + i * step  - labelYHeight)* scaleCoeff
+			let y_ = (gridShape.viewItem.drawingAreaHeight + i * step  - labelYHeight - firstHorizLineY)* scaleCoeff
 			ctx.beginPath()
-			let str = String(-i * step - gridShape.axesOrigin.y)
+			let str = String(firstHorizLineY -i * step - gridShape.axesOrigin.y)
 
 			let textLength = ctx.measureText(str).width
 			x_ = x_ - textLength - Style.marginXS
