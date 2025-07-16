@@ -252,11 +252,13 @@ Rectangle {
 		}
 
 		onHeightChanged: {
+			gridShape.setAxesOrigin()
 			setClipRect()
 			setYTranslation()
 
 		}
 		onWidthChanged: {
+			gridShape.setAxesOrigin()
 			setClipRect()
 			setXTranslation()
 		}
@@ -396,9 +398,17 @@ Rectangle {
 	CoordinateGridShape{
 		id: gridShape;
 
-		axesOrigin: Qt.point(720, 320);
+		axesOrigin: Qt.point(view.width/2, view.height/2);
 		isFixedOrigin: false;
 		legendMargin: 20;
+		function setAxesOrigin(){
+			if(!view.width || !view.height){
+				return
+			}
+			let originX = Math.trunc(0.5 * view.width / gridStepMajor) * gridStepMajor
+			let originY = Math.trunc(0.5 * view.height/ gridStepMajor)  * gridStepMajor
+			axesOrigin = Qt.point(originX, originY);
+		}
 	}
 
 }
