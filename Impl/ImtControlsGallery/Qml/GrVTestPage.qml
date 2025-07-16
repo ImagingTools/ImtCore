@@ -176,25 +176,16 @@ Rectangle {
 			background.addShape(gridShape);
 
 			let inactiveLayer = getInactiveLayer()
-
-			//transformation for the layer
-			inactiveLayer.layerMatrix.invertY();
-			setXTranslation()
-			setYTranslation()
-			let lineObjRed = polylineCompRed.createObject(this);
-			inactiveLayer.addShape(lineObjRed);
-
 			let activeLayer = getActiveLayer()
 
-			//transformation for the layer
+			//transformation for the layers
+			inactiveLayer.layerMatrix.invertY();
 			activeLayer.layerMatrix.invertY();
-			setXTranslation()
-			setYTranslation()
+			setLayersParams()
 
-			let clipRect = Qt.rect(gridShape.labelXWidth, gridShape.legendMargin, view.width - gridShape.labelXWidth - gridShape.legendMargin, view.height - gridShape.labelYHeight - gridShape.legendMargin)
-			activeLayer.clipRect = clipRect
-
-			//activeLayer.addShape(lineObjRed);
+			//adding shapes to layers
+			let lineObjRed = polylineCompRed.createObject(this);
+			inactiveLayer.addShape(lineObjRed);
 
 			let lineObjBlue = polylineCompBlue.createObject(this);
 			activeLayer.addShape(lineObjBlue);
@@ -222,45 +213,37 @@ Rectangle {
 
 		}
 
-		function setClipRect(){
+		function setLayersParams(){
+			let inactiveLayer = getInactiveLayer()
 			let activeLayer = getActiveLayer()
-			if(activeLayer){
-				let clipRect = Qt.rect(gridShape.labelXWidth, gridShape.legendMargin, view.width - gridShape.labelXWidth - gridShape.legendMargin, view.height - gridShape.labelYHeight - gridShape.legendMargin)
-				activeLayer.clipRect = clipRect
+
+			if(!view.width || !view.height || !activeLayer || !inactiveLayer){
+				return
 			}
+
+			let originX = Math.trunc(0.5 * view.width / gridShape.gridStepMajor) * gridShape.gridStepMajor
+			let originY = Math.trunc(0.5 * view.height/ gridShape.gridStepMajor) * gridShape.gridStepMajor
+			// let originX = 0.5 * view.width
+			// let originY = 0.5 * view.height
+			gridShape.axesOrigin = Qt.point(originX, originY);
+
+			let clipRect = Qt.rect(gridShape.labelXWidth, gridShape.legendMargin, view.width - gridShape.labelXWidth - gridShape.legendMargin, view.height - gridShape.labelYHeight - gridShape.legendMargin)
+			activeLayer.clipRect = clipRect
+
+			inactiveLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
+			inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
+
+			activeLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
+			activeLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
 		}
 
-		function setXTranslation(){
-			let inactiveLayer = getInactiveLayer()
-			let activeLayer = getActiveLayer()
-			if(inactiveLayer && inactiveLayer.layerMatrix){
-				inactiveLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
-			}
-			if(activeLayer && activeLayer.layerMatrix){
-				activeLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
-			}
-		}
-		function setYTranslation(){
-			let inactiveLayer = getInactiveLayer()
-			let activeLayer = getActiveLayer()
-			if(inactiveLayer && inactiveLayer.layerMatrix){
-				inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
-			}
-			if(activeLayer && activeLayer.layerMatrix){
-				activeLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
-			}
-		}
 
 		onHeightChanged: {
-			gridShape.setAxesOrigin()
-			setClipRect()
-			setYTranslation()
+			setLayersParams()
 
 		}
 		onWidthChanged: {
-			gridShape.setAxesOrigin()
-			setClipRect()
-			setXTranslation()
+			setLayersParams()
 		}
 	}
 
@@ -398,17 +381,9 @@ Rectangle {
 	CoordinateGridShape{
 		id: gridShape;
 
-		axesOrigin: Qt.point(view.width/2, view.height/2);
 		isFixedOrigin: false;
 		legendMargin: 20;
-		function setAxesOrigin(){
-			if(!view.width || !view.height){
-				return
-			}
-			let originX = Math.trunc(0.5 * view.width / gridStepMajor) * gridStepMajor
-			let originY = Math.trunc(0.5 * view.height/ gridStepMajor)  * gridStepMajor
-			axesOrigin = Qt.point(originX, originY);
-		}
+
 	}
 
 }
