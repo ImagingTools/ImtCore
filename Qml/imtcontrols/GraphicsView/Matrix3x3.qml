@@ -2,6 +2,8 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
+import imtcontrols 1.0
+
 QtObject {
 	id: root
 
@@ -11,17 +13,20 @@ QtObject {
 	[0, 0, 1]
   ];
 
-	function isIdentityMatrix(){
+	function isIdentityMatrix(matrixArg){
+		if(matrixArg==undefined){
+			matrixArg = matrix;
+		}
 		return (
-				matrix[0][0] == 1
-				&& matrix[1][1] == 1
-				&& matrix[2][2] == 1
-				&& matrix[0][1] == 0
-				&& matrix[0][2] == 0
-				&& matrix[1][0] == 0
-				&& matrix[1][2] == 0
-				&& matrix[2][0] == 0
-				&& matrix[2][1] == 0
+				matrixArg[0][0] == 1
+				&& matrixArg[1][1] == 1
+				&& matrixArg[2][2] == 1
+				&& matrixArg[0][1] == 0
+				&& matrixArg[0][2] == 0
+				&& matrixArg[1][0] == 0
+				&& matrixArg[1][2] == 0
+				&& matrixArg[2][0] == 0
+				&& matrixArg[2][1] == 0
 					)
 	}
 
@@ -55,15 +60,15 @@ QtObject {
 		return resultMatrix;
 	}
 
-	function transformPoint(pointArg, matrix_){
+	function transformPoint(pointArg, matrixArg){
 		//vector = [pointArg.x, pointArg.y, 1] - Homogeneous coordinates
 		//matrix * vector
-		if(matrix_==undefined){
-			matrix_ = matrix;
+		if(matrixArg==undefined){
+			matrixArg = matrix;
 		}
 		let retPoint = Qt.point(0, 0);
-		retPoint.x = matrix_[0][0] * pointArg.x + matrix_[0][1] * pointArg.y + matrix_[0][2]//* 1
-		retPoint.y = matrix_[1][0] * pointArg.x + matrix_[1][1] * pointArg.y + matrix_[1][2]//* 1
+		retPoint.x = matrixArg[0][0] * pointArg.x + matrixArg[0][1] * pointArg.y + matrixArg[0][2]//* 1
+		retPoint.y = matrixArg[1][0] * pointArg.x + matrixArg[1][1] * pointArg.y + matrixArg[1][2]//* 1
 		return retPoint;
 	}
 

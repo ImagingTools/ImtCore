@@ -4,6 +4,8 @@ singleton Events 1.0 ./Base/Events.qml
 singleton EventManager 1.0 ./Base/EventManager.qml
 singleton Enums 1.0 ./Base/Enums.qml
 singleton Functions 1.0 ./Base/Functions.qml
+singleton AnalyticGeometry 1.0 ./Base/AnalyticGeometry.qml
+singleton LinearAlgebra 1.0 ./Base/LinearAlgebra.qml
 singleton RelativePosition 1.0 ./Base/RelativePosition.qml
 singleton DesignScheme 1.0 ./Base/DesignScheme.qml
 

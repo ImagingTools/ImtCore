@@ -14,6 +14,8 @@
 	<file alias="imtcontrols/Base/EventManager.qml">Base/EventManager.qml</file>
         <file alias="imtcontrols/Base/Enums.qml">Base/Enums.qml</file>
 		<file alias="imtcontrols/Base/Functions.qml">Base/Functions.qml</file>
+		<file alias="imtcontrols/Base/AnalyticGeometry.qml">Base/AnalyticGeometry.qml</file>
+		<file alias="imtcontrols/Base/LinearAlgebra.qml">Base/LinearAlgebra.qml</file>
 		<file alias="imtcontrols/Base/RelativePosition.qml">Base/RelativePosition.qml</file>
         <file alias="imtcontrols/Base/ButtonType.js">Base/ButtonType.js</file>
         <file alias="imtcontrols/Base/IconTest.qml">Base/IconTest.qml</file>
