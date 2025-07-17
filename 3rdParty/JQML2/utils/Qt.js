@@ -783,26 +783,38 @@ var Qt = {
         return result ? result : sourceText
     },
     createComponent(namespace, path, parent){
-        let className = namespace.split('_')
-        for(let name of path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '').split('_')){
-            if(name === '..') {
-                className.pop()
-            } else {
-                if(className.indexOf(name) < 0) className.push(name)
-            }
-        }
+        let qmlName = path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '').split('_').pop()
+
         let cls
-        try {
-            cls = eval(className.join('_'))
-        } catch (error) {
-            let name = path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '').split('_').pop()
-            for(let key in classList){
-                if(key.split('_').pop() === name){
-                    cls = classList[key]
-                    break
+
+        if(qmlName in JQModules.QtQml) {
+            cls = JQModules.QtQml[qmlName]
+        } else if(qmlName in JQModules.QtQml.Models) {
+            cls = JQModules.QtQml.Models[qmlName]
+        } else {
+            let className = namespace.split('_')
+            for(let name of path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '').split('_')){
+                if(name === '..') {
+                    className.pop()
+                } else {
+                    if(className.indexOf(name) < 0) className.push(name)
+                }
+            }
+            
+            try {
+                cls = eval(className.join('_'))
+            } catch (error) {
+                let name = path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '').split('_').pop()
+                for(let key in classList){
+                    if(key.split('_').pop() === name){
+                        cls = classList[key]
+                        break
+                    }
                 }
             }
         }
+
+        
         
         return {
             createObject: (parent)=>{

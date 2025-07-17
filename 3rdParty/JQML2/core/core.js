@@ -341,6 +341,8 @@ global.JQModules = {
         QObject: __components.QObject,
         QtObject: __components.QtObject,
         Component: __components.Component,
+        BaseClass: __components.BaseClass,
+        BaseModel: __components.BaseModel,
     },
     QtQuick: {
         Item: __components.Item,
