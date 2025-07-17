@@ -28,7 +28,8 @@ BoundingBox {
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 1
 		ctx.beginPath()
 		for(let i = 0;i < points.length; i++){
-			let point = points[i];
+			let point = getScreenPosition(points[i]);
+
 			if(i == 0){
 				ctx.moveTo(point.x, point.y);
 			}
@@ -47,13 +48,15 @@ BoundingBox {
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
 		ctx.beginPath()
 		for(let i = 0;i < points.length; i++){
-			DesignScheme.drawNode(ctx, points[i])
+			let point = getScreenPosition(points[i]);
+			DesignScheme.drawNode(ctx, point)
 		}
 		ctx.closePath();
 	}
 
 	function drawSelectedNode(ctx, point, transformMatrixArg){
 		let params = getParams()
+		point = getScreenPosition(point)
 		ctx.strokeStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.fillStyle = params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2

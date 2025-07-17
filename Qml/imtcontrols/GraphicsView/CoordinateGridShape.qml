@@ -22,7 +22,8 @@ BoundingBox {
 	property bool isFixedOrigin: true;
 	property int legendMargin: -1;
 
-	property CanvasMatrix identityMatrix: CanvasMatrix{};
+	property int labelPrecision : 0;
+
 	property CanvasMatrix labelMatrix: CanvasMatrix{};
 
 	function draw(ctx, transformMatrixArg){
@@ -39,8 +40,9 @@ BoundingBox {
 
 		let step = gridShape.gridStepMajor;
 
-		let firstVertLineX = axesOrigin.x / step < 1 ? axesOrigin.x : axesOrigin.x % step
-		let firstHorizLineY = axesOrigin.y / step < 1 ? axesOrigin.y : axesOrigin.y % step
+		let step_thinning = scaleCoeff > gridShape.thinningZoomLevel ? step : scaleCoeff > gridShape.thinningZoomLevel/2 ? step * 2  : step * 4
+		let firstVertLineX = axesOrigin.x / step_thinning < 1 ? axesOrigin.x : axesOrigin.x % step_thinning
+		let firstHorizLineY = axesOrigin.y / step_thinning < 1 ? axesOrigin.y : axesOrigin.y % step_thinning
 
 		//Label names params
 		let labelNameFontSize = fontSize + 2
@@ -83,8 +85,8 @@ BoundingBox {
 				let x2 = x1;
 				let y2 = gridShape.viewItem.drawingAreaHeight - labelYHeight ;
 
-				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
-				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+				let point1 = getScreenPosition(Qt.point(x1, y1))
+				let point2 = getScreenPosition(Qt.point(x2, y2))
 				x1 = point1.x;
 				y1 = point1.y
 				x2 = point2.x;
@@ -103,8 +105,8 @@ BoundingBox {
 				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
 				let y2 =  y1;
 
-				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
-				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+				let point1 = getScreenPosition(Qt.point(x1, y1))
+				let point2 = getScreenPosition(Qt.point(x2, y2))
 				//x1 = point1.x;
 				y1 = point1.y
 				x2 = point2.x;
@@ -130,8 +132,8 @@ BoundingBox {
 			let x2 = x1;
 			let y2 = gridShape.viewItem.drawingAreaHeight  - labelYHeight ;
 
-			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
-			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+			let point1 = getScreenPosition(Qt.point(x1, y1))
+			let point2 = getScreenPosition(Qt.point(x2, y2))
 			x1 = point1.x;
 			y1 = point1.y
 			x2 = point2.x;
@@ -154,8 +156,8 @@ BoundingBox {
 			let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
 			let y2 =  y1;
 
-			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
-			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+			let point1 = getScreenPosition(Qt.point(x1, y1))
+			let point2 = getScreenPosition(Qt.point(x2, y2))
 			//x1 = point1.x;
 			y1 = point1.y
 			x2 = point2.x;
@@ -181,8 +183,8 @@ BoundingBox {
 				let x2 = x1;
 				let y2 = gridShape.viewItem.drawingAreaHeight - labelYHeight ;
 
-				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
-				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+				let point1 = getScreenPosition(Qt.point(x1, y1))
+				let point2 = getScreenPosition(Qt.point(x2, y2))
 				x1 = point1.x;
 				y1 = point1.y
 				x2 = point2.x;
@@ -203,8 +205,8 @@ BoundingBox {
 				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
 				let y2 =  y1;
 
-				let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
-				let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+				let point1 = getScreenPosition(Qt.point(x1, y1))
+				let point2 = getScreenPosition(Qt.point(x2, y2))
 				//x1 = point1.x;
 				y1 = point1.y
 				x2 = point2.x;
@@ -231,8 +233,8 @@ BoundingBox {
 			let x2 = x1;
 			let y2 = gridShape.viewItem.drawingAreaHeight  - labelYHeight;
 
-			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
-			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+			let point1 = getScreenPosition(Qt.point(x1, y1))
+			let point2 = getScreenPosition(Qt.point(x2, y2))
 			x1 = point1.x;
 			y1 = point1.y
 			x2 = point2.x;
@@ -255,8 +257,8 @@ BoundingBox {
 			let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
 			let y2 =  y1;
 
-			let point1 = layerMatrix.transformPoint(Qt.point(x1, y1))
-			let point2 = layerMatrix.transformPoint(Qt.point(x2, y2))
+			let point1 = getScreenPosition(Qt.point(x1, y1))
+			let point2 = getScreenPosition(Qt.point(x2, y2))
 			//x1 = point1.x;
 			y1 = point1.y
 			x2 = point2.x;
@@ -298,7 +300,7 @@ BoundingBox {
 			let x_ = (firstVertLineX + labelXWidth + i * step) * scaleCoeff;
 			let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
 			ctx.beginPath()
-			let str = String(firstVertLineX + i * step - gridShape.axesOrigin.x)
+			let str = String(Number(firstVertLineX + i * step - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision))
 
 			let textLength = ctx.measureText(str).width
 			x_ = x_ - textLength/2
@@ -314,7 +316,7 @@ BoundingBox {
 			let x_ = (firstVertLineX + labelXWidth - i * step) * scaleCoeff;
 			let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
 			ctx.beginPath()
-			let str = String(firstVertLineX -i * step - gridShape.axesOrigin.x)
+			let str = String(Number(firstVertLineX -i * step - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision))
 
 			let textLength = ctx.measureText(str).width
 			x_ = x_ - textLength/2
@@ -339,7 +341,7 @@ BoundingBox {
 			//console.log("deltaAddY:: ", y_, deltaAddY, (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY * scaleCoeff))
 
 			ctx.beginPath()
-			let str = String(i * step - gridShape.axesOrigin.y + firstHorizLineY)
+			let str = String(Number(i * step - gridShape.axesOrigin.y + firstHorizLineY).toFixed(gridShape.labelPrecision))
 
 			let textLength = ctx.measureText(str).width
 			x_ = x_ - textLength - Style.marginXS
@@ -355,7 +357,7 @@ BoundingBox {
 			let x_ = labelXWidth;
 			let y_ = (gridShape.viewItem.drawingAreaHeight + i * step  - labelYHeight - firstHorizLineY)* scaleCoeff
 			ctx.beginPath()
-			let str = String(firstHorizLineY -i * step - gridShape.axesOrigin.y)
+			let str = String(Number(firstHorizLineY -i * step - gridShape.axesOrigin.y).toFixed(gridShape.labelPrecision))
 
 			let textLength = ctx.measureText(str).width
 			x_ = x_ - textLength - Style.marginXS
@@ -391,10 +393,10 @@ BoundingBox {
 		let rightXAxePointTr = Qt.point(rightXAxePoint.x, rightXAxePoint.y);
 
 		if(!gridShape.isFixedOrigin){
-			topYAxePointTr = layerMatrix.transformPoint(topYAxePoint)
-			bottomYAxePointTr = layerMatrix.transformPoint(bottomYAxePoint)
-			leftXAxePointTr = layerMatrix.transformPoint(leftXAxePoint)
-			rightXAxePointTr = layerMatrix.transformPoint(rightXAxePoint)
+			topYAxePointTr = getScreenPosition(topYAxePoint)
+			bottomYAxePointTr = getScreenPosition(bottomYAxePoint)
+			leftXAxePointTr = getScreenPosition(leftXAxePoint)
+			rightXAxePointTr = getScreenPosition(rightXAxePoint)
 		}
 
 		//horizontal axe

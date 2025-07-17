@@ -132,11 +132,11 @@ Rectangle {
 		anchors.rightMargin: Style.marginL
 
 		width: 200;
-		// BaseText{
-		// 	font.pixelSize: Style.fontSizeL
+		BaseText{
+			font.pixelSize: Style.fontSizeL
 
-		// 	text: "Zoom: " + view.scaleCoeff.toFixed(2)
-		// }
+			text: "Zoom: " + view.scaleCoeff.toFixed(2)
+		}
 		// BaseText{
 		// 	font.pixelSize: Style.fontSizeL
 

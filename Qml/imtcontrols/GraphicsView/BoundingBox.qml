@@ -63,6 +63,13 @@ GraphicsShapeBase {
 		let maxX  = -1000000
 		let maxY = -1000000;
 
+		if(!points.length){
+			minX = 0;
+			minY = 0;
+			maxX = 0;
+			maxY = 0;
+		}
+
 		for(let i = 0; i < points.length; i++){
 			let point = points[i]
 			let x_ = point.x
@@ -111,15 +118,18 @@ GraphicsShapeBase {
 	}
 
 	function getBoundingBoxCoordinate(){
-		return Qt.point(0,0);
+		let point = getBoundingBoxPoints()
+		return point.topLeftPoint
 	}
 
 	function getBoundingBoxWidth(){
-		return 0;
+		let point = getBoundingBoxPoints()
+		return (point.topRightPoint.x - point.topLeftPoint.x)
 	}
 
 	function getBoundingBoxHeight(){
-		return 0;
+		let point = getBoundingBoxPoints()
+		return (point.bottomLeftPoint.y - point.topLeftPoint.y)
 	}
 
 	function draw(ctx, transformMatrixArg){
@@ -208,6 +218,10 @@ GraphicsShapeBase {
 		ok = xArg >= topLeftX && xArg <= bottomRightX && yArg >= topLeftY && yArg <= bottomRightY
 
 		return ok;
+	}
+
+	function isInside(xArg, yArg){
+		return false;
 	}
 
 	function rotate(angle){

@@ -103,6 +103,13 @@ GraphicsView{
 				let x2 = i * step;
 				let y2 = view.drawingAreaHeight ;
 
+				let point1 = getScreenPosition(Qt.point(x1,y1))
+				let point2 = getScreenPosition(Qt.point(x2,y2))
+				x1 = point1.x;
+				y1 =  point1.y ;
+				x2 = point2.x;
+				y2 = point2.y;
+
 				ctx.beginPath()
 				ctx.moveTo(x1, y1);
 				ctx.lineTo(x2, y2);
@@ -114,6 +121,13 @@ GraphicsView{
 				let y1 =  i * step ;
 				let x2 =  view.drawingAreaWidth;
 				let y2 =  i * step;
+
+				let point1 = getScreenPosition(Qt.point(x1,y1))
+				let point2 = getScreenPosition(Qt.point(x2,y2))
+				x1 = point1.x;
+				y1 =  point1.y ;
+				x2 = point2.x;
+				y2 = point2.y;
 
 				ctx.beginPath()
 				ctx.moveTo(x1, y1);
@@ -194,10 +208,10 @@ GraphicsView{
 
 		function getBoundingBoxCornerPoints(){
 			let points = {};
-			points.topLeftPoint = Qt.point(200,200)
-			points.topRightPoint = Qt.point(300, 200)
-			points.bottomRightPoint = Qt.point(300,400)
-			points.bottomLeftPoint = Qt.point(200, 400)
+			points.topLeftPoint = getScreenPosition(Qt.point(200,200))
+			points.topRightPoint = getScreenPosition(Qt.point(300, 200))
+			points.bottomRightPoint = getScreenPosition(Qt.point(300,400))
+			points.bottomLeftPoint = getScreenPosition(Qt.point(200, 400))
 
 			return points;
 		}
@@ -217,6 +231,11 @@ GraphicsView{
 		id: rec1Comp;
 		RectangleShape{
 			Component.onCompleted: {
+				let item = view.drawModel[0]
+				points.push(item.point);
+				width = item.width;
+				height = item.height;
+				radius = item.radius !== undefined ? item.radius : 0
 			}
 
 			function setPoints(pointList){
@@ -247,6 +266,11 @@ GraphicsView{
 		RectangleShape{
 
 			Component.onCompleted: {
+				let item = view.drawModel[1]
+				points.push(item.point);
+				width = item.width;
+				height = item.height;
+				radius = item.radius !== undefined ? item.radius : 0
 			}
 
 			function setPoints(pointList){
@@ -278,6 +302,11 @@ GraphicsView{
 		RectangleShape{
 
 			Component.onCompleted: {
+				let item = view.drawModel[2]
+				points.push(item.point);
+				width = item.width;
+				height = item.height;
+				radius = item.radius !== undefined ? item.radius : 0
 			}
 
 			function setPoints(pointList){

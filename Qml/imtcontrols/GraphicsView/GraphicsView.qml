@@ -321,7 +321,7 @@ Rectangle {
 					canvasMatrix.setYTranslation(canvas.deltaY);
 					canvasMatrix.setXScale(canvas.scaleCoeff);
 					canvasMatrix.setYScale(canvas.scaleCoeff);
-					let isInside =  shape.isInside(mouseX, mouseY, canvasMatrix)
+					let isInside =  shape.isInside(mouseX, mouseY)
 
 					if(isInside){
 						return shape;

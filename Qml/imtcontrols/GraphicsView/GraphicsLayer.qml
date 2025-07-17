@@ -19,6 +19,7 @@ QtObject {
 	property CanvasMatrix viewMatrix: CanvasMatrix{};
 	property CanvasMatrix layerMatrix: CanvasMatrix{};
 	property CanvasMatrix tempMatrix: CanvasMatrix{};
+	property CanvasMatrix identityMatrix: CanvasMatrix{};
 
 	property var viewMode;
 
@@ -70,31 +71,35 @@ QtObject {
 		}
 
 		tempMatrix.matrix = tempMatrix.multiplyByMatrix(viewMatrix.matrix, layerMatrix.matrix)
-
-		tempMatrix.setContextTransform(ctx)
+		//tempMatrix.setContextTransform(ctx)
 
 		for(let i = 0; i < shapeModel.length; i++){
 			ctx.globalAlpha = 1
 			let shape = shapeModel[i]
-			if(shape.layerMatrix !==undefined){
-				shape.layerMatrix = tempMatrix
-			}
 			if(!shape.isSelected){
-				shape.draw(ctx, tempMatrix);
+				drawShape(ctx, shape)
 			}
 		}
 		for(let i = 0; i < shapeModel.length; i++){
 			ctx.globalAlpha = 1
 			let shape = shapeModel[i]
-			if(shape.layerMatrix !==undefined){
-				shape.layerMatrix = tempMatrix
-			}
 			if(shape.isSelected){
-				shape.draw(ctx, tempMatrix);
+				drawShape(ctx, shape)
 			}
 		}
 
 		ctx.restore();
+	}
+
+	function drawShape(ctx, shape){
+		if(shape.viewMatrix !==undefined){
+			shape.viewMatrix = viewMatrix
+		}
+		if(shape.layerMatrix !==undefined){
+			shape.layerMatrix = layerMatrix
+		}
+
+		shape.draw(ctx, tempMatrix);
 	}
 
 }

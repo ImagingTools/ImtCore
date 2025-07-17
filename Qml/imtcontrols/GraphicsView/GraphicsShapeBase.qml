@@ -19,12 +19,15 @@ QtObject {
 	property var highlightedNodeCoordinate
 	property var touchedNodeCoordinate
 
+	property CanvasMatrix viewMatrix: CanvasMatrix{};
 	property CanvasMatrix layerMatrix: CanvasMatrix{};
 	property CanvasMatrix shapeMatrix: CanvasMatrix{};
 	property CanvasMatrix tempMatrix: CanvasMatrix{};
+	property CanvasMatrix identityMatrix: CanvasMatrix{};
 
 	property var viewMode;
 	property var points: [];
+	property var pointsBackup: [];
 
 	signal shapeChanged();
 	signal shapeInfo(var info);
@@ -51,23 +54,21 @@ QtObject {
 	function setPoints(pointList){
 	}
 
-	function isInside(x_, y_, matrix){
-		return false;
-	}
+
 
 	function getScreenPosition(logPosition){
-		let screenPosition = layerMatrix.transformPoint(logPosition)
-		screenPosition = shapeMatrix.transformPoint(screenPosition)
-
+		let matrix = tempMatrix.multiplyByMatrix(viewMatrix.matrix, layerMatrix.matrix)
+		let screenPosition = tempMatrix.transformPoint(logPosition, matrix)
 		return screenPosition
 	}
 
 	function getLogPosition(screenPosition){
-		let invShapeMatrix = shapeMatrix.getInvertedMatrix();
+		let invViewMatrix = viewMatrix.getInvertedMatrix();
 		let invLayerMatrix = layerMatrix.getInvertedMatrix();
 
-		let logPosition = tempMatrix.transformPoint(screenPosition, invShapeMatrix)
-		logPosition = tempMatrix.transformPoint(logPosition, invLayerMatrix)
+		let matrix = tempMatrix.multiplyByMatrix(invViewMatrix, invLayerMatrix)
+
+		let logPosition = tempMatrix.transformPoint(screenPosition, matrix)
 
 		return logPosition
 	}

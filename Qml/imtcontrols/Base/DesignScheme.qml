@@ -7,9 +7,12 @@ QtObject {
 
 	property real shapePointSize: 4;
 	property real shapeSelectedPointSize: 6;
-	property string boundingBoxBorderColor: "#000000"
 	property int boundingBoxLineWidth: 2;
 	property int boundingBoxControlPointRadius: 6;
+	property string boundingBoxBorderColor: "#000000"
+
+	property int selectionLineWidth: 4;
+	property string selectionColor: "yellow"
 
 	function drawNode(ctx, point){
 		let radius = shapePointSize;
