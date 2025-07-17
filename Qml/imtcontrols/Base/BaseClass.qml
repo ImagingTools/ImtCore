@@ -68,7 +68,7 @@ QtObject {
 			}
 		}
 
-		function containceInRemoved(key){
+		function containsInRemoved(key){
 			let index = this.removed.indexOf(key)
 			if (index > -1) {
 				return true
@@ -250,7 +250,7 @@ QtObject {
 		let isFirst = true
 		for(let i = 0; i < list.length; i++){
 			let key = list[i]
-			if (this[key] == null && this._internal.containceInRemoved(key)){
+			if (this[key] == null && this._internal.containsInRemoved(key)){
 				continue
 			}
 			if (!isFirst) json += ','
@@ -278,8 +278,11 @@ QtObject {
 
 					json += "]"
 				}
-				else if (this[key]){
+				else if (this[key] !== null){
 					json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
+				}
+				else{
+					json += '"' + this.getJSONKeyForProperty(key) + '": null'
 				}
 			} else {
 				let value = this[key]
@@ -306,7 +309,7 @@ QtObject {
 		let isFirst = true
 		for(let i = 0; i < list.length; i++){
 			let key = list[i]
-			if (this[key] == null && this._internal.containceInRemoved(key)){
+			if (this[key] == null && this._internal.containsInRemoved(key)){
 				continue
 			}
 			if (!isFirst) graphQL += ','

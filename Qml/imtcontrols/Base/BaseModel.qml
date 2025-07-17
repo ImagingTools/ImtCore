@@ -185,7 +185,6 @@ ListModel {
 	}
 	
 	function copyMe(){
-		console.log("BaseModel copyMe")
 		let retVal = Qt.createComponent('BaseModel.qml').createObject()
 		if (!retVal){
 			console.debug("Unable to create copy for BaseModel. Error: Creating component is failed")
@@ -194,7 +193,6 @@ ListModel {
 		
 		for(let i = 0; i < count; i++){
 			let item = get(i).item
-			console.log("item", item)
 			retVal.addElement(item.copyMe())
 		}
 		
