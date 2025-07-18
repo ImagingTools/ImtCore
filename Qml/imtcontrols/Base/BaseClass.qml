@@ -399,7 +399,9 @@ QtObject {
 						this[objKey].destroy()
 					}
 				}
-				this[objKey] = null
+				if(typeof this[objKey] === "object"){
+					this[objKey] = null
+				}
 			}
 		}
 
