@@ -45,8 +45,15 @@ Rectangle {
 		// }
 
 		// Button{
-		// 	text: "button"
+		// 	text: "test"
 		// 	onClicked: {
+		// 		let shapeList  = []
+		// 		let activeLayer = view.getActiveLayer()
+		// 		shapeList.push(view.shape1) //blue
+		// 		shapeList.push(view.shape2) //green
+		// 		shapeList.push(view.shape3) //red
+
+		// 		view.fitToShapeList(shapeList)
 		// 	}
 		// }
 	}
@@ -71,6 +78,10 @@ Rectangle {
 		//translateYNegativeLimit: gridShape.labelYHeight
 		hasHoverReaction: true;
 
+		property var shape1
+		property var shape2
+		property var shape3
+
 		Component.onCompleted: {
 			//TEST
 
@@ -93,6 +104,14 @@ Rectangle {
 			activeLayer.addShape(lineObjBlue);
 			let lineObjGreen = polylineCompGreen.createObject(this);
 			activeLayer.addShape(lineObjGreen);
+
+			//activeLayer.addShape(lineObjRed);
+
+			view.shape1 = lineObjBlue;
+
+			view.shape2 = lineObjGreen;
+
+			view.shape3 = lineObjRed;
 
 			//view.fitToShape(lineObjRed)
 
@@ -130,7 +149,7 @@ Rectangle {
 			let clipRect = Qt.rect(gridShape.labelXWidth, gridShape.legendMargin, view.width - gridShape.labelXWidth - gridShape.legendMargin, view.height - gridShape.labelYHeight - gridShape.legendMargin)
 			activeLayer.clipRect = clipRect
 
-			inactiveLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
+			inactiveLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x - 100)
 			inactiveLayer.layerMatrix.setYTranslation(view.height - gridShape.labelYHeight - gridShape.axesOrigin.y)
 
 			activeLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
@@ -216,11 +235,11 @@ Rectangle {
 			Component.onCompleted: {
 				let pointList = []
 
-				let point0 = Qt.point(-20, 60)
+				let point0 = Qt.point(-60, 60)
 				let point1 = Qt.point(40, 60)
 				let point2 = Qt.point(120,100)
 				let point3 = Qt.point(200,320)
-				let point4 = Qt.point(400 ,420)
+				let point4 = Qt.point(400 ,480)
 
 				pointList.push(point0)
 				pointList.push(point1)

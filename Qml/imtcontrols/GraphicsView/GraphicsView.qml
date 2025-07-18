@@ -240,26 +240,17 @@ Rectangle {
 		canvas.deltaX = 0;
 		canvas.deltaY = 0;
 
+		canvasMatrix.setXScale(canvas.scaleCoeff)
+		canvasMatrix.setYScale(canvas.scaleCoeff)
+		canvasMatrix.setXTranslation(canvas.deltaX)
+		canvasMatrix.setYTranslation(canvas.deltaY)
+
 		if(requestPaint_ == undefined){
 			requestPaint_ = false;
 		}
 		if(requestPaint_){
 			requestPaintPause.restart()		}
 
-		// if (canvas.backgroundWidth == 0 | canvas.backgroundHeight == 0){
-		// 	return
-		// }
-
-		// let scaleCoeff_ = (canvas.width - Style.marginM * 2) / canvas.backgroundWidth;
-		// let scaleCoeff_h = (canvas.height - Style.marginM * 2) / canvas.backgroundHeight;
-		// if (scaleCoeff_ > scaleCoeff_h){
-		// 	scaleCoeff_ = scaleCoeff_h
-		// }
-
-		// canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
-
-		// canvas.deltaX = graphicsView.width / 2 - backgroundRec.width / 2
-		// canvas.deltaY = graphicsView.height / 2 - backgroundRec.height / 2
 	}
 
 
@@ -378,7 +369,7 @@ Rectangle {
 
 		let minX = 1000000;
 		let minY = 1000000;
-		let maxX  = -1000000;
+		let maxX = -1000000;
 		let maxY = -1000000;
 
 		let screenPointBottomLeftX = 0;
@@ -401,7 +392,7 @@ Rectangle {
 
 		for (let i = 0; i < shapeList.length; i++){
 			let shape = shapeList[i];
-			let boundingBoxPoints = shape.getBoundingBoxPoints();
+			let boundingBoxPoints = shape.getBoundingBoxPoints(true);
 			if(!Object.keys(boundingBoxPoints).length){
 				continue;
 			}
@@ -420,29 +411,62 @@ Rectangle {
 			}
 
 			if(!onlyOneLayer){
+				let layerCurr = shape.layer;
+				let clipRectCurr = layerCurr.clipRect;
+				if(clipRectCurr.width == 0 && clipRectCurr.height == 0){
+					clipRectCurr.width = canvas.width
+					clipRectCurr.height = canvas.height
+				}
 
+				if(clipRectCurr.width < clipRectWidth){
+					clipRectWidth = clipRectCurr.width;
+				}
+				if(clipRectCurr.height < clipRectHeight){
+					clipRectHeight = clipRectCurr.height;
+				}
+				if(clipRectCurr.x > screenPointBottomLeftX){
+					screenPointBottomLeftX = clipRectCurr.x
+				}
+				if(clipRectCurr.y + clipRectCurr.height < screenPointBottomLeftY){
+					screenPointBottomLeftY = clipRectCurr.y + clipRectCurr.height
+				}
 			}
 		}
 
 		let zoomX = (clipRectWidth - margin_)/((maxX - minX)!==0 ? Math.abs(maxX - minX) : 1)
 		let zoomY = (clipRectHeight - margin_)/((maxY - minY)!==0 ? Math.abs(maxY - minY) : 1)
 		let zoom = Math.min(zoomX, zoomY)
-		graphicsView.setZoom(zoom)
 
+		graphicsView.setZoom(zoom)
 		canvasMatrix.setXScale(zoom)
 		canvasMatrix.setYScale(zoom)
 		canvasMatrix.setXTranslation(canvas.deltaX)
 		canvasMatrix.setYTranslation(canvas.deltaY)
 
+		minX = 1000000;
+		maxY = -1000000;
+
+		for (let i = 0; i < shapeList.length; i++){
+			let shape = shapeList[i];
+			let boundingBoxPoints = shape.getBoundingBoxPoints(true);
+			if(!Object.keys(boundingBoxPoints).length){
+				continue;
+			}
+
+			if((boundingBoxPoints.bottomLeftPoint).x < minX){
+				minX = boundingBoxPoints.bottomLeftPoint.x
+			}
+			if((boundingBoxPoints.bottomLeftPoint).y > maxY){
+				maxY = boundingBoxPoints.bottomLeftPoint.y
+			}
+		}
+
 		let screenPointBottomLeft = Qt.point(screenPointBottomLeftX + margin_/2, screenPointBottomLeftY - margin_/2)
+		let screenPointMinXMaxY = Qt.point(minX, maxY)
 
-		let matrix = LinearAlgebra.multiplyByMatrix3x3(canvasMatrix.matrix, layer.layerMatrix.matrix)
-		let screenPointMinXMinY = LinearAlgebra.transformPoint2d(Qt.point(minX, minY), matrix);
-
-		canvas.deltaX += (screenPointBottomLeft.x - screenPointMinXMinY.x)
-		canvas.deltaY += (screenPointBottomLeft.y - screenPointMinXMinY.y)
+		canvas.deltaX += (screenPointBottomLeft.x - screenPointMinXMaxY.x)
+		canvas.deltaY += (screenPointBottomLeft.y - screenPointMinXMaxY.y)
 	}
-
 
 	function fitToLayer(layer){
 		fitToShapeList(layer.shapeModel, layer)
