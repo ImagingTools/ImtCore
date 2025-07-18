@@ -440,12 +440,12 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 	SendInfoMessage(0, QString("Try connect to the WebSocket-server: %1").arg(url.toString()));
 
 	QWebSocketHandshakeOptions handshakeOptions;
-	if (m_subprotocolsOptionsListPtr.IsValid()){
+	if (m_subprotocolsOptionsListCompPtr.IsValid()){
 		QStringList protocols;
 
-		int count = m_subprotocolsOptionsListPtr->GetOptionsCount();
+		int count = m_subprotocolsOptionsListCompPtr->GetOptionsCount();
 		for (int i = 0; i < count; i++){
-			protocols << m_subprotocolsOptionsListPtr->GetOptionId(i);
+			protocols << m_subprotocolsOptionsListCompPtr->GetOptionId(i);
 		}
 
 		handshakeOptions.setSubprotocols(protocols);
