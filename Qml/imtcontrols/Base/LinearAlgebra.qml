@@ -59,18 +59,20 @@ QtObject {
 		return matrixArg;
 	}
 
-	function isIdentityMatrix3x3(matrixArg){
-		return (
-				matrixArg[0][0] == 1
-				&& matrixArg[1][1] == 1
-				&& matrixArg[2][2] == 1
-				&& matrixArg[0][1] == 0
-				&& matrixArg[0][2] == 0
-				&& matrixArg[1][0] == 0
-				&& matrixArg[1][2] == 0
-				&& matrixArg[2][0] == 0
-				&& matrixArg[2][1] == 0
-					)
+	function isIdentityMatrix(matrixArg){
+		for(let i = 0; i < matrixArg.length; i++){
+			let row = matrixArg[i]
+			for(let j = 0; j < row.length; j++){
+				if(i == j && matrixArg[i][j] !==1){
+					return false;
+				}
+				if(i !== j && matrixArg[i][j] !==0){
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	function getInvertedMatrix3x3(matrixArg){

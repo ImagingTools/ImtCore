@@ -17,59 +17,22 @@ QtObject {
 		if(matrixArg == undefined){
 			matrixArg = matrix;
 		}
-		return (
-				matrixArg[0][0] == 1
-				&& matrixArg[1][1] == 1
-				&& matrixArg[2][2] == 1
-				&& matrixArg[0][1] == 0
-				&& matrixArg[0][2] == 0
-				&& matrixArg[1][0] == 0
-				&& matrixArg[1][2] == 0
-				&& matrixArg[2][0] == 0
-				&& matrixArg[2][1] == 0
-					)
+		return LinearAlgebra.isIdentityMatrix(matrixArg)
 	}
 
 	function multiplyByMatrix(matrixArg, externMatrix){
-		//console.log("multiplyByMatrix::", matrixArg, externMatrix)
 		if(matrixArg == undefined){
 			matrixArg = matrix
 		}
-		if(matrixArg == undefined){
-			return;
-		}
 
-		let n = matrixArg.length;
-		let resultMatrix = [
-				[0, 0, 0],
-				[0, 0, 0],
-				[0, 0, 0]
-			  ];
-		if(matrixArg.length !== externMatrix.length){
-			return;
-		}
-		for(let i = 0; i < n; i++){
-			let row = matrixArg[i]
-			for(let j = 0; j < n; j++){
-				resultMatrix[i][j] = 0;
-				for(let k = 0; k < n; k++){
-					resultMatrix[i][j] += matrixArg[i][k] * externMatrix[k][j];
-				}
-			}
-		}
-		return resultMatrix;
+		return LinearAlgebra.multiplyByMatrix3x3(matrixArg, externMatrix);
 	}
 
 	function transformPoint(pointArg, matrixArg){
-		//vector = [pointArg.x, pointArg.y, 1] - Homogeneous coordinates
-		//matrix * vector
-		if(matrixArg==undefined){
+		if(matrixArg == undefined){
 			matrixArg = matrix;
 		}
-		let retPoint = Qt.point(0, 0);
-		retPoint.x = matrixArg[0][0] * pointArg.x + matrixArg[0][1] * pointArg.y + matrixArg[0][2]//* 1
-		retPoint.y = matrixArg[1][0] * pointArg.x + matrixArg[1][1] * pointArg.y + matrixArg[1][2]//* 1
-		return retPoint;
+		return LinearAlgebra.transformPoint2d(pointArg, matrixArg)
 	}
 
 	function multiplyByNumber(matrixArg, number){
@@ -77,14 +40,7 @@ QtObject {
 			matrixArg = matrix
 		}
 
-		for(let i = 0; i < matrixArg.length; i++){
-			let row = matrixArg[i]
-			for(let j = 0; j < row.length; j++){
-				matrixArg[i][j] = number * matrixArg[i][j];
-			}
-		}
-
-		return matrixArg;
+		return LinearAlgebra.multiplyByNumber(matrixArg, number);
 	}
 
 	function getInvertedMatrix(matrixArg){
@@ -92,20 +48,7 @@ QtObject {
 			matrixArg = matrix
 		}
 
-		let determinant = getDeterminant(matrixArg);
-
-		let minorMatrix = getMinorMatrix(matrixArg);
-
-		minorMatrix[0][1] = -minorMatrix[0][1];
-		minorMatrix[1][0] = -minorMatrix[1][0];
-		minorMatrix[1][2] = -minorMatrix[1][2];
-		minorMatrix[2][1] = -minorMatrix[2][1];
-
-		let minorMatrixTransp = getTransposedMatrix(minorMatrix);
-
-		let invertedMatrix = multiplyByNumber(minorMatrixTransp, 1/determinant)
-
-		return invertedMatrix;
+		return LinearAlgebra.getInvertedMatrix3x3(matrixArg);
 	}
 
 	function getDeterminant(matrixArg){
@@ -113,15 +56,7 @@ QtObject {
 			matrixArg = matrix
 		}
 
-		let det =
-			matrixArg[0][0] * matrixArg[1][1] * matrixArg[2][2]
-			- matrixArg[0][0] * matrixArg[1][2] * matrixArg[2][1]
-			- matrixArg[0][1] * matrixArg[1][0] * matrixArg[2][2]
-			+ matrixArg[0][1] * matrixArg[1][2] * matrixArg[2][0]
-			+ matrixArg[0][2] * matrixArg[1][0] * matrixArg[2][1]
-			- matrixArg[0][2] * matrixArg[1][1] * matrixArg[2][0]
-
-		return det;
+		return LinearAlgebra.getDeterminant3x3(matrixArg);
 	}
 
 	function getMinorMatrix(matrixArg){
@@ -129,25 +64,7 @@ QtObject {
 			matrixArg = matrix
 		}
 
-		let minorMatrix = [
-				[0, 0, 0],
-				[0, 0, 0],
-				[0, 0, 0]
-			  ];
-
-		minorMatrix[0][0] = matrixArg[1][1] * matrixArg[2][2] - matrixArg[1][2] * matrixArg[2][1]
-		minorMatrix[0][1] = matrixArg[1][0] * matrixArg[2][2] - matrixArg[1][2] * matrixArg[2][0]
-		minorMatrix[0][2] = matrixArg[1][0] * matrixArg[2][1] - matrixArg[2][2] * matrixArg[2][0]
-
-		minorMatrix[1][0] = matrixArg[0][1] * matrixArg[2][2] - matrixArg[0][2] * matrixArg[2][1]
-		minorMatrix[1][1] = matrixArg[0][0] * matrixArg[2][2] - matrixArg[0][2] * matrixArg[2][0]
-		minorMatrix[1][2] = matrixArg[0][0] * matrixArg[2][1] - matrixArg[0][1] * matrixArg[2][0]
-
-		minorMatrix[2][0] = matrixArg[0][1] * matrixArg[1][2] - matrixArg[0][2] * matrixArg[1][1]
-		minorMatrix[2][1] = matrixArg[0][0] * matrixArg[1][2] - matrixArg[0][2] * matrixArg[1][0]
-		minorMatrix[2][2] = matrixArg[0][0] * matrixArg[1][1] - matrixArg[0][1] * matrixArg[1][0]
-
-		return minorMatrix;
+		return LinearAlgebra.getMinorMatrix3x3(matrixArg);
 	}
 
 	function getTransposedMatrix(matrixArg){
@@ -155,20 +72,7 @@ QtObject {
 			matrixArg = matrix
 		}
 
-		let transposedMatrix = [
-				[0, 0, 0],
-				[0, 0, 0],
-				[0, 0, 0]
-			  ];
-
-		for(let i = 0; i < matrixArg.length; i++){
-			let row = matrixArg[i]
-			for(let j = 0; j < row.length; j++){
-				transposedMatrix[i][j] = matrixArg[j][i];
-			}
-		}
-
-		return transposedMatrix;
+		return LinearAlgebra.getTransposedMatrix3x3(matrixArg);
 	}
 
 	function copyFrom(externMatrix){
