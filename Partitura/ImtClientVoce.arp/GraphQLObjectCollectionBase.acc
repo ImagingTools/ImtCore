@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5387" Description="ACF"/>
-            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395265" Description="Qt Framework"/>
+            <Version Id="0" Number="5405" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Remote object/document collection that can be accessed by GraphQL protocol</Description>
@@ -59,6 +59,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="SslConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Subprotocols" Type="Reference" ExportId="Subprotocols">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="SubscriptionCommandId">

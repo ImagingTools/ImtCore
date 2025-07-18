@@ -2,6 +2,7 @@
 
 
 // Qt includes
+
 #include <QtWebSockets/QWebSocketServer>
 #include <QtWebSockets/QWebSocket>
 #include <QtCore/QSharedPointer>
@@ -9,6 +10,7 @@
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
+#include <iprm/IOptionsList.h>
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
@@ -60,6 +62,7 @@ public:
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
 		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded GraphQL-requests", false, "");
+		I_ASSIGN(m_subprotocolsOptionsListPtr, "SupportedSubprotocols", "Supported Web Socket subprotocols", false, "SupportedSubprotocols");
 	I_END_COMPONENT
 
 	IProtocolEngine* GetProtocolEngine();
@@ -131,6 +134,7 @@ private:
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 	I_REF(IProtocolEngine, m_httpProtocolEngineCompPtr);
 	I_ATTR(QByteArray, m_productId);
+	I_REF(iprm::IOptionsList, m_subprotocolsOptionsListPtr);
 };
 
 

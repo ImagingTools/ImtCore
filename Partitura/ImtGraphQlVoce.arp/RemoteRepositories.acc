@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5395" Description="ACF"/>
+            <Version Id="0" Number="5405" Description="ACF"/>
             <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
@@ -39,6 +39,9 @@
                         <Data IsEnabled="true" Value="/Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="SslConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Subprotocols" Type="Reference" ExportId="Subprotocols">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="">
@@ -114,6 +117,9 @@
                         <Data IsEnabled="true" Value="/Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="SslConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Subprotocols" Type="Reference" ExportId="Subprotocols">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="">
@@ -233,6 +239,9 @@
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="SslConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="Subprotocols" Type="Reference" ExportId="Subprotocols">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -293,6 +302,9 @@
                         <Data IsEnabled="true" Value="/Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SslConfiguration" Type="Reference" ExportId="SslConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Subprotocols" Type="Reference" ExportId="Subprotocols">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SubscriptionCommandId" Type="Id[]" ExportId="">

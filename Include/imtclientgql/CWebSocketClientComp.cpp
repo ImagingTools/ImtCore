@@ -7,6 +7,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QFile>
+#include <QtWebSockets/QWebSocketHandshakeOptions>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -19,6 +20,7 @@
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/CHttpRequest.h>
 #include <imtrest/CHttpResponse.h>
+
 
 
 namespace imtclientgql
@@ -437,7 +439,19 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 
 	SendInfoMessage(0, QString("Try connect to the WebSocket-server: %1").arg(url.toString()));
 
-	m_webSocket.open(url);
+	QWebSocketHandshakeOptions handshakeOptions;
+	if (m_subprotocolsOptionsListPtr.IsValid()){
+		QStringList protocols;
+
+		int count = m_subprotocolsOptionsListPtr->GetOptionsCount();
+		for (int i = 0; i < count; i++){
+			protocols << m_subprotocolsOptionsListPtr->GetOptionId(i);
+		}
+
+		handshakeOptions.setSubprotocols(protocols);
+	}
+
+	m_webSocket.open(url, handshakeOptions);
 }
 
 

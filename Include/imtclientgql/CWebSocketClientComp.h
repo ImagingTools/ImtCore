@@ -13,6 +13,7 @@
 #include <imod/TModelWrap.h>
 #include <ibase/TRuntimeStatusHanderCompWrap.h>
 #include <iprm/IParamsSet.h>
+#include <iprm/IOptionsList.h>
 
 // ImtCore includes
 #include <imtcom/IServerConnectionInterface.h>
@@ -38,11 +39,13 @@ public:
 	I_BEGIN_COMPONENT(CWebSocketClientCompBase);
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
+		I_ASSIGN(m_subprotocolsOptionsListPtr, "Subprotocols", "Web Socket subprotocols", false, "Subprotocols");
 	I_END_COMPONENT;
 		
 protected:
 	I_REF(iprm::IParamsSet, m_sslConfigurationCompPtr);
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
+	I_REF(iprm::IOptionsList, m_subprotocolsOptionsListPtr);
 };
 
 class CWebSocketClientComp:
