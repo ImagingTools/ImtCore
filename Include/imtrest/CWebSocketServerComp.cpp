@@ -231,12 +231,12 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 		m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::NonSecureMode, this));
 	}
 
-	if (m_subprotocolsOptionsListCompPtr.IsValid()){
+	if (m_subprotocolListCompPtr.IsValid()){
 		QStringList supportedSubprotocolList;
 
-		int count = m_subprotocolsOptionsListCompPtr->GetOptionsCount();
+		int count = m_subprotocolListCompPtr->GetOptionsCount();
 		for (int i = 0; i < count; i++){
-			supportedSubprotocolList << m_subprotocolsOptionsListCompPtr->GetOptionId(i);
+			supportedSubprotocolList << m_subprotocolListCompPtr->GetOptionId(i);
 		}
 
 		m_webSocketServerPtr->setSupportedSubprotocols(supportedSubprotocolList);

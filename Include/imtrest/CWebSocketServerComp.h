@@ -62,7 +62,7 @@ public:
 		I_ASSIGN(m_sslConfigurationCompPtr, "SslConfiguration", "SSL Configuration is used by networking classes to relay information about an open SSL connection and to allow the server to control certain features of that connection.", false, "SslConfiguration")
 		I_ASSIGN(m_sslConfigurationManagerCompPtr, "SslConfigurationManager", "SSL configuration manager, used to create an SSL configuration for server", false, "SslConfigurationManager")
 		I_ASSIGN(m_productId, "ProductId", "Product-ID used with corresponded GraphQL-requests", false, "");
-		I_ASSIGN(m_subprotocolsOptionsListCompPtr, "SupportedSubprotocols", "Supported Web Socket subprotocols", false, "SupportedSubprotocols");
+		I_ASSIGN(m_subprotocolListCompPtr, "SupportedSubprotocols", "Supported Web Socket subprotocols", false, "SupportedSubprotocols");
 	I_END_COMPONENT
 
 	IProtocolEngine* GetProtocolEngine();
@@ -134,7 +134,7 @@ private:
 	I_REF(imtcom::ISslConfigurationManager, m_sslConfigurationManagerCompPtr);
 	I_REF(IProtocolEngine, m_httpProtocolEngineCompPtr);
 	I_ATTR(QByteArray, m_productId);
-	I_REF(iprm::IOptionsList, m_subprotocolsOptionsListCompPtr);
+	I_REF(iprm::IOptionsList, m_subprotocolListCompPtr);
 };
 
 
