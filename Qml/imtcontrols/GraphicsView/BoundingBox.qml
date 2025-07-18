@@ -75,6 +75,9 @@ GraphicsShapeBase {
 
 		for(let i = 0; i < points.length; i++){
 			let point = points[i]
+			if(isScreenPosition){
+				point = getScreenPosition(point);
+			}
 			let x_ = point.x
 			let y_ = point.y
 			if(x_ < minX){

@@ -410,8 +410,8 @@ Rectangle {
 		canvasMatrix.setXTranslation(canvas.deltaX)
 		canvasMatrix.setYTranslation(canvas.deltaY)
 
-		let screenPointMinXMinY = layer.layerMatrix.transformPoint(Qt.point(minX, minY))
-		screenPointMinXMinY = canvasMatrix.transformPoint(screenPointMinXMinY)
+		let matrix = canvasMatrix.multiplyByMatrix(canvasMatrix.matrix, layer.layerMatrix.matrix)
+		let screenPointMinXMinY = canvasMatrix.transformPoint(Qt.point(minX, minY), matrix);
 		let screenPointBottomLeft = Qt.point(clipRect.x + margin_/2, clipRect.y + clipRect.height - margin_/2)
 
 		canvas.deltaX += (screenPointBottomLeft.x - screenPointMinXMinY.x)
