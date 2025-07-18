@@ -57,13 +57,13 @@ QtObject {
 
 
 	function getScreenPosition(logPosition){
-		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewMatrix.matrix, layerMatrix.matrix)
+		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
 		let screenPosition = LinearAlgebra.transformPoint2d(logPosition, matrix)
 		return screenPosition
 	}
 
 	function getLogPosition(screenPosition){
-		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewMatrix.matrix, layerMatrix.matrix)
+		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
 		matrix = LinearAlgebra.getInvertedMatrix3x3(matrix)
 		let logPosition = LinearAlgebra.transformPoint2d(screenPosition, matrix)
 

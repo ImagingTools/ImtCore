@@ -62,6 +62,7 @@ Rectangle {
 	property alias scaleCoeff: canvas.scaleCoeff;
 	property alias deltaX: canvas.deltaX;
 	property alias deltaY: canvas.deltaY;
+	property alias viewMatrix: canvasMatrix;
 
 	property var hintShapeModel: []
 	property var hintShapePointModel: []

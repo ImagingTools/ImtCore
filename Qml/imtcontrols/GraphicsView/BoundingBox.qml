@@ -111,6 +111,7 @@ GraphicsShapeBase {
 	}
 
 	function getBoundingBoxMidPoints(){
+
 		let midpoints = ({})
 		let cornerPoints = getBoundingBoxCornerPoints();
 		if(!Object.keys(cornerPoints).length){
