@@ -59,6 +59,9 @@ GraphicsShapeBase {
 		if(isScreenPosition == undefined){
 			isScreenPosition = false;
 		}
+		if(!points.length){
+			return ({});
+		}
 		let pointsObj = ({});
 
 		let minX = 1000000;
@@ -108,8 +111,11 @@ GraphicsShapeBase {
 	}
 
 	function getBoundingBoxMidPoints(){
-		let midpoints = []
+		let midpoints = ({})
 		let cornerPoints = getBoundingBoxCornerPoints();
+		if(!Object.keys(cornerPoints).length){
+			return ({});
+		}
 
 		midpoints.topPoint = Qt.point((cornerPoints.topLeftPoint.x + cornerPoints.topRightPoint.x)/2, cornerPoints.topLeftPoint.y)
 		midpoints.rightPoint = Qt.point(cornerPoints.topRightPoint.x, (cornerPoints.topRightPoint.y + cornerPoints.bottomRightPoint.y)/2)
@@ -124,16 +130,27 @@ GraphicsShapeBase {
 	}
 
 	function getBoundingBoxCoordinate(){
+		if(!points.length){
+			return null;
+		}
 		let point = getBoundingBoxPoints()
 		return point.topLeftPoint
 	}
 
 	function getBoundingBoxWidth(){
+		if(!points.length){
+			return 0;
+		}
+
 		let point = getBoundingBoxPoints()
 		return (point.topRightPoint.x - point.topLeftPoint.x)
 	}
 
 	function getBoundingBoxHeight(){
+		if(!points.length){
+			return 0;
+		}
+
 		let point = getBoundingBoxPoints()
 		return (point.bottomLeftPoint.y - point.topLeftPoint.y)
 	}

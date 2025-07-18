@@ -14,7 +14,7 @@ QtObject {
   ];
 
 	function isIdentityMatrix(matrixArg){
-		if(matrixArg==undefined){
+		if(matrixArg == undefined){
 			matrixArg = matrix;
 		}
 		return (
@@ -30,7 +30,7 @@ QtObject {
 					)
 	}
 
-	function multiplyByMatrix(matrixArg,externMatrix){
+	function multiplyByMatrix(matrixArg, externMatrix){
 		//console.log("multiplyByMatrix::", matrixArg, externMatrix)
 		if(matrixArg == undefined){
 			matrixArg = matrix

@@ -358,10 +358,10 @@ Rectangle {
 		}
 		let activeLayer = getActiveLayer()
 
-		let invViewMatrix = canvasMatrix.getInvertedMatrix();
-		position = canvasMatrix.transformPoint(position, invViewMatrix);
-		let invLayerMatrix = activeLayer.layerMatrix.getInvertedMatrix();
-		position = canvasMatrix.transformPoint(position, invLayerMatrix);
+		let matrix = LinearAlgebra.multiplyByMatrix3x3(canvasMatrix.matrix, activeLayer.layerMatrix.matrix)
+		matrix = LinearAlgebra.getInvertedMatrix3x3(matrix)
+
+		position = LinearAlgebra.transformPoint2d(position, matrix);
 
 		for (let i = 0; i < activeLayer.shapeModel.length; i++){
 			let shape = activeLayer.shapeModel[i];
@@ -372,19 +372,38 @@ Rectangle {
 	function fitToShapeList(shapeList, layer){
 		resetView();
 
+		let onlyOneLayer = layer !==undefined;
+		let margin_ = Style.marginXXL;
+
 		let minX = 1000000;
 		let minY = 1000000;
 		let maxX  = -1000000;
 		let maxY = -1000000;
 
-		let clipRect = layer.clipRect;
-		if(clipRect.width == 0 && clipRect.height == 0){
-			clipRect.width = canvas.width
-			clipRect.height = canvas.height
+		let screenPointBottomLeftX = 0;
+		let screenPointBottomLeftY = graphicsView.height;
+
+		let clipRectWidth = graphicsView.width;
+		let clipRectHeight = graphicsView.height;
+
+		if(onlyOneLayer){
+			let clipRect = layer.clipRect;
+			if(clipRect.width == 0 && clipRect.height == 0){
+				clipRect.width = canvas.width
+				clipRect.height = canvas.height
+			}
+			clipRectWidth = clipRect.width;
+			clipRectHeight = clipRect.height;
+			screenPointBottomLeftX = clipRect.x
+			screenPointBottomLeftY = clipRect.y + clipRect.height
 		}
+
 		for (let i = 0; i < shapeList.length; i++){
 			let shape = shapeList[i];
 			let boundingBoxPoints = shape.getBoundingBoxPoints();
+			if(!Object.keys(boundingBoxPoints).length){
+				continue;
+			}
 
 			if((boundingBoxPoints.topLeftPoint).x < minX){
 				minX = boundingBoxPoints.topLeftPoint.x
@@ -398,10 +417,14 @@ Rectangle {
 			if((boundingBoxPoints.bottomRightPoint).y > maxY){
 				maxY = boundingBoxPoints.bottomRightPoint.y
 			}
+
+			if(!onlyOneLayer){
+
+			}
 		}
-		let margin_ = Style.marginXXL
-		let zoomX = (clipRect.width - margin_)/((maxX - minX)!==0 ? (maxX - minX) : 1)
-		let zoomY = (clipRect.height - margin_)/((maxY - minY)!==0 ? (maxY - minY) : 1)
+
+		let zoomX = (clipRectWidth - margin_)/((maxX - minX)!==0 ? Math.abs(maxX - minX) : 1)
+		let zoomY = (clipRectHeight - margin_)/((maxY - minY)!==0 ? Math.abs(maxY - minY) : 1)
 		let zoom = Math.min(zoomX, zoomY)
 		graphicsView.setZoom(zoom)
 
@@ -410,9 +433,10 @@ Rectangle {
 		canvasMatrix.setXTranslation(canvas.deltaX)
 		canvasMatrix.setYTranslation(canvas.deltaY)
 
-		let matrix = canvasMatrix.multiplyByMatrix(canvasMatrix.matrix, layer.layerMatrix.matrix)
-		let screenPointMinXMinY = canvasMatrix.transformPoint(Qt.point(minX, minY), matrix);
-		let screenPointBottomLeft = Qt.point(clipRect.x + margin_/2, clipRect.y + clipRect.height - margin_/2)
+		let screenPointBottomLeft = Qt.point(screenPointBottomLeftX + margin_/2, screenPointBottomLeftY - margin_/2)
+
+		let matrix = LinearAlgebra.multiplyByMatrix3x3(canvasMatrix.matrix, layer.layerMatrix.matrix)
+		let screenPointMinXMinY = LinearAlgebra.transformPoint2d(Qt.point(minX, minY), matrix);
 
 		canvas.deltaX += (screenPointBottomLeft.x - screenPointMinXMinY.x)
 		canvas.deltaY += (screenPointBottomLeft.y - screenPointMinXMinY.y)

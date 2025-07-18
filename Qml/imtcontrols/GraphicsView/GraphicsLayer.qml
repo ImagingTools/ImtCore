@@ -2,6 +2,9 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
+import imtcontrols 1.0
+
+
 QtObject {
 	id: layer;
 
@@ -69,7 +72,7 @@ QtObject {
 			ctx.clip()
 		}
 
-		tempMatrix.matrix = tempMatrix.multiplyByMatrix(viewMatrix.matrix, layerMatrix.matrix)
+		tempMatrix.matrix = LinearAlgebra.multiplyByMatrix3x3(viewMatrix.matrix, layerMatrix.matrix)
 		//tempMatrix.setContextTransform(ctx)
 
 		for(let i = 0; i < shapeModel.length; i++){
