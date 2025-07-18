@@ -55,8 +55,11 @@ GraphicsShapeBase {
 		return Qt.point((cornerPointList.topLeftPoint.x + cornerPointList.topRightPoint.x)/2,0, (cornerPointList.topRightPoint.y + cornerPointList.bottomRightPoint.y)/2);
 	}
 
-	function getBoundingBoxPoints(){
-		let pointsObj = {};
+	function getBoundingBoxPoints(isScreenPosition){
+		if(isScreenPosition == undefined){
+			isScreenPosition = false;
+		}
+		let pointsObj = ({});
 
 		let minX = 1000000;
 		let minY = 1000000;

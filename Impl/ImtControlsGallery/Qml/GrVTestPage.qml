@@ -132,6 +132,9 @@ Rectangle {
 		anchors.rightMargin: Style.marginL
 
 		width: 200;
+
+		spacing: 20;
+
 		BaseText{
 			font.pixelSize: Style.fontSizeL
 
@@ -146,6 +149,12 @@ Rectangle {
 		// 	font.pixelSize: Style.fontSizeL
 
 		// 	text: "DeltaY: " + view.deltaY
+		// }
+
+		// Button{
+		// 	text: "button"
+		// 	onClicked: {
+		// 	}
 		// }
 	}
 
@@ -191,6 +200,8 @@ Rectangle {
 			activeLayer.addShape(lineObjBlue);
 			let lineObjGreen = polylineCompGreen.createObject(this);
 			activeLayer.addShape(lineObjGreen);
+
+			view.fitToShape(lineObjRed)
 
 			//PERFORMANCE TEST
 

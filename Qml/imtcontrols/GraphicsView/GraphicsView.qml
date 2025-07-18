@@ -374,7 +374,7 @@ Rectangle {
 
 		let minX = 1000000;
 		let minY = 1000000;
-		let maxX  = -1000000
+		let maxX  = -1000000;
 		let maxY = -1000000;
 
 		let clipRect = layer.clipRect;
