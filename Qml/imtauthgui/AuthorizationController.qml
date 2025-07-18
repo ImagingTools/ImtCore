@@ -16,7 +16,7 @@ QtObject {
 	property string productId: "";
 	
 	signal userModeChanged(string userMode);
-	signal superuserExistResult(bool exists, string type, string error);
+	signal superuserExistResult(string status, string error);
 	signal loginFailed();
 	
 	signal loggedIn();
@@ -58,8 +58,8 @@ QtObject {
 	
 	property SuperuserProvider superuserProvider: SuperuserProvider {
 		onResult: {
-			if (exists){
-				if (Qt.platform.os == "web"){
+			if (status === "EXISTS"){
+				if (Qt.platform.os === "web"){
 					let token = localStorage.getItem("accessToken");
 					let refreshToken = localStorage.getItem("refreshToken");
 					if (token && token !== ""){
@@ -75,7 +75,7 @@ QtObject {
 				}
 			}
 			
-			root.superuserExistResult(exists, type, error)
+			root.superuserExistResult(status, error)
 		}
 		
 		function getHeaders(){
@@ -180,7 +180,7 @@ QtObject {
 		setAccessToken("");
 		setRefreshToken("");
 		
-		if (Qt.platform.os == "web"){
+		if (Qt.platform.os === "web"){
 			removeDataFromStorage();
 		}
 		

@@ -392,18 +392,17 @@ Item {
 			}
 		}
 		
-		function onSuperuserExistResult(exists, type, message){
-			console.log("onSuperuserExistResult", exists, type, message)
-			if (exists){
+		function onSuperuserExistResult(status, message){
+			console.log("onSuperuserExistResult", status, message)
+			if (status === "EXISTS"){
 				thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
 			}
+			else if (status === "NOT_EXISTS"){
+				thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
+			}
 			else{
-				if (type === CheckSuperuserErrorTypeTypeMetaInfo.s_notExists){
-					thumbnailDecorator.showPage(thumbnailDecorator.superuserPasswordPageComp)
-				}
-				else if (type === CheckSuperuserErrorTypeTypeMetaInfo.s_dbNotConnection){
-					application.showMessagePage(message);
-				}
+				// UNKNOWN
+				application.showMessagePage(message);
 			}
 		}
 		

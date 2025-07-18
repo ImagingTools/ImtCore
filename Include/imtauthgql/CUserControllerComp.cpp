@@ -432,15 +432,13 @@ sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuse
 		return retVal;
 	}
 
-	response.exists = false;
-	response.errorType = "";
 	response.message = "";
 
 	if (m_databaseConnectionCheckerCompPtr.IsValid()){
 		QString connectionMessage;
 		bool ok = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(connectionMessage);
 		if (!ok){
-			response.errorType = sdl::imtauth::Users::CCheckSuperuserErrorType::V1_0::CheckSuperuserErrorTypeFields::DbNotConnection;
+			response.status = sdl::imtauth::Users::ExistsStatus::UNKNOWN;
 			response.message = connectionMessage;
 
 			return retVal;
@@ -449,12 +447,11 @@ sdl::imtauth::Users::CCheckSuperuserPayload CUserControllerComp::OnCheckSuperuse
 
 	imtauth::IUserInfoSharedPtr userInfoPtr = GetUserInfoByLogin("su");
 	if (!userInfoPtr.IsValid()){
-		response.errorType = sdl::imtauth::Users::CCheckSuperuserErrorType::V1_0::CheckSuperuserErrorTypeFields::NotExists;
-
+		response.status = sdl::imtauth::Users::ExistsStatus::NOT_EXISTS;
 		return retVal;
 	}
 
-	response.exists = true;
+	response.status = sdl::imtauth::Users::ExistsStatus::EXISTS;
 
 	return retVal;
 }

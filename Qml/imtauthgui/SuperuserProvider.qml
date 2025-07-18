@@ -7,7 +7,7 @@ import imtauthUsersSdl 1.0
 QtObject {
 	id: root;
 
-	signal result(bool exists, string type, string error);
+	signal result(string status, string error);
 
 	signal modelStateChanged(string state);
 
@@ -30,7 +30,7 @@ QtObject {
 		sdlObjectComp: Component {
 			CheckSuperuserPayload {
 				onFinished: {
-					root.result(m_exists, m_errorType, m_message);
+					root.result(m_status, m_message);
 				}
 			}
 		}

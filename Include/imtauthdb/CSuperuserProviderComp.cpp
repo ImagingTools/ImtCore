@@ -16,7 +16,7 @@ namespace imtauthdb
 
 // reimplemented (imtauth::ISuperuserProvider)
 
-bool CSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
+imtauth::ISuperuserProvider::ExistsStatus CSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
 {
 	if (m_userCollectionCompPtr.IsValid()){
 		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
@@ -34,11 +34,13 @@ bool CSuperuserProviderComp::SuperuserExists(QString& /*errorMessage*/) const
 
 		imtbase::ICollectionInfo::Ids userObjectIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 		if (!userObjectIds.isEmpty()){
-			return true;
+			return imtauth::ISuperuserProvider::ES_EXISTS;
 		}
+
+		return imtauth::ISuperuserProvider::ES_NOT_EXISTS;
 	}
 
-	return false;
+	return imtauth::ISuperuserProvider::ES_UNKNOWN;
 }
 
 

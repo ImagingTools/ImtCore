@@ -12,18 +12,17 @@ namespace imtauth
 class ISuperuserProvider: virtual public istd::IChangeable
 {
 public:
-	/**
-		Data model change notification flags.
-	*/
-	enum ChangeFlags
+	enum ExistsStatus
 	{
-		CF_SU_EXISTS = 0x36e7b88
+		ES_EXISTS,
+		ES_NOT_EXISTS,
+		ES_UNKNOWN
 	};
 
 	/**
 		Get information for exists superuser.
 	*/
-	virtual bool SuperuserExists(QString& errorMessage) const = 0;
+	virtual ExistsStatus SuperuserExists(QString& errorMessage) const = 0;
 
 	/**
 		Get information for superuser ID.

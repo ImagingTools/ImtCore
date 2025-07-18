@@ -137,9 +137,14 @@ type CheckSuperuserErrorType {
 	dbNotConnection: String
 }
 
+enum ExistsStatus {
+	EXISTS
+	NOT_EXISTS
+	UNKNOWN
+}
+
 type CheckSuperuserPayload {
-	errorType: String
-	exists: Boolean
+	status: ExistsStatus
 	message: String
 }
 

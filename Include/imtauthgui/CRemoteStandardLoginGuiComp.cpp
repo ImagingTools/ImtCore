@@ -295,12 +295,16 @@ void CRemoteStandardLoginGuiComp::OnConnectionStatusUpdate(
 
 		if (m_superuserProviderCompPtr.IsValid()){
 			QString errorMessage;
-			bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
-			if (superuserExists){
+			imtauth::ISuperuserProvider::ExistsStatus status = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
+			if (status == imtauth::ISuperuserProvider::ES_EXISTS){
 				StackedWidget->setCurrentIndex(US_USER_PASSWORD_LOGIN);
 			}
-			else{
+			else if (status == imtauth::ISuperuserProvider::ES_NOT_EXISTS){
 				StackedWidget->setCurrentIndex(US_ENTER_SU_PASSWORD);
+			}
+			else{
+				NoConnection->setText(errorMessage);
+				StackedWidget->setCurrentIndex(US_NO_CONNECTION_TO_SERVER);
 			}
 		}
 		break;
