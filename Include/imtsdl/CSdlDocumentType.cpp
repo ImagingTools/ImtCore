@@ -14,21 +14,6 @@ namespace imtsdl
 
 // public methods
 
-QString CSdlDocumentType::GetName() const
-{
-	return m_name;
-}
-
-
-void CSdlDocumentType::SetName(const QString& name)
-{
-	if (m_name != name){
-		istd::CChangeNotifier notifier(this);
-		m_name = name;
-	}
-}
-
-
 const CSdlEntryBase& CSdlDocumentType::GetReferenceType() const
 {
 	if (!m_referenceType.GetName().isEmpty()){

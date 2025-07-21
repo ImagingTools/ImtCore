@@ -63,9 +63,6 @@ public:
 				OT_EXPORT,
 				OT_GET_VIEW)
 
-	QString GetName() const;
-	void SetName(const QString& name);
-
 	const CSdlEntryBase& GetReferenceType() const;
 	void SetReferenceType(const CSdlType& referenceType);
 	void SetReferenceType(const CSdlUnion& referenceType);
@@ -102,7 +99,6 @@ public:
 										const QByteArray& valueTagId);
 
 private:
-	QString m_name;
 	CSdlType m_referenceType;
 	CSdlUnion m_referenceUnionType;
 	QMultiMap<OperationType, CSdlRequest> m_operationsList;
