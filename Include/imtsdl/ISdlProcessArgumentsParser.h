@@ -1,7 +1,10 @@
 #pragma once
 
 
-//Acf includes
+// Qt includes
+#include <QtCore/QObject>
+
+// Acf includes
 #include <istd/IPolymorphic.h>
 
 // ImtCore includes
@@ -14,6 +17,8 @@ namespace imtsdl
 
 class ISdlProcessArgumentsParser: virtual public istd::IPolymorphic
 {
+	Q_GADGET
+
 public:
 	static inline const QString s_sourceFileType = QStringLiteral("CPP");
 	static inline const QString s_headerFileType = QStringLiteral("H");
@@ -26,6 +31,7 @@ public:
 		GT_CMAKE_PIPE,
 		GT_DEP_FILE
 	};
+	Q_ENUM(GeneratorType)
 
 	enum AutoLinkLevel
 	{
@@ -33,6 +39,7 @@ public:
 		ALL_SAME_NAMESPACE [[deprecated]] = 1,
 		ALL_ONLY_FILE = 2,				///< Compile only input file
 	};
+	Q_ENUM(AutoLinkLevel)
 
 	virtual bool SetArguments(int argc, char** argv);
 	virtual bool SetArguments(const QStringList& arguments) = 0;
