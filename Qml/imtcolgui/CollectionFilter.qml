@@ -17,37 +17,37 @@ import imtbaseComplexCollectionFilterSdl 1.0
 
 ComplexCollectionFilter{
 	id: root
-	
+
 	/*!
 		\qmlproperty Component fieldSortingInfoFact
 		Factory for creating sorting field info objects.
 	*/
 	property Component fieldSortingInfoFact: Component{ FieldSortingInfo{} }
-	
+
 	/*!
 		\qmlproperty Component groupFilterFact
 		Factory for creating group filter objects.
 	*/
 	property Component groupFilterFact: Component{ GroupFilter{} }
-	
+
 	/*!
 		\qmlproperty Component fieldFilterFact
 		Factory for creating field filter objects.
 	*/
 	property Component fieldFilterFact: Component{ FieldFilter{} }
-	
+
 	/*!
 		\qmlproperty Component baseModelFact
 		Factory for creating base model objects.
 	*/
 	property Component baseModelFact: Component{ BaseModel{} }
-	
+
 	/*!
 		\qmlproperty var textFilteringInfoIds
 		Array of field IDs used for text-based filtering.
 	*/
 	property var textFilteringInfoIds: []
-	
+
 	/*!
 		\qmlproperty var logicalOperation
 		Enumeration of logical operations: AND and OR.
@@ -56,7 +56,7 @@ ComplexCollectionFilter{
 										AND: "And",
 										OR: "Or"
 									})
-	
+
 	/*!
 		\qmlproperty var filterOperation
 		Enumeration of supported filter operations.
@@ -68,7 +68,7 @@ ComplexCollectionFilter{
 									   GREATER: "Greater",
 									   CONTAINS: "Contains"
 								   })
-	
+
 	/*!
 		\qmlproperty var valueType
 		Enumeration of value types used in filters.
@@ -79,7 +79,7 @@ ComplexCollectionFilter{
 								 STRING: "String",
 								 BOOL: "Bool"
 							 })
-	
+
 	/*!
 		\qmlsignal filterChanged
 		Emitted when the filter is changed.
@@ -93,7 +93,7 @@ ComplexCollectionFilter{
 	function createBaseModel(){
 		return baseModelFact.createObject(root)
 	}
-	
+
 	/*!
 		\qmlmethod string getTextFilter()
 		Returns the current text filter. (Placeholder, always returns empty string.)
@@ -101,7 +101,7 @@ ComplexCollectionFilter{
 	function getTextFilter(){
 		return ""
 	}
-	
+
 	/*!
 		\qmlmethod void setTextFilter(string filter)
 		Sets a new text filter using OR operation on the fields defined in \c textFilteringInfoIds.
@@ -113,25 +113,25 @@ ComplexCollectionFilter{
 
 		if (filter !== ""){
 			let fieldsModel = createBaseModel()
-			
+
 			for (let i = 0; i < textFilteringInfoIds.length; i++){
 				let infoId = textFilteringInfoIds[i]
 				let fieldObj = createFieldFilter(infoId, filter, valueType.STRING, [filterOperation.CONTAINS])
 				fieldsModel.addElement(fieldObj)
 			}
-			
+
 			let textGroupFilter = createGroupFilter(logicalOperation.OR, fieldsModel)
 			addGroupFilter(textGroupFilter)
 		}
 	}
-	
+
 	/*!
 		\qmlmethod void setSortingInfo(string infoId, string sortOrder)
 		Sets sorting info by field ID and sort order.
 	*/
 	function setSortingInfo(infoId, sortOrder){
 		clearSortFilter()
-		
+
 		let obj = fieldSortingInfoFact.createObject(m_sortingInfo)
 		obj.m_fieldId = infoId
 		obj.m_sortingOrder = sortOrder
@@ -141,7 +141,7 @@ ComplexCollectionFilter{
 
 		m_sortingInfo.addElement(obj)
 	}
-	
+
 	/*!
 		\qmlmethod object getSortingInfo()
 		Returns the first sorting info item or null if not set.
@@ -152,7 +152,7 @@ ComplexCollectionFilter{
 		}
 		return null
 	}
-	
+
 	/*!
 		\qmlmethod void setFilteringInfoIds(var filteringInfoIds)
 		Sets the array of text filtering field IDs.
@@ -160,14 +160,14 @@ ComplexCollectionFilter{
 	function setFilteringInfoIds(filteringInfoIds){
 		root.textFilteringInfoIds = filteringInfoIds
 	}
-	
+
 	/*!
 		\qmlmethod object createGroupFilter(string operation, object fields, object groups)
 		Creates a group filter using given logical operation, fields, and subgroups.
 	*/
 	function createGroupFilter(operation, fields, groups){
 		let groupObj = groupFilterFact.createObject(m_fieldsFilter)
-		
+
 		if (fields){
 			groupObj.m_fieldFilters = fields
 		}
@@ -175,10 +175,10 @@ ComplexCollectionFilter{
 			groupObj.m_groupFilters = groups
 		}
 		groupObj.m_logicalOperation = operation || logicalOperation.AND
-		
+
 		return groupObj
 	}
-	
+
 	/*!
 		\qmlmethod void addGroupFilter(object group)
 		Adds a group filter to the fields filter.
@@ -197,7 +197,7 @@ ComplexCollectionFilter{
 
 		m_fieldsFilter.m_groupFilters.addElement(group)
 	}
-	
+
 	/*!
 		\qmlmethod object createFieldFilter(string fieldId, variant value, string valueType, var operations)
 		Creates and returns a new field filter.
@@ -210,7 +210,7 @@ ComplexCollectionFilter{
 		fieldObj.m_filterOperations = operations
 		return fieldObj
 	}
-	
+
 	/*!
 		\qmlmethod void addFieldFilter(object field)
 		Adds a field filter to the fields filter.
@@ -227,7 +227,7 @@ ComplexCollectionFilter{
 
 		m_fieldsFilter.m_fieldFilters.addElement(field)
 	}
-	
+
 	/*!
 		\qmlmethod bool removeFieldFilter(object field)
 		Removes the given field filter. Returns true if found and removed.
@@ -249,7 +249,33 @@ ComplexCollectionFilter{
 		}
 		return false
 	}
-	
+
+	/*!
+		\qmlmethod bool removeFilterByFieldId(string field)
+		Removes the given field filter by fieldId. Returns true if found and removed.
+		Does not delete items located inside groups!!!
+	*/
+	function removeFilterByFieldId(fieldId){
+		if (!hasFieldsFilter()){
+			return false
+		}
+
+		if (!m_fieldsFilter.hasFieldFilters()){
+			return false
+		}
+
+		let retVal = false
+		for (let i = m_fieldsFilter.m_fieldFilters.count - 1; i >= 0; i--){
+			let item = m_fieldsFilter.m_fieldFilters.get(i).item
+			if (item.m_fieldId === fieldId){
+				m_fieldsFilter.m_fieldFilters.remove(i)
+				retVal = true
+			}
+		}
+
+		return retVal
+	}
+
 	/*!
 		\qmlmethod bool removeGroupFilter(object group)
 		Removes the given group filter. Returns true if found and removed.
@@ -270,7 +296,7 @@ ComplexCollectionFilter{
 		}
 		return false
 	}
-	
+
 	/*!
 		\qmlmethod void setTimeFilter(object timeFilter)
 		Applies a given time filter by copying it into the internal time filter.
@@ -285,7 +311,7 @@ ComplexCollectionFilter{
 			m_timeFilter.copyFrom(timeFilter)
 		}
 	}
-	
+
 	/*!
 		\qmlmethod void clearAllFilters()
 		Clears all filters: sorting, fields, time, and distinct filters.
@@ -296,7 +322,7 @@ ComplexCollectionFilter{
 		clearTimeFilter()
 		clearDistinctFilter()
 	}
-	
+
 	/*!
 		\qmlmethod void clearSortFilter()
 		Clears all sorting filters.
@@ -306,7 +332,7 @@ ComplexCollectionFilter{
 			m_sortingInfo.clear()
 		}
 	}
-	
+
 	/*!
 		\qmlmethod void clearFieldsFilter()
 		Clears all field and group filters.
@@ -322,7 +348,7 @@ ComplexCollectionFilter{
 			removeFieldsFilter()
 		}
 	}
-	
+
 	/*!
 		\qmlmethod void clearTimeFilter()
 		Clears the time filter parameters.
@@ -332,7 +358,7 @@ ComplexCollectionFilter{
 			removeTimeFilter()
 		}
 	}
-	
+
 	/*!
 		\qmlmethod void clearDistinctFilter()
 		Clears the distinct fields array.
@@ -340,7 +366,7 @@ ComplexCollectionFilter{
 	function clearDistinctFilter(){
 		m_distinctFields = []
 	}
-	
+
 	/*!
 		\qmlmethod bool timeFilterIsEmpty()
 		Returns true if the time filter has no meaningful values.
@@ -353,10 +379,10 @@ ComplexCollectionFilter{
 					m_timeFilter.m_interpretationMode === "" &&
 					m_timeFilter.m_unitMultiplier === 0
 		}
-		
+
 		return true;
 	}
-	
+
 	/*!
 		\qmlmethod bool fieldsFilterIsEmpty()
 		Returns true if there are no field or group filters set.
@@ -369,7 +395,7 @@ ComplexCollectionFilter{
 
 		return true
 	}
-	
+
 	/*!
 		\qmlmethod bool isEmpty()
 		Returns true if all filters (time and field/group) are empty.
