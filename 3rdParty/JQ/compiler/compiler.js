@@ -1102,6 +1102,17 @@ class Instruction {
                 }
 
                 if (path.type === QtQml.Component && assignProperty.value.extends !== 'Component') {
+
+                    // code.add(`let ${this.name}=(__root.cachedComponents['${this.qmlFile.getName()}__${this.name}'] || __root.cachedComponent('${this.qmlFile.getName()}__${this.name}',class ${this.className} extends ${typeInfo.path} {
+                    //     static create(parent,context={},component=null){
+                    //         let ${this.name} = super.create(parent,context,component)
+                    //         ${this.name}.__${this.qmlFile.getContextName()} = context
+                    //         ${this.id ? this.name+'.__'+this.qmlFile.getContextName()+'.'+this.id+'='+this.name : ''}
+                    //         return ${this.name}
+                    //     }
+                    // })).create(${this.parent ? this.parent.name : 'null'},__context,`)
+
+
                     lazyCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,__context,`)
 
                     let childTypeInfo = assignProperty.value.getTypeInfo()

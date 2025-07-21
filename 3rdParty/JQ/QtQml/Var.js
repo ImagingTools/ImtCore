@@ -46,13 +46,19 @@ class Var extends Property {
                 name: name+'__destruction',
                 destruction: true
             }
-            if(oldValue instanceof JQModules.QtQml.QtObject){
-                destructionFunc.meta.parent = oldValue
-                oldValue['Component.destruction'].disconnect(destructionFunc)
+            if(oldValue instanceof JQModules.QtQml.QObject){
+                if(oldValue instanceof JQModules.QtQml.QtObject){
+                    destructionFunc.meta.parent = oldValue
+                    oldValue['Component.destruction'].disconnect(destructionFunc)
+                }
+                oldValue.__removeLink()
             }
-            if(currentValue instanceof JQModules.QtQml.QtObject){
-                destructionFunc.meta.parent = currentValue
-                currentValue['Component.destruction'].connect(destructionFunc)
+            if(currentValue instanceof JQModules.QtQml.QObject){
+                currentValue.__addLink()
+                if(oldValue instanceof JQModules.QtQml.QtObject){
+                    destructionFunc.meta.parent = currentValue
+                    currentValue['Component.destruction'].connect(destructionFunc)
+                }
             }
 
             Signal.get(target, name + 'Changed')(oldValue, currentValue)

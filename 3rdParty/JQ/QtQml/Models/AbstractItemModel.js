@@ -1,3 +1,4 @@
+const QObject = require("../QObject")
 const Property = require("../Property")
 const Int = require("../Int")
 const Signal = require("../Signal")
@@ -12,6 +13,9 @@ class AbstractItemModel {
 
         if(data){
             for(let key in data){
+                if(data[key] instanceof QObject){
+                    data[key].__addLink()
+                }
                 model[key] = data[key]
             }
         }
@@ -44,19 +48,32 @@ class AbstractItemModel {
                 if(key === 'index') {
                     if(!(key in target)) return parent.data.indexOf(proxy)
                 }
+                if(key === '__self') {
+                    return target
+                }
                 return target[key]
             },
             set(target, key, value){
-                target[key] = value
-                if(!properties[key]) properties[key] = []
+                if(target[key] !== value){
+                    if(target[key] instanceof QObject){
+                        target[key].__removeLink()
+                    }
 
-                for(let property of properties[key]){
-                    // property.__update()
-                    property.target.__proxy[property.name] = property.func()
+                    if(value instanceof QObject){
+                        value.__addLink()
+                    }
+
+                    target[key] = value
+                    if(!properties[key]) properties[key] = []
+
+                    for(let property of properties[key]){
+                        // property.__update()
+                        property.target.__proxy[property.name] = property.func()
+                    }
+
+                    parent.__propogate()
                 }
 
-                parent.__propogate()
-                
                 return true
             }
         })

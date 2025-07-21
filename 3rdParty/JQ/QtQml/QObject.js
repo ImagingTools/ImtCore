@@ -13,6 +13,11 @@ class QObject extends QBaseObject {
 
     static create(parent = null, properties = {}){
         let obj = super.create(parent, properties)
+
+        if(!parent) {
+            obj.__smart = true
+            obj.__links = 0
+        }
  
         if(parent) {
             if(parent instanceof JQModules.QtQuick.Flickable){
@@ -54,6 +59,21 @@ class QObject extends QBaseObject {
             this.__updateSimpleProperties()
             this.__updateProperties()
             this.__complete()
+        }
+    }
+
+    __addLink(){
+        if(this.__smart){
+            this.__links++
+        }
+    }
+
+    __removeLink(){
+        if(this.__smart){
+            this.__links--
+            if(this.__links === 0){
+                this.destroy()
+            }
         }
     }
 

@@ -96,7 +96,7 @@ class Signal extends BaseObject {
         }
 
         f.disconnect = (...args)=>{
-            if(!target.__connections[name]) return
+            if(!target.__connections || !target.__connections[name]) return
 
             let i = 0
             if(args.length === 1){
@@ -206,7 +206,7 @@ class Signal extends BaseObject {
         let name = connectionObj.name
         let connection = connectionObj.connection
 
-        if(target.__destroyed || !target.__connections[name]) return
+        if(target.__destroyed || !target.__connections || !target.__connections[name]) return
 
         let index = target.__connections[name].indexOf(connection)
         if(index >= 0){

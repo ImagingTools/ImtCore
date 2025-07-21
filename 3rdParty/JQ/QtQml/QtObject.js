@@ -31,15 +31,6 @@ class QtObject extends QObject {
 
     static create(parent = null, properties = {}){
         let obj = super.create(parent, properties)
-        // let self = obj.__self
-        // self.data = []
-        // self.data.target = self
-
-        // self.resources = []
-        // self.resources.target = self
-
-        // self.children = []
-        // self.children.target = self
 
         if(properties.model){
             let keys = Object.keys(properties.model)
@@ -74,7 +65,7 @@ class QtObject extends QObject {
 
         return obj
     }
-
+    
     __complete(){
         if(this.__completed) return
 
@@ -85,14 +76,6 @@ class QtObject extends QObject {
             this.__children[i].__complete()
         }
     }
-
-    // onJQAbstractModelChanged(oldValue, newValue){
-    //     this.index = this.JQAbstractModel.index
-
-    //     if(this.constructor.meta.model.auto){
-    //         this.model = this.JQAbstractModel
-    //     }
-    // }
 
     __removeChild(child){
         let index = -1
@@ -225,6 +208,17 @@ class QtObject extends QObject {
         
 
         for(let key in this){
+            if(key in this.constructor.meta && typeof this[key] === 'object'){
+                if(this[key] instanceof QObject){
+                    this[key].__removeLink()
+                } else {
+                    // if(Array.isArray(this[key])){
+                        
+                    // } else {
+
+                    // }
+                }
+            }
             delete this[key]
         }
 

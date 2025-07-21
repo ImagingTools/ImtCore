@@ -112,11 +112,21 @@ class ListModel extends QtObject {
 
         this.count = this.data.length
     }
+
     remove(index, count = 1){
         JQApplication.updateLater(this)
 
         this.__changeSet.push([index, index+count, 'remove'])
-        this.data.__splice(index, count)
+        let removed = this.data.__splice(index, count)
+
+        for(let r of removed){
+            let model = r.__self
+            for(let key in model){
+                if(model[key] instanceof JQModules.QtQml.QObject){
+                    model[key].__removeLink()
+                }
+            }
+        }
 
         this.count = this.data.length
     }

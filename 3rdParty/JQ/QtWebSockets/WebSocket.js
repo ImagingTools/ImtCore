@@ -93,6 +93,12 @@ class QWebSocket extends QtObject {
             this.__socket.send(message)
         }
     }
+
+    __destroy(){
+        this.__socket.close()
+        
+        super.__destroy()
+    }
 }
 
 

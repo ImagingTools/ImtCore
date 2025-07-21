@@ -180,8 +180,8 @@ class Repeater extends Item {
     }
 
     __destroy(){
-        if(this.__model && typeof this.__model === 'object' && !this.__model.__destroyed){
-            this.__model.__removeViewListener(this)
+        if (this.model && typeof this.model === 'object' && !Array.isArray(this.model) && !this.model.__destroyed) {
+            this.model.__removeViewListener(this)
         }
         this.__clear()
         super.__destroy()

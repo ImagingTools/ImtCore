@@ -23,6 +23,20 @@ class Component extends QQmlComponent {
             return this.__component.create(parent, properties, this.__context)
         }
     }
+
+    __destroy(){
+        if(this.__destroyed || !this.__destroying) return
+
+        JQApplication.MemoryController.delete(this)
+        super.__destroy()
+
+        for(let key in this){
+
+            delete this[key]
+        }
+
+        this.__destroyed = true
+    }
 }
 
 
