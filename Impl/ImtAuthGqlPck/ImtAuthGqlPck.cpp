@@ -139,6 +139,11 @@ I_EXPORT_COMPONENT(
 			"Group meta info delegate",
 			"Group Meta Info Delegate");
 
+I_EXPORT_COMPONENT(
+			RemoteUserController,
+			"Remote user controller",
+			"Remote User Controller");
+
 
 } // namespace ImtAuthGqlPck
 

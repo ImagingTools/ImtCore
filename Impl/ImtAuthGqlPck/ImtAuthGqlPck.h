@@ -31,6 +31,7 @@
 #include <imtauthgql/CRoleMetaInfoDelegateComp.h>
 #include <imtauthgql/CUserMetaInfoDelegateComp.h>
 #include <imtauthgql/CGroupMetaInfoDelegateComp.h>
+#include <imtauthgql/CRemoteUserControllerComp.h>
 
 
 /**
@@ -65,6 +66,7 @@ typedef imtauthgql::CGqlJwtSessionControllerComp GqlJwtSessionController;
 typedef imtauthgql::CRoleMetaInfoDelegateComp RoleMetaInfoDelegate;
 typedef imtauthgql::CUserMetaInfoDelegateComp UserMetaInfoDelegate;
 typedef imtauthgql::CGroupMetaInfoDelegateComp GroupMetaInfoDelegate;
+typedef imtauthgql::CRemoteUserControllerComp RemoteUserController;
 
 
 } // namespace ImtAuthGqlPck
