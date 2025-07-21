@@ -302,19 +302,20 @@ Rectangle {
 	function findObject(mouseX, mouseY){
 		//console.log("findObject", mouseX, mouseY)
 
+		canvasMatrix.setXTranslation(canvas.deltaX);
+		canvasMatrix.setYTranslation(canvas.deltaY);
+		canvasMatrix.setXScale(canvas.scaleCoeff);
+		canvasMatrix.setYScale(canvas.scaleCoeff);
+
 		for(let i = 0; i < graphicsView.layerModel.length ; i++){
 			let layer = graphicsView.layerModel[i];
 			if(layer.layerId == "active" /*|| layer.layerId == "inactive"*/){
 				let shapeModel = layer.shapeModel;
+
 				for(let j = 0; j < shapeModel.length; j++){
 					let shape = shapeModel[j];
 
-					canvasMatrix.setXTranslation(canvas.deltaX);
-					canvasMatrix.setYTranslation(canvas.deltaY);
-					canvasMatrix.setXScale(canvas.scaleCoeff);
-					canvasMatrix.setYScale(canvas.scaleCoeff);
 					let isInside =  shape.isInside(mouseX, mouseY)
-
 					if(isInside){
 						return shape;
 					}

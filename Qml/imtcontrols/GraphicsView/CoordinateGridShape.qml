@@ -14,6 +14,8 @@ BoundingBox {
 	property int fontSize: Style.fontSizeM;
 	property string fontColor: Style.borderColor2;
 	property string backgroundColor: Style.baseColor;
+	property string majorGridColor: Style.imagingToolsGradient1;
+	property string minorGridColor: Style.imagingToolsGradient0;
 
 	property string labelX: "X";
 	property string labelY: "Y";
@@ -60,7 +62,7 @@ BoundingBox {
 		ctx.lineWidth = 1;
 
 		ctx.fillStyle = backgroundColor;
-		ctx.strokeStyle = Style.imagingToolsGradient1;
+		ctx.strokeStyle = gridShape.majorGridColor;
 
 		//background
 		identityMatrix.setContextTransform(ctx);
@@ -76,7 +78,7 @@ BoundingBox {
 
 		//MINOR GRID
 		if(scaleCoeff >= 2){
-			ctx.strokeStyle = Style.imagingToolsGradient0;
+			ctx.strokeStyle = gridShape.minorGridColor;
 			let stepMinor = gridShape.gridStepMinor
 			//vertical minor lines
 			for(let i = 0; i * stepMinor < gridShape.viewItem.drawingAreaWidth - labelXWidth + deltaAddX; i++){//vertical lines
@@ -121,7 +123,7 @@ BoundingBox {
 		}
 
 		//MAJOR GRID
-		ctx.strokeStyle = Style.imagingToolsGradient1;
+		ctx.strokeStyle = gridShape.majorGridColor;
 		//vertical major lines
 		for(let i = 0; i * step  <= (gridShape.viewItem.drawingAreaWidth  /*- labelXWidth*/ + deltaAddX)/scaleCoeff; i++){//vertical lines
 			if(gridShape.thinningCheck(scaleCoeff, i)){
@@ -146,7 +148,7 @@ BoundingBox {
 			ctx.stroke();
 		}
 		//horizontal major lines
-		//ctx.strokeStyle = Style.imagingToolsGradient1;
+		//ctx.strokeStyle = gridShape.majorGridColor;
 		for(let i = 0; i * step <= (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY)/ scaleMax1 ; i++){//horizontal lines
 			if(gridShape.thinningCheck(scaleCoeff, i)){
 				continue
@@ -174,7 +176,7 @@ BoundingBox {
 		//MINOR GRID
 		if(scaleCoeff >= 2){
 			//ctx.strokeStyle = "violet"
-			ctx.strokeStyle = ctx.strokeStyle = Style.imagingToolsGradient0;
+			ctx.strokeStyle = gridShape.minorGridColor;
 			let stepMinor = gridShape.gridStepMinor
 			//vertical minor lines
 			for(let i = 1; i * stepMinor <= (deltaMinusX)/scaleCoeff + step; i++){//vertical lines
@@ -222,7 +224,7 @@ BoundingBox {
 
 		//MAJOR GRID
 		//ctx.strokeStyle = "red"
-		ctx.strokeStyle = Style.imagingToolsGradient1;
+		ctx.strokeStyle = gridShape.majorGridColor;
 		//vertical major lines
 		for(let i = 1; i * step  <= deltaMinusX/scaleCoeff + step; i++){//vertical lines
 			if(gridShape.thinningCheck(scaleCoeff, i)){

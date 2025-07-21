@@ -98,5 +98,71 @@ BoundingBox {
 			&& yArg < topLeftPoint.y + height_
 					)
 	}
+
+	function getBoundingBoxPoints(isScreenPosition){
+		if(isScreenPosition == undefined){
+			isScreenPosition = false;
+		}
+		if(!points.length){
+			return ({});
+		}
+		let pointsObj = ({});
+
+		let minX = 1000000;
+		let minY = 1000000;
+		let maxX  = -1000000
+		let maxY = -1000000;
+
+		if(!points.length){
+			minX = 0;
+			minY = 0;
+			maxX = 0;
+			maxY = 0;
+		}
+
+		let recPoints = [];
+		let params_ = getParams();
+
+		let width_ = params_.width !== undefined ? params_.width : width;
+		let height_ = params_.height !== undefined ? params_.height : height;
+
+		let point0 = points[0];
+		let point1 = Qt.point(point0.x + width_, point0.y)
+		let point2 = Qt.point(point0.x + width_, point0.y + height_)
+		let point3 = Qt.point(point0.x, point0.y + height_)
+
+		recPoints.push(point0)
+		recPoints.push(point1)
+		recPoints.push(point2)
+		recPoints.push(point3)
+
+		for(let i = 0; i < recPoints.length; i++){
+			let point = recPoints[i]
+			if(isScreenPosition){
+				point = getScreenPosition(point);
+			}
+			let x_ = point.x
+			let y_ = point.y
+			if(x_ < minX){
+				minX = x_
+			}
+			if(y_ < minY){
+				minY = y_
+			}
+			if(x_ > maxX){
+				maxX = x_
+			}
+			if(y_ > maxY){
+				maxY = y_
+			}
+		}
+
+		pointsObj.topLeftPoint = Qt.point(minX, minY)
+		pointsObj.topRightPoint = Qt.point(maxX, minY)
+		pointsObj.bottomLeftPoint = Qt.point(minX, maxY)
+		pointsObj.bottomRightPoint = Qt.point(maxX, maxY)
+
+		return pointsObj;
+	}
 }
 

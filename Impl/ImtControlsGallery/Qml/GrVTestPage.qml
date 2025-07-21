@@ -47,13 +47,15 @@ Rectangle {
 		// Button{
 		// 	text: "test"
 		// 	onClicked: {
-		// 		let shapeList  = []
-		// 		let activeLayer = view.getActiveLayer()
-		// 		shapeList.push(view.shape1) //blue
-		// 		shapeList.push(view.shape2) //green
-		// 		shapeList.push(view.shape3) //red
+		// 		// let shapeList  = []
+		// 		// let activeLayer = view.getActiveLayer()
+		// 		// shapeList.push(view.shape1) //blue
+		// 		// shapeList.push(view.shape2) //green
+		// 		// shapeList.push(view.shape3) //red
 
-		// 		view.fitToShapeList(shapeList)
+		// 		// view.fitToShapeList(shapeList)
+
+
 		// 	}
 		// }
 	}
