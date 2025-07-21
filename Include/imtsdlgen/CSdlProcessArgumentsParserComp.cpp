@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtsdlgen/imtsdlgen.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdlgen/CConfigReader.h>
 
 
 namespace imtsdlgen
@@ -58,6 +59,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	commandLineParser.addHelpOption();
 	commandLineParser.addVersionOption();
 
+	/// \todo add 'Template/enable' 'Template/output' options
+
 	QCommandLineOption schemaFilePathOption({"S","schema-file"}, "SDL schema file path", "SchemaFilePath");
 	QCommandLineOption outputDirectoryPathOption({"O","output-directory"}, "Directory where created files will be created", "OutputDirectoryPath");
 	QCommandLineOption namespaceOption({"N","namespace"}, "Namespace, used in source and header files", "Namespace");
@@ -79,6 +82,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	QCommandLineOption moduleIncludePathsOption({"E", "extend", "add-module-path"}, "Specifies the file locations where the modules could be found.", "ExternalModulePaths");
 	QCommandLineOption depFileParhOption("DEPFILE", "Depfile, used by CMake to collect dependencies. MUST be a valid file path if 'generator' option is 'DEPFILE'. If the file exsists it will be overwritten!", "DEPFILE");
 	QCommandLineOption moduleOutFilePathOption("module-out-path", "Defines a path where a module file should ble created. NOTE: this option enables 'generate-module' option");
+	QCommandLineOption configFilePathOption("config", "Defines a path to a file with initial configuration. NOTE: The parameters from the configuration file may be overridden by command line arguments. WARNING: path MUST be a valid path to existing file!", "config");
 
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
@@ -160,6 +164,20 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 
 	commandLineParser.process(arguments);
 
+	// first read the config
+	if (commandLineParser.isSet(configFilePathOption)){
+		CConfigReader configReader;
+		const bool isRead = configReader.ReadFromFile(commandLineParser.value(configFilePathOption));
+		if(!isRead){
+			SendErrorMessage(0, "Unable to read config file. Aborting...");
+
+			return false;
+		}
+		/// \todo contunie here
+
+	}
+
+	// then override/add parameters, provided by command line
 	if (commandLineParser.isSet(schemaFilePathOption)){
 		m_schemaFilePath = commandLineParser.value(schemaFilePathOption);
 		MakePathAbsolute(m_schemaFilePath);
