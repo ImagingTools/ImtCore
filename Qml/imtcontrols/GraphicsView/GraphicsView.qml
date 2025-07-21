@@ -759,6 +759,7 @@ Rectangle {
 			id: canvas
 
 			anchors.fill: parent;
+			renderStrategy: Canvas.Threaded
 
 			//antialiasing: true;
 
