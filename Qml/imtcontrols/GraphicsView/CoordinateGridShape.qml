@@ -14,8 +14,9 @@ BoundingBox {
 	property int fontSize: Style.fontSizeM;
 	property string fontColor: Style.borderColor2;
 	property string backgroundColor: Style.baseColor;
-	property string majorGridColor: Style.imagingToolsGradient1;
-	property string minorGridColor: Style.imagingToolsGradient0;
+	property string majorGridColor: Style.borderColor2;
+	property string minorGridColor: Style.borderColor;
+	property string axesColor: Style.borderColor2;
 
 	property string labelX: "X";
 	property string labelY: "Y";
@@ -287,7 +288,7 @@ BoundingBox {
 
 		ctx.font = String(fontSize) + "px sans-serif"//"14px sans-serif"
 
-		ctx.strokeStyle = Style.borderColor;
+		ctx.strokeStyle = gridShape.axesColor;
 		ctx.fillStyle = gridShape.fontColor;
 
 		//label x
@@ -403,7 +404,7 @@ BoundingBox {
 
 		//horizontal axe
 		ctx.lineWidth = 2;
-		ctx.strokeStyle = Style.borderColor;
+		ctx.strokeStyle = gridShape.axesColor;
 		ctx.beginPath()
 		ctx.moveTo(leftXAxePoint.x, leftXAxePointTr.y);
 		ctx.lineTo(rightXAxePoint.x - marginForXNameLabel, rightXAxePointTr.y);

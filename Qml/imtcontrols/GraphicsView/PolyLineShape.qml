@@ -16,9 +16,6 @@ BoundingBox {
 		if(showNodes){
 			drawNodes(ctx, transformMatrixArg)
 		}
-		if(highlightedNodeIndex >-1  && highlightedNodeCoordinate !==undefined){
-			drawSelectedNode(ctx, highlightedNodeCoordinate, transformMatrixArg)
-		}
 	}
 
 	function drawBase(ctx, transformMatrixArg){
@@ -49,18 +46,14 @@ BoundingBox {
 		ctx.beginPath()
 		for(let i = 0;i < points.length; i++){
 			let point = getScreenPosition(points[i]);
-			DesignScheme.drawNode(ctx, point)
+			if(i == highlightedNodeIndex){
+				DesignScheme.drawSelectedNode(ctx, point);
+			}
+			else {
+				DesignScheme.drawNode(ctx, point)
+			}
 		}
 		ctx.closePath();
-	}
-
-	function drawSelectedNode(ctx, point, transformMatrixArg){
-		let params = getParams()
-		point = getScreenPosition(point)
-		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
-		ctx.fillStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
-		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
-		DesignScheme.drawSelectedNode(ctx, point);
 	}
 
 	function getPointDescription(pointIndex){
