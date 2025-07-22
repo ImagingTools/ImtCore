@@ -4,6 +4,7 @@
 
 //Qt includes
 #include <QtCore/QSettings>
+#include <QtCore/QMetaEnum>
 
 
 namespace imtsdlgen
@@ -43,6 +44,50 @@ void SetVariableFromConfig(const QSettings& configuration, const QString& valueN
 }
 
 
+template <class T>
+bool ConvertStringToEnum(const QString& value, T& output)
+{
+	bool retVal = false;
+	QMetaEnum metaEnum = QMetaEnum::fromType<T>();
+	int enumValue = metaEnum.keyToValue(value.toStdString().c_str(), &retVal);
+
+	if (!retVal){
+		QStringList expectedValues;
+		for (int i = 0; i < metaEnum.keyCount(); i++) {
+			expectedValues << metaEnum.key(i);
+		}
+
+		qCritical() << "Unexpected enum value. Expected one of: " << expectedValues.join("; ");
+	}
+	else {
+		output = T(enumValue);
+	}
+
+	return retVal;
+}
+
+
+template <class T>
+bool SetEnumVariableFromConfig(const QSettings& configuration, const QString& valueName, std::optional<T>& output)
+{
+	QString typeValue;
+	SetVariableFromConfig(configuration, valueName, typeValue);
+	if (!typeValue.isEmpty()){
+		T tempVal;
+		bool isValid = ConvertStringToEnum(typeValue, tempVal);
+		if (!isValid){
+			qCritical() << "Configuration error. Unexpected" << valueName << "value. Actual: " << typeValue;
+
+			return false;
+		}
+
+		output = tempVal;
+	}
+
+	return true;
+}
+
+
 
 // public methods
 
@@ -78,6 +123,13 @@ bool CConfigReader::ReadFromFile(const QString& filePath)
 	SetVariableFromConfig(configuration, QStringLiteral("schema-dependencies"), schemaDependencyModeEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("generate-module"), generateMode);
 
+	if (!SetEnumVariableFromConfig(configuration, QStringLiteral("generator"), generatorType)){
+		return false;
+	}
+	if (!SetEnumVariableFromConfig(configuration, QStringLiteral("auto-link"), autoLinkLevel)){
+		return false;
+	}
+
 	if (configuration.contains(QStringLiteral("base-class"))){
 		const QVariantMap baseClassMap = configuration.value(QStringLiteral("base-class")).toMap();
 		if (!baseClassMap.isEmpty()){
@@ -90,13 +142,7 @@ bool CConfigReader::ReadFromFile(const QString& filePath)
 
 	SetVariableFromConfig(configuration, QStringLiteral("Template/enable"), templateEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("Template/output"), outputDirTemplate);
-
-	QString generatorTypeValue;
-	SetVariableFromConfig(configuration, QStringLiteral("generator"), generatorTypeValue);
-
-	QString autoLinkLevelValue;
-	SetVariableFromConfig(configuration, QStringLiteral("auto-link"), autoLinkLevelValue);
-
+	SetVariableFromConfig(configuration, QStringLiteral("Template/include-path"), includePathTemplate);
 
 	return true;
 }

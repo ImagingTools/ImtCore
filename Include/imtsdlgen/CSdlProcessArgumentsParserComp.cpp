@@ -32,6 +32,15 @@ void MakePathAbsolute(QStringList& paths)
 }
 
 
+template <class T>
+void UpdateValueFromOptionalValue(const std::optional<T>& source, T& destination)
+{
+	if (source){
+		destination = *source;
+	}
+}
+
+
 // public methods
 
 CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
@@ -45,7 +54,7 @@ CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
 	m_schemaDependencyModeEnabled(false),
 	m_generatorType(GT_CMAKE),
 	m_autoJoinEnabled(false),
-	m_autolinkLevel(ALL_NONE),
+	m_autoLinkLevel(ALL_NONE),
 	m_isModuleGenerationEnabled(false)
 {
 }
@@ -59,7 +68,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	commandLineParser.addHelpOption();
 	commandLineParser.addVersionOption();
 
-	/// \todo add 'Template/enable' 'Template/output' options
+	/// \todo add 'Template/*' options, for CMDL parser
 
 	QCommandLineOption schemaFilePathOption({"S","schema-file"}, "SDL schema file path", "SchemaFilePath");
 	QCommandLineOption outputDirectoryPathOption({"O","output-directory"}, "Directory where created files will be created", "OutputDirectoryPath");
@@ -138,13 +147,13 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		}
 
 		// check option value names. Empty names can be duplicated
-		const QString optinValueName = option.valueName();
-		if (!optinValueName.isEmpty()){
-			if (optionValueNames.contains(optinValueName)){
-				SendCriticalMessage(0, QString("Duplication of option value ID '%1' is detected. All option value's IDs MUST be unique! Select another name for this option").arg(optinValueName));
+		const QString optionValueName = option.valueName();
+		if (!optionValueName.isEmpty()){
+			if (optionValueNames.contains(optionValueName)){
+				SendCriticalMessage(0, QString("Duplication of option value ID '%1' is detected. All option value's IDs MUST be unique! Select another name for this option").arg(optionValueName));
 				isOptionsAcceptable = false;
 			}
-			optionValueNames << optinValueName;
+			optionValueNames << optionValueName;
 		}
 	}
 	if (!isOptionsAcceptable){
@@ -173,8 +182,32 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 
 			return false;
 		}
-		/// \todo contunie here
 
+		UpdateValueFromOptionalValue(configReader.schemaFilePath, m_schemaFilePath);
+		UpdateValueFromOptionalValue(configReader.outputDirectoryPath, m_outputDirectoryPath);
+		UpdateValueFromOptionalValue(configReader.namespaceValue, m_namespace);
+		UpdateValueFromOptionalValue(configReader.namespacePrefix, m_namespacePrefix);
+		UpdateValueFromOptionalValue(configReader.dependenciesMode, m_isDependenciesMode);
+		UpdateValueFromOptionalValue(configReader.generateMode, m_isGenerateMode);
+		UpdateValueFromOptionalValue(configReader.enabledModificators, m_usedModificators);
+		UpdateValueFromOptionalValue(configReader.useAllModificators, m_useAllModificators);
+		UpdateValueFromOptionalValue(configReader.cppEnabled, m_cppEnabled);
+		UpdateValueFromOptionalValue(configReader.qmlEnabled, m_qmlEnabled);
+		UpdateValueFromOptionalValue(configReader.gqlEnabled, m_gqlEnabled);
+		UpdateValueFromOptionalValue(configReader.schemaDependencyModeEnabled, m_schemaDependencyModeEnabled);
+		UpdateValueFromOptionalValue(configReader.baseClassList, m_baseClassList);
+		UpdateValueFromOptionalValue(configReader.includePaths, m_includePaths);
+		UpdateValueFromOptionalValue(configReader.generatorType, m_generatorType);
+		UpdateValueFromOptionalValue(configReader.autoJoinEnabled, m_autoJoinEnabled);
+		UpdateValueFromOptionalValue(configReader.autoLinkLevel, m_autoLinkLevel);
+		UpdateValueFromOptionalValue(configReader.headersIncludePaths, m_headersIncludePaths);
+		UpdateValueFromOptionalValue(configReader.moduleIncludePaths, m_moduleIncludePathList);
+		UpdateValueFromOptionalValue(configReader.depFilePath, m_depFilePath);
+		UpdateValueFromOptionalValue(configReader.moduleOutputFilePath, m_moduleOutputFilePath);
+		UpdateValueFromOptionalValue(configReader.moduleGenerateEnabled, m_isModuleGenerationEnabled);
+		UpdateValueFromOptionalValue(configReader.templateEnabled, m_isTemplateEnabled);
+		UpdateValueFromOptionalValue(configReader.outputDirTemplate, m_outputDirTemplate);
+		UpdateValueFromOptionalValue(configReader.includePathTemplate, m_includePathTemplate);
 	}
 
 	// then override/add parameters, provided by command line
@@ -277,7 +310,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 			return false;
 		}
 
-		m_autolinkLevel = AutoLinkLevel(autoLinkLevel);
+		m_autoLinkLevel = AutoLinkLevel(autoLinkLevel);
 	}
 
 	if (commandLineParser.isSet(generatorOption)){
@@ -510,7 +543,7 @@ bool CSdlProcessArgumentsParserComp::IsAutoJoinEnabled() const
 
 imtsdl::ISdlProcessArgumentsParser::AutoLinkLevel CSdlProcessArgumentsParserComp::GetAutoLinkLevel() const
 {
-	return m_autolinkLevel;
+	return m_autoLinkLevel;
 }
 
 
@@ -684,8 +717,8 @@ void CSdlProcessArgumentsParserComp::SetAutoJoinEnabled(bool enabled)
 
 void CSdlProcessArgumentsParserComp::SetAutoLinkLevel(AutoLinkLevel level)
 {
-	if (m_autolinkLevel != level){
-		m_autolinkLevel = level;
+	if (m_autoLinkLevel != level){
+		m_autoLinkLevel = level;
 	}
 }
 

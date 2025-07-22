@@ -46,6 +46,7 @@ public:
 	std::optional<bool> moduleGenerateEnabled;
 	std::optional<bool> templateEnabled;
 	std::optional<QString> outputDirTemplate;
+	std::optional<QString> includePathTemplate;
 };
 
 

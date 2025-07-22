@@ -123,12 +123,15 @@ private:
 	QStringList m_includePaths;
 	GeneratorType m_generatorType;
 	bool m_autoJoinEnabled;
-	AutoLinkLevel m_autolinkLevel;
+	AutoLinkLevel m_autoLinkLevel;
 	QStringList m_headersIncludePaths;
 	QStringList m_moduleIncludePathList;
 	QString m_depFilePath;
 	QString m_moduleOutputFilePath;
 	bool m_isModuleGenerationEnabled;
+	bool m_isTemplateEnabled;
+	QString m_outputDirTemplate;
+	QString m_includePathTemplate;
 };
 
 
