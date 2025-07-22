@@ -44,12 +44,57 @@ QtObject {
 		return retPoint
 	}
 
-
 	function intersectionLineWithLineSegment2d(linePoint1, linePoint2, segmentPoint1, segmentPoint2){
-		//TODO
 		let retPoint = Qt.point(0, 0);
 
+		let denominator = (segmentPoint2.y - segmentPoint1.y)(linePoint2.x - linePoint1.x) -
+			(segmentPoint2.x - segmentPoint1.x)(linePoint2.y - linePoint1.y)
+
+		if(denominator == 0){
+			return null;
+		}
+
+		let numerator = (linePoint2.x  - linePoint1.x)*(linePoint1.y - segmentPoint1.y) -
+			(linePoint2.y  - linePoint1.y)*(linePoint1.x - segmentPoint1.x)
+
+		let u_segm =  numerator / denominator;
+
+		retPoint.x = segmentPoint1.x + u_segm * (segmentPoint2.x - segmentPoint1.x)
+		retPoint.y = segmentPoint1.y + u_segm * (segmentPoint2.y - segmentPoint1.y)
+
 		return retPoint
+	}
+
+	function hasIntersectionLineWithLineSegment2d(linePoint1, linePoint2, segmentPoint1, segmentPoint2){
+		let numerator = (linePoint2.x  - linePoint1.x)*(linePoint1.y - segmentPoint1.y) -
+			(linePoint2.y  - linePoint1.y)*(linePoint1.x - segmentPoint1.x)
+
+		let denominator = (segmentPoint2.y - segmentPoint1.y)(linePoint2.x - linePoint1.x) -
+			(segmentPoint2.x - segmentPoint1.x)(linePoint2.y - linePoint1.y)
+
+		if(numerator == 0 && denominator == 0){
+			return true;
+		}
+		else if(denominator == 0){
+			return false;
+		}
+
+		let u_segm =  numerator / denominator;
+
+		if(u_segm >= 0 && u_segm <= 1){
+			return true;
+		}
+
+		return false
+	}
+
+	function pointInPolygon(point, poligonPointList){//TODO
+		let ok = false;
+		if(point == undefined || poligonPointList == undefined || poligonPointList.length < 3){
+			return false;
+		}
+
+		return ok;
 	}
 
 	function nearestPointOnLine2d(point, linePoint1, linePoint2, isSection){
