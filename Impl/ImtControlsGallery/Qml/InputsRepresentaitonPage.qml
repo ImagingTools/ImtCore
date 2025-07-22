@@ -9,6 +9,7 @@ Rectangle {
 
     anchors.fill: parent;
     clip: true;
+	color: Style.baseColor
 
     Component.onCompleted: {
         spinBox.forceActiveFocus();

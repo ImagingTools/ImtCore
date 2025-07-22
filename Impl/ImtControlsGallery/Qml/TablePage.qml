@@ -10,6 +10,7 @@ Rectangle {
 
     anchors.fill: parent;
     clip: true;
+	color: Style.baseColor
 
     property TreeItemModel items: TreeItemModel{};
 

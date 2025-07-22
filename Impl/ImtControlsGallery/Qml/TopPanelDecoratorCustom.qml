@@ -6,6 +6,8 @@ import imtcontrols 1.0
 DecoratorBase  {
     id: topPanelDecorator;
 
+	signal setDesignScheme(string designId);
+
     Rectangle {
         anchors.fill: parent
 
@@ -35,8 +37,16 @@ DecoratorBase  {
             KeyNavigation.right: qtStyleButton
             KeyNavigation.tab: qtStyleButton
 
-            text: "Dark theme";
+			property bool isLightTheme: true
+			text: isLightTheme ? "Dark theme" : "Light theme";
             onClicked: {
+				isLightTheme = !isLightTheme
+				if(isLightTheme){
+					topPanelDecorator.setDesignScheme("Light")
+				}
+				else {
+					topPanelDecorator.setDesignScheme("Dark")
+				}
             }
         }
 

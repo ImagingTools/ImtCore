@@ -12,6 +12,8 @@ Rectangle {
 
 	anchors.fill: parent;
 	clip: true;
+
+	color: Style.baseColor
 	
 	property string json: "{\"type\": \"data\",\"id\": \"70e4d6b5-7afe-4490-9b80-09636fc825e2\",\"payload\": {\"data\": {\"OnAccountsCollectionChanged\": {\"itemIds\":[\"dce1f9da-8a1b-40c7-b903-49076ab7e550\",\"0722c437-dbaf-4a09-ac64-411ca5bcb61c\"],\"operationContext\":{\"ownerId\":\"su\",\"ownerName\":\"superuser\"},\"typeOperation\":\"removed\"}}}}"
 	
@@ -304,7 +306,6 @@ Rectangle {
 
 		isFixedOrigin: false;
 		legendMargin: 20;
-
 	}
 
 }

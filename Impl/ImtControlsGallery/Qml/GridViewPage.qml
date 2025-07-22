@@ -11,6 +11,7 @@ Rectangle {
 
     anchors.fill: parent;
     clip: true;
+	color: Style.baseColor
 
     Text{
         id: title;

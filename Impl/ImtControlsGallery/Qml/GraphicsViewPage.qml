@@ -6,6 +6,9 @@ import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 import imtcolgui 1.0
 
+
+
+
 GraphicsView{
 	id: view;
 
@@ -13,6 +16,7 @@ GraphicsView{
 	hasRightButtonMenu: true;
 	property var drawModel: []
 
+	color: Style.baseColor
 
 	Component.onCompleted: {
 		//TEST

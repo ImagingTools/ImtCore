@@ -10,7 +10,11 @@ ApplicationMain {
 
     Component {
         id: topPanelDecoratorCustom
-        TopPanelDecoratorCustom {}
+		TopPanelDecoratorCustom {
+			onSetDesignScheme :{
+				window.designProvider.setDesignSchema(designId)
+			}
+		}
     }
 
     Decorators {

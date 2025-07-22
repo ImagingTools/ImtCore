@@ -9,6 +9,8 @@ import imtcolgui 1.0
 SchemeView{
 	id: scheme;
 
+	color: Style.baseColor
+
 	Component.onCompleted: {
 		//TEST
 		//links for test

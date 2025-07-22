@@ -10,6 +10,8 @@ Rectangle {
     anchors.fill: parent;
     clip: true;
 
+	color: Style.baseColor
+
     Component.onCompleted: {
         iconButton.forceActiveFocus();
         iconButton.focus = true;

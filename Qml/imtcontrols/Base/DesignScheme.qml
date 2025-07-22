@@ -24,12 +24,10 @@ QtObject {
 
 	function drawSelectedNode(ctx, point){
 		let radius = shapeSelectedPointSize;
-		ctx.beginPath();
 		ctx.moveTo(point.x, point.y);
 		ctx.arc(point.x, point.y, radius,  0, 2 * Math.PI, true);
 		ctx.stroke();
 		ctx.fill();
-		ctx.closePath();
 	}
 
 
