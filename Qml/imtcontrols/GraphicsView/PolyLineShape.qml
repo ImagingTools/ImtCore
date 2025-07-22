@@ -64,14 +64,21 @@ BoundingBox {
 		return obj
 	}
 
+	onMouseClicked: {
+		//let point  = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
+		//console.log("Mouse Clicked::: ", point.x, point.y)
+	}
+
 	onMousePositionChanged: {
-		let foundNodeIndex = findNodeIndex(mouseEvent)
+		let point  = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
+		let foundNodeIndex = findNodeIndex(point)
 		if(foundNodeIndex > -1){
 			highlightedNodeCoordinate = points[foundNodeIndex]
 		}
 		highlightedNodeIndex = foundNodeIndex;
 
 	}
+
 	onHighlightedNodeIndexChanged: {
 		shapeChanged()
 	}

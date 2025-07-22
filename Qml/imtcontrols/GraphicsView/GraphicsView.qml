@@ -346,11 +346,6 @@ Rectangle {
 		}
 		let activeLayer = getActiveLayer()
 
-		let matrix = LinearAlgebra.multiplyByMatrix3x3(canvasMatrix.matrix, activeLayer.layerMatrix.matrix)
-		matrix = LinearAlgebra.getInvertedMatrix3x3(matrix)
-
-		position = LinearAlgebra.transformPoint2d(position, matrix);
-
 		for (let i = 0; i < activeLayer.shapeModel.length; i++){
 			let shape = activeLayer.shapeModel[i];
 			shape.mousePositionChanged(position)
@@ -498,6 +493,13 @@ Rectangle {
 
 			onClicked: {
 				//console.log("CLICKED!!!")
+
+				let activeLayer = getActiveLayer()
+
+				for (let i = 0; i < activeLayer.shapeModel.length; i++){
+					let shape = activeLayer.shapeModel[i];
+					shape.mouseClicked(mouse)
+				}
 			}
 
 			onPressed: {
@@ -631,7 +633,7 @@ Rectangle {
 
 					let borderMargin = graphicsView.restrictMoveMargin;
 
-					let wasLimitCorrection = canvas.deltaCorrection(canvas.deltaX + delta.x, canvas.deltaY + delta.y)
+					let wasLimitCorrection = false//canvas.deltaCorrection(canvas.deltaX + delta.x, canvas.deltaY + delta.y)
 
 					let okScale = graphicsView.restrictMove && canvas.scaleCoeff <= graphicsView.minZoomLevel ? false : true
 					let okWidth = borderMargin < 0 ? true : canvas.deltaX + delta.x > -1*(canvas.width * canvas.scaleCoeff  - borderMargin)  && canvas.deltaX + delta.x < (canvas.width - borderMargin);
@@ -864,7 +866,7 @@ Rectangle {
 				let newX = (scaleX - canvas.deltaX) / scaleCoeffBack * newScale + canvas.deltaX
 				let newY = (scaleY - canvas.deltaY) / scaleCoeffBack * newScale + canvas.deltaY
 
-				let wasLimitCorrection = deltaCorrection(canvas.deltaX - (newX - scaleX), canvas.deltaY - (newY - scaleY), newScale);
+				let wasLimitCorrection = false//deltaCorrection(canvas.deltaX - (newX - scaleX), canvas.deltaY - (newY - scaleY), newScale);
 
 				if(!wasLimitCorrection){
 					canvas.deltaX -= (newX - scaleX)

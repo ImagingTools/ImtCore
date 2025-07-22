@@ -75,7 +75,7 @@ QtObject {
 		let foundIndex = -1
 		for(let i = 0; i < points.length; i++){
 			let point = points[i];
-			let pointSize = DesignScheme.shapePointSize + Style.marginXS;
+			let pointSize = (DesignScheme.shapePointSize + Style.marginXS)/viewItem.viewMatrix.xScale();
 			if(point.x >= position.x - pointSize
 				&& point.x <= position.x + pointSize
 				&& point.y >= position.y - pointSize
