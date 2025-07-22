@@ -70,6 +70,7 @@ BoundingBox {
 			highlightedNodeCoordinate = points[foundNodeIndex]
 		}
 		highlightedNodeIndex = foundNodeIndex;
+
 	}
 	onHighlightedNodeIndexChanged: {
 		shapeChanged()

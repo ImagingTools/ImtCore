@@ -52,6 +52,7 @@ QtObject {
 	}
 
 	function setPoints(pointList){
+		points = pointList
 	}
 
 
@@ -94,8 +95,10 @@ QtObject {
 		for(let i = 0; i < points.length; i++){
 			let point = points[i];
 			let pointNew = Qt.point(0,0);
-			pointNew.x = point.x + deltaX;
-			pointNew.y = point.y + deltaY;
+			let pointScreen = getScreenPosition(point)
+			pointNew.x = pointScreen.x + deltaX;
+			pointNew.y = pointScreen.y + deltaY;
+			pointNew = getLogPosition(pointNew)
 			pointsListNew.push(pointNew);
 		}
 		setPoints(pointsListNew);

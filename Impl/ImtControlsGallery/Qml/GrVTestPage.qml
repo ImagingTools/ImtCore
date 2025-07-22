@@ -111,11 +111,11 @@ Rectangle {
 
 			//activeLayer.addShape(lineObjRed);
 
-			view.shape1 = lineObjBlue;
+			// view.shape1 = lineObjBlue;
 
-			view.shape2 = lineObjGreen;
+			// view.shape2 = lineObjGreen;
 
-			view.shape3 = lineObjRed;
+			// view.shape3 = lineObjRed;
 
 			//view.fitToShape(lineObjRed)
 

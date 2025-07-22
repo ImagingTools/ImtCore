@@ -73,11 +73,11 @@ BoundingBox {
 			return points[0]
 	}
 
-	function getBoundingBoxWidth(){
+	function getBoundingBoxWidth(isScreenPosition){
 		return width;
 	}
 
-	function getBoundingBoxHeight(){
+	function getBoundingBoxHeight(isScreenPosition){
 		return height;
 	}
 

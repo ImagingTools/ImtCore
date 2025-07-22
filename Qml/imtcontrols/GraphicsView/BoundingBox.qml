@@ -138,22 +138,22 @@ GraphicsShapeBase {
 		return point.topLeftPoint
 	}
 
-	function getBoundingBoxWidth(){
+	function getBoundingBoxWidth(isScreenPosition){
 		if(!points.length){
 			return 0;
 		}
 
-		let point = getBoundingBoxPoints()
-		return (point.topRightPoint.x - point.topLeftPoint.x)
+		let pointsBB = getBoundingBoxPoints(isScreenPosition)
+		return (pointsBB.topRightPoint.x - pointsBB.topLeftPoint.x)
 	}
 
-	function getBoundingBoxHeight(){
+	function getBoundingBoxHeight(isScreenPosition){
 		if(!points.length){
 			return 0;
 		}
 
-		let point = getBoundingBoxPoints()
-		return (point.bottomLeftPoint.y - point.topLeftPoint.y)
+		let pointsBB = getBoundingBoxPoints(isScreenPosition)
+		return (pointsBB.bottomLeftPoint.y - pointsBB.topLeftPoint.y)
 	}
 
 	function draw(ctx, transformMatrixArg){

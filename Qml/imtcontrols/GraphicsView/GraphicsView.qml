@@ -11,7 +11,7 @@ Rectangle {
 
 	clip: true;
 
-	color: Style.imagingToolsGradient0;
+	color: Style.baseColor;
 
 	property BaseModel objectsModel: BaseModel {}
 
@@ -29,7 +29,7 @@ Rectangle {
 
 	property real scaleStep: 0.1;
 	property real minZoomLevel: -1;
-	property real maxZoomLevel: 10;
+	property real maxZoomLevel: 20;
 	property var translateXPositiveLimit;
 	property var translateYPositiveLimit;
 	property var translateXNegativeLimit;
@@ -72,7 +72,7 @@ Rectangle {
 	property bool hasLeftButtonMenu: false;
 	property bool hasRightButtonMenu: false;
 	property var leftMenuCoordinates: Qt.point(Style.marginM, Style.marginS);
-	property var rightMenuCoordinates: Qt.point(width - Style.marginM - Style.buttonWidthM, Style.marginS);
+	property var rightMenuCoordinates: Qt.point(width - Style.marginL - Style.buttonWidthL, Style.marginS);
 
 	signal copySignal(int index);
 	signal pasteSignal(int index);
@@ -186,7 +186,8 @@ Rectangle {
 
 
 	function designSchemeChanged(scheme){
-		requestPaintPause.restart()
+		//console.log("designSchemeChanged!!!!")
+		requestPaintPauseLong.restart()
 	}
 
 	function appSizeChanged(params){
@@ -240,10 +241,7 @@ Rectangle {
 		canvas.deltaX = 0;
 		canvas.deltaY = 0;
 
-		canvasMatrix.setXScale(canvas.scaleCoeff)
-		canvasMatrix.setYScale(canvas.scaleCoeff)
-		canvasMatrix.setXTranslation(canvas.deltaX)
-		canvasMatrix.setYTranslation(canvas.deltaY)
+		canvas.setViewMatrixParams();
 
 		if(requestPaint_ == undefined){
 			requestPaint_ = false;
@@ -302,10 +300,7 @@ Rectangle {
 	function findObject(mouseX, mouseY){
 		//console.log("findObject", mouseX, mouseY)
 
-		canvasMatrix.setXTranslation(canvas.deltaX);
-		canvasMatrix.setYTranslation(canvas.deltaY);
-		canvasMatrix.setXScale(canvas.scaleCoeff);
-		canvasMatrix.setYScale(canvas.scaleCoeff);
+		canvas.setViewMatrixParams();
 
 		for(let i = 0; i < graphicsView.layerModel.length ; i++){
 			let layer = graphicsView.layerModel[i];
@@ -439,10 +434,8 @@ Rectangle {
 		let zoom = Math.min(zoomX, zoomY)
 
 		graphicsView.setZoom(zoom)
-		canvasMatrix.setXScale(zoom)
-		canvasMatrix.setYScale(zoom)
-		canvasMatrix.setXTranslation(canvas.deltaX)
-		canvasMatrix.setYTranslation(canvas.deltaY)
+
+		canvas.setViewMatrixParams();
 
 		minX = 1000000;
 		maxY = -1000000;
@@ -576,6 +569,11 @@ Rectangle {
 			}
 
 			onDeltaSignal: {
+				if (canvas.scaleCoeff < 0.0000001){
+					return;
+				}
+
+				//console.log("delta:::::: ", delta.x, delta.y)
 
 				let found = false;
 				let margin_ = Style.marginM;
@@ -585,55 +583,45 @@ Rectangle {
 					if(shape.isSelected){
 						found = true;
 
-						//correction of position relative to borders
-						let topLeftPoint = shape.getBoundingBoxCoordinate()
-						let x_ = topLeftPoint.x;
-						let y_ = topLeftPoint.y;
+						let deltaX_ = delta.x
+						let deltaY_ = delta.y
 
-						let width_ = shape.getBoundingBoxWidth();
-						let height_ = shape.getBoundingBoxHeight();
+						// fit to borders
+						let correctShapePosition = false
+						if(correctShapePosition){
+							//correction of position relative to borders
+							let boundingBoxPoints = shape.getBoundingBoxPoints(true)
+							let topLeftPoint = boundingBoxPoints.topLeftPoint
 
-						x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
-						y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
-						width_ = width_ * canvas.scaleCoeff;
-						height_ = height_  * canvas.scaleCoeff;
+							// let topRightPoint = boundingBoxPoints.topRightPoint
+							// let bottomLeftPoint = boundingBoxPoints.bottomLeftPoint
+							// let bottomRightPoint = boundingBoxPoints.bottomRightPoint
 
-						if (canvas.scaleCoeff < 0.0000001){
-							return;
-						}
+							let width_ = (boundingBoxPoints.topRightPoint.x - boundingBoxPoints.topLeftPoint.x);
+							let height_ = (boundingBoxPoints.bottomLeftPoint.y - boundingBoxPoints.topLeftPoint.y);
 
-						let newX = (topLeftPoint.x + delta.x / canvas.scaleCoeff);
-						let newY = (topLeftPoint.y + delta.y / canvas.scaleCoeff);
+							let newX = (topLeftPoint.x + delta.x);
+							let newY = (topLeftPoint.y + delta.y );
 
-						//fit to borders
+							if(newX < margin_ && delta.x < 0){
+								newX = margin_;
+							}
+							if(newY < margin_ && delta.y < 0){
+								newY = margin_;
+							}
 
-						if(newX < margin_){
-							newX = margin_;
-						}
-						if(newY < margin_){
-							newY = margin_;
-						}
+							if(newX > (canvas.width  - width_) - margin_ && delta.x > 0){
+								newX = (canvas.width  - width_) - margin_
+							}
+							if(newY > (canvas.height  - height_) - margin_&& delta.y > 0){
+								newY = (canvas.height  - height_) - margin_
+							}
 
-						if (canvas.scaleCoeff - margin_ === 0){
-							return;
-						}
-
-						if(newX > (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_){
-							newX = (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_
-						}
-						if(newY > (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_){
-							newY = (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_
-						}
-
-						// let deltaX_ = delta.x / canvas.scaleCoeff
-						// let deltaY_ = delta.y / canvas.scaleCoeff
-
-						let deltaX_ = newX - topLeftPoint.x
-						let deltaY_ = newY - topLeftPoint.y
-						//correction of position relative to borders
+							deltaX_ = newX - topLeftPoint.x
+							deltaY_ = newY - topLeftPoint.y
+						}// fit to borders
 
 						shape.setCoordinateShift(deltaX_, deltaY_)
-
 					}
 				}
 
@@ -846,6 +834,14 @@ Rectangle {
 				}
 			}
 
+			PauseAnimation {
+				id: requestPaintPauseLong;
+				duration: 100
+				onFinished: {
+					canvas.requestPaint();
+				}
+			}
+
 			CanvasMatrix{
 				id: canvasMatrix;
 			}
@@ -877,6 +873,8 @@ Rectangle {
 
 				canvas.scaleCoeff = newScale
 				canvas.scaleCoeffPrev = newScale;
+
+				canvas.setViewMatrixParams();
 			}
 
 			function deltaCorrection(deltaXArg, deltaYArg, scale_){
@@ -903,6 +901,13 @@ Rectangle {
 				return wasLimitCorrection;
 			}
 
+			function setViewMatrixParams(){
+				canvasMatrix.setXScale(canvas.scaleCoeff);
+				canvasMatrix.setYScale(canvas.scaleCoeff);
+				canvasMatrix.setXTranslation(canvas.deltaX);
+				canvasMatrix.setYTranslation(canvas.deltaY);
+			}
+
 			onPaint: {
 				//console.log("Canvas::onPaint")
 				if (graphicsView.autoFit){
@@ -913,10 +918,7 @@ Rectangle {
 				ctx.reset()
 				ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-				canvasMatrix.setXScale(canvas.scaleCoeff);
-				canvasMatrix.setYScale(canvas.scaleCoeff);
-				canvasMatrix.setXTranslation(canvas.deltaX);
-				canvasMatrix.setYTranslation(canvas.deltaY);
+				canvas.setViewMatrixParams();
 
 				for(let i = 0; i < graphicsView.layerModel.length; i++){
 					let layer = graphicsView.layerModel[i];
