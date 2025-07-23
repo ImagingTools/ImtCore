@@ -3,16 +3,43 @@
 #pragma once
 
 
+#include <QtCore/QMetaEnum>
+
+
 namespace sdl::imtbase::ComplexCollectionFilter
 {
 
 
+Q_NAMESPACE
 enum class ValueType {
 	Integer,
 	Number,
 	String,
 	Bool,
 };
+
+Q_ENUM_NS(ValueType)
+
+
+class EnumValueType: public QObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString Integer READ GetInteger NOTIFY IntegerChanged)
+	Q_PROPERTY(QString Number READ GetNumber NOTIFY NumberChanged)
+	Q_PROPERTY(QString String READ GetString NOTIFY StringChanged)
+	Q_PROPERTY(QString Bool READ GetBool NOTIFY BoolChanged)
+protected:
+	QString GetInteger() { return "Integer"; }
+	QString GetNumber() { return "Number"; }
+	QString GetString() { return "String"; }
+	QString GetBool() { return "Bool"; }
+signals:
+	void IntegerChanged();
+	void NumberChanged();
+	void StringChanged();
+	void BoolChanged();
+};
+
 
 } // namespace sdl::imtbase::ComplexCollectionFilter
 
@@ -24,10 +51,14 @@ enum class ValueType {
 #pragma once
 
 
+#include <QtCore/QMetaEnum>
+
+
 namespace sdl::imtbase::ComplexCollectionFilter
 {
 
 
+Q_NAMESPACE
 enum class FilterOperation {
 	Not,
 	Equal,
@@ -35,6 +66,32 @@ enum class FilterOperation {
 	Greater,
 	Contains,
 };
+
+Q_ENUM_NS(FilterOperation)
+
+
+class EnumFilterOperation: public QObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString Not READ GetNot NOTIFY NotChanged)
+	Q_PROPERTY(QString Equal READ GetEqual NOTIFY EqualChanged)
+	Q_PROPERTY(QString Less READ GetLess NOTIFY LessChanged)
+	Q_PROPERTY(QString Greater READ GetGreater NOTIFY GreaterChanged)
+	Q_PROPERTY(QString Contains READ GetContains NOTIFY ContainsChanged)
+protected:
+	QString GetNot() { return "Not"; }
+	QString GetEqual() { return "Equal"; }
+	QString GetLess() { return "Less"; }
+	QString GetGreater() { return "Greater"; }
+	QString GetContains() { return "Contains"; }
+signals:
+	void NotChanged();
+	void EqualChanged();
+	void LessChanged();
+	void GreaterChanged();
+	void ContainsChanged();
+};
+
 
 } // namespace sdl::imtbase::ComplexCollectionFilter
 
@@ -46,14 +103,35 @@ enum class FilterOperation {
 #pragma once
 
 
+#include <QtCore/QMetaEnum>
+
+
 namespace sdl::imtbase::ComplexCollectionFilter
 {
 
 
+Q_NAMESPACE
 enum class LogicalOperation {
 	And,
 	Or,
 };
+
+Q_ENUM_NS(LogicalOperation)
+
+
+class EnumLogicalOperation: public QObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString And READ GetAnd NOTIFY AndChanged)
+	Q_PROPERTY(QString Or READ GetOr NOTIFY OrChanged)
+protected:
+	QString GetAnd() { return "And"; }
+	QString GetOr() { return "Or"; }
+signals:
+	void AndChanged();
+	void OrChanged();
+};
+
 
 } // namespace sdl::imtbase::ComplexCollectionFilter
 
@@ -65,21 +143,24 @@ enum class LogicalOperation {
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 // custom types includes
 #include <1.0/CPP/ImtBaseTypes.h>
@@ -111,10 +192,10 @@ public:
 			static const inline QString UnitMultiplier = "unitMultiplier";
 		};
 
-		std::optional<ImtBaseTypes::CTimeRange::V1_0> timeRange;
-		std::optional<QString> timeUnit;
-		std::optional<QString> interpretationMode;
-		std::optional<int> unitMultiplier;
+		istd::TSharedNullable<ImtBaseTypes::CTimeRange::V1_0> timeRange;
+		istd::TSharedNullable<QString> timeUnit;
+		istd::TSharedNullable<QString> interpretationMode;
+		istd::TSharedNullable<int> unitMultiplier;
 
 		static QByteArray GetVersionId();
 
@@ -135,7 +216,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -167,21 +248,24 @@ Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CTimeFilter);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -208,8 +292,8 @@ public:
 			static const inline QString SortingOrder = "sortingOrder";
 		};
 
-		std::optional<QString> fieldId;
-		std::optional<QString> sortingOrder;
+		istd::TSharedNullable<QString> fieldId;
+		istd::TSharedNullable<QString> sortingOrder;
 
 		static QByteArray GetVersionId();
 
@@ -230,7 +314,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -262,13 +346,11 @@ Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 #include <QtCore/QList>
@@ -276,9 +358,14 @@ Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo);
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -307,10 +394,10 @@ public:
 			static const inline QString FilterOperations = "filterOperations";
 		};
 
-		std::optional<QByteArray> fieldId;
-		std::optional<QString> filterValue;
-		std::optional<ValueType> filterValueType;
-		std::optional<QList<FilterOperation>> filterOperations;
+		istd::TSharedNullable<QByteArray> fieldId;
+		istd::TSharedNullable<QString> filterValue;
+		istd::TSharedNullable<ValueType> filterValueType;
+		istd::TSharedNullable<QList<FilterOperation>> filterOperations;
 
 		static QByteArray GetVersionId();
 
@@ -331,7 +418,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -363,21 +450,24 @@ Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldFilter);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -405,9 +495,9 @@ public:
 			static const inline QString LogicalOperation = "logicalOperation";
 		};
 
-		std::optional<QList<CFieldFilter::V1_0>> fieldFilters;
-		std::optional<QList<CGroupFilter::V1_0>> groupFilters;
-		std::optional<LogicalOperation> logicalOperation;
+		istd::TSharedNullable<QList<CFieldFilter::V1_0>> fieldFilters;
+		istd::TSharedNullable<QList<CGroupFilter::V1_0>> groupFilters;
+		istd::TSharedNullable<LogicalOperation> logicalOperation;
 
 		static QByteArray GetVersionId();
 
@@ -428,7 +518,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -460,22 +550,25 @@ Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CGroupFilter);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -504,10 +597,10 @@ public:
 			static const inline QString DistinctFields = "distinctFields";
 		};
 
-		std::optional<QList<CFieldSortingInfo::V1_0>> sortingInfo;
-		std::optional<CGroupFilter::V1_0> fieldsFilter;
-		std::optional<CTimeFilter::V1_0> timeFilter;
-		std::optional<QList<QByteArray>> distinctFields;
+		istd::TSharedNullable<QList<CFieldSortingInfo::V1_0>> sortingInfo;
+		istd::TSharedNullable<CGroupFilter::V1_0> fieldsFilter;
+		istd::TSharedNullable<CTimeFilter::V1_0> timeFilter;
+		istd::TSharedNullable<QList<QByteArray>> distinctFields;
 
 		static QByteArray GetVersionId();
 
@@ -528,7 +621,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;

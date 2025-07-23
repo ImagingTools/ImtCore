@@ -6,6 +6,7 @@ namespace sdl::modsdl::PrinterBase
 {
 
 class PrinterSpecification;
+class CPrinterSpecificationObject;
 
 } // namespace sdl::modsdl::PrinterBase
 
@@ -17,21 +18,24 @@ class PrinterSpecification;
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -57,7 +61,7 @@ public:
 			static const inline QString Name = "name";
 		};
 
-		std::optional<QString> name;
+		istd::TSharedNullable<QString> name;
 
 		static QByteArray GetVersionId();
 
@@ -78,7 +82,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -110,21 +114,24 @@ Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterSpecificationBase);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -150,7 +157,7 @@ public:
 			static const inline QString Link = "link";
 		};
 
-		std::optional<QByteArray> link;
+		istd::TSharedNullable<QByteArray> link;
 
 		static QByteArray GetVersionId();
 
@@ -171,7 +178,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -203,21 +210,24 @@ Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CLink);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -244,8 +254,8 @@ public:
 			static const inline QString Specification = "specification";
 		};
 
-		std::optional<QString> name;
-		std::optional<std::shared_ptr<PrinterSpecification>> specification;
+		istd::TSharedNullable<QString> name;
+		istd::TSharedNullable<std::shared_ptr<PrinterSpecification>> specification;
 
 		static QByteArray GetVersionId();
 
@@ -266,7 +276,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -320,6 +330,66 @@ public:
 		: BaseClass(ref){};
 
 };
+
+class CPrinterSpecificationObject: public ::imtbase::CItemModelBase
+{
+	Q_OBJECT
+	Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)
+	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
+
+public:
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+	CPrinterSpecificationObject(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE QString GetType() const{
+		return m_type;
+	}
+
+	Q_INVOKABLE void SetValue(const QVariant& value){
+		if (value.canConvert<CType1>()){
+			m_type = "CPrinterSpecificationBase";
+		}
+
+		if (value.canConvert<CType1>()){
+			m_type = "CLink";
+		}
+
+		m_value = value;
+	}
+
+	Q_INVOKABLE QVariant GetValue(){
+		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((*Version_1_0).get())){
+			if (!m_cprinterspecificationbaseObject){
+				m_cprinterspecificationbaseObject= new CPrinterSpecificationBaseObject(this);
+			}
+
+			return QVariant::fromValue(m_cprinterspecificationbaseObject);
+		}
+
+		if (const CLink* val = std::get_if<CLink>((*Version_1_0).get())){
+			if (!m_clinkObject){
+				m_clinkObject= new CLinkObject(this);
+			}
+
+			return QVariant::fromValue(m_clinkObject);
+		}
+
+		return QVariant();
+	}
+
+signals:
+	void typeChanged();
+	void valueChanged();
+
+public:
+	istd::TSharedNullable<std::shared_ptr<PrinterSpecification>> Version_1_0;
+	CPrinterSpecificationBaseObject* m_cprinterspecificationbaseObject;
+	CLinkObject* m_clinkObject;
+	QVariant m_value;
+	QString m_type;
+};
+
 } // namespace sdl::modsdl::PrinterBase
 
 

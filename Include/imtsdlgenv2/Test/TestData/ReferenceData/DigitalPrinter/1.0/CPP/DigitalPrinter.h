@@ -3,14 +3,35 @@
 #pragma once
 
 
+#include <QtCore/QMetaEnum>
+
+
 namespace sdl::modsdl::DigitalPrinter
 {
 
 
+Q_NAMESPACE
 enum class PrintingTechnology {
 	Inkjet,
 	Toner,
 };
+
+Q_ENUM_NS(PrintingTechnology)
+
+
+class EnumPrintingTechnology: public QObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString Inkjet READ GetInkjet NOTIFY InkjetChanged)
+	Q_PROPERTY(QString Toner READ GetToner NOTIFY TonerChanged)
+protected:
+	QString GetInkjet() { return "Inkjet"; }
+	QString GetToner() { return "Toner"; }
+signals:
+	void InkjetChanged();
+	void TonerChanged();
+};
+
 
 } // namespace sdl::modsdl::DigitalPrinter
 
@@ -22,20 +43,23 @@ enum class PrintingTechnology {
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 // custom types includes
 #include <1.0/CPP/PrinterBase.h>
@@ -65,8 +89,8 @@ public:
 			static const inline QString PrintingTechnology = "printingTechnology";
 		};
 
-		std::optional<PrinterBase::CPrinterSpecificationBase::V1_0> base;
-		std::optional<PrintingTechnology> printingTechnology;
+		istd::TSharedNullable<PrinterBase::CPrinterSpecificationBase::V1_0> base;
+		istd::TSharedNullable<PrintingTechnology> printingTechnology;
 
 		static QByteArray GetVersionId();
 
@@ -87,7 +111,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -119,20 +143,23 @@ Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecification);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 // custom types includes
 #include <1.0/CPP/PrinterBase.h>
@@ -162,8 +189,8 @@ public:
 			static const inline QString PrintingTechnology = "printingTechnology";
 		};
 
-		std::optional<PrinterBase::CPrinterBase::V1_0> base;
-		std::optional<PrintingTechnology> printingTechnology;
+		istd::TSharedNullable<PrinterBase::CPrinterBase::V1_0> base;
+		istd::TSharedNullable<PrintingTechnology> printingTechnology;
 
 		static QByteArray GetVersionId();
 
@@ -184,7 +211,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;

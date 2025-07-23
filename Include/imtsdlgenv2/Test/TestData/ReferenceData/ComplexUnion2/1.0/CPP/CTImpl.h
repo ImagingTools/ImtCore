@@ -6,6 +6,7 @@ namespace sdl::complextest::CTImpl
 {
 
 class ExtendedMetaDataUnionType;
+class CExtendedMetaDataUnionTypeObject;
 
 } // namespace sdl::complextest::CTImpl
 
@@ -20,6 +21,7 @@ namespace sdl::complextest::CTImpl
 {
 
 class CDMResultUnionType;
+class CCDMResultUnionTypeObject;
 
 } // namespace sdl::complextest::CTImpl
 
@@ -31,20 +33,23 @@ class CDMResultUnionType;
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 // custom types includes
 #include <1.0/CPP/CTTypes.h>
@@ -84,18 +89,18 @@ public:
 			static const inline QString Geometry = "Geometry";
 		};
 
-		std::optional<CTTypes::StatusCode> AreaResult;
-		std::optional<double> ExpectedMinValue;
-		std::optional<double> ExpectedMaxValue;
-		std::optional<double> MeasuredValue;
-		std::optional<double> MinMeasuredValue;
-		std::optional<double> MaxMeasuredValue;
-		std::optional<double> MeanMeasuredValue;
-		std::optional<CTTypes::MeasurementType> MeasurementType;
-		std::optional<CTTypes::MeasurementUnit> MeasurementUnit;
-		std::optional<double> Length;
-		std::optional<CTTypes::ErrorCode> ErrorType;
-		std::optional<CTTypes::CGeometry::V1_0> Geometry;
+		istd::TSharedNullable<CTTypes::StatusCode> AreaResult;
+		istd::TSharedNullable<double> ExpectedMinValue;
+		istd::TSharedNullable<double> ExpectedMaxValue;
+		istd::TSharedNullable<double> MeasuredValue;
+		istd::TSharedNullable<double> MinMeasuredValue;
+		istd::TSharedNullable<double> MaxMeasuredValue;
+		istd::TSharedNullable<double> MeanMeasuredValue;
+		istd::TSharedNullable<CTTypes::MeasurementType> MeasurementType;
+		istd::TSharedNullable<CTTypes::MeasurementUnit> MeasurementUnit;
+		istd::TSharedNullable<double> Length;
+		istd::TSharedNullable<CTTypes::ErrorCode> ErrorType;
+		istd::TSharedNullable<CTTypes::CGeometry::V1_0> Geometry;
 
 		static QByteArray GetVersionId();
 
@@ -116,7 +121,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -148,22 +153,25 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResult);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 // custom types includes
 #include <1.0/CPP/CTTypes.h>
@@ -196,11 +204,11 @@ public:
 			static const inline QString Results = "Results";
 		};
 
-		std::optional<QString> AreaName;
-		std::optional<CTTypes::StatusCode> Status;
-		std::optional<CTTypes::CPoint::V1_0> IconPosition;
-		std::optional<CTTypes::ErrorCode> ErrorType;
-		std::optional<QList<CResult::V1_0>> Results;
+		istd::TSharedNullable<QString> AreaName;
+		istd::TSharedNullable<CTTypes::StatusCode> Status;
+		istd::TSharedNullable<CTTypes::CPoint::V1_0> IconPosition;
+		istd::TSharedNullable<CTTypes::ErrorCode> ErrorType;
+		istd::TSharedNullable<QList<CResult::V1_0>> Results;
 
 		static QByteArray GetVersionId();
 
@@ -221,7 +229,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -253,22 +261,25 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CArea);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 // custom types includes
 #include <1.0/CPP/CTTypes.h>
@@ -299,9 +310,9 @@ public:
 			static const inline QString Areas = "Areas";
 		};
 
-		std::optional<QString> AnalyzerName;
-		std::optional<CTTypes::StatusCode> AnalyzerResult;
-		std::optional<QList<CArea::V1_0>> Areas;
+		istd::TSharedNullable<QString> AnalyzerName;
+		istd::TSharedNullable<CTTypes::StatusCode> AnalyzerResult;
+		istd::TSharedNullable<QList<CArea::V1_0>> Areas;
 
 		static QByteArray GetVersionId();
 
@@ -322,7 +333,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -354,22 +365,25 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CAnalyzer);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 // custom types includes
 #include <1.0/CPP/CTTypes.h>
@@ -402,11 +416,11 @@ public:
 			static const inline QString Analyzers = "Analyzers";
 		};
 
-		std::optional<QString> ID;
-		std::optional<QString> TypeID;
-		std::optional<QString> Name;
-		std::optional<CTTypes::StatusCode> Status;
-		std::optional<QList<CAnalyzer::V1_0>> Analyzers;
+		istd::TSharedNullable<QString> ID;
+		istd::TSharedNullable<QString> TypeID;
+		istd::TSharedNullable<QString> Name;
+		istd::TSharedNullable<CTTypes::StatusCode> Status;
+		istd::TSharedNullable<QList<CAnalyzer::V1_0>> Analyzers;
 
 		static QByteArray GetVersionId();
 
@@ -427,7 +441,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -459,22 +473,25 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CInspection);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 // custom types includes
 #include <1.0/CPP/CTTypes.h>
@@ -509,13 +526,13 @@ public:
 			static const inline QString Inspections = "Inspections";
 		};
 
-		std::optional<int> ProductID;
-		std::optional<QString> Name;
-		std::optional<CTTypes::StatusCode> Status;
-		std::optional<QString> PartSerialNumber;
-		std::optional<QString> Timestamp;
-		std::optional<QString> ProductImage;
-		std::optional<QList<CInspection::V1_0>> Inspections;
+		istd::TSharedNullable<int> ProductID;
+		istd::TSharedNullable<QString> Name;
+		istd::TSharedNullable<CTTypes::StatusCode> Status;
+		istd::TSharedNullable<QString> PartSerialNumber;
+		istd::TSharedNullable<QString> Timestamp;
+		istd::TSharedNullable<QString> ProductImage;
+		istd::TSharedNullable<QList<CInspection::V1_0>> Inspections;
 
 		static QByteArray GetVersionId();
 
@@ -536,7 +553,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -568,21 +585,24 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CProductOverview);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -609,8 +629,8 @@ public:
 			static const inline QString Locale = "locale";
 		};
 
-		std::optional<QString> text;
-		std::optional<QString> locale;
+		istd::TSharedNullable<QString> text;
+		istd::TSharedNullable<QString> locale;
 
 		static QByteArray GetVersionId();
 
@@ -631,7 +651,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -663,17 +683,20 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CLocalizedText);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
+
+// ACF includes
+#include <istd/TSharedNullable.h>
 
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -701,9 +724,9 @@ public:
 			static const inline QString Z = "z";
 		};
 
-		std::optional<double> x;
-		std::optional<double> y;
-		std::optional<double> z;
+		istd::TSharedNullable<double> x;
+		istd::TSharedNullable<double> y;
+		istd::TSharedNullable<double> z;
 
 		static QByteArray GetVersionId();
 
@@ -724,7 +747,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -756,21 +779,24 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCoordinates);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -797,8 +823,8 @@ public:
 			static const inline QString Value = "value";
 		};
 
-		std::optional<QString> key;
-		std::optional<std::shared_ptr<ExtendedMetaDataUnionType>> value;
+		istd::TSharedNullable<QString> key;
+		istd::TSharedNullable<std::shared_ptr<ExtendedMetaDataUnionType>> value;
 
 		static QByteArray GetVersionId();
 
@@ -819,7 +845,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -851,13 +877,11 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CExtendedMetaData);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 #include <QtCore/QList>
@@ -865,9 +889,14 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CExtendedMetaData);
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -900,14 +929,14 @@ public:
 			static const inline QString ExtendedMetaData = "extendedMetaData";
 		};
 
-		std::optional<QByteArray> resultId;
-		std::optional<QString> creationTime;
-		std::optional<QString> partId;
-		std::optional<QString> productId;
-		std::optional<QString> name;
-		std::optional<int> classification;
-		std::optional<CLocalizedText::V1_0> description;
-		std::optional<QList<CExtendedMetaData::V1_0>> extendedMetaData;
+		istd::TSharedNullable<QByteArray> resultId;
+		istd::TSharedNullable<QString> creationTime;
+		istd::TSharedNullable<QString> partId;
+		istd::TSharedNullable<QString> productId;
+		istd::TSharedNullable<QString> name;
+		istd::TSharedNullable<int> classification;
+		istd::TSharedNullable<CLocalizedText::V1_0> description;
+		istd::TSharedNullable<QList<CExtendedMetaData::V1_0>> extendedMetaData;
 
 		static QByteArray GetVersionId();
 
@@ -928,7 +957,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -960,21 +989,24 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResultMetaData);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -1004,11 +1036,11 @@ public:
 			static const inline QString HighLimit = "highLimit";
 		};
 
-		std::optional<QString> name;
-		std::optional<QString> valueId;
-		std::optional<double> measuredValue;
-		std::optional<double> lowLimit;
-		std::optional<double> highLimit;
+		istd::TSharedNullable<QString> name;
+		istd::TSharedNullable<QString> valueId;
+		istd::TSharedNullable<double> measuredValue;
+		istd::TSharedNullable<double> lowLimit;
+		istd::TSharedNullable<double> highLimit;
 
 		static QByteArray GetVersionId();
 
@@ -1029,7 +1061,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -1061,22 +1093,25 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::COverallResultValues);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -1106,11 +1141,11 @@ public:
 			static const inline QString OverallResultValues = "overallResultValues";
 		};
 
-		std::optional<QString> dataModelTitle;
-		std::optional<QString> dataModelVersion;
-		std::optional<CResultMetaData::V1_0> resultMetaData;
-		std::optional<QList<std::shared_ptr<CDMResultUnionType>>> resultContent;
-		std::optional<QList<COverallResultValues::V1_0>> overallResultValues;
+		istd::TSharedNullable<QString> dataModelTitle;
+		istd::TSharedNullable<QString> dataModelVersion;
+		istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
+		istd::TSharedNullable<QList<std::shared_ptr<CDMResultUnionType>>> resultContent;
+		istd::TSharedNullable<QList<COverallResultValues::V1_0>> overallResultValues;
 
 		static QByteArray GetVersionId();
 
@@ -1131,7 +1166,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -1163,22 +1198,25 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarRecursive);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -1208,11 +1246,11 @@ public:
 			static const inline QString OverallResultValues = "overallResultValues";
 		};
 
-		std::optional<QString> dataModelTitle;
-		std::optional<QString> dataModelVersion;
-		std::optional<CResultMetaData::V1_0> resultMetaData;
-		std::optional<QList<QString>> resultContent;
-		std::optional<QList<COverallResultValues::V1_0>> overallResultValues;
+		istd::TSharedNullable<QString> dataModelTitle;
+		istd::TSharedNullable<QString> dataModelVersion;
+		istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
+		istd::TSharedNullable<QList<QString>> resultContent;
+		istd::TSharedNullable<QList<COverallResultValues::V1_0>> overallResultValues;
 
 		static QByteArray GetVersionId();
 
@@ -1233,7 +1271,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -1265,22 +1303,25 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarString);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QVariant>
 #include <QtCore/QVariantMap>
 #include <QtCore/QSet>
 
+// ACF includes
+#include <istd/TSharedNullable.h>
+
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -1310,11 +1351,11 @@ public:
 			static const inline QString OverallResultValues = "overallResultValues";
 		};
 
-		std::optional<QString> dataModelTitle;
-		std::optional<QString> dataModelVersion;
-		std::optional<CResultMetaData::V1_0> resultMetaData;
-		std::optional<QList<std::shared_ptr<CDMResultUnionType>>> resultContent;
-		std::optional<QList<COverallResultValues::V1_0>> overallResultValues;
+		istd::TSharedNullable<QString> dataModelTitle;
+		istd::TSharedNullable<QString> dataModelVersion;
+		istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
+		istd::TSharedNullable<QList<std::shared_ptr<CDMResultUnionType>>> resultContent;
+		istd::TSharedNullable<QList<COverallResultValues::V1_0>> overallResultValues;
 
 		static QByteArray GetVersionId();
 
@@ -1335,7 +1376,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -1367,17 +1408,20 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResult);
 #pragma once
 
 
-// C/C++ includes
-#include <optional>
-
 // Qt includes
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
+#include <QtCore/QObject>
+
+// ACF includes
+#include <istd/TSharedNullable.h>
 
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
 
 
 
@@ -1403,7 +1447,7 @@ public:
 			static const inline QString PointAsCoordinates = "pointAsCoordinates";
 		};
 
-		std::optional<bool> pointAsCoordinates;
+		istd::TSharedNullable<bool> pointAsCoordinates;
 
 		static QByteArray GetVersionId();
 
@@ -1424,7 +1468,7 @@ public:
 	};
 
 	// available version members
-	std::optional<V1_0> Version_1_0;
+	istd::TSharedNullable<V1_0> Version_1_0;
 
 	// serialize methods
 	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
@@ -1486,6 +1530,92 @@ public:
 		: BaseClass(ref){};
 
 };
+
+class CExtendedMetaDataUnionTypeObject: public ::imtbase::CItemModelBase
+{
+	Q_OBJECT
+	Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)
+	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
+
+public:
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+	CExtendedMetaDataUnionTypeObject(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE QString GetType() const{
+		return m_type;
+	}
+
+	Q_INVOKABLE void SetValue(const QVariant& value){
+		if (value.canConvert<CType1>()){
+			m_type = "CCoordinates";
+		}
+
+		if (value.canConvert<CType1>()){
+			m_type = "double";
+		}
+
+		if (value.canConvert<CType1>()){
+			m_type = "bool";
+		}
+
+		if (value.canConvert<CType1>()){
+			m_type = "QString";
+		}
+
+		m_value = value;
+	}
+
+	Q_INVOKABLE QVariant GetValue(){
+		if (const CCoordinates* val = std::get_if<CCoordinates>((*Version_1_0).get())){
+			if (!m_ccoordinatesObject){
+				m_ccoordinatesObject= new CCoordinatesObject(this);
+			}
+
+			return QVariant::fromValue(m_ccoordinatesObject);
+		}
+
+		if (const double* val = std::get_if<double>((*Version_1_0).get())){
+			if (!m_doubleObject){
+				m_doubleObject= new doubleObject(this);
+			}
+
+			return QVariant::fromValue(m_doubleObject);
+		}
+
+		if (const bool* val = std::get_if<bool>((*Version_1_0).get())){
+			if (!m_boolObject){
+				m_boolObject= new boolObject(this);
+			}
+
+			return QVariant::fromValue(m_boolObject);
+		}
+
+		if (const QString* val = std::get_if<QString>((*Version_1_0).get())){
+			if (!m_qstringObject){
+				m_qstringObject= new QStringObject(this);
+			}
+
+			return QVariant::fromValue(m_qstringObject);
+		}
+
+		return QVariant();
+	}
+
+signals:
+	void typeChanged();
+	void valueChanged();
+
+public:
+	istd::TSharedNullable<std::shared_ptr<ExtendedMetaDataUnionType>> Version_1_0;
+	CCoordinatesObject* m_ccoordinatesObject;
+	doubleObject* m_doubleObject;
+	boolObject* m_boolObject;
+	QStringObject* m_qstringObject;
+	QVariant m_value;
+	QString m_type;
+};
+
 } // namespace sdl::complextest::CTImpl
 
 
@@ -1518,6 +1648,66 @@ public:
 		: BaseClass(ref){};
 
 };
+
+class CCDMResultUnionTypeObject: public ::imtbase::CItemModelBase
+{
+	Q_OBJECT
+	Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)
+	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
+
+public:
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+	CCDMResultUnionTypeObject(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE QString GetType() const{
+		return m_type;
+	}
+
+	Q_INVOKABLE void SetValue(const QVariant& value){
+		if (value.canConvert<CType1>()){
+			m_type = "CCDMResultVarString";
+		}
+
+		if (value.canConvert<CType1>()){
+			m_type = "CCDMResultVarRecursive";
+		}
+
+		m_value = value;
+	}
+
+	Q_INVOKABLE QVariant GetValue(){
+		if (const CCDMResultVarString* val = std::get_if<CCDMResultVarString>((*Version_1_0).get())){
+			if (!m_ccdmresultvarstringObject){
+				m_ccdmresultvarstringObject= new CCDMResultVarStringObject(this);
+			}
+
+			return QVariant::fromValue(m_ccdmresultvarstringObject);
+		}
+
+		if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>((*Version_1_0).get())){
+			if (!m_ccdmresultvarrecursiveObject){
+				m_ccdmresultvarrecursiveObject= new CCDMResultVarRecursiveObject(this);
+			}
+
+			return QVariant::fromValue(m_ccdmresultvarrecursiveObject);
+		}
+
+		return QVariant();
+	}
+
+signals:
+	void typeChanged();
+	void valueChanged();
+
+public:
+	istd::TSharedNullable<std::shared_ptr<CDMResultUnionType>> Version_1_0;
+	CCDMResultVarStringObject* m_ccdmresultvarstringObject;
+	CCDMResultVarRecursiveObject* m_ccdmresultvarrecursiveObject;
+	QVariant m_value;
+	QString m_type;
+};
+
 } // namespace sdl::complextest::CTImpl
 
 
