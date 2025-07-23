@@ -20,6 +20,8 @@ ViewBase {
 	property alias passwordInput: userGeneralEditor.passwordInput;
 	property alias passwordInputConfirm: userGeneralEditor.confirmPasswordInput;
 	
+	property bool isNew: true
+	
 	function updateGui(){
 		userGeneralEditor.updateGui();
 		rolesGroup.updateGui();
@@ -46,14 +48,17 @@ ViewBase {
 		}
 		
 		setBlockingUpdateModel(true);
-		let systemInfosModel = userData.m_systemInfos;
-		if (systemInfoTable.table){
+		
+		let ok = false
+		if (systemInfoTable.table && userData.hasSystemInfos()){
+			let systemInfosModel = userData.m_systemInfos;
 			systemInfoTable.table.elements = systemInfosModel;
-			
-			if (systemInfoTable.table.elementsCount <= 1){
-				headerSystemInfoGroup.visible = false;
-				systemInfoGroup.visible = false;
-			}
+			ok = systemInfoTable.table.elementsCount > 1
+		}
+		
+		if (!ok){
+			headerSystemInfoGroup.visible = false;
+			systemInfoGroup.visible = false;
 		}
 		
 		checkChangePasswordLogic();
@@ -68,13 +73,17 @@ ViewBase {
 			return;
 		}
 
-		userGeneralEditor.passwordInput.visible = userData.m_id == "";
-		userGeneralEditor.changePasswordButton.visible = !userGeneralEditor.passwordInput.visible;
+		userGeneralEditor.passwordInput.visible = isNew;
+		userGeneralEditor.changePasswordButton.visible = !isNew;
 	}
 	
 	function checkSystemId(){
 		if (!userData){
 			console.error("Unable to check system ID for the user. Error: UserData is invalid");
+			return;
+		}
+		
+		if (!userData.hasSystemInfos()){
 			return;
 		}
 		
@@ -256,6 +265,10 @@ ViewBase {
 				
 				function updateGui(){
 					if (!container.userData){
+						return;
+					}
+					
+					if (!container.userData.hasSystemInfos()){
 						return;
 					}
 					

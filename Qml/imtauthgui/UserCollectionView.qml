@@ -364,6 +364,14 @@ RemoteCollectionView {
 				userCollectionViewContainer.saved.connect(userEditor.onSaved);
 			}
 			
+			onUserDataChanged: {
+				if (userData){
+					if (userCollectionViewContainer.documentManager){
+						userEditor.isNew = userCollectionViewContainer.documentManager.documentIsNew(userData.m_id)
+					}
+				}
+			}
+			
 			commandsDelegateComp: Component {ViewCommandsDelegateBase {
 					view: userEditor;
 				}
@@ -376,6 +384,7 @@ RemoteCollectionView {
 			
 			function onSaved(){
 				if (userEditor){
+					userEditor.isNew = false
 					userEditor.checkChangePasswordLogic();
 				}
 			}
