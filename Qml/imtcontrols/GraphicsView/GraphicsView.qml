@@ -383,7 +383,8 @@ Rectangle {
 
 		for (let i = 0; i < shapeList.length; i++){
 			let shape = shapeList[i];
-			let boundingBoxPoints = shape.getBoundingBoxPoints(true);
+			let boundingBoxPoints = graphicsView.boundingBoxPointsToScreen(shape.getBoundingBoxPoints(), shape);
+
 			if(!Object.keys(boundingBoxPoints).length){
 				continue;
 			}
@@ -437,7 +438,7 @@ Rectangle {
 
 		for (let i = 0; i < shapeList.length; i++){
 			let shape = shapeList[i];
-			let boundingBoxPoints = shape.getBoundingBoxPoints(true);
+			let boundingBoxPoints = graphicsView.boundingBoxPointsToScreen(shape.getBoundingBoxPoints(), shape);
 			if(!Object.keys(boundingBoxPoints).length){
 				continue;
 			}
@@ -470,6 +471,50 @@ Rectangle {
 	function fitToActiveLayer(){
 		let activeLayer = getActiveLayer();
 		fitToLayer(activeLayer)
+	}
+
+	function boundingBoxPointsToScreen(pointsObjLog, shape){
+
+		let pointsObj = ({});
+
+		let minX = 1000000;
+		let minY = 1000000;
+		let maxX  = -1000000
+		let maxY = -1000000;
+
+		let points = []
+
+		points.push(Qt.point(pointsObjLog.topLeftPoint.x, pointsObjLog.topLeftPoint.y))
+		points.push(Qt.point(pointsObjLog.topRightPoint.x, pointsObjLog.topRightPoint.y))
+		points.push(Qt.point(pointsObjLog.bottomLeftPoint.x, pointsObjLog.bottomLeftPoint.y))
+		points.push(Qt.point(pointsObjLog.bottomRightPoint.x, pointsObjLog.bottomRightPoint.y))
+
+		for(let i = 0; i < points.length; i++){
+			let point = points[i]
+			point = shape.getScreenPosition(point);
+
+			let x_ = point.x
+			let y_ = point.y
+			if(x_ < minX){
+				minX = x_
+			}
+			if(y_ < minY){
+				minY = y_
+			}
+			if(x_ > maxX){
+				maxX = x_
+			}
+			if(y_ > maxY){
+				maxY = y_
+			}
+		}
+
+		pointsObj.topLeftPoint = Qt.point(minX, minY)
+		pointsObj.topRightPoint = Qt.point(maxX, minY)
+		pointsObj.bottomLeftPoint = Qt.point(minX, maxY)
+		pointsObj.bottomRightPoint = Qt.point(maxX, maxY)
+
+		return pointsObj;
 	}
 
 	TreeItemModel {
@@ -592,7 +637,7 @@ Rectangle {
 						let correctShapePosition = false
 						if(correctShapePosition){
 							//correction of position relative to borders
-							let boundingBoxPoints = shape.getBoundingBoxPoints(true)
+							let boundingBoxPoints = graphicsView.boundingBoxPointsToScreen(shape.getBoundingBoxPoints(), shape)
 							let topLeftPoint = boundingBoxPoints.topLeftPoint
 
 							// let topRightPoint = boundingBoxPoints.topRightPoint

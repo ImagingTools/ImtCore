@@ -55,10 +55,7 @@ GraphicsShapeBase {
 		return Qt.point((cornerPointList.topLeftPoint.x + cornerPointList.topRightPoint.x)/2,0, (cornerPointList.topRightPoint.y + cornerPointList.bottomRightPoint.y)/2);
 	}
 
-	function getBoundingBoxPoints(isScreenPosition){
-		if(isScreenPosition == undefined){
-			isScreenPosition = false;
-		}
+	function getBoundingBoxPoints(){
 		if(!points.length){
 			return ({});
 		}
@@ -78,9 +75,7 @@ GraphicsShapeBase {
 
 		for(let i = 0; i < points.length; i++){
 			let point = points[i]
-			if(isScreenPosition){
-				point = getScreenPosition(point);
-			}
+
 			let x_ = point.x
 			let y_ = point.y
 			if(x_ < minX){
@@ -138,21 +133,21 @@ GraphicsShapeBase {
 		return point.topLeftPoint
 	}
 
-	function getBoundingBoxWidth(isScreenPosition){
+	function getBoundingBoxWidth(){
 		if(!points.length){
 			return 0;
 		}
 
-		let pointsBB = getBoundingBoxPoints(isScreenPosition)
+		let pointsBB = getBoundingBoxPoints()
 		return (pointsBB.topRightPoint.x - pointsBB.topLeftPoint.x)
 	}
 
-	function getBoundingBoxHeight(isScreenPosition){
+	function getBoundingBoxHeight(){
 		if(!points.length){
 			return 0;
 		}
 
-		let pointsBB = getBoundingBoxPoints(isScreenPosition)
+		let pointsBB = getBoundingBoxPoints()
 		return (pointsBB.bottomLeftPoint.y - pointsBB.topLeftPoint.y)
 	}
 
