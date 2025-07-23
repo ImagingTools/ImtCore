@@ -1,6 +1,5 @@
 const QObject = require("./QObject")
-const Property = require("./Property")
-const GroupProperty = require("./GroupProperty")
+const PropertyAuto = require("./PropertyAuto")
 const Var = require("./Var")
 const Int = require("./Int")
 const List = require("./List")
@@ -24,8 +23,10 @@ class QtObject extends QObject {
         'Component.completed': {type:Signal, slotName:'Component.onCompleted', args:[]},
         'Component.destruction': {type:Signal, slotName:'Component.onDestruction', args:[]},
 
-        JQAbstractModelData: {type:Var, value:undefined, signalName:'JQAbstractModelDataChanged'},
-        JQAbstractModel: {type:Var, value:undefined, signalName:'JQAbstractModelChanged'},
+        JQAbstractModelData: {type:PropertyAuto, value:undefined, signalName:'JQAbstractModelDataChanged'},
+        JQAbstractModel: {type:PropertyAuto, value:undefined, signalName:'JQAbstractModelChanged'},
+
+        JQAbstractModelDataChanged: {type:Signal, slotName:'onJQAbstractModelDataChanged', args:[]},
         JQAbstractModelChanged: {type:Signal, slotName:'onJQAbstractModelChanged', args:[]},
     })  
 
@@ -40,30 +41,59 @@ class QtObject extends QObject {
             obj.JQAbstractModel = properties.model
             delete properties.model
         } else if(!properties.JQAbstractModel){
-            if(!(this.isAssignableFrom(JQModules.QtQuick.Repeater) || this.isAssignableFrom(JQModules.QtQuick.ListView) || 
-                this.isAssignableFrom(JQModules.QtQuick.GridView) || this.isAssignableFrom(JQModules.QtQuick.MapItemView))){
-                    obj.JQAbstractModel = ()=>{return obj.parent ? obj.parent.JQAbstractModel : undefined}
-                }
+            // if(!(this.isAssignableFrom(JQModules.QtQuick.Repeater) || this.isAssignableFrom(JQModules.QtQuick.ListView) || 
+            //     this.isAssignableFrom(JQModules.QtQuick.GridView) || this.isAssignableFrom(JQModules.QtQuick.MapItemView))){
+            //         obj.JQAbstractModel = ()=>{return obj.parent ? obj.parent.JQAbstractModel : undefined}
+            //     }
         }
 
         if(properties.modelData){
             obj.JQAbstractModelData = properties.modelData
             delete properties.modelData
         } else {
-            obj.JQAbstractModelData = ()=>{return obj.parent ? obj.parent.JQAbstractModelData : undefined}
+            // obj.JQAbstractModelData = ()=>{return obj.parent ? obj.parent.JQAbstractModelData : undefined}
+        }
+
+        if(obj.parent){
+            PropertyAuto.setAuto(obj.__self, 'JQAbstractModel', obj.parent.JQAbstractModel, obj.constructor.meta.JQAbstractModel)
+            PropertyAuto.setAuto(obj.__self, 'JQAbstractModelData', obj.parent.JQAbstractModelData, obj.constructor.meta.JQAbstractModelData)
         }
 
         if(this.meta.modelData.auto){
-            obj.modelData = ()=>{return obj.JQAbstractModelData}
+            // obj.modelData = ()=>{return obj.JQAbstractModelData}
         }
         
         if(this.meta.model.auto){
-            obj.model = ()=>{return obj.JQAbstractModel}
+            // obj.model = ()=>{return obj.JQAbstractModel}
         }
 
         obj.index = ()=>{return obj.JQAbstractModel ? obj.JQAbstractModel.index : -1}
 
         return obj
+    }
+
+    SLOT_JQAbstractModelChanged(oldValue, newValue){
+        if(this.constructor.meta.model.auto){
+            this.model = newValue
+        }
+
+        // this.index = newValue.index
+
+        for(let child of this.data){
+            PropertyAuto.setAuto(child.__self, 'JQAbstractModel', newValue, child.constructor.meta.JQAbstractModel)
+            // child.JQAbstractModel = newValue
+        }
+    }
+
+    SLOT_JQAbstractModelDataChanged(oldValue, newValue){
+        if(this.constructor.meta.modelData.auto){
+            this.modelData = newValue
+        }
+
+        for(let child of this.data){
+            PropertyAuto.setAuto(child.__self, 'JQAbstractModelData', newValue, child.constructor.meta.JQAbstractModelData)
+            // child.JQAbstractModelData = newValue
+        }
     }
     
     __complete(){
@@ -174,6 +204,10 @@ class QtObject extends QObject {
         
         if(newValue) {
             newValue.__addChild(this)
+
+            
+            // this.JQAbstractModel = newValue.JQAbstractModel
+            // this.JQAbstractModelData = newValue.JQAbstractModelData
         }
     }
 

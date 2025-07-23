@@ -16,6 +16,7 @@ class Internal extends QtObject {
     })
 
 	removed = []
+	changeList = []
 
 	static create(parent = null, properties = {}){
 		let proxy = super.create(parent, properties)
@@ -29,7 +30,7 @@ class Internal extends QtObject {
 					proxy.countChanges++
 					return
 				}
-			proxy.parent.modelChanged([{"name":name,"sender":sender}])
+			proxy.__base.modelChanged([{"name":name,"sender":sender}])
 		})
 
 		return proxy
@@ -54,7 +55,7 @@ class Internal extends QtObject {
 		}
 
 		if (this.countChanges > 0){
-			this.parent.modelChanged(this.changeList)
+			this.__base.modelChanged(this.changeList)
 
 			this.countChanges = 0
 		}
@@ -88,93 +89,20 @@ class BaseClass extends QtObject {
 
 		modelChanged: { type:Signal, args: ['changeSet'] },
 		finished: { type:Signal, args: [] },
-
-
-
-		isTransaction: { type: Bool, value: false },
-		countChanges: { type: Int, value: 0 },
-		changeList: { type: Var, value: null },
-		removed: { type: Var, value: null },
-
-		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
     })
 
-	// static create(parent = null, properties = {}){
-	// 	let proxy = super.create(parent, properties)
+	static create(parent = null, properties = {}){
+		let proxy = super.create(parent, properties)
 
-	// 	// proxy._internal = Internal.create(proxy)
-	// 	Signal.get(proxy, 'modelChanged').connect(proxy, (changeSet)=>{
-	// 		if (proxy.owner && proxy.owner.enableNotifications && proxy.owner.modelChanged) {
-	// 			proxy.owner.modelChanged(changeSet)
-	// 		}
-	// 	})
-
-	// 	return proxy
-	// }
-	removed = []
-
-	SLOT_modelChanged(changeSet){
-		if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
-			this.owner.modelChanged(changeSet)
-		}
-	}
-
-	SLOT_internalModelChanged(name, sender){
-		if (this.isTransaction){
-			let changeObj = {"name":name,"sender":sender}
-				this.changeList.push(changeObj)
-				this.countChanges++
-				return
+		proxy._internal = Internal.create()
+		proxy._internal.__base = proxy
+		Signal.get(proxy, 'modelChanged').connect(proxy, (changeSet)=>{
+			if (proxy.owner && proxy.owner.enableNotifications && proxy.owner.modelChanged) {
+				proxy.owner.modelChanged(changeSet)
 			}
-		this.modelChanged([{"name":name,"sender":sender}])
-	}
+		})
 
-	startTransaction(){
-		if (this.isTransaction){
-			console.error("Unable to start transaction. Error: transaction already started.")
-
-			return
-		}
-
-		this.changeList = []
-		this.isTransaction = true
-	}
-
-	stopTransaction(){
-		if (!this.isTransaction){
-			console.error("Unable to stop transaction. Error: there is no active transaction.")
-
-			return
-		}
-
-		if (this.countChanges > 0){
-			this.parent.modelChanged(this.changeList)
-
-			this.countChanges = 0
-		}
-
-		this.isTransaction = false
-	}
-
-	removeAt(key){
-	// get index if value found otherwise -1
-		let index = this.removed.indexOf(key)
-		if (index > -1) { //if found
-			this.removed.splice(index, 1)
-		}
-	}
-
-	containceInRemoved(key){
-		let index = this.removed.indexOf(key)
-		if (index > -1) {
-			return true
-		}
-
-		return false
-	}
-
-	get _internal(){
-		return this.__proxy
+		return proxy
 	}
 
 	__complete() {
@@ -539,10 +467,10 @@ class BaseClass extends QtObject {
 		return true
 	}
 
-	// destroy(){
-	// 	if(this._internal) this._internal.destroy()
-	// 	super.destroy()
-	// }
+	destroy(){
+		if(this._internal) this._internal.destroy()
+		super.destroy()
+	}
 }
 
 

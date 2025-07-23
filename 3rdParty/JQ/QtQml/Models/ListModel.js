@@ -21,6 +21,14 @@ class ListModel extends QtObject {
     __views = []
     __changeSet = []
 
+    SLOT_JQAbstractModelChanged(oldValue, newValue){
+        // console.log('SLOT_JQAbstractModelChanged')
+    }
+
+    SLOT_JQAbstractModelDataChanged(oldValue, newValue){
+        // console.log('SLOT_JQAbstractModelDataChanged')
+    }
+
     __addViewListener(obj){
         if(this.__views.indexOf(obj) < 0) this.__views.push(obj)
     }
