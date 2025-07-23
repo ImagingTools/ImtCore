@@ -44,56 +44,89 @@ QtObject {
 		return retPoint
 	}
 
-	function intersectionLineWithLineSegment2d(linePoint1, linePoint2, segmentPoint1, segmentPoint2){
+	function intersectionBetweenLineSegments2d(firstSegmentPoint1, firstSegmentPoint2, secondSegmentPoint1, secondSegmentPoint2){
 		let retPoint = Qt.point(0, 0);
 
-		let denominator = (segmentPoint2.y - segmentPoint1.y)(linePoint2.x - linePoint1.x) -
-			(segmentPoint2.x - segmentPoint1.x)(linePoint2.y - linePoint1.y)
+		let numerator1 = (secondSegmentPoint2.x  - secondSegmentPoint1.x)*(firstSegmentPoint1.y - secondSegmentPoint1.y) -
+			(secondSegmentPoint2.y  - secondSegmentPoint1.y)*(firstSegmentPoint1.x - secondSegmentPoint1.x)
 
-		if(denominator == 0){
+		let numerator2 = (firstSegmentPoint2.x  - firstSegmentPoint1.x)*(firstSegmentPoint1.y - secondSegmentPoint1.y) -
+			(firstSegmentPoint2.y  - firstSegmentPoint1.y)*(firstSegmentPoint1.x - secondSegmentPoint1.x)
+
+		let denominator = (secondSegmentPoint2.y - secondSegmentPoint1.y)*(firstSegmentPoint2.x - firstSegmentPoint1.x) -
+			(secondSegmentPoint2.x - secondSegmentPoint1.x)*(firstSegmentPoint2.y - firstSegmentPoint1.y)
+
+		if(denominator == 0){//the lines are parallel
 			return null;
 		}
 
-		let numerator = (linePoint2.x  - linePoint1.x)*(linePoint1.y - segmentPoint1.y) -
-			(linePoint2.y  - linePoint1.y)*(linePoint1.x - segmentPoint1.x)
+		let u1 =  numerator1 / denominator;
+		let u2 =  numerator2 / denominator;
 
-		let u_segm =  numerator / denominator;
-
-		retPoint.x = segmentPoint1.x + u_segm * (segmentPoint2.x - segmentPoint1.x)
-		retPoint.y = segmentPoint1.y + u_segm * (segmentPoint2.y - segmentPoint1.y)
-
-		return retPoint
+		if(u1 >= 0 && u1 <= 1 && u2 >= 0 && u2 <= 1){
+			retPoint.x = secondSegmentPoint1.x + u2 * (secondSegmentPoint2.x - secondSegmentPoint1.x)
+			retPoint.y = secondSegmentPoint1.y + u2 * (secondSegmentPoint2.y - secondSegmentPoint1.y)
+			return retPoint
+		}
+		else {
+			return null;
+		}
 	}
 
-	function hasIntersectionLineWithLineSegment2d(linePoint1, linePoint2, segmentPoint1, segmentPoint2){
-		let numerator = (linePoint2.x  - linePoint1.x)*(linePoint1.y - segmentPoint1.y) -
-			(linePoint2.y  - linePoint1.y)*(linePoint1.x - segmentPoint1.x)
+	function hasIntersectionBetweenLineSegments2d(firstSegmentPoint1, firstSegmentPoint2, secondSegmentPoint1, secondSegmentPoint2){
+		let numerator1 = (secondSegmentPoint2.x  - secondSegmentPoint1.x)*(firstSegmentPoint1.y - secondSegmentPoint1.y) -
+			(secondSegmentPoint2.y  - secondSegmentPoint1.y)*(firstSegmentPoint1.x - secondSegmentPoint1.x)
 
-		let denominator = (segmentPoint2.y - segmentPoint1.y)(linePoint2.x - linePoint1.x) -
-			(segmentPoint2.x - segmentPoint1.x)(linePoint2.y - linePoint1.y)
+		let numerator2 = (firstSegmentPoint2.x  - firstSegmentPoint1.x)*(firstSegmentPoint1.y - secondSegmentPoint1.y) -
+			(firstSegmentPoint2.y  - firstSegmentPoint1.y)*(firstSegmentPoint1.x - secondSegmentPoint1.x)
 
-		if(numerator == 0 && denominator == 0){
+		let denominator = (secondSegmentPoint2.y - secondSegmentPoint1.y)*(firstSegmentPoint2.x - firstSegmentPoint1.x) -
+			(secondSegmentPoint2.x - secondSegmentPoint1.x)*(firstSegmentPoint2.y - firstSegmentPoint1.y)
+
+		if(numerator1 == 0 && numerator2 == 0 && denominator == 0){//the lines coincide
 			return true;
 		}
-		else if(denominator == 0){
+
+		else if(denominator == 0){//the lines are parallel
 			return false;
 		}
 
-		let u_segm =  numerator / denominator;
+		let u1 =  numerator1 / denominator;
+		let u2 =  numerator2 / denominator;
 
-		if(u_segm >= 0 && u_segm <= 1){
+		if(u1 >= 0 && u1 <= 1 && u2 >= 0 && u2 <= 1){
 			return true;
 		}
 
 		return false
 	}
 
-	function pointInPolygon(point, poligonPointList){//TODO
+	function pointInPolygon(point, poligonPointList){
 		let ok = false;
 		if(point == undefined || poligonPointList == undefined || poligonPointList.length < 3){
 			return false;
 		}
 
+		let intersectionCount = 0;
+		for(let i = 0; i < poligonPointList.length; i++){
+			let segmentPoint1 = poligonPointList[i]
+			let segmentPoint2
+			if(i == poligonPointList.length -1){
+				segmentPoint2 = poligonPointList[0]
+			}
+			else {
+				segmentPoint2 = poligonPointList[i+1]
+			}
+
+			let hasIntersection = hasIntersectionBetweenLineSegments2d(point, Qt.point(100000, point.y), segmentPoint1, segmentPoint2)
+			if(hasIntersection){
+				intersectionCount++;
+			}
+		}
+
+		if(intersectionCount && intersectionCount % 2){
+			ok = true;
+		}
 		return ok;
 	}
 

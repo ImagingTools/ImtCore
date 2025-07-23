@@ -21,7 +21,7 @@ BoundingBox {
 
 		ctx.fillStyle = params_.color !== undefined ? params_.color : "transparent";
 		ctx.strokeStyle = params_.borderColor !== undefined ? params_.borderColor : "transparent";
-		ctx.lineWidth = params_.lineWidth !== undefined ? params_.lineWidth : 0
+		ctx.lineWidth = params_.lineWidth !== undefined ? params_.lineWidth : 1
 		let radius_ = params_.radius !== undefined ? params_.radius : radius
 		let width_ = params_.width !== undefined ? params_.width : width;
 		let height_ = params_.height !== undefined ? params_.height : height;

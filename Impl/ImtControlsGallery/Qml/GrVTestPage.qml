@@ -109,6 +109,11 @@ Rectangle {
 			let lineObjGreen = polylineCompGreen.createObject(this);
 			activeLayer.addShape(lineObjGreen);
 
+			let polygonObj = polygon.createObject(this);
+			activeLayer.addShape(polygonObj);
+
+
+
 			//activeLayer.addShape(lineObjRed);
 
 			// view.shape1 = lineObjBlue;
@@ -298,6 +303,24 @@ Rectangle {
 
 			property int count: 10
 
+		}
+	}
+
+	Component{
+		id: polygon;
+
+		PolygonShape{
+			color: "violet"
+			Component.onCompleted: {
+				let points_ = []
+				points_.push(Qt.point(40, -200))
+				points_.push(Qt.point(120, -40))
+				points_.push(Qt.point(280, -80))
+				points_.push(Qt.point(360, -240))
+				points_.push(Qt.point(80, -320))
+
+				points = points_
+			}
 		}
 	}
 
