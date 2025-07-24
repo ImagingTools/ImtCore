@@ -26,14 +26,13 @@ private Q_SLOTS:
 	void TestBasicSchema();
 	void TestComplexCollectionFilter();
 	void TestUnion();
-	void TestComplexUnion1();
-	void TestComplexUnion2();
+	void TestComplexUnion();
 	void PrinterTest();
 
 	void cleanupTestCase();
 
 private:
-	QList<std::shared_ptr<QDir>> m_tempDirPtrList;
+	QDir m_tempOutputDir;
 
 };
 
