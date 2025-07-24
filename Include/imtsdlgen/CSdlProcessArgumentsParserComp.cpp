@@ -175,39 +175,12 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 
 	// first read the config
 	if (commandLineParser.isSet(configFilePathOption)){
-		CConfigReader configReader;
-		const bool isRead = configReader.ReadFromFile(commandLineParser.value(configFilePathOption));
-		if(!isRead){
+		const bool isRead = ReadFromSettings(commandLineParser.value(configFilePathOption));
+		if (!isRead){
 			SendErrorMessage(0, "Unable to read config file. Aborting...");
 
 			return false;
 		}
-
-		UpdateValueFromOptionalValue(configReader.schemaFilePath, m_schemaFilePath);
-		UpdateValueFromOptionalValue(configReader.outputDirectoryPath, m_outputDirectoryPath);
-		UpdateValueFromOptionalValue(configReader.namespaceValue, m_namespace);
-		UpdateValueFromOptionalValue(configReader.namespacePrefix, m_namespacePrefix);
-		UpdateValueFromOptionalValue(configReader.dependenciesMode, m_isDependenciesMode);
-		UpdateValueFromOptionalValue(configReader.generateMode, m_isGenerateMode);
-		UpdateValueFromOptionalValue(configReader.enabledModificators, m_usedModificators);
-		UpdateValueFromOptionalValue(configReader.useAllModificators, m_useAllModificators);
-		UpdateValueFromOptionalValue(configReader.cppEnabled, m_cppEnabled);
-		UpdateValueFromOptionalValue(configReader.qmlEnabled, m_qmlEnabled);
-		UpdateValueFromOptionalValue(configReader.gqlEnabled, m_gqlEnabled);
-		UpdateValueFromOptionalValue(configReader.schemaDependencyModeEnabled, m_schemaDependencyModeEnabled);
-		UpdateValueFromOptionalValue(configReader.baseClassList, m_baseClassList);
-		UpdateValueFromOptionalValue(configReader.includePaths, m_includePaths);
-		UpdateValueFromOptionalValue(configReader.generatorType, m_generatorType);
-		UpdateValueFromOptionalValue(configReader.autoJoinEnabled, m_autoJoinEnabled);
-		UpdateValueFromOptionalValue(configReader.autoLinkLevel, m_autoLinkLevel);
-		UpdateValueFromOptionalValue(configReader.headersIncludePaths, m_headersIncludePaths);
-		UpdateValueFromOptionalValue(configReader.moduleIncludePaths, m_moduleIncludePathList);
-		UpdateValueFromOptionalValue(configReader.depFilePath, m_depFilePath);
-		UpdateValueFromOptionalValue(configReader.moduleOutputFilePath, m_moduleOutputFilePath);
-		UpdateValueFromOptionalValue(configReader.moduleGenerateEnabled, m_isModuleGenerationEnabled);
-		UpdateValueFromOptionalValue(configReader.templateEnabled, m_isTemplateEnabled);
-		UpdateValueFromOptionalValue(configReader.outputDirTemplate, m_outputDirTemplate);
-		UpdateValueFromOptionalValue(configReader.includePathTemplate, m_includePathTemplate);
 	}
 
 	// then override/add parameters, provided by command line
@@ -577,77 +550,116 @@ bool CSdlProcessArgumentsParserComp::IsModuleGenerateEnabled() const
 }
 
 
+bool CSdlProcessArgumentsParserComp::IsTemplateEnabled() const
+{
+	return m_isTemplateEnabled;
+}
+
+
+QString CSdlProcessArgumentsParserComp::GetTemplateIncludePath() const
+{
+	return m_includePathTemplate;
+}
+
+
+QString CSdlProcessArgumentsParserComp::GetTemplateOutputPath() const
+{
+	return m_outputDirTemplate;
+}
+
+
+bool CSdlProcessArgumentsParserComp::ReadFromSettings(const QString& settingsFilePath)
+{
+
+	CConfigReader configReader;
+	const bool isRead = configReader.ReadFromFile(settingsFilePath);
+	if(!isRead){
+		return false;
+	}
+
+	UpdateValueFromOptionalValue(configReader.schemaFilePath, m_schemaFilePath);
+	UpdateValueFromOptionalValue(configReader.outputDirectoryPath, m_outputDirectoryPath);
+	UpdateValueFromOptionalValue(configReader.namespaceValue, m_namespace);
+	UpdateValueFromOptionalValue(configReader.namespacePrefix, m_namespacePrefix);
+	UpdateValueFromOptionalValue(configReader.dependenciesMode, m_isDependenciesMode);
+	UpdateValueFromOptionalValue(configReader.generateMode, m_isGenerateMode);
+	UpdateValueFromOptionalValue(configReader.enabledModificators, m_usedModificators);
+	UpdateValueFromOptionalValue(configReader.useAllModificators, m_useAllModificators);
+	UpdateValueFromOptionalValue(configReader.cppEnabled, m_cppEnabled);
+	UpdateValueFromOptionalValue(configReader.qmlEnabled, m_qmlEnabled);
+	UpdateValueFromOptionalValue(configReader.gqlEnabled, m_gqlEnabled);
+	UpdateValueFromOptionalValue(configReader.schemaDependencyModeEnabled, m_schemaDependencyModeEnabled);
+	UpdateValueFromOptionalValue(configReader.baseClassList, m_baseClassList);
+	UpdateValueFromOptionalValue(configReader.includePaths, m_includePaths);
+	UpdateValueFromOptionalValue(configReader.generatorType, m_generatorType);
+	UpdateValueFromOptionalValue(configReader.autoJoinEnabled, m_autoJoinEnabled);
+	UpdateValueFromOptionalValue(configReader.autoLinkLevel, m_autoLinkLevel);
+	UpdateValueFromOptionalValue(configReader.headersIncludePaths, m_headersIncludePaths);
+	UpdateValueFromOptionalValue(configReader.moduleIncludePaths, m_moduleIncludePathList);
+	UpdateValueFromOptionalValue(configReader.depFilePath, m_depFilePath);
+	UpdateValueFromOptionalValue(configReader.moduleOutputFilePath, m_moduleOutputFilePath);
+	UpdateValueFromOptionalValue(configReader.moduleGenerateEnabled, m_isModuleGenerationEnabled);
+	UpdateValueFromOptionalValue(configReader.templateEnabled, m_isTemplateEnabled);
+	UpdateValueFromOptionalValue(configReader.outputDirTemplate, m_outputDirTemplate);
+	UpdateValueFromOptionalValue(configReader.includePathTemplate, m_includePathTemplate);
+
+	return true;
+}
+
+
 // reimplemented (imtsdl::ISdlEditableProcessArgumentsParser)
 
 void CSdlProcessArgumentsParserComp::SetSchemaFilePath(const QString& schemaFilePath)
 {
-	if (m_schemaFilePath != schemaFilePath){
-		m_schemaFilePath = schemaFilePath;
-	}
+	m_schemaFilePath = schemaFilePath;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetOutputDirectoryPath(const QString& outputDirectoryPath)
 {
-	if (m_outputDirectoryPath != outputDirectoryPath){
-		m_outputDirectoryPath = outputDirectoryPath;
-	}
+	m_outputDirectoryPath = outputDirectoryPath;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetNamespace(const QString& aNamespace)
 {
-	if (m_namespace != aNamespace){
-		m_namespace = aNamespace;
-	}
+	m_namespace = aNamespace;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetNamespacePrefix(const QString& namespacePrefix)
 {
-	if (m_namespacePrefix != namespacePrefix){
-		m_namespacePrefix = namespacePrefix;
-	}
+	m_namespacePrefix = namespacePrefix;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetDependenciesModeEnabled(bool enabled)
 {
-	if (m_isDependenciesMode != enabled){
-		m_isDependenciesMode = enabled;
-	}
+	m_isDependenciesMode = enabled;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetGenerateModeEnabled(bool enabled)
 {
-	if (m_isGenerateMode != enabled){
-		m_isGenerateMode = enabled;
-	}
+	m_isGenerateMode = enabled;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetEnabledModificators(const QStringList& modificators)
 {
-	if (m_usedModificators != modificators){
-		m_usedModificators = modificators;
-	}
+	m_usedModificators = modificators;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetEnabledAllModificators(bool enable)
 {
-	if (m_useAllModificators != enable){
-		m_useAllModificators = enable;
-	}
+	m_useAllModificators = enable;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetCppEnabled(bool enabled)
 {
-	if (m_cppEnabled != enabled){
-		m_cppEnabled = enabled;
-	}
+	m_cppEnabled = enabled;
 }
 
 
@@ -661,105 +673,97 @@ void CSdlProcessArgumentsParserComp::SetQmlEnabled(bool enabled)
 
 void CSdlProcessArgumentsParserComp::SetGqlEnabled(bool enabled)
 {
-	if (m_gqlEnabled != enabled){
-		m_gqlEnabled = enabled;
-	}
+	m_gqlEnabled = enabled;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetSchemaDependencyModeEnabled(bool enabled)
 {
-	if (m_schemaDependencyModeEnabled != enabled){
-		m_schemaDependencyModeEnabled = enabled;
-	}
+	m_schemaDependencyModeEnabled = enabled;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetBaseClassList(const QMap<QString, QString>& baseClassList)
 {
-	if (m_baseClassList != baseClassList){
-		m_baseClassList = baseClassList;
-	}
+	m_baseClassList = baseClassList;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetJoinRules(const QMap<QString, QString>& rules)
 {
-	if (m_joinRules != rules){
-		m_joinRules = rules;
-	}
+	m_joinRules = rules;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetIncludePaths(const QStringList& includePaths)
 {
-	if (m_includePaths != includePaths){
-		m_includePaths = includePaths;
-	}
+	m_includePaths = includePaths;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetGeneratorType(GeneratorType type)
 {
-	if (m_generatorType != type){
-		m_generatorType = type;
-	}
+	m_generatorType = type;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetAutoJoinEnabled(bool enabled)
 {
-	if (m_autoJoinEnabled != enabled){
-		m_autoJoinEnabled = enabled;
-	}
+	m_autoJoinEnabled = enabled;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetAutoLinkLevel(AutoLinkLevel level)
 {
-	if (m_autoLinkLevel != level){
-		m_autoLinkLevel = level;
-	}
+	m_autoLinkLevel = level;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetHeadersIncludePaths(const QStringList& includePaths)
 {
-	if (m_headersIncludePaths != includePaths){
-		m_headersIncludePaths = includePaths;
+	m_headersIncludePaths = includePaths;
 	}
-}
 
 
 void CSdlProcessArgumentsParserComp::SetModuleIncludePaths(const QStringList& includePaths)
 {
-	if (m_moduleIncludePathList != includePaths){
-		m_moduleIncludePathList = includePaths;
-	}
+	m_moduleIncludePathList = includePaths;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetDepFilePath(const QString& path)
 {
-	if (m_depFilePath != path){
-		m_depFilePath = path;
-	}
+	m_depFilePath = path;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetModuleOutputFilePath(const QString& path)
 {
-	if (m_moduleOutputFilePath != path){
-		m_moduleOutputFilePath = path;
-	}
+	m_moduleOutputFilePath = path;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetModuleGenerateEnabled(bool enabled)
 {
-	if (m_isModuleGenerationEnabled != enabled){
-		m_isModuleGenerationEnabled = enabled;
-	}
+	m_isModuleGenerationEnabled = enabled;
+}
+
+
+void CSdlProcessArgumentsParserComp::SetTemplateEnabled(bool enabled)
+{
+	m_isTemplateEnabled = enabled;
+}
+
+
+void CSdlProcessArgumentsParserComp::SetTemplateIncludePath(const QString& templateIncludePath)
+{
+	m_includePathTemplate = templateIncludePath;
+}
+
+
+void CSdlProcessArgumentsParserComp::SetTemplateOutputPath(const QString& templateOutputPath)
+{
+	m_outputDirTemplate = templateOutputPath;
 }
 
 

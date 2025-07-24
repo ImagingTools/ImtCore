@@ -59,8 +59,12 @@ public:
 	virtual QString GetDepFilePath() const override;
 	virtual QString GetModuleOutputFilePath() const override;
 	virtual bool IsModuleGenerateEnabled() const override;
+	virtual bool IsTemplateEnabled() const override;
+	virtual QString GetTemplateIncludePath() const override;
+	virtual QString GetTemplateOutputPath() const override;
 
 	// reimplemented (imtsdl::ISdlEditableProcessArgumentsParser)
+	virtual bool ReadFromSettings(const QString& settingsFilePath) override;
 	virtual void SetSchemaFilePath(const QString& schemaFilePath) override;
 	virtual void SetOutputDirectoryPath(const QString& outputDirectoryPath) override;
 	virtual void SetNamespace(const QString& aNamespace) override;
@@ -84,6 +88,9 @@ public:
 	virtual void SetDepFilePath(const QString& path) override;
 	virtual void SetModuleOutputFilePath(const QString& path) override;
 	virtual void SetModuleGenerateEnabled(bool enable = true) override;
+	virtual void SetTemplateEnabled(bool enabled) override;
+	virtual void SetTemplateIncludePath(const QString& templateIncludePath) override;
+	virtual void SetTemplateOutputPath(const QString& templateOutputPath) override;
 
 
 protected:

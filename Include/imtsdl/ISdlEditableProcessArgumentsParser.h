@@ -12,6 +12,8 @@ namespace imtsdl
 class ISdlEditableProcessArgumentsParser: virtual public ISdlProcessArgumentsParser
 {
 public:
+	virtual bool ReadFromSettings(const QString& settingsPath) = 0;
+
 	virtual void SetSchemaFilePath(const QString& schemaFilePath) = 0;
 	virtual void SetOutputDirectoryPath(const QString& outputDirectoryPath) = 0;
 	virtual void SetNamespace(const QString& aNamespace) = 0;
@@ -35,6 +37,11 @@ public:
 	virtual void SetDepFilePath(const QString& path) = 0;
 	virtual void SetModuleOutputFilePath(const QString& path) = 0;
 	virtual void SetModuleGenerateEnabled(bool enable = true) = 0;
+
+	// template
+	virtual void SetTemplateEnabled(bool enable = true) = 0;
+	virtual void SetTemplateIncludePath(const QString& templateIncludePath) = 0;
+	virtual void SetTemplateOutputPath(const QString& templateOutputPath) = 0;
 };
 
 

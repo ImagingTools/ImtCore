@@ -36,8 +36,7 @@ public:
 	enum AutoLinkLevel
 	{
 		ALL_NONE = 0,					///< Dasabled. ALL files and deps will be compiled
-		ALL_SAME_NAMESPACE [[deprecated]] = 1,
-		ALL_ONLY_FILE = 2,				///< Compile only input file
+		ALL_ONLY_FILE					///< Compile only input file
 	};
 	Q_ENUM(AutoLinkLevel)
 
@@ -66,6 +65,11 @@ public:
 	virtual QString GetDepFilePath() const = 0;
 	virtual QString GetModuleOutputFilePath() const = 0;
 	virtual bool IsModuleGenerateEnabled() const = 0;
+
+	// template
+	virtual bool IsTemplateEnabled() const = 0;
+	virtual QString GetTemplateIncludePath() const = 0;
+	virtual QString GetTemplateOutputPath() const = 0;
 };
 
 
