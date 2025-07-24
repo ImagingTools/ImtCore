@@ -84,7 +84,6 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	QCommandLineOption generatorOption("generator", "{QMake | CMake | CMake-pipe | DEPFILE}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake.\nNote: DEPFILE also supports define a dep file path i.e.: DEPFILE:<FILE_PATH>", "generator");
 	QCommandLineOption autoLinkOption("auto-link", "Defines the compilation order of the schema files.\n"
 												   "0 - disabled. ALL files will be compiled.\n"
-												   "1 - only those schemas with the same namespace as the original one will be compiled\n"
 												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutoLink", "0");
 	QCommandLineOption includeHeadersOption({"H","include-headers"}, "List of directories to search for generated header files", "HeadersIncludes");
 	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single.");
@@ -665,9 +664,7 @@ void CSdlProcessArgumentsParserComp::SetCppEnabled(bool enabled)
 
 void CSdlProcessArgumentsParserComp::SetQmlEnabled(bool enabled)
 {
-	if (m_qmlEnabled != enabled){
-		m_qmlEnabled = enabled;
-	}
+	m_qmlEnabled = enabled;
 }
 
 

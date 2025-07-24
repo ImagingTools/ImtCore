@@ -36,7 +36,7 @@ public:
 	enum AutoLinkLevel
 	{
 		ALL_NONE = 0,					///< Dasabled. ALL files and deps will be compiled
-		ALL_ONLY_FILE					///< Compile only input file
+		ALL_ONLY_FILE = 2					///< Compile only input file
 	};
 	Q_ENUM(AutoLinkLevel)
 
