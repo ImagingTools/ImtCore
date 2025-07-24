@@ -42,6 +42,10 @@ ViewBase {
 		return {}
 	}
 	
+	onIsNewChanged: {
+		checkChangePasswordLogic();
+	}
+	
 	onUserDataChanged: {
 		if (!userData){
 			return;
