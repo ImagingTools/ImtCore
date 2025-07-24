@@ -30,9 +30,11 @@ BoundingBox {
 			}
 
 		}
+
 		ctx.closePath();
 		ctx.stroke();
 		ctx.fill();
+
 	}
 
 	function isInside(xArg, yArg){

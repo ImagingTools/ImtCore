@@ -75,6 +75,7 @@ Rectangle {
 
 		hideScrollbars: true;
 		hasRightButtonMenu: true;
+		hasLeftButtonMenu: true;
 		leftMenuCoordinates: Qt.point(gridShape.labelXWidth + Style.marginM, Style.marginS)
 		//minZoomLevel: 1;
 		//restrictMove: true;

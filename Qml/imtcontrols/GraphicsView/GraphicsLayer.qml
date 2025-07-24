@@ -101,7 +101,7 @@ QtObject {
 			shape.layerMatrix = layerMatrix
 		}
 
-		shape.draw(ctx, tempMatrix);
+		shape.drawComplex(ctx, tempMatrix);
 	}
 
 }

@@ -56,6 +56,14 @@ QtObject {
 	}
 
 
+	function drawComplex(ctx, transformMatrixArg){
+		draw (ctx, transformMatrixArg)
+		if(isSelected && viewItem.isEditMode){
+			drawBoundingBox(ctx)
+		}
+	}
+
+	function drawBoundingBox(ctx){}
 
 	function getScreenPosition(logPosition){
 		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)

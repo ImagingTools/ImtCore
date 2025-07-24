@@ -9,7 +9,7 @@ QtObject {
 	property real shapeSelectedPointSize: 6;
 	property int boundingBoxLineWidth: 2;
 	property int boundingBoxControlPointRadius: 6;
-	property string boundingBoxBorderColor: "#000000"
+	property string boundingBoxBorderColor: "#3a3b3b"
 
 	property int selectionLineWidth: 4;
 	property string selectionColor: "orange"
@@ -70,9 +70,14 @@ QtObject {
 	function drawBoundingBoxControlPoint(ctx, point){
 		let radius = boundingBoxControlPointRadius;
 		ctx.strokeStyle = boundingBoxBorderColor;
+		ctx.fillStyle = boundingBoxBorderColor;
 		ctx.lineWidth = boundingBoxLineWidth
 
 		ctx.moveTo(point.x, point.y)
+		ctx.beginPath()
 		ctx.arc(point.x, point.y, radius, 0, 2*Math.PI, true);
+		ctx.stroke()
+		ctx.fill()
+		ctx.closePath();
 	}
 }

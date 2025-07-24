@@ -11,28 +11,29 @@ GraphicsShapeBase {
 
 	property bool editMode: false;
 
-		function drawBoundingBox(ctx){
-		drawBoundingBoxBorder(ctx);
-		drawBoundingBoxControlPoints(ctx);
-		drawBoundingBoxRotationControl(ctx);
+	function drawBoundingBox(ctx){
+		ctx.globalAlpha = 1
+		let cornerPointsObj = getBoundingBoxCornerPoints(true);
+		if(!Object.keys(cornerPointsObj).length){
+			return;
+		}
+		drawBoundingBoxBorder(ctx, cornerPointsObj);
+		drawBoundingBoxRotationControl(ctx, cornerPointsObj);
+		drawBoundingBoxControlPoints(ctx, cornerPointsObj);
 	}
 
-	function drawBoundingBoxBorder(ctx){
-		let cornerPointList = getBoundingBoxCornerPoints();
-		DesignScheme.drawBoundingBoxBorder(ctx, cornerPointList)
+	function drawBoundingBoxBorder(ctx, cornerPointsObj){
+		DesignScheme.drawBoundingBoxBorder(ctx, cornerPointsObj)
 	}
 
-	function drawBoundingBoxControlPoints(ctx){
-		let cornerPoints = getBoundingBoxCornerPoints()
-		let midPoints  = getBoundingBoxMidPoints()
-
-		ctx.beginPath()
+	function drawBoundingBoxControlPoints(ctx, cornerPointsObj){
+		let midPoints  = getBoundingBoxMidPoints(true, cornerPointsObj)
 
 		//corner points
-		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPoints.topLeftPoint);
-		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPoints.topRightPoint);
-		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPoints.bottomRightPoint);
-		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPoints.bottomLeftPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.topLeftPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.topRightPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.bottomRightPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.bottomLeftPoint);
 
 		//midPoints
 		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.leftPoint);
@@ -40,19 +41,16 @@ GraphicsShapeBase {
 		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.topPoint);
 		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.bottomPoint);
 
-		ctx.stroke();
-		ctx.closePath();
 	}
 
-	function drawBoundingBoxRotationControl(ctx){
-		let cornerPointslist = getBoundingBoxCornerPoints();
-		DesignScheme.drawBoundingBoxRotationControl(ctx, cornerPointslist);
+	function drawBoundingBoxRotationControl(ctx, cornerPointsObj){
+		DesignScheme.drawBoundingBoxRotationControl(ctx, cornerPointsObj);
 	}
 
 	function getBoundingBoxCenter(){
-		let cornerPointList = getBoundingBoxCornerPoints();
+		let cornerPointsObj = getBoundingBoxCornerPoints();
 
-		return Qt.point((cornerPointList.topLeftPoint.x + cornerPointList.topRightPoint.x)/2,0, (cornerPointList.topRightPoint.y + cornerPointList.bottomRightPoint.y)/2);
+		return Qt.point((cornerPointsObj.topLeftPoint.x + cornerPointsObj.topRightPoint.x)/2,0, (cornerPointsObj.topRightPoint.y + cornerPointsObj.bottomRightPoint.y)/2);
 	}
 
 	function getBoundingBoxPoints(){
@@ -100,23 +98,27 @@ GraphicsShapeBase {
 		return pointsObj;
 	}
 
-	function getBoundingBoxCornerPoints(){
-
+	function getBoundingBoxCornerPoints(isScreenPosition){
+		if(isScreenPosition){
+			return boundingBoxPointsToScreen(getBoundingBoxPoints())
+		}
 		return getBoundingBoxPoints();
 	}
 
-	function getBoundingBoxMidPoints(){
+	function getBoundingBoxMidPoints(isScreenPosition, cornerPointsObj){
 
 		let midpoints = ({})
-		let cornerPoints = getBoundingBoxCornerPoints();
-		if(!Object.keys(cornerPoints).length){
+		if(cornerPointsObj == undefined){
+			cornerPointsObj = getBoundingBoxCornerPoints(isScreenPosition);
+		}
+		if(!Object.keys(cornerPointsObj).length){
 			return ({});
 		}
 
-		midpoints.topPoint = Qt.point((cornerPoints.topLeftPoint.x + cornerPoints.topRightPoint.x)/2, cornerPoints.topLeftPoint.y)
-		midpoints.rightPoint = Qt.point(cornerPoints.topRightPoint.x, (cornerPoints.topRightPoint.y + cornerPoints.bottomRightPoint.y)/2)
-		midpoints.bottomPoint = Qt.point((cornerPoints.bottomRightPoint.x + cornerPoints.bottomLeftPoint.x)/2, cornerPoints.bottomRightPoint.y)
-		midpoints.leftPoint = Qt.point(cornerPoints.bottomLeftPoint.x, (cornerPoints.topLeftPoint.y + cornerPoints.bottomLeftPoint.y)/2)
+		midpoints.topPoint = Qt.point((cornerPointsObj.topLeftPoint.x + cornerPointsObj.topRightPoint.x)/2, cornerPointsObj.topLeftPoint.y)
+		midpoints.rightPoint = Qt.point(cornerPointsObj.topRightPoint.x, (cornerPointsObj.topRightPoint.y + cornerPointsObj.bottomRightPoint.y)/2)
+		midpoints.bottomPoint = Qt.point((cornerPointsObj.bottomRightPoint.x + cornerPointsObj.bottomLeftPoint.x)/2, cornerPointsObj.bottomRightPoint.y)
+		midpoints.leftPoint = Qt.point(cornerPointsObj.bottomLeftPoint.x, (cornerPointsObj.topLeftPoint.y + cornerPointsObj.bottomLeftPoint.y)/2)
 
 		return midpoints;
 	}
@@ -151,8 +153,51 @@ GraphicsShapeBase {
 		return (pointsBB.bottomLeftPoint.y - pointsBB.topLeftPoint.y)
 	}
 
-	function draw(ctx, transformMatrixArg){
-		drawBoundingBox(ctx)
+	function boundingBoxPointsToScreen(pointsObjLog){
+		if(!Object.keys(pointsObjLog).length){
+			return ({});
+		}
+
+		let pointsObj = ({});
+
+		let minX = 1000000;
+		let minY = 1000000;
+		let maxX  = -1000000
+		let maxY = -1000000;
+
+		let points = []
+
+		points.push(Qt.point(pointsObjLog.topLeftPoint.x, pointsObjLog.topLeftPoint.y))
+		points.push(Qt.point(pointsObjLog.topRightPoint.x, pointsObjLog.topRightPoint.y))
+		points.push(Qt.point(pointsObjLog.bottomLeftPoint.x, pointsObjLog.bottomLeftPoint.y))
+		points.push(Qt.point(pointsObjLog.bottomRightPoint.x, pointsObjLog.bottomRightPoint.y))
+
+		for(let i = 0; i < points.length; i++){
+			let point = points[i]
+			point = getScreenPosition(point);
+
+			let x_ = point.x
+			let y_ = point.y
+			if(x_ < minX){
+				minX = x_
+			}
+			if(y_ < minY){
+				minY = y_
+			}
+			if(x_ > maxX){
+				maxX = x_
+			}
+			if(y_ > maxY){
+				maxY = y_
+			}
+		}
+
+		pointsObj.topLeftPoint = Qt.point(minX, minY)
+		pointsObj.topRightPoint = Qt.point(maxX, minY)
+		pointsObj.bottomLeftPoint = Qt.point(minX, maxY)
+		pointsObj.bottomRightPoint = Qt.point(maxX, maxY)
+
+		return pointsObj;
 	}
 
 	function editFunction(xArg, yArg, deltaXArg, deltaYArg, matrix){
@@ -184,13 +229,13 @@ GraphicsShapeBase {
 
 			}
 			else if(xArg >= cornerPoints.topRightPoint.x - margin && xArg <= cornerPoints.topRightPoint.x + margin
-					  && yxArg >= cornerPoints.topRightPoint.y - margin && yArg <= cornerPoints.topRightPoint.y + margin){
+					&& yxArg >= cornerPoints.topRightPoint.y - margin && yArg <= cornerPoints.topRightPoint.y + margin){
 
 				topRightMoving(deltaXArg, deltaYArg);
 
 			}
 			else if(xArg >= cornerPoints.bottomLeftPoint.x - margin && xArg <= cornerPoints.bottomLeftPoint.x + margin
-					  && yxArg >= cornerPoints.bottomLeftPoint.y - margin && yArg <= cornerPoints.bottomLeftPoint.y + margin){
+					&& yxArg >= cornerPoints.bottomLeftPoint.y - margin && yArg <= cornerPoints.bottomLeftPoint.y + margin){
 
 				bottomLeftMoving(deltaXArg, deltaYArg);
 
@@ -198,7 +243,7 @@ GraphicsShapeBase {
 			else if(xArg >= cornerPoints.bottomRightPoint.x - margin && xArg <= cornerPoints.bottomRightPoint.x + margin
 					&& yxArg >= cornerPoints.bottomRightPoint.y - margin && yArg <= cornerPoints.bottomRightPoint.y + margin){
 
-					bottomRightMoving(deltaXArg, deltaYArg);
+				bottomRightMoving(deltaXArg, deltaYArg);
 			}
 			else if(xArg >= midPoints.leftPoint.x - margin && xArg <= midPoints.leftPoint.x + margin
 					&& yxArg >= midPoints.leftPoint.y - margin && yArg <= midPoints.leftPoint.y + margin){
@@ -241,6 +286,24 @@ GraphicsShapeBase {
 
 	function isInside(xArg, yArg){
 		return false;
+	}
+
+	function isInsideBoundingBox(xArg, yArg){
+		let point = getLogPosition(Qt.point(xArg, yArg))
+		let cornerPointsObj = getBoundingBoxCornerPoints();
+		if(!Object.keys(cornerPointsObj).length){
+			return false;
+		}
+
+		xArg = point.x
+		yArg = point.y
+
+		return (
+			xArg > cornerPointsObj.topLeftPoint.x
+			&& xArg < cornerPointsObj.topRightPoint.x
+			&& yArg > cornerPointsObj.topLeftPoint.y
+			&& yArg < cornerPointsObj.bottomRightPoint.y
+					)
 	}
 
 	function rotate(angle){

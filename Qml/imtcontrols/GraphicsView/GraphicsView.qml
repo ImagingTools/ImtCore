@@ -299,9 +299,13 @@ Rectangle {
 
 	function findObject(mouseX, mouseY){
 		//console.log("findObject", mouseX, mouseY)
-
 		canvas.setViewMatrixParams();
 
+		if(!graphicsView.isSelectionMode && canvas.selectedShapeCount){
+			if(canvas.editShape && canvas.editShape.isInsideBoundingBox(mouseX, mouseY)){
+				return canvas.editShape
+			}
+		}
 		for(let i = 0; i < graphicsView.layerModel.length ; i++){
 			let layer = graphicsView.layerModel[i];
 			if(layer.layerId == "active" /*|| layer.layerId == "inactive"*/){
@@ -310,14 +314,13 @@ Rectangle {
 				for(let j = 0; j < shapeModel.length; j++){
 					let shape = shapeModel[j];
 
-					let isInside =  shape.isInside(mouseX, mouseY)
+					//let isInside =  shape.isInside(mouseX, mouseY)
+					let isInside = !graphicsView.isSelectionMode && shape.isSelected ? shape.isInsideBoundingBox(mouseX, mouseY) : shape.isInside(mouseX, mouseY)
 					if(isInside){
 						return shape;
 					}
 				}
 			}
-
-
 		}
 
 		return null
@@ -327,7 +330,7 @@ Rectangle {
 	function clearSelection(exeptShape){
 		for(let i = 0; i < graphicsView.layerModel.length ; i++){
 			let layer = graphicsView.layerModel[i];
-			if(layer.layerId == "active" || layer.layerId == "inactive"){
+			if(layer.layerId == "active" /*|| layer.layerId == "inactive"*/){
 				let shapeModel = layer.shapeModel;
 				for(let j = 0; j < shapeModel.length; j++){
 					let shape = shapeModel[j];
@@ -557,6 +560,9 @@ Rectangle {
 						if(canvas.selectedShapeCount < 2){
 							graphicsView.clearSelection(shape)
 							canvas.selectedShapeCount = 1;
+							if(!graphicsView.isSelectionMode){
+								canvas.editShape = shape;
+							}
 						}
 						shape.isSelected = true;
 					}
@@ -577,7 +583,7 @@ Rectangle {
 			onReleased: {
 				//console.log("RELEASED!!!")
 				let shape = graphicsView.findObject(mouse.x, mouse.y)
-				if(mouse.modifiers & Qt.ControlModifier){//Ctrl
+				if(graphicsView.isSelectionMode && mouse.modifiers & Qt.ControlModifier){//Ctrl
 					if(shape !== null){
 						if(!shape.isSelected){
 							shape.isSelected = true;
@@ -598,6 +604,9 @@ Rectangle {
 						if(canvas.selectedShapeCount > 1){
 							graphicsView.clearSelection(shape)
 							canvas.selectedShapeCount = 1;
+							if(!graphicsView.isSelectionMode){
+								canvas.editShape = shape;
+							}
 						}
 						shape.isSelected = true;
 					}
@@ -800,6 +809,7 @@ Rectangle {
 			//antialiasing: true;
 
 			property int selectedShapeCount: 0;
+			property var editShape
 
 			property real scaleCoeff: 1.0;
 			property real scaleCoeffPrev: 1.0;
