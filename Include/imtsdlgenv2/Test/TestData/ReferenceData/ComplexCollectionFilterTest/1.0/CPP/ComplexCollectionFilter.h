@@ -163,7 +163,7 @@ signals:
 #include <imtbase/TListModelBase.h>
 
 // custom types includes
-#include <1.0/CPP/ImtBaseTypes.h>
+#include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
 
 

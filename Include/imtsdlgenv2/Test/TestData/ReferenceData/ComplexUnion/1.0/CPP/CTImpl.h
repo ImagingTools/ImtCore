@@ -174,7 +174,7 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResult);
 #include <imtbase/TListModelBase.h>
 
 // custom types includes
-#include <1.0/CPP/CTTypes.h>
+#include <complextestsdl/SDL/1.0/CPP/CTTypes.h>
 
 
 
@@ -282,7 +282,7 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CArea);
 #include <imtbase/TListModelBase.h>
 
 // custom types includes
-#include <1.0/CPP/CTTypes.h>
+#include <complextestsdl/SDL/1.0/CPP/CTTypes.h>
 
 
 
@@ -386,7 +386,7 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CAnalyzer);
 #include <imtbase/TListModelBase.h>
 
 // custom types includes
-#include <1.0/CPP/CTTypes.h>
+#include <complextestsdl/SDL/1.0/CPP/CTTypes.h>
 
 
 
@@ -494,7 +494,7 @@ Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CInspection);
 #include <imtbase/TListModelBase.h>
 
 // custom types includes
-#include <1.0/CPP/CTTypes.h>
+#include <complextestsdl/SDL/1.0/CPP/CTTypes.h>
 
 
 

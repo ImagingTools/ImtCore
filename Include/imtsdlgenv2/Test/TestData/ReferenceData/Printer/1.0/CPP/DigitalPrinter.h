@@ -62,7 +62,7 @@ signals:
 #include <imtbase/TListModelBase.h>
 
 // custom types includes
-#include <1.0/CPP/PrinterBase.h>
+#include <modsdlsdl/SDL/1.0/CPP/PrinterBase.h>
 
 
 
@@ -162,7 +162,7 @@ Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecification);
 #include <imtbase/TListModelBase.h>
 
 // custom types includes
-#include <1.0/CPP/PrinterBase.h>
+#include <modsdlsdl/SDL/1.0/CPP/PrinterBase.h>
 
 
 
