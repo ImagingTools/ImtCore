@@ -439,6 +439,7 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 
 	SendInfoMessage(0, QString("Try connect to the WebSocket-server: %1").arg(url.toString()));
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QWebSocketHandshakeOptions handshakeOptions;
 	if (m_subprotocolListCompPtr.IsValid()){
 		QStringList protocols;
@@ -450,8 +451,10 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 
 		handshakeOptions.setSubprotocols(protocols);
 	}
-
 	m_webSocket.open(url, handshakeOptions);
+#else
+	m_webSocket.open(url);
+#endif
 }
 
 

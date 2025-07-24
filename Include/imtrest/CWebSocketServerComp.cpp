@@ -231,6 +231,7 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 		m_webSocketServerPtr.SetPtr(new QWebSocketServer("", QWebSocketServer::NonSecureMode, this));
 	}
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	if (m_subprotocolListCompPtr.IsValid()){
 		QStringList supportedSubprotocolList;
 
@@ -241,6 +242,7 @@ bool CWebSocketServerComp::StartListening(const QHostAddress& address, quint16 p
 
 		m_webSocketServerPtr->setSupportedSubprotocols(supportedSubprotocolList);
 	}
+#endif
 
 	if (m_webSocketServerPtr->listen(address, port)){
 		SendInfoMessage(0, QString("Web socket server successfully started on port %1").arg(port));
@@ -266,9 +268,12 @@ void CWebSocketServerComp::HandleNewConnections()
 	QWebSocketServer* webSocketServerPtr = qobject_cast<QWebSocketServer*>(sender());
 	Q_ASSERT(webSocketServerPtr != nullptr);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QStringList supportedSubprotocols = webSocketServerPtr->supportedSubprotocols();
+#endif
 
 	while (QWebSocket* webSocketPtr = webSocketServerPtr->nextPendingConnection()){
+#if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 		QString subprotocol = webSocketPtr->subprotocol();
 		QString message = QString("Handle new web socket connection, (Subprotocol: '%1', Threads: %2)").arg(subprotocol, m_webSocketThreadList.count()) ;
 		SendVerboseMessage(message, "CWebSocketServerComp");
@@ -276,7 +281,7 @@ void CWebSocketServerComp::HandleNewConnections()
 		if (!subprotocol.isEmpty() && !supportedSubprotocols.contains(subprotocol)) {
 			SendVerboseMessage("Unsupported subprotocol: " + subprotocol, "CWebSocketServerComp");
 		}
-
+#endif
 		bool find = false;
 		for (CWebSocketThread* webSocketThreadPtr: m_webSocketThreadList){
 			if (!webSocketThreadPtr->isRunning()){
