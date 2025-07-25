@@ -7,7 +7,10 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QFile>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
 #include <QtWebSockets/QWebSocketHandshakeOptions>
+#endif 
 
 // ACF includes
 #include <istd/TDelPtr.h>
