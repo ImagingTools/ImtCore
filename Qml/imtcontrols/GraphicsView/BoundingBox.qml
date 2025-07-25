@@ -200,23 +200,16 @@ GraphicsShapeBase {
 		return pointsObj;
 	}
 
-	function editFunction(xArg, yArg, deltaXArg, deltaYArg, matrix){
-		if(!editMode){
+	function editFunction(xArg, yArg, deltaXArg, deltaYArg){
+		if(!viewItem.editMode){
 			return;
 		}
-
-		let scaleCoeff = matrix.xScale()
-		let shiftX = matrix.xTranslation()
-		let shiftY = matrix.yTranslation()
-
-		xArg = (xArg - shiftX) / scaleCoeff
-		yArg = (yArg - shiftY) / scaleCoeff
 
 		if(isInsideRotationArea(xArg, yArg)){//rotation
 			let angle = 0//TODO
 			rotate(angle);
 		}
-		else {//control points moving
+		else {//Bounding box edges moving
 			let cornerPoints = getBoundingBoxCornerPoints();
 			let midPoints  = getBoundingBoxMidPoints();
 
@@ -333,6 +326,16 @@ GraphicsShapeBase {
 	function bottomRightMoving(deltaX, deltaY){
 	}
 
+	onMousePositionChanged: {
+		if(viewItem.isEditMode){
+
+			if(mouseIsPressed){
+
+
+			}
+		}
+
+	}
 
 }
 

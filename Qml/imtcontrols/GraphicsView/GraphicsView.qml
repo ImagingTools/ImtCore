@@ -552,6 +552,13 @@ Rectangle {
 
 			onPressed: {
 				//console.log("PRESSED!!!")
+				let activeLayer = getActiveLayer()
+
+				for (let i = 0; i < activeLayer.shapeModel.length; i++){
+					let shape = activeLayer.shapeModel[i];
+					shape.mousePressed(mouse)
+				}
+
 				let found = false;
 				if(!(mouse.modifiers & Qt.ControlModifier)){// without Ctrl
 					let shape = graphicsView.findObject(mouse.x, mouse.y)
@@ -582,6 +589,13 @@ Rectangle {
 
 			onReleased: {
 				//console.log("RELEASED!!!")
+				let activeLayer = getActiveLayer()
+
+				for (let i = 0; i < activeLayer.shapeModel.length; i++){
+					let shape = activeLayer.shapeModel[i];
+					shape.mouseReleased(mouse)
+				}
+
 				let shape = graphicsView.findObject(mouse.x, mouse.y)
 				if(graphicsView.isSelectionMode && mouse.modifiers & Qt.ControlModifier){//Ctrl
 					if(shape !== null){
@@ -636,7 +650,7 @@ Rectangle {
 				let activeLayer = graphicsView.getActiveLayer()
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
 					let shape = activeLayer.shapeModel[i];
-					if(shape.isSelected){
+					if(shape.isSelected && graphicsView.isSelectionMode){
 						found = true;
 
 						let deltaX_ = delta.x
@@ -769,9 +783,24 @@ Rectangle {
 			}
 
 			onPositionSignal: {
-				positionChangedPause.position = position;
-				positionChangedPause.restart();
+				if(graphicsView.isSelectionMode){
+					positionChangedPause.position = position;
+					positionChangedPause.restart();
+				}
 			}
+
+			onPositionChanged: {
+				if(!graphicsView.isSelectionMode && controlArea.isPressed){
+					let activeLayer = getActiveLayer()
+
+					for (let i = 0; i < activeLayer.shapeModel.length; i++){
+						let shape = activeLayer.shapeModel[i];
+						shape.mousePositionChanged(mouse)
+					}
+				}
+
+			}
+
 			PauseAnimation {
 				id: positionChangedPause;
 

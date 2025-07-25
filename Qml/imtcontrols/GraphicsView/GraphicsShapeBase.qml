@@ -27,7 +27,9 @@ QtObject {
 
 	property var viewMode;
 	property var points: [];
-	property var pointsBackup: [];
+
+	property bool mouseIsPressed: false;
+	property var mousePressedCoord: Qt.point(0,0);
 
 	signal shapeChanged();
 	signal shapeInfo(var info);
@@ -42,6 +44,14 @@ QtObject {
 
 	onShapeChanged: {
 		viewItem.requestPaint();
+	}
+
+	onMousePressed: {
+		mouseIsPressed = true;
+		mousePressedCoord = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
+	}
+	onMouseReleased: {
+		mouseIsPressed = false;
 	}
 
 	function draw (ctx, transformMatrixArg){
