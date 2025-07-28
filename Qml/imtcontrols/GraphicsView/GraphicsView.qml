@@ -542,7 +542,7 @@ Rectangle {
 			onClicked: {
 				//console.log("CLICKED!!!")
 
-				let activeLayer = getActiveLayer()
+				let activeLayer = graphicsView.getActiveLayer()
 
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
 					let shape = activeLayer.shapeModel[i];
@@ -552,7 +552,7 @@ Rectangle {
 
 			onPressed: {
 				//console.log("PRESSED!!!")
-				let activeLayer = getActiveLayer()
+				let activeLayer = graphicsView.getActiveLayer()
 
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
 					let shape = activeLayer.shapeModel[i];
@@ -589,7 +589,7 @@ Rectangle {
 
 			onReleased: {
 				//console.log("RELEASED!!!")
-				let activeLayer = getActiveLayer()
+				let activeLayer = graphicsView.getActiveLayer()
 
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
 					let shape = activeLayer.shapeModel[i];
@@ -650,7 +650,7 @@ Rectangle {
 				let activeLayer = graphicsView.getActiveLayer()
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
 					let shape = activeLayer.shapeModel[i];
-					if(shape.isSelected && graphicsView.isSelectionMode){
+					if(shape.isSelected /*&& graphicsView.isSelectionMode*/){
 						found = true;
 
 						let deltaX_ = delta.x
@@ -691,7 +691,9 @@ Rectangle {
 							deltaY_ = newY - topLeftPoint.y
 						}// fit to borders
 
-						shape.setCoordinateShift(deltaX_, deltaY_)
+						if(graphicsView.isSelectionMode){
+							shape.setCoordinateShift(deltaX_, deltaY_)
+						}
 					}
 				}
 
@@ -791,7 +793,7 @@ Rectangle {
 
 			onPositionChanged: {
 				if(!graphicsView.isSelectionMode && controlArea.isPressed){
-					let activeLayer = getActiveLayer()
+					let activeLayer = graphicsView.getActiveLayer()
 
 					for (let i = 0; i < activeLayer.shapeModel.length; i++){
 						let shape = activeLayer.shapeModel[i];
