@@ -40,6 +40,9 @@ BoundingBox {
 	function isInside(xArg, yArg){
 
 		let mousePoint = getLogPosition(Qt.point(xArg, yArg))
+		if(findNodeIndex(mousePoint) > -1){
+			return true;
+		}
 
 		return AnalyticGeometry.pointInPolygon(mousePoint, points)
 	}

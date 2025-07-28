@@ -15,6 +15,7 @@ QtObject {
 	property bool showNodes: false;
 	property int touchedNodeIndex: -1;
 	property int highlightedNodeIndex: -1;
+	property int editNodeIndex: -1;
 
 	property var highlightedNodeCoordinate
 	property var touchedNodeCoordinate
@@ -48,10 +49,15 @@ QtObject {
 
 	onMousePressed: {
 		mouseIsPressed = true;
-		mousePressedCoord = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
+		//mousePressedCoord = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
+		mousePressedCoord = Qt.point(mouseEvent.x, mouseEvent.y)
+		if(viewItem.isPointsEditMode){
+			editNodeIndex = findNodeIndex(getLogPosition(mousePressedCoord))
+		}
 	}
 	onMouseReleased: {
 		mouseIsPressed = false;
+		editNodeIndex = -1
 	}
 
 	function draw (ctx, transformMatrixArg){
@@ -70,6 +76,18 @@ QtObject {
 		draw (ctx, transformMatrixArg)
 		if(isSelected && viewItem.isEditMode){
 			drawBoundingBox(ctx)
+		}
+
+		if(isSelected && viewItem.isPointsEditMode){
+			drawEditPoints(ctx)
+		}
+	}
+
+	function drawEditPoints(ctx){
+		ctx.globalAlpha = 1
+		for(let i = 0; i < points.length; i++){
+			let point = getScreenPosition(points[i]);
+			DesignScheme.drawEditPoint(ctx, point)
 		}
 	}
 
@@ -93,13 +111,19 @@ QtObject {
 		let foundIndex = -1
 		for(let i = 0; i < points.length; i++){
 			let point = points[i];
-			let pointSize = (DesignScheme.shapePointSize + Style.marginXS)/viewItem.viewMatrix.xScale();
-			if(point.x >= position.x - pointSize
-				&& point.x <= position.x + pointSize
-				&& point.y >= position.y - pointSize
-				&& point.y <= position.y + pointSize
-				){
-				foundIndex = i;
+			let pointSize = (DesignScheme.shapePointSize + Style.marginS)/viewItem.viewMatrix.xScale();
+			// if(point.x >= position.x - pointSize
+			// 	&& point.x <= position.x + pointSize
+			// 	&& point.y >= position.y - pointSize
+			// 	&& point.y <= position.y + pointSize
+			// 	){
+			// 	foundIndex = i;
+			// }
+			let dist = AnalyticGeometry.distanceBetweenPoints2d(point, position)
+
+			if(dist <= pointSize){
+				console.log("DIST:: ", dist, i)
+				return i
 			}
 		}
 		return foundIndex;
@@ -108,6 +132,7 @@ QtObject {
 
 
 	function setCoordinateShift(deltaX, deltaY){
+		//console.log("setCoordinateShift", deltaX, deltaY)
 		let pointsListNew = [];
 
 		for(let i = 0; i < points.length; i++){

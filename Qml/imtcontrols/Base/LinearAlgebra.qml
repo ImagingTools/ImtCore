@@ -20,6 +20,34 @@ QtObject {
 		return retPoint;
 	}
 
+	function rotatePoint(angle, center, pointArg){
+		if(center == undefined){
+			center = Qt.point(0,0);
+		}
+
+		let matrix;
+
+		let rotationMatrix = [
+				[Math.cos(angle), -1*Math.sin(angle), center.x],
+				[Math.sin(angle), Math.cos(angle), center.y],
+				[0, 0, 1]
+			  ];
+		let translateMatrix = [
+				[1, 0, -center.x],
+				[0, 1, -center.y],
+				[0, 0, 1]
+			  ];
+
+		if(center.x == 0 && center.y == 0){
+			matrix = rotationMatrix
+		}
+		else {
+			matrix = multiplyByMatrix3x3(rotationMatrix, translateMatrix)
+		}
+
+		return transformPoint2d(pointArg, matrix)
+	}
+
 	function multiplyByMatrix3x3(matrixArg, externMatrix){
 		let resultMatrix = [
 				[0, 0, 0],

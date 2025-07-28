@@ -47,10 +47,12 @@ GraphicsShapeBase {
 		DesignScheme.drawBoundingBoxRotationControl(ctx, cornerPointsObj);
 	}
 
-	function getBoundingBoxCenter(){
-		let cornerPointsObj = getBoundingBoxCornerPoints();
+	function getBoundingBoxCenter(cornerPointsObj){
+		if(cornerPointsObj == undefined){
+			cornerPointsObj = getBoundingBoxCornerPoints();
+		}
 
-		return Qt.point((cornerPointsObj.topLeftPoint.x + cornerPointsObj.topRightPoint.x)/2,0, (cornerPointsObj.topRightPoint.y + cornerPointsObj.bottomRightPoint.y)/2);
+		return Qt.point((cornerPointsObj.topLeftPoint.x + cornerPointsObj.topRightPoint.x)/2, (cornerPointsObj.topRightPoint.y + cornerPointsObj.bottomRightPoint.y)/2);
 	}
 
 	function getBoundingBoxPoints(){
@@ -135,21 +137,25 @@ GraphicsShapeBase {
 		return point.topLeftPoint
 	}
 
-	function getBoundingBoxWidth(){
+	function getBoundingBoxWidth(pointsBB){
 		if(!points.length){
 			return 0;
 		}
 
-		let pointsBB = getBoundingBoxPoints()
+		if(pointsBB == undefined){
+			pointsBB = getBoundingBoxPoints()
+		}
 		return (pointsBB.topRightPoint.x - pointsBB.topLeftPoint.x)
 	}
 
-	function getBoundingBoxHeight(){
+	function getBoundingBoxHeight(pointsBB){
 		if(!points.length){
 			return 0;
 		}
 
-		let pointsBB = getBoundingBoxPoints()
+		if(pointsBB == undefined){
+			pointsBB = getBoundingBoxPoints()
+		}
 		return (pointsBB.bottomLeftPoint.y - pointsBB.topLeftPoint.y)
 	}
 
@@ -200,71 +206,106 @@ GraphicsShapeBase {
 		return pointsObj;
 	}
 
-	function editFunction(xArg, yArg, deltaXArg, deltaYArg){
-		if(!viewItem.editMode){
+	function editFunction(position){
+		//console.log("editFunction:::::")
+		return;
+
+		if(!viewItem.isEditMode || !isSelected){
 			return;
 		}
 
-		if(isInsideRotationArea(xArg, yArg)){//rotation
-			let angle = 0//TODO
-			rotate(angle);
+		let cornerPoints = getBoundingBoxCornerPoints();
+
+		//let position = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
+		let deltaXArg = position.x - mousePressedCoord.x
+		let deltaYArg = position.y - mousePressedCoord.y
+
+		let positionLog = getLogPosition(position)
+		let xArg = positionLog.x
+		let yArg = positionLog.y
+
+		if(isInsideRotationArea(positionLog.x, positionLog.y, cornerPoints)){//rotation
+			console.log("ROTATE")
+			let center = getBoundingBoxCenter(cornerPoints)
+			let angle  = getAngle(xArg, yArg, center)
+			let startPoint = getLogPosition(Qt.point(mousePressedCoord.x, mousePressedCoord.y))
+			let angle0 = getAngle(startPoint.x, startPoint.y , center)
+
+			angle = angle - angle0
+
+			console.log("ROTATE", angle)
+			//rotate(angle, center);
 		}
 		else {//Bounding box edges moving
-			let cornerPoints = getBoundingBoxCornerPoints();
-			let midPoints  = getBoundingBoxMidPoints();
-
 			let margin = 10;
 
+			let midPoints  = getBoundingBoxMidPoints(false, cornerPoints);
+
+			let bb_width = getBoundingBoxWidth(cornerPoints);
+			let bb_height = getBoundingBoxHeight(cornerPoints);
+
+			let scale_x = bb_width / (bb_width + positionLog.x - getLogPosition(mousePressedCoord).x)
+			let scale_y = bb_height / (bb_height + positionLog.y - getLogPosition(mousePressedCoord).y)
+
 			if(xArg >= cornerPoints.topLeftPoint.x - margin && xArg <= cornerPoints.topLeftPoint.x + margin
-					&& yxArg >= cornerPoints.topLeftPoint.y - margin && yArg <= cornerPoints.topLeftPoint.y + margin){
+					&& yArg >= cornerPoints.topLeftPoint.y - margin && yArg <= cornerPoints.topLeftPoint.y + margin){
 
 				topLeftMoving(deltaXArg, deltaYArg);
 
 			}
 			else if(xArg >= cornerPoints.topRightPoint.x - margin && xArg <= cornerPoints.topRightPoint.x + margin
-					&& yxArg >= cornerPoints.topRightPoint.y - margin && yArg <= cornerPoints.topRightPoint.y + margin){
+					&& yArg >= cornerPoints.topRightPoint.y - margin && yArg <= cornerPoints.topRightPoint.y + margin){
 
-				topRightMoving(deltaXArg, deltaYArg);
+				topRightMoving(scale_x, scale_y);
 
 			}
 			else if(xArg >= cornerPoints.bottomLeftPoint.x - margin && xArg <= cornerPoints.bottomLeftPoint.x + margin
-					&& yxArg >= cornerPoints.bottomLeftPoint.y - margin && yArg <= cornerPoints.bottomLeftPoint.y + margin){
+					&& yArg >= cornerPoints.bottomLeftPoint.y - margin && yArg <= cornerPoints.bottomLeftPoint.y + margin){
 
-				bottomLeftMoving(deltaXArg, deltaYArg);
+				bottomLeftMoving(scale_x, scale_y);
 
 			}
 			else if(xArg >= cornerPoints.bottomRightPoint.x - margin && xArg <= cornerPoints.bottomRightPoint.x + margin
-					&& yxArg >= cornerPoints.bottomRightPoint.y - margin && yArg <= cornerPoints.bottomRightPoint.y + margin){
+					&& yArg >= cornerPoints.bottomRightPoint.y - margin && yArg <= cornerPoints.bottomRightPoint.y + margin){
 
-				bottomRightMoving(deltaXArg, deltaYArg);
+				bottomRightMoving(scale_x, scale_y);
 			}
 			else if(xArg >= midPoints.leftPoint.x - margin && xArg <= midPoints.leftPoint.x + margin
-					&& yxArg >= midPoints.leftPoint.y - margin && yArg <= midPoints.leftPoint.y + margin){
+					&& yArg >= midPoints.leftPoint.y - margin && yArg <= midPoints.leftPoint.y + margin){
 
-				leftMoving(deltaXArg, deltaYArg);
+				leftMoving(scale_x);
 			}
 			else if(xArg >= midPoints.rightPoint.x - margin && xArg <= midPoints.rightPoint.x + margin
-					&& yxArg >= midPoints.rightPoint.y - margin && yArg <= midPoints.rightPoint.y + margin){
+					&& yArg >= midPoints.rightPoint.y - margin && yArg <= midPoints.rightPoint.y + margin){
 
-				rightMoving(deltaXArg, deltaYArg);
+				rightMoving(scale_x);
 			}
 			else if(xArg >= midPoints.topPoint.x - margin && xArg <= midPoints.topPoint.x + margin
-					&& yxArg >= midPoints.topPoint.y - margin && yArg <= midPoints.topPoint.y + margin){
+					&& yArg >= midPoints.topPoint.y - margin && yArg <= midPoints.topPoint.y + margin){
 
-				topMoving(deltaXArg, deltaYArg);
+				topMoving(scale_y);
 			}
 			else if(xArg >= midPoints.bottomPoint.x - margin && xArg <= midPoints.bottomPoint.x + margin
-					&& yxArg >= midPoints.bottomPoint.y - margin && yArg <= midPoints.bottomPoint.y + margin){
+					&& yArg >= midPoints.bottomPoint.y - margin && yArg <= midPoints.bottomPoint.y + margin){
 
-				bottomMoving(deltaXArg, deltaYArg);
+				bottomMoving(scale_y);
 			}
+
+			else {
+				setCoordinateShift(deltaXArg, deltaYArg)
+
+			}
+			mousePressedCoord = position
+			shapeChanged()
 		}
 	}
 
-	function isInsideRotationArea(xArg, yArg){
+	function isInsideRotationArea(xArg, yArg, cornerPoints){
 		let ok = false;
 
-		let cornerPoints = getBoundingBoxCornerPoints();
+		if(cornerPoints == undefined){
+			cornerPoints = getBoundingBoxCornerPoints();
+		}
 
 		let topLeftX = cornerPoints.topLeftPoint.x + (cornerPoints.topRightPoint.x - cornerPoints.topLeftPoint.x)/3
 		let topLeftY = cornerPoints.topLeftPoint.y + (cornerPoints.bottomRightPoint.y - cornerPoints.topRightPoint.y)/3
@@ -274,6 +315,7 @@ GraphicsShapeBase {
 
 		ok = xArg >= topLeftX && xArg <= bottomRightX && yArg >= topLeftY && yArg <= bottomRightY
 
+		//console.log("isInsideRotationArea", ok)
 		return ok;
 	}
 
@@ -282,6 +324,7 @@ GraphicsShapeBase {
 	}
 
 	function isInsideBoundingBox(xArg, yArg){
+		let margin = 10
 		let point = getLogPosition(Qt.point(xArg, yArg))
 		let cornerPointsObj = getBoundingBoxCornerPoints();
 		if(!Object.keys(cornerPointsObj).length){
@@ -292,47 +335,103 @@ GraphicsShapeBase {
 		yArg = point.y
 
 		return (
-			xArg > cornerPointsObj.topLeftPoint.x
-			&& xArg < cornerPointsObj.topRightPoint.x
-			&& yArg > cornerPointsObj.topLeftPoint.y
-			&& yArg < cornerPointsObj.bottomRightPoint.y
+			xArg > cornerPointsObj.topLeftPoint.x - margin
+			&& xArg < cornerPointsObj.topRightPoint.x + margin
+			&& yArg > cornerPointsObj.topLeftPoint.y - margin
+			&& yArg < cornerPointsObj.bottomRightPoint.y + margin
 					)
 	}
 
-	function rotate(angle){
+	function rotate(angle, center){
+		for(let i = 0; i < points.length; i++){
+			points[i] = LinearAlgebra.rotatePoint(angle, center, points[i])
+		}
+		shapeChanged();
 	}
 
-	function leftMoving(deltaX, deltaY){
+	function leftMoving(scaleX){
+		transformPoints(scaleX, 1)
 	}
 
-	function rightMoving(deltaX, deltaY){
+	function rightMoving(scaleX){
+		transformPoints(scaleX, 1)
 	}
 
-	function topMoving(deltaX, deltaY){
+	function topMoving(scaleY){
+		transformPoints(1, scaleY)
 	}
 
-	function bottomMoving(deltaX, deltaY){
+	function bottomMoving(scaleY){
+		transformPoints(1, scaleY)
 	}
 
-	function topLeftMoving(deltaX, deltaY){
+	function topLeftMoving(scaleX, scaleY){
+		transformPoints(scaleX, scaleY)
 	}
 
-	function bottomLeftMoving(deltaX, deltaY){
+	function bottomLeftMoving(scaleX, scaleY){
+		transformPoints(scaleX, scaleY)
 	}
 
-	function topRightMoving(deltaX, deltaY){
+	function topRightMoving(scaleX, scaleY){
+		transformPoints(scaleX, scaleY)
 	}
 
-	function bottomRightMoving(deltaX, deltaY){
+	function bottomRightMoving(scaleX, scaleY){
+		transformPoints(scaleX, scaleY)
+	}
+
+	function transformPoints(scaleX, scaleY){
+
+		let matrix = [
+				[scaleX, 0, 0],
+				[0, scaleY, 0],
+				[0, 0, 1]
+			  ];
+
+		for(let i = 0; i < points.length; i++){
+			points[i] = LinearAlgebra.transformPoint2d(points[i], matrix)
+		}
+	}
+
+	function getAngle(xArg, yArg, center){
+		let x0 = center.x
+		let y0 = center.y
+		let x_ = (xArg- x0)
+		let y_ = (yArg - y0)
+		let r = Math.sqrt(x_*x_+y_*y_)
+		let angle = 0
+		if(x_ >= 0 && y_ <= 0)
+			angle = Math.asin(Math.abs(x_)/r)*180/Math.PI
+		else if(x_ > 0 && y_ > 0)
+			angle = Math.acos(Math.abs(x_)/r)*180/Math.PI + 90
+		else if(x_ <= 0 && y_ > 0)
+			angle = Math.asin(Math.abs(x_)/r)*180/Math.PI + 180
+		else if(x_ <= 0 && y_ <= 0)
+			angle = Math.acos(Math.abs(x_)/r)*180/Math.PI + 270
+
+		return angle;
 	}
 
 	onMousePositionChanged: {
-		if(viewItem.isEditMode){
-
+		if(viewItem.isEditMode && isSelected){
 			if(mouseIsPressed){
-
+				//console.log("onPositionChanged:::::")
+				let position = Qt.point(mouseEvent.x, mouseEvent.y)
+				editFunction(position)
+			}
+		}
+		else if(viewItem.isPointsEditMode && isSelected){
+			//console.log("mouseIsPressed:: ", mouseIsPressed)
+			if(mouseIsPressed){
+				if(editNodeIndex > -1){
+					//console.log("foundNodeIndex:: ", editNodeIndex)
+					points[editNodeIndex] = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
+				}
+				shapeChanged()
 
 			}
+
 		}
 
 	}

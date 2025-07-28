@@ -80,4 +80,19 @@ QtObject {
 		ctx.fill()
 		ctx.closePath();
 	}
+
+	function drawEditPoint(ctx, point){
+		let radius = boundingBoxControlPointRadius;
+		ctx.strokeStyle = boundingBoxBorderColor;
+		ctx.fillStyle = boundingBoxBorderColor;
+		ctx.lineWidth = boundingBoxLineWidth
+
+		ctx.moveTo(point.x, point.y)
+		ctx.beginPath()
+		ctx.arc(point.x, point.y, radius, 0, 2*Math.PI, true);
+		ctx.stroke()
+		ctx.fill()
+		ctx.closePath();
+	}
+
 }

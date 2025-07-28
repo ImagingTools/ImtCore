@@ -301,7 +301,7 @@ Rectangle {
 		//console.log("findObject", mouseX, mouseY)
 		canvas.setViewMatrixParams();
 
-		if(!graphicsView.isSelectionMode && canvas.selectedShapeCount){
+		if(graphicsView.isEditMode && canvas.selectedShapeCount){
 			if(canvas.editShape && canvas.editShape.isInsideBoundingBox(mouseX, mouseY)){
 				return canvas.editShape
 			}
@@ -315,7 +315,7 @@ Rectangle {
 					let shape = shapeModel[j];
 
 					//let isInside =  shape.isInside(mouseX, mouseY)
-					let isInside = !graphicsView.isSelectionMode && shape.isSelected ? shape.isInsideBoundingBox(mouseX, mouseY) : shape.isInside(mouseX, mouseY)
+					let isInside = graphicsView.isEditMode && shape.isSelected ? shape.isInsideBoundingBox(mouseX, mouseY) : shape.isInside(mouseX, mouseY)
 					if(isInside){
 						return shape;
 					}
@@ -567,7 +567,7 @@ Rectangle {
 						if(canvas.selectedShapeCount < 2){
 							graphicsView.clearSelection(shape)
 							canvas.selectedShapeCount = 1;
-							if(!graphicsView.isSelectionMode){
+							if(graphicsView.isEditMode){
 								canvas.editShape = shape;
 							}
 						}
@@ -618,7 +618,7 @@ Rectangle {
 						if(canvas.selectedShapeCount > 1){
 							graphicsView.clearSelection(shape)
 							canvas.selectedShapeCount = 1;
-							if(!graphicsView.isSelectionMode){
+							if(graphicsView.isEditMode){
 								canvas.editShape = shape;
 							}
 						}
