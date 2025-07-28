@@ -225,11 +225,11 @@ void CPopupController::OnAddMessage(const QByteArray& id, const MessagePtr& mess
 void CPopupController::OnAddPopup(
 	const QByteArray& id,
 	const MessagePtr& messagePtr,
-	int /*timeout*/,
+	int timeout,
 	bool isClosingOnMouseClickAllowed,
 	QWidget* contentWidgetPtr)
 {
-	CreatePopupItem(id, messagePtr, m_timeout, isClosingOnMouseClickAllowed, contentWidgetPtr);
+	CreatePopupItem(id, messagePtr, timeout, isClosingOnMouseClickAllowed, contentWidgetPtr);
 }
 
 
