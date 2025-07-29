@@ -176,13 +176,33 @@ DecoratorBase {
 	
 	Component {
 		id: stateDelegateFilterComp
-		FieldFilterDelegate {
+		OptionsFilterDelegate {
 			id: stateDelegateFilter
 			name: qsTr("Document State")
-			defaultFieldFilter.m_fieldId: "State"
+
 			Component.onCompleted: {
 				createAndAddOption("Active", qsTr("Active"), "", true)
 				createAndAddOption("Disabled", qsTr("Disabled"), "", true)
+			}
+			
+			onOptionSelectionChanged: {
+				if (!documentFilter){
+					return
+				}
+				
+				documentFilter.clear()
+				
+				if (optionIndexes.length > 0){
+					let optionIndex = optionIndexes[0]
+					if (optionIndex === 0){
+						documentFilter.addDocumentState(documentFilter.s_activeState)
+					}
+					else{
+						documentFilter.addDocumentState(documentFilter.s_disabledState)
+					}
+				}
+				
+				documentFilter.filterChanged()
 			}
 		}
 	}

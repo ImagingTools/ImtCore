@@ -36,6 +36,7 @@ TopRightPanelDecorator 1.0 Panels/TopRightPanelDecorator.qml
 CommandsPanel 1.0 Panels/CommandsPanel.qml
 FieldFilterDelegate 1.0 Panels/FieldFilterDelegate.qml
 FilterDelegateBase 1.0 Panels/FilterDelegateBase.qml
+OptionsFilterDelegate 1.0 Panels/OptionsFilterDelegate.qml
 
 PageAboutProvider 1.0 Settings/PageAboutProvider.qml
 Preference 1.0 Settings/Preference.qml

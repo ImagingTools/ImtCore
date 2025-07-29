@@ -270,19 +270,36 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRestoreObjectSetQuery(
 {
 	QByteArray retVal = 
 				QString("UPDATE \"%1\" as root SET \"%2\" = 'Active' WHERE \"%2\" = 'Disabled'")
-							.arg(QString::fromUtf8(*m_tableNameAttrPtr),QString::fromUtf8(s_stateColumn)).toUtf8();
+							.arg(QString::fromUtf8(*m_tableNameAttrPtr), QString::fromUtf8(s_stateColumn)).toUtf8();
 
 	if (paramsPtr != nullptr){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(paramsPtr, "ComplexFilter");
 		if (complexFilterParamPtr.IsValid()){
-			QString condition;
-			CreateTextFilterQuery(*complexFilterParamPtr, condition);
-			if (condition.isEmpty()){
+			QByteArrayList conditionList;
+			QString textFilterQuery;
+			QString objectFilterQuery;
+			QString timeFilterQuery;
+
+			CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
+			if (!textFilterQuery.isEmpty()){
+				conditionList << textFilterQuery.toUtf8();
+			}
+
+			CreateObjectFilterQuery(*complexFilterParamPtr, objectFilterQuery);
+			if (!objectFilterQuery.isEmpty()){
+				conditionList << objectFilterQuery.toUtf8();
+			}
+
+			CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
+			if (!timeFilterQuery.isEmpty()){
+				conditionList << timeFilterQuery.toUtf8();
+			}
+
+			if (conditionList.isEmpty()){
 				return QByteArray();
 			}
 
-			SubstituteFieldIds(condition);
-			retVal += QByteArrayLiteral(" AND ") += condition.toUtf8();
+			retVal += QByteArrayLiteral(" AND (") += conditionList.join(" AND ") +  QByteArrayLiteral(")");
 		}
 	}
 

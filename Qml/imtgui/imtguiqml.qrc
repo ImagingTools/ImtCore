@@ -36,7 +36,8 @@
         <file alias="imtgui/Panels/CommandsPanel.qml">Panels/CommandsPanel.qml</file>
 	<file alias="imtgui/Panels/FieldFilterDelegate.qml">Panels/FieldFilterDelegate.qml</file>
 	<file alias="imtgui/Panels/FilterDelegateBase.qml">Panels/FilterDelegateBase.qml</file>
-
+	<file alias="imtgui/Panels/OptionsFilterDelegate.qml">Panels/OptionsFilterDelegate.qml</file>
+	
         <file alias="imtgui/Settings/PageAboutProvider.qml">Settings/PageAboutProvider.qml</file>
         <file alias="imtgui/Settings/Preference.qml">Settings/Preference.qml</file>
         <file alias="imtgui/Settings/PreferenceButton.qml">Settings/PreferenceButton.qml</file>
