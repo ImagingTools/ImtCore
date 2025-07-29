@@ -6,15 +6,30 @@ import imtcolgui 1.0
 
 ControlBase {
     id: filterContainer;
+    
+    decorator: Style.filterPanelDecorator
+    
+    heightFromDecorator: true
+    
+    property CollectionFilter complexFilter: CollectionFilter {}
+    property DocCollectionFilter documentFilter: DocCollectionFilter {}
+    
+    signal close()
+    signal clear()
+    
+    property ListModel filtersModel: ListModel {}
+    
+    function registerFieldFilterDelegate(filterId, filterDelegateComp){
+        filtersModel.append({id: filterId, comp:filterDelegateComp})
+    }
 
-    decorator: Style.filterPanelDecorator;
-
-    heightFromDecorator: true;
-	
-	property CollectionFilter complexFilter: CollectionFilter {}
-	property DocCollectionFilter documentFilter: DocCollectionFilter {}
-
-    signal close();
-    signal clear();
+    function removeFieldFilterDelegate(filterId){
+        for (let i = 0; i < filtersModel.count; i++){
+            if (filtersModel.get(i).id === filterId){
+                filtersModel.remove(i)
+                return;
+            }
+        }
+    }
 }
 

@@ -43,13 +43,13 @@ ControlBase {
 	
 	// ID for display in combo box delegates
 	property string nameId: "name";
-	
+
 	property Component delegate: PopupMenuDelegate {
 		width: popupMenuContainer.width;
 		height: popupMenuContainer.itemHeight;
 		
 		text: model[popupMenuContainer.nameId];
-		iconSource: model.icon === "" ? "" :  enabled ? "../../../../" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) :
+		icon.source: model.icon === "" || model.icon == undefined ? "" :  enabled ? "../../../../" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) :
 														"../../../../" + Style.getIconPath(model.icon, Icon.State.Off, Icon.Mode.Disabled);
 		enabled: model.isEnabled != null && model.isEnabled != undefined ? model.isEnabled : true;
 		

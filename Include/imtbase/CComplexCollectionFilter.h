@@ -18,16 +18,20 @@ class CComplexCollectionFilter: virtual public IComplexCollectionFilter
 public:
 	bool AddFieldFilter(const FieldFilter& fieldFilter);
 	bool AddGroupFilter(const GroupFilter& groupFilter);
-	
+
 	// reimplemented (imtbase::IComplexCollectionFilter)
 	virtual const FieldSortingInfoList& GetSortingInfo() const override;
-	virtual bool SetSortingInfo(const FieldSortingInfoList& info) override;
+	virtual void SetSortingInfo(const FieldSortingInfoList& info) override;
 	virtual const GroupFilter& GetFieldsFilter() const override;
-	virtual bool SetFieldsFilter(const GroupFilter& filter) override;
+	virtual void SetFieldsFilter(const GroupFilter& filter) override;
 	virtual const imtbase::ITimeFilterParam& GetTimeFilter() const override;
-	virtual bool SetTimeFilter(const imtbase::ITimeFilterParam& filter) override;
+	virtual void SetTimeFilter(const imtbase::ITimeFilterParam& filter) override;
 	virtual const QByteArrayList& GetDistinctFieldsList() const override;
-	virtual bool SetDistinctFieldsList(const QByteArrayList& filedIds) override;
+	virtual void SetDistinctFieldsList(const QByteArrayList& filedIds) override;
+	virtual QString GetTextFilter() const override;
+	virtual void SetTextFilter(const QString& textFilter) override;
+	virtual const QByteArrayList& GetTextFilterFieldsList() const override;
+	virtual void SetTextFilterFieldsList(const QByteArrayList& fieldIds) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -49,6 +53,7 @@ private:
 	GroupFilter m_fieldsFilter;
 	CTimeFilterParam m_timeFilter;
 	QByteArrayList m_distinctFields;
+	TextFilter m_textFilter;
 };
 
 

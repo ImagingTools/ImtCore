@@ -16,7 +16,7 @@ DecoratorBase {
     property var delegate: !baseElement ? null : baseElement.delegate;
     property alias contentY: popupMenuListView.contentY;
     property bool moveToEnd: !baseElement ? false : baseElement.moveToEnd;
-    property int moveToIndex: !baseElement ? -1 : baseElement.moveToIndex;
+    property int moveToIndex: baseElement && popupMenuListView.count > 0 ? baseElement.moveToIndex : -1
     property var model: !baseElement ? -1 : baseElement.model;
 
     property int selectedIndex: !baseElement ? -1 : baseElement.selectedIndex;
@@ -33,7 +33,6 @@ DecoratorBase {
         if(root.moveToEnd){
             popupMenuListView.positionViewAtEnd();
         }
-
         if(root.moveToIndex >= 0 && root.moveToIndex < popupMenuListView.count){
             popupMenuListView.positionViewAtIndex(root.moveToIndex, ListView.Beginning);
         }
@@ -54,15 +53,12 @@ DecoratorBase {
 
         anchors.top: topContentLoader.bottom;
 
-        width: root.width;
+        width: root ? root.width : 0;
 		height: visible ? popupMenuListView.height + 2 * Style.marginXS : false;
 
 		color: Style.baseColor;
 
 		visible: popupMenuListView.count > 0;
-
-        // border.width: 1;
-        // border.color: Style.borderColor;
 
         radius: Style.buttonRadius;
 
@@ -75,9 +71,9 @@ DecoratorBase {
             anchors.bottom: popupMenuListView.bottom;
 
             secondSize: !root.baseElement ? 0 :
-                                            !root.baseElement.visibleScrollBar ? 0 : Style.isMobile == undefined ? 8 : Style.isMobile ? 4 : 8;
+                                            !root.baseElement.visibleScrollBar ? 0 : Style.isMobile === undefined ? 8 : Style.isMobile ? 4 : 8;
             targetItem: popupMenuListView;
-            canFade: Style.isMobile == undefined ? false : Style.isMobile;
+            canFade: Style.isMobile === undefined ? false : Style.isMobile;
         }
 
 		ListView {
@@ -85,7 +81,7 @@ DecoratorBase {
 
 			anchors.verticalCenter: parent.verticalCenter;
 
-			width: root.width;
+            width: root ? root.width : 0;
 
 			boundsBehavior: Flickable.StopAtBounds;
 			clip: true;

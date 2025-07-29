@@ -390,6 +390,17 @@ void CObjectCollectionControllerCompBase::ReplaceComplexFilterFields(imtbase::IC
 	imtbase::IComplexCollectionFilter::GroupFilter fieldsFilter = filter.GetFieldsFilter();
 	ProcessGroupFilter(fieldsFilter);
 	filter.SetFieldsFilter(fieldsFilter);
+
+	QByteArrayList textFilterFieldsList = filter.GetTextFilterFieldsList();
+	QByteArrayList retValFieldsList = textFilterFieldsList;
+
+	for (int i = 0; i < textFilterFieldsList.size(); i++){
+		if (m_fieldReplacementMap.contains(textFilterFieldsList[i])){
+			retValFieldsList[i] = m_fieldReplacementMap[textFilterFieldsList[i]];
+		}
+	}
+
+	filter.SetTextFilterFieldsList(retValFieldsList);
 }
 
 

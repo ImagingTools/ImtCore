@@ -1073,12 +1073,11 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::IComplexCo
 
 bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {
-	bool retVal = true;
-
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
 	QString objectTypeIdQuery;
 	QString textFilterQuery;
+	QString objectFilterQuery;
 	QString timeFilterQuery;
 
 	if (paramIds.contains("ObjectTypeIdFilter")){
@@ -1094,18 +1093,9 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 	if (paramIds.contains("ComplexFilter")){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(&filterParams, "ComplexFilter");
 		if (complexFilterParamPtr.IsValid()){
-			retVal = CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
-
-			if (!retVal){
-				return false;
-			}
-
-			SubstituteFieldIds(textFilterQuery);
-
-			retVal = CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
-			if (!retVal){
-				return false;
-			}
+			CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
+			CreateObjectFilterQuery(*complexFilterParamPtr, objectFilterQuery);
+			CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
 		}
 	}
 
@@ -1137,6 +1127,14 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		}
 
 		filterQuery += "(" + textFilterQuery + ")";
+	}
+
+	if (!objectFilterQuery.isEmpty()){
+		if (!filterQuery.isEmpty()){
+			filterQuery += " AND ";
+		}
+
+		filterQuery += "(" + objectFilterQuery + ")";
 	}
 
 	if (!timeFilterQuery.isEmpty()){
@@ -1307,7 +1305,21 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IC
 
 bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
 {
-	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
+	QString textFilter = collectionFilter.GetTextFilter();
+	QByteArrayList fieldIds = collectionFilter.GetTextFilterFieldsList();
+	if (fieldIds.isEmpty() || textFilter.isEmpty()){
+		return false;
+	}
+
+	for (const QByteArray& fieldId : fieldIds){
+		if (!textFilterQuery.isEmpty()){
+			textFilterQuery += QStringLiteral(" OR ");
+		}
+
+		textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(fieldId), textFilter);
+	}
+
+	SubstituteFieldIds(textFilterQuery);
 
 	return true;
 }

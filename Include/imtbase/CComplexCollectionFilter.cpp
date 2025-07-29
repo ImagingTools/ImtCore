@@ -49,15 +49,13 @@ const IComplexCollectionFilter::FieldSortingInfoList& CComplexCollectionFilter::
 }
 
 
-bool CComplexCollectionFilter::SetSortingInfo(const FieldSortingInfoList& info)
+void CComplexCollectionFilter::SetSortingInfo(const FieldSortingInfoList& info)
 {
 	if (m_sortingInfo != info){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_sortingInfo = info;
 	}
-
-	return true;
 }
 
 
@@ -67,15 +65,13 @@ const IComplexCollectionFilter::GroupFilter& CComplexCollectionFilter::GetFields
 }
 
 
-bool CComplexCollectionFilter::SetFieldsFilter(const GroupFilter& filter)
+void CComplexCollectionFilter::SetFieldsFilter(const GroupFilter& filter)
 {
 	if (m_fieldsFilter != filter){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_fieldsFilter = filter;
 	}
-
-	return true;
 }
 
 
@@ -85,11 +81,11 @@ const imtbase::ITimeFilterParam& CComplexCollectionFilter::GetTimeFilter() const
 }
 
 
-bool CComplexCollectionFilter::SetTimeFilter(const imtbase::ITimeFilterParam& filter)
+void CComplexCollectionFilter::SetTimeFilter(const imtbase::ITimeFilterParam& filter)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	return m_timeFilter.CopyFrom(filter);
+	m_timeFilter.CopyFrom(filter);
 }
 
 
@@ -99,7 +95,7 @@ const QByteArrayList& CComplexCollectionFilter::GetDistinctFieldsList() const
 }
 
 
-bool CComplexCollectionFilter::SetDistinctFieldsList(const QByteArrayList& filedIds)
+void CComplexCollectionFilter::SetDistinctFieldsList(const QByteArrayList& filedIds)
 {
 	QSet<QByteArray> idsSet(filedIds.cbegin(), filedIds.cend());
 
@@ -108,8 +104,38 @@ bool CComplexCollectionFilter::SetDistinctFieldsList(const QByteArrayList& filed
 
 		m_distinctFields = filedIds;
 	}
+}
 
-	return false;
+
+QString CComplexCollectionFilter::GetTextFilter() const
+{
+	return m_textFilter.text;
+}
+
+
+void CComplexCollectionFilter::SetTextFilter(const QString& textFilter)
+{
+	if (m_textFilter.text != textFilter){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_textFilter.text = textFilter;
+	}
+}
+
+
+const QByteArrayList& CComplexCollectionFilter::GetTextFilterFieldsList() const
+{
+	return m_textFilter.fieldIds;
+}
+
+
+void CComplexCollectionFilter::SetTextFilterFieldsList(const QByteArrayList& fieldIds)
+{
+	if (m_textFilter.fieldIds != fieldIds){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_textFilter.fieldIds = fieldIds;
+	}
 }
 
 

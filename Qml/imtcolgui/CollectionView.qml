@@ -146,12 +146,11 @@ Item {
 	}
 	
 	function hasActiveFilter(){
-		console.log("hasActiveFilter", collectionFilter.toJson())
-		if (collectionFilter){
-			return !collectionFilter.isEmpty()
-		}
-		
-		return false
+		return container.hasActiveFilter()
+	}
+	
+	function registerFieldFilterDelegate(filterId, filterDelegateComp){
+		container.registerFieldFilterDelegate(filterId, filterDelegateComp)
 	}
 
 	Connections {

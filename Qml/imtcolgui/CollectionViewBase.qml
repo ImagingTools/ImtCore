@@ -47,6 +47,8 @@ ViewBase {
 	signal checkedItemsChanged();
 	signal rightButtonMouseClicked(int mouseX, int mouseY);
 	signal doubleClicked(string id, int index);
+
+	property bool activeFilter: false
 	
 	Component.onCompleted: {
 		tableInternal.focus = true;
@@ -56,6 +58,7 @@ ViewBase {
 		target: collectionViewBaseContainer.collectionFilter;
 		
 		function onFilterChanged(){
+			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
 			collectionViewBaseContainer.doUpdateGui();
 		}
 	}
@@ -64,6 +67,7 @@ ViewBase {
 		target: collectionViewBaseContainer.documentCollectionFilter;
 		
 		function onFilterChanged(){
+			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
 			collectionViewBaseContainer.doUpdateGui();
 		}
 	}
@@ -74,14 +78,26 @@ ViewBase {
 		return selectionManager.selectedIds
 	}
 	
+	function hasActiveFilter(){
+		if (collectionFilter){
+			return !collectionFilter.isEmpty()
+		}
+		
+		return false
+	}
+	
+	function registerFieldFilterDelegate(filterId, filterDelegateComp){
+		filterMenu_.registerFieldFilterDelegate(filterId, filterDelegateComp)
+	}
+	
 	FilterMenu {
 		id: filterMenu_;
 		anchors.top: parent.top;
 		anchors.topMargin: Style.marginM;
 		anchors.left: parent.left;
-		anchors.leftMargin: Style.marginM;
+		// anchors.leftMargin: Style.marginM;
 		anchors.right: parent.right;
-		anchors.rightMargin: Style.marginM;
+		// anchors.rightMargin: Style.marginM;
 		complexFilter: collectionViewBaseContainer.collectionFilter;
 		documentFilter: collectionViewBaseContainer.documentCollectionFilter;
 		
@@ -287,13 +303,18 @@ ViewBase {
 				ToolButton {
 					id: iconFilter;
 					anchors.centerIn: parent;
-					width: Style.buttonWidthM;
+					width: Style.buttonWidthL;
 					height: width;
 					visible: collectionViewBaseContainer.hasFilter;
-					iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
-					
+					icon.source: collectionViewBaseContainer.activeFilter ? "qrc:/" + Style.getIconPath("Icons/FilterActive", Icon.State.On, Icon.Mode.Selected)
+										 : "qrc:/" + Style.getIconPath("Icons/FilterEdit", Icon.State.On, Icon.Mode.Normal)
 					onClicked: {
 						filterMenu_.visible = !filterMenu_.visible;
+					}
+					decorator: Component {
+						ToolButtonDecorator {
+							icon.width: 26
+						}
 					}
 				}
 			}

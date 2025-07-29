@@ -17,7 +17,6 @@ RemoteCollectionView {
 	visibleMetaInfo: true;
 
 	additionalFieldIds: [UserItemTypeMetaInfo.s_systemId]
-	filterMenu.decorator: filterDecoratorComp;
 	
 	property string productId;
 	property var documentManager: null;
@@ -57,86 +56,33 @@ RemoteCollectionView {
 	}
 	
 	Component {
-		id: filterDecoratorComp;
-		
-		DecoratorBase {
-			id: decoratorBase;
-			
-			width: baseElement ? baseElement.width: 0;
-			height: Style.controlHeightL;
-			
-			property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;
-			
-			Row {
-				id: content;
-				anchors.left: parent.left;
-				anchors.verticalCenter: parent.verticalCenter;
-				spacing: Style.marginM;
-				
-				TreeItemModel {
-					id: systemInfoModel;
-					
-					Component.onCompleted: {
-						updateModel();
-					}
-					
-					function updateModel(){
-						systemInfoModel.clear();
-						
-						let index = systemInfoModel.insertNewItem();
-						systemInfoModel.setData("id", "All", index)
-						systemInfoModel.setData("name", qsTr("All systems"), index)
-						
-						index = systemInfoModel.insertNewItem();
-						systemInfoModel.setData("id", "Internal", index)
-						systemInfoModel.setData("name", qsTr("Internal"), index)
-						
-						index = systemInfoModel.insertNewItem();
-						systemInfoModel.setData("id", "Ldap", index)
-						systemInfoModel.setData("name", qsTr("LDAP"), index)
-						
-						systemComboBox.model = systemInfoModel;
-					}
-				}
-				
-				FieldFilter {
-					id: systemFilter
-					m_fieldId: "SystemId"
-					m_filterValue: ""
-					m_filterValueType: "String"
-					m_filterOperations: ["Equal"]
-				}
-				
-				ComboBox {
-					id: systemComboBox;
-					
-					width: 250;
-					height: filtermenu.height;
-					currentIndex: 0;
-					onCurrentIndexChanged: {
-						userCollectionViewContainer.collectionFilter.removeFieldFilter(systemFilter)
-						
-						if (currentIndex == 1){
-							systemFilter.m_filterOperations = ["Equal"]
-							userCollectionViewContainer.collectionFilter.addFieldFilter(systemFilter)
-						}
-						else if (currentIndex == 2){
-							systemFilter.m_filterOperations = ["Not","Equal"]
-							userCollectionViewContainer.collectionFilter.addFieldFilter(systemFilter)
-						}
+		id: systemInfoDelegateFilterComp
+		FieldFilterDelegate {
+			id: systemInfoDelegateFilter
+			name: qsTr("System Info")
 
-						userCollectionViewContainer.collectionFilter.filterChanged()
-					}
-				}
+			Component.onCompleted: {
+				createAndAddOption("Internal", qsTr("Internal"), "", true)
+				createAndAddOption("Ldap", qsTr("LDAP"), "", true)
+				
+				setFieldFilterForOption("Internal", internalSystemFilter)
+				setFieldFilterForOption("Ldap", ldapSystemFilter)
 			}
 			
-			FilterPanelDecorator {
-				id: filtermenu
-				anchors.verticalCenter: parent.verticalCenter;
-				anchors.right: parent.right;
-				baseElement: decoratorBase.baseElement;
-				width: 325;
-				complexFilter: decoratorBase.complexFilter;
+			FieldFilter {
+				id: internalSystemFilter
+				m_fieldId: "SystemId"
+				m_filterValue: ""
+				m_filterValueType: "String"
+				m_filterOperations: ["Equal"]
+			}
+			
+			FieldFilter {
+				id: ldapSystemFilter
+				m_fieldId: "SystemId"
+				m_filterValue: ""
+				m_filterValueType: "String"
+				m_filterOperations: ["Not","Equal"]
 			}
 		}
 	}
@@ -144,6 +90,7 @@ RemoteCollectionView {
 	Component.onCompleted: {
 		table.setSortingInfo(UserItemTypeMetaInfo.s_name, "ASC");
 		table.nonSortableColumns = [UserItemTypeMetaInfo.s_roles, UserItemTypeMetaInfo.s_groups]
+		registerFieldFilterDelegate("SystemInfo", systemInfoDelegateFilterComp)
 		table.rowDelegate = tableRowDelegateBaseComp;
 	}
 	
@@ -313,6 +260,7 @@ RemoteCollectionView {
 			property var regExp: new RegExp(mailRegExp.regularExpression)
 			
 			function isValid(data){
+				console.log("isValid", data)
 				if (!data.editor){
 					return false;
 				}
@@ -337,11 +285,15 @@ RemoteCollectionView {
 					return false;
 				}
 				
-				if (userData.m_id === ""){
-					let passwordText1 = data.editor.passwordInput.text;
-					let passwordText2 = data.editor.passwordInputConfirm.text;
-					if (passwordText1 != passwordText2){
-						return false;
+				if (userCollectionViewContainer.documentManager){
+					if (userCollectionViewContainer.documentManager.documentIsNew(userData.m_id)){
+						console.log("documentIsNew", true)
+						let passwordText1 = data.editor.passwordInput.text;
+						let passwordText2 = data.editor.passwordInputConfirm.text;
+						console.log("passwordText1", passwordText1, passwordText2)
+						if (passwordText1 !== passwordText2){
+							return false;
+						}
 					}
 				}
 				

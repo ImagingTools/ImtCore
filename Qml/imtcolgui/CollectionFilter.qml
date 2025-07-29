@@ -87,6 +87,12 @@ ComplexCollectionFilter{
 	signal filterChanged()
 
 	/*!
+		\qmlsignal cleared
+		Emitted when the filter is cleared.
+	*/
+	signal cleared()
+
+	/*!
 		\qmlmethod object createBaseModel()
 		Creates and returns a new base model object.
 	*/
@@ -99,7 +105,11 @@ ComplexCollectionFilter{
 		Returns the current text filter. (Placeholder, always returns empty string.)
 	*/
 	function getTextFilter(){
-		return ""
+		if (!hasTextFilter()){
+			return ""
+		}
+
+		return m_textFilter.text
 	}
 
 	/*!
@@ -107,21 +117,19 @@ ComplexCollectionFilter{
 		Sets a new text filter using OR operation on the fields defined in \c textFilteringInfoIds.
 	*/
 	function setTextFilter(filter){
-		if (hasFieldsFilter() && m_fieldsFilter.hasGroupFilters()){
-			m_fieldsFilter.m_groupFilters.clear()
+		if (filter === ""){
+			if (hasTextFilter()){
+				m_textFilter.destroy()
+				m_textFilter = null
+			}
 		}
-
-		if (filter !== ""){
-			let fieldsModel = createBaseModel()
-
-			for (let i = 0; i < textFilteringInfoIds.length; i++){
-				let infoId = textFilteringInfoIds[i]
-				let fieldObj = createFieldFilter(infoId, filter, valueType.STRING, [filterOperation.CONTAINS])
-				fieldsModel.addElement(fieldObj)
+		else{
+			if (!hasTextFilter()){
+				createTextFilter()
 			}
 
-			let textGroupFilter = createGroupFilter(logicalOperation.OR, fieldsModel)
-			addGroupFilter(textGroupFilter)
+			m_textFilter.m_text = filter
+			m_textFilter.m_fieldIds = textFilteringInfoIds
 		}
 	}
 
@@ -158,7 +166,7 @@ ComplexCollectionFilter{
 		Sets the array of text filtering field IDs.
 	*/
 	function setFilteringInfoIds(filteringInfoIds){
-		root.textFilteringInfoIds = filteringInfoIds
+		textFilteringInfoIds = filteringInfoIds
 	}
 
 	/*!
@@ -321,6 +329,8 @@ ComplexCollectionFilter{
 		clearFieldsFilter()
 		clearTimeFilter()
 		clearDistinctFilter()
+
+		cleared()
 	}
 
 	/*!
@@ -373,9 +383,12 @@ ComplexCollectionFilter{
 	*/
 	function timeFilterIsEmpty(){
 		if (hasTimeFilter()){
-			return m_timeFilter.m_timeRange.m_begin === "" &&
-					m_timeFilter.m_timeRange.m_end === "" &&
-					m_timeFilter.m_timeUnit === "" &&
+			let isEmpty = true
+			if (m_timeFilter.hasTimeRange()){
+				isEmpty = isEmpty && m_timeFilter.m_timeRange.m_begin === "" && m_timeFilter.m_timeRange.m_end === ""
+			}
+
+			return isEmpty && m_timeFilter.m_timeUnit === "" &&
 					m_timeFilter.m_interpretationMode === "" &&
 					m_timeFilter.m_unitMultiplier === 0
 		}
@@ -384,13 +397,33 @@ ComplexCollectionFilter{
 	}
 
 	/*!
+		\qmlmethod bool textFilterIsEmpty()
+		Returns true if the text filter has no meaningful values.
+	*/
+	function textFilterIsEmpty(){
+		if (hasTextFilter()){
+			return m_textFilter.m_text === ""
+		}
+
+		return true
+	}
+
+	/*!
 		\qmlmethod bool fieldsFilterIsEmpty()
 		Returns true if there are no field or group filters set.
 	*/
 	function fieldsFilterIsEmpty(){
 		if (hasFieldsFilter()){
-			return m_fieldsFilter.m_fieldFilters.count === 0 &&
-					m_fieldsFilter.m_groupFilters.count === 0
+			let isEmpty = true
+			if (m_fieldsFilter.hasFieldFilters()){
+				isEmpty = m_fieldsFilter.m_fieldFilters.count === 0
+			}
+
+			if (m_fieldsFilter.hasGroupFilters()){
+				isEmpty = isEmpty && m_fieldsFilter.m_groupFilters.count === 0
+			}
+
+			return isEmpty
 		}
 
 		return true
@@ -401,6 +434,6 @@ ComplexCollectionFilter{
 		Returns true if all filters (time and field/group) are empty.
 	*/
 	function isEmpty(){
-		return timeFilterIsEmpty() && fieldsFilterIsEmpty()
+		return timeFilterIsEmpty() && fieldsFilterIsEmpty() && textFilterIsEmpty()
 	}
 }

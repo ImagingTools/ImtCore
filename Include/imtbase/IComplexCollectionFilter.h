@@ -109,14 +109,24 @@ public:
 		LogicalOperation logicalOperation = LO_AND;
 	};
 
+	struct TextFilter
+	{
+		QString text;
+		QByteArrayList fieldIds;
+	};
+
 	virtual const FieldSortingInfoList& GetSortingInfo() const = 0;
-	virtual bool SetSortingInfo(const FieldSortingInfoList& info) = 0;
+	virtual void SetSortingInfo(const FieldSortingInfoList& info) = 0;
 	virtual const GroupFilter& GetFieldsFilter() const = 0;
-	virtual bool SetFieldsFilter(const GroupFilter& filter) = 0;
+	virtual void SetFieldsFilter(const GroupFilter& filter) = 0;
 	virtual const imtbase::ITimeFilterParam& GetTimeFilter() const = 0;
-	virtual bool SetTimeFilter(const imtbase::ITimeFilterParam& filter) = 0;
+	virtual void SetTimeFilter(const imtbase::ITimeFilterParam& filter) = 0;
 	virtual const QByteArrayList& GetDistinctFieldsList() const = 0;
-	virtual bool SetDistinctFieldsList(const QByteArrayList& filedIds) = 0;
+	virtual void SetDistinctFieldsList(const QByteArrayList& filedIds) = 0;
+	virtual QString GetTextFilter() const = 0;
+	virtual void SetTextFilter(const QString& textFilter) = 0;
+	virtual const QByteArrayList& GetTextFilterFieldsList() const = 0;
+	virtual void SetTextFilterFieldsList(const QByteArrayList& fieldIds) = 0;
 };
 
 

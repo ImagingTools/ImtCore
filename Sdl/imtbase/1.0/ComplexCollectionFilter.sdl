@@ -61,10 +61,17 @@ type GroupFilter
 	logicalOperation: LogicalOperation!
 }
 
+type TextFilter
+{
+	text: String
+	fieldIds: [ID]
+}
+
 type ComplexCollectionFilter {
 	sortingInfo: [FieldSortingInfo]
 	fieldsFilter: GroupFilter
 	timeFilter: TimeFilter
+	textFilter: TextFilter
 	distinctFields: [ID]
 }
 

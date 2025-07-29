@@ -38,6 +38,10 @@ CustomTextField {
 		sourceSize.height: height
 	}
 	
+	function clear(){
+		iconClear.clicked()
+	}
+	
 	ToolButton {
 		id: iconClear;
 		

@@ -339,6 +339,17 @@ bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRe
 		filter.SetDistinctFieldsList(*filterRepresentaion.distinctFields);
 	}
 
+	if (filterRepresentaion.textFilter){
+		Filter::CTextFilter::V1_0 textFilter = *filterRepresentaion.textFilter;
+		if (textFilter.text){
+			filter.SetTextFilter(*textFilter.text);
+		}
+
+		if (textFilter.fieldIds){
+			filter.SetTextFilterFieldsList(*textFilter.fieldIds);
+		}
+	}
+
 	return true;
 }
 

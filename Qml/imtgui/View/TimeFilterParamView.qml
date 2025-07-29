@@ -39,21 +39,25 @@ PopupView {
 	}
 	
 	function updateGui(){
+		if (!timeFilter.hasTimeRange()){
+			timeFilter.createTimeRange()
+		}
+
 		if (timeFilter.m_timeRange){
 			fromDateItem.visible = true;
 			
 			let beginDate = timeFilter.m_timeRange.m_begin;
 			let fromDate = new Date();
-			if (beginDate !== ""){
+			if (beginDate && beginDate !== ""){
 				fromDate = new Date(beginDate)
 			}
-			
+
 			fromDatePicker.setDate(fromDate);
 
 			let endDate = timeFilter.m_timeRange.m_end;
 			
 			let toDate = new Date();
-			if (endDate !== ""){
+			if (endDate && endDate !== ""){
 				toDate = new Date(endDate)
 			}
 
@@ -253,6 +257,10 @@ PopupView {
 						text: qsTr("Apply");
 						enabled: fromDateItem.visible;
 						onClicked: {
+							if (!root.timeFilter.hasTimeRange()){
+								root.timeFilter.createTimeRange()
+							}
+
 							root.timeFilter.m_timeRange.m_begin = fromDatePicker.selectedDate.toISOString()
 							root.timeFilter.m_timeRange.m_end = toDatePicker.selectedDate.toISOString()
 							
