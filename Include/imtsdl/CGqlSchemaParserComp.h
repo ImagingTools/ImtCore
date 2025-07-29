@@ -16,7 +16,6 @@
 #include <imtsdl/ISdlDocumentTypeListProvider.h>
 #include <imtsdl/CGqlExtSchemaParser.h>
 #include <imtsdl/CSdlTools.h>
-#include <imtsdl/IModuleManager.h>
 
 
 namespace imtsdl
@@ -54,7 +53,6 @@ public:
 
 		I_ASSIGN(m_useFilesImportAttrPtr, "UseJavaStyleImport", "If enabled, all imports will be procesed by resloving paths in file a system", true, true)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
-		I_ASSIGN(m_sdlModuleManaerCompPtr, "ModuleManager", "SDL Module manager, used to initalize paths resolver", true, "ModuleManager")
 		I_ASSIGN(m_schemaNamespaceCompPtr, "SchemaNamespace", "The namespace of the schema being processed", false, "SchemaNamespace")
 		I_ASSIGN(m_fileSchemaParserCompFactPtr, "FileSchemaParserFactory", "Factory used to create shema parser", false, "FileSchemaParserFactory")
 	I_END_COMPONENT;
@@ -96,7 +94,6 @@ private:
 
 protected:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
-	I_REF(IModuleManager, m_sdlModuleManaerCompPtr);
 
 private:
 	I_ATTR(bool, m_useFilesImportAttrPtr);

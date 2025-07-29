@@ -26,7 +26,6 @@ namespace imtsdl
 {
 
 // public static variables
-const QString CSdlTools::s_variantMapClassMemberName = QStringLiteral("_m_settedFields"); // add first underscore to avoid ambiguity
 QString CSdlTools::s_sdlGlobalPrefix = QStringLiteral("sdl");
 
 
@@ -140,6 +139,29 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 	return retVal;
 }
 
+
+QString CSdlTools::ResolveRelativePath(const QString& targetPath, const QStringList& lookupPaths)
+{
+	if (targetPath.isEmpty() || lookupPaths.isEmpty()){
+		return targetPath;
+	}
+
+	for (const QString& path: lookupPaths){
+		QString cleanPath = QDir::cleanPath(path);
+		QString cleanTargetPath = QDir::cleanPath(targetPath);
+#ifdef Q_OS_WIN
+		cleanTargetPath = cleanTargetPath.toLower();
+		cleanPath = cleanPath.toLower();
+#endif
+		if (cleanTargetPath.startsWith(cleanPath)){
+			QDir currentDir(path);
+
+			return currentDir.relativeFilePath(cleanTargetPath);
+		}
+	}
+
+	return targetPath;
+}
 
 QString CSdlTools::ConvertType(const CSdlField& sdlField, bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
 {
@@ -910,6 +932,37 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 }
 
 
+QString CSdlTools::ProcessTemplateString(const iprm::IParamsSet& schemaParams, const QString& templateString, const QString& outputDirPath)
+{
+	QString retVal = templateString;
+	static const QRegularExpression outPathRegExp("^\\$\\(output-directory\\)");
+	retVal.replace(outPathRegExp, outputDirPath);
+
+	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, SdlCustomSchemaKeys::VersionName.toUtf8(), false);
+	if (versionNameParamPtr.IsValid()){
+		static const QRegularExpression schemaVersionRegExp("\\$\\(schema\\.version\\)");
+		const QString versionText = versionNameParamPtr->GetText();
+		retVal.replace(schemaVersionRegExp, versionText);
+	}
+
+	iprm::TParamsPtr<iprm::ITextParam> nameParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaName.toUtf8(), false);
+	if (nameParamPtr.IsValid()){
+		static const QRegularExpression schemaNameRegExp("\\$\\(schema\\.name\\)");
+		const QString nameText = nameParamPtr->GetText();
+		retVal.replace(schemaNameRegExp, nameText);
+	}
+
+	iprm::TParamsPtr<iprm::ITextParam> namespaceParamPtr(&schemaParams, SdlCustomSchemaKeys::SchemaNamespace.toUtf8(), false);
+	if (namespaceParamPtr.IsValid()){
+		static const QRegularExpression schemaNamespaceRegExp("\\$\\(schema\\.namespace\\)");
+		const QString namespaceText = namespaceParamPtr->GetText();
+		retVal.replace(schemaNamespaceRegExp, namespaceText);
+	}
+
+	return retVal;
+}
+
+
 bool CSdlTools::UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* schemaParamsPtr, const ISdlProcessArgumentsParser* argumentParserPtr)
 {
 	if (argumentParserPtr == nullptr){
@@ -932,11 +985,11 @@ bool CSdlTools::UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* 
 		}
 		else {
 			CSdlType* sdlTypePtr = dynamic_cast<CSdlType*>(&sdlEntry);
+			CSdlEnum* sdlEnumPtr = dynamic_cast<CSdlEnum*>(&sdlEntry);
 			if (sdlTypePtr != nullptr){
 				sdlTypePtr->SetTargetHeaderFilePath(QString(outputDirectoryPath + "/C" + sdlTypePtr->GetName() + ".h"));
 			}
-			else {
-				CSdlEnum* sdlEnumPtr = dynamic_cast<CSdlEnum*>(&sdlEntry);
+			else if (sdlEnumPtr != nullptr){
 				sdlEnumPtr->SetTargetHeaderFilePath(QString(outputDirectoryPath + "/" + sdlEnumPtr->GetName() + ".h"));
 			}
 		}
@@ -946,9 +999,114 @@ bool CSdlTools::UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* 
 }
 
 
-QStringList CSdlTools::GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName)
+QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argumentParser, bool relativePath)
 {
-	return CalculateTargetCppFilesFromSchemaParams(schemaParams, baseDirPath, defaultName).values();
+	QMap<QString, QString> retVal;
+
+	if (!argumentParser.IsTemplateEnabled()){
+		const QString defaultName = QFileInfo(argumentParser.GetSchemaFilePath()).fileName();
+		QMap<QString, QString> joinRules = argumentParser.GetJoinRules();
+		if (argumentParser.IsAutoJoinEnabled()){
+			joinRules = CalculateTargetCppFilesFromSchemaParams(schemaParams, argumentParser.GetOutputDirectoryPath(), defaultName);
+		}
+		return retVal;
+	}
+
+	QString baseFilePath;
+	static const QRegularExpression outPathRegExp("^\\$\\(output-directory\\)\\/?");
+	const QString templateInclidePath = argumentParser.GetTemplateIncludePath();
+	if (!templateInclidePath.isEmpty()){
+		baseFilePath = templateInclidePath;
+	}
+	else {
+		baseFilePath = argumentParser.GetTemplateOutputPath();
+	}
+	if (!relativePath && !baseFilePath.contains(outPathRegExp)){
+		baseFilePath.prepend(QStringLiteral("$(output-directory)/"));
+	}
+
+	if (argumentParser.IsAutoJoinEnabled()){
+		// use schema.name as file name
+		baseFilePath+= QStringLiteral("/$(schema.name)");
+	}
+
+	baseFilePath = ProcessTemplateString(schemaParams, baseFilePath, argumentParser.GetOutputDirectoryPath());
+
+	if (relativePath && templateInclidePath.isEmpty()){
+		// find if relative path, should be in subpath of output dir
+		baseFilePath = ResolveRelativePath(baseFilePath, argumentParser.GetHeadersIncludePaths());
+	}
+
+	if (baseFilePath.isEmpty()){
+		qWarning() << "Template is set, but string is not specified";
+
+		return retVal;
+	}
+
+	retVal.insert(ISdlProcessArgumentsParser::s_headerFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".h"))));
+	retVal.insert(ISdlProcessArgumentsParser::s_sourceFileType, QDir::cleanPath(GetFileSystemAcceptableEntryPath(baseFilePath + QStringLiteral(".cpp"))));
+
+	return retVal;
+}
+
+
+QString CSdlTools::GetCompleteOutputPath(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argumentParser, bool cleanPath, bool cppPath)
+{
+	QString retVal;
+	if (!argumentParser.IsTemplateEnabled()){
+		retVal = argumentParser.GetOutputDirectoryPath();
+		if (cleanPath){
+			retVal = QDir::cleanPath(retVal);
+		}
+
+		return retVal;
+	}
+
+	/// \todo move to global
+	static const QRegularExpression outPathRegExp("^\\$\\(output-directory\\)\\/?");
+	if (cppPath){
+		retVal = argumentParser.GetTemplateOutputPath();
+	}
+	else {
+		retVal = argumentParser.GetTemplateQmlOutputPath();
+	}
+	if (!retVal.contains(outPathRegExp)){
+		retVal.prepend(QStringLiteral("$(output-directory)/"));
+	}
+
+	retVal = ProcessTemplateString(schemaParams, retVal, argumentParser.GetOutputDirectoryPath());
+
+	if (retVal.isEmpty()){
+		qWarning() << "Template is set, but string is not specified";
+
+		return QString();
+	}
+
+	if (cleanPath){
+		retVal = QDir::cleanPath(retVal);
+	}
+
+	return retVal;
+}
+
+
+QString CSdlTools::GetCompleteOutputPath(const icomp::TReferenceMember<iprm::IParamsSet>& schemaParamsCompPtr, const ISdlProcessArgumentsParser& argumentParser, bool cleanPath, bool cppPath)
+{
+	if (!schemaParamsCompPtr.IsValid()){
+		QString retVal;
+		retVal = argumentParser.GetOutputDirectoryPath();
+		if (cleanPath){
+			retVal = QDir::cleanPath(retVal);
+		}
+	}
+
+	return GetCompleteOutputPath(*schemaParamsCompPtr, argumentParser, cleanPath, cppPath);
+}
+
+
+QStringList CSdlTools::GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argParser)
+{
+	return CalculateTargetCppFilesFromSchemaParams(schemaParams, argParser).values();
 }
 
 
@@ -1157,28 +1315,6 @@ void CSdlTools::PrintFiles(std::ostream& outStream, const QStringList& files, IS
 	outStream << outputString.toStdString();
 
 	outStream.flush();
-}
-
-
-QString CSdlTools::ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths)
-{
-	const QString targetPath = sdlEntry.GetTargetHeaderFilePath();
-	if (!targetPath.isEmpty()){
-		for (const QString& path: lookupPaths){
-			QString cleanPath = QDir::cleanPath(path);
-			QString cleanTargetPath = QDir::cleanPath(targetPath);
-#ifdef Q_OS_WIN
-			cleanTargetPath = cleanTargetPath.toLower();
-			cleanPath = cleanPath.toLower();
-#endif
-			if (cleanTargetPath.startsWith(cleanPath)){
-				QDir currentDir(path);
-				return currentDir.relativeFilePath(cleanTargetPath);
-			}
-		}
-	}
-
-	return QString();
 }
 
 

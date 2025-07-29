@@ -36,6 +36,7 @@ if(NOT DEFINED ZLIBDIR)
 	endif()
 endif()
 
+include_directories("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}/GeneratedFiles")
 include_directories("${BUILDDIR}/ImtCore/AuxInclude/${TARGETNAME}")
 include_directories("${IMTCOREDIR}/Include")
 include_directories("${IMTCOREDIR}/Impl")

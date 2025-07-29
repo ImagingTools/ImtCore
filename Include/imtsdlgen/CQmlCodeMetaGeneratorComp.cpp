@@ -52,7 +52,7 @@ iproc::IProcessor::TaskState CQmlCodeMetaGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false);
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
@@ -420,7 +420,7 @@ bool CQmlCodeMetaGeneratorComp::GenerateCollectionSchemaInfo()
 
 bool CQmlCodeMetaGeneratorComp::GenerateCollectionSchemaInfoForType(const imtsdl::CSdlDocumentType& documentType, const QString& typeName, const QString& subtypeName)
 {
-	QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false);
 	// get auto defined path if namespace is not provided
 	if (m_argumentParserCompPtr->GetNamespace().isEmpty()){
 		if (m_customSchemaParamsCompPtr.IsValid()){

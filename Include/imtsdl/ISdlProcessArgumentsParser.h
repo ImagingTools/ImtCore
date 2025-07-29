@@ -70,6 +70,7 @@ public:
 	virtual bool IsTemplateEnabled() const = 0;
 	virtual QString GetTemplateIncludePath() const = 0;
 	virtual QString GetTemplateOutputPath() const = 0;
+	virtual QString GetTemplateQmlOutputPath() const = 0;
 };
 
 

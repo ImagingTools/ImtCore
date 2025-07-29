@@ -81,7 +81,7 @@ iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoP
 		return TS_OK;
 	}
 
-	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, true);
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
@@ -99,7 +99,7 @@ iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoP
 	const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
 	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
 	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
 	}
 	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);

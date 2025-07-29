@@ -17,7 +17,6 @@
 
 // ImtCore includes
 #include <imtsdl/CSdlTools.h>
-#include <imtsdl/ModuleInfo.h>
 
 
 namespace imtsdl
@@ -41,7 +40,6 @@ template <class T>
 	const QString& currentSchemaFilePath,
 	const ISdlProcessArgumentsParser& argumentParser,
 	const iprm::IParamsSet& schemaParams,
-	const IModuleManager& moduleManager,
 	istd::ILogger& log)
 {
 	for (T& sdlEntry: listOfEntries){
@@ -55,9 +53,7 @@ template <class T>
 		if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
 			isExternal =  bool(QDir::cleanPath(currentSchemaFilePath) != QDir::cleanPath(argumentParser.GetSchemaFilePath()));
 			if (sdlEntry.GetTargetHeaderFilePath().isEmpty()){
-				const QMap<QString, QString> targetPathList =
-					CSdlTools::CalculateTargetCppFilesFromSchemaParams(
-						schemaParams, argumentParser.GetOutputDirectoryPath(), QFileInfo(currentSchemaFilePath).fileName());
+				const QMap<QString, QString> targetPathList = CSdlTools::CalculateTargetCppFilesFromSchemaParams(schemaParams, argumentParser, true);
 				const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
 				sdlEntry.SetTargetHeaderFilePath(headerFilePath);
 			}
@@ -73,28 +69,6 @@ template <class T>
 					log.SendLogMessage(istd::IInformationProvider::IC_ERROR, 0, QString("Unable to set output file for entry: '%1' in '%2'").arg(sdlEntry.GetName(), currentSchemaFilePath), QString());
 
 					return false;
-				}
-			}
-		}
-		else {
-			// update target header path
-			const QString targetPath = sdlEntry.GetTargetHeaderFilePath();
-			const QString entrySchemaPath = sdlEntry.GetSchemaFilePath();
-			const QString processingSchemaPath = argumentParser.GetSchemaFilePath();
-			// fallback for parallel automatic generation. In this case, it is expected that all target files with schemas from the same folder will have the same output folder.
-			if (targetPath.isEmpty() || (QFileInfo(entrySchemaPath).absoluteDir().absolutePath() != QFileInfo(processingSchemaPath).absoluteDir().absolutePath())){
-				if (argumentParser.IsGenerateMode() && argumentParser.IsCppEnabled()){
-					IModuleManager::ItemInfo info = moduleManager.GetItemInfo(sdlEntry);
-					sdlEntry.SetTargetHeaderFilePath(info.TargerHeaderFilePath);
-					// MUST NOT be empty!!!
-					if (info.TargerHeaderFilePath.isEmpty()){
-						log.SendLogMessage(istd::IInformationProvider::IC_ERROR, 0, QString("Missing header for %1. Perhaps data for schema %2 is not generated").arg(sdlEntry.GetName(), entrySchemaPath), QString());
-						log.SendLogMessage(istd::IInformationProvider::IC_ERROR, 0, QString("targetPath: %1").arg(targetPath), QString());
-						log.SendLogMessage(istd::IInformationProvider::IC_ERROR, 0, QString("entrySchemaPath:%1").arg(entrySchemaPath), QString());
-						log.SendLogMessage(istd::IInformationProvider::IC_ERROR, 0, QString("processingSchemaPath:%1").arg(processingSchemaPath), QString());
-
-						return false;
-					}
 				}
 			}
 		}
@@ -131,8 +105,6 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 
 		return TS_INVALID;
 	}
-
-	Q_ASSERT(m_sdlModuleManaerCompPtr.IsValid());
 
 	// initialize output params
 	iprm::CParamsSet* outputParamsSetPtr = dynamic_cast<iprm::CParamsSet*>(outputPtr);
@@ -737,10 +709,10 @@ bool CGqlSchemaParserComp::ValidateSchema()
 	bool isSchemaValid = true;
 	ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel = m_argumentParserCompPtr->GetAutoLinkLevel();
 	if (!m_argumentParserCompPtr->IsSchemaDependencyModeEnabled()){
-		isSchemaValid = isSchemaValid && UpdateEntryList(m_sdlTypes, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
-		isSchemaValid = isSchemaValid && UpdateEntryList(m_enums, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
-		isSchemaValid = isSchemaValid && UpdateEntryList(m_unions, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
-		isSchemaValid = isSchemaValid && UpdateEntryList(m_documentTypes, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
+		isSchemaValid = isSchemaValid && UpdateEntryList(m_sdlTypes, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *this);
+		isSchemaValid = isSchemaValid && UpdateEntryList(m_enums, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *this);
+		isSchemaValid = isSchemaValid && UpdateEntryList(m_unions, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *this);
+		isSchemaValid = isSchemaValid && UpdateEntryList(m_documentTypes, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *this);
 
 		/// \todo inspect it and fix
 		// isSchemaValid = isSchemaValid && UpdateEntryList(m_requests, autoLinkLevel, m_currentSchemaFilePath, *m_argumentParserCompPtr, *m_schemaParamsPtr, *m_sdlModuleManaerCompPtr, *this);
@@ -755,7 +727,7 @@ bool CGqlSchemaParserComp::ValidateSchema()
 			if (autoLinkLevel == ISdlProcessArgumentsParser::ALL_ONLY_FILE){
 				isExternal =  bool(QDir::cleanPath(m_currentSchemaFilePath) != QDir::cleanPath(m_argumentParserCompPtr->GetSchemaFilePath()));
 				if (sdlRequest.GetTargetHeaderFilePath().isEmpty()){
-					const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), QFileInfo(m_currentSchemaFilePath).fileName());
+					const QMap<QString, QString> targetPathList = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsPtr, *m_argumentParserCompPtr, true);
 					const QString headerFilePath = QDir::cleanPath(targetPathList[ISdlProcessArgumentsParser::s_headerFileType]);
 					sdlRequest.SetTargetHeaderFilePath(headerFilePath);
 				}

@@ -9,3 +9,23 @@ type Lab {
 	a: Double!
 	b: Double!
 }
+
+# type Rgb {
+# 	red: Double!
+# 	green: Double!
+# 	blue: Double!
+# }
+
+# type Hsv {
+# 	hue: Double!
+# 	saturation: Double!
+# 	value: Double!
+# }
+
+# type Cmyk {
+# 	cyan: Double!
+# 	magenta: Double!
+# 	yellow: Double!
+# 	black: Double!
+# }
+

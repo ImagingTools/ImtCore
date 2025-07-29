@@ -1,7 +1,7 @@
 import argparse
 import os
 import re
-
+import configparser
 
 def ReadTextFromFile(path, aEncoding='utf-8'):
 	with open(path, 'r', encoding = aEncoding) as f:
@@ -24,17 +24,38 @@ def GetSchemaDataFromText(text):
 def GetFileSystemAcceptableEntryPath(originalText):
 	retVal = originalText
 
-	retVal.replace('*', '_')
-	retVal.replace('?', '_')
-	retVal.replace('\"', '_')
-	retVal.replace('<', '_')
-	retVal.replace('>', '_')
-	retVal.replace('|', '_')
+	retVal = retVal.replace('*', '_')
+	retVal = retVal.replace('?', '_')
+	retVal = retVal.replace('\"', '_')
+	retVal = retVal.replace('<', '_')
+	retVal = retVal.replace('>', '_')
+	retVal = retVal.replace('|', '_')
 
 	while retVal.endswith('.'):
 		retVal = retVal[:-1]
 
 	return os.path.abspath(retVal)
+
+
+def CalculateTargetCppFilesFromTemplateString(schemaName, schemaVersion, schemaNamespace, templateString, outputPath):
+	retVal = []
+
+	baseFilePath = templateString
+	if not baseFilePath.startswith("$(output-directory)"):
+		baseFilePath = "$(output-directory)/" + baseFilePath
+
+	if not baseFilePath.endswith("$(schema.name)"):
+		baseFilePath += ("/$(schema.name)")
+	
+	baseFilePath = baseFilePath.replace("$(output-directory)", outputPath)
+	baseFilePath = baseFilePath.replace("$(schema.namespace)", schemaNamespace)
+	baseFilePath = baseFilePath.replace("$(schema.name)", schemaName)
+	baseFilePath = baseFilePath.replace("$(schema.version)", schemaVersion)
+
+	retVal.append(GetFileSystemAcceptableEntryPath(baseFilePath + (".cpp")))
+	retVal.append(GetFileSystemAcceptableEntryPath(baseFilePath + (".h")))
+
+	return retVal
 
 
 def CalculateTargetCppFilesFromSchemaParams(schemaName, schemaVersion, baseDirPath, defaultName):
@@ -81,13 +102,10 @@ if __name__ == '__main__':
 	parser.add_argument('-S', '--schema-file', required=True, help='SDL schema file path')
 	parser.add_argument('-O', '--output-directory', required=True, help='Directory where created files will be created')
 	parser.add_argument('--auto-join', required=False, help='Indicates if an automatic join of output files into a single is enabled.', action='store_true')
-	parser.add_argument('--auto-link', required=False, help='Defines the compilation order of the schema files.\n'
-												   '0 - disabled. ALL files will be compiled.\n'
-												   '1 - only those schemas with the same namespace as the original one will be compiled\n'
-												   '2 - only the schema will be compiled. See the \'schema-file\' option', default=2)
 	parser.add_argument('--CPP', required=False, help='C++ Modificator to generate code.', action='store_true', default=False)
 	parser.add_argument('--GQL', required=False, help='GraphQL Modificator to generate GrqphQL wrap C++ code . (disables CPP and QML if it not setted explicit)', action='store_true', default=False)
 	parser.add_argument('--QML', required=False, help='QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)', action='store_true', default=False)
+	parser.add_argument('--config', required=False, help='config file path')
 
 	args, unknown_args = parser.parse_known_args()
 
@@ -99,9 +117,6 @@ if __name__ == '__main__':
 	schemaFilePath = args.schema_file
 	schemaFileData = ReadTextFromFile(schemaFilePath)
 	schemaParams = GetSchemaDataFromText(schemaFileData)
-
-	if args.auto_link != '2':
-		raise BaseException(f'Unexpected auto link! L2 only support. actual {args.auto_link}')
 
 	schemaName = ''
 	schemaNamespace = ''
@@ -115,9 +130,23 @@ if __name__ == '__main__':
 		elif key == 'version':
 			schemaVersion = value
 
+
+	isTemplateEnabled = False
+	if not args.config is None:
+		settings = configparser.ConfigParser(inline_comment_prefixes=(';'))
+		settings.read(args.config)
+		isTemplateEnabledValue = settings['Template']['enable']
+		## BUG puthon reads value with comment separator
+		isTemplateEnabled = (isTemplateEnabledValue == 'true' or isTemplateEnabledValue == 'true;')
+
 	cumulatedFiles = ''
 	if args.CPP or args.GQL:
-		for path in CalculateTargetCppFilesFromSchemaParams(schemaName, schemaVersion, outputDirectoryPath, ''):
+		pathsList = []
+		if isTemplateEnabled:
+			pathsList = CalculateTargetCppFilesFromTemplateString(schemaName, schemaVersion, schemaNamespace, settings['Template']['output'], outputDirectoryPath)
+		else:
+			pathsList = CalculateTargetCppFilesFromSchemaParams(schemaName, schemaVersion, outputDirectoryPath, '')
+		for path in pathsList:
 			cumulatedFiles += path + ';'
 
 	if args.QML:

@@ -72,35 +72,6 @@ macro(ImtCoreGetSdlDeps)
 endmacro()
 
 
-#  TODO remove it later
-function(ImtCoreAddSdlSearchPath ARG_SDL_PATH)
-	message(FATAL_ERROR "Outdated function call. Use 'ImtCoreAddSdlHeaderIncludePath'")
-endfunction()
-
-function(ImtCoreAddModuleWithHeaders ARG_SDL_PATH)
-	ImtCoreAddSdlModulesPath(${ARG_SDL_PATH})
-	ImtCoreAddSdlHeaderIncludePath(${ARG_SDL_PATH})
-endfunction()
-
-function(ImtCoreAddSdlModulesPath ARG_SDL_PATH)
-	if (NOT GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS)
-		set(GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS ${ARG_SDL_PATH}
-			CACHE
-			STRING "List of directories to search for SDL modules, used by SDL code generator"
-			FORCE
-		)
-	else()
-		list(APPEND GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS ${ARG_SDL_PATH})
-		list(REMOVE_DUPLICATES GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS)
-		set(GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS ${GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS}
-			CACHE
-			STRING "List of directories to search for SDL modules, used by SDL code generator"
-			FORCE
-		)
-	endif()
-endfunction()
-
-
 function(ImtCoreAddSdlHeaderIncludePath ARG_SDL_PATH)
 	if (NOT GLOBAL_SDL_SEARCH_PATHS)
 		set(GLOBAL_SDL_SEARCH_PATHS ${ARG_SDL_PATH}
@@ -154,41 +125,20 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	get_filename_component(SCHEMA_NAME "${ARG_SCHEMA_PATH}" NAME_WE)
 
 	set (SDL_OUTPUT_ROOT_DIRECTORY "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL")
-	if (ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH)
-		set (SDL_OUTPUT_ROOT_DIRECTORY "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}")
-	endif()
-
-	ImtCoreAddSdlModulesPath(${SDL_OUTPUT_ROOT_DIRECTORY})
-	set(SDL_OUTPUT_DIRECTORY "${SDL_OUTPUT_ROOT_DIRECTORY}")
 	set(SDL_CPP_OUTPUT_DIRECTORY "${SDL_OUTPUT_ROOT_DIRECTORY}/${ARG_VERSION}/CPP")
 	set(DEP_FILE_PATH "${SDL_CPP_OUTPUT_DIRECTORY}/${SCHEMA_NAME}.depfile")
 
 	set(CUSTOM_MODIFICATORS)
 	list(APPEND CUSTOM_MODIFICATORS "--GG=2") ##< Compile, using a new version of code generator.
-	list(APPEND CUSTOM_MODIFICATORS "--CPP")
-	list(APPEND CUSTOM_MODIFICATORS "--GQL")
-	list(APPEND CUSTOM_MODIFICATORS "--use-all-modificators")
-	list(APPEND CUSTOM_MODIFICATORS "-Psdl")
-	# BUG Base extending error TODO FIXIT
-	# list(APPEND CUSTOM_MODIFICATORS "-Bistd::IPolymorphic=istd/IPolymorphic.h")
-	list(APPEND CUSTOM_MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
+	list(APPEND CUSTOM_MODIFICATORS "--config=${IMT_CONFIG_CMAKE_PATH}/SDL/CommonCXX.cfg") ##< Use config file
 	list(APPEND CUSTOM_MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
-	list(APPEND CUSTOM_MODIFICATORS "--generate-module") ##< add .jsmi module
-
-	if (ARG_SOURCE_NAME)
-		list(APPEND CUSTOM_MODIFICATORS "-JCPP=${SDL_CPP_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.cpp")
-		list(APPEND CUSTOM_MODIFICATORS "-JH=${SDL_CPP_OUTPUT_DIRECTORY}/${ARG_SOURCE_NAME}.h")
-	else()
-		list(APPEND CUSTOM_MODIFICATORS "--auto-join")
-	endif()
+	list(APPEND CUSTOM_MODIFICATORS "--CPP")
 
 	list(LENGTH GLOBAL_SDL_SEARCH_PATHS SDL_PATHS_COUNT)
 	if (SDL_PATHS_COUNT GREATER 0)
 		foreach(SDL_SEARCH_PATH ${GLOBAL_SDL_SEARCH_PATHS})
 			list(APPEND CUSTOM_MODIFICATORS "-H${SDL_SEARCH_PATH}")
 		endforeach()
-	else()
-		message(FATAL_ERROR "SDL PATHS is empty! Did you forget add it? Use 'ImtCoreAddSdlHeaderIncludePath' function.")
 	endif()
 
 	list(LENGTH GLOBAL_SDL_SCHEMA_SEARCH_PATHS SDL_SCHEMA_PATHS_COUNT)
@@ -198,31 +148,17 @@ macro (ImtCoreCustomConfigureSdlCpp)
 		endforeach()
 	endif()
 
-	list(LENGTH GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS_COUNT)
-	if (GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS_COUNT GREATER 0)
-		foreach(SDL_SEARCH_PATH ${GLOBAL_IMT_SDL_MODULES_SEARCH_PATHS})
-			list(APPEND CUSTOM_MODIFICATORS "-E${SDL_SEARCH_PATH}")
-		endforeach()
-	endif()
-
 	ImtCoreGetSdlDeps(
 		INPUT
 			"${ARG_SCHEMA_PATH}"
 		OUT_DIR
-			"${SDL_OUTPUT_DIRECTORY}"
+			"${AUX_INCLUDE_DIR}"
 		MODIFICATORS
 			"${CUSTOM_MODIFICATORS}"
 		RESULT_VARIABLE
 			FOUND_DEPS)
 
 	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
-
-	set(SDL_HEADERS)
-
-	# foreach(SDL_HEADER ${FOUND_DEPS})
-	# 	get_filename_component
-	# 	list(APPEND SDL_HEADERS "-E${SDL_SEARCH_PATH}")
-	# endforeach()
 
 	message(VERBOSE "CPP: FOUND for ${PROJECT_NAME} DEPS: ${FOUND_DEPS}")
 
@@ -234,7 +170,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 		COMMAND
 			${SDL_GENERATOR_EXE_PATH}
 		ARGS
-			-GS ${ARG_SCHEMA_PATH} -O "${SDL_OUTPUT_DIRECTORY}" ${CUSTOM_MODIFICATORS}
+			-GS ${ARG_SCHEMA_PATH} -O "${AUX_INCLUDE_DIR}" ${CUSTOM_MODIFICATORS}
 		DEPENDS
 			${SDL_GENERATOR_EXE_PATH} "${ARG_EXTRA_DEPS}"
 		DEPFILE
@@ -266,7 +202,7 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	qt6_wrap_cpp(MOC_SOURCES "${HEADER_FILES}")
 	target_sources(${PROJECT_NAME} PRIVATE ${MOC_SOURCES})
 
-	message(VERBOSE "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${SDL_OUTPUT_DIRECTORY} ${CUSTOM_MODIFICATORS}")
+	message(VERBOSE "EXEC: ${SDL_GENERATOR_EXE_PATH} -GS ${ARG_SCHEMA_PATH} -O ${AUX_INCLUDE_DIR} ${CUSTOM_MODIFICATORS}")
 
 endmacro()
 
@@ -301,9 +237,8 @@ macro (ImtCoreCustomConfigureSdlQml)
 	set(DEP_FILE_PATH "${SDL_OUTPUT_DIRECTORY}/${ARG_VERSION}/QML/${SCHEMA_NAME}.depfile")
 
 	list(APPEND MODIFICATORS "--QML")
-	list(APPEND MODIFICATORS "--use-all-modificators")
-	list(APPEND MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
 	list(APPEND MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
+	list(APPEND CUSTOM_MODIFICATORS "--config=${IMT_CONFIG_CMAKE_PATH}/SDL/CommonQML.cfg") ##< Use config file
 
 	# use cache file if provided
 	if (GLOBAL_SDL_CACHE_FILE)

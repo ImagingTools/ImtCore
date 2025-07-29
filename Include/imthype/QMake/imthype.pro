@@ -1,5 +1,5 @@
 TARGET = imthype
 
 include($(ACFDIR)/Config/QMake/StaticConfig.pri)
-include($(ACULADIR)/Config/QMake/Acula.pri)
+include($(IMTCOREDIR)/Config/QMake/ImtCore.pri)
 

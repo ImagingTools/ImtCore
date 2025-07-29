@@ -29,11 +29,6 @@ I_EXPORT_COMPONENT(
 			"The SDL specific log filter, used to remove unnecessary messages",
 			"Schema Definition Language SDL Log Filter")
 
-I_EXPORT_COMPONENT(
-			ModuleManager,
-			"The SDL module manager, used to resolve include paths for generated code",
-			"Schema Definition Language SDL Module Manager")
-
 
 } // namespace ImtSdlPck
 

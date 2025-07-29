@@ -46,7 +46,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, true);
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
@@ -61,7 +61,6 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
 	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
 	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
 		if (!m_customSchemaParamsCompPtr.IsValid()){
@@ -70,7 +69,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 			return TS_INVALID;
 		}
 
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
 	}
 	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
 	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
@@ -82,7 +81,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 
 				return TS_INVALID;
 			}
-			QStringList autoJoinFilePaths = GetAutoJoinedCppFilePaths(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+			QStringList autoJoinFilePaths = GetAutoJoinedCppFilePaths(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
 			PrintFiles(std::cout, autoJoinFilePaths, m_argumentParserCompPtr->GetGeneratorType());
 			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), autoJoinFilePaths, *m_dependentSchemaListCompPtr);
 		}
@@ -192,7 +191,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 				const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(true);
 				for (const imtsdl::CSdlUnion& sdlUnion : unionList){
 					filterParams.InsertOption(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
-					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
+					SendVerboseMessage(QString("Add join union file '%1. Total: %2").arg(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
 				}
 
 				// then join types
@@ -230,9 +229,14 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
 					QFile::remove(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 				}
-				QFile::remove(outputDirectoryPath + QStringLiteral("/QmlRegister.h"));
+				for (const imtsdl::CSdlUnion& sdlUnion : unionList){
+					QFile::remove(QString(outputDirectoryPath + '/' + sdlUnion.GetName() + ".h"));
+					QFile::remove(QString(outputDirectoryPath + '/' + sdlUnion.GetName() + "_ClassDef.h"));
+				}
 
+				QFile::remove(outputDirectoryPath + QStringLiteral("/QmlRegister.h"));
 			}
+
 			if (joinSources){
 				filterParams.ResetOptions();
 				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
@@ -258,7 +262,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 				if (joinHeaders){
 					QFile joinedSourceFile(sourceFilePath);
 					if (!joinedSourceFile.open(QIODevice::ReadWrite)){
-						SendCriticalMessage(0, QString("Unable to open joined filee '%1'").arg(sourceFilePath));
+						SendCriticalMessage(0, QString("Unable to open joined file '%1'").arg(sourceFilePath));
 						I_CRITICAL();
 
 						return TS_INVALID;
@@ -387,28 +391,16 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 				}
 
 				if (foundType->IsExternal()){
-					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
-					if (resolvedPath.isEmpty()){
-						QString foundTypeName;
-						imtsdl::CSdlType* typePtr = dynamic_cast<imtsdl::CSdlType*>(foundType.get());
-						if (typePtr != nullptr){
-							foundTypeName = typePtr->GetName();
-						}
-						else {
-							imtsdl::CSdlEnum* enumPtr = dynamic_cast<imtsdl::CSdlEnum*>(foundType.get());
-							if (enumPtr !=nullptr){
-								foundTypeName = enumPtr->GetName();
-							}
-						}
-						SendErrorMessage(0, QString("Unable to find header file for type '%1' of '%2' in '%3' ").arg(foundTypeName, field.GetId(), sdlType.GetName()));
+					const QString typeIncludePath = '<' + foundType->GetTargetHeaderFilePath() + '>';
+					if (typeIncludePath.isEmpty()){
+						SendCriticalMessage(0, QString("Header path is empty %1 of %2").arg(foundType->GetName(), foundType->GetSchemaFilePath()));
+						I_CRITICAL();
 
 						return false;
 					}
-
-					const QString relativeIncludePath = '<' + resolvedPath + '>';
-					if (!resolvedPath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
-						includeDirectivesList << CreateCustomDirective(relativeIncludePath);
-						customIncluded << relativeIncludePath;
+					if (!customIncluded.contains(typeIncludePath)){
+						includeDirectivesList << CreateCustomDirective(typeIncludePath);
+						customIncluded << typeIncludePath;
 					}
 				}
 			}

@@ -320,6 +320,20 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		stream << QStringLiteral("[\"");
 		stream << field.GetId();
 		stream << QStringLiteral("\"].isNull()");
+		if (expected){
+			stream << QStringLiteral(" && ");
+		}
+		else {
+			stream << QStringLiteral(" || ");
+		}
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\") ");
+		if(expected){
+			stream << '!';
+		}
+		stream << QStringLiteral("= nullptr");
 	}
 	else {
 		stream << GetContainerObjectVariableName();

@@ -39,7 +39,7 @@ iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, true);
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
@@ -63,7 +63,7 @@ iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 			return TS_INVALID;
 		}
 
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
 	}
 
 	imtsdl::SdlEnumList sdlEnumList = m_sdlEnumListCompPtr->GetEnums(true);

@@ -36,8 +36,6 @@ class CSdlTools
 {
 public:
 	// static variables
-	/// \todo remove it. \deprecated
-	static const QString s_variantMapClassMemberName;
 	/**
 		\brief Defines an SDL scheme namespace prefix.
 		\warning If a change is required, it MUST ONLY be made BEFORE the process of parsing the scheme.
@@ -75,10 +73,12 @@ public:
 				bool* isEnumPtr = nullptr,
 				bool* isUnionPtr = nullptr);
 
+	[[nodiscard]] static QString ResolveRelativePath(const QString& path, const QStringList& lookupPaths);
+
 	static QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr);
 	static QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr);
 	static QString ConvertTypeOrEnum(const CSdlField& sdlField, const SdlEnumList& enumList, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr, bool* isEnumPtr = nullptr);
-	/// \todo rename it and make a structure with result
+	/// \todo rename it to 'ConvertEntryType' and make a structure with result
 	static QString ConvertTypeOrEnumOrUnion(const CSdlField& sdlField, const SdlEnumList& enumList, const SdlUnionList& unionList, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr, bool* isEnumPtr = nullptr, bool* isUnion = nullptr);
 
 	static QString QmlConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr);
@@ -116,10 +116,16 @@ public:
 				const ISdlProcessArgumentsParser* argumentParamsPtr, bool addVersion = true);
 
 	/// \sa imtsdlgen::ISdlProcessArgumentsParser::s_headerFileType imtsdlgen::ISdlProcessArgumentsParser::s_sourceFileType
-	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
+	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argumentParser, bool relativePath = false);
+
+	/// resolves a complete output path from schema params and template(if enabled) if tepmplate is not enabled, returns \c argumentParser.GetOutputDirectoryPath() \note returns clean path \sa QDir::cleanPath
+	[[nodiscard]] static QString GetCompleteOutputPath(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argumentParser, bool cleanPath, bool cppPath);
+	[[nodiscard]] static QString GetCompleteOutputPath(const icomp::TReferenceMember<iprm::IParamsSet>& schemaParamsCompPtr, const ISdlProcessArgumentsParser& argumentParser, bool cleanPath, bool cppPath);
+
+	[[nodiscard]] static QString ProcessTemplateString(const iprm::IParamsSet& schemaParams, const QString& templateString, const QString& outputDirPath);
 	[[nodiscard]] static bool UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* schemaParamsPtr, const imtsdl::ISdlProcessArgumentsParser* argumentParamsPtr);
 
-	[[nodiscard]] static QStringList GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
+	[[nodiscard]] static QStringList GetAutoJoinedCppFilePaths(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argParser);
 	[[nodiscard]] static QString GetQmlModuleNameFromParamsOrArguments(
 				const iprm::IParamsSet* schemaParamsPtr,
 				const imtsdl::ISdlProcessArgumentsParser* argumentParamsPtr);
@@ -137,8 +143,6 @@ public:
 	static void PrintFiles(const QString& filePath, const QStringList& files, const iprm::IOptionsManager& depsList);
 	static void PrintFiles(std::ostream& outStream, const QStringList& files, imtsdl::ISdlProcessArgumentsParser::GeneratorType projectCodeGenerator = imtsdl::ISdlProcessArgumentsParser::GT_CMAKE);
 
-	/// \todo remove \param rawLookup - V1 fallback use ONLY for V1 generation!!!!!
-	[[nodiscard]] static QString ResolveRelativeHeaderFileForType(const CSdlEntryBase& sdlEntry, const QStringList& lookupPaths);
 	[[nodiscard]] static QString GetTypeVersion(const CSdlEntryBase& sdlType);
 
 	[[nodiscard]] static IncludeDirective CreateCxxDirective(const QString& path);
@@ -146,6 +150,10 @@ public:
 	[[nodiscard]] static IncludeDirective CreateAcfDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateImtDirective(const QString& path);
 	[[nodiscard]] static IncludeDirective CreateCustomDirective(const QString& path);
+
+private:
+	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const QString& baseDirPath, const QString defaultName = QString());
+
 };
 
 

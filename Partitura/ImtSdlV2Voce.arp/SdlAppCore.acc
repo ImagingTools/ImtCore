@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5389" Description="ACF"/>
-            <Version Id="1" Number="2249" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5406" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -25,9 +25,6 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ModuleManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlCoreFramework"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="SdlProcessorList" Type="Reference[]" ExportId="SdlProcessorList">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -36,6 +33,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SdlSchemaDependenciesCollector" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SdlCoreFramework/GqlSchemaParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlSchemaParameters" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SdlSchemaParser" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SdlCoreFramework/GqlSchemaParser"/>

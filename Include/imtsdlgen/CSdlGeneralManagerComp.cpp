@@ -31,7 +31,6 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 
 	Q_ASSERT(m_sdlParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlArgumentParserCompPtr.IsValid());
-	Q_ASSERT(m_sdlModuleManaerCompPtr.IsValid());
 	Q_ASSERT(m_sdlSchemaDependenciesCollectorCompPtr.IsValid());
 
 	if (m_sdlArgumentParserCompPtr->IsSchemaDependencyModeEnabled()){
@@ -52,7 +51,7 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 				0, QString("Unexpected dependencies list for schema: '%1'")
 					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
-			::exit(1);
+			::exit(2);
 		}
 
 		QStringList cumulatedFiles;
@@ -74,8 +73,24 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 		::exit(0);
 	}
 
+	QElapsedTimer timer;
+	timer.start();
+
+	// first parse schema and get complete path to output
+	iprm::CParamsSet outputParamsSet;
+	int parsingResult =
+		m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, &outputParamsSet);
+	if (parsingResult != iproc::IProcessor::TS_OK){
+		SendErrorMessage(
+			0, QString("Unable to parse schema '%1'")
+				.arg(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath())
+						 .absoluteFilePath()));
+
+		::exit(3);
+	}
+
 	const QString outputDirPath =
-		m_sdlArgumentParserCompPtr->GetOutputDirectoryPath();
+		imtsdl::CSdlTools::GetCompleteOutputPath(m_sdlSchemaParamsCompPtr, *m_sdlArgumentParserCompPtr, false, m_sdlArgumentParserCompPtr->IsCppEnabled());
 	const bool isOutputDirExsists =
 		istd::CSystem::EnsurePathExists(outputDirPath);
 	if (!isOutputDirExsists){
@@ -83,13 +98,10 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 			0,
 			QString("Unable to create output directory '%1'").arg(outputDirPath));
 
-		::exit(2);
+		::exit(4);
 	}
 
-	QElapsedTimer timer;
-	timer.start();
-	/// \todo think about to remove lock
-	QLockFile lockFile(outputDirPath + QStringLiteral("/lock"));
+	QLockFile lockFile(outputDirPath + QStringLiteral("/SDL_GEN.lock"));
 	if (m_sdlArgumentParserCompPtr->IsGenerateMode()){
 		bool isLockRequired = true;
 		while (isLockRequired){
@@ -110,59 +122,22 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 #endif
 		}
 		if (IsVerboseEnabled()){
-			qDebug() << qApp->applicationPid() << "processing [wait]" << timer.elapsed();
+			SendInfoMessage(0, QString::number(qApp->applicationPid()) + ":SDL:processing [parse] " + m_sdlArgumentParserCompPtr->GetSchemaFilePath() + QString::number(timer.elapsed()));
 		}
 	}
 
 	timer.restart();
 
-	QStringList modulesPathList =
-		m_sdlArgumentParserCompPtr->GetModuleIncludePaths();
-	if (!modulesPathList.contains(
-			m_sdlArgumentParserCompPtr->GetOutputDirectoryPath())){
-		modulesPathList << m_sdlArgumentParserCompPtr->GetOutputDirectoryPath();
-	}
-	const bool isModulesInitialized =
-		m_sdlModuleManaerCompPtr->Initialize(modulesPathList);
-	if (!isModulesInitialized){
-		SendErrorMessage(0, "Unable to initialize modules");
-
-		::exit(3);
-	}
-
-	// parse schema
-	iprm::CParamsSet outputParamsSet;
-	int parsingResult =
-		m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, &outputParamsSet);
-	if (parsingResult != iproc::IProcessor::TS_OK){
-		SendErrorMessage(
-			0, QString("Unable to parse schema '%1'")
-				.arg(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath())
-						 .absoluteFilePath()));
-
-		::exit(4);
-	}
-
-	// create module
-	if (m_sdlArgumentParserCompPtr->IsModuleGenerateEnabled()){
-		if (!m_sdlModuleManaerCompPtr->CreateModuleFile()){
-			SendErrorMessage(
-				0, QString("Unable to create module for schema '%1'")
-					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
-
-			::exit(5);
-		}
-	}
-
 	const bool isCodeCreated = CreateCode();
 	lockFile.unlock();
 
 	if (!isCodeCreated){
-		::exit(6);
+		::exit(5);
 	}
 
+
 	if (IsVerboseEnabled()){
-		qDebug() << qApp->applicationPid() << "processing finished [creation]" << timer.elapsed();
+		SendInfoMessage(0, QString::number(qApp->applicationPid()) + ":SDL:processing finished [creation] " + QString::number(timer.elapsed()));
 	}
 
 	::exit(0);

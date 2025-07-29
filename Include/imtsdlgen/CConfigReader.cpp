@@ -142,6 +142,7 @@ bool CConfigReader::ReadFromFile(const QString& filePath)
 
 	SetVariableFromConfig(configuration, QStringLiteral("Template/enable"), templateEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("Template/output"), outputDirTemplate);
+	SetVariableFromConfig(configuration, QStringLiteral("Template/qml-output"), qmlOutputDirTemplate);
 	SetVariableFromConfig(configuration, QStringLiteral("Template/include-path"), includePathTemplate);
 
 	return true;

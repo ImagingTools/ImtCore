@@ -39,7 +39,7 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, true);
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
@@ -63,7 +63,7 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 			return TS_INVALID;
 		}
 
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
 	}
 
 	imtsdl::SdlUnionList sdlUnionList = m_sdlUnionListCompPtr->GetUnions(true);
@@ -202,11 +202,7 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 				}
 
 				if (foundType->IsExternal()){
-					QString resolvedPath = ResolveRelativeHeaderFileForType(*foundType, m_argumentParserCompPtr->GetHeadersIncludePaths());
-					if (resolvedPath.isEmpty()){
-						SendErrorMessage(0, QString("Unable to find header file for type of '%1'").arg(sdlType));
-					}
-
+					QString resolvedPath = foundType->GetTargetHeaderFilePath();
 					const QString relativeIncludePath = '<' + resolvedPath + '>';
 					if (!resolvedPath.isEmpty() && !customIncludeList.contains(relativeIncludePath)){
 						customIncludeList << relativeIncludePath;

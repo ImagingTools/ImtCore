@@ -38,7 +38,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 		return retVal;
 	}
 
-	QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false);
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
@@ -68,7 +68,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 			}
 
 			QStringList qmlFilePaths;
-			qmlFilePaths << GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath());
+			qmlFilePaths << GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false));
 			PrintFiles(std::cout, qmlFilePaths, m_argumentParserCompPtr->GetGeneratorType());
 			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), qmlFilePaths, *m_dependentSchemaListCompPtr);
 		}
@@ -169,7 +169,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 	// and finally create a QRC file
 	QString qrcFilePath = outputDirectoryPath + "/" + qmlModuleName + ".qrc";
 	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-		qrcFilePath = GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath());
+		qrcFilePath = GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false));
 	}
 	QFile qrcFile(qrcFilePath);
 	if (!qrcFile.open(QIODevice::WriteOnly)){

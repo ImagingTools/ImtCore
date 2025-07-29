@@ -33,8 +33,6 @@ public:
 		I_REGISTER_INTERFACE(imtsdl::ISdlEditableProcessArgumentsParser)
 	I_END_COMPONENT;
 
-	CSdlProcessArgumentsParserComp();
-
 	// reimplemented (imtsdl::ISdlProcessArgumentsParser)
 	virtual bool SetArguments(const QStringList& arguments) override;
 	virtual QString GetSchemaFilePath() const override;
@@ -62,6 +60,7 @@ public:
 	virtual bool IsTemplateEnabled() const override;
 	virtual QString GetTemplateIncludePath() const override;
 	virtual QString GetTemplateOutputPath() const override;
+	virtual QString GetTemplateQmlOutputPath() const override;
 
 	// reimplemented (imtsdl::ISdlEditableProcessArgumentsParser)
 	virtual bool ReadFromSettings(const QString& settingsFilePath) override;
@@ -117,27 +116,28 @@ private:
 	QString m_namespace;
 	QString m_namespacePrefix;
 	QStringList m_usedModificators;
-	bool m_isGenerateMode;
-	bool m_isDependenciesMode;
-	bool m_useAllModificators;
-	bool m_notUseModificators;
-	bool m_cppEnabled;
-	bool m_qmlEnabled;
-	bool m_gqlEnabled;
-	bool m_schemaDependencyModeEnabled;
+	std::optional<bool> m_isGenerateMode;
+	std::optional<bool> m_isDependenciesMode;
+	std::optional<bool> m_useAllModificators;
+	std::optional<bool> m_notUseModificators;
+	std::optional<bool> m_cppEnabled;
+	std::optional<bool> m_qmlEnabled;
+	std::optional<bool> m_gqlEnabled;
+	std::optional<bool> m_schemaDependencyModeEnabled;
 	QMap<QString, QString> m_baseClassList;
 	QMap<QString, QString> m_joinRules;
 	QStringList m_includePaths;
-	GeneratorType m_generatorType;
-	bool m_autoJoinEnabled;
-	AutoLinkLevel m_autoLinkLevel;
+	std::optional<GeneratorType> m_generatorType;
+	std::optional<bool> m_autoJoinEnabled;
+	std::optional<AutoLinkLevel> m_autoLinkLevel;
 	QStringList m_headersIncludePaths;
 	QStringList m_moduleIncludePathList;
 	QString m_depFilePath;
 	QString m_moduleOutputFilePath;
-	bool m_isModuleGenerationEnabled;
-	bool m_isTemplateEnabled;
+	std::optional<bool> m_isModuleGenerationEnabled;
+	std::optional<bool> m_isTemplateEnabled;
 	QString m_outputDirTemplate;
+	QString m_outputQmlDirTemplate;
 	QString m_includePathTemplate;
 };
 

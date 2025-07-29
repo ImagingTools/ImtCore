@@ -1,6 +1,6 @@
 schema {
 	name: imt2d
-	namespace: imtsdl2d
+	namespace: imt2d
 	version: 1.0
 }
 

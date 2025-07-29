@@ -44,6 +44,7 @@ set(AUX_INCLUDE_DIR "${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}/GeneratedFiles
 set(BUILD_TESTING OFF CACHE BOOL "Configures projects for testing")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
+include_directories(${AUX_INCLUDE_DIR})
 
 
 #------ Required libs ------
@@ -94,26 +95,14 @@ if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
 	add_subdirectory("${INCLUDE_DIR}/imtsdlgenv2/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenTest")
 endif()
 
-
 if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	#-------- Sdl --------
 	if(NOT DEFINED USE_SDL OR USE_SDL)
-		include("${IMTCOREDIR}/Config/CMake/ImtCoreSdlCustomConfig.cmake")
-		ImtCoreAddSdlHeaderIncludePath("${IMTCOREDIR_BUILD}/AuxInclude/${TARGETNAME}")
-
 		add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
-
 		add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
-		add_dependencies(imtauthsdl imtbasesdl)
-
 		add_subdirectory("${SDL_DIR}/imtcolor/CMake" "${AUX_INCLUDE_DIR}/imtcolorsdl")
-		add_dependencies(imtcolorsdl imtbasesdl)
-
 		add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
-		add_dependencies(imtlicsdl imtbasesdl)
-
 		add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
-		add_dependencies(imtappsdl imtbasesdl)
 	endif()
 
 	#-------- Libraries --------

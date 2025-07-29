@@ -97,7 +97,7 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
+	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false);
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
@@ -112,7 +112,6 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 		return TS_INVALID;
 	}
 
-	const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
 	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
 	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
 		if (!m_customSchemaParamsCompPtr.IsValid()){
@@ -121,7 +120,7 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 			return TS_INVALID;
 		}
 
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, m_argumentParserCompPtr->GetOutputDirectoryPath(), defaultName);
+		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
 	}
 
 	if (m_argumentParserCompPtr->IsDependenciesMode()){

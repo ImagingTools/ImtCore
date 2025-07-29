@@ -6,6 +6,7 @@ INCLUDEPATH += $$PWD/../../Include
 INCLUDEPATH += $$PWD/../../Impl
 INCLUDEPATH += $$PWD/../../Sdl
 INCLUDEPATH += $$PWD/../../$$AUXINCLUDEDIR
+INCLUDEPATH += $$PWD/../../$$AUXINCLUDEDIR/GeneratedFiles
 
 win32{
 	LIBS += -ladvapi32 -luser32
