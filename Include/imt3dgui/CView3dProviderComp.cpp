@@ -390,34 +390,7 @@ void CView3dProviderComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
-	m_zoomInCommand.SetVisuals(tr("Zoom in"), tr("Zoom in"), tr("Zoom in"), GetIcon(":/Icons/ViewZoomIn"));
-	m_zoomOutCommand.SetVisuals(tr("Zoom out"), tr("Zoom out"), tr("Zoom out"), GetIcon(":/Icons/ViewZoomOut"));
-	m_showGridCommand.SetVisuals(tr("Show Grid"), tr("Grid"), tr("Show Grid"), GetIcon(":/Icons/Grid"));
-	m_showAxisCommand.SetVisuals(tr("Show Axis"), tr("Axis"), tr("Show Axis"), GetIcon(":/Icons/Axis"));
-	m_showRulerCommand.SetVisuals(tr("Show Ruler"), tr("Ruler"), tr("Show Ruler"), GetIcon(":/Icons/Ruler"));
-	m_resetViewCommand.SetVisuals(tr("Reset View"), tr("Reset"), tr("Reset View"), GetIcon(":/Icons/ViewReset"));
-	m_setViewFromRightCommand.SetVisuals(tr("Right View"), tr("Right"), tr("Right View"), GetIcon(":/Icons/ViewRight"));
-	m_setViewFromFrontCommand.SetVisuals(tr("Front View"), tr("Front"), tr("Front View"), GetIcon(":/Icons/ViewFront"));
-	m_setViewFromTopCommand.SetVisuals(tr("Top View"), tr("Top"), tr("Top View"), GetIcon(":/Icons/ViewTop"));
-	m_setViewFromLeftCommand.SetVisuals(tr("Left View"), tr("Left"), tr("Left View"), GetIcon(":/Icons/ViewLeft"));
-	m_setViewFromBottomCommand.SetVisuals(tr("Bottom View"), tr("Bottom"), tr("Bottom View"), GetIcon(":/Icons/ViewBottom"));
-	m_setViewFromBackCommand.SetVisuals(tr("Back View"), tr("Back"), tr("Back View"), GetIcon(":/Icons/ViewBack"));
-	m_pointSelectionCommand.SetVisuals(tr("Select Point"), tr("Select Point"), tr("Set Point Selection Mode"), GetIcon(":/Icons/PointSelection"));
-	m_boxSelectionCommand.SetVisuals(tr("Select Box"), tr("Select Box"), tr("Set Box Selection Mode"), GetIcon(":/Icons/BoxSelection"));
-	m_circleSelectionCommand.SetVisuals(tr("Select Circle"), tr("Select Circle"), tr("Set Circle Selection Mode"), GetIcon(":/Icons/CircleSelection"));
-	m_clearSelectionCommand.SetVisuals(tr("Clear Selection"), tr("Clear"), tr("Clear Selection"), GetIcon(":/Icons/ClearSelection"));
-	m_allSelectionCommand.SetVisuals(tr("Select all"), tr("Select all"), tr("Select all"), GetIcon(":/Icons/SelectAll"));
-	m_invertSelectionCommand.SetVisuals(tr("Invert Selection"), tr("Invert"), tr("Invert Selection"), GetIcon(":/Icons/InvertSelection"));
-	m_deleteSelectionCommand.SetVisuals(tr("Delete Selection"), tr("Delete"), tr("Delete Selection"), GetIcon(":/Icons/DeleteSelection"));
-	m_freeRotationCommand.SetVisuals(tr("Free Rotation"), tr("Free Rotation"), tr("Set Free Rotation Mode"), GetIcon(":/Icons/FreeRotation"));
-	m_rotationAroundXCommand.SetVisuals(tr("Rotation around X-Axis"), tr("X-Rotation"), tr("Set Rotation around X-Axis Mode"), GetIcon(":/Icons/RotationAroundX"));
-	m_rotationAroundYCommand.SetVisuals(tr("Rotation around Y-Axis"), tr("Y-Rotation"), tr("Set Rotation around Y-Axis Mode"), GetIcon(":/Icons/RotationAroundY"));
-	m_rotationAroundZCommand.SetVisuals(tr("Rotation around Z-Axis"), tr("Z-Rotation"), tr("Set Rotation around Z-Axis Mode"), GetIcon(":/Icons/RotationAroundZ"));
-	m_viewModeCommand.SetVisuals(tr("View"), tr("View Mode"), tr("Set View Mode"), GetIcon(":/Icons/View"));
-	m_selectionModeCommand.SetVisuals(tr("Selection"), tr("Selection Mode"), tr("Set Selection Mode"), GetIcon(":/Icons/Selection"));
-
-	m_orthoModeCommand.SetVisuals(tr("Orthogonal View Mode"), tr("Orthogonal"), tr("Select orthogonal view mode"), GetIcon(":/Icons/Ortho"));
-	m_perspectiveModeCommand.SetVisuals(tr("Perspective View Mode"), tr("Perspective"), tr("Select perspective view mode"), GetIcon(":/Icons/Perspective"));
+	UpdateCommands();
 }
 
 
@@ -430,6 +403,8 @@ void CView3dProviderComp::OnGuiDesignChanged()
 
 	QColor backgroundColor = QGuiApplication::palette().color(QPalette::Base);
 	widgetPtr->SetBackgroundColor(backgroundColor);
+
+	UpdateCommands();
 }
 
 
@@ -743,6 +718,42 @@ void CView3dProviderComp::EnableCommands(COpenGLWidget::ViewMode viewMode)
 	m_allSelectionCommand.setEnabled(isSelection);
 	m_invertSelectionCommand.setEnabled(isSelection);
 	m_deleteSelectionCommand.setEnabled(isSelection);
+}
+
+
+void CView3dProviderComp::UpdateCommands()
+{
+	istd::IChangeable::ChangeSet changeSet(ibase::ICommandsProvider::CF_COMMANDS);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	m_zoomInCommand.SetVisuals(tr("Zoom in"), tr("Zoom in"), tr("Zoom in"), GetIcon(":/Icons/ViewZoomIn"));
+	m_zoomOutCommand.SetVisuals(tr("Zoom out"), tr("Zoom out"), tr("Zoom out"), GetIcon(":/Icons/ViewZoomOut"));
+	m_showGridCommand.SetVisuals(tr("Show Grid"), tr("Grid"), tr("Show Grid"), GetIcon(":/Icons/Grid"));
+	m_showAxisCommand.SetVisuals(tr("Show Axis"), tr("Axis"), tr("Show Axis"), GetIcon(":/Icons/Axis"));
+	m_showRulerCommand.SetVisuals(tr("Show Ruler"), tr("Ruler"), tr("Show Ruler"), GetIcon(":/Icons/Ruler"));
+	m_resetViewCommand.SetVisuals(tr("Reset View"), tr("Reset"), tr("Reset View"), GetIcon(":/Icons/ViewReset"));
+	m_setViewFromRightCommand.SetVisuals(tr("Right View"), tr("Right"), tr("Right View"), GetIcon(":/Icons/ViewRight"));
+	m_setViewFromFrontCommand.SetVisuals(tr("Front View"), tr("Front"), tr("Front View"), GetIcon(":/Icons/ViewFront"));
+	m_setViewFromTopCommand.SetVisuals(tr("Top View"), tr("Top"), tr("Top View"), GetIcon(":/Icons/ViewTop"));
+	m_setViewFromLeftCommand.SetVisuals(tr("Left View"), tr("Left"), tr("Left View"), GetIcon(":/Icons/ViewLeft"));
+	m_setViewFromBottomCommand.SetVisuals(tr("Bottom View"), tr("Bottom"), tr("Bottom View"), GetIcon(":/Icons/ViewBottom"));
+	m_setViewFromBackCommand.SetVisuals(tr("Back View"), tr("Back"), tr("Back View"), GetIcon(":/Icons/ViewBack"));
+	m_pointSelectionCommand.SetVisuals(tr("Select Point"), tr("Select Point"), tr("Set Point Selection Mode"), GetIcon(":/Icons/PointSelection"));
+	m_boxSelectionCommand.SetVisuals(tr("Select Box"), tr("Select Box"), tr("Set Box Selection Mode"), GetIcon(":/Icons/BoxSelection"));
+	m_circleSelectionCommand.SetVisuals(tr("Select Circle"), tr("Select Circle"), tr("Set Circle Selection Mode"), GetIcon(":/Icons/CircleSelection"));
+	m_clearSelectionCommand.SetVisuals(tr("Clear Selection"), tr("Clear"), tr("Clear Selection"), GetIcon(":/Icons/ClearSelection"));
+	m_allSelectionCommand.SetVisuals(tr("Select all"), tr("Select all"), tr("Select all"), GetIcon(":/Icons/SelectAll"));
+	m_invertSelectionCommand.SetVisuals(tr("Invert Selection"), tr("Invert"), tr("Invert Selection"), GetIcon(":/Icons/InvertSelection"));
+	m_deleteSelectionCommand.SetVisuals(tr("Delete Selection"), tr("Delete"), tr("Delete Selection"), GetIcon(":/Icons/DeleteSelection"));
+	m_freeRotationCommand.SetVisuals(tr("Free Rotation"), tr("Free Rotation"), tr("Set Free Rotation Mode"), GetIcon(":/Icons/FreeRotation"));
+	m_rotationAroundXCommand.SetVisuals(tr("Rotation around X-Axis"), tr("X-Rotation"), tr("Set Rotation around X-Axis Mode"), GetIcon(":/Icons/RotationAroundX"));
+	m_rotationAroundYCommand.SetVisuals(tr("Rotation around Y-Axis"), tr("Y-Rotation"), tr("Set Rotation around Y-Axis Mode"), GetIcon(":/Icons/RotationAroundY"));
+	m_rotationAroundZCommand.SetVisuals(tr("Rotation around Z-Axis"), tr("Z-Rotation"), tr("Set Rotation around Z-Axis Mode"), GetIcon(":/Icons/RotationAroundZ"));
+	m_viewModeCommand.SetVisuals(tr("View"), tr("View Mode"), tr("Set View Mode"), GetIcon(":/Icons/View"));
+	m_selectionModeCommand.SetVisuals(tr("Selection"), tr("Selection Mode"), tr("Set Selection Mode"), GetIcon(":/Icons/Selection"));
+
+	m_orthoModeCommand.SetVisuals(tr("Orthogonal View Mode"), tr("Orthogonal"), tr("Select orthogonal view mode"), GetIcon(":/Icons/Ortho"));
+	m_perspectiveModeCommand.SetVisuals(tr("Perspective View Mode"), tr("Perspective"), tr("Select perspective view mode"), GetIcon(":/Icons/Perspective"));
 }
 
 

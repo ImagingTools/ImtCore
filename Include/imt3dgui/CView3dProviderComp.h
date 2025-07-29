@@ -252,6 +252,7 @@ private:
 	}
 
 	void EnableCommands(COpenGLWidget::ViewMode viewMode);
+	void UpdateCommands();
 
 private:
 	// commands
