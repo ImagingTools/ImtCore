@@ -653,6 +653,20 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldWriteToObjectImplCode(
 void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents)
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
+	bool isCustom = false;
+	QString convertedType = imtsdlgenv2::CSdlGenTools::OptListConvertTypeWithNamespaceStruct(
+		field,
+		m_originalSchemaNamespaceCompPtr->GetText(),
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		*m_sdlUnionListCompPtr,
+		true,
+		&isCustom,
+		nullptr,
+		nullptr,
+		nullptr,
+		nullptr,
+		false);
 
 	AddContainerValueCheckConditionBegin(stream, field, !isStrict, hIndents);
 	FeedStream(stream, 1, false);
@@ -670,23 +684,109 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 	const quint16 hhIndents = hIndents + quint16(!isStrict);
 	const QString enumSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
 	const QString unionSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
+	imtsdl::CSdlUnionConverter::ConversionType conversionType = GetUnionScalarConversionType();
+
 	FeedStreamHorizontally(stream, hhIndents);
+
 	if (isEnum){
 		// declare temp value, to store string equivalent
 		stream << QStringLiteral("const QString ");
 		stream << enumSourceVarName;
 	}
 	else if (isUnion){
+		if (isCustom){
+			if (conversionType == imtsdl::CSdlUnionConverter::CT_GQL_SCALAR || conversionType == imtsdl::CSdlUnionConverter::CT_GQL_ARRAY){
+				FeedStreamHorizontally(stream, 1);
+				stream << QStringLiteral("const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr(\"item\");");
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, 1);
+				stream << QStringLiteral("if (!itemDataObjectPtr->ContainsParam(\"__typename\")) {");
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, 2);
+				stream << QStringLiteral("qDebug() << \"invalid typename for: ") << field.GetId() <<  QStringLiteral("\";");
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, 2);
+				stream << QStringLiteral("return false;");
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, 1);
+				stream << '}';
+
+				// const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
+				// if (itemDataObjectPtr.ContainsParam("__typename")) {
+
+				// }
+				// QString itemTypename = gqlObject["__typename"];
+				// if (itemTypename == "CFlexoPrinterSpecification") {
+				// 	gmgmodsdl::FlexoPrinter::CFlexoPrinterSpecification itemConvert;
+				// 	const bool isItemRead = itemConvert.ReadFromGraphQlObject(*itemDataObjectPtr);
+				// 	if (!isItemRead) {
+				// 		return false;
+				// 	}
+				// 	item = std::make_shared<PrinterSpecificationDocument>(itemConvert);
+				// }
+			}
+			else{
+				FeedStreamHorizontally(stream, 1);
+				stream << QStringLiteral("QJsonObject itemObject = jsonObject.value(\"item\").toObject();");
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, 1);
+				stream << QStringLiteral("if (!itemObject.contains(\"__typename\")){");
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, 2);
+				stream << QStringLiteral("qDebug() << \"invalid typename for: ") << field.GetId() <<  QStringLiteral("\";");
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, 2);
+				stream << QStringLiteral("return false;");
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, 1);
+				stream << '}';
+
+
+
+				// QJsonObject itemObject = jsonObject.value("item").toObject();
+				// if (!itemObject.contains("__typename")){
+				// 	qDebug() << "invalid typename for: item";
+				// 	return false;
+				// }
+
+				// QString itemTypename =itemObject.value("__typename").toString();
+				// if (itemTypename == "gmgmodsdl::FlexoPrinter::CFlexoPrinterSpecification") {
+				// 	gmgmodsdl::FlexoPrinter::CFlexoPrinterSpecification itemConvert;
+				// 	const bool isitemRead = itemConvert.ReadFromJsonObject(jsonObject["item"].toObject());
+				// 	if (!isitemRead){
+				// 		return false;
+				// 	}
+				// 	item = std::make_shared<PrinterSpecificationDocument>(itemConvert);
+				// }
+
+			}
+			FeedStream(stream, 2, false);
+			FeedStreamHorizontally(stream, 1);
+			stream << QStringLiteral("QString itemTypename");
+
+		}
+		else{
 		// declare temp value, to store variant equivalent
 		stream << QStringLiteral("const QVariant ");
 		stream << unionSourceVarName;
+		}
 	}
 	else{
 		stream << field.GetId();
 	}
 
 	stream << ' ' << '=' << ' ';
-	AddContainerValueReadFromObject(stream, field, QString(), hhIndents);
+	if (isUnion && isCustom){
+		if (conversionType == imtsdl::CSdlUnionConverter::CT_GQL_SCALAR || conversionType == imtsdl::CSdlUnionConverter::CT_GQL_ARRAY){
+			stream << QStringLiteral("itemDataObjectPtr->GetParamArgumentValue(\"__typename\").toString();");
+		}
+		else{
+			stream << QStringLiteral("itemObject.value(\"__typename\").toString();");
+		}
+	}
+	else{
+		AddContainerValueReadFromObject(stream, field, QString(), hhIndents);
+	}
 	stream << ';';
 	FeedStream(stream, 1, false);
 

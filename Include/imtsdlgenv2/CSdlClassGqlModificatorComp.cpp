@@ -316,10 +316,20 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		if(expected){
 			stream << '!';
 		}
+		stream << '(';
+		stream << QStringLiteral("(gqlObject.IsObject(\"item\") && ");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\") ");
+		stream << QStringLiteral("== nullptr)");
+		stream << QStringLiteral(" || ");
+		stream << QStringLiteral("(!gqlObject.IsObject(\"item\") && ");
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral("[\"");
 		stream << field.GetId();
-		stream << QStringLiteral("\"].isNull()");
+		stream << QStringLiteral("\"].isNull())");
+		stream << ')';
 		if (expected){
 			stream << QStringLiteral(" && ");
 		}
@@ -489,6 +499,11 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(QTextStream& stream
 		accessCodeStream << QStringLiteral("if (");
 		accessCodeStream << result.customAccessedElementName;
 		accessCodeStream << QStringLiteral(" == nullptr){");
+		FeedStream(accessCodeStream, 1, false);
+
+		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 2);
+		accessCodeStream << QStringLiteral("qDebug() << \"invalid type\" << ") << result.customAccessedElementName;
+		accessCodeStream << QStringLiteral(";");
 		FeedStream(accessCodeStream, 1, false);
 
 		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 2);

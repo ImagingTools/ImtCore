@@ -10,9 +10,9 @@ import imtdocgui 1.0
 DocumentDataController {
 	id: container;
 
-	property string gqlGetCommandId;
-	property string gqlAddCommandId;
-	property string gqlUpdateCommandId;
+	property string gqlGetCommandId: "";
+	property string gqlAddCommandId: "";
+	property string gqlUpdateCommandId: "";
 
 	property string subscriptionCommandId;
 

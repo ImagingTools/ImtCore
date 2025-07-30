@@ -329,16 +329,17 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			stream << QStringLiteral("else ");
 		}
 
-		stream << QStringLiteral("if (") << sourceVariableName << QStringLiteral(".canConvert<") << convertedType << QStringLiteral(">()){");
-		FeedStream(stream, 1, false);
-
 		if (isCustom){
-			FeedStreamHorizontally(stream, hIndents + 1);
 			QString tempVar = targetVariableName + QStringLiteral("Convert");
+			stream << QStringLiteral("if (itemTypename == \"") <<  sdlType << QStringLiteral("\") {"); //sourceVariableName << convertedType << QStringLiteral(">()){");
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream, hIndents + 1);
+
 			stream << convertedType << QStringLiteral(" ") << tempVar << QStringLiteral(";");
 			FeedStream(stream, 1, false);
 
 			if (conversionType == CT_MODEL_ARRAY || conversionType == CT_MODEL_SCALAR){
+
 				QString readVariable = QString("is") + targetVariableName + QString("Read");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
@@ -372,6 +373,7 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 				FeedStream(stream, 1, false);
 			}
 			else if (conversionType == CT_JSON_SCALAR || conversionType == CT_JSON_ARRAY){
+
 				QString readVariable = QString("is") + targetVariableName + QString("Read");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
@@ -404,6 +406,7 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 				FeedStream(stream, 1, false);
 			}
 			else{
+
 				QString gqlVariable = targetName + QString("DataObjectPtr");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const ::imtgql::CGqlParamObject* ") << gqlVariable;
@@ -443,6 +446,9 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			}
 		}
 		else{
+			stream << QStringLiteral("if (") << sourceVariableName << QStringLiteral(".canConvert<") << convertedType << QStringLiteral(">()){");
+			FeedStream(stream, 1, false);
+
 			FeedStreamHorizontally(stream, hIndents + 1);
 			stream << targetVariableName;
 			stream << QStringLiteral(" = ");

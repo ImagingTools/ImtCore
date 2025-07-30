@@ -394,6 +394,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
+			FeedStreamHorizontally(stream, 1);
+			stream << QStringLiteral("QString itemTypename = ") << dataVarName;
+			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
+			FeedStream(stream, 2, false);
+
 			WriteUnionConversionFromData(stream,
 				foundUnion,
 				dataVarName,
@@ -443,6 +448,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
+
+			FeedStreamHorizontally(stream, 1);
+			stream << QStringLiteral("QString itemTypename = ") << dataVarName;
+			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
+			FeedStream(stream, 2, false);
 
 			WriteUnionConversionFromData(stream,
 				foundUnion,

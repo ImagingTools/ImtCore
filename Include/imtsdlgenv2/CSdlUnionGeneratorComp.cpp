@@ -324,9 +324,14 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 		stream << QStringLiteral("Q_INVOKABLE void SetValue(const QVariant& value){");
 		FeedStream(stream, 1, false);
 
-		for (const QString& unionType : convertedTypeList){
+		// for (const QString& unionType : convertedTypeList){
+		QStringList unionTypeList = sdlUnion.GetTypes();
+		for (int unionIndex = 0; unionIndex < unionTypeList.count(); unionIndex++){
+			QString unionTypeWithNamespace = convertedTypeList[unionIndex];
+			QString unionType = unionTypeList[unionIndex];
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("if (value.canConvert<CType1>()){");
+			stream << QStringLiteral("if (value.canConvert<") << unionTypeWithNamespace;
+			stream << QStringLiteral(">()){");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 3);
@@ -352,34 +357,34 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 		stream << QStringLiteral("Q_INVOKABLE QVariant GetValue(){");
 		FeedStream(stream, 1, false);
 
-		for (const QString& unionType : convertedTypeList){
-			QString unionTypeObjectClassName = unionType + QStringLiteral("Object");
-			QString unionTypeVarName = QStringLiteral("m_%1Object").arg(unionType.toLower());
+		// for (const QString& unionType : convertedTypeList){
+		// 	QString unionTypeObjectClassName = unionType + QStringLiteral("Object");
+		// 	QString unionTypeVarName = QStringLiteral("m_%1Object").arg(unionType.toLower());
 
-			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("if (const %1* val = std::get_if<%1>((*Version_1_0).get())){").arg(unionType);
-			FeedStream(stream, 1, false);
+		// 	FeedStreamHorizontally(stream, 2);
+		// 	stream << QStringLiteral("if (const %1* val = std::get_if<%1>((*Version_1_0).get())){").arg(unionType);
+		// 	FeedStream(stream, 1, false);
 
-			FeedStreamHorizontally(stream, 3);
-			stream << QStringLiteral("if (!%1){").arg(unionTypeVarName);
-			FeedStream(stream, 1, false);
+		// 	FeedStreamHorizontally(stream, 3);
+		// 	stream << QStringLiteral("if (!%1){").arg(unionTypeVarName);
+		// 	FeedStream(stream, 1, false);
 
-			FeedStreamHorizontally(stream, 4);
-			stream << unionTypeVarName << QStringLiteral("= new %1(this);").arg(unionTypeObjectClassName);
-			FeedStream(stream, 1, false);
+		// 	FeedStreamHorizontally(stream, 4);
+		// 	stream << unionTypeVarName << QStringLiteral("= new %1(this);").arg(unionTypeObjectClassName);
+		// 	FeedStream(stream, 1, false);
 
-			FeedStreamHorizontally(stream, 3);
-			stream << QStringLiteral("}");
-			FeedStream(stream, 2, false);
+		// 	FeedStreamHorizontally(stream, 3);
+		// 	stream << QStringLiteral("}");
+		// 	FeedStream(stream, 2, false);
 
-			FeedStreamHorizontally(stream, 3);
-			stream << QStringLiteral("return QVariant::fromValue(%1);").arg(unionTypeVarName);
-			FeedStream(stream, 1, false);
+		// 	FeedStreamHorizontally(stream, 3);
+		// 	stream << QStringLiteral("return QVariant::fromValue(%1);").arg(unionTypeVarName);
+		// 	FeedStream(stream, 1, false);
 
-			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("}");
-			FeedStream(stream, 2, false);
-		}
+		// 	FeedStreamHorizontally(stream, 2);
+		// 	stream << QStringLiteral("}");
+		// 	FeedStream(stream, 2, false);
+		// }
 
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return QVariant();");
@@ -410,14 +415,14 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 		stream << QStringLiteral("istd::TSharedNullable<std::shared_ptr<%1>> Version_1_0;").arg(sdlUnion.GetName());
 		FeedStream(stream, 1, false);
 
-		for (const QString& unionType : convertedTypeList){
-			QString unionTypeObjectClassName = unionType + QStringLiteral("Object");
-			QString unionTypeVarName = QStringLiteral("m_%1Object").arg(unionType.toLower());
+		// for (const QString& unionType : unionTypeList){
+		// 	QString unionTypeObjectClassName = unionType + QStringLiteral("Object");
+		// 	QString unionTypeVarName = QStringLiteral("m_%1Object").arg(unionType.toLower());
 
-			FeedStreamHorizontally(stream, 1);
-			stream << QStringLiteral("%1* %2;").arg(unionTypeObjectClassName, unionTypeVarName);
-			FeedStream(stream, 1, false);
-		}
+		// 	FeedStreamHorizontally(stream, 1);
+		// 	stream << QStringLiteral("%1* %2;").arg(unionTypeObjectClassName, unionTypeVarName);
+		// 	FeedStream(stream, 1, false);
+		// }
 
 		FeedStreamHorizontally(stream, 1);
 		stream << QStringLiteral("QVariant m_value;");

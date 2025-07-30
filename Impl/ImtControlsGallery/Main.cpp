@@ -18,6 +18,7 @@
 #include <GeneratedFiles/ImtControlsGallery/CImtControlsGallery.h>
 #include <imtqml/CNetworkEventInterceptor.h>
 
+
 int main(int argc, char *argv[])
 {
 #ifdef WEB_COMPILE
@@ -57,7 +58,9 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtappApplicationSdl);
 
 #ifdef Q_OS_WIN
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
 	QQuickWindow::setGraphicsApi(QSGRendererInterface::Direct3D12);
+#endif// QQuickWindow::setGraphicsApi(QSGRendererInterface::Direct3D12);
 #endif
 
 	CImtControlsGallery instance;

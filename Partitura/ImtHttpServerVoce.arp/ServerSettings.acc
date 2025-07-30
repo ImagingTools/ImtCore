@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5402" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -180,20 +180,16 @@
                     <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServerConnectionParams/PumaUrl</Value>
-                                <Value>ServerConnectionParams/PumaWebSocketPort</Value>
-                                <Value>ServerConnectionParams/ServerPort</Value>
-                                <Value>ServerConnectionParams/WebSocketServerPort</Value>
+                                <Value>ServerConnectionParams/PumaConnectionInterface</Value>
+                                <Value>ServerConnectionParams/ServerConnectionInterface</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>PumaUrl</Value>
-                                <Value>PumaWebSocketUrl</Value>
-                                <Value>ServerPort</Value>
-                                <Value>WebSocketServerPort</Value>
+                                <Value>PumaConnectionParam</Value>
+                                <Value>ServerConnectionParam</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -206,10 +202,19 @@
         <Element Id="ServerConnectionParams" PackageId="ImtHttpServerVoce" ComponentId="AuthorizableServerConnectionParams">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="DefaultPort">
+                    <AttributeInfo Id="DefaultHttpPort" Type="Integer" ExportId="DefaultHttpPort">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebSocketDefaultPort" Type="Integer" ExportId="WebSocketDefaultPort">
+                    <AttributeInfo Id="DefaultPumaHost" Type="String" ExportId="DefaultPumaHost">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPumaHttpPort" Type="Integer" ExportId="DefaultPumaHttpPort">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPumaWebSocketPort" Type="Integer" ExportId="DefaultPumaWebSocketPort">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="DefaultWebSocketPort">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -235,8 +240,10 @@
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
         <Component ExportedId="FileBasedSslConfiguration" ComponentId="FileBasedSslConfiguration"/>
         <Component ExportedId="LoggingParams" ComponentId="LoggingParams"/>
+        <Component ExportedId="PumaConnectionInterface" ComponentId="ServerConnectionParams/PumaConnectionInterface"/>
         <Component ExportedId="PumaUrl" ComponentId="ServerConnectionParams/PumaUrl"/>
         <Component ExportedId="PumaWebSocketPort" ComponentId="ServerConnectionParams/PumaWebSocketPort"/>
+        <Component ExportedId="ServerConnectionInterface" ComponentId="ServerConnectionParams/ServerConnectionInterface"/>
         <Component ExportedId="ServerPort" ComponentId="ServerConnectionParams/ServerPort"/>
         <Component ExportedId="SmtpPasswordParam" ComponentId="SmtpServerParams/SmtpPasswordParam"/>
         <Component ExportedId="SmtpPortParam" ComponentId="SmtpServerParams/SmtpPortParam"/>

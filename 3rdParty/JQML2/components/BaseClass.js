@@ -16,6 +16,7 @@ class Internal extends QtObject {
 
 	$complete() {
 		if (!this.$completed) {
+			this.useTypename = false
 			this.changeList = []
 
 			this.internalModelChanged.connect((name, sender) => {
@@ -124,12 +125,12 @@ class BaseClass extends QtObject {
 	$propertiesMember = []
 
 	createProperty(name, type, value){
-		if(name[0] === 'm' && name[1] === '_' && this.$propertiesMember.indexOf(name) < 0) this.$propertiesMember.push(name)
+		if((name[0] === 'm' && name[1] === '_' && this.$propertiesMember.indexOf(name) < 0) || (name == '__typename')) this.$propertiesMember.push(name)
         super.createProperty(name, type, value)
     }
 
     createVariantProperty(name, type, value){
-		if(name[0] === 'm' && name[1] === '_' && this.$propertiesMember.indexOf(name) < 0) this.$propertiesMember.push(name)
+		if((name[0] === 'm' && name[1] === '_' && this.$propertiesMember.indexOf(name) < 0) || (name == '__typename')) this.$propertiesMember.push(name)
         super.createVariantProperty(name, type, value)
     }
 
@@ -446,8 +447,8 @@ class BaseClass extends QtObject {
 					if (this[objKey].destroy){
 						this[objKey].destroy()
 					}
+					this[objKey] = null
 				}
-				this[objKey] = null
 			}
 		}
 

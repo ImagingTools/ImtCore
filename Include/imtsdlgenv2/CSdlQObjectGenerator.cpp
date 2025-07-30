@@ -885,17 +885,23 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 			FeedStream(stream, 1, false);
 			FeedStreamHorizontally(stream, 2);
 
+			std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBase = imtsdl::CSdlTools::GetSdlTypeOrEnumOrUnionForField(field, m_typeListProvider.GetSdlTypes(false), m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false));
+			QString fieldNameSpace;
+			if (sdlEntryBase != nullptr){
+				fieldNameSpace = GetNamespaceFromSchemaParams(sdlEntryBase->GetSchemaParams());
+			}
+
 			if (isEnum){
 				if (isArray){
 
 				}
 				else{
-					stream << sdlNamespace << QStringLiteral("::") << field.GetType() << QStringLiteral(" valueType = Version_1_0->");
+					stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(" valueType = Version_1_0->");
 					stream << field.GetId() << QStringLiteral(".value();");
 					FeedStream(stream, 1, false);
 					FeedStreamHorizontally(stream, 2);
 					stream << QStringLiteral("QMetaEnum metaEnum = QMetaEnum::fromType<");
-					stream << sdlNamespace << QStringLiteral("::") << field.GetType() << QStringLiteral(">();");
+					stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(">();");
 					FeedStream(stream, 1, false);
 					FeedStreamHorizontally(stream, 2);
 					stream << QStringLiteral("QString retval = metaEnum.valueToKey((int)valueType);");
@@ -1062,7 +1068,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 					FeedStream(stream, 1, false);
 					FeedStreamHorizontally(stream, 1);
 					stream << QStringLiteral("QMetaEnum metaEnum = QMetaEnum::fromType<");
-					stream << sdlNamespace << QStringLiteral("::") << field.GetType() << QStringLiteral(">();");
+					stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(">();");
 					FeedStream(stream, 1, false);
 					FeedStreamHorizontally(stream, 1);
 					stream << QStringLiteral("int key = metaEnum.keyToValue(v.toUtf8());");
@@ -1072,7 +1078,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 					FeedStream(stream, 1, false);
 					FeedStreamHorizontally(stream, 2);
 					stream << QStringLiteral("Version_1_0->") << field.GetId() << QStringLiteral(" = (");
-					stream << sdlNamespace << QStringLiteral("::") << field.GetType() << QStringLiteral(")key;");
+					stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(")key;");
 					FeedStream(stream, 1, false);
 					FeedStreamHorizontally(stream, 1);
 					stream << '}';

@@ -324,6 +324,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
 		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
+		const imtsdl::CSdlUnion* unionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get());
 
 		bool isCustom = false;
 		QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
@@ -335,6 +336,9 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		}
 		else if (isEnum){
 			ifStream << QStringLiteral("string");
+		}
+		else if (unionPtr){
+			ifStream << QStringLiteral("var");
 		}
 		else {
 			ifStream << convertedType;
@@ -499,6 +503,10 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
 		ifStream << QStringLiteral("': return '") << sdlField.GetId() << '\'';
 	}
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream, 3);
+	ifStream << QStringLiteral("case '__typename': return '__typename'");
+
 	FeedStream(ifStream, 1, false);
 	FeedStreamHorizontally(ifStream, 2);
 	ifStream << '}'; // end of switch
