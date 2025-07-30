@@ -286,6 +286,7 @@ bool CQmlEnumGeneratorComp::AddQrcEntry(const imtsdl::CSdlEnum& sdlEnum, iprm::C
 	return true;
 }
 
+
 bool CQmlEnumGeneratorComp::AddQmldirEntry(const imtsdl::CSdlEnum& sdlEnum, iprm::IParamsManager& qrcParams) const
 {
 	const int prefixParamsCount = qrcParams.GetParamsSetsCount();
@@ -302,6 +303,7 @@ bool CQmlEnumGeneratorComp::AddQmldirEntry(const imtsdl::CSdlEnum& sdlEnum, iprm
 			}
 		}
 	}
+
 	if (qmlPrefixParams == nullptr){
 		const int prefixParamsSetIndex = qrcParams.InsertParamsSet();
 		qmlPrefixParams = qrcParams.GetParamsSet(prefixParamsSetIndex);
@@ -313,7 +315,7 @@ bool CQmlEnumGeneratorComp::AddQmldirEntry(const imtsdl::CSdlEnum& sdlEnum, iprm
 		SendCriticalMessage(0, QString("Params manager  '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::QrcObjects)));
 		I_CRITICAL();
 
-		return TS_INVALID;
+		return false;
 	}
 
 	const int fileParamsIndex = objectsManagerPtr->InsertParamsSet();
@@ -325,7 +327,7 @@ bool CQmlEnumGeneratorComp::AddQmldirEntry(const imtsdl::CSdlEnum& sdlEnum, iprm
 		SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::QrcFileName)));
 		I_CRITICAL();
 
-		return TS_INVALID;
+		return false;
 	}
 	fileNameParam->SetName(GetQmlFileName(sdlEnum.GetName()) + QStringLiteral(".qml"));
 
@@ -334,8 +336,9 @@ bool CQmlEnumGeneratorComp::AddQmldirEntry(const imtsdl::CSdlEnum& sdlEnum, iprm
 		SendCriticalMessage(0, QString("Name param '%1' is not valid!").arg(qPrintable(QtResourceModelParamIds::QrcAlias)));
 		I_CRITICAL();
 
-		return TS_INVALID;
+		return false;
 	}
+
 	aliasNameParam->SetName(GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) + '/' + GetQmlFileName(sdlEnum.GetName()) + QStringLiteral(".qml"));
 
 	return true;
