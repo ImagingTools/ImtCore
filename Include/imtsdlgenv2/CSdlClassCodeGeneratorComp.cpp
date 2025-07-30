@@ -19,6 +19,10 @@
 #include <imtsdl/CSdlType.h>
 #include <imtsdlgenv2/CSdlQObjectGenerator.h>
 
+#ifndef DISABLE_CREATE_SDL_QOBJECT
+	#define DISABLE_CREATE_SDL_QOBJECT 1
+#endif
+
 
 namespace imtsdlgenv2
 {
