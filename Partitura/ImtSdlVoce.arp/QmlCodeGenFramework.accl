@@ -2,17 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5302" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331532" Description="Qt Framework"/>
+            <Version Id="0" Number="5406" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ParamsFactory" X="650" Y="700" Note=""/>
-        <Element ComponentName="QmlCodeCommandIdGenerator" X="925" Y="375" Note=""/>
-        <Element ComponentName="QmlCodeGenerator" X="540" Y="160" Note=""/>
-        <Element ComponentName="QmlCodeMetaGenerator" X="425" Y="375" Note=""/>
+        <Element ComponentName="QmlCodeCommandIdGenerator" X="1025" Y="350" Note=""/>
+        <Element ComponentName="QmlCodeGenerator" X="500" Y="150" Note=""/>
+        <Element ComponentName="QmlCodeMetaGenerator" X="300" Y="600" Note=""/>
         <Element ComponentName="QmlEntryFactory" X="650" Y="800" Note=""/>
+        <Element ComponentName="QmlEnumGenerator" X="325" Y="375" Note=""/>
         <Element ComponentName="QmldirFilePersistence" X="650" Y="600" Note=""/>
         <Element ComponentName="QtResourceFilePersistence" X="925" Y="500" Note=""/>
         <Element ComponentName="QtResourceModel" X="900" Y="150" Note=""/>

@@ -15,6 +15,7 @@
 #include <imtsdlgen/CQtResourceFilePersistenceComp.h>
 #include <imtsdlgen/CFileCleanupProcessorComp.h>
 #include <imtsdlgen/CFileFinalizerComp.h>
+#include <imtsdlgen/CQmlEnumGeneratorComp.h>
 
 
 /**
@@ -34,6 +35,7 @@ typedef imtsdlgen::CQmldirFilePersistenceComp QmldirFilePersistence;
 typedef imtsdlgen::CQtResourceFilePersistenceComp QtResourceFilePersistence;
 typedef imtsdlgen::CFileCleanupProcessorComp FileCleanupProcessor;
 typedef imtsdlgen::CFileFinalizerComp FileFinalizer;
+typedef imtsdlgen::CQmlEnumGeneratorComp QmlEnumGenerator;
 
 
 } // namespace ImtSdlGenPck

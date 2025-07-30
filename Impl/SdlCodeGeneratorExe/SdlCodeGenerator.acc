@@ -309,6 +309,7 @@
                                             <Value>QmlCodeGenFramework/QmlCodeGenerator</Value>
                                             <Value>QmlCodeGenFramework/QmlCodeMetaGenerator</Value>
                                             <Value>QmlCodeGenFramework/QmlCodeCommandIdGenerator</Value>
+                                            <Value>QmlCodeGenFramework/QmlEnumGenerator</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
