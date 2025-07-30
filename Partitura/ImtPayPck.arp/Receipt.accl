@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5302" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+            <Version Id="0" Number="5406" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -17,6 +17,8 @@
         <Element ComponentName="Payments" X="550" Y="200" Note=""/>
         <Element ComponentName="PaymentsPlace" X="825" Y="400" Note=""/>
         <Element ComponentName="Receipt" X="550" Y="300" Note=""/>
+        <Element ComponentName="TransactionId" X="250" Y="400" Note=""/>
+        <Element ComponentName="TransactionStatus" X="175" Y="550" Note=""/>
         <Element ComponentName="Type" X="900" Y="300" Note=""/>
         <Element ComponentName="TypeConstraints" X="1100" Y="300" Note=""/>
     </PositionMap>

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5302" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+            <Version Id="0" Number="5406" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -71,6 +71,8 @@
                                 <Value>Client</Value>
                                 <Value>Items</Value>
                                 <Value>Payments</Value>
+                                <Value>TransactionId</Value>
+                                <Value>TransactionStatus</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -84,6 +86,8 @@
                                 <Value>Client</Value>
                                 <Value>Items</Value>
                                 <Value>Payments</Value>
+                                <Value>TransactionId</Value>
+                                <Value>TransactionStatus</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -91,6 +95,16 @@
                         <Data IsEnabled="true" Value="Receipt"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TransactionId" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="TransactionStatus" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="Type" PackageId="BasePck" ComponentId="SelectionParam">

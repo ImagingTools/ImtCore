@@ -331,6 +331,18 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::Receipt::CReceipt::V1_0
 
 	receipt.items = itemList;
 
+	// set transaction Id
+	iprm::TParamsPtr<iprm::ITextParam> transactionIdParamPtr(&params, ReceiptParamKeys::TransactionId, false);
+	if (transactionIdParamPtr.IsValid()){
+		receipt.transactionId = transactionIdParamPtr->GetText();
+	}
+
+	// set transaction status
+	iprm::TParamsPtr<iprm::ITextParam> transactionStatusParamPtr(&params, ReceiptParamKeys::TransactionStatus, false);
+	if (transactionStatusParamPtr.IsValid()){
+		receipt.transactionStatus = transactionStatusParamPtr->GetText();
+	}
+
 	return true;
 }
 
@@ -478,6 +490,23 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 		}
 	}
 
+	// set transaction id
+	const QString transactionId = *receipt.transactionId;
+	if (!transactionId.isEmpty()){
+		iprm::ITextParam* transactionIdParamPtr = dynamic_cast<iprm::ITextParam*>(params.GetEditableParameter(ReceiptParamKeys::TransactionId));
+		if (transactionIdParamPtr != nullptr){
+			transactionIdParamPtr->SetText(transactionId);
+		}
+	}
+
+	// set transaction status
+	const QString transactionStatus = *receipt.transactionStatus;
+	if (!transactionStatus.isEmpty()){
+		iprm::ITextParam* transactionStatusParamPtr = dynamic_cast<iprm::ITextParam*>(params.GetEditableParameter(ReceiptParamKeys::TransactionStatus));
+		if (transactionStatusParamPtr != nullptr){
+			transactionStatusParamPtr->SetText(transactionStatus);
+		}
+	}
 
 	return true;
 }

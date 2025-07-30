@@ -52,6 +52,8 @@ type Receipt {
 	client: Client
 	items: [Item!]!
 	payments: [Payment]
+	transactionId: String
+	transactionStatus: String
 }
 
 type RegistrationResult {

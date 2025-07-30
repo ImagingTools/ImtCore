@@ -18,6 +18,8 @@ struct ReceiptParamKeys
 	static inline const QByteArray Client = "Client";
 	static inline const QByteArray Items = "Items";
 	static inline const QByteArray Payments = "Payments";
+	static inline const QByteArray TransactionId = "TransactionId";
+	static inline const QByteArray TransactionStatus = "TransactionStatus";
 };
 
 
