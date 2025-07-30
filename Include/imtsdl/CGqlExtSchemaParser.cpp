@@ -299,7 +299,7 @@ bool CGqlExtSchemaParser::ValidateSchema()
 		}
 	}
 
-	/// \todo don't use a suffix. Instead, define it elsewhere...
+	/// \todo don't use a suffix. Instead, define it elsewhere... like \c s_sdlNamespacePrefix
 	const QString fieldQmlImportDeclaration = CSdlTools::BuildQmlImportDeclarationFromParams(*m_schemaParamsPtr, QStringLiteral("Sdl"));
 	// set namespace and QML import for all types
 	for (CSdlType& sdlType: m_sdlTypes){

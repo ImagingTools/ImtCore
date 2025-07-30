@@ -240,7 +240,13 @@ void CSdlEnumConverter::WriteEnumConversionFromString(
 	stream << QStringLiteral("else {");
 	CSdlTools::FeedStream(stream, 1, false);
 
-	/// \todo add error message with text here
+	// report an error
+	CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("I_IF_DEBUG(qWarning() << QString(\"%1:%2 Error: Unexpected value for enum '%3', actual: '%4'\")");
+	stream << QStringLiteral(".arg(__FILE__, QString::number(__LINE__), \"");
+	stream << sdlEnum.GetName() << QStringLiteral("\", ");
+	stream << sourceVariableName << QStringLiteral(");)");
+	CSdlTools::FeedStream(stream, 2, false);
 
 	CSdlTools::FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;");
