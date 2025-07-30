@@ -23,6 +23,8 @@
 #include <imtcore/Version.h>
 #include <imtbase/CTempDir.h>
 #include <imtbase/CObjectCollection.h>
+#include <imtrepo/CFileObjectCollectionIterator.h>
+
 
 
 namespace imtrepo
@@ -653,7 +655,7 @@ imtbase::IObjectCollectionIterator* CFileCollectionCompBase::CreateObjectCollect
 			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
-	return nullptr;
+	return new CFileObjectCollectionIterator(const_cast<imtrepo::CFileCollectionCompBase*>(this));
 }
 
 
@@ -1256,23 +1258,12 @@ bool CFileCollectionCompBase::ReadItemFile(CFileCollectionItem& collectionItem, 
 
 void CFileCollectionCompBase::StartRepositoryLoader()
 {
-	//if (m_progressManagerListCompPtr.IsValid()){
-	//	for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
-	//		m_progressManagerListCompPtr[i]->BeginProgressSession("FileCollection", "Start reading file collection");
-	//	}
-	//}
-
 	m_readerThread.start();
 }
 
 
 void CFileCollectionCompBase::OnReaderProgress(int /*progress*/)
 {
-	//if (m_progressManagerListCompPtr.IsValid()){
-	//	for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
-	//		m_progressManagerListCompPtr[i]->OnProgress(0, progress);
-	//	}
-	//}
 }
 
 
@@ -1282,13 +1273,8 @@ void CFileCollectionCompBase::OnReaderFinished()
 
 	QWriteLocker locker(&m_filesLock);
 	m_files.append(m_readerFiles);
-	locker.unlock();
 
-	//if (m_progressManagerListCompPtr.IsValid()){
-	//	for (int i = 0; i < m_progressManagerListCompPtr.GetCount(); i++){
-	//		m_progressManagerListCompPtr[i]->EndProgressSession(0);
-	//	}
-	//}
+	locker.unlock();
 }
 
 

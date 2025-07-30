@@ -8,7 +8,7 @@ namespace imtlog
 int CEventContainer::GetMessagesCount() const
 {
 	QMutexLocker locker(&m_mutex);
-	return m_messages.size();
+	return int(m_messages.size());
 }
 
 
