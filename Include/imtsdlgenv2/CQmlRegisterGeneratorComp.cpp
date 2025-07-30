@@ -96,7 +96,7 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false);
+	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, true);
 	if (outputDirectoryPath.isEmpty()){
 		SendCriticalMessage(0, "Output path is not provided");
 		I_CRITICAL();
