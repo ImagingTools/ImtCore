@@ -84,7 +84,6 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 			ibase::IProgressManager* /*progressManagerPtr*/)
 {
 #ifndef DISABLE_CREATE_SDL_QOBJECT
-	qDebug() << "DoProcessing" << __func__;
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
