@@ -1018,6 +1018,8 @@ bool CFieldFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		filterValueType = ValueType::Bool;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ValueType", filterValueTypeStringValue);)
+
 		return false;
 	}
 
@@ -1046,6 +1048,8 @@ bool CFieldFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 			filterOperationsData = FilterOperation::Contains;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "FilterOperation", filterOperationsStringValue);)
+
 			return false;
 		}
 
@@ -1085,6 +1089,8 @@ bool CFieldFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 			filterValueType = ValueType::Bool;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ValueType", filterValueTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -1112,6 +1118,8 @@ bool CFieldFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 				filterOperationsData = FilterOperation::Contains;
 			}
 			else {
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "FilterOperation", filterOperationsStringValue);)
+
 				return false;
 			}
 
@@ -1220,6 +1228,8 @@ bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		filterValueType = ValueType::Bool;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ValueType", filterValueTypeStringValue);)
+
 		return false;
 	}
 
@@ -1249,6 +1259,8 @@ bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			filterOperationsDataValue = FilterOperation::Contains;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "FilterOperation", tempFilterOperations);)
+
 			return false;
 		}
 		filterOperations->append(filterOperationsDataValue);
@@ -1283,6 +1295,8 @@ bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			filterValueType = ValueType::Bool;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ValueType", filterValueTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -1311,6 +1325,8 @@ bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 				filterOperationsDataValue = FilterOperation::Contains;
 			}
 			else {
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "FilterOperation", tempFilterOperations);)
+
 				return false;
 			}
 			filterOperations->append(filterOperationsDataValue);
@@ -1416,6 +1432,8 @@ bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		filterValueType = ValueType::Bool;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ValueType", filterValueTypeStringValue);)
+
 		return false;
 	}
 
@@ -1444,6 +1462,8 @@ bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 			filterOperationsDataValue = FilterOperation::Contains;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "FilterOperation", tempFilterOperations);)
+
 			return false;
 		}
 		filterOperations->append(filterOperationsDataValue);
@@ -1478,6 +1498,8 @@ bool CFieldFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			filterValueType = ValueType::Bool;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ValueType", filterValueTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -1505,6 +1527,8 @@ bool CFieldFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 				filterOperationsDataValue = FilterOperation::Contains;
 			}
 			else {
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "FilterOperation", tempFilterOperations);)
+
 				return false;
 			}
 			filterOperations->append(filterOperationsDataValue);
@@ -1853,6 +1877,8 @@ bool CGroupFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		logicalOperation = LogicalOperation::Or;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "LogicalOperation", logicalOperationStringValue);)
+
 		return false;
 	}
 
@@ -1902,6 +1928,8 @@ bool CGroupFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 			logicalOperation = LogicalOperation::Or;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "LogicalOperation", logicalOperationStringValue);)
+
 			return false;
 		}
 	}
@@ -2002,6 +2030,8 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		logicalOperation = LogicalOperation::Or;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "LogicalOperation", logicalOperationStringValue);)
+
 		return false;
 	}
 
@@ -2052,6 +2082,8 @@ bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			logicalOperation = LogicalOperation::Or;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "LogicalOperation", logicalOperationStringValue);)
+
 			return false;
 		}
 	}
@@ -2146,6 +2178,8 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		logicalOperation = LogicalOperation::Or;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "LogicalOperation", logicalOperationStringValue);)
+
 		return false;
 	}
 
@@ -2190,6 +2224,8 @@ bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			logicalOperation = LogicalOperation::Or;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "LogicalOperation", logicalOperationStringValue);)
+
 			return false;
 		}
 	}

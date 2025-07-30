@@ -485,6 +485,8 @@ bool CGeometry::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 		GeometryType = GeometryType::CIRCLE;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "GeometryType", geometryTypeStringValue);)
+
 		return false;
 	}
 
@@ -528,6 +530,8 @@ bool CGeometry::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 			GeometryType = GeometryType::CIRCLE;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "GeometryType", geometryTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -615,6 +619,8 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		GeometryType = GeometryType::CIRCLE;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "GeometryType", geometryTypeStringValue);)
+
 		return false;
 	}
 
@@ -657,6 +663,8 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			GeometryType = GeometryType::CIRCLE;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "GeometryType", geometryTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -744,6 +752,8 @@ bool CGeometry::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		GeometryType = GeometryType::CIRCLE;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "GeometryType", geometryTypeStringValue);)
+
 		return false;
 	}
 
@@ -783,6 +793,8 @@ bool CGeometry::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			GeometryType = GeometryType::CIRCLE;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "GeometryType", geometryTypeStringValue);)
+
 			return false;
 		}
 	}

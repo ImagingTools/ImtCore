@@ -80,6 +80,8 @@ bool CDigitalPrinterSpecification::V1_0::ReadFromModel(const ::imtbase::CTreeIte
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -109,6 +111,8 @@ bool CDigitalPrinterSpecification::V1_0::OptReadFromModel(const ::imtbase::CTree
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -167,6 +171,8 @@ bool CDigitalPrinterSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::C
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -194,6 +200,8 @@ bool CDigitalPrinterSpecification::V1_0::OptReadFromGraphQlObject(const ::imtgql
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -252,6 +260,8 @@ bool CDigitalPrinterSpecification::V1_0::ReadFromJsonObject(const QJsonObject& j
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -279,6 +289,8 @@ bool CDigitalPrinterSpecification::V1_0::OptReadFromJsonObject(const QJsonObject
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -589,6 +601,8 @@ bool CDigitalPrinter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -618,6 +632,8 @@ bool CDigitalPrinter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -676,6 +692,8 @@ bool CDigitalPrinter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -703,6 +721,8 @@ bool CDigitalPrinter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -761,6 +781,8 @@ bool CDigitalPrinter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}
@@ -788,6 +810,8 @@ bool CDigitalPrinter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			printingTechnology = PrintingTechnology::Toner;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "PrintingTechnology", printingTechnologyStringValue);)
+
 			return false;
 		}
 	}

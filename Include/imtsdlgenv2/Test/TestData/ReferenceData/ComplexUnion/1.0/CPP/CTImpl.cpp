@@ -386,6 +386,8 @@ bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 		AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
+
 		return false;
 	}
 
@@ -464,6 +466,8 @@ bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
+
 		return false;
 	}
 
@@ -488,6 +492,8 @@ bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
+
 		return false;
 	}
 
@@ -653,6 +659,8 @@ bool CResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mo
 		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 		return false;
 	}
 
@@ -692,6 +700,8 @@ bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 			AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
+
 			return false;
 		}
 	}
@@ -763,6 +773,8 @@ bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -786,6 +798,8 @@ bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
+
 			return false;
 		}
 	}
@@ -949,6 +963,8 @@ bool CResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int
 			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -1296,6 +1312,8 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
+
 		return false;
 	}
 
@@ -1367,6 +1385,8 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
+
 		return false;
 	}
 
@@ -1390,6 +1410,8 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
+
 		return false;
 	}
 
@@ -1553,6 +1575,8 @@ bool CResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlOb
 		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 		return false;
 	}
 
@@ -1589,6 +1613,8 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 			AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
+
 			return false;
 		}
 	}
@@ -1653,6 +1679,8 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -1675,6 +1703,8 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
+
 			return false;
 		}
 	}
@@ -1836,6 +1866,8 @@ bool CResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -2182,6 +2214,8 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
+
 		return false;
 	}
 
@@ -2253,6 +2287,8 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
+
 		return false;
 	}
 
@@ -2276,6 +2312,8 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
+
 		return false;
 	}
 
@@ -2439,6 +2477,8 @@ bool CResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 		return false;
 	}
 
@@ -2475,6 +2515,8 @@ bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			AreaResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", areaResultStringValue);)
+
 			return false;
 		}
 	}
@@ -2539,6 +2581,8 @@ bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			MeasurementType = ::sdl::complextest::CTTypes::MeasurementType::OUT_OF_BOUND;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementType", measurementTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -2561,6 +2605,8 @@ bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			MeasurementUnit = ::sdl::complextest::CTTypes::MeasurementUnit::pixel;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "MeasurementUnit", measurementUnitStringValue);)
+
 			return false;
 		}
 	}
@@ -2722,6 +2768,8 @@ bool CResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -3239,6 +3287,8 @@ bool CArea::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 		return false;
 	}
 
@@ -3409,6 +3459,8 @@ bool CArea::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 		return false;
 	}
 
@@ -3458,6 +3510,8 @@ bool CArea::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 			return false;
 		}
 	}
@@ -3625,6 +3679,8 @@ bool CArea::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -3896,6 +3952,8 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 		return false;
 	}
 
@@ -4063,6 +4121,8 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 		return false;
 	}
 
@@ -4111,6 +4171,8 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 			return false;
 		}
 	}
@@ -4276,6 +4338,8 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -4548,6 +4612,8 @@ bool CArea::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 		return false;
 	}
 
@@ -4715,6 +4781,8 @@ bool CArea::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 		return false;
 	}
 
@@ -4760,6 +4828,8 @@ bool CArea::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 			return false;
 		}
 	}
@@ -4925,6 +4995,8 @@ bool CArea::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			ErrorType = ::sdl::complextest::CTTypes::ErrorCode::AREA_GAP_LENGTH;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "ErrorCode", errorTypeStringValue);)
+
 			return false;
 		}
 	}
@@ -5273,6 +5345,8 @@ bool CAnalyzer::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
+
 		return false;
 	}
 
@@ -5321,6 +5395,8 @@ bool CAnalyzer::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
+
 			return false;
 		}
 	}
@@ -5420,6 +5496,8 @@ bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
+
 		return false;
 	}
 
@@ -5467,6 +5545,8 @@ bool CAnalyzer::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
+
 			return false;
 		}
 	}
@@ -5567,6 +5647,8 @@ bool CAnalyzer::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
+
 		return false;
 	}
 
@@ -5611,6 +5693,8 @@ bool CAnalyzer::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			AnalyzerResult = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", analyzerResultStringValue);)
+
 			return false;
 		}
 	}
@@ -5983,6 +6067,8 @@ bool CInspection::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 		return false;
 	}
 
@@ -6041,6 +6127,8 @@ bool CInspection::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 			return false;
 		}
 	}
@@ -6160,6 +6248,8 @@ bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 		return false;
 	}
 
@@ -6215,6 +6305,8 @@ bool CInspection::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 			return false;
 		}
 	}
@@ -6335,6 +6427,8 @@ bool CInspection::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 		return false;
 	}
 
@@ -6387,6 +6481,8 @@ bool CInspection::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 			return false;
 		}
 	}
@@ -6765,6 +6861,8 @@ bool CProductOverview::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mode
 		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 		return false;
 	}
 
@@ -6836,6 +6934,8 @@ bool CProductOverview::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& m
 			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 			return false;
 		}
 	}
@@ -6975,6 +7075,8 @@ bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 		return false;
 	}
 
@@ -7041,6 +7143,8 @@ bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 			return false;
 		}
 	}
@@ -7178,6 +7282,8 @@ bool CProductOverview::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 	}
 	else {
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 		return false;
 	}
 
@@ -7241,6 +7347,8 @@ bool CProductOverview::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject
 			Status = ::sdl::complextest::CTTypes::StatusCode::FAILED;
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unexpected value for enum '%3', actual: '%4'").arg(__FILE__, QString::number(__LINE__), "StatusCode", statusStringValue);)
+
 			return false;
 		}
 	}
