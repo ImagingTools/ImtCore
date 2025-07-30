@@ -33,10 +33,6 @@ public:
 	void SetTypes(const QList<QString>& types);
 	void AddType(const QString& type);
 
-	/// \todo remove it \deprecated. Build namespace from \c m_schemaParamsPtr instead. \sa GetSchemaParams
-	[[nodiscard]] QString GetNamespace() const;
-	void SetNamespace(const QString& aNamespace);
-
 	// reimplemented(iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
@@ -46,7 +42,6 @@ public:
 
 private:
 	QList<QString> m_types;
-	QString m_namespace;
 };
 
 

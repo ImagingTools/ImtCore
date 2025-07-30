@@ -30,7 +30,6 @@ QList<QString> CSdlUnion::GetTypes() const
 }
 
 
-
 void CSdlUnion::SetTypes(const QList<QString>& types)
 {
 	if (types != m_types){
@@ -39,26 +38,13 @@ void CSdlUnion::SetTypes(const QList<QString>& types)
 	}
 }
 
+
 void CSdlUnion::AddType(const QString& type)
 {
 	istd::CChangeNotifier notifier(this);
 
 	if (!m_types.contains(type)){
 		m_types << type;
-	}
-}
-
-QString CSdlUnion::GetNamespace() const
-{
-	return m_namespace;
-}
-
-
-void CSdlUnion::SetNamespace(const QString& aNamespace)
-{
-	if (m_namespace != aNamespace){
-		istd::CChangeNotifier notifier(this);
-		m_namespace = aNamespace;
 	}
 }
 
@@ -75,11 +61,6 @@ bool CSdlUnion::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
-
-	iser::CArchiveTag namespaceTag("Namespace", "", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(namespaceTag);
-	retVal = retVal && archive.Process(m_namespace);
-	retVal = retVal && archive.EndTag(namespaceTag);
 
 	iser::CArchiveTag targetHeaderFileTag("TargetHeaderFile", "", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(targetHeaderFileTag);
@@ -148,7 +129,6 @@ bool CSdlUnion::operator==(const CSdlUnion& other) const
 {
 	bool retVal = m_name == other.m_name;
 	retVal = retVal && m_types == other.m_types;
-	retVal = retVal && m_namespace == other.m_namespace;
 	retVal = retVal && m_targetHeaderFilePath == other.m_targetHeaderFilePath;
 	retVal = retVal && m_schemaFilePath == other.m_schemaFilePath;
 	retVal = retVal && m_isExternal == other.m_isExternal;
