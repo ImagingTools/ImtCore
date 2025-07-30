@@ -837,7 +837,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		name = gqlObject["name"].toString();
 	}
 
-	if (!gqlObject.ContainsParam("specification") || (gqlObject["specification"].isNull())){
+	if (!gqlObject.ContainsParam("specification") || (gqlObject["specification"].isNull() || gqlObject.GetParamArgumentObjectPtr("specification") = nullptr)){
 		return false;
 	}
 	const QVariant specificationVariantValue = gqlObject["specification"];
@@ -870,7 +870,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("specification") && (!gqlObject["specification"].isNull())){
+	if (gqlObject.ContainsParam("specification") && (!gqlObject["specification"].isNull() && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
 		const QVariant specificationVariantValue = gqlObject["specification"];
 		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
 			CPrinterSpecificationBase specificationConvert;

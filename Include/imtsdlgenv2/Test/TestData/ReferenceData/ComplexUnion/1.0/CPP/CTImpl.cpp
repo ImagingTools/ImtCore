@@ -8490,7 +8490,7 @@ bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && (!gqlObject["value"].isNull())){
+	if (gqlObject.ContainsParam("value") && (!gqlObject["value"].isNull() && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
 		const QVariant valueVariantValue = gqlObject["value"];
 		if (valueVariantValue.canConvert<CCoordinates>()){
 			CCoordinates valueConvert;
@@ -8522,7 +8522,7 @@ bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && (!gqlObject["value"].isNull())){
+	if (gqlObject.ContainsParam("value") && (!gqlObject["value"].isNull() && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
 		const QVariant valueVariantValue = gqlObject["value"];
 		if (valueVariantValue.canConvert<CCoordinates>()){
 			CCoordinates valueConvert;
