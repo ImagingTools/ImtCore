@@ -871,8 +871,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	//declare for loop
 	const QString indexVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
 	FeedStreamHorizontally(stream, hIndents);
-	/// \todo replace 'qsizetype' to \c result.listCountVariableType
-	stream << QStringLiteral("for (qsizetype ") << indexVariableName << QStringLiteral(" = 0; ");
+	stream << QStringLiteral("for (") << result.listCountVariableType << ' ' << indexVariableName << QStringLiteral(" = 0; ");
 	stream << indexVariableName << QStringLiteral(" < ") << result.listCountVariableName;
 	stream << QStringLiteral("; ++") << indexVariableName << QStringLiteral("){");
 	FeedStream(stream, 1, false);
@@ -1059,8 +1058,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 	//declare for loop
 	const QString indexVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
 	FeedStreamHorizontally(stream, hIndents);
-	/// \todo replace 'qsizetype' to \c result.listCountVariableType
-	stream << QStringLiteral("for (qsizetype ") << indexVariableName << QStringLiteral(" = 0; ");
+	stream << QStringLiteral("for (") << result.listCountVariableType << ' ' << indexVariableName << QStringLiteral(" = 0; ");
 	stream << indexVariableName << QStringLiteral(" < ") << result.listCountVariableName;
 	stream << QStringLiteral("; ++") << indexVariableName << QStringLiteral("){");
 	FeedStream(stream, 1, false);
