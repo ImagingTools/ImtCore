@@ -9,7 +9,7 @@ namespace imtqml
 {
 
 
-class CQmlModelEditorCompBase: public QObject, public CQmlGuiCompBase
+class CQmlModelEditorCompBase: public CQmlGuiCompBase
 {
 	Q_OBJECT
 public:

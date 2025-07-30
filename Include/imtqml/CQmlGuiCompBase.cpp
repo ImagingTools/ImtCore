@@ -16,6 +16,12 @@ CQmlGuiCompBase::CQmlGuiCompBase()
 }
 
 
+bool CQmlGuiCompBase::IsGuiShown() const
+{
+	return m_isGuiShown;
+}
+
+
 // reimplemented (iqtgui::IGuiObject)
 
 bool CQmlGuiCompBase::IsGuiCreated() const
@@ -46,19 +52,29 @@ bool CQmlGuiCompBase::CreateGui(QWidget* parentPtr)
 			}
 		}
 
+		m_quickWidget->installEventFilter(this);
+
+		EnableLocalization(true);
+
 		OnGuiCreated();
+		OnGuiRetranslate();
+		OnGuiDesignChanged();
 	}
 	else{
 		Q_ASSERT(false);
 	}
 
-	return  m_quickWidget != nullptr;
+	return m_quickWidget != nullptr;
 }
 
 
 bool CQmlGuiCompBase::DestroyGui()
 {
+	EnableLocalization(false);
+
 	if (m_quickWidget != nullptr){
+		OnGuiDestroyed();
+
 		m_quickWidget->deleteLater();
 
 		m_quickWidget = nullptr;
@@ -88,8 +104,55 @@ void CQmlGuiCompBase::OnTryClose(bool* ignoredPtr)
 
 // protected methods
 
+void CQmlGuiCompBase::OnGuiDesignChanged()
+{
+}
+
+
+void CQmlGuiCompBase::OnGuiShown()
+{
+	if (m_hasPendingDesignChanges){
+		OnGuiDesignChanged();
+
+		m_hasPendingDesignChanges = false;
+	}
+}
+
+
+void CQmlGuiCompBase::OnGuiHidden()
+{
+}
+
+
+void CQmlGuiCompBase::OnRetranslate()
+{
+}
+
+
+void CQmlGuiCompBase::OnGuiRetranslate()
+{
+}
+
+
 void CQmlGuiCompBase::OnGuiCreated()
 {
+}
+
+
+void CQmlGuiCompBase::OnGuiDestroyed()
+{
+}
+
+
+// reimplemented (ibase::TLocalizableWrap)
+
+void CQmlGuiCompBase::OnLanguageChanged()
+{
+	OnRetranslate();
+
+	if (IsGuiCreated()){
+		OnGuiRetranslate();
+	}
 }
 
 
@@ -103,6 +166,13 @@ void CQmlGuiCompBase::OnDesignSchemaChanged(const QByteArray & themeId)
 		istd::CChangeNotifier changeNotifier(&m_visualStatus);
 
 		m_visualStatus.m_statusIcon = GetIcon(*m_defaultStatusIconPathAttrPtr);
+	}
+
+	if (IsGuiShown()){
+		OnGuiDesignChanged();
+	}
+	else{
+		m_hasPendingDesignChanges = true;
 	}
 }
 
@@ -118,6 +188,50 @@ void CQmlGuiCompBase::OnComponentCreated()
 	}
 
 	m_visualStatus.m_statusText = *m_defaultStatusTextAttrPtr;
+}
+
+
+// reimplemented (QObject)
+
+bool CQmlGuiCompBase::eventFilter(QObject* senderPtr, QEvent* eventPtr)
+{
+	QWidget* widgetPtr = GetWidget();
+	if ((senderPtr != widgetPtr) || (widgetPtr == NULL)){
+		return false;
+	}
+
+	switch (eventPtr->type()){
+	case QEvent::Close:
+	{
+		bool ignoreClose = false;
+		OnTryClose(&ignoreClose);
+		if (ignoreClose){
+			eventPtr->ignore();
+
+			return true;
+		}
+	}
+	break;
+
+	case QEvent::Show:
+		if (!m_isGuiShown){
+			m_isGuiShown = true;
+			OnGuiShown();
+		}
+		break;
+
+	case QEvent::Hide:
+		if (m_isGuiShown){
+			m_isGuiShown = false;
+			OnGuiHidden();
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	return false;
 }
 
 

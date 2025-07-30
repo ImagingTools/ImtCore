@@ -2,10 +2,12 @@
 
 
 // Qt includes
+#include <QtCore/QObject>
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtWidgets/QVBoxLayout>
 
 // ACF includes
+#include <ibase/TLocalizableWrap.h>
 #include <icomp/CComponentBase.h>
 #include <iqtgui/IVisualStatus.h>
 #include <iqtgui/IGuiObject.h>
@@ -23,11 +25,12 @@ namespace imtqml
 	Base class for IGuiObject implementation based on QML quick object.
 */
 class CQmlGuiCompBase:
-			public iqtgui::TMakeIconProviderCompWrap<icomp::CComponentBase>,
+			public QObject,
+			public ibase::TLocalizableWrap<iqtgui::TMakeIconProviderCompWrap<icomp::CComponentBase>>,
 			virtual public iqtgui::IGuiObject
 {
 public:
-	typedef iqtgui::TMakeIconProviderCompWrap<icomp::CComponentBase> BaseClass;
+	typedef ibase::TLocalizableWrap<iqtgui::TMakeIconProviderCompWrap<icomp::CComponentBase>> BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CQmlGuiCompBase);
 		I_REGISTER_INTERFACE(iqtgui::IGuiObject);
@@ -42,6 +45,8 @@ public:
 
 	CQmlGuiCompBase();
 
+	bool IsGuiShown() const;
+
 	// reimplemented (iqtgui::IGuiObject)
 	virtual bool IsGuiCreated() const override;
 	virtual bool CreateGui(QWidget* parentPtr) override;
@@ -50,13 +55,25 @@ public:
 	virtual void OnTryClose(bool* ignoredPtr = NULL) override;
 	
 protected:
+	virtual void OnGuiDesignChanged();
+	virtual void OnGuiShown();
+	virtual void OnGuiHidden();
+	virtual void OnRetranslate();
+	virtual void OnGuiRetranslate();
 	virtual void OnGuiCreated();
+	virtual void OnGuiDestroyed();
+
+	// reimplemented (ibase::TLocalizableWrap)
+	virtual void OnLanguageChanged() override;
 
 	// reimplemented (ibase::TDesignSchemaHandlerWrap)
 	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+
+	// reimplemented (QObject)
+	virtual bool eventFilter(QObject* senderPtr, QEvent* eventPtr) override;
 
 protected:
 	class VisualStatus: virtual public iqtgui::IVisualStatus
@@ -85,11 +102,13 @@ protected:
 	I_TEXTATTR(m_defaultStatusTextAttrPtr);
 
 	QQuickWidget* m_quickWidget = nullptr;
-
 	imod::TModelWrap<VisualStatus> m_visualStatus;
 
 private:
 	I_ATTR(QString, m_pathToQmlAttrPtr);
+
+	bool m_isGuiShown = false;
+	bool m_hasPendingDesignChanges = false;
 };
 
 
