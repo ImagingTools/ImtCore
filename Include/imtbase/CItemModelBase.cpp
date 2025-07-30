@@ -228,7 +228,7 @@ bool CItemModelBase::copyTo(CItemModelBase* otherObjectPtr)
 }
 
 
-QObject* CItemModelBase::CreateObject(const QString& key)
+QObject* CItemModelBase::CreateObject(const QString& /*key*/)
 {
 	return nullptr;
 }
@@ -291,7 +291,7 @@ QString CItemModelBase::getJSONKeyForProperty(const QString& propertyName) const
 }
 
 
-CItemModelBase* CItemModelBase::CreateItemModel(const QString& jsonKey)
+CItemModelBase* CItemModelBase::CreateItemModel(const QString& /*jsonKey*/)
 {
 	return nullptr;
 }
