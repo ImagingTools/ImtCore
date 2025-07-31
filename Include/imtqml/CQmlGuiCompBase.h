@@ -29,6 +29,7 @@ class CQmlGuiCompBase:
 			public ibase::TLocalizableWrap<iqtgui::TMakeIconProviderCompWrap<icomp::CComponentBase>>,
 			virtual public iqtgui::IGuiObject
 {
+	Q_OBJECT
 public:
 	typedef ibase::TLocalizableWrap<iqtgui::TMakeIconProviderCompWrap<icomp::CComponentBase>> BaseClass;
 
@@ -38,9 +39,9 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE_T(VisualStatus, iqtgui::IVisualStatus, ExtractVisualStatus);
 		I_REGISTER_SUBELEMENT_INTERFACE_T(VisualStatus, istd::IChangeable, ExtractVisualStatus);
 		I_REGISTER_SUBELEMENT_INTERFACE_T(VisualStatus, imod::IModel, ExtractVisualStatus);
+		I_ASSIGN(m_pathToQmlAttrPtr, "QmlFilePath", "This path used for load QML file", true, "");
 		I_ASSIGN(m_defaultStatusIconPathAttrPtr, "DefaultStatusIcon", "Path of status icon used by default", false, "");
 		I_ASSIGN(m_defaultStatusTextAttrPtr, "DefaultStatusText", "Status text used by default", true, "");
-		I_ASSIGN(m_pathToQmlAttrPtr, "QmlFilePath", "This path used for load QML file", true, "");
 	I_END_COMPONENT;
 
 	CQmlGuiCompBase();
@@ -75,6 +76,9 @@ protected:
 	// reimplemented (QObject)
 	virtual bool eventFilter(QObject* senderPtr, QEvent* eventPtr) override;
 
+public Q_SLOTS:
+	virtual void OnQuickItemDestroyed();
+
 protected:
 	class VisualStatus: virtual public iqtgui::IVisualStatus
 	{
@@ -98,6 +102,7 @@ protected:
 	}
 
 protected:
+	I_ATTR(QString, m_pathToQmlAttrPtr);
 	I_ATTR(QString, m_defaultStatusIconPathAttrPtr);
 	I_TEXTATTR(m_defaultStatusTextAttrPtr);
 
@@ -105,8 +110,6 @@ protected:
 	imod::TModelWrap<VisualStatus> m_visualStatus;
 
 private:
-	I_ATTR(QString, m_pathToQmlAttrPtr);
-
 	bool m_isGuiShown = false;
 	bool m_hasPendingDesignChanges = false;
 };

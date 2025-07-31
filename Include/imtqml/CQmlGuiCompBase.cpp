@@ -59,6 +59,11 @@ bool CQmlGuiCompBase::CreateGui(QWidget* parentPtr)
 		OnGuiCreated();
 		OnGuiRetranslate();
 		OnGuiDesignChanged();
+
+		QQuickItem* quickItemPtr = m_quickWidget->rootObject();
+		if (quickItemPtr != nullptr){
+			connect(quickItemPtr, &QQuickItem::destroyed, this, &CQmlGuiCompBase::OnQuickItemDestroyed);
+		}
 	}
 	else{
 		Q_ASSERT(false);
@@ -70,6 +75,11 @@ bool CQmlGuiCompBase::CreateGui(QWidget* parentPtr)
 
 bool CQmlGuiCompBase::DestroyGui()
 {
+	QQuickItem* quickItemPtr = m_quickWidget->rootObject();
+	if (quickItemPtr != nullptr){
+		disconnect(quickItemPtr, &QQuickItem::destroyed, this, &CQmlGuiCompBase::OnQuickItemDestroyed);
+	}
+
 	EnableLocalization(false);
 
 	if (m_quickWidget != nullptr){
@@ -232,6 +242,13 @@ bool CQmlGuiCompBase::eventFilter(QObject* senderPtr, QEvent* eventPtr)
 	}
 
 	return false;
+}
+
+
+// protected slots
+
+void CQmlGuiCompBase::OnQuickItemDestroyed()
+{
 }
 
 
