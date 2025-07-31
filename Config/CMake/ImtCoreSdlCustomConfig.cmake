@@ -237,8 +237,9 @@ macro (ImtCoreCustomConfigureSdlQml)
 	set(DEP_FILE_PATH "${SDL_OUTPUT_DIRECTORY}/${ARG_VERSION}/QML/${SCHEMA_NAME}.depfile")
 
 	list(APPEND MODIFICATORS "--QML")
+	list(APPEND MODIFICATORS "--use-all-modificators")
+	list(APPEND MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
 	list(APPEND MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
-	list(APPEND CUSTOM_MODIFICATORS "--config=${IMT_CONFIG_CMAKE_PATH}/SDL/CommonQML.cfg") ##< Use config file
 
 	# use cache file if provided
 	if (GLOBAL_SDL_CACHE_FILE)
