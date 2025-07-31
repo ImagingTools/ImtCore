@@ -99,6 +99,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	#-------- Sdl --------
 	if(NOT DEFINED USE_SDL OR USE_SDL)
 		add_subdirectory("${SDL_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbasesdl")
+		add_subdirectory("${SDL_DIR}/imt2d/CMake" "${AUX_INCLUDE_DIR}/imt2dsdl")
+		add_dependencies(imt2dsdl imtbasesdl)
 		add_subdirectory("${SDL_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauthsdl")
 		add_subdirectory("${SDL_DIR}/imtcolor/CMake" "${AUX_INCLUDE_DIR}/imtcolorsdl")
 		add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
