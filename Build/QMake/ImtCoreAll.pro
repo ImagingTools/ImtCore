@@ -96,6 +96,9 @@ SUBDIRS += imtappsdl
 imtappsdl.file = ../../Sdl/imtapp/QMake/imtappsdl.pro
 imtappsdl.depends = imtbasesdl
 
+SUBDIRS += imt2dsdl
+imt2dsdl.file = ../../Sdl/imt2d/QMake/imt2dsdl.pro
+
 SUBDIRS += imtdev
 imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
 
