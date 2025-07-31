@@ -12,6 +12,7 @@ Item {
 	property string name
 	property string mainButtonText: name
 	property bool isActive: false
+	property bool readOnly: false
 	property CollectionFilter collectionFilter: null
 	property DocCollectionFilter documentFilter: null
 	
@@ -38,6 +39,7 @@ Item {
 			icon.source: filterDelegateBase.isActive ? "qrc:/" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled) : "qrc:/" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
 			text: filterDelegateBase.mainButtonText
 			widthFromDecorator: true
+			enabled: !filterDelegateBase.readOnly
 
 			onClicked: {
 				filterDelegateBase.openFilter()
@@ -74,16 +76,19 @@ Item {
 				}
 			}
 		}
-		
+
 		Button {
 			id: clearButton
 			width: filterDelegateBase.height
 			height: width
 			visible: filterDelegateBase.isActive
-			icon.source: filterDelegateBase.isActive ? "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.Off, Icon.Mode.Disabled) : "qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal)
-			icon.width: Style.fontSizeM
-			icon.height: Style.fontSizeM
+			icon.source: filterDelegateBase.readOnly ?	"qrc:/" + Style.getIconPath("Icons/Lock", Icon.State.Off, Icon.Mode.Disabled) :
+						(filterDelegateBase.isActive ?	"qrc:/" + Style.getIconPath("Icons/Close", Icon.State.Off, Icon.Mode.Disabled) :
+														"qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal))
+			icon.width: Style.iconSizeS
+			icon.height: Style.iconSizeS
 			widthFromDecorator: true
+			enabled: !filterDelegateBase.readOnly
 			onClicked: {
 				filterDelegateBase.clearFilter()
 			}

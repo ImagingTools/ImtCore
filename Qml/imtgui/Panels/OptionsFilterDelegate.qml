@@ -9,14 +9,6 @@ FilterDelegateBase {
 	isActive: selectionParam ? selectionParam.m_selectedIndex >= 0 : false
 	property SelectionParam selectionParam: SelectionParam {
 		m_selectedIndex: -1
-		onM_selectedIndexChanged: {
-			if (m_selectedIndex >= 0 && filterDelegate.isValidModel()){
-				filterDelegate.mainButtonText = m_constraints.m_options.get(m_selectedIndex).item.m_name
-			}
-			else{
-				filterDelegate.mainButtonText = filterDelegate.name
-			}
-		}
 	}
 
 	property int visibleItemCount: 5
@@ -28,6 +20,75 @@ FilterDelegateBase {
 		
 		function onCleared(){
 			filterDelegate.clearFilter()
+		}
+	}
+	
+	onCollectionFilterChanged: {
+		if (collectionFilter && selectionParam && internal.delaySignal){
+			let optionId = getOptionId(selectionParam.m_selectedIndex)
+			optionSelectionChanged([optionId], [selectionParam.m_selectedIndex])
+			
+			internal.delaySignal = false
+		}
+	}
+	
+	Connections {
+		id: filterConnections
+		target: filterDelegate.selectionParam
+		function onM_selectedIndexChanged(){
+			console.log("onM_selectedIndexChanged", target.m_selectedIndex)
+			
+			if (!internal.block){
+				filterDelegate.setSelectedIndex(target.m_selectedIndex)
+			}
+			
+			filterDelegate.updateMainText()
+		}
+	}
+	
+	QtObject {
+		id: internal
+		property bool delaySignal: false
+		property bool block: false
+	}
+
+	function setSelectedIndex(index){
+		if (!selectionParam){
+			return
+		}
+
+		internal.block = true
+
+		let optionIds = []
+		let optionIndexes = []
+		if (index >= 0){
+			if (index !== selectionParam.m_selectedIndex){
+				selectionParam.m_selectedIndex = index
+				optionIds = [getOptionId(index)]
+				optionIndexes = [index]
+			}
+		}
+		else{
+			selectionParam.m_selectedIndex = -1
+		}
+		
+		if (!collectionFilter){
+			internal.block = false
+			internal.delaySignal = true
+			return
+		}
+		
+		optionSelectionChanged(optionIds, optionIndexes)
+		
+		internal.block = false
+	}
+
+	function updateMainText(){
+		if (selectionParam.m_selectedIndex >= 0 && filterDelegate.isValidModel()){
+			filterDelegate.mainButtonText = selectionParam.m_constraints.m_options.get(selectionParam.m_selectedIndex).item.m_name
+		}
+		else{
+			filterDelegate.mainButtonText = filterDelegate.name
 		}
 	}
 
@@ -149,11 +210,7 @@ FilterDelegateBase {
 	}
 
 	onClearFilter: {
-		if (selectionParam){
-			selectionParam.m_selectedIndex = -1
-		}
-		
-		optionSelectionChanged([], [])
+		setSelectedIndex(-1)
 	}
 
 	Component {
@@ -166,12 +223,12 @@ FilterDelegateBase {
 			moveToIndex: selectedIndex
 			shownItemsCount: filterDelegate.visibleItemCount
 			onFinished: {
-				if (filterDelegate.selectionParam && index >= 0){
-					filterDelegate.selectionParam.m_selectedIndex = index
-					if (filterDelegate.selectionParam.m_selectedIndex >= 0 && filterDelegate.isValidModel()){
-						let optionId = filterDelegate.selectionParam.m_constraints.m_options.get(index).item.m_id
-						filterDelegate.optionSelectionChanged([optionId], [index])
-					}
+				if (!filterDelegate.selectionParam){
+					return
+				}
+
+				if (index >= 0){
+					filterDelegate.setSelectedIndex(index)
 				}
 			}
 

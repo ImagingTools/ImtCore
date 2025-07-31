@@ -11,6 +11,7 @@ ControlBase {
     
     heightFromDecorator: true
     
+    property bool canResetFilters: true
     property CollectionFilter complexFilter: CollectionFilter {}
     property DocCollectionFilter documentFilter: DocCollectionFilter {}
     

@@ -42,6 +42,7 @@ ElementView {
 
             width: root.contentWidth;
             height: contentHeight + headerHeight;
+            canMoveColumns: true
 
             Component.onCompleted: {
                 root.table = table;

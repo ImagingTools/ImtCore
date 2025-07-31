@@ -41,6 +41,7 @@ Item {
 	property alias scrollbarItemHoriz: container.scrollbarItemHoriz
 
 	property bool visibleMetaInfo: false;
+	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
 	
 	signal selectedIndexChanged(int index);
@@ -278,7 +279,7 @@ Item {
 
 			function filterMenuActivate(){
 				if (container.hasFilter){
-					container.filterMenuVisible = !container.filterMenuVisible;
+					// container.filterMenuVisible = !container.filterMenuVisible;
 				}
 			}
 		}

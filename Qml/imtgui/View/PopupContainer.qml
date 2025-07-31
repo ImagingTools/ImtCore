@@ -108,6 +108,13 @@ Item {
 	function removeMessage(index){
 		popupModel.remove(index);
 	}
+	
+	function removeMessageById(id){
+		let index = findMessage(id)
+		if (index >= 0){
+			removeMessage(index)
+		}
+	}
 
 	function findMessage(id){
 		for (let i = 0; i < popupModel.count; i++){

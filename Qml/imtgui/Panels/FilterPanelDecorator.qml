@@ -17,6 +17,7 @@ DecoratorBase {
 	
 	property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;
 	property DocCollectionFilter documentFilter: baseElement ? baseElement.documentFilter : null;
+	property bool canResetFilters: baseElement ? baseElement.canResetFilters : false
 
 	onBaseElementChanged: {
 		if (baseElement){
@@ -281,6 +282,7 @@ DecoratorBase {
 		height: width
 		enabled: false
 		tooltipText: qsTr("Reset all filters")
+		visible: filterPanelDecorator.canResetFilters
 		onClicked: {
 			if (filterPanelDecorator.complexFilter){
 				filterPanelDecorator.complexFilter.clearAllFilters()

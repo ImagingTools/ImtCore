@@ -16,11 +16,12 @@ ViewBase {
 	property bool hasFilter: true;
 	
 	property bool hasSort: true;
+	property bool canResetFilters: true;
 	property alias isMultiCheckable: tableInternal.isMultiCheckable;
 	
 	property alias filterMenu: filterMenu_;
 	property alias loading: loading_;
-	property alias filterMenuVisible: filterMenu_.visible;
+	property bool filterMenuVisible: true
 	property alias pagination: pagination_;
 	property alias elementsCount: tableInternal.elementsCount;
 	property alias tableRowDelegate: tableInternal.rowDelegate
@@ -95,12 +96,11 @@ ViewBase {
 		anchors.top: parent.top;
 		anchors.topMargin: Style.marginM;
 		anchors.left: parent.left;
-		// anchors.leftMargin: Style.marginM;
 		anchors.right: parent.right;
-		// anchors.rightMargin: Style.marginM;
+		canResetFilters: collectionViewBaseContainer.canResetFilters
 		complexFilter: collectionViewBaseContainer.collectionFilter;
 		documentFilter: collectionViewBaseContainer.documentCollectionFilter;
-		
+		visible: collectionViewBaseContainer.filterMenuVisible
 		onClose: {
 			filterMenu_.visible = false;
 		}
