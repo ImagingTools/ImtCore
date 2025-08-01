@@ -246,7 +246,7 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	dark.palette.setColor(QPalette::WindowText, Qt::white);
 	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
 	dark.palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::ToolTipBase, Qt::lightGray);
+	dark.palette.setColor(QPalette::ToolTipBase, Qt::gray);
 	dark.palette.setColor(QPalette::ToolTipText, Qt::lightGray);
 	dark.palette.setColor(QPalette::Text, Qt::lightGray);
 	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
@@ -255,6 +255,10 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
 	dark.palette.setColor(QPalette::Highlight, QColor("#1a76e7"));
 	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
+	dark.toolButtonGradientColors.startColor = QColor(80, 80, 77);
+	dark.toolButtonGradientColors.endColor = QColor(72, 72, 75);
+	dark.pressedToolButtonGradientColors.startColor = QColor(67, 67, 70);
+	dark.pressedToolButtonGradientColors.endColor = QColor(59, 59, 63);
 	dark.stylePath = ":/Dark/Styles/ImtColorStyle";
 
 	m_paletteMap["Dark"] = dark;
