@@ -47,10 +47,6 @@ protected:
 
 protected:
 	std::unique_ptr<QmlAdapter, QObjectDeleter> m_qmlAdapterPtr;
-
-private:
-	// reimplemented (CQmlGuiCompBase)
-	void OnQuickItemDestroyed() override;
 };
 
 
@@ -102,25 +98,6 @@ bool TQmlGuiObserverCompWrap<QmlAdapter, ModelInterface>::DestroyGui()
 template <class QmlAdapter, class ModelInterface>
 void TQmlGuiObserverCompWrap<QmlAdapter, ModelInterface>::OnQmlAdapterInitialized()
 {
-}
-
-
-// private methods
-
-// reimplemented (CQmlGuiCompBase)
-
-template <class QmlAdapter, class ModelInterface>
-void TQmlGuiObserverCompWrap<QmlAdapter, ModelInterface>::OnQuickItemDestroyed()
-{
-	Q_ASSERT(BaseClass::m_quickWidget != nullptr);
-	BaseClass::m_quickWidget->setSource(QUrl(*BaseClass::m_pathToQmlAttrPtr));
-
-	QQuickItem* quickItemPtr = BaseClass::m_quickWidget->rootObject();
-	if (m_qmlAdapterPtr != nullptr && quickItemPtr != nullptr){
-		BaseClass::connect(quickItemPtr, &QQuickItem::destroyed, this, &BaseClass::OnQuickItemDestroyed);
-
-		m_qmlAdapterPtr->AcquireQuickItem(quickItemPtr, true);
-	}
 }
 
 

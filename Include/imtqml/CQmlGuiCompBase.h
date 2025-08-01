@@ -76,7 +76,7 @@ protected:
 	// reimplemented (QObject)
 	virtual bool eventFilter(QObject* senderPtr, QEvent* eventPtr) override;
 
-public Q_SLOTS:
+protected Q_SLOTS:
 	virtual void OnQuickItemDestroyed();
 
 protected:
