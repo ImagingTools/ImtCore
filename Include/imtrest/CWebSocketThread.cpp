@@ -162,6 +162,10 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 				responsePtr = m_requestClientHandlerPtr->ProcessRequest(*webSocketRequest);
 			}
 		}
+		else if (methodType == CWebSocketRequest::MT_KEEP_ALIVE_ACK){
+			// optional ToDo: Map pong to send ping.
+			return;
+		}
 		else {
 			if (methodType == CWebSocketRequest::MT_CONNECTION_INIT){
 				if (!clientId.isEmpty()){

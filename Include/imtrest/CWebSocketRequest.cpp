@@ -131,6 +131,9 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	if (object.value("type") == "unsubscribe"){
 		m_type = MT_STOP;
 	}
+	if (object.value("type") == "complete"){
+		m_type = MT_STOP;
+	}
 	if (object.value("type") == "data"){
 		m_type = MT_DATA;
 	}
@@ -150,7 +153,7 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 		m_type = MT_KEEP_ALIVE;
 	}
 	if (object.value("type") == "pong"){
-		m_type = MT_KEEP_ALIVE;
+		m_type = MT_KEEP_ALIVE_ACK;
 	}
 
 	m_queryId = m_requestId = object.value("id").toString().toUtf8();
