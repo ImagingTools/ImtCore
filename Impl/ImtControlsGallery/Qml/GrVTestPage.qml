@@ -330,6 +330,11 @@ Rectangle {
 
 		isFixedOrigin: false;
 		legendMargin: 20;
+		//gridStepMajorY: 20
+		//gridStepMinorY: 5
+		function getLogicalMajorLineY (lineY){
+			return lineY/10
+		}
 	}
 
 }

@@ -9,6 +9,7 @@ BoundingBox {
 	id: polylineShape;
 
 	property string color: "#000000";
+	property int lineWidth: 1;
 
 	function draw(ctx, transformMatrixArg){
 
@@ -22,7 +23,7 @@ BoundingBox {
 
 		let params = getParams()
 		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
-		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 1
+		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : lineWidth
 		ctx.beginPath()
 		for(let i = 0;i < points.length; i++){
 			let point = getScreenPosition(points[i]);

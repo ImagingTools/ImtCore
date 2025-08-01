@@ -36,6 +36,7 @@ Rectangle {
 	property var translateYNegativeLimit;
 	property bool restrictZoom: false;
 	property bool restrictMove: false;
+	property bool restrictSelect: false;
 	property int restrictMoveMargin: -1;
 	property bool fitToBorders: false;
 
@@ -73,6 +74,9 @@ Rectangle {
 	property bool hasRightButtonMenu: false;
 	property var leftMenuCoordinates: Qt.point(Style.marginM, Style.marginS);
 	property var rightMenuCoordinates: Qt.point(width - Style.marginL - Style.buttonWidthL, Style.marginS);
+
+	property bool propagateWheelEvents: true;
+	property bool propagateMouseEvents: true;
 
 	signal copySignal(int index);
 	signal pasteSignal(int index);
@@ -539,6 +543,9 @@ Rectangle {
 			anchors.fill: parent;
 			cursorShape: Qt.ArrowCursor//Qt.OpenHandCursor;
 
+			propagateMouseEvents: graphicsView.propagateMouseEvents
+			propagateWheelEvents: graphicsView.propagateWheelEvents
+
 			onClicked: {
 				//console.log("CLICKED!!!")
 
@@ -560,7 +567,7 @@ Rectangle {
 				}
 
 				let found = false;
-				if(!(mouse.modifiers & Qt.ControlModifier)){// without Ctrl
+				if(!(mouse.modifiers & Qt.ControlModifier) && !graphicsView.restrictSelect){// without Ctrl
 					let shape = graphicsView.findObject(mouse.x, mouse.y)
 					if(shape !== null){
 						found = true;
@@ -597,7 +604,7 @@ Rectangle {
 				}
 
 				let shape = graphicsView.findObject(mouse.x, mouse.y)
-				if(graphicsView.isSelectionMode && mouse.modifiers & Qt.ControlModifier){//Ctrl
+				if(graphicsView.isSelectionMode && mouse.modifiers & Qt.ControlModifier && !graphicsView.restrictSelect){//Ctrl
 					if(shape !== null){
 						if(!shape.isSelected){
 							shape.isSelected = true;
@@ -614,7 +621,7 @@ Rectangle {
 					}
 				}
 				else {//without Ctrl
-					if(!wasMoving && shape !== null){
+					if(!wasMoving && shape !== null && !graphicsView.restrictSelect){
 						if(canvas.selectedShapeCount > 1){
 							graphicsView.clearSelection(shape)
 							canvas.selectedShapeCount = 1;
@@ -639,7 +646,7 @@ Rectangle {
 			}
 
 			onDeltaSignal: {
-				if (canvas.scaleCoeff < 0.0000001){
+				if (canvas.scaleCoeff < 0.0000001 || graphicsView.restrictMove){
 					return;
 				}
 

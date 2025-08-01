@@ -214,89 +214,121 @@ GraphicsShapeBase {
 			return;
 		}
 
-		let cornerPoints = getBoundingBoxCornerPoints();
+		let cornerPoints = bbPointsBackup;
 
 		//let position = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
-		let deltaXArg = position.x - mousePressedCoord.x
-		let deltaYArg = position.y - mousePressedCoord.y
+		// let deltaXArg = position.x - mousePressedCoord.x
+		// let deltaYArg = position.y - mousePressedCoord.y
 
 		let positionLog = getLogPosition(position)
-		let xArg = positionLog.x
-		let yArg = positionLog.y
+		let positionPressedLog = getLogPosition(mousePressedCoord)
+		let deltaXArg = positionLog.x - positionPressedLog.x
+		let deltaYArg = positionLog.y - positionPressedLog.y
 
-		if(isInsideRotationArea(positionLog.x, positionLog.y, cornerPoints)){//rotation
-			console.log("ROTATE")
-			let center = getBoundingBoxCenter(cornerPoints)
-			let angle  = getAngle(xArg, yArg, center)
-			let startPoint = getLogPosition(Qt.point(mousePressedCoord.x, mousePressedCoord.y))
-			let angle0 = getAngle(startPoint.x, startPoint.y , center)
+		let xArg = mousePressedCoord.x
+		let yArg = mousePressedCoord.y
 
-			angle = angle - angle0
+		if(0/*isInsideRotationArea(positionLog.x, positionLog.y, cornerPoints)*/){//rotation
+			// console.log("ROTATE")
+			// let center = getBoundingBoxCenter(cornerPoints)
+			// let angle  = getAngle(xArg, yArg, center)
+			// let startPoint = getLogPosition(Qt.point(mousePressedCoord.x, mousePressedCoord.y))
+			// let angle0 = getAngle(startPoint.x, startPoint.y , center)
 
-			console.log("ROTATE", angle)
-			//rotate(angle, center);
+			// angle = angle - angle0
+
+			// console.log("ROTATE", angle)
+			// //rotate(angle, center);
 		}
 		else {//Bounding box edges moving
 			let margin = 10;
 
+			cornerPoints = boundingBoxPointsToScreen(cornerPoints)
 			let midPoints  = getBoundingBoxMidPoints(false, cornerPoints);
 
-			let bb_width = getBoundingBoxWidth(cornerPoints);
-			let bb_height = getBoundingBoxHeight(cornerPoints);
+			let bb_width = bbWidthBackup
+			let bb_height = bbHeightBackup
 
-			let scale_x = bb_width / (bb_width + positionLog.x - getLogPosition(mousePressedCoord).x)
-			let scale_y = bb_height / (bb_height + positionLog.y - getLogPosition(mousePressedCoord).y)
+			let deltaXLog = (positionLog.x - getLogPosition(mousePressedCoord).x)
+			let deltaYLog = (positionLog.y - getLogPosition(mousePressedCoord).y)
+			let scale_xLeft = (bb_width - deltaXLog) / bb_width
+			let scale_xRight = (bb_width + deltaXLog) / bb_width
+			let scale_yTop = (bb_height + deltaYLog) / bb_height
+			let scale_yBottom = (bb_height - deltaYLog) / bb_height
+			let marginXLeft = bb_width - deltaXLog
+			let marginXRight = bb_width + deltaXLog
+			let marginYTop = bb_height + deltaYLog
+			let marginYBottom = bb_height - deltaYLog
+
+			//TEST
+			//leftMoving(scale_xLeft, deltaXArg, deltaYArg, marginXLeft)
+			//rightMoving(scale_xRight, deltaXArg, deltaYArg, marginXRight)
+			//topMoving(scale_yTop, deltaXArg, deltaYArg, marginYTop)
+			//bottomMoving(scale_yBottom, deltaXArg, deltaYArg, marginYBottom)
+
+			//topLeftMoving(scale_xLeft, scale_yTop, deltaXArg, deltaYArg, marginXLeft, marginYTop);
+			//topRightMoving(scale_xRight, scale_yTop, deltaXArg, deltaYArg, marginXRight, marginYTop);
+			//bottomLeftMoving(scale_xLeft, scale_yBottom, deltaXArg, deltaYArg, marginXLeft, marginYBottom);
+			//bottomRightMoving(scale_xRight, scale_yBottom, deltaXArg, deltaYArg, marginXRight, marginYBottom);
+
+			//return
+			//TEST
 
 			if(xArg >= cornerPoints.topLeftPoint.x - margin && xArg <= cornerPoints.topLeftPoint.x + margin
 					&& yArg >= cornerPoints.topLeftPoint.y - margin && yArg <= cornerPoints.topLeftPoint.y + margin){
 
-				topLeftMoving(deltaXArg, deltaYArg);
-
+				console.log("topLeftMoving::::::::::::::")
+				topLeftMoving(scale_xLeft, scale_yTop, deltaXArg, deltaYArg, marginXLeft, marginYTop);
 			}
 			else if(xArg >= cornerPoints.topRightPoint.x - margin && xArg <= cornerPoints.topRightPoint.x + margin
 					&& yArg >= cornerPoints.topRightPoint.y - margin && yArg <= cornerPoints.topRightPoint.y + margin){
 
-				topRightMoving(scale_x, scale_y);
+				console.log("topRightMoving::::::::::::::")
+				topRightMoving(scale_xRight, scale_yTop, deltaXArg, deltaYArg, marginXRight, marginYTop);
 
 			}
 			else if(xArg >= cornerPoints.bottomLeftPoint.x - margin && xArg <= cornerPoints.bottomLeftPoint.x + margin
 					&& yArg >= cornerPoints.bottomLeftPoint.y - margin && yArg <= cornerPoints.bottomLeftPoint.y + margin){
 
-				bottomLeftMoving(scale_x, scale_y);
-
+				console.log("bottomLeftMoving::::::::::::::")
+				bottomLeftMoving(scale_xLeft, scale_yBottom, deltaXArg, deltaYArg, marginXLeft, marginYBottom);
 			}
 			else if(xArg >= cornerPoints.bottomRightPoint.x - margin && xArg <= cornerPoints.bottomRightPoint.x + margin
 					&& yArg >= cornerPoints.bottomRightPoint.y - margin && yArg <= cornerPoints.bottomRightPoint.y + margin){
 
-				bottomRightMoving(scale_x, scale_y);
+				console.log("bottomRightMoving::::::::::::::")
+				bottomRightMoving(scale_xRight, scale_yBottom, deltaXArg, deltaYArg, marginXRight, marginYBottom);
 			}
-			else if(xArg >= midPoints.leftPoint.x - margin && xArg <= midPoints.leftPoint.x + margin
-					&& yArg >= midPoints.leftPoint.y - margin && yArg <= midPoints.leftPoint.y + margin){
+			else if(xArg >= cornerPoints.topLeftPoint.x - margin && xArg <= cornerPoints.topLeftPoint.x + margin
+					&& yArg >= cornerPoints.topLeftPoint.y - margin && yArg <= cornerPoints.bottomLeftPoint.y + margin){
 
-				leftMoving(scale_x);
+				console.log("leftMoving::::::::::::::")
+				leftMoving(scale_xLeft, deltaXArg, deltaYArg, marginXLeft)
 			}
-			else if(xArg >= midPoints.rightPoint.x - margin && xArg <= midPoints.rightPoint.x + margin
-					&& yArg >= midPoints.rightPoint.y - margin && yArg <= midPoints.rightPoint.y + margin){
+			else if(xArg >= cornerPoints.topRightPoint.x - margin && xArg <= cornerPoints.topRightPoint.x + margin
+					&& yArg >= cornerPoints.topRightPoint.y - margin && yArg <= cornerPoints.bottomRightPoint.y + margin){
 
-				rightMoving(scale_x);
+				console.log("rightMoving::::::::::::::")
+				rightMoving(scale_xRight, deltaXArg, deltaYArg, marginXRight)
 			}
-			else if(xArg >= midPoints.topPoint.x - margin && xArg <= midPoints.topPoint.x + margin
-					&& yArg >= midPoints.topPoint.y - margin && yArg <= midPoints.topPoint.y + margin){
+			else if(xArg >= cornerPoints.topLeftPoint.x - margin && xArg <= cornerPoints.topRightPoint.x + margin
+					&& yArg >= cornerPoints.topRightPoint.y - margin && yArg <= cornerPoints.topRightPoint.y + margin){
 
-				topMoving(scale_y);
+				console.log("topMoving::::::::::::::")
+				topMoving(scale_yTop, deltaXArg, deltaYArg, marginYTop)
 			}
-			else if(xArg >= midPoints.bottomPoint.x - margin && xArg <= midPoints.bottomPoint.x + margin
-					&& yArg >= midPoints.bottomPoint.y - margin && yArg <= midPoints.bottomPoint.y + margin){
+			else if(xArg >= cornerPoints.bottomLeftPoint.x - margin && xArg <= cornerPoints.bottomRightPoint.x + margin
+					&& yArg >= cornerPoints.bottomRightPoint.y - margin && yArg <= cornerPoints.bottomRightPoint.y + margin){
 
-				bottomMoving(scale_y);
+				console.log("bottomMoving::::::::::::::")
+				bottomMoving(scale_yBottom, deltaXArg, deltaYArg, marginYBottom)
 			}
-
 			else {
-				setCoordinateShift(deltaXArg, deltaYArg)
-
+				console.log("Moving ALL::::::::::::::")
+				transformPoints(1,1,deltaXArg, deltaYArg)
 			}
-			mousePressedCoord = position
-			shapeChanged()
+
+			mouseCoord = position
 		}
 	}
 
@@ -349,48 +381,72 @@ GraphicsShapeBase {
 		shapeChanged();
 	}
 
-	function leftMoving(scaleX){
-		transformPoints(scaleX, 1)
+	function leftMoving(scaleX, deltaXArg, deltaYArg, marginXArg){
+		if(marginXArg < Style.marginXXL){
+			return
+		}
+		transformPoints(scaleX, 1, deltaXArg, 0)
 	}
 
-	function rightMoving(scaleX){
-		transformPoints(scaleX, 1)
+	function rightMoving(scaleX, deltaXArg, deltaYArg, marginXArg){
+		if(marginXArg < Style.marginXXL){
+			return
+		}
+		transformPoints(scaleX, 1,deltaXArg,0)
 	}
 
-	function topMoving(scaleY){
-		transformPoints(1, scaleY)
+	function topMoving(scaleY, deltaXArg, deltaYArg, marginYArg){
+		if(marginYArg < Style.marginXXL){
+			return
+		}
+		transformPoints(1, scaleY, 0, deltaYArg)
 	}
 
-	function bottomMoving(scaleY){
-		transformPoints(1, scaleY)
+	function bottomMoving(scaleY, deltaXArg, deltaYArg, marginYArg){
+		if(marginYArg < Style.marginXXL){
+			return
+		}
+		transformPoints(1, scaleY,0,deltaYArg)
 	}
 
-	function topLeftMoving(scaleX, scaleY){
-		transformPoints(scaleX, scaleY)
+	function topLeftMoving(scaleX, scaleY, deltaXArg, deltaYArg, marginXArg, marginYArg){
+		if(marginXArg < Style.marginXXL || marginYArg < Style.marginXXL){
+			return
+		}
+		transformPoints(scaleX, scaleY, deltaXArg, deltaYArg)
 	}
 
-	function bottomLeftMoving(scaleX, scaleY){
-		transformPoints(scaleX, scaleY)
+	function topRightMoving(scaleX, scaleY, deltaXArg, deltaYArg, marginXArg, marginYArg){
+		if(marginXArg < Style.marginXXL || marginYArg < Style.marginXXL){
+			return
+		}
+		transformPoints(scaleX, scaleY, deltaXArg, deltaYArg)
 	}
 
-	function topRightMoving(scaleX, scaleY){
-		transformPoints(scaleX, scaleY)
+	function bottomLeftMoving(scaleX, scaleY, deltaXArg, deltaYArg, marginXArg, marginYArg){
+		if(marginXArg < Style.marginXXL || marginYArg < Style.marginXXL){
+			return
+		}
+		transformPoints(scaleX, scaleY, deltaXArg, deltaYArg)
 	}
 
-	function bottomRightMoving(scaleX, scaleY){
-		transformPoints(scaleX, scaleY)
+	function bottomRightMoving(scaleX, scaleY, deltaXArg, deltaYArg, marginXArg, marginYArg){
+		if(marginXArg < Style.marginXXL || marginYArg < Style.marginXXL){
+			return
+		}
+		transformPoints(scaleX, scaleY,deltaXArg,deltaYArg)
 	}
 
-	function transformPoints(scaleX, scaleY){
+	function transformPoints(scaleX, scaleY, translationX, translationY){
 
 		let matrix = [
-				[scaleX, 0, 0],
-				[0, scaleY, 0],
+				[scaleX, 0, translationX],
+				[0, scaleY, translationY],
 				[0, 0, 1]
 			  ];
 
-		for(let i = 0; i < points.length; i++){
-			points[i] = LinearAlgebra.transformPoint2d(points[i], matrix)
+		for(let i = 0; i < pointsBackup.length; i++){
+			points[i] = LinearAlgebra.transformPoint2d(pointsBackup[i], matrix)
 		}
 	}
 
@@ -434,6 +490,32 @@ GraphicsShapeBase {
 
 		}
 
+	}
+
+	property var pointsBackup: []
+	property real bbWidthBackup: 1
+	property real bbHeightBackup: 1
+	property var bbPointsBackup
+
+	onIsSelectedChanged: {
+		setBackup()
+	}
+
+	onMousePressed: {
+		setBackup()
+	}
+
+	function setBackup(){
+		if(isSelected && viewItem.isEditMode){
+			pointsBackup = []
+			for(let i = 0; i < points.length; i++){
+				pointsBackup.push(Qt.point(points[i].x, points[i].y))
+			}
+
+			bbPointsBackup = getBoundingBoxCornerPoints()
+			bbWidthBackup = getBoundingBoxWidth(bbPointsBackup)
+			bbHeightBackup = getBoundingBoxHeight(bbPointsBackup)
+		}
 	}
 
 }

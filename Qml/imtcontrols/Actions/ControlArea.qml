@@ -20,6 +20,9 @@ MouseArea{
     property bool wasMoving: false;
     property bool isPressed: false;
 
+	property bool propagateWheelEvents: true;
+	property bool propagateMouseEvents: true;
+
     signal deltaSignal(point delta)
     signal wheelDeltaSignal(int wheelDelta)
     signal positionSignal(point position)
@@ -65,6 +68,9 @@ MouseArea{
 
     onWheel: {
         wheelDeltaSignal(wheel.angleDelta.y)
+		if(!propagateWheelEvents){
+			wheel.accepted = false;
+		}
     }
 
     onDeltaSignal: {
@@ -81,6 +87,9 @@ MouseArea{
 	onClicked: {
 		if (mouse.button == Qt.RightButton){
 			rightClicked(mouse.x, mouse.y);
+		}
+		if(!propagateMouseEvents){
+			mouse.accepted = false;
 		}
 	}
 

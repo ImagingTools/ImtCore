@@ -10,6 +10,7 @@ QtObject {
 	property Item viewItem: null;
 	property var layer;
 
+	property bool hasCalibration: false
 	property bool isTouched: false;
 	property bool isSelected: false;
 	property bool showNodes: false;
@@ -31,6 +32,7 @@ QtObject {
 
 	property bool mouseIsPressed: false;
 	property var mousePressedCoord: Qt.point(0,0);
+	property var mouseCoord: Qt.point(0,0);
 
 	signal shapeChanged();
 	signal shapeInfo(var info);
@@ -51,6 +53,7 @@ QtObject {
 		mouseIsPressed = true;
 		//mousePressedCoord = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
 		mousePressedCoord = Qt.point(mouseEvent.x, mouseEvent.y)
+		mouseCoord = Qt.point(mouseEvent.x, mouseEvent.y)
 		if(viewItem.isPointsEditMode){
 			editNodeIndex = findNodeIndex(getLogPosition(mousePressedCoord))
 		}
@@ -95,6 +98,9 @@ QtObject {
 
 	function getScreenPosition(logPosition){
 		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
+		if(hasCalibration){
+			logPosition = getCalibratedPosition(logPosition)
+		}
 		let screenPosition = LinearAlgebra.transformPoint2d(logPosition, matrix)
 		return screenPosition
 	}
@@ -103,8 +109,17 @@ QtObject {
 		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
 		matrix = LinearAlgebra.getInvertedMatrix3x3(matrix)
 		let logPosition = LinearAlgebra.transformPoint2d(screenPosition, matrix)
-
+		if(hasCalibration){
+			logPosition = getReverseCalibratedPosition(logPosition)
+		}
 		return logPosition
+	}
+
+	function getCalibratedPosition(position){
+		return position;
+	}
+	function getReverseCalibratedPosition(position){
+		return position;
 	}
 
 	function findNodeIndex(position){
@@ -156,6 +171,8 @@ QtObject {
 		let obj = ({})
 		return obj
 	}
+
+
 
 }
 
