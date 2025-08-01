@@ -392,7 +392,7 @@ GraphicsShapeBase {
 		if(marginXArg < Style.marginXXL){
 			return
 		}
-		transformPoints(scaleX, 1,deltaXArg,0)
+		transformPoints(scaleX, 1,0,0)
 	}
 
 	function topMoving(scaleY, deltaXArg, deltaYArg, marginYArg){
@@ -406,7 +406,7 @@ GraphicsShapeBase {
 		if(marginYArg < Style.marginXXL){
 			return
 		}
-		transformPoints(1, scaleY,0,deltaYArg)
+		transformPoints(1, scaleY,0,0)
 	}
 
 	function topLeftMoving(scaleX, scaleY, deltaXArg, deltaYArg, marginXArg, marginYArg){
@@ -420,21 +420,21 @@ GraphicsShapeBase {
 		if(marginXArg < Style.marginXXL || marginYArg < Style.marginXXL){
 			return
 		}
-		transformPoints(scaleX, scaleY, deltaXArg, deltaYArg)
+		transformPoints(scaleX, scaleY, 0, deltaYArg)
 	}
 
 	function bottomLeftMoving(scaleX, scaleY, deltaXArg, deltaYArg, marginXArg, marginYArg){
 		if(marginXArg < Style.marginXXL || marginYArg < Style.marginXXL){
 			return
 		}
-		transformPoints(scaleX, scaleY, deltaXArg, deltaYArg)
+		transformPoints(scaleX, scaleY, deltaXArg, 0)
 	}
 
 	function bottomRightMoving(scaleX, scaleY, deltaXArg, deltaYArg, marginXArg, marginYArg){
 		if(marginXArg < Style.marginXXL || marginYArg < Style.marginXXL){
 			return
 		}
-		transformPoints(scaleX, scaleY,deltaXArg,deltaYArg)
+		transformPoints(scaleX, scaleY,0,0)
 	}
 
 	function transformPoints(scaleX, scaleY, translationX, translationY){
