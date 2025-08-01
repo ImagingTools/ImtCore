@@ -559,6 +559,10 @@ void COpenGLWidget::PaintSelection(QPainter& painter)
 			painter.drawEllipse(m_selectionRect);
 		}
 		break;
+
+	default:
+		// no selection
+		break;
 	}
 
 	painter.restore();

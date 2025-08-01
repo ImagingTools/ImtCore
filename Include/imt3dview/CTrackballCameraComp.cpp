@@ -14,9 +14,10 @@ namespace imt3dview
 
 // static members
 
-const double CTrackballCameraComp::s_zoomSpeed = 0.2;
+const double CTrackballCameraComp::s_zoomSpeed = 15;
 const double CTrackballCameraComp::s_moveSpeed = 0.005;
 const double CTrackballCameraComp::s_rotationSpeed = 1.0;
+constexpr float minDelta = 0.01f;
 
 
 // public methods
@@ -94,15 +95,32 @@ void CTrackballCameraComp::RotateTo(const QPoint& pointFrom, const QPoint& point
 }
 
 
+void CTrackballCameraComp::RotateAround(const QVector3D& axis, float angle)
+{
+	QQuaternion deltaRotation = QQuaternion::fromAxisAndAngle(axis, angle);
+	m_rotation *= deltaRotation;
+}
+
+
 void CTrackballCameraComp::ZoomIn()
 {
-	m_position.setZ(m_position.z() - s_zoomSpeed);
+	float delta = m_position.z() / s_zoomSpeed;
+	if (qAbs(delta) < minDelta){
+		delta = delta > minDelta ? minDelta : -minDelta;
+	}
+
+	m_position.setZ(m_position.z() - delta);
 }
 
 
 void CTrackballCameraComp::ZoomOut()
 {
-	m_position.setZ(m_position.z() + s_zoomSpeed);
+	float delta = m_position.z() / s_zoomSpeed;
+	if (qAbs(delta) < minDelta){
+		delta = delta > minDelta ? minDelta : -minDelta;
+	}
+
+	m_position.setZ(m_position.z() + delta);
 }
 
 
@@ -143,6 +161,7 @@ void CTrackballCameraComp::SetBoundingCuboid(const imt3d::CCuboid & cuboid)
 		}
 	}
 }
+
 
 imt3d::CCuboid CTrackballCameraComp::GetBoundingCuboid() const
 {

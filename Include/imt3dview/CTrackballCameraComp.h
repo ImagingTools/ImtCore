@@ -37,6 +37,7 @@ public:
 	virtual const QQuaternion& GetRotation() const override;
 	virtual void RotateTo(const QQuaternion& rotation) override;
 	virtual void RotateTo(const QPoint& pointFrom, const QPoint& pointTo, const QVector3D& axis = QVector3D()) override;
+	virtual void RotateAround(const QVector3D& axis, float angle) override;
 
 	virtual void ZoomIn() override;
 	virtual void ZoomOut() override;

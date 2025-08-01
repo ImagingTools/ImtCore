@@ -383,6 +383,8 @@ void CView3dProviderComp::OnGuiCreated()
 
 		m_rootCommands.InsertChild(&m_editCommands);
 	}
+
+	OnViewReset();
 }
 
 
