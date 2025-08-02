@@ -64,6 +64,10 @@ GraphicsView{
 		layer.addShape(rec2);
 		layer.addShape(rec3);
 
+		let polygonObj = polygonComp.createObject(this);
+		layer.addShape(polygonObj);
+
+
 		let toolsLayer = view.getToolsLayer()
 		toolsLayer.addShape(rulerShape)
 
@@ -412,6 +416,24 @@ GraphicsView{
 		TextShape{
 		}
 
+	}
+
+	Component{
+		id: polygonComp;
+
+		PolygonShape{
+			color: "violet"
+			Component.onCompleted: {
+				let points_ = []
+				points_.push(Qt.point(40, 200))
+				points_.push(Qt.point(120, 40))
+				points_.push(Qt.point(280, 80))
+				points_.push(Qt.point(360, 240))
+				points_.push(Qt.point(80, 320))
+
+				points = points_
+			}
+		}
 	}
 
 

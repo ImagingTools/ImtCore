@@ -32,7 +32,6 @@ QtObject {
 
 	property bool mouseIsPressed: false;
 	property var mousePressedCoord: Qt.point(0,0);
-	property var mouseCoord: Qt.point(0,0);
 
 	signal shapeChanged();
 	signal shapeInfo(var info);
@@ -53,7 +52,6 @@ QtObject {
 		mouseIsPressed = true;
 		//mousePressedCoord = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
 		mousePressedCoord = Qt.point(mouseEvent.x, mouseEvent.y)
-		mouseCoord = Qt.point(mouseEvent.x, mouseEvent.y)
 		if(viewItem.isPointsEditMode){
 			editNodeIndex = findNodeIndex(getLogPosition(mousePressedCoord))
 		}
