@@ -183,7 +183,7 @@ bool CSqliteUserDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParam
 		filterQuery += QString(R"((('%1' = '' AND NOT root."Document" ? 'SystemInfos') OR EXISTS (SELECT 1 FROM jsonb_array_elements(root."Document"->'SystemInfos') as s WHERE s->>'SystemId' = '%1')))").arg(systemId);
 	}
 	else{
-		return BaseClass::CreateObjectFilterQuery(filterParams, filterQuery);
+		return CreateObjectFilterQuery(filterParams, filterQuery);
 	}
 	
 	return true;
