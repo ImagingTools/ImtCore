@@ -19,7 +19,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 protected:
 	// reimplemented (CRepresentationControllerCompBase)

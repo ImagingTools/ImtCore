@@ -68,7 +68,7 @@ protected:
 	static void AddSearchPath(const QString& path);
 
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 private:
 	Scripts m_scripts;

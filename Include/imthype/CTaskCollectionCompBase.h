@@ -154,8 +154,8 @@ protected:
 	virtual QString GenerateUniqueObjectName(QString newName, QString oldName) const;
 
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
-	virtual void OnComponentDestroyed();
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 protected:
 	typedef istd::TOptInterfacePtr<iinsp::ISupplier> OptionalTaskPtr;

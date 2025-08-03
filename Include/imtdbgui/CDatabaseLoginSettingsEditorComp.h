@@ -36,7 +36,7 @@ public:
 
 protected:
 	// reimplemented (imod::IModelEditor)
-	virtual void UpdateModel() const;
+	virtual void UpdateModel() const override;
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;

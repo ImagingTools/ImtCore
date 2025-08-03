@@ -61,11 +61,11 @@ public:
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimpemented (ibase::ICommandsProvider)
-	virtual const ibase::IHierarchicalCommand* GetCommands() const;
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 	// reimpemented (icomp::IComponent)
-	virtual void OnComponentCreated();
-	virtual void OnComponentDestroyed();
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 protected:
 	// reimpemented (ibase::TLocalizableWrap)

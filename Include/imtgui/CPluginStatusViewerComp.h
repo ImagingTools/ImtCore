@@ -24,7 +24,7 @@ public:
 
 protected:
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;

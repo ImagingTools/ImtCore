@@ -58,7 +58,7 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiModelAttached() override;
 	virtual void OnGuiModelDetached() override;
-	virtual void UpdateModel() const;
+	virtual void UpdateModel() const override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;

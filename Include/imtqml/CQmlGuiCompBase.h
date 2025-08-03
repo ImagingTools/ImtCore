@@ -84,8 +84,8 @@ protected:
 	{
 	public:
 		// reimplemented (iqtgui::IVisualStatus)
-		virtual QIcon GetStatusIcon() const;
-		virtual QString GetStatusText() const;
+		virtual QIcon GetStatusIcon() const override;
+		virtual QString GetStatusText() const override;
 
 		friend class CQmlGuiCompBase;
 

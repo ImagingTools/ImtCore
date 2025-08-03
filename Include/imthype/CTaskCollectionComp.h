@@ -40,7 +40,7 @@ protected:
 	virtual iinsp::ISupplierUniquePtr CreateTaskInstance(const QByteArray& taskTypeId) const override;
 
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 protected:
 	imod::TModelWrap<iprm::COptionsManager> m_taskFactories;

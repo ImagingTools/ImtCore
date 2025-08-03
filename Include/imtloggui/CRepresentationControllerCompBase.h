@@ -66,8 +66,8 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
-	virtual void OnComponentDestroyed();
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 protected:
 	I_REF(imtlog::IEventProvider, m_eventProviderCompPtr);

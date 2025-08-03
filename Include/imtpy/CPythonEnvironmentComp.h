@@ -27,7 +27,7 @@ public:
 
 protected:
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 private:
 	static istd::TDelPtr<pybind11::scoped_interpreter> s_pythonInterpreter;
