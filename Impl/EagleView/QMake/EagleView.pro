@@ -7,7 +7,7 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limeas -liproc -liqtmeas -lAcfSlnLoc -lAcfLoc
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtgui -limt3d -limt3dview -limt3dgui -limtstyle
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtdesign -limtgui -limt3d -limt3dview -limt3dgui -limtstyle
 
 HEADERS =
 

@@ -2,16 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4824" Description="ACF"/>
-            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331008" Description="Qt Framework"/>
+            <Version Id="0" Number="5407" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="ImtCoreLocalization" X="400" Y="175" Note=""/>
         <Element ComponentName="MeshDocumentTemplate" X="1025" Y="450" Note=""/>
         <Element ComponentName="MultiDocApp" X="625" Y="250" Note=""/>
         <Element ComponentName="PointCloudDocumentTemplate" X="225" Y="450" Note=""/>
-        <Element ComponentName="VersionInfo" X="625" Y="75" Note=""/>
+        <Element ComponentName="Preferences" X="150" Y="75" Note=""/>
+        <Element ComponentName="PreferencesGui" X="150" Y="225" Note=""/>
+        <Element ComponentName="VersionInfo" X="900" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -2,14 +2,26 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4824" Description="ACF"/>
-            <Version Id="1" Number="2119" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331008" Description="Qt Framework"/>
+            <Version Id="0" Number="5407" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ImtCoreLocalization" PackageId="ImtCoreVoce" ComponentId="ImtCoreLocalization">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="LanguageSelection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Preferences/SelectedLanguage"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MultiDocApp/TrayMessages"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="MeshDocumentTemplate" PackageId="ImtEagleVoce" ComponentId="MeshTemplate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -48,6 +60,9 @@
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="ImtCore"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SettingsDialog" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PreferencesGui"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UiStartMode" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="3"/>
                     </AttributeInfo>
@@ -65,6 +80,36 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MultiDocApp/SettingsProvider"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Preferences" PackageId="ImtEagleVoce" ComponentId="Preferences">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MultiDocApp"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Languages" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ImtCoreLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MultiDocApp/TrayMessages"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="MultiDocApp"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PreferencesGui" PackageId="ImtEagleVoce" ComponentId="PreferencesGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GeneralPage" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Preferences/General"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
