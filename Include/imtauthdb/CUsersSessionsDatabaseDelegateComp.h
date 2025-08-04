@@ -24,8 +24,7 @@ public:
 				int count = -1,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
-				const QSqlRecord& record,
-				const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
+				const QSqlRecord& record) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,

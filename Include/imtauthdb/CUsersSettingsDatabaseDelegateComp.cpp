@@ -41,7 +41,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::GetSelectionQuery(
 }
 
 
-istd::IChangeableUniquePtr CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
+istd::IChangeableUniquePtr CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid() || !m_userSettingsInfoFactCompPtr.IsValid()){
 		return nullptr;
