@@ -98,6 +98,13 @@ public:
 
 	static void AddArrayInternalChecksFail(QTextStream& stream, const imtsdl::CSdlField& field, bool checkEmpty, const QString& objectName = QString(), uint hIndents = 1);
 
+	/**
+		\param errorMessage - error message, can contain placeholders \warning placeholders MUST start from 3. 0-2 - reserved for additional info
+		\param argset - placeholders for \c errorMessage
+		\param onlyDebug - if enabled, the message will print only in debug mode
+	 */
+	static void AddErrorReport(QTextStream& stream, const QString& errorMessage, uint hIndents = 0,  const QStringList& argset = QStringList(), bool onlyDebug = true);
+
 	template <class SdlEntryClass>
 	[[nodiscard]] static QString GetSdlEntryVersion(const SdlEntryClass& entry, bool addVPrefix = true);
 

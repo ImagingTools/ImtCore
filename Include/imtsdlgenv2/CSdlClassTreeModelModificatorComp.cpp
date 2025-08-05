@@ -357,6 +357,8 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 		FeedStream(stream, 1, false);
 
+		AddErrorReport(stream, QStringLiteral("Field '%3' not exists, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;");
 		FeedStream(stream, 1, false);
@@ -543,9 +545,13 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelImplCode(
 	stream << GetCapitalizedValue(field.GetId());
 	stream << QStringLiteral("Added){");
 	FeedStream(stream, 1, false);
+
+	AddErrorReport(stream, QStringLiteral("Unable to write field '%3'"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;");
 	FeedStream(stream, 1, false);
+
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
@@ -574,9 +580,13 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(
 		stream << GetDecapitalizedValue(field.GetId());
 		stream << QStringLiteral("DataModelPtr == nullptr){");
 		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("Field '%3' is missing, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream);
 		stream << '}';
 		FeedStream(stream, 1, false);
@@ -635,9 +645,13 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 	stream << GetCapitalizedValue(field.GetId());
 	stream << QStringLiteral("Readed){");
 	FeedStream(stream, 1, false);
+
+	AddErrorReport(stream, QStringLiteral("Unable to read field '%3'"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;");
 	FeedStream(stream, 1, false);
+
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
@@ -798,9 +812,13 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 	if (!optional && field.IsRequired()){
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model == nullptr){");
 		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("Field '%3' is missing, but required"), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream);
 		stream << '}';
 		FeedStream(stream, 1, false);
@@ -843,9 +861,13 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("if (") << countVariableName << QStringLiteral(" <= 0){");
 		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("Field '%3' is empty"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("return false;");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream, hIndents);
 		stream << '}';
 		FeedStream(stream, 1, false);
@@ -1045,9 +1067,12 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	FeedStream(stream, 1, false);
 
 	// inLoop: error report
+	AddErrorReport(stream, QStringLiteral("Unable to write field '%3'"), hIndents + 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 	FeedStreamHorizontally(stream, hIndents + 2);
 	stream << QStringLiteral("return false;");
 	FeedStream(stream, 1, false);
+
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << '}';
 
@@ -1076,9 +1101,13 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(
 	if (!optional && (field.IsRequired())){
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model == nullptr){");
 		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("Field '%3' is missing, but required."), 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream);
 		stream << '}';
 		FeedStream(stream, 1, false);
@@ -1123,9 +1152,13 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("if (") << countVariableName << QStringLiteral(" <= 0){");
 		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("Field '%3' is empty"), hIndents, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("return false;");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream, hIndents);
 		stream << '}';
 		FeedStream(stream, 1, false);
@@ -1165,9 +1198,13 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model, ");
 	stream << indexVariableName << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
+
+	AddErrorReport(stream, QStringLiteral("Unable to read field '%3'"), hIndents + 2, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
 	FeedStreamHorizontally(stream, hIndents + 2);
 	stream << QStringLiteral("return false;");
 	FeedStream(stream, 1, false);
+
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << '}';
 	FeedStream(stream, 1, false);

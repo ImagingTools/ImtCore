@@ -1264,9 +1264,13 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("if (objectCollectionIterator == nullptr){");
 		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("Unable to create object iterator."), hIndents);
+
 		FeedStreamHorizontally(stream, hIndents + 2);
 		stream << QStringLiteral("return false;");
 		FeedStream(stream, 1, false);
+
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("}");
 		FeedStream(stream, 2, false);
@@ -1291,6 +1295,12 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("errorMessage = QString(\"Bad request. Unexpected command-ID: '%1'\").arg(qPrintable(commandId));");
 		FeedStream(stream, 2, false);
+
+		// send log message
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("SendErrorMessage(0, errorMessage);");
+		FeedStream(stream, 2, false);
+
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << QStringLiteral("return false;");
 		break;
@@ -1531,6 +1541,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		stream << QStringLiteral("if (!isRepresentationCreated){");
 		FeedStream(stream, 1, false);
 
+		AddErrorReport(stream, QStringLiteral("Unable to create representation"), hIndents);
+
 		// [2] return
 		FeedStreamHorizontally(stream, hIndents + 2);
 		stream << QStringLiteral("return false;");
@@ -1577,6 +1589,8 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 			FeedStreamHorizontally(stream, hIndents + 1);
 			stream << QStringLiteral("if (!isRepresentationWritten){");
 			FeedStream(stream, 1, false);
+
+			AddErrorReport(stream, "Unable to Write TreeModel", hIndents + 2);
 
 			// [2] return
 			FeedStreamHorizontally(stream, hIndents + 2);

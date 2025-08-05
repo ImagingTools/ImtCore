@@ -364,6 +364,36 @@ void CSdlGenTools::AddArrayInternalChecksFail(QTextStream& stream, const imtsdl:
 }
 
 
+void CSdlGenTools::AddErrorReport(
+			QTextStream& stream,
+			const QString& errorMessage,
+			uint hIndents,
+			const QStringList& argset,
+			bool onlyDebug)
+{
+	imtsdl::CSdlTools::FeedStreamHorizontally(stream, hIndents);
+
+	if (onlyDebug){
+		stream << QStringLiteral("I_IF_DEBUG(");
+	}
+
+	stream << QStringLiteral("qWarning() << QString(\"%1:%2 Error: ");
+	stream << errorMessage;
+	stream << QStringLiteral("\")");
+	stream << QStringLiteral(".arg(__FILE__, QString::number(__LINE__)");
+	for (const QString& argument: argset){
+		stream << ',' << ' ' << argument;
+	}
+	stream << QStringLiteral(");");
+
+	if (onlyDebug){
+		stream << ')';
+	}
+
+	imtsdl::CSdlTools::FeedStream(stream, 2, false);
+}
+
+
 void CSdlGenTools::GenerateIsRequestSupportedMethodImpl(
 			QTextStream& stream,
 			const imtsdl::SdlRequestList& requestList,
@@ -416,6 +446,5 @@ void CSdlGenTools::GenerateIsRequestSupportedMethodImpl(
 	stream << '}';
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 }
-
 
 } // namespace imtsdlgenv2

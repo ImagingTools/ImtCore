@@ -1237,6 +1237,8 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
 
+	AddErrorReport(stream, QStringLiteral("Unable to create GQL Object"), hIndents + 1);
+
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;");
 	FeedStream(stream, 1, false);
