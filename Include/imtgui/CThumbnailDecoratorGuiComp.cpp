@@ -1396,12 +1396,6 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 					CommandsMenuButton->setVisible(!m_commandsMenu.isEmpty());
 			}
 			else{
-				QAction* placeholderAction = new QAction(QIcon("/"), "");
-				placeholderAction->setEnabled(false);
-
-				m_mainToolBar->addAction(placeholderAction);
-				m_mainToolBar->addSeparator();
-
 				CommandsMenuButton->setVisible(false);
 			}
 		}

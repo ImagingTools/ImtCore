@@ -1,6 +1,14 @@
 #include <imtgui/CFullScreenCommandComp.h>
 
 
+// Qt includes
+#include <QtGui/QWindow>
+
+#if defined (Q_OS_WIN)
+#include <Windows.h>
+#endif
+
+
 namespace imtgui
 {
 
@@ -144,6 +152,9 @@ void CFullScreenCommandComp::OnLanguageChanged()
 
 void CFullScreenCommandComp::OnCommandActivated()
 {
+	QWindow* windowHandle = NULL;
+	Q_UNUSED(windowHandle)
+
 	QWidget* mainWidgetPtr = GetMainWidget();
 	Q_ASSERT(mainWidgetPtr != nullptr);
 
@@ -154,6 +165,15 @@ void CFullScreenCommandComp::OnCommandActivated()
 		mainWidgetPtr->setWindowState(m_mainWidgetLastState);
 	}
 	else{
+#if QT_VERSION >= 0x060000
+		windowHandle = mainWidgetPtr->windowHandle();
+#if defined (Q_OS_WIN)
+		if (windowHandle != NULL){
+			HWND handle = reinterpret_cast<HWND>(windowHandle->winId());
+			SetWindowLongPtr(handle, GWL_STYLE, GetWindowLongPtr(handle, GWL_STYLE) | WS_BORDER);
+		}
+#endif
+#endif
 		mainWidgetPtr->showFullScreen();
 	}
 }
