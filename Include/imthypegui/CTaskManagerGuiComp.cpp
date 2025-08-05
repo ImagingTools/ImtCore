@@ -113,7 +113,7 @@ void CTaskManagerGuiComp::OnSelectionChanged(const QItemSelection& selected, con
 }
 
 
-void CTaskManagerGuiComp::OnMicroSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
+void CTaskManagerGuiComp::OnMicroSelectionChanged(const QItemSelection& selected, const QItemSelection& /*deselected*/)
 {
 	TaskList->selectionModel()->select(selected, QItemSelectionModel::ClearAndSelect);
 }
@@ -226,12 +226,6 @@ void CTaskManagerGuiComp::UpdateCommands()
 
 	ExecuteAllButton->setVisible(*m_showAllExecuteButtonAttrPtr && m_executeAllTasksCommand.isVisible());
 	ExecuteAllButton->setEnabled(*m_showAllExecuteButtonAttrPtr && m_executeAllTasksCommand.isEnabled());
-
-	//TaskActionFrame->setVisible(
-	//			AddButton->isVisible() ||
-	//			RemoveButton->isVisible() ||
-	//			DuplicateButton->isVisible() ||
-	//			ExecuteAllButton->isVisible());
 }
 
 
@@ -298,7 +292,7 @@ void CTaskManagerGuiComp::OnGuiCreated()
 	connect(ExecuteAllButton, &QToolButton::clicked, this, &CTaskManagerGuiComp::OnTestAll, uniqueQueued);
 
 	m_showInputsManagerCommand.setVisible(m_taskInputManagerGuiCompPtr.IsValid() && m_taskInputManagerObserverCompPtr.IsValid());
-
+	connect(ShowInputManagerButton, &QToolButton::clicked, this, &CTaskManagerGuiComp::OnShowInputsManager, uniqueQueued);
 
 	AddButton->setPopupMode(QToolButton::InstantPopup);
 
@@ -340,7 +334,7 @@ void CTaskManagerGuiComp::OnGuiRetranslate()
 	m_addCommand.SetVisuals(tr("&Add Task"), tr("Add"), tr("Add a new task"), GetIcon(":/Icons/Add"));
 	m_deleteCommand.SetVisuals(tr("&Remove Task"), tr("Remove"), tr("Remove current task"), GetIcon(":/Icons/Delete"));
 	m_duplicateCommand.SetVisuals(tr("&Duplicate Task"), tr("Duplicate"), tr("Duplicate current task"), GetIcon(":/Icons/Duplicate"));
-	m_showInputsManagerCommand.SetVisuals(tr("&Show Input Manager"), tr("Show Input Manager"), tr("Show editor of the task inputs"), GetIcon(":/Icons/Import"));
+	m_showInputsManagerCommand.SetVisuals(tr("&Show Input Manager"), tr("Show Input Manager"), tr("Show editor of the task inputs"), GetIcon(":/Icons/Capture"));
 }
 
 
@@ -353,12 +347,13 @@ void CTaskManagerGuiComp::OnGuiDesignChanged()
 	m_addCommand.setIcon(GetIcon(":/Icons/Add"));
 	m_deleteCommand.setIcon(GetIcon(":/Icons/Delete"));
 	m_duplicateCommand.setIcon(GetIcon(":/Icons/Duplicate"));
-	m_showInputsManagerCommand.setIcon(GetIcon(":/Icons/Import"));
+	m_showInputsManagerCommand.setIcon(GetIcon(":/Icons/Capture"));
 
 	AddButton->setIcon(GetIcon(":/Icons/Add"));
 	DuplicateButton->setIcon(GetIcon(":/Icons/Duplicate"));
 	ExecuteAllButton->setIcon(GetIcon(":/Icons/Play"));
 	RemoveButton->setIcon(GetIcon(":/Icons/Delete"));
+	ShowInputManagerButton->setIcon(GetIcon(":/Icons/Capture"));
 }
 
 

@@ -221,7 +221,7 @@ TTaskCollectionEditorCompBase<UI>::TTaskCollectionEditorCompBase()
 	m_addCommand("Add Task", 100, ibase::ICommand::CF_GLOBAL_MENU, 1979),
 	m_deleteCommand("Remove Task", 100, ibase::ICommand::CF_GLOBAL_MENU, 1979),
 	m_duplicateCommand("Duplicate Task", 100, ibase::ICommand::CF_GLOBAL_MENU, 1979),
-	m_showInputsManagerCommand("Edit Inputs", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 1980),
+	m_showInputsManagerCommand("Edit Inputs", 100, ibase::ICommand::CF_GLOBAL_MENU, 1980),
 	m_isTaskSettingsUpdating(false),
 	m_taskSettingsObserver(*this)
 {
@@ -428,26 +428,24 @@ void TTaskCollectionEditorCompBase<UI>::OnTaskSelectionChanged(const QItemSelect
 		if (!selectedIndexes.isEmpty()){
 			const QModelIndex index = selectedIndexes[0];
 
-			if (QStandardItem* itemPtr = m_itemModel.itemFromIndex(index))
-			{
-				//Q_ASSERT(itemPtr != nullptr);
+			QStandardItem* itemPtr = m_itemModel.itemFromIndex(index);
+			if (itemPtr != nullptr){
+				m_currentSelectedIndex = itemPtr->row();
 
-			m_currentSelectedIndex = itemPtr->row();
+				QByteArray typeId = itemPtr->data(CTaskItemDelegate::DR_TYPE_ID).toByteArray();
+				pageIndex = m_typeToStackIndexMap[typeId];
+				taskName = itemPtr->data(CTaskItemDelegate::DR_TASK_NAME).toString();
+				m_selectedTaskId = itemPtr->data(CTaskItemDelegate::DR_TASK_UUID).toByteArray();
 
-			QByteArray typeId = itemPtr->data(CTaskItemDelegate::DR_TYPE_ID).toByteArray();
-			pageIndex = m_typeToStackIndexMap[typeId];
-			taskName = itemPtr->data(CTaskItemDelegate::DR_TASK_NAME).toString();
-			m_selectedTaskId = itemPtr->data(CTaskItemDelegate::DR_TASK_UUID).toByteArray();
-
-			imod::IModel* selectedTaskModelPtr = GetTaskModelFromSelection(selected);
-			if (selectedTaskModelPtr != nullptr){
-				imod::IObserver* observerPtr = GetTaskModelObserverFromSelection(selected);
-				if ((observerPtr != nullptr) && !selectedTaskModelPtr->IsAttached(observerPtr)){
-					selectedTaskModelPtr->AttachObserver(observerPtr);
+				imod::IModel* selectedTaskModelPtr = GetTaskModelFromSelection(selected);
+				if (selectedTaskModelPtr != nullptr){
+					imod::IObserver* selectedObserverPtr = GetTaskModelObserverFromSelection(selected);
+					if ((selectedObserverPtr != nullptr) && !selectedTaskModelPtr->IsAttached(selectedObserverPtr)){
+						selectedTaskModelPtr->AttachObserver(selectedObserverPtr);
+					}
 				}
 			}
 		}
-	}
 	}
 
 	BaseClass::TaskEditorStack->setCurrentIndex(pageIndex);
@@ -455,6 +453,7 @@ void TTaskCollectionEditorCompBase<UI>::OnTaskSelectionChanged(const QItemSelect
 	BaseClass::SetStatusText(taskName);
 
 	UpdateCommands();
+
 	InfoToTaskSettings();
 }
 

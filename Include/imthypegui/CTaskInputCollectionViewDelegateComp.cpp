@@ -33,18 +33,33 @@ bool CTaskInputCollectionViewDelegateComp::GetSummaryInformation(
 			if (informationId == "Preview" && m_paramSetRepresentationControllerCompPtr.IsValid()){
 				QString text;
 				if (m_paramSetRepresentationControllerCompPtr->CreateSummaryRepresentation(*objectPtr, text)){
+					text = text.replace(";", "\n");
 					summaryInformation.sortValue = text;
 					summaryInformation.text = text;
 					summaryInformation.infoId = informationId;
 					objectMetaInfo.append(summaryInformation);
 				}
 
-				break;
+				continue;
+			}
+
+			ObjectMetaInfo baseInfo;
+			if (BaseClass::GetSummaryInformation(objectId, { informationId }, baseInfo)) {
+				summaryInformation.icon = baseInfo[0].icon;
+				summaryInformation.sortValue = baseInfo[0].sortValue;
+				summaryInformation.text = baseInfo[0].text;
+
+				objectMetaInfo.append(summaryInformation);
+			}
+			else {
+				I_CRITICAL();
+
+				return false;
 			}
 		}
 	}
 
-	return BaseClass::GetSummaryInformation(objectId, fieldIds, objectMetaInfo);
+	return true;
 }
 
 
@@ -88,7 +103,7 @@ void CTaskInputCollectionViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem("Name", tr("Input-ID"), "");
+	m_summaryInformationTypes.InsertItem("Name", tr("Acquisition-ID"), "");
 	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
 
 	m_summaryInformationTypes.InsertItem("Preview", *m_previewColumnNameAttrPtr, "");

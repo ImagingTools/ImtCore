@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>707</width>
-    <height>341</height>
+    <width>963</width>
+    <height>510</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -179,6 +179,22 @@
             </widget>
            </item>
            <item>
+            <widget class="QToolButton" name="ShowInputManagerButton">
+             <property name="text">
+              <string>Inputs...</string>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="horizontalSpacer_2">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -243,6 +259,9 @@
                <width>20</width>
                <height>20</height>
               </size>
+             </property>
+             <property name="autoRaise">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -434,7 +453,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../ImtCore/Include/imtgui/imtgui.qrc"/>
+  <include location="../imtgui/imtgui.qrc"/>
  </resources>
  <connections/>
 </ui>
