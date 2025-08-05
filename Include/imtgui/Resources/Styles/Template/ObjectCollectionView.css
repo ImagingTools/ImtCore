@@ -42,7 +42,7 @@ QTreeWidget#TypeList::item:last
 
 QTreeWidget#TypeList::item:selected
 {
-	background-color: ${Active.Base};
+	background-color: ${Active.TabBackground};
 	color: ${Active.Text};
 }
 
