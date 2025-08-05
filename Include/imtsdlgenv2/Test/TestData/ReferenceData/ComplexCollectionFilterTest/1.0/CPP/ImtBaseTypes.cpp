@@ -167,6 +167,8 @@ bool CTimeRange::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, 
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -241,6 +243,8 @@ bool CTimeRange::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Prot
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -315,6 +319,8 @@ bool CTimeRange::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion vers
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -550,12 +556,16 @@ bool CSdlSize::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 {
 	QVariant widthData = model.GetData("width", modelIndex);
 	if (widthData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "width");)
+
 		return false;
 	}
 	width = widthData.toDouble();
 
 	QVariant heightData = model.GetData("height", modelIndex);
 	if (heightData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "height");)
+
 		return false;
 	}
 	height = heightData.toDouble();
@@ -599,11 +609,15 @@ bool CSdlSize::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) 
 bool CSdlSize::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("width") || (gqlObject["width"].userType() != QMetaType::Float && gqlObject["width"].userType() != QMetaType::Double && gqlObject["width"].userType() != QMetaType::Int && gqlObject["width"].userType() != QMetaType::UInt && gqlObject["width"].userType() != QMetaType::LongLong && gqlObject["width"].userType() != QMetaType::ULongLong && gqlObject["width"].userType() != QMetaType::Long && gqlObject["width"].userType() != QMetaType::Short && gqlObject["width"].userType() != QMetaType::ULong && gqlObject["width"].userType() != QMetaType::UShort && gqlObject["width"].userType() != QMetaType::UChar)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width");)
+
 		return false;
 	}
 	width = gqlObject["width"].toDouble();
 
 	if (!gqlObject.ContainsParam("height") || (gqlObject["height"].userType() != QMetaType::Float && gqlObject["height"].userType() != QMetaType::Double && gqlObject["height"].userType() != QMetaType::Int && gqlObject["height"].userType() != QMetaType::UInt && gqlObject["height"].userType() != QMetaType::LongLong && gqlObject["height"].userType() != QMetaType::ULongLong && gqlObject["height"].userType() != QMetaType::Long && gqlObject["height"].userType() != QMetaType::Short && gqlObject["height"].userType() != QMetaType::ULong && gqlObject["height"].userType() != QMetaType::UShort && gqlObject["height"].userType() != QMetaType::UChar)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "height");)
+
 		return false;
 	}
 	height = gqlObject["height"].toDouble();
@@ -645,11 +659,15 @@ bool CSdlSize::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CSdlSize::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("width") || ! jsonObject["width"].isDouble()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width");)
+
 		return false;
 	}
 	width = jsonObject["width"].toDouble();
 
 	if (!jsonObject.contains("height") || ! jsonObject["height"].isDouble()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "height");)
+
 		return false;
 	}
 	height = jsonObject["height"].toDouble();
@@ -681,6 +699,8 @@ bool CSdlSize::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Pr
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -755,6 +775,8 @@ bool CSdlSize::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protoc
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -829,6 +851,8 @@ bool CSdlSize::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versio
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1064,12 +1088,16 @@ bool CSdlPoint::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (xData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "x");)
+
 		return false;
 	}
 	x = xData.toDouble();
 
 	QVariant yData = model.GetData("y", modelIndex);
 	if (yData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "y");)
+
 		return false;
 	}
 	y = yData.toDouble();
@@ -1113,11 +1141,15 @@ bool CSdlPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 bool CSdlPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("x") || (gqlObject["x"].userType() != QMetaType::Float && gqlObject["x"].userType() != QMetaType::Double && gqlObject["x"].userType() != QMetaType::Int && gqlObject["x"].userType() != QMetaType::UInt && gqlObject["x"].userType() != QMetaType::LongLong && gqlObject["x"].userType() != QMetaType::ULongLong && gqlObject["x"].userType() != QMetaType::Long && gqlObject["x"].userType() != QMetaType::Short && gqlObject["x"].userType() != QMetaType::ULong && gqlObject["x"].userType() != QMetaType::UShort && gqlObject["x"].userType() != QMetaType::UChar)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x");)
+
 		return false;
 	}
 	x = gqlObject["x"].toDouble();
 
 	if (!gqlObject.ContainsParam("y") || (gqlObject["y"].userType() != QMetaType::Float && gqlObject["y"].userType() != QMetaType::Double && gqlObject["y"].userType() != QMetaType::Int && gqlObject["y"].userType() != QMetaType::UInt && gqlObject["y"].userType() != QMetaType::LongLong && gqlObject["y"].userType() != QMetaType::ULongLong && gqlObject["y"].userType() != QMetaType::Long && gqlObject["y"].userType() != QMetaType::Short && gqlObject["y"].userType() != QMetaType::ULong && gqlObject["y"].userType() != QMetaType::UShort && gqlObject["y"].userType() != QMetaType::UChar)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "y");)
+
 		return false;
 	}
 	y = gqlObject["y"].toDouble();
@@ -1159,11 +1191,15 @@ bool CSdlPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CSdlPoint::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("x") || ! jsonObject["x"].isDouble()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x");)
+
 		return false;
 	}
 	x = jsonObject["x"].toDouble();
 
 	if (!jsonObject.contains("y") || ! jsonObject["y"].isDouble()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "y");)
+
 		return false;
 	}
 	y = jsonObject["y"].toDouble();
@@ -1195,6 +1231,8 @@ bool CSdlPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1269,6 +1307,8 @@ bool CSdlPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1343,6 +1383,8 @@ bool CSdlPoint::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -2161,6 +2203,8 @@ bool CParamTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -2235,6 +2279,8 @@ bool CParamTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, P
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -2309,6 +2355,8 @@ bool CParamTypeIds::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion v
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -3061,6 +3109,8 @@ bool CUrlParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -3135,6 +3185,8 @@ bool CUrlParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -3209,6 +3261,8 @@ bool CUrlParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -3574,6 +3628,8 @@ bool CIdParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Pr
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -3648,6 +3704,8 @@ bool CIdParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protoc
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -3722,6 +3780,8 @@ bool CIdParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versio
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -4006,6 +4066,8 @@ bool CTextParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, 
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -4080,6 +4142,8 @@ bool CTextParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Prot
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -4154,6 +4218,8 @@ bool CTextParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion vers
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -4438,6 +4504,8 @@ bool CEnableableParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -4512,6 +4580,8 @@ bool CEnableableParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -4586,6 +4656,8 @@ bool CEnableableParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersio
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -4870,6 +4942,8 @@ bool CIntegerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -4944,6 +5018,8 @@ bool CIntegerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, P
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -5018,6 +5094,8 @@ bool CIntegerParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion v
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -5304,6 +5382,8 @@ bool CDoubleParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -5378,6 +5458,8 @@ bool CDoubleParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -5452,6 +5534,8 @@ bool CDoubleParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -5853,6 +5937,8 @@ bool COption::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Pro
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -5927,6 +6013,8 @@ bool COption::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protoco
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -6001,6 +6089,8 @@ bool COption::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -6282,6 +6372,8 @@ bool COptionsList::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
 			newOptionsModelPtr->InsertNewItem();
 			if (!(options->at(optionsIndex).WriteToModel(*newOptionsModelPtr, optionsIndex))){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+
 				return false;
 			}
 		}
@@ -6310,6 +6402,8 @@ bool COptionsList::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
 			COption::V1_0 options;
 			if (!options.ReadFromModel(*optionsModel, optionsIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+
 				return false;
 			}
 			optionsList << options;
@@ -6341,6 +6435,8 @@ bool COptionsList::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
 			COption::V1_0 options;
 			if (!options.OptReadFromModel(*optionsModel, optionsIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+
 				return false;
 			}
 			optionsList << options;
@@ -6368,6 +6464,8 @@ bool COptionsList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
 			::imtgql::CGqlParamObject newOptionsGqlObject;
 			if (!options->at(optionsIndex).WriteToGraphQlObject(newOptionsGqlObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+
 				return false;
 			}
 			optionsDataObjectList << newOptionsGqlObject;
@@ -6400,6 +6498,8 @@ bool COptionsList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			}
 			COption::V1_0 tempOptions;
 			if (!tempOptions.ReadFromGraphQlObject(*optionsDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+
 				return false;
 			}
 			options->append(tempOptions);
@@ -6431,6 +6531,8 @@ bool COptionsList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			}
 			COption::V1_0 tempOptions;
 			if (!tempOptions.OptReadFromGraphQlObject(*optionsDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+
 				return false;
 			}
 			options->append(tempOptions);
@@ -6456,6 +6558,8 @@ bool COptionsList::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
 			QJsonObject newOptionsJsonObject;
 			if (!options->at(optionsIndex).WriteToJsonObject(newOptionsJsonObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+
 				return false;
 			}
 			newOptionsArray << newOptionsJsonObject;
@@ -6484,6 +6588,8 @@ bool COptionsList::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
 			COption::V1_0 tempOptions;
 			if (!tempOptions.ReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+
 				return false;
 			}
 			options->append(tempOptions);
@@ -6511,6 +6617,8 @@ bool COptionsList::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
 			COption::V1_0 tempOptions;
 			if (!tempOptions.OptReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+
 				return false;
 			}
 			options->append(tempOptions);
@@ -6530,6 +6638,8 @@ bool COptionsList::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -6604,6 +6714,8 @@ bool COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -6678,6 +6790,8 @@ bool COptionsList::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -6947,6 +7061,8 @@ bool CSelectionParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int m
 		::imtbase::CTreeItemModel* constraintsNewModelPtr = model.AddTreeModel("constraints", modelIndex);
 		const bool isConstraintsAdded = constraints->WriteToModel(*constraintsNewModelPtr, 0);
 		if (!isConstraintsAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+
 			return false;
 		}
 
@@ -6968,6 +7084,8 @@ bool CSelectionParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsReaded = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
 		if (!isConstraintsReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+
 			return false;
 		}
 	}
@@ -6988,6 +7106,8 @@ bool CSelectionParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsReaded = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
 		if (!isConstraintsReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+
 			return false;
 		}
 	}
@@ -7006,6 +7126,8 @@ bool CSelectionParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 		::imtgql::CGqlParamObject constraintsGqlObject;
 		const bool isConstraintsAdded = constraints->WriteToGraphQlObject(constraintsGqlObject);
 		if (!isConstraintsAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+
 			return false;
 		}
 		gqlObject.InsertParam("constraints", constraintsGqlObject);
@@ -7025,6 +7147,8 @@ bool CSelectionParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+
 			return false;
 		}
 	}
@@ -7043,6 +7167,8 @@ bool CSelectionParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+
 			return false;
 		}
 	}
@@ -7061,6 +7187,8 @@ bool CSelectionParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		QJsonObject constraintsJsonObject;
 		const bool isConstraintsAdded = constraints->WriteToJsonObject(constraintsJsonObject);
 		if (!isConstraintsAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+
 			return false;
 		}
 		jsonObject["constraints"] = constraintsJsonObject;
@@ -7080,6 +7208,8 @@ bool CSelectionParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->ReadFromJsonObject(jsonObject["constraints"].toObject());
 		if (!isConstraintsRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+
 			return false;
 		}
 	}
@@ -7098,6 +7228,8 @@ bool CSelectionParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->OptReadFromJsonObject(jsonObject["constraints"].toObject());
 		if (!isConstraintsRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+
 			return false;
 		}
 	}
@@ -7115,6 +7247,8 @@ bool CSelectionParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -7189,6 +7323,8 @@ bool CSelectionParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -7263,6 +7399,8 @@ bool CSelectionParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -7634,6 +7772,8 @@ bool CSchedulerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -7708,6 +7848,8 @@ bool CSchedulerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -7782,6 +7924,8 @@ bool CSchedulerParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -7999,6 +8143,8 @@ bool CBackupSettings::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int m
 		::imtbase::CTreeItemModel* schedulerParamNewModelPtr = model.AddTreeModel("schedulerParam", modelIndex);
 		const bool isSchedulerParamAdded = schedulerParam->WriteToModel(*schedulerParamNewModelPtr, 0);
 		if (!isSchedulerParamAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+
 			return false;
 		}
 
@@ -8019,6 +8165,8 @@ bool CBackupSettings::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamReaded = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
 		if (!isSchedulerParamReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+
 			return false;
 		}
 	}
@@ -8039,6 +8187,8 @@ bool CBackupSettings::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamReaded = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
 		if (!isSchedulerParamReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+
 			return false;
 		}
 	}
@@ -8058,6 +8208,8 @@ bool CBackupSettings::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 		::imtgql::CGqlParamObject schedulerParamGqlObject;
 		const bool isSchedulerParamAdded = schedulerParam->WriteToGraphQlObject(schedulerParamGqlObject);
 		if (!isSchedulerParamAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+
 			return false;
 		}
 		gqlObject.InsertParam("schedulerParam", schedulerParamGqlObject);
@@ -8077,6 +8229,8 @@ bool CBackupSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+
 			return false;
 		}
 	}
@@ -8095,6 +8249,8 @@ bool CBackupSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+
 			return false;
 		}
 	}
@@ -8113,6 +8269,8 @@ bool CBackupSettings::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		QJsonObject schedulerParamJsonObject;
 		const bool isSchedulerParamAdded = schedulerParam->WriteToJsonObject(schedulerParamJsonObject);
 		if (!isSchedulerParamAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+
 			return false;
 		}
 		jsonObject["schedulerParam"] = schedulerParamJsonObject;
@@ -8132,6 +8290,8 @@ bool CBackupSettings::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromJsonObject(jsonObject["schedulerParam"].toObject());
 		if (!isSchedulerParamRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+
 			return false;
 		}
 	}
@@ -8150,6 +8310,8 @@ bool CBackupSettings::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->OptReadFromJsonObject(jsonObject["schedulerParam"].toObject());
 		if (!isSchedulerParamRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+
 			return false;
 		}
 	}
@@ -8171,6 +8333,8 @@ bool CBackupSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -8245,6 +8409,8 @@ bool CBackupSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -8319,6 +8485,8 @@ bool CBackupSettings::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -8846,6 +9014,8 @@ bool CDatabaseAccessSettings::WriteToModel(::imtbase::CTreeItemModel& model, int
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -8920,6 +9090,8 @@ bool CDatabaseAccessSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -8994,6 +9166,8 @@ bool CDatabaseAccessSettings::WriteToJsonObject(QJsonObject& jsonObject, Protoco
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -9452,6 +9626,8 @@ bool CFileNameParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelInd
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -9526,6 +9702,8 @@ bool CFileNameParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, 
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -9600,6 +9778,8 @@ bool CFileNameParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion 
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -10332,6 +10512,8 @@ bool CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, 
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -10406,6 +10588,8 @@ bool CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Prot
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -10480,6 +10664,8 @@ bool CParamsSet::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion vers
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -10833,6 +11019,8 @@ bool CMimeType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 {
 	QVariant typeData = model.GetData("type", modelIndex);
 	if (typeData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "type");)
+
 		return false;
 	}
 	type = typeData.toString();
@@ -10851,6 +11039,8 @@ bool CMimeType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 
 	QVariant subTypeData = model.GetData("subType", modelIndex);
 	if (subTypeData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "subType");)
+
 		return false;
 	}
 	subType = subTypeData.toString();
@@ -10960,6 +11150,8 @@ bool CMimeType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("type") || (gqlObject["type"].userType() != QMetaType::QString && gqlObject["type"].userType() != QMetaType::QByteArray)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type");)
+
 		return false;
 	}
 	type = gqlObject["type"].toString();
@@ -10976,6 +11168,8 @@ bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 
 	if (!gqlObject.ContainsParam("subType") || (gqlObject["subType"].userType() != QMetaType::QString && gqlObject["subType"].userType() != QMetaType::QByteArray)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "subType");)
+
 		return false;
 	}
 	subType = gqlObject["subType"].toString();
@@ -11078,6 +11272,8 @@ bool CMimeType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CMimeType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("type") || ! jsonObject["type"].isString()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type");)
+
 		return false;
 	}
 	type = jsonObject["type"].toString();
@@ -11093,6 +11289,8 @@ bool CMimeType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (!jsonObject.contains("subType") || ! jsonObject["subType"].isString()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "subType");)
+
 		return false;
 	}
 	subType = jsonObject["subType"].toString();
@@ -11162,6 +11360,8 @@ bool CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -11236,6 +11436,8 @@ bool CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -11310,6 +11512,8 @@ bool CMimeType::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}

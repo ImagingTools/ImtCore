@@ -52,12 +52,16 @@ bool CPoint::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mod
 {
 	QVariant xData = model.GetData("X", modelIndex);
 	if (xData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "X");)
+
 		return false;
 	}
 	X = xData.toFloat();
 
 	QVariant yData = model.GetData("Y", modelIndex);
 	if (yData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "Y");)
+
 		return false;
 	}
 	Y = yData.toFloat();
@@ -101,11 +105,15 @@ bool CPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) co
 bool CPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("X") || (gqlObject["X"].userType() != QMetaType::Float && gqlObject["X"].userType() != QMetaType::Double && gqlObject["X"].userType() != QMetaType::Int && gqlObject["X"].userType() != QMetaType::UInt && gqlObject["X"].userType() != QMetaType::LongLong && gqlObject["X"].userType() != QMetaType::ULongLong && gqlObject["X"].userType() != QMetaType::Long && gqlObject["X"].userType() != QMetaType::Short && gqlObject["X"].userType() != QMetaType::ULong && gqlObject["X"].userType() != QMetaType::UShort && gqlObject["X"].userType() != QMetaType::UChar)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X");)
+
 		return false;
 	}
 	X = gqlObject["X"].toDouble();
 
 	if (!gqlObject.ContainsParam("Y") || (gqlObject["Y"].userType() != QMetaType::Float && gqlObject["Y"].userType() != QMetaType::Double && gqlObject["Y"].userType() != QMetaType::Int && gqlObject["Y"].userType() != QMetaType::UInt && gqlObject["Y"].userType() != QMetaType::LongLong && gqlObject["Y"].userType() != QMetaType::ULongLong && gqlObject["Y"].userType() != QMetaType::Long && gqlObject["Y"].userType() != QMetaType::Short && gqlObject["Y"].userType() != QMetaType::ULong && gqlObject["Y"].userType() != QMetaType::UShort && gqlObject["Y"].userType() != QMetaType::UChar)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Y");)
+
 		return false;
 	}
 	Y = gqlObject["Y"].toDouble();
@@ -147,11 +155,15 @@ bool CPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CPoint::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("X") || ! jsonObject["X"].isDouble()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "X");)
+
 		return false;
 	}
 	X = jsonObject["X"].toDouble();
 
 	if (!jsonObject.contains("Y") || ! jsonObject["Y"].isDouble()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Y");)
+
 		return false;
 	}
 	Y = jsonObject["Y"].toDouble();
@@ -183,6 +195,8 @@ bool CPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Prot
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -257,6 +271,8 @@ bool CPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protocol
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -331,6 +347,8 @@ bool CPoint::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version)
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -578,6 +596,8 @@ bool CGeometry::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 	for (qsizetype pointsIndex = 0; pointsIndex < Points->size(); ++pointsIndex){
 		newPointsModelPtr->InsertNewItem();
 		if (!(Points->at(pointsIndex).WriteToModel(*newPointsModelPtr, pointsIndex))){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 			return false;
 		}
 	}
@@ -590,6 +610,8 @@ bool CGeometry::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 {
 	QVariant geometryTypeData = model.GetData("GeometryType", modelIndex);
 	if (geometryTypeData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType");)
+
 		return false;
 	}
 	QString geometryTypeStringValue = geometryTypeData.toString();
@@ -615,6 +637,8 @@ bool CGeometry::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 
 	::imtbase::CTreeItemModel* pointsModel = model.GetTreeItemModel("Points", modelIndex);
 	if (pointsModel == nullptr){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' is missing, but required.").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 		return false;
 	}
 	int pointsCount = pointsModel->GetItemsCount();
@@ -622,6 +646,8 @@ bool CGeometry::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	for (int pointsIndex = 0; pointsIndex < pointsCount; ++pointsIndex){
 		CPoint::V1_0 points;
 		if (!points.ReadFromModel(*pointsModel, pointsIndex)){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 			return false;
 		}
 		pointsList << points;
@@ -666,6 +692,8 @@ bool CGeometry::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		for (int pointsIndex = 0; pointsIndex < pointsCount; ++pointsIndex){
 			CPoint::V1_0 points;
 			if (!points.OptReadFromModel(*pointsModel, pointsIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 				return false;
 			}
 			pointsList << points;
@@ -711,6 +739,8 @@ bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 	for (qsizetype pointsIndex = 0; pointsIndex < Points->size(); ++pointsIndex){
 		::imtgql::CGqlParamObject newPointsGqlObject;
 		if (!Points->at(pointsIndex).WriteToGraphQlObject(newPointsGqlObject)){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 			return false;
 		}
 		pointsDataObjectList << newPointsGqlObject;
@@ -724,6 +754,8 @@ bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("GeometryType") || (gqlObject["GeometryType"].userType() != QMetaType::QString && gqlObject["GeometryType"].userType() != QMetaType::QByteArray)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType");)
+
 		return false;
 	}
 	const QString geometryTypeStringValue = gqlObject["GeometryType"].toString();
@@ -747,6 +779,8 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 
 	if (!gqlObject.ContainsParam("Points") || (gqlObject.GetObjectsCount("Points") <= 0)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 		return false;
 	}
 	const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("points");
@@ -759,6 +793,8 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		}
 		CPoint::V1_0 tempPoints;
 		if (!tempPoints.ReadFromGraphQlObject(*pointsDataObjectPtr)){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 			return false;
 		}
 		Points->append(tempPoints);
@@ -803,6 +839,8 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			}
 			CPoint::V1_0 tempPoints;
 			if (!tempPoints.OptReadFromGraphQlObject(*pointsDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 				return false;
 			}
 			Points->append(tempPoints);
@@ -846,6 +884,8 @@ bool CGeometry::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	for (qsizetype pointsIndex = 0; pointsIndex < Points->size(); ++pointsIndex){
 		QJsonObject newPointsJsonObject;
 		if (!Points->at(pointsIndex).WriteToJsonObject(newPointsJsonObject)){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 			return false;
 		}
 		newPointsArray << newPointsJsonObject;
@@ -859,6 +899,8 @@ bool CGeometry::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CGeometry::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("GeometryType") || ! jsonObject["GeometryType"].isString()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "GeometryType");)
+
 		return false;
 	}
 	const QString geometryTypeStringValue = jsonObject["GeometryType"].toString();
@@ -882,6 +924,8 @@ bool CGeometry::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (!jsonObject.contains("Points") || ! jsonObject["Points"].isArray()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 		return false;
 	}
 	const QJsonArray pointsJsonArray = jsonObject["Points"].toArray();
@@ -890,6 +934,8 @@ bool CGeometry::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	for (qsizetype pointsIndex = 0; pointsIndex < pointsArrayCount; ++pointsIndex){
 		CPoint::V1_0 tempPoints;
 		if (!tempPoints.ReadFromJsonObject(pointsJsonArray[pointsIndex].toObject())){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 			return false;
 		}
 		Points->append(tempPoints);
@@ -930,6 +976,8 @@ bool CGeometry::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype pointsIndex = 0; pointsIndex < pointsArrayCount; ++pointsIndex){
 			CPoint::V1_0 tempPoints;
 			if (!tempPoints.OptReadFromJsonObject(pointsJsonArray[pointsIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
+
 				return false;
 			}
 			Points->append(tempPoints);
@@ -949,6 +997,8 @@ bool CGeometry::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1023,6 +1073,8 @@ bool CGeometry::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1097,6 +1149,8 @@ bool CGeometry::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}

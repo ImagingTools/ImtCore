@@ -34,6 +34,8 @@ bool CDigitalPrinterSpecification::V1_0::WriteToModel(::imtbase::CTreeItemModel&
 		::imtbase::CTreeItemModel* baseNewModelPtr = model.AddTreeModel("base", modelIndex);
 		const bool isBaseAdded = base->WriteToModel(*baseNewModelPtr, 0);
 		if (!isBaseAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 
@@ -66,6 +68,8 @@ bool CDigitalPrinterSpecification::V1_0::ReadFromModel(const ::imtbase::CTreeIte
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
 		const bool isBaseReaded = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -97,6 +101,8 @@ bool CDigitalPrinterSpecification::V1_0::OptReadFromModel(const ::imtbase::CTree
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
 		const bool isBaseReaded = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -127,6 +133,8 @@ bool CDigitalPrinterSpecification::V1_0::WriteToGraphQlObject(::imtgql::CGqlPara
 		::imtgql::CGqlParamObject baseGqlObject;
 		const bool isBaseAdded = base->WriteToGraphQlObject(baseGqlObject);
 		if (!isBaseAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 		gqlObject.InsertParam("base", baseGqlObject);
@@ -158,6 +166,8 @@ bool CDigitalPrinterSpecification::V1_0::ReadFromGraphQlObject(const ::imtgql::C
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -187,6 +197,8 @@ bool CDigitalPrinterSpecification::V1_0::OptReadFromGraphQlObject(const ::imtgql
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -216,6 +228,8 @@ bool CDigitalPrinterSpecification::V1_0::WriteToJsonObject(QJsonObject& jsonObje
 		QJsonObject baseJsonObject;
 		const bool isBaseAdded = base->WriteToJsonObject(baseJsonObject);
 		if (!isBaseAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 		jsonObject["base"] = baseJsonObject;
@@ -247,6 +261,8 @@ bool CDigitalPrinterSpecification::V1_0::ReadFromJsonObject(const QJsonObject& j
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
 		const bool isBaseRead = base->ReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -276,6 +292,8 @@ bool CDigitalPrinterSpecification::V1_0::OptReadFromJsonObject(const QJsonObject
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
 		const bool isBaseRead = base->OptReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -308,6 +326,8 @@ bool CDigitalPrinterSpecification::WriteToModel(::imtbase::CTreeItemModel& model
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -382,6 +402,8 @@ bool CDigitalPrinterSpecification::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -456,6 +478,8 @@ bool CDigitalPrinterSpecification::WriteToJsonObject(QJsonObject& jsonObject, Pr
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -703,6 +727,8 @@ bool CDigitalPrinter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int m
 		::imtbase::CTreeItemModel* baseNewModelPtr = model.AddTreeModel("base", modelIndex);
 		const bool isBaseAdded = base->WriteToModel(*baseNewModelPtr, 0);
 		if (!isBaseAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 
@@ -735,6 +761,8 @@ bool CDigitalPrinter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 		base = PrinterBase::CPrinterBase::V1_0();
 		const bool isBaseReaded = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -766,6 +794,8 @@ bool CDigitalPrinter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 		base = PrinterBase::CPrinterBase::V1_0();
 		const bool isBaseReaded = base->ReadFromModel(*baseDataModelPtr, modelIndex);
 		if (!isBaseReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -796,6 +826,8 @@ bool CDigitalPrinter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 		::imtgql::CGqlParamObject baseGqlObject;
 		const bool isBaseAdded = base->WriteToGraphQlObject(baseGqlObject);
 		if (!isBaseAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 		gqlObject.InsertParam("base", baseGqlObject);
@@ -827,6 +859,8 @@ bool CDigitalPrinter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		base = PrinterBase::CPrinterBase::V1_0();
 		const bool isBaseRead = base->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -856,6 +890,8 @@ bool CDigitalPrinter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		base = PrinterBase::CPrinterBase::V1_0();
 		const bool isBaseRead = base->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("base"));
 		if (!isBaseRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -885,6 +921,8 @@ bool CDigitalPrinter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		QJsonObject baseJsonObject;
 		const bool isBaseAdded = base->WriteToJsonObject(baseJsonObject);
 		if (!isBaseAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 		jsonObject["base"] = baseJsonObject;
@@ -916,6 +954,8 @@ bool CDigitalPrinter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		base = PrinterBase::CPrinterBase::V1_0();
 		const bool isBaseRead = base->ReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -945,6 +985,8 @@ bool CDigitalPrinter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		base = PrinterBase::CPrinterBase::V1_0();
 		const bool isBaseRead = base->OptReadFromJsonObject(jsonObject["base"].toObject());
 		if (!isBaseRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "base");)
+
 			return false;
 		}
 	}
@@ -977,6 +1019,8 @@ bool CDigitalPrinter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1051,6 +1095,8 @@ bool CDigitalPrinter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1125,6 +1171,8 @@ bool CDigitalPrinter::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}

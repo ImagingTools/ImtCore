@@ -36,6 +36,8 @@ bool CTimeFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int model
 		::imtbase::CTreeItemModel* timeRangeNewModelPtr = model.AddTreeModel("timeRange", modelIndex);
 		const bool isTimeRangeAdded = timeRange->WriteToModel(*timeRangeNewModelPtr, 0);
 		if (!isTimeRangeAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange");)
+
 			return false;
 		}
 
@@ -64,6 +66,8 @@ bool CTimeFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, in
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
 		const bool isTimeRangeReaded = timeRange->ReadFromModel(*timeRangeDataModelPtr, modelIndex);
 		if (!isTimeRangeReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange");)
+
 			return false;
 		}
 	}
@@ -94,6 +98,8 @@ bool CTimeFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model,
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
 		const bool isTimeRangeReaded = timeRange->ReadFromModel(*timeRangeDataModelPtr, modelIndex);
 		if (!isTimeRangeReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange");)
+
 			return false;
 		}
 	}
@@ -123,6 +129,8 @@ bool CTimeFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 		::imtgql::CGqlParamObject timeRangeGqlObject;
 		const bool isTimeRangeAdded = timeRange->WriteToGraphQlObject(timeRangeGqlObject);
 		if (!isTimeRangeAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange");)
+
 			return false;
 		}
 		gqlObject.InsertParam("timeRange", timeRangeGqlObject);
@@ -150,6 +158,8 @@ bool CTimeFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
 		const bool isTimeRangeRead = timeRange->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
 		if (!isTimeRangeRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange");)
+
 			return false;
 		}
 	}
@@ -176,6 +186,8 @@ bool CTimeFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
 		const bool isTimeRangeRead = timeRange->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeRange"));
 		if (!isTimeRangeRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange");)
+
 			return false;
 		}
 	}
@@ -202,6 +214,8 @@ bool CTimeFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		QJsonObject timeRangeJsonObject;
 		const bool isTimeRangeAdded = timeRange->WriteToJsonObject(timeRangeJsonObject);
 		if (!isTimeRangeAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange");)
+
 			return false;
 		}
 		jsonObject["timeRange"] = timeRangeJsonObject;
@@ -229,6 +243,8 @@ bool CTimeFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
 		const bool isTimeRangeRead = timeRange->ReadFromJsonObject(jsonObject["timeRange"].toObject());
 		if (!isTimeRangeRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange");)
+
 			return false;
 		}
 	}
@@ -255,6 +271,8 @@ bool CTimeFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		timeRange = ImtBaseTypes::CTimeRange::V1_0();
 		const bool isTimeRangeRead = timeRange->OptReadFromJsonObject(jsonObject["timeRange"].toObject());
 		if (!isTimeRangeRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeRange");)
+
 			return false;
 		}
 	}
@@ -284,6 +302,8 @@ bool CTimeFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex,
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -358,6 +378,8 @@ bool CTimeFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pro
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -432,6 +454,8 @@ bool CTimeFilter::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ver
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -738,12 +762,16 @@ bool CFieldSortingInfo::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (fieldIdData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "fieldId");)
+
 		return false;
 	}
 	fieldId = fieldIdData.toString();
 
 	QVariant sortingOrderData = model.GetData("sortingOrder", modelIndex);
 	if (sortingOrderData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "sortingOrder");)
+
 		return false;
 	}
 	sortingOrder = sortingOrderData.toString();
@@ -787,11 +815,15 @@ bool CFieldSortingInfo::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 bool CFieldSortingInfo::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("fieldId") || (gqlObject["fieldId"].userType() != QMetaType::QString && gqlObject["fieldId"].userType() != QMetaType::QByteArray)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId");)
+
 		return false;
 	}
 	fieldId = gqlObject["fieldId"].toString();
 
 	if (!gqlObject.ContainsParam("sortingOrder") || (gqlObject["sortingOrder"].userType() != QMetaType::QString && gqlObject["sortingOrder"].userType() != QMetaType::QByteArray)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "sortingOrder");)
+
 		return false;
 	}
 	sortingOrder = gqlObject["sortingOrder"].toString();
@@ -833,11 +865,15 @@ bool CFieldSortingInfo::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CFieldSortingInfo::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("fieldId") || ! jsonObject["fieldId"].isString()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId");)
+
 		return false;
 	}
 	fieldId = jsonObject["fieldId"].toString();
 
 	if (!jsonObject.contains("sortingOrder") || ! jsonObject["sortingOrder"].isString()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "sortingOrder");)
+
 		return false;
 	}
 	sortingOrder = jsonObject["sortingOrder"].toString();
@@ -869,6 +905,8 @@ bool CFieldSortingInfo::WriteToModel(::imtbase::CTreeItemModel& model, int model
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -943,6 +981,8 @@ bool CFieldSortingInfo::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObjec
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1017,6 +1057,8 @@ bool CFieldSortingInfo::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1301,18 +1343,24 @@ bool CFieldFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 {
 	QVariant fieldIdData = model.GetData("fieldId", modelIndex);
 	if (fieldIdData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "fieldId");)
+
 		return false;
 	}
 	fieldId = fieldIdData.toByteArray();
 
 	QVariant filterValueData = model.GetData("filterValue", modelIndex);
 	if (filterValueData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "filterValue");)
+
 		return false;
 	}
 	filterValue = filterValueData.toString();
 
 	QVariant filterValueTypeData = model.GetData("filterValueType", modelIndex);
 	if (filterValueTypeData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "filterValueType");)
+
 		return false;
 	}
 	QString filterValueTypeStringValue = filterValueTypeData.toString();
@@ -1336,6 +1384,8 @@ bool CFieldFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	::imtbase::CTreeItemModel* filterOperationsModel = model.GetTreeItemModel("filterOperations", modelIndex);
 	if (filterOperationsModel == nullptr){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' is missing, but required").arg(__FILE__, QString::number(__LINE__), "filterOperations");)
+
 		return false;
 	}
 	int filterOperationsCount = filterOperationsModel->GetItemsCount();
@@ -1513,16 +1563,22 @@ bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("fieldId") || (gqlObject["fieldId"].userType() != QMetaType::QString && gqlObject["fieldId"].userType() != QMetaType::QByteArray)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId");)
+
 		return false;
 	}
 	fieldId = gqlObject["fieldId"].toByteArray();
 
 	if (!gqlObject.ContainsParam("filterValue") || (gqlObject["filterValue"].userType() != QMetaType::QString && gqlObject["filterValue"].userType() != QMetaType::QByteArray)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValue");)
+
 		return false;
 	}
 	filterValue = gqlObject["filterValue"].toString();
 
 	if (!gqlObject.ContainsParam("filterValueType") || (gqlObject["filterValueType"].userType() != QMetaType::QString && gqlObject["filterValueType"].userType() != QMetaType::QByteArray)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValueType");)
+
 		return false;
 	}
 	const QString filterValueTypeStringValue = gqlObject["filterValueType"].toString();
@@ -1545,6 +1601,8 @@ bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (!gqlObject.ContainsParam("filterOperations") || (gqlObject["filterOperations"].isNull())){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterOperations");)
+
 		return false;
 	}
 	const QVariant filterOperationsData = gqlObject["filterOperations"];
@@ -1717,16 +1775,22 @@ bool CFieldFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("fieldId") || ! jsonObject["fieldId"].isString()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "fieldId");)
+
 		return false;
 	}
 	fieldId = jsonObject["fieldId"].toString().toUtf8();
 
 	if (!jsonObject.contains("filterValue") || ! jsonObject["filterValue"].isString()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValue");)
+
 		return false;
 	}
 	filterValue = jsonObject["filterValue"].toString();
 
 	if (!jsonObject.contains("filterValueType") || ! jsonObject["filterValueType"].isString()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterValueType");)
+
 		return false;
 	}
 	const QString filterValueTypeStringValue = jsonObject["filterValueType"].toString();
@@ -1749,6 +1813,8 @@ bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (!jsonObject.contains("filterOperations") || ! jsonObject["filterOperations"].isArray()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "filterOperations");)
+
 		return false;
 	}
 	const QJsonArray filterOperationsJsonArray = jsonObject["filterOperations"].toArray();
@@ -1859,6 +1925,8 @@ bool CFieldFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -1933,6 +2001,8 @@ bool CFieldFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -2007,6 +2077,8 @@ bool CFieldFilter::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -2289,6 +2361,8 @@ bool CGroupFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
 			newFieldFiltersModelPtr->InsertNewItem();
 			if (!(fieldFilters->at(fieldFiltersIndex).WriteToModel(*newFieldFiltersModelPtr, fieldFiltersIndex))){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters");)
+
 				return false;
 			}
 		}
@@ -2299,6 +2373,8 @@ bool CGroupFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
 			newGroupFiltersModelPtr->InsertNewItem();
 			if (!(groupFilters->at(groupFiltersIndex).WriteToModel(*newGroupFiltersModelPtr, groupFiltersIndex))){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters");)
+
 				return false;
 			}
 		}
@@ -2334,6 +2410,8 @@ bool CGroupFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		for (int fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 fieldFilters;
 			if (!fieldFilters.ReadFromModel(*fieldFiltersModel, fieldFiltersIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters");)
+
 				return false;
 			}
 			fieldFiltersList << fieldFilters;
@@ -2349,6 +2427,8 @@ bool CGroupFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		for (int groupFiltersIndex = 0; groupFiltersIndex < groupFiltersCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 groupFilters;
 			if (!groupFilters.ReadFromModel(*groupFiltersModel, groupFiltersIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters");)
+
 				return false;
 			}
 			groupFiltersList << groupFilters;
@@ -2359,6 +2439,8 @@ bool CGroupFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	QVariant logicalOperationData = model.GetData("logicalOperation", modelIndex);
 	if (logicalOperationData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "logicalOperation");)
+
 		return false;
 	}
 	QString logicalOperationStringValue = logicalOperationData.toString();
@@ -2387,6 +2469,8 @@ bool CGroupFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 		for (int fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 fieldFilters;
 			if (!fieldFilters.OptReadFromModel(*fieldFiltersModel, fieldFiltersIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters");)
+
 				return false;
 			}
 			fieldFiltersList << fieldFilters;
@@ -2402,6 +2486,8 @@ bool CGroupFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 		for (int groupFiltersIndex = 0; groupFiltersIndex < groupFiltersCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 groupFilters;
 			if (!groupFilters.OptReadFromModel(*groupFiltersModel, groupFiltersIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters");)
+
 				return false;
 			}
 			groupFiltersList << groupFilters;
@@ -2437,6 +2523,8 @@ bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
 			::imtgql::CGqlParamObject newFieldFiltersGqlObject;
 			if (!fieldFilters->at(fieldFiltersIndex).WriteToGraphQlObject(newFieldFiltersGqlObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters");)
+
 				return false;
 			}
 			fieldFiltersDataObjectList << newFieldFiltersGqlObject;
@@ -2449,6 +2537,8 @@ bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
 			::imtgql::CGqlParamObject newGroupFiltersGqlObject;
 			if (!groupFilters->at(groupFiltersIndex).WriteToGraphQlObject(newGroupFiltersGqlObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters");)
+
 				return false;
 			}
 			groupFiltersDataObjectList << newGroupFiltersGqlObject;
@@ -2490,6 +2580,8 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			}
 			CFieldFilter::V1_0 tempFieldFilters;
 			if (!tempFieldFilters.ReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters");)
+
 				return false;
 			}
 			fieldFilters->append(tempFieldFilters);
@@ -2507,6 +2599,8 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			}
 			CGroupFilter::V1_0 tempGroupFilters;
 			if (!tempGroupFilters.ReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters");)
+
 				return false;
 			}
 			groupFilters->append(tempGroupFilters);
@@ -2514,6 +2608,8 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (!gqlObject.ContainsParam("logicalOperation") || (gqlObject["logicalOperation"].userType() != QMetaType::QString && gqlObject["logicalOperation"].userType() != QMetaType::QByteArray)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "logicalOperation");)
+
 		return false;
 	}
 	const QString logicalOperationStringValue = gqlObject["logicalOperation"].toString();
@@ -2546,6 +2642,8 @@ bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			}
 			CFieldFilter::V1_0 tempFieldFilters;
 			if (!tempFieldFilters.OptReadFromGraphQlObject(*fieldFiltersDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters");)
+
 				return false;
 			}
 			fieldFilters->append(tempFieldFilters);
@@ -2563,6 +2661,8 @@ bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			}
 			CGroupFilter::V1_0 tempGroupFilters;
 			if (!tempGroupFilters.OptReadFromGraphQlObject(*groupFiltersDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters");)
+
 				return false;
 			}
 			groupFilters->append(tempGroupFilters);
@@ -2595,6 +2695,8 @@ bool CGroupFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
 			QJsonObject newFieldFiltersJsonObject;
 			if (!fieldFilters->at(fieldFiltersIndex).WriteToJsonObject(newFieldFiltersJsonObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters");)
+
 				return false;
 			}
 			newFieldFiltersArray << newFieldFiltersJsonObject;
@@ -2607,6 +2709,8 @@ bool CGroupFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
 			QJsonObject newGroupFiltersJsonObject;
 			if (!groupFilters->at(groupFiltersIndex).WriteToJsonObject(newGroupFiltersJsonObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters");)
+
 				return false;
 			}
 			newGroupFiltersArray << newGroupFiltersJsonObject;
@@ -2644,6 +2748,8 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 tempFieldFilters;
 			if (!tempFieldFilters.ReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters");)
+
 				return false;
 			}
 			fieldFilters->append(tempFieldFilters);
@@ -2657,6 +2763,8 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 tempGroupFilters;
 			if (!tempGroupFilters.ReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters");)
+
 				return false;
 			}
 			groupFilters->append(tempGroupFilters);
@@ -2664,6 +2772,8 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (!jsonObject.contains("logicalOperation") || ! jsonObject["logicalOperation"].isString()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "logicalOperation");)
+
 		return false;
 	}
 	const QString logicalOperationStringValue = jsonObject["logicalOperation"].toString();
@@ -2692,6 +2802,8 @@ bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 tempFieldFilters;
 			if (!tempFieldFilters.OptReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters");)
+
 				return false;
 			}
 			fieldFilters->append(tempFieldFilters);
@@ -2705,6 +2817,8 @@ bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 tempGroupFilters;
 			if (!tempGroupFilters.OptReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters");)
+
 				return false;
 			}
 			groupFilters->append(tempGroupFilters);
@@ -2739,6 +2853,8 @@ bool CGroupFilter::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -2813,6 +2929,8 @@ bool CGroupFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -2887,6 +3005,8 @@ bool CGroupFilter::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -3185,6 +3305,8 @@ bool CComplexCollectionFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& mod
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
 			newSortingInfoModelPtr->InsertNewItem();
 			if (!(sortingInfo->at(sortingInfoIndex).WriteToModel(*newSortingInfoModelPtr, sortingInfoIndex))){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo");)
+
 				return false;
 			}
 		}
@@ -3194,6 +3316,8 @@ bool CComplexCollectionFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& mod
 		::imtbase::CTreeItemModel* fieldsFilterNewModelPtr = model.AddTreeModel("fieldsFilter", modelIndex);
 		const bool isFieldsFilterAdded = fieldsFilter->WriteToModel(*fieldsFilterNewModelPtr, 0);
 		if (!isFieldsFilterAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter");)
+
 			return false;
 		}
 
@@ -3203,6 +3327,8 @@ bool CComplexCollectionFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& mod
 		::imtbase::CTreeItemModel* timeFilterNewModelPtr = model.AddTreeModel("timeFilter", modelIndex);
 		const bool isTimeFilterAdded = timeFilter->WriteToModel(*timeFilterNewModelPtr, 0);
 		if (!isTimeFilterAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter");)
+
 			return false;
 		}
 
@@ -3230,6 +3356,8 @@ bool CComplexCollectionFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemMod
 		for (int sortingInfoIndex = 0; sortingInfoIndex < sortingInfoCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 sortingInfo;
 			if (!sortingInfo.ReadFromModel(*sortingInfoModel, sortingInfoIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo");)
+
 				return false;
 			}
 			sortingInfoList << sortingInfo;
@@ -3243,6 +3371,8 @@ bool CComplexCollectionFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemMod
 		fieldsFilter = CGroupFilter::V1_0();
 		const bool isFieldsFilterReaded = fieldsFilter->ReadFromModel(*fieldsFilterDataModelPtr, modelIndex);
 		if (!isFieldsFilterReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter");)
+
 			return false;
 		}
 	}
@@ -3252,6 +3382,8 @@ bool CComplexCollectionFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemMod
 		timeFilter = CTimeFilter::V1_0();
 		const bool isTimeFilterReaded = timeFilter->ReadFromModel(*timeFilterDataModelPtr, modelIndex);
 		if (!isTimeFilterReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter");)
+
 			return false;
 		}
 	}
@@ -3281,6 +3413,8 @@ bool CComplexCollectionFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItem
 		for (int sortingInfoIndex = 0; sortingInfoIndex < sortingInfoCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 sortingInfo;
 			if (!sortingInfo.OptReadFromModel(*sortingInfoModel, sortingInfoIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo");)
+
 				return false;
 			}
 			sortingInfoList << sortingInfo;
@@ -3294,6 +3428,8 @@ bool CComplexCollectionFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItem
 		fieldsFilter = CGroupFilter::V1_0();
 		const bool isFieldsFilterReaded = fieldsFilter->ReadFromModel(*fieldsFilterDataModelPtr, modelIndex);
 		if (!isFieldsFilterReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter");)
+
 			return false;
 		}
 	}
@@ -3303,6 +3439,8 @@ bool CComplexCollectionFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItem
 		timeFilter = CTimeFilter::V1_0();
 		const bool isTimeFilterReaded = timeFilter->ReadFromModel(*timeFilterDataModelPtr, modelIndex);
 		if (!isTimeFilterReaded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter");)
+
 			return false;
 		}
 	}
@@ -3330,6 +3468,8 @@ bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObj
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
 			::imtgql::CGqlParamObject newSortingInfoGqlObject;
 			if (!sortingInfo->at(sortingInfoIndex).WriteToGraphQlObject(newSortingInfoGqlObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo");)
+
 				return false;
 			}
 			sortingInfoDataObjectList << newSortingInfoGqlObject;
@@ -3341,6 +3481,8 @@ bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObj
 		::imtgql::CGqlParamObject fieldsFilterGqlObject;
 		const bool isFieldsFilterAdded = fieldsFilter->WriteToGraphQlObject(fieldsFilterGqlObject);
 		if (!isFieldsFilterAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter");)
+
 			return false;
 		}
 		gqlObject.InsertParam("fieldsFilter", fieldsFilterGqlObject);
@@ -3350,6 +3492,8 @@ bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObj
 		::imtgql::CGqlParamObject timeFilterGqlObject;
 		const bool isTimeFilterAdded = timeFilter->WriteToGraphQlObject(timeFilterGqlObject);
 		if (!isTimeFilterAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter");)
+
 			return false;
 		}
 		gqlObject.InsertParam("timeFilter", timeFilterGqlObject);
@@ -3380,6 +3524,8 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 			}
 			CFieldSortingInfo::V1_0 tempSortingInfo;
 			if (!tempSortingInfo.ReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo");)
+
 				return false;
 			}
 			sortingInfo->append(tempSortingInfo);
@@ -3390,6 +3536,8 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 		fieldsFilter = CGroupFilter::V1_0();
 		const bool isFieldsFilterRead = fieldsFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
 		if (!isFieldsFilterRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter");)
+
 			return false;
 		}
 	}
@@ -3398,6 +3546,8 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 		timeFilter = CTimeFilter::V1_0();
 		const bool isTimeFilterRead = timeFilter->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
 		if (!isTimeFilterRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter");)
+
 			return false;
 		}
 	}
@@ -3430,6 +3580,8 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 			}
 			CFieldSortingInfo::V1_0 tempSortingInfo;
 			if (!tempSortingInfo.OptReadFromGraphQlObject(*sortingInfoDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo");)
+
 				return false;
 			}
 			sortingInfo->append(tempSortingInfo);
@@ -3440,6 +3592,8 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 		fieldsFilter = CGroupFilter::V1_0();
 		const bool isFieldsFilterRead = fieldsFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("fieldsFilter"));
 		if (!isFieldsFilterRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter");)
+
 			return false;
 		}
 	}
@@ -3448,6 +3602,8 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 		timeFilter = CTimeFilter::V1_0();
 		const bool isTimeFilterRead = timeFilter->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("timeFilter"));
 		if (!isTimeFilterRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter");)
+
 			return false;
 		}
 	}
@@ -3474,6 +3630,8 @@ bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) 
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
 			QJsonObject newSortingInfoJsonObject;
 			if (!sortingInfo->at(sortingInfoIndex).WriteToJsonObject(newSortingInfoJsonObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo");)
+
 				return false;
 			}
 			newSortingInfoArray << newSortingInfoJsonObject;
@@ -3485,6 +3643,8 @@ bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) 
 		QJsonObject fieldsFilterJsonObject;
 		const bool isFieldsFilterAdded = fieldsFilter->WriteToJsonObject(fieldsFilterJsonObject);
 		if (!isFieldsFilterAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter");)
+
 			return false;
 		}
 		jsonObject["fieldsFilter"] = fieldsFilterJsonObject;
@@ -3494,6 +3654,8 @@ bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) 
 		QJsonObject timeFilterJsonObject;
 		const bool isTimeFilterAdded = timeFilter->WriteToJsonObject(timeFilterJsonObject);
 		if (!isTimeFilterAdded){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter");)
+
 			return false;
 		}
 		jsonObject["timeFilter"] = timeFilterJsonObject;
@@ -3520,6 +3682,8 @@ bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonO
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 tempSortingInfo;
 			if (!tempSortingInfo.ReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo");)
+
 				return false;
 			}
 			sortingInfo->append(tempSortingInfo);
@@ -3530,6 +3694,8 @@ bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonO
 		fieldsFilter = CGroupFilter::V1_0();
 		const bool isFieldsFilterRead = fieldsFilter->ReadFromJsonObject(jsonObject["fieldsFilter"].toObject());
 		if (!isFieldsFilterRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter");)
+
 			return false;
 		}
 	}
@@ -3538,6 +3704,8 @@ bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonO
 		timeFilter = CTimeFilter::V1_0();
 		const bool isTimeFilterRead = timeFilter->ReadFromJsonObject(jsonObject["timeFilter"].toObject());
 		if (!isTimeFilterRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter");)
+
 			return false;
 		}
 	}
@@ -3565,6 +3733,8 @@ bool CComplexCollectionFilter::V1_0::OptReadFromJsonObject(const QJsonObject& js
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 tempSortingInfo;
 			if (!tempSortingInfo.OptReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo");)
+
 				return false;
 			}
 			sortingInfo->append(tempSortingInfo);
@@ -3575,6 +3745,8 @@ bool CComplexCollectionFilter::V1_0::OptReadFromJsonObject(const QJsonObject& js
 		fieldsFilter = CGroupFilter::V1_0();
 		const bool isFieldsFilterRead = fieldsFilter->OptReadFromJsonObject(jsonObject["fieldsFilter"].toObject());
 		if (!isFieldsFilterRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldsFilter");)
+
 			return false;
 		}
 	}
@@ -3583,6 +3755,8 @@ bool CComplexCollectionFilter::V1_0::OptReadFromJsonObject(const QJsonObject& js
 		timeFilter = CTimeFilter::V1_0();
 		const bool isTimeFilterRead = timeFilter->OptReadFromJsonObject(jsonObject["timeFilter"].toObject());
 		if (!isTimeFilterRead){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "timeFilter");)
+
 			return false;
 		}
 	}
@@ -3610,6 +3784,8 @@ bool CComplexCollectionFilter::WriteToModel(::imtbase::CTreeItemModel& model, in
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -3684,6 +3860,8 @@ bool CComplexCollectionFilter::WriteToGraphQlObject(::imtgql::CGqlParamObject& g
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
@@ -3758,6 +3936,8 @@ bool CComplexCollectionFilter::WriteToJsonObject(QJsonObject& jsonObject, Protoc
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+
 			return false;
 		}
 	}
