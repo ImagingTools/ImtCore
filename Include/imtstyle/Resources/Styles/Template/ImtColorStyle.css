@@ -10,7 +10,7 @@ QWidget::item:disabled
 
 QWidget:disabled
 {
-	color: ${Active.Text};
+	color: ${Inactive.Text};
 }
 
 QSplashScreen > QWidget
