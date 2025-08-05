@@ -523,6 +523,154 @@ bool CDigitalPrinterSpecification::OptReadFromJsonObject(const QJsonObject& json
 }
 
 
+CDigitalPrinterSpecificationObject::CDigitalPrinterSpecificationObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_baseQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CDigitalPrinterSpecificationObject::baseChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CDigitalPrinterSpecificationObject::printingTechnologyChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* CDigitalPrinterSpecificationObject::GetBase()
+{
+	if (Version_1_0->base.has_value()){
+		if (!m_baseQObjectPtr){
+			m_baseQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>(CreateObject("base"));
+			m_baseQObjectPtr->Version_1_0 = Version_1_0->base;
+		}
+		return m_baseQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CDigitalPrinterSpecificationObject::SetBase(sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* v)
+{
+	if (v){
+		Version_1_0->base = v->Version_1_0;
+		m_baseQObjectPtr = v;
+	}
+	else {
+		Version_1_0->base = nullptr;
+	}
+
+	baseChanged();
+}
+
+
+bool CDigitalPrinterSpecificationObject::hasBase()
+{
+	 return Version_1_0->base.HasValue();
+}
+
+
+void CDigitalPrinterSpecificationObject::createBase()
+{	Version_1_0->base.emplace();
+
+}
+
+
+QString CDigitalPrinterSpecificationObject::GetPrintingTechnology()
+{
+	if (Version_1_0->printingTechnology.has_value()){
+		sdl::modsdl::DigitalPrinter::PrintingTechnology valueType = Version_1_0->printingTechnology.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CDigitalPrinterSpecificationObject::SetPrintingTechnology(QString v)
+{
+	Version_1_0->printingTechnology.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->printingTechnology = (sdl::modsdl::DigitalPrinter::PrintingTechnology)key;
+	}
+	printingTechnologyChanged();
+}
+
+
+bool CDigitalPrinterSpecificationObject::hasPrintingTechnology()
+{
+	 return Version_1_0->printingTechnology.HasValue();
+}
+
+
+QString CDigitalPrinterSpecificationObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CDigitalPrinterSpecificationObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CDigitalPrinterSpecificationObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CDigitalPrinterSpecificationObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CDigitalPrinterSpecificationObject::CreateObject(const QString& key)
+{
+	if (key == "base"){
+		return new sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CDigitalPrinterSpecificationObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "base")){
+		return "base";
+	}
+	if (propertyName == (QString("m_") + "printingTechnology")){
+		return "printingTechnology";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::modsdl::DigitalPrinter
 
 
@@ -1041,6 +1189,154 @@ bool CDigitalPrinter::OptReadFromJsonObject(const QJsonObject& jsonObject, Proto
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CDigitalPrinterObject::CDigitalPrinterObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_baseQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CDigitalPrinterObject::baseChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CDigitalPrinterObject::printingTechnologyChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+sdl::modsdl::PrinterBase::CPrinterBaseObject* CDigitalPrinterObject::GetBase()
+{
+	if (Version_1_0->base.has_value()){
+		if (!m_baseQObjectPtr){
+			m_baseQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CPrinterBaseObject*>(CreateObject("base"));
+			m_baseQObjectPtr->Version_1_0 = Version_1_0->base;
+		}
+		return m_baseQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CDigitalPrinterObject::SetBase(sdl::modsdl::PrinterBase::CPrinterBaseObject* v)
+{
+	if (v){
+		Version_1_0->base = v->Version_1_0;
+		m_baseQObjectPtr = v;
+	}
+	else {
+		Version_1_0->base = nullptr;
+	}
+
+	baseChanged();
+}
+
+
+bool CDigitalPrinterObject::hasBase()
+{
+	 return Version_1_0->base.HasValue();
+}
+
+
+void CDigitalPrinterObject::createBase()
+{	Version_1_0->base.emplace();
+
+}
+
+
+QString CDigitalPrinterObject::GetPrintingTechnology()
+{
+	if (Version_1_0->printingTechnology.has_value()){
+		sdl::modsdl::DigitalPrinter::PrintingTechnology valueType = Version_1_0->printingTechnology.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CDigitalPrinterObject::SetPrintingTechnology(QString v)
+{
+	Version_1_0->printingTechnology.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->printingTechnology = (sdl::modsdl::DigitalPrinter::PrintingTechnology)key;
+	}
+	printingTechnologyChanged();
+}
+
+
+bool CDigitalPrinterObject::hasPrintingTechnology()
+{
+	 return Version_1_0->printingTechnology.HasValue();
+}
+
+
+QString CDigitalPrinterObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CDigitalPrinterObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CDigitalPrinterObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CDigitalPrinterObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CDigitalPrinterObject::CreateObject(const QString& key)
+{
+	if (key == "base"){
+		return new sdl::modsdl::PrinterBase::CPrinterBaseObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CDigitalPrinterObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "base")){
+		return "base";
+	}
+	if (propertyName == (QString("m_") + "printingTechnology")){
+		return "printingTechnology";
+	}
+
+	return propertyName;
 }
 
 

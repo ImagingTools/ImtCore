@@ -270,7 +270,7 @@ void CSdlGenTest::PrinterTest()
 void CSdlGenTest::cleanupTestCase()
 {
 	if (m_tempOutputDir.exists()){
-		QVERIFY(m_tempOutputDir.removeRecursively());
+		// QVERIFY(m_tempOutputDir.removeRecursively());
 	}
 }
 

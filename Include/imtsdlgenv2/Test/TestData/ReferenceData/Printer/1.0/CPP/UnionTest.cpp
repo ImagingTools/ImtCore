@@ -401,6 +401,124 @@ bool CCoords::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersi
 }
 
 
+CCoordsObject::CCoordsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CCoordsObject::xChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCoordsObject::yChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+double CCoordsObject::GetX()
+{
+	if (Version_1_0->X.has_value()){
+		return Version_1_0->X.value();
+	}
+
+	return 0;
+}
+
+
+void CCoordsObject::SetX(double v)
+{
+	Version_1_0->X = v;
+	xChanged();
+}
+
+
+bool CCoordsObject::hasX()
+{
+	 return Version_1_0->X.HasValue();
+}
+
+
+double CCoordsObject::GetY()
+{
+	if (Version_1_0->Y.has_value()){
+		return Version_1_0->Y.value();
+	}
+
+	return 0;
+}
+
+
+void CCoordsObject::SetY(double v)
+{
+	Version_1_0->Y = v;
+	yChanged();
+}
+
+
+bool CCoordsObject::hasY()
+{
+	 return Version_1_0->Y.HasValue();
+}
+
+
+QString CCoordsObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CCoordsObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CCoordsObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CCoordsObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CCoordsObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString CCoordsObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "x")){
+		return "X";
+	}
+	if (propertyName == (QString("m_") + "y")){
+		return "Y";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::modsdl::UnionTest
 
 
@@ -739,6 +857,97 @@ bool CPrinterSpecificationBase::OptReadFromJsonObject(const QJsonObject& jsonObj
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CPrinterSpecificationBaseObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CPrinterSpecificationBaseObject::GetName()
+{
+	if (Version_1_0->name.has_value()){
+		return Version_1_0->name.value();
+	}
+
+	return QString();
+}
+
+
+void CPrinterSpecificationBaseObject::SetName(QString v)
+{
+	Version_1_0->name = v;
+	nameChanged();
+}
+
+
+bool CPrinterSpecificationBaseObject::hasName()
+{
+	 return Version_1_0->name.HasValue();
+}
+
+
+QString CPrinterSpecificationBaseObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CPrinterSpecificationBaseObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CPrinterSpecificationBaseObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CPrinterSpecificationBaseObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CPrinterSpecificationBaseObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString CPrinterSpecificationBaseObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "name")){
+		return "name";
+	}
+
+	return propertyName;
 }
 
 
@@ -1089,6 +1298,97 @@ bool CLink::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion
 }
 
 
+CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CLinkObject::linkChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CLinkObject::GetLink()
+{
+	if (Version_1_0->link.has_value()){
+		return Version_1_0->link.value();
+	}
+
+	return QString();
+}
+
+
+void CLinkObject::SetLink(QString v)
+{
+	Version_1_0->link = v.toUtf8();
+	linkChanged();
+}
+
+
+bool CLinkObject::hasLink()
+{
+	 return Version_1_0->link.HasValue();
+}
+
+
+QString CLinkObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CLinkObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CLinkObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CLinkObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CLinkObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString CLinkObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "link")){
+		return "link";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::modsdl::UnionTest
 
 
@@ -1149,7 +1449,9 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	QVariant specificationData = model.GetData("specification", modelIndex);
 	if (!specificationData.isNull()){
-		if (specificationData.canConvert<CPrinterSpecificationBase>()){
+	QString itemTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+
+		if (itemTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
 			if (!isspecificationRead){
@@ -1157,7 +1459,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (specificationData.canConvert<CLink>()){
+		else if (itemTypename == "Link") {
 			CLink specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
 			if (!isspecificationRead){
@@ -1180,7 +1482,9 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 
 	QVariant specificationData = model.GetData("specification", modelIndex);
 	if (!specificationData.isNull()){
-		if (specificationData.canConvert<CPrinterSpecificationBase>()){
+	QString itemTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+
+		if (itemTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
 			if (!isspecificationRead){
@@ -1188,7 +1492,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (specificationData.canConvert<CLink>()){
+		else if (itemTypename == "Link") {
 			CLink specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
 			if (!isspecificationRead){
@@ -1233,9 +1537,15 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("specification") && (!gqlObject["specification"].isNull() && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
-		const QVariant specificationVariantValue = gqlObject["specification"];
-		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
+	if (gqlObject.ContainsParam("specification") && (!((gqlObject.IsObject("item") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("item") && gqlObject["specification"].isNull())) && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
+			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
+	if (!itemDataObjectPtr->ContainsParam("__typename")) {
+		qDebug() << "invalid typename for: specification";
+		return false;
+	}
+
+	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
+		if (itemTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
@@ -1244,7 +1554,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (specificationVariantValue.canConvert<CLink>()){
+		else if (itemTypename == "Link") {
 			CLink specificationConvert;
 			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
@@ -1265,9 +1575,15 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("specification") && (!gqlObject["specification"].isNull() && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
-		const QVariant specificationVariantValue = gqlObject["specification"];
-		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
+	if (gqlObject.ContainsParam("specification") && (!((gqlObject.IsObject("item") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("item") && gqlObject["specification"].isNull())) && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
+			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
+	if (!itemDataObjectPtr->ContainsParam("__typename")) {
+		qDebug() << "invalid typename for: specification";
+		return false;
+	}
+
+	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
+		if (itemTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
@@ -1276,7 +1592,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (specificationVariantValue.canConvert<CLink>()){
+		else if (itemTypename == "Link") {
 			CLink specificationConvert;
 			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
@@ -1328,8 +1644,14 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("specification") && jsonObject["specification"].isObject()){
-		const QVariant specificationVariantValue = jsonObject["specification"].toVariant();
-		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
+			QJsonObject itemObject = jsonObject.value("item").toObject();
+	if (!itemObject.contains("__typename")){
+		qDebug() << "invalid typename for: specification";
+		return false;
+	}
+
+	QString itemTypename = itemObject.value("__typename").toString();;
+		if (itemTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());
 			if (!isspecificationRead){
@@ -1337,7 +1659,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (specificationVariantValue.canConvert<CLink>()){
+		else if (itemTypename == "Link") {
 			CLink specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());
 			if (!isspecificationRead){
@@ -1358,8 +1680,14 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("specification") && jsonObject["specification"].isObject()){
-		const QVariant specificationVariantValue = jsonObject["specification"].toVariant();
-		if (specificationVariantValue.canConvert<CPrinterSpecificationBase>()){
+			QJsonObject itemObject = jsonObject.value("item").toObject();
+	if (!itemObject.contains("__typename")){
+		qDebug() << "invalid typename for: specification";
+		return false;
+	}
+
+	QString itemTypename = itemObject.value("__typename").toString();;
+		if (itemTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());
 			if (!isspecificationRead){
@@ -1367,7 +1695,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (specificationVariantValue.canConvert<CLink>()){
+		else if (itemTypename == "Link") {
 			CLink specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());
 			if (!isspecificationRead){
@@ -1602,6 +1930,145 @@ bool CPrinterBase::OptReadFromJsonObject(const QJsonObject& jsonObject, Protocol
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_specificationQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CPrinterBaseObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CPrinterBaseObject::specificationChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CPrinterBaseObject::GetName()
+{
+	if (Version_1_0->name.has_value()){
+		return Version_1_0->name.value();
+	}
+
+	return QString();
+}
+
+
+void CPrinterBaseObject::SetName(QString v)
+{
+	Version_1_0->name = v;
+	nameChanged();
+}
+
+
+bool CPrinterBaseObject::hasName()
+{
+	 return Version_1_0->name.HasValue();
+}
+
+
+sdl::modsdl::UnionTest::CPrinterSpecificationObject* CPrinterBaseObject::GetSpecification()
+{
+	if (Version_1_0->specification.has_value()){
+		if (!m_specificationQObjectPtr){
+			m_specificationQObjectPtr = dynamic_cast<sdl::modsdl::UnionTest::CPrinterSpecificationObject*>(CreateObject("specification"));
+			m_specificationQObjectPtr->Version_1_0 = Version_1_0->specification;
+		}
+		return m_specificationQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CPrinterBaseObject::SetSpecification(sdl::modsdl::UnionTest::CPrinterSpecificationObject* v)
+{
+	if (v){
+		Version_1_0->specification = v->Version_1_0;
+		m_specificationQObjectPtr = v;
+	}
+	else {
+		Version_1_0->specification = nullptr;
+	}
+
+	specificationChanged();
+}
+
+
+bool CPrinterBaseObject::hasSpecification()
+{
+	 return Version_1_0->specification.HasValue();
+}
+
+
+void CPrinterBaseObject::createSpecification()
+{	Version_1_0->specification.emplace();
+
+}
+
+
+QString CPrinterBaseObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CPrinterBaseObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CPrinterBaseObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CPrinterBaseObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CPrinterBaseObject::CreateObject(const QString& key)
+{
+	if (key == "specification"){
+		return new sdl::modsdl::UnionTest::CPrinterSpecificationObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CPrinterBaseObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "name")){
+		return "name";
+	}
+	if (propertyName == (QString("m_") + "specification")){
+		return "specification";
+	}
+
+	return propertyName;
 }
 
 

@@ -3010,6 +3010,451 @@ bool CResult::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersi
 }
 
 
+CResultObject::CResultObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_geometryQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CResultObject::areaResultChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::expectedMinValueChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::expectedMaxValueChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::measuredValueChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::minMeasuredValueChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::maxMeasuredValueChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::meanMeasuredValueChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::measurementTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::measurementUnitChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::lengthChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::errorTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultObject::geometryChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CResultObject::GetAreaResult()
+{
+	if (Version_1_0->AreaResult.has_value()){
+		sdl::complextest::CTTypes::StatusCode valueType = Version_1_0->AreaResult.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CResultObject::SetAreaResult(QString v)
+{
+	Version_1_0->AreaResult.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->AreaResult = (sdl::complextest::CTTypes::StatusCode)key;
+	}
+	areaResultChanged();
+}
+
+
+bool CResultObject::hasAreaResult()
+{
+	 return Version_1_0->AreaResult.HasValue();
+}
+
+
+double CResultObject::GetExpectedMinValue()
+{
+	if (Version_1_0->ExpectedMinValue.has_value()){
+		return Version_1_0->ExpectedMinValue.value();
+	}
+
+	return 0;
+}
+
+
+void CResultObject::SetExpectedMinValue(double v)
+{
+	Version_1_0->ExpectedMinValue = v;
+	expectedMinValueChanged();
+}
+
+
+bool CResultObject::hasExpectedMinValue()
+{
+	 return Version_1_0->ExpectedMinValue.HasValue();
+}
+
+
+double CResultObject::GetExpectedMaxValue()
+{
+	if (Version_1_0->ExpectedMaxValue.has_value()){
+		return Version_1_0->ExpectedMaxValue.value();
+	}
+
+	return 0;
+}
+
+
+void CResultObject::SetExpectedMaxValue(double v)
+{
+	Version_1_0->ExpectedMaxValue = v;
+	expectedMaxValueChanged();
+}
+
+
+bool CResultObject::hasExpectedMaxValue()
+{
+	 return Version_1_0->ExpectedMaxValue.HasValue();
+}
+
+
+double CResultObject::GetMeasuredValue()
+{
+	if (Version_1_0->MeasuredValue.has_value()){
+		return Version_1_0->MeasuredValue.value();
+	}
+
+	return 0;
+}
+
+
+void CResultObject::SetMeasuredValue(double v)
+{
+	Version_1_0->MeasuredValue = v;
+	measuredValueChanged();
+}
+
+
+bool CResultObject::hasMeasuredValue()
+{
+	 return Version_1_0->MeasuredValue.HasValue();
+}
+
+
+double CResultObject::GetMinMeasuredValue()
+{
+	if (Version_1_0->MinMeasuredValue.has_value()){
+		return Version_1_0->MinMeasuredValue.value();
+	}
+
+	return 0;
+}
+
+
+void CResultObject::SetMinMeasuredValue(double v)
+{
+	Version_1_0->MinMeasuredValue = v;
+	minMeasuredValueChanged();
+}
+
+
+bool CResultObject::hasMinMeasuredValue()
+{
+	 return Version_1_0->MinMeasuredValue.HasValue();
+}
+
+
+double CResultObject::GetMaxMeasuredValue()
+{
+	if (Version_1_0->MaxMeasuredValue.has_value()){
+		return Version_1_0->MaxMeasuredValue.value();
+	}
+
+	return 0;
+}
+
+
+void CResultObject::SetMaxMeasuredValue(double v)
+{
+	Version_1_0->MaxMeasuredValue = v;
+	maxMeasuredValueChanged();
+}
+
+
+bool CResultObject::hasMaxMeasuredValue()
+{
+	 return Version_1_0->MaxMeasuredValue.HasValue();
+}
+
+
+double CResultObject::GetMeanMeasuredValue()
+{
+	if (Version_1_0->MeanMeasuredValue.has_value()){
+		return Version_1_0->MeanMeasuredValue.value();
+	}
+
+	return 0;
+}
+
+
+void CResultObject::SetMeanMeasuredValue(double v)
+{
+	Version_1_0->MeanMeasuredValue = v;
+	meanMeasuredValueChanged();
+}
+
+
+bool CResultObject::hasMeanMeasuredValue()
+{
+	 return Version_1_0->MeanMeasuredValue.HasValue();
+}
+
+
+QString CResultObject::GetMeasurementType()
+{
+	if (Version_1_0->MeasurementType.has_value()){
+		sdl::complextest::CTTypes::MeasurementType valueType = Version_1_0->MeasurementType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::MeasurementType>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CResultObject::SetMeasurementType(QString v)
+{
+	Version_1_0->MeasurementType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::MeasurementType>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->MeasurementType = (sdl::complextest::CTTypes::MeasurementType)key;
+	}
+	measurementTypeChanged();
+}
+
+
+bool CResultObject::hasMeasurementType()
+{
+	 return Version_1_0->MeasurementType.HasValue();
+}
+
+
+QString CResultObject::GetMeasurementUnit()
+{
+	if (Version_1_0->MeasurementUnit.has_value()){
+		sdl::complextest::CTTypes::MeasurementUnit valueType = Version_1_0->MeasurementUnit.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::MeasurementUnit>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CResultObject::SetMeasurementUnit(QString v)
+{
+	Version_1_0->MeasurementUnit.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::MeasurementUnit>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->MeasurementUnit = (sdl::complextest::CTTypes::MeasurementUnit)key;
+	}
+	measurementUnitChanged();
+}
+
+
+bool CResultObject::hasMeasurementUnit()
+{
+	 return Version_1_0->MeasurementUnit.HasValue();
+}
+
+
+double CResultObject::GetLength()
+{
+	if (Version_1_0->Length.has_value()){
+		return Version_1_0->Length.value();
+	}
+
+	return 0;
+}
+
+
+void CResultObject::SetLength(double v)
+{
+	Version_1_0->Length = v;
+	lengthChanged();
+}
+
+
+bool CResultObject::hasLength()
+{
+	 return Version_1_0->Length.HasValue();
+}
+
+
+QString CResultObject::GetErrorType()
+{
+	if (Version_1_0->ErrorType.has_value()){
+		sdl::complextest::CTTypes::ErrorCode valueType = Version_1_0->ErrorType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::ErrorCode>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CResultObject::SetErrorType(QString v)
+{
+	Version_1_0->ErrorType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::ErrorCode>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->ErrorType = (sdl::complextest::CTTypes::ErrorCode)key;
+	}
+	errorTypeChanged();
+}
+
+
+bool CResultObject::hasErrorType()
+{
+	 return Version_1_0->ErrorType.HasValue();
+}
+
+
+sdl::complextest::CTTypes::CGeometryObject* CResultObject::GetGeometry()
+{
+	if (Version_1_0->Geometry.has_value()){
+		if (!m_geometryQObjectPtr){
+			m_geometryQObjectPtr = dynamic_cast<sdl::complextest::CTTypes::CGeometryObject*>(CreateObject("Geometry"));
+			m_geometryQObjectPtr->Version_1_0 = Version_1_0->Geometry;
+		}
+		return m_geometryQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CResultObject::SetGeometry(sdl::complextest::CTTypes::CGeometryObject* v)
+{
+	if (v){
+		Version_1_0->Geometry = v->Version_1_0;
+		m_geometryQObjectPtr = v;
+	}
+	else {
+		Version_1_0->Geometry = nullptr;
+	}
+
+	geometryChanged();
+}
+
+
+bool CResultObject::hasGeometry()
+{
+	 return Version_1_0->Geometry.HasValue();
+}
+
+
+void CResultObject::createGeometry()
+{	Version_1_0->Geometry.emplace();
+
+}
+
+
+QString CResultObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CResultObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CResultObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CResultObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CResultObject::CreateObject(const QString& key)
+{
+	if (key == "Geometry"){
+		return new sdl::complextest::CTTypes::CGeometryObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CResultObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "areaResult")){
+		return "AreaResult";
+	}
+	if (propertyName == (QString("m_") + "expectedMinValue")){
+		return "ExpectedMinValue";
+	}
+	if (propertyName == (QString("m_") + "expectedMaxValue")){
+		return "ExpectedMaxValue";
+	}
+	if (propertyName == (QString("m_") + "measuredValue")){
+		return "MeasuredValue";
+	}
+	if (propertyName == (QString("m_") + "minMeasuredValue")){
+		return "MinMeasuredValue";
+	}
+	if (propertyName == (QString("m_") + "maxMeasuredValue")){
+		return "MaxMeasuredValue";
+	}
+	if (propertyName == (QString("m_") + "meanMeasuredValue")){
+		return "MeanMeasuredValue";
+	}
+	if (propertyName == (QString("m_") + "measurementType")){
+		return "MeasurementType";
+	}
+	if (propertyName == (QString("m_") + "measurementUnit")){
+		return "MeasurementUnit";
+	}
+	if (propertyName == (QString("m_") + "length")){
+		return "Length";
+	}
+	if (propertyName == (QString("m_") + "errorType")){
+		return "ErrorType";
+	}
+	if (propertyName == (QString("m_") + "geometry")){
+		return "Geometry";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::complextest::CTImpl
 
 
@@ -4134,6 +4579,7 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 	for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
 		const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
 		if (resultsDataObjectPtr == nullptr){
+			qDebug() << "invalid type" << resultsDataObjectPtr;
 			return false;
 		}
 		CResult::V1_0 tempResults;
@@ -4350,6 +4796,7 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 		for (qsizetype resultsIndex = 0; resultsIndex < resultsElementsCount; ++resultsIndex){
 			const ::imtgql::CGqlParamObject* resultsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Results", resultsIndex);
 			if (resultsDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << resultsDataObjectPtr;
 				return false;
 			}
 			CResult::V1_0 tempResults;
@@ -5242,6 +5689,265 @@ bool CArea::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion
 }
 
 
+CAreaObject::CAreaObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_iconPositionQObjectPtr(nullptr)
+			, m_resultsQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CAreaObject::areaNameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CAreaObject::statusChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CAreaObject::iconPositionChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CAreaObject::errorTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CAreaObject::resultsChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CAreaObject::GetAreaName()
+{
+	if (Version_1_0->AreaName.has_value()){
+		return Version_1_0->AreaName.value();
+	}
+
+	return QString();
+}
+
+
+void CAreaObject::SetAreaName(QString v)
+{
+	Version_1_0->AreaName = v;
+	areaNameChanged();
+}
+
+
+bool CAreaObject::hasAreaName()
+{
+	 return Version_1_0->AreaName.HasValue();
+}
+
+
+QString CAreaObject::GetStatus()
+{
+	if (Version_1_0->Status.has_value()){
+		sdl::complextest::CTTypes::StatusCode valueType = Version_1_0->Status.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CAreaObject::SetStatus(QString v)
+{
+	Version_1_0->Status.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->Status = (sdl::complextest::CTTypes::StatusCode)key;
+	}
+	statusChanged();
+}
+
+
+bool CAreaObject::hasStatus()
+{
+	 return Version_1_0->Status.HasValue();
+}
+
+
+sdl::complextest::CTTypes::CPointObject* CAreaObject::GetIconPosition()
+{
+	if (Version_1_0->IconPosition.has_value()){
+		if (!m_iconPositionQObjectPtr){
+			m_iconPositionQObjectPtr = dynamic_cast<sdl::complextest::CTTypes::CPointObject*>(CreateObject("IconPosition"));
+			m_iconPositionQObjectPtr->Version_1_0 = Version_1_0->IconPosition;
+		}
+		return m_iconPositionQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CAreaObject::SetIconPosition(sdl::complextest::CTTypes::CPointObject* v)
+{
+	if (v){
+		Version_1_0->IconPosition = v->Version_1_0;
+		m_iconPositionQObjectPtr = v;
+	}
+	else {
+		Version_1_0->IconPosition = nullptr;
+	}
+
+	iconPositionChanged();
+}
+
+
+bool CAreaObject::hasIconPosition()
+{
+	 return Version_1_0->IconPosition.HasValue();
+}
+
+
+void CAreaObject::createIconPosition()
+{	Version_1_0->IconPosition.emplace();
+
+}
+
+
+QString CAreaObject::GetErrorType()
+{
+	if (Version_1_0->ErrorType.has_value()){
+		sdl::complextest::CTTypes::ErrorCode valueType = Version_1_0->ErrorType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::ErrorCode>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CAreaObject::SetErrorType(QString v)
+{
+	Version_1_0->ErrorType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::ErrorCode>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->ErrorType = (sdl::complextest::CTTypes::ErrorCode)key;
+	}
+	errorTypeChanged();
+}
+
+
+bool CAreaObject::hasErrorType()
+{
+	 return Version_1_0->ErrorType.HasValue();
+}
+
+
+sdl::complextest::CTImpl::CResultObjectList* CAreaObject::GetResults()
+{
+	if (Version_1_0->Results.has_value()){
+		if (!m_resultsQObjectPtr){
+			m_resultsQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CResultObjectList*>(CreateObject("Results"));
+			m_resultsQObjectPtr->Version_1_0 = Version_1_0->Results;
+		}
+		return m_resultsQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CAreaObject::SetResults(sdl::complextest::CTImpl::CResultObjectList* v)
+{
+	if (v){
+		Version_1_0->Results = v->Version_1_0;
+		m_resultsQObjectPtr = v;
+	}
+	else {
+		Version_1_0->Results = nullptr;
+	}
+
+	resultsChanged();
+}
+
+
+bool CAreaObject::hasResults()
+{
+	 return Version_1_0->Results.HasValue();
+}
+
+
+void CAreaObject::createResults()
+{	Version_1_0->Results.emplace();
+
+}
+
+
+QString CAreaObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CAreaObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CAreaObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CAreaObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CAreaObject::CreateObject(const QString& key)
+{
+	if (key == "IconPosition"){
+		return new sdl::complextest::CTTypes::CPointObject(this);
+	}
+	if (key == "Results"){
+		return new sdl::complextest::CTImpl::CResultObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CAreaObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "areaName")){
+		return "AreaName";
+	}
+	if (propertyName == (QString("m_") + "status")){
+		return "Status";
+	}
+	if (propertyName == (QString("m_") + "iconPosition")){
+		return "IconPosition";
+	}
+	if (propertyName == (QString("m_") + "errorType")){
+		return "ErrorType";
+	}
+	if (propertyName == (QString("m_") + "results")){
+		return "Results";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::complextest::CTImpl
 
 
@@ -5507,6 +6213,7 @@ bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
 			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
 			if (areasDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << areasDataObjectPtr;
 				return false;
 			}
 			CArea::V1_0 tempAreas;
@@ -5557,6 +6264,7 @@ bool CAnalyzer::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		for (qsizetype areasIndex = 0; areasIndex < areasElementsCount; ++areasIndex){
 			const ::imtgql::CGqlParamObject* areasDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Areas", areasIndex);
 			if (areasDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << areasDataObjectPtr;
 				return false;
 			}
 			CArea::V1_0 tempAreas;
@@ -5940,6 +6648,181 @@ bool CAnalyzer::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVer
 }
 
 
+CAnalyzerObject::CAnalyzerObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_areasQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CAnalyzerObject::analyzerNameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CAnalyzerObject::analyzerResultChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CAnalyzerObject::areasChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CAnalyzerObject::GetAnalyzerName()
+{
+	if (Version_1_0->AnalyzerName.has_value()){
+		return Version_1_0->AnalyzerName.value();
+	}
+
+	return QString();
+}
+
+
+void CAnalyzerObject::SetAnalyzerName(QString v)
+{
+	Version_1_0->AnalyzerName = v;
+	analyzerNameChanged();
+}
+
+
+bool CAnalyzerObject::hasAnalyzerName()
+{
+	 return Version_1_0->AnalyzerName.HasValue();
+}
+
+
+QString CAnalyzerObject::GetAnalyzerResult()
+{
+	if (Version_1_0->AnalyzerResult.has_value()){
+		sdl::complextest::CTTypes::StatusCode valueType = Version_1_0->AnalyzerResult.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CAnalyzerObject::SetAnalyzerResult(QString v)
+{
+	Version_1_0->AnalyzerResult.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->AnalyzerResult = (sdl::complextest::CTTypes::StatusCode)key;
+	}
+	analyzerResultChanged();
+}
+
+
+bool CAnalyzerObject::hasAnalyzerResult()
+{
+	 return Version_1_0->AnalyzerResult.HasValue();
+}
+
+
+sdl::complextest::CTImpl::CAreaObjectList* CAnalyzerObject::GetAreas()
+{
+	if (Version_1_0->Areas.has_value()){
+		if (!m_areasQObjectPtr){
+			m_areasQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CAreaObjectList*>(CreateObject("Areas"));
+			m_areasQObjectPtr->Version_1_0 = Version_1_0->Areas;
+		}
+		return m_areasQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CAnalyzerObject::SetAreas(sdl::complextest::CTImpl::CAreaObjectList* v)
+{
+	if (v){
+		Version_1_0->Areas = v->Version_1_0;
+		m_areasQObjectPtr = v;
+	}
+	else {
+		Version_1_0->Areas = nullptr;
+	}
+
+	areasChanged();
+}
+
+
+bool CAnalyzerObject::hasAreas()
+{
+	 return Version_1_0->Areas.HasValue();
+}
+
+
+void CAnalyzerObject::createAreas()
+{	Version_1_0->Areas.emplace();
+
+}
+
+
+QString CAnalyzerObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CAnalyzerObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CAnalyzerObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CAnalyzerObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CAnalyzerObject::CreateObject(const QString& key)
+{
+	if (key == "Areas"){
+		return new sdl::complextest::CTImpl::CAreaObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CAnalyzerObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "analyzerName")){
+		return "AnalyzerName";
+	}
+	if (propertyName == (QString("m_") + "analyzerResult")){
+		return "AnalyzerResult";
+	}
+	if (propertyName == (QString("m_") + "areas")){
+		return "Areas";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::complextest::CTImpl
 
 
@@ -6259,6 +7142,7 @@ bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
 			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
 			if (analyzersDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << analyzersDataObjectPtr;
 				return false;
 			}
 			CAnalyzer::V1_0 tempAnalyzers;
@@ -6317,6 +7201,7 @@ bool CInspection::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 		for (qsizetype analyzersIndex = 0; analyzersIndex < analyzersElementsCount; ++analyzersIndex){
 			const ::imtgql::CGqlParamObject* analyzersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Analyzers", analyzersIndex);
 			if (analyzersDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << analyzersDataObjectPtr;
 				return false;
 			}
 			CAnalyzer::V1_0 tempAnalyzers;
@@ -6728,6 +7613,235 @@ bool CInspection::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolV
 }
 
 
+CInspectionObject::CInspectionObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_analyzersQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CInspectionObject::iDChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CInspectionObject::typeIDChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CInspectionObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CInspectionObject::statusChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CInspectionObject::analyzersChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CInspectionObject::GetID()
+{
+	if (Version_1_0->ID.has_value()){
+		return Version_1_0->ID.value();
+	}
+
+	return QString();
+}
+
+
+void CInspectionObject::SetID(QString v)
+{
+	Version_1_0->ID = v;
+	iDChanged();
+}
+
+
+bool CInspectionObject::hasID()
+{
+	 return Version_1_0->ID.HasValue();
+}
+
+
+QString CInspectionObject::GetTypeID()
+{
+	if (Version_1_0->TypeID.has_value()){
+		return Version_1_0->TypeID.value();
+	}
+
+	return QString();
+}
+
+
+void CInspectionObject::SetTypeID(QString v)
+{
+	Version_1_0->TypeID = v;
+	typeIDChanged();
+}
+
+
+bool CInspectionObject::hasTypeID()
+{
+	 return Version_1_0->TypeID.HasValue();
+}
+
+
+QString CInspectionObject::GetName()
+{
+	if (Version_1_0->Name.has_value()){
+		return Version_1_0->Name.value();
+	}
+
+	return QString();
+}
+
+
+void CInspectionObject::SetName(QString v)
+{
+	Version_1_0->Name = v;
+	nameChanged();
+}
+
+
+bool CInspectionObject::hasName()
+{
+	 return Version_1_0->Name.HasValue();
+}
+
+
+QString CInspectionObject::GetStatus()
+{
+	if (Version_1_0->Status.has_value()){
+		sdl::complextest::CTTypes::StatusCode valueType = Version_1_0->Status.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CInspectionObject::SetStatus(QString v)
+{
+	Version_1_0->Status.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->Status = (sdl::complextest::CTTypes::StatusCode)key;
+	}
+	statusChanged();
+}
+
+
+bool CInspectionObject::hasStatus()
+{
+	 return Version_1_0->Status.HasValue();
+}
+
+
+sdl::complextest::CTImpl::CAnalyzerObjectList* CInspectionObject::GetAnalyzers()
+{
+	if (Version_1_0->Analyzers.has_value()){
+		if (!m_analyzersQObjectPtr){
+			m_analyzersQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CAnalyzerObjectList*>(CreateObject("Analyzers"));
+			m_analyzersQObjectPtr->Version_1_0 = Version_1_0->Analyzers;
+		}
+		return m_analyzersQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CInspectionObject::SetAnalyzers(sdl::complextest::CTImpl::CAnalyzerObjectList* v)
+{
+	if (v){
+		Version_1_0->Analyzers = v->Version_1_0;
+		m_analyzersQObjectPtr = v;
+	}
+	else {
+		Version_1_0->Analyzers = nullptr;
+	}
+
+	analyzersChanged();
+}
+
+
+bool CInspectionObject::hasAnalyzers()
+{
+	 return Version_1_0->Analyzers.HasValue();
+}
+
+
+void CInspectionObject::createAnalyzers()
+{	Version_1_0->Analyzers.emplace();
+
+}
+
+
+QString CInspectionObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CInspectionObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CInspectionObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CInspectionObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CInspectionObject::CreateObject(const QString& key)
+{
+	if (key == "Analyzers"){
+		return new sdl::complextest::CTImpl::CAnalyzerObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CInspectionObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "iD")){
+		return "ID";
+	}
+	if (propertyName == (QString("m_") + "typeID")){
+		return "TypeID";
+	}
+	if (propertyName == (QString("m_") + "name")){
+		return "Name";
+	}
+	if (propertyName == (QString("m_") + "status")){
+		return "Status";
+	}
+	if (propertyName == (QString("m_") + "analyzers")){
+		return "Analyzers";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::complextest::CTImpl
 
 
@@ -7101,6 +8215,7 @@ bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
 			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
 			if (inspectionsDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << inspectionsDataObjectPtr;
 				return false;
 			}
 			CInspection::V1_0 tempInspections;
@@ -7167,6 +8282,7 @@ bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		for (qsizetype inspectionsIndex = 0; inspectionsIndex < inspectionsElementsCount; ++inspectionsIndex){
 			const ::imtgql::CGqlParamObject* inspectionsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Inspections", inspectionsIndex);
 			if (inspectionsDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << inspectionsDataObjectPtr;
 				return false;
 			}
 			CInspection::V1_0 tempInspections;
@@ -7606,6 +8722,289 @@ bool CProductOverview::OptReadFromJsonObject(const QJsonObject& jsonObject, Prot
 }
 
 
+CProductOverviewObject::CProductOverviewObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_inspectionsQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CProductOverviewObject::productIDChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CProductOverviewObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CProductOverviewObject::statusChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CProductOverviewObject::partSerialNumberChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CProductOverviewObject::timestampChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CProductOverviewObject::productImageChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CProductOverviewObject::inspectionsChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+int CProductOverviewObject::GetProductID()
+{
+	if (Version_1_0->ProductID.has_value()){
+		return Version_1_0->ProductID.value();
+	}
+
+	return 0;
+}
+
+
+void CProductOverviewObject::SetProductID(int v)
+{
+	Version_1_0->ProductID = v;
+	productIDChanged();
+}
+
+
+bool CProductOverviewObject::hasProductID()
+{
+	 return Version_1_0->ProductID.HasValue();
+}
+
+
+QString CProductOverviewObject::GetName()
+{
+	if (Version_1_0->Name.has_value()){
+		return Version_1_0->Name.value();
+	}
+
+	return QString();
+}
+
+
+void CProductOverviewObject::SetName(QString v)
+{
+	Version_1_0->Name = v;
+	nameChanged();
+}
+
+
+bool CProductOverviewObject::hasName()
+{
+	 return Version_1_0->Name.HasValue();
+}
+
+
+QString CProductOverviewObject::GetStatus()
+{
+	if (Version_1_0->Status.has_value()){
+		sdl::complextest::CTTypes::StatusCode valueType = Version_1_0->Status.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CProductOverviewObject::SetStatus(QString v)
+{
+	Version_1_0->Status.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::StatusCode>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->Status = (sdl::complextest::CTTypes::StatusCode)key;
+	}
+	statusChanged();
+}
+
+
+bool CProductOverviewObject::hasStatus()
+{
+	 return Version_1_0->Status.HasValue();
+}
+
+
+QString CProductOverviewObject::GetPartSerialNumber()
+{
+	if (Version_1_0->PartSerialNumber.has_value()){
+		return Version_1_0->PartSerialNumber.value();
+	}
+
+	return QString();
+}
+
+
+void CProductOverviewObject::SetPartSerialNumber(QString v)
+{
+	Version_1_0->PartSerialNumber = v;
+	partSerialNumberChanged();
+}
+
+
+bool CProductOverviewObject::hasPartSerialNumber()
+{
+	 return Version_1_0->PartSerialNumber.HasValue();
+}
+
+
+QString CProductOverviewObject::GetTimestamp()
+{
+	if (Version_1_0->Timestamp.has_value()){
+		return Version_1_0->Timestamp.value();
+	}
+
+	return QString();
+}
+
+
+void CProductOverviewObject::SetTimestamp(QString v)
+{
+	Version_1_0->Timestamp = v;
+	timestampChanged();
+}
+
+
+bool CProductOverviewObject::hasTimestamp()
+{
+	 return Version_1_0->Timestamp.HasValue();
+}
+
+
+QString CProductOverviewObject::GetProductImage()
+{
+	if (Version_1_0->ProductImage.has_value()){
+		return Version_1_0->ProductImage.value();
+	}
+
+	return QString();
+}
+
+
+void CProductOverviewObject::SetProductImage(QString v)
+{
+	Version_1_0->ProductImage = v;
+	productImageChanged();
+}
+
+
+bool CProductOverviewObject::hasProductImage()
+{
+	 return Version_1_0->ProductImage.HasValue();
+}
+
+
+sdl::complextest::CTImpl::CInspectionObjectList* CProductOverviewObject::GetInspections()
+{
+	if (Version_1_0->Inspections.has_value()){
+		if (!m_inspectionsQObjectPtr){
+			m_inspectionsQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CInspectionObjectList*>(CreateObject("Inspections"));
+			m_inspectionsQObjectPtr->Version_1_0 = Version_1_0->Inspections;
+		}
+		return m_inspectionsQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CProductOverviewObject::SetInspections(sdl::complextest::CTImpl::CInspectionObjectList* v)
+{
+	if (v){
+		Version_1_0->Inspections = v->Version_1_0;
+		m_inspectionsQObjectPtr = v;
+	}
+	else {
+		Version_1_0->Inspections = nullptr;
+	}
+
+	inspectionsChanged();
+}
+
+
+bool CProductOverviewObject::hasInspections()
+{
+	 return Version_1_0->Inspections.HasValue();
+}
+
+
+void CProductOverviewObject::createInspections()
+{	Version_1_0->Inspections.emplace();
+
+}
+
+
+QString CProductOverviewObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CProductOverviewObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CProductOverviewObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CProductOverviewObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CProductOverviewObject::CreateObject(const QString& key)
+{
+	if (key == "Inspections"){
+		return new sdl::complextest::CTImpl::CInspectionObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CProductOverviewObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "productID")){
+		return "ProductID";
+	}
+	if (propertyName == (QString("m_") + "name")){
+		return "Name";
+	}
+	if (propertyName == (QString("m_") + "status")){
+		return "Status";
+	}
+	if (propertyName == (QString("m_") + "partSerialNumber")){
+		return "PartSerialNumber";
+	}
+	if (propertyName == (QString("m_") + "timestamp")){
+		return "Timestamp";
+	}
+	if (propertyName == (QString("m_") + "productImage")){
+		return "ProductImage";
+	}
+	if (propertyName == (QString("m_") + "inspections")){
+		return "Inspections";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::complextest::CTImpl
 
 
@@ -7995,6 +9394,124 @@ bool CLocalizedText::OptReadFromJsonObject(const QJsonObject& jsonObject, Protoc
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CLocalizedTextObject::CLocalizedTextObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CLocalizedTextObject::textChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CLocalizedTextObject::localeChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CLocalizedTextObject::GetText()
+{
+	if (Version_1_0->text.has_value()){
+		return Version_1_0->text.value();
+	}
+
+	return QString();
+}
+
+
+void CLocalizedTextObject::SetText(QString v)
+{
+	Version_1_0->text = v;
+	textChanged();
+}
+
+
+bool CLocalizedTextObject::hasText()
+{
+	 return Version_1_0->text.HasValue();
+}
+
+
+QString CLocalizedTextObject::GetLocale()
+{
+	if (Version_1_0->locale.has_value()){
+		return Version_1_0->locale.value();
+	}
+
+	return QString();
+}
+
+
+void CLocalizedTextObject::SetLocale(QString v)
+{
+	Version_1_0->locale = v;
+	localeChanged();
+}
+
+
+bool CLocalizedTextObject::hasLocale()
+{
+	 return Version_1_0->locale.HasValue();
+}
+
+
+QString CLocalizedTextObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CLocalizedTextObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CLocalizedTextObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CLocalizedTextObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CLocalizedTextObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString CLocalizedTextObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "text")){
+		return "text";
+	}
+	if (propertyName == (QString("m_") + "locale")){
+		return "locale";
+	}
+
+	return propertyName;
 }
 
 
@@ -8441,6 +9958,151 @@ bool CCoordinates::OptReadFromJsonObject(const QJsonObject& jsonObject, Protocol
 }
 
 
+CCoordinatesObject::CCoordinatesObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CCoordinatesObject::xChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCoordinatesObject::yChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCoordinatesObject::zChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+double CCoordinatesObject::GetX()
+{
+	if (Version_1_0->x.has_value()){
+		return Version_1_0->x.value();
+	}
+
+	return 0;
+}
+
+
+void CCoordinatesObject::SetX(double v)
+{
+	Version_1_0->x = v;
+	xChanged();
+}
+
+
+bool CCoordinatesObject::hasX()
+{
+	 return Version_1_0->x.HasValue();
+}
+
+
+double CCoordinatesObject::GetY()
+{
+	if (Version_1_0->y.has_value()){
+		return Version_1_0->y.value();
+	}
+
+	return 0;
+}
+
+
+void CCoordinatesObject::SetY(double v)
+{
+	Version_1_0->y = v;
+	yChanged();
+}
+
+
+bool CCoordinatesObject::hasY()
+{
+	 return Version_1_0->y.HasValue();
+}
+
+
+double CCoordinatesObject::GetZ()
+{
+	if (Version_1_0->z.has_value()){
+		return Version_1_0->z.value();
+	}
+
+	return 0;
+}
+
+
+void CCoordinatesObject::SetZ(double v)
+{
+	Version_1_0->z = v;
+	zChanged();
+}
+
+
+bool CCoordinatesObject::hasZ()
+{
+	 return Version_1_0->z.HasValue();
+}
+
+
+QString CCoordinatesObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CCoordinatesObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CCoordinatesObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CCoordinatesObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CCoordinatesObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString CCoordinatesObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "x")){
+		return "x";
+	}
+	if (propertyName == (QString("m_") + "y")){
+		return "y";
+	}
+	if (propertyName == (QString("m_") + "z")){
+		return "z";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::complextest::CTImpl
 
 
@@ -8508,7 +10170,9 @@ bool CExtendedMetaData::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& mod
 
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
-		if (valueData.canConvert<CCoordinates>()){
+	QString itemTypename = valueData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+
+		if (itemTypename == "Coordinates") {
 			CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromModel(*model.GetTreeItemModel("value", modelIndex)); 
 			if (!isvalueRead){
@@ -8540,7 +10204,9 @@ bool CExtendedMetaData::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& 
 
 	QVariant valueData = model.GetData("value", modelIndex);
 	if (!valueData.isNull()){
-		if (valueData.canConvert<CCoordinates>()){
+	QString itemTypename = valueData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+
+		if (itemTypename == "Coordinates") {
 			CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromModel(*model.GetTreeItemModel("value", modelIndex)); 
 			if (!isvalueRead){
@@ -8598,9 +10264,15 @@ bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && (!gqlObject["value"].isNull() && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
-		const QVariant valueVariantValue = gqlObject["value"];
-		if (valueVariantValue.canConvert<CCoordinates>()){
+	if (gqlObject.ContainsParam("value") && (!((gqlObject.IsObject("item") && gqlObject.GetParamArgumentObjectPtr("value") == nullptr) || (!gqlObject.IsObject("item") && gqlObject["value"].isNull())) && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
+			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
+	if (!itemDataObjectPtr->ContainsParam("__typename")) {
+		qDebug() << "invalid typename for: value";
+		return false;
+	}
+
+	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
+		if (itemTypename == "Coordinates") {
 			CCoordinates valueConvert;
 			const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
 			const bool isValueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
@@ -8630,9 +10302,15 @@ bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && (!gqlObject["value"].isNull() && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
-		const QVariant valueVariantValue = gqlObject["value"];
-		if (valueVariantValue.canConvert<CCoordinates>()){
+	if (gqlObject.ContainsParam("value") && (!((gqlObject.IsObject("item") && gqlObject.GetParamArgumentObjectPtr("value") == nullptr) || (!gqlObject.IsObject("item") && gqlObject["value"].isNull())) && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
+			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
+	if (!itemDataObjectPtr->ContainsParam("__typename")) {
+		qDebug() << "invalid typename for: value";
+		return false;
+	}
+
+	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
+		if (itemTypename == "Coordinates") {
 			CCoordinates valueConvert;
 			const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
 			const bool isValueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
@@ -8703,8 +10381,14 @@ bool CExtendedMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("value") && jsonObject["value"].isObject()){
-		const QVariant valueVariantValue = jsonObject["value"].toVariant();
-		if (valueVariantValue.canConvert<CCoordinates>()){
+			QJsonObject itemObject = jsonObject.value("item").toObject();
+	if (!itemObject.contains("__typename")){
+		qDebug() << "invalid typename for: value";
+		return false;
+	}
+
+	QString itemTypename = itemObject.value("__typename").toString();;
+		if (itemTypename == "Coordinates") {
 			CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromJsonObject(jsonObject["value"].toObject());
 			if (!isvalueRead){
@@ -8734,8 +10418,14 @@ bool CExtendedMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObjec
 	}
 
 	if (jsonObject.contains("value") && jsonObject["value"].isObject()){
-		const QVariant valueVariantValue = jsonObject["value"].toVariant();
-		if (valueVariantValue.canConvert<CCoordinates>()){
+			QJsonObject itemObject = jsonObject.value("item").toObject();
+	if (!itemObject.contains("__typename")){
+		qDebug() << "invalid typename for: value";
+		return false;
+	}
+
+	QString itemTypename = itemObject.value("__typename").toString();;
+		if (itemTypename == "Coordinates") {
 			CCoordinates valueConvert;
 			const bool isvalueRead = valueConvert.ReadFromJsonObject(jsonObject["value"].toObject());
 			if (!isvalueRead){
@@ -8979,6 +10669,145 @@ bool CExtendedMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject, Pro
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CExtendedMetaDataObject::CExtendedMetaDataObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_valueQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CExtendedMetaDataObject::keyChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CExtendedMetaDataObject::valueChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CExtendedMetaDataObject::GetKey()
+{
+	if (Version_1_0->key.has_value()){
+		return Version_1_0->key.value();
+	}
+
+	return QString();
+}
+
+
+void CExtendedMetaDataObject::SetKey(QString v)
+{
+	Version_1_0->key = v;
+	keyChanged();
+}
+
+
+bool CExtendedMetaDataObject::hasKey()
+{
+	 return Version_1_0->key.HasValue();
+}
+
+
+sdl::complextest::CTImpl::CExtendedMetaDataUnionTypeObject* CExtendedMetaDataObject::GetValue()
+{
+	if (Version_1_0->value.has_value()){
+		if (!m_valueQObjectPtr){
+			m_valueQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CExtendedMetaDataUnionTypeObject*>(CreateObject("value"));
+			m_valueQObjectPtr->Version_1_0 = Version_1_0->value;
+		}
+		return m_valueQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CExtendedMetaDataObject::SetValue(sdl::complextest::CTImpl::CExtendedMetaDataUnionTypeObject* v)
+{
+	if (v){
+		Version_1_0->value = v->Version_1_0;
+		m_valueQObjectPtr = v;
+	}
+	else {
+		Version_1_0->value = nullptr;
+	}
+
+	valueChanged();
+}
+
+
+bool CExtendedMetaDataObject::hasValue()
+{
+	 return Version_1_0->value.HasValue();
+}
+
+
+void CExtendedMetaDataObject::createValue()
+{	Version_1_0->value.emplace();
+
+}
+
+
+QString CExtendedMetaDataObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CExtendedMetaDataObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CExtendedMetaDataObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CExtendedMetaDataObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CExtendedMetaDataObject::CreateObject(const QString& key)
+{
+	if (key == "value"){
+		return new sdl::complextest::CTImpl::CExtendedMetaDataUnionTypeObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CExtendedMetaDataObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "key")){
+		return "key";
+	}
+	if (propertyName == (QString("m_") + "value")){
+		return "value";
+	}
+
+	return propertyName;
 }
 
 
@@ -9278,6 +11107,7 @@ bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
 			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
 			if (extendedMetaDataDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << extendedMetaDataDataObjectPtr;
 				return false;
 			}
 			CExtendedMetaData::V1_0 tempExtendedMetaData;
@@ -9332,6 +11162,7 @@ bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		for (qsizetype extendedMetaDataIndex = 0; extendedMetaDataIndex < extendedMetaDataElementsCount; ++extendedMetaDataIndex){
 			const ::imtgql::CGqlParamObject* extendedMetaDataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("extendedMetaData", extendedMetaDataIndex);
 			if (extendedMetaDataDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << extendedMetaDataDataObjectPtr;
 				return false;
 			}
 			CExtendedMetaData::V1_0 tempExtendedMetaData;
@@ -9722,6 +11553,328 @@ bool CResultMetaData::OptReadFromJsonObject(const QJsonObject& jsonObject, Proto
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CResultMetaDataObject::CResultMetaDataObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_descriptionQObjectPtr(nullptr)
+			, m_extendedMetaDataQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CResultMetaDataObject::resultIdChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultMetaDataObject::creationTimeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultMetaDataObject::partIdChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultMetaDataObject::productIdChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultMetaDataObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultMetaDataObject::classificationChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultMetaDataObject::descriptionChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CResultMetaDataObject::extendedMetaDataChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CResultMetaDataObject::GetResultId()
+{
+	if (Version_1_0->resultId.has_value()){
+		return Version_1_0->resultId.value();
+	}
+
+	return QString();
+}
+
+
+void CResultMetaDataObject::SetResultId(QString v)
+{
+	Version_1_0->resultId = v.toUtf8();
+	resultIdChanged();
+}
+
+
+bool CResultMetaDataObject::hasResultId()
+{
+	 return Version_1_0->resultId.HasValue();
+}
+
+
+QString CResultMetaDataObject::GetCreationTime()
+{
+	if (Version_1_0->creationTime.has_value()){
+		return Version_1_0->creationTime.value();
+	}
+
+	return QString();
+}
+
+
+void CResultMetaDataObject::SetCreationTime(QString v)
+{
+	Version_1_0->creationTime = v;
+	creationTimeChanged();
+}
+
+
+bool CResultMetaDataObject::hasCreationTime()
+{
+	 return Version_1_0->creationTime.HasValue();
+}
+
+
+QString CResultMetaDataObject::GetPartId()
+{
+	if (Version_1_0->partId.has_value()){
+		return Version_1_0->partId.value();
+	}
+
+	return QString();
+}
+
+
+void CResultMetaDataObject::SetPartId(QString v)
+{
+	Version_1_0->partId = v;
+	partIdChanged();
+}
+
+
+bool CResultMetaDataObject::hasPartId()
+{
+	 return Version_1_0->partId.HasValue();
+}
+
+
+QString CResultMetaDataObject::GetProductId()
+{
+	if (Version_1_0->productId.has_value()){
+		return Version_1_0->productId.value();
+	}
+
+	return QString();
+}
+
+
+void CResultMetaDataObject::SetProductId(QString v)
+{
+	Version_1_0->productId = v;
+	productIdChanged();
+}
+
+
+bool CResultMetaDataObject::hasProductId()
+{
+	 return Version_1_0->productId.HasValue();
+}
+
+
+QString CResultMetaDataObject::GetName()
+{
+	if (Version_1_0->name.has_value()){
+		return Version_1_0->name.value();
+	}
+
+	return QString();
+}
+
+
+void CResultMetaDataObject::SetName(QString v)
+{
+	Version_1_0->name = v;
+	nameChanged();
+}
+
+
+bool CResultMetaDataObject::hasName()
+{
+	 return Version_1_0->name.HasValue();
+}
+
+
+int CResultMetaDataObject::GetClassification()
+{
+	if (Version_1_0->classification.has_value()){
+		return Version_1_0->classification.value();
+	}
+
+	return 0;
+}
+
+
+void CResultMetaDataObject::SetClassification(int v)
+{
+	Version_1_0->classification = v;
+	classificationChanged();
+}
+
+
+bool CResultMetaDataObject::hasClassification()
+{
+	 return Version_1_0->classification.HasValue();
+}
+
+
+sdl::complextest::CTImpl::CLocalizedTextObject* CResultMetaDataObject::GetDescription()
+{
+	if (Version_1_0->description.has_value()){
+		if (!m_descriptionQObjectPtr){
+			m_descriptionQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CLocalizedTextObject*>(CreateObject("description"));
+			m_descriptionQObjectPtr->Version_1_0 = Version_1_0->description;
+		}
+		return m_descriptionQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CResultMetaDataObject::SetDescription(sdl::complextest::CTImpl::CLocalizedTextObject* v)
+{
+	if (v){
+		Version_1_0->description = v->Version_1_0;
+		m_descriptionQObjectPtr = v;
+	}
+	else {
+		Version_1_0->description = nullptr;
+	}
+
+	descriptionChanged();
+}
+
+
+bool CResultMetaDataObject::hasDescription()
+{
+	 return Version_1_0->description.HasValue();
+}
+
+
+void CResultMetaDataObject::createDescription()
+{	Version_1_0->description.emplace();
+
+}
+
+
+sdl::complextest::CTImpl::CExtendedMetaDataObjectList* CResultMetaDataObject::GetExtendedMetaData()
+{
+	if (Version_1_0->extendedMetaData.has_value()){
+		if (!m_extendedMetaDataQObjectPtr){
+			m_extendedMetaDataQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CExtendedMetaDataObjectList*>(CreateObject("extendedMetaData"));
+			m_extendedMetaDataQObjectPtr->Version_1_0 = Version_1_0->extendedMetaData;
+		}
+		return m_extendedMetaDataQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CResultMetaDataObject::SetExtendedMetaData(sdl::complextest::CTImpl::CExtendedMetaDataObjectList* v)
+{
+	if (v){
+		Version_1_0->extendedMetaData = v->Version_1_0;
+		m_extendedMetaDataQObjectPtr = v;
+	}
+	else {
+		Version_1_0->extendedMetaData = nullptr;
+	}
+
+	extendedMetaDataChanged();
+}
+
+
+bool CResultMetaDataObject::hasExtendedMetaData()
+{
+	 return Version_1_0->extendedMetaData.HasValue();
+}
+
+
+void CResultMetaDataObject::createExtendedMetaData()
+{	Version_1_0->extendedMetaData.emplace();
+
+}
+
+
+QString CResultMetaDataObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CResultMetaDataObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CResultMetaDataObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CResultMetaDataObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CResultMetaDataObject::CreateObject(const QString& key)
+{
+	if (key == "description"){
+		return new sdl::complextest::CTImpl::CLocalizedTextObject(this);
+	}
+	if (key == "extendedMetaData"){
+		return new sdl::complextest::CTImpl::CExtendedMetaDataObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CResultMetaDataObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "resultId")){
+		return "resultId";
+	}
+	if (propertyName == (QString("m_") + "creationTime")){
+		return "creationTime";
+	}
+	if (propertyName == (QString("m_") + "partId")){
+		return "partId";
+	}
+	if (propertyName == (QString("m_") + "productId")){
+		return "productId";
+	}
+	if (propertyName == (QString("m_") + "name")){
+		return "name";
+	}
+	if (propertyName == (QString("m_") + "classification")){
+		return "classification";
+	}
+	if (propertyName == (QString("m_") + "description")){
+		return "description";
+	}
+	if (propertyName == (QString("m_") + "extendedMetaData")){
+		return "extendedMetaData";
+	}
+
+	return propertyName;
 }
 
 
@@ -10240,6 +12393,205 @@ bool COverallResultValues::OptReadFromJsonObject(const QJsonObject& jsonObject, 
 }
 
 
+COverallResultValuesObject::COverallResultValuesObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &COverallResultValuesObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &COverallResultValuesObject::valueIdChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &COverallResultValuesObject::measuredValueChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &COverallResultValuesObject::lowLimitChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &COverallResultValuesObject::highLimitChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString COverallResultValuesObject::GetName()
+{
+	if (Version_1_0->name.has_value()){
+		return Version_1_0->name.value();
+	}
+
+	return QString();
+}
+
+
+void COverallResultValuesObject::SetName(QString v)
+{
+	Version_1_0->name = v;
+	nameChanged();
+}
+
+
+bool COverallResultValuesObject::hasName()
+{
+	 return Version_1_0->name.HasValue();
+}
+
+
+QString COverallResultValuesObject::GetValueId()
+{
+	if (Version_1_0->valueId.has_value()){
+		return Version_1_0->valueId.value();
+	}
+
+	return QString();
+}
+
+
+void COverallResultValuesObject::SetValueId(QString v)
+{
+	Version_1_0->valueId = v;
+	valueIdChanged();
+}
+
+
+bool COverallResultValuesObject::hasValueId()
+{
+	 return Version_1_0->valueId.HasValue();
+}
+
+
+double COverallResultValuesObject::GetMeasuredValue()
+{
+	if (Version_1_0->measuredValue.has_value()){
+		return Version_1_0->measuredValue.value();
+	}
+
+	return 0;
+}
+
+
+void COverallResultValuesObject::SetMeasuredValue(double v)
+{
+	Version_1_0->measuredValue = v;
+	measuredValueChanged();
+}
+
+
+bool COverallResultValuesObject::hasMeasuredValue()
+{
+	 return Version_1_0->measuredValue.HasValue();
+}
+
+
+double COverallResultValuesObject::GetLowLimit()
+{
+	if (Version_1_0->lowLimit.has_value()){
+		return Version_1_0->lowLimit.value();
+	}
+
+	return 0;
+}
+
+
+void COverallResultValuesObject::SetLowLimit(double v)
+{
+	Version_1_0->lowLimit = v;
+	lowLimitChanged();
+}
+
+
+bool COverallResultValuesObject::hasLowLimit()
+{
+	 return Version_1_0->lowLimit.HasValue();
+}
+
+
+double COverallResultValuesObject::GetHighLimit()
+{
+	if (Version_1_0->highLimit.has_value()){
+		return Version_1_0->highLimit.value();
+	}
+
+	return 0;
+}
+
+
+void COverallResultValuesObject::SetHighLimit(double v)
+{
+	Version_1_0->highLimit = v;
+	highLimitChanged();
+}
+
+
+bool COverallResultValuesObject::hasHighLimit()
+{
+	 return Version_1_0->highLimit.HasValue();
+}
+
+
+QString COverallResultValuesObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool COverallResultValuesObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool COverallResultValuesObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString COverallResultValuesObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* COverallResultValuesObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString COverallResultValuesObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "name")){
+		return "name";
+	}
+	if (propertyName == (QString("m_") + "valueId")){
+		return "valueId";
+	}
+	if (propertyName == (QString("m_") + "measuredValue")){
+		return "measuredValue";
+	}
+	if (propertyName == (QString("m_") + "lowLimit")){
+		return "lowLimit";
+	}
+	if (propertyName == (QString("m_") + "highLimit")){
+		return "highLimit";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::complextest::CTImpl
 
 
@@ -10354,7 +12706,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
 			std::shared_ptr<CDMResultUnionType> resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
-			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
@@ -10362,7 +12714,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel
 				}
 				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
 			}
-			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
@@ -10427,7 +12779,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromModel(const ::imtbase::CTreeItemMo
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
 			std::shared_ptr<CDMResultUnionType> resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
-			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
@@ -10435,7 +12787,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromModel(const ::imtbase::CTreeItemMo
 				}
 				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
 			}
-			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
@@ -10556,7 +12908,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentDataList[resultContentIndex];
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
-			if (tempResultContent.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
@@ -10565,7 +12917,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 				}
 				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
@@ -10587,6 +12939,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
 			COverallResultValues::V1_0 tempOverallResultValues;
@@ -10627,7 +12980,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentDataList[resultContentIndex];
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
-			if (tempResultContent.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
@@ -10636,7 +12989,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 				}
 				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
@@ -10658,6 +13011,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
 			COverallResultValues::V1_0 tempOverallResultValues;
@@ -10759,7 +13113,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObj
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
-			if (tempResultContent.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
@@ -10767,7 +13121,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObj
 				}
 				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
@@ -10824,7 +13178,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& json
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
-			if (tempResultContent.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
@@ -10832,7 +13186,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& json
 				}
 				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
@@ -11085,6 +13439,268 @@ bool CCDMResultVarRecursive::OptReadFromJsonObject(const QJsonObject& jsonObject
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CCDMResultVarRecursiveObject::CCDMResultVarRecursiveObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_resultMetaDataQObjectPtr(nullptr)
+			, m_resultContentQObjectPtr(nullptr)
+			, m_overallResultValuesQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CCDMResultVarRecursiveObject::dataModelTitleChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultVarRecursiveObject::dataModelVersionChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultVarRecursiveObject::resultMetaDataChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultVarRecursiveObject::resultContentChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultVarRecursiveObject::overallResultValuesChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CCDMResultVarRecursiveObject::GetDataModelTitle()
+{
+	if (Version_1_0->dataModelTitle.has_value()){
+		return Version_1_0->dataModelTitle.value();
+	}
+
+	return QString();
+}
+
+
+void CCDMResultVarRecursiveObject::SetDataModelTitle(QString v)
+{
+	Version_1_0->dataModelTitle = v;
+	dataModelTitleChanged();
+}
+
+
+bool CCDMResultVarRecursiveObject::hasDataModelTitle()
+{
+	 return Version_1_0->dataModelTitle.HasValue();
+}
+
+
+QString CCDMResultVarRecursiveObject::GetDataModelVersion()
+{
+	if (Version_1_0->dataModelVersion.has_value()){
+		return Version_1_0->dataModelVersion.value();
+	}
+
+	return QString();
+}
+
+
+void CCDMResultVarRecursiveObject::SetDataModelVersion(QString v)
+{
+	Version_1_0->dataModelVersion = v;
+	dataModelVersionChanged();
+}
+
+
+bool CCDMResultVarRecursiveObject::hasDataModelVersion()
+{
+	 return Version_1_0->dataModelVersion.HasValue();
+}
+
+
+sdl::complextest::CTImpl::CResultMetaDataObject* CCDMResultVarRecursiveObject::GetResultMetaData()
+{
+	if (Version_1_0->resultMetaData.has_value()){
+		if (!m_resultMetaDataQObjectPtr){
+			m_resultMetaDataQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CResultMetaDataObject*>(CreateObject("resultMetaData"));
+			m_resultMetaDataQObjectPtr->Version_1_0 = Version_1_0->resultMetaData;
+		}
+		return m_resultMetaDataQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CCDMResultVarRecursiveObject::SetResultMetaData(sdl::complextest::CTImpl::CResultMetaDataObject* v)
+{
+	if (v){
+		Version_1_0->resultMetaData = v->Version_1_0;
+		m_resultMetaDataQObjectPtr = v;
+	}
+	else {
+		Version_1_0->resultMetaData = nullptr;
+	}
+
+	resultMetaDataChanged();
+}
+
+
+bool CCDMResultVarRecursiveObject::hasResultMetaData()
+{
+	 return Version_1_0->resultMetaData.HasValue();
+}
+
+
+void CCDMResultVarRecursiveObject::createResultMetaData()
+{	Version_1_0->resultMetaData.emplace();
+
+}
+
+
+sdl::complextest::CTImpl::CCDMResultUnionTypeObjectList* CCDMResultVarRecursiveObject::GetResultContent()
+{
+	if (Version_1_0->resultContent.has_value()){
+		if (!m_resultContentQObjectPtr){
+			m_resultContentQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CCDMResultUnionTypeObjectList*>(CreateObject("resultContent"));
+			m_resultContentQObjectPtr->Version_1_0 = Version_1_0->resultContent;
+		}
+		return m_resultContentQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CCDMResultVarRecursiveObject::SetResultContent(sdl::complextest::CTImpl::CCDMResultUnionTypeObjectList* v)
+{
+	if (v){
+		Version_1_0->resultContent = v->Version_1_0;
+		m_resultContentQObjectPtr = v;
+	}
+	else {
+		Version_1_0->resultContent = nullptr;
+	}
+
+	resultContentChanged();
+}
+
+
+bool CCDMResultVarRecursiveObject::hasResultContent()
+{
+	 return Version_1_0->resultContent.HasValue();
+}
+
+
+void CCDMResultVarRecursiveObject::createResultContent()
+{	Version_1_0->resultContent.emplace();
+
+}
+
+
+sdl::complextest::CTImpl::COverallResultValuesObjectList* CCDMResultVarRecursiveObject::GetOverallResultValues()
+{
+	if (Version_1_0->overallResultValues.has_value()){
+		if (!m_overallResultValuesQObjectPtr){
+			m_overallResultValuesQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::COverallResultValuesObjectList*>(CreateObject("overallResultValues"));
+			m_overallResultValuesQObjectPtr->Version_1_0 = Version_1_0->overallResultValues;
+		}
+		return m_overallResultValuesQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CCDMResultVarRecursiveObject::SetOverallResultValues(sdl::complextest::CTImpl::COverallResultValuesObjectList* v)
+{
+	if (v){
+		Version_1_0->overallResultValues = v->Version_1_0;
+		m_overallResultValuesQObjectPtr = v;
+	}
+	else {
+		Version_1_0->overallResultValues = nullptr;
+	}
+
+	overallResultValuesChanged();
+}
+
+
+bool CCDMResultVarRecursiveObject::hasOverallResultValues()
+{
+	 return Version_1_0->overallResultValues.HasValue();
+}
+
+
+void CCDMResultVarRecursiveObject::createOverallResultValues()
+{	Version_1_0->overallResultValues.emplace();
+
+}
+
+
+QString CCDMResultVarRecursiveObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CCDMResultVarRecursiveObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CCDMResultVarRecursiveObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CCDMResultVarRecursiveObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CCDMResultVarRecursiveObject::CreateObject(const QString& key)
+{
+	if (key == "resultMetaData"){
+		return new sdl::complextest::CTImpl::CResultMetaDataObject(this);
+	}
+	if (key == "resultContent"){
+		return new sdl::complextest::CTImpl::CCDMResultUnionTypeObjectList(this);
+	}
+	if (key == "overallResultValues"){
+		return new sdl::complextest::CTImpl::COverallResultValuesObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CCDMResultVarRecursiveObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "dataModelTitle")){
+		return "dataModelTitle";
+	}
+	if (propertyName == (QString("m_") + "dataModelVersion")){
+		return "dataModelVersion";
+	}
+	if (propertyName == (QString("m_") + "resultMetaData")){
+		return "resultMetaData";
+	}
+	if (propertyName == (QString("m_") + "resultContent")){
+		return "resultContent";
+	}
+	if (propertyName == (QString("m_") + "overallResultValues")){
+		return "overallResultValues";
+	}
+
+	return propertyName;
 }
 
 
@@ -11349,6 +13965,7 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
 			COverallResultValues::V1_0 tempOverallResultValues;
@@ -11398,6 +14015,7 @@ bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
 			COverallResultValues::V1_0 tempOverallResultValues;
@@ -11773,6 +14391,247 @@ bool CCDMResultVarString::OptReadFromJsonObject(const QJsonObject& jsonObject, P
 }
 
 
+CCDMResultVarStringObject::CCDMResultVarStringObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_resultMetaDataQObjectPtr(nullptr)
+			, m_overallResultValuesQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CCDMResultVarStringObject::dataModelTitleChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultVarStringObject::dataModelVersionChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultVarStringObject::resultMetaDataChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultVarStringObject::resultContentChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultVarStringObject::overallResultValuesChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CCDMResultVarStringObject::GetDataModelTitle()
+{
+	if (Version_1_0->dataModelTitle.has_value()){
+		return Version_1_0->dataModelTitle.value();
+	}
+
+	return QString();
+}
+
+
+void CCDMResultVarStringObject::SetDataModelTitle(QString v)
+{
+	Version_1_0->dataModelTitle = v;
+	dataModelTitleChanged();
+}
+
+
+bool CCDMResultVarStringObject::hasDataModelTitle()
+{
+	 return Version_1_0->dataModelTitle.HasValue();
+}
+
+
+QString CCDMResultVarStringObject::GetDataModelVersion()
+{
+	if (Version_1_0->dataModelVersion.has_value()){
+		return Version_1_0->dataModelVersion.value();
+	}
+
+	return QString();
+}
+
+
+void CCDMResultVarStringObject::SetDataModelVersion(QString v)
+{
+	Version_1_0->dataModelVersion = v;
+	dataModelVersionChanged();
+}
+
+
+bool CCDMResultVarStringObject::hasDataModelVersion()
+{
+	 return Version_1_0->dataModelVersion.HasValue();
+}
+
+
+sdl::complextest::CTImpl::CResultMetaDataObject* CCDMResultVarStringObject::GetResultMetaData()
+{
+	if (Version_1_0->resultMetaData.has_value()){
+		if (!m_resultMetaDataQObjectPtr){
+			m_resultMetaDataQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CResultMetaDataObject*>(CreateObject("resultMetaData"));
+			m_resultMetaDataQObjectPtr->Version_1_0 = Version_1_0->resultMetaData;
+		}
+		return m_resultMetaDataQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CCDMResultVarStringObject::SetResultMetaData(sdl::complextest::CTImpl::CResultMetaDataObject* v)
+{
+	if (v){
+		Version_1_0->resultMetaData = v->Version_1_0;
+		m_resultMetaDataQObjectPtr = v;
+	}
+	else {
+		Version_1_0->resultMetaData = nullptr;
+	}
+
+	resultMetaDataChanged();
+}
+
+
+bool CCDMResultVarStringObject::hasResultMetaData()
+{
+	 return Version_1_0->resultMetaData.HasValue();
+}
+
+
+void CCDMResultVarStringObject::createResultMetaData()
+{	Version_1_0->resultMetaData.emplace();
+
+}
+
+
+QList<QString> CCDMResultVarStringObject::GetResultContent()
+{
+	if (Version_1_0->resultContent.has_value()){
+		return Version_1_0->resultContent.value();
+	}
+
+	return QStringList();
+}
+
+
+void CCDMResultVarStringObject::SetResultContent(QList<QString> v)
+{
+	Version_1_0->resultContent = v;
+	resultContentChanged();
+}
+
+
+bool CCDMResultVarStringObject::hasResultContent()
+{
+	 return Version_1_0->resultContent.HasValue();
+}
+
+
+sdl::complextest::CTImpl::COverallResultValuesObjectList* CCDMResultVarStringObject::GetOverallResultValues()
+{
+	if (Version_1_0->overallResultValues.has_value()){
+		if (!m_overallResultValuesQObjectPtr){
+			m_overallResultValuesQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::COverallResultValuesObjectList*>(CreateObject("overallResultValues"));
+			m_overallResultValuesQObjectPtr->Version_1_0 = Version_1_0->overallResultValues;
+		}
+		return m_overallResultValuesQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CCDMResultVarStringObject::SetOverallResultValues(sdl::complextest::CTImpl::COverallResultValuesObjectList* v)
+{
+	if (v){
+		Version_1_0->overallResultValues = v->Version_1_0;
+		m_overallResultValuesQObjectPtr = v;
+	}
+	else {
+		Version_1_0->overallResultValues = nullptr;
+	}
+
+	overallResultValuesChanged();
+}
+
+
+bool CCDMResultVarStringObject::hasOverallResultValues()
+{
+	 return Version_1_0->overallResultValues.HasValue();
+}
+
+
+void CCDMResultVarStringObject::createOverallResultValues()
+{	Version_1_0->overallResultValues.emplace();
+
+}
+
+
+QString CCDMResultVarStringObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CCDMResultVarStringObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CCDMResultVarStringObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CCDMResultVarStringObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CCDMResultVarStringObject::CreateObject(const QString& key)
+{
+	if (key == "resultMetaData"){
+		return new sdl::complextest::CTImpl::CResultMetaDataObject(this);
+	}
+	if (key == "overallResultValues"){
+		return new sdl::complextest::CTImpl::COverallResultValuesObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CCDMResultVarStringObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "dataModelTitle")){
+		return "dataModelTitle";
+	}
+	if (propertyName == (QString("m_") + "dataModelVersion")){
+		return "dataModelVersion";
+	}
+	if (propertyName == (QString("m_") + "resultMetaData")){
+		return "resultMetaData";
+	}
+	if (propertyName == (QString("m_") + "resultContent")){
+		return "resultContent";
+	}
+	if (propertyName == (QString("m_") + "overallResultValues")){
+		return "overallResultValues";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::complextest::CTImpl
 
 
@@ -11887,7 +14746,7 @@ bool CCDMResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
 			std::shared_ptr<CDMResultUnionType> resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
-			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
@@ -11895,7 +14754,7 @@ bool CCDMResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 				}
 				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
 			}
-			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
@@ -11960,7 +14819,7 @@ bool CCDMResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
 			std::shared_ptr<CDMResultUnionType> resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
-			if (resultContentVariantValue.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
@@ -11968,7 +14827,7 @@ bool CCDMResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 				}
 				resultContentData = std::make_shared<CDMResultUnionType>(resultContentDataConvert);
 			}
-			else if (resultContentVariantValue.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
 				if (!isresultContentDataRead){
@@ -12089,7 +14948,7 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentDataList[resultContentIndex];
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
-			if (tempResultContent.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
@@ -12098,7 +14957,7 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 				}
 				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
@@ -12120,6 +14979,7 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
 			COverallResultValues::V1_0 tempOverallResultValues;
@@ -12160,7 +15020,7 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentDataList[resultContentIndex];
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
-			if (tempResultContent.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
@@ -12169,7 +15029,7 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 				}
 				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
 				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
 				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
@@ -12191,6 +15051,7 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		for (qsizetype overallResultValuesIndex = 0; overallResultValuesIndex < overallResultValuesElementsCount; ++overallResultValuesIndex){
 			const ::imtgql::CGqlParamObject* overallResultValuesDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("overallResultValues", overallResultValuesIndex);
 			if (overallResultValuesDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << overallResultValuesDataObjectPtr;
 				return false;
 			}
 			COverallResultValues::V1_0 tempOverallResultValues;
@@ -12292,7 +15153,7 @@ bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
-			if (tempResultContent.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
@@ -12300,7 +15161,7 @@ bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 				}
 				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
@@ -12357,7 +15218,7 @@ bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
 			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
-			if (tempResultContent.canConvert<CCDMResultVarString>()){
+			if (itemTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
@@ -12365,7 +15226,7 @@ bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 				}
 				resultContentDataValue = std::make_shared<CDMResultUnionType>(resultContentDataValueConvert);
 			}
-			else if (tempResultContent.canConvert<CCDMResultVarRecursive>()){
+			else if (itemTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
 				const bool isresultContentDataValueRead = resultContentDataValueConvert.ReadFromJsonObject(resultContentJsonArray[resultContentIndex].toObject());
 				if (!isresultContentDataValueRead){
@@ -12618,6 +15479,268 @@ bool CCDMResult::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVe
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CCDMResultObject::CCDMResultObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_resultMetaDataQObjectPtr(nullptr)
+			, m_resultContentQObjectPtr(nullptr)
+			, m_overallResultValuesQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CCDMResultObject::dataModelTitleChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultObject::dataModelVersionChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultObject::resultMetaDataChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultObject::resultContentChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CCDMResultObject::overallResultValuesChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CCDMResultObject::GetDataModelTitle()
+{
+	if (Version_1_0->dataModelTitle.has_value()){
+		return Version_1_0->dataModelTitle.value();
+	}
+
+	return QString();
+}
+
+
+void CCDMResultObject::SetDataModelTitle(QString v)
+{
+	Version_1_0->dataModelTitle = v;
+	dataModelTitleChanged();
+}
+
+
+bool CCDMResultObject::hasDataModelTitle()
+{
+	 return Version_1_0->dataModelTitle.HasValue();
+}
+
+
+QString CCDMResultObject::GetDataModelVersion()
+{
+	if (Version_1_0->dataModelVersion.has_value()){
+		return Version_1_0->dataModelVersion.value();
+	}
+
+	return QString();
+}
+
+
+void CCDMResultObject::SetDataModelVersion(QString v)
+{
+	Version_1_0->dataModelVersion = v;
+	dataModelVersionChanged();
+}
+
+
+bool CCDMResultObject::hasDataModelVersion()
+{
+	 return Version_1_0->dataModelVersion.HasValue();
+}
+
+
+sdl::complextest::CTImpl::CResultMetaDataObject* CCDMResultObject::GetResultMetaData()
+{
+	if (Version_1_0->resultMetaData.has_value()){
+		if (!m_resultMetaDataQObjectPtr){
+			m_resultMetaDataQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CResultMetaDataObject*>(CreateObject("resultMetaData"));
+			m_resultMetaDataQObjectPtr->Version_1_0 = Version_1_0->resultMetaData;
+		}
+		return m_resultMetaDataQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CCDMResultObject::SetResultMetaData(sdl::complextest::CTImpl::CResultMetaDataObject* v)
+{
+	if (v){
+		Version_1_0->resultMetaData = v->Version_1_0;
+		m_resultMetaDataQObjectPtr = v;
+	}
+	else {
+		Version_1_0->resultMetaData = nullptr;
+	}
+
+	resultMetaDataChanged();
+}
+
+
+bool CCDMResultObject::hasResultMetaData()
+{
+	 return Version_1_0->resultMetaData.HasValue();
+}
+
+
+void CCDMResultObject::createResultMetaData()
+{	Version_1_0->resultMetaData.emplace();
+
+}
+
+
+sdl::complextest::CTImpl::CCDMResultUnionTypeObjectList* CCDMResultObject::GetResultContent()
+{
+	if (Version_1_0->resultContent.has_value()){
+		if (!m_resultContentQObjectPtr){
+			m_resultContentQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::CCDMResultUnionTypeObjectList*>(CreateObject("resultContent"));
+			m_resultContentQObjectPtr->Version_1_0 = Version_1_0->resultContent;
+		}
+		return m_resultContentQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CCDMResultObject::SetResultContent(sdl::complextest::CTImpl::CCDMResultUnionTypeObjectList* v)
+{
+	if (v){
+		Version_1_0->resultContent = v->Version_1_0;
+		m_resultContentQObjectPtr = v;
+	}
+	else {
+		Version_1_0->resultContent = nullptr;
+	}
+
+	resultContentChanged();
+}
+
+
+bool CCDMResultObject::hasResultContent()
+{
+	 return Version_1_0->resultContent.HasValue();
+}
+
+
+void CCDMResultObject::createResultContent()
+{	Version_1_0->resultContent.emplace();
+
+}
+
+
+sdl::complextest::CTImpl::COverallResultValuesObjectList* CCDMResultObject::GetOverallResultValues()
+{
+	if (Version_1_0->overallResultValues.has_value()){
+		if (!m_overallResultValuesQObjectPtr){
+			m_overallResultValuesQObjectPtr = dynamic_cast<sdl::complextest::CTImpl::COverallResultValuesObjectList*>(CreateObject("overallResultValues"));
+			m_overallResultValuesQObjectPtr->Version_1_0 = Version_1_0->overallResultValues;
+		}
+		return m_overallResultValuesQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CCDMResultObject::SetOverallResultValues(sdl::complextest::CTImpl::COverallResultValuesObjectList* v)
+{
+	if (v){
+		Version_1_0->overallResultValues = v->Version_1_0;
+		m_overallResultValuesQObjectPtr = v;
+	}
+	else {
+		Version_1_0->overallResultValues = nullptr;
+	}
+
+	overallResultValuesChanged();
+}
+
+
+bool CCDMResultObject::hasOverallResultValues()
+{
+	 return Version_1_0->overallResultValues.HasValue();
+}
+
+
+void CCDMResultObject::createOverallResultValues()
+{	Version_1_0->overallResultValues.emplace();
+
+}
+
+
+QString CCDMResultObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CCDMResultObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CCDMResultObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CCDMResultObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CCDMResultObject::CreateObject(const QString& key)
+{
+	if (key == "resultMetaData"){
+		return new sdl::complextest::CTImpl::CResultMetaDataObject(this);
+	}
+	if (key == "resultContent"){
+		return new sdl::complextest::CTImpl::CCDMResultUnionTypeObjectList(this);
+	}
+	if (key == "overallResultValues"){
+		return new sdl::complextest::CTImpl::COverallResultValuesObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CCDMResultObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "dataModelTitle")){
+		return "dataModelTitle";
+	}
+	if (propertyName == (QString("m_") + "dataModelVersion")){
+		return "dataModelVersion";
+	}
+	if (propertyName == (QString("m_") + "resultMetaData")){
+		return "resultMetaData";
+	}
+	if (propertyName == (QString("m_") + "resultContent")){
+		return "resultContent";
+	}
+	if (propertyName == (QString("m_") + "overallResultValues")){
+		return "overallResultValues";
+	}
+
+	return propertyName;
 }
 
 
@@ -12959,6 +16082,97 @@ bool CPointsInCoordinateFormat::OptReadFromJsonObject(const QJsonObject& jsonObj
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CPointsInCoordinateFormatObject::CPointsInCoordinateFormatObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CPointsInCoordinateFormatObject::pointAsCoordinatesChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+bool CPointsInCoordinateFormatObject::GetPointAsCoordinates()
+{
+	if (Version_1_0->pointAsCoordinates.has_value()){
+		return Version_1_0->pointAsCoordinates.value();
+	}
+
+	return false;
+}
+
+
+void CPointsInCoordinateFormatObject::SetPointAsCoordinates(bool v)
+{
+	Version_1_0->pointAsCoordinates = v;
+	pointAsCoordinatesChanged();
+}
+
+
+bool CPointsInCoordinateFormatObject::hasPointAsCoordinates()
+{
+	 return Version_1_0->pointAsCoordinates.HasValue();
+}
+
+
+QString CPointsInCoordinateFormatObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CPointsInCoordinateFormatObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CPointsInCoordinateFormatObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CPointsInCoordinateFormatObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CPointsInCoordinateFormatObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString CPointsInCoordinateFormatObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "pointAsCoordinates")){
+		return "pointAsCoordinates";
+	}
+
+	return propertyName;
 }
 
 

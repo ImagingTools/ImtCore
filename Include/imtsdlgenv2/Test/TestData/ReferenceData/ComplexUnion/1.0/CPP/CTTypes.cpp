@@ -398,6 +398,124 @@ bool CPoint::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersio
 }
 
 
+CPointObject::CPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CPointObject::xChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CPointObject::yChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+double CPointObject::GetX()
+{
+	if (Version_1_0->X.has_value()){
+		return Version_1_0->X.value();
+	}
+
+	return 0;
+}
+
+
+void CPointObject::SetX(double v)
+{
+	Version_1_0->X = v;
+	xChanged();
+}
+
+
+bool CPointObject::hasX()
+{
+	 return Version_1_0->X.HasValue();
+}
+
+
+double CPointObject::GetY()
+{
+	if (Version_1_0->Y.has_value()){
+		return Version_1_0->Y.value();
+	}
+
+	return 0;
+}
+
+
+void CPointObject::SetY(double v)
+{
+	Version_1_0->Y = v;
+	yChanged();
+}
+
+
+bool CPointObject::hasY()
+{
+	 return Version_1_0->Y.HasValue();
+}
+
+
+QString CPointObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CPointObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CPointObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CPointObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CPointObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString CPointObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "x")){
+		return "X";
+	}
+	if (propertyName == (QString("m_") + "y")){
+		return "Y";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::complextest::CTTypes
 
 
@@ -636,6 +754,7 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	for (qsizetype pointsIndex = 0; pointsIndex < pointsElementsCount; ++pointsIndex){
 		const ::imtgql::CGqlParamObject* pointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Points", pointsIndex);
 		if (pointsDataObjectPtr == nullptr){
+			qDebug() << "invalid type" << pointsDataObjectPtr;
 			return false;
 		}
 		CPoint::V1_0 tempPoints;
@@ -679,6 +798,7 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		for (qsizetype pointsIndex = 0; pointsIndex < pointsElementsCount; ++pointsIndex){
 			const ::imtgql::CGqlParamObject* pointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("Points", pointsIndex);
 			if (pointsDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << pointsDataObjectPtr;
 				return false;
 			}
 			CPoint::V1_0 tempPoints;
@@ -1041,6 +1161,181 @@ bool CGeometry::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVer
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CGeometryObject::CGeometryObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_pointsQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CGeometryObject::geometryTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CGeometryObject::radiusChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CGeometryObject::pointsChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CGeometryObject::GetGeometryType()
+{
+	if (Version_1_0->GeometryType.has_value()){
+		sdl::complextest::CTTypes::GeometryType valueType = Version_1_0->GeometryType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::GeometryType>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CGeometryObject::SetGeometryType(QString v)
+{
+	Version_1_0->GeometryType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::complextest::CTTypes::GeometryType>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->GeometryType = (sdl::complextest::CTTypes::GeometryType)key;
+	}
+	geometryTypeChanged();
+}
+
+
+bool CGeometryObject::hasGeometryType()
+{
+	 return Version_1_0->GeometryType.HasValue();
+}
+
+
+double CGeometryObject::GetRadius()
+{
+	if (Version_1_0->Radius.has_value()){
+		return Version_1_0->Radius.value();
+	}
+
+	return 0;
+}
+
+
+void CGeometryObject::SetRadius(double v)
+{
+	Version_1_0->Radius = v;
+	radiusChanged();
+}
+
+
+bool CGeometryObject::hasRadius()
+{
+	 return Version_1_0->Radius.HasValue();
+}
+
+
+sdl::complextest::CTTypes::CPointObjectList* CGeometryObject::GetPoints()
+{
+	if (Version_1_0->Points.has_value()){
+		if (!m_pointsQObjectPtr){
+			m_pointsQObjectPtr = dynamic_cast<sdl::complextest::CTTypes::CPointObjectList*>(CreateObject("Points"));
+			m_pointsQObjectPtr->Version_1_0 = Version_1_0->Points;
+		}
+		return m_pointsQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CGeometryObject::SetPoints(sdl::complextest::CTTypes::CPointObjectList* v)
+{
+	if (v){
+		Version_1_0->Points = v->Version_1_0;
+		m_pointsQObjectPtr = v;
+	}
+	else {
+		Version_1_0->Points = nullptr;
+	}
+
+	pointsChanged();
+}
+
+
+bool CGeometryObject::hasPoints()
+{
+	 return Version_1_0->Points.HasValue();
+}
+
+
+void CGeometryObject::createPoints()
+{	Version_1_0->Points.emplace();
+
+}
+
+
+QString CGeometryObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CGeometryObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CGeometryObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CGeometryObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CGeometryObject::CreateObject(const QString& key)
+{
+	if (key == "Points"){
+		return new sdl::complextest::CTTypes::CPointObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CGeometryObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "geometryType")){
+		return "GeometryType";
+	}
+	if (propertyName == (QString("m_") + "radius")){
+		return "Radius";
+	}
+	if (propertyName == (QString("m_") + "points")){
+		return "Points";
+	}
+
+	return propertyName;
 }
 
 

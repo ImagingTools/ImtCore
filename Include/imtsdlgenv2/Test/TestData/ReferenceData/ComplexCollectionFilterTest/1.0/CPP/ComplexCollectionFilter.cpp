@@ -499,6 +499,199 @@ bool CTimeFilter::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolV
 }
 
 
+CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_timeRangeQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CTimeFilterObject::timeRangeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CTimeFilterObject::timeUnitChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CTimeFilterObject::interpretationModeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CTimeFilterObject::unitMultiplierChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+sdl::imtbase::ImtBaseTypes::CTimeRangeObject* CTimeFilterObject::GetTimeRange()
+{
+	if (Version_1_0->timeRange.has_value()){
+		if (!m_timeRangeQObjectPtr){
+			m_timeRangeQObjectPtr = dynamic_cast<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>(CreateObject("timeRange"));
+			m_timeRangeQObjectPtr->Version_1_0 = Version_1_0->timeRange;
+		}
+		return m_timeRangeQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CTimeFilterObject::SetTimeRange(sdl::imtbase::ImtBaseTypes::CTimeRangeObject* v)
+{
+	if (v){
+		Version_1_0->timeRange = v->Version_1_0;
+		m_timeRangeQObjectPtr = v;
+	}
+	else {
+		Version_1_0->timeRange = nullptr;
+	}
+
+	timeRangeChanged();
+}
+
+
+bool CTimeFilterObject::hasTimeRange()
+{
+	 return Version_1_0->timeRange.HasValue();
+}
+
+
+void CTimeFilterObject::createTimeRange()
+{	Version_1_0->timeRange.emplace();
+
+}
+
+
+QString CTimeFilterObject::GetTimeUnit()
+{
+	if (Version_1_0->timeUnit.has_value()){
+		return Version_1_0->timeUnit.value();
+	}
+
+	return QString();
+}
+
+
+void CTimeFilterObject::SetTimeUnit(QString v)
+{
+	Version_1_0->timeUnit = v;
+	timeUnitChanged();
+}
+
+
+bool CTimeFilterObject::hasTimeUnit()
+{
+	 return Version_1_0->timeUnit.HasValue();
+}
+
+
+QString CTimeFilterObject::GetInterpretationMode()
+{
+	if (Version_1_0->interpretationMode.has_value()){
+		return Version_1_0->interpretationMode.value();
+	}
+
+	return QString();
+}
+
+
+void CTimeFilterObject::SetInterpretationMode(QString v)
+{
+	Version_1_0->interpretationMode = v;
+	interpretationModeChanged();
+}
+
+
+bool CTimeFilterObject::hasInterpretationMode()
+{
+	 return Version_1_0->interpretationMode.HasValue();
+}
+
+
+int CTimeFilterObject::GetUnitMultiplier()
+{
+	if (Version_1_0->unitMultiplier.has_value()){
+		return Version_1_0->unitMultiplier.value();
+	}
+
+	return 0;
+}
+
+
+void CTimeFilterObject::SetUnitMultiplier(int v)
+{
+	Version_1_0->unitMultiplier = v;
+	unitMultiplierChanged();
+}
+
+
+bool CTimeFilterObject::hasUnitMultiplier()
+{
+	 return Version_1_0->unitMultiplier.HasValue();
+}
+
+
+QString CTimeFilterObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CTimeFilterObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CTimeFilterObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CTimeFilterObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CTimeFilterObject::CreateObject(const QString& key)
+{
+	if (key == "timeRange"){
+		return new sdl::imtbase::ImtBaseTypes::CTimeRangeObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CTimeFilterObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "timeRange")){
+		return "timeRange";
+	}
+	if (propertyName == (QString("m_") + "timeUnit")){
+		return "timeUnit";
+	}
+	if (propertyName == (QString("m_") + "interpretationMode")){
+		return "interpretationMode";
+	}
+	if (propertyName == (QString("m_") + "unitMultiplier")){
+		return "unitMultiplier";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::imtbase::ComplexCollectionFilter
 
 
@@ -888,6 +1081,124 @@ bool CFieldSortingInfo::OptReadFromJsonObject(const QJsonObject& jsonObject, Pro
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CFieldSortingInfoObject::CFieldSortingInfoObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CFieldSortingInfoObject::fieldIdChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CFieldSortingInfoObject::sortingOrderChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CFieldSortingInfoObject::GetFieldId()
+{
+	if (Version_1_0->fieldId.has_value()){
+		return Version_1_0->fieldId.value();
+	}
+
+	return QString();
+}
+
+
+void CFieldSortingInfoObject::SetFieldId(QString v)
+{
+	Version_1_0->fieldId = v;
+	fieldIdChanged();
+}
+
+
+bool CFieldSortingInfoObject::hasFieldId()
+{
+	 return Version_1_0->fieldId.HasValue();
+}
+
+
+QString CFieldSortingInfoObject::GetSortingOrder()
+{
+	if (Version_1_0->sortingOrder.has_value()){
+		return Version_1_0->sortingOrder.value();
+	}
+
+	return QString();
+}
+
+
+void CFieldSortingInfoObject::SetSortingOrder(QString v)
+{
+	Version_1_0->sortingOrder = v;
+	sortingOrderChanged();
+}
+
+
+bool CFieldSortingInfoObject::hasSortingOrder()
+{
+	 return Version_1_0->sortingOrder.HasValue();
+}
+
+
+QString CFieldSortingInfoObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CFieldSortingInfoObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CFieldSortingInfoObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CFieldSortingInfoObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CFieldSortingInfoObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString CFieldSortingInfoObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "fieldId")){
+		return "fieldId";
+	}
+	if (propertyName == (QString("m_") + "sortingOrder")){
+		return "sortingOrder";
+	}
+
+	return propertyName;
 }
 
 
@@ -1763,6 +2074,187 @@ bool CFieldFilter::OptReadFromJsonObject(const QJsonObject& jsonObject, Protocol
 }
 
 
+CFieldFilterObject::CFieldFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CFieldFilterObject::fieldIdChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CFieldFilterObject::filterValueChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CFieldFilterObject::filterValueTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CFieldFilterObject::filterOperationsChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CFieldFilterObject::GetFieldId()
+{
+	if (Version_1_0->fieldId.has_value()){
+		return Version_1_0->fieldId.value();
+	}
+
+	return QString();
+}
+
+
+void CFieldFilterObject::SetFieldId(QString v)
+{
+	Version_1_0->fieldId = v.toUtf8();
+	fieldIdChanged();
+}
+
+
+bool CFieldFilterObject::hasFieldId()
+{
+	 return Version_1_0->fieldId.HasValue();
+}
+
+
+QString CFieldFilterObject::GetFilterValue()
+{
+	if (Version_1_0->filterValue.has_value()){
+		return Version_1_0->filterValue.value();
+	}
+
+	return QString();
+}
+
+
+void CFieldFilterObject::SetFilterValue(QString v)
+{
+	Version_1_0->filterValue = v;
+	filterValueChanged();
+}
+
+
+bool CFieldFilterObject::hasFilterValue()
+{
+	 return Version_1_0->filterValue.HasValue();
+}
+
+
+QString CFieldFilterObject::GetFilterValueType()
+{
+	if (Version_1_0->filterValueType.has_value()){
+		sdl::imtbase::ComplexCollectionFilter::ValueType valueType = Version_1_0->filterValueType.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::ValueType>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CFieldFilterObject::SetFilterValueType(QString v)
+{
+	Version_1_0->filterValueType.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::ValueType>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->filterValueType = (sdl::imtbase::ComplexCollectionFilter::ValueType)key;
+	}
+	filterValueTypeChanged();
+}
+
+
+bool CFieldFilterObject::hasFilterValueType()
+{
+	 return Version_1_0->filterValueType.HasValue();
+}
+
+
+QList<QString> CFieldFilterObject::GetFilterOperations()
+{
+	if (Version_1_0->filterOperations.has_value()){
+		
+	}
+
+	return QStringList();
+}
+
+
+void CFieldFilterObject::SetFilterOperations(QList<QString> v)
+{
+	
+	filterOperationsChanged();
+}
+
+
+bool CFieldFilterObject::hasFilterOperations()
+{
+	 return Version_1_0->filterOperations.HasValue();
+}
+
+
+QString CFieldFilterObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CFieldFilterObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CFieldFilterObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CFieldFilterObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CFieldFilterObject::CreateObject(const QString& key)
+{
+	return nullptr;
+}
+
+
+QString CFieldFilterObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "fieldId")){
+		return "fieldId";
+	}
+	if (propertyName == (QString("m_") + "filterValue")){
+		return "filterValue";
+	}
+	if (propertyName == (QString("m_") + "filterValueType")){
+		return "filterValueType";
+	}
+	if (propertyName == (QString("m_") + "filterOperations")){
+		return "filterOperations";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::imtbase::ComplexCollectionFilter
 
 
@@ -1993,6 +2485,7 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
 			if (fieldFiltersDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << fieldFiltersDataObjectPtr;
 				return false;
 			}
 			CFieldFilter::V1_0 tempFieldFilters;
@@ -2009,6 +2502,7 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
 			if (groupFiltersDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << groupFiltersDataObjectPtr;
 				return false;
 			}
 			CGroupFilter::V1_0 tempGroupFilters;
@@ -2047,6 +2541,7 @@ bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
 			if (fieldFiltersDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << fieldFiltersDataObjectPtr;
 				return false;
 			}
 			CFieldFilter::V1_0 tempFieldFilters;
@@ -2063,6 +2558,7 @@ bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
 			if (groupFiltersDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << groupFiltersDataObjectPtr;
 				return false;
 			}
 			CGroupFilter::V1_0 tempGroupFilters;
@@ -2458,6 +2954,202 @@ bool CGroupFilter::OptReadFromJsonObject(const QJsonObject& jsonObject, Protocol
 }
 
 
+CGroupFilterObject::CGroupFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_fieldFiltersQObjectPtr(nullptr)
+			, m_groupFiltersQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CGroupFilterObject::fieldFiltersChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CGroupFilterObject::groupFiltersChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CGroupFilterObject::logicalOperationChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* CGroupFilterObject::GetFieldFilters()
+{
+	if (Version_1_0->fieldFilters.has_value()){
+		if (!m_fieldFiltersQObjectPtr){
+			m_fieldFiltersQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList*>(CreateObject("fieldFilters"));
+			m_fieldFiltersQObjectPtr->Version_1_0 = Version_1_0->fieldFilters;
+		}
+		return m_fieldFiltersQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CGroupFilterObject::SetFieldFilters(sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* v)
+{
+	if (v){
+		Version_1_0->fieldFilters = v->Version_1_0;
+		m_fieldFiltersQObjectPtr = v;
+	}
+	else {
+		Version_1_0->fieldFilters = nullptr;
+	}
+
+	fieldFiltersChanged();
+}
+
+
+bool CGroupFilterObject::hasFieldFilters()
+{
+	 return Version_1_0->fieldFilters.HasValue();
+}
+
+
+void CGroupFilterObject::createFieldFilters()
+{	Version_1_0->fieldFilters.emplace();
+
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* CGroupFilterObject::GetGroupFilters()
+{
+	if (Version_1_0->groupFilters.has_value()){
+		if (!m_groupFiltersQObjectPtr){
+			m_groupFiltersQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList*>(CreateObject("groupFilters"));
+			m_groupFiltersQObjectPtr->Version_1_0 = Version_1_0->groupFilters;
+		}
+		return m_groupFiltersQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CGroupFilterObject::SetGroupFilters(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* v)
+{
+	if (v){
+		Version_1_0->groupFilters = v->Version_1_0;
+		m_groupFiltersQObjectPtr = v;
+	}
+	else {
+		Version_1_0->groupFilters = nullptr;
+	}
+
+	groupFiltersChanged();
+}
+
+
+bool CGroupFilterObject::hasGroupFilters()
+{
+	 return Version_1_0->groupFilters.HasValue();
+}
+
+
+void CGroupFilterObject::createGroupFilters()
+{	Version_1_0->groupFilters.emplace();
+
+}
+
+
+QString CGroupFilterObject::GetLogicalOperation()
+{
+	if (Version_1_0->logicalOperation.has_value()){
+		sdl::imtbase::ComplexCollectionFilter::LogicalOperation valueType = Version_1_0->logicalOperation.value();
+		QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::LogicalOperation>();
+		QString retval = metaEnum.valueToKey((int)valueType);
+
+		return retval;
+	}
+
+	return QString();
+}
+
+
+void CGroupFilterObject::SetLogicalOperation(QString v)
+{
+	Version_1_0->logicalOperation.emplace();
+	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::LogicalOperation>();
+	int key = metaEnum.keyToValue(v.toUtf8());
+	if (key > -1){
+		Version_1_0->logicalOperation = (sdl::imtbase::ComplexCollectionFilter::LogicalOperation)key;
+	}
+	logicalOperationChanged();
+}
+
+
+bool CGroupFilterObject::hasLogicalOperation()
+{
+	 return Version_1_0->logicalOperation.HasValue();
+}
+
+
+QString CGroupFilterObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CGroupFilterObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CGroupFilterObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CGroupFilterObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CGroupFilterObject::CreateObject(const QString& key)
+{
+	if (key == "fieldFilters"){
+		return new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList(this);
+	}
+	if (key == "groupFilters"){
+		return new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CGroupFilterObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "fieldFilters")){
+		return "fieldFilters";
+	}
+	if (propertyName == (QString("m_") + "groupFilters")){
+		return "groupFilters";
+	}
+	if (propertyName == (QString("m_") + "logicalOperation")){
+		return "logicalOperation";
+	}
+
+	return propertyName;
+}
+
+
 } // namespace sdl::imtbase::ComplexCollectionFilter
 
 
@@ -2683,6 +3375,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
 			if (sortingInfoDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << sortingInfoDataObjectPtr;
 				return false;
 			}
 			CFieldSortingInfo::V1_0 tempSortingInfo;
@@ -2732,6 +3425,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
 			if (sortingInfoDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << sortingInfoDataObjectPtr;
 				return false;
 			}
 			CFieldSortingInfo::V1_0 tempSortingInfo;
@@ -3128,6 +3822,249 @@ bool CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObje
 	Q_ASSERT_X(false, __func__, "Invalid version");
 
 	return false;
+}
+
+
+CComplexCollectionFilterObject::CComplexCollectionFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_sortingInfoQObjectPtr(nullptr)
+			, m_fieldsFilterQObjectPtr(nullptr)
+			, m_timeFilterQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CComplexCollectionFilterObject::sortingInfoChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CComplexCollectionFilterObject::fieldsFilterChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CComplexCollectionFilterObject::timeFilterChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CComplexCollectionFilterObject::distinctFieldsChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* CComplexCollectionFilterObject::GetSortingInfo()
+{
+	if (Version_1_0->sortingInfo.has_value()){
+		if (!m_sortingInfoQObjectPtr){
+			m_sortingInfoQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList*>(CreateObject("sortingInfo"));
+			m_sortingInfoQObjectPtr->Version_1_0 = Version_1_0->sortingInfo;
+		}
+		return m_sortingInfoQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CComplexCollectionFilterObject::SetSortingInfo(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* v)
+{
+	if (v){
+		Version_1_0->sortingInfo = v->Version_1_0;
+		m_sortingInfoQObjectPtr = v;
+	}
+	else {
+		Version_1_0->sortingInfo = nullptr;
+	}
+
+	sortingInfoChanged();
+}
+
+
+bool CComplexCollectionFilterObject::hasSortingInfo()
+{
+	 return Version_1_0->sortingInfo.HasValue();
+}
+
+
+void CComplexCollectionFilterObject::createSortingInfo()
+{	Version_1_0->sortingInfo.emplace();
+
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* CComplexCollectionFilterObject::GetFieldsFilter()
+{
+	if (Version_1_0->fieldsFilter.has_value()){
+		if (!m_fieldsFilterQObjectPtr){
+			m_fieldsFilterQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject*>(CreateObject("fieldsFilter"));
+			m_fieldsFilterQObjectPtr->Version_1_0 = Version_1_0->fieldsFilter;
+		}
+		return m_fieldsFilterQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CComplexCollectionFilterObject::SetFieldsFilter(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* v)
+{
+	if (v){
+		Version_1_0->fieldsFilter = v->Version_1_0;
+		m_fieldsFilterQObjectPtr = v;
+	}
+	else {
+		Version_1_0->fieldsFilter = nullptr;
+	}
+
+	fieldsFilterChanged();
+}
+
+
+bool CComplexCollectionFilterObject::hasFieldsFilter()
+{
+	 return Version_1_0->fieldsFilter.HasValue();
+}
+
+
+void CComplexCollectionFilterObject::createFieldsFilter()
+{	Version_1_0->fieldsFilter.emplace();
+
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* CComplexCollectionFilterObject::GetTimeFilter()
+{
+	if (Version_1_0->timeFilter.has_value()){
+		if (!m_timeFilterQObjectPtr){
+			m_timeFilterQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject*>(CreateObject("timeFilter"));
+			m_timeFilterQObjectPtr->Version_1_0 = Version_1_0->timeFilter;
+		}
+		return m_timeFilterQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CComplexCollectionFilterObject::SetTimeFilter(sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* v)
+{
+	if (v){
+		Version_1_0->timeFilter = v->Version_1_0;
+		m_timeFilterQObjectPtr = v;
+	}
+	else {
+		Version_1_0->timeFilter = nullptr;
+	}
+
+	timeFilterChanged();
+}
+
+
+bool CComplexCollectionFilterObject::hasTimeFilter()
+{
+	 return Version_1_0->timeFilter.HasValue();
+}
+
+
+void CComplexCollectionFilterObject::createTimeFilter()
+{	Version_1_0->timeFilter.emplace();
+
+}
+
+
+QList<QString> CComplexCollectionFilterObject::GetDistinctFields()
+{
+	if (Version_1_0->distinctFields.has_value()){
+		QStringList tempDistinctFieldsList;
+		for (const auto& tempValue: Version_1_0->distinctFields.value()){
+			tempDistinctFieldsList << tempValue;
+		}
+		return tempDistinctFieldsList;
+	}
+
+	return QStringList();
+}
+
+
+void CComplexCollectionFilterObject::SetDistinctFields(QList<QString> v)
+{
+	Version_1_0->distinctFields = QList<QByteArray>(); 
+	for (const auto& tempValue: v){
+		Version_1_0->distinctFields->append(tempValue.toUtf8());
+	}
+
+	distinctFieldsChanged();
+}
+
+
+bool CComplexCollectionFilterObject::hasDistinctFields()
+{
+	 return Version_1_0->distinctFields.HasValue();
+}
+
+
+QString CComplexCollectionFilterObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CComplexCollectionFilterObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CComplexCollectionFilterObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CComplexCollectionFilterObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CComplexCollectionFilterObject::CreateObject(const QString& key)
+{
+	if (key == "sortingInfo"){
+		return new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList(this);
+	}
+	if (key == "fieldsFilter"){
+		return new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject(this);
+	}
+	if (key == "timeFilter"){
+		return new sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CComplexCollectionFilterObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "sortingInfo")){
+		return "sortingInfo";
+	}
+	if (propertyName == (QString("m_") + "fieldsFilter")){
+		return "fieldsFilter";
+	}
+	if (propertyName == (QString("m_") + "timeFilter")){
+		return "timeFilter";
+	}
+	if (propertyName == (QString("m_") + "distinctFields")){
+		return "distinctFields";
+	}
+
+	return propertyName;
 }
 
 

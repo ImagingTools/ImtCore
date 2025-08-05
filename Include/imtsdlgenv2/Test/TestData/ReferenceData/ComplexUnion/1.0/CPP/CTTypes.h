@@ -538,6 +538,230 @@ public:
 };
 
 
+class CPointObjectList;
+
+class CPointObject: public ::imtbase::CItemModelBase, public CPoint
+{
+	Q_OBJECT
+	Q_PROPERTY(double m_x READ GetX WRITE SetX NOTIFY xChanged)
+	Q_PROPERTY(double m_y READ GetY WRITE SetY NOTIFY yChanged)
+
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+public:
+	CPointObject(QObject* parent = nullptr);
+
+	double GetX();
+	void SetX(double v);
+	Q_INVOKABLE bool hasX();
+	double GetY();
+	void SetY(double v);
+	Q_INVOKABLE bool hasY();
+	// CItemModelBase implemented
+	Q_INVOKABLE QString toJson() const override;
+	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
+	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
+	Q_INVOKABLE QString toGraphQL() const override;
+	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
+
+signals:
+	void xChanged();
+	void yChanged();
+	void finished();
+
+protected:
+};
+
+
+class CPointObjectList: public ::imtbase::TListModelBase<sdl::complextest::CTTypes::CPoint::V1_0, sdl::complextest::CTTypes::CPointObject>
+{
+	Q_OBJECT
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
+public:
+	typedef ::imtbase::TListModelBase<sdl::complextest::CTTypes::CPoint::V1_0, sdl::complextest::CTTypes::CPointObject> BaseClass;
+
+	CPointObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
+		return true;
+	}
+
+	Q_INVOKABLE int getItemsCount(){
+		return rowCount();
+	}
+	Q_INVOKABLE QVariantMap get(int row) const{
+		QVariantMap data;
+		QModelIndex idx = index(row, 0);
+		if (!idx.isValid()) return data;
+		QHash<int, QByteArray> roles = roleNames();
+		for (auto it = roles.begin(); it != roles.end(); ++it)
+			data[it.value()] = idx.data(it.key());
+		return data;
+	}
+	Q_INVOKABLE void append(sdl::complextest::CTTypes::CPointObject* item){
+		beginInsertRows(QModelIndex(), rowCount(), rowCount());
+		Version_1_0->append(*item->Version_1_0);
+		ClearCache();
+		endInsertRows();
+	}
+	Q_INVOKABLE sdl::complextest::CTTypes::CPointObjectList* copyMe(){
+		sdl::complextest::CTTypes::CPointObjectList* objectListPtr = new sdl::complextest::CTTypes::CPointObjectList();
+
+		for (int i = 0; i < this->rowCount(); i++){
+			QVariant item = this->getData("item", i);
+			if (!item.canConvert<sdl::complextest::CTTypes::CPointObject>()){
+				return nullptr;
+			}
+
+			sdl::complextest::CTTypes::CPointObject* itemObjectPtr = item.value<sdl::complextest::CTTypes::CPointObject*>();
+			if (itemObjectPtr == nullptr){
+				return nullptr;
+			}
+
+			objectListPtr->addElement(dynamic_cast<sdl::complextest::CTTypes::CPointObject*>(itemObjectPtr->copyMe()));
+		}
+
+		return objectListPtr;
+	}
+
+	Q_INVOKABLE QString toJson(){
+		QString retVal = QStringLiteral("[");
+
+		for (int i = 0; i < this->rowCount(); i++){
+			if (i > 0 && i < this->rowCount() - 1){
+				retVal += QStringLiteral(", ");
+			}
+
+			QVariant item = this->getData("item", i);
+			if (!item.canConvert<sdl::complextest::CTTypes::CPointObject>()){
+				return nullptr;
+			}
+
+			sdl::complextest::CTTypes::CPointObject* itemObjectPtr = item.value<sdl::complextest::CTTypes::CPointObject*>();
+			if (itemObjectPtr == nullptr){
+				return QString();
+			}
+
+			retVal += itemObjectPtr->toJson();
+		}
+
+		retVal += QStringLiteral("]");
+
+		return retVal;
+	}
+
+	Q_INVOKABLE QString toGraphQL(){
+		QString retVal = QStringLiteral("[");
+
+		for (int i = 0; i < this->rowCount(); i++){
+			if (i > 0 && i < this->rowCount() - 1){
+				retVal += QStringLiteral(", ");
+			}
+
+			QVariant item = this->getData("item", i);
+			if (!item.canConvert<sdl::complextest::CTTypes::CPointObject>()){
+				return nullptr;
+			}
+
+			sdl::complextest::CTTypes::CPointObject* itemObjectPtr = item.value<sdl::complextest::CTTypes::CPointObject*>();
+			if (itemObjectPtr == nullptr){
+				return QString();
+			}
+
+			retVal += itemObjectPtr->toGraphQL();
+		}
+
+		retVal += QStringLiteral("]");
+
+		return retVal;
+	}
+
+	Q_INVOKABLE void addElement(sdl::complextest::CTTypes::CPointObject* item){
+		append(item);
+	}
+
+	Q_INVOKABLE void removeElement(int index){
+		remove(index);
+	}
+
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::CTTypes::CPointObjectList* otherModelPtr){
+		if (otherModelPtr == nullptr){
+			return false;
+		}
+
+		if (this == otherModelPtr){
+			return false;
+		}
+
+		if (this->rowCount() != otherModelPtr->rowCount()){
+			return false;
+		}
+
+		for (int i = 0; i < this->rowCount(); i++){
+			QVariant selfItem = this->getData("item", i);
+			QVariant otherItem = otherModelPtr->getData("item", i);
+			if (!selfItem.canConvert<sdl::complextest::CTTypes::CPointObject>()){
+				return false;
+			}
+
+			sdl::complextest::CTTypes::CPointObject* selfItemObjectPtr = selfItem.value<sdl::complextest::CTTypes::CPointObject*>();
+			if (selfItemObjectPtr == nullptr){
+				return false;
+			}
+
+			sdl::complextest::CTTypes::CPointObject* otherItemObjectPtr = selfItem.value<sdl::complextest::CTTypes::CPointObject*>();
+			if (otherItemObjectPtr == nullptr){
+				return false;
+			}
+
+			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	Q_INVOKABLE void insert(int index, sdl::complextest::CTTypes::CPointObject* item){
+		if (index < 0 || index > Version_1_0->size()) return;
+		beginInsertRows(QModelIndex(), index, index);
+		Version_1_0->insert(index, *item->Version_1_0);
+		ClearCache();
+		endInsertRows();
+	}
+	Q_INVOKABLE void remove(int index){
+		if (index < 0 || index >= Version_1_0->size()) return;
+		beginRemoveRows(QModelIndex(), index, index);
+		Version_1_0->removeAt(index);
+		ClearCache();
+		endRemoveRows();
+	}
+	Q_INVOKABLE void clear(){
+		beginResetModel();
+		ClearCache();
+		Version_1_0->clear();
+		endResetModel();
+	}
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
+		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+			sdl::complextest::CTTypes::CPointObject* retVal = GetOrCreateCachedObject(index);
+			return QVariant::fromValue(retVal);
+		}
+		if (nameId == "m_x"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).X.value());
+		}
+		if (nameId == "m_y"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Y.value());
+		}
+		return QVariant();
+	}
+	signals:
+	void countChanged();
+};
+
+
+
 } // namespace sdl::complextest::CTTypes
 
 
@@ -638,12 +862,306 @@ public:
 };
 
 
+class CGeometryObjectList;
+
+class CGeometryObject: public ::imtbase::CItemModelBase, public CGeometry
+{
+	Q_OBJECT
+	Q_PROPERTY(QString m_geometryType READ GetGeometryType WRITE SetGeometryType NOTIFY geometryTypeChanged)
+	Q_PROPERTY(double m_radius READ GetRadius WRITE SetRadius NOTIFY radiusChanged)
+	Q_PROPERTY(sdl::complextest::CTTypes::CPointObjectList* m_points READ GetPoints WRITE SetPoints NOTIFY pointsChanged)
+
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+public:
+	CGeometryObject(QObject* parent = nullptr);
+
+	QString GetGeometryType();
+	void SetGeometryType(QString v);
+	Q_INVOKABLE bool hasGeometryType();
+	double GetRadius();
+	void SetRadius(double v);
+	Q_INVOKABLE bool hasRadius();
+	sdl::complextest::CTTypes::CPointObjectList* GetPoints();
+	void SetPoints(sdl::complextest::CTTypes::CPointObjectList* v);
+	Q_INVOKABLE bool hasPoints();
+	Q_INVOKABLE void createPoints();
+	// CItemModelBase implemented
+	Q_INVOKABLE QString toJson() const override;
+	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
+	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
+	Q_INVOKABLE QString toGraphQL() const override;
+	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
+
+signals:
+	void geometryTypeChanged();
+	void radiusChanged();
+	void pointsChanged();
+	void finished();
+
+protected:
+	sdl::complextest::CTTypes::CPointObjectList* m_pointsQObjectPtr;
+};
+
+
+class CGeometryObjectList: public ::imtbase::TListModelBase<sdl::complextest::CTTypes::CGeometry::V1_0, sdl::complextest::CTTypes::CGeometryObject>
+{
+	Q_OBJECT
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
+public:
+	typedef ::imtbase::TListModelBase<sdl::complextest::CTTypes::CGeometry::V1_0, sdl::complextest::CTTypes::CGeometryObject> BaseClass;
+
+	CGeometryObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
+		return true;
+	}
+
+	Q_INVOKABLE int getItemsCount(){
+		return rowCount();
+	}
+	Q_INVOKABLE QVariantMap get(int row) const{
+		QVariantMap data;
+		QModelIndex idx = index(row, 0);
+		if (!idx.isValid()) return data;
+		QHash<int, QByteArray> roles = roleNames();
+		for (auto it = roles.begin(); it != roles.end(); ++it)
+			data[it.value()] = idx.data(it.key());
+		return data;
+	}
+	Q_INVOKABLE void append(sdl::complextest::CTTypes::CGeometryObject* item){
+		beginInsertRows(QModelIndex(), rowCount(), rowCount());
+		Version_1_0->append(*item->Version_1_0);
+		ClearCache();
+		endInsertRows();
+	}
+	Q_INVOKABLE sdl::complextest::CTTypes::CGeometryObjectList* copyMe(){
+		sdl::complextest::CTTypes::CGeometryObjectList* objectListPtr = new sdl::complextest::CTTypes::CGeometryObjectList();
+
+		for (int i = 0; i < this->rowCount(); i++){
+			QVariant item = this->getData("item", i);
+			if (!item.canConvert<sdl::complextest::CTTypes::CGeometryObject>()){
+				return nullptr;
+			}
+
+			sdl::complextest::CTTypes::CGeometryObject* itemObjectPtr = item.value<sdl::complextest::CTTypes::CGeometryObject*>();
+			if (itemObjectPtr == nullptr){
+				return nullptr;
+			}
+
+			objectListPtr->addElement(dynamic_cast<sdl::complextest::CTTypes::CGeometryObject*>(itemObjectPtr->copyMe()));
+		}
+
+		return objectListPtr;
+	}
+
+	Q_INVOKABLE QString toJson(){
+		QString retVal = QStringLiteral("[");
+
+		for (int i = 0; i < this->rowCount(); i++){
+			if (i > 0 && i < this->rowCount() - 1){
+				retVal += QStringLiteral(", ");
+			}
+
+			QVariant item = this->getData("item", i);
+			if (!item.canConvert<sdl::complextest::CTTypes::CGeometryObject>()){
+				return nullptr;
+			}
+
+			sdl::complextest::CTTypes::CGeometryObject* itemObjectPtr = item.value<sdl::complextest::CTTypes::CGeometryObject*>();
+			if (itemObjectPtr == nullptr){
+				return QString();
+			}
+
+			retVal += itemObjectPtr->toJson();
+		}
+
+		retVal += QStringLiteral("]");
+
+		return retVal;
+	}
+
+	Q_INVOKABLE QString toGraphQL(){
+		QString retVal = QStringLiteral("[");
+
+		for (int i = 0; i < this->rowCount(); i++){
+			if (i > 0 && i < this->rowCount() - 1){
+				retVal += QStringLiteral(", ");
+			}
+
+			QVariant item = this->getData("item", i);
+			if (!item.canConvert<sdl::complextest::CTTypes::CGeometryObject>()){
+				return nullptr;
+			}
+
+			sdl::complextest::CTTypes::CGeometryObject* itemObjectPtr = item.value<sdl::complextest::CTTypes::CGeometryObject*>();
+			if (itemObjectPtr == nullptr){
+				return QString();
+			}
+
+			retVal += itemObjectPtr->toGraphQL();
+		}
+
+		retVal += QStringLiteral("]");
+
+		return retVal;
+	}
+
+	Q_INVOKABLE void addElement(sdl::complextest::CTTypes::CGeometryObject* item){
+		append(item);
+	}
+
+	Q_INVOKABLE void removeElement(int index){
+		remove(index);
+	}
+
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::CTTypes::CGeometryObjectList* otherModelPtr){
+		if (otherModelPtr == nullptr){
+			return false;
+		}
+
+		if (this == otherModelPtr){
+			return false;
+		}
+
+		if (this->rowCount() != otherModelPtr->rowCount()){
+			return false;
+		}
+
+		for (int i = 0; i < this->rowCount(); i++){
+			QVariant selfItem = this->getData("item", i);
+			QVariant otherItem = otherModelPtr->getData("item", i);
+			if (!selfItem.canConvert<sdl::complextest::CTTypes::CGeometryObject>()){
+				return false;
+			}
+
+			sdl::complextest::CTTypes::CGeometryObject* selfItemObjectPtr = selfItem.value<sdl::complextest::CTTypes::CGeometryObject*>();
+			if (selfItemObjectPtr == nullptr){
+				return false;
+			}
+
+			sdl::complextest::CTTypes::CGeometryObject* otherItemObjectPtr = selfItem.value<sdl::complextest::CTTypes::CGeometryObject*>();
+			if (otherItemObjectPtr == nullptr){
+				return false;
+			}
+
+			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	Q_INVOKABLE void insert(int index, sdl::complextest::CTTypes::CGeometryObject* item){
+		if (index < 0 || index > Version_1_0->size()) return;
+		beginInsertRows(QModelIndex(), index, index);
+		Version_1_0->insert(index, *item->Version_1_0);
+		ClearCache();
+		endInsertRows();
+	}
+	Q_INVOKABLE void remove(int index){
+		if (index < 0 || index >= Version_1_0->size()) return;
+		beginRemoveRows(QModelIndex(), index, index);
+		Version_1_0->removeAt(index);
+		ClearCache();
+		endRemoveRows();
+	}
+	Q_INVOKABLE void clear(){
+		beginResetModel();
+		ClearCache();
+		Version_1_0->clear();
+		endResetModel();
+	}
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
+		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+			sdl::complextest::CTTypes::CGeometryObject* retVal = GetOrCreateCachedObject(index);
+			return QVariant::fromValue(retVal);
+		}
+		if (nameId == "m_geometryType"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).GeometryType.value());
+		}
+		if (nameId == "m_radius"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Radius.value());
+		}
+		if (nameId == "m_points"){
+			sdl::complextest::CTTypes::CGeometryObject* retVal = GetOrCreateCachedObject(index);
+			return QVariant::fromValue(retVal->GetPoints());
+		}
+		return QVariant();
+	}
+	signals:
+	void countChanged();
+};
+
+
+
 } // namespace sdl::complextest::CTTypes
 
 
 Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CGeometry::V1_0);
 Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CGeometry);
 
+
+
+
+
+/// \file QmlRegister.h
+
+#pragma once
+
+
+#ifdef QT_QML_LIB
+#include <QtQml/QQmlEngine>
+
+
+namespace sdl::complextest::CTTypes
+{
+
+
+static void RegisterQmlTypes()
+{
+	qmlRegisterType<CPointObject>("complextestCTTypesSdl", 1, 0, "Point");
+	qmlRegisterType<CGeometryObject>("complextestCTTypesSdl", 1, 0, "Geometry");
+	qmlRegisterSingletonType<EnumStatusCode>("complextestCTTypesSdl", 1, 0, "StatusCode", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+		Q_UNUSED(engine)
+		Q_UNUSED(scriptEngine)
+
+		EnumStatusCode *enumType = new EnumStatusCode();
+		return enumType;
+	});
+	qmlRegisterSingletonType<EnumErrorCode>("complextestCTTypesSdl", 1, 0, "ErrorCode", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+		Q_UNUSED(engine)
+		Q_UNUSED(scriptEngine)
+
+		EnumErrorCode *enumType = new EnumErrorCode();
+		return enumType;
+	});
+	qmlRegisterSingletonType<EnumMeasurementType>("complextestCTTypesSdl", 1, 0, "MeasurementType", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+		Q_UNUSED(engine)
+		Q_UNUSED(scriptEngine)
+
+		EnumMeasurementType *enumType = new EnumMeasurementType();
+		return enumType;
+	});
+	qmlRegisterSingletonType<EnumMeasurementUnit>("complextestCTTypesSdl", 1, 0, "MeasurementUnit", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+		Q_UNUSED(engine)
+		Q_UNUSED(scriptEngine)
+
+		EnumMeasurementUnit *enumType = new EnumMeasurementUnit();
+		return enumType;
+	});
+	qmlRegisterSingletonType<EnumGeometryType>("complextestCTTypesSdl", 1, 0, "GeometryType", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+		Q_UNUSED(engine)
+		Q_UNUSED(scriptEngine)
+
+		EnumGeometryType *enumType = new EnumGeometryType();
+		return enumType;
+	});
+}
+} // namespace sdl::complextest::CTTypes
+#endif
 
 
 
