@@ -1000,7 +1000,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 						stream << QStringLiteral("0;");
 					}
 				}
-				else if (field.GetType() == "Double"){
+				else if (field.GetType() == "Double" || field.GetType() == "Float"){
 					if (isArray){
 						stream << QStringLiteral("QList<double>();");
 					}
@@ -1376,7 +1376,7 @@ QString CSdlQObjectGenerator::GetQObjectTypeName(const imtsdl::CSdlField& field,
 		else if (field.GetType() == "Integer" || field.GetType() == "Int"){
 			retVal += QStringLiteral("int");
 		}
-		else if (field.GetType() == "Double"){
+		else if (field.GetType() == "Double" || field.GetType() == "Float"){
 			retVal += QStringLiteral("double");
 		}
 		else if (field.GetType() == "Boolean" || field.GetType() == "Bool"){
