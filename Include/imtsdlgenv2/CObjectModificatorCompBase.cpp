@@ -703,7 +703,9 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 		if (isCustom){
 			if (conversionType == imtsdl::CSdlUnionConverter::CT_GQL_SCALAR || conversionType == imtsdl::CSdlUnionConverter::CT_GQL_ARRAY){
 				FeedStreamHorizontally(stream, 1);
-				stream << QStringLiteral("const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr(\"item\");");
+				/// \todo fix variabels gqlObject
+				stream << QStringLiteral("const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr(\"");
+				stream << field.GetId() << QStringLiteral("\");");
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 1);
 				stream << QStringLiteral("if (!itemDataObjectPtr->ContainsParam(\"__typename\")) {");
@@ -733,7 +735,8 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 			}
 			else{
 				FeedStreamHorizontally(stream, 1);
-				stream << QStringLiteral("QJsonObject itemObject = jsonObject.value(\"item\").toObject();");
+				stream << QStringLiteral("QJsonObject itemObject = jsonObject.value(\"");
+				stream << field.GetId() <<  QStringLiteral("\").toObject();");
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 1);
 				stream << QStringLiteral("if (!itemObject.contains(\"__typename\")){");

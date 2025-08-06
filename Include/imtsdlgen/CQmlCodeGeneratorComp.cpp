@@ -444,7 +444,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			ifStream << QStringLiteral(" = createComponent('");
 			ifStream << QStringLiteral("m_");
 			ifStream << GetDecapitalizedValue(sdlField.GetId());
-			ifStream << QStringLiteral("', typename).createObject()");
+			ifStream << QStringLiteral("', typename).createObject(this)");
 			FeedStream(ifStream, 1, false);
 			FeedStreamHorizontally(ifStream, 2);
 			ifStream << QStringLiteral("m_");

@@ -317,14 +317,14 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 			stream << '!';
 		}
 		stream << '(';
-		stream << QStringLiteral("(gqlObject.IsObject(\"item\") && ");
+		stream << QStringLiteral("(gqlObject.IsObject(\"") << field.GetId() << QStringLiteral("\") && ");
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
 		stream << field.GetId();
 		stream << QStringLiteral("\") ");
 		stream << QStringLiteral("== nullptr)");
 		stream << QStringLiteral(" || ");
-		stream << QStringLiteral("(!gqlObject.IsObject(\"item\") && ");
+		stream << QStringLiteral("(!gqlObject.IsObject(\"") << field.GetId() << QStringLiteral("\") && ");
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral("[\"");
 		stream << field.GetId();
@@ -342,6 +342,9 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		stream << QStringLiteral("\") ");
 		if(expected){
 			stream << '!';
+		}
+		else {
+			stream << '=';
 		}
 		stream << QStringLiteral("= nullptr");
 	}
