@@ -4703,7 +4703,7 @@ bool CArea::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 
-	if (!gqlObject.ContainsParam("Results") || (gqlObject.GetObjectsCount("Results") <= 0)){
+	if (!gqlObject.ContainsParam("Results")){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Results");)
 
 		return false;
@@ -10618,8 +10618,8 @@ bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && (!((gqlObject.IsObject("item") && gqlObject.GetParamArgumentObjectPtr("value") == nullptr) || (!gqlObject.IsObject("item") && gqlObject["value"].isNull())) && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
-			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
+	if (gqlObject.ContainsParam("value") && (!((gqlObject.IsObject("value") && gqlObject.GetParamArgumentObjectPtr("value") == nullptr) || (!gqlObject.IsObject("value") && gqlObject["value"].isNull())) && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
+			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
 	if (!itemDataObjectPtr->ContainsParam("__typename")) {
 		qDebug() << "invalid typename for: value";
 		return false;
@@ -10656,8 +10656,8 @@ bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && (!((gqlObject.IsObject("item") && gqlObject.GetParamArgumentObjectPtr("value") == nullptr) || (!gqlObject.IsObject("item") && gqlObject["value"].isNull())) && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
-			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
+	if (gqlObject.ContainsParam("value") && (!((gqlObject.IsObject("value") && gqlObject.GetParamArgumentObjectPtr("value") == nullptr) || (!gqlObject.IsObject("value") && gqlObject["value"].isNull())) && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
+			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
 	if (!itemDataObjectPtr->ContainsParam("__typename")) {
 		qDebug() << "invalid typename for: value";
 		return false;
@@ -10735,7 +10735,7 @@ bool CExtendedMetaData::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("value") && jsonObject["value"].isObject()){
-			QJsonObject itemObject = jsonObject.value("item").toObject();
+			QJsonObject itemObject = jsonObject.value("value").toObject();
 	if (!itemObject.contains("__typename")){
 		qDebug() << "invalid typename for: value";
 		return false;
@@ -10772,7 +10772,7 @@ bool CExtendedMetaData::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObjec
 	}
 
 	if (jsonObject.contains("value") && jsonObject["value"].isObject()){
-			QJsonObject itemObject = jsonObject.value("item").toObject();
+			QJsonObject itemObject = jsonObject.value("value").toObject();
 	if (!itemObject.contains("__typename")){
 		qDebug() << "invalid typename for: value";
 		return false;
@@ -13352,7 +13352,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
+	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -13428,7 +13428,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
+	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -14454,7 +14454,7 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
+	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -14508,7 +14508,7 @@ bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
+	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -15500,7 +15500,7 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
+	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -15576,7 +15576,7 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && (!gqlObject["resultContent"].isNull())){
+	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
@@ -16879,12 +16879,30 @@ CGetLastProductionResultsGqlRequest::CGetLastProductionResultsGqlRequest(const :
 														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isGeometryTypeRequested = true;
 														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isRadiusRequested = geometryRequestedIds.contains("Radius");
 														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isPointsRequested = true;
+														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isRequiredPointsRequested = true;
+														m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.isOptionalPointsRequested = geometryRequestedIds.contains("OptionalPoints");
 														const imtgql::CGqlFieldObject* pointsRequestedFieldsPtr = geometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("Points");
 														if (pointsRequestedFieldsPtr != nullptr){
 															const QByteArrayList pointsRequestedIds = pointsRequestedFieldsPtr->GetFieldIds();
 															if (!pointsRequestedIds.isEmpty()){
 																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.Points.isXRequested = true;
 																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.Points.isYRequested = true;
+															}
+														}
+														const imtgql::CGqlFieldObject* requiredPointsRequestedFieldsPtr = geometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("RequiredPoints");
+														if (requiredPointsRequestedFieldsPtr != nullptr){
+															const QByteArrayList requiredPointsRequestedIds = requiredPointsRequestedFieldsPtr->GetFieldIds();
+															if (!requiredPointsRequestedIds.isEmpty()){
+																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.RequiredPoints.isXRequested = true;
+																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.RequiredPoints.isYRequested = true;
+															}
+														}
+														const imtgql::CGqlFieldObject* optionalPointsRequestedFieldsPtr = geometryRequestedFieldsPtr->GetFieldArgumentObjectPtr("OptionalPoints");
+														if (optionalPointsRequestedFieldsPtr != nullptr){
+															const QByteArrayList optionalPointsRequestedIds = optionalPointsRequestedFieldsPtr->GetFieldIds();
+															if (!optionalPointsRequestedIds.isEmpty()){
+																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.OptionalPoints.isXRequested = true;
+																m_requestInfo.Inspections.Analyzers.Areas.Results.Geometry.OptionalPoints.isYRequested = true;
 															}
 														}
 													}

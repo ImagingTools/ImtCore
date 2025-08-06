@@ -102,4 +102,6 @@ type Geometry{
 	GeometryType: GeometryType!
 	Radius: Float
 	Points: [Point]!
+	RequiredPoints: [Point!]!
+	OptionalPoints: [Point]
 }

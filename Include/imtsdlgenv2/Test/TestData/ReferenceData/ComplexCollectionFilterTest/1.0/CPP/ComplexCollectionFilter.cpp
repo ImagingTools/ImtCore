@@ -1670,7 +1670,7 @@ bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
-	if (gqlObject.ContainsParam("filterOperations") && (!gqlObject["filterOperations"].isNull())){
+	if (gqlObject.ContainsParam("filterOperations") && !(gqlObject["filterOperations"].isNull())){
 		const QVariant filterOperationsData = gqlObject["filterOperations"];
 		const QVariantList filterOperationsDataList = filterOperationsData.toList();
 		const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
@@ -3552,7 +3552,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 		}
 	}
 
-	if (gqlObject.ContainsParam("distinctFields") && (!gqlObject["distinctFields"].isNull())){
+	if (gqlObject.ContainsParam("distinctFields") && !(gqlObject["distinctFields"].isNull())){
 		const QVariant distinctFieldsData = gqlObject["distinctFields"];
 		const QVariantList distinctFieldsDataList = distinctFieldsData.toList();
 		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();
@@ -3608,7 +3608,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 		}
 	}
 
-	if (gqlObject.ContainsParam("distinctFields") && (!gqlObject["distinctFields"].isNull())){
+	if (gqlObject.ContainsParam("distinctFields") && !(gqlObject["distinctFields"].isNull())){
 		const QVariant distinctFieldsData = gqlObject["distinctFields"];
 		const QVariantList distinctFieldsDataList = distinctFieldsData.toList();
 		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();

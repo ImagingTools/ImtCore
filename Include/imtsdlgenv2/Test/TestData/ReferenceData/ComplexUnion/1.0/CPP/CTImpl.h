@@ -5275,11 +5275,23 @@ struct GetLastProductionResultsRequestInfo
 							bool isGeometryTypeRequested = true;
 							bool isRadiusRequested = true;
 							bool isPointsRequested = true;
+							bool isRequiredPointsRequested = true;
+							bool isOptionalPointsRequested = true;
 							struct PointsRequestInfo
 							{
 								bool isXRequested = true;
 								bool isYRequested = true;
 							} Points;
+							struct RequiredPointsRequestInfo
+							{
+								bool isXRequested = true;
+								bool isYRequested = true;
+							} RequiredPoints;
+							struct OptionalPointsRequestInfo
+							{
+								bool isXRequested = true;
+								bool isYRequested = true;
+							} OptionalPoints;
 						} Geometry;
 					} Results;
 				} Areas;

@@ -10225,7 +10225,7 @@ bool CParamsSet::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 
 bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("paramIds") && (!gqlObject["paramIds"].isNull())){
+	if (gqlObject.ContainsParam("paramIds") && !(gqlObject["paramIds"].isNull())){
 		const QVariant paramIdsData = gqlObject["paramIds"];
 		const QVariantList paramIdsDataList = paramIdsData.toList();
 		const qsizetype paramIdsElementsCount = paramIdsDataList.size();
@@ -10236,7 +10236,7 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramTypeIds") && (!gqlObject["paramTypeIds"].isNull())){
+	if (gqlObject.ContainsParam("paramTypeIds") && !(gqlObject["paramTypeIds"].isNull())){
 		const QVariant paramTypeIdsData = gqlObject["paramTypeIds"];
 		const QVariantList paramTypeIdsDataList = paramTypeIdsData.toList();
 		const qsizetype paramTypeIdsElementsCount = paramTypeIdsDataList.size();
@@ -10247,7 +10247,7 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramNames") && (!gqlObject["paramNames"].isNull())){
+	if (gqlObject.ContainsParam("paramNames") && !(gqlObject["paramNames"].isNull())){
 		const QVariant paramNamesData = gqlObject["paramNames"];
 		const QVariantList paramNamesDataList = paramNamesData.toList();
 		const qsizetype paramNamesElementsCount = paramNamesDataList.size();
@@ -10258,7 +10258,7 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramDescriptions") && (!gqlObject["paramDescriptions"].isNull())){
+	if (gqlObject.ContainsParam("paramDescriptions") && !(gqlObject["paramDescriptions"].isNull())){
 		const QVariant paramDescriptionsData = gqlObject["paramDescriptions"];
 		const QVariantList paramDescriptionsDataList = paramDescriptionsData.toList();
 		const qsizetype paramDescriptionsElementsCount = paramDescriptionsDataList.size();
@@ -10269,7 +10269,7 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("parameters") && (!gqlObject["parameters"].isNull())){
+	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
 		const QVariantList parametersDataList = parametersData.toList();
 		const qsizetype parametersElementsCount = parametersDataList.size();
@@ -10286,7 +10286,7 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 
 bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("paramIds") && (!gqlObject["paramIds"].isNull())){
+	if (gqlObject.ContainsParam("paramIds") && !(gqlObject["paramIds"].isNull())){
 		const QVariant paramIdsData = gqlObject["paramIds"];
 		const QVariantList paramIdsDataList = paramIdsData.toList();
 		const qsizetype paramIdsElementsCount = paramIdsDataList.size();
@@ -10297,7 +10297,7 @@ bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramTypeIds") && (!gqlObject["paramTypeIds"].isNull())){
+	if (gqlObject.ContainsParam("paramTypeIds") && !(gqlObject["paramTypeIds"].isNull())){
 		const QVariant paramTypeIdsData = gqlObject["paramTypeIds"];
 		const QVariantList paramTypeIdsDataList = paramTypeIdsData.toList();
 		const qsizetype paramTypeIdsElementsCount = paramTypeIdsDataList.size();
@@ -10308,7 +10308,7 @@ bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramNames") && (!gqlObject["paramNames"].isNull())){
+	if (gqlObject.ContainsParam("paramNames") && !(gqlObject["paramNames"].isNull())){
 		const QVariant paramNamesData = gqlObject["paramNames"];
 		const QVariantList paramNamesDataList = paramNamesData.toList();
 		const qsizetype paramNamesElementsCount = paramNamesDataList.size();
@@ -10319,7 +10319,7 @@ bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
-	if (gqlObject.ContainsParam("paramDescriptions") && (!gqlObject["paramDescriptions"].isNull())){
+	if (gqlObject.ContainsParam("paramDescriptions") && !(gqlObject["paramDescriptions"].isNull())){
 		const QVariant paramDescriptionsData = gqlObject["paramDescriptions"];
 		const QVariantList paramDescriptionsDataList = paramDescriptionsData.toList();
 		const qsizetype paramDescriptionsElementsCount = paramDescriptionsDataList.size();
@@ -10330,7 +10330,7 @@ bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
-	if (gqlObject.ContainsParam("parameters") && (!gqlObject["parameters"].isNull())){
+	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
 		const QVariantList parametersDataList = parametersData.toList();
 		const qsizetype parametersElementsCount = parametersDataList.size();
@@ -11156,7 +11156,7 @@ bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	type = gqlObject["type"].toString();
 
-	if (gqlObject.ContainsParam("tree") && (!gqlObject["tree"].isNull())){
+	if (gqlObject.ContainsParam("tree") && !(gqlObject["tree"].isNull())){
 		const QVariant treeData = gqlObject["tree"];
 		const QVariantList treeDataList = treeData.toList();
 		const qsizetype treeElementsCount = treeDataList.size();
@@ -11178,7 +11178,7 @@ bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		suffix = gqlObject["suffix"].toString();
 	}
 
-	if (gqlObject.ContainsParam("parameters") && (!gqlObject["parameters"].isNull())){
+	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
 		const QVariantList parametersDataList = parametersData.toList();
 		const qsizetype parametersElementsCount = parametersDataList.size();
@@ -11199,7 +11199,7 @@ bool CMimeType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		type = gqlObject["type"].toString();
 	}
 
-	if (gqlObject.ContainsParam("tree") && (!gqlObject["tree"].isNull())){
+	if (gqlObject.ContainsParam("tree") && !(gqlObject["tree"].isNull())){
 		const QVariant treeData = gqlObject["tree"];
 		const QVariantList treeDataList = treeData.toList();
 		const qsizetype treeElementsCount = treeDataList.size();
@@ -11218,7 +11218,7 @@ bool CMimeType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		suffix = gqlObject["suffix"].toString();
 	}
 
-	if (gqlObject.ContainsParam("parameters") && (!gqlObject["parameters"].isNull())){
+	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
 		const QVariantList parametersDataList = parametersData.toList();
 		const qsizetype parametersElementsCount = parametersDataList.size();

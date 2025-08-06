@@ -820,11 +820,15 @@ public:
 			static const inline QString GeometryType = "GeometryType";
 			static const inline QString Radius = "Radius";
 			static const inline QString Points = "Points";
+			static const inline QString RequiredPoints = "RequiredPoints";
+			static const inline QString OptionalPoints = "OptionalPoints";
 		};
 
 		istd::TSharedNullable<GeometryType> GeometryType;
 		istd::TSharedNullable<double> Radius;
 		istd::TSharedNullable<QList<CPoint::V1_0>> Points;
+		istd::TSharedNullable<QList<CPoint::V1_0>> RequiredPoints;
+		istd::TSharedNullable<QList<CPoint::V1_0>> OptionalPoints;
 
 		static QByteArray GetVersionId();
 
@@ -870,6 +874,8 @@ class CGeometryObject: public ::imtbase::CItemModelBase, public CGeometry
 	Q_PROPERTY(QString m_geometryType READ GetGeometryType WRITE SetGeometryType NOTIFY geometryTypeChanged)
 	Q_PROPERTY(double m_radius READ GetRadius WRITE SetRadius NOTIFY radiusChanged)
 	Q_PROPERTY(sdl::complextest::CTTypes::CPointObjectList* m_points READ GetPoints WRITE SetPoints NOTIFY pointsChanged)
+	Q_PROPERTY(sdl::complextest::CTTypes::CPointObjectList* m_requiredPoints READ GetRequiredPoints WRITE SetRequiredPoints NOTIFY requiredPointsChanged)
+	Q_PROPERTY(sdl::complextest::CTTypes::CPointObjectList* m_optionalPoints READ GetOptionalPoints WRITE SetOptionalPoints NOTIFY optionalPointsChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
@@ -886,6 +892,14 @@ public:
 	void SetPoints(sdl::complextest::CTTypes::CPointObjectList* v);
 	Q_INVOKABLE bool hasPoints();
 	Q_INVOKABLE void createPoints();
+	sdl::complextest::CTTypes::CPointObjectList* GetRequiredPoints();
+	void SetRequiredPoints(sdl::complextest::CTTypes::CPointObjectList* v);
+	Q_INVOKABLE bool hasRequiredPoints();
+	Q_INVOKABLE void createRequiredPoints();
+	sdl::complextest::CTTypes::CPointObjectList* GetOptionalPoints();
+	void SetOptionalPoints(sdl::complextest::CTTypes::CPointObjectList* v);
+	Q_INVOKABLE bool hasOptionalPoints();
+	Q_INVOKABLE void createOptionalPoints();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -898,10 +912,14 @@ signals:
 	void geometryTypeChanged();
 	void radiusChanged();
 	void pointsChanged();
+	void requiredPointsChanged();
+	void optionalPointsChanged();
 	void finished();
 
 protected:
 	sdl::complextest::CTTypes::CPointObjectList* m_pointsQObjectPtr;
+	sdl::complextest::CTTypes::CPointObjectList* m_requiredPointsQObjectPtr;
+	sdl::complextest::CTTypes::CPointObjectList* m_optionalPointsQObjectPtr;
 };
 
 
@@ -1088,6 +1106,14 @@ public:
 		if (nameId == "m_points"){
 			sdl::complextest::CTTypes::CGeometryObject* retVal = GetOrCreateCachedObject(index);
 			return QVariant::fromValue(retVal->GetPoints());
+		}
+		if (nameId == "m_requiredPoints"){
+			sdl::complextest::CTTypes::CGeometryObject* retVal = GetOrCreateCachedObject(index);
+			return QVariant::fromValue(retVal->GetRequiredPoints());
+		}
+		if (nameId == "m_optionalPoints"){
+			sdl::complextest::CTTypes::CGeometryObject* retVal = GetOrCreateCachedObject(index);
+			return QVariant::fromValue(retVal->GetOptionalPoints());
 		}
 		return QVariant();
 	}

@@ -558,7 +558,9 @@ bool CGeometry::V1_0::operator==(const V1_0& other) const
 				Radius.has_value() == other.Radius.has_value() &&
 				((Radius.has_value() && other.Radius.has_value()) ?
 					qFuzzyCompare(*Radius, *other.Radius) : true) &&
-				Points == other.Points;
+				Points == other.Points &&
+				RequiredPoints == other.RequiredPoints &&
+				OptionalPoints == other.OptionalPoints;
 }
 
 
@@ -599,6 +601,31 @@ bool CGeometry::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "Points");)
 
 			return false;
+		}
+	}
+	if (!RequiredPoints || RequiredPoints->isEmpty()){
+		return false;
+	}
+	::imtbase::CTreeItemModel* newRequiredPointsModelPtr = model.AddTreeModel("RequiredPoints", modelIndex);
+	newRequiredPointsModelPtr->setIsArray(true);
+	for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < RequiredPoints->size(); ++requiredPointsIndex){
+		newRequiredPointsModelPtr->InsertNewItem();
+		if (!(RequiredPoints->at(requiredPointsIndex).WriteToModel(*newRequiredPointsModelPtr, requiredPointsIndex))){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+			return false;
+		}
+	}
+	if (OptionalPoints){
+		::imtbase::CTreeItemModel* newOptionalPointsModelPtr = model.AddTreeModel("OptionalPoints", modelIndex);
+		newOptionalPointsModelPtr->setIsArray(true);
+		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < OptionalPoints->size(); ++optionalPointsIndex){
+			newOptionalPointsModelPtr->InsertNewItem();
+			if (!(OptionalPoints->at(optionalPointsIndex).WriteToModel(*newOptionalPointsModelPtr, optionalPointsIndex))){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints");)
+
+				return false;
+			}
 		}
 	}
 
@@ -655,6 +682,48 @@ bool CGeometry::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 	Points = pointsList;
 
 
+	::imtbase::CTreeItemModel* requiredPointsModel = model.GetTreeItemModel("RequiredPoints", modelIndex);
+	if (requiredPointsModel == nullptr){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' is missing, but required.").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+		return false;
+	}
+	int requiredPointsCount = requiredPointsModel->GetItemsCount();
+	if (requiredPointsCount <= 0){
+	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' is empty").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+		return false;
+	}
+	QList<CPoint::V1_0> requiredPointsList;
+	for (int requiredPointsIndex = 0; requiredPointsIndex < requiredPointsCount; ++requiredPointsIndex){
+		CPoint::V1_0 requiredPoints;
+		if (!requiredPoints.ReadFromModel(*requiredPointsModel, requiredPointsIndex)){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+			return false;
+		}
+		requiredPointsList << requiredPoints;
+	}
+	RequiredPoints = requiredPointsList;
+
+
+	::imtbase::CTreeItemModel* optionalPointsModel = model.GetTreeItemModel("OptionalPoints", modelIndex);
+	if (optionalPointsModel != nullptr){
+		int optionalPointsCount = optionalPointsModel->GetItemsCount();
+		QList<CPoint::V1_0> optionalPointsList;
+		for (int optionalPointsIndex = 0; optionalPointsIndex < optionalPointsCount; ++optionalPointsIndex){
+			CPoint::V1_0 optionalPoints;
+			if (!optionalPoints.ReadFromModel(*optionalPointsModel, optionalPointsIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints");)
+
+				return false;
+			}
+			optionalPointsList << optionalPoints;
+		}
+		OptionalPoints = optionalPointsList;
+
+	}
+
 	return true;
 }
 
@@ -699,6 +768,45 @@ bool CGeometry::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 			pointsList << points;
 		}
 		Points = pointsList;
+
+	}
+
+	::imtbase::CTreeItemModel* requiredPointsModel = model.GetTreeItemModel("RequiredPoints", modelIndex);
+	if (requiredPointsModel != nullptr){
+		int requiredPointsCount = requiredPointsModel->GetItemsCount();
+		if (requiredPointsCount <= 0){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' is empty").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+			return false;
+		}
+		QList<CPoint::V1_0> requiredPointsList;
+		for (int requiredPointsIndex = 0; requiredPointsIndex < requiredPointsCount; ++requiredPointsIndex){
+			CPoint::V1_0 requiredPoints;
+			if (!requiredPoints.OptReadFromModel(*requiredPointsModel, requiredPointsIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+				return false;
+			}
+			requiredPointsList << requiredPoints;
+		}
+		RequiredPoints = requiredPointsList;
+
+	}
+
+	::imtbase::CTreeItemModel* optionalPointsModel = model.GetTreeItemModel("OptionalPoints", modelIndex);
+	if (optionalPointsModel != nullptr){
+		int optionalPointsCount = optionalPointsModel->GetItemsCount();
+		QList<CPoint::V1_0> optionalPointsList;
+		for (int optionalPointsIndex = 0; optionalPointsIndex < optionalPointsCount; ++optionalPointsIndex){
+			CPoint::V1_0 optionalPoints;
+			if (!optionalPoints.OptReadFromModel(*optionalPointsModel, optionalPointsIndex)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints");)
+
+				return false;
+			}
+			optionalPointsList << optionalPoints;
+		}
+		OptionalPoints = optionalPointsList;
 
 	}
 
@@ -747,6 +855,35 @@ bool CGeometry::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 	}
 	gqlObject.InsertParam("Points", pointsDataObjectList);
 
+	if (!RequiredPoints || RequiredPoints->isEmpty()){
+		return false;
+	}
+	QList<::imtgql::CGqlParamObject> requiredPointsDataObjectList;
+	for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < RequiredPoints->size(); ++requiredPointsIndex){
+		::imtgql::CGqlParamObject newRequiredPointsGqlObject;
+		if (!RequiredPoints->at(requiredPointsIndex).WriteToGraphQlObject(newRequiredPointsGqlObject)){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+			return false;
+		}
+		requiredPointsDataObjectList << newRequiredPointsGqlObject;
+	}
+	gqlObject.InsertParam("RequiredPoints", requiredPointsDataObjectList);
+
+	if (OptionalPoints){
+		QList<::imtgql::CGqlParamObject> optionalPointsDataObjectList;
+		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < OptionalPoints->size(); ++optionalPointsIndex){
+			::imtgql::CGqlParamObject newOptionalPointsGqlObject;
+			if (!OptionalPoints->at(optionalPointsIndex).WriteToGraphQlObject(newOptionalPointsGqlObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints");)
+
+				return false;
+			}
+			optionalPointsDataObjectList << newOptionalPointsGqlObject;
+		}
+		gqlObject.InsertParam("OptionalPoints", optionalPointsDataObjectList);
+	}
+
 	return true;
 }
 
@@ -778,7 +915,7 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		Radius = gqlObject["Radius"].toDouble();
 	}
 
-	if (!gqlObject.ContainsParam("Points") || (gqlObject.GetObjectsCount("Points") <= 0)){
+	if (!gqlObject.ContainsParam("Points")){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "Points");)
 
 		return false;
@@ -798,6 +935,52 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 			return false;
 		}
 		Points->append(tempPoints);
+	}
+
+	if (!gqlObject.ContainsParam("RequiredPoints")){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+		return false;
+	}
+	const qsizetype requiredPointsElementsCount = gqlObject.GetObjectsCount("requiredPoints");
+	if (requiredPointsElementsCount <= 0){
+	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' is empty").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+		return false;
+	}
+	RequiredPoints = QList<CPoint::V1_0>();
+	for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsElementsCount; ++requiredPointsIndex){
+		const ::imtgql::CGqlParamObject* requiredPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("RequiredPoints", requiredPointsIndex);
+		if (requiredPointsDataObjectPtr == nullptr){
+			qDebug() << "invalid type" << requiredPointsDataObjectPtr;
+			return false;
+		}
+		CPoint::V1_0 tempRequiredPoints;
+		if (!tempRequiredPoints.ReadFromGraphQlObject(*requiredPointsDataObjectPtr)){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+			return false;
+		}
+		RequiredPoints->append(tempRequiredPoints);
+	}
+
+	if (gqlObject.ContainsParam("OptionalPoints") && (gqlObject.GetObjectsCount("OptionalPoints") > 0)){
+		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("optionalPoints");
+		OptionalPoints = QList<CPoint::V1_0>();
+		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsElementsCount; ++optionalPointsIndex){
+			const ::imtgql::CGqlParamObject* optionalPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("OptionalPoints", optionalPointsIndex);
+			if (optionalPointsDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << optionalPointsDataObjectPtr;
+				return false;
+			}
+			CPoint::V1_0 tempOptionalPoints;
+			if (!tempOptionalPoints.ReadFromGraphQlObject(*optionalPointsDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints");)
+
+				return false;
+			}
+			OptionalPoints->append(tempOptionalPoints);
+		}
 	}
 
 	return true;
@@ -847,6 +1030,49 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		}
 	}
 
+	if (gqlObject.ContainsParam("RequiredPoints") && (gqlObject.GetObjectsCount("RequiredPoints") > 0)){
+		const qsizetype requiredPointsElementsCount = gqlObject.GetObjectsCount("requiredPoints");
+		if (requiredPointsElementsCount <= 0){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' is empty").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+			return false;
+		}
+		RequiredPoints = QList<CPoint::V1_0>();
+		for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsElementsCount; ++requiredPointsIndex){
+			const ::imtgql::CGqlParamObject* requiredPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("RequiredPoints", requiredPointsIndex);
+			if (requiredPointsDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << requiredPointsDataObjectPtr;
+				return false;
+			}
+			CPoint::V1_0 tempRequiredPoints;
+			if (!tempRequiredPoints.OptReadFromGraphQlObject(*requiredPointsDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+				return false;
+			}
+			RequiredPoints->append(tempRequiredPoints);
+		}
+	}
+
+	if (gqlObject.ContainsParam("OptionalPoints") && (gqlObject.GetObjectsCount("OptionalPoints") > 0)){
+		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("optionalPoints");
+		OptionalPoints = QList<CPoint::V1_0>();
+		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsElementsCount; ++optionalPointsIndex){
+			const ::imtgql::CGqlParamObject* optionalPointsDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("OptionalPoints", optionalPointsIndex);
+			if (optionalPointsDataObjectPtr == nullptr){
+				qDebug() << "invalid type" << optionalPointsDataObjectPtr;
+				return false;
+			}
+			CPoint::V1_0 tempOptionalPoints;
+			if (!tempOptionalPoints.OptReadFromGraphQlObject(*optionalPointsDataObjectPtr)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints");)
+
+				return false;
+			}
+			OptionalPoints->append(tempOptionalPoints);
+		}
+	}
+
 	return true;
 }
 
@@ -891,6 +1117,35 @@ bool CGeometry::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		newPointsArray << newPointsJsonObject;
 	}
 	jsonObject["Points"] = newPointsArray;
+
+	if (!RequiredPoints || RequiredPoints->isEmpty()){
+		return false;
+	}
+	QJsonArray newRequiredPointsArray;
+	for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < RequiredPoints->size(); ++requiredPointsIndex){
+		QJsonObject newRequiredPointsJsonObject;
+		if (!RequiredPoints->at(requiredPointsIndex).WriteToJsonObject(newRequiredPointsJsonObject)){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+			return false;
+		}
+		newRequiredPointsArray << newRequiredPointsJsonObject;
+	}
+	jsonObject["RequiredPoints"] = newRequiredPointsArray;
+
+	if (OptionalPoints){
+		QJsonArray newOptionalPointsArray;
+		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < OptionalPoints->size(); ++optionalPointsIndex){
+			QJsonObject newOptionalPointsJsonObject;
+			if (!OptionalPoints->at(optionalPointsIndex).WriteToJsonObject(newOptionalPointsJsonObject)){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints");)
+
+				return false;
+			}
+			newOptionalPointsArray << newOptionalPointsJsonObject;
+		}
+		jsonObject["OptionalPoints"] = newOptionalPointsArray;
+	}
 
 	return true;
 }
@@ -941,6 +1196,44 @@ bool CGeometry::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		Points->append(tempPoints);
 	}
 
+	if (!jsonObject.contains("RequiredPoints") || ! jsonObject["RequiredPoints"].isArray()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+		return false;
+	}
+	const QJsonArray requiredPointsJsonArray = jsonObject["RequiredPoints"].toArray();
+	const qsizetype requiredPointsArrayCount = requiredPointsJsonArray.size();
+	if (requiredPointsArrayCount <= 0){
+	I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' is empty").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+		return false;
+	}
+	RequiredPoints = QList<CPoint::V1_0>();
+	for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsArrayCount; ++requiredPointsIndex){
+		CPoint::V1_0 tempRequiredPoints;
+		if (!tempRequiredPoints.ReadFromJsonObject(requiredPointsJsonArray[requiredPointsIndex].toObject())){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+			return false;
+		}
+		RequiredPoints->append(tempRequiredPoints);
+	}
+
+	if (jsonObject.contains("OptionalPoints") && jsonObject["OptionalPoints"].isArray()){
+		const QJsonArray optionalPointsJsonArray = jsonObject["OptionalPoints"].toArray();
+		const qsizetype optionalPointsArrayCount = optionalPointsJsonArray.size();
+		OptionalPoints = QList<CPoint::V1_0>();
+		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsArrayCount; ++optionalPointsIndex){
+			CPoint::V1_0 tempOptionalPoints;
+			if (!tempOptionalPoints.ReadFromJsonObject(optionalPointsJsonArray[optionalPointsIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints");)
+
+				return false;
+			}
+			OptionalPoints->append(tempOptionalPoints);
+		}
+	}
+
 	return true;
 }
 
@@ -981,6 +1274,41 @@ bool CGeometry::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 				return false;
 			}
 			Points->append(tempPoints);
+		}
+	}
+
+	if (jsonObject.contains("RequiredPoints") && jsonObject["RequiredPoints"].isArray()){
+		const QJsonArray requiredPointsJsonArray = jsonObject["RequiredPoints"].toArray();
+		const qsizetype requiredPointsArrayCount = requiredPointsJsonArray.size();
+		if (requiredPointsArrayCount <= 0){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' is empty").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+			return false;
+		}
+		RequiredPoints = QList<CPoint::V1_0>();
+		for (qsizetype requiredPointsIndex = 0; requiredPointsIndex < requiredPointsArrayCount; ++requiredPointsIndex){
+			CPoint::V1_0 tempRequiredPoints;
+			if (!tempRequiredPoints.OptReadFromJsonObject(requiredPointsJsonArray[requiredPointsIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "RequiredPoints");)
+
+				return false;
+			}
+			RequiredPoints->append(tempRequiredPoints);
+		}
+	}
+
+	if (jsonObject.contains("OptionalPoints") && jsonObject["OptionalPoints"].isArray()){
+		const QJsonArray optionalPointsJsonArray = jsonObject["OptionalPoints"].toArray();
+		const qsizetype optionalPointsArrayCount = optionalPointsJsonArray.size();
+		OptionalPoints = QList<CPoint::V1_0>();
+		for (qsizetype optionalPointsIndex = 0; optionalPointsIndex < optionalPointsArrayCount; ++optionalPointsIndex){
+			CPoint::V1_0 tempOptionalPoints;
+			if (!tempOptionalPoints.OptReadFromJsonObject(optionalPointsJsonArray[optionalPointsIndex].toObject())){
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "OptionalPoints");)
+
+				return false;
+			}
+			OptionalPoints->append(tempOptionalPoints);
 		}
 	}
 
@@ -1219,12 +1547,16 @@ bool CGeometry::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVer
 
 
 CGeometryObject::CGeometryObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_pointsQObjectPtr(nullptr)
+			, m_requiredPointsQObjectPtr(nullptr)
+			, m_optionalPointsQObjectPtr(nullptr)
 {
 	Version_1_0.emplace();
 
 	QObject::connect(this, &CGeometryObject::geometryTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CGeometryObject::radiusChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CGeometryObject::pointsChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CGeometryObject::requiredPointsChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CGeometryObject::optionalPointsChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
 
 
@@ -1323,6 +1655,86 @@ void CGeometryObject::createPoints()
 }
 
 
+sdl::complextest::CTTypes::CPointObjectList* CGeometryObject::GetRequiredPoints()
+{
+	if (Version_1_0->RequiredPoints.has_value()){
+		if (!m_requiredPointsQObjectPtr){
+			m_requiredPointsQObjectPtr = dynamic_cast<sdl::complextest::CTTypes::CPointObjectList*>(CreateObject("RequiredPoints"));
+			m_requiredPointsQObjectPtr->Version_1_0 = Version_1_0->RequiredPoints;
+		}
+		return m_requiredPointsQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CGeometryObject::SetRequiredPoints(sdl::complextest::CTTypes::CPointObjectList* v)
+{
+	if (v){
+		Version_1_0->RequiredPoints = v->Version_1_0;
+		m_requiredPointsQObjectPtr = v;
+	}
+	else {
+		Version_1_0->RequiredPoints = nullptr;
+	}
+
+	requiredPointsChanged();
+}
+
+
+bool CGeometryObject::hasRequiredPoints()
+{
+	 return Version_1_0->RequiredPoints.HasValue();
+}
+
+
+void CGeometryObject::createRequiredPoints()
+{	Version_1_0->RequiredPoints.emplace();
+
+}
+
+
+sdl::complextest::CTTypes::CPointObjectList* CGeometryObject::GetOptionalPoints()
+{
+	if (Version_1_0->OptionalPoints.has_value()){
+		if (!m_optionalPointsQObjectPtr){
+			m_optionalPointsQObjectPtr = dynamic_cast<sdl::complextest::CTTypes::CPointObjectList*>(CreateObject("OptionalPoints"));
+			m_optionalPointsQObjectPtr->Version_1_0 = Version_1_0->OptionalPoints;
+		}
+		return m_optionalPointsQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CGeometryObject::SetOptionalPoints(sdl::complextest::CTTypes::CPointObjectList* v)
+{
+	if (v){
+		Version_1_0->OptionalPoints = v->Version_1_0;
+		m_optionalPointsQObjectPtr = v;
+	}
+	else {
+		Version_1_0->OptionalPoints = nullptr;
+	}
+
+	optionalPointsChanged();
+}
+
+
+bool CGeometryObject::hasOptionalPoints()
+{
+	 return Version_1_0->OptionalPoints.HasValue();
+}
+
+
+void CGeometryObject::createOptionalPoints()
+{	Version_1_0->OptionalPoints.emplace();
+
+}
+
+
 QString CGeometryObject::toJson() const
 {
 	QJsonObject jsonObject;
@@ -1373,6 +1785,12 @@ QObject* CGeometryObject::CreateObject(const QString& key)
 	if (key == "Points"){
 		return new sdl::complextest::CTTypes::CPointObjectList(this);
 	}
+	if (key == "RequiredPoints"){
+		return new sdl::complextest::CTTypes::CPointObjectList(this);
+	}
+	if (key == "OptionalPoints"){
+		return new sdl::complextest::CTTypes::CPointObjectList(this);
+	}
 	return nullptr;
 }
 
@@ -1387,6 +1805,12 @@ QString CGeometryObject::getJSONKeyForProperty(const QString& propertyName) cons
 	}
 	if (propertyName == (QString("m_") + "points")){
 		return "Points";
+	}
+	if (propertyName == (QString("m_") + "requiredPoints")){
+		return "RequiredPoints";
+	}
+	if (propertyName == (QString("m_") + "optionalPoints")){
+		return "OptionalPoints";
 	}
 
 	return propertyName;

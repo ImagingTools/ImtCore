@@ -1043,12 +1043,12 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		name = gqlObject["name"].toString();
 	}
 
-	if (!gqlObject.ContainsParam("specification") || (((gqlObject.IsObject("item") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("item") && gqlObject["specification"].isNull())) || gqlObject.GetParamArgumentObjectPtr("specification") = nullptr)){
+	if (!gqlObject.ContainsParam("specification") || (((gqlObject.IsObject("specification") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("specification") && gqlObject["specification"].isNull())) || gqlObject.GetParamArgumentObjectPtr("specification") == nullptr)){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification");)
 
 		return false;
 	}
-		const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
+		const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 	if (!itemDataObjectPtr->ContainsParam("__typename")) {
 		qDebug() << "invalid typename for: specification";
 		return false;
@@ -1084,8 +1084,8 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("specification") && (!((gqlObject.IsObject("item") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("item") && gqlObject["specification"].isNull())) && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
-			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("item");
+	if (gqlObject.ContainsParam("specification") && (!((gqlObject.IsObject("specification") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("specification") && gqlObject["specification"].isNull())) && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
+			const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 	if (!itemDataObjectPtr->ContainsParam("__typename")) {
 		qDebug() << "invalid typename for: specification";
 		return false;
@@ -1158,7 +1158,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 
 		return false;
 	}
-		QJsonObject itemObject = jsonObject.value("item").toObject();
+		QJsonObject itemObject = jsonObject.value("specification").toObject();
 	if (!itemObject.contains("__typename")){
 		qDebug() << "invalid typename for: specification";
 		return false;
@@ -1193,7 +1193,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (jsonObject.contains("specification") && jsonObject["specification"].isObject()){
-			QJsonObject itemObject = jsonObject.value("item").toObject();
+			QJsonObject itemObject = jsonObject.value("specification").toObject();
 	if (!itemObject.contains("__typename")){
 		qDebug() << "invalid typename for: specification";
 		return false;
