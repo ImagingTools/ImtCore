@@ -14,6 +14,7 @@
 #include <iprm/IParamsSet.h>
 #include <iprm/ITextParam.h>
 #include <iprm/TParamsPtr.h>
+#include <ifile/IFileNameParam.h>
 
 // ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
@@ -1101,6 +1102,21 @@ QString CSdlTools::GetCompleteOutputPath(const icomp::TReferenceMember<iprm::IPa
 	}
 
 	return GetCompleteOutputPath(*schemaParamsCompPtr, argumentParser, cleanPath, cppPath);
+}
+
+QString CSdlTools::GetTempOutputPathFromParams(const iprm::IParamsSet* paramsPtr, const QString& fallbackPath)
+{
+	QString tempDirectoryPath = fallbackPath;
+
+	iprm::TParamsPtr<ifile::IFileNameParam> tempDirParamPtr(paramsPtr, imtsdl::ProcessorParamKeys::TempDirPath, fallbackPath.isNull());
+	if (tempDirParamPtr.IsValid()){
+		const QString paramsPath = tempDirParamPtr->GetPath();
+		if (!paramsPath.isEmpty()){
+			tempDirectoryPath = tempDirParamPtr->GetPath();
+		}
+	}
+
+	return tempDirectoryPath;
 }
 
 

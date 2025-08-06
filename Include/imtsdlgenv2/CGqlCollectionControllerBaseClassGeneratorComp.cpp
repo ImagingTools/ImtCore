@@ -65,7 +65,7 @@ static QMap<imtsdl::CSdlDocumentType::OperationType, QString> s_operationsAliasL
 // reimplemented(iproc::IProcessor)
 
 iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* /*paramsPtr*/,
+			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
@@ -126,9 +126,10 @@ iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoP
 		}
 	}
 
+	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
 	for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-		m_headerFilePtr.SetPtr(new QFile(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h"), outputDirectoryPath)));
-		m_sourceFilePtr.SetPtr(new QFile(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), outputDirectoryPath)));
+		m_headerFilePtr.SetPtr(new QFile(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h"), tempDirectoryPath)));
+		m_sourceFilePtr.SetPtr(new QFile(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), tempDirectoryPath)));
 
 		if (!ProcessFiles(sdlDocumentType, !joinHeaders, !joinSources)){
 			SendErrorMessage(0, QString("Unable to process files"));
@@ -168,7 +169,7 @@ iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoP
 		if (m_filesJoinerCompPtr.IsValid()){
 			iprm::CParamsSet inputParams;
 			ifile::CFileNameParam sourceDirPathParam;
-			sourceDirPathParam.SetPath(outputDirectoryPath);
+			sourceDirPathParam.SetPath(tempDirectoryPath);
 			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
 			ifile::CFileNameParam outputFileNameParam;
 			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
@@ -194,7 +195,7 @@ iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoP
 
 				// cleanup joined files
 				for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-					QFile::remove(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h"), outputDirectoryPath));
+					QFile::remove(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h"), tempDirectoryPath));
 				}
 			}
 			if (joinSources){
@@ -214,7 +215,7 @@ iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoP
 
 				// cleanup joined files
 				for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-					QFile::remove(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), outputDirectoryPath));
+					QFile::remove(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), tempDirectoryPath));
 				}
 
 				// add joined header include directive

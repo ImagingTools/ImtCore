@@ -24,7 +24,7 @@ namespace imtsdlgenv2
 
 
 iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* /*paramsPtr*/,
+			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
@@ -87,8 +87,9 @@ iproc::IProcessor::TaskState CSdlEnumGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
+	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
 	for (const imtsdl::CSdlEnum& sdlEnum: sdlEnumList){
-		QFile enumFile(QString(outputDirectoryPath + "/" + sdlEnum.GetName() + ".h"));
+		QFile enumFile(QString(tempDirectoryPath + "/" + sdlEnum.GetName() + ".h"));
 		if (!enumFile.open(QIODevice::WriteOnly)){
 			SendErrorMessage(0, QString("Unable to open file '%1'. Error: %2").arg(enumFile.fileName(), enumFile.errorString()));
 

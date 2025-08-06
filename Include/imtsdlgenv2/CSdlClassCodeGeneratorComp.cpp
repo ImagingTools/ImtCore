@@ -13,6 +13,7 @@
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
 #include <ifile/CFileNameParam.h>
+#include <iprm/TParamsPtr.h>
 
 // ImtCore includes
 #include <imtfile/CSimpleFileJoinerComp.h>
@@ -25,7 +26,7 @@ namespace imtsdlgenv2
 
 
 iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* /*paramsPtr*/,
+			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
@@ -112,9 +113,12 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 	}
 
 	imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
+
+	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
+
 	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
-		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
+		m_headerFilePtr.SetPtr(new QFile(tempDirectoryPath + "/C" + sdlType.GetName() + ".h"));
+		m_sourceFilePtr.SetPtr(new QFile(tempDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
 		const bool hasExtDeps = m_argumentParserCompPtr->GetAutoLinkLevel() != imtsdl::ISdlProcessArgumentsParser::ALL_NONE;
 
 		// First create all files with basic methods
@@ -145,7 +149,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 		if (!baseClassList.isEmpty()){
 			iprm::CParamsSet paramsSet;
 
-			const QString filePath = outputDirectoryPath + "/C" + sdlType.GetName() + ".h";
+			const QString filePath = tempDirectoryPath + "/C" + sdlType.GetName() + ".h";
 			ifile::CFileNameParam headerFileNameParam;
 			headerFileNameParam.SetPath(filePath);
 			paramsSet.SetEditableParameter(QByteArrayLiteral("HeaderFile"), &headerFileNameParam);
@@ -171,7 +175,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 		if (m_filesJoinerCompPtr.IsValid()){
 			iprm::CParamsSet inputParams;
 			ifile::CFileNameParam sourceDirPathParam;
-			sourceDirPathParam.SetPath(outputDirectoryPath);
+			sourceDirPathParam.SetPath(tempDirectoryPath);
 			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
 			ifile::CFileNameParam outputFileNameParam;
 			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
@@ -224,17 +228,17 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 
 				// cleanup joined files
 				for (const imtsdl::CSdlEnum& sdlEnum: enumList){
-					QFile::remove(outputDirectoryPath + '/' + sdlEnum.GetName() + ".h");
+					QFile::remove(tempDirectoryPath + '/' + sdlEnum.GetName() + ".h");
 				}
 				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-					QFile::remove(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
+					QFile::remove(QString(tempDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 				}
 				for (const imtsdl::CSdlUnion& sdlUnion : unionList){
-					QFile::remove(QString(outputDirectoryPath + '/' + sdlUnion.GetName() + ".h"));
-					QFile::remove(QString(outputDirectoryPath + '/' + sdlUnion.GetName() + "_ClassDef.h"));
+					QFile::remove(QString(tempDirectoryPath + '/' + sdlUnion.GetName() + ".h"));
+					QFile::remove(QString(tempDirectoryPath + '/' + sdlUnion.GetName() + "_ClassDef.h"));
 				}
 
-				QFile::remove(outputDirectoryPath + QStringLiteral("/QmlRegister.h"));
+				QFile::remove(tempDirectoryPath + QStringLiteral("/QmlRegister.h"));
 			}
 
 			if (joinSources){
@@ -255,7 +259,7 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 
 				// cleanup joined files
 				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-					QFile::remove(QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
+					QFile::remove(QString(tempDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
 				}
 
 				// add joined header include directive

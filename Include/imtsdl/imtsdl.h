@@ -22,6 +22,7 @@ typedef QList<CSdlDocumentType> SdlDocumentTypeList;
 typedef QList<CSdlEnum> SdlEnumList;
 typedef QList<CSdlUnion> SdlUnionList;
 
+
 enum KeyId
 {
 	KI_QUERY,
@@ -48,6 +49,19 @@ struct EnumConversionTypes
 	static const inline QString LowerSnake = QStringLiteral("lowerSnake");
 	static const inline QString UpperKebab = QStringLiteral("upperKebab");
 	static const inline QString LowerKebab = QStringLiteral("lowerKebab");
+};
+
+
+/// this struct describes keys of params for SDL processors
+struct ProcessorParamKeys
+{
+	/**
+		\brief the path to the temporary directory where the processors MUST be work
+		\details
+			where the output files MUST be written (if available)
+			represented as \c ifile::IFileNameParam with type \c ifile::IFileNameParam::PT_DIRECTORY
+	*/
+	static const inline QByteArray TempDirPath = QByteArrayLiteral("TempDirPath");
 };
 
 

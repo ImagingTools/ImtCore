@@ -78,7 +78,7 @@ void GenerateRegisterFunctions(QTextStream& stream, const QList<T>& entryList, b
 // reimplemented (iproc::IProcessor)
 
 iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* /*paramsPtr*/,
+			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
@@ -135,7 +135,9 @@ iproc::IProcessor::TaskState CQmlRegisterGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	QFile qmlRegisterFile(QString(outputDirectoryPath + QStringLiteral("/QmlRegister.h")));
+	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
+
+	QFile qmlRegisterFile(QString(tempDirectoryPath + QStringLiteral("/QmlRegister.h")));
 	if (!qmlRegisterFile.open(QIODevice::WriteOnly)){
 		SendErrorMessage(0, QString("Unable to open file '%1'. Error: %2").arg(qmlRegisterFile.fileName(), qmlRegisterFile.errorString()));
 

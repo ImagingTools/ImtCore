@@ -10,6 +10,8 @@
 #include <iprm/IOptionsManager.h>
 #include <iproc/IProcessor.h>
 #include <itest/CStandardTestExecutor.h>
+#include <iprm/CParamsSet.h>
+#include <ifile/CFileNameParam.h>
 
 // generated includes
 #include <GeneratedFiles/ImtSdlGenTest/CImtSdlGenTest.h>
@@ -70,12 +72,12 @@ static bool CompareDirectories(const QString& dir1, const QString& dir2) {
 }
 
 
-void GetPrecessorAndExec(CImtSdlGenTest& testSuite, const QByteArray& processorName)
+void GetPrecessorAndExec(CImtSdlGenTest& testSuite, const QByteArray& processorName, iprm::IParamsSet* processorParamsPtr = nullptr)
 {
 	iproc::IProcessor* processorPtr = testSuite.GetInterface<iproc::IProcessor>(processorName);
 	QCOMPARE_NE(processorPtr, nullptr);
 
-	iproc::IProcessor::TaskState execResult = processorPtr->DoProcessing(nullptr, nullptr, nullptr);
+	iproc::IProcessor::TaskState execResult = processorPtr->DoProcessing(processorParamsPtr, nullptr, nullptr);
 	QCOMPARE(execResult, iproc::IProcessor::TS_OK);
 }
 
@@ -123,18 +125,32 @@ void ExecuteTest(
 
 	argParserPtr->SetSchemaFilePath(s_testDataDirectoryPath + '/' + schemaFileName);
 
+	// set a temp dir for all processors
+	QTemporaryDir tempOutputDir;
+	const QString tempOutputDirPath = tempOutputDir.path();
+	if (!istd::CSystem::EnsurePathExists(tempOutputDirPath)){
+		qCritical() <<  QString("Unable to create temp dir at '%1'").arg(tempOutputDirPath);
+
+		return;
+	}
+
+	iprm::CParamsSet processorParams;
+	ifile::CFileNameParam tempDirParam;
+	tempDirParam.SetPath(tempOutputDirPath);
+	processorParams.SetEditableParameter(imtsdl::ProcessorParamKeys::TempDirPath, &tempDirParam);
+
 	// first parse the schema
 	GetPrecessorAndExec(testSuite, "GqlSchemaParser");
 
 	// do processing
 	// CXX
-	GetPrecessorAndExec(testSuite, "QmlRegisterGenerator");
-	GetPrecessorAndExec(testSuite, "SdlEnumGenerator");
-	GetPrecessorAndExec(testSuite, "SdlUnionGenerator");
-	GetPrecessorAndExec(testSuite, "SdlClassCodeGenerator");
-	GetPrecessorAndExec(testSuite, "GqlWrapClassCodeGenerator");
-	GetPrecessorAndExec(testSuite, "GqlHandlerBaseClassGenerator");
-	GetPrecessorAndExec(testSuite, "GqlCollectionControllerBaseClassGenerator");
+	GetPrecessorAndExec(testSuite, "QmlRegisterGenerator", &processorParams);
+	GetPrecessorAndExec(testSuite, "SdlEnumGenerator", &processorParams);
+	GetPrecessorAndExec(testSuite, "SdlUnionGenerator", &processorParams);
+	GetPrecessorAndExec(testSuite, "SdlClassCodeGenerator", &processorParams);
+	GetPrecessorAndExec(testSuite, "GqlWrapClassCodeGenerator", &processorParams);
+	GetPrecessorAndExec(testSuite, "GqlHandlerBaseClassGenerator", &processorParams);
+	GetPrecessorAndExec(testSuite, "GqlCollectionControllerBaseClassGenerator", &processorParams);
 #if IMT_QML_FINAL_APPROVED /// QML disabled until the final generation choice is approved.
 	GetPrecessorAndExec(testSuite, "QmlCodeGenerator");
 	GetPrecessorAndExec(testSuite, "QmlCodeMetaGenerator");
@@ -270,7 +286,7 @@ void CSdlGenTest::PrinterTest()
 void CSdlGenTest::cleanupTestCase()
 {
 	if (m_tempOutputDir.exists()){
-		// QVERIFY(m_tempOutputDir.removeRecursively());
+		QVERIFY(m_tempOutputDir.removeRecursively());
 	}
 }
 

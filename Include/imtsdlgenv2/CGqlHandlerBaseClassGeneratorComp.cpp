@@ -26,7 +26,7 @@ namespace imtsdlgenv2
 
 
 iproc::IProcessor::TaskState CGqlHandlerBaseClassGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* /*paramsPtr*/,
+			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
@@ -86,8 +86,9 @@ iproc::IProcessor::TaskState CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
-	m_headerFilePtr.SetPtr(new QFile(WrapFileName(QStringLiteral("h"), outputDirectoryPath)));
-	m_sourceFilePtr.SetPtr(new QFile(WrapFileName(QStringLiteral("cpp"), outputDirectoryPath)));
+	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
+	m_headerFilePtr.SetPtr(new QFile(WrapFileName(QStringLiteral("h"), tempDirectoryPath)));
+	m_sourceFilePtr.SetPtr(new QFile(WrapFileName(QStringLiteral("cpp"), tempDirectoryPath)));
 
 	if (!ProcessFiles(!joinHeaders, !joinSources)){
 		SendErrorMessage(0, QString("Unable to process files"));
@@ -125,7 +126,7 @@ iproc::IProcessor::TaskState CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 		if (m_filesJoinerCompPtr.IsValid()){
 			iprm::CParamsSet inputParams;
 			ifile::CFileNameParam sourceDirPathParam;
-			sourceDirPathParam.SetPath(outputDirectoryPath);
+			sourceDirPathParam.SetPath(tempDirectoryPath);
 			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
 			ifile::CFileNameParam outputFileNameParam;
 			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
@@ -149,7 +150,7 @@ iproc::IProcessor::TaskState CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 				}
 
 				// cleanup joined files
-				QFile::remove(WrapFileName(QStringLiteral("h"), outputDirectoryPath));
+				QFile::remove(WrapFileName(QStringLiteral("h"), tempDirectoryPath));
 			}
 
 			if (joinSources){
@@ -167,7 +168,7 @@ iproc::IProcessor::TaskState CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 				}
 
 				// cleanup joined files
-				QFile::remove(WrapFileName(QStringLiteral("cpp"), outputDirectoryPath));
+				QFile::remove(WrapFileName(QStringLiteral("cpp"), tempDirectoryPath));
 
 				// add joined header include directive
 				if (joinHeaders){

@@ -122,6 +122,9 @@ public:
 	[[nodiscard]] static QString GetCompleteOutputPath(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argumentParser, bool cleanPath, bool cppPath);
 	[[nodiscard]] static QString GetCompleteOutputPath(const icomp::TReferenceMember<iprm::IParamsSet>& schemaParamsCompPtr, const ISdlProcessArgumentsParser& argumentParser, bool cleanPath, bool cppPath);
 
+	/// extracts a temp path from \c paramsPtr ant returns it on successfull, returns \c fallbackPath otherwise
+	[[nodiscard]] static QString GetTempOutputPathFromParams(const iprm::IParamsSet* paramsPtr, const QString& fallbackPath = QString());
+
 	[[nodiscard]] static QString ProcessTemplateString(const iprm::IParamsSet& schemaParams, const QString& templateString, const QString& outputDirPath);
 	[[nodiscard]] static bool UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* schemaParamsPtr, const imtsdl::ISdlProcessArgumentsParser* argumentParamsPtr);
 

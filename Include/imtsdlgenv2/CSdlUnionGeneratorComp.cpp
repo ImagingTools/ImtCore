@@ -24,7 +24,7 @@ namespace imtsdlgenv2
 
 
 iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* /*paramsPtr*/,
+			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
@@ -88,8 +88,9 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 		return TS_OK;
 	}
 
+	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
 	for (imtsdl::CSdlUnion& sdlUnion: sdlUnionList){
-		QFile unionFile(QString(outputDirectoryPath + "/" + sdlUnion.GetName() + ".h"));
+		QFile unionFile(QString(tempDirectoryPath + "/" + sdlUnion.GetName() + ".h"));
 		if (!unionFile.open(QIODevice::WriteOnly)){
 			SendErrorMessage(0, QString("Unable to open file '%1'. Error: %2").arg(unionFile.fileName(), unionFile.errorString()));
 
@@ -125,7 +126,7 @@ iproc::IProcessor::TaskState CSdlUnionGeneratorComp::DoProcessing(
 			FeedStream(stream, 2, true);
 		}
 
-		QFile unionImplFile(QString(outputDirectoryPath + "/" + sdlUnion.GetName() + "_ClassDef.h"));
+		QFile unionImplFile(QString(tempDirectoryPath + "/" + sdlUnion.GetName() + "_ClassDef.h"));
 		if (!unionImplFile.open(QIODevice::WriteOnly)){
 			SendErrorMessage(0, QString("Unable to open file '%1'. Error: %2").arg(unionImplFile.fileName(), unionImplFile.errorString()));
 

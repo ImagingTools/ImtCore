@@ -27,7 +27,7 @@ namespace imtsdlgenv2
 
 
 iproc::IProcessor::TaskState CGqlWrapClassCodeGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* /*paramsPtr*/,
+			const iprm::IParamsSet* paramsPtr,
 			const istd::IPolymorphic* /*inputPtr*/,
 			istd::IChangeable* /*outputPtr*/,
 			ibase::IProgressManager* /*progressManagerPtr*/)
@@ -83,9 +83,10 @@ iproc::IProcessor::TaskState CGqlWrapClassCodeGeneratorComp::DoProcessing(
 		}
 	}
 
+	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
 	for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
-		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h"));
-		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp"));
+		m_headerFilePtr.SetPtr(new QFile(tempDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h"));
+		m_sourceFilePtr.SetPtr(new QFile(tempDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp"));
 
 		if (!ProcessFiles(sdlRequest, !joinHeaders, !joinSources)){
 			SendErrorMessage(0, QString("Unable to process files"));
@@ -105,7 +106,7 @@ iproc::IProcessor::TaskState CGqlWrapClassCodeGeneratorComp::DoProcessing(
 		if (m_filesJoinerCompPtr.IsValid()){
 			iprm::CParamsSet inputParams;
 			ifile::CFileNameParam sourceDirPathParam;
-			sourceDirPathParam.SetPath(outputDirectoryPath);
+			sourceDirPathParam.SetPath(tempDirectoryPath);
 			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
 			ifile::CFileNameParam outputFileNameParam;
 			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
@@ -132,7 +133,7 @@ iproc::IProcessor::TaskState CGqlWrapClassCodeGeneratorComp::DoProcessing(
 
 				// cleanup joined files
 				for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
-					QFile::remove(QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h"));
+					QFile::remove(QString(tempDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h"));
 				}
 			}
 			if (joinSources){
@@ -153,7 +154,7 @@ iproc::IProcessor::TaskState CGqlWrapClassCodeGeneratorComp::DoProcessing(
 
 				// cleanup joined files
 				for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
-					QFile::remove(QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp"));
+					QFile::remove(QString(tempDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp"));
 				}
 
 				// add joined header include directive
