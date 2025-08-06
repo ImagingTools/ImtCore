@@ -27,10 +27,14 @@ OptionManager {
 
 		dataModel: optionsListModel.m_options
 
-		responseModel: OptionsList { id: optionsListModel }
+		responseModel: OptionsList { id: optionsListModel
+			Component.onCompleted: {
+				createOptions()
+			}
+		}
 
 		onDataModelReady: {
-			container.optionModelReady(params)
+			container.optionModelReady(dataModel)
 		}
 
 		onDataModelLoadFailed: {

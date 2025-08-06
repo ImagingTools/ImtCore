@@ -57,7 +57,7 @@ QtObject {
 		The base implementation does not perform an actual data retrieval and
 		should not be used directly.
 	*/
-	function saveDataModel(params){
+	function saveDataModel(params, documentId, documentName, documentDescription){
 		console.warn("saveDataModel() should be implemented in a subclass")
 
 		resultModelReady(resultModel)
