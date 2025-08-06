@@ -408,20 +408,20 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 		QByteArray enabled = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_ENABLED).toByteArray();
 		infoModelPtr->SetData("enabled", enabled);
 
-		QByteArray data;
+		QByteArray serializedMetaIndoData;
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(id);
-		if (SerializeObject(metaInfo.GetPtr(), data)){
-			itemsModel->SetData("metaInfo", data.toBase64(), itemIndex);
+		if (SerializeObject(metaInfo.GetPtr(), serializedMetaIndoData)){
+			itemsModel->SetData("metaInfo", serializedMetaIndoData.toBase64(), itemIndex);
 		}
 		else{
 			SendWarningMessage(0, QString("Unable to set meta info for element '%1'. Error: Meta info serialization failed").arg(qPrintable(id)), "CSerializableObjectCollectionControllerComp");
 		}
 
-		data.clear();
+		serializedMetaIndoData.clear();
 		idoc::MetaInfoPtr dataMetaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(id);
 
-		if (SerializeObject(dataMetaInfo.GetPtr(), data)){
-			itemsModel->SetData("dataMetaInfo", data.toBase64(), itemIndex);
+		if (SerializeObject(dataMetaInfo.GetPtr(), serializedMetaIndoData)){
+			itemsModel->SetData("dataMetaInfo", serializedMetaIndoData.toBase64(), itemIndex);
 		}
 		else{
 			SendWarningMessage(0, QString("Unable to set data meta info for element '%1'. Error: Data meta info serialization failed").arg(qPrintable(id)), "CSerializableObjectCollectionControllerComp");

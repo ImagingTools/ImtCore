@@ -321,8 +321,8 @@ QString CSdlGenTools::GetNullCheckString(const imtsdl::CSdlField& sdlField, bool
 
 QString CSdlGenTools::GetSettingValueString(
 			const imtsdl::CSdlField& sdlField,
-			const QString& relatedNamespace,
-			const imtsdl::ISdlTypeListProvider& listProvider,
+			const QString& /*relatedNamespace*/,
+			const imtsdl::ISdlTypeListProvider& /*listProvider*/,
 			const QString& variableName,
 			const QString& objectName)
 {

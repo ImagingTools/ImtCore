@@ -64,7 +64,7 @@ void CObjectModificatorCompBase::WriteSetValueToStruct(
 
 // reimplemented (CSdlClassModificatorBaseComp)
 
-bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType)
+bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& /*sdlType*/)
 {
 	if (m_headerFilePtr == nullptr){
 		SendCriticalMessage(0, "Unable to process header file. Pointer is not set!");
@@ -467,7 +467,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectCode(QTextStream& str
 void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			bool optional,
+			bool /*optional*/,
 			quint16 hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
@@ -703,7 +703,7 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 		if (isCustom){
 			if (conversionType == imtsdl::CSdlUnionConverter::CT_GQL_SCALAR || conversionType == imtsdl::CSdlUnionConverter::CT_GQL_ARRAY){
 				FeedStreamHorizontally(stream, 1);
-				/// \todo fix variabels gqlObject
+				/// \todo fix variabels gqlObject \example '::imtgql::CGqlParamObject' -> \c GetContainerObjectClassName
 				stream << QStringLiteral("const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr(\"");
 				stream << field.GetId() << QStringLiteral("\");");
 				FeedStream(stream, 1, false);

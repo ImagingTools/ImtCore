@@ -380,9 +380,9 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::ImportObject(const im
 							imtbase::ICollectionInfo::Ids featureIds = m_featureCollectionCompPtr->GetElementIds();
 							imtbase::ICollectionInfo::Ids productFeatureIds = featureCollectionPtr->GetElementIds();
 							for (const imtbase::ICollectionInfo::Id& productFeatureId : productFeatureIds){
-								imtbase::IObjectCollection::DataPtr dataPtr;
-								if (featureCollectionPtr->GetObjectData(productFeatureId, dataPtr)){
-									const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+								imtbase::IObjectCollection::DataPtr productFeatureDataPtr;
+								if (featureCollectionPtr->GetObjectData(productFeatureId, productFeatureDataPtr)){
+									const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(productFeatureDataPtr.GetPtr());
 									if (featureInfoPtr != nullptr){
 										if (!featureIds.contains(productFeatureId)){
 											QByteArray result = m_featureCollectionCompPtr->InsertNewObject("", "", "", featureInfoPtr, productFeatureId);

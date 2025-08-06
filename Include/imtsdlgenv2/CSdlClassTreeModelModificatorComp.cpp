@@ -18,7 +18,7 @@ namespace imtsdlgenv2
 
 // reimplemented (CSdlClassModificatorBaseComp)
 
-bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType)
+bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& /*sdlType*/)
 {
 	if (m_headerFilePtr == nullptr){
 		SendCriticalMessage(0, "Unable to process header file. Pointer is not set!");
@@ -511,8 +511,8 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(QTextStre
 void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			const imtsdl::CSdlType& sdlType,
-			bool optional,
+			const imtsdl::CSdlType& /*sdlType*/,
+			bool /*optional*/,
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
@@ -611,8 +611,8 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(
 void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			const imtsdl::CSdlType& sdlType,
-			bool optional,
+			const imtsdl::CSdlType& /*sdlType*/,
+			bool /*optional*/,
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
@@ -692,10 +692,10 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
 void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			const imtsdl::CSdlType& sdlType,
+			const imtsdl::CSdlType& /*sdlType*/,
 			bool isEnum,
 			bool isUnion,
-			bool optional,
+			bool /*optional*/,
 			quint16 hIndents)
 {
 	// add a new model,to store list
@@ -795,7 +795,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			const imtsdl::CSdlType& sdlType,
+			const imtsdl::CSdlType& /*sdlType*/,
 			bool isEnum, 
 			bool isUnion,
 			bool optional)
@@ -844,7 +844,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 			const imtsdl::CSdlField& field,
 			bool isEnum,
 			bool isUnion,
-			bool optional,
+			bool /*optional*/,
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
@@ -1018,8 +1018,8 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(
 void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			const imtsdl::CSdlType& sdlType,
-			bool optional,
+			const imtsdl::CSdlType& /*sdlType*/,
+			bool /*optional*/,
 			quint16 hIndents)
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
@@ -1086,7 +1086,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			const imtsdl::CSdlType& sdlType,
+			const imtsdl::CSdlType& /*sdlType*/,
 			bool optional)
 {
 	FeedStreamHorizontally(stream, 1);

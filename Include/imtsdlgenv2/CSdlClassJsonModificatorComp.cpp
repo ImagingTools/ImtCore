@@ -105,7 +105,7 @@ bool CSdlClassJsonModificatorComp::AddFieldValueWriteToObject(QTextStream& strea
 }
 
 
-bool CSdlClassJsonModificatorComp::AddObjectValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, uint horizontalIndents) const
+bool CSdlClassJsonModificatorComp::AddObjectValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, uint /*horizontalIndents*/) const
 {
 	stream << GetContainerObjectVariableName();
 	stream << '[' << '"';
@@ -129,7 +129,7 @@ QString CSdlClassJsonModificatorComp::AddCreationOfTemporaryArray(QTextStream& s
 }
 
 
-bool CSdlClassJsonModificatorComp::AddFieldValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, const QString& variableName, uint horizontalIndents) const
+bool CSdlClassJsonModificatorComp::AddFieldValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, const QString& variableName, uint /*horizontalIndents*/) const
 {
 	stream << arrayContainerVariableName;
 	stream << ' '<< '<' << '<' << ' ';
@@ -158,7 +158,7 @@ bool CSdlClassJsonModificatorComp::AddFieldValueAppendToObjectArray(QTextStream&
 }
 
 
-bool CSdlClassJsonModificatorComp::AddArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, const QString& targetObjectVariableName, uint horizontalIndents) const
+bool CSdlClassJsonModificatorComp::AddArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, const QString& targetObjectVariableName, uint /*horizontalIndents*/) const
 {
 	if (targetObjectVariableName.isEmpty()){
 		stream << GetContainerObjectVariableName();
@@ -243,7 +243,7 @@ bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStr
 }
 
 
-bool CSdlClassJsonModificatorComp::AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents)
+bool CSdlClassJsonModificatorComp::AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 /*horizontalIndents*/)
 {
 	if (variableName.isEmpty()){
 		stream << GetContainerObjectVariableName();

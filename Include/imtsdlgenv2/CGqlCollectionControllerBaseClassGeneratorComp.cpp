@@ -966,7 +966,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType /*operationType*/, uint hIndents)
 {
 	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
 

@@ -392,8 +392,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 	// has<PROPERTY>()
 	for (const imtsdl::CSdlField& sdlField: typeFieldList){
 		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(sdlField, allTypes, enumList, unionList);
-		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
-
 		bool isCustom = false;
 		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
 

@@ -60,14 +60,14 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 			{
 				imtbase::IObjectCollection::DataPtr dataElementPtr;
 				if (m_objectCollectionCompPtr->GetObjectData(elemId, dataElementPtr)){
-					const IAddressElementInfo* addressInfoPtr =
+					const IAddressElementInfo* parentAddressInfoPtr =
 						dynamic_cast<const IAddressElementInfo*>(dataElementPtr.GetPtr());
-					imtbase::IObjectCollection::DataPtr dataTypePtr;
-					if (m_addressTypeCollectionPtr->GetObjectData(addressInfoPtr->GetAddressTypeId(), dataTypePtr)){
+					imtbase::IObjectCollection::DataPtr parentDataTypePtr;
+					if (m_addressTypeCollectionPtr->GetObjectData(parentAddressInfoPtr->GetAddressTypeId(), parentDataTypePtr)){
 						const IAddressTypeInfo* typeInfoPtr =
-							dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
+							dynamic_cast<const IAddressTypeInfo*>(parentDataTypePtr.GetPtr());
 						QString shortName = typeInfoPtr->GetShortName();
-						QString addressName = addressInfoPtr->GetName();
+						QString addressName = parentAddressInfoPtr->GetName();
 						address += shortName + " " + addressName + ",";
 					}
 				}

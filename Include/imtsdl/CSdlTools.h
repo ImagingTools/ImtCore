@@ -78,7 +78,7 @@ public:
 	static QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr);
 	static QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr);
 	static QString ConvertTypeOrEnum(const CSdlField& sdlField, const SdlEnumList& enumList, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr, bool* isEnumPtr = nullptr);
-	/// \todo rename it to 'ConvertEntryType' and make a structure with result
+	/// \todo rename it to 'ConvertEntryType' and make a structure with result; remove \c isArrayPtr
 	static QString ConvertTypeOrEnumOrUnion(const CSdlField& sdlField, const SdlEnumList& enumList, const SdlUnionList& unionList, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr, bool* isEnumPtr = nullptr, bool* isUnion = nullptr);
 
 	static QString QmlConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr);
@@ -100,7 +100,7 @@ public:
 	[[nodiscard]] static bool GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType);
 	[[nodiscard]] static bool GetSdlEnumForField(const CSdlField& sdlField, const SdlEnumList& enumList, CSdlEnum& sdlEnum);
 	[[nodiscard]] static bool GetSdlUnionForField(const CSdlField& sdlField, const SdlUnionList& unionList, CSdlUnion& sdlEnum);
-	/// \todo rename it to 'GetSdlEntryFromField'
+	/// \todo rename it to 'GetSdlEntryFromField'; add method 'FindEntryByName'
 	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> GetSdlTypeOrEnumOrUnionForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
 
 	[[nodiscard]] static QString GetNamespaceAcceptableString(const QString& originalText);

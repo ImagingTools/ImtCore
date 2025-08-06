@@ -123,7 +123,7 @@ istd::IChangeable *CUserConnectionInfo::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CUserConnectionInfo::ResetData(CompatibilityMode mode)
+bool CUserConnectionInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
