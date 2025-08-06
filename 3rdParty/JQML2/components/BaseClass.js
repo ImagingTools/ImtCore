@@ -487,7 +487,12 @@ class BaseClass extends QtObject {
 				} else {
 					let obj
 					if (!this[_key]) {
-						obj = this.createComponent(_key).createObject(this)
+						let sourceData = sourceObject[key]
+						let sourceTypename
+						if (sourceData['__typename']){
+							sourceTypename = sourceData['__typename']
+						}	
+						obj = this.createComponent(_key, sourceTypename).createObject(this)
 					}
 					else {
 						obj = this[_key]
