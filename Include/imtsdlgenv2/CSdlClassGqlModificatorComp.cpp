@@ -36,7 +36,7 @@ const static QStringList s_numberMetaTypes = QStringList({
 
 void WriteTypeMultiConditionCheck(
 			QTextStream& stream,
-			const imtsdl::CSdlField& field,
+			const imtsdl::CSdlField& /*field*/,
 			const QString& variableName,
 			const QStringList& metaTypeList,
 			bool expected = false)
@@ -207,7 +207,7 @@ QString CSdlClassGqlModificatorComp::AddCreationOfTemporaryArray(QTextStream& st
 }
 
 
-bool CSdlClassGqlModificatorComp::AddFieldValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, const QString& variableName, uint horizontalIndents) const
+bool CSdlClassGqlModificatorComp::AddFieldValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, const QString& variableName, uint /*horizontalIndents*/) const
 {
 	bool isCustom = false;
 	bool isEnum = false;
@@ -266,37 +266,40 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 	stream << QStringLiteral(".ContainsParam(\"");
 	stream << field.GetId();
 	stream << QStringLiteral("\")");
-	if (expected){
-		stream << QStringLiteral(" && ");
-	}
-	else {
-		stream << QStringLiteral(" || ");
+	if (!isArray){
+		if (expected){
+			stream << QStringLiteral(" && ");
+		}
+		else {
+			stream << QStringLiteral(" || ");
+		}
+		stream << '(';
 	}
 
-	stream << '(';
 
 	if (isArray && !isUserType){ // array of scalars
 		if (expected){
-			stream << '!';
+			stream << QStringLiteral(" && !");
 		}
-
+		else {
+			stream << QStringLiteral(" || ");
+		}
+		stream << '(';
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral("[\"");
 		stream << field.GetId();
-		stream << QStringLiteral("\"].isNull()");
+		stream << QStringLiteral("\"].isNull())");
 	}
 	else if (isArray){
-		stream << GetContainerObjectVariableName();
-		stream << QStringLiteral(".GetObjectsCount(\"");
-		stream << field.GetId();
-		stream << QStringLiteral("\") ");
 		if (expected){
+			stream << QStringLiteral(" && (");
+			stream << GetContainerObjectVariableName();
+			stream << QStringLiteral(".GetObjectsCount(\"");
+			stream << field.GetId();
+			stream << QStringLiteral("\") ");
 			stream << '>';
+			stream << QStringLiteral(" 0)");
 		}
-		else {
-			stream << '<' << '=';
-		}
-		stream << QStringLiteral(" 0");
 	}
 
 	else if (isUserType){
@@ -416,13 +419,17 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		}
 	}
 
-	stream << QStringLiteral(")){");
+	if (!isArray){
+		stream << ')';
+	}
+
+	stream << QStringLiteral("){");
 
 	return true;
 }
 
 
-bool CSdlClassGqlModificatorComp::AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents)
+bool CSdlClassGqlModificatorComp::AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 /*horizontalIndents*/)
 {
 	bool isArray = false;
 	bool isCustom = false;
@@ -461,7 +468,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueReadFromObject(QTextStream& s
 }
 
 
-bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result)
+bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& /*variableName*/, quint16 horizontalIndents, ListAccessResult& result)
 {
 	result.listCountVariableName			= GetDecapitalizedValue(field.GetId()) + QStringLiteral("ElementsCount");
 	result.listCountVariableType			= QStringLiteral("qsizetype");
