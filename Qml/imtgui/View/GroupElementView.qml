@@ -23,22 +23,26 @@ Rectangle {
 
 	function calcHeight(){
 		let h = border.width * 2
-
+		let emptyGroup = true
 		for (let i = 0; i < children.length; i++) {
 			let child = children[i]
-
 			if (!child.visible) continue
-
+			if (emptyGroup && child.height > 0){
+				emptyGroup = false
+			}
 			if (child.objectName === "Separator"){
 				h += child.height
 			}
 			else{
 				h += child.height
-
 				if (i > 0 && child.anchors.topMargin !== undefined){
 					h += child.anchors.topMargin
 				}
 			}
+		}
+
+		if (emptyGroup){
+			h = 0
 		}
 
 		contentHeight = h
@@ -117,9 +121,6 @@ Rectangle {
 
 			if (i === 0){
 				item.anchors.top = container.top
-				// if (item.hasOwnProperty('topRoundedCorners')) {
-				// 	item.topRoundedCorners = true
-				// }
 			} 
 			else {
 				// Add separator between items
@@ -130,10 +131,6 @@ Rectangle {
 				separator.anchors.right = container.right
 
 				item.anchors.top = separator.bottom
-
-				// if (i === visibleItems.length - 1 && item.hasOwnProperty('bottomRoundedCorners')) {
-				// 	item.bottomRoundedCorners = true
-				// }
 			}
 		}
 

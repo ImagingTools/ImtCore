@@ -277,7 +277,18 @@ RemoteCollectionView {
 					return false;
 				}
 				
-				if (userData.m_password === ""){
+				let emptyPasswordIsOk = false
+				if (userData.hasSystemInfos()){
+					for (let i = 0; i < userData.m_systemInfos.count; i++){
+						let systemId = userData.m_systemInfos.get(i).item.m_id;
+						if (systemId !== ""){
+							emptyPasswordIsOk = true
+							break
+						}
+					}
+				}
+
+				if (userData.m_password === "" && !emptyPasswordIsOk){
 					return false;
 				}
 				
@@ -287,10 +298,8 @@ RemoteCollectionView {
 				
 				if (userCollectionViewContainer.documentManager){
 					if (userCollectionViewContainer.documentManager.documentIsNew(userData.m_id)){
-						console.log("documentIsNew", true)
 						let passwordText1 = data.editor.passwordInput.text;
 						let passwordText2 = data.editor.passwordInputConfirm.text;
-						console.log("passwordText1", passwordText1, passwordText2)
 						if (passwordText1 !== passwordText2){
 							return false;
 						}

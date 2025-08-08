@@ -34,7 +34,6 @@ ViewBase {
 		rolesGroup.updateModel();
 		groupsBlock.updateModel();
 		systemInfoGroup.updateModel();
-		
 		userData.m_productId = container.productId;
 	}
 	
@@ -93,7 +92,7 @@ ViewBase {
 		
 		userGeneralEditor.usernameInput.readOnly = false;
 		userGeneralEditor.passwordInput.readOnly = false;
-		
+
 		for (let i = 0; i < userData.m_systemInfos.count; i++){
 			let systemId = userData.m_systemInfos.get(i).item.m_id;
 			if (systemId !== ""){
@@ -256,7 +255,6 @@ ViewBase {
 								systemInfoGroup.block = true;
 								systemInfoTable.table.checkItem(0);
 								systemInfoGroup.block = false;
-								// systemInfoGroup.updateGui()
 							}
 							
 							container.doUpdateModel();
