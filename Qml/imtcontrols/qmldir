@@ -64,6 +64,7 @@ MessagePopup 1.0 ./Dialogs/MessagePopup.qml
 ProgressDialogManager 1.0 ./Dialogs/ProgressDialogManager.qml
 PopupMenuDialog 1.0 ./Dialogs/PopupMenuDialog.qml
 PopupDecorator 1.0 ./Dialogs/PopupDecorator.qml
+PopupDecoratorGql 1.0 ./Dialogs/PopupDecoratorGql.qml
 PopupItemDelegateDecorator 1.0 ./Dialogs/PopupItemDelegateDecorator.qml
 DialogDecorator 1.0 ./Dialogs/DialogDecorator.qml
 DialogManagerView 1.0 ./Dialogs/DialogManagerView.qml

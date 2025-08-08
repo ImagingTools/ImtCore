@@ -1,378 +1,212 @@
 import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
-import imtgui 1.0
-import imtguigql 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
 
-Item {
+
+ComboBox {
 	id: comboBoxContainerGql;
 
-	width: 90;
-	height: Style.controlHeightM;
+	shownItemsCount: 60
+	decorator: 	Component{ PopupDecoratorGql{} }
 
-	property var model;
-	property TreeItemModel properties : TreeItemModel{};
-	property TreeItemModel gettedParams : TreeItemModel{};
-	property TreeItemModel filterIdsModel : TreeItemModel{};
+	// Data provider aliases
+	property alias filter: dataProvider.filter
+	property alias filterModel: dataProvider.filterModel
+	property alias commandId: dataProvider.commandId;
+	property alias subscriptionCommandId: dataProvider.subscriptionCommandId;
+	property alias fields: dataProvider.fields;
+	property alias textFilteringInfoIds: dataProvider.filter.textFilteringInfoIds
 
-	property color borderColor: comboBoxContainerGql.focus ? Style.iconColorOnSelected : Style.alternateBaseColor;
-
-	property color backgroundColor: Style.baseColor;
-
-	property string currentText;
-
-	property bool textCentered: false;
-	property bool menuVisible: false;
-	property bool isColor: false;
-	property bool backVisible: true;
-	property bool hiddenBackground: true;
-	property bool canClose: true;
-	property bool closeEmpty: false;
-	property bool complexModel: false;
-	property bool openST: false;
-	property bool preventFirstLoading: false;
-
-	property int radius: Style.radiusM;
-	property int currentIndex: -1;
-	property int offset: 0;
-	property int count: 15;
-	property int countVisibleItem: 5;
-	property int delegateRadius: 0;
-	property int itemHeight: 26;
-	property int filterHeiht: Style.controlHeightM;
-	property int textSize: Style.fontSizeM;
-	property int textDelegateSize: Style.fontSizeM;
-	property int dialogsCountPrev: 1000;
-	property int dialogsCount: ModalDialogManager.count;
-
-	property string commandId: "";
-	property string filterName: "Name";
-	property string filterText: "";
-	property string fontColor: Style.textColor;
-	property string fontColorTitle: fontColor;
-	property bool keepFilterText: false;
-	property bool inFocus: false;
-	property int pauseDuration: 500;
+	property int totalCount: -1;
 
 	property string excludeFilterPart: "";
-	property bool canUpdateModel: true;
-	property string additionalFilter: "";
+	property string filterText: "";
 
-	// ID for display in combo box delegates
-	property string nameId: "name";
+	property bool endListStatus: false;
 
-	property int selectedIndex: -1;
-	property bool hoverBlocked: true;
-	property bool doNotCorrectPosition : false;
-	property bool readOnly: false;
-	property bool isUpwards: false;
-
-	property Component delegate: PopupMenuDelegate{
-		width: comboBoxContainerGql.width;
-		height: comboBoxContainerGql.itemHeight;
-
-		text: model[comboBoxContainerGql.nameId];
-
-		selected: comboBoxContainerGql.selectedIndex === model.index;
-
-		onClicked: {
-			comboBoxContainerGql.finished(model.id, model.index)
-		}
-
-		onEntered: {
-			comboBoxContainerGql.selectedIndex = model.index;
-		}
-	};
-
-	property alias popupComp: popupMenu;
-	property alias gradient: cbMainRect.gradient;
-
-	property alias image: cbArrowIcon;
-	property alias imageSource: cbArrowIcon.source;
-	property alias imageRotation: cbArrowIcon.rotation;
-
-	property alias tooltipText: tooltip.text;
-	property alias tooltipItem: tooltip;
-
+	// signals
 	signal setCurrentText(var modelll, int index);
-	signal clicked();
-	signal finished(string commandId, int index);
 	signal editSignal();
 	signal closeSignal(var model_);
 	signal clearSignal();
 	signal closeEmptySignal();
 
-	onSetCurrentText: {
-		if(!comboBoxContainerGql.complexModel){
-			comboBoxContainerGql.currentText = modelll.getData(comboBoxContainerGql.nameId,index);
-		}
-	}
-
-	onOpenSTChanged: {
-		selectedIndex = -1;
-	}
-
-	onModelChanged: {
-		if (comboBoxContainerGql.currentIndex > -1){
-			comboBoxContainerGql.currentText = popup.model.getData("name");
-		}
-	}
-
-	onDialogsCountChanged: {
-
-		comboBoxContainerGql.openST = comboBoxContainerGql.dialogsCount > comboBoxContainerGql.dialogsCountPrev;
-		if(!comboBoxContainerGql.openST && comboBoxContainerGql.dialogsCountPrev < 1000){
-			comboBoxContainerGql.dialogsCountPrev = 1000;
-		}
-	}
-
-	onPropertiesChanged: {
-		comboBoxContainerGql.currentIndex = -1;
-		comboBoxContainerGql.currentText = "";
-	}
-
-	function popupDestruction(){
-		console.log("popupDestruction");
-	}
-
-	Component {
+	popupMenuComp: Component {
 		id: popupMenu;
 		PopupMenuDialogGql {
 			id: popup;
 
-			opacity: 0;
-			rootItem: comboBoxContainerGql;
-			offset: comboBoxContainerGql.offset;
-			count: comboBoxContainerGql.count;
-			commandId: comboBoxContainerGql.commandId;
-			filterName: comboBoxContainerGql.filterName;
 			delegate: comboBoxContainerGql.delegate;
-			properties: comboBoxContainerGql.properties;
-			gettedParams: comboBoxContainerGql.gettedParams;
-			filterIdsModel: comboBoxContainerGql.filterIdsModel;
-			delegateRadius: comboBoxContainerGql.delegateRadius;
 			hiddenBackground: comboBoxContainerGql.hiddenBackground;
 			itemHeight: comboBoxContainerGql.itemHeight;
-			filterHeight: comboBoxContainerGql.filterHeiht;
 			textSize: comboBoxContainerGql.textSize;
 			fontColor: comboBoxContainerGql.fontColor;
-			canClose: comboBoxContainerGql.canClose;
-			preventFirstLoading: comboBoxContainerGql.preventFirstLoading;
-			pauseDuration: comboBoxContainerGql.pauseDuration;
-			excludeFilterPart: comboBoxContainerGql.excludeFilterPart;
-			canUpdateModel: comboBoxContainerGql.canUpdateModel;
-			additionalFilter: comboBoxContainerGql.additionalFilter;
-			isUpwards: comboBoxContainerGql.isUpwards;
-			// doNotCorrectPosition: comboBoxContainerGql.doNotCorrectPosition; !!!!!!!!!!!!
 
-			// function getCurrentText(index){
-			// 	return popup.model.getData("name",index);
-			// }
-			// Connections{
-			// 	target: comboBoxContainerGql;
-			// 	onFinished: popup.finished(commandId, index)
-			// }
+			model: comboBoxContainerGql.model;
+			shownItemsCount: comboBoxContainerGql.countVisibleItem
+			commandId: comboBoxContainerGql.commandId;
+			dataProverState: dataProvider.state
+			filterText: comboBoxContainerGql.filterText;
+			selectedIndex: comboBoxContainerGql.currentIndex;
+
+			moveToEnd: comboBoxContainerGql.moveToEnd;
+			moveToIndex: comboBoxContainerGql.moveToIndex;
+			visibleScrollBar: comboBoxContainerGql.visibleScrollBar;
 
 			Component.onCompleted: {
 				comboBoxContainerGql.finished.connect(popup.finished);
+				popup.closeSignal.connect(comboBoxContainerGql.closeSignal);
 				popup.clearSignal.connect(comboBoxContainerGql.clearSignal);
 			}
 
-			onHeightChanged: {
-				popup.setY();
+			onStarted: {
+				comboBoxContainerGql.popup = popup;
 			}
 
-			function setY(){
-				if(popup.height === 0){
-					return
-				}
-				if(comboBoxContainerGql.isUpwards){
-					let point = comboBoxContainerGql.mapToItem(null, 0, 0)
-					popup.y = point.y;
-				}
-				popup.opacity = 1;
-			}
-
-			onFilterTextChanged: {
-				// comboBoxContainerGql.filterText = popup.filterText;
-				// comboBoxContainerGql.currentIndex = -1;
-				// comboBoxContainerGql.currentText = popup.filterText;
-			}
 			onFinished: {
-				if (index > -1){
-					for (var item = 0; item < comboBoxContainerGql.gettedParams.getItemsCount(); item++){
-						let param = comboBoxContainerGql.gettedParams.getData("name", item);
-						let value = popup.model.getData(param, index);
-						comboBoxContainerGql.gettedParams.setData("Value", value, item);
-					}
+				if (index >= 0){
+					comboBoxContainerGql.currentIndex = index;
 				}
-				// comboBoxContainerGql.currentText = popup.model.getData("name", index);
-				comboBoxContainerGql.setCurrentText(popup.model,index)
+
+				comboBoxContainerGql.isOpen = false;
+
+				comboBoxContainerGql.setCurrentText(popup.model, index)
 				if (comboBoxContainerGql.currentText == ""){
 					comboBoxContainerGql.currentText = popup.filterText;
 				}
 
 				comboBoxContainerGql.currentIndex = index;
+			}
 
-				if(popup.canClose){
-					popup.root.closeDialog();
+			onDecorator_Changed: {
+				if(!popup.decorator_){
+					return
+				}
+
+				dataProvider.updateModel(0)
+			}
+
+			onEditSignal: {
+				comboBoxContainerGql.filterText = filterText
+				comboBoxContainerGql.currentIndex = -1;
+
+				let str = filterText.replace(comboBoxContainerGql.excludeFilterPart, "");
+				if(dataProvider.filter.hasTextFilter()){
+					dataProvider.filter.m_textFilter.m_text = str
+				}
+				else{
+					dataProvider.filter.setFilteringInfoIds(comboBoxContainerGql.textFilteringInfoIds)
+					dataProvider.filter.setTextFilter(str)
+				}
+
+				pause.restart();
+			}
+
+			function setY(){
+				if(popup.height == 0){
+					return
+				}
+
+				let point = comboBoxContainerGql.mapToItem(null, 0, 0)
+				let y_ = point.y;
+
+				popup.isUpwards = (y_ + popup.height) > ModalDialogManager.activeView.height
+				popup.y = popup.isUpwards ? point.y - popup.height : point.y;
+				popup.opacity = 1;
+			}
+
+			function requestNextBatch(){
+				let elementCount = popup.model.getItemsCount();
+				let elemCountOk = elementCount >= 0 ? elementCount > dataProvider.offset : true;
+				let doRequest = !comboBoxContainerGql.endListStatus
+									&& dataProverState.toLowerCase() == "ready"
+									&& elemCountOk;
+				if(doRequest){
+					dataProvider.updateModel(dataProvider.offset + dataProvider.count)
 				}
 			}
-			onPropertiesChangedSignal: {
-				comboBoxContainerGql.currentIndex = -1;
-				comboBoxContainerGql.currentText = "";
-			}
-			onDestructionSignal: {
-				comboBoxContainerGql.popupDestruction();
-			}
-		}
-	}
-
-	Component.onCompleted: {
-		if (comboBoxContainerGql.textCentered){
-			cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
-		}
-		else {
-			cbTitleTxt.anchors.left = cbMainRect.left;
-			cbTitleTxt.anchors.leftMargin = 10;
 		}
 	}
 
 	function openPopupMenu(){
-		comboBoxContainerGql.dialogsCountPrev = ModalDialogManager.count;
+		let point = comboBoxContainerGql.mapToItem(null, 0, comboBoxContainerGql.height);
 		let filterText_ = comboBoxContainerGql.keepFilterText ? comboBoxContainerGql.currentText : "";
-		let point = comboBoxContainerGql.mapToItem(null, 0, 0);
-		let y_ = point.y;
-		if(y_ + comboBoxContainerGql.height + comboBoxContainerGql.countVisibleItem * comboBoxContainerGql.itemHeight > ModalDialogManager.activeView.height){
-			comboBoxContainerGql.isUpwards = true;
-		}
-		else {
-			comboBoxContainerGql.isUpwards = false;
-		}
 
-		let params = {};
-		if(!comboBoxContainerGql.isUpwards){
-			params = {
-				"x": point.x,
-				"y": point.y,
-				"filterText": filterText_,
-				"model": comboBoxContainerGql.model,
-				"width": comboBoxContainerGql.width,
-				"countVisibleItem": comboBoxContainerGql.countVisibleItem}
-		}
-		else {
-			params = {
-				"x": point.x,
-				"filterText": filterText_,
-				"model": comboBoxContainerGql.model,
-				"width": comboBoxContainerGql.width,
-				"countVisibleItem": comboBoxContainerGql.countVisibleItem}
-		}
+		ModalDialogManager.openDialog(comboBoxContainerGql.popupMenuComp, {
+										"x":	 point.x,
+										"width": comboBoxContainerGql.width,
+									});
 
-		ModalDialogManager.openDialog(popupMenu, params);
+		comboBoxContainerGql.isOpen = true;
 	}
 
-	function closeFunc(){
-		if(comboBoxContainerGql.closeEmpty){
-			ModalDialogManager.closeDialog();
-			closeEmptySignal();
+	function onMouseAreaClicked(){
+		comboBoxContainerGql.focus = true;
+		comboBoxContainerGql.forceActiveFocus();
+
+		comboBoxContainerGql.openPopupMenu();
+		comboBoxContainerGql.clicked();
+	}
+
+	PauseAnimation {
+		id: pause;
+
+		duration: 400;
+		onFinished:{
+			dataProvider.updateModel(0);
 		}
 	}
 
-	Rectangle {
-		id: cbMainRect;
+	CollectionDataProvider {
+		id: dataProvider;
 
-		anchors.fill: parent;
+		offset: 0
+		count: 15
+		commandId: comboBoxContainerGql.commandId
 
-		border.color: comboBoxContainerGql.borderColor;
-		border.width: !comboBoxContainerGql.backVisible ? 0 :1;
+		property var filterModel: null
 
-		radius: comboBoxContainerGql.radius;
-		color: comboBoxContainerGql.backgroundColor;
-
-
-		gradient: Gradient {
-			GradientStop { position: 0.0; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
-			GradientStop { position: 0.97; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
-			GradientStop { position: 0.98; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient3; }
-			GradientStop { position: 1.0; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient4; }
-		}
-
-		Text {
-			id: cbTitleTxt;
-
-			anchors.verticalCenter: parent.verticalCenter;
-			anchors.left: parent.left;
-			anchors.leftMargin: 10;
-			anchors.right: parent.right;
-			anchors.rightMargin: 20;
-
-			clip: true;
-
-			color: comboBoxContainerGql.fontColorTitle;
-			font.family: Style.fontFamily;
-			font.pixelSize: comboBoxContainerGql.textSize;
-			visible: comboBoxContainerGql.backVisible;
-
-			text: comboBoxContainerGql.currentText;
-		}
-
-		Image {
-			id: cbArrowIcon;
-
-			anchors.right: cbMainRect.right;
-			anchors.verticalCenter: cbMainRect.verticalCenter;
-			anchors.rightMargin: Style.marginXS;
-
-			width: Style.iconSizeXS;
-			height: Style.iconSizeXXS;
-
-			source: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
-
-			sourceSize.width: width;
-			sourceSize.height: height;
-		}
-
-		MouseArea {
-			id: cbMouseArea;
-
-			anchors.fill: parent;
-			hoverEnabled: !comboBoxContainerGql.readOnly;
-			enabled: comboBoxContainerGql.enabled;
-
-			cursorShape: hoverEnabled ? Qt.PointingHandCursor : Qt.ArrowCursor;
-
-			onClicked: {
-				if(!comboBoxContainerGql.readOnly){
-					comboBoxContainerGql.openPopupMenu();
-					comboBoxContainerGql.clicked();
-				}
-			}
-
-			onPressed: {
-				if(tooltip.text !== ""){
-					tooltip.closeTooltip();
-				}
-			}
-
-			onPositionChanged: {
-				if(tooltip.text !== ""){
-					tooltip.show(mouseX, mouseY);
-				}
-			}
-
-			onExited: {
-				if(tooltip.text !== ""){
-					tooltip.hide();
-				}
+		onFilterModelChanged: {
+			/// WEB issue
+			/// cannot use fromObject()
+			/// tries to create object from key 'm_$properties'
+			if(filterModel){
+				dataProvider.filter.createFromJson(filterModel.toJson())
 			}
 		}
 
-		CustomTooltip{
-			id: tooltip;
+		onFailed: {
+			ModalDialogManager.showErrorDialog(message)
+		}
 
-			fitToTextWidth: true;
+		onModelUpdated: {
+			let canClose = data.containsKey("close") && data.getData("close");
+
+			if (dataProvider.notificationModel.containsKey("totalCount")){
+				comboBoxContainerGql.totalCount = dataProvider.notificationModel.getData("totalCount");
+			}
+
+			if (dataProvider.offset == 0){
+				comboBoxContainerGql.model = dataProvider.collectionModel
+				comboBoxContainerGql.endListStatus = false;
+				comboBoxContainerGql.currentIndex = -1;
+				if(canClose){
+					comboBoxContainerGql.closePopupMenu();
+				}
+			}
+			else{
+				comboBoxContainerGql.endListStatus = dataProvider.collectionModel.getItemsCount() <= 0
+				if(!comboBoxContainerGql.endListStatus){
+					for (let i = 0; i < dataProvider.collectionModel.getItemsCount(); i++){
+						let index_ = comboBoxContainerGql.model.insertNewItem();
+						dataProvider.collectionModel.copyItemDataToModel(i, comboBoxContainerGql.model, index_);
+					}
+				}
+			}
+
+			dataProvider.collectionModel.refresh();
 		}
 	}
 }

@@ -574,7 +574,7 @@ Rectangle{
 		}
 	}
 
-	ComboBoxGql{
+	ComboBoxGqlLegacy{
 		id: searchTextField;
 
 		anchors.horizontalCenter: parent.horizontalCenter;

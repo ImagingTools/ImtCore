@@ -2,8 +2,10 @@ module imtguigql
 
 GqlDocumentDataController 1.0 GqlDocumentDataController.qml
 ComboBoxGql 1.0 ComboBoxGql.qml
+ComboBoxGqlLegacy 1.0 ComboBoxGqlLegacy.qml
 ComboBoxGqlSimple 1.0 ComboBoxGqlSimple.qml
 PopupMenuDialogGql 1.0 PopupMenuDialogGql.qml
+PopupMenuDialogGqlLegacy 1.0 PopupMenuDialogGqlLegacy.qml
 RemoteFileController__ 1.0 RemoteFileController.qml
 SubscriptionClient 1.0 SubscriptionClient.qml
 SubscriptionManager 1.0 SubscriptionManager.qml
