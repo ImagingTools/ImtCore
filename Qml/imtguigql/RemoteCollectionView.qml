@@ -101,8 +101,6 @@ CollectionView {
 		if (!root.visibleMetaInfo){
 			return;
 		}
-		
-		console.log("onSelectionChanged", selectedIds, selectedIndexes)
 
 		if (selectedIds.length === 1){
 			let elementId = selectedIds[0];
@@ -219,7 +217,7 @@ CollectionView {
 			if (operationContextInfo.containsKey("ownerId")){
 				let ownerId = operationContextInfo.getData("ownerId");
 				let currentUserId = AuthorizationController.getLoggedUserId();
-				if (ownerId == currentUserId){
+				if (ownerId === currentUserId){
 					root.doUpdateGui();
 				}
 				else{

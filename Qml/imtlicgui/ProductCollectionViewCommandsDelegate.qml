@@ -22,6 +22,8 @@ DocumentCollectionViewDelegate {
 	exportFileDialog.title: qsTr("Select product");
 	
 	importObjectTypeId: "Product";
+	canSetDescription: true
+	canRename: true
 
 	property bool force: false;
 	
@@ -82,7 +84,6 @@ DocumentCollectionViewDelegate {
 	}
 
 	function onImportDialogResult(name, fileData, mimeType){
-		console.log("onImportDialogResult", name, mimeType)
 		if (collectionView && collectionView.dataController){
 			collectionView.dataController.importObject(importObjectTypeId, name, "", fileData, mimeType, {"force":container.force});
 		}

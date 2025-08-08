@@ -73,7 +73,8 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isDescriptionRequested){
-		representationObject.description = QString(productInfoPtr->GetProductDescription());
+		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::ElementInfoType::EIT_DESCRIPTION).toString();
+		representationObject.description = description;
 	}
 
 	if (requestInfo.items.isCategoryIdRequested){
@@ -326,7 +327,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
-	QString newName = inputParamPtr->GetParamArgumentValue("NewName").toByteArray();
+	QString newName = inputParamPtr->GetParamArgumentValue("newName").toByteArray();
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){

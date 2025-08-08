@@ -18,7 +18,6 @@ ViewBase {
 	
 	property Component treeItemModelComp: Component {
 		TreeItemModel {}
-
 	}
 	
 	Component.onCompleted: {
@@ -38,6 +37,10 @@ ViewBase {
 	
 	onFeatureDataChanged: {
 		if (featureData){
+			if (!featureData.hasSubFeatures()){
+				featureData.createSubFeatures()
+			}
+
 			tableView_.rowModel = featureData.m_subFeatures;
 		}
 	}
@@ -59,6 +62,7 @@ ViewBase {
 	}
 	
 	function updateTreeViewGui(){
+		console.log("FeatureEditor.qml updateTreeViewGui")
 		let selectedIndex = null;
 		if (tableView.tableSelection.items.length > 0){
 			selectedIndex = tableView.tableSelection.items[0];
@@ -103,7 +107,7 @@ ViewBase {
 		for (let i = 0; i < itemsDataList.length; i++){
 			let delegateItem = itemsDataList[i]
 			let itemData = delegateItem.getItemData();
-			let itemId = itemData.FeatureId;
+			let itemId = itemData.featureId;
 			
 			delegateItem.isVisible = itemId !== selectedId;
 			delegateItem.isActive = !inactiveElements.includes(itemId);
@@ -124,24 +128,16 @@ ViewBase {
 	}
 	
 	function updateGui(){
-		console.log("updateGui", featureData.toJson());
 		descriptionInput.text = featureData.m_description;
 		featureNameInput.text = featureData.m_featureName;
 		featureIdInput.text = featureData.m_featureId;
-		console.log("descriptionInput.text", descriptionInput.text);
-		
 		featureEditor.updateTreeViewGui();
 	}
 	
 	function updateModel(){
-		console.log("updateModel", featureData.toJson());
-		
 		featureData.m_description = descriptionInput.text;
 		featureData.m_featureName = featureNameInput.text;
 		featureData.m_featureId = featureIdInput.text;
-		
-		console.log("featureData.m_description", featureData.m_description);
-		
 		tableView_.rowModel = featureData.m_subFeatures;
 	}
 	
@@ -260,10 +256,6 @@ ViewBase {
 						}
 						
 						return true;
-					}
-					
-					onError: {
-						// ModalDialogManager.showWarningDialog(message);
 					}
 				} }
 			
@@ -410,17 +402,16 @@ ViewBase {
 					id: delegate;
 					root: featureDependenciesView;
 					childModelKey: FeatureItemTypeMetaInfo.s_subFeatures;
-					
 					onCheckStateChanged: {
 						let selectedIndex =  null;
 						if (tableView_.tableSelection.items.length > 0){
 							selectedIndex = tableView_.tableSelection.items[0];
 						}
-						
+
 						if (selectedIndex != null){
 							if (!featureDependenciesView.delegateUpdatingBlock){
-								if (delegate.itemData.FeatureId !== ""){
-									let featureId = delegate.itemData.FeatureId;
+								if (delegate.itemData.featureId !== ""){
+									let featureId = delegate.itemData.featureId;
 									let state = delegate.checkState;
 									
 									let selectedId = selectedIndex.itemData.m_featureId;
@@ -449,8 +440,6 @@ ViewBase {
 									else{
 										selectedIndex.itemData.m_dependencies = "";
 									}
-									
-									featureEditor.updateTreeViewGui();
 								}
 							}
 						}
@@ -463,7 +452,7 @@ ViewBase {
 				for (let i = 0; i < itemsDataList.length; i++){
 					let delegateItem = itemsDataList[i]
 					let itemData = delegateItem.getItemData();
-					let id = itemData.FeatureId;
+					let id = itemData.featureId;
 					let dependencies = itemData.Dependencies;
 					
 					if (dependencies && dependencies !== ""){
@@ -491,7 +480,7 @@ ViewBase {
 					//     continue;
 					// }
 					
-					let id = itemData.FeatureId;
+					let id = itemData.featureId;
 					
 					if (featureId === id){
 						let dependencies = itemData.Dependencies;
