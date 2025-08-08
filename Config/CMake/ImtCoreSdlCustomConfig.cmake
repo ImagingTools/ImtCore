@@ -192,18 +192,10 @@ macro (ImtCoreCustomConfigureSdlCpp)
 		string(FIND "${SDL_HEADER}" ".h" matchres)
 
 		if (${matchres} GREATER  -1)
-
-			# message("acf_create_moc ${SDL_HEADER}")
 			LIST(APPEND HEADER_FILES ${SDL_HEADER})
-			# acf_create_moc(SDL_HEADER)
-			# target_sources(${PROJECT_NAME} PRIVATE ${FOUND_DEPS})
 		endif ()
 	endforeach()
 
-	message("acf_create_moc ${HEADER_FILES}")
-
-	# acf_create_moc(MOC_SOURCES "${HEADER_FILES}")
-	# qt6_wrap_cpp("${outfiles}" ${ARGN} )
 	qt6_wrap_cpp(MOC_SOURCES "${HEADER_FILES}")
 	target_sources(${PROJECT_NAME} PRIVATE ${MOC_SOURCES})
 
@@ -297,13 +289,11 @@ endmacro()
 
 #! CPP+QML+GQL \NOTE this function enables ALL modificators
 #! \param SCHEMA_PATH		- The absolute path to the schema file to be compiled.
-#! \param QML_NAME			- \DEPRECATED \WARNING NEVER USE IT! set \param 'QML' instead (boolean) \TODO After adapting all the projects, remove it.
 #! \TODO think about \param SCHEMA_PATH as multi value
 macro (ImtCoreCustomConfigureSdlCppQml)
 	set(oneValueArgs
 		SCHEMA_PATH
 		VERSION
-		QML_NAME
 		CUSTOM_OUTPUT_ROOT_DIR_PATH)
 
 	set(booleanArgs
@@ -315,19 +305,6 @@ macro (ImtCoreCustomConfigureSdlCppQml)
 		ImtCoreCustomConfigureSdlCpp(
 			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
 			VERSION "${ARG_VERSION}"
-			CUSTOM_OUTPUT_ROOT_DIR_PATH "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}")
-	endif()
-
-	if (ARG_QML_NAME)
-		# \TODO REMOVE IT later
-		message(FATAL_ERROR "DEPRECATED argument provided! replace 'QML_NAME MyQmlSdl' to 'QML' ")
-
-		# unreachable code!
-		message(VERBOSE "Additing SDL for QML compile source '${ARG_SCHEMA_PATH}' for ${PROJECT_NAME}")
-		ImtCoreCustomConfigureSdlQml(
-			SCHEMA_PATH "${ARG_SCHEMA_PATH}"
-			VERSION "${ARG_VERSION}"
-			QML_NAME "${ARG_QML_NAME}"
 			CUSTOM_OUTPUT_ROOT_DIR_PATH "${ARG_CUSTOM_OUTPUT_ROOT_DIR_PATH}")
 	endif()
 
