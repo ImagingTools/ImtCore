@@ -231,23 +231,19 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest getVisualStatusRequest(gqlRequest, false);
-	if (getVisualStatusRequest.GetCommandId() == gqlRequest.GetCommandId()){
+	if (sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest::GetCommandId() == gqlRequest.GetCommandId()){
 		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 	}
 
-	sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest removeElementSetGqlRequest(gqlRequest, false);
-	if (removeElementSetGqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
+	if (sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest::GetCommandId() == gqlRequest.GetCommandId()){
 		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 	}
 
-	sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest restoreObjectSetGqlRequest(gqlRequest, false);
-	if (restoreObjectSetGqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
+	if (sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest::GetCommandId() == gqlRequest.GetCommandId()){
 		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 	}
 
-	sdl::imtbase::ImtCollection::CRestoreObjectsGqlRequest restoreObjectsGqlRequest(gqlRequest, false);
-	if (restoreObjectsGqlRequest.GetCommandId() == gqlRequest.GetCommandId()){
+	if (sdl::imtbase::ImtCollection::CRestoreObjectsGqlRequest::GetCommandId() == gqlRequest.GetCommandId()){
 		return BaseClass::CreateInternalResponse(gqlRequest, errorMessage);
 	}
 
@@ -314,17 +310,21 @@ bool CObjectCollectionControllerCompBase::IsRequestSupported(const imtgql::CGqlR
 	const QByteArray requestCommandId = gqlRequest.GetCommandId();
 
 	{
-		CGetObjectVisualStatusGqlRequest req(gqlRequest, false);
-		if (req.GetCommandId() == requestCommandId && req.IsValid()) {
-			const auto& argsOpt = req.GetRequestedArguments().input.Version_1_0;
-			if (!argsOpt.has_value()) {
-				Q_ASSERT(false);
-				return false;
-			}
+		if (CGetObjectVisualStatusGqlRequest::GetCommandId() == requestCommandId){
+			CGetObjectVisualStatusGqlRequest req(gqlRequest, false);
+			if(req.IsValid()){
+				const auto& argsOpt = req.GetRequestedArguments().input.Version_1_0;
+				if (!argsOpt.has_value()) {
+					Q_ASSERT(false);
 
-			const auto& typeIdOpt = argsOpt->typeId;
-			const QByteArray typeId = typeIdOpt.value_or(QByteArray());
-			return m_objectTypeIdAttrPtr.FindValue(typeId) >= 0;
+					return false;
+				}
+
+				const auto& typeIdOpt = argsOpt->typeId;
+				const QByteArray& typeId = typeIdOpt.value_or(QByteArray());
+
+				return m_objectTypeIdAttrPtr.FindValue(typeId) >= 0;
+			}
 		}
 	}
 
