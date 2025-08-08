@@ -371,7 +371,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 	paginationQuery.clear();
 
 	if (offset >= 0 && count > 0){
-		paginationQuery = QString("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
+		paginationQuery = QStringLiteral("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
 	}
 
 	return true;
@@ -383,15 +383,17 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 	bool retVal = true;
 
 	QString objectFilterQuery;
-	retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
-	if (!retVal){
-		return false;
-	}
-
 	QString timeFilterQuery;
 	QString textFilterQuery;
 
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+	if (paramIds.contains(QByteArrayLiteral("ObjectFilter"))){
+		retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
+		if (!retVal){
+			return false;
+		}
+	}
+
 	if (paramIds.contains(QByteArrayLiteral("Filter"))){
 		iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, QByteArrayLiteral("Filter"), false);
 		if (collectionFilterParamPtr.IsValid()){
@@ -404,20 +406,13 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 	else if (paramIds.contains(QByteArrayLiteral("ComplexFilter"))){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(&filterParams, QByteArrayLiteral("ComplexFilter"), false);
 		if(complexFilterParamPtr.IsValid()){
-			retVal = CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
-
-			if (!retVal){
-				return false;
-			}
-
-			retVal = CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
-			if (!retVal){
-				return false;
-			}
+			CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
+			CreateObjectFilterQuery(*complexFilterParamPtr, objectFilterQuery);
+			CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
 		}
 	}
 
-	QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
+	const QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
 
 	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !additionalFilters.isEmpty()){
 		filterQuery = QStringLiteral(" WHERE ");
@@ -457,7 +452,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 			QString& filterQuery) const
 {
 	QString objectFilterQuery;
-	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
+	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, QByteArrayLiteral("ObjectFilter"), false);
 	if (objectFilterParamPtr.IsValid()){
 		iprm::IParamsSet::Ids paramIds = objectFilterParamPtr->GetParamIds();
 		if (!paramIds.isEmpty()){
@@ -475,9 +470,17 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 			QString value = textParamPtr->GetText();
 
-			filterQuery = QString("\"%1\" = '%2'").arg(qPrintable(key)).arg(value);
+			filterQuery = QStringLiteral(R"("%1" = '%2')").arg(qPrintable(key)).arg(value);
 		}
 	}
+
+	return true;
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
+{
+	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
 
 	return true;
 }
@@ -494,12 +497,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
-		textFilterQuery = QString("\"%1\" ILIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+		textFilterQuery = QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
-			textFilterQuery += " OR ";
+			textFilterQuery += QStringLiteral(" OR ");
 
-			textFilterQuery += QString("\"%1\" ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+			textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
 		}
 	}
 
@@ -509,7 +512,19 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& textFilterQuery) const
 {
-	textFilterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter);
+	const QString textFilter = collectionFilter.GetTextFilter();
+	const QByteArrayList fieldIds = collectionFilter.GetTextFilterFieldsList();
+	if (fieldIds.isEmpty() || textFilter.isEmpty()){
+		return false;
+	}
+
+	for (const QByteArray& fieldId : fieldIds){
+		if (!textFilterQuery.isEmpty()){
+			textFilterQuery += QStringLiteral(" OR ");
+		}
+
+		textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(fieldId), textFilter);
+	}
 
 	return true;
 }

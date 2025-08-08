@@ -359,23 +359,13 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 		}
 	}
 
-
 	QString timeFilterQuery;
 	if (paramIds.contains("ComplexFilter")){
 		iprm::TParamsPtr<imtbase::IComplexCollectionFilter> complexFilterParamPtr(&filterParams, "ComplexFilter");
 		if (complexFilterParamPtr.IsValid()){
-			retVal = BaseClass::CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
-
-			if (!retVal){
-				return false;
-			}
-
-			SubstituteFieldIds(textFilterQuery);
-
-			retVal = CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
-			if (!retVal){
-				return false;
-			}
+			BaseClass::CreateTextFilterQuery(*complexFilterParamPtr, textFilterQuery);
+			BaseClass::CreateObjectFilterQuery(*complexFilterParamPtr, objectFilterQuery);
+			BaseClass::CreateTimeFilterQuery(complexFilterParamPtr->GetTimeFilter(), timeFilterQuery);
 		}
 	}
 

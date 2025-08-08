@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5338" Description="ACF"/>
-            <Version Id="1" Number="2232" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395265" Description="Qt Framework"/>
+            <Version Id="0" Number="5407" Description="ACF"/>
+            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395521" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -52,6 +52,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="PostgresXPathExtractor" PackageId="ImtDatabasePck" ComponentId="PostgresXPathExtractor">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="SqlDatabaseJsonDelegate" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseJsonDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -90,6 +95,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PostgresXPathExtractor"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="TableName">
                         <Data IsEnabled="false"/>
