@@ -349,7 +349,7 @@ Item {
 			horizontalAlignment: Text.AlignLeft;
 			verticalAlignment: Text.AlignVCenter;
 			wrapMode: Text.NoWrap;
-			font.pixelSize: 10;
+			font.pixelSize: Style.fontSizeXS;
 			font.bold: true;
 			font.family: Style.fontFamily;
 			color:  diagram.valueColor;
@@ -378,7 +378,7 @@ Item {
 					horizontalAlignment: Text.AlignHCenter;
 					verticalAlignment: Text.AlignTop;
 					wrapMode: Text.NoWrap;
-					font.pixelSize: 10;
+					font.pixelSize: Style.fontSizeXS;
 					font.bold: false;
 					font.family: Style.fontFamily;
 					color:  diagram.valueColor;
@@ -703,7 +703,7 @@ Item {
 
 				color: diagram.valueColor;
 				font.family: Style.fontFamily;
-				font.pixelSize: Style.fontXSizeSmall;
+				font.pixelSize: Style.fontSizeXS;
 
 				rotation: diagram.xElementRotation;
 
