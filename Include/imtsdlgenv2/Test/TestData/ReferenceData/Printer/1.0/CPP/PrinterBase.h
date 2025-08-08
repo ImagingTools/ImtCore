@@ -962,6 +962,321 @@ Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterBase);
 
 
 
+/// \file CPrinterList.h
+
+#pragma once
+
+
+// Qt includes
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonValue>
+#include <QtCore/QObject>
+#include <QtCore/QList>
+#include <QtCore/QVariant>
+#include <QtCore/QVariantMap>
+#include <QtCore/QSet>
+
+// ACF includes
+#include <istd/TSharedNullable.h>
+
+// ImtCore includes
+#include <imtbase/CTreeItemModel.h>
+#include <imtgql/CGqlParamObject.h>
+#include <imtbase/CItemModelBase.h>
+#include <imtbase/TListModelBase.h>
+
+
+
+namespace sdl::modsdl::PrinterBase
+{
+
+
+class CPrinterList
+{
+public:
+	enum ProtocolVersion
+	{
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_1_0,
+		PV_LAST = PV_1_0
+	};
+
+	// V1_0 struct
+	struct V1_0
+	{
+		struct PrinterListFields
+		{
+			static const inline QString Data = "data";
+		};
+
+		istd::TSharedNullable<QList<CPrinterBase::V1_0>> data;
+
+		static QByteArray GetVersionId();
+
+		[[nodiscard]] bool operator==(const V1_0& other) const;
+		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
+
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+
+		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
+	};
+
+	// available version members
+	istd::TSharedNullable<V1_0> Version_1_0;
+
+	// serialize methods
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
+
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
+
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
+};
+
+
+class CPrinterListObjectList;
+
+class CPrinterListObject: public ::imtbase::CItemModelBase, public CPrinterList
+{
+	Q_OBJECT
+	Q_PROPERTY(sdl::modsdl::PrinterBase::CPrinterBaseObjectList* m_data READ GetData WRITE SetData NOTIFY dataChanged)
+
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+public:
+	CPrinterListObject(QObject* parent = nullptr);
+
+	sdl::modsdl::PrinterBase::CPrinterBaseObjectList* GetData();
+	void SetData(sdl::modsdl::PrinterBase::CPrinterBaseObjectList* v);
+	Q_INVOKABLE bool hasData();
+	Q_INVOKABLE void createData();
+	// CItemModelBase implemented
+	Q_INVOKABLE QString toJson() const override;
+	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
+	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
+	Q_INVOKABLE QString toGraphQL() const override;
+	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
+
+signals:
+	void dataChanged();
+	void finished();
+
+protected:
+	sdl::modsdl::PrinterBase::CPrinterBaseObjectList* m_dataQObjectPtr;
+};
+
+
+class CPrinterListObjectList: public ::imtbase::TListModelBase<sdl::modsdl::PrinterBase::CPrinterList::V1_0, sdl::modsdl::PrinterBase::CPrinterListObject>
+{
+	Q_OBJECT
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
+public:
+	typedef ::imtbase::TListModelBase<sdl::modsdl::PrinterBase::CPrinterList::V1_0, sdl::modsdl::PrinterBase::CPrinterListObject> BaseClass;
+
+	CPrinterListObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
+		return true;
+	}
+
+	Q_INVOKABLE int getItemsCount(){
+		return rowCount();
+	}
+	Q_INVOKABLE QVariantMap get(int row) const{
+		QVariantMap data;
+		QModelIndex idx = index(row, 0);
+		if (!idx.isValid()) return data;
+		QHash<int, QByteArray> roles = roleNames();
+		for (auto it = roles.begin(); it != roles.end(); ++it)
+			data[it.value()] = idx.data(it.key());
+		return data;
+	}
+	Q_INVOKABLE void append(sdl::modsdl::PrinterBase::CPrinterListObject* item){
+		beginInsertRows(QModelIndex(), rowCount(), rowCount());
+		Version_1_0->append(*item->Version_1_0);
+		ClearCache();
+		endInsertRows();
+	}
+	Q_INVOKABLE sdl::modsdl::PrinterBase::CPrinterListObjectList* copyMe(){
+		sdl::modsdl::PrinterBase::CPrinterListObjectList* objectListPtr = new sdl::modsdl::PrinterBase::CPrinterListObjectList();
+
+		for (int i = 0; i < this->rowCount(); i++){
+			QVariant item = this->getData("item", i);
+			if (!item.canConvert<sdl::modsdl::PrinterBase::CPrinterListObject>()){
+				return nullptr;
+			}
+
+			sdl::modsdl::PrinterBase::CPrinterListObject* itemObjectPtr = item.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
+			if (itemObjectPtr == nullptr){
+				return nullptr;
+			}
+
+			objectListPtr->addElement(dynamic_cast<sdl::modsdl::PrinterBase::CPrinterListObject*>(itemObjectPtr->copyMe()));
+		}
+
+		return objectListPtr;
+	}
+
+	Q_INVOKABLE QString toJson(){
+		QString retVal = QStringLiteral("[");
+
+		for (int i = 0; i < this->rowCount(); i++){
+			if (i > 0 && i < this->rowCount() - 1){
+				retVal += QStringLiteral(", ");
+			}
+
+			QVariant item = this->getData("item", i);
+			if (!item.canConvert<sdl::modsdl::PrinterBase::CPrinterListObject>()){
+				return nullptr;
+			}
+
+			sdl::modsdl::PrinterBase::CPrinterListObject* itemObjectPtr = item.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
+			if (itemObjectPtr == nullptr){
+				return QString();
+			}
+
+			retVal += itemObjectPtr->toJson();
+		}
+
+		retVal += QStringLiteral("]");
+
+		return retVal;
+	}
+
+	Q_INVOKABLE QString toGraphQL(){
+		QString retVal = QStringLiteral("[");
+
+		for (int i = 0; i < this->rowCount(); i++){
+			if (i > 0 && i < this->rowCount() - 1){
+				retVal += QStringLiteral(", ");
+			}
+
+			QVariant item = this->getData("item", i);
+			if (!item.canConvert<sdl::modsdl::PrinterBase::CPrinterListObject>()){
+				return nullptr;
+			}
+
+			sdl::modsdl::PrinterBase::CPrinterListObject* itemObjectPtr = item.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
+			if (itemObjectPtr == nullptr){
+				return QString();
+			}
+
+			retVal += itemObjectPtr->toGraphQL();
+		}
+
+		retVal += QStringLiteral("]");
+
+		return retVal;
+	}
+
+	Q_INVOKABLE void addElement(sdl::modsdl::PrinterBase::CPrinterListObject* item){
+		append(item);
+	}
+
+	Q_INVOKABLE void removeElement(int index){
+		remove(index);
+	}
+
+	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::PrinterBase::CPrinterListObjectList* otherModelPtr){
+		if (otherModelPtr == nullptr){
+			return false;
+		}
+
+		if (this == otherModelPtr){
+			return false;
+		}
+
+		if (this->rowCount() != otherModelPtr->rowCount()){
+			return false;
+		}
+
+		for (int i = 0; i < this->rowCount(); i++){
+			QVariant selfItem = this->getData("item", i);
+			QVariant otherItem = otherModelPtr->getData("item", i);
+			if (!selfItem.canConvert<sdl::modsdl::PrinterBase::CPrinterListObject>()){
+				return false;
+			}
+
+			sdl::modsdl::PrinterBase::CPrinterListObject* selfItemObjectPtr = selfItem.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
+			if (selfItemObjectPtr == nullptr){
+				return false;
+			}
+
+			sdl::modsdl::PrinterBase::CPrinterListObject* otherItemObjectPtr = selfItem.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
+			if (otherItemObjectPtr == nullptr){
+				return false;
+			}
+
+			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	Q_INVOKABLE void insert(int index, sdl::modsdl::PrinterBase::CPrinterListObject* item){
+		if (index < 0 || index > Version_1_0->size()) return;
+		beginInsertRows(QModelIndex(), index, index);
+		Version_1_0->insert(index, *item->Version_1_0);
+		ClearCache();
+		endInsertRows();
+	}
+	Q_INVOKABLE void remove(int index){
+		if (index < 0 || index >= Version_1_0->size()) return;
+		beginRemoveRows(QModelIndex(), index, index);
+		Version_1_0->removeAt(index);
+		ClearCache();
+		endRemoveRows();
+	}
+	Q_INVOKABLE void clear(){
+		beginResetModel();
+		ClearCache();
+		Version_1_0->clear();
+		endResetModel();
+	}
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
+		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+			sdl::modsdl::PrinterBase::CPrinterListObject* retVal = GetOrCreateCachedObject(index);
+			return QVariant::fromValue(retVal);
+		}
+		if (nameId == "m_data"){
+			sdl::modsdl::PrinterBase::CPrinterListObject* retVal = GetOrCreateCachedObject(index);
+			return QVariant::fromValue(retVal->GetData());
+		}
+		return QVariant();
+	}
+	signals:
+	void countChanged();
+};
+
+
+
+} // namespace sdl::modsdl::PrinterBase
+
+
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterList::V1_0);
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterList);
+
+
+
+
+
 /// \file PrinterSpecification_ClassDef.h
 
 #pragma once
@@ -1054,10 +1369,111 @@ static void RegisterQmlTypes()
 	qmlRegisterType<CPrinterSpecificationBaseObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterSpecificationBase");
 	qmlRegisterType<CLinkObject>("modsdlPrinterBaseSdl", 1, 0, "Link");
 	qmlRegisterType<CPrinterBaseObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterBase");
+	qmlRegisterType<CPrinterListObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterList");
 }
 } // namespace sdl::modsdl::PrinterBase
 #endif
 
+
+
+
+/// \file CGetPrintersGqlRequest.h
+
+#pragma once
+
+
+// Qt includes
+#include <QtCore/QVariant>
+#include <QtCore/QVariantMap>
+
+
+// imtgql includes
+#include <imtgql/IGqlContext.h>
+#include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlParamObject.h>
+
+
+namespace sdl::modsdl::PrinterBase
+{
+
+
+
+struct GetPrintersRequestInfo
+{
+	bool isDataRequested = true;
+		struct dataRequestInfo
+		{
+			bool isNameRequested = true;
+			bool isSpecificationRequested = true;
+		} data;
+};
+
+
+struct GetPrintersRequestArguments
+{
+};
+
+
+class CGetPrintersGqlRequest
+{
+public:
+	static QByteArray GetCommandId();
+
+	[[nodiscard]] static bool SetupGqlRequest(::imtgql::CGqlRequest& gqlRequest, const GetPrintersRequestArguments& requestArguments, const GetPrintersRequestInfo& requestInfo = GetPrintersRequestInfo());
+
+	CGetPrintersGqlRequest(const ::imtgql::CGqlRequest& gqlRequest, bool optRead);
+	bool IsValid() const;
+	const GetPrintersRequestArguments& GetRequestedArguments() const;
+	GetPrintersRequestInfo GetRequestInfo() const;
+	const ::imtgql::IGqlContext* GetRequestContext() const;
+
+private:
+	bool m_isValid;
+	GetPrintersRequestArguments m_requestedArguments;
+	GetPrintersRequestInfo m_requestInfo;
+	const ::imtgql::IGqlContext* m_gqlContextPtr;
+};
+
+
+} // namespace sdl::modsdl::PrinterBase
+
+
+
+
+
+/// \file CGraphQlHandlerCompBase.h
+
+#pragma once
+
+//  includes
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+
+
+
+namespace sdl::modsdl::PrinterBase
+{
+
+
+class CGraphQlHandlerCompBase:
+			virtual public ::imtservergql::CPermissibleGqlRequestHandlerComp
+{
+public:
+	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CGraphQlHandlerCompBase)
+	I_END_COMPONENT
+
+	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+	virtual ::imtbase::CTreeItemModel* CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
+protected:
+	// abstract methods
+	virtual CPrinterList OnGetPrinters(const CGetPrintersGqlRequest& getPrintersRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+};
+
+
+} // namespace sdl::modsdl::PrinterBase
 
 
 
