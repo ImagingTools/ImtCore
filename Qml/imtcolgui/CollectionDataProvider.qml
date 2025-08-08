@@ -8,6 +8,7 @@ QtObject {
 	id: container;
 
 	property TreeItemModel collectionModel: TreeItemModel {};
+	property TreeItemModel notificationModel: TreeItemModel {};
 
 	property string commandId;
 	property string subscriptionCommandId;
@@ -28,10 +29,14 @@ QtObject {
 
 	property CollectionFilter filter: CollectionFilter {}
 
-	signal modelUpdated();
-	signal failed();
+	signal modelUpdated(var data);
+	signal failed(string message);
 
-	function updateModel(){
+	function updateModel(offset){
+		if(offset !== undefined && offset !== null && offset >= 0){
+			container.offset = offset;
+		}
+
 		container.itemsInfoModel.send();
 	}
 
@@ -108,11 +113,14 @@ QtObject {
 
 		function onResult(data){
 			container.collectionModel = data.getData("items");
-			container.modelUpdated();
+			container.notificationModel = data.getData("notification");
+
+			container.modelUpdated(data);
 		}
 
 		function onError(message, type){
 			console.warn(message);
+			container.failed(message)
 		}
 	}
 

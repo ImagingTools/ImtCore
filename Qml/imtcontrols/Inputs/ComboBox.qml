@@ -3,12 +3,13 @@ import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 
+
 ControlBase {
 	id: comboBoxContainer;
 
 	decorator: Style.comboBoxDecorator
 
-	property var model:0;
+	property var model: 0;
 
 	property color borderColor: comboBoxContainer.activeFocus ? Style.iconColorOnSelected : Style.borderColor;
 
@@ -206,6 +207,21 @@ ControlBase {
 		comboBoxContainer.isOpen = true;
 	}
 
+	function onMouseAreaClicked(){
+		if (!comboBoxContainer.model || !comboBoxContainer.changeable){
+			return;
+		}
+
+		comboBoxContainer.focus = true;
+		comboBoxContainer.forceActiveFocus();
+
+		if (comboBoxContainer.model !== undefined && comboBoxContainer.model.getItemsCount() > 0){
+			comboBoxContainer.openPopupMenu();
+		}
+
+		comboBoxContainer.clicked();
+	}
+
 	MouseArea {
 		id: cbMouseArea;
 
@@ -215,18 +231,7 @@ ControlBase {
 		cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
 		onClicked: {
-			if (!comboBoxContainer.model || !comboBoxContainer.changeable){
-				return;
-			}
-
-			comboBoxContainer.focus = true;
-			comboBoxContainer.forceActiveFocus();
-
-			if (comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() > 0){
-				comboBoxContainer.openPopupMenu();
-			}
-
-			comboBoxContainer.clicked();
+			comboBoxContainer.onMouseAreaClicked()
 		}
 
 		onPressed: {
@@ -279,7 +284,6 @@ ControlBase {
 			if(comboBoxContainer.model !==undefined && comboBoxContainer.model.getItemsCount() && comboBoxContainer.currentIndex < (comboBoxContainer.model.getItemsCount()-1)){
 				comboBoxContainer.currentIndex++;
 			}
-
 		}
 	}
 }

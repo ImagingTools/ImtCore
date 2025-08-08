@@ -69,7 +69,7 @@ ControlBase {
 	signal finished(string commandId, int index);
 	signal started();
 	
-	//forShortcutEnter
+	// forShortcutEnter
 	Component.onCompleted: {
 		Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
 	}
