@@ -64,11 +64,16 @@ I_EXPORT_COMPONENT(
 			"A processor that finalizes files",
 			"SDL Class File Finalize Generated")
 
-
 I_EXPORT_COMPONENT(
 			QmlEnumGenerator,
 			"The QML file with ENUM ids generator of SDL enums",
 			"Schema Definition Language SDL QML Enum Generator")
+
+I_EXPORT_COMPONENT(
+			QmlCodeRequestGenerator,
+			"The QML file with SDL request data",
+			"Qml Request Generator")
+
 
 } // namespace ImtSdlGenPck
 

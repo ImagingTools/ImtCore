@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5406" Description="ACF"/>
+            <Version Id="0" Number="5411" Description="ACF"/>
             <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
@@ -119,6 +119,33 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="QmlCodeRequestGenerator" PackageId="ImtSdlGenPck" ComponentId="QmlCodeRequestGenerator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QmldirFilePersistence"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="SdlDocumentListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="SdlRequestListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -282,6 +309,7 @@
         <Component ExportedId="QmlCodeCommandIdGenerator" ComponentId="QmlCodeCommandIdGenerator"/>
         <Component ExportedId="QmlCodeGenerator" ComponentId="QmlCodeGenerator"/>
         <Component ExportedId="QmlCodeMetaGenerator" ComponentId="QmlCodeMetaGenerator"/>
+        <Component ExportedId="QmlCodeRequestGenerator" ComponentId="QmlCodeRequestGenerator"/>
         <Component ExportedId="QmlEnumGenerator" ComponentId="QmlEnumGenerator"/>
     </ExportedComponents>
 </Acf>

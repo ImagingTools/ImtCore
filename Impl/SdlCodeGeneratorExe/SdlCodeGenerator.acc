@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5406" Description="ACF"/>
+            <Version Id="0" Number="5411" Description="ACF"/>
             <Version Id="1" Number="2250" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
@@ -279,6 +279,9 @@
                                 <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlAppCore"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlAppCore"/>
                                 </AttributeInfo>
@@ -310,6 +313,7 @@
                                             <Value>QmlCodeGenFramework/QmlCodeMetaGenerator</Value>
                                             <Value>QmlCodeGenFramework/QmlCodeCommandIdGenerator</Value>
                                             <Value>QmlCodeGenFramework/QmlEnumGenerator</Value>
+                                            <Value>QmlCodeGenFramework/QmlCodeRequestGenerator</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
