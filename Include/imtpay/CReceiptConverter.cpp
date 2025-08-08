@@ -351,6 +351,12 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 {
 	namespace ReceiptV1 = sdl::imtpay::Receipt;
 
+	if (!receipt.type){
+		I_IF_DEBUG(qWarning() << __FILE__ << __LINE__ << "Receip->type is missing";)
+
+		return false;
+	}
+
 	istd::CChangeGroup paramsChangeGroup(&params);
 	// set type
 	const QByteArray receiptTypeId = receipt.type->toUtf8();
@@ -372,8 +378,8 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	}
 
 	// set place
-	const QString paymentPlace = *receipt.paymentsPlace;
-	if (!paymentPlace.isEmpty()){
+	if (receipt.paymentsPlace){
+		const QString paymentPlace = *receipt.paymentsPlace;
 		iprm::ITextParam* paymentsPlaceParamPtr = dynamic_cast<iprm::ITextParam*>(params.GetEditableParameter(ReceiptParamKeys::PaymentsPlace));
 		if (paymentsPlaceParamPtr != nullptr){
 			paymentsPlaceParamPtr->SetText(paymentPlace);
@@ -381,8 +387,8 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	}
 
 	// set machine number
-	const QString machineNumber = *receipt.machineNumber;
-	if (!machineNumber.isEmpty()){
+	if (receipt.machineNumber){
+		const QString machineNumber = *receipt.machineNumber;
 		iprm::ITextParam* machineNumberParamPtr = dynamic_cast<iprm::ITextParam*>(params.GetEditableParameter(ReceiptParamKeys::MachineNumber));
 		if (machineNumberParamPtr != nullptr){
 			machineNumberParamPtr->SetText(machineNumber);
@@ -464,6 +470,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 		}
 	}
 
+	Q_ASSERT_X(receipt.items.HasValue(), __func__, "Receipt items expected but missing");
 	const QList<ReceiptV1::CItem::V1_0> receiptItemList = *receipt.items;
 	iprm::IParamsManager* itemsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Items));
 	if (!receiptItemList.isEmpty() && itemsParamsManagerPtr != nullptr){
@@ -491,8 +498,8 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	}
 
 	// set transaction id
-	const QString transactionId = *receipt.transactionId;
-	if (!transactionId.isEmpty()){
+	if (receipt.transactionId){
+		const QString transactionId = *receipt.transactionId;
 		iprm::ITextParam* transactionIdParamPtr = dynamic_cast<iprm::ITextParam*>(params.GetEditableParameter(ReceiptParamKeys::TransactionId));
 		if (transactionIdParamPtr != nullptr){
 			transactionIdParamPtr->SetText(transactionId);
@@ -500,8 +507,8 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	}
 
 	// set transaction status
-	const QString transactionStatus = *receipt.transactionStatus;
-	if (!transactionStatus.isEmpty()){
+	if (receipt.transactionStatus){
+		const QString transactionStatus = *receipt.transactionStatus;
 		iprm::ITextParam* transactionStatusParamPtr = dynamic_cast<iprm::ITextParam*>(params.GetEditableParameter(ReceiptParamKeys::TransactionStatus));
 		if (transactionStatusParamPtr != nullptr){
 			transactionStatusParamPtr->SetText(transactionStatus);
