@@ -914,7 +914,9 @@ bool CPrinterBase::V1_0::operator==(const V1_0& other) const
 {
 	return 
 				name == other.name &&
-				specification == other.specification;
+				specification == other.specification &&
+				simpleTest == other.simpleTest &&
+				mixedTest == other.mixedTest;
 }
 
 
@@ -935,6 +937,35 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		}
 		else if (const CLink* val = std::get_if<CLink>((*specification).get())){
 			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
+				return false;
+			}
+		}
+
+
+	if (!simpleTest){
+		return false;
+	}
+	QVariant simpleTestVariantValue;
+		if (const QString* val = std::get_if<QString>((*simpleTest).get())){
+			simpleTestVariantValue = *val;
+			model.SetData("simpleTest", simpleTestVariantValue, modelIndex);
+		}
+		else if (const double* val = std::get_if<double>((*simpleTest).get())){
+			simpleTestVariantValue = *val;
+			model.SetData("simpleTest", simpleTestVariantValue, modelIndex);
+		}
+
+
+	if (!mixedTest){
+		return false;
+	}
+	QVariant mixedTestVariantValue;
+		if (const QString* val = std::get_if<QString>((*mixedTest).get())){
+			mixedTestVariantValue = *val;
+			model.SetData("mixedTest", mixedTestVariantValue, modelIndex);
+		}
+		else if (const CLink* val = std::get_if<CLink>((*mixedTest).get())){
+			if (!val->WriteToModel(*(model.AddTreeModel("mixedTest", modelIndex)), 0)){
 				return false;
 			}
 		}
@@ -977,6 +1008,41 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		specification = std::make_shared<PrinterSpecification>(specificationConvert);
 	}
 
+	QVariant simpleTestData = model.GetData("simpleTest", modelIndex);
+	if (simpleTestData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest");)
+
+		return false;
+	}
+		QString itemTypename = simpleTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+
+	if (simpleTestData.canConvert<QString>()){
+		simpleTest = std::make_shared<SimpleUnion>(simpleTestData.value<QString>());
+	}
+	else if (simpleTestData.canConvert<double>()){
+		simpleTest = std::make_shared<SimpleUnion>(simpleTestData.value<double>());
+	}
+
+	QVariant mixedTestData = model.GetData("mixedTest", modelIndex);
+	if (mixedTestData.isNull()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+
+		return false;
+	}
+		QString itemTypename = mixedTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+
+	if (mixedTestData.canConvert<QString>()){
+		mixedTest = std::make_shared<MixedUnion>(mixedTestData.value<QString>());
+	}
+	else if (itemTypename == "Link") {
+		CLink mixedTestConvert;
+		const bool ismixedTestRead = mixedTestConvert.ReadFromModel(*model.GetTreeItemModel("mixedTest", modelIndex)); 
+		if (!ismixedTestRead){
+			return false;
+		}
+		mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+	}
+
 	return true;
 }
 
@@ -1010,6 +1076,35 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 		}
 	}
 
+	QVariant simpleTestData = model.GetData("simpleTest", modelIndex);
+	if (!simpleTestData.isNull()){
+	QString itemTypename = simpleTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+
+		if (simpleTestData.canConvert<QString>()){
+			simpleTest = std::make_shared<SimpleUnion>(simpleTestData.value<QString>());
+		}
+		else if (simpleTestData.canConvert<double>()){
+			simpleTest = std::make_shared<SimpleUnion>(simpleTestData.value<double>());
+		}
+	}
+
+	QVariant mixedTestData = model.GetData("mixedTest", modelIndex);
+	if (!mixedTestData.isNull()){
+	QString itemTypename = mixedTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+
+		if (mixedTestData.canConvert<QString>()){
+			mixedTest = std::make_shared<MixedUnion>(mixedTestData.value<QString>());
+		}
+		else if (itemTypename == "Link") {
+			CLink mixedTestConvert;
+			const bool ismixedTestRead = mixedTestConvert.ReadFromModel(*model.GetTreeItemModel("mixedTest", modelIndex)); 
+			if (!ismixedTestRead){
+				return false;
+			}
+			mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+		}
+	}
+
 	return true;
 }
 
@@ -1035,6 +1130,32 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		}
 	}
 	gqlObject.InsertParam("specification", specificationDataObject);
+
+	if (!simpleTest){
+		return false;
+	}
+	::imtgql::CGqlParamObject simpleTestDataObject;
+	if (const QString* val = std::get_if<QString>((*simpleTest).get())){
+		simpleTestDataObject.InsertParam("simpleTest", *val);
+	}
+	else if (const double* val = std::get_if<double>((*simpleTest).get())){
+		simpleTestDataObject.InsertParam("simpleTest", *val);
+	}
+	gqlObject.InsertParam("simpleTest", simpleTestDataObject);
+
+	if (!mixedTest){
+		return false;
+	}
+	::imtgql::CGqlParamObject mixedTestDataObject;
+	if (const QString* val = std::get_if<QString>((*mixedTest).get())){
+		mixedTestDataObject.InsertParam("mixedTest", *val);
+	}
+	else if (const CLink* val = std::get_if<CLink>((*mixedTest).get())){
+		if (!val->WriteToGraphQlObject(mixedTestDataObject)){
+			return false;
+		}
+	}
+	gqlObject.InsertParam("mixedTest", mixedTestDataObject);
 
 	return true;
 }
@@ -1077,6 +1198,50 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		specification = std::make_shared<PrinterSpecification>(specificationConvert);
 	}
 
+	if (!gqlObject.ContainsParam("simpleTest") || (((gqlObject.IsObject("simpleTest") && gqlObject.GetParamArgumentObjectPtr("simpleTest") == nullptr) || (!gqlObject.IsObject("simpleTest") && gqlObject["simpleTest"].isNull())) || gqlObject.GetParamArgumentObjectPtr("simpleTest") == nullptr)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest");)
+
+		return false;
+	}
+	const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("simpleTest");
+	if (!itemDataObjectPtr->ContainsParam("__typename")) {
+		qDebug() << "invalid typename for: simpleTest";
+		return false;
+	}
+
+	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
+	if (simpleTestVariantValue.canConvert<QString>()){
+		simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<QString>());
+	}
+	else if (simpleTestVariantValue.canConvert<double>()){
+		simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<double>());
+	}
+
+	if (!gqlObject.ContainsParam("mixedTest") || (((gqlObject.IsObject("mixedTest") && gqlObject.GetParamArgumentObjectPtr("mixedTest") == nullptr) || (!gqlObject.IsObject("mixedTest") && gqlObject["mixedTest"].isNull())) || gqlObject.GetParamArgumentObjectPtr("mixedTest") == nullptr)){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+
+		return false;
+	}
+	const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedTest");
+	if (!itemDataObjectPtr->ContainsParam("__typename")) {
+		qDebug() << "invalid typename for: mixedTest";
+		return false;
+	}
+
+	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
+	if (mixedTestVariantValue.canConvert<QString>()){
+		mixedTest = std::make_shared<MixedUnion>(mixedTestVariantValue.value<QString>());
+	}
+	else if (itemTypename == "Link") {
+		CLink mixedTestConvert;
+		const ::imtgql::CGqlParamObject* mixedTestDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedTest");
+		const bool isMixedTestRead = mixedTestConvert.ReadFromGraphQlObject(*mixedTestDataObjectPtr);
+		if (!isMixedTestRead){
+			return false;
+		}
+		mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+	}
+
 	return true;
 }
 
@@ -1115,6 +1280,44 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
+	if (gqlObject.ContainsParam("simpleTest") && (!((gqlObject.IsObject("simpleTest") && gqlObject.GetParamArgumentObjectPtr("simpleTest") == nullptr) || (!gqlObject.IsObject("simpleTest") && gqlObject["simpleTest"].isNull())) && gqlObject.GetParamArgumentObjectPtr("simpleTest") != nullptr)){
+		const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("simpleTest");
+	if (!itemDataObjectPtr->ContainsParam("__typename")) {
+		qDebug() << "invalid typename for: simpleTest";
+		return false;
+	}
+
+	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
+		if (simpleTestVariantValue.canConvert<QString>()){
+			simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<QString>());
+		}
+		else if (simpleTestVariantValue.canConvert<double>()){
+			simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<double>());
+		}
+	}
+
+	if (gqlObject.ContainsParam("mixedTest") && (!((gqlObject.IsObject("mixedTest") && gqlObject.GetParamArgumentObjectPtr("mixedTest") == nullptr) || (!gqlObject.IsObject("mixedTest") && gqlObject["mixedTest"].isNull())) && gqlObject.GetParamArgumentObjectPtr("mixedTest") != nullptr)){
+		const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedTest");
+	if (!itemDataObjectPtr->ContainsParam("__typename")) {
+		qDebug() << "invalid typename for: mixedTest";
+		return false;
+	}
+
+	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
+		if (mixedTestVariantValue.canConvert<QString>()){
+			mixedTest = std::make_shared<MixedUnion>(mixedTestVariantValue.value<QString>());
+		}
+		else if (itemTypename == "Link") {
+			CLink mixedTestConvert;
+			const ::imtgql::CGqlParamObject* mixedTestDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedTest");
+			const bool isMixedTestRead = mixedTestConvert.ReadFromGraphQlObject(*mixedTestDataObjectPtr);
+			if (!isMixedTestRead){
+				return false;
+			}
+			mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+		}
+	}
+
 	return true;
 }
 
@@ -1143,6 +1346,42 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 			return false;
 		}
 		jsonObject["specification"] = specificationJsonObject;
+	}
+
+
+	if (!simpleTest){
+		return false;
+	}
+	if (const QString* val = std::get_if<QString>((*simpleTest).get())){
+		if (!simpleTest){
+			return false;
+		}
+		jsonObject["simpleTest"] = QJsonValue::fromVariant(*val);
+	}
+	else if (const double* val = std::get_if<double>((*simpleTest).get())){
+		if (!simpleTest){
+			return false;
+		}
+		jsonObject["simpleTest"] = QJsonValue::fromVariant(*val);
+	}
+
+
+	if (!mixedTest){
+		return false;
+	}
+	if (const QString* val = std::get_if<QString>((*mixedTest).get())){
+		if (!mixedTest){
+			return false;
+		}
+		jsonObject["mixedTest"] = QJsonValue::fromVariant(*val);
+	}
+	else if (const CLink* val = std::get_if<CLink>((*mixedTest).get())){
+		QJsonObject mixedTestJsonObject;
+		const bool ismixedTestAdded = val->WriteToJsonObject(mixedTestJsonObject);
+		if (!ismixedTestAdded){
+			return false;
+		}
+		jsonObject["mixedTest"] = mixedTestJsonObject;
 	}
 
 
@@ -1185,6 +1424,49 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		specification = std::make_shared<PrinterSpecification>(specificationConvert);
 	}
 
+	if (!jsonObject.contains("simpleTest") || ! jsonObject["simpleTest"].isObject()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest");)
+
+		return false;
+	}
+	QJsonObject itemObject = jsonObject.value("simpleTest").toObject();
+	if (!itemObject.contains("__typename")){
+		qDebug() << "invalid typename for: simpleTest";
+		return false;
+	}
+
+	QString itemTypename = itemObject.value("__typename").toString();;
+	if (simpleTestVariantValue.canConvert<QString>()){
+		simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<QString>());
+	}
+	else if (simpleTestVariantValue.canConvert<double>()){
+		simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<double>());
+	}
+
+	if (!jsonObject.contains("mixedTest") || ! jsonObject["mixedTest"].isObject()){
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+
+		return false;
+	}
+	QJsonObject itemObject = jsonObject.value("mixedTest").toObject();
+	if (!itemObject.contains("__typename")){
+		qDebug() << "invalid typename for: mixedTest";
+		return false;
+	}
+
+	QString itemTypename = itemObject.value("__typename").toString();;
+	if (mixedTestVariantValue.canConvert<QString>()){
+		mixedTest = std::make_shared<MixedUnion>(mixedTestVariantValue.value<QString>());
+	}
+	else if (itemTypename == "Link") {
+		CLink mixedTestConvert;
+		const bool ismixedTestRead = mixedTestConvert.ReadFromJsonObject(jsonObject["mixedTest"].toObject());
+		if (!ismixedTestRead){
+			return false;
+		}
+		mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+	}
+
 	return true;
 }
 
@@ -1218,6 +1500,43 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 				return false;
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
+		}
+	}
+
+	if (jsonObject.contains("simpleTest") && jsonObject["simpleTest"].isObject()){
+		QJsonObject itemObject = jsonObject.value("simpleTest").toObject();
+	if (!itemObject.contains("__typename")){
+		qDebug() << "invalid typename for: simpleTest";
+		return false;
+	}
+
+	QString itemTypename = itemObject.value("__typename").toString();;
+		if (simpleTestVariantValue.canConvert<QString>()){
+			simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<QString>());
+		}
+		else if (simpleTestVariantValue.canConvert<double>()){
+			simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<double>());
+		}
+	}
+
+	if (jsonObject.contains("mixedTest") && jsonObject["mixedTest"].isObject()){
+		QJsonObject itemObject = jsonObject.value("mixedTest").toObject();
+	if (!itemObject.contains("__typename")){
+		qDebug() << "invalid typename for: mixedTest";
+		return false;
+	}
+
+	QString itemTypename = itemObject.value("__typename").toString();;
+		if (mixedTestVariantValue.canConvert<QString>()){
+			mixedTest = std::make_shared<MixedUnion>(mixedTestVariantValue.value<QString>());
+		}
+		else if (itemTypename == "Link") {
+			CLink mixedTestConvert;
+			const bool ismixedTestRead = mixedTestConvert.ReadFromJsonObject(jsonObject["mixedTest"].toObject());
+			if (!ismixedTestRead){
+				return false;
+			}
+			mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
 		}
 	}
 
@@ -1456,11 +1775,15 @@ bool CPrinterBase::OptReadFromJsonObject(const QJsonObject& jsonObject, Protocol
 
 
 CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_specificationQObjectPtr(nullptr)
+			, m_simpleTestQObjectPtr(nullptr)
+			, m_mixedTestQObjectPtr(nullptr)
 {
 	Version_1_0.emplace();
 
 	QObject::connect(this, &CPrinterBaseObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
 	QObject::connect(this, &CPrinterBaseObject::specificationChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CPrinterBaseObject::simpleTestChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CPrinterBaseObject::mixedTestChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
 
 
@@ -1527,6 +1850,86 @@ void CPrinterBaseObject::createSpecification()
 }
 
 
+sdl::modsdl::PrinterBase::CSimpleUnionObject* CPrinterBaseObject::GetSimpleTest()
+{
+	if (Version_1_0->simpleTest.has_value()){
+		if (!m_simpleTestQObjectPtr){
+			m_simpleTestQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CSimpleUnionObject*>(CreateObject("simpleTest"));
+			m_simpleTestQObjectPtr->Version_1_0 = Version_1_0->simpleTest;
+		}
+		return m_simpleTestQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CPrinterBaseObject::SetSimpleTest(sdl::modsdl::PrinterBase::CSimpleUnionObject* v)
+{
+	if (v){
+		Version_1_0->simpleTest = v->Version_1_0;
+		m_simpleTestQObjectPtr = v;
+	}
+	else {
+		Version_1_0->simpleTest = nullptr;
+	}
+
+	simpleTestChanged();
+}
+
+
+bool CPrinterBaseObject::hasSimpleTest()
+{
+	 return Version_1_0->simpleTest.HasValue();
+}
+
+
+void CPrinterBaseObject::createSimpleTest()
+{	Version_1_0->simpleTest.emplace();
+
+}
+
+
+sdl::modsdl::PrinterBase::CMixedUnionObject* CPrinterBaseObject::GetMixedTest()
+{
+	if (Version_1_0->mixedTest.has_value()){
+		if (!m_mixedTestQObjectPtr){
+			m_mixedTestQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CMixedUnionObject*>(CreateObject("mixedTest"));
+			m_mixedTestQObjectPtr->Version_1_0 = Version_1_0->mixedTest;
+		}
+		return m_mixedTestQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CPrinterBaseObject::SetMixedTest(sdl::modsdl::PrinterBase::CMixedUnionObject* v)
+{
+	if (v){
+		Version_1_0->mixedTest = v->Version_1_0;
+		m_mixedTestQObjectPtr = v;
+	}
+	else {
+		Version_1_0->mixedTest = nullptr;
+	}
+
+	mixedTestChanged();
+}
+
+
+bool CPrinterBaseObject::hasMixedTest()
+{
+	 return Version_1_0->mixedTest.HasValue();
+}
+
+
+void CPrinterBaseObject::createMixedTest()
+{	Version_1_0->mixedTest.emplace();
+
+}
+
+
 QString CPrinterBaseObject::toJson() const
 {
 	QJsonObject jsonObject;
@@ -1577,6 +1980,12 @@ QObject* CPrinterBaseObject::CreateObject(const QString& key)
 	if (key == "specification"){
 		return new sdl::modsdl::PrinterBase::CPrinterSpecificationObject(this);
 	}
+	if (key == "simpleTest"){
+		return new sdl::modsdl::PrinterBase::CSimpleUnionObject(this);
+	}
+	if (key == "mixedTest"){
+		return new sdl::modsdl::PrinterBase::CMixedUnionObject(this);
+	}
 	return nullptr;
 }
 
@@ -1588,6 +1997,12 @@ QString CPrinterBaseObject::getJSONKeyForProperty(const QString& propertyName) c
 	}
 	if (propertyName == (QString("m_") + "specification")){
 		return "specification";
+	}
+	if (propertyName == (QString("m_") + "simpleTest")){
+		return "simpleTest";
+	}
+	if (propertyName == (QString("m_") + "mixedTest")){
+		return "mixedTest";
 	}
 
 	return propertyName;
@@ -2210,6 +2625,8 @@ CGetPrintersGqlRequest::CGetPrintersGqlRequest(const ::imtgql::CGqlRequest& gqlR
 					if (!dataRequestedIds.isEmpty()){
 						m_requestInfo.data.isNameRequested = dataRequestedIds.contains("name");
 						m_requestInfo.data.isSpecificationRequested = true;
+						m_requestInfo.data.isSimpleTestRequested = true;
+						m_requestInfo.data.isMixedTestRequested = true;
 					}
 				}
 			}

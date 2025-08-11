@@ -14,10 +14,14 @@ type Link {
 }
 
 union PrinterSpecification = PrinterSpecificationBase | Link
+union SimpleUnion = String | Double
+union MixedUnion = String | Link
 
 type PrinterBase {
 	name: String
 	specification: PrinterSpecification!
+	simpleTest: SimpleUnion!
+	mixedTest: MixedUnion!
 }
 
 type PrinterList{

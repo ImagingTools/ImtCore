@@ -13,6 +13,36 @@ class CPrinterSpecificationObject;
 
 
 
+/// \file SimpleUnion.h
+
+#pragma once
+
+namespace sdl::modsdl::PrinterBase
+{
+
+class SimpleUnion;
+class CSimpleUnionObject;
+
+} // namespace sdl::modsdl::PrinterBase
+
+
+
+
+/// \file MixedUnion.h
+
+#pragma once
+
+namespace sdl::modsdl::PrinterBase
+{
+
+class MixedUnion;
+class CMixedUnionObject;
+
+} // namespace sdl::modsdl::PrinterBase
+
+
+
+
 /// \file CPrinterSpecificationBase.h
 
 #pragma once
@@ -684,10 +714,14 @@ public:
 		{
 			static const inline QString Name = "name";
 			static const inline QString Specification = "specification";
+			static const inline QString SimpleTest = "simpleTest";
+			static const inline QString MixedTest = "mixedTest";
 		};
 
 		istd::TSharedNullable<QString> name;
 		istd::TSharedNullable<std::shared_ptr<PrinterSpecification>> specification;
+		istd::TSharedNullable<std::shared_ptr<SimpleUnion>> simpleTest;
+		istd::TSharedNullable<std::shared_ptr<MixedUnion>> mixedTest;
 
 		static QByteArray GetVersionId();
 
@@ -732,6 +766,8 @@ class CPrinterBaseObject: public ::imtbase::CItemModelBase, public CPrinterBase
 	Q_OBJECT
 	Q_PROPERTY(QString m_name READ GetName WRITE SetName NOTIFY nameChanged)
 	Q_PROPERTY(sdl::modsdl::PrinterBase::CPrinterSpecificationObject* m_specification READ GetSpecification WRITE SetSpecification NOTIFY specificationChanged)
+	Q_PROPERTY(sdl::modsdl::PrinterBase::CSimpleUnionObject* m_simpleTest READ GetSimpleTest WRITE SetSimpleTest NOTIFY simpleTestChanged)
+	Q_PROPERTY(sdl::modsdl::PrinterBase::CMixedUnionObject* m_mixedTest READ GetMixedTest WRITE SetMixedTest NOTIFY mixedTestChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
@@ -745,6 +781,14 @@ public:
 	void SetSpecification(sdl::modsdl::PrinterBase::CPrinterSpecificationObject* v);
 	Q_INVOKABLE bool hasSpecification();
 	Q_INVOKABLE void createSpecification();
+	sdl::modsdl::PrinterBase::CSimpleUnionObject* GetSimpleTest();
+	void SetSimpleTest(sdl::modsdl::PrinterBase::CSimpleUnionObject* v);
+	Q_INVOKABLE bool hasSimpleTest();
+	Q_INVOKABLE void createSimpleTest();
+	sdl::modsdl::PrinterBase::CMixedUnionObject* GetMixedTest();
+	void SetMixedTest(sdl::modsdl::PrinterBase::CMixedUnionObject* v);
+	Q_INVOKABLE bool hasMixedTest();
+	Q_INVOKABLE void createMixedTest();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -756,10 +800,14 @@ public:
 signals:
 	void nameChanged();
 	void specificationChanged();
+	void simpleTestChanged();
+	void mixedTestChanged();
 	void finished();
 
 protected:
 	sdl::modsdl::PrinterBase::CPrinterSpecificationObject* m_specificationQObjectPtr;
+	sdl::modsdl::PrinterBase::CSimpleUnionObject* m_simpleTestQObjectPtr;
+	sdl::modsdl::PrinterBase::CMixedUnionObject* m_mixedTestQObjectPtr;
 };
 
 
@@ -943,6 +991,14 @@ public:
 		if (nameId == "m_specification"){
 			sdl::modsdl::PrinterBase::CPrinterBaseObject* retVal = GetOrCreateCachedObject(index);
 			return QVariant::fromValue(retVal->GetSpecification());
+		}
+		if (nameId == "m_simpleTest"){
+			sdl::modsdl::PrinterBase::CPrinterBaseObject* retVal = GetOrCreateCachedObject(index);
+			return QVariant::fromValue(retVal->GetSimpleTest());
+		}
+		if (nameId == "m_mixedTest"){
+			sdl::modsdl::PrinterBase::CPrinterBaseObject* retVal = GetOrCreateCachedObject(index);
+			return QVariant::fromValue(retVal->GetMixedTest());
 		}
 		return QVariant();
 	}
@@ -1351,6 +1407,158 @@ public:
 
 
 
+/// \file SimpleUnion_ClassDef.h
+
+#pragma once
+
+// STD includes
+#include <variant>
+
+// Qt includes
+#include <QtCore/QString>
+
+
+namespace sdl::modsdl::PrinterBase
+{
+
+
+class SimpleUnion: public std::variant<QString, double> {
+
+public:
+
+	typedef std::variant<QString, double> BaseClass;
+
+	SimpleUnion(){};
+	SimpleUnion(const QString& ref)
+		: BaseClass(ref){};
+
+	SimpleUnion(const double& ref)
+		: BaseClass(ref){};
+
+};
+
+class CSimpleUnionObject: public ::imtbase::CItemModelBase
+{
+	Q_OBJECT
+	Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)
+	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
+
+public:
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+	CSimpleUnionObject(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE QString GetType() const{
+		return m_type;
+	}
+
+	Q_INVOKABLE void SetValue(const QVariant& value){
+		if (value.canConvert<QString>()){
+			m_type = "String";
+		}
+
+		if (value.canConvert<double>()){
+			m_type = "Double";
+		}
+
+		m_value = value;
+	}
+
+	Q_INVOKABLE QVariant GetValue(){
+		return QVariant();
+	}
+
+signals:
+	void typeChanged();
+	void valueChanged();
+
+public:
+	istd::TSharedNullable<std::shared_ptr<SimpleUnion>> Version_1_0;
+	QVariant m_value;
+	QString m_type;
+};
+
+} // namespace sdl::modsdl::PrinterBase
+
+
+
+
+/// \file MixedUnion_ClassDef.h
+
+#pragma once
+
+// STD includes
+#include <variant>
+
+// Qt includes
+#include <QtCore/QString>
+
+
+namespace sdl::modsdl::PrinterBase
+{
+
+
+class MixedUnion: public std::variant<QString, CLink> {
+
+public:
+
+	typedef std::variant<QString, CLink> BaseClass;
+
+	MixedUnion(){};
+	MixedUnion(const QString& ref)
+		: BaseClass(ref){};
+
+	MixedUnion(const CLink& ref)
+		: BaseClass(ref){};
+
+};
+
+class CMixedUnionObject: public ::imtbase::CItemModelBase
+{
+	Q_OBJECT
+	Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)
+	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
+
+public:
+	typedef ::imtbase::CItemModelBase BaseClass;
+
+	CMixedUnionObject(QObject* parent = nullptr): BaseClass(parent) {}
+
+	Q_INVOKABLE QString GetType() const{
+		return m_type;
+	}
+
+	Q_INVOKABLE void SetValue(const QVariant& value){
+		if (value.canConvert<QString>()){
+			m_type = "String";
+		}
+
+		if (value.canConvert<CLink>()){
+			m_type = "Link";
+		}
+
+		m_value = value;
+	}
+
+	Q_INVOKABLE QVariant GetValue(){
+		return QVariant();
+	}
+
+signals:
+	void typeChanged();
+	void valueChanged();
+
+public:
+	istd::TSharedNullable<std::shared_ptr<MixedUnion>> Version_1_0;
+	QVariant m_value;
+	QString m_type;
+};
+
+} // namespace sdl::modsdl::PrinterBase
+
+
+
+
 /// \file QmlRegister.h
 
 #pragma once
@@ -1405,6 +1613,8 @@ struct GetPrintersRequestInfo
 		{
 			bool isNameRequested = true;
 			bool isSpecificationRequested = true;
+			bool isSimpleTestRequested = true;
+			bool isMixedTestRequested = true;
 		} data;
 };
 
