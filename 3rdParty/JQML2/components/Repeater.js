@@ -46,6 +46,7 @@ class Repeater extends Item {
                     let obj = this.$items[i]
                     delete this.$items[i]
                     obj.destroy()
+                    if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, obj)
                 }
             }
             for(let k = bottomRight; k < this.$items.length.get() + (bottomRight - leftTop); k++){
@@ -89,8 +90,10 @@ class Repeater extends Item {
         this.$disconnectModel()
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].destroy()
+                let obj = this.$items[key]
+                obj.destroy()
                 delete this.$items[key]
+                if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, obj)
             }
         }
         if(!this.UID) return
@@ -115,8 +118,10 @@ class Repeater extends Item {
     $delegateChanged(){
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].destroy()
+                let obj = this.$items[key]
+                obj.destroy()
                 delete this.$items[key]
+                if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, obj)
             }
         }
         this.updateView()
