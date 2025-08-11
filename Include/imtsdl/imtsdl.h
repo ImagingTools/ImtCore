@@ -92,4 +92,27 @@ struct IncludeDirective
 };
 
 
+
+/**
+	\brief The QtResourceModelParamIds struct defines param IDs of a QT resource's (QRC) model
+*/
+struct QtResourceModelParamIds
+{
+	// prefix properties
+	/// defines an ID of the "prefix name" parameter, represented as \c iprm::INameParam
+	static const inline QByteArray PrefixName = QByteArrayLiteral("Name");
+
+	/// defines an ID of the "Objects" parameter, represented as ilst of parameters i.e. \c iprm::IParamsManager of \c iprm::IParamsSet
+	static const inline QByteArray QrcObjects = QByteArrayLiteral("Objects");
+
+	// QRC-object properties
+	/// defines an ID of the "QRC object alias" parameter, represented as \c iprm::INameParam
+	static const inline QByteArray QrcAlias = QByteArrayLiteral("Alias");
+
+	/// defines an ID of the "QRC object name" parameter - is a relative file path, represented as \c iprm::INameParam
+	static const inline QByteArray QrcFileName = QByteArrayLiteral("FileName");
+};
+
+
+
 } // namespace imtsdl

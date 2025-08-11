@@ -5,7 +5,7 @@ include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 LIBS += -L../../../Lib/$$COMPILER_DIR
-LIBS += -limtsdlgenv2 -limtsdlgen -limtsdl -limtbase -limtfile
+LIBS += -limtsdlgencpp -limtsdlgenqml -limtsdl -limtbase -limtfile
 
 QT += core 
 

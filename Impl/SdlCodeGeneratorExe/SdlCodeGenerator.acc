@@ -212,7 +212,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="FileCleanupProcessor" PackageId="ImtSdlGenPck" ComponentId="FileCleanupProcessor">
+                    <Element Id="FileCleanupProcessor" PackageId="ImtSdlPck" ComponentId="FileCleanupProcessor">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
@@ -230,7 +230,7 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="FileFinalizer" PackageId="ImtSdlGenPck" ComponentId="FileFinalizer">
+                    <Element Id="FileFinalizer" PackageId="ImtSdlPck" ComponentId="FileFinalizer">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
@@ -351,7 +351,7 @@
                     <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="SdlAppCore"/>
                     <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="SdlAppCore"/>
                     <Interface InterfaceId="imtsdl::ISdlUnionListProvider" ComponentId="SdlAppCore"/>
-                    <Interface InterfaceId="imtsdlgenv2::ISdlProcessArgumentsParser" ComponentId="SdlAppCore"/>
+                    <Interface InterfaceId="imtsdlgencpp::ISdlProcessArgumentsParser" ComponentId="SdlAppCore"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlAppCore"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>

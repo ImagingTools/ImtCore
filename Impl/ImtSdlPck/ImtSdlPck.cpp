@@ -34,6 +34,26 @@ I_EXPORT_COMPONENT(
 			"Simple file joiner. Joins text files into a single",
 			"Simple File Join Text")
 
+I_EXPORT_COMPONENT(
+			SdlProcessArgumentsParser,
+			"The command line argument parser for processors",
+			"Schema Definition Language SDL Argument Parser")
+
+I_EXPORT_COMPONENT(
+			QtResourceFilePersistence,
+			"A Qt resource file persistence",
+			"Qt Resource File Persistence")
+
+I_EXPORT_COMPONENT(
+			FileCleanupProcessor,
+			"A processor that allows you to clear generated files from unnecessary lines",
+			"SDL Class File Cleanup Generated")
+
+I_EXPORT_COMPONENT(
+			FileFinalizer,
+			"A processor that finalizes files",
+			"SDL Class File Finalize Generated")
+
 
 } // namespace ImtSdlPck
 

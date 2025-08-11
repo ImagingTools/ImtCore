@@ -2,28 +2,29 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5300" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394499" Description="Qt Framework"/>
+            <Version Id="0" Number="5300" Description="ACF" />
+            <Version Id="1" Number="2230" Description="ACF-Solutions" />
+            <Version Id="1023" Number="394499" Description="Qt Framework" />
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="BaseClassExtender" PackageId="ImtSdlGenPck" ComponentId="BaseClassExtender">
+        <Element Id="BaseClassExtender" PackageId="ImtSdlGenQmlPck" ComponentId="BaseClassExtender">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference"
+                        ExportId="TracingConfiguration">
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -32,74 +33,78 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
+                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser" />
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SdlCodeCreatorProcessorsController" PackageId="ImtSdlGenPck" ComponentId="SdlGeneralManager">
+        <Element Id="SdlCodeCreatorProcessorsController" PackageId="ImtSdlGenQmlPck"
+            ComponentId="SdlGeneralManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
+                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser" />
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlProcessorList" Type="Reference[]" ExportId="SdlProcessorList">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="SdlProcessorList" Type="Reference[]"
+                        ExportId="SdlProcessorList">
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="SdlSchemaDependenciesCollector" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GqlSchemaParser"/>
+                        <Data IsEnabled="true" Value="GqlSchemaParser" />
                     </AttributeInfo>
                     <AttributeInfo Id="SdlSchemaParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GqlSchemaParser"/>
+                        <Data IsEnabled="true" Value="GqlSchemaParser" />
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SdlProcessArgumentsParser" PackageId="ImtSdlGenPck" ComponentId="SdlProcessArgumentsParser">
+        <Element Id="SdlProcessArgumentsParser" PackageId="ImtSdlGenQmlPck"
+            ComponentId="SdlProcessArgumentsParser">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="false" />
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
+    <EmbeddedRegistriesList />
     <ExportedInterfaces>
-        <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="GqlSchemaParser"/>
-        <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>
-        <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="GqlSchemaParser"/>
-        <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="GqlSchemaParser"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlCodeCreatorProcessorsController"/>
+        <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="GqlSchemaParser" />
+        <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser"
+            ComponentId="SdlProcessArgumentsParser" />
+        <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="GqlSchemaParser" />
+        <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="GqlSchemaParser" />
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlCodeCreatorProcessorsController" />
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="BaseClassExtender" ComponentId="BaseClassExtender"/>
-        <Component ExportedId="OriginalNamespace" ComponentId="GqlSchemaParser/OriginalNamespace"/>
-        <Component ExportedId="SchemaCustomParams" ComponentId="GqlSchemaParser/SchemaCustomParams"/>
+        <Component ExportedId="BaseClassExtender" ComponentId="BaseClassExtender" />
+        <Component ExportedId="OriginalNamespace" ComponentId="GqlSchemaParser/OriginalNamespace" />
+        <Component ExportedId="SchemaCustomParams" ComponentId="GqlSchemaParser/SchemaCustomParams" />
     </ExportedComponents>
 </Acf>

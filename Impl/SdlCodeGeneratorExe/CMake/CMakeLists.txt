@@ -19,8 +19,8 @@ include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 target_link_libraries(${PROJECT_NAME}
-	imtsdlgenv2
-	imtsdlgen
+	imtsdlgencpp
+	imtsdlgenqml
 	imtsdl
 	imtfile
 	imtbase

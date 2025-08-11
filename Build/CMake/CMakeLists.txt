@@ -73,16 +73,16 @@ add_subdirectory("${INCLUDE_DIR}/imtsdl/CMake" "${AUX_INCLUDE_DIR}/imtsdl")
 add_subdirectory("${IMPL_DIR}/ImtSdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlPck")
 add_dependencies(ImtSdlPck imtsdl imtfile imtbase)
 
-add_subdirectory("${INCLUDE_DIR}/imtsdlgen/CMake" "${AUX_INCLUDE_DIR}/imtsdlgen")
-add_subdirectory("${IMPL_DIR}/ImtSdlGenPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenPck")
-add_dependencies(ImtSdlGenPck imtsdlgen imtsdl imtfile imtbase)
+add_subdirectory("${INCLUDE_DIR}/imtsdlgenqml/CMake" "${AUX_INCLUDE_DIR}/imtsdlgenqml")
+add_subdirectory("${IMPL_DIR}/ImtSdlGenQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenQmlPck")
+add_dependencies(ImtSdlGenQmlPck imtsdlgenqml imtsdl imtfile imtbase)
 
-add_subdirectory("${INCLUDE_DIR}/imtsdlgenv2/CMake" "${AUX_INCLUDE_DIR}/imtsdlgenv2")
-add_subdirectory("${IMPL_DIR}/ImtSdlGenV2Pck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenV2Pck")
-add_dependencies(ImtSdlGenV2Pck imtsdlgenv2 imtsdlgen imtsdl imtfile imtbase)
+add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/CMake" "${AUX_INCLUDE_DIR}/imtsdlgencpp")
+add_subdirectory("${IMPL_DIR}/ImtSdlGenCppPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppPck")
+add_dependencies(ImtSdlGenCppPck imtsdlgencpp imtsdlgenqml imtsdl imtfile imtbase)
 
 add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
-add_dependencies(SdlCodeGenerator ImtSdlGenV2Pck ImtSdlGenPck ImtSdlPck)
+add_dependencies(SdlCodeGenerator ImtSdlGenCppPck ImtSdlGenQmlPck ImtSdlPck)
 
 #------ OpenAPI ------
 add_subdirectory("${INCLUDE_DIR}/imtoas/CMake" "${AUX_INCLUDE_DIR}/imtoas")
@@ -92,7 +92,7 @@ add_subdirectory("${IMPL_DIR}/OasCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/Oas
 #------ BaseTests ------
 if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
 	add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
-	add_subdirectory("${INCLUDE_DIR}/imtsdlgenv2/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenTest")
+	add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppTest")
 endif()
 
 if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)

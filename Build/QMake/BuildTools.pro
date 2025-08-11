@@ -17,11 +17,11 @@ imtddl.file = ../../Include/imtddl/QMake/imtddl.pro
 SUBDIRS += imtsdl
 imtsdl.file = ../../Include/imtsdl/QMake/imtsdl.pro
 
-SUBDIRS += imtsdlgen
-imtsdlgen.file = ../../Include/imtsdlgen/QMake/imtsdlgen.pro
+SUBDIRS += imtsdlgenqml
+imtsdlgenqml.file = ../../Include/imtsdlgenqml/QMake/imtsdlgenqml.pro
 
-SUBDIRS += imtsdlgenv2
-imtsdlgenv2.file = ../../Include/imtsdlgenv2/QMake/imtsdlgenv2.pro
+SUBDIRS += imtsdlgencpp
+imtsdlgencpp.file = ../../Include/imtsdlgencpp/QMake/imtsdlgencpp.pro
 
 
 SUBDIRS += ImtDesignPck
@@ -44,13 +44,13 @@ SUBDIRS += ImtSdlPck
 ImtSdlPck.file = ../../Impl/ImtSdlPck/QMake/ImtSdlPck.pro
 ImtSdlPck.depends = imtsdl
 
-SUBDIRS += ImtSdlGenPck
-ImtSdlGenPck.file = ../../Impl/ImtSdlGenPck/QMake/ImtSdlGenPck.pro
-ImtSdlGenPck.depends = imtsdl imtsdlgen
+SUBDIRS += ImtSdlGenQmlPck
+ImtSdlGenQmlPck.file = ../../Impl/ImtSdlGenQmlPck/QMake/ImtSdlGenQmlPck.pro
+ImtSdlGenQmlPck.depends = imtsdl imtsdlgenqml
 
-SUBDIRS += ImtSdlGenV2Pck
-ImtSdlGenV2Pck.file = ../../Impl/ImtSdlGenV2Pck/QMake/ImtSdlGenV2Pck.pro
-ImtSdlGenV2Pck.depends = imtsdl imtsdlgen imtsdlgenv2
+SUBDIRS += ImtSdlGenCppPck
+ImtSdlGenCppPck.file = ../../Impl/ImtSdlGenCppPck/QMake/ImtSdlGenCppPck.pro
+ImtSdlGenCppPck.depends = imtsdl imtsdlgenqml imtsdlgencpp
 
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
@@ -58,5 +58,5 @@ ImtCorePck.depends = imtbase imtfile
 
 SUBDIRS += SdlCodeGenerator
 SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe.pro
-SdlCodeGenerator.depends = ImtCorePck ImtSdlPck ImtSdlGenPck ImtSdlGenV2Pck
+SdlCodeGenerator.depends = ImtCorePck ImtSdlPck ImtSdlGenQmlPck ImtSdlGenCppPck
 
