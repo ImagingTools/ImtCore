@@ -203,6 +203,10 @@ bool CSelection::ApplySelection(const Ids& selectionIds)
 		return false;
 	}
 
+	if (selectionIds.contains(QByteArray())){
+		return false;
+	}
+
 	if (m_selectedIds != selectionIds){
 		istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
 		changeSet.SetChangeInfo(ISelection::CN_SELECTION_CHANGED, QVariant());
