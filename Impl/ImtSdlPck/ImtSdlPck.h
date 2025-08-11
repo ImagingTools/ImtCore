@@ -8,6 +8,8 @@
 #include <imtsdl/CGqlSchemaParserComp.h>
 #include <imtsdl/CLogFilterComp.h>
 #include <imtsdl/CBasicRequestsProxyProviderComp.h>
+#include <imtsdl/CSimpleFileJoinerComp.h>
+
 
 
 /**
@@ -19,6 +21,8 @@ namespace ImtSdlPck
 typedef imtsdl::CGqlSchemaParserComp GqlSchemaParser;
 typedef imtsdl::CLogFilterComp LogFilter;
 typedef imtsdl::CBasicRequestsProxyProviderComp BasicRequestsProxyProvider;
+typedef imtsdl::CSimpleFileJoinerComp SimpleFileJoiner;
+
 
 
 

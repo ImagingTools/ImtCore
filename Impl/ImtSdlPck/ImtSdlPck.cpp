@@ -29,6 +29,11 @@ I_EXPORT_COMPONENT(
 			"The SDL specific log filter, used to remove unnecessary messages",
 			"Schema Definition Language SDL Log Filter")
 
+I_EXPORT_COMPONENT(
+			SimpleFileJoiner,
+			"Simple file joiner. Joins text files into a single",
+			"Simple File Join Text")
+
 
 } // namespace ImtSdlPck
 

@@ -26,6 +26,15 @@
 namespace imtsdl
 {
 
+//static helpers
+static std::function<bool(const CSdlEntryBase&)> CreateFindByNamePredicate(const QString& name)
+{
+	return [name](const CSdlEntryBase& entry){
+		return entry.GetName() == name;
+	};
+}
+
+
 // public static variables
 QString CSdlTools::s_sdlGlobalPrefix = QStringLiteral("sdl");
 
@@ -736,6 +745,48 @@ std::shared_ptr<CSdlEntryBase> CSdlTools::GetSdlTypeOrEnumOrUnionForField(
 				retVal = sdlUnionPtr;
 			}
 		}
+	}
+
+	return retVal;
+}
+
+
+std::shared_ptr<CSdlEntryBase> CSdlTools::FindEntryByName(
+			const QString& entryName,
+			const SdlTypeList& typeList,
+			const SdlEnumList& enumList,
+			const SdlUnionList& unionList)
+{
+	std::shared_ptr<CSdlEntryBase> retVal;
+
+	// if type
+	SdlTypeList::const_iterator typeFountIter =
+		std::find_if(typeList.cbegin(), typeList.cend(), CreateFindByNamePredicate(entryName));
+
+	if (typeFountIter != typeList.cend()){
+		retVal.reset(new CSdlType(*typeFountIter));
+
+		return retVal;
+	}
+
+	// if enum
+	SdlEnumList::const_iterator enumFoundIter =
+		std::find_if(enumList.cbegin(), enumList.cend(), CreateFindByNamePredicate(entryName));
+
+	if (enumFoundIter != enumList.cend()){
+		retVal.reset(new CSdlEnum(*enumFoundIter));
+
+		return retVal;
+	}
+
+	// if union
+	SdlUnionList::const_iterator unionFoundIter =
+		std::find_if(unionList.cbegin(), unionList.cend(), CreateFindByNamePredicate(entryName));
+
+	if (unionFoundIter != unionList.cend()){
+		retVal.reset(new CSdlUnion(*unionFoundIter));
+
+		return retVal;
 	}
 
 	return retVal;

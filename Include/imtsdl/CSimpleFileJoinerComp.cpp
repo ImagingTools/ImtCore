@@ -1,4 +1,4 @@
-#include <imtfile/CSimpleFileJoinerComp.h>
+#include <imtsdl/CSimpleFileJoinerComp.h>
 
 
 // Qt includes
@@ -15,7 +15,7 @@
 #include <ifile/IFileNameParam.h>
 
 
-namespace imtfile
+namespace imtsdl
 {
 
 
@@ -166,6 +166,6 @@ iproc::IProcessor::TaskState CSimpleFileJoinerComp::DoProcessing(
 }
 
 
-} // namespace imtfile
+} // namespace imtsdl
 
 

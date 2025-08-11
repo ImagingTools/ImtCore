@@ -100,8 +100,10 @@ public:
 	[[nodiscard]] static bool GetSdlTypeForField(const CSdlField& sdlField, const SdlTypeList& typeList, CSdlType& sdlType);
 	[[nodiscard]] static bool GetSdlEnumForField(const CSdlField& sdlField, const SdlEnumList& enumList, CSdlEnum& sdlEnum);
 	[[nodiscard]] static bool GetSdlUnionForField(const CSdlField& sdlField, const SdlUnionList& unionList, CSdlUnion& sdlEnum);
-	/// \todo rename it to 'GetSdlEntryFromField'; add method 'FindEntryByName'
+	/// \todo rename it to 'GetSdlEntryFromField'
 	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> GetSdlTypeOrEnumOrUnionForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
+
+	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> FindEntryByName(const QString& entryName, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
 
 	[[nodiscard]] static QString GetNamespaceAcceptableString(const QString& originalText);
 	[[nodiscard]] static QString GetFileSystemAcceptableEntryPath(const QString& originalText);

@@ -16,7 +16,7 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
-#include <imtfile/CSimpleFileJoinerComp.h>
+#include <imtsdl/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdlgenv2/CSdlQObjectGenerator.h>
 
@@ -176,9 +176,9 @@ iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
 			iprm::CParamsSet inputParams;
 			ifile::CFileNameParam sourceDirPathParam;
 			sourceDirPathParam.SetPath(tempDirectoryPath);
-			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
+			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
 			ifile::CFileNameParam outputFileNameParam;
-			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
+			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
 
 			iprm::COptionsManager filterParams;
 

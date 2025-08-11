@@ -15,7 +15,6 @@
 #include <ifile/CFileNameParam.h>
 
 // ImtCore includes
-#include <imtfile/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlType.h>
 
 

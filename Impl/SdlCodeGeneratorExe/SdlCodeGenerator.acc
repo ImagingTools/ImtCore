@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5411" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5421" Description="ACF"/>
+            <Version Id="1" Number="2251" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -112,18 +112,21 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="VersionInfo" PackageId="ImtCoreVoce" ComponentId="VersionInfo">
+                    <Element Id="VersionInfo" PackageId="BasePck" ComponentId="VersionInfo">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="KnownVersionNames" Type="String[]" ExportId="">
+                                <AttributeInfo Id="IsExtensionUsed" Type="Boolean" ExportId="IsExtensionUsed">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="KnownVersionNames" Type="String[]" ExportId="KnownVersionNames">
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>1.6</Value>
-                                            <Value>2.20</Value>
+                                            <Value>2.25</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
-                                <AttributeInfo Id="KnownVersions" Type="Integer[]" ExportId="">
+                                <AttributeInfo Id="KnownVersions" Type="Integer[]" ExportId="KnownVersions">
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>1</Value>
@@ -131,13 +134,13 @@
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
-                                <AttributeInfo Id="VersionId" Type="Integer" ExportId="">
+                                <AttributeInfo Id="VersionId" Type="Integer" ExportId="VersionId">
                                     <Data IsEnabled="true" Value="2000"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="VersionIdDesc" Type="Text" ExportId="">
+                                <AttributeInfo Id="VersionIdDesc" Type="Text" ExportId="VersionIdDesc">
                                     <Data IsEnabled="true" Value="SDL Generator version"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="VersionNumber" Type="Integer" ExportId="">
+                                <AttributeInfo Id="VersionNumber" Type="Integer" ExportId="VersionNumber">
                                     <Data IsEnabled="true" Value="2"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
@@ -150,7 +153,6 @@
                     <Interface InterfaceId="ibase::IApplicationInfo" ComponentId="ApplicationInfo"/>
                     <Interface InterfaceId="ibase::IRuntimeStatusProvider" ComponentId="ConsoleApplication/RuntimeStatus"/>
                     <Interface InterfaceId="ilog::IMessageConsumer" ComponentId="FilteredConsoleLog"/>
-                    <Interface InterfaceId="iser::IVersionInfo" ComponentId="VersionInfo"/>
                     <Interface InterfaceId="istd::IPolymorphic" ComponentId="ConsoleApplication"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>

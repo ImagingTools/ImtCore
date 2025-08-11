@@ -24,11 +24,6 @@ I_EXPORT_COMPONENT(
 			"File format conversion",
 			"File Format Conversion");
 
-I_EXPORT_COMPONENT(
-			SimpleFileJoiner,
-			"Simple file joiner. Joins text files into a single",
-			"Simple File Join Text");
-
 
 } // namespace ImtFilePck
 

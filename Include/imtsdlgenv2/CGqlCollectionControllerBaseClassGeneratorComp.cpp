@@ -16,7 +16,7 @@
 #include <ifile/CFileNameParam.h>
 
 // ImtCore includes
-#include <imtfile/CSimpleFileJoinerComp.h>
+#include <imtsdl/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlRequest.h>
 #include <imtsdl/CSdlUnionConverter.h>
 
@@ -170,12 +170,12 @@ iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoP
 			iprm::CParamsSet inputParams;
 			ifile::CFileNameParam sourceDirPathParam;
 			sourceDirPathParam.SetPath(tempDirectoryPath);
-			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
+			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
 			ifile::CFileNameParam outputFileNameParam;
-			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
+			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
 			iprm::CEnableableParam appendEnableParam;
 			appendEnableParam.SetEnabled(true);
-			inputParams.SetEditableParameter(imtfile::CSimpleFileJoinerComp::s_appendModeParamId, &appendEnableParam);
+			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_appendModeParamId, &appendEnableParam);
 
 			iprm::COptionsManager filterParams;
 

@@ -7,7 +7,7 @@
 #include <iproc/TSyncProcessorCompBase.h>
 
 
-namespace imtfile
+namespace imtsdl
 {
 
 
@@ -18,6 +18,7 @@ class CSimpleFileJoinerComp:
 			virtual public iproc::CSyncProcessorCompBase
 {
 public:
+	/// \todo move it to \file imtsdl.h
 	static const QByteArray s_sourceDirPathParamId;
 	static const QByteArray s_targetFilePathParamId;
 	static const QByteArray s_appendModeParamId;
@@ -59,6 +60,6 @@ private:
 };
 
 
-} // namespace imtfile
+} // namespace imtsdl
 
 
