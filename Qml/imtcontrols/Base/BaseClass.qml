@@ -32,7 +32,7 @@ QtObject {
 		}
 
 		function startTransaction(){
-			console.log("startTransaction")
+			// console.log("startTransaction")
 			if (isTransaction){
 				console.error("Unable to start transaction. Error: transaction already started.");
 
@@ -44,7 +44,7 @@ QtObject {
 		}
 
 		function stopTransaction(){
-			console.log("stopTransaction")
+			// console.log("stopTransaction")
 			if (!isTransaction){
 				console.error("Unable to stop transaction. Error: there is no active transaction.");
 
