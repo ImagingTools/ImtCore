@@ -115,7 +115,7 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 
 		QmldirFileInfo qmldirFileInfo;
 		qmldirFileInfo.Version = GetTypeVersion(sdlRequest);
-		qmldirFileInfo.Type = sdlRequest.GetName() + QStringLiteral(".qml");
+		qmldirFileInfo.Type = sdlRequest.GetName();
 		qmldirFileInfo.FileName = qmlClassName;
 		qmldirFileInfoList << qmldirFileInfo;
 
