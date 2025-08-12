@@ -391,7 +391,6 @@ StyleComponents {
 
 				anchors.verticalCenter: cbMainRect.verticalCenter;
 				anchors.left: cbMainRect.left;
-				anchors.leftMargin: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - width/2 : Style.marginM;
 				anchors.right: cbArrowIcon.left;
 				anchors.rightMargin: Style.marginM;
 
@@ -403,6 +402,15 @@ StyleComponents {
 				font.pixelSize: !cbMainRect.baseElement ? Style.fontSizeM : cbMainRect.baseElement.textSize;
 
 				elide: Text.ElideRight;
+			}
+
+			Binding {
+				target: cbTitleTxt.anchors
+				property: "leftMargin"
+				value:  !cbMainRect.baseElement ? 0 :
+						cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - cbTitleTxt.width/2 :
+						Style.marginM
+				delayed: true
 			}
 
 			Text {
