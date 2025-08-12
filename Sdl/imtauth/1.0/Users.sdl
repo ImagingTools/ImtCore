@@ -16,7 +16,7 @@ input UsersListInput {
 	viewParams: CollectionViewParams
 }
 
-type UserItem {
+type UserItemData {
 	id: ID!
 	typeId: ID!
 	userId: ID
@@ -33,7 +33,7 @@ type UserItem {
 }
 
 type UsersListPayload {
-	items: [UserItem]
+	items: [UserItemData]
 	notification: NotificationItem
 }
 
@@ -178,7 +178,7 @@ type Mutation {
 
 collectionSchema {
 	type User {
-		ref: UserItem
+		ref: UserItemData
 		operations {
 				list: UsersList
 		}

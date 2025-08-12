@@ -16,7 +16,7 @@ input RolesListInput {
 	viewParams: CollectionViewParams
 }
 
-type RoleItem {
+type RoleItemData {
 	typeId: ID!
 	id: ID!
 	roleName: String!
@@ -29,7 +29,7 @@ type RoleItem {
 }
 
 type RolesListPayload {
-	items: [RoleItem]
+	items: [RoleItemData]
 	notification: NotificationItem
 }
 
@@ -68,7 +68,7 @@ type Mutation {
 
 collectionSchema {
 	type Role {
-		ref: RoleItem
+		ref: RoleItemData
 		operations {
 			list: RolesList
 		}

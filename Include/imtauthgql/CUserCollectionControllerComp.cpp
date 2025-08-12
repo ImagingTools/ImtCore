@@ -241,7 +241,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserCollectionControllerComp::OnGetO
 bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 	const sdl::imtauth::Users::CUsersListGqlRequest& usersListRequest,
-	sdl::imtauth::Users::CUserItem::V1_0& representationObject,
+	sdl::imtauth::Users::CUserItemData::V1_0& representationObject,
 	QString& errorMessage) const
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();

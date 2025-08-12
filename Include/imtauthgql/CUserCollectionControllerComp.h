@@ -40,7 +40,7 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtauth::Users::CUsersListGqlRequest& usersListRequest,
-				sdl::imtauth::Users::CUserItem::V1_0& representationObject,
+				sdl::imtauth::Users::CUserItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtauth::Users::CUserData::V1_0& userDataRepresentation,

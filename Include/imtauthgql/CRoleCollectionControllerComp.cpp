@@ -178,7 +178,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetO
 bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 			const sdl::imtauth::Roles::CRolesListGqlRequest& rolesListRequest,
-			sdl::imtauth::Roles::CRoleItem::V1_0& representationObject,
+			sdl::imtauth::Roles::CRoleItemData::V1_0& representationObject,
 			QString& errorMessage) const
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();

@@ -42,7 +42,7 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const sdl::imtauth::Groups::CGroupsListGqlRequest& groupsListRequest,
-				sdl::imtauth::Groups::CGroupItem::V1_0& representationObject,
+				sdl::imtauth::Groups::CGroupItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
 	virtual istd::IChangeableUniquePtr CreateObjectFromRepresentation(
 				const sdl::imtauth::Groups::CGroupData::V1_0& groupDataRepresentation,

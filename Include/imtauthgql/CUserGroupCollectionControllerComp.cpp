@@ -142,7 +142,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserGroupCollectionControllerComp::O
 bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 			const sdl::imtauth::Groups::CGroupsListGqlRequest& groupsListRequest,
-			sdl::imtauth::Groups::CGroupItem::V1_0& representationObject,
+			sdl::imtauth::Groups::CGroupItemData::V1_0& representationObject,
 			QString& errorMessage) const
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
