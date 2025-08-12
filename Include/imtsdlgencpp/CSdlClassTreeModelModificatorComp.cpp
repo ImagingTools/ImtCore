@@ -195,7 +195,6 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			const QString unionSourceVarName = QStringLiteral("*") + field.GetId();
 			const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
 
-
 			// declare target value, to store value
 			stream << QStringLiteral("QVariant ");
 			stream << unionConvertedVarName << ';';
@@ -396,10 +395,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			FeedStreamHorizontally(stream, 1);
-			stream << QStringLiteral("QString itemTypename = ") << dataVarName;
+			stream << QStringLiteral("QString ");
+			stream << GetDecapitalizedValue(field.GetId());
+			stream << QStringLiteral("Typename = ") << dataVarName;
 			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
-			FeedStream(stream, 2, false);
+			FeedStream(stream, 1, false);
 
 			WriteUnionConversionFromData(stream,
 				foundUnion,
@@ -451,10 +451,12 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 			imtsdl::CSdlUnion foundUnion;
 			[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 
-			FeedStreamHorizontally(stream, 1);
-			stream << QStringLiteral("QString itemTypename = ") << dataVarName;
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("QString ");
+			stream << GetDecapitalizedValue(field.GetId());
+			stream << QStringLiteral("Typename = ") << dataVarName;
 			stream << QStringLiteral(".value<::imtbase::CTreeItemModel*>()->GetData(\"__typename\").toString();");
-			FeedStream(stream, 2, false);
+			FeedStream(stream, 1, false);
 
 			WriteUnionConversionFromData(stream,
 				foundUnion,

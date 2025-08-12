@@ -48,6 +48,16 @@ void CObjectModificatorCompBase::WriteMethodCall(QTextStream& stream, MetdodType
 }
 
 
+std::shared_ptr<imtsdl::CSdlEntryBase> CObjectModificatorCompBase::FindEntryByName(const QString& entryName, bool onlyLocal) const
+{
+	imtsdl::SdlTypeList typeList = m_sdlTypeListCompPtr.IsValid() ? m_sdlTypeListCompPtr->GetSdlTypes(onlyLocal): imtsdl::SdlTypeList();
+	imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr.IsValid() ? m_sdlEnumListCompPtr->GetEnums(onlyLocal) : imtsdl::SdlEnumList();
+	imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr.IsValid() ? m_sdlUnionListCompPtr->GetUnions(onlyLocal) : imtsdl::SdlUnionList();
+
+	return imtsdl::CSdlTools::FindEntryByName(entryName, typeList, enumList, unionList);
+}
+
+
 void CObjectModificatorCompBase::WriteSetValueToStruct(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
@@ -694,34 +704,19 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 
 	FeedStreamHorizontally(stream, hhIndents);
 
-	if (isEnum){
-		// declare temp value, to store string equivalent
-		stream << QStringLiteral("const QString ");
-		stream << enumSourceVarName;
-	}
-	else if (isUnion){
+	if (isUnion){
+		AddUnionFieldValueReadFromObject(stream, field, optional, hhIndents);
+		if(!isStrict){
+			FeedStreamHorizontally(stream, 1);
+			stream << '}';
+			FeedStream(stream, 1, false);
+		}
+
+		return;
+
 		if (isCustom){
-			if (conversionType == CSdlUnionConverter::CT_GQL_SCALAR || conversionType == CSdlUnionConverter::CT_GQL_ARRAY){
-				/// \todo fix variabels gqlObject \example '::imtgql::CGqlParamObject' -> \c GetContainerObjectClassName
-				stream << QStringLiteral("const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr(\"");
-				stream << field.GetId() << QStringLiteral("\");");
-				FeedStream(stream, 1, false);
-
-				FeedStreamHorizontally(stream, 1);
-				stream << QStringLiteral("if (!itemDataObjectPtr->ContainsParam(\"__typename\")) {");
-				FeedStream(stream, 1, false);
-
-				FeedStreamHorizontally(stream, 2);
-				stream << QStringLiteral("qDebug() << \"invalid typename for: ") << field.GetId() <<  QStringLiteral("\";");
-				FeedStream(stream, 1, false);
-
-				FeedStreamHorizontally(stream, 2);
-				stream << QStringLiteral("return false;");
-				FeedStream(stream, 1, false);
-
-				FeedStreamHorizontally(stream, 1);
-				stream << '}';
-			}
+			/// \todo move it to correct derived clases
+			if (conversionType == CSdlUnionConverter::CT_GQL_SCALAR || conversionType == CSdlUnionConverter::CT_GQL_ARRAY){}
 			else{
 				stream << QStringLiteral("QJsonObject itemObject = jsonObject.value(\"");
 				stream << field.GetId() <<  QStringLiteral("\").toObject();");
@@ -742,17 +737,18 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 				FeedStreamHorizontally(stream, 1);
 				stream << '}';
 			}
-			FeedStream(stream, 2, false);
-
-			FeedStreamHorizontally(stream, 1);
-			stream << QStringLiteral("QString itemTypename");
-
+			FeedStream(stream, 1, false);
 		}
 		else{
 		// declare temp value, to store variant equivalent
 		stream << QStringLiteral("const QVariant ");
 		stream << unionSourceVarName;
 		}
+	}
+	else if (isEnum){
+		// declare temp value, to store string equivalent
+		stream << QStringLiteral("const QString ");
+		stream << enumSourceVarName;
 	}
 	else{
 		stream << field.GetId();
@@ -761,10 +757,9 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 	stream << ' ' << '=' << ' ';
 	if (isUnion && isCustom){
 		if (conversionType == CSdlUnionConverter::CT_GQL_SCALAR || conversionType == CSdlUnionConverter::CT_GQL_ARRAY){
-			stream << QStringLiteral("itemDataObjectPtr->GetParamArgumentValue(\"__typename\").toString();");
 		}
 		else{
-			stream << QStringLiteral("itemObject.value(\"__typename\").toString();");
+			stream << QStringLiteral("itemObject.value(\"__typename\").toString()");
 		}
 	}
 	else{
@@ -799,7 +794,6 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 			GetUnionScalarConversionType(),
 			field.GetId());
 	}
-
 
 	if(!isStrict){
 		FeedStreamHorizontally(stream, 1);

@@ -188,56 +188,60 @@ bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStr
 	stream << GetContainerObjectVariableName();
 	stream << QStringLiteral(".contains(\"");
 	stream << field.GetId();
-	stream << QStringLiteral("\") ");
-	if(!expected){
-		stream << '|' << '|' << ' ' << '!';
-	}
-	else {
-		stream << '&' << '&';
-	}
-
-	stream << ' ' << GetContainerObjectVariableName();
-	stream << QStringLiteral("[\"");
-	stream << field.GetId();
-	stream << QStringLiteral("\"].is");
-
+	stream << QStringLiteral("\")");
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
 	bool isUnion = false;
 	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
-	if(isArray){
-		stream << QStringLiteral("Array");
-	}
-	else if (	isEnum ||
-			 convertedType == QStringLiteral("QString") ||
-			 convertedType == QStringLiteral("QByteArray"))
-	{
-		stream << QStringLiteral("String");
-	}
-	else if (isCustom || isUnion){
-		stream << QStringLiteral("Object");
-	}
-	else if (	convertedType == QStringLiteral("int") ||
-				convertedType == QStringLiteral("long") ||
-				convertedType == QStringLiteral("qlonglong") ||
-				convertedType == QStringLiteral("float") ||
-				convertedType == QStringLiteral("double"))
-	{
-		stream << QStringLiteral("Double");
-	}
-	else if (convertedType == QStringLiteral("bool")){
-		stream << QStringLiteral("Bool");
-	}
-	else {
-		SendCriticalMessage(0, QString("Unexpected type for field %1").arg(field.GetId()));
-		I_CRITICAL();
+	if (!isUnion){
+		stream << ' ';
+		if(!expected){
+			stream << '|' << '|' << ' ' << '!';
+		}
+		else {
+			stream << '&' << '&';
+		}
 
-		return false;
+		stream << ' ' << GetContainerObjectVariableName();
+		stream << QStringLiteral("[\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\"].is");
+
+		if(isArray){
+			stream << QStringLiteral("Array");
+		}
+		else if (	isEnum ||
+				 convertedType == QStringLiteral("QString") ||
+				 convertedType == QStringLiteral("QByteArray"))
+		{
+			stream << QStringLiteral("String");
+		}
+		else if (isCustom){
+			stream << QStringLiteral("Object");
+		}
+		else if (	convertedType == QStringLiteral("int") ||
+				 convertedType == QStringLiteral("long") ||
+				 convertedType == QStringLiteral("qlonglong") ||
+				 convertedType == QStringLiteral("float") ||
+				 convertedType == QStringLiteral("double"))
+		{
+			stream << QStringLiteral("Double");
+		}
+		else if (convertedType == QStringLiteral("bool")){
+			stream << QStringLiteral("Bool");
+		}
+		else {
+			SendCriticalMessage(0, QString("Unexpected type for field %1").arg(field.GetId()));
+			I_CRITICAL();
+
+			return false;
+		}
+		stream << QStringLiteral("()");
 	}
 
-	stream << QStringLiteral("()){");
+	stream << QStringLiteral("){");
 
 	return true;
 }
@@ -305,6 +309,105 @@ CSdlUnionConverter::ConversionType CSdlClassJsonModificatorComp::GetUnionArrayCo
 }
 
 
+void CSdlClassJsonModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents)
+{
+	bool hasComplexTypes = false;
+	bool hasScalarTypes = false;
+
+	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = FindEntryByName(field.GetType());
+	imtsdl::CSdlUnion* unionPtr = dynamic_cast<imtsdl::CSdlUnion*>(foundEntryPtr.get());
+	Q_ASSERT(unionPtr != nullptr);
+	const QStringList unionTypeList = unionPtr->GetTypes();
+	for (const QString& unionType: unionTypeList){
+		std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = FindEntryByName(unionType);
+		if (foundEntryPtr != nullptr){
+			hasComplexTypes = true;
+		}
+		else {
+			hasScalarTypes = true;
+		}
+	}
+
+	Q_ASSERT(hasComplexTypes || hasScalarTypes);
+	if (hasComplexTypes){
+		const QString tempDataPtrVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Object");
+		stream << QStringLiteral("const ");
+		stream << GetContainerObjectClassName();
+		stream << ' ' << tempDataPtrVarName;
+		stream << QStringLiteral(" = ");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".value(\"");
+		stream << field.GetId() << QStringLiteral("\").toObject();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("if (!");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".value(\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\").isObject()");
+		stream << QStringLiteral(" || !");
+		stream << tempDataPtrVarName;
+		stream << QStringLiteral(".contains(\"__typename\")");
+
+		stream << ')' << '{';
+		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("__typename for field '%3' is missing, but expected"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return false;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << '}';
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("QString ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("Typename = ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("Object.value(\"__typename\").toString();");
+		FeedStream(stream, 1, false);
+	}
+
+	if (hasScalarTypes){
+		if (hasComplexTypes){
+			FeedStreamHorizontally(stream, hIndents);
+		}
+		stream << QStringLiteral("QVariant ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("VariantValue = ");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral("[\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\"].toVariant();");
+		FeedStream(stream, 1, false);
+	}
+
+	const QString unionSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
+	WriteUnionConversionFromData(stream,
+								 *unionPtr,
+								 unionSourceVarName,
+								 field.GetId(),
+								 m_originalSchemaNamespaceCompPtr->GetText(),
+								 "modelIndex",
+								 *m_sdlTypeListCompPtr,
+								 *m_sdlEnumListCompPtr,
+								 *m_sdlUnionListCompPtr,
+								 hIndents,
+								 GetUnionScalarConversionType(),
+								 field.GetId());
+}
+
+
+void CSdlClassJsonModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents)
+{
+
+}
+
+
 // private methods
 
 QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::CSdlField& field, bool forType) const
@@ -321,7 +424,7 @@ QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::
 		retVal += QStringLiteral("Array");
 	}
 	else if (	isEnum ||
-			 convertedType == QStringLiteral("QString"))
+				convertedType == QStringLiteral("QString"))
 	{
 		retVal += QStringLiteral("String");
 	}
@@ -335,7 +438,7 @@ QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::
 		retVal += QStringLiteral("String().toUtf8");
 	}
 	else if (	convertedType == QStringLiteral("float") ||
-			 convertedType == QStringLiteral("double"))
+				convertedType == QStringLiteral("double"))
 	{
 		retVal += QStringLiteral("Double");
 	}
@@ -343,7 +446,7 @@ QString CSdlClassJsonModificatorComp::GetConvertEndForFieldString(const imtsdl::
 		retVal += QStringLiteral("Int");
 	}
 	else if (	convertedType == QStringLiteral("long") ||
-			 convertedType == QStringLiteral("qlonglong"))
+				convertedType == QStringLiteral("qlonglong"))
 	{
 		retVal += QStringLiteral("Integer");
 	}

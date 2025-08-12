@@ -17,16 +17,16 @@ namespace imtsdlgencpp
 	\warning ALL modificators MUST inherit from this class!
  */
 class CObjectModificatorCompBase:
-			public imtsdlgencpp::CSdlClassModificatorBaseComp,
+			public CSdlClassModificatorBaseComp,
 			protected CSdlGenTools,
 			protected imtsdl::CSdlTools,
 			protected imtsdl::CSdlEnumConverter,
-			protected imtsdlgencpp::CSdlUnionConverter
+			protected CSdlUnionConverter
 {
 	using CSdlGenTools::AddArrayInternalChecksFail;
 
 public:
-	typedef imtsdlgencpp::CSdlClassModificatorBaseComp BaseClass;
+	typedef CSdlClassModificatorBaseComp BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CObjectModificatorCompBase)
 	I_END_COMPONENT;
@@ -224,11 +224,18 @@ protected:
 	 */
 	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) = 0;
 
-	virtual imtsdlgencpp::CSdlUnionConverter::ConversionType GetUnionScalarConversionType() const = 0;
-	virtual imtsdlgencpp::CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const = 0;
+	virtual CSdlUnionConverter::ConversionType GetUnionScalarConversionType() const = 0;
+	virtual CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const = 0;
+
+	// additional methods
+	/// \todo refactor it and describe
+	virtual void AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) = 0;
+	virtual void AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) = 0;
+
 
 	// comfort methods
 	void WriteMethodCall(QTextStream& stream, MetdodType type, const QString& objectName = QString(), bool isPointer = false) const;
+	std::shared_ptr<imtsdl::CSdlEntryBase> FindEntryByName(const QString& entryName, bool onlyLocal = false) const;
 
 	/// Simply generates a start of code, that sets a value to struct like \code *object.value = \endcode
 	void WriteSetValueToStruct(QTextStream& stream, const imtsdl::CSdlField& field, const QString& objectName = QStringLiteral("object"));

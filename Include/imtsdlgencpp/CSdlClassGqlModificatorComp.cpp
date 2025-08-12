@@ -623,6 +623,99 @@ CSdlUnionConverter::ConversionType CSdlClassGqlModificatorComp::GetUnionArrayCon
 }
 
 
+void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents)
+{
+	bool hasComplexTypes = false;
+	bool hasScalarTypes = false;
+
+	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = FindEntryByName(field.GetType());
+	imtsdl::CSdlUnion* unionPtr = dynamic_cast<imtsdl::CSdlUnion*>(foundEntryPtr.get());
+	Q_ASSERT(unionPtr != nullptr);
+	const QStringList unionTypeList = unionPtr->GetTypes();
+	for (const QString& unionType: unionTypeList){
+		std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = FindEntryByName(unionType);
+		if (foundEntryPtr != nullptr){
+			hasComplexTypes = true;
+		}
+		else {
+			hasScalarTypes = true;
+		}
+	}
+
+	Q_ASSERT(hasComplexTypes || hasScalarTypes);
+	if (hasComplexTypes){
+		const QString tempDataPtrVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
+		stream << QStringLiteral("const ");
+		stream << GetContainerObjectClassName();
+		stream << QStringLiteral("* ");
+		stream << tempDataPtrVarName;
+		stream << QStringLiteral(" = ");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
+		stream << field.GetId() << QStringLiteral("\");");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("if (!");
+		stream << tempDataPtrVarName;
+		stream << QStringLiteral("->ContainsParam(\"__typename\")){");
+		FeedStream(stream, 1, false);
+
+		AddErrorReport(stream, QStringLiteral("__typename for field '%3' is missing, but expected"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("return false;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << '}';
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << QStringLiteral("QString ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("Typename = ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("DataObjectPtr->GetParamArgumentValue(\"__typename\").toString();");
+		FeedStream(stream, 1, false);
+	}
+
+	if (hasScalarTypes){
+		if (hasComplexTypes){
+			FeedStreamHorizontally(stream, hIndents);
+		}
+		stream << QStringLiteral("QVariant ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("VariantValue = ");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral("[\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\"];");
+		FeedStream(stream, 1, false);
+	}
+
+	const QString unionSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
+	WriteUnionConversionFromData(stream,
+								 *unionPtr,
+								 unionSourceVarName,
+								 field.GetId(),
+								 m_originalSchemaNamespaceCompPtr->GetText(),
+								 "modelIndex",
+								 *m_sdlTypeListCompPtr,
+								 *m_sdlEnumListCompPtr,
+								 *m_sdlUnionListCompPtr,
+								 hIndents,
+								 GetUnionScalarConversionType(),
+								 field.GetId());
+}
+
+
+void CSdlClassGqlModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool /*optional*/, quint16 hIndents)
+{
+
+}
+
+
 
 } // namespace imtsdlgencpp
 

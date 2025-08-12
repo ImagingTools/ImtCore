@@ -347,7 +347,9 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 
 		if (isCustom){
 			QString tempVar = targetVariableName + QStringLiteral("Convert");
-			stream << QStringLiteral("if (itemTypename == \"") <<  sdlType << QStringLiteral("\") {"); //sourceVariableName << convertedType << QStringLiteral(">()){");
+			stream << QStringLiteral("if (");
+			stream << imtsdl::CSdlTools::GetDecapitalizedValue(targetVariableName);
+			stream << QStringLiteral("Typename == \"") <<  sdlType << QStringLiteral("\") {");
 			FeedStream(stream, 1, false);
 			FeedStreamHorizontally(stream, hIndents + 1);
 

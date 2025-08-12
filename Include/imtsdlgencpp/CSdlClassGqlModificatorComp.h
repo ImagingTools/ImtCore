@@ -18,7 +18,7 @@ class CSdlClassGqlModificatorComp: public CObjectModificatorCompBase
 {
 
 public:
-	typedef imtsdlgencpp::CObjectModificatorCompBase BaseClass;
+	typedef CObjectModificatorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSdlClassGqlModificatorComp)
 	I_END_COMPONENT
@@ -49,10 +49,13 @@ protected:
 	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) override;
 	virtual CSdlUnionConverter::ConversionType GetUnionScalarConversionType() const override;
 	virtual CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const override;
+	virtual void AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) override;
+	virtual void AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) override;
 
 private:
 	/// writes end for convert 'value' to 'dest' \example String() (if string) \example Integer (if long)
 	[[nodiscard]] QString GetConvertEndForFieldString(const imtsdl::CSdlField& field, bool forType) const;
+
 };
 
 
