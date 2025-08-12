@@ -97,7 +97,6 @@ ComboBox {
 					dataProvider.filter.m_textFilter.m_text = str
 				}
 				else{
-					dataProvider.filter.setFilteringInfoIds(comboBoxContainerGql.textFilteringInfoIds)
 					dataProvider.filter.setTextFilter(str)
 				}
 
