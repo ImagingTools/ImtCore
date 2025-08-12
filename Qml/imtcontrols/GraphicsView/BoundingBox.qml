@@ -56,25 +56,25 @@ GraphicsShapeBase {
 	}
 
 	function getBoundingBoxPoints(){
-		if(!points.length){
-			return ({});
+		let pointCount = 0
+		if(points.length){
+			pointCount = points.length
 		}
 		let pointsObj = ({});
 
-		let minX = 1000000;
-		let minY = 1000000;
-		let maxX  = -1000000
-		let maxY = -1000000;
+		let minX = 0;
+		let minY = 0;
+		let maxX = 0
+		let maxY = 0;
 
-		if(!points.length){
-			minX = 0;
-			minY = 0;
-			maxX = 0;
-			maxY = 0;
-		}
-
-		for(let i = 0; i < points.length; i++){
+		for(let i = 0; i < pointCount; i++){
 			let point = points[i]
+			if (i == 0){
+				minX = maxX = point.x
+				minY = maxY = point.y
+
+				continue
+			}
 
 			let x_ = point.x
 			let y_ = point.y

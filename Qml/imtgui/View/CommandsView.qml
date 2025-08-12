@@ -187,6 +187,22 @@ Item {
 					return 0;
 				});
 			}
+
+			onItemRemoved: {
+				if (!item || !item.element){
+					return;
+				}
+
+				let removedIndex = commandsItem.allElements.indexOf(item)
+				if (removedIndex >= 0){
+					commandsItem.allElements.splice(removedIndex, 1)
+				}
+
+				removedIndex = commandsItem.priorityElements.indexOf(item)
+				if (removedIndex >= 0){
+					commandsItem.priorityElements.splice(removedIndex, 1)
+				}
+			}
 		}
 	}
 }

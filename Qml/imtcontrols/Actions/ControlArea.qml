@@ -4,8 +4,8 @@ import Acf 1.0
 MouseArea{
     id: controlArea;
 
-    preventStealing: true;
-    hoverEnabled: true;
+	preventStealing: true;
+	hoverEnabled: true;
 
     property Item movingItem: null;
     property Item wheelTargetItem: null;
@@ -20,8 +20,8 @@ MouseArea{
     property bool wasMoving: false;
     property bool isPressed: false;
 
-	property bool propagateWheelEvents: true;
-	property bool propagateMouseEvents: true;
+	property bool propagateWheelEvents: false;
+	property bool propagateMouseEvents: false;
 
     signal deltaSignal(point delta)
     signal wheelDeltaSignal(int wheelDelta)
@@ -45,12 +45,16 @@ MouseArea{
         }
 
         wasMoving = false;
+
+		if(propagateMouseEvents){
+			mouse.accepted = false;
+		}
     }
     onReleased: {
         isPressed = false;
     }
 
-    onPositionChanged: {
+	onPositionChanged: {
         if(isPressed){
             var newCoords = mapToItem(this, mouse.x, mouse.y);
             var deltaX_ = newCoords.x - this.coord.x;
@@ -66,12 +70,12 @@ MouseArea{
         }
     }
 
-    onWheel: {
-        wheelDeltaSignal(wheel.angleDelta.y)
-		if(!propagateWheelEvents){
+	onWheel: {
+		wheelDeltaSignal(wheel.angleDelta.y)
+		if(propagateWheelEvents){
 			wheel.accepted = false;
 		}
-    }
+	}
 
     onDeltaSignal: {
         //console.log("Delta:: ", delta.x, delta.y);
@@ -88,7 +92,7 @@ MouseArea{
 		if (mouse.button == Qt.RightButton){
 			rightClicked(mouse.x, mouse.y);
 		}
-		if(!propagateMouseEvents){
+		if(propagateMouseEvents){
 			mouse.accepted = false;
 		}
 	}

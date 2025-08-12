@@ -75,8 +75,8 @@ Rectangle {
 	property var leftMenuCoordinates: Qt.point(Style.marginM, Style.marginS);
 	property var rightMenuCoordinates: Qt.point(width - Style.marginL - Style.buttonWidthL, Style.marginS);
 
-	property bool propagateWheelEvents: true;
-	property bool propagateMouseEvents: true;
+	property bool propagateWheelEvents: false;
+	property bool propagateMouseEvents: false;
 
 	signal copySignal(int index);
 	signal pasteSignal(int index);
@@ -365,10 +365,10 @@ Rectangle {
 		let onlyOneLayer = layer !==undefined;
 		let margin_ = Style.marginXXL;
 
-		let minX = 1000000;
-		let minY = 1000000;
-		let maxX = -1000000;
-		let maxY = -1000000;
+		let minX = 0;
+		let minY = 0;
+		let maxX = 0;
+		let maxY = 0;
 
 		let screenPointBottomLeftX = 0;
 		let screenPointBottomLeftY = graphicsView.height;
@@ -396,16 +396,16 @@ Rectangle {
 				continue;
 			}
 
-			if((boundingBoxPoints.topLeftPoint).x < minX){
+			if(i == 0 || (boundingBoxPoints.topLeftPoint).x < minX){
 				minX = boundingBoxPoints.topLeftPoint.x
 			}
-			if((boundingBoxPoints.topRightPoint).x > maxX){
+			if(i == 0 || (boundingBoxPoints.topRightPoint).x > maxX){
 				maxX = boundingBoxPoints.topRightPoint.x
 			}
-			if((boundingBoxPoints.topLeftPoint).y < minY){
+			if(i == 0 || (boundingBoxPoints.topLeftPoint).y < minY){
 				minY = boundingBoxPoints.topLeftPoint.y
 			}
-			if((boundingBoxPoints.bottomRightPoint).y > maxY){
+			if(i == 0 || (boundingBoxPoints.bottomRightPoint).y > maxY){
 				maxY = boundingBoxPoints.bottomRightPoint.y
 			}
 
@@ -440,8 +440,8 @@ Rectangle {
 
 		canvas.setViewMatrixParams();
 
-		minX = 1000000;
-		maxY = -1000000;
+		minX = 0;
+		maxY = 0;
 
 		for (let i = 0; i < shapeList.length; i++){
 			let shape = shapeList[i];
@@ -450,10 +450,10 @@ Rectangle {
 				continue;
 			}
 
-			if((boundingBoxPoints.bottomLeftPoint).x < minX){
+			if(i == 0 || (boundingBoxPoints.bottomLeftPoint).x < minX){
 				minX = boundingBoxPoints.bottomLeftPoint.x
 			}
-			if((boundingBoxPoints.bottomLeftPoint).y > maxY){
+			if(i == 0 || (boundingBoxPoints.bottomLeftPoint).y > maxY){
 				maxY = boundingBoxPoints.bottomLeftPoint.y
 			}
 		}
@@ -484,10 +484,10 @@ Rectangle {
 
 		let pointsObj = ({});
 
-		let minX = 1000000;
-		let minY = 1000000;
-		let maxX  = -1000000
-		let maxY = -1000000;
+		let minX = 0;
+		let minY = 0;
+		let maxX = 0
+		let maxY = 0;
 
 		let points = []
 
@@ -499,6 +499,12 @@ Rectangle {
 		for(let i = 0; i < points.length; i++){
 			let point = points[i]
 			point = shape.getScreenPosition(point);
+			if (i == 0){
+				minX = maxX = point.x
+				minY = maxY = point.y
+
+				continue
+			}
 
 			let x_ = point.x
 			let y_ = point.y
@@ -732,6 +738,10 @@ Rectangle {
 
 			onWheel: {
 				if (canvas.scaleCoeff == 0 || graphicsView.restrictZoom){
+					if(controlArea.propagateWheelEvents){
+						wheel.accepted = false;
+					}
+
 					return
 				}
 
