@@ -368,7 +368,7 @@ QtObject {
 	}
 
 	function fromJSON(json){
-		console.log("fromJSON", json)
+		// console.log("fromJSON", json)
 		let obj;
 		try {
 			obj = JSON.parse(escapeSpecialChars(json));

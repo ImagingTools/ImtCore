@@ -12,42 +12,56 @@ ControlBase {
 	property var model: 0;
 
 	property color borderColor: comboBoxContainer.activeFocus ? Style.iconColorOnSelected : Style.borderColor;
-
 	property color backgroundColor: changeable ? Style.baseColor : Style.alternateBaseColor;
-
-	property string currentText;
-
-	property bool changeable: true;
-
-	property bool isColor: false;
-
-	property bool textCentered: false;
-	property bool hiddenBackground: true;
-	property bool openST: false;
-
-	property bool visibleScrollBar: true;
-	property bool visibleIcon: true;
-	property string compMainColor: "transparent";
-	property string compSelectedColor: Style.selectedColor;
-	property bool moveToEnd: false;
-	property int moveToIndex: currentIndex;
-	property int contentLeftMargin: Style.marginM;
-
-	property int shownItemsCount: 5;
-
-	property int radius: Style.comboBoxRadius;
-	property int currentIndex: -1;
-
-	property string placeHolderText: "";
-
-	property real contentY;
 
 	// ID for display in combo box delegates
 	property string nameId: "name";
+	// ID of model value to be displayed in the list (containing possible SDL prefix)
+	property string displayId: nameId;
 
+	property string currentText;
+	property string placeHolderText: "";
+	property string compMainColor: "transparent";
+	property string compSelectedColor: Style.selectedColor;
+	property string fontColor: Style.textColor;
+	property string fontColorTitle: fontColor;
+
+	property bool changeable: true;
+	property bool isColor: false;
+	property bool textCentered: false;
+	property bool hiddenBackground: true;
+
+	property bool openST: false;
+	property bool visibleScrollBar: true;
+	property bool visibleIcon: true;
+	property bool moveToEnd: false;
 	property bool hoverBlocked: true;
+	property bool isOpen: false;
 
+	property int currentIndex: -1;
+	property int shownItemsCount: 5;
+	property int moveToIndex: currentIndex;
+	property int radius: Style.comboBoxRadius;
+	property int contentLeftMargin: Style.marginM;
+	property int textSize: Style.fontSizeM;
+	property int itemHeight: Style.controlHeightM;
+
+	property real contentY;
+
+	// Reference to current \c popupMenuComp object instance
 	property var popup: null;
+
+	property alias containsMouse: cbMouseArea.containsMouse;
+	property alias mouseArea: cbMouseArea;
+	property alias tooltipText: tooltip.text;
+	property alias tooltipItem: tooltip;
+
+	signal accepted();
+	signal activated();
+	signal highlighted(int index);
+
+	signal clicked();
+	signal finished(string itemId, int index);
 
 	property Component delegate: Component {PopupMenuDelegate{
 			width: comboBoxContainer.width;
@@ -55,13 +69,13 @@ ControlBase {
 			contentLeftMargin: comboBoxContainer.contentLeftMargin;
 
 			highlighted: comboBoxContainer.currentIndex == model.index
-			text: model.item ? model.item[comboBoxContainer.nameId] : model[comboBoxContainer.nameId]
+			text: model.item ? model.item[comboBoxContainer.displayId] : model[comboBoxContainer.displayId]
 
 			selected: comboBoxContainer.popup ? comboBoxContainer.popup.selectedIndex == model.index : false;
 
 			onClicked: {
 				if (comboBoxContainer.popup){
-					let resultId = model.Id || model.id || "";
+					let resultId = model.Id || model.id || model.item.m_id || "";
 					comboBoxContainer.popup.finished(resultId, model.index)
 				}
 			}
@@ -74,51 +88,27 @@ ControlBase {
 		}
 	}
 
-	property alias containsMouse: cbMouseArea.containsMouse;
-	property alias mouseArea: cbMouseArea;
-
-	property int textSize: Style.fontSizeM;
-	property int itemHeight: Style.controlHeightM;
-	property string fontColor: Style.textColor;
-	property string fontColorTitle: fontColor;
-
-	property alias tooltipText: tooltip.text;
-	property alias tooltipItem: tooltip;
-	property bool isOpen: false;
-
-	signal accepted();
-	signal activated();
-	signal highlighted(int index);
-
-	signal clicked();
-	signal finished(string itemId, int index);
-
 	onModelChanged: {
 		if (!comboBoxContainer.model){
 			return;
 		}
 
-		if (comboBoxContainer.currentIndex > -1){
-			if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
-				comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
-			}
+		comboBoxContainer.displayId = model.containsKey('m_' + nameId, 0) ? 'm_' + nameId : nameId;
+		if (comboBoxContainer.currentIndex >= 0 && comboBoxContainer.model.containsKey(comboBoxContainer.displayId, comboBoxContainer.currentIndex)){
+			comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.displayId, comboBoxContainer.currentIndex);
 		}
 	}
 
 	onCurrentIndexChanged: {
-		if (!comboBoxContainer.model){
+		if (!comboBoxContainer.model || comboBoxContainer.currentIndex < 0){
 			comboBoxContainer.currentText = "";
+
 			return;
 		}
 
-		if (comboBoxContainer.currentIndex > -1){
-			if (comboBoxContainer.model.containsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
-				let name = comboBoxContainer.model.getData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
-				comboBoxContainer.currentText = name;
-			}
-		}
-		else{
-			comboBoxContainer.currentText = "";
+		if (comboBoxContainer.model.containsKey(comboBoxContainer.displayId, comboBoxContainer.currentIndex)){
+			let name = comboBoxContainer.model.getData(comboBoxContainer.displayId, comboBoxContainer.currentIndex);
+			comboBoxContainer.currentText = name;
 		}
 	}
 
@@ -151,7 +141,7 @@ ControlBase {
 				}
 				let point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height)
 				let y_ = point.y;
-				//console.log("Y__", y_, popup.height, ModalDialogManager.activeView.height)
+				// console.log("Y__", y_, popup.height, ModalDialogManager.activeView.height)
 				if(y_ + popup.height > ModalDialogManager.activeView.height){
 					popup.y = point.y - popup.height - comboBoxContainer.height;
 					popup.isUpwards = true;
@@ -197,7 +187,7 @@ ControlBase {
 	}
 
 	function openPopupMenu(){
-		console.log("openPopupMenu", comboBoxContainer.model);
+		// console.log("openPopupMenu", comboBoxContainer.model);
 		let point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
 		ModalDialogManager.openDialog(popupMenuComp, {
 										  "x":     point.x,
