@@ -189,7 +189,7 @@ void CDocumentCollectionViewDelegateComp::RemoveObjects(const imtbase::ICollecti
 				if (id == objectInfoPtr->uuid){
 					for (int docIndex = 0; m_documentManagerCompPtr->GetDocumentsCount(); docIndex++){
 						idoc::IDocumentManager::DocumentInfo documentInfo;
-						if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
+						if (objectInfoPtr->objectPtr.GetPtr() == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)) {
 							if (documentInfo.isDirty){
 								QString message = tr("Item \"%1\" is currently being edited and cannot be deleted").arg(objectInfoPtr->name);
 								QMessageBox::warning(nullptr, "", message, QMessageBox::Ok);
@@ -232,7 +232,7 @@ QString CDocumentCollectionViewDelegateComp::RenameObject(const QByteArray& obje
 				if (m_documentManagerCompPtr.IsValid()){
 					for (int docIndex = 0; docIndex < m_documentManagerCompPtr->GetDocumentsCount(); docIndex++){
 						idoc::IDocumentManager::DocumentInfo documentInfo;
-						if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
+						if (objectInfoPtr->objectPtr.GetPtr() == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)) {
 							imtbase::IDocumentManagerExtender* extenderPtr = dynamic_cast<imtbase::IDocumentManagerExtender*>(m_documentManagerCompPtr.GetPtr());
 							if (extenderPtr != nullptr){
 								extenderPtr->SetDocumentName(docIndex, newDocumentName);
@@ -311,7 +311,7 @@ bool CDocumentCollectionViewDelegateComp::OpenDocumentEditor(
 	if (isAlreadyOpened){
 		int count = m_documentManagerCompPtr->GetDocumentsCount();
 		for (int i = 0; i < count; i++){
-			if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(i)){
+			if (objectInfoPtr->objectPtr.GetPtr() == &m_documentManagerCompPtr->GetDocumentFromIndex(i)) {
 				istd::IPolymorphic* viewPtr = m_documentManagerCompPtr->GetViewFromIndex(i, 0);
 				if (viewPtr != nullptr){
 					m_documentManagerCompPtr->SetActiveView(viewPtr);
@@ -404,7 +404,7 @@ bool CDocumentCollectionViewDelegateComp::IsRestoreAllowed(const QByteArray& obj
 		if (objectInfoPtr->uuid == objectId){
 			for (int docIndex = 0; m_documentManagerCompPtr->GetDocumentsCount(); docIndex++){
 				idoc::IDocumentManager::DocumentInfo documentInfo;
-				if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
+				if (objectInfoPtr->objectPtr.GetPtr() == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)) {
 					bool retVal = m_documentManagerCompPtr->CloseDocument(docIndex, false);
 					if (retVal){
 						m_closedForRestoreId = objectId;
@@ -599,7 +599,7 @@ ifile::IFilePersistence::OperationState CDocumentCollectionViewDelegateComp::Obj
 			ICollectionViewDelegate::ObjectInfo* objectInfoPtr = m_parent.m_openedDocuments.GetAt(i);
 			Q_ASSERT(objectInfoPtr != nullptr);
 
-			if (objectInfoPtr->objectPtr == &data){
+			if (objectInfoPtr->objectPtr.GetPtr() == &data) {
 				QString fileExtension = QFileInfo(filePath).suffix();
 				QByteArray typeId = objectInfoPtr->typeId;
 
@@ -660,7 +660,7 @@ bool CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::GetFileExtensi
 		const ICollectionViewDelegate::ObjectInfo* documentInfoPtr = m_parent.m_openedDocuments.GetAt(i);
 		Q_ASSERT(documentInfoPtr != nullptr);
 
-		if ((dataObjectPtr != nullptr) && (dataObjectPtr == documentInfoPtr->objectPtr) && m_parent.m_filePersistenceCompPtr.IsValid()){
+		if ((dataObjectPtr != nullptr) && (dataObjectPtr == documentInfoPtr->objectPtr.GetPtr()) && m_parent.m_filePersistenceCompPtr.IsValid()){
 			return m_parent.m_filePersistenceCompPtr->GetFileExtensions(result, dataObjectPtr, flags, doAppend);
 		}
 	}
@@ -723,12 +723,12 @@ void CDocumentCollectionViewDelegateComp::DocumentManagerObserver::OnUpdate(cons
 		int documentsCount = m_parent.m_documentManagerCompPtr->GetDocumentsCount();
 
 		for (int i = 0; i < m_parent.m_openedDocuments.GetCount(); ++i){
-			const istd::IChangeable* dataPtr = m_parent.m_openedDocuments.GetAt(i)->objectPtr;
+			const istd::IChangeableSharedPtr dataPtr = m_parent.m_openedDocuments.GetAt(i)->objectPtr;
 
 			bool wasFound = false;
 			for (int documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
 				const istd::IChangeable& documentData = m_parent.m_documentManagerCompPtr->GetDocumentFromIndex(documentIndex);
-				if (dataPtr == &documentData){
+				if (dataPtr.GetPtr() == &documentData) {
 					wasFound = true;
 					break;
 				}

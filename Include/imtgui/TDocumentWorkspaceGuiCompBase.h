@@ -66,7 +66,7 @@ protected:
 	virtual void OnDropEvent(QDropEvent* dropEventPtr);
 
 	// reimplemented (DocumentManagerBase)
-	virtual istd::IChangeable* OpenSingleDocument(
+	virtual istd::IChangeableSharedPtr OpenSingleDocument(
 				const QString& filePath,
 				bool createView,
 				const QByteArray& viewTypeId,
@@ -80,7 +80,7 @@ protected:
 				const QByteArray& documentTypeId,
 				bool createView = true,
 				const QByteArray& viewTypeId = "",
-				istd::IChangeable** newDocumentPtr = nullptr,
+				istd::IChangeableSharedPtr* newDocumentPtr = nullptr,
 				bool beQuiet = false,
 				bool* ignoredPtr = nullptr) override;
 
@@ -225,7 +225,7 @@ void TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OnDropEvent(QDropEv
 // reimplemented (DocumentManagerBase)
 
 template <class DocumentManagerBase, class UI>
-istd::IChangeable* TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OpenSingleDocument(
+istd::IChangeableSharedPtr TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::OpenSingleDocument(
 			const QString& filePath,
 			bool createView,
 			const QByteArray& viewTypeId,
@@ -260,16 +260,16 @@ bool TDocumentWorkspaceGuiCompBase<DocumentManagerBase, UI>::InsertNewDocument(
 			const QByteArray& documentTypeId,
 			bool createView,
 			const QByteArray& viewTypeId,
-			istd::IChangeable** newDocumentPtr,
+			istd::IChangeableSharedPtr* newDocumentPtr,
 			bool beQuiet,
 			bool* ignoredPtr)
 {
 	bool retVal = BaseClass::InsertNewDocument(documentTypeId, createView, viewTypeId, newDocumentPtr, beQuiet, ignoredPtr);
 
-	if (retVal && (newDocumentPtr != nullptr) && (*newDocumentPtr != nullptr) && createView){
+	if (retVal && (newDocumentPtr != nullptr) && newDocumentPtr->IsValid() && createView){
 		int documentsCount = BaseClass::GetDocumentsCount();
 		for (int i = 0; i < documentsCount; ++i){
-			if (&BaseClass::GetDocumentFromIndex(i) == *newDocumentPtr){
+			if (&BaseClass::GetDocumentFromIndex(i) == newDocumentPtr->GetPtr()){
 				istd::IPolymorphic* viewPtr = BaseClass::GetViewFromIndex(i, 0);
 				if (viewPtr != nullptr){
 					BaseClass::SetActiveView(viewPtr);

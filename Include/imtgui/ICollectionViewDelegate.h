@@ -70,7 +70,7 @@ public:
 		{
 		}
 
-		istd::IChangeable* objectPtr;
+		istd::IChangeableSharedPtr objectPtr;
 		QByteArray uuid;
 		QString name;
 		QString description;

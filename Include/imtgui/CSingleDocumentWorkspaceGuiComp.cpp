@@ -174,9 +174,9 @@ void CSingleDocumentWorkspaceGuiComp::OnRedo()
 
 void CSingleDocumentWorkspaceGuiComp::OnNew()
 {
-	istd::IChangeable* newDocumentPtr = 0;
+	istd::IChangeableSharedPtr newDocumentPtr;
 	if (InsertNewDocument("", false, "", &newDocumentPtr)){
-		Q_ASSERT(newDocumentPtr != nullptr);
+		Q_ASSERT(newDocumentPtr.IsValid());
 
 		AddViewToDocument(*newDocumentPtr);
 	}
@@ -185,9 +185,9 @@ void CSingleDocumentWorkspaceGuiComp::OnNew()
 
 void CSingleDocumentWorkspaceGuiComp::OnOpen()
 {
-	istd::IChangeable* documentPtr = 0;
+	istd::IChangeableSharedPtr documentPtr;
 	if (OpenDocument(nullptr, nullptr, false, "", &documentPtr)){
-		if (documentPtr != nullptr){
+		if (documentPtr.IsValid()){
 			AddViewToDocument(*documentPtr);
 		}
 	}
