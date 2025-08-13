@@ -24,10 +24,6 @@ PopupMenuDialog {
 		popup.setY();
 	}
 
-	onFilterTextChanged: {
-		console.log("PopupMenuDialog filter text changed", popup.filterText);
-	}
-
 	onDataProverStateChanged: {
 		if(popup.decorator_){
 			let visible_ = popup.dataProverState.toLowerCase() == "loading"
@@ -115,7 +111,6 @@ PopupMenuDialog {
 
 			onTextChanged: {
 				popup.filterText = text
-				console.log("customtextfield text changed", text)
 
 				popup.editSignal();
 			}

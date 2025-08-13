@@ -72,6 +72,10 @@ QtObject {
 		collectionModel.clear();
 	}
 
+	function setCustomInputParams(inputParams){
+		// override for derived implementations
+	}
+
 	function getData(objectId, value){
 		for (let i = 0; i < container.collectionModel.getItemsCount(); i++){
 			let objectCollectionId = container.collectionModel.getData("id", i);
@@ -103,6 +107,7 @@ QtObject {
 
 			var inputParams = Gql.GqlObject("input");
 			inputParams.InsertFieldObject(viewParams);
+			container.setCustomInputParams(inputParams)
 
 			query.AddParam(inputParams);
 

@@ -12,7 +12,6 @@ ComboBox {
 
 	// Data provider aliases
 	property alias filter: dataProvider.filter
-	property alias filterModel: dataProvider.filterModel
 	property alias commandId: dataProvider.commandId;
 	property alias subscriptionCommandId: dataProvider.subscriptionCommandId;
 	property alias fields: dataProvider.fields;
@@ -151,6 +150,9 @@ ComboBox {
 		comboBoxContainerGql.clicked();
 	}
 
+	function setCustomFilters(inputParams){
+	}
+
 	PauseAnimation {
 		id: pause;
 
@@ -167,15 +169,8 @@ ComboBox {
 		count: 15
 		commandId: comboBoxContainerGql.commandId
 
-		property var filterModel: null
-
-		onFilterModelChanged: {
-			/// WEB issue
-			/// cannot use fromObject()
-			/// tries to create object from key 'm_$properties'
-			if(filterModel){
-				dataProvider.filter.createFromJson(filterModel.toJson())
-			}
+		function setCustomInputParams(inputParams){
+			comboBoxContainerGql.setCustomFilters(inputParams)
 		}
 
 		onFailed: {
