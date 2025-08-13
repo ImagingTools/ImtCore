@@ -1485,9 +1485,8 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	QVariant specificationData = model.GetData("specification", modelIndex);
 	if (!specificationData.isNull()){
-	QString itemTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
-
-		if (itemTypename == "PrinterSpecificationBase") {
+		QString specificationTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
 			if (!isspecificationRead){
@@ -1495,7 +1494,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (itemTypename == "Link") {
+		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
 			if (!isspecificationRead){
@@ -1518,9 +1517,8 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 
 	QVariant specificationData = model.GetData("specification", modelIndex);
 	if (!specificationData.isNull()){
-	QString itemTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
-
-		if (itemTypename == "PrinterSpecificationBase") {
+		QString specificationTypename = specificationData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
+		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
 			if (!isspecificationRead){
@@ -1528,7 +1526,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (itemTypename == "Link") {
+		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromModel(*model.GetTreeItemModel("specification", modelIndex)); 
 			if (!isspecificationRead){
@@ -1574,14 +1572,14 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (gqlObject.ContainsParam("specification") && (!((gqlObject.IsObject("specification") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("specification") && gqlObject["specification"].isNull())) && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
-		const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
-	if (!itemDataObjectPtr->ContainsParam("__typename")) {
-		qDebug() << "invalid typename for: specification";
-		return false;
-	}
+		const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
+		if (!specificationDataObjectPtr->ContainsParam("__typename")){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
 
-	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
-		if (itemTypename == "PrinterSpecificationBase") {
+			return false;
+		}
+		QString specificationTypename = specificationDataObjectPtr->GetParamArgumentValue("__typename").toString();
+		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
@@ -1590,7 +1588,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (itemTypename == "Link") {
+		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
 			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
@@ -1612,14 +1610,14 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 	}
 
 	if (gqlObject.ContainsParam("specification") && (!((gqlObject.IsObject("specification") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("specification") && gqlObject["specification"].isNull())) && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
-		const ::imtgql::CGqlParamObject* itemDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
-	if (!itemDataObjectPtr->ContainsParam("__typename")) {
-		qDebug() << "invalid typename for: specification";
-		return false;
-	}
+		const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
+		if (!specificationDataObjectPtr->ContainsParam("__typename")){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
 
-	QString itemTypename = itemDataObjectPtr->GetParamArgumentValue("__typename").toString();;
-		if (itemTypename == "PrinterSpecificationBase") {
+			return false;
+		}
+		QString specificationTypename = specificationDataObjectPtr->GetParamArgumentValue("__typename").toString();
+		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
@@ -1628,7 +1626,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (itemTypename == "Link") {
+		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
 			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
@@ -1679,15 +1677,15 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		name = jsonObject["name"].toString();
 	}
 
-	if (jsonObject.contains("specification") && jsonObject["specification"].isObject()){
-		QJsonObject itemObject = jsonObject.value("specification").toObject();
-	if (!itemObject.contains("__typename")){
-		qDebug() << "invalid typename for: specification";
-		return false;
-	}
+	if (jsonObject.contains("specification")){
+		const QJsonObject specificationObject = jsonObject.value("specification").toObject();
+		if (!jsonObject.value("specification").isObject() || !specificationObject.contains("__typename")){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
 
-	QString itemTypename = itemObject.value("__typename").toString();;
-		if (itemTypename == "PrinterSpecificationBase") {
+			return false;
+		}
+		QString specificationTypename = specificationObject.value("__typename").toString();
+		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());
 			if (!isspecificationRead){
@@ -1695,7 +1693,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (itemTypename == "Link") {
+		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());
 			if (!isspecificationRead){
@@ -1715,15 +1713,15 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		name = jsonObject["name"].toString();
 	}
 
-	if (jsonObject.contains("specification") && jsonObject["specification"].isObject()){
-		QJsonObject itemObject = jsonObject.value("specification").toObject();
-	if (!itemObject.contains("__typename")){
-		qDebug() << "invalid typename for: specification";
-		return false;
-	}
+	if (jsonObject.contains("specification")){
+		const QJsonObject specificationObject = jsonObject.value("specification").toObject();
+		if (!jsonObject.value("specification").isObject() || !specificationObject.contains("__typename")){
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
 
-	QString itemTypename = itemObject.value("__typename").toString();;
-		if (itemTypename == "PrinterSpecificationBase") {
+			return false;
+		}
+		QString specificationTypename = specificationObject.value("__typename").toString();
+		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());
 			if (!isspecificationRead){
@@ -1731,7 +1729,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			}
 			specification = std::make_shared<PrinterSpecification>(specificationConvert);
 		}
-		else if (itemTypename == "Link") {
+		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
 			const bool isspecificationRead = specificationConvert.ReadFromJsonObject(jsonObject["specification"].toObject());
 			if (!isspecificationRead){
