@@ -172,7 +172,14 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 		}
 
 		FeedStreamHorizontally(stream, 1);
-		stream << QStringLiteral("responseModel: ") << outputSdlField.GetType() << QStringLiteral("{}");
+		stream << QStringLiteral("responseModel: ");
+		std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBasePtr = FindEntryByName(outputSdlField.GetType(), m_sdlTypeListCompPtr->GetSdlTypes(false), imtsdl::SdlEnumList(), imtsdl::SdlUnionList());
+		if (sdlEntryBasePtr){
+			stream << outputSdlField.GetType() << QStringLiteral("{}");
+		}
+		else{
+			stream << QStringLiteral("null");
+		}
 		FeedStream(stream, 2, false);
 
 		FeedStreamHorizontally(stream, 1);
