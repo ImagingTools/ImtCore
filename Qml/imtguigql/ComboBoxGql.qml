@@ -8,8 +8,7 @@ import imtcolgui 1.0
 ComboBox {
 	id: comboBoxContainerGql;
 
-	shownItemsCount: 60
-	decorator: 	Component{ PopupDecoratorGql{} }
+	shownItemsCount: 6
 
 	// Data provider aliases
 	property alias filter: dataProvider.filter
@@ -17,7 +16,7 @@ ComboBox {
 	property alias commandId: dataProvider.commandId;
 	property alias subscriptionCommandId: dataProvider.subscriptionCommandId;
 	property alias fields: dataProvider.fields;
-	property alias textFilteringInfoIds: dataProvider.filter.textFilteringInfoIds
+	property alias textFilteringInfoIds: dataProvider.textFilteringInfoIds
 
 	property int totalCount: -1;
 
@@ -25,6 +24,8 @@ ComboBox {
 	property string filterText: "";
 
 	property bool endListStatus: false;
+
+	property Component popupDecorator: Component{ PopupDecoratorGql{} }
 
 	// signals
 	signal setCurrentText(var modelll, int index);
@@ -38,6 +39,7 @@ ComboBox {
 		PopupMenuDialogGql {
 			id: popup;
 
+			decorator: comboBoxContainerGql.popupDecorator
 			delegate: comboBoxContainerGql.delegate;
 			hiddenBackground: comboBoxContainerGql.hiddenBackground;
 			itemHeight: comboBoxContainerGql.itemHeight;
@@ -45,7 +47,7 @@ ComboBox {
 			fontColor: comboBoxContainerGql.fontColor;
 
 			model: comboBoxContainerGql.model;
-			shownItemsCount: comboBoxContainerGql.countVisibleItem
+			shownItemsCount: comboBoxContainerGql.shownItemsCount
 			commandId: comboBoxContainerGql.commandId;
 			dataProverState: dataProvider.state
 			filterText: comboBoxContainerGql.filterText;

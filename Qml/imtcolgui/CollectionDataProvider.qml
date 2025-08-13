@@ -18,6 +18,8 @@ QtObject {
 
 	// Fields to get from server
 	property var fields: [];
+	// Fields to which text filter will be applied
+	property var textFilteringInfoIds: []
 
 	property string orderType: "ASC";
 	property string sortByField;
@@ -31,18 +33,6 @@ QtObject {
 
 	signal modelUpdated(var data);
 	signal failed(string message);
-
-	function updateModel(offset){
-		if(offset !== undefined && offset !== null && offset >= 0){
-			container.offset = offset;
-		}
-
-		container.itemsInfoModel.send();
-	}
-
-	function clearModel(){
-		collectionModel.clear();
-	}
 
 	Component.onCompleted: {
 		filter.setSortingInfo(sortByField, orderType)
@@ -58,12 +48,28 @@ QtObject {
 		}
 	}
 
+	onTextFilteringInfoIdsChanged: {
+		filter.textFilteringInfoIds = textFilteringInfoIds
+	}
+
 	onOrderTypeChanged: {
 		filter.setSortingInfo(sortByField, orderType)
 	}
 
 	onSortByFieldChanged: {
 		filter.setSortingInfo(sortByField, orderType)
+	}
+
+	function updateModel(offset){
+		if(offset !== undefined && offset !== null && offset >= 0){
+			container.offset = offset;
+		}
+
+		container.itemsInfoModel.send();
+	}
+
+	function clearModel(){
+		collectionModel.clear();
 	}
 
 	function getData(objectId, value){

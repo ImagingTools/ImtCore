@@ -16,21 +16,23 @@ DecoratorBase {
 	property alias contentY: popupMenuListView.contentY;
 	property bool moveToEnd: !baseElement ? false : baseElement.moveToEnd;
 	property int moveToIndex: baseElement && popupMenuListView.count > 0 ? baseElement.moveToIndex : -1
-	property var model: !baseElement ? -1 : baseElement.model;
+	property var model: !baseElement ? 0 : baseElement.model;
 
 	property int selectedIndex: !baseElement ? -1 : baseElement.selectedIndex;
 
 	property alias topContentLoaderSourceComp: topContentLoader.sourceComponent;
 	property alias bottomContentLoaderSourceComp: bottomContentLoader.sourceComponent;
 	property alias repeater: popupMenuListView;
+	property alias scrollbar: scrollbar;
 
 	property bool isUpwards: !baseElement ? false: baseElement.isUpwards;
 
 	onModelChanged: {
 		popupMenuListView.model = root.model;
 
-		let hasItems = root.model && root.model.count > 0;
+		let hasItems = popupMenuListView.count > 0;
 		root.setNoDataRecVisible(!hasItems)
+
 		if(!hasItems){
 			return
 		}
@@ -49,11 +51,9 @@ DecoratorBase {
 		}
 	}
 
-
 	function setNoDataRecVisible(visible_){
 		itemBody.visible = !visible_
 		if(visible_){
-			// popupMenuListView.height = 0
 			root.bottomContentLoaderSourceComp = noDataRecComp
 		}
 		else{
@@ -65,46 +65,87 @@ DecoratorBase {
 		loadingSplashRec.visible = visible_;
 	}
 
+	function contentYCorrection(down_){
+		let contentY	 = popupMenuListView.contentY;
+		let itemHeight	 = root.itemHeight;
+		let visibleCount = root.shownItemsCount;
+		let index		 = root.selectedIndex;
+
+		if(root.baseElement && root.selectedIndex >= 0){
+			if(down_){
+				let nextElementIndex = index + 1
+				if(nextElementIndex * itemHeight > contentY + visibleCount * itemHeight){
+					popupMenuListView.contentY = nextElementIndex * itemHeight - visibleCount * itemHeight
+				}
+			}
+			else {
+				if(index * itemHeight < contentY){
+					popupMenuListView.contentY = index * itemHeight
+				}
+			}
+		}
+	}
+
+	Component{
+		id: dropShadow;
+
+		DropShadow {
+			anchors.fill: parent;
+			horizontalOffset: 3;
+			verticalOffset: root.isUpwards ? -3 : 3;
+
+			radius: Style.radiusL;
+			spread: 0;
+			color: Style.shadowColor;
+
+			Component.onCompleted: {
+				if (Qt.platform.os === "web"){
+					samples = 17;
+				}
+			}
+		}
+	}
+
 	Component{
 		id: noDataRecComp
 
 		Rectangle{
-			id: noDataRec;
+			id: noDataRecContainer
 
 			width: root ? root.width : 0;
-			height: 50;
+			height: Style.size_indicatorHeight;
 			radius: itemBody.radius;
 			color: itemBody.color;
 
-			Text{
-				id: noDataText;
+			Loader {
+				id: shadowLoaderNoData;
 
-				anchors.centerIn: parent;
+				sourceComponent: dropShadow
+				anchors.fill: noDataRec
 
-				font.pixelSize: !root.baseElement ? Style.fontSizeM : root.baseElement.textSize;
-				color: !root.baseElement ? Style.textColor : root.baseElement.fontColor;
-
-				text: qsTr("No data");
+				onLoaded: {
+					if(item){
+						item.source = noDataRec
+					}
+				}
 			}
 
-			DropShadow {
-				id: dropShadow;
+			Rectangle{
+				id: noDataRec;
 
-				anchors.fill: parent;
-				z: parent.z - 1
+				anchors.fill: parent
+				radius: parent.radius;
+				color: parent.color;
 
-				horizontalOffset: 3;
-				verticalOffset: root.isUpwards ? -3 : 3;
+				Text{
+					id: noDataText;
 
-				radius: Style.radiusL;
-				spread: 0; // unset
-				color: Style.shadowColor;
-				source: parent;
+					anchors.centerIn: parent;
 
-				Component.onCompleted: {
-					if (Qt.platform.os === "web"){
-						dropShadow.samples = 17;
-					}
+					font.pixelSize: !root.baseElement ? Style.fontSizeM : root.baseElement.textSize;
+					color: !root.baseElement ? Style.textColor : root.baseElement.fontColor;
+
+					text: qsTr("No data");
 				}
 			}
 		}
@@ -112,6 +153,19 @@ DecoratorBase {
 
 	Loader {
 		id: topContentLoader;
+	}
+
+	Loader {
+		id: shadowLoaderBody;
+
+		sourceComponent: dropShadow
+		anchors.fill: itemBody
+
+		onLoaded: {
+			if(item){
+				item.source = itemBody
+			}
+		}
 	}
 
 	Rectangle {
@@ -197,53 +251,11 @@ DecoratorBase {
 				}
 			}
 		}
-	}//ItemListView
+	} // ItemListView
 
 	Loader {
 		id: bottomContentLoader;
 
 		anchors.top: itemBody.bottom;
-	}
-
-	DropShadow {
-		id: dropShadow;
-
-		anchors.fill: itemBody;
-		z: itemBody.z - 1
-
-		horizontalOffset: 3; // 2
-		verticalOffset: root.isUpwards ? -3 : 3; // 2
-
-		radius: Style.radiusL; // Style.radiusM
-		spread: 0; // unset
-		color: Style.shadowColor;
-		source: itemBody;
-
-		Component.onCompleted: {
-			if (Qt.platform.os === "web"){
-				dropShadow.samples = 17;
-			}
-		}
-	}
-
-	function contentYCorrection(down_){
-		let contentY	 = popupMenuListView.contentY;
-		let itemHeight	 = root.itemHeight;
-		let visibleCount = root.shownItemsCount;
-		let index		 = root.selectedIndex;
-
-		if(root.baseElement && root.selectedIndex >= 0){
-			if(down_){
-				let nextElementIndex = index + 1
-				if(nextElementIndex * itemHeight > contentY + visibleCount * itemHeight){
-					popupMenuListView.contentY = nextElementIndex * itemHeight - visibleCount * itemHeight
-				}
-			}
-			else {
-				if(index * itemHeight < contentY){
-					popupMenuListView.contentY = index * itemHeight
-				}
-			}
-		}
 	}
 }

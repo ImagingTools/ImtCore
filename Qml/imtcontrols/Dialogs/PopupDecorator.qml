@@ -17,7 +17,7 @@ DecoratorBase {
     property alias contentY: popupMenuListView.contentY;
     property bool moveToEnd: !baseElement ? false : baseElement.moveToEnd;
     property int moveToIndex: baseElement && popupMenuListView.count > 0 ? baseElement.moveToIndex : -1
-    property var model: !baseElement ? -1 : baseElement.model;
+	property var model: !baseElement ? 0 : baseElement.model;
 
     property int selectedIndex: !baseElement ? -1 : baseElement.selectedIndex;
 
