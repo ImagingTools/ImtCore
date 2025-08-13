@@ -21,7 +21,6 @@ protected:
 	virtual void initTestCase() = 0;
 
 private slots:
-	//void cleanup();
 	void InsertNewNodeWithRequiredParamsTest_data();
 	void InsertNewNodeWithRequiredParamsTest();
 	void SetNodeNameTest();

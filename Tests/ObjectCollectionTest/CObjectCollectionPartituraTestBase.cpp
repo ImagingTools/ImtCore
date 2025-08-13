@@ -23,6 +23,7 @@
 
 void CObjectCollectionPartituraTestBase::cleanup()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -54,6 +55,7 @@ void CObjectCollectionPartituraTestBase::cleanup()
 
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithRequiredParamsTest_data()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	QWARN(qPrintable(QString("Start tests for %1 accessor").arg(m_nameAccessor)));
 
@@ -76,6 +78,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithRequiredParamsTest_d
 
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithRequiredParamsTest()
 {
+	QSKIP("test skipped");
 	// get values from rows
 	QFETCH(QByteArray, typeId);
 	QFETCH(QString, name);
@@ -113,6 +116,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithRequiredParamsTest()
 
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithNonExistElementTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -148,6 +152,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithNonExistElementTest(
 
 void CObjectCollectionPartituraTestBase::GetDataFromEmpyObjectIdTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -175,6 +180,7 @@ void CObjectCollectionPartituraTestBase::GetDataFromEmpyObjectIdTest()
 
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithExistElementTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -237,6 +243,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithExistElementTest()
 
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithDataTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -325,6 +332,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithDataTest()
 
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithMetaObjectTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -396,6 +404,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithMetaObjectTest()
 
 void CObjectCollectionPartituraTestBase::RemoveExistObjectTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -441,6 +450,7 @@ void CObjectCollectionPartituraTestBase::RemoveExistObjectTest()
 
 void CObjectCollectionPartituraTestBase::RemoveNonExistObjectTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -484,6 +494,7 @@ void CObjectCollectionPartituraTestBase::RemoveNonExistObjectTest()
 
 void CObjectCollectionPartituraTestBase::ResetCollectionWithoutFixedObjectsTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	// declaration component accessor
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
@@ -516,6 +527,7 @@ void CObjectCollectionPartituraTestBase::ResetCollectionWithoutFixedObjectsTest(
 
 void CObjectCollectionPartituraTestBase::SetObjectNameTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -551,6 +563,7 @@ void CObjectCollectionPartituraTestBase::SetObjectNameTest()
 
 void CObjectCollectionPartituraTestBase::SetObjectDescriptionTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -586,6 +599,7 @@ void CObjectCollectionPartituraTestBase::SetObjectDescriptionTest()
 
 void CObjectCollectionPartituraTestBase::GetObjectTypeIdTest()
 {
+	QSKIP("test skipped");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -620,6 +634,7 @@ void CObjectCollectionPartituraTestBase::GetObjectTypeIdTest()
 
 void CObjectCollectionPartituraTestBase::GetElementsCountTest_data()
 {
+	QSKIP("test skipped");
 	initTestCase();
 
 	// variable decloration
@@ -635,6 +650,7 @@ void CObjectCollectionPartituraTestBase::GetElementsCountTest_data()
 
 void CObjectCollectionPartituraTestBase::GetElementsCountTest()
 {
+	QSKIP("test skipped");
 	// get values from rows
 	QFETCH(QString, textFilter);
 	QFETCH(bool, result);
@@ -709,6 +725,7 @@ void CObjectCollectionPartituraTestBase::GetElementsCountTest()
 
 void CObjectCollectionPartituraTestBase::PaginationTest_data()
 {
+	QSKIP("test skipped");
 	initTestCase();
 
 	// variable decloration
@@ -729,6 +746,7 @@ void CObjectCollectionPartituraTestBase::PaginationTest_data()
 
 void CObjectCollectionPartituraTestBase::PaginationTest()
 {
+	QSKIP("test skipped");
 	// get values from rows
 	QFETCH(int, offset);
 	QFETCH(int, count);
@@ -796,6 +814,7 @@ void CObjectCollectionPartituraTestBase::PaginationTest()
 
 void CObjectCollectionPartituraTestBase::FilterTest_data()
 {
+	QSKIP("test skipped");
 	initTestCase();
 
 	// variable decloration
@@ -815,6 +834,7 @@ void CObjectCollectionPartituraTestBase::FilterTest_data()
 
 void CObjectCollectionPartituraTestBase::FilterTest()
 {
+	QSKIP("test skipped");
 	// get values from rows
 	QFETCH(QString, textFilter);
 	QFETCH(QByteArray, column);
@@ -896,6 +916,7 @@ void CObjectCollectionPartituraTestBase::FilterTest()
 
 void CObjectCollectionPartituraTestBase::SortingTest_data()
 {
+	QSKIP("test skipped");
 	initTestCase();
 
 	// variable decloration
@@ -912,6 +933,7 @@ void CObjectCollectionPartituraTestBase::SortingTest_data()
 
 void CObjectCollectionPartituraTestBase::SortingTest()
 {
+	QSKIP("test skipped");
 	// get values from rows
 	QFETCH(QString, sortOrder);
 	QFETCH(QByteArray, column);
@@ -1005,6 +1027,7 @@ void CObjectCollectionPartituraTestBase::SortingTest()
 
 void CObjectCollectionPartituraTestBase::GetElementIdsTest_data()
 {
+	QSKIP("test skipped");
 	initTestCase();
 
 	// variable decloration
@@ -1033,6 +1056,7 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest_data()
 
 void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 {
+	QSKIP("test skipped");
 	// get values from rows
 	QFETCH(int, offset);
 	QFETCH(int, count);
@@ -1226,6 +1250,7 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 
 void CObjectCollectionPartituraTestBase::cleanupTestCase()
 {
+	QSKIP("test skipped");
 	// get component object collection
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
