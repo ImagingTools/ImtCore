@@ -143,6 +143,10 @@ ComboBox {
 	}
 
 	function onMouseAreaClicked(){
+		if (!comboBoxContainerGql.changeable){
+			return;
+		}
+
 		comboBoxContainerGql.focus = true;
 		comboBoxContainerGql.forceActiveFocus();
 
