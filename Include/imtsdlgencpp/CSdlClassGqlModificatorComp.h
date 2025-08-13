@@ -51,6 +51,7 @@ protected:
 	virtual CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const override;
 	virtual void AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) override;
 	virtual void AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) override;
+	QString GetUnionListElementType(bool forScalar) const override;
 
 private:
 	/// writes end for convert 'value' to 'dest' \example String() (if string) \example Integer (if long)

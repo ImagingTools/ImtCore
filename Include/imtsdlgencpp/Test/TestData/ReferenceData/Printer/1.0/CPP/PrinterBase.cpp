@@ -1161,7 +1161,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		name = gqlObject["name"].toString();
 	}
 
-	if (!gqlObject.ContainsParam("specification") || (((gqlObject.IsObject("specification") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("specification") && gqlObject["specification"].isNull())) || gqlObject.GetParamArgumentObjectPtr("specification") == nullptr)){
+	if (!gqlObject.ContainsParam("specification")){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification");)
 
 		return false;
@@ -1175,7 +1175,6 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	QString specificationTypename = specificationDataObjectPtr->GetParamArgumentValue("__typename").toString();
 	if (specificationTypename == "PrinterSpecificationBase") {
 		CPrinterSpecificationBase specificationConvert;
-		const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 		const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
 		if (!isSpecificationRead){
 			return false;
@@ -1184,7 +1183,6 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 	else if (specificationTypename == "Link") {
 		CLink specificationConvert;
-		const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 		const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
 		if (!isSpecificationRead){
 			return false;
@@ -1192,7 +1190,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		specification = std::make_shared<PrinterSpecification>(specificationConvert);
 	}
 
-	if (!gqlObject.ContainsParam("simpleTest") || (((gqlObject.IsObject("simpleTest") && gqlObject.GetParamArgumentObjectPtr("simpleTest") == nullptr) || (!gqlObject.IsObject("simpleTest") && gqlObject["simpleTest"].isNull())) || gqlObject.GetParamArgumentObjectPtr("simpleTest") == nullptr)){
+	if (!gqlObject.ContainsParam("simpleTest")){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest");)
 
 		return false;
@@ -1205,7 +1203,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<double>());
 	}
 
-	if (!gqlObject.ContainsParam("mixedTest") || (((gqlObject.IsObject("mixedTest") && gqlObject.GetParamArgumentObjectPtr("mixedTest") == nullptr) || (!gqlObject.IsObject("mixedTest") && gqlObject["mixedTest"].isNull())) || gqlObject.GetParamArgumentObjectPtr("mixedTest") == nullptr)){
+	if (!gqlObject.ContainsParam("mixedTest")){
 		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
 
 		return false;
@@ -1223,7 +1221,6 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 	else if (mixedTestTypename == "Link") {
 		CLink mixedTestConvert;
-		const ::imtgql::CGqlParamObject* mixedTestDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedTest");
 		const bool isMixedTestRead = mixedTestConvert.ReadFromGraphQlObject(*mixedTestDataObjectPtr);
 		if (!isMixedTestRead){
 			return false;
@@ -1241,7 +1238,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("specification") && (!((gqlObject.IsObject("specification") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("specification") && gqlObject["specification"].isNull())) && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
+	if (gqlObject.ContainsParam("specification")){
 		const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 		if (!specificationDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
@@ -1251,7 +1248,6 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		QString specificationTypename = specificationDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
 			if (!isSpecificationRead){
 				return false;
@@ -1260,7 +1256,6 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
 			if (!isSpecificationRead){
 				return false;
@@ -1269,7 +1264,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
-	if (gqlObject.ContainsParam("simpleTest") && (!((gqlObject.IsObject("simpleTest") && gqlObject.GetParamArgumentObjectPtr("simpleTest") == nullptr) || (!gqlObject.IsObject("simpleTest") && gqlObject["simpleTest"].isNull())) && gqlObject.GetParamArgumentObjectPtr("simpleTest") != nullptr)){
+	if (gqlObject.ContainsParam("simpleTest")){
 		QVariant simpleTestVariantValue = gqlObject["simpleTest"];
 		if (simpleTestVariantValue.canConvert<QString>()){
 			simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<QString>());
@@ -1279,7 +1274,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
-	if (gqlObject.ContainsParam("mixedTest") && (!((gqlObject.IsObject("mixedTest") && gqlObject.GetParamArgumentObjectPtr("mixedTest") == nullptr) || (!gqlObject.IsObject("mixedTest") && gqlObject["mixedTest"].isNull())) && gqlObject.GetParamArgumentObjectPtr("mixedTest") != nullptr)){
+	if (gqlObject.ContainsParam("mixedTest")){
 		const ::imtgql::CGqlParamObject* mixedTestDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedTest");
 		if (!mixedTestDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
@@ -1293,7 +1288,6 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 		else if (mixedTestTypename == "Link") {
 			CLink mixedTestConvert;
-			const ::imtgql::CGqlParamObject* mixedTestDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedTest");
 			const bool isMixedTestRead = mixedTestConvert.ReadFromGraphQlObject(*mixedTestDataObjectPtr);
 			if (!isMixedTestRead){
 				return false;

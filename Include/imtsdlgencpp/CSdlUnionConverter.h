@@ -20,6 +20,7 @@ namespace imtsdlgencpp
 {
 
 
+/// \todo refactor this use class and it's properties instead of arguments
 class CSdlUnionConverter
 {
 
@@ -64,7 +65,8 @@ public:
 				const imtsdl::ISdlUnionListProvider& unionlistProvider,
 				uint hIndents = 1,
 				const ConversionType& conversionType = CT_MODEL_SCALAR,
-				const QString& targetName = QString());
+				const QString& targetName = QString(),
+				const QString& arraySourceVariableName = QString());
 };
 
 

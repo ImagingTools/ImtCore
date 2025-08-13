@@ -266,7 +266,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 	stream << QStringLiteral(".ContainsParam(\"");
 	stream << field.GetId();
 	stream << QStringLiteral("\")");
-	if (!isArray){
+	if (!isArray && !isUnion){
 		if (expected){
 			stream << QStringLiteral(" && ");
 		}
@@ -277,7 +277,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 	}
 
 
-	if (isArray && !isUserType){ // array of scalars
+	if (isArray && !isUserType && !isUnion){ // array of scalars
 		if (expected){
 			stream << QStringLiteral(" && !");
 		}
@@ -290,7 +290,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		stream << field.GetId();
 		stream << QStringLiteral("\"].isNull())");
 	}
-	else if (isArray){
+	else if (isArray && !isUnion){
 		if (expected){
 			stream << QStringLiteral(" && (");
 			stream << GetContainerObjectVariableName();
@@ -315,43 +315,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		}
 		stream << QStringLiteral("= nullptr");
 	}
-	else if (isUnion){
-		if(expected){
-			stream << '!';
-		}
-		stream << '(';
-		stream << QStringLiteral("(gqlObject.IsObject(\"") << field.GetId() << QStringLiteral("\") && ");
-		stream << GetContainerObjectVariableName();
-		stream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
-		stream << field.GetId();
-		stream << QStringLiteral("\") ");
-		stream << QStringLiteral("== nullptr)");
-		stream << QStringLiteral(" || ");
-		stream << QStringLiteral("(!gqlObject.IsObject(\"") << field.GetId() << QStringLiteral("\") && ");
-		stream << GetContainerObjectVariableName();
-		stream << QStringLiteral("[\"");
-		stream << field.GetId();
-		stream << QStringLiteral("\"].isNull())");
-		stream << ')';
-		if (expected){
-			stream << QStringLiteral(" && ");
-		}
-		else {
-			stream << QStringLiteral(" || ");
-		}
-		stream << GetContainerObjectVariableName();
-		stream << QStringLiteral(".GetParamArgumentObjectPtr(\"");
-		stream << field.GetId();
-		stream << QStringLiteral("\") ");
-		if(expected){
-			stream << '!';
-		}
-		else {
-			stream << '=';
-		}
-		stream << QStringLiteral("= nullptr");
-	}
-	else {
+	else if (!isUnion){
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral("[\"");
 		stream << field.GetId();
@@ -419,7 +383,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		}
 	}
 
-	if (!isArray){
+	if (!isArray && !isUnion){
 		stream << ')';
 	}
 
@@ -468,7 +432,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueReadFromObject(QTextStream& s
 }
 
 
-bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& /*variableName*/, quint16 horizontalIndents, ListAccessResult& result)
+bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result)
 {
 	result.listCountVariableName			= GetDecapitalizedValue(field.GetId()) + QStringLiteral("ElementsCount");
 	result.listCountVariableType			= QStringLiteral("qsizetype");
@@ -523,6 +487,57 @@ bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(QTextStream& stream
 		FeedStreamHorizontally(accessCodeStream, horizontalIndents + 1);
 		accessCodeStream << '}';
 		FeedStream(accessCodeStream, 1, false);
+	}
+	else if (isUnion){
+		stream << QStringLiteral("const QList<const ");
+		stream << GetContainerObjectClassName();
+		stream << QStringLiteral("*> ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("DataList = ");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".GetParamArgumentObjectPtrList(\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\");");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, horizontalIndents);
+		stream << QStringLiteral("const qsizetype ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("ElementsCount = ");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("DataList.size();");
+
+		result.listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataList");
+
+		result.customAccessedElementName = "a";
+		QTextStream accessStream(&result.customListAccessCode);
+		accessStream << ' ' << variableName;
+		accessStream << QStringLiteral(" = ");
+		accessStream << GetDecapitalizedValue(field.GetId());
+		accessStream << QStringLiteral("DataList[$(index)];");
+		FeedStream(accessStream);
+
+		FeedStreamHorizontally(accessStream, horizontalIndents + 1);
+		accessStream << QStringLiteral("if (");
+		accessStream << variableName;
+		accessStream << QStringLiteral(" == nullptr){");
+		FeedStream(accessStream);
+
+		FeedStreamHorizontally(accessStream, horizontalIndents + 2);
+		accessStream << QStringLiteral("return false;");
+		FeedStream(accessStream);
+
+		FeedStreamHorizontally(accessStream, horizontalIndents + 1);
+		accessStream << '}';
+		FeedStream(accessStream);
+
+		FeedStreamHorizontally(accessStream, horizontalIndents + 1);
+		accessStream << QStringLiteral("QString ");
+		/// \bug \todo fix it
+		accessStream << GetDecapitalizedValue(variableName.mid(4));
+		accessStream << ("DataValueTypename = ");
+		accessStream << variableName;
+		accessStream << QStringLiteral("->GetParamArgumentValue(\"__typename\").toString();");
 	}
 	else{
 		stream << QStringLiteral("const QVariant ");
@@ -643,8 +658,9 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 	}
 
 	Q_ASSERT(hasComplexTypes || hasScalarTypes);
+	const QString tempDataPtrVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
+	const QString unionSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
 	if (hasComplexTypes){
-		const QString tempDataPtrVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataObjectPtr");
 		stream << QStringLiteral("const ");
 		stream << GetContainerObjectClassName();
 		stream << QStringLiteral("* ");
@@ -675,8 +691,8 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 		stream << QStringLiteral("QString ");
 		stream << GetDecapitalizedValue(field.GetId());
 		stream << QStringLiteral("Typename = ");
-		stream << GetDecapitalizedValue(field.GetId());
-		stream << QStringLiteral("DataObjectPtr->GetParamArgumentValue(\"__typename\").toString();");
+		stream << tempDataPtrVarName;
+		stream << QStringLiteral("->GetParamArgumentValue(\"__typename\").toString();");
 		FeedStream(stream, 1, false);
 	}
 
@@ -685,8 +701,8 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 			FeedStreamHorizontally(stream, hIndents);
 		}
 		stream << QStringLiteral("QVariant ");
-		stream << GetDecapitalizedValue(field.GetId());
-		stream << QStringLiteral("VariantValue = ");
+		stream << unionSourceVarName;
+		stream << QStringLiteral(" = ");
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral("[\"");
 		stream << field.GetId();
@@ -694,7 +710,6 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 		FeedStream(stream, 1, false);
 	}
 
-	const QString unionSourceVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
 	WriteUnionConversionFromData(stream,
 								 *unionPtr,
 								 unionSourceVarName,
@@ -706,13 +721,23 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 								 *m_sdlUnionListCompPtr,
 								 hIndents,
 								 GetUnionScalarConversionType(),
-								 field.GetId());
+								 field.GetId(),
+								 tempDataPtrVarName);
 }
 
 
 void CSdlClassGqlModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool /*optional*/, quint16 hIndents)
 {
 
+}
+
+QString CSdlClassGqlModificatorComp::GetUnionListElementType(bool forScalar) const
+{
+	if (forScalar){
+		return QStringLiteral("QVariant");
+	}
+
+	return QStringLiteral("::imtgql::CGqlParamObject*");
 }
 
 

@@ -606,20 +606,18 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 			FeedStream(ifStream, 1, false);
 
 			for (const QString& typeName: typeList){
-				imtsdl::CSdlField sdlFieldForType;
-				sdlFieldForType.SetType(typeName);
-				imtsdl::CSdlType foundType;
-				[[maybe_unused]]const bool isTypeFound = GetSdlTypeForField(
-					sdlFieldForType,
-					m_sdlTypeListCompPtr->GetSdlTypes(false),
-					foundType);
-				Q_ASSERT(isTypeFound);
+				std::shared_ptr<imtsdl::CSdlEntryBase> foundTypePtr =
+					FindEntryByName(typeName, m_sdlTypeListCompPtr->GetSdlTypes(false));
 
-				const QString convertedSubtype = QmlConvertType(sdlFieldForType.GetType());
+				if (!foundTypePtr){
+					continue;
+				}
+
+				const QString convertedSubtype = QmlConvertType(typeName);
 				FeedStreamHorizontally(ifStream, 5);
 				ifStream << QStringLiteral("case '") << typeName;
 				ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
-				ifStream << BuildQmlImportDeclarationFromParams(foundType.GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
+				ifStream << BuildQmlImportDeclarationFromParams(foundTypePtr->GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
 				ifStream << convertedSubtype << QStringLiteral(".qml')");
 				FeedStream(ifStream, 1, false);
 			}

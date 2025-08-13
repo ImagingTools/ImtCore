@@ -267,15 +267,31 @@ bool CSdlClassJsonModificatorComp::AddContainerValueReadFromObject(QTextStream& 
 
 bool CSdlClassJsonModificatorComp::AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result)
 {
+	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = FindEntryByName(field.GetType());
+	bool idUnion = (foundEntry != nullptr && dynamic_cast<imtsdl::CSdlUnion*>(foundEntry.get()));
+
+	if (idUnion){
+		result.customAccessedElementName = "a";
+		QTextStream accessStream(&result.customListAccessCode);
+		accessStream << ' ' << variableName;
+		accessStream << QStringLiteral(" = ");
+		accessStream << GetDecapitalizedValue(field.GetId());
+		accessStream << QStringLiteral("JsonArray[$(index)].toVariant();");
+		FeedStream(accessStream);
+
+		FeedStreamHorizontally(accessStream, horizontalIndents + 1);
+		accessStream << QStringLiteral("QString ");
+		/// \bug \todo fix it
+		accessStream << GetDecapitalizedValue(variableName.mid(4));
+		accessStream << ("DataValueTypename = ");
+		accessStream << GetDecapitalizedValue(field.GetId());
+		accessStream << QStringLiteral("JsonArray[$(index)].toObject().value(\"__typename\").toString();");
+	}
+
 	stream << QStringLiteral("const QJsonArray ");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("JsonArray = ");
-	if (variableName.isEmpty()){
-		stream << GetContainerObjectVariableName();
-	}
-	else {
-		stream << variableName;
-	}
+	stream << GetContainerObjectVariableName();
 	stream << '[' << '"';
 	stream << field.GetId();
 	stream << QStringLiteral("\"].toArray();");
@@ -292,6 +308,7 @@ bool CSdlClassJsonModificatorComp::AddContainerListAccessCode(QTextStream& strea
 	result.listCountVariableName			= GetDecapitalizedValue(field.GetId()) + QStringLiteral("ArrayCount");
 	result.listCountVariableType			= QStringLiteral("qsizetype");
 	result.toObjectTransformMethod			= QStringLiteral(".to") + GetConvertEndForFieldString(field, true);
+
 
 	return true;
 }

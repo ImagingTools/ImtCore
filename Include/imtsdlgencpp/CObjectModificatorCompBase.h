@@ -229,6 +229,7 @@ protected:
 
 	// additional methods
 	/// \todo refactor it and describe
+	virtual QString GetUnionListElementType(bool forScalar) const;
 	virtual void AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) = 0;
 	virtual void AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) = 0;
 

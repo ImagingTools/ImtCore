@@ -103,7 +103,7 @@ public:
 	/// \todo rename it to 'GetSdlEntryFromField'
 	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> GetSdlTypeOrEnumOrUnionForField(const CSdlField& sdlField, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
 
-	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> FindEntryByName(const QString& entryName, const SdlTypeList& typeList, const SdlEnumList& enumList, const SdlUnionList& unionList);
+	[[nodiscard]] static std::shared_ptr<CSdlEntryBase> FindEntryByName(const QString& entryName, const SdlTypeList& typeList, const SdlEnumList& enumList = SdlEnumList(), const SdlUnionList& unionList = SdlUnionList());
 
 	[[nodiscard]] static QString GetNamespaceAcceptableString(const QString& originalText);
 	[[nodiscard]] static QString GetFileSystemAcceptableEntryPath(const QString& originalText);

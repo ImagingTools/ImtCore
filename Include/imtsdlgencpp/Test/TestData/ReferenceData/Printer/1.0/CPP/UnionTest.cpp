@@ -1571,7 +1571,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("specification") && (!((gqlObject.IsObject("specification") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("specification") && gqlObject["specification"].isNull())) && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
+	if (gqlObject.ContainsParam("specification")){
 		const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 		if (!specificationDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
@@ -1581,7 +1581,6 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		QString specificationTypename = specificationDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
 			if (!isSpecificationRead){
 				return false;
@@ -1590,7 +1589,6 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		}
 		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
 			if (!isSpecificationRead){
 				return false;
@@ -1609,7 +1607,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		name = gqlObject["name"].toString();
 	}
 
-	if (gqlObject.ContainsParam("specification") && (!((gqlObject.IsObject("specification") && gqlObject.GetParamArgumentObjectPtr("specification") == nullptr) || (!gqlObject.IsObject("specification") && gqlObject["specification"].isNull())) && gqlObject.GetParamArgumentObjectPtr("specification") != nullptr)){
+	if (gqlObject.ContainsParam("specification")){
 		const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 		if (!specificationDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
@@ -1619,7 +1617,6 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		QString specificationTypename = specificationDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		if (specificationTypename == "PrinterSpecificationBase") {
 			CPrinterSpecificationBase specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
 			if (!isSpecificationRead){
 				return false;
@@ -1628,7 +1625,6 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
-			const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 			const bool isSpecificationRead = specificationConvert.ReadFromGraphQlObject(*specificationDataObjectPtr);
 			if (!isSpecificationRead){
 				return false;

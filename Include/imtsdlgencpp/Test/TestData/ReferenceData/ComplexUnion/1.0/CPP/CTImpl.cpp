@@ -10616,7 +10616,7 @@ bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && (!((gqlObject.IsObject("value") && gqlObject.GetParamArgumentObjectPtr("value") == nullptr) || (!gqlObject.IsObject("value") && gqlObject["value"].isNull())) && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
+	if (gqlObject.ContainsParam("value")){
 		const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
 		if (!valueDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "value");)
@@ -10627,7 +10627,6 @@ bool CExtendedMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		QVariant valueVariantValue = gqlObject["value"];
 		if (valueTypename == "Coordinates") {
 			CCoordinates valueConvert;
-			const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
 			const bool isValueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
 			if (!isValueRead){
 				return false;
@@ -10655,7 +10654,7 @@ bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		key = gqlObject["key"].toString();
 	}
 
-	if (gqlObject.ContainsParam("value") && (!((gqlObject.IsObject("value") && gqlObject.GetParamArgumentObjectPtr("value") == nullptr) || (!gqlObject.IsObject("value") && gqlObject["value"].isNull())) && gqlObject.GetParamArgumentObjectPtr("value") != nullptr)){
+	if (gqlObject.ContainsParam("value")){
 		const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
 		if (!valueDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "value");)
@@ -10666,7 +10665,6 @@ bool CExtendedMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		QVariant valueVariantValue = gqlObject["value"];
 		if (valueTypename == "Coordinates") {
 			CCoordinates valueConvert;
-			const ::imtgql::CGqlParamObject* valueDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("value");
 			const bool isValueRead = valueConvert.ReadFromGraphQlObject(*valueDataObjectPtr);
 			if (!isValueRead){
 				return false;
@@ -13289,7 +13287,7 @@ bool CUnionTestingType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 
 bool CUnionTestingType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("simpleUnion") && (!((gqlObject.IsObject("simpleUnion") && gqlObject.GetParamArgumentObjectPtr("simpleUnion") == nullptr) || (!gqlObject.IsObject("simpleUnion") && gqlObject["simpleUnion"].isNull())) && gqlObject.GetParamArgumentObjectPtr("simpleUnion") != nullptr)){
+	if (gqlObject.ContainsParam("simpleUnion")){
 		QVariant simpleUnionVariantValue = gqlObject["simpleUnion"];
 		if (simpleUnionVariantValue.canConvert<double>()){
 			simpleUnion = std::make_shared<ExtendedMetaDataUnionSimpleType>(simpleUnionVariantValue.value<double>());
@@ -13302,7 +13300,7 @@ bool CUnionTestingType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		}
 	}
 
-	if (gqlObject.ContainsParam("complexUnion") && (!((gqlObject.IsObject("complexUnion") && gqlObject.GetParamArgumentObjectPtr("complexUnion") == nullptr) || (!gqlObject.IsObject("complexUnion") && gqlObject["complexUnion"].isNull())) && gqlObject.GetParamArgumentObjectPtr("complexUnion") != nullptr)){
+	if (gqlObject.ContainsParam("complexUnion")){
 		const ::imtgql::CGqlParamObject* complexUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("complexUnion");
 		if (!complexUnionDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "complexUnion");)
@@ -13312,7 +13310,6 @@ bool CUnionTestingType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		QString complexUnionTypename = complexUnionDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
 			CCDMResultVarString complexUnionConvert;
-			const ::imtgql::CGqlParamObject* complexUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("complexUnion");
 			const bool isComplexUnionRead = complexUnionConvert.ReadFromGraphQlObject(*complexUnionDataObjectPtr);
 			if (!isComplexUnionRead){
 				return false;
@@ -13321,7 +13318,6 @@ bool CUnionTestingType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		}
 		else if (complexUnionTypename == "CDMResultVarRecursive") {
 			CCDMResultVarRecursive complexUnionConvert;
-			const ::imtgql::CGqlParamObject* complexUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("complexUnion");
 			const bool isComplexUnionRead = complexUnionConvert.ReadFromGraphQlObject(*complexUnionDataObjectPtr);
 			if (!isComplexUnionRead){
 				return false;
@@ -13330,7 +13326,7 @@ bool CUnionTestingType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		}
 	}
 
-	if (gqlObject.ContainsParam("mixedUnion") && (!((gqlObject.IsObject("mixedUnion") && gqlObject.GetParamArgumentObjectPtr("mixedUnion") == nullptr) || (!gqlObject.IsObject("mixedUnion") && gqlObject["mixedUnion"].isNull())) && gqlObject.GetParamArgumentObjectPtr("mixedUnion") != nullptr)){
+	if (gqlObject.ContainsParam("mixedUnion")){
 		const ::imtgql::CGqlParamObject* mixedUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedUnion");
 		if (!mixedUnionDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedUnion");)
@@ -13341,7 +13337,6 @@ bool CUnionTestingType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 		QVariant mixedUnionVariantValue = gqlObject["mixedUnion"];
 		if (mixedUnionTypename == "Coordinates") {
 			CCoordinates mixedUnionConvert;
-			const ::imtgql::CGqlParamObject* mixedUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedUnion");
 			const bool isMixedUnionRead = mixedUnionConvert.ReadFromGraphQlObject(*mixedUnionDataObjectPtr);
 			if (!isMixedUnionRead){
 				return false;
@@ -13365,7 +13360,7 @@ bool CUnionTestingType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObj
 
 bool CUnionTestingType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
-	if (gqlObject.ContainsParam("simpleUnion") && (!((gqlObject.IsObject("simpleUnion") && gqlObject.GetParamArgumentObjectPtr("simpleUnion") == nullptr) || (!gqlObject.IsObject("simpleUnion") && gqlObject["simpleUnion"].isNull())) && gqlObject.GetParamArgumentObjectPtr("simpleUnion") != nullptr)){
+	if (gqlObject.ContainsParam("simpleUnion")){
 		QVariant simpleUnionVariantValue = gqlObject["simpleUnion"];
 		if (simpleUnionVariantValue.canConvert<double>()){
 			simpleUnion = std::make_shared<ExtendedMetaDataUnionSimpleType>(simpleUnionVariantValue.value<double>());
@@ -13378,7 +13373,7 @@ bool CUnionTestingType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		}
 	}
 
-	if (gqlObject.ContainsParam("complexUnion") && (!((gqlObject.IsObject("complexUnion") && gqlObject.GetParamArgumentObjectPtr("complexUnion") == nullptr) || (!gqlObject.IsObject("complexUnion") && gqlObject["complexUnion"].isNull())) && gqlObject.GetParamArgumentObjectPtr("complexUnion") != nullptr)){
+	if (gqlObject.ContainsParam("complexUnion")){
 		const ::imtgql::CGqlParamObject* complexUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("complexUnion");
 		if (!complexUnionDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "complexUnion");)
@@ -13388,7 +13383,6 @@ bool CUnionTestingType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		QString complexUnionTypename = complexUnionDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		if (complexUnionTypename == "CDMResultVarString") {
 			CCDMResultVarString complexUnionConvert;
-			const ::imtgql::CGqlParamObject* complexUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("complexUnion");
 			const bool isComplexUnionRead = complexUnionConvert.ReadFromGraphQlObject(*complexUnionDataObjectPtr);
 			if (!isComplexUnionRead){
 				return false;
@@ -13397,7 +13391,6 @@ bool CUnionTestingType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		}
 		else if (complexUnionTypename == "CDMResultVarRecursive") {
 			CCDMResultVarRecursive complexUnionConvert;
-			const ::imtgql::CGqlParamObject* complexUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("complexUnion");
 			const bool isComplexUnionRead = complexUnionConvert.ReadFromGraphQlObject(*complexUnionDataObjectPtr);
 			if (!isComplexUnionRead){
 				return false;
@@ -13406,7 +13399,7 @@ bool CUnionTestingType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		}
 	}
 
-	if (gqlObject.ContainsParam("mixedUnion") && (!((gqlObject.IsObject("mixedUnion") && gqlObject.GetParamArgumentObjectPtr("mixedUnion") == nullptr) || (!gqlObject.IsObject("mixedUnion") && gqlObject["mixedUnion"].isNull())) && gqlObject.GetParamArgumentObjectPtr("mixedUnion") != nullptr)){
+	if (gqlObject.ContainsParam("mixedUnion")){
 		const ::imtgql::CGqlParamObject* mixedUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedUnion");
 		if (!mixedUnionDataObjectPtr->ContainsParam("__typename")){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedUnion");)
@@ -13417,7 +13410,6 @@ bool CUnionTestingType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParam
 		QVariant mixedUnionVariantValue = gqlObject["mixedUnion"];
 		if (mixedUnionTypename == "Coordinates") {
 			CCoordinates mixedUnionConvert;
-			const ::imtgql::CGqlParamObject* mixedUnionDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedUnion");
 			const bool isMixedUnionRead = mixedUnionConvert.ReadFromGraphQlObject(*mixedUnionDataObjectPtr);
 			if (!isMixedUnionRead){
 				return false;
@@ -14225,6 +14217,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
 			std::shared_ptr<CDMResultUnionType> resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
+			QString resultContentDataTypename = resultContentModel->GetData("__typename", resultContentIndex).toString();
 			if (resultContentDataTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
@@ -14302,6 +14295,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromModel(const ::imtbase::CTreeItemMo
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
 			std::shared_ptr<CDMResultUnionType> resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
+			QString resultContentDataTypename = resultContentModel->GetData("__typename", resultContentIndex).toString();
 			if (resultContentDataTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
@@ -14435,18 +14429,20 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
-		const QVariant resultContentData = gqlObject["resultContent"];
-		const QVariantList resultContentDataList = resultContentData.toList();
+	if (gqlObject.ContainsParam("resultContent")){
+		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentDataList[resultContentIndex];
+			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
+			if (tempResultContent == nullptr){
+				return false;
+			}
+			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
-				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
 				}
@@ -14454,8 +14450,7 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
-				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
 				}
@@ -14511,18 +14506,20 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
-		const QVariant resultContentData = gqlObject["resultContent"];
-		const QVariantList resultContentDataList = resultContentData.toList();
+	if (gqlObject.ContainsParam("resultContent")){
+		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentDataList[resultContentIndex];
+			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
+			if (tempResultContent == nullptr){
+				return false;
+			}
+			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
-				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
 				}
@@ -14530,8 +14527,7 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
-				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
 				}
@@ -14662,7 +14658,8 @@ bool CCDMResultVarRecursive::V1_0::ReadFromJsonObject(const QJsonObject& jsonObj
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
+			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
+			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
@@ -14731,7 +14728,8 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromJsonObject(const QJsonObject& json
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
+			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
+			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
@@ -16373,6 +16371,7 @@ bool CCDMResult::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
 			std::shared_ptr<CDMResultUnionType> resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
+			QString resultContentDataTypename = resultContentModel->GetData("__typename", resultContentIndex).toString();
 			if (resultContentDataTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
@@ -16450,6 +16449,7 @@ bool CCDMResult::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 		for (int resultContentIndex = 0; resultContentIndex < resultContentCount; ++resultContentIndex){
 			std::shared_ptr<CDMResultUnionType> resultContentData;
 			QVariant resultContentVariantValue = resultContentModel->GetData(QByteArray(), resultContentIndex);
+			QString resultContentDataTypename = resultContentModel->GetData("__typename", resultContentIndex).toString();
 			if (resultContentDataTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataConvert;
 				const bool isresultContentDataRead = resultContentDataConvert.ReadFromModel(*model.GetTreeItemModel("resultContent", resultContentIndex)); 
@@ -16583,18 +16583,20 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
-		const QVariant resultContentData = gqlObject["resultContent"];
-		const QVariantList resultContentDataList = resultContentData.toList();
+	if (gqlObject.ContainsParam("resultContent")){
+		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentDataList[resultContentIndex];
+			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
+			if (tempResultContent == nullptr){
+				return false;
+			}
+			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
-				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
 				}
@@ -16602,8 +16604,7 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
-				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
 				}
@@ -16659,18 +16660,20 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
-	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
-		const QVariant resultContentData = gqlObject["resultContent"];
-		const QVariantList resultContentDataList = resultContentData.toList();
+	if (gqlObject.ContainsParam("resultContent")){
+		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentElementsCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentDataList[resultContentIndex];
+			const ::imtgql::CGqlParamObject* tempResultContent = resultContentDataList[resultContentIndex];
+			if (tempResultContent == nullptr){
+				return false;
+			}
+			QString resultContentDataValueTypename = tempResultContent->GetParamArgumentValue("__typename").toString();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
-				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
 				}
@@ -16678,8 +16681,7 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 			}
 			else if (resultContentDataValueTypename == "CDMResultVarRecursive") {
 				CCDMResultVarRecursive resultContentDataValueConvert;
-				const ::imtgql::CGqlParamObject* resultContentDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("resultContent");
-				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*resultContentDataObjectPtr);
+				const bool isResultContentRead = resultContentDataValueConvert.ReadFromGraphQlObject(*tempResultContent);
 				if (!isResultContentRead){
 					return false;
 				}
@@ -16810,7 +16812,8 @@ bool CCDMResult::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
+			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
+			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;
@@ -16879,7 +16882,8 @@ bool CCDMResult::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		const qsizetype resultContentArrayCount = resultContentJsonArray.size();
 		resultContent = QList<std::shared_ptr<complextest::CTImpl::CDMResultUnionType>>();
 		for (qsizetype resultContentIndex = 0; resultContentIndex < resultContentArrayCount; ++resultContentIndex){
-			QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
+			const QVariant tempResultContent = resultContentJsonArray[resultContentIndex].toVariant();
+			QString resultContentDataValueTypename = resultContentJsonArray[resultContentIndex].toObject().value("__typename").toString();
 			std::shared_ptr<complextest::CTImpl::CDMResultUnionType> resultContentDataValue;
 			if (resultContentDataValueTypename == "CDMResultVarString") {
 				CCDMResultVarString resultContentDataValueConvert;

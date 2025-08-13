@@ -319,7 +319,8 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			const imtsdl::ISdlUnionListProvider& unionlistProvider,
 			uint hIndents,
 			const ConversionType& conversionType,
-			const QString& targetName)
+			const QString& targetName,
+			const QString& arraySourceVariableName)
 {
 	bool isFirstIteration = true;
 	for (const auto& sdlType : sdlUnion.GetTypes()){
@@ -357,7 +358,6 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 			FeedStream(stream, 1, false);
 
 			if (conversionType == CT_MODEL_ARRAY || conversionType == CT_MODEL_SCALAR){
-
 				QString readVariable = QString("is") + targetVariableName + QString("Read");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
@@ -391,7 +391,6 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 				FeedStream(stream, 1, false);
 			}
 			else if (conversionType == CT_JSON_SCALAR || conversionType == CT_JSON_ARRAY){
-
 				QString readVariable = QString("is") + targetVariableName + QString("Read");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
@@ -424,24 +423,10 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 				FeedStream(stream, 1, false);
 			}
 			else{
-
-				QString gqlVariable = targetName + QString("DataObjectPtr");
-				FeedStreamHorizontally(stream, hIndents + 1);
-				stream << QStringLiteral("const ::imtgql::CGqlParamObject* ") << gqlVariable;
-				stream << QStringLiteral(" = gqlObject.GetParamArgumentObjectPtr(\"");
-				if (conversionType == CT_GQL_SCALAR){
-					stream << targetVariableName;
-				}
-				else{
-					stream << targetName;
-				}
-				stream << QStringLiteral("\");");
-				FeedStream(stream, 1, false);
-
 				QString readVariable = QString("is") + imtsdl::CSdlTools::GetCapitalizedValue(targetName) + QString("Read");
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << QStringLiteral("const bool ") << readVariable << QStringLiteral(" = ");
-				stream << tempVar << QStringLiteral(".ReadFromGraphQlObject(*") << gqlVariable << QStringLiteral(");");
+				stream << tempVar << QStringLiteral(".ReadFromGraphQlObject(*") << arraySourceVariableName << QStringLiteral(");");
 				FeedStream(stream, 1, false);
 
 				FeedStreamHorizontally(stream, hIndents + 1);
@@ -483,9 +468,10 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 		isFirstIteration = false;
 	}
 
-	if (conversionType == CT_MODEL_ARRAY 
-		|| conversionType == CT_JSON_ARRAY
-		|| conversionType == CT_GQL_ARRAY){
+	if (	conversionType == CT_MODEL_ARRAY ||
+			conversionType == CT_JSON_ARRAY ||
+			conversionType == CT_GQL_ARRAY)
+	{
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("else{");
 		FeedStream(stream, 1, false);

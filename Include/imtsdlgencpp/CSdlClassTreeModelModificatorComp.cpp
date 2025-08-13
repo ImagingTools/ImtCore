@@ -942,6 +942,16 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 		stream << indexVariableName << QStringLiteral(");");
 		FeedStream(stream, 1, false);
 
+		// declare string value to store typename
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << QStringLiteral("QString ");
+		stream << GetDecapitalizedValue(field.GetId()) + QStringLiteral("DataTypename");
+		stream << QStringLiteral(" = ");
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(\"__typename\", ");
+		stream << indexVariableName << QStringLiteral(").toString();");
+		FeedStream(stream, 1, false);
+
+
 		imtsdl::CSdlUnion foundUnion;
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 

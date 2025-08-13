@@ -12,7 +12,6 @@
 namespace imtsdlgencpp
 {
 
-
 // protected methods
 
 // comfort methods
@@ -341,7 +340,8 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		Q_ASSERT(found);
 
-		WriteConversionFromUnion(stream,
+		WriteConversionFromUnion(
+			stream,
 			foundUnion,
 			unionSourceVarName,
 			field.GetId(),
@@ -925,7 +925,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 	ListAccessResult result;
 
 	FeedStreamHorizontally(stream, hIndents);
-	AddContainerListAccessCode(stream, field, QString(), hIndents, result);
+	AddContainerListAccessCode(stream, field, QStringLiteral("temp") + GetCapitalizedValue(field.GetId()), hIndents, result);
 	FeedStream(stream, 1, false);
 
 	// value non empty checks
@@ -967,7 +967,15 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		stream << QStringLiteral("const QString");
 	}
 	else if (isUnion){
-		stream << QStringLiteral("QVariant");
+		/// \todo refactor it
+
+		std::shared_ptr<imtsdl::CSdlEntryBase> entryPtr = FindEntryByName(field.GetType());
+		Q_ASSERT(entryPtr != nullptr);
+		imtsdl::CSdlUnion* unionPtr = dynamic_cast<imtsdl::CSdlUnion*>(entryPtr.get());
+		Q_ASSERT(unionPtr != nullptr);
+		std::shared_ptr<imtsdl::CSdlEntryBase> unionFirstEntryPtr = FindEntryByName(unionPtr->GetTypes().constFirst());
+		bool forScalar = bool(unionFirstEntryPtr == nullptr);
+		stream << QStringLiteral("const ") << GetUnionListElementType(forScalar);
 	}
 	else{
 		stream << OptListConvertTypeWithNamespace(field, QString(), *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr);
@@ -977,19 +985,18 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		stream << ' ' << '=' << ' ';
 		stream << result.listVariableName;
 		stream << '[';
+		stream << indexVariableName;
+		stream << ']';
+		if (!result.toObjectTransformMethod.isEmpty()){
+			stream << result.toObjectTransformMethod;
+		}
+		stream << ';';
 	}
 	else {
-		stream << result.customListAccessCode;
+		Q_ASSERT(result.customListAccessCode.contains("$(index)"));
 		Q_ASSERT(!result.customAccessedElementName.isEmpty());
+		stream << result.customListAccessCode.replace("$(index)", indexVariableName);
 	}
-	stream << indexVariableName;
-	if(result.customListAccessCode.isEmpty()){
-		stream << ']';
-	}
-	if (!result.toObjectTransformMethod.isEmpty()){
-		stream << result.toObjectTransformMethod;
-	}
-	stream << ';';
 	FeedStream(stream, 1, false);
 
 	// inLoop: add temp variable to object's List
@@ -1033,7 +1040,8 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		stream << QStringLiteral("> ") << dataVarName << QStringLiteral(";");
 		FeedStream(stream, 1, false);
 
-		WriteUnionConversionFromData(stream,
+		WriteUnionConversionFromData(
+			stream,
 			foundUnion,
 			unionSourceVarName,
 			dataVarName,
@@ -1044,7 +1052,8 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
 			GetUnionArrayConversionType(),
-			GetDecapitalizedValue(field.GetId()));
+			GetDecapitalizedValue(field.GetId()),
+			unionSourceVarName);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
 		stream << field.GetId();
@@ -1206,6 +1215,12 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
+}
+
+
+QString CObjectModificatorCompBase::GetUnionListElementType(bool forScalar) const
+{
+	return QStringLiteral("QVariant");
 }
 
 
