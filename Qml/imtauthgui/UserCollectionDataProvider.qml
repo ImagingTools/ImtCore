@@ -6,10 +6,10 @@ import imtauthUsersSdl 1.0
 
 CollectionDataProvider {
     id: container;
-    fields: [UserItemTypeMetaInfo.s_id, UserItemTypeMetaInfo.s_name];
+    fields: [UserItemDataTypeMetaInfo.s_id, UserItemDataTypeMetaInfo.s_name];
     commandId: ImtauthUsersSdlCommandIds.s_usersList;
     subscriptionCommandId: "OnUsersCollectionChanged"
-    sortByField: UserItemTypeMetaInfo.s_name;
+    sortByField: UserItemDataTypeMetaInfo.s_name;
 }
 
 

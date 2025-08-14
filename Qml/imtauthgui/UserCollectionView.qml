@@ -16,7 +16,7 @@ RemoteCollectionView {
 	collectionId: "Users";
 	visibleMetaInfo: true;
 
-	additionalFieldIds: [UserItemTypeMetaInfo.s_systemId]
+	additionalFieldIds: [UserItemDataTypeMetaInfo.s_systemId]
 	
 	property string productId;
 	property var documentManager: null;
@@ -88,8 +88,8 @@ RemoteCollectionView {
 	}
 	
 	Component.onCompleted: {
-		table.setSortingInfo(UserItemTypeMetaInfo.s_name, "ASC");
-		table.nonSortableColumns = [UserItemTypeMetaInfo.s_roles, UserItemTypeMetaInfo.s_groups]
+		table.setSortingInfo(UserItemDataTypeMetaInfo.s_name, "ASC");
+		table.nonSortableColumns = [UserItemDataTypeMetaInfo.s_roles, UserItemDataTypeMetaInfo.s_groups]
 		registerFieldFilterDelegate("SystemInfo", systemInfoDelegateFilterComp)
 		table.rowDelegate = tableRowDelegateBaseComp;
 	}
@@ -106,8 +106,8 @@ RemoteCollectionView {
 	}
 	
 	onHeadersChanged: {
-		table.setColumnContentById(UserItemTypeMetaInfo.s_roles, dataComp);
-		table.setColumnContentById(UserItemTypeMetaInfo.s_groups, groupsContentComp);
+		table.setColumnContentById(UserItemDataTypeMetaInfo.s_roles, dataComp);
+		table.setColumnContentById(UserItemDataTypeMetaInfo.s_groups, groupsContentComp);
 	}
 	
 	Component {
@@ -125,8 +125,8 @@ RemoteCollectionView {
 					return
 				}
 				
-				let username = userCollectionViewContainer.table.elements.getData(UserItemTypeMetaInfo.s_name, rowIndex);
-				let roles = userCollectionViewContainer.table.elements.getData(UserItemTypeMetaInfo.s_roles, rowIndex);
+				let username = userCollectionViewContainer.table.elements.getData(UserItemDataTypeMetaInfo.s_name, rowIndex);
+				let roles = userCollectionViewContainer.table.elements.getData(UserItemDataTypeMetaInfo.s_roles, rowIndex);
 				arrowButton.visible = roles !== "";
 				if (roles !== ""){
 					let roleList = roles.split(';');
@@ -189,8 +189,8 @@ RemoteCollectionView {
 					return
 				}
 				
-				let username = userCollectionViewContainer.table.elements.getData(UserItemTypeMetaInfo.s_name, rowIndex);
-				let groups = userCollectionViewContainer.table.elements.getData(UserItemTypeMetaInfo.s_groups, rowIndex);
+				let username = userCollectionViewContainer.table.elements.getData(UserItemDataTypeMetaInfo.s_name, rowIndex);
+				let groups = userCollectionViewContainer.table.elements.getData(UserItemDataTypeMetaInfo.s_groups, rowIndex);
 				arrowButton.visible = groups !== "";
 				if (groups !== ""){
 					let groupList = groups.split(';');

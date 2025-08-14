@@ -41,7 +41,7 @@ RemoteCollectionView {
 	}
 
 	Component.onCompleted: {
-		table.setSortingInfo(GroupItemTypeMetaInfo.s_name, "ASC");
+		table.setSortingInfo(GroupItemDataTypeMetaInfo.s_name, "ASC");
 		
 		if (documentManager){
 			documentManager.registerDocumentView("Group", "GroupEditor", userGroupDocumentComp);

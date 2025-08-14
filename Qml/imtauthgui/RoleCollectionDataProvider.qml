@@ -6,17 +6,17 @@ CollectionDataProvider {
     id: container;
 
     fields: [
-        RoleItemTypeMetaInfo.s_id,
-        RoleItemTypeMetaInfo.s_roleName,
-        RoleItemTypeMetaInfo.s_roleDescription,
-        RoleItemTypeMetaInfo.s_parentRoles,
-        RoleItemTypeMetaInfo.s_roleId,
-        RoleItemTypeMetaInfo.s_productId
+        RoleItemDataTypeMetaInfo.s_id,
+        RoleItemDataTypeMetaInfo.s_roleName,
+        RoleItemDataTypeMetaInfo.s_roleDescription,
+        RoleItemDataTypeMetaInfo.s_parentRoles,
+        RoleItemDataTypeMetaInfo.s_roleId,
+        RoleItemDataTypeMetaInfo.s_productId
     ];
 
     commandId: ImtauthRolesSdlCommandIds.s_rolesList;
     subscriptionCommandId: "OnRolesCollectionChanged"
-    sortByField: RoleItemTypeMetaInfo.s_roleName;
+    sortByField: RoleItemDataTypeMetaInfo.s_roleName;
 
     property string productId;
 

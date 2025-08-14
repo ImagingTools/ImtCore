@@ -7,15 +7,15 @@ import imtauthGroupsSdl 1.0
 CollectionDataProvider {
     id: container;
     fields: [
-        GroupItemTypeMetaInfo.s_id,
-        GroupItemTypeMetaInfo.s_name,
-        GroupItemTypeMetaInfo.s_description,
-        GroupItemTypeMetaInfo.s_parentGroups,
-        GroupItemTypeMetaInfo.s_roles
+        GroupItemDataTypeMetaInfo.s_id,
+        GroupItemDataTypeMetaInfo.s_name,
+        GroupItemDataTypeMetaInfo.s_description,
+        GroupItemDataTypeMetaInfo.s_parentGroups,
+        GroupItemDataTypeMetaInfo.s_roles
     ];
     commandId: ImtauthGroupsSdlCommandIds.s_groupsList;
     subscriptionCommandId: "OnGroupsCollectionChanged"
-    sortByField: GroupItemTypeMetaInfo.s_name;
+    sortByField: GroupItemDataTypeMetaInfo.s_name;
 }
 
 
