@@ -14,7 +14,7 @@ class QObject extends QBaseObject {
     static create(parent = null, properties = {}){
         let obj = super.create(parent, properties)
 
-        if(!parent) {
+        if(!parent && !this.singleton) {
             obj.__smart = true
             obj.__links = 0
         }
@@ -59,6 +59,7 @@ class QObject extends QBaseObject {
             this.__updateSimpleProperties()
             this.__updateProperties()
             this.__complete()
+            this.__completeProperties()
         }
     }
 
@@ -109,6 +110,10 @@ class QObject extends QBaseObject {
         let path = propName.split('.')
         let value = this.__properties[propName]
 
+        if(value === 'JQObject'){
+            return
+        }
+
         delete this.__properties[propName]
 
         if(value instanceof QObject){
@@ -116,6 +121,7 @@ class QObject extends QBaseObject {
             value.__updateSimpleProperties()
             value.__updateProperties()
             value.__complete()
+            value.__completeProperties()
         }
 
         if(path.length === 2){
@@ -141,6 +147,32 @@ class QObject extends QBaseObject {
         for(let propName in this.__properties){
             this.__updateProperty(propName)
         } 
+    }
+
+    __completeProperty(propName){
+        let path = propName.split('.')
+        let value = this.__properties[propName]
+
+        if(value === 'JQObject'){
+            delete this.__properties[propName]
+
+            let obj = this.__proxy[path[0]]
+            obj.__updateAliases()
+            obj.__updateSimpleProperties()
+            obj.__updateProperties()
+            obj.__complete()
+            obj.__completeProperties()
+        }
+    }
+
+    __completeProperties(){
+        for(let propName in this.__properties){
+            this.__completeProperty(propName)
+        } 
+
+        for(let child of this.__children){
+            child.__completeProperties()
+        }
     }
 }
 

@@ -5,6 +5,31 @@ const Signal = require("../Signal")
 const JQApplication = require("../../core/JQApplication")
 
 
+function recursiveAddLink(obj){
+    if(typeof obj === 'object'){
+        if(obj instanceof QObject){
+            obj.__addLink()
+        } else {
+            for(let key in obj){
+                recursiveAddLink(obj[key])
+            }
+        }
+    }
+    
+}
+
+function recursiveRemoveLink(obj){
+    if(typeof obj === 'object'){
+        if(obj instanceof QObject){
+            obj.__removeLink()
+        } else {
+            for(let key in obj){
+                recursiveRemoveLink(obj[key])
+            }
+        }
+    }
+}
+
 class AbstractItemModel {
     static create(parent, index, data){
         let properties = {}
@@ -55,13 +80,8 @@ class AbstractItemModel {
             },
             set(target, key, value){
                 if(target[key] !== value){
-                    if(target[key] instanceof QObject){
-                        target[key].__removeLink()
-                    }
-
-                    if(value instanceof QObject){
-                        value.__addLink()
-                    }
+                    recursiveRemoveLink(target[key])
+                    recursiveAddLink(value)
 
                     target[key] = value
                     if(!properties[key]) properties[key] = []

@@ -1085,10 +1085,19 @@ class Instruction {
         return meta.join('')
     }
 
+    checkDefineProperty(name){
+        for(let defineProperty of this.defineProperties){
+            if(name === defineProperty.name) return true
+        }
+
+        return false
+    }
+
     getProperties() {
         let code = new SourceNode()
         let lazyCode = new SourceNode()
         let aliasCode = new SourceNode()
+        let classCode =  new SourceNode()
 
         for (let assignProperty of this.assignProperties) {
             let path = this.resolve(assignProperty.name.split('.')[0], this.name)
@@ -1101,19 +1110,16 @@ class Instruction {
                     throw `${this.qmlFile.fileName}:${assignProperty.value.info.line + 1}:${assignProperty.value.info.col - assignProperty.name.length - 1}: error: ${assignProperty.name} is not founded`
                 }
 
+                let resultCode
+                if(this.checkDefineProperty(assignProperty.name)){
+                    resultCode = classCode
+                } else {
+                    resultCode = lazyCode
+                }
+
                 if (path.type === QtQml.Component && assignProperty.value.extends !== 'Component') {
 
-                    // code.add(`let ${this.name}=(__root.cachedComponents['${this.qmlFile.getName()}__${this.name}'] || __root.cachedComponent('${this.qmlFile.getName()}__${this.name}',class ${this.className} extends ${typeInfo.path} {
-                    //     static create(parent,context={},component=null){
-                    //         let ${this.name} = super.create(parent,context,component)
-                    //         ${this.name}.__${this.qmlFile.getContextName()} = context
-                    //         ${this.id ? this.name+'.__'+this.qmlFile.getContextName()+'.'+this.id+'='+this.name : ''}
-                    //         return ${this.name}
-                    //     }
-                    // })).create(${this.parent ? this.parent.name : 'null'},__context,`)
-
-
-                    lazyCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,__context,`)
+                    resultCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,__context,`)
 
                     let childTypeInfo = assignProperty.value.getTypeInfo()
                     let childMeta = assignProperty.value.getMeta()
@@ -1124,61 +1130,82 @@ class Instruction {
 
                     let properties = assignProperty.value.getProperties()
 
-                    lazyCode.add(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {`)
-                    lazyCode.add(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
-                    lazyCode.add('static create(parent,properties={},context={},isRoot=true){')
+                    resultCode.add(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {`)
+                    resultCode.add(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
+                    resultCode.add('static create(parent,properties={},context={},isRoot=true){')
 
-                    lazyCode.add(`let __context = JQContext.create(context)`)
+                    resultCode.add(`let __context = JQContext.create(context)`)
 
-                    lazyCode.add(`let ${assignProperty.value.name} = super.create(parent,properties,context,false)`)
-                    lazyCode.add(`${assignProperty.value.name}.__${this.qmlFile.getContextName()} = __context`)
+                    resultCode.add(`let ${assignProperty.value.name} = super.create(parent,properties,context,false)`)
+                    resultCode.add(`${assignProperty.value.name}.__${this.qmlFile.getContextName()} = __context`)
 
-                    if (assignProperty.value.id) lazyCode.add(`${assignProperty.value.name}.__${this.qmlFile.getContextName()}.${assignProperty.value.id}=${assignProperty.value.name}`)
+                    if (assignProperty.value.id) resultCode.add(`${assignProperty.value.name}.__${this.qmlFile.getContextName()}.${assignProperty.value.id}=${assignProperty.value.name}`)
+                    
+                    resultCode.add(properties.classCode)
 
-                    lazyCode.add(`${assignProperty.value.name}.__aliases.push(function(){`)
-                    lazyCode.add(properties.aliasCode)
-                    lazyCode.add(`})`)
+                    resultCode.add(`${assignProperty.value.name}.__aliases.push(function(){`)
+                    resultCode.add(properties.aliasCode)
+                    resultCode.add(`})`)
 
-                    lazyCode.add(`${assignProperty.value.name}.__simpleProperties.push(function(){`)
-                    lazyCode.add(`${assignProperty.value.name}.__${assignProperty.value.className}__${assignProperty.value.name}=true`)
-                    lazyCode.add(properties.code)
-                    lazyCode.add(`})`)
+                    resultCode.add(`${assignProperty.value.name}.__simpleProperties.push(function(){`)
+                    resultCode.add(`${assignProperty.value.name}.__${assignProperty.value.className}__${assignProperty.value.name}=true`)
+                    resultCode.add(properties.code)
+                    resultCode.add(`})`)
 
                     // // children 
 
                     for (let i = 0; i < assignProperty.value.children.length; i++) {
-                        // lazyCode.add(`let ${assignProperty.value.children[i].name}=`)
-                        lazyCode.add(assignProperty.value.children[i].toCode())
+                        // resultCode.add(`let ${assignProperty.value.children[i].name}=`)
+                        resultCode.add(assignProperty.value.children[i].toCode())
                     }
 
                     // // children
 
-                    lazyCode.add(properties.lazyCode)
+                    resultCode.add(properties.lazyCode)
 
-                    // lazyCode.add(assignProperty.value.getConnectedSignals())
+                    // resultCode.add(assignProperty.value.getConnectedSignals())
 
-                    lazyCode.add(`if(isRoot) {${assignProperty.value.name}.__updateAliases();${assignProperty.value.name}.__updateSimpleProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__complete()}`)
+                    resultCode.add(`if(isRoot) {${assignProperty.value.name}.__updateAliases();${assignProperty.value.name}.__updateSimpleProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__complete();${assignProperty.value.name}.__completeProperties()}`)
 
-                    lazyCode.add(`return ${assignProperty.value.name}`)
+                    resultCode.add(`return ${assignProperty.value.name}`)
 
-                    lazyCode.add('}')
+                    resultCode.add('}')
 
-                    lazyCode.add('__dynamic=true')
+                    resultCode.add('__dynamic=true')
 
-                    lazyCode.add(assignProperty.value.getMethods())
-                    lazyCode.add(assignProperty.value.getConnectedSignals())
+                    resultCode.add(assignProperty.value.getMethods())
+                    resultCode.add(assignProperty.value.getConnectedSignals())
 
-                    lazyCode.add(`})`)
-
-
-                    lazyCode.add(`)`)
+                    resultCode.add(`})`)
 
 
+                    resultCode.add(`)`)
 
-                    lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${assignProperty.value.name}`)
+
+
+                    
+                    if(this.checkDefineProperty(assignProperty.name)){
+                        // lazyCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
+                        classCode.add(`${assignProperty.value.name}.__addLink()`)
+                        classCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
+                        lazyCode.add(`${this.name}.__properties['${assignProperty.name}']='JQObject'`)
+                    } else {
+                        lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${assignProperty.value.name}`)
+                    }
+                    
                 } else {
-                    lazyCode.add(`${assignProperty.value.toCode()}`)
-                    lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${assignProperty.value.name}`)
+                    if(this.checkDefineProperty(assignProperty.name)){
+                        // lazyCode.add(`${assignProperty.value.toCode()}`)
+                        // lazyCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
+                        classCode.add(`${assignProperty.value.toCode()}`)
+                        classCode.add(`${assignProperty.value.name}.__addLink()`)
+                        classCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
+                        lazyCode.add(`${this.name}.__properties['${assignProperty.name}']='JQObject'`)
+                    } else {    
+                        lazyCode.add(`${assignProperty.value.toCode()}`)
+                        lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${assignProperty.value.name}`)
+                    }
+                    
                 }
 
             } else {
@@ -1208,7 +1235,12 @@ class Instruction {
                         code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=${stat.value}`)
                         code.add(`${this.name}['${names[0]}'].__updateProperties()`)
                     } else {
-                        code.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
+                        if(this.checkDefineProperty(assignProperty.name)){
+                            classCode.add(`${this.name}.__self['${assignProperty.name}']=${stat.value}`)
+                        } else {
+                            code.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
+                        }
+                        
                     }
                     
                 }
@@ -1217,7 +1249,7 @@ class Instruction {
 
         }
 
-        return { code: code.join('\n'), lazyCode: lazyCode.join('\n') , aliasCode: aliasCode.join('\n') }
+        return { code: code.join('\n'), lazyCode: lazyCode.join('\n') , aliasCode: aliasCode.join('\n'), classCode: classCode.join('\n') }
     }
 
     getConnectedSignals() {
@@ -1358,7 +1390,7 @@ class Instruction {
 
         // code.add(this.children[0].getConnectedSignals())
 
-        code.add(`if(isRoot) {${this.children[0].name}.__updateAliases();${this.children[0].name}.__updateSimpleProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__complete()}`)
+        code.add(`if(isRoot) {${this.children[0].name}.__updateAliases();${this.children[0].name}.__updateSimpleProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__complete();${this.children[0].name}.__completeProperties()}`)
 
         code.add(`return ${this.children[0].name}`)
 
@@ -1411,6 +1443,8 @@ class Instruction {
                 let ${this.name} = super.create(parent,properties,context,isRoot)
                 ${this.name}.__${this.qmlFile.getContextName()} = context
                 ${id}
+
+                ${properties.classCode}
 
                 ${this.name}.__aliases.push(function(){
                 ${properties.aliasCode}
@@ -1579,6 +1613,8 @@ class QmlFile {
 
         if (this.instruction.id) code.add(`${this.instruction.name}.__${this.getContextName()}.${this.instruction.id}=${this.instruction.name}`)
         
+        code.add(properties.classCode)
+
         code.add(`${this.instruction.name}.__aliases.push(function(){`)
         code.add(properties.aliasCode)
         code.add(`})`)
@@ -1601,7 +1637,7 @@ class QmlFile {
 
         // code.add(this.instruction.getConnectedSignals())
 
-        code.add(`if(isRoot) {${this.instruction.name}.__updateAliases();${this.instruction.name}.__updateSimpleProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__complete()}`)
+        code.add(`if(isRoot) {${this.instruction.name}.__updateAliases();${this.instruction.name}.__updateSimpleProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__complete();${this.instruction.name}.__completeProperties()}`)
 
         code.add(`return ${this.instruction.name}`)
 
