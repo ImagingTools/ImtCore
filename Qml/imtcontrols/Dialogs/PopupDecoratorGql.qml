@@ -11,21 +11,22 @@ DecoratorBase {
 
 	property int itemHeight: !baseElement ? 0 : baseElement.itemHeight;
 	property int itemWidth: !baseElement ? 0 : baseElement.itemWidth;
-	property int shownItemsCount: !baseElement ? 0 : baseElement.shownItemsCount;
-	property var delegate: !baseElement ? null : baseElement.delegate;
-	property alias contentY: popupMenuListView.contentY;
-	property bool moveToEnd: !baseElement ? false : baseElement.moveToEnd;
-	property int moveToIndex: baseElement && popupMenuListView.count > 0 ? baseElement.moveToIndex : -1
-	property var model: !baseElement ? 0 : baseElement.model;
-
 	property int selectedIndex: !baseElement ? -1 : baseElement.selectedIndex;
+	property int shownItemsCount: !baseElement ? 0 : baseElement.shownItemsCount;
+	property int moveToIndex: baseElement && popupMenuListView.count > 0 ? baseElement.moveToIndex : -1
+	property int radius: !baseElement ? Style.buttonRadius : baseElement.radius;
 
+	property bool moveToEnd: !baseElement ? false : baseElement.moveToEnd;
+	property bool isUpwards: !baseElement ? false: baseElement.isUpwards;
+
+	property var model: !baseElement ? 0 : baseElement.model;
+	property var delegate: !baseElement ? null : baseElement.delegate;
+
+	property alias contentY: popupMenuListView.contentY;
 	property alias topContentLoaderSourceComp: topContentLoader.sourceComponent;
 	property alias bottomContentLoaderSourceComp: bottomContentLoader.sourceComponent;
 	property alias repeater: popupMenuListView;
 	property alias scrollbar: scrollbar;
-
-	property bool isUpwards: !baseElement ? false: baseElement.isUpwards;
 
 	onModelChanged: {
 		popupMenuListView.model = root.model;
@@ -177,18 +178,19 @@ DecoratorBase {
 		height: visible ? popupMenuListView.height + 2 * Style.marginXS : 0
 
 		color: Style.baseColor;
-
 		visible: popupMenuListView.count > 0;
 
-		radius: Style.buttonRadius;
+		radius: root.radius;
+		clip: true;
 
 		Rectangle{
 			id: loadingSplashRec;
 
 			anchors.fill: parent;
 			opacity: 0.5;
-			color: "transparent";
+			color: itemBody.color;
 			visible: false;
+			z: popupMenuListView.z + 1
 
 			Text {
 				anchors.centerIn: parent;
@@ -208,6 +210,7 @@ DecoratorBase {
 
 			anchors.right: popupMenuListView.right;
 			anchors.bottom: popupMenuListView.bottom;
+			anchors.rightMargin: parent.radius/2
 
 			secondSize: !root.baseElement ? 0 :
 											!root.baseElement.visibleScrollBar ? 0 : Style.isMobile === undefined ? 8 : Style.isMobile ? 4 : 8;

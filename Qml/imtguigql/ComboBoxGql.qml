@@ -11,11 +11,9 @@ ComboBox {
 	shownItemsCount: 6
 
 	// Data provider aliases
+	property alias dataProvider: dataProvider
 	property alias filter: dataProvider.filter
 	property alias commandId: dataProvider.commandId;
-	property alias subscriptionCommandId: dataProvider.subscriptionCommandId;
-	property alias fields: dataProvider.fields;
-	property alias textFilteringInfoIds: dataProvider.textFilteringInfoIds
 
 	property int totalCount: -1;
 
@@ -24,7 +22,7 @@ ComboBox {
 
 	property bool endListStatus: false;
 
-	property Component popupDecorator: Component{ PopupDecoratorGql{} }
+	property Component popupDecorator: Style.popupDecoratorGql
 
 	// signals
 	signal setCurrentText(var modelll, int index);
@@ -38,10 +36,12 @@ ComboBox {
 		PopupMenuDialogGql {
 			id: popup;
 
+			comboDecorator: comboBoxContainerGql.decorator_;
 			decorator: comboBoxContainerGql.popupDecorator
 			delegate: comboBoxContainerGql.delegate;
 			hiddenBackground: comboBoxContainerGql.hiddenBackground;
 			itemHeight: comboBoxContainerGql.itemHeight;
+			radius: comboBoxContainerGql.radius;
 			textSize: comboBoxContainerGql.textSize;
 			fontColor: comboBoxContainerGql.fontColor;
 
@@ -57,7 +57,7 @@ ComboBox {
 			visibleScrollBar: comboBoxContainerGql.visibleScrollBar;
 
 			Component.onCompleted: {
-				comboBoxContainerGql.finished.connect(popup.finished);
+				// comboBoxContainerGql.finished.connect(popup.finished);
 				popup.closeSignal.connect(comboBoxContainerGql.closeSignal);
 				popup.clearSignal.connect(comboBoxContainerGql.clearSignal);
 			}
@@ -73,12 +73,12 @@ ComboBox {
 
 				comboBoxContainerGql.isOpen = false;
 
-				comboBoxContainerGql.setCurrentText(popup.model, index)
+				// comboBoxContainerGql.setCurrentText(popup.model, index)
 				if (comboBoxContainerGql.currentText == ""){
 					comboBoxContainerGql.currentText = popup.filterText;
 				}
 
-				comboBoxContainerGql.currentIndex = index;
+				comboBoxContainerGql.finished(commandId, index)
 			}
 
 			onDecorator_Changed: {
@@ -172,6 +172,7 @@ ComboBox {
 		offset: 0
 		count: 15
 		commandId: comboBoxContainerGql.commandId
+		sortByField: comboBoxContainerGql.nameId
 
 		function setCustomInputParams(inputParams){
 			comboBoxContainerGql.setCustomFilters(inputParams)

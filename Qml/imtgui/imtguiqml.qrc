@@ -12,7 +12,7 @@
         <file alias="imtgui/Application/PagesProvider.qml">Application/PagesProvider.qml</file>
         <file alias="imtgui/Application/ThumbnailDecorator.qml">Application/ThumbnailDecorator.qml</file>
         <file alias="imtgui/Application/ApplicationEvents.qml">Application/ApplicationEvents.qml</file>
-	<file alias="imtgui/Application/ClientSettingsController.qml">Application/ClientSettingsController.qml</file>
+        <file alias="imtgui/Application/ClientSettingsController.qml">Application/ClientSettingsController.qml</file>
         <file alias="imtgui/Panels/ButtonPanel.qml">Panels/ButtonPanel.qml</file>
         <file alias="imtgui/Panels/CommandsDecorator.qml">Panels/CommandsDecorator.qml</file>
         <file alias="imtgui/Panels/FilterMenu.qml">Panels/FilterMenu.qml</file>
@@ -34,10 +34,9 @@
         <file alias="imtgui/Panels/TopRightPanel.qml">Panels/TopRightPanel.qml</file>
         <file alias="imtgui/Panels/TopRightPanelDecorator.qml">Panels/TopRightPanelDecorator.qml</file>
         <file alias="imtgui/Panels/CommandsPanel.qml">Panels/CommandsPanel.qml</file>
-	<file alias="imtgui/Panels/FieldFilterDelegate.qml">Panels/FieldFilterDelegate.qml</file>
-	<file alias="imtgui/Panels/FilterDelegateBase.qml">Panels/FilterDelegateBase.qml</file>
-	<file alias="imtgui/Panels/OptionsFilterDelegate.qml">Panels/OptionsFilterDelegate.qml</file>
-	
+        <file alias="imtgui/Panels/FieldFilterDelegate.qml">Panels/FieldFilterDelegate.qml</file>
+        <file alias="imtgui/Panels/FilterDelegateBase.qml">Panels/FilterDelegateBase.qml</file>
+        <file alias="imtgui/Panels/OptionsFilterDelegate.qml">Panels/OptionsFilterDelegate.qml</file>
         <file alias="imtgui/Settings/PageAboutProvider.qml">Settings/PageAboutProvider.qml</file>
         <file alias="imtgui/Settings/Preference.qml">Settings/Preference.qml</file>
         <file alias="imtgui/Settings/PreferenceButton.qml">Settings/PreferenceButton.qml</file>
@@ -83,8 +82,8 @@
         <file alias="imtgui/View/StickerView.qml">View/StickerView.qml</file>
         <file alias="imtgui/View/PopupContainer.qml">View/PopupContainer.qml</file>
         <file alias="imtgui/View/PopupManager.qml">View/PopupManager.qml</file>
-	<file alias="imtgui/View/ObjectVisualStatusProvider.qml">View/ObjectVisualStatusProvider.qml</file>
-	<file alias="imtgui/View/ServerConnectionParamElementView.qml">View/ServerConnectionParamElementView.qml</file>
+        <file alias="imtgui/View/ObjectVisualStatusProvider.qml">View/ObjectVisualStatusProvider.qml</file>
+        <file alias="imtgui/View/ServerConnectionParamElementView.qml">View/ServerConnectionParamElementView.qml</file>
         <file alias="imtgui/Params/ComposedParamsGui.qml">Params/ComposedParamsGui.qml</file>
         <file alias="imtgui/Params/TextParamEditor.qml">Params/TextParamEditor.qml</file>
         <file alias="imtgui/Params/UrlParamEditor.qml">Params/UrlParamEditor.qml</file>
@@ -97,10 +96,10 @@
         <file alias="imtgui/Params/SchedulerParamEditor.qml">Params/SchedulerParamEditor.qml</file>
         <file alias="imtgui/Params/ParamController.qml">Params/ParamController.qml</file>
         <file alias="imtgui/Params/ParamsSetController.qml">Params/ParamsSetController.qml</file>
-	<file alias="imtgui/Params/IntegerParamEditor.qml">Params/IntegerParamEditor.qml</file>
-	<file alias="imtgui/Params/DoubleParamEditor.qml">Params/DoubleParamEditor.qml</file>
-	<file alias="imtgui/Params/EnableableParamEditor.qml">Params/EnableableParamEditor.qml</file>
-	<file alias="imtgui/Params/ServerConnectionParamEditor.qml">Params/ServerConnectionParamEditor.qml</file>
+        <file alias="imtgui/Params/IntegerParamEditor.qml">Params/IntegerParamEditor.qml</file>
+        <file alias="imtgui/Params/DoubleParamEditor.qml">Params/DoubleParamEditor.qml</file>
+        <file alias="imtgui/Params/EnableableParamEditor.qml">Params/EnableableParamEditor.qml</file>
+        <file alias="imtgui/Params/ServerConnectionParamEditor.qml">Params/ServerConnectionParamEditor.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

@@ -97,6 +97,7 @@ ControlBase {
 		if (comboBoxContainer.currentIndex >= 0 && comboBoxContainer.model.containsKey(comboBoxContainer.displayId, comboBoxContainer.currentIndex)){
 			comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.displayId, comboBoxContainer.currentIndex);
 		}
+
 	}
 
 	onCurrentIndexChanged: {
@@ -122,6 +123,7 @@ ControlBase {
 			delegate: comboBoxContainer.delegate;
 			width: comboBoxContainer.width;
 			itemHeight: comboBoxContainer.itemHeight;
+			radius: comboBoxContainer.radius;
 			hiddenBackground: comboBoxContainer.hiddenBackground;
 			textSize: comboBoxContainer.textSize;
 			fontColor: comboBoxContainer.fontColor;

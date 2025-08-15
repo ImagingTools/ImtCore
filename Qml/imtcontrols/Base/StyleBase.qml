@@ -535,6 +535,10 @@ StyleComponents {
 			styleContainer.popupDecorator = sourceDecorators.popupDecorator
 		}
 
+		if (sourceDecorators.popupDecoratorGql){
+			styleContainer.popupDecoratorGql = sourceDecorators.popupDecoratorGql
+		}
+
 		if (sourceDecorators.popupItemDelegateDecorator){
 			styleContainer.popupItemDelegateDecorator = sourceDecorators.popupItemDelegateDecorator
 		}

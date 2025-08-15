@@ -9,7 +9,8 @@ DecoratorBase {
 	id: root;
 
 	height: bottomContentLoader.y + bottomContentLoader.height;
-
+	property int radius: !baseElement ? Style.buttonRadius : baseElement.radius;
+	
 	property int itemHeight: !baseElement ? 0 : baseElement.itemHeight;
 	property int itemWidth: !baseElement ? 0 : baseElement.itemWidth;
 	property int shownItemsCount: !baseElement ? 0 : baseElement.shownItemsCount;
@@ -60,7 +61,8 @@ DecoratorBase {
 
 		visible: popupMenuListView.count > 0;
 
-		radius: Style.buttonRadius;
+		radius: root.radius;
+		clip: true;
 
 		CustomScrollbar {
 			id: scrollbar;
@@ -69,6 +71,7 @@ DecoratorBase {
 
 			anchors.right: popupMenuListView.right;
 			anchors.bottom: popupMenuListView.bottom;
+			anchors.rightMargin: parent.radius/2
 
 			secondSize: !root.baseElement ? 0 :
 											!root.baseElement.visibleScrollBar ? 0 : Style.isMobile === undefined ? 8 : Style.isMobile ? 4 : 8;

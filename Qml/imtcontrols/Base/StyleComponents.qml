@@ -43,6 +43,7 @@ Item {
 	property Component topPanelDialogDecorator
 	property Component itemDelegateDecorator
 	property Component popupDecorator
+	property Component popupDecoratorGql
 	property Component popupItemDelegateDecorator
 	property Component detailedPopupItemDelegateDecorator
 	property Component collectionTableDecorator

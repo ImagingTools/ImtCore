@@ -53,6 +53,7 @@ StyleComponents {
 	itemDelegateDecorator: itemDelegateDecoratorComp;
 
 	popupDecorator: popupDecoratorComp;
+	popupDecoratorGql: popupDecoratorCompGql;
 	popupItemDelegateDecorator: popupItemDelegateDecoratorComp;
 	detailedPopupItemDelegateDecorator: detailedPopupItemDelegateDecoratorComp;
 
@@ -77,6 +78,13 @@ StyleComponents {
 		id: popupDecoratorComp;
 
 		PopupDecorator {
+		}
+	}
+
+	Component {
+		id: popupDecoratorGqlComp;
+
+		PopupDecoratorGql {
 		}
 	}
 
@@ -396,7 +404,8 @@ StyleComponents {
 
 				horizontalAlignment: !cbMainRect.baseElement ? Text.AlignLeft : cbMainRect.baseElement.textCentered ? Text.AlignHCenter : Text.AlignLeft;
 
-				color: !cbMainRect.baseElement ? "transparent" : cbMainRect.baseElement.fontColorTitle;
+				color: !cbMainRect.baseElement ? "transparent" :
+						cbMainRect.baseElement.currentText !== "" ? cbMainRect.baseElement.fontColorTitle : Style.placeHolderTextColor;
 				text: !cbMainRect.baseElement ? "" : cbMainRect.baseElement.currentText !== "" ? cbMainRect.baseElement.currentText : cbMainRect.baseElement.placeHolderText;
 				font.family: Style.fontFamily;
 				font.pixelSize: !cbMainRect.baseElement ? Style.fontSizeM : cbMainRect.baseElement.textSize;

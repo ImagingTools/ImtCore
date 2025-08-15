@@ -20,6 +20,7 @@ QtObject {
 	property var fields: [];
 	// Fields to which text filter will be applied
 	property var textFilteringInfoIds: []
+	property var distinctSelectionFields: []
 
 	property string orderType: "ASC";
 	property string sortByField;
@@ -50,6 +51,10 @@ QtObject {
 
 	onTextFilteringInfoIdsChanged: {
 		filter.textFilteringInfoIds = textFilteringInfoIds
+	}
+
+	onDistinctSelectionFieldsChanged: {
+		filter.m_distinctFields = distinctSelectionFields
 	}
 
 	onOrderTypeChanged: {

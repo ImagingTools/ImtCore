@@ -14,6 +14,7 @@ PopupMenuDialog {
 	property string dataProverState: ""
 	property string filterText: "";
 
+	property var comboDecorator: null;
 	property var textField_: null;
 
 	signal editSignal();
@@ -85,9 +86,9 @@ PopupMenuDialog {
 
 			z: 100;
 			width: popup.width;
-			height: popup.decorator_ ? popup.decorator_.itemHeight : Style.controlHeightM;
+			height: popup.comboDecorator ? popup.comboDecorator.height : Style.controlHeightM;
 			margin: Style.marginM;
-			radius: Style.buttonRadius;
+			radius: popup.decorator_ ? popup.decorator_.radius : Style.buttonRadius;
 			anchors.top: parent.top;
 			anchors.left: parent.left;
 			textSize: popup.textSize;
