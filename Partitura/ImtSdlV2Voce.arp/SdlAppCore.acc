@@ -9,103 +9,14 @@
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
-    <ElementsList>
-        <Element Id="SdlCodeCreatorProcessorsController" PackageId="ImtSdlGenCppPck" ComponentId="SdlGeneralManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ArgumentParserV2" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlProcessorList" Type="Reference[]" ExportId="SdlProcessorList">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlProcessorV2List" Type="Reference[]" ExportId="SdlProcessorV2List">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlSchemaDependenciesCollector" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlCoreFramework/GqlSchemaParser"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlSchemaParameters" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlSchemaParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlCoreFramework/GqlSchemaParser"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SdlCoreFramework" PackageId="ImtSdlV2Voce" ComponentId="SdlCoreFramework">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SdlProcessArgumentsParser" PackageId="ImtSdlGenCppPck" ComponentId="SdlProcessArgumentsParser">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-    </ElementsList>
+    <ElementsList/>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces>
-        <Interface InterfaceId="imtsdl::IModuleManager" ComponentId="SdlCoreFramework"/>
-        <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="SdlCoreFramework"/>
-        <Interface InterfaceId="imtsdl::ISdlEnumListProvider" ComponentId="SdlCoreFramework"/>
-        <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>
-        <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="SdlCoreFramework"/>
-        <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="SdlCoreFramework"/>
-        <Interface InterfaceId="imtsdl::ISdlUnionListProvider" ComponentId="SdlCoreFramework"/>
-        <Interface InterfaceId="imtsdlgencpp::ISdlProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SdlCodeCreatorProcessorsController"/>
-    </ExportedInterfaces>
+    <ExportedInterfaces/>
     <ExportedComponents>
         <Component ExportedId="BaseClassExtender" ComponentId="SdlCoreFramework/BaseClassExtender"/>
         <Component ExportedId="BasicRequestsProvider" ComponentId="SdlCoreFramework/BasicRequestsProvider"/>
         <Component ExportedId="DependentSchemaList" ComponentId="SdlCoreFramework/DependentSchemaList"/>
         <Component ExportedId="OriginalNamespace" ComponentId="SdlCoreFramework/OriginalNamespace"/>
         <Component ExportedId="SchemaCustomParams" ComponentId="SdlCoreFramework/SchemaCustomParams"/>
-        <Component ExportedId="SdlCodeCreatorProcessorsController" ComponentId="SdlCodeCreatorProcessorsController"/>
-        <Component ExportedId="SdlCoreFramework" ComponentId="SdlCoreFramework"/>
-        <Component ExportedId="SdlProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>
     </ExportedComponents>
 </Acf>

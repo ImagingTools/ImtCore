@@ -4,11 +4,10 @@
 // ACF includes
 #include <icomp/TMakeComponentWrap.h>
 
-#include <imtsdlgencpp/CSdlProcessArgumentsParserComp.h>
+#include <imtsdlgencpp/CCxxProcessorsManagerComp.h>
 #include <imtsdlgencpp/CSdlClassCodeGeneratorComp.h>
 #include <imtsdlgencpp/CSdlClassJsonModificatorComp.h>
 #include <imtsdlgencpp/CSdlClassTreeModelModificatorComp.h>
-#include <imtsdlgencpp/CSdlGeneralManagerComp.h>
 #include <imtsdlgencpp/CSdlClassGqlModificatorComp.h>
 #include <imtsdlgencpp/CGqlWrapClassCodeGeneratorComp.h>
 #include <imtsdlgencpp/CGqlHandlerBaseClassGeneratorComp.h>
@@ -26,8 +25,7 @@ namespace ImtSdlGenCppPck
 {
 
 
-typedef imtsdlgencpp::CSdlGeneralManagerComp SdlGeneralManager;
-typedef imtsdlgencpp::CSdlProcessArgumentsParserComp SdlProcessArgumentsParser;
+typedef imtsdlgencpp::CCxxProcessorsManagerComp CxxProcessorsManager;
 typedef imtsdlgencpp::CSdlClassCodeGeneratorComp SdlClassCodeGenerator;
 typedef imtsdlgencpp::CSdlClassTreeModelModificatorComp SdlClassTreeModelModificator;
 typedef imtsdlgencpp::CSdlClassGqlModificatorComp SdlClassGqlModificator;

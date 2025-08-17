@@ -54,6 +54,11 @@ I_EXPORT_COMPONENT(
 			"A processor that finalizes files",
 			"SDL Class File Finalize Generated")
 
+I_EXPORT_COMPONENT(
+			CodeGeneratorExecutor,
+			"The central component of SDL generator (entry point)",
+			"SDL Processor")
+
 
 } // namespace ImtSdlPck
 

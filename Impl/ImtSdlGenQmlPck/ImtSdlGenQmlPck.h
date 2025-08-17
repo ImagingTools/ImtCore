@@ -5,7 +5,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtsdlgenqml/CSdlGeneralManagerComp.h>
+#include <imtsdlgenqml/CQmlProcessorsManagerComp.h>
 #include <imtsdlgenqml/CQmlCodeGeneratorComp.h>
 #include <imtsdlgenqml/CQmlCodeMetaGeneratorComp.h>
 #include <imtsdlgenqml/CQmlCodeCommandIdGeneratorComp.h>
@@ -21,7 +21,7 @@ namespace ImtSdlGenQmlPck
 {
 
 
-typedef imtsdlgenqml::CSdlGeneralManagerComp SdlGeneralManager;
+typedef imtsdlgenqml::CQmlProcessorsManagerComp QmlProcessorsManager;
 typedef imtsdlgenqml::CQmlCodeGeneratorComp QmlCodeGenerator;
 typedef imtsdlgenqml::CQmlCodeMetaGeneratorComp QmlCodeMetaGenerator;
 typedef imtsdlgenqml::CQmlCodeCommandIdGeneratorComp QmlCodeCommandIdGenerator;

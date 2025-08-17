@@ -7,10 +7,6 @@
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <PositionMap>
-        <Element ComponentName="SdlCodeCreatorProcessorsController" X="850" Y="375" Note=""/>
-        <Element ComponentName="SdlCoreFramework" X="500" Y="500" Note=""/>
-        <Element ComponentName="SdlProcessArgumentsParser" X="500" Y="275" Note=""/>
-    </PositionMap>
+    <PositionMap/>
     <EmbeddedRegistries/>
 </Acf>

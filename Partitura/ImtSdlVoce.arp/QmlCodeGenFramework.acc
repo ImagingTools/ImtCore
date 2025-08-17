@@ -2,63 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5421" Description="ACF"/>
-            <Version Id="1" Number="2251" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ParamsFactory" PackageId="BasePck" ComponentId="ParamsManager">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ParamsSetFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="QmlEntryFactory"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="QmlCodeCommandIdGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlCodeCommandIdGenerator">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="QmlCommandIdFileSuffix" Type="String" ExportId="QmlCommandIdFileSuffix">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QmldirFilePersistence"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="QrcFilePersistance" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QtResourceFilePersistence"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="QrcParamsFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="QtResourceModel"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="QmlCodeGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlCodeGenerator">
+        <Element Id="Generators" PackageId="" ComponentId="Generators">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
@@ -73,10 +25,25 @@
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QmldirFilePersistence"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QrResourceFilePersistance" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QtResourceFilePersistence"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QrcFilePersistance" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QtResourceFilePersistence"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QrcParamsFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="QtResourceModel"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="SdlDocumentListProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="SdlRequestListProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
@@ -94,62 +61,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="QmlCodeMetaGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlCodeMetaGenerator">
-            <Data IsEnabled="true" Flags="0">
+        <Element Id="ParamsFactory" PackageId="BasePck" ComponentId="ParamsManager">
+            <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QmldirFilePersistence"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="SdlDocumentListProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="QmlCodeRequestGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlCodeRequestGenerator">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QmldirFilePersistence"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="SdlDocumentListProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="SdlRequestListProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="ParamsSetFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="QmlEntryFactory"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -159,13 +75,10 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="QmlEnumGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlEnumGenerator">
+        <Element Id="QmlProcessorsManager" PackageId="ImtSdlGenQmlPck" ComponentId="QmlProcessorsManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
@@ -174,16 +87,18 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QmldirFilePersistence"/>
+                    <AttributeInfo Id="SdlProcessorList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Generators/QmlCodeGenerator</Value>
+                                <Value>Generators/QmlCodeCommandIdGenerator</Value>
+                                <Value>Generators/QmlCodeRequestGenerator</Value>
+                                <Value>Generators/QmlEnumGenerator</Value>
+                                <Value>Generators/QmlCodeMetaGenerator</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="QrResourceFilePersistance" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QtResourceFilePersistence"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="QrcParamsFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="QtResourceModel"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                    <AttributeInfo Id="SdlSchemaParameters" Type="Reference" ExportId="SdlSchemaParameters">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
@@ -241,6 +156,195 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="Generators">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="QmlCodeCommandIdGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlCodeCommandIdGenerator">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="QmlCommandIdFileSuffix" Type="String" ExportId="QmlCommandIdFileSuffix">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="QmldirFilePersistance">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="QrcFilePersistance" Type="Reference" ExportId="QrcFilePersistance">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="QrcParamsFactory" Type="Factory" ExportId="QrcParamsFactory">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="QmlCodeGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlCodeGenerator">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CodeGeneratorExtenderList" Type="Reference[]" ExportId="CodeGeneratorExtenderList">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="DependentSchemaList">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="QmlCodeMetaGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlCodeMetaGenerator">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="QmldirFilePersistance">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="SdlDocumentListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="QmlCodeRequestGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlCodeRequestGenerator">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="QmldirFilePersistance">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="SdlDocumentListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="SdlRequestListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="QmlEnumGenerator" PackageId="ImtSdlGenQmlPck" ComponentId="QmlEnumGenerator">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="QmldirFilePersistance">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="QrResourceFilePersistance" Type="Reference" ExportId="QrResourceFilePersistance">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="QrcParamsFactory" Type="Factory" ExportId="QrcParamsFactory">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces/>
+                <ExportedComponents>
+                    <Component ExportedId="QmlCodeCommandIdGenerator" ComponentId="QmlCodeCommandIdGenerator"/>
+                    <Component ExportedId="QmlCodeGenerator" ComponentId="QmlCodeGenerator"/>
+                    <Component ExportedId="QmlCodeMetaGenerator" ComponentId="QmlCodeMetaGenerator"/>
+                    <Component ExportedId="QmlCodeRequestGenerator" ComponentId="QmlCodeRequestGenerator"/>
+                    <Component ExportedId="QmlEnumGenerator" ComponentId="QmlEnumGenerator"/>
+                </ExportedComponents>
+            </Data>
+        </EmbeddedRegistry>
         <EmbeddedRegistry Id="QmlEntryFactory">
             <Data Description="" Keywords="">
                 <ElementsList>
@@ -304,12 +408,9 @@
             </Data>
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>
-    <ExportedInterfaces/>
-    <ExportedComponents>
-        <Component ExportedId="QmlCodeCommandIdGenerator" ComponentId="QmlCodeCommandIdGenerator"/>
-        <Component ExportedId="QmlCodeGenerator" ComponentId="QmlCodeGenerator"/>
-        <Component ExportedId="QmlCodeMetaGenerator" ComponentId="QmlCodeMetaGenerator"/>
-        <Component ExportedId="QmlCodeRequestGenerator" ComponentId="QmlCodeRequestGenerator"/>
-        <Component ExportedId="QmlEnumGenerator" ComponentId="QmlEnumGenerator"/>
-    </ExportedComponents>
+    <ExportedInterfaces>
+        <Interface InterfaceId="iproc::IProcessor" ComponentId="QmlProcessorsManager"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="QmlProcessorsManager"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
 </Acf>

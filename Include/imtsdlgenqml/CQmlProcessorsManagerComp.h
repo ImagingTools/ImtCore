@@ -6,7 +6,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
-#include <iproc/IProcessor.h>
+#include <iproc/TSyncProcessorWrap.h>
 
 // ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
@@ -16,31 +16,34 @@ namespace imtsdlgenqml
 {
 
 /// \todo rename it to SdlQmlManager
-class CSdlGeneralManagerComp: public ilog::CLoggerComponentBase
+class CQmlProcessorsManagerComp: public ilog::CLoggerComponentBase,
+								public iproc::CSyncProcessorBase
 {
 
 
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CSdlGeneralManagerComp)
+	I_BEGIN_COMPONENT(CQmlProcessorsManagerComp)
+		I_REGISTER_INTERFACE(iproc::IProcessor)
 		I_ASSIGN(m_sdlArgumentParserCompPtr, "ArgumentParser", "Argument parser", true, "ArgumentParser")
-		I_ASSIGN(m_sdlParserCompPtr, "SdlSchemaParser", "SDL schema Parser", true, "SdlSchemaParser")
-		I_ASSIGN(m_sdlSchemaDependenciesCollectorCompPtr, "SdlSchemaDependenciesCollector", "Processor, used to collect a list of all schemas that affect the generated code", true, "SdlSchemaDependenciesCollector")
 		I_ASSIGN(m_sdlSchemaParamsCompPtr, "SdlSchemaParameters", "The parameters of the current schema", true, "SdlSchemaParameters")
 		I_ASSIGN_MULTI_0(m_sdlProcessorsCompListPtr, "SdlProcessorList", "The list of SDL processors", true)
 	I_END_COMPONENT;
 
 protected:
-	virtual bool CreateCode();
+	// reimplemented (iproc::IProcessor)
+	virtual TaskState DoProcessing(
+		const iprm::IParamsSet* paramsPtr,
+		const istd::IPolymorphic* inputPtr,
+		istd::IChangeable* outputPtr,
+		ibase::IProgressManager* progressManagerPtr = nullptr) override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
+private:
+	bool CreateCode();
 
-protected:
+private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_sdlArgumentParserCompPtr);
-	I_REF(iproc::IProcessor, m_sdlParserCompPtr);
-	I_REF(iproc::IProcessor, m_sdlSchemaDependenciesCollectorCompPtr);
 	I_REF(iprm::IParamsSet, m_sdlSchemaParamsCompPtr);
 	I_MULTIREF(iproc::IProcessor, m_sdlProcessorsCompListPtr);
 };

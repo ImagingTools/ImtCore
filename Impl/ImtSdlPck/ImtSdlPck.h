@@ -13,6 +13,7 @@
 #include <imtsdl/CQtResourceFilePersistenceComp.h>
 #include <imtsdl/CFileCleanupProcessorComp.h>
 #include <imtsdl/CFileFinalizerComp.h>
+#include <imtsdl/CCodeGeneratorExecutorComp.h>
 
 
 
@@ -30,6 +31,7 @@ typedef imtsdl::CSdlProcessArgumentsParserComp SdlProcessArgumentsParser;
 typedef imtsdl::CQtResourceFilePersistenceComp QtResourceFilePersistence;
 typedef imtsdl::CFileCleanupProcessorComp FileCleanupProcessor;
 typedef imtsdl::CFileFinalizerComp FileFinalizer;
+typedef imtsdl::CCodeGeneratorExecutorComp CodeGeneratorExecutor;
 
 
 

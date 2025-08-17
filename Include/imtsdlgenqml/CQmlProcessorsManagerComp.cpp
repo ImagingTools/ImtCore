@@ -1,4 +1,4 @@
-#include "CSdlGeneralManagerComp.h"
+#include "CQmlProcessorsManagerComp.h"
 
 
 // std includes
@@ -25,69 +25,14 @@ namespace imtsdlgenqml
 {
 
 
-void CSdlGeneralManagerComp::OnComponentCreated()
+iproc::IProcessor::TaskState CQmlProcessorsManagerComp::DoProcessing(
+	const iprm::IParamsSet* /*paramsPtr*/,
+	const istd::IPolymorphic* /*inputPtr*/,
+	istd::IChangeable* /*outputPtr*/,
+	ibase::IProgressManager* /*progressManagerPtr*/)
 {
-	BaseClass::OnComponentCreated();
-
-	Q_ASSERT(m_sdlParserCompPtr.IsValid());
-	Q_ASSERT(m_sdlArgumentParserCompPtr.IsValid());
-	Q_ASSERT(m_sdlSchemaDependenciesCollectorCompPtr.IsValid());
-
-	if (m_sdlArgumentParserCompPtr->IsSchemaDependencyModeEnabled()){
-		iprm::CParamsSet outputParams;
-		int collectionResult =
-			m_sdlSchemaDependenciesCollectorCompPtr->DoProcessing(nullptr, nullptr, &outputParams);
-		if (collectionResult != iproc::IProcessor::TS_OK){
-			SendErrorMessage(
-				0, QString("Unable to collect dependencies for schema: '%1'")
-					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
-
-			::exit(1);
-		}
-		iprm::TParamsPtr<iprm::IOptionsManager> processedFilesPtr(
-			&outputParams, QByteArrayLiteral("ProcessedFiles"), true);
-		if (!processedFilesPtr.IsValid()){
-			SendCriticalMessage(
-				0, QString("Unexpected dependencies list for schema: '%1'")
-					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
-
-			::exit(2);
-		}
-
-		QStringList cumulatedFiles;
-		int optionsCount = processedFilesPtr->GetOptionsCount();
-		for (int i = 0; i < optionsCount; ++i){
-			cumulatedFiles << processedFilesPtr->GetOptionName(i);
-		}
-		cumulatedFiles.removeDuplicates();
-
-		//remove input schema
-		cumulatedFiles.removeAll(
-			QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath())
-				.canonicalFilePath());
-
-		imtsdl::CSdlTools::PrintFiles(
-			std::cout, cumulatedFiles,
-			m_sdlArgumentParserCompPtr->GetGeneratorType());
-
-		::exit(0);
-	}
-
 	QElapsedTimer timer;
 	timer.start();
-
-	// first parse schema and get complete path to output
-	iprm::CParamsSet outputParamsSet;
-	int parsingResult =
-		m_sdlParserCompPtr->DoProcessing(nullptr, nullptr, &outputParamsSet);
-	if (parsingResult != iproc::IProcessor::TS_OK){
-		SendErrorMessage(
-			0, QString("Unable to parse schema '%1'")
-				.arg(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath())
-						 .absoluteFilePath()));
-
-		::exit(3);
-	}
 
 	const QString outputDirPath =
 		imtsdl::CSdlTools::GetCompleteOutputPath(m_sdlSchemaParamsCompPtr, *m_sdlArgumentParserCompPtr, false, m_sdlArgumentParserCompPtr->IsCppEnabled());
@@ -144,7 +89,7 @@ void CSdlGeneralManagerComp::OnComponentCreated()
 }
 
 
-bool CSdlGeneralManagerComp::CreateCode()
+bool CQmlProcessorsManagerComp::CreateCode()
 {
 	// create code
 	const int sdlProcessorsCount = m_sdlProcessorsCompListPtr.GetCount();

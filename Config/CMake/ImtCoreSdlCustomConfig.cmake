@@ -134,7 +134,6 @@ macro (ImtCoreCustomConfigureSdlCpp)
 	set(DEP_FILE_PATH "${SDL_CPP_OUTPUT_DIRECTORY}/${SCHEMA_NAME}.depfile")
 
 	set(CUSTOM_MODIFICATORS)
-	list(APPEND CUSTOM_MODIFICATORS "--GG=2") ##< Compile, using a new version of code generator.
 	list(APPEND CUSTOM_MODIFICATORS "--config=${IMT_CONFIG_CMAKE_PATH}/SDL/CommonCXX.cfg") ##< Use config file
 	list(APPEND CUSTOM_MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
 	list(APPEND CUSTOM_MODIFICATORS "--CPP")

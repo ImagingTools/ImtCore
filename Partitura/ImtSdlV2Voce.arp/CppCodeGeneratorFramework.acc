@@ -2,108 +2,125 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5399" Description="ACF" />
-            <Version Id="1" Number="2250" Description="ACF-Solutions" />
-            <Version Id="1023" Number="395264" Description="Qt Framework" />
+            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="QmlRegisterGenerator" PackageId="ImtSdlGenCppPck"
-            ComponentId="QmlRegisterGenerator">
+        <Element Id="CxxProcessorsManager" PackageId="ImtSdlGenCppPck" ComponentId="CxxProcessorsManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false" />
-                    </AttributeInfo>
-                    <AttributeInfo Id="CustomSchemaParams" Type="Reference"
-                        ExportId="CustomSchemaParams">
-                        <Data IsEnabled="false" />
-                    </AttributeInfo>
-                    <AttributeInfo Id="DependentSchemaList" Type="Reference"
-                        ExportId="DependentSchemaList">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference"
-                        ExportId="OriginalSchemaNamespace">
-                        <Data IsEnabled="false" />
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference"
-                        ExportId="SdlEnumListProvider">
-                        <Data IsEnabled="false" />
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference"
-                        ExportId="SdlTypeListProvider">
-                        <Data IsEnabled="false" />
-                    </AttributeInfo>
-                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference"
-                        ExportId="SdlUnionListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlProcessorV2List" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>QmlRegisterGenerator</Value>
+                                <Value>SdlEnumGenerator</Value>
+                                <Value>SdlUnionGenerator</Value>
+                                <Value>SdlClassCodeGenerator</Value>
+                                <Value>SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
+                                <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
+                                <Value>SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference"
-                        ExportId="TracingConfiguration">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SdlClassCodeGenerator" PackageId="ImtSdlV2Voce"
-            ComponentId="SdlClassCodeGeneratorFramework">
+        <Element Id="QmlRegisterGenerator" PackageId="ImtSdlGenCppPck" ComponentId="QmlRegisterGenerator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="BaseClassExtender" Type="Reference"
-                        ExportId="BaseClassExtender">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CustomSchemaParams" Type="Reference"
-                        ExportId="CustomSchemaParams">
-                        <Data IsEnabled="false" />
-                    </AttributeInfo>
-                    <AttributeInfo Id="DependentSchemaList" Type="Reference"
-                        ExportId="DependentSchemaList">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="DependentSchemaList">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference"
-                        ExportId="OriginalSchemaNamespace">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference"
-                        ExportId="SdlEnumListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference"
-                        ExportId="SdlTypeListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference"
-                        ExportId="SdlUnionListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference"
-                        ExportId="TracingConfiguration">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SdlClassCodeGenerator" PackageId="ImtSdlV2Voce" ComponentId="SdlClassCodeGeneratorFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="BaseClassExtender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="DependentSchemaList">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -112,102 +129,85 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CustomSchemaParams" Type="Reference"
-                        ExportId="CustomSchemaParams">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DependentSchemaList" Type="Reference"
-                        ExportId="DependentSchemaList">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="DependentSchemaList">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference"
-                        ExportId="OriginalSchemaNamespace">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference"
-                        ExportId="SdlEnumListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference"
-                        ExportId="TracingConfiguration">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SdlGqlCodeGeneratorFramework" PackageId="ImtSdlV2Voce"
-            ComponentId="SdlGqlCodeGeneratorFramework">
+        <Element Id="SdlGqlCodeGeneratorFramework" PackageId="ImtSdlV2Voce" ComponentId="SdlGqlCodeGeneratorFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="BaseClassExtender" Type="Reference"
-                        ExportId="BaseClassExtender">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="BaseClassExtender">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CustomSchemaParams" Type="Reference"
-                        ExportId="CustomSchemaParams">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DependentSchemaList" Type="Reference"
-                        ExportId="DependentSchemaList">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="DependentSchemaList">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FilesJoiner" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlClassCodeGenerator/SimpleFileJoiner" />
+                        <Data IsEnabled="true" Value="SdlClassCodeGenerator/SimpleFileJoiner"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference"
-                        ExportId="OriginalSchemaNamespace">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlBaseRequestListProvider" Type="Reference"
-                        ExportId="SdlBaseRequestListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlBaseRequestListProvider" Type="Reference" ExportId="SdlBaseRequestListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference"
-                        ExportId="SdlDocumentListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="SdlDocumentListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference"
-                        ExportId="SdlEnumListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference"
-                        ExportId="SdlRequestListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="SdlRequestListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference"
-                        ExportId="SdlTypeListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference"
-                        ExportId="SdlUnionListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference"
-                        ExportId="TracingConfiguration">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -216,65 +216,56 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CustomSchemaParams" Type="Reference"
-                        ExportId="CustomSchemaParams">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DependentSchemaList" Type="Reference"
-                        ExportId="DependentSchemaList">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="DependentSchemaList">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference"
-                        ExportId="OriginalSchemaNamespace">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="OriginalSchemaNamespace" Type="Reference" ExportId="OriginalSchemaNamespace">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference"
-                        ExportId="SdlEnumListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference"
-                        ExportId="SdlTypeListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference"
-                        ExportId="SdlUnionListProvider">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false" />
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference"
-                        ExportId="TracingConfiguration">
-                        <Data IsEnabled="false" />
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList />
-    <ExportedInterfaces />
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="iproc::IProcessor" ComponentId="CxxProcessorsManager"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="CxxProcessorsManager"/>
+    </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="GqlCollectionControllerBaseClassGenerator"
-            ComponentId="SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator" />
-        <Component ExportedId="GqlHandlerBaseClassGenerator"
-            ComponentId="SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator" />
-        <Component ExportedId="GqlWrapClassCodeGenerator"
-            ComponentId="SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator" />
-        <Component ExportedId="QmlRegisterGenerator" ComponentId="QmlRegisterGenerator" />
-        <Component ExportedId="SdlClassCodeGenerator" ComponentId="SdlClassCodeGenerator" />
-        <Component ExportedId="SdlEnumGenerator" ComponentId="SdlEnumGenerator" />
-        <Component ExportedId="SdlGqlCodeGeneratorFramework"
-            ComponentId="SdlGqlCodeGeneratorFramework" />
-        <Component ExportedId="SdlUnionGenerator" ComponentId="SdlUnionGenerator" />
-        <Component ExportedId="SimpleFileJoiner"
-            ComponentId="SdlClassCodeGenerator/SimpleFileJoiner" />
+        <Component ExportedId="GqlCollectionControllerBaseClassGenerator" ComponentId="SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator"/>
+        <Component ExportedId="GqlHandlerBaseClassGenerator" ComponentId="SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator"/>
+        <Component ExportedId="GqlWrapClassCodeGenerator" ComponentId="SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator"/>
+        <Component ExportedId="QmlRegisterGenerator" ComponentId="QmlRegisterGenerator"/>
+        <Component ExportedId="SdlClassCodeGenerator" ComponentId="SdlClassCodeGenerator"/>
+        <Component ExportedId="SdlEnumGenerator" ComponentId="SdlEnumGenerator"/>
+        <Component ExportedId="SdlGqlCodeGeneratorFramework" ComponentId="SdlGqlCodeGeneratorFramework"/>
+        <Component ExportedId="SdlUnionGenerator" ComponentId="SdlUnionGenerator"/>
+        <Component ExportedId="SimpleFileJoiner" ComponentId="SdlClassCodeGenerator/SimpleFileJoiner"/>
     </ExportedComponents>
 </Acf>

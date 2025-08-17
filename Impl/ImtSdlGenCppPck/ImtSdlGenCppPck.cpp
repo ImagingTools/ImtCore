@@ -15,14 +15,9 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools") IM_AUTHOR("Sergey Zastrovnyh"));
 
 I_EXPORT_COMPONENT(
-			SdlGeneralManager,
-			"The manager of SDL processors and argument paresrs",
+			CxxProcessorsManager,
+			"The manager of SDL processors for C++",
 			"Schema Definition Language SDL Parser Argument General Manager")
-
-I_EXPORT_COMPONENT(
-			SdlProcessArgumentsParser,
-			"The command line argument parser for processors",
-			"Schema Definition Language SDL Argument Parser")
 
 I_EXPORT_COMPONENT(
 			SdlClassCodeGenerator,

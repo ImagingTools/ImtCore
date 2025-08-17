@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5421" Description="ACF"/>
-            <Version Id="1" Number="2251" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -31,8 +31,8 @@
         <Element Id="GqlSchemaParser" PackageId="ImtSdlVoce" ComponentId="GqlSchemaComplexParser">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
@@ -40,10 +40,25 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ModuleManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ModuleManager"/>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SdlProcessArgumentsParser" PackageId="ImtSdlPck" ComponentId="SdlProcessArgumentsParser">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -53,7 +68,9 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtsdl::ISdlDocumentTypeListProvider" ComponentId="GqlSchemaParser"/>
+        <Interface InterfaceId="imtsdl::ISdlEditableProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>
         <Interface InterfaceId="imtsdl::ISdlEnumListProvider" ComponentId="GqlSchemaParser"/>
+        <Interface InterfaceId="imtsdl::ISdlProcessArgumentsParser" ComponentId="SdlProcessArgumentsParser"/>
         <Interface InterfaceId="imtsdl::ISdlRequestListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="imtsdl::ISdlTypeListProvider" ComponentId="GqlSchemaParser"/>
         <Interface InterfaceId="imtsdl::ISdlUnionListProvider" ComponentId="GqlSchemaParser"/>
