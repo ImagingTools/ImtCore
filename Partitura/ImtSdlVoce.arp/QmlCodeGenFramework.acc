@@ -25,6 +25,9 @@
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="QmldirFilePersistence"/>
                     </AttributeInfo>
@@ -91,10 +94,10 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Generators/QmlCodeGenerator</Value>
-                                <Value>Generators/QmlCodeCommandIdGenerator</Value>
-                                <Value>Generators/QmlCodeRequestGenerator</Value>
-                                <Value>Generators/QmlEnumGenerator</Value>
                                 <Value>Generators/QmlCodeMetaGenerator</Value>
+                                <Value>Generators/QmlCodeCommandIdGenerator</Value>
+                                <Value>Generators/QmlEnumGenerator</Value>
+                                <Value>Generators/QmlCodeRequestGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -204,9 +207,6 @@
                                 <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="CodeGeneratorExtenderList" Type="Reference[]" ExportId="CodeGeneratorExtenderList">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -277,6 +277,9 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="QmldirFilePersistance" Type="Reference" ExportId="QmldirFilePersistance">

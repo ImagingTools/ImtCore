@@ -17,16 +17,6 @@
         <Element ComponentName="QtResourceModel" X="925" Y="400" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="QmlEntryFactory">
-            <PositionMap>
-                <Element ComponentName="ComposedParamsSet" X="475" Y="275" Note=""/>
-                <Element ComponentName="FileName" X="600" Y="475" Note=""/>
-                <Element ComponentName="IsSingleton" X="125" Y="275" Note=""/>
-                <Element ComponentName="TypeName" X="225" Y="475" Note=""/>
-                <Element ComponentName="VersionName" X="400" Y="475" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Generators">
             <PositionMap>
                 <Element ComponentName="QmlCodeCommandIdGenerator" X="1025" Y="350" Note=""/>
@@ -34,6 +24,16 @@
                 <Element ComponentName="QmlCodeMetaGenerator" X="650" Y="500" Note=""/>
                 <Element ComponentName="QmlCodeRequestGenerator" X="650" Y="350" Note=""/>
                 <Element ComponentName="QmlEnumGenerator" X="375" Y="350" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="QmlEntryFactory">
+            <PositionMap>
+                <Element ComponentName="ComposedParamsSet" X="475" Y="275" Note=""/>
+                <Element ComponentName="FileName" X="600" Y="475" Note=""/>
+                <Element ComponentName="IsSingleton" X="125" Y="275" Note=""/>
+                <Element ComponentName="TypeName" X="225" Y="475" Note=""/>
+                <Element ComponentName="VersionName" X="400" Y="475" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
