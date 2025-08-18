@@ -15,6 +15,61 @@ class Var extends Property {
      * @param {*} value
      * @param {Object} meta
      */
+    static simpleSet(target, name, value, meta){
+        let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+
+        if(typeof value === 'function'){
+            try {
+                target[name] = this.typeCasting(value.call(target))
+            } catch(error) {
+                console.error(error)
+            }
+        } else {
+            try {
+                target[name] = this.typeCasting(value)
+            } catch (error) {
+                console.error(error)
+            }
+        }  
+
+        let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
+
+        if(oldValue !== currentValue){
+            let destructionFunc = ()=>{
+                target[name] = null
+            }
+            destructionFunc.meta = {
+                name: name+'__destruction',
+                destruction: true
+            }
+
+            if(currentValue instanceof JQModules.QtQml.QObject){
+                currentValue.__addLink()
+                if(oldValue instanceof JQModules.QtQml.QtObject){
+                    destructionFunc.meta.parent = currentValue
+                    currentValue['Component.destruction'].connect(destructionFunc)
+                }
+            }
+            if(oldValue instanceof JQModules.QtQml.QObject){
+                if(oldValue instanceof JQModules.QtQml.QtObject){
+                    destructionFunc.meta.parent = oldValue
+                    oldValue['Component.destruction'].disconnect(destructionFunc)
+                }
+                oldValue.__removeLink()
+            }
+
+            Signal.get(target, name + 'Changed')(oldValue, currentValue)
+        }
+
+        return true
+    }
+
+    /**
+     * @param {Object} target 
+     * @param {String} name
+     * @param {*} value
+     * @param {Object} meta
+     */
     static set(target, name, value, meta){
         let oldValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
@@ -46,19 +101,20 @@ class Var extends Property {
                 name: name+'__destruction',
                 destruction: true
             }
-            if(oldValue instanceof JQModules.QtQml.QObject){
-                if(oldValue instanceof JQModules.QtQml.QtObject){
-                    destructionFunc.meta.parent = oldValue
-                    oldValue['Component.destruction'].disconnect(destructionFunc)
-                }
-                oldValue.__removeLink()
-            }
+
             if(currentValue instanceof JQModules.QtQml.QObject){
                 currentValue.__addLink()
                 if(oldValue instanceof JQModules.QtQml.QtObject){
                     destructionFunc.meta.parent = currentValue
                     currentValue['Component.destruction'].connect(destructionFunc)
                 }
+            }
+            if(oldValue instanceof JQModules.QtQml.QObject){
+                if(oldValue instanceof JQModules.QtQml.QtObject){
+                    destructionFunc.meta.parent = oldValue
+                    oldValue['Component.destruction'].disconnect(destructionFunc)
+                }
+                oldValue.__removeLink()
             }
 
             Signal.get(target, name + 'Changed')(oldValue, currentValue)

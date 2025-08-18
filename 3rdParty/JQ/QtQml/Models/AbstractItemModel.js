@@ -80,8 +80,8 @@ class AbstractItemModel {
             },
             set(target, key, value){
                 if(target[key] !== value){
-                    recursiveRemoveLink(target[key])
                     recursiveAddLink(value)
+                    recursiveRemoveLink(target[key])
 
                     target[key] = value
                     if(!properties[key]) properties[key] = []

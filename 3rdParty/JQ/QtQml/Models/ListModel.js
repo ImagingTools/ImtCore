@@ -121,6 +121,18 @@ class ListModel extends QtObject {
         this.count = this.data.length
     }
 
+    __recursiveRemoveLink(obj){
+        if(typeof obj === 'object'){
+            if(obj instanceof JQModules.QtQml.QObject){
+                obj.__removeLink()
+            } else {
+                for(let key in obj){
+                    this.__recursiveRemoveLink(obj[key])
+                }
+            }
+        }
+    }
+
     remove(index, count = 1){
         JQApplication.updateLater(this)
 
@@ -129,11 +141,12 @@ class ListModel extends QtObject {
 
         for(let r of removed){
             let model = r.__self
-            for(let key in model){
-                if(model[key] instanceof JQModules.QtQml.QObject){
-                    model[key].__removeLink()
-                }
-            }
+            this.__recursiveRemoveLink(model)
+            // for(let key in model){
+            //     if(model[key] instanceof JQModules.QtQml.QObject){
+            //         model[key].__removeLink()
+            //     }
+            // }
         }
 
         this.count = this.data.length
