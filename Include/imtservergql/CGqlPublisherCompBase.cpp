@@ -111,14 +111,21 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 			const QByteArray& subscriptionId,
 			const QByteArray& commandId,
 			const QByteArray& data,
-			const imtrest::IRequest& networkRequest)
+			const imtrest::IRequest& networkRequest,
+			const bool useAwsStyle)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'RequestManager' was not set", "CGqlPublisherCompBase");
 		return false;
 	}
 
-	QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": %3}}})")
+	QString typeId = "data";
+	if (!useAwsStyle){
+		typeId = "next";
+	}
+
+	QByteArray body = QString(R"({"type": "%1","id": "%2","payload": {"data": {"%3": %4}}})")
+			.arg(typeId)
 			.arg(qPrintable(subscriptionId))
 			.arg(qPrintable(commandId))
 			.arg(qPrintable(data)).toUtf8();

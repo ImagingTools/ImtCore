@@ -25,6 +25,7 @@ public:
 
 	I_BEGIN_COMPONENT(CModelPublisherComp);
 		I_ASSIGN(m_modelCompPtr, "Model", "Observed data model. On changes of this data model the subscriber will be notified", true, "Model");
+		I_ASSIGN(m_useAwsStyle, "UseAwsStyleGraphQl", "Use AWS Stlye GraphQl subscriptions", true, true);
 	I_END_COMPONENT;
 
 protected:
@@ -37,6 +38,7 @@ protected:
 
 protected:
 	I_REF(imod::IModel, m_modelCompPtr);
+	I_ATTR(bool, m_useAwsStyle);
 };
 
 

@@ -23,7 +23,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	virtual bool Publish();
+	virtual bool Publish(bool useAwsStyle = true);
 
 protected:
 	I_REF(imtgql::IGqlRequestHandler, m_requestHandlerCompPtr);

@@ -37,7 +37,7 @@ void CModelPublisherComp::OnComponentDestroyed()
 
 void CModelPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	Publish();
+	Publish((*m_useAwsStyle));
 }
 
 

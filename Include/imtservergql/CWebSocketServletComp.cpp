@@ -36,7 +36,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_INIT:
 			return InitConnection(request);
-		
+
+		case imtrest::CWebSocketRequest::MT_KEEP_ALIVE:
+			return KeepAliveAcknowledge(request);
+
 		case imtrest::CWebSocketRequest::MT_START:
 			return RegisterSubscription(request);
 
@@ -91,6 +94,22 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 	return imtrest::ConstResponsePtr();	
 }
 
+imtrest::ConstResponsePtr CWebSocketServletComp::KeepAliveAcknowledge(const imtrest::IRequest& request) const
+{
+	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
+	if (webSocketRequest == nullptr){
+		Q_ASSERT(false);
+
+		return imtrest::ConstResponsePtr();
+	}
+	else{
+		QByteArray data = QString(R"({"type": "pong"})").toUtf8();
+
+		return CreateDataResponse(data, request);
+	}
+	return imtrest::ConstResponsePtr();
+}
+
 
 imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest::IRequest& request) const
 {
@@ -109,8 +128,13 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 	QByteArray body = request.GetBody();
 	QJsonDocument document = QJsonDocument::fromJson(body);
 	QJsonObject object = document.object();
-
-	body = object.value("payload").toObject().value("data").toString().toUtf8();
+	if (object.value("payload").toObject().contains("data")){
+		body = object.value("payload").toObject().value("data").toString().toUtf8();
+	}
+	else{
+		body = document["payload"].toObject().value("query").toString().toUtf8();
+		body = QByteArray("{\"query\": \"") + body + QByteArray("\"}");
+	}
 
 	int errorPosition;
 	if (!gqlRequest.ParseQuery(body, errorPosition)){

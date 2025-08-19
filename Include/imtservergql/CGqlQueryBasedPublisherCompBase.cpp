@@ -16,7 +16,7 @@ namespace imtservergql
 
 // protected methods
 
-bool CGqlQueryBasedPublisherCompBase::Publish()
+bool CGqlQueryBasedPublisherCompBase::Publish(bool useAwsStyle)
 {
 	if (*m_requestHandlerCommandIdAtrPtr == ""){
 		return false;
@@ -54,7 +54,7 @@ bool CGqlQueryBasedPublisherCompBase::Publish()
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
 			if (networkRequestPtr != nullptr){
-				PushDataToSubscriber(id, "", data, *networkRequestPtr);
+				PushDataToSubscriber(id, "", data, *networkRequestPtr, useAwsStyle);
 			}
 		}
 	}

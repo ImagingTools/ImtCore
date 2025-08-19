@@ -43,7 +43,7 @@ public:
 	virtual void OnRequestDestroyed(imtrest::IRequest* request) override;
 
 protected:
-	virtual bool PushDataToSubscriber(const QByteArray& subscriptionId, const QByteArray& commandId, const QByteArray& data, const imtrest::IRequest& networkRequest);
+	virtual bool PushDataToSubscriber(const QByteArray& subscriptionId, const QByteArray& commandId, const QByteArray& data, const imtrest::IRequest& networkRequest, const bool useAwsStyle = true);
 	virtual bool PublishData(const QByteArray& commandId, const QByteArray& data);
 
 protected:
