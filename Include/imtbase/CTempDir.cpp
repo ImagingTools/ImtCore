@@ -14,12 +14,15 @@ CTempDir::CTempDir(const QString& tempSubDir, bool autoRemove)
 	QString path = QDir::tempPath();
 	if (!tempSubDir.isEmpty()){
 		path += '/' + tempSubDir;
+
+		m_basePath = path;
 	}
 	path += '/' + QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	m_autoRemove = false;
 	if (m_dir.mkpath(path)){
 		m_dir.setPath(path);
+
 		m_autoRemove = autoRemove;
 	}
 }
@@ -33,13 +36,19 @@ CTempDir::~CTempDir()
 }
 
 
-QString CTempDir::Path() const
+QString CTempDir::GetPath() const
 {
 	if (m_dir.path() != "."){
 		return m_dir.path();
 	}
 
 	return QString();
+}
+
+
+QString CTempDir::GetBasePath() const
+{
+	return m_basePath;
 }
 
 

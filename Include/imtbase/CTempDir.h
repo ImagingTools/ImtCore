@@ -15,11 +15,13 @@ public:
 	CTempDir(const QString& tempSubDir = QString(), bool autoRemove = true);
 	~CTempDir();
 
-	QString Path() const;
+	QString GetPath() const;
+	QString GetBasePath() const;
 
 private:
 	QDir m_dir;
-	bool m_autoRemove;
+	bool m_autoRemove = true;
+	QString m_basePath;
 };
 
 
