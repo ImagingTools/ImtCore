@@ -313,7 +313,8 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 	imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 	if (
 			methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ACK ||
-			methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE
+			methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE ||
+			methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE_ACK
 			){
 	}
 	else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
