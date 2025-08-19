@@ -110,7 +110,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 }
 
 
-istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(
+			const QSqlRecord& record,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", "No database engine was registered");

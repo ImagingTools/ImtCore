@@ -341,7 +341,7 @@ bool CDocumentCollectionViewDelegateComp::OpenDocumentEditor(
 	QString tempFilePath = tempPath + "/" + objectInfoPtr->name + "." + fileExtension;
 
 	imtbase::IObjectCollection::DataPtr documentDataPtr;
-	if (m_collectionPtr->GetObjectData(objectId, documentDataPtr)){
+	if (m_collectionPtr->GetObjectData(objectId, documentDataPtr, &m_loadFilterParamSet)){
 		int state = m_filePersistenceCompPtr->SaveToFile(*documentDataPtr, tempFilePath);
 		if (state == ifile::IFilePersistence::OS_OK){
 			if (m_documentManagerCompPtr->OpenDocument(&objectInfoPtr->typeId, &tempFilePath, true, viewTypeId, &objectInfoPtr->objectPtr)){
@@ -383,7 +383,7 @@ bool CDocumentCollectionViewDelegateComp::RenameObjectOnSave() const
 }
 
 
-QString CDocumentCollectionViewDelegateComp::CommentDocumentChanges(int revision) const
+QString CDocumentCollectionViewDelegateComp::CommentDocumentChanges(int /*revision*/) const
 {
 	QString comment = QInputDialog::getText(
 		nullptr,

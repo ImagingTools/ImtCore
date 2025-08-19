@@ -75,7 +75,7 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
-	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
+	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr, iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual bool SetObjectData(
 				const Id& objectId,
 				const istd::IChangeable& object,

@@ -348,7 +348,7 @@ const istd::IChangeable* CTaskCollectionCompBase::GetObjectPtr(const QByteArray&
 }
 
 
-bool CTaskCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
+bool CTaskCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr, iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	for (const Task& task : m_tasks){
 		if ((task.uuid == objectId) && task.taskPtr.IsValid()){

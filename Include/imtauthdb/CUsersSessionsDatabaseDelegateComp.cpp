@@ -40,7 +40,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::GetSelectionQuery(
 }
 
 
-istd::IChangeableUniquePtr CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;

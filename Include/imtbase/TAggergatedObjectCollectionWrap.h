@@ -65,7 +65,7 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
-	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
+	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr, iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual imtbase::IObjectCollectionUniquePtr CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
@@ -240,7 +240,7 @@ inline const istd::IChangeable* TAggergatedObjectCollectionWrap<BaseInterface, O
 
 
 template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr, iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	return m_collection.GetObjectData(objectId, dataPtr);
 }

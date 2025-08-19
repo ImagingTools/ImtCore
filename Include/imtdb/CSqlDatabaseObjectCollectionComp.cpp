@@ -301,7 +301,7 @@ const istd::IChangeable* CSqlDatabaseObjectCollectionComp::GetObjectPtr(const QB
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
+bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr, iprm::IParamsSet* dataConfigurationPtr) const
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
@@ -317,7 +317,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
-	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, -1, -1, nullptr);
+	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, -1, -1, dataConfigurationPtr);
 	if (objectSelectionQuery.isEmpty()){
 		return false;
 	}
@@ -334,7 +334,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
-	istd::IChangeableUniquePtr objectPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
+	istd::IChangeableUniquePtr objectPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record(), dataConfigurationPtr);
 	dataPtr.FromUnique(objectPtr);
 
 	return dataPtr.IsValid();

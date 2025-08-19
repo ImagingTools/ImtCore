@@ -19,7 +19,7 @@ QByteArray CAddressElementDatabaseDelegateComp::GetObjectTypeId(const QByteArray
 	return "Address";
 }
 
-istd::IChangeableUniquePtr CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;

@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QTextStream>
+
 // ACF includes
 #include <ifile/IFilePersistence.h>
 #include <ilog/TLoggerCompWrap.h>

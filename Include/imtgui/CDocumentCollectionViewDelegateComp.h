@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtgui/CObjectCollectionViewDelegate.h>
+#include <iprm/CParamsSet.h>
 
 
 namespace imtgui
@@ -162,6 +163,7 @@ protected:
 	I_REF(imod::IModel, m_documentManagerModelCompPtr);
 	typedef istd::TPointerVector<ICollectionViewDelegate::ObjectInfo> OpenedDocuments;
 	mutable OpenedDocuments m_openedDocuments;
+	mutable iprm::CParamsSet m_loadFilterParamSet;
 
 private:
 	/**

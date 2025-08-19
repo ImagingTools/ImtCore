@@ -75,7 +75,7 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
-	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
+	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual IObjectCollectionUniquePtr CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(

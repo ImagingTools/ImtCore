@@ -521,7 +521,7 @@ const istd::IChangeable* CFileCollectionCompBase::GetObjectPtr(const QByteArray&
 }
 
 
-bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
+bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr, iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	QByteArray typeId = GetObjectTypeId(objectId);
 
@@ -1374,6 +1374,11 @@ void CFileCollectionCompBase::OnComponentCreated()
 			SendCriticalMessage(0, QT_TR_NOOP(QString("Root folder for the file collection could not be created in '%1'").arg(path)));
 		}
 	}
+
+	// Cleanup of the temp directory:
+	imtbase::CTempDir tempDir("ImtCore");
+
+	istd::CSystem::RemoveDirectory(tempDir.GetBasePath());
 }
 
 

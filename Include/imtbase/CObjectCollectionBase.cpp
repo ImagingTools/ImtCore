@@ -221,12 +221,12 @@ bool CObjectCollectionBase::RemoveElements(const Ids& elementIds, const IOperati
 
 	MultiElementNotifierInfo notifierInfo;
 
-	QWriteLocker locker(&m_lock);
-
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 	changeSet.SetChangeInfo(CN_ELEMENTS_REMOVED, QVariant::fromValue(notifierInfo));
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 	istd::IChangeable::ChangeInfoMap changeInfoMap;
+
+	QWriteLocker locker(&m_lock);
 
 	Objects::iterator iter = m_objects.begin();
 	while (iter != m_objects.end()){
@@ -308,7 +308,7 @@ const istd::IChangeable* CObjectCollectionBase::GetObjectPtr(const Id& objectId)
 }
 
 
-bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr) const
+bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr, iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 

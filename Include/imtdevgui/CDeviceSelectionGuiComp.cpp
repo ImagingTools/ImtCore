@@ -40,7 +40,7 @@ void CDeviceSelectionGuiComp::OnDeviceListUpdated(
 	DeviceListComboBox->blockSignals(true);
 	DeviceListComboBox->clear();
 
-	QByteArrayList deviceIds = objectPtr->GetElementIds();
+	imtbase::ICollectionInfo::Ids deviceIds = objectPtr->GetElementIds();
 	int currentIndex = -1;
 	int count = deviceIds.count();
 	for (int i = 0; i < count; ++i) {

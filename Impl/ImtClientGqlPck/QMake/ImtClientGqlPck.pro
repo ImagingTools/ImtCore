@@ -9,6 +9,7 @@ QT += websockets
 
 LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtbasesdl -limtrest -limtgql -limtcom -limtclientgql -limtservergql
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc
+LIBS += -L$$(ACFDIR)/Lib/$$COMPILER_DIR -liprm
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
 include($(ACFCONFIGDIR)/QMake/AcfStd.pri)

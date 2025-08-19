@@ -162,7 +162,7 @@ const istd::IChangeable* CRemoteGqlCollectionController::GetObjectPtr(const Id& 
 }
 
 
-bool CRemoteGqlCollectionController::GetObjectData(const Id& objectId, DataPtr& dataPtr) const
+bool CRemoteGqlCollectionController::GetObjectData(const Id& objectId, DataPtr& dataPtr, iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
 		return false;

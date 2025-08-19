@@ -27,7 +27,9 @@ namespace imtdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeableUniquePtr CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(
+			const QSqlRecord& record,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;

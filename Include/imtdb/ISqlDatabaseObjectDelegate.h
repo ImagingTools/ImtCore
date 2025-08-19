@@ -40,7 +40,9 @@ public:
 	/**
 		Create a data object for the given SQL record.
 	*/
-	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(const QSqlRecord& record) const = 0;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
+		const QSqlRecord& record,
+		const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 
 	/**
 		Create object meta-information element based on the SQL record.

@@ -105,7 +105,7 @@ ICollectionInfo::Id CFilterCollectionProxy::InsertNewObject(
 }
 
 
-bool CFilterCollectionProxy::GetObjectData(const Id& objectId, DataPtr& dataPtr) const
+bool CFilterCollectionProxy::GetObjectData(const Id& objectId, DataPtr& dataPtr, iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	if (!m_isObjectProxy){
 		return BaseClass::GetObjectData(objectId, dataPtr);

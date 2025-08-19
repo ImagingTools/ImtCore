@@ -29,7 +29,9 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(const QSqlRecord& record) const override;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(
+				const QSqlRecord& record,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 };
 
@@ -39,7 +41,9 @@ public:
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 template <class BaseDelegate>
-istd::IChangeableUniquePtr TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFromRecord(
+			const QSqlRecord& record,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!this->m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
