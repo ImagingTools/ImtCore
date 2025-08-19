@@ -216,6 +216,7 @@ private Q_SLOTS:
 	void on_SubPages_itemSelectionChanged();
 	void on_HomeButton_clicked();
 	void on_LoginControlButton_clicked();
+	void on_LoginCancelButton_clicked();
 	void on_CommandsMenuButton_clicked();
 	void OnAutoLogoutTimer();
 	void OnCheckIsFullScreenTimer();

@@ -632,6 +632,17 @@ void CThumbnailDecoratorGuiComp::on_LoginControlButton_clicked()
 }
 
 
+void CThumbnailDecoratorGuiComp::on_LoginCancelButton_clicked()
+{
+	if (m_defaultPageIndexAttrPtr.IsValid()){
+		SwitchToPage(*m_defaultPageIndexAttrPtr);
+	}
+	else{
+		ShowHomePage();
+	}
+}
+
+
 void CThumbnailDecoratorGuiComp::on_CommandsMenuButton_clicked()
 {
 	QPoint origin = CommandsMenuButton->geometry().center();
