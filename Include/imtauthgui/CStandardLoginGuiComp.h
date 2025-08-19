@@ -53,15 +53,17 @@ public:
 	I_END_COMPONENT;
 
 	CStandardLoginGuiComp();
-	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 protected:
+	virtual bool eventFilter(QObject* watched, QEvent* event) override;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiShown() override;
+	virtual void OnGuiHidden() override;
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 
@@ -140,6 +142,8 @@ private:
 
 	LoginLog m_loginLog;
 	SetSuPasswordThread m_setSuPasswordThread;
+
+	QMovie* m_loadingMovie = nullptr;
 };
 
 

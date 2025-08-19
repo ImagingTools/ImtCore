@@ -60,6 +60,7 @@ protected:
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiShown() override;
+	virtual void OnGuiHidden() override;
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 

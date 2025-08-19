@@ -98,13 +98,23 @@ void CRemoteStandardLoginGuiComp::OnGuiShown()
 
 	on_SuPasswordEdit_textEdited("");
 
-	QMovie* movie = new QMovie(":/Animation/Loading");
-	movie->setScaledSize(QSize(50, 50));
-
-	LoadingLabel->setMovie(movie);
+	if (!LoadingLabel->movie()) {
+		auto movie = new QMovie(":/Animation/Loading", "", LoadingLabel);
+		movie->setScaledSize(QSize(50, 50));
+		LoadingLabel->setMovie(movie);
+	}
 
 	LoadingLabel->movie()->start();
 	LoadingLabel->show();
+}
+
+
+void CRemoteStandardLoginGuiComp::OnGuiHidden()
+{
+	if (LoadingLabel->movie())
+		LoadingLabel->movie()->stop();
+
+	BaseClass::OnGuiHidden();
 }
 
 
@@ -133,6 +143,10 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 
 void CRemoteStandardLoginGuiComp::OnGuiDestroyed()
 {
+	if (LoadingLabel->movie()) {
+		LoadingLabel->movie()->stop();
+	}
+
 	m_loginObserver.UnregisterAllObjects();
 	m_loginStatusProviderObserver.UnregisterAllObjects();
 	m_pumaLoginStatusProviderObserver.UnregisterAllObjects();

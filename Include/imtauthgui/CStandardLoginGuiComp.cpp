@@ -97,13 +97,23 @@ void CStandardLoginGuiComp::OnGuiShown()
 
 	on_SuPasswordEdit_textEdited("");
 
-	QMovie* movie = new QMovie(":/Animation/Loading");
-	movie->setScaledSize(QSize(50, 50));
-
-	LoadingLabel->setMovie(movie);
+	if (!LoadingLabel->movie()) {
+		auto movie = new QMovie(":/Animation/Loading", "", LoadingLabel);
+		movie->setScaledSize(QSize(50, 50));
+		LoadingLabel->setMovie(movie);
+	}
 
 	LoadingLabel->movie()->start();
 	LoadingLabel->show();
+}
+
+
+void CStandardLoginGuiComp::OnGuiHidden()
+{
+	if (LoadingLabel->movie())
+		LoadingLabel->movie()->stop();
+
+	BaseClass::OnGuiHidden();
 }
 
 
@@ -125,6 +135,11 @@ void CStandardLoginGuiComp::OnGuiCreated()
 
 void CStandardLoginGuiComp::OnGuiDestroyed()
 {
+	// fix memory leak & eventually freezing after closing the gui
+	if (LoadingLabel->movie()) {
+		LoadingLabel->movie()->stop();
+	}
+
 	m_loginObserver.UnregisterAllObjects();
 	m_connectionObserver.UnregisterAllObjects();
 
