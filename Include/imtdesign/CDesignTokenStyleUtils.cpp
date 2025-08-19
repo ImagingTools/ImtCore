@@ -140,9 +140,9 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromMultiEntry(const QJsonValue& styl
 	QPalette palette;
 
 	QJsonObject jsonObject = styleEntry.toObject();
-	QJsonValue v;
-	for(QJsonObject::const_iterator jsonValue = jsonObject.constBegin(); jsonValue != jsonObject.constEnd(); ++jsonValue){
 
+	QJsonValue v;
+	for (QJsonObject::const_iterator jsonValue = jsonObject.constBegin(); jsonValue != jsonObject.constEnd(); ++jsonValue){
 		for (const QString& groupName: s_colorGroupNamesMap.keys()){
 			if (jsonValue->isObject() && jsonValue.key().startsWith(groupName)){
 				QJsonObject colorGroupObject = jsonValue->toObject();
@@ -150,15 +150,21 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromMultiEntry(const QJsonValue& styl
 				for (QJsonObject::const_iterator jsonColorValue = colorGroupObject.constBegin(); jsonColorValue != colorGroupObject.constEnd(); ++jsonColorValue){
 					if(s_colorRolesNamesMap.contains(jsonColorValue.key())){
 						QColor color;
-						if (!CDesignTokenStyleUtils::CreateColorFromGrb(jsonColorValue->toString(), color)){
+						QString colorTextValue = jsonColorValue->toString();
+						QString roleName = jsonColorValue.key();
+
+						if (!CDesignTokenStyleUtils::CreateColorFromGrb(colorTextValue, color)){
 							#if QT_VERSION >= 0x060600
-							color.fromString(jsonColorValue->toString());
+							color.setNamedColor(colorTextValue);
 							#else
-							color.setNamedColor(jsonColorValue->toString());
+							color.setNamedColor(colorTextValue);
 							#endif
 						}
 						if (color.isValid()){
-							palette.setColor(colorRoleGroup, s_colorRolesNamesMap[jsonColorValue.key()], color);
+							palette.setColor(colorRoleGroup, s_colorRolesNamesMap[roleName], color);
+						}
+						else{
+							qDebug() << QString("Color value: '%1' could not be set").arg(colorTextValue);
 						}
 					}
 				}
