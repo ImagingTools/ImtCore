@@ -7,8 +7,21 @@ namespace imtcom
 
 // protected methods
 
-// reimplemented (icomp::CComponentBase)
+// reimplemented (imtcom/CServerConnectionInterfaceParam)
+int CServerConnectionInterfaceParamComp::GetConnectionFlags() const
+{
+	if (m_sslEnabledCompPtr.IsValid()){
+		if (m_sslEnabledCompPtr->IsEnabled()){
+			return CF_SECURE;
+		}
+		else{
+			return CF_DEFAULT;
+		}
+	}
+	return BaseClass2::GetConnectionFlags();
+}
 
+// reimplemented (icomp::CComponentBase)
 void CServerConnectionInterfaceParamComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();

@@ -101,10 +101,10 @@ bool CServerConnectionInterfaceParam::GetUrl(ProtocolType protocol, QUrl& url) c
 	QString scheme;
 	switch (protocol){
 	case PT_HTTP:
-		scheme = m_connectionFlags & CF_SECURE ? "https" : "http";
+		scheme = GetConnectionFlags() & CF_SECURE ? "https" : "http";
 		break;
 	case PT_WEBSOCKET:
-		scheme = m_connectionFlags & CF_SECURE ? "wss" : "ws";
+		scheme = GetConnectionFlags() & CF_SECURE ? "wss" : "ws";
 		break;
 	case PT_FILE:
 		scheme = "file";

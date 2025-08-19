@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5405" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5416" Description="ACF"/>
+            <Version Id="1" Number="2251" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395265" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Connection parameters for the server side</Description>
@@ -22,6 +22,9 @@
                     <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="DefaultPumaWebSocketPort">
                         <Data IsEnabled="true" Value="8788"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ExternalEnableSSL" Type="Reference" ExportId="ExternalEnableSSL">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -35,6 +38,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultWebSocketPort" Type="Integer" ExportId="DefaultWebSocketPort">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ExternalEnableSSL" Type="Reference" ExportId="ExternalEnableSSL">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
