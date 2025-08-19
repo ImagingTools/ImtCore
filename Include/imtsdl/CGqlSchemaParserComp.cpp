@@ -199,7 +199,7 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 	static QRegularExpression commentRegex("#.*\n");
 	content.replace(commentRegex, "\n");
 
-	QString outputFileName = m_tempDirPtr->Path() + QDir::separator() + "schema.sdl";
+	QString outputFileName = m_tempDirPtr->GetPath() + QDir::separator() + "schema.sdl";
 	QFile outputFile(outputFileName);
 
 	if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text)){

@@ -454,13 +454,13 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 		if (persistencePtr != nullptr){
 			imtbase::CTempDir tempDir("ImtCore");
-			if (tempDir.Path().isEmpty()){
+			if (tempDir.GetPath().isEmpty()){
 				SendErrorMessage(0, QT_TR_NOOP("Temp folder could not be created"));
 
 				return QByteArray();
 			}
 
-			QString tempFileBaseName = tempDir.Path() + "/" + QUuid::createUuid().toString();
+			QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString();
 
 			QString workingExt = GetWorkingExt(
 						persistencePtr,
@@ -599,13 +599,13 @@ bool CFileCollectionCompBase::SetObjectData(
 	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(GetObjectTypeId(objectId));
 	if (persistencePtr != nullptr){
 		imtbase::CTempDir tempDir("ImtCore");
-		if (tempDir.Path().isEmpty()){
+		if (tempDir.GetPath().isEmpty()){
 			SendErrorMessage(0, QT_TR_NOOP("Temp folder could not be created"));
 
 			return false;
 		}
 
-		QString tempFileBaseName = tempDir.Path() + "/" + QUuid::createUuid().toString();
+		QString tempFileBaseName = tempDir.GetPath() + "/" + QUuid::createUuid().toString();
 
 		QString workingExt = GetWorkingExt(
 					persistencePtr,

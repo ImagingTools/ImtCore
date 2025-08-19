@@ -151,7 +151,7 @@ iproc::IProcessor::TaskState CBaseClassExtenderComp::DoProcessing(
 	}
 
 	imtbase::CTempDir tempDir;
-	const QString tempPath = tempDir.Path();
+	const QString tempPath = tempDir.GetPath();
 
 	iprm::TParamsPtr<ifile::IFileNameParam> headerFilePathPtr(paramsPtr, QByteArrayLiteral("HeaderFile"));
 	if (!headerFilePathPtr.IsValid()){
