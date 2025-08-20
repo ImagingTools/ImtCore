@@ -93,14 +93,16 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 				Q_ASSERT(fieldIds.count() < 2);
 				for (int i = 0; i < fieldIds.count(); i++){
 					QString fieldId = fieldIds[i];
+
+					const QByteArray& dataColumn = m_useDataMetaInfoAttrPtr.IsValid() && *m_useDataMetaInfoAttrPtr
+														? s_dataMetaInfoColumn : s_documentColumn;
+					fieldId = s_filterableColumns.contains(fieldId) ? QStringLiteral(R"("%1")").arg(fieldId) : CreateJsonExtractSql(dataColumn, fieldId);
 	
-					fieldId = s_filterableColumns.contains(fieldId) ? QString("\"%1\"").arg(fieldId) : CreateJsonExtractSql(s_dataMetaInfoColumn, fieldId);
-	
-					distinctString += i > 0 ? QString(", %1").arg(fieldId) : fieldId;
+					distinctString += i > 0 ? QStringLiteral(", %1").arg(fieldId) : fieldId;
 				}
 	
 				if (!distinctString.isEmpty()){
-					selectionQuery = QString("SELECT DISTINCT ON (%1) * FROM %2 as collectiondata").arg(distinctString, selectionQuery).toUtf8();
+					selectionQuery = QStringLiteral("SELECT DISTINCT ON (%1) * FROM (%2) as collectiondata").arg(distinctString, selectionQuery).toUtf8();
 				}
 			}
 		}
