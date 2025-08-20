@@ -385,6 +385,7 @@ StyleComponents {
 
 			property alias textVisible: cbTitleTxt.visible;
 			property alias iconVisible: cbArrowIcon.visible;
+			property alias icon: cbArrowIcon;
 
 			property bool isCropped: textHelper.width > cbTitleTxt.width;
 

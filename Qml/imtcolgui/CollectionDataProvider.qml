@@ -36,7 +36,9 @@ QtObject {
 	signal failed(string message);
 
 	Component.onCompleted: {
-		filter.setSortingInfo(sortByField, orderType)
+		if(sortByField && orderType){
+			filter.setSortingInfo(sortByField, orderType)
+		}
 	}
 
 	Component.onDestruction: {
@@ -58,11 +60,15 @@ QtObject {
 	}
 
 	onOrderTypeChanged: {
-		filter.setSortingInfo(sortByField, orderType)
+		if(sortByField && orderType){
+			filter.setSortingInfo(sortByField, orderType)
+		}
 	}
 
 	onSortByFieldChanged: {
-		filter.setSortingInfo(sortByField, orderType)
+		if(sortByField && orderType){
+			filter.setSortingInfo(sortByField, orderType)
+		}
 	}
 
 	function updateModel(offset){

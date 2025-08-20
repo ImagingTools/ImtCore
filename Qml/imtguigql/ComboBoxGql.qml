@@ -25,7 +25,6 @@ ComboBox {
 	property Component popupDecorator: Style.popupDecoratorGql
 
 	// signals
-	signal setCurrentText(var modelll, int index);
 	signal editSignal();
 	signal closeSignal(var model_);
 	signal clearSignal();
@@ -57,7 +56,6 @@ ComboBox {
 			visibleScrollBar: comboBoxContainerGql.visibleScrollBar;
 
 			Component.onCompleted: {
-				// comboBoxContainerGql.finished.connect(popup.finished);
 				popup.closeSignal.connect(comboBoxContainerGql.closeSignal);
 				popup.clearSignal.connect(comboBoxContainerGql.clearSignal);
 			}
@@ -73,7 +71,6 @@ ComboBox {
 
 				comboBoxContainerGql.isOpen = false;
 
-				// comboBoxContainerGql.setCurrentText(popup.model, index)
 				if (comboBoxContainerGql.currentText == ""){
 					comboBoxContainerGql.currentText = popup.filterText;
 				}
@@ -172,7 +169,6 @@ ComboBox {
 		offset: 0
 		count: 15
 		commandId: comboBoxContainerGql.commandId
-		sortByField: comboBoxContainerGql.nameId
 
 		function setCustomInputParams(inputParams){
 			comboBoxContainerGql.setCustomFilters(inputParams)
