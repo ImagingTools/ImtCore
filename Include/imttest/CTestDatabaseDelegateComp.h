@@ -20,7 +20,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(const QSqlRecord& record) const override;
+	virtual istd::IChangeableUniquePtr CreateObjectFromRecord(const QSqlRecord& record, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,

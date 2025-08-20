@@ -17,7 +17,7 @@ namespace imttest
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeableUniquePtr CTestDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+istd::IChangeableUniquePtr CTestDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
