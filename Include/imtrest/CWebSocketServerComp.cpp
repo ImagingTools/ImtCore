@@ -333,7 +333,12 @@ void CWebSocketServerComp::OnTimeout()
 		if (!m_senders[key].isNull()){
 			QWebSocket* webSocketPtr = const_cast<QWebSocket*>(m_senders[key]->GetSocket());
 			if (webSocketPtr != nullptr && !sendedSockets.contains(webSocketPtr)){
-				QString subProtocolId = webSocketPtr->subprotocol();
+				QString subProtocolId;
+
+			#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+				subProtocolId = webSocketPtr->subprotocol();
+			#endif
+
 				if (subProtocolId == "graphql-transport-ws"){
 					//optional ToDo: Remember send ping and disconnect websocket if no pong is received
 					webSocketPtr->sendTextMessage(QString(R"({"type": "ping"})"));
