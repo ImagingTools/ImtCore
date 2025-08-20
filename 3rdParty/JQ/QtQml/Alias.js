@@ -87,7 +87,11 @@ class Alias extends Property {
 
             if(!found){
                 let connectionObj = Signal.get(target, name + 'Changed').connect(()=>{
-                    link.meta.type.set(link.target, link.name, link.func, link.meta)
+                    if(!link.target[link.name+'__updating']){
+                        link.target[link.name+'__updating'] = true
+                        link.meta.type.set(link.target, link.name, link.func, link.meta)
+                        delete link.target[link.name+'__updating']
+                    }
                 })
     
                 link.target.__depends[link.name].push(connectionObj)
