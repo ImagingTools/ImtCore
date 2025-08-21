@@ -6,6 +6,8 @@ import imtcontrols 1.0
 Item{
 	id: inputView;
 
+	// \todo check functionality with TreeItemModel
+
 	property var model;
 	property TreeItemModel dataModel: TreeItemModel{};
 
@@ -47,7 +49,7 @@ Item{
 			Loader{
 			id: loader;
 
-			source: model.item.m_source || model.Source || "";
+			source: model.item ? model.item.m_source : model.Source || "";
 
 			function setValue(value_){
 				item.value = value_
@@ -82,7 +84,7 @@ Item{
 							loader.setValue(value);
 						}
 						else {
-							if (value !== undefined) {
+							if (key in item && value !== undefined) {
 								item[key] = value;
 							}
 						}
