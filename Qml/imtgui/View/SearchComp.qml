@@ -21,6 +21,10 @@ ComboBoxGql{
 	visibleIcon: !clearButton.visible
 
 	onClearSignal:{
+		reset()
+	}
+
+	function reset(){
 		searchContainer.filterText = ""
 		searchContainer.currentText = "";
 		searchContainer.currentIndex = -1
