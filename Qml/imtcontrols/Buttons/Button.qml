@@ -112,6 +112,7 @@ ControlBase {
 		onExited: {
 			if (baseButton){
 				baseButton.exited(mouseX, mouseY);
+				baseButton.down = false
 			}
 		}
 
@@ -119,6 +120,10 @@ ControlBase {
 			if (baseButton){
 				baseButton.positionChanged(mouse.x, mouse.y);
 			}
+		}
+
+		onCanceled: {
+			baseButton.down = false
 		}
 	}
 }
