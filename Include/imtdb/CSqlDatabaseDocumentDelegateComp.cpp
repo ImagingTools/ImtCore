@@ -410,8 +410,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateMetaInfoQuery(const QSq
 	QByteArray metaInfoRepresentation = QByteArrayLiteral("{}");
 
 	if (m_metaInfoCreatorCompPtr.IsValid()){
-		idoc::MetaInfoPtr metaInfoPtr;
-		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(objectPtr.GetPtr(), typeId, metaInfoPtr) && metaInfoPtr.IsValid()){
+		idoc::MetaInfoPtr metaInfoPtr = CreateObjectMetaInfo(typeId);
+		if (metaInfoPtr.IsValid()){
 			if (m_jsonBasedMetaInfoDelegateCompPtr.IsValid()){
 				if (!m_jsonBasedMetaInfoDelegateCompPtr->ToJsonRepresentation(*metaInfoPtr.GetPtr(), metaInfoRepresentation)){
 					SendErrorMessage(0, "Meta information could not be converted to the JSON-based representation");
@@ -1343,27 +1343,6 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICom
 	SubstituteFieldIds(textFilterQuery);
 
 	return true;
-}
-
-
-const ifile::IFilePersistence* CSqlDatabaseDocumentDelegateComp::FindDocumentPersistence(const QByteArray& typeId) const
-{
-	int persistenceIndex = -1;
-
-	if (m_typesCompPtr.IsValid()){
-		for (int i = 0; i < m_typesCompPtr->GetOptionsCount(); ++i){
-			if (typeId == m_typesCompPtr->GetOptionId(i)){
-				persistenceIndex = i;
-				break;
-			}
-		}
-	}
-
-	if ((persistenceIndex >= 0) && persistenceIndex < m_documentPersistenceListCompPtr.GetCount()){
-		return m_documentPersistenceListCompPtr[persistenceIndex];
-	}
-
-	return nullptr;
 }
 
 
