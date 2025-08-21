@@ -308,7 +308,7 @@ const istd::IChangeable* CObjectCollectionBase::GetObjectPtr(const Id& objectId)
 }
 
 
-bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr, iprm::IParamsSet* /*dataConfigurationPtr*/) const
+bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 

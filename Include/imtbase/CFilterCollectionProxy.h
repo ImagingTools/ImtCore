@@ -39,7 +39,7 @@ public:
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
 				const IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
+	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual bool SetObjectData(
 				const Id& objectId,
 				const istd::IChangeable& object,

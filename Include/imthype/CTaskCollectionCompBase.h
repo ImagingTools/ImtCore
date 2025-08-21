@@ -95,7 +95,7 @@ public:
 	virtual bool GetObjectData(
 				const QByteArray& objectId,
 				DataPtr& dataPtr,
-				iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
+				const iprm::IParamsSet* dataConfigurationPtr = nullptr) const override;
 	virtual bool SetObjectData(
 				const QByteArray& objectId,
 				const istd::IChangeable& object,

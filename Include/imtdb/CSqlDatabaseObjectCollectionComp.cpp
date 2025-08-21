@@ -301,7 +301,7 @@ const istd::IChangeable* CSqlDatabaseObjectCollectionComp::GetObjectPtr(const QB
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr, iprm::IParamsSet* dataConfigurationPtr) const
+bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;

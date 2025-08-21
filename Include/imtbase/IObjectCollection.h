@@ -177,7 +177,7 @@ public:
 	/**
 		Get object data instance for the entry with the given ID.
 	*/
-	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, iprm::IParamsSet* dataConfigurationPtr = nullptr) const = 0;
+	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr = nullptr) const = 0;
 
 	/**
 		Set data for the entry with the given ID.

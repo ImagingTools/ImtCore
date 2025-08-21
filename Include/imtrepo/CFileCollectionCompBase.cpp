@@ -521,7 +521,7 @@ const istd::IChangeable* CFileCollectionCompBase::GetObjectPtr(const QByteArray&
 }
 
 
-bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr, iprm::IParamsSet* /*dataConfigurationPtr*/) const
+bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	QByteArray typeId = GetObjectTypeId(objectId);
 

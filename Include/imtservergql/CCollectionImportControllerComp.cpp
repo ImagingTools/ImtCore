@@ -208,7 +208,7 @@ bool CCollectionImportControllerComp::PrepareProgressManager(SessionInfo& sessio
 }
 
 
-void CCollectionImportControllerComp::UploadProgressChanged(QByteArray sessionId, QByteArray fileId)
+void CCollectionImportControllerComp::UploadProgressChanged(QByteArray sessionId, QByteArray /*fileId*/)
 {
 	QMutexLocker locker(&m_mutex);
 

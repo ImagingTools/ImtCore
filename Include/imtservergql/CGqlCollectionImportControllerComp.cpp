@@ -54,7 +54,7 @@ collectionImport::CSessionStatus CGqlCollectionImportControllerComp::OnBeginColl
 				}
 			}
 
-			if (session.files.size() == sdlImportParamsV1_0.fileList->count()){
+			if (session.files.size() == size_t(sdlImportParamsV1_0.fileList->count())){
 				if (!m_collectionImportControllerCompPtr->BeginCollectionImportSession(session, errorMessage)){
 					retVal.Version_1_0->status = collectionImport::Status::Failed;
 				}

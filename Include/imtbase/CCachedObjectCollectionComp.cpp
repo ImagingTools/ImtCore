@@ -181,7 +181,7 @@ const istd::IChangeable* CCachedObjectCollectionComp::GetObjectPtr(const Id& obj
 }
 
 
-bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, iprm::IParamsSet* /*dataConfigurationPtr*/) const
+bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
