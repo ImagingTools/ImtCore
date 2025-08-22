@@ -39,6 +39,7 @@ class Canvas extends Item {
     $initCtx(ctx){
         if(this.$init) return
 
+        ctx.text = (...args)=>{ctx.fillText(...args)}
         ctx.roundedRect = (...args)=>{ctx.roundRect(...args)}
         let originDrawImage = ctx.drawImage
         ctx.drawImage = (...args)=>{
