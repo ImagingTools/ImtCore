@@ -125,10 +125,10 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 
 	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
 		QStringList cumulatedFiles;
-		const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
 		const QString sourceFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
-		cumulatedFiles << headerFilePath;
+		const QString headerFilePath = CalculateTargetCppFilesFromSchemaParams(*m_schemaParamsCompPtr, *m_argumentParserCompPtr)[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
 		cumulatedFiles << sourceFilePath;
+		cumulatedFiles << headerFilePath;
 
 		PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
