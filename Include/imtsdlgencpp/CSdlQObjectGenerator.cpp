@@ -1293,6 +1293,9 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("{");
 	FeedStream(stream, 1, false);
 
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("Q_UNUSED(key);");
+
 	for (const imtsdl::CSdlField& field: fieldList){
 		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 		if (isCustom && !isEnum){

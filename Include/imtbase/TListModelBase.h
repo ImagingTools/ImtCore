@@ -90,6 +90,8 @@ template <class ModelDataType, class ModelObjectDataType>
 QVariant TListModelBase<ModelDataType, ModelObjectDataType>::
 			data(const QModelIndex& index, int role) const
 {
+	Q_UNUSED(role);
+
 	int row = index.row();
 	if (!Version_1_0.has_value() || row < 0 || row > Version_1_0->count() - 1){
 		return QVariant();
@@ -104,6 +106,8 @@ template <class ModelDataType, class ModelObjectDataType>
 bool TListModelBase<ModelDataType, ModelObjectDataType>::
 			setData(const QModelIndex& index, const QVariant& value, int role)
 {
+	Q_UNUSED(role);
+
 	int row = index.row();
 
 	if (!Version_1_0.has_value() || row < 0 || row > Version_1_0->count() - 1){
