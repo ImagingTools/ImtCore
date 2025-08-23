@@ -101,7 +101,6 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Helper script to extract CXX or QML file name from SDL schema')
 	parser.add_argument('-S', '--schema-file', required=True, help='SDL schema file path')
 	parser.add_argument('-O', '--output-directory', required=True, help='Directory where created files will be created')
-	parser.add_argument('--auto-join', required=False, help='Indicates if an automatic join of output files into a single is enabled.', action='store_true')
 	parser.add_argument('--CPP', required=False, help='C++ Modificator to generate code.', action='store_true', default=False)
 	parser.add_argument('--GQL', required=False, help='GraphQL Modificator to generate GrqphQL wrap C++ code . (disables CPP and QML if it not setted explicit)', action='store_true', default=False)
 	parser.add_argument('--QML', required=False, help='QML Modificator to generate code. (disables CPP and GQL if it not setted explicit)', action='store_true', default=False)

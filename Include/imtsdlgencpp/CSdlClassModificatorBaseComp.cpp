@@ -22,30 +22,38 @@ namespace imtsdlgencpp
 
 // public methods
 
-//reimplemented(iproc::IProcessor)
+// reimplemented (ICxxFileProcessor)
 
-bool CSdlClassModificatorBaseComp::ProcessType(const imtsdl::CSdlType& sdlType, QFile* headerFilePtr, QFile* sourceFilePtr)
+bool CSdlClassModificatorBaseComp::ProcessEntry (
+			const imtsdl::CSdlEntryBase& sdlEntry,
+			QIODevice* headerDevicePtr,
+			QIODevice* sourceDevicePtr,
+			const iprm::IParamsSet* paramsPtr) const
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_sdlEnumListCompPtr.IsValid());
 
-	if (!m_argumentParserCompPtr->IsModificatorEnabled(*m_processorModificatorNameAttrPtr)){
-		// nothing todo if our modificator is not exsits
-		return true;
-	}
+	const imtsdl::CSdlType* sdlTypePtr =  dynamic_cast<const imtsdl::CSdlType*>(&sdlEntry);
+	if (sdlTypePtr == nullptr || (headerDevicePtr == nullptr && sourceDevicePtr == nullptr)){
+		I_CRITICAL();
 
-	m_headerFilePtr = headerFilePtr;
-	m_sourceFilePtr = sourceFilePtr;
-
-	bool isOk = ProcessHeaderClassFile(sdlType);
-	if (!isOk){
 		return false;
 	}
 
-	isOk = isOk && ProcessSourceClassFile(sdlType);
-	if (!isOk){
-		return false;
+	bool isOk = false;
+	if (headerDevicePtr != nullptr){
+		isOk = ProcessHeaderClassFile(*sdlTypePtr, headerDevicePtr, paramsPtr);
+		if (!isOk){
+			return false;
+		}
+	}
+
+	if (sourceDevicePtr != nullptr){
+		isOk = isOk && ProcessSourceClassFile(*sdlTypePtr, sourceDevicePtr, paramsPtr);
+		if (!isOk){
+			return false;
+		}
 	}
 
 	return true;

@@ -109,6 +109,7 @@ bool CGqlSchemaParser::ParseGqlSchema()
 
 SdlTypeList CGqlSchemaParser::GetSdlTypes(bool onlyLocal) const
 {
+	/// \todo optimize it (invert)
 	SdlTypeList retVal = m_sdlTypes;
 
 	if (onlyLocal){
@@ -158,6 +159,7 @@ SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
 
 SdlRequestList CGqlSchemaParser::GetRequests(bool onlyLocal) const
 {
+	/// \todo optimize it (invert)
 	SdlRequestList retVal = m_requests;
 	if (onlyLocal){
 		QMutableListIterator requestsIter(retVal);
@@ -177,6 +179,7 @@ SdlRequestList CGqlSchemaParser::GetRequests(bool onlyLocal) const
 
 SdlEnumList CGqlSchemaParser::GetEnums(bool onlyLocal) const
 {
+	/// \todo optimize it (invert)
 	SdlEnumList retVal = m_enums;
 
 	if (onlyLocal){
@@ -197,6 +200,7 @@ SdlEnumList CGqlSchemaParser::GetEnums(bool onlyLocal) const
 
 SdlUnionList CGqlSchemaParser::GetUnions(bool onlyLocal) const
 {
+	/// \todo optimize it (invert)
 	SdlUnionList retVal = m_unions;
 
 	if (onlyLocal){

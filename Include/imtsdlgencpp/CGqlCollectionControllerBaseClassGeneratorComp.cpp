@@ -1,9 +1,6 @@
 #include <imtsdlgencpp/CGqlCollectionControllerBaseClassGeneratorComp.h>
 
 
-// C includes
-#include <iostream>
-
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
@@ -62,13 +59,13 @@ static QMap<imtsdl::CSdlDocumentType::OperationType, QString> s_operationsAliasL
 
 // public methods
 
-// reimplemented(iproc::IProcessor)
+// reimplemented (ICxxFileProcessor)
 
-iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* paramsPtr,
-			const istd::IPolymorphic* /*inputPtr*/,
-			istd::IChangeable* /*outputPtr*/,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessEntry (
+			const imtsdl::CSdlEntryBase& sdlEntry,
+			QIODevice* headerDevicePtr,
+			QIODevice* sourceDevicePtr,
+			const iprm::IParamsSet* paramsPtr) const
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
@@ -77,287 +74,78 @@ iproc::IProcessor::TaskState CGqlCollectionControllerBaseClassGeneratorComp::DoP
 	Q_ASSERT(m_sdlDocumentListCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	if (!m_argumentParserCompPtr->IsGqlEnabled()){
-		return TS_OK;
-	}
 
-	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, true);
-	if (outputDirectoryPath.isEmpty()){
-		SendCriticalMessage(0, "Output path is not provided");
+	const imtsdl::CSdlDocumentType* sdlDocumentType = dynamic_cast<const imtsdl::CSdlDocumentType*>(&sdlEntry);
+	if (sdlDocumentType == nullptr || headerDevicePtr == nullptr || sourceDevicePtr == nullptr){
 		I_CRITICAL();
-
-		return TS_INVALID;
-	}
-
-	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
-		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
-		I_CRITICAL();
-
-		return TS_INVALID;
-	}
-
-	const QString defaultName = QFileInfo(m_argumentParserCompPtr->GetSchemaFilePath()).fileName();
-	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
-	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
-	}
-	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
-	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
-
-	imtsdl::SdlDocumentTypeList sdlDocumentTypeList = m_sdlDocumentListCompPtr->GetDocumentTypes(true);
-
-	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
-		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
-			QStringList cumulatedFiles;
-			for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-				if (!joinHeaders){
-					cumulatedFiles << WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h"), outputDirectoryPath);
-				}
-				if (!joinSources){
-					cumulatedFiles << WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), outputDirectoryPath);
-				}
-			}
-			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
-			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
-		}
-
-		if (m_argumentParserCompPtr->IsDependenciesMode()){
-			return TS_OK;
-		}
-	}
-
-	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
-	for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-		m_headerFilePtr.SetPtr(new QFile(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h"), tempDirectoryPath)));
-		m_sourceFilePtr.SetPtr(new QFile(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), tempDirectoryPath)));
-
-		if (!ProcessFiles(sdlDocumentType, !joinHeaders, !joinSources)){
-			SendErrorMessage(0, QString("Unable to process files"));
-
-			return TS_INVALID;
-		}
-
-		if (!CloseFiles()){
-			SendErrorMessage(0, QString("Unable to finalize files"));
-			I_CRITICAL();
-
-			return TS_INVALID;
-		}
-
-		// add extending for base class
-		iprm::CParamsSet paramsSet;
-		ifile::CFileNameParam headerFileNameParam;
-		headerFileNameParam.SetPath(m_headerFilePtr->fileName());
-		paramsSet.SetEditableParameter(QByteArrayLiteral("HeaderFile"), &headerFileNameParam);
-		iprm::CEnableableParam enableCompMacroParam(true);
-		paramsSet.SetEditableParameter(QByteArrayLiteral("AddBaseComponentMacro"), &enableCompMacroParam);
-
-		iprm::COptionsManager baseClassDirectivesList;
-		baseClassDirectivesList.InsertOption(QStringLiteral("imtservergql/CObjectCollectionControllerCompBase.h"), QByteArrayLiteral("::imtservergql::CObjectCollectionControllerCompBase"));
-
-		int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
-		if (extendResult != TS_OK){
-			SendErrorMessage(0, QString("Unable to extend file'%1'").arg(m_headerFilePtr->fileName()));
-			I_CRITICAL();
-
-			return TS_INVALID;
-		}
-	}
-
-	// join files if required
-	if (!joinRules.isEmpty()){
-		if (m_filesJoinerCompPtr.IsValid()){
-			iprm::CParamsSet inputParams;
-			ifile::CFileNameParam sourceDirPathParam;
-			sourceDirPathParam.SetPath(tempDirectoryPath);
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
-			ifile::CFileNameParam outputFileNameParam;
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
-			iprm::CEnableableParam appendEnableParam;
-			appendEnableParam.SetEnabled(true);
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_appendModeParamId, &appendEnableParam);
-
-			iprm::COptionsManager filterParams;
-
-			if (joinHeaders){
-				filterParams.ResetOptions();
-				for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-					filterParams.InsertOption(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h")), QByteArray::number(filterParams.GetOptionsCount()));
-				}
-
-				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
-				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
-				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join header files");
-
-					return TS_INVALID;
-				}
-
-				// cleanup joined files
-				for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-					QFile::remove(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h"), tempDirectoryPath));
-				}
-			}
-			if (joinSources){
-				filterParams.ResetOptions();
-				for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-					filterParams.InsertOption(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp")), QByteArray::number(filterParams.GetOptionsCount()));
-				}
-
-				const QString sourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
-				outputFileNameParam.SetPath(sourceFilePath);
-				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
-				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join source  files");
-
-					return TS_INVALID;
-				}
-
-				// cleanup joined files
-				for (const imtsdl::CSdlDocumentType& sdlDocumentType: sdlDocumentTypeList){
-					QFile::remove(WrapFileName(sdlDocumentType.GetName(), QStringLiteral("cpp"), tempDirectoryPath));
-				}
-
-				// add joined header include directive
-				if (joinHeaders){
-					QFile joinedSourceFile(sourceFilePath);
-					if (!joinedSourceFile.open(QIODevice::ReadWrite)){
-						SendCriticalMessage(0, QString("Unable to open joined filee '%1'").arg(sourceFilePath));
-						I_CRITICAL();
-
-						return TS_INVALID;
-					}
-					QFileInfo headerFileInfo(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
-					QByteArray sourceReadData = joinedSourceFile.readAll();
-					joinedSourceFile.seek(0);
-					QByteArray includeDirective = QByteArrayLiteral("#include ");
-					includeDirective.append('"').append(headerFileInfo.fileName().toUtf8()).append('"');
-					includeDirective.append('\n').append('\n').append('\n');
-					sourceReadData.prepend(includeDirective);
-					joinedSourceFile.write(sourceReadData);
-				}
-			}
-		}
-	}
-
-	return TS_OK;
-}
-
-
-// private static methods
-
-QString CGqlCollectionControllerBaseClassGeneratorComp::WrapFileName(const QString& baseName, const QString& ext, const QString& directoryPath)
-{
-	QString retVal;
-	Q_ASSERT_X(!ext.isEmpty(), __func__, "Extension for file MUST be specified");
-
-	if (!directoryPath.isEmpty()){
-		retVal.append(directoryPath);
-		if (!retVal.endsWith('/') || !retVal.endsWith(QDir::separator())){
-			retVal.append('/');
-		}
-	}
-	retVal += 'C';
-	retVal.append(baseName);
-	retVal.append(QStringLiteral("CollectionControllerCompBase."));
-	retVal.append(ext);
-
-	return retVal;
-}
-
-
-// private methods
-
-bool CGqlCollectionControllerBaseClassGeneratorComp::CloseFiles()
-{
-	bool retVal = true;
-
-	retVal = m_headerFilePtr->flush();
-
-	retVal = m_sourceFilePtr->flush() && retVal;
-
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	return retVal;
-}
-
-
-bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessFiles(const imtsdl::CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude, bool addSelfHeaderInclude)
-{
-	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
-		SendCriticalMessage(0,
-							QString("Unable to open file: '%1'. Error: %2")
-								.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	if (!m_sourceFilePtr->open(QIODevice::WriteOnly)){
-		SendCriticalMessage(0,
-							QString("Unable to open file: '%1'. Error: %2")
-								.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
-
-		AbortCurrentProcessing();
 
 		return false;
 	}
 
 	bool retVal = true;
-	retVal = retVal && ProcessHeaderClassFile(sdlDocumentType, addDependenciesInclude);
-	retVal = retVal && ProcessSourceClassFile(sdlDocumentType, addSelfHeaderInclude);
+	retVal = retVal && ProcessHeaderClassFile(*sdlDocumentType, headerDevicePtr, paramsPtr);
+	retVal = retVal && ProcessSourceClassFile(*sdlDocumentType, sourceDevicePtr, paramsPtr);
 
 	return retVal;
 }
 
 
-bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude)
-{
-	QTextStream ifStream(m_headerFilePtr.GetPtr());
+// reimplemented (ICxxFileProcessor)
 
-	// preprocessor's section
-	ifStream << QStringLiteral("#pragma once");
-	FeedStream(ifStream, 3, false);
+QSet<imtsdl::IncludeDirective> CGqlCollectionControllerBaseClassGeneratorComp::GetIncludeDirectives() const
+{
+	if (!m_sdlRequestListCompPtr.IsValid()){
+		return QSet<imtsdl::IncludeDirective>();
+	}
+
+	imtsdl::SdlDocumentTypeList list = m_sdlDocumentListCompPtr->GetDocumentTypes(true);
+	if (list.isEmpty()){
+		return QSet<imtsdl::IncludeDirective>();
+	}
+
+	static QSet<imtsdl::IncludeDirective> retVal = {
+		CreateImtDirective("<imtservergql/CObjectCollectionControllerCompBase.h>")
+	};
+
+	return retVal;
+}
+
+
+bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const
+{
+	QTextStream ifStream(headerDevicePtr);
 
 	const imtsdl::SdlDocumentTypeList subtypesList = sdlDocumentType.GetSubtypes();
-
-	// add generated includes
-	if (addDependenciesInclude){
-		AddRequiredIncludesForDocument(ifStream, sdlDocumentType);
-		FeedStream(ifStream, 1, false);
-		for (const imtsdl::CSdlDocumentType& subtype: subtypesList){
-			AddRequiredIncludesForDocument(ifStream, subtype);
-			FeedStream(ifStream, 1, false);
-		}
-		FeedStream(ifStream, 1, false);
-	}
-
-	// namespace begin
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
 		m_customSchemaParamsCompPtr,
 		m_argumentParserCompPtr,
 		false);
-	ifStream << QStringLiteral("namespace ");
-	ifStream <<  sdlNamespace;
-	FeedStream(ifStream, 1, false);
-
-	ifStream <<  QStringLiteral("{");
-	FeedStream(ifStream, 3, false);
 
 	// class begin
-	ifStream << QStringLiteral("class C") << sdlDocumentType.GetName() << QStringLiteral("CollectionControllerCompBase");
+	ifStream << QStringLiteral("class C") << sdlDocumentType.GetName() << QStringLiteral("CollectionControllerCompBase: public ::imtservergql::CObjectCollectionControllerCompBase");
 	FeedStream(ifStream, 1, false);
 
 	ifStream << QStringLiteral("{");
-	FeedStream(ifStream, 1, false);
+	FeedStream(ifStream, 2, false);
 
 	// public section
-	/// \bug if no public section, base class macro will not be added
-	/// \todo fix it
 	ifStream << QStringLiteral("public:");
 	FeedStream(ifStream, 1, false);
+
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("typedef ::imtservergql::CObjectCollectionControllerCompBase BaseClass;");
+	FeedStream(ifStream, 2, false);
+
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("I_BEGIN_BASE_COMPONENT(C");
+	ifStream << sdlDocumentType.GetName();
+	ifStream << QStringLiteral("CollectionControllerCompBase)");
+	FeedStream(ifStream, 1, false);
+
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("I_END_COMPONENT");
+	FeedStream(ifStream, 2, false);
+
 	FeedStreamHorizontally(ifStream);
 	ifStream << QStringLiteral("virtual QMap<int, QByteArray> GetSupportedCommandIds() const override;");
 	FeedStream(ifStream, 2, false);
@@ -457,39 +245,18 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 	ifStream << QStringLiteral("};");
 	FeedStream(ifStream, 3, false);
 
-	// end of namespace
-	ifStream << QStringLiteral("} // namespace ");
-	ifStream << sdlNamespace;
-	FeedStream(ifStream, 1, false);
-
 	return true;
 }
 
 
-bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, bool addSelfHeaderInclude)
+bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	QTextStream ifStream(m_sourceFilePtr.GetPtr());
+	QTextStream ifStream(sourceDevicePtr);
 
-	// include section
-	if (addSelfHeaderInclude){
-		ifStream << QStringLiteral("#include \"");
-		ifStream << WrapFileName(sdlDocumentType.GetName(), QStringLiteral("h")) << '"';
-		FeedStream(ifStream, 2);
-	}
-	FeedStream(ifStream, 1);
-
-	// namespace begin
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
-				m_customSchemaParamsCompPtr,
-				m_argumentParserCompPtr,
-				false);
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("namespace ");
-		ifStream << sdlNamespace;
-		FeedStream(ifStream, 1, false);
-		ifStream << '{';
-		FeedStream(ifStream, 3, false);
-	}
+		m_customSchemaParamsCompPtr,
+		m_argumentParserCompPtr,
+		false);
 
 	// GetSupportedCommandIds method
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
@@ -532,32 +299,14 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(cons
 
 	AddSpecialMethodImplCodeForDocument(ifStream, sdlDocumentType);
 
-
-	// end of namespace
-	FeedStream(ifStream, 2, false);
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("} // namespace ");
-		ifStream << sdlNamespace;
-	}
-	FeedStream(ifStream, 1, true);
-
 	return true;
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AbortCurrentProcessing()
-{
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	I_CRITICAL();
-
-	m_headerFilePtr->remove();
-	m_sourceFilePtr->remove();
-}
-
-
-void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodDeclarationForOperationType(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlRequest& sdlRequest)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodDeclarationForOperationType(
+			QTextStream& stream,
+			imtsdl::CSdlDocumentType::OperationType operationType,
+			const imtsdl::CSdlRequest& sdlRequest) const
 {
 	if (!s_nonTrivialOperationMethodsMap.contains(operationType)){
 		SendCriticalMessage(0, "Unexpected type");
@@ -599,7 +348,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodDeclarationForOper
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddBaseMethodDeclarationForOperationType(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QString& className)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddBaseMethodDeclarationForOperationType(
+			QTextStream& stream,
+			imtsdl::CSdlDocumentType::OperationType operationType,
+			const QString& className) const
 {
 	if (!s_nonTrivialOperationMethodsMap.contains(operationType)){
 		SendCriticalMessage(0, "Unexpected type");
@@ -622,7 +374,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddBaseMethodDeclarationFor
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddRequiredIncludesForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddRequiredIncludesForDocument(
+			QTextStream& stream,
+			const imtsdl::CSdlDocumentType& sdlDocumentType,
+			uint hIndents) const
 {
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("// ");
@@ -642,7 +397,10 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddRequiredIncludesForDocum
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(
+			QTextStream& stream,
+			const imtsdl::CSdlDocumentType& sdlDocumentType,
+			uint hIndents) const
 {
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("// ");
@@ -666,9 +424,9 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 		imtsdl::CSdlDocumentType::OperationType operationType = operation.key();
 
 		if (	operationType == imtsdl::CSdlDocumentType::OT_GET ||
-				operationType == imtsdl::CSdlDocumentType::OT_LIST ||
-				operationType == imtsdl::CSdlDocumentType::OT_UPDATE ||
-				operationType == imtsdl::CSdlDocumentType::OT_INSERT)
+			operationType == imtsdl::CSdlDocumentType::OT_LIST ||
+			operationType == imtsdl::CSdlDocumentType::OT_UPDATE ||
+			operationType == imtsdl::CSdlDocumentType::OT_INSERT)
 		{
 			if (!implementedGetRequests.contains(sdlRequest)){
 				AddMethodForDocument(stream, operation.value(), operationType, documentClassName, sdlDocumentType, hIndents);
@@ -676,12 +434,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodsForDocument(QText
 			}
 		}
 		else if (	operationType != imtsdl::CSdlDocumentType::OT_UPDATE &&
-					operationType != imtsdl::CSdlDocumentType::OT_INSERT &&
-					operationType != imtsdl::CSdlDocumentType::OT_GET &&
-					operationType != imtsdl::CSdlDocumentType::OT_LIST &&
-					operationType != imtsdl::CSdlDocumentType::OT_DELETE &&
-					operationType != imtsdl::CSdlDocumentType::OT_ELEMENT_IDS &&
-					operationType != imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT)
+				 operationType != imtsdl::CSdlDocumentType::OT_INSERT &&
+				 operationType != imtsdl::CSdlDocumentType::OT_GET &&
+				 operationType != imtsdl::CSdlDocumentType::OT_LIST &&
+				 operationType != imtsdl::CSdlDocumentType::OT_DELETE &&
+				 operationType != imtsdl::CSdlDocumentType::OT_ELEMENT_IDS &&
+				 operationType != imtsdl::CSdlDocumentType::OT_ELEMENTS_COUNT)
 		{
 			AddMethodForDocument(stream, operation.value(), operationType, documentClassName, sdlDocumentType, hIndents);
 		}
@@ -695,12 +453,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 			imtsdl::CSdlDocumentType::OperationType operationType,
 			const QString& itemClassName,
 			const imtsdl::CSdlDocumentType& sdlDocumentType,
-			uint hIndents)
+			uint hIndents) const
 {
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
-				&sdlRequest.GetSchemaParams(),
-				m_argumentParserCompPtr.GetPtr(),
-				false);
+		&sdlRequest.GetSchemaParams(),
+		m_argumentParserCompPtr.GetPtr(),
+		false);
 
 	CStructNamespaceConverter structNameConverter;
 	structNameConverter.relatedNamespace = sdlNamespace;
@@ -818,16 +576,16 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 		FeedStream(stream, 1, false);
 	}
 	else if (		operationType == imtsdl::CSdlDocumentType::OT_UPDATE_COLLECTION ||
-					operationType == imtsdl::CSdlDocumentType::OT_RENAME ||
-					operationType == imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION ||
-					operationType == imtsdl::CSdlDocumentType::OT_HEADERS ||
-					operationType == imtsdl::CSdlDocumentType::OT_INFO ||
-					operationType == imtsdl::CSdlDocumentType::OT_METAINFO ||
-					operationType == imtsdl::CSdlDocumentType::OT_DATAMETAINFO ||
-					operationType == imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY ||
-					operationType == imtsdl::CSdlDocumentType::OT_IMPORT ||
-					operationType == imtsdl::CSdlDocumentType::OT_EXPORT ||
-					operationType == imtsdl::CSdlDocumentType::OT_GET_VIEW)
+			 operationType == imtsdl::CSdlDocumentType::OT_RENAME ||
+			 operationType == imtsdl::CSdlDocumentType::OT_SET_DESCRIPTION ||
+			 operationType == imtsdl::CSdlDocumentType::OT_HEADERS ||
+			 operationType == imtsdl::CSdlDocumentType::OT_INFO ||
+			 operationType == imtsdl::CSdlDocumentType::OT_METAINFO ||
+			 operationType == imtsdl::CSdlDocumentType::OT_DATAMETAINFO ||
+			 operationType == imtsdl::CSdlDocumentType::OT_ELEMENT_HISTORY ||
+			 operationType == imtsdl::CSdlDocumentType::OT_IMPORT ||
+			 operationType == imtsdl::CSdlDocumentType::OT_EXPORT ||
+			 operationType == imtsdl::CSdlDocumentType::OT_GET_VIEW)
 	{
 		FeedStreamHorizontally(stream, hIndents);
 		stream << QStringLiteral("virtual ");
@@ -843,7 +601,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddMethodForDocument(
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialRequest(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialRequest(
+			QTextStream& stream,
+			const imtsdl::CSdlRequest& sdlRequest,
+			imtsdl::CSdlDocumentType::OperationType operationType,
+			uint hIndents) const
 {
 	FeedStreamHorizontally(stream, hIndents);
 	QString functionName = s_nonTrivialOperationMethodsMap[operationType];
@@ -854,9 +616,9 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 	FeedStream(stream, 1, false);
 
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
-				m_customSchemaParamsCompPtr,
-				m_argumentParserCompPtr,
-				false);
+		m_customSchemaParamsCompPtr,
+		m_argumentParserCompPtr,
+		false);
 
 	const QString requestClassName = sdlRequest.GetName() + QStringLiteral("GqlRequest");
 
@@ -910,12 +672,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 
 	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
 	CStructNamespaceConverter structNamespaceConverter(
-				outputArgument,
-				sdlNamespace,
-				*m_sdlTypeListCompPtr,
-				*m_sdlEnumListCompPtr,
-				*m_sdlUnionListCompPtr,
-				false);
+		outputArgument,
+		sdlNamespace,
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		*m_sdlUnionListCompPtr,
+		false);
 
 	// [1] create payload variable by calling reimplemented method
 	FeedStreamHorizontally(stream, hIndents + 1);
@@ -967,7 +729,11 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForSpecialReques
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType /*operationType*/, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
+			QTextStream& stream,
+			const imtsdl::CSdlRequest& sdlRequest,
+			imtsdl::CSdlDocumentType::OperationType /*operationType*/,
+			uint hIndents) const
 {
 	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
 
@@ -976,17 +742,17 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(QT
 	if (isUnion){
 		const static QString unionSourceVarName = QStringLiteral("replyPayload");
 		CSdlUnionConverter::WriteConversionFromUnion(stream,
-			foundUnion,
-			unionSourceVarName,
-			outputArgument.GetId(),
-			m_originalSchemaNamespaceCompPtr->GetText(),
-			outputArgument.GetId(),
-			QString(),
-			*m_sdlTypeListCompPtr,
-			*m_sdlEnumListCompPtr,
-			*m_sdlUnionListCompPtr,
-			hIndents,
-			CSdlUnionConverter::CT_MODEL_SCALAR);
+													 foundUnion,
+													 unionSourceVarName,
+													 outputArgument.GetId(),
+													 m_originalSchemaNamespaceCompPtr->GetText(),
+													 outputArgument.GetId(),
+													 QString(),
+													 *m_sdlTypeListCompPtr,
+													 *m_sdlEnumListCompPtr,
+													 *m_sdlUnionListCompPtr,
+													 hIndents,
+													 CSdlUnionConverter::CT_MODEL_SCALAR);
 	}
 	else{
 		// [1] write payload variable in model and create variable, to check if it success
@@ -1017,7 +783,9 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(QT
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodImplForDocument(
+			QTextStream& stream,
+			const imtsdl::CSdlDocumentType& sdlDocumentType) const
 {
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
 
@@ -1090,7 +858,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestMethodIm
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const
 {
 	QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
 
@@ -1122,14 +890,14 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationRequestCheck(QT
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationMapPairs(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationMapPairs(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const
 {
 	QMultiMap<imtsdl::CSdlDocumentType::OperationType, imtsdl::CSdlRequest> operations = sdlDocumentType.GetOperationsList();
 
 	for (auto operationsIter = operations.cbegin(); operationsIter != operations.cend(); ++operationsIter){
 
 		if (	!s_operationsAliasList.contains(operationsIter.key()) ||
-				s_operationsAliasList[operationsIter.key()].isEmpty())
+			s_operationsAliasList[operationsIter.key()].isEmpty())
 		{
 			continue;
 		}
@@ -1148,7 +916,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddOperationMapPairs(QTextS
 }
 
 
-bool CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
+bool CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const
 {
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
 
@@ -1167,10 +935,10 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddCollectionMethodsImplFor
 		}
 	}
 	QList<imtsdl::CSdlDocumentType::OperationType> remainingOperations({
-				imtsdl::CSdlDocumentType::OT_GET,
-				imtsdl::CSdlDocumentType::OT_INSERT,
-				imtsdl::CSdlDocumentType::OT_UPDATE,
-				imtsdl::CSdlDocumentType::OT_LIST});
+																		imtsdl::CSdlDocumentType::OT_GET,
+																		imtsdl::CSdlDocumentType::OT_INSERT,
+																		imtsdl::CSdlDocumentType::OT_UPDATE,
+																		imtsdl::CSdlDocumentType::OT_LIST});
 
 	for (imtsdl::CSdlDocumentType::OperationType operationType: requestInfoMultiMap.uniqueKeys()){
 		const QList<ImplGenerationInfo> requestList = requestInfoMultiMap.values(operationType);
@@ -1191,7 +959,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 			const QList<ImplGenerationInfo>& requestList,
 			const QString& className,
 			const imtsdl::CSdlDocumentType& sdlDocumentType,
-			uint hIndents)
+			uint hIndents) const
 {
 	// declare method
 
@@ -1351,7 +1119,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequests(
 
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const
 {
 	const QString className = 'C' + sdlDocumentType.GetName() + QStringLiteral("CollectionControllerCompBase");
 
@@ -1385,7 +1153,12 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCodeFor
 }
 
 
-void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCode(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents)
+void CGqlCollectionControllerBaseClassGeneratorComp::AddSpecialMethodImplCode(
+			QTextStream& stream,
+			imtsdl::CSdlDocumentType::OperationType operationType,
+			const QList<ImplGenerationInfo>& requestList,
+			const QString& className,
+			uint hIndents) const
 {
 	// declare method
 	AddBaseMethodDeclarationForOperationType(stream, operationType, className);
@@ -1453,31 +1226,31 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 			const ImplGenerationInfo& sdlRequestInfo,
 			imtsdl::CSdlDocumentType::OperationType operationType,
 			const imtsdl::CSdlDocumentType& sdlDocumentType,
-			uint hIndents)
+			uint hIndents) const
 {
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
-				&sdlRequestInfo.request.GetSchemaParams(),
-				m_argumentParserCompPtr.GetPtr(),
-				false);
+		&sdlRequestInfo.request.GetSchemaParams(),
+		m_argumentParserCompPtr.GetPtr(),
+		false);
 
 	const imtsdl::CSdlEntryBase& referenceType = sdlDocumentType.GetReferenceType();
 	CStructNamespaceConverter structNameConverter(
-				referenceType,
-				sdlNamespace,
-				*m_sdlTypeListCompPtr,
-				*m_sdlEnumListCompPtr,
-				*m_sdlUnionListCompPtr,
-				false);
+		referenceType,
+		sdlNamespace,
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		*m_sdlUnionListCompPtr,
+		false);
 	structNameConverter.addVersion = true;
 
 	imtsdl::CSdlField outputArgument = sdlRequestInfo.request.GetOutputArgument();
 	CStructNamespaceConverter getStructNameConverter(
-				outputArgument,
-				sdlNamespace,
-				*m_sdlTypeListCompPtr,
-				*m_sdlEnumListCompPtr,
-				*m_sdlUnionListCompPtr,
-				false);
+		outputArgument,
+		sdlNamespace,
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		*m_sdlUnionListCompPtr,
+		false);
 	getStructNameConverter.addVersion = true;
 
 	FeedStreamHorizontally(stream, hIndents);
@@ -1510,7 +1283,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 
 	// GET
 	if (	operationType == imtsdl::CSdlDocumentType::OT_GET ||
-			operationType == imtsdl::CSdlDocumentType::OT_LIST)
+		operationType == imtsdl::CSdlDocumentType::OT_LIST)
 	{
 		FeedStreamHorizontally(stream, hIndents + 1);
 		if (operationType == imtsdl::CSdlDocumentType::OT_GET){
@@ -1559,19 +1332,19 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		if (isUnion){
 			const static QString unionSourceVarName = QStringLiteral("representationObject");
 			CSdlUnionConverter::WriteConversionFromUnion(stream,
-						foundUnion,
-						unionSourceVarName,
-						outputArgument.GetId(),
-						m_originalSchemaNamespaceCompPtr->GetText(),
-						QStringLiteral("representationObject"),
-						QString(),
-						*m_sdlTypeListCompPtr,
-						*m_sdlEnumListCompPtr,
-						*m_sdlUnionListCompPtr,
-						hIndents + 1,
-						CSdlUnionConverter::CT_MODEL_SCALAR,
-						QString(),
-						QStringLiteral("dataModel"));
+														 foundUnion,
+														 unionSourceVarName,
+														 outputArgument.GetId(),
+														 m_originalSchemaNamespaceCompPtr->GetText(),
+														 QStringLiteral("representationObject"),
+														 QString(),
+														 *m_sdlTypeListCompPtr,
+														 *m_sdlEnumListCompPtr,
+														 *m_sdlUnionListCompPtr,
+														 hIndents + 1,
+														 CSdlUnionConverter::CT_MODEL_SCALAR,
+														 QString(),
+														 QStringLiteral("dataModel"));
 		}
 		else{
 			// [1] create write check variable
@@ -1751,19 +1524,6 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 
 	if (aSdlField.GetType() == typeName){
 		return true;
-	}
-
-	return false;
-}
-
-bool CGqlCollectionControllerBaseClassGeneratorComp::IsExternal(const imtsdl::CSdlDocumentType& documentType) const
-{
-	imtsdl::ISdlProcessArgumentsParser::AutoLinkLevel autoLinkLevel = m_argumentParserCompPtr->GetAutoLinkLevel();
-	if (autoLinkLevel == imtsdl::ISdlProcessArgumentsParser::ALL_ONLY_FILE){
-		QFileInfo generatorSchemaFileInfo(m_argumentParserCompPtr->GetSchemaFilePath());
-		QFileInfo currentSchemaFileInfo(documentType.GetSchemaFilePath());
-
-		return bool(generatorSchemaFileInfo != currentSchemaFileInfo);
 	}
 
 	return false;

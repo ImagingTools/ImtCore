@@ -117,7 +117,7 @@ public:
 				const iprm::IParamsSet* schemaParamsPtr,
 				const ISdlProcessArgumentsParser* argumentParamsPtr, bool addVersion = true);
 
-	/// \sa imtsdlgenqml::ISdlProcessArgumentsParser::s_headerFileType imtsdlgenqml::ISdlProcessArgumentsParser::s_sourceFileType
+	/// \sa imtsdl::ISdlProcessArgumentsParser::s_headerFileType imtsdl::ISdlProcessArgumentsParser::s_sourceFileType
 	[[nodiscard]] static QMap<QString/*type*/, QString/*path*/> CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argumentParser, bool relativePath = false);
 
 	/// resolves a complete output path from schema params and template(if enabled) if tepmplate is not enabled, returns \c argumentParser.GetOutputDirectoryPath() \note returns clean path \sa QDir::cleanPath

@@ -17,6 +17,7 @@
 #include <imtsdlgencpp/CSdlUnionConverter.h>
 #include <imtsdlgencpp/IIncludeDirectivesProvider.h>
 #include <imtsdlgencpp/CSdlGenTools.h>
+#include <imtsdlgencpp/CCxxProcessorCompBase.h>
 
 
 namespace imtsdlgencpp
@@ -26,14 +27,14 @@ namespace imtsdlgencpp
 	A base C++ union generator
 */
 class CSdlUnionGeneratorComp:
-			public iproc::CSyncProcessorCompBase,
+			public CCxxProcessorCompBase,
 			private imtsdl::CSdlTools,
 			private CSdlGenTools,
 			private imtsdlgencpp::CSdlUnionConverter
 {
 
 public:
-	typedef iproc::CSyncProcessorCompBase BaseClass;
+	typedef CCxxProcessorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSdlUnionGeneratorComp)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
@@ -46,12 +47,15 @@ public:
 
 	I_END_COMPONENT
 
-	//reimplemented(iproc::IProcessor)
-	virtual TaskState DoProcessing(
-				const iprm::IParamsSet* paramsPtr,
-				const istd::IPolymorphic* inputPtr,
-				istd::IChangeable* outputPtr,
-				ibase::IProgressManager* progressManagerPtr = NULL) override;
+	// reimplemented (ICxxFileProcessor)
+	virtual bool ProcessEntry(
+				const imtsdl::CSdlEntryBase& sdlEntry,
+				QIODevice* headerDevicePtr,
+				QIODevice* sourceDevicePtr = nullptr,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
+
+	// reimplemented (IIncludeDirectivesProvider)
+	virtual QSet<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);

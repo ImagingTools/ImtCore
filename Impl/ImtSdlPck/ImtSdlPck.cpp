@@ -45,16 +45,6 @@ I_EXPORT_COMPONENT(
 			"Qt Resource File Persistence")
 
 I_EXPORT_COMPONENT(
-			FileCleanupProcessor,
-			"A processor that allows you to clear generated files from unnecessary lines",
-			"SDL Class File Cleanup Generated")
-
-I_EXPORT_COMPONENT(
-			FileFinalizer,
-			"A processor that finalizes files",
-			"SDL Class File Finalize Generated")
-
-I_EXPORT_COMPONENT(
 			CodeGeneratorExecutor,
 			"The central component of SDL generator (entry point)",
 			"SDL Processor")

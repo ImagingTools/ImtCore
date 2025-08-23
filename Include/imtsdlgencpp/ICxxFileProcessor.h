@@ -1,12 +1,22 @@
 #pragma once
 
+
 // Qt includes
-
-// ImtCore includes
-#include <imtsdl/imtsdl.h>
+#include <QtCore/QString>
 
 
-class QFile;
+// forward declaration
+class QIODevice;
+
+namespace iprm 
+{
+class IParamsSet;
+}
+
+namespace imtsdl
+{
+class CSdlEntryBase;
+}
 
 
 namespace imtsdlgencpp
@@ -19,12 +29,18 @@ public:
 	/**
 		\brief Processing a file, by modifying file's content
 		\param sdlType			- type to process
-		\param headerFilePtr	- header (.h) file, to write data
-		\param sourceFilePtr	- source(.cpp) file, to write data
+		\param headerFilePtr	- [usually required] header (.h) file, to write data
+		\param sourceFilePtr	- [optional] source(.cpp) file, to write data
+		\param paramsPtr		- [optional] additional params for processing
 		\returns true - if processing is successful and false otherwise
-		\todo replace \c QFile to \c QIODevice
 	 */
-	[[nodiscard]] virtual bool ProcessType (const imtsdl::CSdlType& sdlType, QFile* headerFilePtr, QFile* sourceFilePtr) = 0;
+	[[nodiscard]] virtual bool ProcessEntry(const imtsdl::CSdlEntryBase& sdlEntry, QIODevice* headerDevicePtr, QIODevice* sourceDevicePtr = nullptr, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
+
+	/**
+		\returns the processor type identifier (GQL) or, in the case of an additional modifier, the type of that modifier (JSON). 
+	*/
+	[[nodiscard]] virtual QString GetProcessorTypeId() const = 0;
+
 };
 
 

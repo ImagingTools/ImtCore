@@ -1,9 +1,6 @@
 #include <imtsdlgencpp/CSdlClassCodeGeneratorComp.h>
 
 
-// C includes
-#include <iostream>
-
 // Qt includes
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
@@ -24,448 +21,91 @@
 namespace imtsdlgencpp
 {
 
+// reimplemented (ICxxFileProcessor)
 
-iproc::IProcessor::TaskState CSdlClassCodeGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* paramsPtr,
-			const istd::IPolymorphic* /*inputPtr*/,
-			istd::IChangeable* /*outputPtr*/,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+bool CSdlClassCodeGeneratorComp::ProcessEntry (
+			const imtsdl::CSdlEntryBase& sdlEntry, 
+			QIODevice* headerDevicePtr,
+			QIODevice* sourceDevicePtr,
+			const iprm::IParamsSet* paramsPtr) const
 {
-	Q_ASSERT(m_argumentParserCompPtr.IsValid());
-	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_originalSchemaNamespaceCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	if (!m_argumentParserCompPtr->IsCppEnabled()){
-		return TS_OK;
+	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<const imtsdl::CSdlType*>(&sdlEntry);
+	if (sdlTypePtr == nullptr){
+		// nothing todo
+		Q_ASSERT_X(false, __func__, "Configuration invalid: ONLY TYPES are supported.");
+
+		return false;
 	}
 
-	if (!m_baseClassExtenderCompPtr.IsValid()){
-		SendCriticalMessage(0, "BaseClassExtender is not set");
-		I_CRITICAL();
+	// First create all files with basic methods
+	if (!BeginClassFiles(*sdlTypePtr, headerDevicePtr, sourceDevicePtr, paramsPtr)){
+		SendErrorMessage(0, QString("Unable to process files"));
 
-		return TS_INVALID;
+		return false;
 	}
 
-	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, true);
-	if (outputDirectoryPath.isEmpty()){
-		SendCriticalMessage(0, "Output path is not provided");
-		I_CRITICAL();
+	// Then let extenders to make changes. Add new transformation methods (JSON, GQL, ...)
+	const int extendersCount = m_codeGeneratorExtenderListCompPtr.GetCount();
+	for (int i = 0; i < extendersCount; ++i){
+		ICxxFileProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
+		Q_ASSERT(extenderPtr != nullptr);
 
-		return TS_INVALID;
-	}
-
-	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
-		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
-		I_CRITICAL();
-
-		return TS_INVALID;
-	}
-
-	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
-	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-		if (!m_customSchemaParamsCompPtr.IsValid()){
-			SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
-
-			return TS_INVALID;
-		}
-
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
-	}
-	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
-	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
-
-	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
-		if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-			if (!m_customSchemaParamsCompPtr.IsValid()){
-				SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
-
-				return TS_INVALID;
-			}
-			QStringList autoJoinFilePaths = GetAutoJoinedCppFilePaths(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
-			PrintFiles(std::cout, autoJoinFilePaths, m_argumentParserCompPtr->GetGeneratorType());
-			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), autoJoinFilePaths, *m_dependentSchemaListCompPtr);
-		}
-		else {
-			QStringList cumulatedFiles;
-			imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
-			for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-				if (!joinHeaders){
-					cumulatedFiles << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h");
-				}
-				if (!joinSources){
-					cumulatedFiles << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp");
-				}
-			}
-			if (joinHeaders){
-				cumulatedFiles << joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType];
-			}
-			if (joinSources){
-				cumulatedFiles << joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
-			}
-			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
-			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
-		}
-
-		if (m_argumentParserCompPtr->IsDependenciesMode()){
-			return TS_OK;
+		bool extendSuccess = extenderPtr->ProcessEntry(*sdlTypePtr, headerDevicePtr, sourceDevicePtr, paramsPtr);
+		if (!extendSuccess){
+			return false;
 		}
 	}
 
-	imtsdl::SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes(true);
+	// And complete the processing
+	EndClassFiles(*sdlTypePtr, headerDevicePtr, sourceDevicePtr, paramsPtr);
+	
 
-	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
-
-	for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-		m_headerFilePtr.SetPtr(new QFile(tempDirectoryPath + "/C" + sdlType.GetName() + ".h"));
-		m_sourceFilePtr.SetPtr(new QFile(tempDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
-		const bool hasExtDeps = m_argumentParserCompPtr->GetAutoLinkLevel() != imtsdl::ISdlProcessArgumentsParser::ALL_NONE;
-
-		// First create all files with basic methods
-		if (!BeginClassFiles(sdlType, hasExtDeps || !joinHeaders, !joinSources)){
-			SendErrorMessage(0, QString("Unable to process files"));
-
-			return TS_INVALID;
-		}
-
-		// Then let extenders to make changes. Add new transformation methods (JSON, GQL, ...)
-		const int extendersCount = m_codeGeneratorExtenderListCompPtr.GetCount();
-		for (int i = 0; i < extendersCount; ++i){
-			ICxxFileProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
-			Q_ASSERT(extenderPtr != nullptr);
-
-			m_headerFilePtr->write(QByteArrayLiteral("\n"));
-			bool extendSuccess = extenderPtr->ProcessType(sdlType, m_headerFilePtr.GetPtr(), m_sourceFilePtr.GetPtr());
-			if (!extendSuccess){
-				return TS_INVALID;
-			}
-		}
-
-		// And complete the processing
-		EndClassFiles(sdlType);
-
-		// Extend with base class if required
-		QMap<QString, QString> baseClassList = m_argumentParserCompPtr->GetBaseClassList();
-		if (!baseClassList.isEmpty()){
-			iprm::CParamsSet paramsSet;
-
-			const QString filePath = tempDirectoryPath + "/C" + sdlType.GetName() + ".h";
-			ifile::CFileNameParam headerFileNameParam;
-			headerFileNameParam.SetPath(filePath);
-			paramsSet.SetEditableParameter(QByteArrayLiteral("HeaderFile"), &headerFileNameParam);
-
-			iprm::COptionsManager baseClassDirectivesList;
-			for (auto iter = baseClassList.cbegin(); iter != baseClassList.cend(); ++iter){
-				baseClassDirectivesList.InsertOption(iter.value(), iter.key().toUtf8());
-			}
-
-			TaskState extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
-			if (extendResult != TS_OK){
-				SendErrorMessage(0, QString("Unable to extend file: '%1'").arg(filePath));
-				I_CRITICAL();
-
-				return extendResult;
-			}
-		}
-	}
-
-	/// \todo make a new method
-	// join files if required
-	if (!joinRules.isEmpty()){
-		if (m_filesJoinerCompPtr.IsValid()){
-			iprm::CParamsSet inputParams;
-			ifile::CFileNameParam sourceDirPathParam;
-			sourceDirPathParam.SetPath(tempDirectoryPath);
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
-			ifile::CFileNameParam outputFileNameParam;
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
-
-			iprm::COptionsManager filterParams;
-
-			if (joinHeaders){
-				filterParams.ResetOptions();
-				// first join enums
-				const imtsdl::SdlEnumList enumList = m_sdlEnumListCompPtr->GetEnums(true);
-				for (const imtsdl::CSdlEnum& sdlEnum: enumList){
-					filterParams.InsertOption(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
-					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlEnum.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
-				}
-
-				// then join unions forward declarations
-				const imtsdl::SdlUnionList unionList = m_sdlUnionListCompPtr->GetUnions(true);
-				for (const imtsdl::CSdlUnion& sdlUnion : unionList){
-					filterParams.InsertOption(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
-					SendVerboseMessage(QString("Add join union file '%1. Total: %2").arg(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
-				}
-
-				// then join types
-				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-					filterParams.InsertOption("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount()));
-					SendVerboseMessage(QString("Add join file '%1'. Total: %2").arg("C" + sdlType.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
-				}
-
-				// then join unions class definitions
-				for (const imtsdl::CSdlUnion& sdlUnion : unionList){
-					filterParams.InsertOption(sdlUnion.GetName() + "_ClassDef.h", QByteArray::number(filterParams.GetOptionsCount()));
-					SendVerboseMessage(QString("Add join enum file '%1. Total: %2").arg(sdlUnion.GetName() + ".h", QByteArray::number(filterParams.GetOptionsCount())));
-				}
-
-#ifndef DISABLE_CREATE_SDL_QOBJECT
-				// join QML register file
-				if (m_argumentParserCompPtr->IsCppEnabled()){
-					filterParams.InsertOption(QStringLiteral("QmlRegister.h"), QByteArray::number(filterParams.GetOptionsCount()));
-					SendVerboseMessage(QString("Add QmlRegister enum file '%1. Total: %2").arg("QmlRegister.h", QByteArray::number(filterParams.GetOptionsCount())));
-				}
-#endif
-				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
-				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
-				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join header files");
-					I_CRITICAL();
-
-					return TS_INVALID;
-				}
-
-				// cleanup joined files
-				for (const imtsdl::CSdlEnum& sdlEnum: enumList){
-					QFile::remove(tempDirectoryPath + '/' + sdlEnum.GetName() + ".h");
-				}
-				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-					QFile::remove(QString(tempDirectoryPath + "/C" + sdlType.GetName() + ".h"));
-				}
-				for (const imtsdl::CSdlUnion& sdlUnion : unionList){
-					QFile::remove(QString(tempDirectoryPath + '/' + sdlUnion.GetName() + ".h"));
-					QFile::remove(QString(tempDirectoryPath + '/' + sdlUnion.GetName() + "_ClassDef.h"));
-				}
-
-				QFile::remove(tempDirectoryPath + QStringLiteral("/QmlRegister.h"));
-			}
-
-			if (joinSources){
-				filterParams.ResetOptions();
-				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-					filterParams.InsertOption("C" + sdlType.GetName() + ".cpp", QByteArray::number(filterParams.GetOptionsCount()));
-				}
-
-				const QString sourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
-				outputFileNameParam.SetPath(sourceFilePath);
-				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
-				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join cource  files");
-					I_CRITICAL();
-
-					return TS_INVALID;
-				}
-
-				// cleanup joined files
-				for (const imtsdl::CSdlType& sdlType: sdlTypeList){
-					QFile::remove(QString(tempDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
-				}
-
-				// add joined header include directive
-				if (joinHeaders){
-					QFile joinedSourceFile(sourceFilePath);
-					if (!joinedSourceFile.open(QIODevice::ReadWrite)){
-						SendCriticalMessage(0, QString("Unable to open joined file '%1'").arg(sourceFilePath));
-						I_CRITICAL();
-
-						return TS_INVALID;
-					}
-
-					QFileInfo headerFileInfo(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
-					QByteArray sourceReadData = joinedSourceFile.readAll();
-					joinedSourceFile.seek(0);
-					QByteArray includeDirective = QByteArrayLiteral("#include ");
-					includeDirective.append('"').append(headerFileInfo.fileName().toUtf8()).append('"');
-					includeDirective.append('\n').append('\n').append('\n');
-					sourceReadData.prepend(includeDirective);
-					joinedSourceFile.write(sourceReadData);
-				}
-			}
-		}
-	}
-
-	return TS_OK;
+	return true;
 }
 
 
-bool CSdlClassCodeGeneratorComp::BeginClassFiles(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude, bool addSelfHeaderInclude)
+// reimplemented (IIncludeDirectivesProvider)
+
+QSet<imtsdl::IncludeDirective> CSdlClassCodeGeneratorComp::GetIncludeDirectives() const
 {
-	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
-		SendCriticalMessage(0,
-					QString("Unable to open file: '%1'. Error: %2")
-						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
+	QSet<imtsdl::IncludeDirective> retVal;
 
-		AbortCurrentProcessing();
+	if (m_includeDirectivesProviderListCompPtr.IsValid()){
+		const int providersCount = m_includeDirectivesProviderListCompPtr.GetCount();
+		for (int i = 0; i < providersCount; ++i){
+			IIncludeDirectivesProvider* providerPtr = m_includeDirectivesProviderListCompPtr[i];
+			Q_ASSERT(providerPtr != nullptr);
 
-		return false;
+			retVal += providerPtr->GetIncludeDirectives();
+		}
 	}
 
-	if (!m_sourceFilePtr->open(QIODevice::WriteOnly)){
-		SendCriticalMessage(0,
-						QString("Unable to open file: '%1'. Error: %2")
-							.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	bool retVal = true;
-	retVal = retVal && BeginHeaderClassFile(sdlType, addDependenciesInclude);
-	retVal = retVal && BeginSourceClassFile(sdlType, addSelfHeaderInclude);
+	/// \todo remove it, make a part of extenders
+	retVal += CreateImtDirective("<imtbase/TListModelBase.h>");
+	retVal += CreateQtDirective("<QtCore/QMetaEnum>");
 
 	return retVal;
 }
 
 
-bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude)
+// private methods
+
+bool CSdlClassCodeGeneratorComp::BeginClassFiles(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	QTextStream stream(m_headerFilePtr.GetPtr());
+	bool retVal = true;
+	retVal = retVal && BeginHeaderClassFile(sdlType, headerPtr, paramsPtr);
+	retVal = retVal && BeginSourceClassFile(sdlType, sourcePtr, paramsPtr);
 
-	stream << QStringLiteral("#pragma once");
-	FeedStream(stream, 3, false);
-
-	QList<imtsdl::IncludeDirective> includeDirectivesList;
-	for (int i = 0; i < m_includeDirectivesProviderListCompPtr.GetCount(); ++i){
-		IIncludeDirectivesProvider* providerPtr = m_includeDirectivesProviderListCompPtr[i];
-		if (providerPtr != nullptr){
-			includeDirectivesList << providerPtr->GetIncludeDirectives();
-		}
-	}
+	return retVal;
+}
 
 
-	// add ACF includes for nullable
-	static imtsdl::IncludeDirective memoryIncludeDirective = CreateAcfDirective(QStringLiteral("<istd/TSharedNullable.h>"));
-	includeDirectivesList << memoryIncludeDirective;
-
-	/// \todo add it only if QtObject is enabled
-	static imtsdl::IncludeDirective qobjectDirective = CreateQtDirective(QStringLiteral("<QtCore/QObject>"));
-	includeDirectivesList << qobjectDirective;
-	static imtsdl::IncludeDirective cmodelbaseDirective = CreateImtDirective(QStringLiteral("<imtbase/CItemModelBase.h>"));
-	includeDirectivesList << cmodelbaseDirective;
-	static imtsdl::IncludeDirective clistbasemodelDirective = CreateImtDirective(QStringLiteral("<imtbase/TListModelBase.h>"));
-	includeDirectivesList << clistbasemodelDirective;
-
-	QSet<QString> complexTypeList;
-	bool hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList);
-	if (hasComplexTypes){
-		// Add Qt types
-		if (complexTypeList.contains(QStringLiteral("QByteArray"))){
-			static imtsdl::IncludeDirective byteArrayDirective = CreateQtDirective(QStringLiteral("<QtCore/QByteArray>"));
-			includeDirectivesList << byteArrayDirective;
-		}
-		if (complexTypeList.contains(QStringLiteral("QString"))){
-			static imtsdl::IncludeDirective stringDirective = CreateQtDirective(QStringLiteral("<QtCore/QString>"));
-			includeDirectivesList << stringDirective;
-		}
-		if (complexTypeList.contains(QStringLiteral("QList"))){
-			static imtsdl::IncludeDirective listDirective = CreateQtDirective(QStringLiteral("<QtCore/QList>"));
-			includeDirectivesList << listDirective;
-		}
-
-		static imtsdl::IncludeDirective variantDirective = CreateQtDirective(QStringLiteral("<QtCore/QVariant>"));
-		includeDirectivesList << variantDirective;
-		static imtsdl::IncludeDirective variantMapDirective = CreateQtDirective(QStringLiteral("<QtCore/QVariantMap>"));
-		includeDirectivesList << variantMapDirective;
-		static imtsdl::IncludeDirective setDirective = CreateQtDirective(QStringLiteral("<QtCore/QSet>"));
-		includeDirectivesList << setDirective;
-
-
-
-		// save already included files, to avoid duplicates
-		QSet<QString> customIncluded;
-
-		// Add user custom types
-		if (addDependenciesInclude){
-			imtsdl::SdlFieldList relatedFields = sdlType.GetFields();
-			for (const imtsdl::CSdlField& field: relatedFields){
-				bool isCustom = false;
-				ConvertType(field, &isCustom);
-				if (!isCustom){
-					continue;
-				}
-
-				std::shared_ptr<imtsdl::CSdlEntryBase> foundType = GetSdlTypeOrEnumOrUnionForField(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
-				if (!foundType){
-					SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlType.GetName()));
-					I_CRITICAL();
-
-					return false;
-				}
-
-				if (foundType->IsExternal()){
-					const QString typeIncludePath = '<' + foundType->GetTargetHeaderFilePath() + '>';
-					if (typeIncludePath.isEmpty()){
-						SendCriticalMessage(0, QString("Header path is empty %1 of %2").arg(foundType->GetName(), foundType->GetSchemaFilePath()));
-						I_CRITICAL();
-
-						return false;
-					}
-					if (!customIncluded.contains(typeIncludePath)){
-						includeDirectivesList << CreateCustomDirective(typeIncludePath);
-						customIncluded << typeIncludePath;
-					}
-				}
-			}
-		}
-	}
-
-	// add all required includes
-	QList<imtsdl::Priority> orderList = {
-		imtsdl::P_C,
-		imtsdl::P_OS_API,
-		imtsdl::P_QT,
-		imtsdl::P_ACF,
-		imtsdl::P_IMT,
-		imtsdl::P_CUSTOM
-	};
-
-	QMutableListIterator includeIter(includeDirectivesList);
-	while(!orderList.isEmpty()){
-		imtsdl::Priority currentPriority = orderList.takeFirst();
-		bool addRemark = true;
-		bool isAdded = false;
-		while(includeIter.hasNext()){
-			imtsdl::IncludeDirective directive = includeIter.next();
-			if (directive.priority == currentPriority){
-				isAdded = true;
-				if (addRemark){
-					if (!directive.remark.startsWith(QStringLiteral("//"))){
-						stream << QStringLiteral("// ");
-					}
-					stream << directive.remark;
-					FeedStream(stream, 1, false);
-					addRemark = false;
-				}
-				stream << QStringLiteral("#include ");
-				stream << directive.path;
-				FeedStream(stream, 1, false);
-
-				includeIter.remove();
-			}
-		}
-		if (isAdded){
-			FeedStream(stream, 1, false);
-		}
-		includeIter.toFront();
-	}
-
-	FeedStream(stream, 2, false);
-
-	// namespace begin
-	QString namespaceString;
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
-	if (!sdlNamespace.isEmpty()){
-		namespaceString = QStringLiteral("namespace ");
-		namespaceString+= sdlNamespace;
-		namespaceString += QStringLiteral("\n{");
-	}
-
-	if (!namespaceString.isEmpty()){
-		stream << namespaceString;
-		FeedStream(stream, 3, false);
-	}
+bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, const iprm::IParamsSet* paramsPtr) const
+{
+	QTextStream stream(headerPtr);
 
 	// class begin
 	stream << QStringLiteral("class C") << sdlType.GetName() << '\n';
@@ -512,30 +152,9 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const imtsdl::CSdlType& sd
 }
 
 
-bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sdlType, bool addSelfHeaderInclude)
+bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	QTextStream stream(m_sourceFilePtr.GetPtr());
-
-	// include section
-	if (addSelfHeaderInclude){
-		stream << QStringLiteral("#include \"C");
-		stream << sdlType.GetName() << QStringLiteral(".h\"");
-		FeedStream(stream, 3);
-	}
-
-	// namespace begin
-	QString namespaceString;
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
-	if (!sdlNamespace.isEmpty()){
-		namespaceString = QStringLiteral("namespace ");
-		namespaceString+= sdlNamespace;
-		namespaceString += QStringLiteral("\n{");
-	}
-
-	if (!namespaceString.isEmpty()){
-		stream << namespaceString;
-		FeedStream(stream, 3);
-	}
+	QTextStream stream(sourcePtr);
 
 	//implement GetVersionId method
 	stream << QStringLiteral("QByteArray C");
@@ -557,7 +176,7 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 	stream << '}';
 	FeedStream(stream, 3, false);
 
-	// implement coparation operator
+	// implement comparation operator
 	stream << QStringLiteral("bool C");
 	stream << sdlType.GetName();
 	stream << ':' << ':';
@@ -625,10 +244,10 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 }
 
 
-bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
+bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const
 {
 	// finish header
-	QTextStream headerStream(m_headerFilePtr.GetPtr());
+	QTextStream headerStream(headerPtr);
 
 	// end of struct
 	FeedStreamHorizontally(headerStream, 1);
@@ -672,51 +291,13 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 	// end of class
 	headerStream << QStringLiteral("};");
 
-#ifndef DISABLE_CREATE_SDL_QOBJECT
 	// add QtObject class
 	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
 	CSdlQObjectGenerator qObjectGenerator(*m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, *m_sdlTypeListCompPtr);
 	qObjectGenerator.ProcessHeaderClassFile(headerStream, sdlType);
-#endif
-	
-	// end of namespace
-	QString namespaceString;
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
-	if (!sdlNamespace.isEmpty()){
-		namespaceString += QStringLiteral("} // namespace ");
-		namespaceString += sdlNamespace;
-	}
-	FeedStream(headerStream, 3, false);
-	if (!namespaceString.isEmpty()){
-		headerStream << namespaceString;
-		FeedStream(headerStream, 2, false);
-	}
-
-	// add Q_DECLARE_METATYPE macro to use the type as a custom type in QVariant
-	FeedStream(headerStream, 1, false);
-	headerStream << QStringLiteral("Q_DECLARE_METATYPE(");
-	if (sdlNamespace.length() > 0){
-		headerStream << sdlNamespace;
-		headerStream << ':' << ':';
-	}
-	headerStream << 'C' << sdlType.GetName();
-	headerStream << ':' << ':';
-	headerStream << GetSdlEntryVersion(sdlType);
-	headerStream << QStringLiteral(");");
-
-	FeedStream(headerStream, 1, false);
-	headerStream << QStringLiteral("Q_DECLARE_METATYPE(");
-	if (sdlNamespace.length() > 0){
-		headerStream << sdlNamespace;
-		headerStream << ':' << ':';
-	}
-	headerStream << 'C' << sdlType.GetName();
-	headerStream << QStringLiteral(");");
-
-	FeedStream(headerStream, 3, true);
 
 	// finish source
-	QTextStream sourceStream(m_sourceFilePtr.GetPtr());
+	QTextStream sourceStream(sourcePtr);
 
 	if (modifiersCount > 0){
 		sourceStream << QStringLiteral("// serialize methods");
@@ -739,45 +320,20 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType)
 		FeedStream(sourceStream, 2, false);
 	}
 
-#ifndef DISABLE_CREATE_SDL_QOBJECT
 	// add QtObject class impl
 	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
 	qObjectGenerator.ProcessSourceClassFile(sourceStream, sdlType);
-#endif
 
-	// finish namespace 
-	if (!namespaceString.isEmpty()){
-		sourceStream << namespaceString;
-		FeedStream(sourceStream, 2);
-	}
 	sourceStream.flush();
 
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	m_headerFilePtr.Reset();
-	m_sourceFilePtr.Reset();
-
 	return true;
-}
-
-
-void CSdlClassCodeGeneratorComp::AbortCurrentProcessing()
-{
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	I_CRITICAL();
-
-	m_headerFilePtr->remove();
-	m_sourceFilePtr->remove();
 }
 
 
 void CSdlClassCodeGeneratorComp::GenerateMetaInfo(
 			QTextStream& stream,
 			const imtsdl::CSdlType& sdlType,
-			uint indents)
+			uint indents) const
 {
 	FeedStreamHorizontally(stream, indents);
 	// create struct to store field id list
@@ -810,7 +366,7 @@ void CSdlClassCodeGeneratorComp::GenerateMetaInfo(
 void CSdlClassCodeGeneratorComp::GenerateVersionStruct(
 			QTextStream& stream,
 			const imtsdl::CSdlType& sdlType,
-			uint indents)
+			uint indents) const
 {
 	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
 
@@ -884,7 +440,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodDefinition(
 			const imtsdl::CSdlType& sdlType,
 			MetdodType methodType,
 			ICxxModifier& modifier,
-			bool forHeader)
+			bool forHeader) const
 {
 	// type
 	if (forHeader){
@@ -991,7 +547,7 @@ void CSdlClassCodeGeneratorComp::GenerateVersionMemberDeclaration(
 			QTextStream& stream,
 			const imtsdl::CSdlType& sdlType,
 			bool optWrap,
-			int versionIndex)
+			int versionIndex) const
 {
 	if (optWrap){
 		stream << QStringLiteral("istd::TSharedNullable<");
@@ -1008,7 +564,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodImplementation(
 			QTextStream& stream,
 			const imtsdl::CSdlType& sdlType,
 			MetdodType methodType,
-			ICxxModifier& modifier)
+			ICxxModifier& modifier) const
 {
 	stream << '{';
 	FeedStream(stream, 1, false);
@@ -1175,7 +731,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodCall(
 			QTextStream& stream,
 			const imtsdl::CSdlType& /*sdlType*/,
 			MetdodType methodType,
-			ICxxModifier& modifier)
+			ICxxModifier& modifier) const
 {
 	// optional?
 	switch (methodType){

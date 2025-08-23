@@ -27,16 +27,10 @@ public:
 	virtual void SetGqlEnabled(bool enabled = true) = 0;
 	virtual void SetSchemaDependencyModeEnabled(bool enabled = true) = 0;
 	virtual void SetBaseClassList(const QMap<QString, QString>& baseClassList) = 0;
-	virtual void SetJoinRules(const QMap<QString, QString>& rules) = 0;
 	virtual void SetIncludePaths(const QStringList & includePaths) = 0;
 	virtual void SetGeneratorType(GeneratorType type) = 0;
-	virtual void SetAutoJoinEnabled(bool enable = true) = 0;
-	virtual void SetAutoLinkLevel(AutoLinkLevel level) = 0;
 	virtual void SetHeadersIncludePaths(const QStringList& includePaths) = 0;
-	virtual void SetModuleIncludePaths(const QStringList& includePaths) = 0;
 	virtual void SetDepFilePath(const QString& path) = 0;
-	virtual void SetModuleOutputFilePath(const QString& path) = 0;
-	virtual void SetModuleGenerateEnabled(bool enable = true) = 0;
 
 	// template
 	virtual void SetTemplateEnabled(bool enable = true) = 0;

@@ -1,10 +1,5 @@
 #include "CGqlWrapClassCodeGeneratorComp.h"
-#include "imtsdl/CSdlField.h"
 
-
-// C includes
-#include <QtCore/qstring.h>
-#include <iostream>
 
 // Qt includes
 #include <QtCore/QDir>
@@ -26,230 +21,56 @@ namespace imtsdlgencpp
 {
 
 
-iproc::IProcessor::TaskState CGqlWrapClassCodeGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* paramsPtr,
-			const istd::IPolymorphic* /*inputPtr*/,
-			istd::IChangeable* /*outputPtr*/,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+// public methods
+
+bool CGqlWrapClassCodeGeneratorComp::ProcessEntry (
+	const imtsdl::CSdlEntryBase& sdlEntry,
+	QIODevice* headerDevicePtr,
+	QIODevice* sourceDevicePtr,
+	const iprm::IParamsSet* paramsPtr) const
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
 	Q_ASSERT(m_sdlTypeListCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	if (!m_argumentParserCompPtr->IsGqlEnabled()){
-		return TS_OK;
-	}
-
-	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, true);
-	if (outputDirectoryPath.isEmpty()){
-		SendCriticalMessage(0, "Output path is not provided");
+	const imtsdl::CSdlRequest* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(&sdlEntry);
+	if (sdlRequestPtr == nullptr || headerDevicePtr == nullptr || sourceDevicePtr == nullptr){
 		I_CRITICAL();
 
-		return TS_INVALID;
+		return false;
 	}
 
-	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
-		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
-		I_CRITICAL();
+	bool retVal = true;
+	retVal = retVal && ProcessHeaderClassFile(*sdlRequestPtr, headerDevicePtr, paramsPtr);
+	retVal = retVal && ProcessSourceClassFile(*sdlRequestPtr, sourceDevicePtr, paramsPtr);
 
-		return TS_INVALID;
-	}
+	return retVal;
+}
 
-	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
-	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
-	}
-	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
-	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
 
-	imtsdl::SdlRequestList sdlRequestList = m_sdlRequestListCompPtr->GetRequests(true);
-	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
-		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
-			QStringList cumulatedFiles;
-			for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
-				if (!joinHeaders){
-					cumulatedFiles << QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h");
-				}
-				if (!joinSources){
-					cumulatedFiles << QString(outputDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp");
-				}
-			}
-			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
-			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
-		}
-		if (m_argumentParserCompPtr->IsDependenciesMode()){
-			return TS_OK;
-		}
-	}
+// reimplemented (ICxxFileProcessor)
 
-	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
-	for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
-		m_headerFilePtr.SetPtr(new QFile(tempDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h"));
-		m_sourceFilePtr.SetPtr(new QFile(tempDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp"));
+QSet<imtsdl::IncludeDirective> CGqlWrapClassCodeGeneratorComp::GetIncludeDirectives() const
+{
+	static QSet<imtsdl::IncludeDirective> retVal = {
+		CreateImtDirective("<imtservergql/CPermissibleGqlRequestHandlerComp.h>")
+	};
 
-		if (!ProcessFiles(sdlRequest, !joinHeaders, !joinSources)){
-			SendErrorMessage(0, QString("Unable to process files"));
-
-			return TS_INVALID;
-		}
-
-		if (!CloseFiles()){
-			SendErrorMessage(0, QString("Unable to finalize files"));
-
-			return TS_INVALID;
-		}
-	}
-
-	// join files if required
-	if (!joinRules.isEmpty()){
-		if (m_filesJoinerCompPtr.IsValid()){
-			iprm::CParamsSet inputParams;
-			ifile::CFileNameParam sourceDirPathParam;
-			sourceDirPathParam.SetPath(tempDirectoryPath);
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
-			ifile::CFileNameParam outputFileNameParam;
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
-			iprm::CEnableableParam appendEnableParam;
-			appendEnableParam.SetEnabled(true);
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_appendModeParamId, &appendEnableParam);
-
-			iprm::COptionsManager filterParams;
-
-			if (joinHeaders){
-				filterParams.ResetOptions();
-				for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
-					filterParams.InsertOption("C" + sdlRequest.GetName() + "GqlRequest.h", QByteArray::number(filterParams.GetOptionsCount()));
-				}
-
-				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
-				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
-				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join header files");
-					I_CRITICAL();
-
-					return TS_INVALID;
-				}
-
-				// cleanup joined files
-				for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
-					QFile::remove(QString(tempDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.h"));
-				}
-			}
-			if (joinSources){
-				filterParams.ResetOptions();
-				for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
-					filterParams.InsertOption("C" + sdlRequest.GetName() + "GqlRequest.cpp", QByteArray::number(filterParams.GetOptionsCount()));
-				}
-
-				const QString sourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
-				outputFileNameParam.SetPath(sourceFilePath);
-				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
-				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join cource  files");
-					I_CRITICAL();
-
-					return TS_INVALID;
-				}
-
-				// cleanup joined files
-				for (const imtsdl::CSdlRequest& sdlRequest: sdlRequestList){
-					QFile::remove(QString(tempDirectoryPath + "/C" + sdlRequest.GetName() + "GqlRequest.cpp"));
-				}
-
-				// add joined header include directive
-				if (joinHeaders){
-					QFile joinedSourceFile(sourceFilePath);
-					if (!joinedSourceFile.open(QIODevice::ReadWrite)){
-						SendCriticalMessage(0, QString("Unable to open joined filee '%1'").arg(sourceFilePath));
-						I_CRITICAL();
-
-						return TS_INVALID;
-					}
-					QFileInfo headerFileInfo(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
-					QByteArray sourceReadData = joinedSourceFile.readAll();
-					joinedSourceFile.seek(0);
-					QByteArray includeDirective = QByteArrayLiteral("#include ");
-					includeDirective.append('"').append(headerFileInfo.fileName().toUtf8()).append('"');
-					includeDirective.append('\n').append('\n').append('\n');
-					sourceReadData.prepend(includeDirective);
-					joinedSourceFile.write(sourceReadData);
-				}
-			}
-		}
-	}
-
-	return TS_OK;
+	return retVal;
 }
 
 
 // private methods
 
-bool CGqlWrapClassCodeGeneratorComp::CloseFiles()
+bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRequest& sdlRequest, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	bool retVal = true;
+	QTextStream ifStream(headerDevicePtr);
 
-	retVal = m_headerFilePtr->flush();
-	retVal = m_sourceFilePtr->flush() && retVal;
-
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	return retVal;
-}
-
-
-bool CGqlWrapClassCodeGeneratorComp::ProcessFiles(const imtsdl::CSdlRequest& sdlRequest, bool addDependenciesInclude, bool addSelfHeaderInclude)
-{
-	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
-		SendCriticalMessage(0,
-					QString("Unable to open file: '%1'. Error: %2")
-						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	if (!m_sourceFilePtr->open(QIODevice::WriteOnly)){
-		SendCriticalMessage(0,
-						QString("Unable to open file: '%1'. Error: %2")
-							.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	bool retVal = true;
-	retVal = retVal && ProcessHeaderClassFile(sdlRequest, addDependenciesInclude);
-	retVal = retVal && ProcessSourceClassFile(sdlRequest, addSelfHeaderInclude);
-
-	return retVal;
-}
-
-
-bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRequest& sdlRequest, bool addDependenciesInclude)
-{
-	QTextStream ifStream(m_headerFilePtr.GetPtr());
-
-	// preprocessor's section
-	ifStream << QStringLiteral("#pragma once");
-	FeedStream(ifStream, 3, false);
-
-	AddRequiredIncludesToHeaderFile(ifStream, sdlRequest, addDependenciesInclude);
-
-	// namespace begin
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
-				m_customSchemaParamsCompPtr,
-				m_argumentParserCompPtr,
-				false);
-
-	ifStream << QStringLiteral("namespace ");
-	ifStream <<  sdlNamespace;
-	FeedStream(ifStream, 1, false);
-	ifStream <<  QStringLiteral("{");
-	FeedStream(ifStream, 2, false);
+		m_customSchemaParamsCompPtr,
+		m_argumentParserCompPtr,
+		false);
 
 	// RequestInfo struct Begin
 	FeedStream(ifStream, 2, false);
@@ -322,40 +143,13 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 	ifStream << QStringLiteral("};");
 	FeedStream(ifStream, 3, false);
 
-	// end of namespace
-	ifStream << QStringLiteral("} // namespace ");
-	ifStream << sdlNamespace;
-	FeedStream(ifStream, 3, true);
-
-
 	return true;
 }
 
 
-bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRequest& sdlRequest, bool addSelfHeaderInclude)
+bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRequest& sdlRequest, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	QTextStream ifStream(m_sourceFilePtr.GetPtr());
-
-	// include section
-	if (addSelfHeaderInclude){
-		ifStream << QStringLiteral("#include \"C");
-		ifStream << sdlRequest.GetName() << QStringLiteral("GqlRequest.h\"");
-		FeedStream(ifStream, 2);
-	}
-	FeedStream(ifStream, 1);
-
-	// namespace begin
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
-		m_customSchemaParamsCompPtr,
-		m_argumentParserCompPtr,
-		false);
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("namespace ");
-		ifStream << sdlNamespace;
-		FeedStream(ifStream, 1, false);
-		ifStream << '{';
-		FeedStream(ifStream, 1, false);
-	}
+	QTextStream ifStream(sourceDevicePtr);
 
 	const QString className = 'C' + sdlRequest.GetName() + QStringLiteral("GqlRequest");
 	// implementation of methods
@@ -482,23 +276,15 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRe
 	ifStream << '}';
 	FeedStream(ifStream, 1, false);
 
-	// end of namespace
-	FeedStream(ifStream, 2, false);
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("} // namespace ");
-		ifStream << sdlNamespace;
-	}
-	FeedStream(ifStream, 1, true);
-
 	return true;
 }
 
 
 bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
-			QTextStream& stream,
-			const imtsdl::CSdlField& sdlField,
-			uint hIndents,
-			bool createStructDefinition)
+	QTextStream& stream,
+	const imtsdl::CSdlField& sdlField,
+	uint hIndents,
+	bool createStructDefinition) const
 {
 	bool isUnion = false;
 	imtsdl::CSdlType sdlType;
@@ -580,9 +366,9 @@ bool CGqlWrapClassCodeGeneratorComp::GenerateFieldRequestInfo(
 
 
 void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
-			QTextStream& stream,
-			const imtsdl::CSdlRequest& sdlRequest,
-			uint hIndents)
+	QTextStream& stream,
+	const imtsdl::CSdlRequest& sdlRequest,
+	uint hIndents) const
 {
 	// Get context
 	FeedStreamHorizontally(stream, hIndents);
@@ -632,12 +418,12 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 	FeedStream(stream, 1, false);
 
 	GenerateRequestedFieldsParsing(
-				stream,
-				sdlRequest.GetOutputArgument(),
-				QStringLiteral("requestedIds"),
-				QStringLiteral("requestedFieldsObjectPtr"),
-				QString(),
-				hIndents + 2);
+		stream,
+		sdlRequest.GetOutputArgument(),
+		QStringLiteral("requestedIds"),
+		QStringLiteral("requestedFieldsObjectPtr"),
+		QString(),
+		hIndents + 2);
 
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << '}';
@@ -651,12 +437,12 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestParsing(
 
 
 void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
-			QTextStream& stream,
-			const imtsdl::CSdlField& sdlField,
-			const QString& idListContainerParamName,
-			const QString& gqlObjectVarName,
-			const QString& complexFieldName,
-			uint hIndents)
+	QTextStream& stream,
+	const imtsdl::CSdlField& sdlField,
+	const QString& idListContainerParamName,
+	const QString& gqlObjectVarName,
+	const QString& complexFieldName,
+	uint hIndents) const
 {
 	bool isCustom = false;
 	bool isEnum = false;
@@ -666,9 +452,9 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 	}
 
 	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumOrUnionForField(sdlField, 
-		m_sdlTypeListCompPtr->GetSdlTypes(false),
-		m_sdlEnumListCompPtr->GetEnums(false),
-		m_sdlUnionListCompPtr->GetUnions(false));
+																						m_sdlTypeListCompPtr->GetSdlTypes(false),
+																						m_sdlEnumListCompPtr->GetEnums(false),
+																						m_sdlUnionListCompPtr->GetUnions(false));
 	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
 	const imtsdl::CSdlUnion* sdlUnionPtr = dynamic_cast<imtsdl::CSdlUnion*>(foundEntry.get());
 	if(sdlTypePtr == nullptr && sdlUnionPtr == nullptr){
@@ -685,12 +471,12 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 
 
 void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
-			QTextStream& stream,
-			const imtsdl::CSdlType& sdlType,
-			const QString& idListContainerParamName,
-			const QString& gqlObjectVarName,
-			const QString& complexFieldName,
-			uint hIndents)
+	QTextStream& stream,
+	const imtsdl::CSdlType& sdlType,
+	const QString& idListContainerParamName,
+	const QString& gqlObjectVarName,
+	const QString& complexFieldName,
+	uint hIndents) const
 {
 	const imtsdl::SdlFieldList typeFieldList = sdlType.GetFields();
 	if (typeFieldList.isEmpty()){
@@ -736,13 +522,13 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 		bool isEnum = false;
 		bool isUnion = false;
 		ConvertTypeOrEnumOrUnion(typeField,
-			m_sdlEnumListCompPtr->GetEnums(false),
-			m_sdlUnionListCompPtr->GetUnions(false),
-			&isCustom,
-			nullptr,
-			nullptr,
-			&isEnum,
-			&isUnion);
+								 m_sdlEnumListCompPtr->GetEnums(false),
+								 m_sdlUnionListCompPtr->GetUnions(false),
+								 &isCustom,
+								 nullptr,
+								 nullptr,
+								 &isEnum,
+								 &isUnion);
 		if (!isCustom || isEnum || isUnion){
 			continue;
 		}
@@ -824,7 +610,7 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestedFieldsParsing(
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::GenerateRequestSetup(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents)
+void CGqlWrapClassCodeGeneratorComp::GenerateRequestSetup(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents) const
 {
 	// set commandID
 	FeedStreamHorizontally(stream, hIndents);
@@ -841,179 +627,6 @@ void CGqlWrapClassCodeGeneratorComp::GenerateRequestSetup(QTextStream& stream, c
 
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("return true;");
-}
-
-
-void CGqlWrapClassCodeGeneratorComp::AbortCurrentProcessing()
-{
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	I_CRITICAL();
-
-	m_headerFilePtr->remove();
-	m_sourceFilePtr->remove();
-}
-
-
-void CGqlWrapClassCodeGeneratorComp::AddRequiredIncludesToHeaderFile(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, bool addDependenciesInclude) const
-{
-	QSet<QString> complexTypeList;
-	bool hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlRequest, &complexTypeList);
-
-	if (hasComplexTypes){
-		bool isQtCommentAdded = false;
-		// Add Qt types
-		if (complexTypeList.contains(QStringLiteral("QByteArray"))){
-			if (!isQtCommentAdded){
-				stream << QStringLiteral("// Qt includes");
-				FeedStream(stream, 1, false);
-				isQtCommentAdded = true;
-			}
-			stream << QStringLiteral("#include <QtCore/QByteArray>");
-			FeedStream(stream, 1, false);
-		}
-		if (complexTypeList.contains(QStringLiteral("QString"))){
-			if (!isQtCommentAdded){
-				stream << QStringLiteral("// Qt includes");
-				FeedStream(stream, 1, false);
-				isQtCommentAdded = true;
-			}
-			stream << QStringLiteral("#include <QtCore/QString>");
-			FeedStream(stream, 1, false);
-		}
-		if (complexTypeList.contains(QStringLiteral("QList"))){
-			if (!isQtCommentAdded){
-				stream << QStringLiteral("// Qt includes");
-				FeedStream(stream, 1, false);
-				isQtCommentAdded = true;
-			}
-			stream << QStringLiteral("#include <QtCore/QList>");
-			FeedStream(stream, 1, false);
-		}
-		// if variant map is enabled we need to add QVariant and QVariantMap
-		if (!isQtCommentAdded){
-			stream << QStringLiteral("// Qt includes");
-			FeedStream(stream, 1, false);
-		}
-		stream << QStringLiteral("#include <QtCore/QVariant>");
-		FeedStream(stream, 1, false);
-		stream << QStringLiteral("#include <QtCore/QVariantMap>");
-		FeedStream(stream, 1, false);
-
-		// remove qt types from list
-		complexTypeList.remove(QStringLiteral("QByteArray"));
-		complexTypeList.remove(QStringLiteral("QString"));
-		complexTypeList.remove(QStringLiteral("QList"));
-		if (!complexTypeList.isEmpty()){
-			FeedStream(stream, 1, false);
-		}
-
-		/// \todo add it also for GQL Base handler and GQL CollectionHandler
-		QList<imtsdl::IncludeDirective> includeDirectivesList;
-		QSet<QString> customIncluded;
-		QList<imtsdl::CSdlField> requestFields = sdlRequest.GetInputArguments();
-		requestFields << sdlRequest.GetOutputArgument();
-		for (const imtsdl::CSdlField& field: requestFields){
-			std::shared_ptr<imtsdl::CSdlEntryBase> foundEntryPtr = GetSdlTypeOrEnumOrUnionForField(
-				field,
-				m_sdlTypeListCompPtr->GetSdlTypes(false),
-				m_sdlEnumListCompPtr->GetEnums(false),
-				m_sdlUnionListCompPtr->GetUnions(false));
-
-			if (!foundEntryPtr){
-				SendCriticalMessage(0, QString("Unable to find type for %1 of %2").arg(field.GetId(), sdlRequest.GetName()));
-				I_CRITICAL();
-
-				return;
-			}
-
-			if (!foundEntryPtr->IsExternal()){
-				continue;
-			}
-
-			QString resolvedPath = foundEntryPtr->GetTargetHeaderFilePath();
-			if (resolvedPath.isEmpty()){
-				SendErrorMessage(0, QString("Unable to find header for %1 of %2").arg(field.GetId(), sdlRequest.GetName()));
-
-				return;
-			}
-
-			const QString relativeIncludePath = '<' + resolvedPath + '>';
-			if (!resolvedPath.isEmpty() && !customIncluded.contains(relativeIncludePath)){
-				includeDirectivesList << CreateCustomDirective(relativeIncludePath);
-				customIncluded << relativeIncludePath;
-			}
-		}
-
-		QList<imtsdl::Priority> orderList = {
-			imtsdl::P_C,
-			imtsdl::P_OS_API,
-			imtsdl::P_QT,
-			imtsdl::P_ACF,
-			imtsdl::P_IMT,
-			imtsdl::P_CUSTOM
-		};
-
-		QMutableListIterator includeIter(includeDirectivesList);
-		while(!orderList.isEmpty()){
-			imtsdl::Priority currentPriority = orderList.takeFirst();
-			bool addRemark = true;
-			bool isAdded = false;
-			while(includeIter.hasNext()){
-				imtsdl::IncludeDirective directive = includeIter.next();
-				if (directive.priority == currentPriority){
-					isAdded = true;
-					if (addRemark){
-						if (!directive.remark.startsWith(QStringLiteral("//"))){
-							stream << QStringLiteral("// ");
-						}
-						stream << directive.remark;
-						FeedStream(stream, 1, false);
-						addRemark = false;
-					}
-					stream << QStringLiteral("#include ");
-					stream << directive.path;
-					FeedStream(stream, 1, false);
-
-					includeIter.remove();
-				}
-			}
-			if (isAdded){
-				FeedStream(stream, 1, false);
-			}
-			includeIter.toFront();
-		}
-
-
-		/// \fallback for V1 ? \todo inspect and remove it
-		// Add user's custom types
-		if (addDependenciesInclude){
-			// first add include comment
-			if (!complexTypeList.isEmpty()){
-				stream << QStringLiteral("// ") << GetNamespaceFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr, false) << QStringLiteral(" includes");
-				FeedStream(stream, 1, false);
-			}
-
-			// then add inclides
-			for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
-				const QString& complexTypeName = *complexIter;
-				stream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
-				FeedStream(stream, 1, false);
-			}
-		}
-	}
-
-	// add imtgql includes
-	FeedStream(stream, 1, false);
-	stream << QStringLiteral("// imtgql includes");
-	FeedStream(stream, 1, false);
-	stream << QStringLiteral("#include <imtgql/IGqlContext.h>");
-	FeedStream(stream, 1, false);
-	stream << QStringLiteral("#include <imtgql/CGqlRequest.h>");
-	FeedStream(stream, 1, false);
-	stream << QStringLiteral("#include <imtgql/CGqlParamObject.h>");
-	FeedStream(stream, 3, false);
 }
 
 
@@ -1093,7 +706,7 @@ void CGqlWrapClassCodeGeneratorComp::AddClassProperties(QTextStream& stream, con
 
 // read methods
 
-bool CGqlWrapClassCodeGeneratorComp::AddFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field)
+bool CGqlWrapClassCodeGeneratorComp::AddFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field) const
 {
 	bool isCustom = false;
 	bool isArray = false;
@@ -1117,7 +730,7 @@ bool CGqlWrapClassCodeGeneratorComp::AddFieldReadFromRequestCode(QTextStream& st
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field)
+void CGqlWrapClassCodeGeneratorComp::AddScalarFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field) const
 {
 	AddExtractValueFromRequestCode(stream, field);
 	FeedStreamHorizontally(stream);
@@ -1144,7 +757,7 @@ void CGqlWrapClassCodeGeneratorComp::AddScalarFieldReadFromRequestCode(QTextStre
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::AddCustomFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field)
+void CGqlWrapClassCodeGeneratorComp::AddCustomFieldReadFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field) const
 {
 	AddExtractCustomValueFromRequestCode(stream, field);
 	FeedStreamHorizontally(stream);
@@ -1173,7 +786,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldReadFromRequestCode(QTextStre
 
 // write methods
 
-bool CGqlWrapClassCodeGeneratorComp::AddFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field)
+bool CGqlWrapClassCodeGeneratorComp::AddFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field) const
 {
 	bool isCustom = false;
 	bool isArray = false;
@@ -1198,7 +811,7 @@ bool CGqlWrapClassCodeGeneratorComp::AddFieldWriteToRequestCode(QTextStream& str
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
+void CGqlWrapClassCodeGeneratorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents) const
 {
 	QString tempListVarName;
 	GenerateListTempValueCode(stream, field, tempListVarName, hIndents);
@@ -1216,7 +829,7 @@ void CGqlWrapClassCodeGeneratorComp::AddScalarFieldWriteToRequestCode(QTextStrea
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
+void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -1263,7 +876,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCustomFieldWriteToRequestCode(QTextStrea
 
 // general help methods for scalar
 
-void CGqlWrapClassCodeGeneratorComp::AddExtractValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, quint32 hIndents)
+void CGqlWrapClassCodeGeneratorComp::AddExtractValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, quint32 hIndents) const
 {
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = gqlRequest.GetParamObject(");
@@ -1273,7 +886,7 @@ void CGqlWrapClassCodeGeneratorComp::AddExtractValueFromRequestCode(QTextStream&
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::AddDataCheckRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, quint32 hIndents)
+void CGqlWrapClassCodeGeneratorComp::AddDataCheckRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, quint32 hIndents) const
 {
 	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 	FeedStream(stream, 1, false);
@@ -1296,7 +909,7 @@ void CGqlWrapClassCodeGeneratorComp::AddDataCheckRequiredValueCode(QTextStream& 
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::AddSetValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field)
+void CGqlWrapClassCodeGeneratorComp::AddSetValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field) const
 {
 	stream << QStringLiteral("m_requestedArguments.") << field.GetId() << QStringLiteral(" = ");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
@@ -1306,7 +919,7 @@ void CGqlWrapClassCodeGeneratorComp::AddSetValueToObjectCode(QTextStream& stream
 
 // general help methods for custom
 
-void CGqlWrapClassCodeGeneratorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
+void CGqlWrapClassCodeGeneratorComp::AddExtractCustomValueFromRequestCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents) const
 {
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("const ::imtgql::CGqlParamObject* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = gqlRequest.GetParamObject(");
@@ -1316,7 +929,7 @@ void CGqlWrapClassCodeGeneratorComp::AddExtractCustomValueFromRequestCode(QTextS
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::AddCheckCustomRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
+void CGqlWrapClassCodeGeneratorComp::AddCheckCustomRequiredValueCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents) const
 {
 	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr == nullptr){");
 	FeedStream(stream, 1, false);
@@ -1339,7 +952,7 @@ void CGqlWrapClassCodeGeneratorComp::AddCheckCustomRequiredValueCode(QTextStream
 }
 
 
-void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents)
+void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, uint hIndents) const
 {
 	// check if a protocol is acceptable
 	stream << QStringLiteral("if (!protocolVersion.isEmpty()){");
@@ -1347,9 +960,9 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 
 	imtsdl::CSdlType foundType;
 	[[maybe_unused]]const bool isTypeFound = GetSdlTypeForField(
-				field,
-				m_sdlTypeListCompPtr->GetSdlTypes(false),
-				foundType);
+		field,
+		m_sdlTypeListCompPtr->GetSdlTypes(false),
+		foundType);
 	Q_ASSERT(isTypeFound);
 
 	/// \todo check all versions
@@ -1363,12 +976,12 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 	/// \todo do this for all versions
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(
-				foundType,
-				sdlNamespace,
-				*m_sdlTypeListCompPtr,
-				*m_sdlEnumListCompPtr,
-				*m_sdlUnionListCompPtr,
-				false);
+		foundType,
+		sdlNamespace,
+		*m_sdlTypeListCompPtr,
+		*m_sdlEnumListCompPtr,
+		*m_sdlUnionListCompPtr,
+		false);
 
 	QString typeVersion = structNameConverter.GetString();
 	typeVersion += QStringLiteral("::PV_");
@@ -1414,10 +1027,10 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCode(QTextStream& 
 }
 
 void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCodeImpl(
-			QTextStream& stream,
-			const imtsdl::CSdlField& field,
-			const QString& typeVersion,
-			uint hIndents)
+	QTextStream& stream,
+	const imtsdl::CSdlField& field,
+	const QString& typeVersion,
+	uint hIndents) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -1471,12 +1084,12 @@ void CGqlWrapClassCodeGeneratorComp::AddSetCustomValueToObjectCodeImpl(
 
 
 void CGqlWrapClassCodeGeneratorComp::AddReadFromRequestCode(
-			QTextStream& stream,
-			const imtsdl::CSdlField& field,
-			const QString& typeVersion,
-			const QString& readVariableName,
-			bool optRead,
-			uint hIndents)
+	QTextStream& stream,
+	const imtsdl::CSdlField& field,
+	const QString& typeVersion,
+	const QString& readVariableName,
+	bool optRead,
+	uint hIndents) const
 {
 	FeedStreamHorizontally(stream, hIndents);
 	stream << readVariableName;

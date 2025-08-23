@@ -194,7 +194,7 @@ protected:
 			if (!jsonObject.contains("value") || !jsonObject["value"].isString()){
 		\endcode
 	 */
-	virtual bool AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) = 0;
+	virtual bool AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) const = 0;
 
 	/*!
 		\brief Writes a begin of code, that reads a value from an object
@@ -204,7 +204,7 @@ protected:
 			jsonObject["value"].toString() ///< 'jsonObject' - \c variableName (if is empty, MUST be same as \c GetContainerObjectVariableName()); 'value' - can be obtained from \c field (field.GetName());
 		\endcode
 	 */
-	virtual bool AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents) = 0;
+	virtual bool AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents) const = 0;
 
 	/*!
 		\brief Writes code, that obtains a value from an object as list
@@ -222,16 +222,16 @@ protected:
 					\c ListAccessResult::toObjectTransformMethod		= ".toJsonObject()", bacause access by index returns \c QJsonValue, but we need a \c QJsonObject in case JSON for custom types
 					\c ListAccessResult::toObjectTransformMethod		= ".toString()", bacause access by index returns \c QJsonValue, but we need a \c QString in case JSON if a \c field is string
 	 */
-	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) = 0;
+	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) const = 0;
 
 	virtual CSdlUnionConverter::ConversionType GetUnionScalarConversionType() const = 0;
 	virtual CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const = 0;
 
 	// additional methods
 	/// \todo refactor it and describe
-	virtual QString GetUnionListElementType(bool forScalar) const;
-	virtual void AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) = 0;
-	virtual void AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) = 0;
+	virtual QString GetUnionListElementType(bool forScalar) const ;
+	virtual void AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) const = 0 ;
+	virtual void AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) const = 0 ;
 
 
 	// comfort methods
@@ -239,34 +239,34 @@ protected:
 	std::shared_ptr<imtsdl::CSdlEntryBase> FindEntryByName(const QString& entryName, bool onlyLocal = false) const;
 
 	/// Simply generates a start of code, that sets a value to struct like \code *object.value = \endcode
-	void WriteSetValueToStruct(QTextStream& stream, const imtsdl::CSdlField& field, const QString& objectName = QStringLiteral("object"));
+	void WriteSetValueToStruct(QTextStream& stream, const imtsdl::CSdlField& field, const QString& objectName = QStringLiteral("object")) const;
 
 	// reimplemented (imtsdlgencpp::CSdlClassModificatorBaseComp)
-	virtual bool ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType) override;
-	virtual bool ProcessSourceClassFile(const imtsdl::CSdlType& sdlType) override;
+	virtual bool ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const override;
+	virtual bool ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const override;
 
 private:
 	// basic helper methods
-	void AddFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
+	void AddFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const;
+	void AddFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const;
 
 	// write helpers
-	void AddScalarFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion);
-	void AddCustomFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddCustomFieldWriteToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddArrayFieldWriteToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddCustomArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddCustomArrayFieldWriteToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
+	void AddScalarFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion) const;
+	void AddCustomFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const;
+	void AddCustomFieldWriteToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1) const;
+	void AddArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const;
+	void AddArrayFieldWriteToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1) const;
+	void AddCustomArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const;
+	void AddCustomArrayFieldWriteToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1) const;
 
 	// read helpers
-	void AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents = 1);
-	void AddCustomFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddCustomFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
-	void AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion);
-	void AddArrayFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents = 1);
-	void AddCustomArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional);
-	void AddCustomArrayFieldReadToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1);
+	void AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents = 1) const;
+	void AddCustomFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const;
+	void AddCustomFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1) const;
+	void AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion) const;
+	void AddArrayFieldReadFromObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents = 1) const;
+	void AddCustomArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const;
+	void AddCustomArrayFieldReadToObjectImplCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents = 1) const;
 };
 
 

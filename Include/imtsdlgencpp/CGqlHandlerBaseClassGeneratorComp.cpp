@@ -1,12 +1,9 @@
-#include "CGqlHandlerBaseClassGeneratorComp.h"
+#include <imtsdlgencpp/CGqlHandlerBaseClassGeneratorComp.h>
 
-
-// C includes
-#include <iostream>
 
 // Qt includes
-#include <QtCore/QDir>
 #include <QtCore/QTextStream>
+
 
 //Acf includes
 #include <istd/CSystem.h>
@@ -16,7 +13,6 @@
 #include <ifile/CFileNameParam.h>
 
 // ImtCore includes
-#include <imtsdl/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlRequest.h>
 #include <imtsdlgencpp/CSdlUnionConverter.h>
 
@@ -25,11 +21,13 @@ namespace imtsdlgencpp
 {
 
 
-iproc::IProcessor::TaskState CGqlHandlerBaseClassGeneratorComp::DoProcessing(
-			const iprm::IParamsSet* paramsPtr,
-			const istd::IPolymorphic* /*inputPtr*/,
-			istd::IChangeable* /*outputPtr*/,
-			ibase::IProgressManager* /*progressManagerPtr*/)
+// reimplemented (IIncludeDirectivesProvider)
+
+bool CGqlHandlerBaseClassGeneratorComp::ProcessEntry(
+				const imtsdl::CSdlEntryBase& sdlEntry,
+				QIODevice* headerDevicePtr,
+				QIODevice* sourceDevicePtr,
+				const iprm::IParamsSet* paramsPtr) const
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
@@ -37,268 +35,61 @@ iproc::IProcessor::TaskState CGqlHandlerBaseClassGeneratorComp::DoProcessing(
 	Q_ASSERT(m_baseClassExtenderCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	if (!m_argumentParserCompPtr->IsGqlEnabled()){
-		return TS_OK;
-	}
 
-	const QString outputDirectoryPath = imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, true);
-	if (outputDirectoryPath.isEmpty()){
-		SendErrorMessage(0, "Output path is not provided");
-
-		return TS_INVALID;
-	}
-
-	if (!istd::CSystem::EnsurePathExists(outputDirectoryPath)){
-		SendErrorMessage(0, QString("Unable to create path '%1'").arg(outputDirectoryPath));
-		I_CRITICAL();
-
-		return TS_INVALID;
-	}
-
-	QMap<QString, QString> joinRules = m_argumentParserCompPtr->GetJoinRules();
-	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*m_customSchemaParamsCompPtr, *m_argumentParserCompPtr);
-	}
-	const bool joinHeaders = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_headerFileType);
-	const bool joinSources = joinRules.contains(imtsdl::ISdlProcessArgumentsParser::s_sourceFileType);
-	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
-		if (!m_argumentParserCompPtr->IsAutoJoinEnabled()){
-			QStringList cumulatedFiles;
-			if (!joinHeaders){
-				cumulatedFiles << WrapFileName(QStringLiteral("h"), outputDirectoryPath);
-			}
-			if (!joinSources){
-				cumulatedFiles << WrapFileName(QStringLiteral("cpp"), outputDirectoryPath);
-			}
-			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
-			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
-		}
-
-		if (m_argumentParserCompPtr->IsDependenciesMode()){
-			return TS_OK;
-		}
-	}
-
-	imtsdl::SdlRequestList requests = m_sdlRequestListCompPtr->GetRequests(true);
-	if (requests.isEmpty()){
-		SendVerboseMessage("Requests is empty. Nothing todo");
-
-		return TS_OK;
-	}
-
-	const QString tempDirectoryPath = GetTempOutputPathFromParams(paramsPtr, outputDirectoryPath);
-	m_headerFilePtr.SetPtr(new QFile(WrapFileName(QStringLiteral("h"), tempDirectoryPath)));
-	m_sourceFilePtr.SetPtr(new QFile(WrapFileName(QStringLiteral("cpp"), tempDirectoryPath)));
-
-	if (!ProcessFiles(!joinHeaders, !joinSources)){
-		SendErrorMessage(0, QString("Unable to process files"));
-
-		return TS_INVALID;
-	}
-
-	if (!CloseFiles()){
-		SendErrorMessage(0, QString("Unable to finalize files"));
-
-		return TS_INVALID;
-	}
-
-	// add extending for base class
-	iprm::CParamsSet paramsSet;
-	ifile::CFileNameParam headerFileNameParam;
-	headerFileNameParam.SetPath(m_headerFilePtr->fileName());
-	paramsSet.SetEditableParameter(QByteArrayLiteral("HeaderFile"), &headerFileNameParam);
-	iprm::CEnableableParam enableCompMacroParam(true);
-	paramsSet.SetEditableParameter(QByteArrayLiteral("AddBaseComponentMacro"), &enableCompMacroParam);
-
-	iprm::COptionsManager baseClassDirectivesList;
-	baseClassDirectivesList.InsertOption(QStringLiteral("imtservergql/CPermissibleGqlRequestHandlerComp.h"), QByteArrayLiteral("::imtservergql::CPermissibleGqlRequestHandlerComp"));
-
-	int extendResult = m_baseClassExtenderCompPtr->DoProcessing(&paramsSet, &baseClassDirectivesList, nullptr);
-	if (extendResult != TS_OK){
-		SendErrorMessage(0, QString("Unable to extend file'%1'").arg(m_headerFilePtr->fileName()));
-		I_CRITICAL();
-
-		return TS_INVALID;
-	}
-
-	// join files if required
-	if (!joinRules.isEmpty()){
-		if (m_filesJoinerCompPtr.IsValid()){
-			iprm::CParamsSet inputParams;
-			ifile::CFileNameParam sourceDirPathParam;
-			sourceDirPathParam.SetPath(tempDirectoryPath);
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_sourceDirPathParamId, &sourceDirPathParam);
-			ifile::CFileNameParam outputFileNameParam;
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_targetFilePathParamId, &outputFileNameParam);
-			iprm::CEnableableParam appendEnableParam;
-			appendEnableParam.SetEnabled(true);
-			inputParams.SetEditableParameter(imtsdl::CSimpleFileJoinerComp::s_appendModeParamId, &appendEnableParam);
-
-			iprm::COptionsManager filterParams;
-
-			if (joinHeaders){
-				filterParams.ResetOptions();
-				filterParams.InsertOption(WrapFileName(QStringLiteral("h")), QByteArray::number(filterParams.GetOptionsCount()));
-
-				outputFileNameParam.SetPath(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
-				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
-				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join header files");
-					I_CRITICAL();
-
-					return TS_INVALID;
-				}
-
-				// cleanup joined files
-				QFile::remove(WrapFileName(QStringLiteral("h"), tempDirectoryPath));
-			}
-
-			if (joinSources){
-				filterParams.ResetOptions();
-				filterParams.InsertOption(WrapFileName(QStringLiteral("cpp")), QByteArray::number(filterParams.GetOptionsCount()));
-
-				const QString sourceFilePath = joinRules[imtsdl::ISdlProcessArgumentsParser::s_sourceFileType];
-				outputFileNameParam.SetPath(sourceFilePath);
-				int joinProcessResult = m_filesJoinerCompPtr->DoProcessing(&inputParams, &filterParams, nullptr);
-				if (joinProcessResult != TS_OK){
-					SendCriticalMessage(0, "Unable to join source  files");
-					I_CRITICAL();
-
-					return TS_INVALID;
-				}
-
-				// cleanup joined files
-				QFile::remove(WrapFileName(QStringLiteral("cpp"), tempDirectoryPath));
-
-				// add joined header include directive
-				if (joinHeaders){
-					QFile joinedSourceFile(sourceFilePath);
-					if (!joinedSourceFile.open(QIODevice::ReadWrite)){
-						SendCriticalMessage(0, QString("Unable to open joined filee '%1'").arg(sourceFilePath));
-						I_CRITICAL();
-
-						return TS_INVALID;
-					}
-					QFileInfo headerFileInfo(joinRules[imtsdl::ISdlProcessArgumentsParser::s_headerFileType]);
-					QByteArray sourceReadData = joinedSourceFile.readAll();
-					joinedSourceFile.seek(0);
-					QByteArray includeDirective = QByteArrayLiteral("#include ");
-					includeDirective.append('"').append(headerFileInfo.fileName().toUtf8()).append('"');
-					includeDirective.append('\n').append('\n').append('\n');
-					sourceReadData.prepend(includeDirective);
-					joinedSourceFile.write(sourceReadData);
-				}
-			}
-		}
-	}
-
-	return TS_OK;
-}
-
-
-// private static methods
-
-QString CGqlHandlerBaseClassGeneratorComp::WrapFileName(const QString& ext, const QString& directoryPath)
-{
-	QString retVal;
-	Q_ASSERT_X(!ext.isEmpty(), __func__, "Extension for file MUST be specified");
-
-	if (!directoryPath.isEmpty()){
-		retVal.append(directoryPath);
-		if (!retVal.endsWith('/') || !retVal.endsWith(QDir::separator())){
-			retVal.append('/');
-		}
-	}
-	retVal.append(QStringLiteral("CGraphQlHandlerCompBase."));
-	retVal.append(ext);
-
-	return retVal;
-}
-
-
-// private methods
-
-bool CGqlHandlerBaseClassGeneratorComp::CloseFiles()
-{
-	bool retVal = true;
-
-	retVal = m_headerFilePtr->flush();
-	retVal = m_sourceFilePtr->flush() && retVal;
-
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	return retVal;
-}
-
-
-bool CGqlHandlerBaseClassGeneratorComp::ProcessFiles(bool addDependenciesInclude, bool addSelfHeaderInclude)
-{
-	if (!m_headerFilePtr->open(QIODevice::WriteOnly)){
-		SendCriticalMessage(0,
-					QString("Unable to open file: '%1'. Error: %2")
-						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
-	}
-
-	if (!m_sourceFilePtr->open(QIODevice::WriteOnly)){
-		SendCriticalMessage(0,
-						QString("Unable to open file: '%1'. Error: %2")
-							.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
-
-		AbortCurrentProcessing();
-
-		return false;
+	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests(true);
+	if (requestList.isEmpty()){
+		// nothing todo
+		return true;
 	}
 
 	bool retVal = true;
-	retVal = retVal && ProcessHeaderClassFile(addDependenciesInclude);
-	retVal = retVal && ProcessSourceClassFile(addSelfHeaderInclude);
+	retVal = retVal && ProcessHeaderClassFile(sdlEntry, headerDevicePtr);
+	retVal = retVal && ProcessSourceClassFile(sdlEntry, sourceDevicePtr);
 
 	return retVal;
 }
 
 
-bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenciesInclude)
+// reimplemented (IIncludeDirectivesProvider)
+
+QSet<imtsdl::IncludeDirective> CGqlHandlerBaseClassGeneratorComp::GetIncludeDirectives() const
 {
-	QTextStream ifStream(m_headerFilePtr.GetPtr());
+	static QSet<imtsdl::IncludeDirective> retVal = {
 
-	// preprocessor's section
-	ifStream << QStringLiteral("#pragma once");
-	FeedStream(ifStream, 3, false);
+	};
 
-	// add generated includes
-	if (addDependenciesInclude){
-		AddRequiredIncludesForDocument(ifStream);
-		FeedStream(ifStream, 1, false);
-	}
+	return retVal;
+}
 
-	// namespace begin
 
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
-				m_customSchemaParamsCompPtr,
-				m_argumentParserCompPtr,
-				false);
-	ifStream << QStringLiteral("namespace ");
-	ifStream <<  sdlNamespace;
-	FeedStream(ifStream, 1, false);
 
-	ifStream <<  QStringLiteral("{");
-	FeedStream(ifStream, 3, false);
+bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlEntryBase& sdlEntry, QIODevice* headerDevicePtr) const
+{
+	QTextStream ifStream(headerDevicePtr);
 
 	// class begin
-	ifStream << QStringLiteral("class CGraphQlHandlerCompBase");
+	ifStream << QStringLiteral("class CGraphQlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp");
 	FeedStream(ifStream, 1, false);
 
 	ifStream << QStringLiteral("{");
-	FeedStream(ifStream, 1, false);
+	FeedStream(ifStream, 2, false);
 
 	// public section
 	ifStream << QStringLiteral("public:");
 	FeedStream(ifStream, 1, false);
+
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;");
+	FeedStream(ifStream, 2, false);
+
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("I_BEGIN_BASE_COMPONENT(CGraphQlHandlerCompBase)");
+	FeedStream(ifStream, 1, false);
+
+	FeedStreamHorizontally(ifStream, 1);
+	ifStream << QStringLiteral("I_END_COMPONENT");
+	FeedStream(ifStream, 2, false);
+
 
 	// base class methods override definition
 	FeedStreamHorizontally(ifStream, 1);
@@ -324,84 +115,21 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(bool addDependenc
 	ifStream << QStringLiteral("};");
 	FeedStream(ifStream, 3, false);
 
-	// end of namespace
-	ifStream << QStringLiteral("} // namespace ");
-	ifStream << sdlNamespace;
-	FeedStream(ifStream, 1, true);
-
 	return true;
 }
 
 
-bool CGqlHandlerBaseClassGeneratorComp::ProcessSourceClassFile(bool addSelfHeaderInclude)
+bool CGqlHandlerBaseClassGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlEntryBase& sdlEntry, QIODevice* sourceDevicePtr) const
 {
-	QTextStream ifStream(m_sourceFilePtr.GetPtr());
-
-	// include section
-	if (addSelfHeaderInclude){
-		ifStream << QStringLiteral("#include \"");
-		ifStream << WrapFileName(QStringLiteral("h")) << '"';
-		FeedStream(ifStream, 2);
-	}
-	FeedStream(ifStream, 1);
-
-	// namespace begin
-	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
-				m_customSchemaParamsCompPtr,
-				m_argumentParserCompPtr,
-				false);
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("namespace ");
-		ifStream << sdlNamespace;
-		FeedStream(ifStream, 1, false);
-		ifStream << '{';
-		FeedStream(ifStream, 3, false);
-	}
+	QTextStream ifStream(sourceDevicePtr);
 
 	AddCollectionMethodsImplForDocument(ifStream);
 
-	// end of namespace
-	FeedStream(ifStream, 2, false);
-	if (!sdlNamespace.isEmpty()){
-		ifStream << QStringLiteral("} // namespace ");
-		ifStream << sdlNamespace;
-	}
-	FeedStream(ifStream, 1, true);
-
 	return true;
 }
 
 
-void CGqlHandlerBaseClassGeneratorComp::AbortCurrentProcessing()
-{
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
-
-	I_CRITICAL();
-
-	m_headerFilePtr->remove();
-	m_sourceFilePtr->remove();
-}
-
-
-void CGqlHandlerBaseClassGeneratorComp::AddRequiredIncludesForDocument(QTextStream& stream, uint hIndents)
-{
-	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("// generated SDL includes");
-	FeedStream(stream, 1, false);
-
-	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests(true);
-	for (const imtsdl::CSdlRequest& sdlRequest: requestList){
-		stream << QStringLiteral("#include \"C");
-		stream << sdlRequest.GetName();
-		stream << QStringLiteral("GqlRequest.h\"");
-		FeedStream(stream, 1, false);
-	}
-	FeedStream(stream, 1, false);
-}
-
-
-void CGqlHandlerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& stream, uint hIndents)
+void CGqlHandlerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& stream, uint hIndents) const
 {
 	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("// abstract methods");
@@ -414,7 +142,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodsForDocument(QTextStream& strea
 }
 
 
-void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents)
+void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents) const
 {
 	const QString sdlNamespace = GetNamespaceFromParamsOrArguments(
 				m_customSchemaParamsCompPtr,
@@ -424,8 +152,8 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 	imtsdl::CSdlField outputArgument = sdlRequest.GetOutputArgument();
 	CStructNamespaceConverter structNameConverter(
 			outputArgument,
-			sdlNamespace, 
-			*m_sdlTypeListCompPtr, 
+			sdlNamespace,
+			*m_sdlTypeListCompPtr,
 			*m_sdlEnumListCompPtr,
 			*m_sdlUnionListCompPtr,
 			false);
@@ -444,7 +172,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddMethodForDocument(QTextStream& stream
 	FeedStream(stream, 1, false);
 }
 
-void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, uint hIndents)
+void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTextStream& stream, uint hIndents) const
 {
 	const QString className = QStringLiteral("CGraphQlHandlerCompBase");
 	const imtsdl::SdlRequestList requestList = m_sdlRequestListCompPtr->GetRequests(true);
@@ -519,7 +247,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddCollectionMethodsImplForDocument(QTex
 }
 
 
-void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents)
+void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents) const
 {
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '/' << '/' << ' ' << sdlRequest.GetName();

@@ -16,6 +16,7 @@
 #include <imtsdl/ISdlRequestListProvider.h>
 #include <imtsdl/CSdlTools.h>
 #include <imtsdlgencpp/CSdlGenTools.h>
+#include <imtsdlgencpp/CCxxProcessorCompBase.h>
 
 
 namespace imtsdlgencpp
@@ -26,13 +27,13 @@ namespace imtsdlgencpp
 	A C++ class generator of GraphQL handlers for SDL requests
 */
 class CGqlHandlerBaseClassGeneratorComp:
-			public iproc::CSyncProcessorCompBase,
+			public CCxxProcessorCompBase,
 			private imtsdl::CSdlTools,
 			private CSdlGenTools
 {
 
 public:
-	typedef iproc::CSyncProcessorCompBase BaseClass;
+	typedef CCxxProcessorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlHandlerBaseClassGeneratorComp)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
@@ -41,40 +42,35 @@ public:
 		I_ASSIGN(m_sdlUnionListCompPtr, "SdlUnionListProvider", "SDL unioins used to create a code", true, "SdlUnionListProvider")
 		I_ASSIGN(m_sdlRequestListCompPtr, "SdlRequestListProvider", "SDL requests used to create a GraphQL wrap code", true, "SdlRequestListProvider")
 		I_ASSIGN(m_baseClassExtenderCompPtr, "BaseClassExtender", "Compoment, used to add base class inherits", true, "BaseClassExtender")
-		I_ASSIGN(m_filesJoinerCompPtr, "FilesJoiner", "Compoment, used to join files into a single", false, "FilesJoiner")
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
-		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
-		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList");
+		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace")
+		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList")
+	I_END_COMPONENT
 
-	I_END_COMPONENT;
+	// reimplemented (ICxxFileProcessor)
+	virtual bool ProcessEntry(
+				const imtsdl::CSdlEntryBase& sdlEntry, 
+				QIODevice* headerDevicePtr, 
+				QIODevice* sourceDevicePtr = nullptr,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
-	//reimplemented(iproc::IProcessor)
-	virtual iproc::IProcessor::TaskState DoProcessing(
-				const iprm::IParamsSet* paramsPtr,
-				const istd::IPolymorphic* inputPtr,
-				istd::IChangeable* outputPtr,
-				ibase::IProgressManager* progressManagerPtr = NULL) override;
+	// reimplemented (IIncludeDirectivesProvider)
+	virtual QSet<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
+
 private:
-	static QString WrapFileName(const QString& ext, const QString& directoryPath = QString());
-
-private:
-	bool CloseFiles();
-	bool ProcessFiles(bool addDependenciesInclude, bool addSelfHeaderInclude);
-	bool ProcessHeaderClassFile(bool addDependenciesInclude);
-	bool ProcessSourceClassFile(bool addSelfHeaderInclude);
-	void AbortCurrentProcessing();
+	bool ProcessHeaderClassFile(const imtsdl::CSdlEntryBase& sdlEntry, QIODevice* headerDevicePtr) const;
+	bool ProcessSourceClassFile(const imtsdl::CSdlEntryBase& sdlEntry, QIODevice* sourceDevicePtr) const;
 
 	// comfort methods
-	void AddRequiredIncludesForDocument(QTextStream& stream, uint hIndents = 0);
-	void AddMethodsForDocument(QTextStream& stream, uint hIndents = 0);
-	void AddMethodForDocument(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents = 0);
+	void AddMethodsForDocument(QTextStream& stream, uint hIndents = 0) const;
+	void AddMethodForDocument(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents = 0) const;
 
 	/**
 		Creates method implementations for all document's (and subtype's) operation types
 	 */
-	void AddCollectionMethodsImplForDocument(QTextStream& stream, uint hIndents = 0);
-	void AddImplCodeForRequests(QTextStream& stream, const imtsdl::SdlRequestList& requestList, const QString& className, uint hIndents = 0);
-	void AddImplCodeForRequest(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents = 0);
+	void AddCollectionMethodsImplForDocument(QTextStream& stream, uint hIndents = 0) const;
+	void AddImplCodeForRequests(QTextStream& stream, const imtsdl::SdlRequestList& requestList, const QString& className, uint hIndents = 0) const;
+	void AddImplCodeForRequest(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, uint hIndents = 0) const;
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
@@ -83,13 +79,9 @@ private:
 	I_REF(imtsdl::ISdlUnionListProvider, m_sdlUnionListCompPtr);
 	I_REF(imtsdl::ISdlRequestListProvider, m_sdlRequestListCompPtr);
 	I_REF(iproc::IProcessor, m_baseClassExtenderCompPtr);
-	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 	I_REF(iprm::IOptionsManager, m_dependentSchemaListCompPtr);
-
-	istd::TDelPtr<QFile> m_headerFilePtr;
-	istd::TDelPtr<QFile> m_sourceFilePtr;
 };
 
 

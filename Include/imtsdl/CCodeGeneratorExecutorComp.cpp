@@ -26,6 +26,13 @@ namespace imtsdl
 
 void CCodeGeneratorExecutorComp:: OnComponentCreated()
 {
+	if (qApp == nullptr){
+		SendCriticalMessage(0, "Unable to start processing, when QCoreApplication is not initialized");
+		I_CRITICAL();
+
+		::exit(-1);
+	}
+
 	/// \todo reorganize it, use simple processor and call 'DoProcessing' from main.cpp
 	BaseClass::OnComponentCreated();
 
@@ -42,7 +49,9 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 				0, QString("Unable to collect dependencies for schema: '%1'")
 					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
-			::exit(1);
+			qApp->exit(1);
+
+			return;
 		}
 		iprm::TParamsPtr<iprm::IOptionsManager> processedFilesPtr(
 			&outputParams, QByteArrayLiteral("ProcessedFiles"), true);
@@ -51,7 +60,9 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 				0, QString("Unexpected dependencies list for schema: '%1'")
 					.arg(m_sdlArgumentParserCompPtr->GetSchemaFilePath()));
 
-			::exit(2);
+			qApp->exit(2);
+
+			return;
 		}
 
 		QStringList cumulatedFiles;
@@ -70,7 +81,9 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 			std::cout, cumulatedFiles,
 			m_sdlArgumentParserCompPtr->GetGeneratorType());
 
-		::exit(0);
+		qApp->exit(0);
+
+		return;
 	}
 
 
@@ -84,22 +97,34 @@ void CCodeGeneratorExecutorComp:: OnComponentCreated()
 				.arg(QFileInfo(m_sdlArgumentParserCompPtr->GetSchemaFilePath())
 						 .absoluteFilePath()));
 
-		::exit(3);
+		qApp->exit(3);
+
+		return;
 	}
 
-	if (m_cxxProcessorCompPtr.IsValid()){
-		iproc::IProcessor::TaskState execResult = m_cxxProcessorCompPtr->DoProcessing(nullptr, nullptr, nullptr, nullptr);
+
+	iprm::CParamsSet params;
+	// PrepareParams(params) -> void;
+
+	if (m_cxxProcessorCompPtr.IsValid() && m_sdlArgumentParserCompPtr->IsCppEnabled()){
+		iproc::IProcessor::TaskState execResult = m_cxxProcessorCompPtr->DoProcessing(&params, nullptr, nullptr, nullptr);
 		if (execResult != iproc::IProcessor::TS_OK){
+			qApp->exit(4);
+
 			return;
 		}
 	}
 
-	if (m_qmlProcessorCompPtr.IsValid()){
-		iproc::IProcessor::TaskState execResult = m_qmlProcessorCompPtr->DoProcessing(nullptr, nullptr, nullptr, nullptr);
+	if (m_qmlProcessorCompPtr.IsValid() && m_sdlArgumentParserCompPtr->IsQmlEnabled()){
+		iproc::IProcessor::TaskState execResult = m_qmlProcessorCompPtr->DoProcessing(&params, nullptr, nullptr, nullptr);
 		if (execResult != iproc::IProcessor::TS_OK){
+			qApp->exit(5);
+
 			return;
 		}
 	}
+
+	qApp->exit(0);
 }
 
 

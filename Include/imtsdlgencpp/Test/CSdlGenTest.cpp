@@ -43,8 +43,31 @@ static bool CompareDirectories(const QString& dir1, const QString& dir2) {
 	QDir directory1(dir1);
 	QDir directory2(dir2);
 
-	const QStringList files1 = directory1.entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
-	for (const QString &entry : files1) {
+	QStringList files1 = directory1.entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
+	QStringList files2 = directory2.entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
+	if (files1 != files2){
+		QListIterator dirIter1(files1);
+		while(dirIter1.hasNext()){
+			files2.removeAll(dirIter1.next());
+		}
+
+		QListIterator dir2Iter(files2);
+		while(dir2Iter.hasNext()){
+			files1.removeAll(dir2Iter.next());
+		}
+
+		if (!files1.isEmpty()){
+			qWarning() << directory2.absolutePath() << "Doesn't contains expected files: " << files1.join(" | ");
+		}
+
+		if (!files2.isEmpty()){
+			qWarning() << directory1.absolutePath() << "Doesn't contains expected files: " << files2.join(" | ");
+		}
+
+		return false;
+	}
+
+	for (const QString &entry : std::as_const(files1)){
 		const QString path1 = directory1.absoluteFilePath(entry);
 		const QString path2 = directory2.absoluteFilePath(entry);
 
@@ -99,13 +122,7 @@ void PrepareSuite(CImtSdlGenTest& testSuite, const QDir& outputDir)
 	const bool settingsIsValid = argParserPtr->ReadFromSettings(s_configFilePath);
 	QVERIFY(settingsIsValid);
 
-	// base classes are not needed for this test
-	argParserPtr->SetBaseClassList(QMap<QString,QString>());
-
-	argParserPtr->SetAutoJoinEnabled();
-	argParserPtr->SetAutoLinkLevel(imtsdl::ISdlProcessArgumentsParser::ALL_ONLY_FILE);
 	argParserPtr->SetGenerateModeEnabled();
-	argParserPtr->SetModuleGenerateEnabled(false);
 	argParserPtr->SetEnabledAllModificators();
 }
 
@@ -134,36 +151,19 @@ void ExecuteTest(
 		return;
 	}
 
-	iprm::CParamsSet processorParams;
-	ifile::CFileNameParam tempDirParam;
-	tempDirParam.SetPath(tempOutputDirPath);
-	processorParams.SetEditableParameter(imtsdl::ProcessorParamKeys::TempDirPath, &tempDirParam);
-
 	// first parse the schema
 	GetPrecessorAndExec(testSuite, "GqlSchemaParser");
 
 	// do processing
-	// CXX
-	GetPrecessorAndExec(testSuite, "QmlRegisterGenerator", &processorParams);
-	GetPrecessorAndExec(testSuite, "SdlEnumGenerator", &processorParams);
-	GetPrecessorAndExec(testSuite, "SdlUnionGenerator", &processorParams);
-	GetPrecessorAndExec(testSuite, "SdlClassCodeGenerator", &processorParams);
-	GetPrecessorAndExec(testSuite, "GqlWrapClassCodeGenerator", &processorParams);
-	GetPrecessorAndExec(testSuite, "GqlHandlerBaseClassGenerator", &processorParams);
-	GetPrecessorAndExec(testSuite, "GqlCollectionControllerBaseClassGenerator", &processorParams);
-#if IMT_QML_FINAL_APPROVED /// QML disabled until the final generation choice is approved.
-	GetPrecessorAndExec(testSuite, "QmlCodeGenerator");
-	GetPrecessorAndExec(testSuite, "QmlCodeMetaGenerator");
-	GetPrecessorAndExec(testSuite, "QmlCodeCommandIdGenerator");
-#endif
+	GetPrecessorAndExec(testSuite, "CppCodeGeneratorFramework");
+
 	if (!referenceDataDirName.isEmpty() && !outputDirName.isEmpty()){
 		/// compare only CPP dirs \todo remove it when QML will be acceptable
-		static const QString pathSuffix = "/1.0/CPP";
 		const QString referenceDataAbsolutePath = s_testReferenceDataDirectoryPath + '/' + referenceDataDirName;
-		bool isDataEqual = CompareDirectories(argParserPtr->GetOutputDirectoryPath() + '/' + outputDirName + "/SDL" + pathSuffix, referenceDataAbsolutePath + pathSuffix);
+		bool isDataEqual = CompareDirectories(argParserPtr->GetOutputDirectoryPath() + '/' + outputDirName, referenceDataAbsolutePath);
 
 		if (!isDataEqual){
-			qWarning() << argParserPtr->GetOutputDirectoryPath() << "and" << referenceDataAbsolutePath << "are not equal";
+			qWarning() << argParserPtr->GetOutputDirectoryPath() + '/' + outputDirName << "and" << referenceDataAbsolutePath << "are not equal";
 		}
 		QVERIFY(isDataEqual);
 	}
@@ -175,6 +175,9 @@ void ExecuteTest(
 void CSdlGenTest::initTestCase()
 {
 	m_tempOutputDir.setPath("SdlGenTest");
+	if (m_tempOutputDir.exists()){
+		QVERIFY(m_tempOutputDir.removeRecursively());
+	}
 
 #if 0 ///\todo inspect it and don't forget to fix partutura
 	CImtSdlGenTest testSuite;

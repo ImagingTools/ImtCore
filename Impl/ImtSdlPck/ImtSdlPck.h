@@ -11,8 +11,6 @@
 #include <imtsdl/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlProcessArgumentsParserComp.h>
 #include <imtsdl/CQtResourceFilePersistenceComp.h>
-#include <imtsdl/CFileCleanupProcessorComp.h>
-#include <imtsdl/CFileFinalizerComp.h>
 #include <imtsdl/CCodeGeneratorExecutorComp.h>
 
 
@@ -29,8 +27,6 @@ typedef imtsdl::CBasicRequestsProxyProviderComp BasicRequestsProxyProvider;
 typedef imtsdl::CSimpleFileJoinerComp SimpleFileJoiner;
 typedef imtsdl::CSdlProcessArgumentsParserComp SdlProcessArgumentsParser;
 typedef imtsdl::CQtResourceFilePersistenceComp QtResourceFilePersistence;
-typedef imtsdl::CFileCleanupProcessorComp FileCleanupProcessor;
-typedef imtsdl::CFileFinalizerComp FileFinalizer;
 typedef imtsdl::CCodeGeneratorExecutorComp CodeGeneratorExecutor;
 
 

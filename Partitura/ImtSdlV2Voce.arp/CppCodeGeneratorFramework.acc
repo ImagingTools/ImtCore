@@ -16,30 +16,97 @@
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AutoProcessorsList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
+                                <Value>QmlRegisterGenerator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="BaseClassExtender">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CurrentSchemaParams" Type="Reference" ExportId="CurrentSchemaParams">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DependentSchemaList" Type="Reference" ExportId="DependentSchemaList">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentTypeProcessorsList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnumProcessorsList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SdlEnumGenerator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IncludeDirectivesProviderList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SdlEnumGenerator</Value>
+                                <Value>SdlUnionGenerator</Value>
+                                <Value>SdlClassCodeGenerator</Value>
+                                <Value>SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
+                                <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
+                                <Value>SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
+                                <Value>QmlRegisterGenerator</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SdlProcessorV2List" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="RequestProcessorsList" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>QmlRegisterGenerator</Value>
-                                <Value>SdlEnumGenerator</Value>
-                                <Value>SdlUnionGenerator</Value>
-                                <Value>SdlClassCodeGenerator</Value>
                                 <Value>SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
-                                <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
-                                <Value>SdlGqlCodeGeneratorFramework/GqlCollectionControllerBaseClassGenerator</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlDocumentTypeListProvider" Type="Reference" ExportId="SdlDocumentTypeListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="SdlRequestListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeProcessorsList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SdlClassCodeGenerator</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UnionProcessorsList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SdlUnionGenerator</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -87,9 +154,6 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="ArgumentParser">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="BaseClassExtender">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="CustomSchemaParams">
@@ -175,9 +239,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="FilesJoiner" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlClassCodeGenerator/SimpleFileJoiner"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -266,6 +327,5 @@
         <Component ExportedId="SdlEnumGenerator" ComponentId="SdlEnumGenerator"/>
         <Component ExportedId="SdlGqlCodeGeneratorFramework" ComponentId="SdlGqlCodeGeneratorFramework"/>
         <Component ExportedId="SdlUnionGenerator" ComponentId="SdlUnionGenerator"/>
-        <Component ExportedId="SimpleFileJoiner" ComponentId="SdlClassCodeGenerator/SimpleFileJoiner"/>
     </ExportedComponents>
 </Acf>

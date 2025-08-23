@@ -17,9 +17,9 @@ namespace imtsdlgencpp
 
 // reimplemented (IIncludeDirectivesProvider)
 
-QList<imtsdl::IncludeDirective> CSdlClassJsonModificatorComp::GetIncludeDirectives() const
+QSet<imtsdl::IncludeDirective> CSdlClassJsonModificatorComp::GetIncludeDirectives() const
 {
-	static QList<imtsdl::IncludeDirective> retVal = {
+	static QSet<imtsdl::IncludeDirective> retVal = {
 		CreateQtDirective(QStringLiteral("<QtCore/QJsonObject>")),
 		CreateQtDirective(QStringLiteral("<QtCore/QJsonArray>")),
 		CreateQtDirective(QStringLiteral("<QtCore/QJsonValue>"))
@@ -158,7 +158,12 @@ bool CSdlClassJsonModificatorComp::AddFieldValueAppendToObjectArray(QTextStream&
 }
 
 
-bool CSdlClassJsonModificatorComp::AddArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, const QString& targetObjectVariableName, uint /*horizontalIndents*/) const
+bool CSdlClassJsonModificatorComp::AddArrayWriteToObject(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& variableName,
+			const QString& targetObjectVariableName,
+			uint /*horizontalIndents*/) const
 {
 	if (targetObjectVariableName.isEmpty()){
 		stream << GetContainerObjectVariableName();
@@ -177,7 +182,7 @@ bool CSdlClassJsonModificatorComp::AddArrayWriteToObject(QTextStream& stream, co
 }
 
 
-bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents)
+bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) const
 {
 	FeedStreamHorizontally(stream, horizontalIndents);
 	stream << QStringLiteral("if (");
@@ -247,7 +252,11 @@ bool CSdlClassJsonModificatorComp::AddContainerValueCheckConditionBegin(QTextStr
 }
 
 
-bool CSdlClassJsonModificatorComp::AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 /*horizontalIndents*/)
+bool CSdlClassJsonModificatorComp::AddContainerValueReadFromObject(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& variableName,
+			quint16 /*horizontalIndents*/) const
 {
 	if (variableName.isEmpty()){
 		stream << GetContainerObjectVariableName();
@@ -265,7 +274,12 @@ bool CSdlClassJsonModificatorComp::AddContainerValueReadFromObject(QTextStream& 
 }
 
 
-bool CSdlClassJsonModificatorComp::AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result)
+bool CSdlClassJsonModificatorComp::AddContainerListAccessCode(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& variableName,
+			quint16 horizontalIndents,
+			ListAccessResult& result) const
 {
 	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = FindEntryByName(field.GetType());
 	bool idUnion = (foundEntry != nullptr && dynamic_cast<imtsdl::CSdlUnion*>(foundEntry.get()));
@@ -326,7 +340,11 @@ CSdlUnionConverter::ConversionType CSdlClassJsonModificatorComp::GetUnionArrayCo
 }
 
 
-void CSdlClassJsonModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents)
+void CSdlClassJsonModificatorComp::AddUnionFieldValueReadFromObject(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			bool optional,
+			quint16 hIndents) const
 {
 	bool hasComplexTypes = false;
 	bool hasScalarTypes = false;
@@ -419,7 +437,7 @@ void CSdlClassJsonModificatorComp::AddUnionFieldValueReadFromObject(QTextStream&
 }
 
 
-void CSdlClassJsonModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents)
+void CSdlClassJsonModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& /*stream*/, const imtsdl::CSdlField& /*field*/, bool /*optional*/, quint16 /*hIndents*/) const
 {
 
 }

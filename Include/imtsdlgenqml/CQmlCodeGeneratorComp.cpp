@@ -60,25 +60,16 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 	}
 
 	if (m_argumentParserCompPtr->IsDependenciesMode() || !m_argumentParserCompPtr->GetDepFilePath().isEmpty()){
-		if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-			if (!m_customSchemaParamsCompPtr.IsValid()){
-				SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
+		if (!m_customSchemaParamsCompPtr.IsValid()){
+			SendErrorMessage(0, "Application is not configured with custom parameters. Auto join is not possible. Please specify paths to join explicitly(use -J option), or disable join.");
 
-				return TS_INVALID;
-			}
-
-			QStringList qmlFilePaths;
-			qmlFilePaths << GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false));
-			PrintFiles(std::cout, qmlFilePaths, m_argumentParserCompPtr->GetGeneratorType());
-			PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), qmlFilePaths, *m_dependentSchemaListCompPtr);
+			return TS_INVALID;
 		}
-		else{
-			QStringList cumulatedFiles;
-			// generated QRC file
-			cumulatedFiles << QString(outputDirectoryPath + "/" + GetQmlModuleNameFromParamsOrArguments(m_customSchemaParamsCompPtr, m_argumentParserCompPtr) + ".qrc");
 
-			PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
-		}
+		QStringList qmlFilePaths;
+		qmlFilePaths << GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false));
+		PrintFiles(std::cout, qmlFilePaths, m_argumentParserCompPtr->GetGeneratorType());
+		PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), qmlFilePaths, *m_dependentSchemaListCompPtr);
 
 		if (m_argumentParserCompPtr->IsDependenciesMode()){
 			return TS_OK;
@@ -167,10 +158,7 @@ iproc::IProcessor::TaskState CQmlCodeGeneratorComp::DoProcessing(
 	}
 
 	// and finally create a QRC file
-	QString qrcFilePath = outputDirectoryPath + "/" + qmlModuleName + ".qrc";
-	if (m_argumentParserCompPtr->IsAutoJoinEnabled()){
-		qrcFilePath = GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false));
-	}
+	QString qrcFilePath = GetAutoDefinedQmlQrcFilePath(*m_customSchemaParamsCompPtr, imtsdl::CSdlTools::GetCompleteOutputPath(m_customSchemaParamsCompPtr, *m_argumentParserCompPtr, true, false));
 	QFile qrcFile(qrcFilePath);
 	if (!qrcFile.open(QIODevice::WriteOnly)){
 		SendCriticalMessage(0,
@@ -274,7 +262,6 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		const std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = GetSdlTypeOrEnumOrUnionForField(field, allTypes, enumList, unionList);
 		if (!foundEntry){
 			SendCriticalMessage(0, QString("Unable to find type for %1:%2").arg(field.GetId(), field.GetType()));
-			I_CRITICAL();
 
 			return false;
 		}

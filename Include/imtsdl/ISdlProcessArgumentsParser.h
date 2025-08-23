@@ -33,13 +33,6 @@ public:
 	};
 	Q_ENUM(GeneratorType)
 
-	enum AutoLinkLevel
-	{
-		ALL_NONE = 0,					///< Dasabled. ALL files and deps will be compiled
-		ALL_ONLY_FILE = 2					///< Compile only input file
-	};
-	Q_ENUM(AutoLinkLevel)
-
 	virtual bool SetArguments(int argc, char** argv);
 	virtual bool SetArguments(const QStringList& arguments) = 0;
 	virtual QString GetSchemaFilePath() const = 0;
@@ -54,17 +47,11 @@ public:
 	virtual bool IsGqlEnabled() const = 0;
 	virtual bool IsSchemaDependencyModeEnabled() const = 0;
 	virtual QMap<QString/*class name*/, QString/*include directive*/> GetBaseClassList() const = 0;
-	virtual QMap<QString/*File extention*/, QString/*Destination path*/> GetJoinRules() const = 0;
 	/// \returns paths where schemas should be loacted
 	virtual QStringList GetIncludePaths() const = 0;
 	virtual GeneratorType GetGeneratorType() const = 0;
-	virtual bool IsAutoJoinEnabled() const = 0;
-	virtual AutoLinkLevel GetAutoLinkLevel() const = 0;
 	virtual QStringList GetHeadersIncludePaths() const = 0;
-	virtual QStringList GetModuleIncludePaths() const = 0;
 	virtual QString GetDepFilePath() const = 0;
-	virtual QString GetModuleOutputFilePath() const = 0;
-	virtual bool IsModuleGenerateEnabled() const = 0;
 
 	// template
 	virtual bool IsTemplateEnabled() const = 0;

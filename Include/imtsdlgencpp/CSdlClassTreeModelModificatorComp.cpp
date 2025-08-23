@@ -18,16 +18,9 @@ namespace imtsdlgencpp
 
 // reimplemented (CSdlClassModificatorBaseComp)
 
-bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& /*sdlType*/)
+bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	if (m_headerFilePtr == nullptr){
-		SendCriticalMessage(0, "Unable to process header file. Pointer is not set!");
-		I_CRITICAL();
-
-		return false;
-	}
-
-	QTextStream ofStream(m_headerFilePtr);
+	QTextStream ofStream(headerDevicePtr);
 
 	// add method definitions
 	ofStream << QStringLiteral("\t\t[[nodiscard]] bool WriteToModel(");
@@ -48,17 +41,9 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSd
 	return true;
 }
 
-
-bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType)
+bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	if (m_sourceFilePtr == nullptr){
-		SendCriticalMessage(0, "Unable to process source file. Pointer is not set!");
-		I_CRITICAL();
-
-		return false;
-	}
-
-	QTextStream ofStream(m_sourceFilePtr);
+	QTextStream ofStream(sourceDevicePtr);
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -122,7 +107,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& sdlType,
-			bool optional)
+			bool optional) const
 {
 	bool isArray = false;
 	bool isCustom = false;
@@ -307,7 +292,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 }
 
 
-void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& stream, const imtsdl::CSdlField& field, const imtsdl::CSdlType& sdlType, bool optional)
+void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const imtsdl::CSdlType& sdlType,
+			bool optional) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 
@@ -486,7 +475,11 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 }
 
 
-void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(QTextStream& stream, const imtsdl::CSdlField& field, const imtsdl::CSdlType& sdlType, bool optional)
+void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const imtsdl::CSdlType& sdlType,
+			bool optional) const
 {
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream);
@@ -515,7 +508,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelImplCode(
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& /*sdlType*/,
 			bool /*optional*/,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -564,7 +557,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& sdlType,
-			bool optional)
+			bool optional) const
 {
 	FeedStreamHorizontally(stream);
 
@@ -615,7 +608,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& /*sdlType*/,
 			bool /*optional*/,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -661,12 +654,12 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 
 
 void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelCode(
-	QTextStream& stream,
-	const imtsdl::CSdlField& field,
-	const imtsdl::CSdlType& sdlType,
-	bool isEnum,
-	bool isUnion,
-	bool optional)
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const imtsdl::CSdlType& sdlType,
+			bool isEnum,
+			bool isUnion,
+			bool optional) const
 {
 	if (!optional && field.IsRequired()){
 		if (field.IsArray() && field.IsNonEmpty()){
@@ -698,7 +691,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 			bool isEnum,
 			bool isUnion,
 			bool /*optional*/,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	// add a new model,to store list
 	const QString newTreeModelVarName = QStringLiteral("new") + GetCapitalizedValue(field.GetId()) + QStringLiteral("ModelPtr");
@@ -798,9 +791,9 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& /*sdlType*/,
-			bool isEnum, 
+			bool isEnum,
 			bool isUnion,
-			bool optional)
+			bool optional) const
 {
 	FeedStreamHorizontally(stream, 1);
 	stream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
@@ -847,7 +840,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 			bool isEnum,
 			bool isUnion,
 			bool /*optional*/,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	const QString countVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Count");
@@ -1007,7 +1000,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& sdlType,
-			bool optional)
+			bool optional) const
 {
 	if (!optional && field.IsRequired()){
 		if (field.IsArray()){
@@ -1032,7 +1025,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& /*sdlType*/,
 			bool /*optional*/,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -1099,7 +1092,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			const imtsdl::CSdlType& /*sdlType*/,
-			bool optional)
+			bool optional) const
 {
 	FeedStreamHorizontally(stream, 1);
 	stream << GetEscapedNamespace(QStringLiteral("imtbase"), QString());
@@ -1144,7 +1137,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			bool optional,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -1240,9 +1233,9 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	FeedStream(stream, 1, false);
 }
 
-QList<imtsdl::IncludeDirective> CSdlClassTreeModelModificatorComp::GetIncludeDirectives() const
+QSet<imtsdl::IncludeDirective> CSdlClassTreeModelModificatorComp::GetIncludeDirectives() const
 {
-	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtbase/CTreeItemModel.h>"))};
+	static QSet<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtbase/CTreeItemModel.h>"))};
 
 	return retVal;
 }

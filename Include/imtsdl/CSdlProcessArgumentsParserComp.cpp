@@ -72,17 +72,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	QCommandLineOption modificatorsOption({"M", "modificator"}, "Modificator to generate code. You can provide multiple modificators. Note: modifier names are case sensitive.", "ModificatorList");
 	QCommandLineOption allModificatorsOption("use-all-modificators", "Use all modificators to generate code");
 	QCommandLineOption baseClassOption({"B", "base-class"}, "Defines base class of all generated classes with include path CLASS=/include/path", "BaseClassList");
-	QCommandLineOption joinRulesOption({"J", "join"}, "Defines file types, will be joined TYPE(H or CPP)=/Destination/File/Path", "JoinRules");
 	QCommandLineOption includePathOption({"I", "include"}, "Specifies the import directories which should be searched when parsing the schema.", "IncludePathList");
 	QCommandLineOption generatorOption("generator", "{QMake | CMake | CMake-pipe | DEPFILE}. Optional. Only for dependencies mode. Defines a type of output of files to be generated. Default - CMake.\nNote: DEPFILE also supports define a dep file path i.e.: DEPFILE:<FILE_PATH>", "generator");
-	QCommandLineOption autoLinkOption("auto-link", "Defines the compilation order of the schema files.\n"
-												   "0 - disabled. ALL files will be compiled.\n"
-												   "2 - only the schema will be compiled. See the 'input parameter' option", "AutoLink", "0");
 	QCommandLineOption includeHeadersOption({"H","include-headers"}, "List of directories to search for generated header files", "HeadersIncludes");
-	QCommandLineOption autoJoinOption("auto-join", "Enables automatic join of output files into a single.");
-	QCommandLineOption moduleIncludePathsOption({"E", "extend", "add-module-path"}, "Specifies the file locations where the modules could be found.", "ExternalModulePaths");
 	QCommandLineOption depFileParhOption("DEPFILE", "Depfile, used by CMake to collect dependencies. MUST be a valid file path if 'generator' option is 'DEPFILE'. If the file exsists it will be overwritten!", "DEPFILE");
-	QCommandLineOption moduleOutFilePathOption("module-out-path", "Defines a path where a module file should ble created. NOTE: this option enables 'generate-module' option");
 	QCommandLineOption configFilePathOption("config", "Defines a path to a file with initial configuration. NOTE: The parameters from the configuration file may be overridden by command line arguments. WARNING: path MUST be a valid path to existing file!", "config");
 
 	// special modes
@@ -93,9 +86,6 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 				"Schema dependency collection mode: This mode displays a list of all schemas that affect the generated code. "
 						"Only the 'generator', 'include' and 'schema-file (S)' options SHOULD be used in conjunction with this mode. "
 						"You MUST NOT use other options, in this case, the behavior is undefined!");
-
-	QCommandLineOption moduleGenerationOption("generate-module", "Enables module generation");
-
 
 	QList<QCommandLineOption> allOptions = PrepareCommandLineOptions();
 	allOptions << QList<QCommandLineOption>({
@@ -112,16 +102,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 				gqlOption,
 				schemaDependencyOption,
 				baseClassOption,
-				joinRulesOption,
 				includePathOption,
-				autoJoinOption,
 				generatorOption,
-				autoLinkOption,
 				includeHeadersOption,
-				moduleIncludePathsOption,
 				depFileParhOption,
-				moduleOutFilePathOption,
-				moduleGenerationOption,
 				configFilePathOption
 	});
 
@@ -226,58 +210,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		}
 	}
 
-	if (commandLineParser.isSet(joinRulesOption)){
-		const QStringList joinRules = commandLineParser.values(joinRulesOption);
-		for (const QString& joinRule: joinRules){
-			if (!joinRule.contains('=')){
-				SendCriticalMessage(0, QString("Declaration '%1' does not contains destination path").arg(joinRule));
-				Q_ASSERT_X(false, "destination path of join rule parsing", "Destination path is not set");
-
-				return false;
-			}
-
-			QString fileType = joinRule.split('=')[0];
-			if (fileType != s_headerFileType && fileType != s_sourceFileType){
-				SendCriticalMessage(0, QString("Unknown file type. extected on of: %1 %2").arg(s_headerFileType, s_sourceFileType));
-				I_CRITICAL();
-
-				return false;
-			}
-
-			QString destinationPath = joinRule.split('=')[1];
-			MakePathAbsolute(destinationPath);
-			m_joinRules.insert(fileType, destinationPath);
-		}
-	}
-
 	if (commandLineParser.isSet(includePathOption)){
 		m_includePaths = commandLineParser.values(includePathOption);
 		MakePathAbsolute(m_includePaths);
-	}
-
-	if (!m_autoJoinEnabled.has_value()){
-		m_autoJoinEnabled = commandLineParser.isSet(autoJoinOption);
-	}
-
-	if (commandLineParser.isSet(autoLinkOption)){
-		bool isDigit = false;
-
-		const QString autoLinkLevelString = commandLineParser.value(autoLinkOption);
-		const int autoLinkLevel =  autoLinkLevelString.toInt(&isDigit);
-		if (!isDigit){
-			SendErrorMessage(0, QString("Unexpected auto link [%1] argument value '%2'. See help for details").arg(autoLinkOption.names().join('|'), autoLinkLevelString));
-
-			return false;
-		}
-
-		const QList<int> acceptableValues = QList<int>({ALL_NONE, ALL_ONLY_FILE});
-		if (!acceptableValues.contains(autoLinkLevel)){
-			SendErrorMessage(0, QString("Unexpected auto link [%1] argument value '%2'. See help for details").arg(autoLinkOption.names().join('|'), autoLinkLevelString));
-
-			return false;
-		}
-
-		m_autoLinkLevel = AutoLinkLevel(autoLinkLevel);
 	}
 
 	if (commandLineParser.isSet(generatorOption)){
@@ -313,18 +248,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 		MakePathAbsolute(m_headersIncludePaths);
 	}
 
-	if (commandLineParser.isSet(moduleIncludePathsOption)){
-		m_moduleIncludePathList = commandLineParser.values(moduleIncludePathsOption);
-		MakePathAbsolute(m_moduleIncludePathList);
-	}
-
 	if (commandLineParser.isSet(depFileParhOption)){
 		m_depFilePath = commandLineParser.value(depFileParhOption);
 		MakePathAbsolute(m_depFilePath);
-	}
-	if (commandLineParser.isSet(moduleOutFilePathOption)){
-		m_moduleOutputFilePath = commandLineParser.value(moduleOutFilePathOption);
-		m_isModuleGenerationEnabled = true;
 	}
 
 	// special modes
@@ -340,10 +266,6 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	}
 	if (!m_gqlEnabled.has_value()){
 		m_gqlEnabled = isGqlInParamSet;
-	}
-
-	if (commandLineParser.isSet(moduleGenerationOption)){
-		m_isModuleGenerationEnabled = true;
 	}
 
 	// schema dependency mode - is a special mode. Cleanup all unnecessary values
@@ -490,12 +412,6 @@ QMap<QString, QString> CSdlProcessArgumentsParserComp::GetBaseClassList() const
 }
 
 
-QMap<QString, QString> CSdlProcessArgumentsParserComp::GetJoinRules() const
-{
-	return m_joinRules;
-}
-
-
 QStringList CSdlProcessArgumentsParserComp::GetIncludePaths() const
 {
 	return m_includePaths;
@@ -508,45 +424,15 @@ imtsdl::ISdlProcessArgumentsParser::GeneratorType CSdlProcessArgumentsParserComp
 }
 
 
-bool CSdlProcessArgumentsParserComp::IsAutoJoinEnabled() const
-{
-	return m_autoJoinEnabled.value_or(false);
-}
-
-
-imtsdl::ISdlProcessArgumentsParser::AutoLinkLevel CSdlProcessArgumentsParserComp::GetAutoLinkLevel() const
-{
-	return m_autoLinkLevel.value_or(ALL_NONE);
-}
-
-
 QStringList CSdlProcessArgumentsParserComp::GetHeadersIncludePaths() const
 {
 	return m_headersIncludePaths;
 }
 
 
-QStringList CSdlProcessArgumentsParserComp::GetModuleIncludePaths() const
-{
-	return m_moduleIncludePathList;
-}
-
-
 QString CSdlProcessArgumentsParserComp::GetDepFilePath() const
 {
 	return m_depFilePath;
-}
-
-
-QString CSdlProcessArgumentsParserComp::GetModuleOutputFilePath() const
-{
-	return m_moduleOutputFilePath;
-}
-
-
-bool CSdlProcessArgumentsParserComp::IsModuleGenerateEnabled() const
-{
-	return m_isModuleGenerationEnabled.value_or(false);
 }
 
 
@@ -598,13 +484,8 @@ bool CSdlProcessArgumentsParserComp::ReadFromSettings(const QString& settingsFil
 	UpdateValueFromOptionalValue(configReader.baseClassList, m_baseClassList);
 	UpdateValueFromOptionalValue(configReader.includePaths, m_includePaths);
 	UpdateValueFromOptionalValueO(configReader.generatorType, m_generatorType);
-	UpdateValueFromOptionalValueO(configReader.autoJoinEnabled, m_autoJoinEnabled);
-	UpdateValueFromOptionalValueO(configReader.autoLinkLevel, m_autoLinkLevel);
 	UpdateValueFromOptionalValue(configReader.headersIncludePaths, m_headersIncludePaths);
-	UpdateValueFromOptionalValue(configReader.moduleIncludePaths, m_moduleIncludePathList);
 	UpdateValueFromOptionalValue(configReader.depFilePath, m_depFilePath);
-	UpdateValueFromOptionalValue(configReader.moduleOutputFilePath, m_moduleOutputFilePath);
-	UpdateValueFromOptionalValueO(configReader.moduleGenerateEnabled, m_isModuleGenerationEnabled);
 	UpdateValueFromOptionalValueO(configReader.templateEnabled, m_isTemplateEnabled);
 	UpdateValueFromOptionalValue(configReader.outputDirTemplate, m_outputDirTemplate);
 	UpdateValueFromOptionalValue(configReader.qmlOutputDirTemplate, m_outputQmlDirTemplate);
@@ -694,12 +575,6 @@ void CSdlProcessArgumentsParserComp::SetBaseClassList(const QMap<QString, QStrin
 }
 
 
-void CSdlProcessArgumentsParserComp::SetJoinRules(const QMap<QString, QString>& rules)
-{
-	m_joinRules = rules;
-}
-
-
 void CSdlProcessArgumentsParserComp::SetIncludePaths(const QStringList& includePaths)
 {
 	m_includePaths = includePaths;
@@ -711,46 +586,15 @@ void CSdlProcessArgumentsParserComp::SetGeneratorType(GeneratorType type)
 	m_generatorType = type;
 }
 
-
-void CSdlProcessArgumentsParserComp::SetAutoJoinEnabled(bool enabled)
-{
-	m_autoJoinEnabled = enabled;
-}
-
-
-void CSdlProcessArgumentsParserComp::SetAutoLinkLevel(AutoLinkLevel level)
-{
-	m_autoLinkLevel = level;
-}
-
-
 void CSdlProcessArgumentsParserComp::SetHeadersIncludePaths(const QStringList& includePaths)
 {
 	m_headersIncludePaths = includePaths;
-	}
-
-
-void CSdlProcessArgumentsParserComp::SetModuleIncludePaths(const QStringList& includePaths)
-{
-	m_moduleIncludePathList = includePaths;
 }
 
 
 void CSdlProcessArgumentsParserComp::SetDepFilePath(const QString& path)
 {
 	m_depFilePath = path;
-}
-
-
-void CSdlProcessArgumentsParserComp::SetModuleOutputFilePath(const QString& path)
-{
-	m_moduleOutputFilePath = path;
-}
-
-
-void CSdlProcessArgumentsParserComp::SetModuleGenerateEnabled(bool enabled)
-{
-	m_isModuleGenerationEnabled = enabled;
 }
 
 

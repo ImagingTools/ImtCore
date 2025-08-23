@@ -95,6 +95,7 @@ if (NOT DEFINED BUILD_TESTING OR BUILD_TESTING)
 	add_subdirectory("${INCLUDE_DIR}/imtsdlgencpp/Test/CMake" "${AUX_INCLUDE_DIR}/ImtSdlGenCppTest")
 endif()
 
+
 if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	#-------- Sdl --------
 	if(NOT DEFINED USE_SDL OR USE_SDL)

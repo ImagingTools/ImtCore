@@ -1021,49 +1021,27 @@ bool CSdlTools::UpdateTypeInfo(CSdlEntryBase& sdlEntry, const iprm::IParamsSet* 
 		return false;
 	}
 
-	QMap<QString, QString> joinRules = argumentParserPtr->GetJoinRules();
-	const QString outputDirectoryPath = QDir::cleanPath(argumentParserPtr->GetOutputDirectoryPath());
-	if (argumentParserPtr->IsAutoJoinEnabled()){
-		if (schemaParamsPtr == nullptr){
-			return false;
-		}
-
-		const QString defaultName = QFileInfo(argumentParserPtr->GetSchemaFilePath()).fileName();
-		joinRules = CalculateTargetCppFilesFromSchemaParams(*schemaParamsPtr, outputDirectoryPath, defaultName);
+	const QString defaultName = QFileInfo(argumentParserPtr->GetSchemaFilePath()).fileName();
+	QMap<QString, QString> joinRules = CalculateTargetCppFilesFromSchemaParams(*schemaParamsPtr, argumentParserPtr->GetOutputDirectoryPath(), defaultName);
+	
+	if(joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
+		sdlEntry.SetTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
 	}
-	else {
-		if(joinRules.contains(ISdlProcessArgumentsParser::s_headerFileType)){
-			sdlEntry.SetTargetHeaderFilePath(QDir::cleanPath(joinRules[ISdlProcessArgumentsParser::s_headerFileType]));
-		}
-		else {
-			CSdlType* sdlTypePtr = dynamic_cast<CSdlType*>(&sdlEntry);
-			CSdlEnum* sdlEnumPtr = dynamic_cast<CSdlEnum*>(&sdlEntry);
-			if (sdlTypePtr != nullptr){
-				sdlTypePtr->SetTargetHeaderFilePath(QString(outputDirectoryPath + "/C" + sdlTypePtr->GetName() + ".h"));
-			}
-			else if (sdlEnumPtr != nullptr){
-				sdlEnumPtr->SetTargetHeaderFilePath(QString(outputDirectoryPath + "/" + sdlEnumPtr->GetName() + ".h"));
-			}
-		}
-	}
-
+	
 	return true;
 }
 
 
 QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const iprm::IParamsSet& schemaParams, const ISdlProcessArgumentsParser& argumentParser, bool relativePath)
 {
-	QMap<QString, QString> retVal;
-
 	if (!argumentParser.IsTemplateEnabled()){
 		const QString defaultName = QFileInfo(argumentParser.GetSchemaFilePath()).fileName();
-		QMap<QString, QString> joinRules = argumentParser.GetJoinRules();
-		if (argumentParser.IsAutoJoinEnabled()){
-			joinRules = CalculateTargetCppFilesFromSchemaParams(schemaParams, argumentParser.GetOutputDirectoryPath(), defaultName);
-		}
-		return retVal;
+		QMap<QString, QString> joinRules = CalculateTargetCppFilesFromSchemaParams(schemaParams, argumentParser.GetOutputDirectoryPath(), defaultName);
+
+		return joinRules;
 	}
 
+	QMap<QString, QString> retVal;
 	QString baseFilePath;
 	static const QRegularExpression outPathRegExp("^\\$\\(output-directory\\)\\/?");
 	const QString templateInclidePath = argumentParser.GetTemplateIncludePath();
@@ -1077,10 +1055,7 @@ QMap<QString, QString> CSdlTools::CalculateTargetCppFilesFromSchemaParams(const 
 		baseFilePath.prepend(QStringLiteral("$(output-directory)/"));
 	}
 
-	if (argumentParser.IsAutoJoinEnabled()){
-		// use schema.name as file name
-		baseFilePath+= QStringLiteral("/$(schema.name)");
-	}
+	baseFilePath+= QStringLiteral("/$(schema.name)");
 
 	baseFilePath = ProcessTemplateString(schemaParams, baseFilePath, argumentParser.GetOutputDirectoryPath());
 
@@ -1326,7 +1301,7 @@ void CSdlTools::PrintFiles(const QString& filePath, const QStringList& files, co
 	}
 
 	QFile depFile(filePath);
-	const bool isOpen = depFile.open(QIODevice::ReadWrite | QIODevice::Append | QIODevice::Text);
+	const bool isOpen = depFile.open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text);
 	if (!isOpen){
 		qCritical() << "Can't open dep file" << filePath;
 	}

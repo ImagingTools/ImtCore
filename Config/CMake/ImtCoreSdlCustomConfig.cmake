@@ -222,17 +222,11 @@ macro (ImtCoreCustomConfigureSdlQml)
 
 	set(MODIFICATORS)
 
-	if (ARG_QML_NAME)
-		list(APPEND MODIFICATORS "-N=${ARG_QML_NAME}")
-	else()
-		list(APPEND MODIFICATORS "--auto-join")
-	endif()
 	get_filename_component(SCHEMA_NAME "${ARG_SCHEMA_PATH}" NAME_WE)
 	set(DEP_FILE_PATH "${SDL_OUTPUT_DIRECTORY}/${ARG_VERSION}/QML/${SCHEMA_NAME}.depfile")
 
 	list(APPEND MODIFICATORS "--QML")
 	list(APPEND MODIFICATORS "--use-all-modificators")
-	list(APPEND MODIFICATORS "--auto-link=2") ##< Compile the schema provided exclusively.
 	list(APPEND MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
 
 	# use cache file if provided

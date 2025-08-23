@@ -110,13 +110,9 @@ bool CConfigReader::ReadFromFile(const QString& filePath)
 	SetVariableFromConfig(configuration, QStringLiteral("dependencies"), dependenciesMode);
 	SetVariableFromConfig(configuration, QStringLiteral("modificators"), enabledModificators);
 	SetVariableFromConfig(configuration, QStringLiteral("use-all-modificators"), useAllModificators);
-	SetVariableFromConfig(configuration, QStringLiteral("join"), autoJoinEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("include"), includePaths);
 	SetVariableFromConfig(configuration, QStringLiteral("include-headers"), headersIncludePaths);
-	SetVariableFromConfig(configuration, QStringLiteral("auto-join"), autoJoinEnabled);
-	SetVariableFromConfig(configuration, QStringLiteral("extend"), moduleIncludePaths);
 	SetVariableFromConfig(configuration, QStringLiteral("DEPFILE"), depFilePath);
-	SetVariableFromConfig(configuration, QStringLiteral("module-out-path"), moduleOutputFilePath);
 	SetVariableFromConfig(configuration, QStringLiteral("CPP"), cppEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("QML"), qmlEnabled);
 	SetVariableFromConfig(configuration, QStringLiteral("GQL"), gqlEnabled);
@@ -124,9 +120,6 @@ bool CConfigReader::ReadFromFile(const QString& filePath)
 	SetVariableFromConfig(configuration, QStringLiteral("generate-module"), generateMode);
 
 	if (!SetEnumVariableFromConfig(configuration, QStringLiteral("generator"), generatorType)){
-		return false;
-	}
-	if (!SetEnumVariableFromConfig(configuration, QStringLiteral("auto-link"), autoLinkLevel)){
 		return false;
 	}
 

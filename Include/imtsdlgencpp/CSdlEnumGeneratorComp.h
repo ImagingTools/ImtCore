@@ -17,6 +17,7 @@
 #include <imtsdl/CSdlEnumConverter.h>
 #include <imtsdlgencpp/IIncludeDirectivesProvider.h>
 #include <imtsdlgencpp/CSdlGenTools.h>
+#include <imtsdlgencpp/CCxxProcessorCompBase.h>
 
 
 namespace imtsdlgencpp
@@ -26,34 +27,34 @@ namespace imtsdlgencpp
 	A base C++ enum generator
 */
 class  CSdlEnumGeneratorComp:
-			public iproc::CSyncProcessorCompBase,
+			public CCxxProcessorCompBase,
 			private imtsdl::CSdlTools,
 			private CSdlGenTools,
 			private imtsdl::CSdlEnumConverter
 {
 
 public:
-	typedef iproc::CSyncProcessorCompBase BaseClass;
+	typedef CCxxProcessorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSdlEnumGeneratorComp)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
-		I_ASSIGN(m_sdlEnumListCompPtr, "SdlEnumListProvider", "SDL enums used to create a code", true, "SdlEnumListProvider")
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
-		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
-		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList");
-
+		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace")
+		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList")
 	I_END_COMPONENT
 
-	//reimplemented(iproc::IProcessor)
-	virtual TaskState DoProcessing(
-				const iprm::IParamsSet* paramsPtr,
-				const istd::IPolymorphic* inputPtr,
-				istd::IChangeable* outputPtr,
-				ibase::IProgressManager* progressManagerPtr = NULL) override;
+	// reimplemented (ICxxFileProcessor)
+	virtual bool ProcessEntry(
+				const imtsdl::CSdlEntryBase& sdlEntry,
+				QIODevice* headerDevicePtr,
+				QIODevice* sourceDevicePtr = nullptr,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
+
+	// reimplemented (IIncludeDirectivesProvider)
+	virtual QSet<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
-	I_REF(imtsdl::ISdlEnumListProvider, m_sdlEnumListCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 	I_REF(iprm::IOptionsManager, m_dependentSchemaListCompPtr);

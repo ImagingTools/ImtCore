@@ -203,6 +203,9 @@
                                 <AttributeInfo Id="BaseClassExtender" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework/BaseClassExtender"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="CurrentSchemaParams" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
                                 </AttributeInfo>
@@ -224,6 +227,9 @@
                                 <AttributeInfo Id="SdlDocumentListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="SdlDocumentTypeListProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
                                 </AttributeInfo>
@@ -235,51 +241,6 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="SdlCoreFramework"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="FileCleanupProcessor" PackageId="ImtSdlPck" ComponentId="FileCleanupProcessor">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="FileFinalizer" PackageId="ImtSdlPck" ComponentId="FileFinalizer">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="CleanupProcessor" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="FileCleanupProcessor"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="CustomSchemaParams" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="SdlCoreFramework/SchemaCustomParams"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                                     <Data IsEnabled="false"/>

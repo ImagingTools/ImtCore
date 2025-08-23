@@ -16,6 +16,7 @@
 #include <imtsdl/ISdlRequestListProvider.h>
 #include <imtsdl/ISdlDocumentTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
+#include <imtsdlgencpp/CCxxProcessorCompBase.h>
 #include <imtsdlgencpp/CSdlGenTools.h>
 
 
@@ -26,14 +27,14 @@ namespace imtsdlgencpp
 	A C++ class generator of GraphQL Collection controllers for SDL requests
 */
 class CGqlCollectionControllerBaseClassGeneratorComp:
-			public iproc::CSyncProcessorCompBase,
+			public CCxxProcessorCompBase,
 			private imtsdl::CSdlTools,
 			private CSdlGenTools
 {
 
 	static const QMap<imtsdl::CSdlDocumentType::OperationType, QString> s_nonTrivialOperationMethodsMap;
 public:
-	typedef iproc::CSyncProcessorCompBase BaseClass;
+	typedef CCxxProcessorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlCollectionControllerBaseClassGeneratorComp)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
@@ -45,16 +46,20 @@ public:
 		I_ASSIGN(m_baseClassExtenderCompPtr, "BaseClassExtender", "Compoment, used to add base class inherits", true, "BaseClassExtender")
 		I_ASSIGN(m_filesJoinerCompPtr, "FilesJoiner", "Compoment, used to join files into a single", false, "FilesJoiner")
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
-		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
-		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList");
-	I_END_COMPONENT;
+		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace")
+		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList")
+	I_END_COMPONENT
 
-	//reimplemented(iproc::IProcessor)
-	virtual iproc::IProcessor::TaskState DoProcessing(
-				const iprm::IParamsSet* paramsPtr,
-				const istd::IPolymorphic* inputPtr,
-				istd::IChangeable* outputPtr,
-				ibase::IProgressManager* progressManagerPtr = NULL) override;
+	// reimplemented (ICxxFileProcessor)
+	virtual bool ProcessEntry(
+				const imtsdl::CSdlEntryBase& sdlEntry,
+				QIODevice* headerDevicePtr,
+				QIODevice* sourceDevicePtr = nullptr,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
+
+	// reimplemented (IIncludeDirectivesProvider)
+	virtual QSet<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
+
 private:
 	static QString WrapFileName(const QString& baseName, const QString& ext, const QString& directoryPath = QString());
 
@@ -70,40 +75,33 @@ private:
 	};
 
 private:
-	bool CloseFiles();
-	bool ProcessFiles(const imtsdl::CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude, bool addSelfHeaderInclude);
-	bool ProcessHeaderClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, bool addDependenciesInclude);
-	bool ProcessSourceClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, bool addSelfHeaderInclude);
-	void AbortCurrentProcessing();
+	bool ProcessHeaderClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const;
+	bool ProcessSourceClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const;
 
 	// comfort methods
-	void AddRequiredIncludesForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
-	void AddMethodsForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
-	void AddMethodForDocument(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const QString& itemClassName, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
-	void AddMethodDeclarationForOperationType(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlRequest& sdlRequest);
-	void AddBaseMethodDeclarationForOperationType(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QString& className);
-	void AddImplCodeForSpecialRequest(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, uint hIndents);
-	void AddPayloadModelWriteCode(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, uint hIndents);
+	void AddRequiredIncludesForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0) const;
+	void AddMethodsForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0) const;
+	void AddMethodForDocument(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const QString& itemClassName, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0) const;
+	void AddMethodDeclarationForOperationType(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlRequest& sdlRequest) const;
+	void AddBaseMethodDeclarationForOperationType(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QString& className) const;
+	void AddImplCodeForSpecialRequest(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, uint hIndents) const;
+	void AddPayloadModelWriteCode(QTextStream& stream, const imtsdl::CSdlRequest& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, uint hIndents) const;
 
 	/**
 		Creates method implementations for all document's (and subtype's) operation types
 	*/
-	void AddOperationRequestMethodImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
-	void AddOperationRequestCheck(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
-	void AddOperationMapPairs(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
-	bool AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
-	bool AddImplCodeForRequests(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
-	bool AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0);
-	void AddSpecialMethodImplCodeForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType);
-	void AddSpecialMethodImplCode(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents = 1);
+	void AddOperationRequestMethodImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const;
+	void AddOperationRequestCheck(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const;
+	void AddOperationMapPairs(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const;
+	bool AddCollectionMethodsImplForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const;
+	bool AddImplCodeForRequests(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0) const;
+	bool AddImplCodeForRequest(QTextStream& stream, const ImplGenerationInfo& sdlRequest, imtsdl::CSdlDocumentType::OperationType operationType, const imtsdl::CSdlDocumentType& sdlDocumentType, uint hIndents = 0) const;
+	void AddSpecialMethodImplCodeForDocument(QTextStream& stream, const imtsdl::CSdlDocumentType& sdlDocumentType) const;
+	void AddSpecialMethodImplCode(QTextStream& stream, imtsdl::CSdlDocumentType::OperationType operationType, const QList<ImplGenerationInfo>& requestList, const QString& className, uint hIndents = 1) const;
 	QString GetInputExtractionStringForTypeName(const imtsdl::CSdlRequest& sdlRequest, const QString typeName, const QString version = QString(), bool* okPtr = nullptr) const;
 
 	/// \param _isRoot - internal recursive param. NEVER SET IT!
 	bool FindCallChainForField(const imtsdl::CSdlField& sdlRequest, const QString typeName, QString& callChain, bool _isRoot = true) const;
-
-	/// fallback for quick fix \todo do this resolving in schemaParser
-	/// \todo improve method m_sdlDocumentListCompPtr->GetDocumentTypes(), add \param localOnly
-	[[nodiscard]] bool IsExternal(const imtsdl::CSdlDocumentType& documentType) const;
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
@@ -117,9 +115,6 @@ private:
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 	I_REF(iprm::IOptionsManager, m_dependentSchemaListCompPtr);
-
-	istd::TDelPtr<QFile> m_headerFilePtr;
-	istd::TDelPtr<QFile> m_sourceFilePtr;
 };
 
 

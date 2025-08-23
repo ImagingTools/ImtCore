@@ -92,9 +92,9 @@ void WriteTypeMultiConditionCheck(
 
 // reimplemented (IIncludeDirectivesProvider)
 
-QList<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirectives() const
+QSet<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirectives() const
 {
-	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtgql/CGqlParamObject.h>"))};
+	static QSet<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtgql/CGqlParamObject.h>"))};
 
 	return retVal;
 }
@@ -246,7 +246,7 @@ bool CSdlClassGqlModificatorComp::AddArrayWriteToObject(QTextStream& stream, con
 }
 
 
-bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents)
+bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) const
 {
 	bool isArray = false;
 	bool isCustom = false;
@@ -393,7 +393,11 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 }
 
 
-bool CSdlClassGqlModificatorComp::AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 /*horizontalIndents*/)
+bool CSdlClassGqlModificatorComp::AddContainerValueReadFromObject(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& variableName,
+			quint16 /*horizontalIndents*/) const
 {
 	bool isArray = false;
 	bool isCustom = false;
@@ -432,7 +436,12 @@ bool CSdlClassGqlModificatorComp::AddContainerValueReadFromObject(QTextStream& s
 }
 
 
-bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result)
+bool CSdlClassGqlModificatorComp::AddContainerListAccessCode(
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			const QString& variableName,
+			quint16 horizontalIndents,
+			ListAccessResult& result) const
 {
 	result.listCountVariableName			= GetDecapitalizedValue(field.GetId()) + QStringLiteral("ElementsCount");
 	result.listCountVariableType			= QStringLiteral("qsizetype");
@@ -638,7 +647,7 @@ CSdlUnionConverter::ConversionType CSdlClassGqlModificatorComp::GetUnionArrayCon
 }
 
 
-void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents)
+void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) const
 {
 	bool hasComplexTypes = false;
 	bool hasScalarTypes = false;
@@ -726,7 +735,7 @@ void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& 
 }
 
 
-void CSdlClassGqlModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool /*optional*/, quint16 hIndents)
+void CSdlClassGqlModificatorComp::AddUnionFieldValueWriteToObject(QTextStream& /*stream*/, const imtsdl::CSdlField& /*field*/, bool /*optional*/, quint16 /*hIndents*/) const
 {
 
 }

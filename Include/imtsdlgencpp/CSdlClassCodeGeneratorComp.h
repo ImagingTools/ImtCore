@@ -12,12 +12,10 @@
 
 // ImtCore includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
-#include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/CSdlTools.h>
-#include <imtsdlgencpp/IIncludeDirectivesProvider.h>
-#include <imtsdlgencpp/ICxxFileProcessor.h>
 #include <imtsdlgencpp/ICxxModifier.h>
 #include <imtsdlgencpp/CSdlGenTools.h>
+#include <imtsdlgencpp/CCxxProcessorCompBase.h>
 
 
 namespace imtsdlgencpp
@@ -27,23 +25,20 @@ namespace imtsdlgencpp
 	A base C++ class generator of SDL types
 */
 class CSdlClassCodeGeneratorComp:
-			public iproc::CSyncProcessorCompBase,
+			public CCxxProcessorCompBase,
 			private imtsdl::CSdlTools,
 			private CSdlGenTools
 {
 
 public:
-	typedef iproc::CSyncProcessorCompBase BaseClass;
+	typedef CCxxProcessorCompBase BaseClass;
 	typedef imtsdl::CSdlTools BaseClass2;
 	typedef CSdlGenTools BaseClass3;
 
 	I_BEGIN_COMPONENT(CSdlClassCodeGeneratorComp)
-		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 		I_ASSIGN(m_sdlTypeListCompPtr, "SdlTypeListProvider", "SDL types used to create a code", true, "SdlTypeListProvider")
 		I_ASSIGN(m_sdlEnumListCompPtr, "SdlEnumListProvider", "SDL enums used to create a code", true, "SdlEnumListProvider")
 		I_ASSIGN(m_sdlUnionListCompPtr, "SdlUnionListProvider", "SDL unioins used to create a code", true, "SdlUnionListProvider")
-		I_ASSIGN(m_baseClassExtenderCompPtr, "BaseClassExtender", "The C++ class extender, that adds inheritance to class files", true, "BaseClassExtender")
-		I_ASSIGN(m_filesJoinerCompPtr, "FilesJoiner", "Compoment, used to join files into a single", false, "FilesJoiner")
 		I_ASSIGN_MULTI_0(m_codeGeneratorExtenderListCompPtr, "CodeGeneratorExtenderList", "Extenders, used to generate an additional code", false)
 		I_ASSIGN(m_customSchemaParamsCompPtr, "CustomSchemaParams", "Custom schema parameters, that contains additional options", false, "CustomSchemaParams")
 		I_ASSIGN(m_originalSchemaNamespaceCompPtr, "OriginalSchemaNamespace", "The namespace of the original(root) schema", true, "OriginalSchemaNamespace");
@@ -52,12 +47,15 @@ public:
 		I_ASSIGN(m_dependentSchemaListCompPtr, "DependentSchemaList", "The list of dependent schemas, used to generate dependencies of output file", true, "DependentSchemaList");
 	I_END_COMPONENT
 
-	//reimplemented(iproc::IProcessor)
-	virtual iproc::IProcessor::TaskState DoProcessing(
-				const iprm::IParamsSet* paramsPtr,
-				const istd::IPolymorphic* inputPtr,
-				istd::IChangeable* outputPtr,
-				ibase::IProgressManager* progressManagerPtr = NULL) override;
+	// reimplemented (ICxxFileProcessor)
+	virtual bool ProcessEntry(
+				const imtsdl::CSdlEntryBase& sdlEntry,
+				QIODevice* headerDevicePtr,
+				QIODevice* sourceDevicePtr = nullptr,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
+
+	// reimplemented (IIncludeDirectivesProvider)
+	virtual QSet<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
 private:
 	enum MetdodType
@@ -68,25 +66,24 @@ private:
 		MT_OPT_WRITE
 	};
 
-	bool BeginClassFiles(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude, bool addSelfHeaderInclude);
-	bool BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, bool addDependenciesInclude);
-	bool BeginSourceClassFile(const imtsdl::CSdlType& sdlType, bool addSelfHeaderInclude);
-	bool EndClassFiles(const imtsdl::CSdlType& sdlType);
-	void AbortCurrentProcessing();
+	bool BeginClassFiles(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const;
+	bool BeginHeaderClassFile(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, const iprm::IParamsSet* paramsPtr) const;
+	bool BeginSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const;
+	bool EndClassFiles(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const;
 	void GenerateMetaInfo(
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
-				uint indents = 1);
+				uint indents = 1) const;
 	void GenerateVersionStruct(
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
-				uint indents = 1);
+				uint indents = 1) const;
 	void GenerateMethodDefinition(
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
 				MetdodType methodType,
 				ICxxModifier& modifier,
-				bool forHeader);
+				bool forHeader) const;
 	QString GetVersionMemberVariableName(
 				const imtsdl::CSdlType& sdlType,
 				int versionIndex = -1) const;
@@ -94,34 +91,28 @@ private:
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
 				bool optWrap = false,
-				int versionIndex = -1);
+				int versionIndex = -1) const;
 	void GenerateMethodImplementation(
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
 				MetdodType methodType,
-				ICxxModifier& modifier);
+				ICxxModifier& modifier) const;
 	void GenerateMethodCall(
 				QTextStream& stream,
 				const imtsdl::CSdlType& sdlType,
 				MetdodType methodType,
-				ICxxModifier& modifier);
+				ICxxModifier& modifier) const;
 
 private:
-	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);
 	I_REF(imtsdl::ISdlTypeListProvider, m_sdlTypeListCompPtr);
 	I_REF(imtsdl::ISdlEnumListProvider, m_sdlEnumListCompPtr);
 	I_REF(imtsdl::ISdlUnionListProvider, m_sdlUnionListCompPtr);
-	I_REF(iproc::IProcessor, m_baseClassExtenderCompPtr);
-	I_REF(iproc::IProcessor, m_filesJoinerCompPtr);
 	I_MULTIREF(ICxxFileProcessor, m_codeGeneratorExtenderListCompPtr);
 	I_REF(iprm::IParamsSet, m_customSchemaParamsCompPtr);
 	I_REF(iprm::ITextParam, m_originalSchemaNamespaceCompPtr);
 	I_MULTIREF(IIncludeDirectivesProvider, m_includeDirectivesProviderListCompPtr);
 	I_MULTIREF(ICxxModifier, m_modifierListCompPtr);
 	I_REF(iprm::IOptionsManager, m_dependentSchemaListCompPtr);
-
-	istd::TDelPtr<QFile> m_headerFilePtr;
-	istd::TDelPtr<QFile> m_sourceFilePtr;
 };
 
 

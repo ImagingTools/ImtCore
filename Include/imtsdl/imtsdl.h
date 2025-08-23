@@ -89,8 +89,16 @@ struct IncludeDirective
 	QString remark;
 	QString path;
 	Type type = T_HEADER;
-};
 
+	bool operator == (const IncludeDirective& other) const
+	{
+		return
+			priority == other.priority &&
+			remark == other.remark &&
+			path == other.path &&
+			type == other.type;
+	}
+};
 
 
 /**
@@ -116,3 +124,15 @@ struct QtResourceModelParamIds
 
 
 } // namespace imtsdl
+
+
+
+/// Custom specialization of std::hash for \c imtsdl::IncludeDirective
+template<>
+struct std::hash<imtsdl::IncludeDirective>
+{
+	size_t operator()(const imtsdl::IncludeDirective& s, size_t seed = 0)
+	{
+		return qHashMulti(seed, s.priority, s.remark, s.path, s.type);
+	}
+};

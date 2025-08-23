@@ -8,12 +8,12 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CxxProcessorsManager" X="575" Y="350" Note=""/>
-        <Element ComponentName="QmlRegisterGenerator" X="800" Y="125" Note=""/>
-        <Element ComponentName="SdlClassCodeGenerator" X="450" Y="100" Note=""/>
-        <Element ComponentName="SdlEnumGenerator" X="250" Y="625" Note=""/>
-        <Element ComponentName="SdlGqlCodeGeneratorFramework" X="250" Y="250" Note=""/>
-        <Element ComponentName="SdlUnionGenerator" X="700" Y="675" Note=""/>
+        <Element ComponentName="CxxProcessorsManager" X="700" Y="375" Note=""/>
+        <Element ComponentName="QmlRegisterGenerator" X="1000" Y="250" Note=""/>
+        <Element ComponentName="SdlClassCodeGenerator" X="650" Y="175" Note=""/>
+        <Element ComponentName="SdlEnumGenerator" X="400" Y="675" Note=""/>
+        <Element ComponentName="SdlGqlCodeGeneratorFramework" X="275" Y="350" Note=""/>
+        <Element ComponentName="SdlUnionGenerator" X="900" Y="675" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -25,7 +25,7 @@ public:
 
 public:
 	// reimplemented (IIncludeDirectivesProvider)
-	[[nodiscard]] virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
+	[[nodiscard]] virtual QSet<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
 	// reimplemented (ICxxModifier)
 	[[nodiscard]] virtual QString GetReadMethodName() const override;
@@ -44,13 +44,13 @@ protected:
 	virtual QString AddCreationOfTemporaryArray(QTextStream& stream, const imtsdl::CSdlField& field) const override;
 	virtual bool AddFieldValueAppendToObjectArray(QTextStream& stream, const imtsdl::CSdlField& field, const QString& arrayContainerVariableName, const QString& variableName, uint horizontalIndents) const override;
 	virtual bool AddArrayWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, const QString& targetObjectVariableName, uint horizontalIndents) const override;
-	virtual bool AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) override;
-	virtual bool AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents) override;
-	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) override;
+	virtual bool AddContainerValueCheckConditionBegin(QTextStream& stream, const imtsdl::CSdlField& field, bool expected, quint16 horizontalIndents) const override;
+	virtual bool AddContainerValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents) const override;
+	virtual bool AddContainerListAccessCode(QTextStream& stream, const imtsdl::CSdlField& field, const QString& variableName, quint16 horizontalIndents, ListAccessResult& result) const override;
 	virtual CSdlUnionConverter::ConversionType GetUnionScalarConversionType() const override;
 	virtual CSdlUnionConverter::ConversionType GetUnionArrayConversionType() const override;
-	virtual void AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) override;
-	virtual void AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) override;
+	virtual void AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) const override;
+	virtual void AddUnionFieldValueWriteToObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) const override;
 	QString GetUnionListElementType(bool forScalar) const override;
 
 private:

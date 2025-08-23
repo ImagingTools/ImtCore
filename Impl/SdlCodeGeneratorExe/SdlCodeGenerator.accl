@@ -26,10 +26,8 @@
             <PositionMap>
                 <Element ComponentName="CodeGeneratorExecutor" X="475" Y="425" Note=""/>
                 <Element ComponentName="CppCodeGeneratorFramework" X="475" Y="575" Note=""/>
-                <Element ComponentName="FileCleanupProcessor" X="950" Y="225" Note=""/>
-                <Element ComponentName="FileFinalizer" X="950" Y="425" Note=""/>
                 <Element ComponentName="QmlCodeGenFramework" X="475" Y="250" Note=""/>
-                <Element ComponentName="SdlCoreFramework" X="725" Y="425" Note=""/>
+                <Element ComponentName="SdlCoreFramework" X="750" Y="425" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

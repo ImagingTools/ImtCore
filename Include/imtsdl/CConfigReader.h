@@ -37,13 +37,8 @@ public:
 	std::optional<QMap<QString, QString>> baseClassList;
 	std::optional<QStringList> includePaths;
 	std::optional<imtsdl::ISdlProcessArgumentsParser::GeneratorType> generatorType;
-	std::optional<bool> autoJoinEnabled;
-	std::optional<imtsdl::ISdlProcessArgumentsParser::AutoLinkLevel> autoLinkLevel;
 	std::optional<QStringList> headersIncludePaths;
-	std::optional<QStringList> moduleIncludePaths;
 	std::optional<QString> depFilePath;
-	std::optional<QString> moduleOutputFilePath;
-	std::optional<bool> moduleGenerateEnabled;
 	std::optional<bool> templateEnabled;
 	std::optional<QString> outputDirTemplate;
 	std::optional<QString> qmlOutputDirTemplate;

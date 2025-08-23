@@ -60,7 +60,7 @@ std::shared_ptr<imtsdl::CSdlEntryBase> CObjectModificatorCompBase::FindEntryByNa
 void CObjectModificatorCompBase::WriteSetValueToStruct(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			const QString& objectName)
+			const QString& objectName) const
 {
 	stream << '*';
 	stream << objectName;
@@ -70,19 +70,11 @@ void CObjectModificatorCompBase::WriteSetValueToStruct(
 }
 
 
-
 // reimplemented (CSdlClassModificatorBaseComp)
 
-bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& /*sdlType*/)
+bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	if (m_headerFilePtr == nullptr){
-		SendCriticalMessage(0, "Unable to process header file. Pointer is not set!");
-		I_CRITICAL();
-
-		return false;
-	}
-
-	QTextStream ofStream(m_headerFilePtr);
+	QTextStream ofStream(headerDevicePtr);
 
 	// add method definitions
 	// write
@@ -122,16 +114,9 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 }
 
 
-bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType)
+bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	if (m_sourceFilePtr == nullptr){
-		SendCriticalMessage(0, "Unable to process source file. Pointer is not set!");
-		I_CRITICAL();
-
-		return false;
-	}
-
-	QTextStream ofStream(m_sourceFilePtr);
+	QTextStream ofStream(sourceDevicePtr);
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(sdlType, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -234,7 +219,7 @@ bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& 
 
 // basic helpers methods
 
-void CObjectModificatorCompBase::AddFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
+void CObjectModificatorCompBase::AddFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const
 {
 	bool isArray = false;
 	bool isCustom = false;
@@ -265,7 +250,7 @@ void CObjectModificatorCompBase::AddFieldWriteToObjectCode(QTextStream& stream, 
 }
 
 
-void CObjectModificatorCompBase::AddFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
+void CObjectModificatorCompBase::AddFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const
 {
 	bool isArray = false;
 	bool isCustom = false;
@@ -298,7 +283,7 @@ void CObjectModificatorCompBase::AddFieldReadFromObjectCode(QTextStream& stream,
 
 // write helpers
 
-void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion)
+void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion) const
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 
@@ -369,7 +354,7 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 
 
 /// \todo optimize it! \c AddScalarFieldWriteToObjectCode has simular code!
-void CObjectModificatorCompBase::AddCustomFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
+void CObjectModificatorCompBase::AddCustomFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const
 {
 	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
@@ -402,7 +387,7 @@ void CObjectModificatorCompBase::AddCustomFieldWriteToObjectImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			bool optional,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -449,7 +434,7 @@ void CObjectModificatorCompBase::AddCustomFieldWriteToObjectImplCode(
 }
 
 
-void CObjectModificatorCompBase::AddArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
+void CObjectModificatorCompBase::AddArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const
 {
 	if (!optional && field.IsRequired()){
 		if (field.IsArray() && field.IsNonEmpty()){
@@ -478,7 +463,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			bool /*optional*/,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	FeedStreamHorizontally(stream, hIndents);
 
@@ -570,7 +555,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 }
 
 
-void CObjectModificatorCompBase::AddCustomArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
+void CObjectModificatorCompBase::AddCustomArrayFieldWriteToObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const
 {
 	if (!optional && field.IsRequired()){
 		if (field.IsArray()){
@@ -594,10 +579,10 @@ void CObjectModificatorCompBase::AddCustomArrayFieldWriteToObjectCode(QTextStrea
 
 /// \todo optimize it! this method has same code as \c AddArrayFieldWriteToObjectImplCode (mb join them)
 void CObjectModificatorCompBase:: AddCustomArrayFieldWriteToObjectImplCode(
-	QTextStream& stream,
-	const imtsdl::CSdlField& field,
-	bool optional,
-	quint16 hIndents)
+			QTextStream& stream,
+			const imtsdl::CSdlField& field,
+			bool optional,
+			quint16 hIndents) const
 {
 	// create a new object array to contain custom type
 	FeedStreamHorizontally(stream, hIndents);
@@ -664,7 +649,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldWriteToObjectImplCode(
 // read helpers
 
 
-void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents)
+void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion, quint16 hIndents) const
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 	bool isCustom = false;
@@ -804,7 +789,7 @@ void CObjectModificatorCompBase::AddFieldValueReadFromObject(QTextStream& stream
 
 
 /// \todo optimize it! \c AddFieldValueReadFromObject has simular code! (or not...)
-void CObjectModificatorCompBase::AddCustomFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
+void CObjectModificatorCompBase::AddCustomFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 
@@ -837,7 +822,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			bool optional,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
@@ -884,7 +869,7 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 
 
 
-void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion)
+void CObjectModificatorCompBase::AddArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, bool isEnum, bool isUnion) const
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 
@@ -920,7 +905,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 			bool /*optional*/,
 			bool isEnum,
 			bool isUnion,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	ListAccessResult result;
 
@@ -1083,7 +1068,7 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 }
 
 
-void CObjectModificatorCompBase::AddCustomArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional)
+void CObjectModificatorCompBase::AddCustomArrayFieldReadFromObjectCode(QTextStream& stream, const imtsdl::CSdlField& field, bool optional) const
 {
 	const bool isStrict = bool(!optional && field.IsRequired());
 	AddContainerValueCheckConditionBegin(stream, field, !isStrict, 1);
@@ -1115,7 +1100,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
 			bool optional,
-			quint16 hIndents)
+			quint16 hIndents) const
 {
 	ListAccessResult result;
 
