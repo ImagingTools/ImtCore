@@ -1,9 +1,30 @@
-/// \file PrintingTechnology.h
-
 #pragma once
 
 
+#ifdef QT_QML_LIB
+#include <QtQml/QQmlEngine>
+#endif // QT_QML_LIB
+
+// Qt includes
+#include <QtCore/QObject>
+#include <QtCore/QJsonObject>
 #include <QtCore/QMetaEnum>
+#include <QtCore/QVariant>
+#include <QtCore/QJsonValue>
+#include <QtCore/QJsonArray>
+
+// ACF includes
+#include <istd/TSharedNullable.h>
+
+// ImtCore includes
+#include <imtbase/CItemModelBase.h>
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+#include <imtbase/TListModelBase.h>
+#include <imtgql/CGqlParamObject.h>
+#include <imtbase/CTreeItemModel.h>
+
+// custom types includes
+#include <modsdlsdl/SDL/1.0/CPP/PrinterBase.h>
 
 
 namespace sdl::modsdl::DigitalPrinter
@@ -11,6 +32,7 @@ namespace sdl::modsdl::DigitalPrinter
 
 
 Q_NAMESPACE
+
 enum class PrintingTechnology {
 	Inkjet,
 	Toner,
@@ -24,6 +46,7 @@ class EnumPrintingTechnology: public QObject
 	Q_OBJECT
 	Q_PROPERTY(QString Inkjet READ GetInkjet NOTIFY InkjetChanged)
 	Q_PROPERTY(QString Toner READ GetToner NOTIFY TonerChanged)
+
 protected:
 	QString GetInkjet() { return "Inkjet"; }
 	QString GetToner() { return "Toner"; }
@@ -32,42 +55,6 @@ signals:
 	void TonerChanged();
 };
 
-
-} // namespace sdl::modsdl::DigitalPrinter
-
-
-
-
-/// \file CDigitalPrinterSpecification.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-// custom types includes
-#include <modsdlsdl/SDL/1.0/CPP/PrinterBase.h>
-
-
-
-namespace sdl::modsdl::DigitalPrinter
-{
 
 
 class CDigitalPrinterSpecification
@@ -96,15 +83,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -352,51 +336,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::modsdl::DigitalPrinter
-
-
-Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecification::V1_0);
-Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecification);
-
-
-
-
-
-/// \file CDigitalPrinter.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-// custom types includes
-#include <modsdlsdl/SDL/1.0/CPP/PrinterBase.h>
-
-
-
-namespace sdl::modsdl::DigitalPrinter
-{
-
-
 class CDigitalPrinter
 {
 public:
@@ -423,15 +362,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -679,32 +615,7 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::modsdl::DigitalPrinter
-
-
-Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinter::V1_0);
-Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinter);
-
-
-
-
-
-/// \file QmlRegister.h
-
-#pragma once
-
-
 #ifdef QT_QML_LIB
-#include <QtQml/QQmlEngine>
-
-
-namespace sdl::modsdl::DigitalPrinter
-{
-
-
 static void RegisterQmlTypes()
 {
 	qmlRegisterType<CDigitalPrinterSpecificationObject>("modsdlDigitalPrinterSdl", 1, 0, "DigitalPrinterSpecification");
@@ -717,9 +628,12 @@ static void RegisterQmlTypes()
 		return enumType;
 	});
 }
-} // namespace sdl::modsdl::DigitalPrinter
 #endif
 
+} // namespace sdl::modsdl::DigitalPrinter
 
 
-
+Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecification::V1_0);
+Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecification);
+Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinter::V1_0);
+Q_DECLARE_METATYPE(sdl::modsdl::DigitalPrinter::CDigitalPrinter);

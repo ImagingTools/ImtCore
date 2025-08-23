@@ -1,77 +1,42 @@
-/// \file PrinterSpecification.h
-
 #pragma once
 
-namespace sdl::modsdl::PrinterBase
-{
 
-class PrinterSpecification;
-class CPrinterSpecificationObject;
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file SimpleUnion.h
-
-#pragma once
-
-namespace sdl::modsdl::PrinterBase
-{
-
-class SimpleUnion;
-class CSimpleUnionObject;
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file MixedUnion.h
-
-#pragma once
-
-namespace sdl::modsdl::PrinterBase
-{
-
-class MixedUnion;
-class CMixedUnionObject;
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file CPrinterSpecificationBase.h
-
-#pragma once
-
+#ifdef QT_QML_LIB
+#include <QtQml/QQmlEngine>
+#endif // QT_QML_LIB
 
 // Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
 #include <QtCore/QObject>
-#include <QtCore/QString>
+#include <QtCore/QJsonObject>
+#include <QtCore/QMetaEnum>
 #include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
+#include <QtCore/QJsonValue>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <istd/TSharedNullable.h>
 
 // ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
 #include <imtbase/CItemModelBase.h>
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 #include <imtbase/TListModelBase.h>
-
+#include <imtgql/CGqlParamObject.h>
+#include <imtbase/CTreeItemModel.h>
 
 
 namespace sdl::modsdl::PrinterBase
 {
 
+
+Q_NAMESPACE
+
+// forward declaration for union types
+class PrinterSpecification;
+class CPrinterSpecificationObject;
+class SimpleUnion;
+class CSimpleUnionObject;
+class MixedUnion;
+class CMixedUnionObject;
 
 class CPrinterSpecificationBase
 {
@@ -97,15 +62,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -342,49 +304,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterSpecificationBase::V1_0);
-Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterSpecificationBase);
-
-
-
-
-
-/// \file CLink.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QByteArray>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::modsdl::PrinterBase
-{
-
-
 class CLink
 {
 public:
@@ -409,15 +328,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -654,49 +570,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CLink::V1_0);
-Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CLink);
-
-
-
-
-
-/// \file CPrinterBase.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::modsdl::PrinterBase
-{
-
-
 class CPrinterBase
 {
 public:
@@ -727,15 +600,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1005,49 +875,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterBase::V1_0);
-Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterBase);
-
-
-
-
-
-/// \file CPrinterList.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::modsdl::PrinterBase
-{
-
-
 class CPrinterList
 {
 public:
@@ -1072,15 +899,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1322,30 +1146,6 @@ public:
 };
 
 
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterList::V1_0);
-Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterList);
-
-
-
-
-
-/// \file PrinterSpecification_ClassDef.h
-
-#pragma once
-
-// STD includes
-#include <variant>
-
-
-
-namespace sdl::modsdl::PrinterBase
-{
-
-
 class PrinterSpecification: public std::variant<CPrinterSpecificationBase, CLink> {
 
 public:
@@ -1402,24 +1202,6 @@ public:
 	QString m_type;
 };
 
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file SimpleUnion_ClassDef.h
-
-#pragma once
-
-// STD includes
-#include <variant>
-
-// Qt includes
-#include <QtCore/QString>
-
-
-namespace sdl::modsdl::PrinterBase
-{
 
 
 class SimpleUnion: public std::variant<QString, double> {
@@ -1478,24 +1260,6 @@ public:
 	QString m_type;
 };
 
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file MixedUnion_ClassDef.h
-
-#pragma once
-
-// STD includes
-#include <variant>
-
-// Qt includes
-#include <QtCore/QString>
-
-
-namespace sdl::modsdl::PrinterBase
-{
 
 
 class MixedUnion: public std::variant<QString, CLink> {
@@ -1554,56 +1318,6 @@ public:
 	QString m_type;
 };
 
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file QmlRegister.h
-
-#pragma once
-
-
-#ifdef QT_QML_LIB
-#include <QtQml/QQmlEngine>
-
-
-namespace sdl::modsdl::PrinterBase
-{
-
-
-static void RegisterQmlTypes()
-{
-	qmlRegisterType<CPrinterSpecificationBaseObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterSpecificationBase");
-	qmlRegisterType<CLinkObject>("modsdlPrinterBaseSdl", 1, 0, "Link");
-	qmlRegisterType<CPrinterBaseObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterBase");
-	qmlRegisterType<CPrinterListObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterList");
-}
-} // namespace sdl::modsdl::PrinterBase
-#endif
-
-
-
-
-/// \file CGetPrintersGqlRequest.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-
-
-// imtgql includes
-#include <imtgql/IGqlContext.h>
-#include <imtgql/CGqlRequest.h>
-#include <imtgql/CGqlParamObject.h>
-
-
-namespace sdl::modsdl::PrinterBase
-{
-
 
 
 struct GetPrintersRequestInfo
@@ -1645,28 +1359,9 @@ private:
 };
 
 
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-
-/// \file CGraphQlHandlerCompBase.h
-
-#pragma once
-
-//  includes
-#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
-
-
-
-namespace sdl::modsdl::PrinterBase
+class CGraphQlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
 {
 
-
-class CGraphQlHandlerCompBase:
-			virtual public ::imtservergql::CPermissibleGqlRequestHandlerComp
-{
 public:
 	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
 
@@ -1683,7 +1378,24 @@ protected:
 };
 
 
+#ifdef QT_QML_LIB
+static void RegisterQmlTypes()
+{
+	qmlRegisterType<CPrinterSpecificationBaseObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterSpecificationBase");
+	qmlRegisterType<CLinkObject>("modsdlPrinterBaseSdl", 1, 0, "Link");
+	qmlRegisterType<CPrinterBaseObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterBase");
+	qmlRegisterType<CPrinterListObject>("modsdlPrinterBaseSdl", 1, 0, "PrinterList");
+}
+#endif
+
 } // namespace sdl::modsdl::PrinterBase
 
 
-
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterSpecificationBase::V1_0);
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterSpecificationBase);
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CLink::V1_0);
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CLink);
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterBase::V1_0);
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterBase);
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterList::V1_0);
+Q_DECLARE_METATYPE(sdl::modsdl::PrinterBase::CPrinterList);

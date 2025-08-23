@@ -1,31 +1,34 @@
-/// \file CTimeRange.h
-
 #pragma once
 
 
+#ifdef QT_QML_LIB
+#include <QtQml/QQmlEngine>
+#endif // QT_QML_LIB
+
 // Qt includes
-#include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
 #include <QtCore/QObject>
-#include <QtCore/QString>
+#include <QtCore/QJsonObject>
 #include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
+#include <QtCore/QJsonValue>
+#include <QtCore/QMetaEnum>
 
 // ACF includes
 #include <istd/TSharedNullable.h>
 
 // ImtCore includes
-#include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 #include <imtbase/CItemModelBase.h>
 #include <imtbase/TListModelBase.h>
-
+#include <imtbase/CTreeItemModel.h>
 
 
 namespace sdl::imtbase::ImtBaseTypes
 {
+
+
+Q_NAMESPACE
 
 
 class CTimeRange
@@ -54,15 +57,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -307,45 +307,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CTimeRange::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CTimeRange);
-
-
-
-
-
-/// \file CSdlSize.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CSdlSize
 {
 public:
@@ -372,15 +333,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -625,45 +583,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSdlSize::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSdlSize);
-
-
-
-
-
-/// \file CSdlPoint.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CSdlPoint
 {
 public:
@@ -690,15 +609,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -943,49 +859,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSdlPoint::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSdlPoint);
-
-
-
-
-
-/// \file CParamTypeIds.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QByteArray>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CParamTypeIds
 {
 public:
@@ -1036,15 +909,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1385,49 +1255,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CParamTypeIds);
-
-
-
-
-
-/// \file CUrlParam.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CUrlParam
 {
 public:
@@ -1458,15 +1285,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1727,49 +1551,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CUrlParam);
-
-
-
-
-
-/// \file CIdParam.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QByteArray>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CIdParam
 {
 public:
@@ -1794,15 +1575,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -2039,49 +1817,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CIdParam::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CIdParam);
-
-
-
-
-
-/// \file CTextParam.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CTextParam
 {
 public:
@@ -2106,15 +1841,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -2351,45 +2083,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CTextParam::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CTextParam);
-
-
-
-
-
-/// \file CEnableableParam.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CEnableableParam
 {
 public:
@@ -2414,15 +2107,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -2659,45 +2349,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CEnableableParam::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CEnableableParam);
-
-
-
-
-
-/// \file CIntegerParam.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CIntegerParam
 {
 public:
@@ -2722,15 +2373,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -2967,45 +2615,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CIntegerParam::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CIntegerParam);
-
-
-
-
-
-/// \file CDoubleParam.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CDoubleParam
 {
 public:
@@ -3030,15 +2639,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -3275,50 +2881,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CDoubleParam);
-
-
-
-
-
-/// \file COption.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class COption
 {
 public:
@@ -3349,15 +2911,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -3618,49 +3177,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::COption::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::COption);
-
-
-
-
-
-/// \file COptionsList.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class COptionsList
 {
 public:
@@ -3689,15 +3205,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -3953,48 +3466,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::COptionsList::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::COptionsList);
-
-
-
-
-
-/// \file CSelectionParam.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CSelectionParam
 {
 public:
@@ -4021,15 +3492,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -4277,49 +3745,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSelectionParam);
-
-
-
-
-
-/// \file CSchedulerParam.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CSchedulerParam
 {
 public:
@@ -4346,15 +3771,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -4599,49 +4021,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSchedulerParam);
-
-
-
-
-
-/// \file CBackupSettings.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CBackupSettings
 {
 public:
@@ -4668,15 +4047,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -4924,49 +4300,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CBackupSettings::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CBackupSettings);
-
-
-
-
-
-/// \file CDatabaseAccessSettings.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CDatabaseAccessSettings
 {
 public:
@@ -5001,15 +4334,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -5286,49 +4616,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings);
-
-
-
-
-
-/// \file CFileNameParam.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CFileNameParam
 {
 public:
@@ -5355,15 +4642,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -5608,51 +4892,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CFileNameParam::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CFileNameParam);
-
-
-
-
-
-/// \file CParamsSet.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CParamsSet
 {
 public:
@@ -5685,15 +4924,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -5962,50 +5198,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CParamsSet);
-
-
-
-
-
-/// \file CMimeType.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 class CMimeType
 {
 public:
@@ -6038,15 +5230,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -6315,32 +5504,7 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CMimeType::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CMimeType);
-
-
-
-
-
-/// \file QmlRegister.h
-
-#pragma once
-
-
 #ifdef QT_QML_LIB
-#include <QtQml/QQmlEngine>
-
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 static void RegisterQmlTypes()
 {
 	qmlRegisterType<CTimeRangeObject>("imtbaseImtBaseTypesSdl", 1, 0, "TimeRange");
@@ -6363,9 +5527,46 @@ static void RegisterQmlTypes()
 	qmlRegisterType<CParamsSetObject>("imtbaseImtBaseTypesSdl", 1, 0, "ParamsSet");
 	qmlRegisterType<CMimeTypeObject>("imtbaseImtBaseTypesSdl", 1, 0, "MimeType");
 }
-} // namespace sdl::imtbase::ImtBaseTypes
 #endif
 
+} // namespace sdl::imtbase::ImtBaseTypes
 
 
-
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CTimeRange::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CTimeRange);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSdlSize::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSdlSize);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSdlPoint::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSdlPoint);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CParamTypeIds);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CUrlParam);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CIdParam::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CIdParam);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CTextParam::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CTextParam);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CEnableableParam::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CEnableableParam);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CIntegerParam::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CIntegerParam);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CDoubleParam);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::COption::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::COption);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::COptionsList::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::COptionsList);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSelectionParam);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CSchedulerParam);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CBackupSettings::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CBackupSettings);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CFileNameParam::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CFileNameParam);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CParamsSet);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CMimeType::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ImtBaseTypes::CMimeType);

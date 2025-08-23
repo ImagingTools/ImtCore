@@ -1,79 +1,45 @@
-/// \file ExtendedMetaDataUnionType.h
-
 #pragma once
 
-namespace sdl::complextest::CTImpl
-{
 
-class ExtendedMetaDataUnionType;
-class CExtendedMetaDataUnionTypeObject;
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file ExtendedMetaDataUnionSimpleType.h
-
-#pragma once
-
-namespace sdl::complextest::CTImpl
-{
-
-class ExtendedMetaDataUnionSimpleType;
-class CExtendedMetaDataUnionSimpleTypeObject;
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CDMResultUnionType.h
-
-#pragma once
-
-namespace sdl::complextest::CTImpl
-{
-
-class CDMResultUnionType;
-class CCDMResultUnionTypeObject;
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CResult.h
-
-#pragma once
-
+#ifdef QT_QML_LIB
+#include <QtQml/QQmlEngine>
+#endif // QT_QML_LIB
 
 // Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
 #include <QtCore/QObject>
+#include <QtCore/QJsonObject>
+#include <QtCore/QMetaEnum>
 #include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
+#include <QtCore/QJsonValue>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <istd/TSharedNullable.h>
 
 // ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
 #include <imtbase/CItemModelBase.h>
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 #include <imtbase/TListModelBase.h>
+#include <imtgql/CGqlParamObject.h>
+#include <imtbase/CTreeItemModel.h>
 
 // custom types includes
 #include <complextestsdl/SDL/1.0/CPP/CTTypes.h>
 
 
-
 namespace sdl::complextest::CTImpl
 {
 
+
+Q_NAMESPACE
+
+// forward declaration for union types
+class ExtendedMetaDataUnionType;
+class CExtendedMetaDataUnionTypeObject;
+class ExtendedMetaDataUnionSimpleType;
+class CExtendedMetaDataUnionSimpleTypeObject;
+class CDMResultUnionType;
+class CCDMResultUnionTypeObject;
 
 class CResult
 {
@@ -121,15 +87,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -457,53 +420,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResult::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResult);
-
-
-
-
-
-/// \file CArea.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-// custom types includes
-#include <complextestsdl/SDL/1.0/CPP/CTTypes.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CArea
 {
 public:
@@ -536,15 +452,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -819,53 +732,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CArea::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CArea);
-
-
-
-
-
-/// \file CAnalyzer.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-// custom types includes
-#include <complextestsdl/SDL/1.0/CPP/CTTypes.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CAnalyzer
 {
 public:
@@ -894,15 +760,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1158,53 +1021,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CAnalyzer::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CAnalyzer);
-
-
-
-
-
-/// \file CInspection.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-// custom types includes
-#include <complextestsdl/SDL/1.0/CPP/CTTypes.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CInspection
 {
 public:
@@ -1237,15 +1053,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1517,53 +1330,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CInspection::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CInspection);
-
-
-
-
-
-/// \file CProductOverview.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-// custom types includes
-#include <complextestsdl/SDL/1.0/CPP/CTTypes.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CProductOverview
 {
 public:
@@ -1600,15 +1366,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1896,49 +1659,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CProductOverview::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CProductOverview);
-
-
-
-
-
-/// \file CLocalizedText.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CLocalizedText
 {
 public:
@@ -1965,15 +1685,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -2218,45 +1935,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CLocalizedText::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CLocalizedText);
-
-
-
-
-
-/// \file CCoordinates.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CCoordinates
 {
 public:
@@ -2285,15 +1963,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -2546,49 +2221,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCoordinates::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCoordinates);
-
-
-
-
-
-/// \file CExtendedMetaData.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CExtendedMetaData
 {
 public:
@@ -2615,15 +2247,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -2871,51 +2500,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CExtendedMetaData::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CExtendedMetaData);
-
-
-
-
-
-/// \file CResultMetaData.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CResultMetaData
 {
 public:
@@ -2954,15 +2538,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -3261,49 +2842,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResultMetaData::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResultMetaData);
-
-
-
-
-
-/// \file COverallResultValues.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class COverallResultValues
 {
 public:
@@ -3336,15 +2874,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -3613,48 +3148,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::COverallResultValues::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::COverallResultValues);
-
-
-
-
-
-/// \file CUnionTestingType.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CUnionTestingType
 {
 public:
@@ -3683,15 +3176,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -3953,50 +3443,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CUnionTestingType::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CUnionTestingType);
-
-
-
-
-
-/// \file CCDMResultVarRecursive.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CCDMResultVarRecursive
 {
 public:
@@ -4029,15 +3475,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -4315,50 +3758,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarRecursive::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarRecursive);
-
-
-
-
-
-/// \file CCDMResultVarString.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CCDMResultVarString
 {
 public:
@@ -4391,15 +3790,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -4674,50 +4070,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarString::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarString);
-
-
-
-
-
-/// \file CCDMResult.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CCDMResult
 {
 public:
@@ -4750,15 +4102,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -5036,45 +4385,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResult::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResult);
-
-
-
-
-
-/// \file CPointsInCoordinateFormat.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class CPointsInCoordinateFormat
 {
 public:
@@ -5099,15 +4409,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -5346,32 +4653,6 @@ public:
 };
 
 
-
-} // namespace sdl::complextest::CTImpl
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CPointsInCoordinateFormat::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CPointsInCoordinateFormat);
-
-
-
-
-
-/// \file ExtendedMetaDataUnionType_ClassDef.h
-
-#pragma once
-
-// STD includes
-#include <variant>
-
-// Qt includes
-#include <QtCore/QString>
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 class ExtendedMetaDataUnionType: public std::variant<CCoordinates, double, bool, QString> {
 
 public:
@@ -5442,24 +4723,6 @@ public:
 	QString m_type;
 };
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file ExtendedMetaDataUnionSimpleType_ClassDef.h
-
-#pragma once
-
-// STD includes
-#include <variant>
-
-// Qt includes
-#include <QtCore/QString>
-
-
-namespace sdl::complextest::CTImpl
-{
 
 
 class ExtendedMetaDataUnionSimpleType: public std::variant<double, bool, QString> {
@@ -5525,22 +4788,6 @@ public:
 	QString m_type;
 };
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CDMResultUnionType_ClassDef.h
-
-#pragma once
-
-// STD includes
-#include <variant>
-
-
-
-namespace sdl::complextest::CTImpl
-{
 
 
 class CDMResultUnionType: public std::variant<CCDMResultVarString, CCDMResultVarRecursive> {
@@ -5598,67 +4845,6 @@ public:
 	QVariant m_value;
 	QString m_type;
 };
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file QmlRegister.h
-
-#pragma once
-
-
-#ifdef QT_QML_LIB
-#include <QtQml/QQmlEngine>
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
-static void RegisterQmlTypes()
-{
-	qmlRegisterType<CResultObject>("complextestCTImplSdl", 1, 0, "Result");
-	qmlRegisterType<CAreaObject>("complextestCTImplSdl", 1, 0, "Area");
-	qmlRegisterType<CAnalyzerObject>("complextestCTImplSdl", 1, 0, "Analyzer");
-	qmlRegisterType<CInspectionObject>("complextestCTImplSdl", 1, 0, "Inspection");
-	qmlRegisterType<CProductOverviewObject>("complextestCTImplSdl", 1, 0, "ProductOverview");
-	qmlRegisterType<CLocalizedTextObject>("complextestCTImplSdl", 1, 0, "LocalizedText");
-	qmlRegisterType<CCoordinatesObject>("complextestCTImplSdl", 1, 0, "Coordinates");
-	qmlRegisterType<CExtendedMetaDataObject>("complextestCTImplSdl", 1, 0, "ExtendedMetaData");
-	qmlRegisterType<CResultMetaDataObject>("complextestCTImplSdl", 1, 0, "ResultMetaData");
-	qmlRegisterType<COverallResultValuesObject>("complextestCTImplSdl", 1, 0, "OverallResultValues");
-	qmlRegisterType<CUnionTestingTypeObject>("complextestCTImplSdl", 1, 0, "UnionTestingType");
-	qmlRegisterType<CCDMResultVarRecursiveObject>("complextestCTImplSdl", 1, 0, "CDMResultVarRecursive");
-	qmlRegisterType<CCDMResultVarStringObject>("complextestCTImplSdl", 1, 0, "CDMResultVarString");
-	qmlRegisterType<CCDMResultObject>("complextestCTImplSdl", 1, 0, "CDMResult");
-	qmlRegisterType<CPointsInCoordinateFormatObject>("complextestCTImplSdl", 1, 0, "PointsInCoordinateFormat");
-}
-} // namespace sdl::complextest::CTImpl
-#endif
-
-
-
-
-/// \file CGetLastProductionResultsGqlRequest.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-
-
-// imtgql includes
-#include <imtgql/IGqlContext.h>
-#include <imtgql/CGqlRequest.h>
-#include <imtgql/CGqlParamObject.h>
-
-
-namespace sdl::complextest::CTImpl
-{
 
 
 
@@ -5765,31 +4951,6 @@ private:
 };
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-
-/// \file CGetLastProductionResultsCDMGqlRequest.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-
-
-// imtgql includes
-#include <imtgql/IGqlContext.h>
-#include <imtgql/CGqlRequest.h>
-#include <imtgql/CGqlParamObject.h>
-
-
-namespace sdl::complextest::CTImpl
-{
-
 
 
 struct GetLastProductionResultsCDMRequestInfo
@@ -5858,28 +5019,9 @@ private:
 };
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-
-/// \file CGraphQlHandlerCompBase.h
-
-#pragma once
-
-//  includes
-#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
-
-
-
-namespace sdl::complextest::CTImpl
+class CGraphQlHandlerCompBase: public ::imtservergql::CPermissibleGqlRequestHandlerComp
 {
 
-
-class CGraphQlHandlerCompBase:
-			virtual public ::imtservergql::CPermissibleGqlRequestHandlerComp
-{
 public:
 	typedef ::imtservergql::CPermissibleGqlRequestHandlerComp BaseClass;
 
@@ -5897,7 +5039,57 @@ protected:
 };
 
 
+#ifdef QT_QML_LIB
+static void RegisterQmlTypes()
+{
+	qmlRegisterType<CResultObject>("complextestCTImplSdl", 1, 0, "Result");
+	qmlRegisterType<CAreaObject>("complextestCTImplSdl", 1, 0, "Area");
+	qmlRegisterType<CAnalyzerObject>("complextestCTImplSdl", 1, 0, "Analyzer");
+	qmlRegisterType<CInspectionObject>("complextestCTImplSdl", 1, 0, "Inspection");
+	qmlRegisterType<CProductOverviewObject>("complextestCTImplSdl", 1, 0, "ProductOverview");
+	qmlRegisterType<CLocalizedTextObject>("complextestCTImplSdl", 1, 0, "LocalizedText");
+	qmlRegisterType<CCoordinatesObject>("complextestCTImplSdl", 1, 0, "Coordinates");
+	qmlRegisterType<CExtendedMetaDataObject>("complextestCTImplSdl", 1, 0, "ExtendedMetaData");
+	qmlRegisterType<CResultMetaDataObject>("complextestCTImplSdl", 1, 0, "ResultMetaData");
+	qmlRegisterType<COverallResultValuesObject>("complextestCTImplSdl", 1, 0, "OverallResultValues");
+	qmlRegisterType<CUnionTestingTypeObject>("complextestCTImplSdl", 1, 0, "UnionTestingType");
+	qmlRegisterType<CCDMResultVarRecursiveObject>("complextestCTImplSdl", 1, 0, "CDMResultVarRecursive");
+	qmlRegisterType<CCDMResultVarStringObject>("complextestCTImplSdl", 1, 0, "CDMResultVarString");
+	qmlRegisterType<CCDMResultObject>("complextestCTImplSdl", 1, 0, "CDMResult");
+	qmlRegisterType<CPointsInCoordinateFormatObject>("complextestCTImplSdl", 1, 0, "PointsInCoordinateFormat");
+}
+#endif
+
 } // namespace sdl::complextest::CTImpl
 
 
-
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResult::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResult);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CArea::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CArea);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CAnalyzer::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CAnalyzer);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CInspection::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CInspection);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CProductOverview::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CProductOverview);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CLocalizedText::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CLocalizedText);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCoordinates::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCoordinates);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CExtendedMetaData::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CExtendedMetaData);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResultMetaData::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CResultMetaData);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::COverallResultValues::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::COverallResultValues);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CUnionTestingType::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CUnionTestingType);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarRecursive::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarRecursive);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarString::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResultVarString);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResult::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CCDMResult);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CPointsInCoordinateFormat::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTImpl::CPointsInCoordinateFormat);

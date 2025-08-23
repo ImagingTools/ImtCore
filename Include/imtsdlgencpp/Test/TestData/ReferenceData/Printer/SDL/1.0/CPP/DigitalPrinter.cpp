@@ -1,14 +1,6 @@
 #include "DigitalPrinter.h"
 
 
-#include "DigitalPrinter.h"
-
-
-#include "DigitalPrinter.h"
-
-
-/// \file CDigitalPrinterSpecification.cpp
-
 namespace sdl::modsdl::DigitalPrinter
 {
 
@@ -695,17 +687,6 @@ QString CDigitalPrinterSpecificationObject::getJSONKeyForProperty(const QString&
 }
 
 
-} // namespace sdl::modsdl::DigitalPrinter
-
-
-
-
-/// \file CDigitalPrinter.cpp
-
-namespace sdl::modsdl::DigitalPrinter
-{
-
-
 QByteArray CDigitalPrinter::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -1389,7 +1370,3 @@ QString CDigitalPrinterObject::getJSONKeyForProperty(const QString& propertyName
 
 
 } // namespace sdl::modsdl::DigitalPrinter
-
-
-
-

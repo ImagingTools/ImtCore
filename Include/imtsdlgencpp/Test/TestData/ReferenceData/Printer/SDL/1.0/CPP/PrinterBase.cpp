@@ -1,17 +1,6 @@
 #include "PrinterBase.h"
 
 
-#include "PrinterBase.h"
-
-
-#include "PrinterBase.h"
-
-
-#include "PrinterBase.h"
-
-
-/// \file CPrinterSpecificationBase.cpp
-
 namespace sdl::modsdl::PrinterBase
 {
 
@@ -441,17 +430,6 @@ QString CPrinterSpecificationBaseObject::getJSONKeyForProperty(const QString& pr
 
 	return propertyName;
 }
-
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file CLink.cpp
-
-namespace sdl::modsdl::PrinterBase
-{
 
 
 QByteArray CLink::V1_0::GetVersionId()
@@ -891,17 +869,6 @@ QString CLinkObject::getJSONKeyForProperty(const QString& propertyName) const
 
 	return propertyName;
 }
-
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file CPrinterBase.cpp
-
-namespace sdl::modsdl::PrinterBase
-{
 
 
 QByteArray CPrinterBase::V1_0::GetVersionId()
@@ -1977,17 +1944,6 @@ QString CPrinterBaseObject::getJSONKeyForProperty(const QString& propertyName) c
 }
 
 
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file CPrinterList.cpp
-
-namespace sdl::modsdl::PrinterBase
-{
-
-
 QByteArray CPrinterList::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -2540,16 +2496,6 @@ QString CPrinterListObject::getJSONKeyForProperty(const QString& propertyName) c
 }
 
 
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-
-/// \file CGetPrintersGqlRequest.cpp
-
-
-namespace sdl::modsdl::PrinterBase
-{
 
 
 QByteArray CGetPrintersGqlRequest::GetCommandId()
@@ -2625,19 +2571,6 @@ GetPrintersRequestInfo CGetPrintersGqlRequest::GetRequestInfo() const
 {
 	return m_requestInfo;
 }
-
-
-} // namespace sdl::modsdl::PrinterBase
-
-
-
-/// \file CGraphQlHandlerCompBase.cpp
-
-
-namespace sdl::modsdl::PrinterBase
-{
-
-
 bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
@@ -2690,9 +2623,4 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-
-
 } // namespace sdl::modsdl::PrinterBase
-
-
-

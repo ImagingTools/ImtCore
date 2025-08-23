@@ -1,17 +1,6 @@
 #include "CTImpl.h"
 
 
-#include "CTImpl.h"
-
-
-#include "CTImpl.h"
-
-
-#include "CTImpl.h"
-
-
-/// \file CResult.cpp
-
 namespace sdl::complextest::CTImpl
 {
 
@@ -3551,17 +3540,6 @@ QString CResultObject::getJSONKeyForProperty(const QString& propertyName) const
 }
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CArea.cpp
-
-namespace sdl::complextest::CTImpl
-{
-
-
 QByteArray CArea::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -6116,17 +6094,6 @@ QString CAreaObject::getJSONKeyForProperty(const QString& propertyName) const
 }
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CAnalyzer.cpp
-
-namespace sdl::complextest::CTImpl
-{
-
-
 QByteArray CAnalyzer::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -7025,17 +6992,6 @@ QString CAnalyzerObject::getJSONKeyForProperty(const QString& propertyName) cons
 
 	return propertyName;
 }
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CInspection.cpp
-
-namespace sdl::complextest::CTImpl
-{
 
 
 QByteArray CInspection::V1_0::GetVersionId()
@@ -8092,17 +8048,6 @@ QString CInspectionObject::getJSONKeyForProperty(const QString& propertyName) co
 
 	return propertyName;
 }
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CProductOverview.cpp
-
-namespace sdl::complextest::CTImpl
-{
 
 
 QByteArray CProductOverview::V1_0::GetVersionId()
@@ -9317,17 +9262,6 @@ QString CProductOverviewObject::getJSONKeyForProperty(const QString& propertyNam
 }
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CLocalizedText.cpp
-
-namespace sdl::complextest::CTImpl
-{
-
-
 QByteArray CLocalizedText::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -9843,17 +9777,6 @@ QString CLocalizedTextObject::getJSONKeyForProperty(const QString& propertyName)
 
 	return propertyName;
 }
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CCoordinates.cpp
-
-namespace sdl::complextest::CTImpl
-{
 
 
 QByteArray CCoordinates::V1_0::GetVersionId()
@@ -10455,17 +10378,6 @@ QString CCoordinatesObject::getJSONKeyForProperty(const QString& propertyName) c
 
 	return propertyName;
 }
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CExtendedMetaData.cpp
-
-namespace sdl::complextest::CTImpl
-{
 
 
 QByteArray CExtendedMetaData::V1_0::GetVersionId()
@@ -11169,17 +11081,6 @@ QString CExtendedMetaDataObject::getJSONKeyForProperty(const QString& propertyNa
 
 	return propertyName;
 }
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CResultMetaData.cpp
-
-namespace sdl::complextest::CTImpl
-{
 
 
 QByteArray CResultMetaData::V1_0::GetVersionId()
@@ -12286,17 +12187,6 @@ QString CResultMetaDataObject::getJSONKeyForProperty(const QString& propertyName
 }
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file COverallResultValues.cpp
-
-namespace sdl::complextest::CTImpl
-{
-
-
 QByteArray COverallResultValues::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -13016,17 +12906,6 @@ QString COverallResultValuesObject::getJSONKeyForProperty(const QString& propert
 
 	return propertyName;
 }
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CUnionTestingType.cpp
-
-namespace sdl::complextest::CTImpl
-{
 
 
 QByteArray CUnionTestingType::V1_0::GetVersionId()
@@ -14091,17 +13970,6 @@ QString CUnionTestingTypeObject::getJSONKeyForProperty(const QString& propertyNa
 
 	return propertyName;
 }
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CCDMResultVarRecursive.cpp
-
-namespace sdl::complextest::CTImpl
-{
 
 
 QByteArray CCDMResultVarRecursive::V1_0::GetVersionId()
@@ -15265,17 +15133,6 @@ QString CCDMResultVarRecursiveObject::getJSONKeyForProperty(const QString& prope
 }
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CCDMResultVarString.cpp
-
-namespace sdl::complextest::CTImpl
-{
-
-
 QByteArray CCDMResultVarString::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -16245,17 +16102,6 @@ QString CCDMResultVarStringObject::getJSONKeyForProperty(const QString& property
 
 	return propertyName;
 }
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CCDMResult.cpp
-
-namespace sdl::complextest::CTImpl
-{
 
 
 QByteArray CCDMResult::V1_0::GetVersionId()
@@ -17419,17 +17265,6 @@ QString CCDMResultObject::getJSONKeyForProperty(const QString& propertyName) con
 }
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CPointsInCoordinateFormat.cpp
-
-namespace sdl::complextest::CTImpl
-{
-
-
 QByteArray CPointsInCoordinateFormat::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -17857,16 +17692,6 @@ QString CPointsInCoordinateFormatObject::getJSONKeyForProperty(const QString& pr
 }
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-
-/// \file CGetLastProductionResultsGqlRequest.cpp
-
-
-namespace sdl::complextest::CTImpl
-{
 
 
 QByteArray CGetLastProductionResultsGqlRequest::GetCommandId()
@@ -18032,17 +17857,6 @@ GetLastProductionResultsRequestInfo CGetLastProductionResultsGqlRequest::GetRequ
 }
 
 
-} // namespace sdl::complextest::CTImpl
-
-
-
-/// \file CGetLastProductionResultsCDMGqlRequest.cpp
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 QByteArray CGetLastProductionResultsCDMGqlRequest::GetCommandId()
 {
 	return QByteArrayLiteral("GetLastProductionResultsCDM");
@@ -18193,19 +18007,6 @@ GetLastProductionResultsCDMRequestInfo CGetLastProductionResultsCDMGqlRequest::G
 {
 	return m_requestInfo;
 }
-
-
-} // namespace sdl::complextest::CTImpl
-
-
-
-/// \file CGraphQlHandlerCompBase.cpp
-
-
-namespace sdl::complextest::CTImpl
-{
-
-
 bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
 	const QByteArray commandId = gqlRequest.GetCommandId();
@@ -18289,9 +18090,4 @@ bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 }
 
 
-
-
 } // namespace sdl::complextest::CTImpl
-
-
-

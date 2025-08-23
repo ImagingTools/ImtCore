@@ -1,17 +1,6 @@
 #include "UnionTest.h"
 
 
-#include "UnionTest.h"
-
-
-#include "UnionTest.h"
-
-
-#include "UnionTest.h"
-
-
-/// \file CCoords.cpp
-
 namespace sdl::modsdl::UnionTest
 {
 
@@ -537,17 +526,6 @@ QString CCoordsObject::getJSONKeyForProperty(const QString& propertyName) const
 }
 
 
-} // namespace sdl::modsdl::UnionTest
-
-
-
-
-/// \file CPrinterSpecificationBase.cpp
-
-namespace sdl::modsdl::UnionTest
-{
-
-
 QByteArray CPrinterSpecificationBase::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -973,17 +951,6 @@ QString CPrinterSpecificationBaseObject::getJSONKeyForProperty(const QString& pr
 
 	return propertyName;
 }
-
-
-} // namespace sdl::modsdl::UnionTest
-
-
-
-
-/// \file CLink.cpp
-
-namespace sdl::modsdl::UnionTest
-{
 
 
 QByteArray CLink::V1_0::GetVersionId()
@@ -1423,17 +1390,6 @@ QString CLinkObject::getJSONKeyForProperty(const QString& propertyName) const
 
 	return propertyName;
 }
-
-
-} // namespace sdl::modsdl::UnionTest
-
-
-
-
-/// \file CPrinterBase.cpp
-
-namespace sdl::modsdl::UnionTest
-{
 
 
 QByteArray CPrinterBase::V1_0::GetVersionId()
@@ -2108,16 +2064,6 @@ QString CPrinterBaseObject::getJSONKeyForProperty(const QString& propertyName) c
 }
 
 
-} // namespace sdl::modsdl::UnionTest
-
-
-
-
-/// \file CGetSpecificationsGqlRequest.cpp
-
-
-namespace sdl::modsdl::UnionTest
-{
 
 
 QByteArray CGetSpecificationsGqlRequest::GetCommandId()
@@ -2222,86 +2168,6 @@ GetSpecificationsRequestInfo CGetSpecificationsGqlRequest::GetRequestInfo() cons
 {
 	return m_requestInfo;
 }
-
-
-} // namespace sdl::modsdl::UnionTest
-
-
-
-/// \file CGraphQlHandlerCompBase.cpp
-
-
-namespace sdl::modsdl::UnionTest
-{
-
-
-bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
-		return true;
-	}
-
-	return BaseClass::IsRequestSupported(gqlRequest);
-}
-
-
-::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const QByteArray commandId = gqlRequest.GetCommandId();
-	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
-	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
-
-	// GetSpecifications
-	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
-		CGetSpecificationsGqlRequest getSpecificationsGqlRequest(gqlRequest, false);
-		if (!getSpecificationsGqlRequest.IsValid()){
-			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
-			SendErrorMessage(0, errorMessage);
-
-			return nullptr;
-		}
-
-		std::shared_ptr<PrinterSpecification> replyPayload = OnGetSpecifications(getSpecificationsGqlRequest, gqlRequest, errorMessage);
-		if (!errorMessage.isEmpty()){
-			SendErrorMessage(0, QString("The derived call [OnGetSpecifications] returned an error: %1").arg(errorMessage));
-
-			return nullptr;
-		}
-
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((replyPayload).get())){
-			if (!val->WriteToModel(*dataModelPtr)){
-				return nullptr;
-			}
-		}
-		else if (const CLink* val = std::get_if<CLink>((replyPayload).get())){
-			if (!val->WriteToModel(*dataModelPtr)){
-				return nullptr;
-			}
-		}
-		return modelPtr.PopPtr();
-	}
-
-	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
-	SendErrorMessage(0, errorMessage);
-
-	return nullptr;
-}
-
-
-
-
-} // namespace sdl::modsdl::UnionTest
-
-
-
-/// \file CPrinterCollectionControllerCompBase.cpp
-
-
-namespace sdl::modsdl::UnionTest
-{
-
-
 QMap<int, QByteArray> CPrinterCollectionControllerCompBase::GetSupportedCommandIds() const
 {
 	static QMap<int, QByteArray> retVal = {
@@ -2374,9 +2240,58 @@ bool CPrinterCollectionControllerCompBase::CreateRepresentationFromObject(const 
 }
 
 
+bool CGraphQlHandlerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
+::imtbase::CTreeItemModel* CGraphQlHandlerCompBase::CreateInternalResponse(const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	const QByteArray commandId = gqlRequest.GetCommandId();
+	istd::TDelPtr<::imtbase::CTreeItemModel> modelPtr(new ::imtbase::CTreeItemModel);
+	::imtbase::CTreeItemModel* dataModelPtr = modelPtr->AddTreeModel("data");
+
+	// GetSpecifications
+	if (commandId == CGetSpecificationsGqlRequest::GetCommandId()){
+		CGetSpecificationsGqlRequest getSpecificationsGqlRequest(gqlRequest, false);
+		if (!getSpecificationsGqlRequest.IsValid()){
+			errorMessage = QString("Bad request. Unexpected request for command-ID: '%1'").arg(qPrintable(commandId));
+			SendErrorMessage(0, errorMessage);
+
+			return nullptr;
+		}
+
+		std::shared_ptr<PrinterSpecification> replyPayload = OnGetSpecifications(getSpecificationsGqlRequest, gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			SendErrorMessage(0, QString("The derived call [OnGetSpecifications] returned an error: %1").arg(errorMessage));
+
+			return nullptr;
+		}
+
+		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((replyPayload).get())){
+			if (!val->WriteToModel(*dataModelPtr)){
+				return nullptr;
+			}
+		}
+		else if (const CLink* val = std::get_if<CLink>((replyPayload).get())){
+			if (!val->WriteToModel(*dataModelPtr)){
+				return nullptr;
+			}
+		}
+		return modelPtr.PopPtr();
+	}
+
+	errorMessage = QString("Bad request. Unexpected command-ID: '%1'").arg(qPrintable(commandId));
+	SendErrorMessage(0, errorMessage);
+
+	return nullptr;
+}
 
 
 } // namespace sdl::modsdl::UnionTest
-
-
-

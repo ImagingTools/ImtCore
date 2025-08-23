@@ -1,14 +1,6 @@
 #include "ImtBaseTypes.h"
 
 
-#include "ImtBaseTypes.h"
-
-
-#include "ImtBaseTypes.h"
-
-
-/// \file CTimeRange.cpp
-
 namespace sdl::imtbase::ImtBaseTypes
 {
 
@@ -504,17 +496,6 @@ QString CTimeRangeObject::getJSONKeyForProperty(const QString& propertyName) con
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CSdlSize.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
 
 
 QByteArray CSdlSize::V1_0::GetVersionId()
@@ -1038,17 +1019,6 @@ QString CSdlSizeObject::getJSONKeyForProperty(const QString& propertyName) const
 }
 
 
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CSdlPoint.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 QByteArray CSdlPoint::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -1568,17 +1538,6 @@ QString CSdlPointObject::getJSONKeyForProperty(const QString& propertyName) cons
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CParamTypeIds.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
 
 
 QByteArray CParamTypeIds::V1_0::GetVersionId()
@@ -2866,17 +2825,6 @@ QString CParamTypeIdsObject::getJSONKeyForProperty(const QString& propertyName) 
 }
 
 
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CUrlParam.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 QByteArray CUrlParam::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -3502,17 +3450,6 @@ QString CUrlParamObject::getJSONKeyForProperty(const QString& propertyName) cons
 }
 
 
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CIdParam.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 QByteArray CIdParam::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -3938,17 +3875,6 @@ QString CIdParamObject::getJSONKeyForProperty(const QString& propertyName) const
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CTextParam.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
 
 
 QByteArray CTextParam::V1_0::GetVersionId()
@@ -4378,17 +4304,6 @@ QString CTextParamObject::getJSONKeyForProperty(const QString& propertyName) con
 }
 
 
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CEnableableParam.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 QByteArray CEnableableParam::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -4814,17 +4729,6 @@ QString CEnableableParamObject::getJSONKeyForProperty(const QString& propertyNam
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CIntegerParam.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
 
 
 QByteArray CIntegerParam::V1_0::GetVersionId()
@@ -5254,17 +5158,6 @@ QString CIntegerParamObject::getJSONKeyForProperty(const QString& propertyName) 
 }
 
 
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CDoubleParam.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 QByteArray CDoubleParam::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -5692,17 +5585,6 @@ QString CDoubleParamObject::getJSONKeyForProperty(const QString& propertyName) c
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file COption.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
 
 
 QByteArray COption::V1_0::GetVersionId()
@@ -6328,17 +6210,6 @@ QString COptionObject::getJSONKeyForProperty(const QString& propertyName) const
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file COptionsList.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
 
 
 QByteArray COptionsList::V1_0::GetVersionId()
@@ -7025,17 +6896,6 @@ QString COptionsListObject::getJSONKeyForProperty(const QString& propertyName) c
 }
 
 
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CSelectionParam.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 QByteArray CSelectionParam::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -7607,17 +7467,6 @@ QString CSelectionParamObject::getJSONKeyForProperty(const QString& propertyName
 }
 
 
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CSchedulerParam.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 QByteArray CSchedulerParam::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -8109,17 +7958,6 @@ QString CSchedulerParamObject::getJSONKeyForProperty(const QString& propertyName
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CBackupSettings.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
 
 
 QByteArray CBackupSettings::V1_0::GetVersionId()
@@ -8691,17 +8529,6 @@ QString CBackupSettingsObject::getJSONKeyForProperty(const QString& propertyName
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CDatabaseAccessSettings.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
 
 
 QByteArray CDatabaseAccessSettings::V1_0::GetVersionId()
@@ -9461,17 +9288,6 @@ QString CDatabaseAccessSettingsObject::getJSONKeyForProperty(const QString& prop
 }
 
 
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CFileNameParam.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 QByteArray CFileNameParam::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -9963,17 +9779,6 @@ QString CFileNameParamObject::getJSONKeyForProperty(const QString& propertyName)
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CParamsSet.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
 
 
 QByteArray CParamsSet::V1_0::GetVersionId()
@@ -10948,17 +10753,6 @@ QString CParamsSetObject::getJSONKeyForProperty(const QString& propertyName) con
 }
 
 
-} // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-
-/// \file CMimeType.cpp
-
-namespace sdl::imtbase::ImtBaseTypes
-{
-
-
 QByteArray CMimeType::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -11781,7 +11575,3 @@ QString CMimeTypeObject::getJSONKeyForProperty(const QString& propertyName) cons
 
 
 } // namespace sdl::imtbase::ImtBaseTypes
-
-
-
-

@@ -1,14 +1,6 @@
 #include "ComplexCollectionFilter.h"
 
 
-#include "ComplexCollectionFilter.h"
-
-
-#include "ComplexCollectionFilter.h"
-
-
-/// \file CTimeFilter.cpp
-
 namespace sdl::imtbase::ComplexCollectionFilter
 {
 
@@ -716,17 +708,6 @@ QString CTimeFilterObject::getJSONKeyForProperty(const QString& propertyName) co
 }
 
 
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-
-
-/// \file CFieldSortingInfo.cpp
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
-
-
 QByteArray CFieldSortingInfo::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -1242,17 +1223,6 @@ QString CFieldSortingInfoObject::getJSONKeyForProperty(const QString& propertyNa
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-
-
-/// \file CFieldFilter.cpp
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
 
 
 QByteArray CFieldFilter::V1_0::GetVersionId()
@@ -2327,17 +2297,6 @@ QString CFieldFilterObject::getJSONKeyForProperty(const QString& propertyName) c
 }
 
 
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-
-
-/// \file CGroupFilter.cpp
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
-
-
 QByteArray CGroupFilter::V1_0::GetVersionId()
 {
 	return QByteArrayLiteral("1.0");
@@ -3268,17 +3227,6 @@ QString CGroupFilterObject::getJSONKeyForProperty(const QString& propertyName) c
 
 	return propertyName;
 }
-
-
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-
-
-/// \file CComplexCollectionFilter.cpp
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
 
 
 QByteArray CComplexCollectionFilter::V1_0::GetVersionId()
@@ -4249,7 +4197,3 @@ QString CComplexCollectionFilterObject::getJSONKeyForProperty(const QString& pro
 
 
 } // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-
-

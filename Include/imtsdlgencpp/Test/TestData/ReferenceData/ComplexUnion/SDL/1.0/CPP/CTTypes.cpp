@@ -1,14 +1,6 @@
 #include "CTTypes.h"
 
 
-#include "CTTypes.h"
-
-
-#include "CTTypes.h"
-
-
-/// \file CPoint.cpp
-
 namespace sdl::complextest::CTTypes
 {
 
@@ -532,17 +524,6 @@ QString CPointObject::getJSONKeyForProperty(const QString& propertyName) const
 
 	return propertyName;
 }
-
-
-} // namespace sdl::complextest::CTTypes
-
-
-
-
-/// \file CGeometry.cpp
-
-namespace sdl::complextest::CTTypes
-{
 
 
 QByteArray CGeometry::V1_0::GetVersionId()
@@ -1818,7 +1799,3 @@ QString CGeometryObject::getJSONKeyForProperty(const QString& propertyName) cons
 
 
 } // namespace sdl::complextest::CTTypes
-
-
-
-

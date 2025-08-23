@@ -1,9 +1,27 @@
-/// \file StatusCode.h
-
 #pragma once
 
 
+#ifdef QT_QML_LIB
+#include <QtQml/QQmlEngine>
+#endif // QT_QML_LIB
+
+// Qt includes
+#include <QtCore/QObject>
+#include <QtCore/QJsonObject>
 #include <QtCore/QMetaEnum>
+#include <QtCore/QVariant>
+#include <QtCore/QJsonValue>
+#include <QtCore/QJsonArray>
+
+// ACF includes
+#include <istd/TSharedNullable.h>
+
+// ImtCore includes
+#include <imtbase/CItemModelBase.h>
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+#include <imtbase/TListModelBase.h>
+#include <imtgql/CGqlParamObject.h>
+#include <imtbase/CTreeItemModel.h>
 
 
 namespace sdl::complextest::CTTypes
@@ -11,6 +29,7 @@ namespace sdl::complextest::CTTypes
 
 
 Q_NAMESPACE
+
 enum class StatusCode {
 	NONE,
 	OK,
@@ -30,6 +49,7 @@ class EnumStatusCode: public QObject
 	Q_PROPERTY(QString WARNING READ GetWARNING NOTIFY WARNINGChanged)
 	Q_PROPERTY(QString NOK READ GetNOK NOTIFY NOKChanged)
 	Q_PROPERTY(QString FAILED READ GetFAILED NOTIFY FAILEDChanged)
+
 protected:
 	QString GetNONE() { return "NONE"; }
 	QString GetOK() { return "OK"; }
@@ -45,24 +65,6 @@ signals:
 };
 
 
-} // namespace sdl::complextest::CTTypes
-
-
-
-
-/// \file ErrorCode.h
-
-#pragma once
-
-
-#include <QtCore/QMetaEnum>
-
-
-namespace sdl::complextest::CTTypes
-{
-
-
-Q_NAMESPACE
 enum class ErrorCode {
 	OK,
 	TOO_WIDE,
@@ -172,6 +174,7 @@ class EnumErrorCode: public QObject
 	Q_PROPERTY(QString AREA_GLUE_FOUND READ GetAREA_GLUE_FOUND NOTIFY AREA_GLUE_FOUNDChanged)
 	Q_PROPERTY(QString AREA_GLUE_MOVED READ GetAREA_GLUE_MOVED NOTIFY AREA_GLUE_MOVEDChanged)
 	Q_PROPERTY(QString AREA_GAP_LENGTH READ GetAREA_GAP_LENGTH NOTIFY AREA_GAP_LENGTHChanged)
+
 protected:
 	QString GetOK() { return "OK"; }
 	QString GetTOO_WIDE() { return "TOO_WIDE"; }
@@ -277,24 +280,6 @@ signals:
 };
 
 
-} // namespace sdl::complextest::CTTypes
-
-
-
-
-/// \file MeasurementType.h
-
-#pragma once
-
-
-#include <QtCore/QMetaEnum>
-
-
-namespace sdl::complextest::CTTypes
-{
-
-
-Q_NAMESPACE
 enum class MeasurementType {
 	NONE,
 	WIDTH,
@@ -326,6 +311,7 @@ class EnumMeasurementType: public QObject
 	Q_PROPERTY(QString VOLUMERATE READ GetVOLUMERATE NOTIFY VOLUMERATEChanged)
 	Q_PROPERTY(QString LENGTH READ GetLENGTH NOTIFY LENGTHChanged)
 	Q_PROPERTY(QString OUT_OF_BOUND READ GetOUT_OF_BOUND NOTIFY OUT_OF_BOUNDChanged)
+
 protected:
 	QString GetNONE() { return "NONE"; }
 	QString GetWIDTH() { return "WIDTH"; }
@@ -353,24 +339,6 @@ signals:
 };
 
 
-} // namespace sdl::complextest::CTTypes
-
-
-
-
-/// \file MeasurementUnit.h
-
-#pragma once
-
-
-#include <QtCore/QMetaEnum>
-
-
-namespace sdl::complextest::CTTypes
-{
-
-
-Q_NAMESPACE
 enum class MeasurementUnit {
 	NONE,
 	mm,
@@ -390,6 +358,7 @@ class EnumMeasurementUnit: public QObject
 	Q_PROPERTY(QString mm3 READ GetMm3 NOTIFY Mm3Changed)
 	Q_PROPERTY(QString mm3_mm READ GetMm3_mm NOTIFY Mm3_mmChanged)
 	Q_PROPERTY(QString pixel READ GetPixel NOTIFY PixelChanged)
+
 protected:
 	QString GetNONE() { return "NONE"; }
 	QString GetMm() { return "mm"; }
@@ -405,24 +374,6 @@ signals:
 };
 
 
-} // namespace sdl::complextest::CTTypes
-
-
-
-
-/// \file GeometryType.h
-
-#pragma once
-
-
-#include <QtCore/QMetaEnum>
-
-
-namespace sdl::complextest::CTTypes
-{
-
-
-Q_NAMESPACE
 enum class GeometryType {
 	LINE,
 	POLYGON,
@@ -438,6 +389,7 @@ class EnumGeometryType: public QObject
 	Q_PROPERTY(QString LINE READ GetLINE NOTIFY LINEChanged)
 	Q_PROPERTY(QString POLYGON READ GetPOLYGON NOTIFY POLYGONChanged)
 	Q_PROPERTY(QString CIRCLE READ GetCIRCLE NOTIFY CIRCLEChanged)
+
 protected:
 	QString GetLINE() { return "LINE"; }
 	QString GetPOLYGON() { return "POLYGON"; }
@@ -448,36 +400,6 @@ signals:
 	void CIRCLEChanged();
 };
 
-
-} // namespace sdl::complextest::CTTypes
-
-
-
-
-/// \file CPoint.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTTypes
-{
 
 
 class CPoint
@@ -506,15 +428,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -759,49 +678,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTTypes
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CPoint::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CPoint);
-
-
-
-
-
-/// \file CGeometry.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::complextest::CTTypes
-{
-
-
 class CGeometry
 {
 public:
@@ -834,15 +710,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1120,32 +993,7 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::complextest::CTTypes
-
-
-Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CGeometry::V1_0);
-Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CGeometry);
-
-
-
-
-
-/// \file QmlRegister.h
-
-#pragma once
-
-
 #ifdef QT_QML_LIB
-#include <QtQml/QQmlEngine>
-
-
-namespace sdl::complextest::CTTypes
-{
-
-
 static void RegisterQmlTypes()
 {
 	qmlRegisterType<CPointObject>("complextestCTTypesSdl", 1, 0, "Point");
@@ -1186,9 +1034,12 @@ static void RegisterQmlTypes()
 		return enumType;
 	});
 }
-} // namespace sdl::complextest::CTTypes
 #endif
 
+} // namespace sdl::complextest::CTTypes
 
 
-
+Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CPoint::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CPoint);
+Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CGeometry::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::CTTypes::CGeometry);

@@ -1,9 +1,30 @@
-/// \file ValueType.h
-
 #pragma once
 
 
+#ifdef QT_QML_LIB
+#include <QtQml/QQmlEngine>
+#endif // QT_QML_LIB
+
+// Qt includes
+#include <QtCore/QObject>
+#include <QtCore/QJsonObject>
 #include <QtCore/QMetaEnum>
+#include <QtCore/QVariant>
+#include <QtCore/QJsonValue>
+#include <QtCore/QJsonArray>
+
+// ACF includes
+#include <istd/TSharedNullable.h>
+
+// ImtCore includes
+#include <imtbase/CItemModelBase.h>
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
+#include <imtbase/TListModelBase.h>
+#include <imtgql/CGqlParamObject.h>
+#include <imtbase/CTreeItemModel.h>
+
+// custom types includes
+#include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
 
 namespace sdl::imtbase::ComplexCollectionFilter
@@ -11,6 +32,7 @@ namespace sdl::imtbase::ComplexCollectionFilter
 
 
 Q_NAMESPACE
+
 enum class ValueType {
 	Integer,
 	Number,
@@ -28,6 +50,7 @@ class EnumValueType: public QObject
 	Q_PROPERTY(QString Number READ GetNumber NOTIFY NumberChanged)
 	Q_PROPERTY(QString String READ GetString NOTIFY StringChanged)
 	Q_PROPERTY(QString Bool READ GetBool NOTIFY BoolChanged)
+
 protected:
 	QString GetInteger() { return "Integer"; }
 	QString GetNumber() { return "Number"; }
@@ -41,24 +64,6 @@ signals:
 };
 
 
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-
-
-/// \file FilterOperation.h
-
-#pragma once
-
-
-#include <QtCore/QMetaEnum>
-
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
-
-
-Q_NAMESPACE
 enum class FilterOperation {
 	Not,
 	Equal,
@@ -78,6 +83,7 @@ class EnumFilterOperation: public QObject
 	Q_PROPERTY(QString Less READ GetLess NOTIFY LessChanged)
 	Q_PROPERTY(QString Greater READ GetGreater NOTIFY GreaterChanged)
 	Q_PROPERTY(QString Contains READ GetContains NOTIFY ContainsChanged)
+
 protected:
 	QString GetNot() { return "Not"; }
 	QString GetEqual() { return "Equal"; }
@@ -93,24 +99,6 @@ signals:
 };
 
 
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-
-
-/// \file LogicalOperation.h
-
-#pragma once
-
-
-#include <QtCore/QMetaEnum>
-
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
-
-
-Q_NAMESPACE
 enum class LogicalOperation {
 	And,
 	Or,
@@ -124,6 +112,7 @@ class EnumLogicalOperation: public QObject
 	Q_OBJECT
 	Q_PROPERTY(QString And READ GetAnd NOTIFY AndChanged)
 	Q_PROPERTY(QString Or READ GetOr NOTIFY OrChanged)
+
 protected:
 	QString GetAnd() { return "And"; }
 	QString GetOr() { return "Or"; }
@@ -132,43 +121,6 @@ signals:
 	void OrChanged();
 };
 
-
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-
-
-/// \file CTimeFilter.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-// custom types includes
-#include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
-
-
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
 
 
 class CTimeFilter
@@ -201,15 +153,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -473,49 +422,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CTimeFilter);
-
-
-
-
-
-/// \file CFieldSortingInfo.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
-
-
 class CFieldSortingInfo
 {
 public:
@@ -542,15 +448,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -795,51 +698,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo);
-
-
-
-
-
-/// \file CFieldFilter.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
-
-
 class CFieldFilter
 {
 public:
@@ -870,15 +728,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1139,49 +994,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldFilter);
-
-
-
-
-
-/// \file CGroupFilter.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
-
-
 class CGroupFilter
 {
 public:
@@ -1210,15 +1022,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1477,50 +1286,6 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CGroupFilter);
-
-
-
-
-
-/// \file CComplexCollectionFilter.h
-
-#pragma once
-
-
-// Qt includes
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonValue>
-#include <QtCore/QObject>
-#include <QtCore/QByteArray>
-#include <QtCore/QList>
-#include <QtCore/QVariant>
-#include <QtCore/QVariantMap>
-#include <QtCore/QSet>
-
-// ACF includes
-#include <istd/TSharedNullable.h>
-
-// ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/CGqlParamObject.h>
-#include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
-
-
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
-
-
 class CComplexCollectionFilter
 {
 public:
@@ -1551,15 +1316,12 @@ public:
 
 		[[nodiscard]] bool operator==(const V1_0& other) const;
 		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
-
 		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
 		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
 		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
-
 		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
 		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
 		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
-
 		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
 		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
 		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
@@ -1829,32 +1591,7 @@ public:
 	signals:
 	void countChanged();
 };
-
-
-
-} // namespace sdl::imtbase::ComplexCollectionFilter
-
-
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0);
-Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter);
-
-
-
-
-
-/// \file QmlRegister.h
-
-#pragma once
-
-
 #ifdef QT_QML_LIB
-#include <QtQml/QQmlEngine>
-
-
-namespace sdl::imtbase::ComplexCollectionFilter
-{
-
-
 static void RegisterQmlTypes()
 {
 	qmlRegisterType<CTimeFilterObject>("imtbaseComplexCollectionFilterSdl", 1, 0, "TimeFilter");
@@ -1884,9 +1621,18 @@ static void RegisterQmlTypes()
 		return enumType;
 	});
 }
-} // namespace sdl::imtbase::ComplexCollectionFilter
 #endif
 
+} // namespace sdl::imtbase::ComplexCollectionFilter
 
 
-
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CTimeFilter);
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo);
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CFieldFilter);
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CGroupFilter);
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0);
+Q_DECLARE_METATYPE(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter);
