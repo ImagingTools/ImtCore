@@ -8,3 +8,4 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 SDL_SCHEMES_LIST = $$PWD/../1.0/Application.sdl
 
 include($(IMTCOREDIR)/Config/QMake/SdlConfiguration.pri)
+
