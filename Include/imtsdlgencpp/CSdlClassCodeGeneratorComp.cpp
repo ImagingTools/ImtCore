@@ -69,9 +69,9 @@ bool CSdlClassCodeGeneratorComp::ProcessEntry (
 
 // reimplemented (IIncludeDirectivesProvider)
 
-QSet<imtsdl::IncludeDirective> CSdlClassCodeGeneratorComp::GetIncludeDirectives() const
+QList<imtsdl::IncludeDirective> CSdlClassCodeGeneratorComp::GetIncludeDirectives() const
 {
-	QSet<imtsdl::IncludeDirective> retVal;
+	QList<imtsdl::IncludeDirective> retVal;
 
 	if (m_includeDirectivesProviderListCompPtr.IsValid()){
 		const int providersCount = m_includeDirectivesProviderListCompPtr.GetCount();

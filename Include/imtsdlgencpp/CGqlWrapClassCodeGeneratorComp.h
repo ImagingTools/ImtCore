@@ -53,7 +53,7 @@ public:
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 	// reimplemented (IIncludeDirectivesProvider)
-	virtual QSet<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
+	virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
 private:
 	bool ProcessHeaderClassFile(const imtsdl::CSdlRequest& sdlRequest, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const;

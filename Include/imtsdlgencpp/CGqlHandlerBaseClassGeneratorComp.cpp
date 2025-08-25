@@ -52,11 +52,9 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessEntry(
 
 // reimplemented (IIncludeDirectivesProvider)
 
-QSet<imtsdl::IncludeDirective> CGqlHandlerBaseClassGeneratorComp::GetIncludeDirectives() const
+QList<imtsdl::IncludeDirective> CGqlHandlerBaseClassGeneratorComp::GetIncludeDirectives() const
 {
-	static QSet<imtsdl::IncludeDirective> retVal = {
-
-	};
+	static QList<imtsdl::IncludeDirective> retVal = {};
 
 	return retVal;
 }

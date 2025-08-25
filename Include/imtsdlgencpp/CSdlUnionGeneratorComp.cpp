@@ -261,11 +261,9 @@ bool CSdlUnionGeneratorComp::ProcessEntry(
 
 // reimplemented (IIncludeDirectivesProvider)
 
-QSet<imtsdl::IncludeDirective> CSdlUnionGeneratorComp::GetIncludeDirectives() const
+QList<imtsdl::IncludeDirective> CSdlUnionGeneratorComp::GetIncludeDirectives() const
 {
-	static QSet<imtsdl::IncludeDirective> retVal = {
-		CreateImtDirective("<imtbase/CItemModelBase.h>")
-	};
+	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective("<imtbase/CItemModelBase.h>")};
 
 	return retVal;
 }

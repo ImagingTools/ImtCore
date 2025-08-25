@@ -92,18 +92,18 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessEntry (
 
 // reimplemented (ICxxFileProcessor)
 
-QSet<imtsdl::IncludeDirective> CGqlCollectionControllerBaseClassGeneratorComp::GetIncludeDirectives() const
+QList<imtsdl::IncludeDirective> CGqlCollectionControllerBaseClassGeneratorComp::GetIncludeDirectives() const
 {
 	if (!m_sdlRequestListCompPtr.IsValid()){
-		return QSet<imtsdl::IncludeDirective>();
+		return QList<imtsdl::IncludeDirective>();
 	}
 
 	imtsdl::SdlDocumentTypeList list = m_sdlDocumentListCompPtr->GetDocumentTypes(true);
 	if (list.isEmpty()){
-		return QSet<imtsdl::IncludeDirective>();
+		return QList<imtsdl::IncludeDirective>();
 	}
 
-	static QSet<imtsdl::IncludeDirective> retVal = {
+	static QList<imtsdl::IncludeDirective> retVal = {
 		CreateImtDirective("<imtservergql/CObjectCollectionControllerCompBase.h>")
 	};
 

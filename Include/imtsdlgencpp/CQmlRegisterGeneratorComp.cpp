@@ -114,16 +114,16 @@ bool CQmlRegisterGeneratorComp::ProcessEntry (
 	return true;
 }
 
+
 // reimplemented (ICxxFileProcessor)
 
-QSet<imtsdl::IncludeDirective> CQmlRegisterGeneratorComp::GetIncludeDirectives() const
+QList<imtsdl::IncludeDirective> CQmlRegisterGeneratorComp::GetIncludeDirectives() const
 {
-	static QSet<imtsdl::IncludeDirective> retVal = {
+	static QList<imtsdl::IncludeDirective> retVal = {};
 
-	};
-
-return retVal;
+	return retVal;
 }
+
 
 } // namespace imtsdlgencpp
 

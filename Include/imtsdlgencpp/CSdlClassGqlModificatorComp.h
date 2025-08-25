@@ -25,7 +25,7 @@ public:
 
 public:
 	// reimplemented (IIncludeDirectivesProvider)
-	[[nodiscard]] virtual QSet<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
+	[[nodiscard]] virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
 	// reimplemented (ICxxModifier)
 	[[nodiscard]] virtual QString GetReadMethodName() const override;

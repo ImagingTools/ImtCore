@@ -73,7 +73,7 @@ void WriteDeclareMetaType(const QList<T>& entryList, QTextStream& stream)
 
 
 template <class T>
-bool CreateDirectivesFromEntryList(const QList<T>& entryList, QSet<imtsdl::IncludeDirective>& output)
+bool CreateDirectivesFromEntryList(const QList<T>& entryList, QList<imtsdl::IncludeDirective>& output)
 {
 	for (const T& entry: entryList){
 		if (entry.IsExternal()){
@@ -84,7 +84,11 @@ bool CreateDirectivesFromEntryList(const QList<T>& entryList, QSet<imtsdl::Inclu
 
 				return false;
 			}
-			output << imtsdl::CSdlTools::CreateCustomDirective(typeIncludePath);
+
+			imtsdl::IncludeDirective directive = imtsdl::CSdlTools::CreateCustomDirective(typeIncludePath);
+			if (!output.contains(directive)){
+				output << directive;
+			}
 		}
 	}
 
@@ -92,9 +96,9 @@ bool CreateDirectivesFromEntryList(const QList<T>& entryList, QSet<imtsdl::Inclu
 }
 
 
-void CreateBaseDirectives(QSet<imtsdl::IncludeDirective>& output)
+void CreateBaseDirectives(QList<imtsdl::IncludeDirective>& output)
 {
-	static QSet<imtsdl::IncludeDirective> baseDirectives = {
+	static QList<imtsdl::IncludeDirective> baseDirectives = {
 		imtsdl::CSdlTools::CreateQtDirective("<QtCore/QObject>"),
 		imtsdl::CSdlTools::CreateQtDirective("<QtCore/QVariant>"),
 		imtsdl::CSdlTools::CreateAcfDirective("<istd/TSharedNullable.h>"),
@@ -133,7 +137,9 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		PrintFiles(std::cout, cumulatedFiles, m_argumentParserCompPtr->GetGeneratorType());
 		PrintFiles(m_argumentParserCompPtr->GetDepFilePath(), cumulatedFiles, *m_dependentSchemaListCompPtr);
 
-		return TS_OK;
+		if (m_argumentParserCompPtr->IsDependenciesMode()){
+			return TS_OK;
+		}
 	}
 
 	const EntryFileMap headerFiles = CreateHeaderFiles(paramsPtr);
@@ -294,7 +300,7 @@ bool CCxxProcessorsManagerComp::BeginHeaderFile(
 		imtsdl::P_CUSTOM
 	};
 
-	QSet<imtsdl::IncludeDirective> includeDirectivesList;
+	QList<imtsdl::IncludeDirective> includeDirectivesList;
 	CreateBaseDirectives(includeDirectivesList);
 
 	// include all required files
@@ -327,8 +333,7 @@ bool CCxxProcessorsManagerComp::BeginHeaderFile(
 		CreateDirectivesFromEntryList(list, includeDirectivesList);
 	}
 
-
-	QMutableSetIterator includeIter(includeDirectivesList);
+	QMutableListIterator includeIter(includeDirectivesList);
 	while(!orderList.isEmpty()){
 		imtsdl::Priority currentPriority = orderList.takeFirst();
 		bool addRemark = true;
@@ -423,6 +428,7 @@ bool CCxxProcessorsManagerComp::EndHeaderFile(
 		imtsdl::SdlTypeList list = m_sdlTypeListCompPtr->GetSdlTypes(true);
 		WriteDeclareMetaType(list, stream);
 	}
+	FeedStream(stream, 1, false);
 
 	return true;
 }

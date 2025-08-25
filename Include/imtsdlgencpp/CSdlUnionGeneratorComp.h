@@ -55,7 +55,7 @@ public:
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 	// reimplemented (IIncludeDirectivesProvider)
-	virtual QSet<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
+	virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
 private:
 	I_REF(imtsdl::ISdlProcessArgumentsParser, m_argumentParserCompPtr);

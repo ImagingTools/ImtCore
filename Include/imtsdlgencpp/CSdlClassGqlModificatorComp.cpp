@@ -92,9 +92,9 @@ void WriteTypeMultiConditionCheck(
 
 // reimplemented (IIncludeDirectivesProvider)
 
-QSet<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirectives() const
+QList<imtsdl::IncludeDirective> CSdlClassGqlModificatorComp::GetIncludeDirectives() const
 {
-	static QSet<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtgql/CGqlParamObject.h>"))};
+	static QList<imtsdl::IncludeDirective> retVal = {CreateImtDirective(QStringLiteral("<imtgql/CGqlParamObject.h>"))};
 
 	return retVal;
 }

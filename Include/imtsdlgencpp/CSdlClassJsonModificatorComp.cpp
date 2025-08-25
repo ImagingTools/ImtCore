@@ -17,9 +17,9 @@ namespace imtsdlgencpp
 
 // reimplemented (IIncludeDirectivesProvider)
 
-QSet<imtsdl::IncludeDirective> CSdlClassJsonModificatorComp::GetIncludeDirectives() const
+QList<imtsdl::IncludeDirective> CSdlClassJsonModificatorComp::GetIncludeDirectives() const
 {
-	static QSet<imtsdl::IncludeDirective> retVal = {
+	static QList<imtsdl::IncludeDirective> retVal = {
 		CreateQtDirective(QStringLiteral("<QtCore/QJsonObject>")),
 		CreateQtDirective(QStringLiteral("<QtCore/QJsonArray>")),
 		CreateQtDirective(QStringLiteral("<QtCore/QJsonValue>"))

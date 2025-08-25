@@ -51,9 +51,9 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessEntry (
 
 // reimplemented (ICxxFileProcessor)
 
-QSet<imtsdl::IncludeDirective> CGqlWrapClassCodeGeneratorComp::GetIncludeDirectives() const
+QList<imtsdl::IncludeDirective> CGqlWrapClassCodeGeneratorComp::GetIncludeDirectives() const
 {
-	static QSet<imtsdl::IncludeDirective> retVal = {
+	static QList<imtsdl::IncludeDirective> retVal = {
 		CreateImtDirective("<imtservergql/CPermissibleGqlRequestHandlerComp.h>")
 	};
 

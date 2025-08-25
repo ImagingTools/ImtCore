@@ -112,11 +112,9 @@ bool CSdlEnumGeneratorComp::ProcessEntry(
 
 // reimplemented (IIncludeDirectivesProvider)
 
-QSet<imtsdl::IncludeDirective> CSdlEnumGeneratorComp::GetIncludeDirectives() const
+QList<imtsdl::IncludeDirective> CSdlEnumGeneratorComp::GetIncludeDirectives() const
 {
-	static QSet<imtsdl::IncludeDirective> retVal = {
-
-	};
+	static QList<imtsdl::IncludeDirective> retVal = {};
 
 	return retVal;
 }
