@@ -114,14 +114,10 @@ Item {
 	}
 
 	function selectItem(id, name){
-		console.log("MEGATEST2")
 		let editorPath = gridCollectionViewBase.commands.objectViewEditorPath;
-		// let editorPath = "qrc:/Chronos/DeviceElementCollectionView.qml"
 		let commandsId = gridCollectionViewBase.commands.objectViewEditorCommandsId;
-		console.log("CollectionView selectItem", id, name, commandsId, editorPath);
 
 		if (gridCollectionViewContainer.isUsedDocumentManager){
-			// documentManagerPtr.addDocument({"id": id, "name": name, "Source": editorPath, "CommandId": commandsId});
 			documentManagerPtr.insertNewDocument(commandsId);
 		}
 		else{
