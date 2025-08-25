@@ -7,21 +7,21 @@
 
 // Qt includes
 #include <QtCore/QObject>
-#include <QtCore/QJsonObject>
-#include <QtCore/QMetaEnum>
 #include <QtCore/QVariant>
-#include <QtCore/QJsonValue>
+#include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
+#include <QtCore/QJsonValue>
+#include <QtCore/QMetaEnum>
 
 // ACF includes
 #include <istd/TSharedNullable.h>
 
 // ImtCore includes
 #include <imtbase/CItemModelBase.h>
-#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
-#include <imtbase/TListModelBase.h>
-#include <imtgql/CGqlParamObject.h>
 #include <imtbase/CTreeItemModel.h>
+#include <imtgql/CGqlParamObject.h>
+#include <imtbase/TListModelBase.h>
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 // custom types includes
 #include <complextestsdl/SDL/1.0/CPP/CTTypes.h>

@@ -6,10 +6,10 @@
 #endif // QT_QML_LIB
 
 // Qt includes
-#include <QtCore/QJsonArray>
 #include <QtCore/QObject>
-#include <QtCore/QJsonObject>
 #include <QtCore/QVariant>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonValue>
 #include <QtCore/QMetaEnum>
 
@@ -17,11 +17,11 @@
 #include <istd/TSharedNullable.h>
 
 // ImtCore includes
-#include <imtgql/CGqlParamObject.h>
-#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 #include <imtbase/CItemModelBase.h>
-#include <imtbase/TListModelBase.h>
 #include <imtbase/CTreeItemModel.h>
+#include <imtgql/CGqlParamObject.h>
+#include <imtbase/TListModelBase.h>
+#include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 
 namespace sdl::imtbase::ImtBaseTypes
