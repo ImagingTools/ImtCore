@@ -5,7 +5,7 @@
 #include <QtCore/QByteArray>
 
 
-namespace imtpay
+namespace imtpaysdl
 {
 
 
@@ -64,4 +64,4 @@ struct ReceiptItemKeys
 };
 
 
-} // namespace imtpay
+} // namespace imtpaysdl
