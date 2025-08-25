@@ -509,7 +509,7 @@ QString CPointObject::toGraphQL() const
 
 QObject* CPointObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -1763,7 +1763,7 @@ QString CGeometryObject::toGraphQL() const
 
 QObject* CGeometryObject::CreateObject(const QString& key)
 {
-	if (key == "Points"){
+	Q_UNUSED(key);	if (key == "Points"){
 		return new sdl::complextest::CTTypes::CPointObjectList(this);
 	}
 	if (key == "RequiredPoints"){

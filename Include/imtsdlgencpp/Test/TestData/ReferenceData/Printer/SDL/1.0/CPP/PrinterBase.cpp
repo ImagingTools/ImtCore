@@ -418,7 +418,7 @@ QString CPrinterSpecificationBaseObject::toGraphQL() const
 
 QObject* CPrinterSpecificationBaseObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -857,7 +857,7 @@ QString CLinkObject::toGraphQL() const
 
 QObject* CLinkObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -1912,7 +1912,7 @@ QString CPrinterBaseObject::toGraphQL() const
 
 QObject* CPrinterBaseObject::CreateObject(const QString& key)
 {
-	if (key == "specification"){
+	Q_UNUSED(key);	if (key == "specification"){
 		return new sdl::modsdl::PrinterBase::CPrinterSpecificationObject(this);
 	}
 	if (key == "simpleTest"){
@@ -2479,7 +2479,7 @@ QString CPrinterListObject::toGraphQL() const
 
 QObject* CPrinterListObject::CreateObject(const QString& key)
 {
-	if (key == "data"){
+	Q_UNUSED(key);	if (key == "data"){
 		return new sdl::modsdl::PrinterBase::CPrinterBaseObjectList(this);
 	}
 	return nullptr;

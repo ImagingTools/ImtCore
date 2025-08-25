@@ -3490,7 +3490,7 @@ QString CResultObject::toGraphQL() const
 
 QObject* CResultObject::CreateObject(const QString& key)
 {
-	if (key == "Geometry"){
+	Q_UNUSED(key);	if (key == "Geometry"){
 		return new sdl::complextest::CTTypes::CGeometryObject(this);
 	}
 	return nullptr;
@@ -6062,7 +6062,7 @@ QString CAreaObject::toGraphQL() const
 
 QObject* CAreaObject::CreateObject(const QString& key)
 {
-	if (key == "IconPosition"){
+	Q_UNUSED(key);	if (key == "IconPosition"){
 		return new sdl::complextest::CTTypes::CPointObject(this);
 	}
 	if (key == "Results"){
@@ -6971,7 +6971,7 @@ QString CAnalyzerObject::toGraphQL() const
 
 QObject* CAnalyzerObject::CreateObject(const QString& key)
 {
-	if (key == "Areas"){
+	Q_UNUSED(key);	if (key == "Areas"){
 		return new sdl::complextest::CTImpl::CAreaObjectList(this);
 	}
 	return nullptr;
@@ -8021,7 +8021,7 @@ QString CInspectionObject::toGraphQL() const
 
 QObject* CInspectionObject::CreateObject(const QString& key)
 {
-	if (key == "Analyzers"){
+	Q_UNUSED(key);	if (key == "Analyzers"){
 		return new sdl::complextest::CTImpl::CAnalyzerObjectList(this);
 	}
 	return nullptr;
@@ -9227,7 +9227,7 @@ QString CProductOverviewObject::toGraphQL() const
 
 QObject* CProductOverviewObject::CreateObject(const QString& key)
 {
-	if (key == "Inspections"){
+	Q_UNUSED(key);	if (key == "Inspections"){
 		return new sdl::complextest::CTImpl::CInspectionObjectList(this);
 	}
 	return nullptr;
@@ -9762,7 +9762,7 @@ QString CLocalizedTextObject::toGraphQL() const
 
 QObject* CLocalizedTextObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -10360,7 +10360,7 @@ QString CCoordinatesObject::toGraphQL() const
 
 QObject* CCoordinatesObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -11063,7 +11063,7 @@ QString CExtendedMetaDataObject::toGraphQL() const
 
 QObject* CExtendedMetaDataObject::CreateObject(const QString& key)
 {
-	if (key == "value"){
+	Q_UNUSED(key);	if (key == "value"){
 		return new sdl::complextest::CTImpl::CExtendedMetaDataUnionTypeObject(this);
 	}
 	return nullptr;
@@ -12146,7 +12146,7 @@ QString CResultMetaDataObject::toGraphQL() const
 
 QObject* CResultMetaDataObject::CreateObject(const QString& key)
 {
-	if (key == "description"){
+	Q_UNUSED(key);	if (key == "description"){
 		return new sdl::complextest::CTImpl::CLocalizedTextObject(this);
 	}
 	if (key == "extendedMetaData"){
@@ -12882,7 +12882,7 @@ QString COverallResultValuesObject::toGraphQL() const
 
 QObject* COverallResultValuesObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -13943,7 +13943,7 @@ QString CUnionTestingTypeObject::toGraphQL() const
 
 QObject* CUnionTestingTypeObject::CreateObject(const QString& key)
 {
-	if (key == "simpleUnion"){
+	Q_UNUSED(key);	if (key == "simpleUnion"){
 		return new sdl::complextest::CTImpl::CExtendedMetaDataUnionSimpleTypeObject(this);
 	}
 	if (key == "complexUnion"){
@@ -15098,7 +15098,7 @@ QString CCDMResultVarRecursiveObject::toGraphQL() const
 
 QObject* CCDMResultVarRecursiveObject::CreateObject(const QString& key)
 {
-	if (key == "resultMetaData"){
+	Q_UNUSED(key);	if (key == "resultMetaData"){
 		return new sdl::complextest::CTImpl::CResultMetaDataObject(this);
 	}
 	if (key == "resultContent"){
@@ -16072,7 +16072,7 @@ QString CCDMResultVarStringObject::toGraphQL() const
 
 QObject* CCDMResultVarStringObject::CreateObject(const QString& key)
 {
-	if (key == "resultMetaData"){
+	Q_UNUSED(key);	if (key == "resultMetaData"){
 		return new sdl::complextest::CTImpl::CResultMetaDataObject(this);
 	}
 	if (key == "overallResultValues"){
@@ -17230,7 +17230,7 @@ QString CCDMResultObject::toGraphQL() const
 
 QObject* CCDMResultObject::CreateObject(const QString& key)
 {
-	if (key == "resultMetaData"){
+	Q_UNUSED(key);	if (key == "resultMetaData"){
 		return new sdl::complextest::CTImpl::CResultMetaDataObject(this);
 	}
 	if (key == "resultContent"){
@@ -17678,7 +17678,7 @@ QString CPointsInCoordinateFormatObject::toGraphQL() const
 
 QObject* CPointsInCoordinateFormatObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 

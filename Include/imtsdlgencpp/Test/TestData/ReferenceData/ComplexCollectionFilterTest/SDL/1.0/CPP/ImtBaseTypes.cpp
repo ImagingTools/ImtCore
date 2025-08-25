@@ -481,7 +481,7 @@ QString CTimeRangeObject::toGraphQL() const
 
 QObject* CTimeRangeObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -1002,7 +1002,7 @@ QString CSdlSizeObject::toGraphQL() const
 
 QObject* CSdlSizeObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -1523,7 +1523,7 @@ QString CSdlPointObject::toGraphQL() const
 
 QObject* CSdlPointObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -2772,7 +2772,7 @@ QString CParamTypeIdsObject::toGraphQL() const
 
 QObject* CParamTypeIdsObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -3427,7 +3427,7 @@ QString CUrlParamObject::toGraphQL() const
 
 QObject* CUrlParamObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -3863,7 +3863,7 @@ QString CIdParamObject::toGraphQL() const
 
 QObject* CIdParamObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -4290,7 +4290,7 @@ QString CTextParamObject::toGraphQL() const
 
 QObject* CTextParamObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -4717,7 +4717,7 @@ QString CEnableableParamObject::toGraphQL() const
 
 QObject* CEnableableParamObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -5144,7 +5144,7 @@ QString CIntegerParamObject::toGraphQL() const
 
 QObject* CIntegerParamObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -5573,7 +5573,7 @@ QString CDoubleParamObject::toGraphQL() const
 
 QObject* CDoubleParamObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -6189,7 +6189,7 @@ QString COptionObject::toGraphQL() const
 
 QObject* COptionObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -6873,7 +6873,7 @@ QString COptionsListObject::toGraphQL() const
 
 QObject* COptionsListObject::CreateObject(const QString& key)
 {
-	if (key == "options"){
+	Q_UNUSED(key);	if (key == "options"){
 		return new sdl::imtbase::ImtBaseTypes::COptionObjectList(this);
 	}
 	return nullptr;
@@ -7447,7 +7447,7 @@ QString CSelectionParamObject::toGraphQL() const
 
 QObject* CSelectionParamObject::CreateObject(const QString& key)
 {
-	if (key == "constraints"){
+	Q_UNUSED(key);	if (key == "constraints"){
 		return new sdl::imtbase::ImtBaseTypes::COptionsListObject(this);
 	}
 	return nullptr;
@@ -7943,7 +7943,7 @@ QString CSchedulerParamObject::toGraphQL() const
 
 QObject* CSchedulerParamObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -8511,7 +8511,7 @@ QString CBackupSettingsObject::toGraphQL() const
 
 QObject* CBackupSettingsObject::CreateObject(const QString& key)
 {
-	if (key == "schedulerParam"){
+	Q_UNUSED(key);	if (key == "schedulerParam"){
 		return new sdl::imtbase::ImtBaseTypes::CSchedulerParamObject(this);
 	}
 	return nullptr;
@@ -9259,7 +9259,7 @@ QString CDatabaseAccessSettingsObject::toGraphQL() const
 
 QObject* CDatabaseAccessSettingsObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -9764,7 +9764,7 @@ QString CFileNameParamObject::toGraphQL() const
 
 QObject* CFileNameParamObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -10727,7 +10727,7 @@ QString CParamsSetObject::toGraphQL() const
 
 QObject* CParamsSetObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -11548,7 +11548,7 @@ QString CMimeTypeObject::toGraphQL() const
 
 QObject* CMimeTypeObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 

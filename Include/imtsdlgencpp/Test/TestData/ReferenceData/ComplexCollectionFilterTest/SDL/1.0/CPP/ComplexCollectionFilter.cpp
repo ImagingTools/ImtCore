@@ -682,7 +682,7 @@ QString CTimeFilterObject::toGraphQL() const
 
 QObject* CTimeFilterObject::CreateObject(const QString& key)
 {
-	if (key == "timeRange"){
+	Q_UNUSED(key);	if (key == "timeRange"){
 		return new sdl::imtbase::ImtBaseTypes::CTimeRangeObject(this);
 	}
 	return nullptr;
@@ -1208,7 +1208,7 @@ QString CFieldSortingInfoObject::toGraphQL() const
 
 QObject* CFieldSortingInfoObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -2274,7 +2274,7 @@ QString CFieldFilterObject::toGraphQL() const
 
 QObject* CFieldFilterObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -3203,7 +3203,7 @@ QString CGroupFilterObject::toGraphQL() const
 
 QObject* CGroupFilterObject::CreateObject(const QString& key)
 {
-	if (key == "fieldFilters"){
+	Q_UNUSED(key);	if (key == "fieldFilters"){
 		return new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList(this);
 	}
 	if (key == "groupFilters"){
@@ -4164,7 +4164,7 @@ QString CComplexCollectionFilterObject::toGraphQL() const
 
 QObject* CComplexCollectionFilterObject::CreateObject(const QString& key)
 {
-	if (key == "sortingInfo"){
+	Q_UNUSED(key);	if (key == "sortingInfo"){
 		return new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList(this);
 	}
 	if (key == "fieldsFilter"){

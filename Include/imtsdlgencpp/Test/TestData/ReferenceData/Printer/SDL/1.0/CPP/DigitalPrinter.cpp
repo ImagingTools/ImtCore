@@ -667,7 +667,7 @@ QString CDigitalPrinterSpecificationObject::toGraphQL() const
 
 QObject* CDigitalPrinterSpecificationObject::CreateObject(const QString& key)
 {
-	if (key == "base"){
+	Q_UNUSED(key);	if (key == "base"){
 		return new sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject(this);
 	}
 	return nullptr;
@@ -1349,7 +1349,7 @@ QString CDigitalPrinterObject::toGraphQL() const
 
 QObject* CDigitalPrinterObject::CreateObject(const QString& key)
 {
-	if (key == "base"){
+	Q_UNUSED(key);	if (key == "base"){
 		return new sdl::modsdl::PrinterBase::CPrinterBaseObject(this);
 	}
 	return nullptr;

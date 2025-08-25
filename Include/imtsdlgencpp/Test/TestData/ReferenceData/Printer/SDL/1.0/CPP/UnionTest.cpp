@@ -509,7 +509,7 @@ QString CCoordsObject::toGraphQL() const
 
 QObject* CCoordsObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -939,7 +939,7 @@ QString CPrinterSpecificationBaseObject::toGraphQL() const
 
 QObject* CPrinterSpecificationBaseObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -1378,7 +1378,7 @@ QString CLinkObject::toGraphQL() const
 
 QObject* CLinkObject::CreateObject(const QString& key)
 {
-	return nullptr;
+	Q_UNUSED(key);	return nullptr;
 }
 
 
@@ -2044,7 +2044,7 @@ QString CPrinterBaseObject::toGraphQL() const
 
 QObject* CPrinterBaseObject::CreateObject(const QString& key)
 {
-	if (key == "specification"){
+	Q_UNUSED(key);	if (key == "specification"){
 		return new sdl::modsdl::UnionTest::CPrinterSpecificationObject(this);
 	}
 	return nullptr;
