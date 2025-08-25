@@ -1,0 +1,125 @@
+#! this is a configuration file for SDL-based projects
+#! \USAGE:
+#!	Declare a vatiable with schemas SDL_SCHEMES_LIST ##< it is a list of schemas to process
+#!	Include this file include($$PWD/../../../Config/QMake/SdlConfiguration.pri)
+
+
+################################# General #################################
+win32{
+	QMAKE_RCC = rcc.exe
+	COPY_FILE = copy
+	SDL_GENERATOR_BIN = SdlCodeGenerator.exe
+}
+else{
+	QMAKE_RCC = rcc
+	COPY_FILE = cp
+	SDL_GENERATOR_BIN = SdlCodeGenerator
+}
+macx*{
+	SDL_GENERATOR_BIN = SdlCodeGenerator.app/Contents/MacOS/SdlCodeGenerator
+}
+
+isEmpty(SDL_GENERATOR_COMMAND_PARAM_MODIFICATORS) {
+	SDL_GENERATOR_COMMAND_PARAM_MODIFICATORS = "--use-all-modificators"
+}
+
+SDL_GENERATOR_BIN = $$PWD/../../Bin/TOOLS_Qt$${QT_MAJOR_VERSION}_$$COMPILER_CODE/$$SDL_GENERATOR_BIN
+
+SDL_GENERATOR_OUT_SUBFOLDER = $$OUT_PWD/../../../AuxInclude/Qt$${QT_MAJOR_VERSION}_$$COMPILER_CODE/GeneratedFiles
+
+SDL_GENERATOR_CONFIG_PATH = $$PWD/../SDL/CommonCXX.cfg
+SDL_GENERATOR_QML_CONFIG_PATH = $$PWD/../SDL/CommonQML.cfg
+
+# Paths-fix for windows
+win32{
+	SDL_SCHEMES_LIST ~= s,/,\\,g
+	SDL_GENERATOR_OUTPUT_DIR ~= s,/,\\,g
+	SDL_GENERATOR_OUT_SUBFOLDER ~= s,/,\\,g
+	SDL_GENERATED_FILES ~= s,/,\\,g
+	SDL_GENERATOR_CONFIG_PATH ~= s,/,\\,g
+	SDL_GENERATOR_QML_CONFIG_PATH ~= s,/,\\,g
+}
+
+################################# CXX #################################
+
+SDL_CXX_GENERATOR_COMMAND_BASE = $$SDL_GENERATOR_BIN $$SDL_GENERATOR_COMMAND_PARAM_MODIFICATORS --generator=QMake -O=$${SDL_GENERATOR_OUT_SUBFOLDER}
+win32{
+	SDL_CXX_GENERATOR_COMMAND_BASE ~= s,/,\\,g
+}
+
+SDL_C_COMPILER.name = SDL_Compiler_CPP-$${TARGET}
+SDL_C_COMPILER.commands = $${SDL_CXX_GENERATOR_COMMAND_BASE} -GS ${QMAKE_FILE_IN} --config=$${SDL_GENERATOR_CONFIG_PATH}
+SDL_C_COMPILER.input = SDL_SCHEMES_LIST
+SDL_C_COMPILER.output = $${SDL_GENERATOR_OUT_SUBFOLDER}/$${TARGET}/SDL/1.0/CPP/${QMAKE_FILE_BASE}.cpp
+SDL_C_COMPILER.dependency_type = TYPE_C
+SDL_C_COMPILER.variable_out = SOURCES
+SDL_C_COMPILER.CONFIG = target_predeps
+SDL_C_COMPILER.depends = ${QMAKE_FILE_IN} $${SDL_GENERATOR_BIN}
+QMAKE_EXTRA_COMPILERS += SDL_C_COMPILER
+
+# h-dummy compiller this is a dummy compiler for MOC bypass, it doing nothing, only creates missing file
+SDL_H_COMPILER.name = SDL_Compiler_D-Header-$${TARGET}
+SDL_H_COMPILER.input = SDL_SCHEMES_LIST
+SDL_H_COMPILER.output =  $${SDL_GENERATOR_OUT_SUBFOLDER}/$${TARGET}/SDL/1.0/CPP/${QMAKE_FILE_BASE}.h
+SDL_H_COMPILER.dependency_type = TYPE_C
+SDL_H_COMPILER.variable_out = HEADERS
+SDL_H_COMPILER.CONFIG = target_predeps
+SDL_H_COMPILER.depends = ${QMAKE_FILE_IN} $${SDL_GENERATOR_BIN} $${SDL_GENERATOR_OUT_SUBFOLDER}/$${TARGET}/SDL/1.0/CPP/${QMAKE_FILE_BASE}.cpp
+win*{
+	SDL_H_COMPILER.commands = powershell -Command "New-Item -ItemType File -Path '$${SDL_GENERATOR_OUT_SUBFOLDER}/$${TARGET}/SDL/1.0/CPP/${QMAKE_FILE_BASE}.h' -erroraction 'silentlycontinue'"
+}
+else {
+	SDL_H_COMPILER.commands = touch $${SDL_GENERATOR_OUT_SUBFOLDER}/$${TARGET}/SDL/1.0/CPP/${QMAKE_FILE_BASE}.h
+}
+QMAKE_EXTRA_COMPILERS += SDL_H_COMPILER
+
+
+################################# QML #################################
+# RCC_EXECUTABLE_PATH = $$[QT_HOST_LIBEXECS]/$$QMAKE_RCC
+# SDL_QML_GENERATOR_COMMAND_BASE = $$SDL_GENERATOR_BIN $$SDL_GENERATOR_COMMAND_PARAM_MODIFICATORS --generator=QMake -O=$${SDL_GENERATOR_OUT_SUBFOLDER} --config=$${SDL_GENERATOR_QML_CONFIG_PATH}
+# DIR_SEPARATOR = /
+
+# win32 {
+# 	RCC_EXECUTABLE_PATH = $$[QT_INSTALL_BINS]/$$QMAKE_RCC
+# 	RCC_EXECUTABLE_PATH ~= s,/,\\,g
+# 	SDL_OUTPUT_FILES_QML ~= s,/,\\,g
+# 	DIR_SEPARATOR = '\\'
+# }
+
+# QRC_WRAP_DIR_PATH = $$split(SDL_OUTPUT_FILES_QML, $${DIR_SEPARATOR})
+# isEmpty(QRC_WRAP_DIR_PATH){
+# 	message("QRC_WRAP_DIR_PATH IS EMPTY variable is empty. SDL output files were not defined.")
+# }
+
+# QRC_NAME = $$take_last(QRC_WRAP_DIR_PATH)
+# QRC_NAME = $$split(QRC_NAME, .)
+# QRC_NAME = $$first(QRC_NAME)
+# QRC_WRAP_DIR_PATH = $$join(QRC_WRAP_DIR_PATH, $${DIR_SEPARATOR})
+# # add first slash
+# !win32 {
+# 	QRC_WRAP_DIR_PATH = /$${QRC_WRAP_DIR_PATH}
+# }
+
+# CPP_SDL_OUTPUT_FILES_QML = $${QRC_WRAP_DIR_PATH}/qrc_$${QRC_NAME}.cpp
+# # Paths-fix for windows
+# win32{
+# 	CPP_SDL_OUTPUT_FILES_QML ~= s,/,\\,g
+# }
+
+# GENERATE_RESOURCE_COMMANDS = $${RCC_EXECUTABLE_PATH} -name $${QRC_NAME} $${SDL_OUTPUT_FILES_QML} -o $${CPP_SDL_OUTPUT_FILES_QML}
+
+# SDL_QML_COMPILER.name = SDL-Compiler-QML-$${SDL_GENERATOR_QML_MODULE_NAME}
+# SDL_QML_COMPILER.target = $${CPP_SDL_OUTPUT_FILES_QML}
+# SDL_QML_COMPILER.commands = $${SDL_QML_GENERATOR_COMMAND_BASE} -GS $${SDL_GENERATOR_SCHEME_PATH} --QML && $${GENERATE_RESOURCE_COMMANDS}
+# SDL_QML_COMPILER.input = SDL_GENERATOR_SCHEME_PATH
+# SDL_QML_COMPILER.output = $${CPP_SDL_OUTPUT_FILES_QML}
+# SDL_QML_COMPILER.dependency_type = TYPE_C
+# SDL_QML_COMPILER.variable_out = SOURCES
+# SDL_QML_COMPILER.CONFIG = target_predeps
+# SDL_QML_COMPILER.depends = $${SDL_GENERATOR_SCHEME_PATH} $${SDL_GENERATOR_BIN}
+
+# # additional target
+# SDL_QML_CPP_COMPILER.target = $${CPP_SDL_OUTPUT_FILES_QML}
+# SDL_QML_CPP_COMPILER.commands = $${SDL_QML_GENERATOR_COMMAND_BASE} -GS $${SDL_GENERATOR_SCHEME_PATH} --QML && $${GENERATE_RESOURCE_COMMANDS}
+# QMAKE_EXTRA_TARGETS += $${QML_SDL_TARGET_NAME}
+
