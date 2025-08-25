@@ -96,8 +96,12 @@ QList<imtsdl::IncludeDirective> CSdlClassCodeGeneratorComp::GetIncludeDirectives
 bool CSdlClassCodeGeneratorComp::BeginClassFiles(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const
 {
 	bool retVal = true;
-	retVal = retVal && BeginHeaderClassFile(sdlType, headerPtr, paramsPtr);
-	retVal = retVal && BeginSourceClassFile(sdlType, sourcePtr, paramsPtr);
+	if (headerPtr != nullptr){
+		retVal = retVal && BeginHeaderClassFile(sdlType, headerPtr, paramsPtr);
+	}
+	if (sourcePtr != nullptr){
+		retVal = retVal && BeginSourceClassFile(sdlType, sourcePtr, paramsPtr);
+	}
 
 	return retVal;
 }
@@ -246,85 +250,90 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 
 bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const
 {
-	// finish header
-	QTextStream headerStream(headerPtr);
-
-	// end of struct
-	FeedStreamHorizontally(headerStream, 1);
-	headerStream << '}' << ';';
-	FeedStream(headerStream, 2, false);
-
-	// member versions
-	FeedStreamHorizontally(headerStream);
-	headerStream << QStringLiteral("// available version members");
-	FeedStream(headerStream, 1, false);
-
-	/// \todo add here ALL versions
-	FeedStreamHorizontally(headerStream);
-	GenerateVersionMemberDeclaration(headerStream, sdlType, true);
-	headerStream << ';';
-	FeedStream(headerStream, 2, false);
-
-
-	// add version-independend read write methods
 	const int modifiersCount = m_modifierListCompPtr.GetCount();
-	if (modifiersCount > 0){
-		FeedStreamHorizontally(headerStream);
-		headerStream << QStringLiteral("// serialize methods");
-	}
-	for (int modifierIndex = 0; modifierIndex < modifiersCount; ++modifierIndex){
-		ICxxModifier* modifierPtr = m_modifierListCompPtr[modifierIndex];
-		Q_ASSERT(modifierPtr != nullptr);
+	CSdlQObjectGenerator qObjectGenerator(*m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, *m_sdlTypeListCompPtr);
 
+	// finish header
+	if (headerPtr != nullptr){
+		QTextStream headerStream(headerPtr);
+
+		// end of struct
+		FeedStreamHorizontally(headerStream, 1);
+		headerStream << '}' << ';';
+		FeedStream(headerStream, 2, false);
+
+		// member versions
+		FeedStreamHorizontally(headerStream);
+		headerStream << QStringLiteral("// available version members");
 		FeedStream(headerStream, 1, false);
 
+		/// \todo add here ALL versions
 		FeedStreamHorizontally(headerStream);
-		GenerateMethodDefinition(headerStream, sdlType, MT_WRITE, *modifierPtr, true);
+		GenerateVersionMemberDeclaration(headerStream, sdlType, true);
+		headerStream << ';';
+		FeedStream(headerStream, 2, false);
 
-		FeedStreamHorizontally(headerStream);
-		GenerateMethodDefinition(headerStream, sdlType, MT_READ, *modifierPtr, true);
 
-		FeedStreamHorizontally(headerStream);
-		GenerateMethodDefinition(headerStream, sdlType, MT_OPT_READ, *modifierPtr, true);
+		// add version-independend read write methods
+		if (modifiersCount > 0){
+			FeedStreamHorizontally(headerStream);
+			headerStream << QStringLiteral("// serialize methods");
+		}
+		for (int modifierIndex = 0; modifierIndex < modifiersCount; ++modifierIndex){
+			ICxxModifier* modifierPtr = m_modifierListCompPtr[modifierIndex];
+			Q_ASSERT(modifierPtr != nullptr);
+
+			FeedStream(headerStream, 1, false);
+
+			FeedStreamHorizontally(headerStream);
+			GenerateMethodDefinition(headerStream, sdlType, MT_WRITE, *modifierPtr, true);
+
+			FeedStreamHorizontally(headerStream);
+			GenerateMethodDefinition(headerStream, sdlType, MT_READ, *modifierPtr, true);
+
+			FeedStreamHorizontally(headerStream);
+			GenerateMethodDefinition(headerStream, sdlType, MT_OPT_READ, *modifierPtr, true);
+		}
+
+		// end of class
+		headerStream << QStringLiteral("};");
+
+		// add QtObject class
+		/// \todo make an option to control it in \c ISdlProcessArgumentsParser
+		qObjectGenerator.ProcessHeaderClassFile(headerStream, sdlType);
 	}
-
-	// end of class
-	headerStream << QStringLiteral("};");
-
-	// add QtObject class
-	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
-	CSdlQObjectGenerator qObjectGenerator(*m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, *m_sdlTypeListCompPtr);
-	qObjectGenerator.ProcessHeaderClassFile(headerStream, sdlType);
 
 	// finish source
-	QTextStream sourceStream(sourcePtr);
+	if (sourcePtr != nullptr){
+		QTextStream sourceStream(sourcePtr);
 
-	if (modifiersCount > 0){
-		sourceStream << QStringLiteral("// serialize methods");
-		FeedStream(sourceStream, 2, false);
+		if (modifiersCount > 0){
+			sourceStream << QStringLiteral("// serialize methods");
+			FeedStream(sourceStream, 2, false);
+		}
+		for (int modifierIndex = 0; modifierIndex < modifiersCount; ++modifierIndex){
+			ICxxModifier* modifierPtr = m_modifierListCompPtr[modifierIndex];
+			Q_ASSERT(modifierPtr != nullptr);
+
+			GenerateMethodDefinition(sourceStream, sdlType, MT_WRITE, *modifierPtr, false);
+			GenerateMethodImplementation(sourceStream, sdlType, MT_WRITE, *modifierPtr);
+			FeedStream(sourceStream, 2, false);
+
+			GenerateMethodDefinition(sourceStream, sdlType, MT_READ, *modifierPtr, false);
+			GenerateMethodImplementation(sourceStream, sdlType, MT_READ, *modifierPtr);
+			FeedStream(sourceStream, 2, false);
+
+			GenerateMethodDefinition(sourceStream, sdlType, MT_OPT_READ, *modifierPtr, false);
+			GenerateMethodImplementation(sourceStream, sdlType, MT_OPT_READ, *modifierPtr);
+			FeedStream(sourceStream, 2, false);
+		}
+
+		// add QtObject class impl
+		/// \todo make an option to control it in \c ISdlProcessArgumentsParser
+		qObjectGenerator.ProcessSourceClassFile(sourceStream, sdlType);
+
+		sourceStream.flush();
 	}
-	for (int modifierIndex = 0; modifierIndex < modifiersCount; ++modifierIndex){
-		ICxxModifier* modifierPtr = m_modifierListCompPtr[modifierIndex];
-		Q_ASSERT(modifierPtr != nullptr);
-
-		GenerateMethodDefinition(sourceStream, sdlType, MT_WRITE, *modifierPtr, false);
-		GenerateMethodImplementation(sourceStream, sdlType, MT_WRITE, *modifierPtr);
-		FeedStream(sourceStream, 2, false);
-
-		GenerateMethodDefinition(sourceStream, sdlType, MT_READ, *modifierPtr, false);
-		GenerateMethodImplementation(sourceStream, sdlType, MT_READ, *modifierPtr);
-		FeedStream(sourceStream, 2, false);
-
-		GenerateMethodDefinition(sourceStream, sdlType, MT_OPT_READ, *modifierPtr, false);
-		GenerateMethodImplementation(sourceStream, sdlType, MT_OPT_READ, *modifierPtr);
-		FeedStream(sourceStream, 2, false);
-	}
-
-	// add QtObject class impl
-	/// \todo make an option to control it in \c ISdlProcessArgumentsParser
-	qObjectGenerator.ProcessSourceClassFile(sourceStream, sdlType);
-
-	sourceStream.flush();
 
 	return true;
 }

@@ -33,6 +33,14 @@ public:
 	};
 	Q_ENUM(GeneratorType)
 
+	enum CppGenerationMode
+	{
+		CGM_FULL,
+		CGM_HEADER_ONLY,
+		CGM_IMPLEMENTATION_ONLY,
+	};
+	Q_ENUM(CppGenerationMode)
+
 	virtual bool SetArguments(int argc, char** argv);
 	virtual bool SetArguments(const QStringList& arguments) = 0;
 	virtual QString GetSchemaFilePath() const = 0;
@@ -52,6 +60,7 @@ public:
 	virtual GeneratorType GetGeneratorType() const = 0;
 	virtual QStringList GetHeadersIncludePaths() const = 0;
 	virtual QString GetDepFilePath() const = 0;
+	virtual CppGenerationMode GetCppGenerationMode() const = 0;
 
 	// template
 	virtual bool IsTemplateEnabled() const = 0;

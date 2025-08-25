@@ -76,15 +76,17 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessEntry (
 
 
 	const imtsdl::CSdlDocumentType* sdlDocumentType = dynamic_cast<const imtsdl::CSdlDocumentType*>(&sdlEntry);
-	if (sdlDocumentType == nullptr || headerDevicePtr == nullptr || sourceDevicePtr == nullptr){
-		I_CRITICAL();
-
+	if (sdlDocumentType == nullptr || (headerDevicePtr == nullptr && sourceDevicePtr == nullptr)){
 		return false;
 	}
 
 	bool retVal = true;
-	retVal = retVal && ProcessHeaderClassFile(*sdlDocumentType, headerDevicePtr, paramsPtr);
-	retVal = retVal && ProcessSourceClassFile(*sdlDocumentType, sourceDevicePtr, paramsPtr);
+	if (headerDevicePtr != nullptr){
+		retVal = retVal && ProcessHeaderClassFile(*sdlDocumentType, headerDevicePtr, paramsPtr);
+	}
+	if (sourceDevicePtr != nullptr){
+		retVal = retVal && ProcessSourceClassFile(*sdlDocumentType, sourceDevicePtr, paramsPtr);
+	}
 
 	return retVal;
 }

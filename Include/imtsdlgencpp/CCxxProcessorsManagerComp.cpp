@@ -26,10 +26,7 @@ namespace imtsdlgencpp
 // static helpers
 CCxxProcessorsManagerComp::FilePtr GetFilePtrForEntry(const imtsdl::CSdlEntryBase& entry, const CCxxProcessorsManagerComp::EntryFileMap& map)
 {
-	// expected, that map is MUST NOT be empty
 	if (map.isEmpty()){
-		Q_ASSERT(false);
-
 		return CCxxProcessorsManagerComp::FilePtr();
 	}
 
@@ -145,14 +142,8 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 	const EntryFileMap headerFiles = CreateHeaderFiles(paramsPtr);
 	const EntryFileMap sourceFiles = CreateSourceFiles(paramsPtr);
 
-	if (headerFiles.isEmpty()){
+	if (headerFiles.isEmpty() && sourceFiles.isEmpty()){
 		SendErrorMessage(0, "Can't create header files");
-
-		return TS_INVALID;
-	}
-
-	if (sourceFiles.isEmpty()){
-		SendErrorMessage(0, "Can't create source files");
 
 		return TS_INVALID;
 	}
@@ -223,7 +214,7 @@ iproc::IProcessor::TaskState CCxxProcessorsManagerComp::DoProcessing(
 		imtsdl::CSdlType dummyType;
 		FilePtr headerFilePtr = GetFilePtrForEntry(dummyType, headerFiles);
 		FilePtr sourceFilePtr = GetFilePtrForEntry(dummyType, sourceFiles);
-		Q_ASSERT(headerFilePtr && sourceFilePtr);
+		Q_ASSERT(headerFilePtr || sourceFilePtr);
 		for (int i = 0; i < processorsCount; ++i){
 			ICxxFileProcessor* processorPtr = m_autoProcessorCompListPtr[i];
 			Q_ASSERT(processorPtr != nullptr);
@@ -457,12 +448,12 @@ bool CCxxProcessorsManagerComp::ProcessEnums(
 			const EntryFileMap& sourceFiles,
 			const iprm::IParamsSet* paramsPtr) const
 {
-	if (!m_enumProcessorCompListPtr.IsValid() || !m_sdlEnumListCompPtr.IsValid()){
+	if (!m_enumProcessorCompListPtr.IsValid() || !m_sdlEnumListCompPtr.IsValid() || headerFiles.isEmpty()){
 		// nothing todo
 		return true;
 	}
 
-	if(headerFiles.size() !=1 || sourceFiles.size() != 1){
+	if(headerFiles.size() > 1 || sourceFiles.size() > 1){
 		Q_ASSERT_X(false, __func__, "Mufli file processing not implemented");
 
 		return false;
@@ -499,7 +490,7 @@ bool CCxxProcessorsManagerComp::ProcessTypes(
 		return true;
 	}
 
-	if(headerFiles.size() !=1 || sourceFiles.size() != 1){
+	if(headerFiles.size() > 1 || sourceFiles.size() > 1){
 		Q_ASSERT_X(false, __func__, "Mufli file processing not implemented");
 
 		return false;
@@ -534,7 +525,6 @@ bool CCxxProcessorsManagerComp::ProcessTypes(
 		for (const imtsdl::CSdlType& sdlType: typeList){
 			FilePtr headerFilePtr = GetFilePtrForEntry(sdlType, headerFiles);
 			FilePtr sourceFilePtr = GetFilePtrForEntry(sdlType, sourceFiles);
-			Q_ASSERT(headerFilePtr && sourceFilePtr);
 			const bool ok = typeProcessorPtr->ProcessEntry(sdlType, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
 				SendErrorMessage(0, QString("Unable to process type '%1'").arg(sdlType.GetName()));
@@ -553,12 +543,12 @@ bool CCxxProcessorsManagerComp::ProcessUnions(
 			const EntryFileMap& sourceFiles,
 			const iprm::IParamsSet* paramsPtr) const
 {
-	if (!m_unionProcessorCompListPtr.IsValid() || !m_sdlUnionListCompPtr.IsValid()){
+	if (!m_unionProcessorCompListPtr.IsValid() || !m_sdlUnionListCompPtr.IsValid() || headerFiles.isEmpty()){
 		// nothing todo
 		return true;
 	}
 
-	if(headerFiles.size() !=1 || sourceFiles.size() != 1){
+	if(headerFiles.size() > 1 || sourceFiles.size() > 1){
 		Q_ASSERT_X(false, __func__, "Mufli file processing not implemented");
 
 		return false;
@@ -587,12 +577,15 @@ bool CCxxProcessorsManagerComp::ProcessUnions(
 
 bool CCxxProcessorsManagerComp::ProcessDocumentTypes(const EntryFileMap& headerFiles, const EntryFileMap& sourceFiles, const iprm::IParamsSet* paramsPtr) const
 {
-	if (!m_documentTypeProcessorCompListPtr.IsValid() || !m_sdlDocumentTypeListCompPtr.IsValid()){
+	if (	!m_documentTypeProcessorCompListPtr.IsValid() ||
+			!m_sdlDocumentTypeListCompPtr.IsValid() ||
+			(headerFiles.isEmpty() && sourceFiles.isEmpty()))
+	{
 		// nothing todo
 		return true;
 	}
 
-	if(headerFiles.size() !=1 || sourceFiles.size() != 1){
+	if(headerFiles.size() > 1 || sourceFiles.size() > 1){
 		Q_ASSERT_X(false, __func__, "Mufli file processing not implemented");
 
 		return false;
@@ -606,7 +599,7 @@ bool CCxxProcessorsManagerComp::ProcessDocumentTypes(const EntryFileMap& headerF
 		for (const imtsdl::CSdlDocumentType& documentType: documentTypesList){
 			FilePtr headerFilePtr = GetFilePtrForEntry(documentType, headerFiles);
 			FilePtr sourceFilePtr = GetFilePtrForEntry(documentType, sourceFiles);
-			Q_ASSERT(headerFilePtr && sourceFilePtr);
+			Q_ASSERT(headerFilePtr || sourceFilePtr);
 			const bool ok = processorPtr->ProcessEntry(documentType, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
 				SendErrorMessage(0, QString("Unable to process document type '%1'").arg(documentType.GetName()));
@@ -620,12 +613,15 @@ bool CCxxProcessorsManagerComp::ProcessDocumentTypes(const EntryFileMap& headerF
 
 bool CCxxProcessorsManagerComp::ProcessRequests(const EntryFileMap& headerFiles, const EntryFileMap& sourceFiles, const iprm::IParamsSet* paramsPtr) const
 {
-	if (!m_requestProcessorCompListPtr.IsValid() || !m_requestsProviderListCompPtr.IsValid()){
+	if (	!m_requestProcessorCompListPtr.IsValid() ||
+			!m_requestsProviderListCompPtr.IsValid() ||
+			(headerFiles.isEmpty() && sourceFiles.isEmpty()))
+	{
 		// nothing todo
 		return true;
 	}
 
-	if(headerFiles.size() !=1 || sourceFiles.size() != 1){
+	if(headerFiles.size() > 1 || sourceFiles.size() > 1){
 		Q_ASSERT_X(false, __func__, "Mufli file processing not implemented");
 
 		return false;
@@ -639,6 +635,7 @@ bool CCxxProcessorsManagerComp::ProcessRequests(const EntryFileMap& headerFiles,
 		for (const imtsdl::CSdlRequest& request: requestsList){
 			FilePtr headerFilePtr = GetFilePtrForEntry(request, headerFiles);
 			FilePtr sourceFilePtr = GetFilePtrForEntry(request, sourceFiles);
+
 			const bool ok = requestProcessorPtr->ProcessEntry(request, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
 				SendErrorMessage(0, QString("Unable to process request '%1'").arg(request.GetName()));
@@ -655,6 +652,11 @@ bool CCxxProcessorsManagerComp::ProcessRequests(const EntryFileMap& headerFiles,
 CCxxProcessorsManagerComp::EntryFileMap CCxxProcessorsManagerComp::CreateHeaderFiles(const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	EntryFileMap retVal;
+
+	imtsdl::ISdlProcessArgumentsParser::CppGenerationMode mode = m_argumentParserCompPtr->GetCppGenerationMode();
+	if (mode == imtsdl::ISdlProcessArgumentsParser::CGM_IMPLEMENTATION_ONLY){
+		return retVal;
+	}
 
 	// create multi files if enabled
 	/// \todo (implement it later))
@@ -674,6 +676,10 @@ CCxxProcessorsManagerComp::EntryFileMap CCxxProcessorsManagerComp::CreateHeaderF
 CCxxProcessorsManagerComp::EntryFileMap CCxxProcessorsManagerComp::CreateSourceFiles(const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	EntryFileMap retVal;
+	imtsdl::ISdlProcessArgumentsParser::CppGenerationMode mode = m_argumentParserCompPtr->GetCppGenerationMode();
+	if (mode == imtsdl::ISdlProcessArgumentsParser::CGM_HEADER_ONLY){
+		return retVal;
+	}
 
 	// create multi files if enabled
 	/// \todo (implement it later))

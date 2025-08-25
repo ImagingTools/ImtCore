@@ -89,6 +89,11 @@ bool CQmlRegisterGeneratorComp::ProcessEntry (
 	Q_ASSERT(m_customSchemaParamsCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
+	if (headerDevicePtr == nullptr){
+		// nothing todo
+		return true;
+	}
+
 	QTextStream stream(headerDevicePtr);
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();

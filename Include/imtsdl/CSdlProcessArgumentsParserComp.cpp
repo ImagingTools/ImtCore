@@ -77,6 +77,7 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	QCommandLineOption includeHeadersOption({"H","include-headers"}, "List of directories to search for generated header files", "HeadersIncludes");
 	QCommandLineOption depFileParhOption("DEPFILE", "Depfile, used by CMake to collect dependencies. MUST be a valid file path if 'generator' option is 'DEPFILE'. If the file exsists it will be overwritten!", "DEPFILE");
 	QCommandLineOption configFilePathOption("config", "Defines a path to a file with initial configuration. NOTE: The parameters from the configuration file may be overridden by command line arguments. WARNING: path MUST be a valid path to existing file!", "config");
+	QCommandLineOption cppModeOption("cpp-mode", "Defines the type of generated files. Headers, sources(implementation) or both(default). Expected values: ALL | HEADER | IMPL", "CPP_MODE");
 
 	// special modes
 	QCommandLineOption cppOption("CPP", "C++ Modificator to generate code. (enabled default)");
@@ -106,7 +107,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 				generatorOption,
 				includeHeadersOption,
 				depFileParhOption,
-				configFilePathOption
+				configFilePathOption,
+				cppModeOption
 	});
 
 	bool isOptionsAcceptable = true;
@@ -251,6 +253,24 @@ bool CSdlProcessArgumentsParserComp::SetArguments(const QStringList& arguments)
 	if (commandLineParser.isSet(depFileParhOption)){
 		m_depFilePath = commandLineParser.value(depFileParhOption);
 		MakePathAbsolute(m_depFilePath);
+	}
+
+	if (commandLineParser.isSet(cppModeOption)){
+		const QString cppModeValue = commandLineParser.value(cppModeOption);
+		if (cppModeValue == QStringLiteral("ALL")){
+			m_cppGenerationMode = CGM_FULL;
+		}
+		else if (cppModeValue == QStringLiteral("HEADER")){
+			m_cppGenerationMode = CGM_HEADER_ONLY;
+		}
+		else if (cppModeValue == QStringLiteral("IMPL")){
+			m_cppGenerationMode = CGM_IMPLEMENTATION_ONLY;
+		}
+		else {
+			SendErrorMessage(0, QString("Unexpected value for option '--cpp-mode' expecdeet one of: ALL | HEADER | IMPL"));
+
+			return false;
+		}
 	}
 
 	// special modes
@@ -457,6 +477,12 @@ QString CSdlProcessArgumentsParserComp::GetTemplateOutputPath() const
 QString CSdlProcessArgumentsParserComp::GetTemplateQmlOutputPath() const
 {
 	return m_outputQmlDirTemplate;
+}
+
+
+CSdlProcessArgumentsParserComp::CppGenerationMode CSdlProcessArgumentsParserComp::GetCppGenerationMode() const
+{
+	return m_cppGenerationMode.value_or(CGM_FULL);
 }
 
 

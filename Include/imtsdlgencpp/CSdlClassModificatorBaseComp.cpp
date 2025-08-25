@@ -41,7 +41,7 @@ bool CSdlClassModificatorBaseComp::ProcessEntry (
 		return false;
 	}
 
-	bool isOk = false;
+	bool isOk = true;
 	if (headerDevicePtr != nullptr){
 		isOk = ProcessHeaderClassFile(*sdlTypePtr, headerDevicePtr, paramsPtr);
 		if (!isOk){

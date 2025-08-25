@@ -35,15 +35,19 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessEntry (
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
 	const imtsdl::CSdlRequest* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(&sdlEntry);
-	if (sdlRequestPtr == nullptr || headerDevicePtr == nullptr || sourceDevicePtr == nullptr){
+	if (sdlRequestPtr == nullptr || (headerDevicePtr == nullptr && sourceDevicePtr == nullptr)){
 		I_CRITICAL();
 
 		return false;
 	}
 
 	bool retVal = true;
-	retVal = retVal && ProcessHeaderClassFile(*sdlRequestPtr, headerDevicePtr, paramsPtr);
-	retVal = retVal && ProcessSourceClassFile(*sdlRequestPtr, sourceDevicePtr, paramsPtr);
+	if (headerDevicePtr != nullptr){
+		retVal = retVal && ProcessHeaderClassFile(*sdlRequestPtr, headerDevicePtr, paramsPtr);
+	}
+	if (sourceDevicePtr != nullptr){
+		retVal = retVal && ProcessSourceClassFile(*sdlRequestPtr, sourceDevicePtr, paramsPtr);
+	}
 
 	return retVal;
 }
