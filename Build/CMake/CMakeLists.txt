@@ -106,6 +106,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 		add_subdirectory("${SDL_DIR}/imtcolor/CMake" "${AUX_INCLUDE_DIR}/imtcolorsdl")
 		add_subdirectory("${SDL_DIR}/imtlic/CMake" "${AUX_INCLUDE_DIR}/imtlicsdl")
 		add_subdirectory("${SDL_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtappsdl")
+		add_subdirectory("${SDL_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpaysdl")
+		add_dependencies(imtpaysdl imtbasesdl)
 	endif()
 
 	#-------- Libraries --------
@@ -151,9 +153,6 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 	add_subdirectory("${INCLUDE_DIR}/imthype/CMake" "${AUX_INCLUDE_DIR}/imthype")
 	add_subdirectory("${INCLUDE_DIR}/imthypegui/CMake" "${AUX_INCLUDE_DIR}/imthypegui")
-
-	add_subdirectory("${INCLUDE_DIR}/imtpay/CMake" "${AUX_INCLUDE_DIR}/imtpay")
-	add_dependencies(imtpay imtbasesdl)
 
 	if(NOT DEFINED USE_GEO OR USE_GEO)
 		add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")

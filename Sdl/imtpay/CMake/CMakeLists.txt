@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.26)
-project(imtpay LANGUAGES CXX DESCRIPTION "The basic library for working with payments/transactions")
+project(imtpaysdl LANGUAGES CXX DESCRIPTION "The basic library for working with payments/transactions")
 
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)

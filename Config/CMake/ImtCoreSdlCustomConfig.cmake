@@ -2,6 +2,9 @@ include (${CMAKE_CURRENT_LIST_DIR}/ImtSdlConfig.cmake)
 set(IMT_CONFIG_CMAKE_PATH "${CMAKE_CURRENT_LIST_DIR}/..")
 
 
+## DEPRECATED
+## TODO remove it
+## WARNING do not use it
 macro(ImtCoreGetSdlDeps)
 	set(booleanArgs)
 	set(oneValueArgs INPUT OUT_DIR RESULT_VARIABLE)
@@ -70,6 +73,45 @@ macro(ImtCoreGetSdlDeps)
 	unset(CUSTOM_PYTHON)
 
 endmacro()
+
+
+macro(ImtCoreGetStaticCppDeps)
+	set(booleanArgs)
+	set(oneValueArgs INPUT OUT_DIR RESULT_VARIABLE)
+	set(multiValueArgs)
+	cmake_parse_arguments(ARG "${booleanArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+	get_filename_component(SDL_SCHEMA_NAME ${ARG_INPUT} NAME_WE)
+	set(SDL_DEPS_VAR)
+	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}.h")
+	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/CPP/${SDL_SCHEMA_NAME}.cpp")
+
+	set(${ARG_RESULT_VARIABLE} ${SDL_DEPS_VAR})
+	message(VERBOSE "static CXX deps for schema: ${ARG_INPUT}: ${SDL_DEPS_VAR}")
+endmacro()
+
+
+macro(ImtCoreGetStaticQmlDeps)
+	set(booleanArgs)
+	set(oneValueArgs INPUT OUT_DIR RESULT_VARIABLE)
+	set(multiValueArgs)
+	cmake_parse_arguments(ARG "${booleanArgs}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+	get_filename_component(SDL_SCHEMA_NAME ${ARG_INPUT} NAME_WE)
+	set(SDL_DEPS_VAR)
+	# list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${PROJECT_NAME}/SDL/${ARG_VERSION}/QML/${SDL_SCHEMA_NAME}Sdl.qrc")
+	# BUG QML output dir calculates wrong TODO fix it
+	string(LENGTH "${PROJECT_NAME}" PROJECT_NAME_LEN)
+	math(EXPR PROJECT_NAME_LEN "${PROJECT_NAME_LEN} - 3")
+	string(SUBSTRING "${PROJECT_NAME}" 0 ${PROJECT_NAME_LEN} SDL_TARGET_NAME)
+	set(SDL_TARGET_NAME "${SDL_TARGET_NAME}${SDL_SCHEMA_NAME}Sdl")
+	list(APPEND SDL_DEPS_VAR "${ARG_OUT_DIR}/${ARG_VERSION}/QML/${SDL_TARGET_NAME}/${SDL_TARGET_NAME}.qrc")
+
+	set(${ARG_RESULT_VARIABLE} ${SDL_DEPS_VAR})
+	message(VERBOSE "static QML deps for schema: ${ARG_INPUT}: ${SDL_DEPS_VAR}")
+endmacro()
+
+
 
 
 function(ImtCoreAddSdlHeaderIncludePath ARG_SDL_PATH)
@@ -152,15 +194,14 @@ macro (ImtCoreCustomConfigureSdlCpp)
 		endforeach()
 	endif()
 
-	ImtCoreGetSdlDeps(
+	ImtCoreGetStaticCppDeps(
 		INPUT
 			"${ARG_SCHEMA_PATH}"
 		OUT_DIR
 			"${SDL_OUTPUT_ROOT_DIRECTORY}"
-		MODIFICATORS
-			"${CUSTOM_MODIFICATORS}"
 		RESULT_VARIABLE
-			FOUND_DEPS)
+			FOUND_DEPS
+	)
 
 	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
 
@@ -229,11 +270,6 @@ macro (ImtCoreCustomConfigureSdlQml)
 	list(APPEND MODIFICATORS "--use-all-modificators")
 	list(APPEND MODIFICATORS "--generator=DEPFILE:${DEP_FILE_PATH}") ##< use depfile
 
-	# use cache file if provided
-	if (GLOBAL_SDL_CACHE_FILE)
-		list(APPEND MODIFICATORS "-C${GLOBAL_SDL_CACHE_FILE}")
-	endif()
-
 	list(LENGTH GLOBAL_SDL_SCHEMA_SEARCH_PATHS SDL_SCHEMA_PATHS_COUNT)
 	if (SDL_SCHEMA_PATHS_COUNT GREATER 0 )
 		foreach(SDL_SEARCH_PATH ${GLOBAL_SDL_SCHEMA_SEARCH_PATHS})
@@ -241,7 +277,7 @@ macro (ImtCoreCustomConfigureSdlQml)
 		endforeach()
 	endif()
 
-	ImtCoreGetSdlDeps(
+	ImtCoreGetStaticQmlDeps(
 		INPUT
 			"${ARG_SCHEMA_PATH}"
 		OUT_DIR
@@ -249,7 +285,8 @@ macro (ImtCoreCustomConfigureSdlQml)
 		MODIFICATORS
 			"${MODIFICATORS}"
 		RESULT_VARIABLE
-			FOUND_DEPS)
+			FOUND_DEPS
+	)
 
 	set(${ARG_FOUND_DEPS} "${FOUND_DEPS}")
 

@@ -2,7 +2,7 @@ schema {
 	query: Query
 	mutation: Mutation
 	subscription: Subscription
-	name: Receipt
+	name: ImtPay
 	namespace: imtpay
 	version: 1.0
 }
