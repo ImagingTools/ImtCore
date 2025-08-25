@@ -6,15 +6,17 @@
 #include <QtCore/QPair>
 
 // ImtCore includes
-#include <imtmdbx/IMaskContainer.h>
 #include <imtmdbx/imtmdbx.h>
+#include <imtmdbx/IMaskContainer.h>
 
 
 namespace imtmdbx
 {
 
 
-class CMaskContainer: virtual public IMaskContainer, virtual public IMask
+class CMaskContainer:
+			virtual public IMask,
+			virtual public IMaskContainer
 {
 public:
 	enum OperationType
@@ -52,8 +54,8 @@ public:
 	bool GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart);
 
 protected:
-	QList<QPair<IMask*,quint64>> m_maskList; // IMask*, next offset
-	QList<QPair<IMask*,quint64>> m_maskListInv;
+	QList<QPair<IMask*/*maskPtr*/,quint64/*nextOffset*/>> m_maskList;
+	QList<QPair<IMask*/*maskPtr*/,quint64/*nextOffset*/>> m_maskListInv;
 	OperationType m_operationType;
 	IDocumentTable* m_documentTable;
 };

@@ -1,5 +1,6 @@
 #include <imtmdbx/CMaskContainer.h>
 
+
 // Qt includes
 #include <QtCore/QDebug>
 
@@ -8,53 +9,23 @@ namespace imtmdbx
 {
 
 
-// statics
-static int BitsSetTable256[256];
-static bool isInit = false;
-
-inline int BitCount(quint64 n)
-{
-	return (BitsSetTable256[n & 0xff] +
-			BitsSetTable256[(n >> 8) & 0xff] +
-			BitsSetTable256[(n >> 16) & 0xff] +
-			BitsSetTable256[(n >> 24) & 0xff] +
-			BitsSetTable256[(n >> 32) & 0xff] +
-			BitsSetTable256[(n >> 40) & 0xff] +
-			BitsSetTable256[(n >> 48) & 0xff] +
-			BitsSetTable256[n >> 56]);
-
-}
-
-void Initialize()
-{
-	// To initially generate the
-	// table algorithmically
-	BitsSetTable256[0] = 0;
-	for (int i = 0; i < 256; i++)
-	{
-		BitsSetTable256[i] = (i & 1) +
-							 BitsSetTable256[i / 2];
-	}
-}
-
+// public methods
 
 CMaskContainer::CMaskContainer(OperationType operationType):
-	m_operationType(operationType), m_documentTable(nullptr)
+	m_operationType(operationType),
+	m_documentTable(nullptr)
 {
-	if (!isInit){
-		Initialize();
-	}
 }
 
 
 void CMaskContainer::Erase()
 {
-	for(int i = 0; i < m_maskList.length(); i++){
-		delete m_maskList.at(i).first;
+	for (auto& [maskPtr, nextOffset] : m_maskList){
+		delete maskPtr;
 	}
 
-	for(int i = 0; i < m_maskListInv.length(); i++){
-		delete m_maskListInv.at(i).first;
+	for (auto& [maskPtr, nextOffset] : m_maskListInv){
+		delete maskPtr;
 	}
 
 	Clear();
@@ -69,190 +40,139 @@ bool CMaskContainer::isEmpty()
 
 bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, bool isStart)
 {
+	activeItem = m_operationType == imtmdbx::CMaskContainer::OT_AND ? imtmdbx::QUINT64_MAX : 0;
+
 	quint64 maxOffset = activeOffset;
 	quint64 minOffset = imtmdbx::QUINT64_MAX;
-	activeItem = m_operationType == imtmdbx::CMaskContainer::OT_AND ? imtmdbx::QUINT64_MAX : 0;
 	bool isLast = true;
-	for(int i = 0; i < m_maskList.length(); i++){
-		quint64 offset = 0;
-		bool changeOffset = false;
-		if (isStart){
-			if (!m_maskList.at(i).first->GetNearestOffset(offset, activeOffset)){
-				if(m_operationType == OT_AND){
-					return false;
-				}
-				else if(m_operationType == OT_OR){
-					m_maskList[i].second = imtmdbx::QUINT64_MAX;
-					continue;
-				}
-			}
-			else {//found nearest offset
-				m_maskList[i].second = offset;
-				isLast = false;
-				changeOffset = true;
-			}
-		}
-		else{//not start
-			if (m_maskList.at(i).second <= activeOffset){
-				if (!m_maskList.at(i).first->GetNextItemOffset(offset, activeOffset)){
-					//qDebug() << "NOT FOUND!!!";
-					if(m_operationType == OT_AND){
-						return false;
-					}
-					else if(m_operationType == OT_OR){
-						m_maskList[i].second = imtmdbx::QUINT64_MAX;
-						continue;
-					}
-				}
-				else {//found next offset
-					m_maskList[i].second = offset;
+
+	auto processOffsets = [&](QList<QPair<IMask*,quint64>>& list) -> bool
+	{
+		for (auto& [maskPtr, nextOffset] : list) {
+			quint64 offset = 0;
+			bool changeOffset = false;
+
+			if (isStart){
+				if (maskPtr->GetNearestOffset(offset, activeOffset)){
+					// found nearest offset
+					nextOffset = offset;
 					isLast = false;
 					changeOffset = true;
 				}
-			}
-			else {//m_maskList.at(i).second > activeOffset
-				offset = m_maskList[i].second;
-				changeOffset = true;
-				isLast = false;
-			}
-
-		}//not start
-
-		/****************if (changeOffset)***********/
-		if (changeOffset){
-			if(offset == imtmdbx::QUINT64_MAX){
-				//qDebug() << "imtmdbx::QUINT64_MAX";
-			}
-
-			if(offset > maxOffset){
-				maxOffset = offset;
-			}
-			if(offset < minOffset){
-				minOffset = offset;
-			}
-		}
-	}//for
-
-	for (int i = 0; i < m_maskListInv.length(); i++){
-		quint64 offset = 0;
-		bool changeOffset = false;
-		if (isStart){
-			if (!m_maskListInv.at(i).first->GetNearestOffset(offset, activeOffset)){
-				m_maskListInv[i].second = imtmdbx::QUINT64_MAX;
-				if(m_operationType == OT_AND){
-					return false;
-				}
-				else if(m_operationType == OT_OR){
-					continue;
-				}
-			}
-			else {
-				m_maskListInv[i].second = offset;
-				isLast = false;
-				changeOffset = true;
-				isLast = false;
-			}
-		}
-		else{
-			if (m_maskListInv.at(i).second <= activeOffset){
-				if (!m_maskListInv.at(i).first->GetNextItemOffset(offset, activeOffset)){
-					m_maskListInv[i].second = imtmdbx::QUINT64_MAX;
-					isLast = false;
-					if(m_operationType == OT_AND){
+				else{
+					if (m_operationType == OT_AND){
 						return false;
 					}
-					else if(m_operationType == OT_OR){
+
+					if (m_operationType == OT_OR){
+						nextOffset = imtmdbx::QUINT64_MAX;
+
 						continue;
 					}
 				}
-				else {
-					m_maskListInv[i].second = offset;
+			}
+			else {
+				if (nextOffset > activeOffset){
+					// found next offset
+					offset = nextOffset;
 					isLast = false;
 					changeOffset = true;
 				}
+				else{
+					if (maskPtr->GetNextItemOffset(offset, activeOffset)){
+						// found next offset
+						nextOffset = offset;
+						isLast = false;
+						changeOffset = true;
+					}
+					else{
+						if (m_operationType == OT_AND){
+							return false;
+						}
+
+						if (m_operationType == OT_OR){
+							nextOffset = imtmdbx::QUINT64_MAX;
+
+							continue;
+						}
+					}
+				}
 			}
-			else {
-				offset = m_maskListInv[i].second;
-				changeOffset = true;
-				isLast = false;
+
+			if (changeOffset) {
+				maxOffset = std::max(maxOffset, offset);
+				minOffset = std::min(minOffset, offset);
 			}
 		}
-		if (changeOffset){
-			if(offset > maxOffset){
-				maxOffset = offset;
-			}
-			if(offset < minOffset){
-				minOffset = offset;
-			}
-		}
+
+		return true;
+	};
+
+	if (!processOffsets(m_maskList)){
+		return false;
 	}
-
-
-	/*******************conditions***************************/
-
-	if(isLast){
+	if (!processOffsets(m_maskListInv)){
 		return false;
 	}
 
-	if(m_operationType == OT_AND){
-		if(maxOffset >= activeOffset){
-			activeOffset = maxOffset;
-		}
-		else {
-			Q_ASSERT(0);
-		}
+	/*******************conditions***************************/
+
+	if (isLast){
+		return false;
 	}
-	else if(m_operationType == OT_OR){
-		if(minOffset == imtmdbx::QUINT64_MAX){
-			//qDebug() << "imtmdbx::QUINT64_MAX";
+
+	if (m_operationType == OT_AND) {
+		if (maxOffset < activeOffset){
+			qCritical() << "CMaskContainer::GetActiveItem: maxOffset < activeOffset";
+			I_CRITICAL();
+
 			return false;
 		}
-		if(minOffset >= activeOffset){
-			activeOffset = minOffset;
+
+		activeOffset = maxOffset;
+	}
+	else if (m_operationType == OT_OR) {
+		if (minOffset == imtmdbx::QUINT64_MAX){
+			return false;
 		}
-		else {
-			Q_ASSERT(0);
+
+		if (minOffset < activeOffset){
+			qCritical() << "CMaskContainer::GetActiveItem: minOffset < activeOffset";
+			I_CRITICAL();
+
+			return false;
 		}
 
-	}	/*******************conditions***************************/
-
-
-
+		activeOffset = minOffset;
+	}
 
 	/*******************calculation***************************/
-	for(int i = 0; i < m_maskList.length(); i++){
-		quint64 item = 0;
-		if(m_maskList.at(i).second <= activeOffset){
-			if (!m_maskList.at(i).first->GetItem(activeOffset, item)){
-				item = 0;
+
+	auto processItems = [&](QList<QPair<IMask*,quint64>>& list, const bool& isInvertedList)
+	{
+		for (auto& [maskPtr, nextOffset] : list) {
+			quint64 item = 0;
+			if (nextOffset <= activeOffset){
+				if (!maskPtr->GetItem(activeOffset, item)){
+					item = 0;
+				}
+			}
+
+			if (isInvertedList){
+				item = ~item;
+			}
+
+			if (m_operationType == OT_AND){
+				activeItem &= item;
+			}
+			else if (m_operationType == OT_OR){
+				activeItem |= item;
 			}
 		}
+	};
 
-		if(m_operationType == imtmdbx::CMaskContainer::OT_AND){
-			activeItem = activeItem & item;
-		}
-		else if(m_operationType == imtmdbx::CMaskContainer::OT_OR){
-			activeItem = activeItem | item;
-		}
-
-
-	}
-	for(int i = 0; i < m_maskListInv.length(); i++){
-
-		quint64 item = 0;
-		if(m_maskListInv.at(i).second <= activeOffset){
-			if (!m_maskListInv.at(i).first->GetItem(activeOffset, item)){
-				item = 0;
-			}
-		}
-
-		if(m_operationType == imtmdbx::CMaskContainer::OT_AND){
-			activeItem = activeItem & ~item;//Inversion
-		}
-		else if(m_operationType == imtmdbx::CMaskContainer::OT_OR){
-			activeItem = activeItem | ~item;//Inversion
-		}
-	}
+	processItems(m_maskList, false);
+	processItems(m_maskListInv, true);
 
 	return true;
 }
@@ -260,102 +180,9 @@ bool CMaskContainer::GetActiveItem(quint64& activeOffset, quint64& activeItem, b
 
 // reimplemented (imtmdbx::IMask)
 
-bool CMaskContainer::GetUnit(quint64 position)
-{
-	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
-		return false;
-	}
-	bool firstUnit  = m_operationType == OT_AND ? true : false;
-
-	bool retUnit = firstUnit;
-
-	for(int i = 0; i < m_maskList.length(); i++){
-		bool currUnit = m_maskList.at(i).first->GetUnit(position);
-		if(m_operationType == OT_AND){
-			retUnit = retUnit & currUnit;
-		}
-		else if(m_operationType == OT_OR){
-			retUnit = retUnit | currUnit;
-		}
-
-	}
-	for(int i = 0; i < m_maskListInv.length(); i++){
-		bool currUnit = m_maskListInv.at(i).first->GetUnit(position);
-		if(m_operationType == OT_AND){
-			retUnit = retUnit & currUnit;
-		}
-		else if(m_operationType == OT_OR){
-			retUnit = retUnit | currUnit;
-		}
-
-	}
-
-	return retUnit;
-}
-
-
 bool CMaskContainer::SetUnit(quint64 position, bool unit)
 {
 	return false;
-}
-
-
-bool CMaskContainer::GetItem(quint64 offset, quint64 &item)
-{
-	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
-		return false;
-	}
-
-	quint64 retItem = m_operationType == OT_AND ? imtmdbx::QUINT64_MAX : 0;
-
-	for(int i = 0; i < m_maskList.length(); i++){
-		quint64 currItem = 0;
-		bool okCurr = false;
-		//if(m_maskList.at(i).second <= offset){
-		okCurr = m_maskList.at(i).first->GetItem(offset, currItem);
-		//}
-
-		if(!okCurr){
-			if(m_operationType == OT_AND){
-				return false;
-			}
-			else if(m_operationType == OT_OR){
-				continue;
-			}
-		}
-
-		if(m_operationType == OT_AND){
-			retItem = retItem & currItem;
-		}
-		else if(m_operationType == OT_OR){
-			retItem = retItem | currItem;
-		}
-	}
-	for(int i = 0; i < m_maskListInv.length(); i++){
-		quint64 currItem = 0;
-		bool okCurr = false;
-		//if(m_maskListInv.at(i).second <= offset){
-		okCurr = m_maskListInv.at(i).first->GetItem(offset, currItem);
-		//}
-		if(!okCurr){
-			if(m_operationType == OT_AND){
-				return false;
-			}
-			else if(m_operationType == OT_OR){
-				continue;
-			}
-		}
-		if(m_operationType == OT_AND){
-			retItem = retItem & currItem;
-		}
-		else if(m_operationType == OT_OR){
-			retItem = retItem | currItem;
-		}
-	}
-
-	item = retItem;
-
-	return true;
 }
 
 
@@ -365,161 +192,187 @@ bool CMaskContainer::SetItem(quint64 offset, quint64 item)
 }
 
 
-bool CMaskContainer::GetNearestOffset(quint64 &offset, quint64 startOffset)
+bool CMaskContainer::GetUnit(quint64 position)
 {
-	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
+	if (m_maskList.isEmpty() && m_maskListInv.isEmpty()) {
+		return false;
+	}
+
+	bool retUnit = m_operationType == OT_AND;
+
+	auto processList = [&](QList<QPair<IMask*,quint64>>& targetList)
+	{
+		for (auto& [maskPtr, nextOffset] : targetList){
+			bool currUnit = maskPtr->GetUnit(position);
+
+			if (m_operationType == OT_AND){
+				retUnit &= currUnit;
+			}
+			else if (m_operationType == OT_OR){
+				retUnit |= currUnit;
+			}
+		}
+	};
+
+	processList(m_maskList);
+	processList(m_maskListInv);
+
+	return retUnit;
+}
+
+
+bool CMaskContainer::GetItem(quint64 offset, quint64& item)
+{
+	if (m_maskList.isEmpty() && m_maskListInv.isEmpty()) {
+		return false;
+	}
+
+	quint64 retItem = m_operationType == OT_AND ? imtmdbx::QUINT64_MAX : 0;
+
+	auto processList = [&](QList<QPair<IMask*,quint64>>& targetList) -> bool
+	{
+		for (auto& [maskPtr, nextOffset] : targetList){
+			quint64 currItem = 0;
+			if (!maskPtr->GetItem(offset, currItem)) {
+				if (m_operationType == OT_AND){
+					return false;
+				}
+
+				if (m_operationType == OT_OR){
+					continue;
+				}
+			}
+
+			if (m_operationType == OT_AND){
+				retItem &= currItem;
+			}
+			else if (m_operationType == OT_OR){
+				retItem |= currItem;
+			}
+		}
+
+		return true;
+	};
+
+	if (!processList(m_maskList)) {
+		return false;
+	}
+	if (!processList(m_maskListInv)) {
+		return false;
+	}
+
+	item = retItem;
+
+	return true;
+}
+
+
+bool CMaskContainer::GetNearestOffset(quint64& offset, quint64 startOffset)
+{
+	if (m_maskList.isEmpty() && m_maskListInv.isEmpty()) {
 		return false;
 	}
 
 	bool isLast = true;
-
 	quint64 retOffset = m_operationType == imtmdbx::CMaskContainer::OT_AND ? 0 : imtmdbx::QUINT64_MAX;
-	for(int i = 0; i < m_maskList.length(); i++){
-		quint64 currOffset;
-		bool okCurr = m_maskList.at(i).first->GetNearestOffset(currOffset, startOffset);
-		if(!okCurr){
-			m_maskList[i].second = imtmdbx::QUINT64_MAX;
-			if(m_operationType == OT_AND){
-				return false;
+
+	auto processList = [&](QList<QPair<IMask*,quint64>>& targetList) -> bool
+	{
+		for (auto& [maskPtr, nextOffset] : targetList) {
+			quint64 currOffset;
+			if (maskPtr->GetNearestOffset(currOffset, startOffset)){
+				nextOffset = currOffset;
+				isLast = false;
 			}
-			else if(m_operationType == OT_OR){
-				continue;
+			else{
+				nextOffset = imtmdbx::QUINT64_MAX;
+				if (m_operationType == OT_AND) {
+					return false;
+				}
+
+				if (m_operationType == OT_OR) {
+					continue;
+				}
+			}
+
+			if (m_operationType == OT_AND) {
+				retOffset = std::max(retOffset, currOffset);
+			}
+			else if (m_operationType == OT_OR) {
+				retOffset = std::min(retOffset, currOffset);
 			}
 		}
-		else{
-			m_maskList[i].second = currOffset;
-			isLast = false;
-		}
-		if(m_operationType == OT_AND){
-			if(currOffset > retOffset){
-				retOffset = currOffset;
-			}
-		}
-		else if(m_operationType == OT_OR){
-			if(currOffset < retOffset){
-				retOffset = currOffset;
-			}
-		}
+
+		return true;
+	};
+
+	if (!processList(m_maskList)) {
+		return false;
 	}
-	for(int i = 0; i < m_maskListInv.length(); i++){
-		quint64 currOffset;
-		bool okCurr = m_maskListInv.at(i).first->GetNearestOffset(currOffset, startOffset);
-		if(!okCurr){
-			m_maskListInv[i].second = imtmdbx::QUINT64_MAX;
-			if(m_operationType == OT_AND){
-				return false;
-			}
-			else if(m_operationType == OT_OR){
-				continue;
-			}
-		}
-		else{
-			m_maskListInv[i].second = currOffset;
-			isLast = false;
-		}
-		if(m_operationType == OT_AND){
-			if(currOffset > retOffset){
-				retOffset = currOffset;
-			}
-		}
-		else if(m_operationType == OT_OR){
-			if(currOffset < retOffset){
-				retOffset = currOffset;
-			}
-		}
+	if (!processList(m_maskListInv)) {
+		return false;
 	}
 
 	offset = retOffset;
 
-	if(isLast){
-		return false;
-	}
-
-	return true;
+	return !isLast;
 }
 
 
-bool CMaskContainer::GetNextItemOffset(quint64 &offset, quint64 startOffset)
+bool CMaskContainer::GetNextItemOffset(quint64& offset, quint64 startOffset)
 {
 	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
 		return false;
 	}
 
 	bool isLast = true;
-
 	quint64 retOffset = 0;
-	for(int i = 0; i < m_maskList.length(); i++){
-		quint64 currOffset;
-		if (m_maskList.at(i).second <= startOffset){
-			bool okCurr = m_maskList.at(i).first->GetNextItemOffset(currOffset, startOffset);
-			if(!okCurr){
-				m_maskList[i].second = imtmdbx::QUINT64_MAX;
-				if(m_operationType == OT_AND){
+
+	auto processList = [&](QList<QPair<IMask*,quint64>>& targetList) -> bool
+	{
+		for (auto& [maskPtr, nextOffset] : targetList) {
+			if (nextOffset > startOffset) {
+				isLast = false;
+
+				continue;
+			}
+
+			quint64 currOffset = 0;
+			if (maskPtr->GetNextItemOffset(currOffset, startOffset)){
+				isLast = false;
+				nextOffset = currOffset;
+			}
+			else{
+				nextOffset = imtmdbx::QUINT64_MAX;
+				if (m_operationType == OT_AND){
 					return false;
 				}
-				else if(m_operationType == OT_OR){
+
+				if (m_operationType == OT_OR){
 					continue;
 				}
 			}
-			else{
-				m_maskList[i].second = currOffset;
-				isLast = false;
-			}
-			if(m_operationType == OT_AND){
-				if(currOffset > retOffset){
-					retOffset = currOffset;
-				}
-			}
-			else if(m_operationType == OT_OR){
-				if(currOffset < retOffset){
-					retOffset = currOffset;
-				}
-			}
 
+			if (m_operationType == OT_AND) {
+				retOffset = std::max(retOffset, currOffset);
+			}
+			else if (m_operationType == OT_OR) {
+				retOffset = std::min(retOffset, currOffset);
+			}
 		}
-		else {
-			currOffset = m_maskList[i].second;
-			isLast = false;
-		}
+
+		return true;
+	};
+
+	if (!processList(m_maskList)){
+		return false;
 	}
-	for(int i = 0; i < m_maskListInv.length(); i++){
-		quint64 currOffset;
-		if (m_maskList.at(i).second <= startOffset){
-			bool okCurr = m_maskListInv.at(i).first->GetNextItemOffset(currOffset, startOffset);
-			if(!okCurr){
-				m_maskListInv[i].second = imtmdbx::QUINT64_MAX;
-				if(m_operationType == OT_AND){
-					return false;
-				}
-				else if(m_operationType == OT_OR){
-					continue;
-				}
-			}
-			else{
-				m_maskListInv[i].second = currOffset;
-				isLast = false;
-			}
-			if(m_operationType == OT_AND){
-				if(currOffset > retOffset){
-					retOffset = currOffset;
-				}
-			}
-			else if(m_operationType == OT_OR){
-				if(currOffset < retOffset){
-					retOffset = currOffset;
-				}
-			}
-
-		}
-		else {
-			currOffset = m_maskListInv[i].second;
-			isLast = false;
-		}
+	if (!processList(m_maskListInv)){
+		return false;
 	}
 
 	offset = retOffset;
-
-	if(isLast || offset == imtmdbx::QUINT64_MAX){
+	if (isLast || offset == imtmdbx::QUINT64_MAX){
 		return false;
 	}
 
@@ -527,73 +380,59 @@ bool CMaskContainer::GetNextItemOffset(quint64 &offset, quint64 startOffset)
 }
 
 
-bool CMaskContainer::GetPreviosItemOffset(quint64 &offset, quint64 startOffset)
+bool CMaskContainer::GetPreviosItemOffset(quint64& offset, quint64 startOffset)
 {
-	if(m_maskList.isEmpty() && m_maskListInv.isEmpty()){
+	if (m_maskList.isEmpty() && m_maskListInv.isEmpty()){
 		return false;
 	}
 
 	quint64 retOffset = 0;
-	for(int i = 0; i < m_maskList.length(); i++){
-		quint64 currOffset;
-		bool okCurr = m_maskList.at(i).first->GetPreviosItemOffset(currOffset, startOffset);
-		if(!okCurr){
-			if(m_operationType == OT_AND){
-				return false;
+
+	auto processList = [&](QList<QPair<IMask*,quint64>>& targetList) -> bool
+	{
+		for (auto& [maskPtr, nextOffset] : targetList){
+			quint64 currOffset = 0;
+			if (!maskPtr->GetPreviosItemOffset(currOffset, startOffset)) {
+				if (m_operationType == OT_AND){
+					return false;
+				}
+
+				if (m_operationType == OT_OR){
+					continue;
+				}
 			}
-			else if(m_operationType == OT_OR){
-				continue;
+
+			if (m_operationType == OT_AND){
+				retOffset = std::min(retOffset, currOffset);
+			}
+			else if (m_operationType == OT_OR){
+				retOffset = std::max(retOffset, currOffset);
 			}
 		}
-		if(m_operationType == OT_AND){
-			if(currOffset < retOffset){
-				retOffset = currOffset;
-			}
-		}
-		else if(m_operationType == OT_OR){
-			if(currOffset > retOffset){
-				retOffset = currOffset;
-			}
-		}
+
+		return true;
+	};
+
+	if (!processList(m_maskList)){
+		return false;
 	}
-	for(int i = 0; i < m_maskListInv.length(); i++){
-		quint64 currOffset;
-		bool okCurr = m_maskListInv.at(i).first->GetPreviosItemOffset(currOffset, startOffset);
-		if(!okCurr){
-			if(m_operationType == OT_AND){
-				return false;
-			}
-			else if(m_operationType == OT_OR){
-				continue;
-			}
-		}
-		if(m_operationType == OT_AND){
-			if(currOffset < retOffset){
-				retOffset = currOffset;
-			}
-		}
-		else if(m_operationType == OT_OR){
-			if(currOffset > retOffset){
-				retOffset = currOffset;
-			}
-		}
+	if (!processList(m_maskListInv)){
+		return false;
 	}
 
 	offset = retOffset;
 
 	return true;
 }
-//reimplemented (IMask)
 
 
-void CMaskContainer::AddMask(IMask *mask, bool isInversion)
+// reimplemented (imtmdbx::IMaskContainer)
+
+void CMaskContainer::AddMask(IMask* mask, bool isInversion)
 {
-	if(!isInversion){
-		m_maskList.append(QPair<IMask*,int>(mask,0));
-	}
-	else {
-		m_maskListInv.append(QPair<IMask*,int>(mask,0));
-	}
+	QList<QPair<IMask*,quint64>>& targetList = isInversion ? m_maskListInv : m_maskList;
+
+	targetList.append(QPair<IMask*,int>(mask, 0));
 }
 
 
@@ -608,66 +447,30 @@ void CMaskContainer::Clear()
 
 bool CMaskContainer::RemoveLastMask(bool isInversion)
 {
-	bool ok = true;
-	if(!isInversion){
-		if(!m_maskList.isEmpty()){
-			m_maskList.removeLast();
-			m_maskList.squeeze();
-		}
-		else {
-			ok = false;
-		}
-	}
-	else {
-		if(!m_maskListInv.isEmpty()){
-			m_maskListInv.removeLast();
-			m_maskListInv.squeeze();
-		}
-		else {
-			ok = false;
-		}
-	}
+	QList<QPair<IMask*,quint64>>& targetList = isInversion ? m_maskListInv : m_maskList;
 
-	return ok;
+	return RemoveMask(targetList.size() - 1, 1, isInversion);
 }
+
 
 bool CMaskContainer::RemoveMask(int index, int n, bool isInversion)
 {
-	bool ok = true;
-	if(!isInversion){
-		if(!m_maskList.isEmpty() && index + n -1  < m_maskList.length()){
-			m_maskList.remove(index, n);
-			m_maskList.squeeze();
-		}
-		else {
-			ok = false;
-		}
-	}
-	else {
-		if(!m_maskListInv.isEmpty() && index + n -1 < m_maskListInv.length()){
-			m_maskListInv.remove(index, n);
-			m_maskListInv.squeeze();
-		}
-		else {
-			ok = false;
-		}
-
+	QList<QPair<IMask*,quint64>>& targetList = isInversion ? m_maskListInv : m_maskList;
+	const bool canRemove = !targetList.isEmpty() && (index + n - 1) < m_maskList.length();
+	if(canRemove){
+		m_maskList.remove(index, n);
+		m_maskList.squeeze();
 	}
 
-	return ok;
+	return canRemove;
 }
+
 
 int CMaskContainer::GetMaskCount(bool isInversion)
 {
-	int count = 0;
-	if(!isInversion){
-		count = m_maskList.length();
-	}
-	else {
-		count = m_maskListInv.length();
-	}
-	return count;
+	return isInversion ? m_maskListInv.length() : m_maskList.length();
 }
+
 
 void CMaskContainer::SetDocumentTable(IDocumentTable* documentTable)
 {
@@ -677,29 +480,17 @@ void CMaskContainer::SetDocumentTable(IDocumentTable* documentTable)
 
 quint64 CMaskContainer::GetUnitCount()
 {
-
+	quint64 unitCount	 = 0;
 	quint64 activeOffset = 0;
-	quint64 unitCount = 0;
+	quint64 activeItem	 = imtmdbx::QUINT64_MAX;
 	bool isStart = true;
 
-	int whileCount = 0;
-	while(1){
-		quint64 activeItem = imtmdbx::QUINT64_MAX;
-
-		if (GetActiveItem(activeOffset, activeItem, isStart) == false){
-			//qDebug() << "whileCount " << whileCount;
-
-			return unitCount;
-		}
-
+	while(GetActiveItem(activeOffset, activeItem, isStart)){
 		isStart = false;
+		unitCount += imtmdbx::BitUtils::BitCount(activeItem);
 
-		whileCount++;
-
-		unitCount += BitCount(activeItem);
+		activeItem = imtmdbx::QUINT64_MAX;
 	}
-
-	qDebug() << "whileCount " << whileCount;
 
 	return unitCount;
 }
@@ -709,31 +500,30 @@ QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, quint64 limit)
 {
 	QList<quint64> list;
 	quint64 activeOffset = 0;
-	quint64 unitCount = 0;
+	quint64 unitCount	 = 0;
+	quint64 activeItem	 = imtmdbx::QUINT64_MAX;
 	bool isStart = true;
 
-	while(1){
-		quint64 activeItem = imtmdbx::QUINT64_MAX;
-
-		if (GetActiveItem(activeOffset, activeItem, isStart) == false){
-			return list;
-		}
-
+	while(GetActiveItem(activeOffset, activeItem, isStart)){
 		isStart = false;
 
 		for(int i = 0; i < 64; i++){
-			bool ok = (activeItem >> i) & (quint64)1;//check activeItem
-			if(ok){
-				unitCount++;
-				if (unitCount > offset){
-					int position = activeOffset * 64 + i;
-					list.append(position);
-					if(quint64(list.length()) >= limit){
-						return list;
-					}
+			bool ok = (activeItem >> i) & static_cast<quint64>(1); // check activeItem
+			if(!ok){
+				continue;
+			}
+
+			unitCount++;
+			if (unitCount > offset){
+				int position = activeOffset * 64 + i;
+				list.append(position);
+				if(static_cast<quint64>(list.length()) >= limit){
+					return list;
 				}
 			}
 		}
+
+		activeItem = imtmdbx::QUINT64_MAX;
 	}
 
 	return list;
@@ -742,41 +532,41 @@ QList<quint64> CMaskContainer::GetUnitPositions(quint64 offset, quint64 limit)
 
 QList<QByteArray> CMaskContainer::GetDocuments(quint64 offset, quint64 limit)
 {
-	QList<QByteArray> list;
-	quint64 activeOffset = 0;
-	quint64 unitCount = 0;
-	bool isStart = true;
-
 	if (m_documentTable == nullptr){
-		return list;
+		return QList<QByteArray>();
 	}
 
-	while(1){
-		quint64 activeItem = imtmdbx::QUINT64_MAX;
+	QList<QByteArray> list;
+	quint64 activeOffset = 0;
+	quint64 unitCount	 = 0;
+	quint64 activeItem	 = imtmdbx::QUINT64_MAX;
+	bool isStart = true;
 
-		if (GetActiveItem(activeOffset, activeItem, isStart) == false){
-			return list;
-		}
-
+	while(GetActiveItem(activeOffset, activeItem, isStart)){
 		isStart = false;
 
 		for(int i = 0; i < 64; i++){
-			bool ok = (activeItem >> i) & (quint64)1;//check activeItem
-			if(ok){
-				unitCount++;
-				if (unitCount > offset){
-					int position = activeOffset * 64 + i;
-					list.append(m_documentTable->GetDocument(position));
-					if(quint64(list.length()) >= limit){
-						return list;
-					}
+			bool ok = (activeItem >> i) & static_cast<quint64>(1); // check activeItem
+			if(!ok){
+				continue;
+			}
+
+			unitCount++;
+			if (unitCount > offset){
+				int position = activeOffset * 64 + i;
+				list.append(m_documentTable->GetDocument(position));
+				if(static_cast<quint64>(list.length()) >= limit){
+					return list;
 				}
 			}
 		}
+
+		activeItem = imtmdbx::QUINT64_MAX;
 	}
 
 	return list;
 }
 
 
-}//namespace imtmdbx
+} // namespace imtmdbx
+
