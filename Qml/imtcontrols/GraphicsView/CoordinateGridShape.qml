@@ -28,6 +28,8 @@ BoundingBox {
 	property bool cutAxesEnds: false;
 	property int legendMargin: -1;
 
+	property bool  canDrawText: true;
+
 	property int labelPrecision : 0;
 
 	property CanvasMatrix labelMatrix: CanvasMatrix{};
@@ -264,6 +266,7 @@ BoundingBox {
 			ctx.lineTo(x2, y2);
 			ctx.closePath()
 			ctx.stroke();
+
 		}
 		//horizontal major lines
 		//ctx.strokeStyle = "green"
@@ -301,91 +304,93 @@ BoundingBox {
 
 
 		//LABELS FOR COORDINATE AXIS
+		if(gridShape.canDrawText){
+			ctx.font = String(fontSize) + "px sans-serif"//"14px sans-serif"
 
-		ctx.font = String(fontSize) + "px sans-serif"//"14px sans-serif"
+			ctx.strokeStyle = gridShape.axesColor;
+			ctx.fillStyle = gridShape.fontColor;
 
-		ctx.strokeStyle = gridShape.axesColor;
-		ctx.fillStyle = gridShape.fontColor;
+			// let stepXLog = getLogicalMajorLineX(stepX)
+			// let stepYLog = getLogicalMajorLineY(stepY)
 
-		// let stepXLog = getLogicalMajorLineX(stepX)
-		// let stepYLog = getLogicalMajorLineY(stepY)
+			//label x
+			labelMatrix.setXTranslation(deltaX);
+			labelMatrix.setYTranslation(0);
+			labelMatrix.setContextTransform(ctx);
 
-		//label x
-		labelMatrix.setXTranslation(deltaX);
-		labelMatrix.setYTranslation(0);
-		labelMatrix.setContextTransform(ctx);
+			for(let i = 1; i * stepX  <= (gridShape.viewItem.drawingAreaWidth - labelXWidth + deltaAddX)/scaleCoeff; i++){
+				if(gridShape.thinningCheck(scaleCoeff, i)){
+					continue
+				}
+				let x_ = (firstVertLineX + labelXWidth + i * stepX) * scaleCoeff;
+				let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
+				ctx.beginPath()
+				let str = String(getLogicalMajorLineX(Number(firstVertLineX + i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision)))
 
-		for(let i = 1; i * stepX  <= (gridShape.viewItem.drawingAreaWidth - labelXWidth + deltaAddX)/scaleCoeff; i++){
-			if(gridShape.thinningCheck(scaleCoeff, i)){
-				continue
+				let textLength = ctx.measureText(str).width
+				x_ = x_ - textLength/2
+
+				ctx.fillText(str,x_, y_);
+				ctx.closePath()
 			}
-			let x_ = (firstVertLineX + labelXWidth + i * stepX) * scaleCoeff;
-			let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
-			ctx.beginPath()
-			let str = String(getLogicalMajorLineX(Number(firstVertLineX + i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision)))
+			// completing label x to zero
+			for(let i = 0; i * stepX  <= deltaMinusX/scaleCoeff + stepX; i++){
+				if(gridShape.thinningCheck(scaleCoeff, i)){
+					continue
+				}
+				let x_ = (firstVertLineX + labelXWidth - i * stepX) * scaleCoeff;
+				let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
+				ctx.beginPath()
+				let str = String(getLogicalMajorLineX(Number(firstVertLineX -i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision)))
 
-			let textLength = ctx.measureText(str).width
-			x_ = x_ - textLength/2
+				let textLength = ctx.measureText(str).width
+				x_ = x_ - textLength/2
 
-			ctx.fillText(str,x_, y_);
-			ctx.closePath()
-		}		
-		// completing label x to zero
-		for(let i = 0; i * stepX  <= deltaMinusX/scaleCoeff + stepX; i++){
-			if(gridShape.thinningCheck(scaleCoeff, i)){
-				continue
+				ctx.fillText(str,x_, y_);
+				ctx.closePath()
 			}
-			let x_ = (firstVertLineX + labelXWidth - i * stepX) * scaleCoeff;
-			let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
-			ctx.beginPath()
-			let str = String(getLogicalMajorLineX(Number(firstVertLineX -i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision)))
-
-			let textLength = ctx.measureText(str).width
-			x_ = x_ - textLength/2
-
-			ctx.fillText(str,x_, y_);
-			ctx.closePath()
-		}
 
 
-		//LABEL Y
-		labelMatrix.reset()
-		//labelMatrix.setXTranslation(0);
-		labelMatrix.setYTranslation(deltaY);
-		labelMatrix.setContextTransform(ctx);
+			//LABEL Y
+			labelMatrix.reset()
+			//labelMatrix.setXTranslation(0);
+			labelMatrix.setYTranslation(deltaY);
+			labelMatrix.setContextTransform(ctx);
 
-		for(let i = 1; i * stepY * scaleCoeff < (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY) * scaleCoeff / scaleMax1; i++){
-			if(gridShape.thinningCheck(scaleCoeff, i)){
-				continue
+			for(let i = 1; i * stepY * scaleCoeff < (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY) * scaleCoeff / scaleMax1; i++){
+				if(gridShape.thinningCheck(scaleCoeff, i)){
+					continue
+				}
+				let x_ = labelXWidth;
+				let y_ = (gridShape.viewItem.drawingAreaHeight - i * stepY - labelYHeight - firstHorizLineY)* scaleCoeff
+				//console.log("deltaAddY:: ", y_, deltaAddY, (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY * scaleCoeff))
+
+				ctx.beginPath()
+				let str = String(getLogicalMajorLineY(Number(i * stepY - gridShape.axesOrigin.y + firstHorizLineY).toFixed(gridShape.labelPrecision)))
+
+				let textLength = ctx.measureText(str).width
+				x_ = x_ - textLength - Style.marginXS
+
+				ctx.fillText(str,x_, y_);
+				ctx.closePath()
 			}
-			let x_ = labelXWidth;
-			let y_ = (gridShape.viewItem.drawingAreaHeight - i * stepY - labelYHeight - firstHorizLineY)* scaleCoeff
-			//console.log("deltaAddY:: ", y_, deltaAddY, (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY * scaleCoeff))
+			// completing label y to zero
+			for(let i = 0; i * stepY  <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff); i++){
+				if(gridShape.thinningCheck(scaleCoeff, i)){
+					continue
+				}
+				let x_ = labelXWidth;
+				let y_ = (gridShape.viewItem.drawingAreaHeight + i * stepY  - labelYHeight - firstHorizLineY)* scaleCoeff
+				ctx.beginPath()
+				let str = String(getLogicalMajorLineY(Number(firstHorizLineY -i * stepY - gridShape.axesOrigin.y).toFixed(gridShape.labelPrecision)))
 
-			ctx.beginPath()
-			let str = String(getLogicalMajorLineY(Number(i * stepY - gridShape.axesOrigin.y + firstHorizLineY).toFixed(gridShape.labelPrecision)))
+				let textLength = ctx.measureText(str).width
+				x_ = x_ - textLength - Style.marginXS
 
-			let textLength = ctx.measureText(str).width
-			x_ = x_ - textLength - Style.marginXS
-
-			ctx.fillText(str,x_, y_);
-			ctx.closePath()
-		}
-		// completing label y to zero
-		for(let i = 0; i * stepY  <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff); i++){
-			if(gridShape.thinningCheck(scaleCoeff, i)){
-				continue
+				ctx.fillText(str,x_, y_);
+				ctx.closePath()
 			}
-			let x_ = labelXWidth;
-			let y_ = (gridShape.viewItem.drawingAreaHeight + i * stepY  - labelYHeight - firstHorizLineY)* scaleCoeff
-			ctx.beginPath()
-			let str = String(getLogicalMajorLineY(Number(firstHorizLineY -i * stepY - gridShape.axesOrigin.y).toFixed(gridShape.labelPrecision)))
 
-			let textLength = ctx.measureText(str).width
-			x_ = x_ - textLength - Style.marginXS
-
-			ctx.fillText(str,x_, y_);
-			ctx.closePath()
 		}
 
 		//coordinate axis

@@ -10,6 +10,9 @@ BoundingBox {
 
 	property string color: "#000000";
 	property int lineWidth: 1;
+	property real shapePointSize: DesignScheme.shapePointSize;
+	property real shapeSelectedPointSize: DesignScheme.shapeSelectedPointSize;
+
 
 	function draw(ctx, transformMatrixArg){
 
@@ -48,12 +51,15 @@ BoundingBox {
 		for(let i = 0;i < points.length; i++){
 			let point = getScreenPosition(points[i]);
 			if(i == highlightedNodeIndex){
-				DesignScheme.drawSelectedNode(ctx, point);
+				DesignScheme.drawSelectedNode(ctx, point, shapeSelectedPointSize);
 			}
 			else {
-				DesignScheme.drawNode(ctx, point)
+				DesignScheme.drawNode(ctx, point, shapePointSize)
 			}
 		}
+		ctx.stroke();
+		ctx.fill();
+
 		ctx.closePath();
 	}
 

@@ -14,20 +14,24 @@ QtObject {
 	property int selectionLineWidth: 4;
 	property string selectionColor: "orange"
 
-	function drawNode(ctx, point){
-		let radius = shapePointSize;
+	function drawNode(ctx, point, radius){
+		if(radius == 0 || radius == undefined){
+			radius = shapePointSize;
+		}
 		ctx.moveTo(point.x, point.y);
 		ctx.arc(point.x, point.y, radius,  0, 2 * Math.PI, true);
-		ctx.stroke();
-		ctx.fill();
+		// ctx.stroke();
+		// ctx.fill();
 	}
 
-	function drawSelectedNode(ctx, point){
-		let radius = shapeSelectedPointSize;
+	function drawSelectedNode(ctx, point, radius){
+		if(radius == 0 || radius == undefined){
+			radius = shapeSelectedPointSize;
+		}
 		ctx.moveTo(point.x, point.y);
 		ctx.arc(point.x, point.y, radius,  0, 2 * Math.PI, true);
-		ctx.stroke();
-		ctx.fill();
+		// ctx.stroke();
+		// ctx.fill();
 	}
 
 

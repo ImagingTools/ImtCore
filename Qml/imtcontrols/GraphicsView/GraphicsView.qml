@@ -78,6 +78,12 @@ Rectangle {
 	property bool propagateWheelEvents: false;
 	property bool propagateMouseEvents: false;
 
+	property bool restrictDrawing: false;
+	property int resizePauseDuration: 100;
+
+	property bool canvasAntialiasing
+	property alias renderStrategy: canvas.renderStrategy
+
 	signal copySignal(int index);
 	signal pasteSignal(int index);
 	signal deleteSignal(int index);
@@ -88,6 +94,8 @@ Rectangle {
 	signal cursorPosition(point position)
 	signal hintShape(int shapeIndex)
 	signal hintShapePoint(int shapeIndex,int pointIndex)
+
+	signal paintTime(int time)
 
 	Component.onCompleted: {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
@@ -138,6 +146,30 @@ Rectangle {
 		if (autoFit){
 			appSizeChanged();
 		}
+	}
+
+	onWidthChanged: {
+		graphicsView.restrictDrawing = true
+		sizeChangedPause.restart()
+	}
+
+	onHeightChanged: {
+		graphicsView.restrictDrawing = true
+		sizeChangedPause.restart()
+	}
+
+
+	PauseAnimation {
+		id: sizeChangedPause;
+		duration: graphicsView.resizePauseDuration
+		onFinished: {
+			graphicsView.restrictDrawing = false
+			resize()
+		}
+	}
+
+	function resize(){
+		requestPaintPause.restart()
 	}
 
 	function requestPaint(){
@@ -360,6 +392,11 @@ Rectangle {
 	}
 
 	function fitToShapeList(shapeList, layer){
+		if(shapeList == undefined || !shapeList.length || width == 0 || height == 0){
+			console.log("fitToShapeList return", width, height)
+			return
+		}
+
 		resetView();
 
 		let onlyOneLayer = layer !==undefined;
@@ -466,6 +503,9 @@ Rectangle {
 	}
 
 	function fitToLayer(layer){
+		if(layer.shapeModel == undefined || !layer.shapeModel.length){
+			return
+		}
 		fitToShapeList(layer.shapeModel, layer)
 	}
 
@@ -854,7 +894,7 @@ Rectangle {
 			anchors.fill: parent;
 			renderStrategy: Canvas.Threaded
 
-			//antialiasing: true;
+			antialiasing: graphicsView.canvasAntialiasing;
 
 			property int selectedShapeCount: 0;
 			property var editShape
@@ -905,13 +945,7 @@ Rectangle {
 			property string backgroundColor: Style.baseColor;
 			property string innerFrameColor: "transparent";
 
-			onWidthChanged: {
-				requestPaintPause.restart();
-			}
 
-			onHeightChanged: {
-				requestPaintPause.restart();
-			}
 
 			onImageLoaded: {
 				requestPaintPause.restart();
@@ -1013,7 +1047,13 @@ Rectangle {
 				canvasMatrix.setYTranslation(canvas.deltaY);
 			}
 
+			property var startPaintTime
+
 			onPaint: {
+				if(graphicsView.restrictDrawing){
+					return;
+				}
+				startPaintTime = new Date().valueOf()
 				//console.log("Canvas::onPaint")
 				if (graphicsView.autoFit){
 					graphicsView.resetView(false);
@@ -1036,6 +1076,12 @@ Rectangle {
 				}
 
 			}//onPaint
+
+			onPainted: {
+				let endPaintTime = new Date().valueOf()
+				//console.log("PAINT TIME:: ", endPaintTime - startPaintTime)
+				graphicsView.paintTime(endPaintTime - startPaintTime)
+			}
 
 		}//canvas
 
@@ -1476,7 +1522,6 @@ Rectangle {
 
 				iconSource: "../../../" + Style.getIconPath("Icons/ZoomIn", Icon.State.On, Icon.Mode.Normal)
 				onClicked: {
-					graphicsView.zoomIn();
 				}
 				onPressed: {
 					graphicsView.zoomIn()
