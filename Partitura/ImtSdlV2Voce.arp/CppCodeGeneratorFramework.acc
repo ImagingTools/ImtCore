@@ -20,7 +20,6 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
-                                <Value>QmlRegisterGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -60,6 +59,7 @@
                                 <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
                                 <Value>SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
                                 <Value>QmlRegisterGenerator</Value>
+                                <Value>SdlQObjectGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -256,6 +256,33 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SdlRequestListProvider" Type="Reference" ExportId="SdlRequestListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlUnionListProvider" Type="Reference" ExportId="SdlUnionListProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SdlQObjectGenerator" PackageId="ImtSdlGenCppPck" ComponentId="SdlQObjectGenerator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SdlEnumListProvider" Type="Reference" ExportId="SdlEnumListProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">

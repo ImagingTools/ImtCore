@@ -74,6 +74,11 @@ I_EXPORT_COMPONENT(
 			"The C++ class extender adds inheritance to class files",
 			"Schema Definition Language Class Generator Base Class")
 
+I_EXPORT_COMPONENT(
+			SdlQObjectGenerator,
+			"A C++ class generator of QObject implementations",
+			"Schema Definition Language SDL Class Generator QObject")
+
 
 
 } // namespace ImtSdlGenCppPck

@@ -15,7 +15,6 @@
 // ImtCore includes
 #include <imtsdl/CSimpleFileJoinerComp.h>
 #include <imtsdl/CSdlType.h>
-#include <imtsdlgencpp/CSdlQObjectGenerator.h>
 
 
 namespace imtsdlgencpp
@@ -251,7 +250,6 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType, QIODevice* headerPtr, QIODevice* sourcePtr, const iprm::IParamsSet* paramsPtr) const
 {
 	const int modifiersCount = m_modifierListCompPtr.GetCount();
-	CSdlQObjectGenerator qObjectGenerator(*m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, *m_sdlTypeListCompPtr);
 
 	// finish header
 	if (headerPtr != nullptr){
@@ -297,10 +295,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType, 
 
 		// end of class
 		headerStream << QStringLiteral("};");
-
-		// add QtObject class
-		/// \todo make an option to control it in \c ISdlProcessArgumentsParser
-		qObjectGenerator.ProcessHeaderClassFile(headerStream, sdlType);
+		FeedStream(headerStream, 2, false);
 	}
 
 	// finish source
@@ -327,12 +322,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const imtsdl::CSdlType& sdlType, 
 			GenerateMethodImplementation(sourceStream, sdlType, MT_OPT_READ, *modifierPtr);
 			FeedStream(sourceStream, 2, false);
 		}
-
-		// add QtObject class impl
-		/// \todo make an option to control it in \c ISdlProcessArgumentsParser
-		qObjectGenerator.ProcessSourceClassFile(sourceStream, sdlType);
-
-		sourceStream.flush();
+		FeedStream(sourceStream, 2, false);
 	}
 
 	return true;
