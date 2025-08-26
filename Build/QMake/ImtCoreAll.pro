@@ -67,7 +67,6 @@ SdlCodeGenerator.file = ../../Impl/SdlCodeGeneratorExe/QMake/SdlCodeGeneratorExe
 SdlCodeGenerator.depends = ImtCorePck ImtSdlPck ImtSdlGenQmlPck ImtSdlGenCppPck
 
 # SDL modules
-
 SUBDIRS += imtbasesdl
 imtbasesdl.file = ../../Sdl/imtbase/QMake/imtbasesdl.pro
 imtbasesdl.depends = SdlCodeGenerator
@@ -75,10 +74,6 @@ imtbasesdl.depends = SdlCodeGenerator
 SUBDIRS += imtserverapp
 imtserverapp.file = ../../Include/imtserverapp/QMake/imtserverapp.pro
 imtserverapp.depends = imtbasesdl
-
-SUBDIRS += imtcol
-imtcol.file = ../../Include/imtcol/QMake/imtcol.pro
-imtcol.depends = imtbase imtbasesdl
 
 SUBDIRS += imtauthsdl
 imtauthsdl.file = ../../Sdl/imtauth/QMake/imtauthsdl.pro
@@ -99,6 +94,10 @@ imtappsdl.depends = imtbasesdl
 SUBDIRS += imt2dsdl
 imt2dsdl.file = ../../Sdl/imt2d/QMake/imt2dsdl.pro
 imt2dsdl.depends = imtcolorsdl
+
+SUBDIRS += imtcol
+imtcol.file = ../../Include/imtcol/QMake/imtcol.pro
+imtcol.depends = imtbase imtbasesdl
 
 SUBDIRS += imtdev
 imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
