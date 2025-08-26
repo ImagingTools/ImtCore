@@ -179,7 +179,6 @@ bool CSdlUnionGeneratorComp::ProcessEntry(
 	stream << QStringLiteral("Q_INVOKABLE void SetValue(const QVariant& value){");
 	FeedStream(stream, 1, false);
 
-	// for (const QString& unionType : convertedTypeList){
 	QStringList unionTypeList = sdlUnion->GetTypes();
 	for (int unionIndex = 0; unionIndex < unionTypeList.count(); unionIndex++){
 		QString unionTypeWithNamespace = convertedTypeList[unionIndex];

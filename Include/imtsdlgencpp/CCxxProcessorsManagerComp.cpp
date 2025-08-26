@@ -513,6 +513,8 @@ bool CCxxProcessorsManagerComp::ProcessTypes(
 			FeedStream(stream, 1, false);
 			stream << QStringLiteral("class C")  << sdlUinion.GetName() << QStringLiteral("Object;");
 			FeedStream(stream, 1, false);
+			stream << QStringLiteral("class C")  << sdlUinion.GetName() << QStringLiteral("ObjectList;");
+			FeedStream(stream, 1, false);
 		}
 		FeedStream(stream, 1, false);
 	}

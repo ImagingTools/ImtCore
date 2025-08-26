@@ -12,29 +12,34 @@ namespace imtsdlgencpp
 {
 
 
-CSdlQObjectGenerator::CSdlQObjectGenerator(const imtsdl::ISdlEnumListProvider& enumListProvider,
-	const imtsdl::ISdlUnionListProvider& unionListProvider, const imtsdl::ISdlTypeListProvider &typeListProvider):
+// public methods
+
+CSdlQObjectGenerator::CSdlQObjectGenerator(
+	const imtsdl::ISdlEnumListProvider& enumListProvider,
+	const imtsdl::ISdlUnionListProvider& unionListProvider,
+	const imtsdl::ISdlTypeListProvider &typeListProvider):
 		m_enumListProvider(enumListProvider),
 		m_unionListProvider(unionListProvider),
 		m_typeListProvider(typeListProvider)
 {
-
 }
 
-bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imtsdl::CSdlType& sdlType)
+
+bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry) const
 {
 	FeedStream(stream, 3, false);
 
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
 
-	stream << QStringLiteral("class C") << sdlType.GetName();
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlEntry.GetSchemaParams());
+
+	stream << QStringLiteral("class C") << sdlEntry.GetName();
 	stream << QStringLiteral("ObjectList;");
 	FeedStream(stream, 2, false);
 
 	// class begin
-	stream << QStringLiteral("class C") << sdlType.GetName();
+	stream << QStringLiteral("class C") << sdlEntry.GetName();
 	stream << QStringLiteral("Object: public ::imtbase::CItemModelBase, public ");
-	stream << QStringLiteral("C") << sdlType.GetName();
+	stream << QStringLiteral("C") << sdlEntry.GetName();
 	FeedStream(stream, 1, false);
 	stream << QStringLiteral("{");
 	FeedStream(stream, 1, false);
@@ -42,26 +47,16 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("Q_OBJECT");
 	FeedStream(stream, 1, false);
 
-	bool isArray = false;
-	bool isCustom = false;
-	bool isEnum = false;
-	bool isUnion = false;
-
 	// class Q_PROPERTY
-	const imtsdl::SdlFieldList fieldList =  sdlType.GetFields();
-	for (const imtsdl::CSdlField& field: fieldList){
-		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("Q_PROPERTY(") + GetQObjectTypeName(field); // QVariant");
-		stream << QStringLiteral(" m_") << GetDecapitalizedValue(field.GetId());
-		stream << QStringLiteral(" READ Get") << GetCapitalizedValue(field.GetId());
-		stream << QStringLiteral(" WRITE Set") << GetCapitalizedValue(field.GetId());
-		stream << QStringLiteral(" NOTIFY ") << GetDecapitalizedValue(field.GetId());
-		stream << QStringLiteral("Changed)");
-		FeedStream(stream, 1, false);
+	imtsdl::SdlFieldList fieldList;
+	try{
+		const imtsdl::CSdlType& sdlType = dynamic_cast<const imtsdl::CSdlType&> (sdlEntry);
+		fieldList = sdlType.GetFields();
 	}
-	FeedStream(stream, 1, false);
+	catch (std::bad_cast&){}
+
+	CreatePropertiesForType(stream, fieldList);
+
 	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("typedef ::imtbase::CItemModelBase BaseClass;");
 	FeedStream(stream, 1, false);
@@ -70,36 +65,12 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("public:");
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("C") << sdlType.GetName() << QStringLiteral("Object");;
+	stream << QStringLiteral("C") << sdlEntry.GetName() << QStringLiteral("Object");
 	stream << QStringLiteral("(QObject* parent = nullptr);");
 	FeedStream(stream, 2, false);
 
 	// class Getters and Setters
-
-	for (const imtsdl::CSdlField& field: fieldList){
-		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-
-		FeedStreamHorizontally(stream);
-		stream << GetQObjectTypeName(field);
-		stream << QStringLiteral(" Get") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("void Set") << GetCapitalizedValue(field.GetId());
-		stream << QStringLiteral("(") << GetQObjectTypeName(field);
-		stream << QStringLiteral(" v);");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("Q_INVOKABLE bool has") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
-		FeedStream(stream, 1, false);
-
-		if (isCustom && !isEnum){
-			FeedStreamHorizontally(stream);
-			stream << QStringLiteral("Q_INVOKABLE void create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
-			FeedStream(stream, 1, false);
-		}
-	}
+	CreateAccessMethodsDefinition(stream, fieldList);
 
 	// CItemModelBase implemented
 	FeedStreamHorizontally(stream);
@@ -135,7 +106,8 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("signals:");
 	FeedStream(stream, 1, false);
 	for (const imtsdl::CSdlField& field: fieldList){
-		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);		FeedStreamHorizontally(stream);
+		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false));
+		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("void ") << GetDecapitalizedValue(field.GetId());
 		stream << QStringLiteral("Changed();");
 		FeedStream(stream, 1, false);
@@ -149,7 +121,9 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("protected:");
 	FeedStream(stream, 1, false);
 	for (const imtsdl::CSdlField& field: fieldList){
-		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+		bool isCustom = false;
+		bool isEnum = false;
+		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, nullptr, &isEnum);
 		if (isCustom && !isEnum){
 			FeedStreamHorizontally(stream);
 			stream << GetQObjectTypeName(field);
@@ -163,10 +137,10 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("};");
 	FeedStream(stream, 3, false);
 
-	QString itemClassName = sdlNamespace + QStringLiteral("::C") + sdlType.GetName();
+	QString itemClassName = sdlNamespace + QStringLiteral("::C") + sdlEntry.GetName();
 	QString modelDataTypeName = itemClassName + QStringLiteral("::V1_0");
 	QString modelObjectDataTypeName = itemClassName + QStringLiteral("Object");
-	QString objectListClassName = QStringLiteral("C") + sdlType.GetName() + QStringLiteral("ObjectList");
+	QString objectListClassName = QStringLiteral("C") + sdlEntry.GetName() + QStringLiteral("ObjectList");
 	QString objectListClassNameWithNamespace = sdlNamespace + QStringLiteral("::") + objectListClassName;
 
 	stream << QStringLiteral("class ") << objectListClassName;
@@ -764,8 +738,9 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	FeedStream(stream, 1, false);
 
 	for (const imtsdl::CSdlField& field: fieldList){
-		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-		// if (isCustom && !isEnum){
+		bool isCustom = false;
+		bool isEnum = false;
+		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, nullptr, &isEnum);
 			FeedStreamHorizontally(stream, 2);
 			stream << QStringLiteral("if (nameId == \"m_") << GetDecapitalizedValue(field.GetId());
 			stream << QStringLiteral("\"){");
@@ -778,12 +753,8 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 				FeedStream(stream, 1, false);
 			}
 			else{
-				// FeedStreamHorizontally(stream, 3);
-				// stream << modelObjectDataTypeName << QStringLiteral("* retVal = GetOrCreateCachedObject(index);");
-				// FeedStream(stream, 1, false);
-				
 				FeedStreamHorizontally(stream, 3);
-				stream << sdlNamespace << QStringLiteral("::C") << sdlType.GetName();
+				stream << sdlNamespace << QStringLiteral("::C") << sdlEntry.GetName();
 				stream << QStringLiteral("Object* retVal = GetOrCreateCachedObject(index);");
 				FeedStream(stream, 1, false);
 
@@ -796,13 +767,9 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 			FeedStreamHorizontally(stream, 2);
 			stream << QStringLiteral("}");
 			FeedStream(stream, 1, false);
-		// }
 	}
 	FeedStreamHorizontally(stream, 2);
 	stream << QStringLiteral("return QVariant();");
-	// if ( && !isEnum){
-		// stream << QStringLiteral("return Version_1_0.GetPtr()->at(index).property(nameId.toUtf8());"); //Version_1_0.GetPtr()->at(index)
-	// }
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream);
@@ -819,23 +786,27 @@ bool CSdlQObjectGenerator::ProcessHeaderClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("};");
 	FeedStream(stream, 1, false);
 
-	// stream.flush();
-
 	return true;
 }
 
 
-bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imtsdl::CSdlType& sdlType)
+bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry) const
 {
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
 	bool isUnion = false;
 
-	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlType.GetSchemaParams());
-	const imtsdl::SdlFieldList fieldList =  sdlType.GetFields();
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlEntry.GetSchemaParams());
 
-	const QString className = QStringLiteral("C") + sdlType.GetName() + QStringLiteral("Object");
+	imtsdl::SdlFieldList fieldList;
+	try{
+		const imtsdl::CSdlType& sdlType = dynamic_cast<const imtsdl::CSdlType&>(sdlEntry);
+		fieldList = sdlType.GetFields();
+	}
+	catch(std::bad_cast&){}
+
+	const QString className = QStringLiteral("C") + sdlEntry.GetName() + QStringLiteral("Object");
 	stream << className;
 	stream << QStringLiteral("::")<< className;
 	stream << QStringLiteral("(QObject* parent): ::imtbase::CItemModelBase(parent)");
@@ -875,7 +846,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 			// Getter implemented
 
 			stream << GetQObjectTypeName(field);
-			stream << QStringLiteral(" C") << sdlType.GetName() << QStringLiteral("Object");
+			stream << QStringLiteral(" C") << sdlEntry.GetName() << QStringLiteral("Object");
 			stream << QStringLiteral("::Get") << GetCapitalizedValue(field.GetId()) << QStringLiteral("()");
 			FeedStream(stream, 1, false);
 			stream << QStringLiteral("{");
@@ -1033,7 +1004,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 			FeedStream(stream, 3, false);
 
 			// Setter implemented
-			stream << QStringLiteral("void C") << sdlType.GetName() << QStringLiteral("Object");
+			stream << QStringLiteral("void C") << sdlEntry.GetName() << QStringLiteral("Object");
 			stream << QStringLiteral("::Set") << GetCapitalizedValue(field.GetId());
 			stream << QStringLiteral("(") << GetQObjectTypeName(field);
 			stream << QStringLiteral(" v)");
@@ -1132,7 +1103,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 			FeedStream(stream, 3, false);
 
 			// Has implemented
-			stream << QStringLiteral("bool C") << sdlType.GetName() << QStringLiteral("Object");
+			stream << QStringLiteral("bool C") << sdlEntry.GetName() << QStringLiteral("Object");
 			stream << QStringLiteral("::has") << GetCapitalizedValue(field.GetId()) << QStringLiteral("()");
 			FeedStream(stream, 1, false);
 
@@ -1148,7 +1119,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 
 			// Create property implemented
 			if (isCustom && !isEnum){
-				stream << QStringLiteral("void C") << sdlType.GetName() << QStringLiteral("Object");
+				stream << QStringLiteral("void C") << sdlEntry.GetName() << QStringLiteral("Object");
 				stream << QStringLiteral("::create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("()");
 				FeedStream(stream, 1, false);
 				stream << QStringLiteral("{");
@@ -1166,7 +1137,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 
 	// CItemModelBase implemented
 
-	stream << QStringLiteral("QString C") << sdlType.GetName();
+	stream << QStringLiteral("QString C") << sdlEntry.GetName();
 	stream << QStringLiteral("Object::toJson() const");
 	FeedStream(stream, 1, false);
 	stream << QStringLiteral("{");
@@ -1209,7 +1180,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 
 	// formJson implemented
 
-	stream << QStringLiteral("bool C") << sdlType.GetName();
+	stream << QStringLiteral("bool C") << sdlEntry.GetName();
 	stream << QStringLiteral("Object::createFromJson(const QString& json)");
 	FeedStream(stream, 1, false);
 	stream << QStringLiteral("{");
@@ -1227,7 +1198,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("}");
 	FeedStream(stream, 3, false);
 
-	stream << QStringLiteral("bool C") << sdlType.GetName();
+	stream << QStringLiteral("bool C") << sdlEntry.GetName();
 	stream << QStringLiteral("Object::fromObject(const QJsonObject& jsonObject)");
 	FeedStream(stream, 1, false);
 	stream << QStringLiteral("{");
@@ -1274,7 +1245,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 
 	// toGraphQL implemented
 
-	stream << QStringLiteral("QString C") << sdlType.GetName();
+	stream << QStringLiteral("QString C") << sdlEntry.GetName();
 	stream << QStringLiteral("Object::toGraphQL() const");
 	FeedStream(stream, 1, false);
 	stream << QStringLiteral("{");
@@ -1287,7 +1258,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("}");
 	FeedStream(stream,3, false);
 
-	stream << QStringLiteral("QObject* C") << sdlType.GetName();
+	stream << QStringLiteral("QObject* C") << sdlEntry.GetName();
 	stream << QStringLiteral("Object::CreateObject(const QString& key)");
 	FeedStream(stream, 1, false);
 	stream << QStringLiteral("{");
@@ -1318,7 +1289,7 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 	stream << QStringLiteral("}");
 	FeedStream(stream,3, false);
 
-	stream << QStringLiteral("QString C") << sdlType.GetName();
+	stream << QStringLiteral("QString C") << sdlEntry.GetName();
 	stream << QStringLiteral("Object::getJSONKeyForProperty(const QString& propertyName) const");
 	FeedStream(stream, 1, false);
 	stream << QStringLiteral("{");
@@ -1349,7 +1320,9 @@ bool CSdlQObjectGenerator::ProcessSourceClassFile(QTextStream& stream, const imt
 }
 
 
-QString CSdlQObjectGenerator::GetQObjectTypeName(const imtsdl::CSdlField& field, bool withPointer)
+// protected methods
+
+QString CSdlQObjectGenerator::GetQObjectTypeName(const imtsdl::CSdlField& field, bool withPointer) const
 {
 	QString retVal = "";
 	bool isArray = false;
@@ -1358,10 +1331,11 @@ QString CSdlQObjectGenerator::GetQObjectTypeName(const imtsdl::CSdlField& field,
 	bool isUnion = false;
 
 	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-	std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBase = GetSdlTypeOrEnumOrUnionForField(field,
-																						  m_typeListProvider.GetSdlTypes(false),
-																						  m_enumListProvider.GetEnums(false),
-																						  m_unionListProvider.GetUnions(false));
+	std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBase = FindEntryByName(
+				field.GetType(),
+				m_typeListProvider.GetSdlTypes(false),
+				m_enumListProvider.GetEnums(false),
+				m_unionListProvider.GetUnions(false));
 
 	QString sdlNamespace;
 	if (sdlEntryBase != nullptr){
@@ -1421,6 +1395,60 @@ QString CSdlQObjectGenerator::GetQObjectTypeName(const imtsdl::CSdlField& field,
 
 	return retVal;
 }
+
+
+void CSdlQObjectGenerator::CreatePropertiesForType(QTextStream& stream, const imtsdl::SdlFieldList& fieldList) const
+{
+	for (const imtsdl::CSdlField& field: fieldList){
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("Q_PROPERTY(") + GetQObjectTypeName(field); // QVariant");
+		stream << QStringLiteral(" m_") << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral(" READ Get") << GetCapitalizedValue(field.GetId());
+		stream << QStringLiteral(" WRITE Set") << GetCapitalizedValue(field.GetId());
+		stream << QStringLiteral(" NOTIFY ") << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("Changed)");
+		FeedStream(stream, 1, false);
+	}
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlQObjectGenerator::CreateAccessMethodsDefinition(QTextStream& stream, const imtsdl::SdlFieldList& fieldList) const
+{
+	for (const imtsdl::CSdlField& field: fieldList){
+		bool isArray = false;
+		bool isCustom = false;
+		bool isEnum = false;
+		bool isUnion = false;
+		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_enumListProvider.GetEnums(false), m_unionListProvider.GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+
+		FeedStreamHorizontally(stream);
+		stream << GetQObjectTypeName(field);
+		stream << QStringLiteral(" Get") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("void Set") << GetCapitalizedValue(field.GetId());
+		stream << QStringLiteral("(") << GetQObjectTypeName(field);
+		stream << QStringLiteral(" v);");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("Q_INVOKABLE bool has") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
+		FeedStream(stream, 1, false);
+
+		if (isCustom && !isEnum){
+			FeedStreamHorizontally(stream);
+			stream << QStringLiteral("Q_INVOKABLE void create") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
+			FeedStream(stream, 1, false);
+		}
+	}
+}
+
+
+// private methods
+
+
 
 
 } // namespace imtsdlgencpp

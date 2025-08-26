@@ -36,10 +36,13 @@ Q_NAMESPACE
 // forward declaration for union types
 class ExtendedMetaDataUnionType;
 class CExtendedMetaDataUnionTypeObject;
+class CExtendedMetaDataUnionTypeObjectList;
 class ExtendedMetaDataUnionSimpleType;
 class CExtendedMetaDataUnionSimpleTypeObject;
+class CExtendedMetaDataUnionSimpleTypeObjectList;
 class CDMResultUnionType;
 class CCDMResultUnionTypeObject;
+class CCDMResultUnionTypeObjectList;
 
 class CResult
 {

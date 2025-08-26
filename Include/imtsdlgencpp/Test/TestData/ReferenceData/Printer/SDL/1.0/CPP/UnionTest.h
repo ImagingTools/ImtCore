@@ -34,6 +34,7 @@ Q_NAMESPACE
 // forward declaration for union types
 class PrinterSpecification;
 class CPrinterSpecificationObject;
+class CPrinterSpecificationObjectList;
 
 class CCoords
 {

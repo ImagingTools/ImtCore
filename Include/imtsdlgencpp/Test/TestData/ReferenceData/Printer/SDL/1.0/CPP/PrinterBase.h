@@ -33,10 +33,13 @@ Q_NAMESPACE
 // forward declaration for union types
 class PrinterSpecification;
 class CPrinterSpecificationObject;
+class CPrinterSpecificationObjectList;
 class SimpleUnion;
 class CSimpleUnionObject;
+class CSimpleUnionObjectList;
 class MixedUnion;
 class CMixedUnionObject;
+class CMixedUnionObjectList;
 
 class CPrinterSpecificationBase
 {
