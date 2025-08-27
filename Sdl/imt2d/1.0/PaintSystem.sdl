@@ -26,35 +26,35 @@ type Painter {
 
 type Point2dShape {
 	point: Point2d!
-	painter: Painter!
+	painter: Painter
 }
 
 type Line2dShape {
 	line: Line2d!
-	painter: Painter!
+	painter: Painter
 }
 
 type Polyline2dShape {
 	polyline2d: Polyline2d!
-	painter: Painter!
+	painter: Painter
 }
 
 type Polygon2dShape {
 	polygon2d: Polygon2d!
-	painter: Painter!
+	painter: Painter
 }
 
 type Rectangle2dShape {
 	rectangle2d: Rectangle2d!
-	painter: Painter!
+	painter: Painter
 }
 
 type CircleShape {
 	Circle: Circle!
-	painter: Painter!
+	painter: Painter
 }
 
 type AnnulusShape {
 	annulus: Annulus!
-	painter: Painter!
+	painter: Painter
 }

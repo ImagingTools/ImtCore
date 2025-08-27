@@ -327,7 +327,7 @@ class ImtCoreConan(ConanFile):
         # probably limitation of conan 1.x when using v2 features
         # HACK: we call it in package_info() instead of layout() because deps_cpp_info is needed to calculate the directory name
         self.cpp.source.includedirs = ["Include", "Impl"]
-        self.cpp.build.includedirs = [os.path.join("AuxInclude", self._include_folder_suffix())]
+        self.cpp.build.includedirs = [os.path.join("AuxInclude", self._include_folder_suffix()), os.path.join("AuxInclude", self._include_folder_suffix(), "GeneratedFiles")]
         self.cpp.build.libdirs = self.cpp_info.libdirs
 
         cmakeModules = [

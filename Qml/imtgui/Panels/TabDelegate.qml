@@ -9,6 +9,8 @@ ControlBase {
 	property bool selected: tabPanel ? model.index === tabPanel.selectedIndex : false;
 	property bool firstElement: model.index === 0;
 	property bool lastElement: listView ? model.index === listView.count - 1 : false;
+	// property bool lastElement: model.index === model.count - 1;
+
 	property bool autoWidth: true;
 	property bool isCloseEnable: true;
 

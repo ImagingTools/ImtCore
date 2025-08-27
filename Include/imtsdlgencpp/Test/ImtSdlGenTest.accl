@@ -8,7 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ConsoleLog" X="550" Y="425" Note=""/>
+        <Element ComponentName="ConsoleLog" X="525" Y="425" Note=""/>
         <Element ComponentName="CppCodeGeneratorFramework" X="575" Y="725" Note=""/>
         <Element ComponentName="QmlCodeGenFramework" X="525" Y="150" Note=""/>
         <Element ComponentName="SdlCoreFramework" X="850" Y="425" Note=""/>

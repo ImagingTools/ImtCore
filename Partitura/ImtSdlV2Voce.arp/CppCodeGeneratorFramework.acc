@@ -20,6 +20,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
+                                <Value>QmlRegisterGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -59,7 +60,6 @@
                                 <Value>SdlGqlCodeGeneratorFramework/GqlHandlerBaseClassGenerator</Value>
                                 <Value>SdlGqlCodeGeneratorFramework/GqlWrapClassCodeGenerator</Value>
                                 <Value>QmlRegisterGenerator</Value>
-                                <Value>SdlQObjectGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -98,6 +98,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SdlClassCodeGenerator</Value>
+                                <Value>SdlQObjectGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -105,6 +106,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>SdlUnionGenerator</Value>
+                                <Value>SdlQObjectGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

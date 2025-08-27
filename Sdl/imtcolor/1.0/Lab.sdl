@@ -10,6 +10,26 @@ type Lab {
 	b: Double!
 }
 
+enum ObserverType {
+	DegreeTwo
+	DegreeTen
+}
+
+enum IlluminantType {
+	D50
+	D65
+}
+
+type TristimulusSpec {
+	observer: ObserverType
+	illuminantType: IlluminantType
+}
+
+type LabColor {
+	lab: Lab
+	tristimulusSpec: TristimulusSpec
+}
+
 # type Rgb {
 # 	red: Double!
 # 	green: Double!
