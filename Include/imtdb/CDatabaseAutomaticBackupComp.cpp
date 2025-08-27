@@ -21,23 +21,24 @@ void CDatabaseAutomaticBackupComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_backupSettingsCompPtr.IsValid()){
-		connect(&m_timer, &QTimer::timeout, this, &CDatabaseAutomaticBackupComp::OnTimeout);
-		connect(&m_backupWatcher, &QFutureWatcher<bool>::finished, this, &CDatabaseAutomaticBackupComp::OnBackupFinished);
+	if (!m_backupSettingsCompPtr.IsValid()){
+		return;
+	}
 
-		const int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr : 60000;
-		m_timer.setInterval(interval);
+	connect(&m_backupWatcher, &QFutureWatcher<bool>::finished, this, &CDatabaseAutomaticBackupComp::OnBackupFinished);
+	connect(&m_timer, &QTimer::timeout, this, &CDatabaseAutomaticBackupComp::OnTimeout);
 
-		if (!*m_backupOnStartAttrPtr){
-			m_timer.start();
-		}
-		else{
+	m_timer.setInterval(*m_checkIntervalAttrPtr);
+
+	if (!*m_backupOnStartAttrPtr){
+		m_timer.start();
+	}
+	else{
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-			m_backupWatcher.setFuture(QtConcurrent::run(this, &CDatabaseAutomaticBackupComp::Backup));
+		m_backupWatcher.setFuture(QtConcurrent::run(this, &CDatabaseAutomaticBackupComp::Backup));
 #else
-			m_backupWatcher.setFuture(QtConcurrent::run(&CDatabaseAutomaticBackupComp::Backup, this));
+		m_backupWatcher.setFuture(QtConcurrent::run(&CDatabaseAutomaticBackupComp::Backup, this));
 #endif
-		}
 	}
 }
 
@@ -93,12 +94,12 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	const QString filePath = folder.filePath(fileName);
 
 	// Use pg_dump with compression to reduce backup size
-	QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -Fc -f \"%4\" \"%5\"")
+	QString pgDumpCommand = QStringLiteral("pg_dump -h %1 -U %2 -p %3 -Fc -f \"%4\" \"%5\"")
 								.arg(host, userName, QString::number(port), filePath, dbName);
 
 	QProcess process;
 	process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
-	process.setEnvironment(QStringList() << QStringLiteral("PGPASSWORD=") + password);
+	process.setEnvironment({ QStringLiteral("PGPASSWORD=") + password });
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 	process.start(pgDumpCommand);
@@ -113,12 +114,12 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	}
 
 	if (process.exitCode() != 0){
-		SendErrorMessage(0, QString("Backup failed: '%1'").arg(qPrintable(process.readAllStandardError())), QStringLiteral("CDatabaseAutomaticBackupComp"));
+		SendErrorMessage(0, QStringLiteral("Backup failed: '%1'").arg(QString::fromUtf8(process.readAllStandardError())), QStringLiteral("CDatabaseAutomaticBackupComp"));
 
 		return false;
 	}
 
-	SendInfoMessage(0, QString("Backup successful: '%1'").arg(filePath), QStringLiteral("CDatabaseAutomaticBackupComp"));
+	SendInfoMessage(0, QStringLiteral("Backup successful: '%1'").arg(filePath), QStringLiteral("CDatabaseAutomaticBackupComp"));
 
 	m_lastBackupDateTime = QDateTime::currentDateTime();
 
@@ -135,21 +136,20 @@ void CDatabaseAutomaticBackupComp::CleanupOldBackups(const QString& backupFolder
 	}
 
 	// Maximum number of backups to keep
-	static const int maxBackups = m_maxBackupCountAttrPtr.IsValid() ? *m_maxBackupCountAttrPtr : 20;
-	if (maxBackups < 0){
+	if (*m_maxBackupCountAttrPtr < 0){
 		return;
 	}
 
 	QStringList backupFiles = GetPrevBackupsList(backupFolderPath);
 
 	QDir folder(backupFolderPath);
-	while (backupFiles.size() > maxBackups){
+	while (backupFiles.size() > *m_maxBackupCountAttrPtr){
 		const QString oldestBackup = backupFiles.takeFirst();
 		if (!folder.remove(oldestBackup)){
-			SendErrorMessage(0, QString("Failed to remove old backup: '%1'").arg(oldestBackup), QStringLiteral("CDatabaseAutomaticBackupComp"));
+			SendErrorMessage(0, QStringLiteral("Failed to remove old backup: '%1'").arg(oldestBackup), QStringLiteral("CDatabaseAutomaticBackupComp"));
 		}
 		else{
-			SendInfoMessage(0, QString("Deleted old backup: '%1'").arg(oldestBackup), QStringLiteral("CDatabaseAutomaticBackupComp"));
+			SendInfoMessage(0, QStringLiteral("Deleted old backup: '%1'").arg(oldestBackup), QStringLiteral("CDatabaseAutomaticBackupComp"));
 		}
 	}
 }
@@ -193,6 +193,8 @@ void CDatabaseAutomaticBackupComp::OnBackupFinished()
 
 void CDatabaseAutomaticBackupComp::OnTimeout()
 {
+	qDebug() << "CDatabaseAutomaticBackupComp::OnTimeout";
+
 	if (!m_backupSettingsCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'BackupSettings' was not set", "CDatabaseAutomaticBackupComp");
 
@@ -222,51 +224,51 @@ void CDatabaseAutomaticBackupComp::OnTimeout()
 		return;
 	}
 
-	if (currentDateTime >= startTime){
-		/** Prevent reduntant backups right after startup if any backups within the given time constraint already exist.
-			Check latest backup modification time if such backup exists and set it as last backup time.
-			Ensure continued backup creation in case of manual backup directory cleanup.
-		*/
-		iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(m_backupSettingsCompPtr.GetPtr(), QByteArrayLiteral("BackupFolder"), false);
-		const QString backupFolderPath = fileNameParamPtr.IsValid() ? fileNameParamPtr->GetPath() : QStringLiteral(".");
+	if (currentDateTime < startTime){
+		return;
+	}
 
-		QStringList backupFiles = GetPrevBackupsList(backupFolderPath, QDir::Time);
-		if(backupFiles.isEmpty()){
-			m_lastBackupDateTime = QDateTime();
-		}
-		else{
-			const QString latestBackupName = backupFiles.takeFirst();
-			const QFile latestBackup(backupFolderPath + '/' + latestBackupName);
-			if(latestBackup.exists()){\
-				/// \bug? (tested on Qt 6.8.1) QFile::fileTime returns time as UTC even if system time zone is not UTC
-				const qint64 latestBackupTimeSecs = latestBackup.fileTime(QFileDevice::FileModificationTime).toSecsSinceEpoch();
-				const QDateTime latestBackupTime = QDateTime::fromSecsSinceEpoch(latestBackupTimeSecs);
-				if(latestBackupTime.isValid()){
-					// qDebug() << "OnTimeout: latestBackupTime" << latestBackupTime;
-					m_lastBackupDateTime = latestBackupTime;
-				}
+	/** Prevent reduntant backups right after startup if any backups within the given time constraint already exist.
+		Check latest backup modification time if such backup exists and set it as last backup time.
+		Ensure continued backup creation in case of manual backup directory cleanup.
+	*/
+	iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(m_backupSettingsCompPtr.GetPtr(), QByteArrayLiteral("BackupFolder"), false);
+	const QString backupFolderPath = fileNameParamPtr.IsValid() ? fileNameParamPtr->GetPath() : QStringLiteral(".");
+
+	QStringList backupFiles = GetPrevBackupsList(backupFolderPath, QDir::Time);
+	if(backupFiles.isEmpty()){
+		m_lastBackupDateTime = QDateTime();
+	}
+	else{
+		const QString latestBackupName = backupFiles.takeFirst();
+		const QFile latestBackup(backupFolderPath + '/' + latestBackupName);
+		if(latestBackup.exists()){\
+			const qint64 latestBackupTimeSecs = latestBackup.fileTime(QFileDevice::FileModificationTime).toSecsSinceEpoch();
+			const QDateTime latestBackupTime = QDateTime::fromSecsSinceEpoch(latestBackupTimeSecs);
+			if(latestBackupTime.isValid()){
+				m_lastBackupDateTime = latestBackupTime;
 			}
 		}
+	}
 
-		const bool validLastBackupDate = m_lastBackupDateTime.isValid();
-		bool shouldBackup = !validLastBackupDate;
-		if (validLastBackupDate){
-			const int interval = schedulerParamPtr->GetInterval();
-			const int secs = m_lastBackupDateTime.secsTo(currentDateTime);
-			shouldBackup = bool(secs >= interval);
-		}
+	const bool validLastBackupDate = m_lastBackupDateTime.isValid();
+	bool shouldBackup = !validLastBackupDate;
+	if (validLastBackupDate){
+		const int interval = schedulerParamPtr->GetInterval();
+		const int secs = m_lastBackupDateTime.secsTo(currentDateTime);
+		shouldBackup = bool(secs >= interval);
+	}
 
-		if (shouldBackup){
-			SendInfoMessage(0, QStringLiteral("Starting database backup..."), QStringLiteral("CDatabaseAutomaticBackupComp"));
+	if (shouldBackup){
+		SendInfoMessage(0, QStringLiteral("Starting database backup..."), QStringLiteral("CDatabaseAutomaticBackupComp"));
 
-			m_timer.stop();
+		m_timer.stop();
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-			m_backupWatcher.setFuture(QtConcurrent::run(this, &CDatabaseAutomaticBackupComp::Backup));
+		m_backupWatcher.setFuture(QtConcurrent::run(this, &CDatabaseAutomaticBackupComp::Backup));
 #else
-			m_backupWatcher.setFuture(QtConcurrent::run(&CDatabaseAutomaticBackupComp::Backup, this));
+		m_backupWatcher.setFuture(QtConcurrent::run(&CDatabaseAutomaticBackupComp::Backup, this));
 #endif
-		}
 	}
 }
 
