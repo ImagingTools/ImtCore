@@ -34,7 +34,7 @@ bool CQmlGuiCompBase::CreateGui(QWidget* parentPtr)
 {
 	if (m_quickWidget == nullptr){
 #if QT_VERSION > 0x060000
-		// QQuickWindow::setGraphicsApi(QSGRendererInterface::Direct3D11);
+		QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 #endif
 		m_quickWidget = new QQuickWidget(parentPtr);
 		m_quickWidget->setContentsMargins(0, 0, 0, 0);
