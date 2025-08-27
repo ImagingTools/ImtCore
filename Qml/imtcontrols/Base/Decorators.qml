@@ -53,7 +53,7 @@ StyleComponents {
 	itemDelegateDecorator: itemDelegateDecoratorComp;
 
 	popupDecorator: popupDecoratorComp;
-	popupDecoratorGql: popupDecoratorCompGql;
+	popupDecoratorGql: popupDecoratorGqlComp;
 	popupItemDelegateDecorator: popupItemDelegateDecoratorComp;
 	detailedPopupItemDelegateDecorator: detailedPopupItemDelegateDecoratorComp;
 
