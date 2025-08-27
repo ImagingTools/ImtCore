@@ -12,14 +12,11 @@ namespace imtdev
 {
 
 
-/**
-	\todo rename to IEditableDeviceInstanceInfo
-*/
-class IDeviceInstanceInfoEditor : virtual public IDeviceInstanceInfo
+class IEditableDeviceInstanceInfo : virtual public IDeviceInstanceInfo
 {
 public:
 	/**
-		Set the device-ID with the given ID-type
+		Set the device ID with the given IdType
 	*/
 	virtual bool SetIdentifier(IdentifierTypes idType, const QByteArray& id) = 0;
 
@@ -27,10 +24,10 @@ public:
 		Set the device version
 	*/
 	virtual bool SetVersion(
-				int versionId,
-				quint32 version,
-				const QString& name,
-				const QString& description) = 0;
+		int versionId,
+		quint32 version,
+		const QString& name,
+		const QString& description) = 0;
 
 	/**
 		Get device instance attributes manager
@@ -39,7 +36,7 @@ public:
 };
 
 
-typedef std::shared_ptr<IDeviceInstanceInfoEditor> DeviceInstanceInfoEditorPtr;
+typedef std::shared_ptr<IEditableDeviceInstanceInfo> EditableDeviceInstanceInfoPtr;
 
 
 } // namespace imtdev

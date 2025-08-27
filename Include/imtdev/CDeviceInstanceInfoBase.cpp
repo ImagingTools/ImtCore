@@ -25,7 +25,7 @@ CDeviceInstanceInfoBase::~CDeviceInstanceInfoBase()
 }
 
 
-// reimplemented (imtdev::IDeviceInstanceInfoEditor)
+// reimplemented (imtdev::IEditableDeviceInstanceInfo)
 
 bool CDeviceInstanceInfoBase::SetIdentifier(IdentifierTypes idType, const QByteArray& value)
 {

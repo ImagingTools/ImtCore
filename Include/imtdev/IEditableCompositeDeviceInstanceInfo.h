@@ -15,7 +15,7 @@ class IDeviceStaticInfo;
 /**
 	Interface for changing information about a composite device instance
 */
-class ICompositeDeviceInstanceInfoEditor : virtual public ICompositeDeviceInstanceInfo
+class IEditableCompositeDeviceInstanceInfo : virtual public ICompositeDeviceInstanceInfo
 {
 public:
 	/**
@@ -34,7 +34,7 @@ public:
 };
 
 
-typedef std::shared_ptr<ICompositeDeviceInstanceInfoEditor> CompositeDeviceInstanceInfoEditorPtr;
+typedef std::shared_ptr<IEditableCompositeDeviceInstanceInfo> EditableCompositeDeviceInstanceInfoPtr;
 
 
 } // namespace imtdev

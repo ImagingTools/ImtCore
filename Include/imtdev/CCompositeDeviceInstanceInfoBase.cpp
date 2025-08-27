@@ -30,7 +30,7 @@ CCompositeDeviceInstanceInfoBase::~CCompositeDeviceInstanceInfoBase()
 }
 
 
-// reimplemented (imtdev::ICompositeDeviceInstanceInfoEditor)
+// reimplemented (imtdev::IEditableCompositeDeviceInstanceInfo)
 
 QByteArray CCompositeDeviceInstanceInfoBase::AddSubDevice(
 	const QByteArray& deviceTypeId,

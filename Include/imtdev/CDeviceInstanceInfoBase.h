@@ -6,7 +6,7 @@
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
-#include <imtdev/IDeviceInstanceInfoEditor.h>
+#include <imtdev/IEditableDeviceInstanceInfo.h>
 #include <imtdev/IDeviceStaticInfo.h>
 
 
@@ -14,13 +14,13 @@ namespace imtdev
 {
 
 
-class CDeviceInstanceInfoBase : virtual public IDeviceInstanceInfoEditor
+class CDeviceInstanceInfoBase : virtual public IEditableDeviceInstanceInfo
 {
 public:
 	CDeviceInstanceInfoBase();
 	~CDeviceInstanceInfoBase();
 
-	// reimplemented (imtdev::IDeviceInstanceInfoEditor)
+	// reimplemented (imtdev::IEditableDeviceInstanceInfo)
 	virtual bool SetIdentifier(IdentifierTypes idType, const QByteArray& id) override;
 	virtual bool SetVersion(
 		int versionId,

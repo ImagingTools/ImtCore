@@ -8,8 +8,7 @@
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
-#include <imtdev/ICompositeDeviceInstanceInfoEditor.h>
-#include <imtdev/IDeviceInstanceInfoEditor.h>
+#include <imtdev/IEditableCompositeDeviceInstanceInfo.h>
 #include <imtdev/CDeviceInstanceInfoBase.h>
 
 
@@ -17,7 +16,7 @@ namespace imtdev
 {
 
 
-class CCompositeDeviceInstanceInfoBase : public CDeviceInstanceInfoBase, virtual public ICompositeDeviceInstanceInfoEditor
+class CCompositeDeviceInstanceInfoBase : public CDeviceInstanceInfoBase, virtual public IEditableCompositeDeviceInstanceInfo
 {
 public:
 	typedef CDeviceInstanceInfoBase BaseClass;
@@ -25,7 +24,7 @@ public:
 	CCompositeDeviceInstanceInfoBase();
 	~CCompositeDeviceInstanceInfoBase();
 
-	// reimplemented (ICompositeDeviceInstanceInfoEditor)
+	// reimplemented (IEditableCompositeDeviceInstanceInfo)
 	virtual QByteArray AddSubDevice(
 		const QByteArray& deviceTypeId,
 		const QString& name,
