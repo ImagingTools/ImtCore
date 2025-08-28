@@ -158,7 +158,7 @@ Rectangle {
 		duration: graphicsView.resizePauseDuration
 		onFinished: {
 			graphicsView.restrictDrawing = false
-			resize()
+			graphicsView.resize()
 		}
 	}
 
