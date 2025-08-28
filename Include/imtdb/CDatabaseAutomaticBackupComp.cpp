@@ -163,8 +163,7 @@ QStringList CDatabaseAutomaticBackupComp::GetPrevBackupsList(const QString& back
 	}
 
 	static const QString dbName = m_databaseLoginSettingsCompPtr->GetDatabaseName();
-	QStringList filters;
-	filters << dbName + QStringLiteral("_*.backup");
+	const QStringList filters({ dbName + QStringLiteral("_*.backup") });
 
 	folder.setSorting(sortFlags);
 	folder.setFilter(QDir::Files);
@@ -193,8 +192,6 @@ void CDatabaseAutomaticBackupComp::OnBackupFinished()
 
 void CDatabaseAutomaticBackupComp::OnTimeout()
 {
-	qDebug() << "CDatabaseAutomaticBackupComp::OnTimeout";
-
 	if (!m_backupSettingsCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Attribute 'BackupSettings' was not set", "CDatabaseAutomaticBackupComp");
 

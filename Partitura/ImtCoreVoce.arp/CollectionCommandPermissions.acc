@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5225" Description="ACF"/>
-            <Version Id="1" Number="2208" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395521" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -158,7 +158,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::ICommandPermissionsProvider" ComponentId="CommandsJoiner"/>
+        <Interface InterfaceId="imtserverapp::ICommandPermissionsProvider" ComponentId="CommandsJoiner"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="CommandsJoiner"/>
     </ExportedInterfaces>
     <ExportedComponents/>

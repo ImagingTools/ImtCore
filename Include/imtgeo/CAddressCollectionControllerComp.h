@@ -15,7 +15,7 @@ public:
 	typedef imtservergql::CLegacyObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAddressCollectionControllerComp);
-		I_ASSIGN(m_addressTypeCollectionPtr, "AddressTypeComponent", "The string address type collection", true, "AddressTypeCollection");
+		I_ASSIGN(m_addressTypeCollectionPtr, "AddressTypeComponent", "The string address type collection", false, "AddressTypeCollection");
 	I_END_COMPONENT;
 
 protected:
