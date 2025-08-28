@@ -20,6 +20,7 @@ class Item extends QtObject {
         x: { type: QAutoGeometry, value: 0, changed: '$xChanged' },
         y: { type: QAutoGeometry, value: 0, changed: '$yChanged' },
         z: { type: QInt, value: 0, changed: '$zChanged' },
+        antialiasing: { type: QBool, value: false },
         width: { type: QAutoGeometry, value: 0, changed: '$widthChanged' },
         height: { type: QAutoGeometry, value: 0, changed: '$heightChanged' },
         visible: { type: QVisible, value: true, changed: '$visibleChanged' },
