@@ -13,8 +13,6 @@ Rectangle {
 
 	color: Style.baseColor;
 
-	property BaseModel objectsModel: BaseModel {}
-
 	property alias selectedIndex: canvas.selectedIndex;
 
 	//for scrollBars
@@ -82,7 +80,7 @@ Rectangle {
 	property int resizePauseDuration: 100;
 
 	property bool canvasAntialiasing
-	property alias renderStrategy: canvas.renderStrategy
+	property int renderStrategy: Canvas.Threaded
 
 	signal copySignal(int index);
 	signal pasteSignal(int index);
@@ -136,10 +134,6 @@ Rectangle {
 
 	onContentYChanged: {
 		canvas.deltaY = -graphicsView.contentY
-	}
-
-	onObjectsModelChanged: {
-		requestPaintPause.restart();
 	}
 
 	onAutoFitChanged: {
@@ -285,52 +279,6 @@ Rectangle {
 		if(requestPaint_){
 			requestPaintPause.restart()		}
 
-	}
-
-
-	function findModelIndex(id){
-		let ind = -1;
-		if(!id) return ind
-		for(let i = 0; i < objectsModel.count; i++){
-			if(objectsModel.get(i).item.m_id == id){
-				ind = i;
-				break;
-			}
-		}
-		return ind;
-	}
-
-	function goInside(){
-		if(objectsModel.count > canvas.selectedIndex && canvas.selectedIndex >= 0){
-			// let isComposite = objectsModel.isValidData("isComposite", canvas.selectedIndex) ? objectsModel.getData("isComposite", canvas.selectedIndex) : false;
-			// if(!isComposite){
-			//     return;
-			// }
-			// let id = objectsModel.getData("id", canvas.selectedIndex);
-			//console.log("Go inside");
-		}
-	}
-
-	function correctPosition(addX, addY){
-		for(let i = 0; i < graphicsView.objectsModel.count; i++){
-			let item = graphicsView.objectsModel.get(i).item;
-
-			item.m_x = item.m_x + addX;
-			item.m_y = item.m_y + addY;
-
-			// graphicsView.objectsModel.set(i, item);
-		}
-	}
-
-	function correctPositionScaled(addX, addY, scale_){
-		for(let i = 0; i < objectsModel.count; i++){
-			let item = objectsModel.get(i).item;
-
-			let newWidth = scale_ * item.m_width;
-			item.m_width = newWidth;
-
-			// graphicsView.objectsModel.set(i, item);
-		}
 	}
 
 	function findObject(mouseX, mouseY){
@@ -686,9 +634,6 @@ Rectangle {
 				wasMoving = false;
 				isPressed = false;
 
-				if(canvas.selectedIndex >= 0){
-					graphicsView.goInside();
-				}
 			}
 
 			onDeltaSignal: {
@@ -878,8 +823,8 @@ Rectangle {
 			x: canvas.deltaX;
 			y: canvas.deltaY;
 
-			width: canvas.backgroundWidth * canvas.scaleCoeff;
-			height: canvas.backgroundHeight * canvas.scaleCoeff;
+			width: graphicsView.drawingAreaWidth * canvas.scaleCoeff;
+			height: graphicsView.drawingAreaHeight * canvas.scaleCoeff;
 			property real topY: y;
 			property real bottomY: y + height;
 			property real leftX: x;
@@ -892,7 +837,8 @@ Rectangle {
 			id: canvas
 
 			anchors.fill: parent;
-			renderStrategy: Canvas.Threaded
+
+			renderStrategy: graphicsView.renderStrategy
 
 			antialiasing: graphicsView.canvasAntialiasing;
 
@@ -905,47 +851,6 @@ Rectangle {
 			property real deltaY: 0.0;
 
 			property int selectedIndex: -1;
-			property int hoverIndex: -1;
-			property bool hasTailSelection: false;
-
-			//sizes
-			property real mainRec_width: 250
-			property real mainRec_height: 60
-
-			property int fontSize: 20
-			property int fontSizeS: 14
-			property int radius_: 2
-			property int borderShift: 4
-			property int shadowSize: 6
-
-			property int backgroundStep: 30
-			property int backgroundWidth: graphicsView.drawingAreaWidth
-			property int backgroundHeight: graphicsView.drawingAreaHeight
-
-			property int intersectionSize: 16
-			property int arcRadius: 8
-			property int textMargin: 8
-			property int textVerticalOffset: 22
-			property real imageSize: 20
-			property real imageMargin: 4
-
-			//colors
-			property string selectedColor: Style.selectedColor
-			property string mainColor: Style.borderColor2
-			property string errorColor: Style.errorColor
-			property string compositeColor: "#bcd2e8";
-			property string compositeSelectedColor: "#1167b1";
-			property string selectedLinkFromColor: Style.selectedLinkFromColor
-			property string selectedLinkToColor: Style.selectedLinkToColor
-			property string linkColor: Style.borderColor2
-			property string mainTextColor: Style.textColor
-			property string secondTextColor: Style.inactiveTextColor
-			property string gridColor: Style.imagingToolsGradient1;
-			property string backgroundBorderColor: Style.borderColor; // Style.alternateBaseColor;
-			property string backgroundColor: Style.baseColor;
-			property string innerFrameColor: "transparent";
-
-
 
 			onImageLoaded: {
 				requestPaintPause.restart();
@@ -1146,67 +1051,6 @@ Rectangle {
 		}
 	}
 
-	function copyObjectFunc(index){
-		if(index >= 0){
-			// bufferModel.clear();
-			// bufferModel.copyItemDataFromModel(0, graphicsView.objectsModel, index);
-		}
-	}
-
-	function pasteObjectFunc(){
-		if(bufferModel.getItemsCount()){
-			bufferModel.setExternTreeModel("links", emptyModel, 0);
-			let mainText = bufferModel.getData("mainText") + "_1";
-			let secondText = bufferModel.getData("secondText") + "_1";
-			let x_ = bufferModel.getData("x") + 10;
-			let y_ = bufferModel.getData("y") + 10;
-
-			//TO DO: unique Id
-			var date = new Date();
-			let datString = String(date.valueOf());
-			bufferModel.setData("id", datString, 0);
-
-			bufferModel.setData("mainText", mainText, 0);
-			bufferModel.setData("secondText", secondText, 0);
-			bufferModel.setData("x", x_, 0);
-			bufferModel.setData("y", y_, 0);
-			bufferModel.setData("Selected", false, 0);
-			// let index = graphicsView.objectsModel.insertNewItem();
-			// graphicsView.objectsModel.copyItemDataFromModel(index, bufferModel,0);
-
-			canvas.selectedIndex = 100//index;
-
-			requestPaintPause.restart();
-		}
-	}
-
-	function deleteObjectFunc(index){
-		console.log("DELETE OBJECT: ", index);
-		let id = graphicsView.objectsModel.get(index).item.m_id;
-
-		//remove links
-		for(let i = 0; i < graphicsView.objectsModel.count; i++){
-			let item = graphicsView.objectsModel.get(i).item;
-			let links = item.m_links;
-			if(links !== undefined){
-				for(let k = 0; k < links.count; k++){
-					let itemLink = links.get(k).item;
-					let objectId = itemLink.m_objectId;
-					if(objectId == id){
-						links.removeItem(k);
-						break;
-					}
-				}
-			}
-		}
-
-		//remove object
-		graphicsView.objectsModel.removeItem(index);
-
-		canvas.selectedIndex = -1;
-
-		requestPaintPause.restart();
-	}
 
 
 	CustomScrollbar{
@@ -1598,7 +1442,5 @@ Rectangle {
 
 		}
 	}
-
-
 
 }

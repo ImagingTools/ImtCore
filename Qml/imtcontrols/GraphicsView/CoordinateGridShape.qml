@@ -2,6 +2,9 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 
+import imtcontrols 1.0
+
+
 BoundingBox {
 
 	id: gridShape;
@@ -82,12 +85,10 @@ BoundingBox {
 		ctx.strokeStyle = gridShape.majorGridColor;
 
 		//background
-		identityMatrix.setContextTransform(ctx);
 
 		ctx.fillRect(labelXWidth,0, gridShape.viewItem.drawingAreaWidth - labelXWidth, gridShape.viewItem.drawingAreaHeight - labelYHeight)
 		// ctx.fillRect(0,0, gridShape.viewItem.drawingAreaWidth, gridShape.viewItem.drawingAreaHeight)
 
-		//layerMatrix.setContextTransform(ctx);
 
 		//GRID
 		let verticalLineTopY = (gridShape.viewItem.drawingAreaHeight - labelYHeight) - (Math.trunc((gridShape.viewItem.drawingAreaHeight - labelYHeight)/ stepY) * stepY) - deltaAddY;
@@ -295,7 +296,6 @@ BoundingBox {
 
 
 		//AXES BACKGROUND
-		//identityMatrix.setContextTransform(ctx);
 
 		ctx.fillStyle = backgroundColor;
 		ctx.fillRect(0,0, labelXWidth, gridShape.viewItem.drawingAreaHeight)
@@ -315,8 +315,6 @@ BoundingBox {
 
 			//label x
 			labelMatrix.setXTranslation(deltaX);
-			labelMatrix.setYTranslation(0);
-			labelMatrix.setContextTransform(ctx);
 
 			for(let i = 1; i * stepX  <= (gridShape.viewItem.drawingAreaWidth - labelXWidth + deltaAddX)/scaleCoeff; i++){
 				if(gridShape.thinningCheck(scaleCoeff, i)){
@@ -324,6 +322,7 @@ BoundingBox {
 				}
 				let x_ = (firstVertLineX + labelXWidth + i * stepX) * scaleCoeff;
 				let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
+				x_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).x
 				ctx.beginPath()
 				let str = String(getLogicalMajorLineX(Number(firstVertLineX + i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision)))
 
@@ -340,6 +339,8 @@ BoundingBox {
 				}
 				let x_ = (firstVertLineX + labelXWidth - i * stepX) * scaleCoeff;
 				let y_ = gridShape.viewItem.drawingAreaHeight  - labelYHeight + fontSize + Style.marginXS
+				x_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).x
+
 				ctx.beginPath()
 				let str = String(getLogicalMajorLineX(Number(firstVertLineX -i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision)))
 
@@ -353,9 +354,7 @@ BoundingBox {
 
 			//LABEL Y
 			labelMatrix.reset()
-			//labelMatrix.setXTranslation(0);
 			labelMatrix.setYTranslation(deltaY);
-			labelMatrix.setContextTransform(ctx);
 
 			for(let i = 1; i * stepY * scaleCoeff < (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY) * scaleCoeff / scaleMax1; i++){
 				if(gridShape.thinningCheck(scaleCoeff, i)){
@@ -363,6 +362,8 @@ BoundingBox {
 				}
 				let x_ = labelXWidth;
 				let y_ = (gridShape.viewItem.drawingAreaHeight - i * stepY - labelYHeight - firstHorizLineY)* scaleCoeff
+				y_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).y
+
 				//console.log("deltaAddY:: ", y_, deltaAddY, (gridShape.viewItem.drawingAreaHeight - labelYHeight + deltaAddY * scaleCoeff))
 
 				ctx.beginPath()
@@ -381,6 +382,8 @@ BoundingBox {
 				}
 				let x_ = labelXWidth;
 				let y_ = (gridShape.viewItem.drawingAreaHeight + i * stepY  - labelYHeight - firstHorizLineY)* scaleCoeff
+				y_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).y
+
 				ctx.beginPath()
 				let str = String(getLogicalMajorLineY(Number(firstHorizLineY -i * stepY - gridShape.axesOrigin.y).toFixed(gridShape.labelPrecision)))
 
@@ -395,7 +398,6 @@ BoundingBox {
 
 		//coordinate axis
 
-		identityMatrix.setContextTransform(ctx);
 
 		//labeles background
 		ctx.fillStyle = backgroundColor;

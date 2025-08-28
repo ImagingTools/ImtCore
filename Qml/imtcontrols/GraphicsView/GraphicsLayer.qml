@@ -73,7 +73,6 @@ QtObject {
 		}
 
 		tempMatrix.matrix = LinearAlgebra.multiplyByMatrix3x3(viewMatrix.matrix, layerMatrix.matrix)
-		//tempMatrix.setContextTransform(ctx)
 
 		for(let i = 0; i < shapeModel.length; i++){
 			ctx.globalAlpha = 1
