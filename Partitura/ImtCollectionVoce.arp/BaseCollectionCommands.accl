@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CommandGroup" X="575" Y="375" Note=""/>
+        <Element ComponentName="CommandsController" X="575" Y="125" Note=""/>
+        <Element ComponentName="Edit" X="575" Y="600" Note=""/>
+        <Element ComponentName="GuiElementContainer" X="575" Y="250" Note=""/>
+        <Element ComponentName="New" X="575" Y="500" Note=""/>
+        <Element ComponentName="Remove" X="575" Y="700" Note=""/>
+        <Element ComponentName="Revision" X="275" Y="525" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
