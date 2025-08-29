@@ -1,5 +1,4 @@
 schema {
-	name: ProgressManager
 	namespace: imtbase
 	version: 1.0
 

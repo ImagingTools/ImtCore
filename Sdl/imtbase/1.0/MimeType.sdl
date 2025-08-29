@@ -1,5 +1,4 @@
 schema {
-	name: MimeType
 	namespace: imtbase
 	version: 1.0
 }

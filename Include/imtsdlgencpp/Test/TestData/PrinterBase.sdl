@@ -1,5 +1,4 @@
 schema {
-	name: PrinterBase
 	namespace: modsdl
 	version: 1.0
 	query: Query

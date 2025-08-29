@@ -1,6 +1,5 @@
 schema 
 {
-	name: Commands
 	namespace: imtbase
 	version: 1.0
 	query: Query

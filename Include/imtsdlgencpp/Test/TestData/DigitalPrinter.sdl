@@ -1,5 +1,4 @@
 schema {
-	name: DigitalPrinter
 	namespace: modsdl
 	version: 1.0
 }

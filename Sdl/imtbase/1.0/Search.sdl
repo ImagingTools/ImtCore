@@ -1,5 +1,4 @@
 schema {
-	name: Search
 	namespace: imtbase
 	version: 1.0
 	query: Query

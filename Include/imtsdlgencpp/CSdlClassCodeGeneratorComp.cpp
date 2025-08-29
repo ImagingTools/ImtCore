@@ -602,7 +602,7 @@ void CSdlClassCodeGeneratorComp::GenerateMethodImplementation(
 			stream << QStringLiteral("else {");
 			FeedStream(stream, 1, false);
 
-			AddErrorReport(stream, QStringLiteral("For auto version, 'version object not initialized."), 3);
+			AddErrorReport(stream, QStringLiteral("For auto version, 'version' object not initialized."), 3);
 
 			FeedStreamHorizontally(stream, 3);
 			stream << QStringLiteral("return false;");

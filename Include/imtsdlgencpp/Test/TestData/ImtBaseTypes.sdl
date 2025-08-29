@@ -1,5 +1,4 @@
 schema {
-	name: ImtBaseTypes
 	namespace: imtbase
 	version: 1.0
 }

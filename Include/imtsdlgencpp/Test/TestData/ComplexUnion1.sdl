@@ -1,5 +1,4 @@
 schema {
-	name: CTTypes
 	namespace: complextest
 	version: 1.0
 }

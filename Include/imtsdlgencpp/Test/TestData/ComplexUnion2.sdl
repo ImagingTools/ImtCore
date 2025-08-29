@@ -1,7 +1,6 @@
 schema {
 	query: Query
 	mutation: Mutation
-	name: CTImpl
 	namespace: complextest
 	version: 1.0
 }

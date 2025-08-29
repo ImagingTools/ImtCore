@@ -147,7 +147,6 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 			unionListParamsPtr = new iprm::CParamsSet;
 			outputParamsSetPtr->SetEditableParameter(s_unionListParamId, unionListParamsPtr, true);
 		}
-
 	}
 
 	// first ensure, this file is not processed. It is OK it already processed as import from another schema
@@ -216,6 +215,8 @@ iproc::IProcessor::TaskState CGqlSchemaParserComp::DoProcessing(
 
 		return TS_INVALID;
 	}
+
+	SetSchemaName(QFileInfo(m_currentSchemaFilePath).baseName());
 
 	BaseClass::SetDevice(*m_currentInputFilePtr);
 

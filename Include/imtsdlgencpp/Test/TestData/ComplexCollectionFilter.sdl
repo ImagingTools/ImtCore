@@ -1,5 +1,4 @@
 schema {
-	name: ComplexCollectionFilter
 	namespace: imtbase
 	version: 1.0
 }

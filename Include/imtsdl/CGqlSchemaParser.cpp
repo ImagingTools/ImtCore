@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
+#include <iprm/CTextParam.h>
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
@@ -102,6 +103,19 @@ bool CGqlSchemaParser::ParseGqlSchema()
 	retVal = retVal && ParseGqlSchema();
 
 	return retVal;
+}
+
+
+bool CGqlSchemaParser::SetSchemaName(const QString& schemaName)
+{
+	iprm::ITextParam* nameParamPtr = dynamic_cast<iprm::ITextParam*>(m_schemaParamsPtr->GetEditableParameter(SdlCustomSchemaKeys::SchemaName.toUtf8()));
+	if (nameParamPtr == nullptr){
+		nameParamPtr = new iprm::CTextParam;
+	}
+	nameParamPtr->SetText(schemaName);
+	const bool isSet = m_schemaParamsPtr->SetEditableParameter(SdlCustomSchemaKeys::SchemaName.toUtf8(), nameParamPtr, true);
+
+	return isSet;
 }
 
 
@@ -255,10 +269,12 @@ bool CGqlSchemaParser::ProcessSchema()
 		}
 		else if (!ProcessCustomSchemaValue(key, value)){
 			SendLogMessage(
-						istd::IInformationProvider::InformationCategory::IC_WARNING,
+						istd::IInformationProvider::InformationCategory::IC_ERROR,
 						0,
-						QString("Unexpected derictive '%1' at %2 line. It will be ignored.").arg(key, QString::number(m_lastReadLine + 1)),
+						QString("Unknown derictive '%1' at line %2. ").arg(key, QString::number(m_lastReadLine + 1)),
 						"CGqlSchemaParser");
+
+			return false;
 		}
 	}
 	while(foundDelimiter != '}');
@@ -354,8 +370,6 @@ bool CGqlSchemaParser::ProcessUnion()
 	currentUnion.SetName(unionName);
 	currentUnion.SetSchemaParamsPtr(m_schemaParamsPtr);
 
-	//retVal = ReadToDelimeterOrSpace("=", unionName);
-
 	bool atEnd = false;
 	while (!atEnd){
 		retVal = retVal && MoveToNextReadableSymbol() && MoveInside();
@@ -370,7 +384,7 @@ bool CGqlSchemaParser::ProcessUnion()
 		atEnd = bool(!retVal || foundDelimeter == '\n');
 	}
 
-	/// \todo make a common update method
+	/// \todo make a common update method \c CreateMetainfo
 	currentUnion.SetSchemaFilePath(m_originalSchemaFile);
 	currentUnion.SetSchemaParamsPtr(m_schemaParamsPtr);
 

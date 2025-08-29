@@ -1,5 +1,4 @@
 schema {
-	name: DocumentCollectionFilter
 	namespace: imtbase
 	version: 1.0
 }

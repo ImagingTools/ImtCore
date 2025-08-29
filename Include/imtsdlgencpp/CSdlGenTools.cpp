@@ -384,7 +384,7 @@ void CSdlGenTools::AddErrorReport(
 	for (const QString& argument: argset){
 		stream << ',' << ' ' << argument;
 	}
-	stream << QStringLiteral(");");
+	stream << QStringLiteral(").toLocal8Bit().constData();");
 
 	if (onlyDebug){
 		stream << ')';

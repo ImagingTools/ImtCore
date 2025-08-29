@@ -1,5 +1,4 @@
 schema {
-	name: DocumentRevision
 	namespace: imtbase
 	version: 1.0
 	query: Query

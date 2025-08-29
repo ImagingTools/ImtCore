@@ -1,5 +1,4 @@
 schema {
-	name: PaintSystem
 	namespace: imt2d
 	version: 1.0
 }

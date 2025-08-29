@@ -1,5 +1,4 @@
 schema {
-	name: Geometry
 	namespace: imt2d
 	version: 1.0
 }

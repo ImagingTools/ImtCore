@@ -1,7 +1,6 @@
 schema {
 	query: Query
 	mutation: Mutation
-	name: Authorization
 	namespace: imtauth
 	version: 1.0
 }

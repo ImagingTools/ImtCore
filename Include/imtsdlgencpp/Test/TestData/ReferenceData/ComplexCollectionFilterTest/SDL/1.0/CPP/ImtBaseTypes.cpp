@@ -159,7 +159,7 @@ bool CTimeRange::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, 
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -235,7 +235,7 @@ bool CTimeRange::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Prot
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -311,7 +311,7 @@ bool CTimeRange::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion vers
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -421,7 +421,7 @@ bool CSdlSize::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 {
 	QVariant widthData = model.GetData("width", modelIndex);
 	if (widthData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "width");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -429,7 +429,7 @@ bool CSdlSize::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int m
 
 	QVariant heightData = model.GetData("height", modelIndex);
 	if (heightData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "height");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "height").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -474,14 +474,14 @@ bool CSdlSize::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) 
 bool CSdlSize::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("width") || (gqlObject["width"].userType() != QMetaType::Float && gqlObject["width"].userType() != QMetaType::Double && gqlObject["width"].userType() != QMetaType::Int && gqlObject["width"].userType() != QMetaType::UInt && gqlObject["width"].userType() != QMetaType::LongLong && gqlObject["width"].userType() != QMetaType::ULongLong && gqlObject["width"].userType() != QMetaType::Long && gqlObject["width"].userType() != QMetaType::Short && gqlObject["width"].userType() != QMetaType::ULong && gqlObject["width"].userType() != QMetaType::UShort && gqlObject["width"].userType() != QMetaType::UChar)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
 
 		return false;
 	}
 	width = gqlObject["width"].toDouble();
 
 	if (!gqlObject.ContainsParam("height") || (gqlObject["height"].userType() != QMetaType::Float && gqlObject["height"].userType() != QMetaType::Double && gqlObject["height"].userType() != QMetaType::Int && gqlObject["height"].userType() != QMetaType::UInt && gqlObject["height"].userType() != QMetaType::LongLong && gqlObject["height"].userType() != QMetaType::ULongLong && gqlObject["height"].userType() != QMetaType::Long && gqlObject["height"].userType() != QMetaType::Short && gqlObject["height"].userType() != QMetaType::ULong && gqlObject["height"].userType() != QMetaType::UShort && gqlObject["height"].userType() != QMetaType::UChar)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "height");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "height").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -524,14 +524,14 @@ bool CSdlSize::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CSdlSize::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("width") || ! jsonObject["width"].isDouble()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "width").toLocal8Bit().constData();)
 
 		return false;
 	}
 	width = jsonObject["width"].toDouble();
 
 	if (!jsonObject.contains("height") || ! jsonObject["height"].isDouble()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "height");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "height").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -564,7 +564,7 @@ bool CSdlSize::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Pr
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -640,7 +640,7 @@ bool CSdlSize::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protoc
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -716,7 +716,7 @@ bool CSdlSize::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versio
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -826,7 +826,7 @@ bool CSdlPoint::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 {
 	QVariant xData = model.GetData("x", modelIndex);
 	if (xData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "x");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -834,7 +834,7 @@ bool CSdlPoint::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 
 	QVariant yData = model.GetData("y", modelIndex);
 	if (yData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "y");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "y").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -879,14 +879,14 @@ bool CSdlPoint::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 bool CSdlPoint::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("x") || (gqlObject["x"].userType() != QMetaType::Float && gqlObject["x"].userType() != QMetaType::Double && gqlObject["x"].userType() != QMetaType::Int && gqlObject["x"].userType() != QMetaType::UInt && gqlObject["x"].userType() != QMetaType::LongLong && gqlObject["x"].userType() != QMetaType::ULongLong && gqlObject["x"].userType() != QMetaType::Long && gqlObject["x"].userType() != QMetaType::Short && gqlObject["x"].userType() != QMetaType::ULong && gqlObject["x"].userType() != QMetaType::UShort && gqlObject["x"].userType() != QMetaType::UChar)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
 
 		return false;
 	}
 	x = gqlObject["x"].toDouble();
 
 	if (!gqlObject.ContainsParam("y") || (gqlObject["y"].userType() != QMetaType::Float && gqlObject["y"].userType() != QMetaType::Double && gqlObject["y"].userType() != QMetaType::Int && gqlObject["y"].userType() != QMetaType::UInt && gqlObject["y"].userType() != QMetaType::LongLong && gqlObject["y"].userType() != QMetaType::ULongLong && gqlObject["y"].userType() != QMetaType::Long && gqlObject["y"].userType() != QMetaType::Short && gqlObject["y"].userType() != QMetaType::ULong && gqlObject["y"].userType() != QMetaType::UShort && gqlObject["y"].userType() != QMetaType::UChar)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "y");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "y").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -929,14 +929,14 @@ bool CSdlPoint::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CSdlPoint::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("x") || ! jsonObject["x"].isDouble()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "x").toLocal8Bit().constData();)
 
 		return false;
 	}
 	x = jsonObject["x"].toDouble();
 
 	if (!jsonObject.contains("y") || ! jsonObject["y"].isDouble()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "y");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "y").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -969,7 +969,7 @@ bool CSdlPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1045,7 +1045,7 @@ bool CSdlPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1121,7 +1121,7 @@ bool CSdlPoint::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1814,7 +1814,7 @@ bool CParamTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1890,7 +1890,7 @@ bool CParamTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, P
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1966,7 +1966,7 @@ bool CParamTypeIds::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion v
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2269,7 +2269,7 @@ bool CUrlParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2345,7 +2345,7 @@ bool CUrlParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2421,7 +2421,7 @@ bool CUrlParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2607,7 +2607,7 @@ bool CIdParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Pr
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2683,7 +2683,7 @@ bool CIdParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protoc
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2759,7 +2759,7 @@ bool CIdParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versio
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2945,7 +2945,7 @@ bool CTextParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, 
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3021,7 +3021,7 @@ bool CTextParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Prot
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3097,7 +3097,7 @@ bool CTextParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion vers
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3283,7 +3283,7 @@ bool CEnableableParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3359,7 +3359,7 @@ bool CEnableableParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3435,7 +3435,7 @@ bool CEnableableParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersio
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3621,7 +3621,7 @@ bool CIntegerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3697,7 +3697,7 @@ bool CIntegerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, P
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3773,7 +3773,7 @@ bool CIntegerParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion v
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3961,7 +3961,7 @@ bool CDoubleParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4037,7 +4037,7 @@ bool CDoubleParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4113,7 +4113,7 @@ bool CDoubleParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4416,7 +4416,7 @@ bool COption::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Pro
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4492,7 +4492,7 @@ bool COption::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protoco
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4568,7 +4568,7 @@ bool COption::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4670,7 +4670,7 @@ bool COptionsList::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
 			newOptionsModelPtr->InsertNewItem();
 			if (!(options->at(optionsIndex).WriteToModel(*newOptionsModelPtr, optionsIndex))){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -4700,7 +4700,7 @@ bool COptionsList::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
 			COption::V1_0 options;
 			if (!options.ReadFromModel(*optionsModel, optionsIndex)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -4733,7 +4733,7 @@ bool COptionsList::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
 			COption::V1_0 options;
 			if (!options.OptReadFromModel(*optionsModel, optionsIndex)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -4762,7 +4762,7 @@ bool COptionsList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
 			::imtgql::CGqlParamObject newOptionsGqlObject;
 			if (!options->at(optionsIndex).WriteToGraphQlObject(newOptionsGqlObject)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -4796,7 +4796,7 @@ bool COptionsList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			}
 			COption::V1_0 tempOptions;
 			if (!tempOptions.ReadFromGraphQlObject(*optionsDataObjectPtr)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -4829,7 +4829,7 @@ bool COptionsList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			}
 			COption::V1_0 tempOptions;
 			if (!tempOptions.OptReadFromGraphQlObject(*optionsDataObjectPtr)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -4856,7 +4856,7 @@ bool COptionsList::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		for (qsizetype optionsIndex = 0; optionsIndex < options->size(); ++optionsIndex){
 			QJsonObject newOptionsJsonObject;
 			if (!options->at(optionsIndex).WriteToJsonObject(newOptionsJsonObject)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -4886,7 +4886,7 @@ bool COptionsList::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
 			COption::V1_0 tempOptions;
 			if (!tempOptions.ReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -4915,7 +4915,7 @@ bool COptionsList::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype optionsIndex = 0; optionsIndex < optionsArrayCount; ++optionsIndex){
 			COption::V1_0 tempOptions;
 			if (!tempOptions.OptReadFromJsonObject(optionsJsonArray[optionsIndex].toObject())){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -4936,7 +4936,7 @@ bool COptionsList::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5012,7 +5012,7 @@ bool COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5088,7 +5088,7 @@ bool COptionsList::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5184,7 +5184,7 @@ bool CSelectionParam::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int m
 		::imtbase::CTreeItemModel* constraintsNewModelPtr = model.AddTreeModel("constraints", modelIndex);
 		const bool isConstraintsAdded = constraints->WriteToModel(*constraintsNewModelPtr, 0);
 		if (!isConstraintsAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5207,7 +5207,7 @@ bool CSelectionParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsReaded = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
 		if (!isConstraintsReaded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5229,7 +5229,7 @@ bool CSelectionParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsReaded = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
 		if (!isConstraintsReaded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5249,7 +5249,7 @@ bool CSelectionParam::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 		::imtgql::CGqlParamObject constraintsGqlObject;
 		const bool isConstraintsAdded = constraints->WriteToGraphQlObject(constraintsGqlObject);
 		if (!isConstraintsAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5270,7 +5270,7 @@ bool CSelectionParam::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5290,7 +5290,7 @@ bool CSelectionParam::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("constraints"));
 		if (!isConstraintsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5310,7 +5310,7 @@ bool CSelectionParam::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		QJsonObject constraintsJsonObject;
 		const bool isConstraintsAdded = constraints->WriteToJsonObject(constraintsJsonObject);
 		if (!isConstraintsAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5331,7 +5331,7 @@ bool CSelectionParam::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->ReadFromJsonObject(jsonObject["constraints"].toObject());
 		if (!isConstraintsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5351,7 +5351,7 @@ bool CSelectionParam::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		constraints = COptionsList::V1_0();
 		const bool isConstraintsRead = constraints->OptReadFromJsonObject(jsonObject["constraints"].toObject());
 		if (!isConstraintsRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5370,7 +5370,7 @@ bool CSelectionParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5446,7 +5446,7 @@ bool CSelectionParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5522,7 +5522,7 @@ bool CSelectionParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5747,7 +5747,7 @@ bool CSchedulerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5823,7 +5823,7 @@ bool CSchedulerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5899,7 +5899,7 @@ bool CSchedulerParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5991,7 +5991,7 @@ bool CBackupSettings::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int m
 		::imtbase::CTreeItemModel* schedulerParamNewModelPtr = model.AddTreeModel("schedulerParam", modelIndex);
 		const bool isSchedulerParamAdded = schedulerParam->WriteToModel(*schedulerParamNewModelPtr, 0);
 		if (!isSchedulerParamAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6013,7 +6013,7 @@ bool CBackupSettings::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamReaded = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
 		if (!isSchedulerParamReaded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6035,7 +6035,7 @@ bool CBackupSettings::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamReaded = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
 		if (!isSchedulerParamReaded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6056,7 +6056,7 @@ bool CBackupSettings::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlO
 		::imtgql::CGqlParamObject schedulerParamGqlObject;
 		const bool isSchedulerParamAdded = schedulerParam->WriteToGraphQlObject(schedulerParamGqlObject);
 		if (!isSchedulerParamAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6077,7 +6077,7 @@ bool CBackupSettings::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6097,7 +6097,7 @@ bool CBackupSettings::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->OptReadFromGraphQlObject(*gqlObject.GetParamArgumentObjectPtr("schedulerParam"));
 		if (!isSchedulerParamRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6117,7 +6117,7 @@ bool CBackupSettings::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		QJsonObject schedulerParamJsonObject;
 		const bool isSchedulerParamAdded = schedulerParam->WriteToJsonObject(schedulerParamJsonObject);
 		if (!isSchedulerParamAdded){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6138,7 +6138,7 @@ bool CBackupSettings::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->ReadFromJsonObject(jsonObject["schedulerParam"].toObject());
 		if (!isSchedulerParamRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6158,7 +6158,7 @@ bool CBackupSettings::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		schedulerParam = CSchedulerParam::V1_0();
 		const bool isSchedulerParamRead = schedulerParam->OptReadFromJsonObject(jsonObject["schedulerParam"].toObject());
 		if (!isSchedulerParamRead){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field: '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6181,7 +6181,7 @@ bool CBackupSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6257,7 +6257,7 @@ bool CBackupSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6333,7 +6333,7 @@ bool CBackupSettings::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6714,7 +6714,7 @@ bool CDatabaseAccessSettings::WriteToModel(::imtbase::CTreeItemModel& model, int
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6790,7 +6790,7 @@ bool CDatabaseAccessSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6866,7 +6866,7 @@ bool CDatabaseAccessSettings::WriteToJsonObject(QJsonObject& jsonObject, Protoco
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7091,7 +7091,7 @@ bool CFileNameParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelInd
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7167,7 +7167,7 @@ bool CFileNameParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, 
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7243,7 +7243,7 @@ bool CFileNameParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion 
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7850,7 +7850,7 @@ bool CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, 
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7926,7 +7926,7 @@ bool CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Prot
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -8002,7 +8002,7 @@ bool CParamsSet::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion vers
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -8133,7 +8133,7 @@ bool CMimeType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 {
 	QVariant typeData = model.GetData("type", modelIndex);
 	if (typeData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "type");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -8153,7 +8153,7 @@ bool CMimeType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 
 	QVariant subTypeData = model.GetData("subType", modelIndex);
 	if (subTypeData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "subType");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "subType").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -8264,7 +8264,7 @@ bool CMimeType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject)
 bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("type") || (gqlObject["type"].userType() != QMetaType::QString && gqlObject["type"].userType() != QMetaType::QByteArray)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -8282,7 +8282,7 @@ bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 
 	if (!gqlObject.ContainsParam("subType") || (gqlObject["subType"].userType() != QMetaType::QString && gqlObject["subType"].userType() != QMetaType::QByteArray)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "subType");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "subType").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -8386,7 +8386,7 @@ bool CMimeType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CMimeType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("type") || ! jsonObject["type"].isString()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "type").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -8403,7 +8403,7 @@ bool CMimeType::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (!jsonObject.contains("subType") || ! jsonObject["subType"].isString()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "subType");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "subType").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -8474,7 +8474,7 @@ bool CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -8550,7 +8550,7 @@ bool CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -8626,7 +8626,7 @@ bool CMimeType::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -8695,6 +8695,2921 @@ bool CMimeType::OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVer
 }
 
 
+
+
+CTimeRangeObject::CTimeRangeObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CTimeRangeObject::beginChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CTimeRangeObject::endChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CTimeRangeObject::GetBegin()
+{
+	if (Version_1_0->Begin.has_value()){
+		return Version_1_0->Begin.value();
+	}
+
+	return QString();
+}
+
+
+void CTimeRangeObject::SetBegin(QString v)
+{
+	Version_1_0->Begin = v;
+	beginChanged();
+}
+
+
+bool CTimeRangeObject::hasBegin()
+{
+	 return Version_1_0->Begin.HasValue();
+}
+
+
+QString CTimeRangeObject::GetEnd()
+{
+	if (Version_1_0->End.has_value()){
+		return Version_1_0->End.value();
+	}
+
+	return QString();
+}
+
+
+void CTimeRangeObject::SetEnd(QString v)
+{
+	Version_1_0->End = v;
+	endChanged();
+}
+
+
+bool CTimeRangeObject::hasEnd()
+{
+	 return Version_1_0->End.HasValue();
+}
+
+
+QString CTimeRangeObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CTimeRangeObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CTimeRangeObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CTimeRangeObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CTimeRangeObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CTimeRangeObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "begin")){
+		return "Begin";
+	}
+	if (propertyName == (QString("m_") + "end")){
+		return "End";
+	}
+
+	return propertyName;
+}
+
+
+CSdlSizeObject::CSdlSizeObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CSdlSizeObject::widthChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CSdlSizeObject::heightChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+double CSdlSizeObject::GetWidth()
+{
+	if (Version_1_0->width.has_value()){
+		return Version_1_0->width.value();
+	}
+
+	return 0;
+}
+
+
+void CSdlSizeObject::SetWidth(double v)
+{
+	Version_1_0->width = v;
+	widthChanged();
+}
+
+
+bool CSdlSizeObject::hasWidth()
+{
+	 return Version_1_0->width.HasValue();
+}
+
+
+double CSdlSizeObject::GetHeight()
+{
+	if (Version_1_0->height.has_value()){
+		return Version_1_0->height.value();
+	}
+
+	return 0;
+}
+
+
+void CSdlSizeObject::SetHeight(double v)
+{
+	Version_1_0->height = v;
+	heightChanged();
+}
+
+
+bool CSdlSizeObject::hasHeight()
+{
+	 return Version_1_0->height.HasValue();
+}
+
+
+QString CSdlSizeObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CSdlSizeObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CSdlSizeObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CSdlSizeObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CSdlSizeObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CSdlSizeObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "width")){
+		return "width";
+	}
+	if (propertyName == (QString("m_") + "height")){
+		return "height";
+	}
+
+	return propertyName;
+}
+
+
+CSdlPointObject::CSdlPointObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CSdlPointObject::xChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CSdlPointObject::yChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+double CSdlPointObject::GetX()
+{
+	if (Version_1_0->x.has_value()){
+		return Version_1_0->x.value();
+	}
+
+	return 0;
+}
+
+
+void CSdlPointObject::SetX(double v)
+{
+	Version_1_0->x = v;
+	xChanged();
+}
+
+
+bool CSdlPointObject::hasX()
+{
+	 return Version_1_0->x.HasValue();
+}
+
+
+double CSdlPointObject::GetY()
+{
+	if (Version_1_0->y.has_value()){
+		return Version_1_0->y.value();
+	}
+
+	return 0;
+}
+
+
+void CSdlPointObject::SetY(double v)
+{
+	Version_1_0->y = v;
+	yChanged();
+}
+
+
+bool CSdlPointObject::hasY()
+{
+	 return Version_1_0->y.HasValue();
+}
+
+
+QString CSdlPointObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CSdlPointObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CSdlPointObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CSdlPointObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CSdlPointObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CSdlPointObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "x")){
+		return "x";
+	}
+	if (propertyName == (QString("m_") + "y")){
+		return "y";
+	}
+
+	return propertyName;
+}
+
+
+CParamTypeIdsObject::CParamTypeIdsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CParamTypeIdsObject::urlParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::idParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::textParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::textViewChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::selectionParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::schedulerParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::backupSettingsChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::databaseAccessSettingsChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::paramsSetChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::fileNameParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::integerParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::doubleParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::passwordParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamTypeIdsObject::enableableParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CParamTypeIdsObject::GetUrlParam()
+{
+	if (Version_1_0->UrlParam.has_value()){
+		return Version_1_0->UrlParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetUrlParam(QString v)
+{
+	Version_1_0->UrlParam = v.toUtf8();
+	urlParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasUrlParam()
+{
+	 return Version_1_0->UrlParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetIdParam()
+{
+	if (Version_1_0->IdParam.has_value()){
+		return Version_1_0->IdParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetIdParam(QString v)
+{
+	Version_1_0->IdParam = v.toUtf8();
+	idParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasIdParam()
+{
+	 return Version_1_0->IdParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetTextParam()
+{
+	if (Version_1_0->TextParam.has_value()){
+		return Version_1_0->TextParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetTextParam(QString v)
+{
+	Version_1_0->TextParam = v.toUtf8();
+	textParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasTextParam()
+{
+	 return Version_1_0->TextParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetTextView()
+{
+	if (Version_1_0->TextView.has_value()){
+		return Version_1_0->TextView.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetTextView(QString v)
+{
+	Version_1_0->TextView = v.toUtf8();
+	textViewChanged();
+}
+
+
+bool CParamTypeIdsObject::hasTextView()
+{
+	 return Version_1_0->TextView.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetSelectionParam()
+{
+	if (Version_1_0->SelectionParam.has_value()){
+		return Version_1_0->SelectionParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetSelectionParam(QString v)
+{
+	Version_1_0->SelectionParam = v.toUtf8();
+	selectionParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasSelectionParam()
+{
+	 return Version_1_0->SelectionParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetSchedulerParam()
+{
+	if (Version_1_0->SchedulerParam.has_value()){
+		return Version_1_0->SchedulerParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetSchedulerParam(QString v)
+{
+	Version_1_0->SchedulerParam = v.toUtf8();
+	schedulerParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasSchedulerParam()
+{
+	 return Version_1_0->SchedulerParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetBackupSettings()
+{
+	if (Version_1_0->BackupSettings.has_value()){
+		return Version_1_0->BackupSettings.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetBackupSettings(QString v)
+{
+	Version_1_0->BackupSettings = v.toUtf8();
+	backupSettingsChanged();
+}
+
+
+bool CParamTypeIdsObject::hasBackupSettings()
+{
+	 return Version_1_0->BackupSettings.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetDatabaseAccessSettings()
+{
+	if (Version_1_0->DatabaseAccessSettings.has_value()){
+		return Version_1_0->DatabaseAccessSettings.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetDatabaseAccessSettings(QString v)
+{
+	Version_1_0->DatabaseAccessSettings = v.toUtf8();
+	databaseAccessSettingsChanged();
+}
+
+
+bool CParamTypeIdsObject::hasDatabaseAccessSettings()
+{
+	 return Version_1_0->DatabaseAccessSettings.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetParamsSet()
+{
+	if (Version_1_0->ParamsSet.has_value()){
+		return Version_1_0->ParamsSet.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetParamsSet(QString v)
+{
+	Version_1_0->ParamsSet = v.toUtf8();
+	paramsSetChanged();
+}
+
+
+bool CParamTypeIdsObject::hasParamsSet()
+{
+	 return Version_1_0->ParamsSet.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetFileNameParam()
+{
+	if (Version_1_0->FileNameParam.has_value()){
+		return Version_1_0->FileNameParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetFileNameParam(QString v)
+{
+	Version_1_0->FileNameParam = v.toUtf8();
+	fileNameParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasFileNameParam()
+{
+	 return Version_1_0->FileNameParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetIntegerParam()
+{
+	if (Version_1_0->IntegerParam.has_value()){
+		return Version_1_0->IntegerParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetIntegerParam(QString v)
+{
+	Version_1_0->IntegerParam = v.toUtf8();
+	integerParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasIntegerParam()
+{
+	 return Version_1_0->IntegerParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetDoubleParam()
+{
+	if (Version_1_0->DoubleParam.has_value()){
+		return Version_1_0->DoubleParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetDoubleParam(QString v)
+{
+	Version_1_0->DoubleParam = v.toUtf8();
+	doubleParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasDoubleParam()
+{
+	 return Version_1_0->DoubleParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetPasswordParam()
+{
+	if (Version_1_0->PasswordParam.has_value()){
+		return Version_1_0->PasswordParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetPasswordParam(QString v)
+{
+	Version_1_0->PasswordParam = v.toUtf8();
+	passwordParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasPasswordParam()
+{
+	 return Version_1_0->PasswordParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::GetEnableableParam()
+{
+	if (Version_1_0->EnableableParam.has_value()){
+		return Version_1_0->EnableableParam.value();
+	}
+
+	return QString();
+}
+
+
+void CParamTypeIdsObject::SetEnableableParam(QString v)
+{
+	Version_1_0->EnableableParam = v.toUtf8();
+	enableableParamChanged();
+}
+
+
+bool CParamTypeIdsObject::hasEnableableParam()
+{
+	 return Version_1_0->EnableableParam.HasValue();
+}
+
+
+QString CParamTypeIdsObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CParamTypeIdsObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CParamTypeIdsObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CParamTypeIdsObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CParamTypeIdsObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CParamTypeIdsObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "urlParam")){
+		return "UrlParam";
+	}
+	if (propertyName == (QString("m_") + "idParam")){
+		return "IdParam";
+	}
+	if (propertyName == (QString("m_") + "textParam")){
+		return "TextParam";
+	}
+	if (propertyName == (QString("m_") + "textView")){
+		return "TextView";
+	}
+	if (propertyName == (QString("m_") + "selectionParam")){
+		return "SelectionParam";
+	}
+	if (propertyName == (QString("m_") + "schedulerParam")){
+		return "SchedulerParam";
+	}
+	if (propertyName == (QString("m_") + "backupSettings")){
+		return "BackupSettings";
+	}
+	if (propertyName == (QString("m_") + "databaseAccessSettings")){
+		return "DatabaseAccessSettings";
+	}
+	if (propertyName == (QString("m_") + "paramsSet")){
+		return "ParamsSet";
+	}
+	if (propertyName == (QString("m_") + "fileNameParam")){
+		return "FileNameParam";
+	}
+	if (propertyName == (QString("m_") + "integerParam")){
+		return "IntegerParam";
+	}
+	if (propertyName == (QString("m_") + "doubleParam")){
+		return "DoubleParam";
+	}
+	if (propertyName == (QString("m_") + "passwordParam")){
+		return "PasswordParam";
+	}
+	if (propertyName == (QString("m_") + "enableableParam")){
+		return "EnableableParam";
+	}
+
+	return propertyName;
+}
+
+
+CUrlParamObject::CUrlParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CUrlParamObject::schemeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CUrlParamObject::hostChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CUrlParamObject::portChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CUrlParamObject::pathChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CUrlParamObject::GetScheme()
+{
+	if (Version_1_0->scheme.has_value()){
+		return Version_1_0->scheme.value();
+	}
+
+	return QString();
+}
+
+
+void CUrlParamObject::SetScheme(QString v)
+{
+	Version_1_0->scheme = v;
+	schemeChanged();
+}
+
+
+bool CUrlParamObject::hasScheme()
+{
+	 return Version_1_0->scheme.HasValue();
+}
+
+
+QString CUrlParamObject::GetHost()
+{
+	if (Version_1_0->host.has_value()){
+		return Version_1_0->host.value();
+	}
+
+	return QString();
+}
+
+
+void CUrlParamObject::SetHost(QString v)
+{
+	Version_1_0->host = v;
+	hostChanged();
+}
+
+
+bool CUrlParamObject::hasHost()
+{
+	 return Version_1_0->host.HasValue();
+}
+
+
+int CUrlParamObject::GetPort()
+{
+	if (Version_1_0->port.has_value()){
+		return Version_1_0->port.value();
+	}
+
+	return 0;
+}
+
+
+void CUrlParamObject::SetPort(int v)
+{
+	Version_1_0->port = v;
+	portChanged();
+}
+
+
+bool CUrlParamObject::hasPort()
+{
+	 return Version_1_0->port.HasValue();
+}
+
+
+QString CUrlParamObject::GetPath()
+{
+	if (Version_1_0->path.has_value()){
+		return Version_1_0->path.value();
+	}
+
+	return QString();
+}
+
+
+void CUrlParamObject::SetPath(QString v)
+{
+	Version_1_0->path = v;
+	pathChanged();
+}
+
+
+bool CUrlParamObject::hasPath()
+{
+	 return Version_1_0->path.HasValue();
+}
+
+
+QString CUrlParamObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CUrlParamObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CUrlParamObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CUrlParamObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CUrlParamObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CUrlParamObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "scheme")){
+		return "scheme";
+	}
+	if (propertyName == (QString("m_") + "host")){
+		return "host";
+	}
+	if (propertyName == (QString("m_") + "port")){
+		return "port";
+	}
+	if (propertyName == (QString("m_") + "path")){
+		return "path";
+	}
+
+	return propertyName;
+}
+
+
+CIdParamObject::CIdParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CIdParamObject::idChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CIdParamObject::GetId()
+{
+	if (Version_1_0->id.has_value()){
+		return Version_1_0->id.value();
+	}
+
+	return QString();
+}
+
+
+void CIdParamObject::SetId(QString v)
+{
+	Version_1_0->id = v.toUtf8();
+	idChanged();
+}
+
+
+bool CIdParamObject::hasId()
+{
+	 return Version_1_0->id.HasValue();
+}
+
+
+QString CIdParamObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CIdParamObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CIdParamObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CIdParamObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CIdParamObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CIdParamObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "id")){
+		return "id";
+	}
+
+	return propertyName;
+}
+
+
+CTextParamObject::CTextParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CTextParamObject::textChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CTextParamObject::GetText()
+{
+	if (Version_1_0->text.has_value()){
+		return Version_1_0->text.value();
+	}
+
+	return QString();
+}
+
+
+void CTextParamObject::SetText(QString v)
+{
+	Version_1_0->text = v;
+	textChanged();
+}
+
+
+bool CTextParamObject::hasText()
+{
+	 return Version_1_0->text.HasValue();
+}
+
+
+QString CTextParamObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CTextParamObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CTextParamObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CTextParamObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CTextParamObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CTextParamObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "text")){
+		return "text";
+	}
+
+	return propertyName;
+}
+
+
+CEnableableParamObject::CEnableableParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CEnableableParamObject::valueChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+bool CEnableableParamObject::GetValue()
+{
+	if (Version_1_0->value.has_value()){
+		return Version_1_0->value.value();
+	}
+
+	return false;
+}
+
+
+void CEnableableParamObject::SetValue(bool v)
+{
+	Version_1_0->value = v;
+	valueChanged();
+}
+
+
+bool CEnableableParamObject::hasValue()
+{
+	 return Version_1_0->value.HasValue();
+}
+
+
+QString CEnableableParamObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CEnableableParamObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CEnableableParamObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CEnableableParamObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CEnableableParamObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CEnableableParamObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "value")){
+		return "value";
+	}
+
+	return propertyName;
+}
+
+
+CIntegerParamObject::CIntegerParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CIntegerParamObject::valueChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+int CIntegerParamObject::GetValue()
+{
+	if (Version_1_0->value.has_value()){
+		return Version_1_0->value.value();
+	}
+
+	return 0;
+}
+
+
+void CIntegerParamObject::SetValue(int v)
+{
+	Version_1_0->value = v;
+	valueChanged();
+}
+
+
+bool CIntegerParamObject::hasValue()
+{
+	 return Version_1_0->value.HasValue();
+}
+
+
+QString CIntegerParamObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CIntegerParamObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CIntegerParamObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CIntegerParamObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CIntegerParamObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CIntegerParamObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "value")){
+		return "value";
+	}
+
+	return propertyName;
+}
+
+
+CDoubleParamObject::CDoubleParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CDoubleParamObject::valueChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+double CDoubleParamObject::GetValue()
+{
+	if (Version_1_0->value.has_value()){
+		return Version_1_0->value.value();
+	}
+
+	return 0;
+}
+
+
+void CDoubleParamObject::SetValue(double v)
+{
+	Version_1_0->value = v;
+	valueChanged();
+}
+
+
+bool CDoubleParamObject::hasValue()
+{
+	 return Version_1_0->value.HasValue();
+}
+
+
+QString CDoubleParamObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CDoubleParamObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CDoubleParamObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CDoubleParamObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CDoubleParamObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CDoubleParamObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "value")){
+		return "value";
+	}
+
+	return propertyName;
+}
+
+
+COptionObject::COptionObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &COptionObject::idChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &COptionObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &COptionObject::descriptionChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &COptionObject::enabledChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString COptionObject::GetId()
+{
+	if (Version_1_0->id.has_value()){
+		return Version_1_0->id.value();
+	}
+
+	return QString();
+}
+
+
+void COptionObject::SetId(QString v)
+{
+	Version_1_0->id = v.toUtf8();
+	idChanged();
+}
+
+
+bool COptionObject::hasId()
+{
+	 return Version_1_0->id.HasValue();
+}
+
+
+QString COptionObject::GetName()
+{
+	if (Version_1_0->name.has_value()){
+		return Version_1_0->name.value();
+	}
+
+	return QString();
+}
+
+
+void COptionObject::SetName(QString v)
+{
+	Version_1_0->name = v;
+	nameChanged();
+}
+
+
+bool COptionObject::hasName()
+{
+	 return Version_1_0->name.HasValue();
+}
+
+
+QString COptionObject::GetDescription()
+{
+	if (Version_1_0->description.has_value()){
+		return Version_1_0->description.value();
+	}
+
+	return QString();
+}
+
+
+void COptionObject::SetDescription(QString v)
+{
+	Version_1_0->description = v;
+	descriptionChanged();
+}
+
+
+bool COptionObject::hasDescription()
+{
+	 return Version_1_0->description.HasValue();
+}
+
+
+bool COptionObject::GetEnabled()
+{
+	if (Version_1_0->enabled.has_value()){
+		return Version_1_0->enabled.value();
+	}
+
+	return false;
+}
+
+
+void COptionObject::SetEnabled(bool v)
+{
+	Version_1_0->enabled = v;
+	enabledChanged();
+}
+
+
+bool COptionObject::hasEnabled()
+{
+	 return Version_1_0->enabled.HasValue();
+}
+
+
+QString COptionObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool COptionObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool COptionObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString COptionObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* COptionObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString COptionObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "id")){
+		return "id";
+	}
+	if (propertyName == (QString("m_") + "name")){
+		return "name";
+	}
+	if (propertyName == (QString("m_") + "description")){
+		return "description";
+	}
+	if (propertyName == (QString("m_") + "enabled")){
+		return "enabled";
+	}
+
+	return propertyName;
+}
+
+
+COptionsListObject::COptionsListObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_optionsQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &COptionsListObject::totalCountChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &COptionsListObject::offsetChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &COptionsListObject::optionsChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+int COptionsListObject::GetTotalCount()
+{
+	if (Version_1_0->totalCount.has_value()){
+		return Version_1_0->totalCount.value();
+	}
+
+	return 0;
+}
+
+
+void COptionsListObject::SetTotalCount(int v)
+{
+	Version_1_0->totalCount = v;
+	totalCountChanged();
+}
+
+
+bool COptionsListObject::hasTotalCount()
+{
+	 return Version_1_0->totalCount.HasValue();
+}
+
+
+int COptionsListObject::GetOffset()
+{
+	if (Version_1_0->offset.has_value()){
+		return Version_1_0->offset.value();
+	}
+
+	return 0;
+}
+
+
+void COptionsListObject::SetOffset(int v)
+{
+	Version_1_0->offset = v;
+	offsetChanged();
+}
+
+
+bool COptionsListObject::hasOffset()
+{
+	 return Version_1_0->offset.HasValue();
+}
+
+
+sdl::imtbase::ImtBaseTypes::COptionObjectList* COptionsListObject::GetOptions()
+{
+	if (Version_1_0->options.has_value()){
+		if (!m_optionsQObjectPtr){
+			m_optionsQObjectPtr = dynamic_cast<sdl::imtbase::ImtBaseTypes::COptionObjectList*>(CreateObject("options"));
+			m_optionsQObjectPtr->Version_1_0 = Version_1_0->options;
+		}
+		return m_optionsQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void COptionsListObject::SetOptions(sdl::imtbase::ImtBaseTypes::COptionObjectList* v)
+{
+	if (v){
+		Version_1_0->options = v->Version_1_0;
+		m_optionsQObjectPtr = v;
+	}
+	else {
+		Version_1_0->options = nullptr;
+	}
+
+	optionsChanged();
+}
+
+
+bool COptionsListObject::hasOptions()
+{
+	 return Version_1_0->options.HasValue();
+}
+
+
+void COptionsListObject::createOptions()
+{	Version_1_0->options.emplace();
+
+}
+
+
+QString COptionsListObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool COptionsListObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool COptionsListObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString COptionsListObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* COptionsListObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	if (key == "options"){
+		return new sdl::imtbase::ImtBaseTypes::COptionObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString COptionsListObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "totalCount")){
+		return "totalCount";
+	}
+	if (propertyName == (QString("m_") + "offset")){
+		return "offset";
+	}
+	if (propertyName == (QString("m_") + "options")){
+		return "options";
+	}
+
+	return propertyName;
+}
+
+
+CSelectionParamObject::CSelectionParamObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_constraintsQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CSelectionParamObject::selectedIndexChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CSelectionParamObject::constraintsChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+int CSelectionParamObject::GetSelectedIndex()
+{
+	if (Version_1_0->selectedIndex.has_value()){
+		return Version_1_0->selectedIndex.value();
+	}
+
+	return 0;
+}
+
+
+void CSelectionParamObject::SetSelectedIndex(int v)
+{
+	Version_1_0->selectedIndex = v;
+	selectedIndexChanged();
+}
+
+
+bool CSelectionParamObject::hasSelectedIndex()
+{
+	 return Version_1_0->selectedIndex.HasValue();
+}
+
+
+sdl::imtbase::ImtBaseTypes::COptionsListObject* CSelectionParamObject::GetConstraints()
+{
+	if (Version_1_0->constraints.has_value()){
+		if (!m_constraintsQObjectPtr){
+			m_constraintsQObjectPtr = dynamic_cast<sdl::imtbase::ImtBaseTypes::COptionsListObject*>(CreateObject("constraints"));
+			m_constraintsQObjectPtr->Version_1_0 = Version_1_0->constraints;
+		}
+		return m_constraintsQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CSelectionParamObject::SetConstraints(sdl::imtbase::ImtBaseTypes::COptionsListObject* v)
+{
+	if (v){
+		Version_1_0->constraints = v->Version_1_0;
+		m_constraintsQObjectPtr = v;
+	}
+	else {
+		Version_1_0->constraints = nullptr;
+	}
+
+	constraintsChanged();
+}
+
+
+bool CSelectionParamObject::hasConstraints()
+{
+	 return Version_1_0->constraints.HasValue();
+}
+
+
+void CSelectionParamObject::createConstraints()
+{	Version_1_0->constraints.emplace();
+
+}
+
+
+QString CSelectionParamObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CSelectionParamObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CSelectionParamObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CSelectionParamObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CSelectionParamObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	if (key == "constraints"){
+		return new sdl::imtbase::ImtBaseTypes::COptionsListObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CSelectionParamObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "selectedIndex")){
+		return "selectedIndex";
+	}
+	if (propertyName == (QString("m_") + "constraints")){
+		return "constraints";
+	}
+
+	return propertyName;
+}
+
+
+CSchedulerParamObject::CSchedulerParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CSchedulerParamObject::startTimeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CSchedulerParamObject::intervalChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CSchedulerParamObject::GetStartTime()
+{
+	if (Version_1_0->startTime.has_value()){
+		return Version_1_0->startTime.value();
+	}
+
+	return QString();
+}
+
+
+void CSchedulerParamObject::SetStartTime(QString v)
+{
+	Version_1_0->startTime = v;
+	startTimeChanged();
+}
+
+
+bool CSchedulerParamObject::hasStartTime()
+{
+	 return Version_1_0->startTime.HasValue();
+}
+
+
+int CSchedulerParamObject::GetInterval()
+{
+	if (Version_1_0->interval.has_value()){
+		return Version_1_0->interval.value();
+	}
+
+	return 0;
+}
+
+
+void CSchedulerParamObject::SetInterval(int v)
+{
+	Version_1_0->interval = v;
+	intervalChanged();
+}
+
+
+bool CSchedulerParamObject::hasInterval()
+{
+	 return Version_1_0->interval.HasValue();
+}
+
+
+QString CSchedulerParamObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CSchedulerParamObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CSchedulerParamObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CSchedulerParamObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CSchedulerParamObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CSchedulerParamObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "startTime")){
+		return "startTime";
+	}
+	if (propertyName == (QString("m_") + "interval")){
+		return "interval";
+	}
+
+	return propertyName;
+}
+
+
+CBackupSettingsObject::CBackupSettingsObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_schedulerParamQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CBackupSettingsObject::schedulerParamChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CBackupSettingsObject::folderPathChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* CBackupSettingsObject::GetSchedulerParam()
+{
+	if (Version_1_0->schedulerParam.has_value()){
+		if (!m_schedulerParamQObjectPtr){
+			m_schedulerParamQObjectPtr = dynamic_cast<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>(CreateObject("schedulerParam"));
+			m_schedulerParamQObjectPtr->Version_1_0 = Version_1_0->schedulerParam;
+		}
+		return m_schedulerParamQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CBackupSettingsObject::SetSchedulerParam(sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* v)
+{
+	if (v){
+		Version_1_0->schedulerParam = v->Version_1_0;
+		m_schedulerParamQObjectPtr = v;
+	}
+	else {
+		Version_1_0->schedulerParam = nullptr;
+	}
+
+	schedulerParamChanged();
+}
+
+
+bool CBackupSettingsObject::hasSchedulerParam()
+{
+	 return Version_1_0->schedulerParam.HasValue();
+}
+
+
+void CBackupSettingsObject::createSchedulerParam()
+{	Version_1_0->schedulerParam.emplace();
+
+}
+
+
+QString CBackupSettingsObject::GetFolderPath()
+{
+	if (Version_1_0->folderPath.has_value()){
+		return Version_1_0->folderPath.value();
+	}
+
+	return QString();
+}
+
+
+void CBackupSettingsObject::SetFolderPath(QString v)
+{
+	Version_1_0->folderPath = v;
+	folderPathChanged();
+}
+
+
+bool CBackupSettingsObject::hasFolderPath()
+{
+	 return Version_1_0->folderPath.HasValue();
+}
+
+
+QString CBackupSettingsObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CBackupSettingsObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CBackupSettingsObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CBackupSettingsObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CBackupSettingsObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	if (key == "schedulerParam"){
+		return new sdl::imtbase::ImtBaseTypes::CSchedulerParamObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CBackupSettingsObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "schedulerParam")){
+		return "schedulerParam";
+	}
+	if (propertyName == (QString("m_") + "folderPath")){
+		return "folderPath";
+	}
+
+	return propertyName;
+}
+
+
+CDatabaseAccessSettingsObject::CDatabaseAccessSettingsObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CDatabaseAccessSettingsObject::dbNameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CDatabaseAccessSettingsObject::hostChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CDatabaseAccessSettingsObject::portChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CDatabaseAccessSettingsObject::dbPathChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CDatabaseAccessSettingsObject::usernameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CDatabaseAccessSettingsObject::passwordChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CDatabaseAccessSettingsObject::GetDbName()
+{
+	if (Version_1_0->dbName.has_value()){
+		return Version_1_0->dbName.value();
+	}
+
+	return QString();
+}
+
+
+void CDatabaseAccessSettingsObject::SetDbName(QString v)
+{
+	Version_1_0->dbName = v;
+	dbNameChanged();
+}
+
+
+bool CDatabaseAccessSettingsObject::hasDbName()
+{
+	 return Version_1_0->dbName.HasValue();
+}
+
+
+QString CDatabaseAccessSettingsObject::GetHost()
+{
+	if (Version_1_0->host.has_value()){
+		return Version_1_0->host.value();
+	}
+
+	return QString();
+}
+
+
+void CDatabaseAccessSettingsObject::SetHost(QString v)
+{
+	Version_1_0->host = v;
+	hostChanged();
+}
+
+
+bool CDatabaseAccessSettingsObject::hasHost()
+{
+	 return Version_1_0->host.HasValue();
+}
+
+
+int CDatabaseAccessSettingsObject::GetPort()
+{
+	if (Version_1_0->port.has_value()){
+		return Version_1_0->port.value();
+	}
+
+	return 0;
+}
+
+
+void CDatabaseAccessSettingsObject::SetPort(int v)
+{
+	Version_1_0->port = v;
+	portChanged();
+}
+
+
+bool CDatabaseAccessSettingsObject::hasPort()
+{
+	 return Version_1_0->port.HasValue();
+}
+
+
+QString CDatabaseAccessSettingsObject::GetDbPath()
+{
+	if (Version_1_0->dbPath.has_value()){
+		return Version_1_0->dbPath.value();
+	}
+
+	return QString();
+}
+
+
+void CDatabaseAccessSettingsObject::SetDbPath(QString v)
+{
+	Version_1_0->dbPath = v;
+	dbPathChanged();
+}
+
+
+bool CDatabaseAccessSettingsObject::hasDbPath()
+{
+	 return Version_1_0->dbPath.HasValue();
+}
+
+
+QString CDatabaseAccessSettingsObject::GetUsername()
+{
+	if (Version_1_0->username.has_value()){
+		return Version_1_0->username.value();
+	}
+
+	return QString();
+}
+
+
+void CDatabaseAccessSettingsObject::SetUsername(QString v)
+{
+	Version_1_0->username = v;
+	usernameChanged();
+}
+
+
+bool CDatabaseAccessSettingsObject::hasUsername()
+{
+	 return Version_1_0->username.HasValue();
+}
+
+
+QString CDatabaseAccessSettingsObject::GetPassword()
+{
+	if (Version_1_0->password.has_value()){
+		return Version_1_0->password.value();
+	}
+
+	return QString();
+}
+
+
+void CDatabaseAccessSettingsObject::SetPassword(QString v)
+{
+	Version_1_0->password = v;
+	passwordChanged();
+}
+
+
+bool CDatabaseAccessSettingsObject::hasPassword()
+{
+	 return Version_1_0->password.HasValue();
+}
+
+
+QString CDatabaseAccessSettingsObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CDatabaseAccessSettingsObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CDatabaseAccessSettingsObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CDatabaseAccessSettingsObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CDatabaseAccessSettingsObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CDatabaseAccessSettingsObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "dbName")){
+		return "dbName";
+	}
+	if (propertyName == (QString("m_") + "host")){
+		return "host";
+	}
+	if (propertyName == (QString("m_") + "port")){
+		return "port";
+	}
+	if (propertyName == (QString("m_") + "dbPath")){
+		return "dbPath";
+	}
+	if (propertyName == (QString("m_") + "username")){
+		return "username";
+	}
+	if (propertyName == (QString("m_") + "password")){
+		return "password";
+	}
+
+	return propertyName;
+}
+
+
+CFileNameParamObject::CFileNameParamObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CFileNameParamObject::pathTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CFileNameParamObject::pathChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+int CFileNameParamObject::GetPathType()
+{
+	if (Version_1_0->pathType.has_value()){
+		return Version_1_0->pathType.value();
+	}
+
+	return 0;
+}
+
+
+void CFileNameParamObject::SetPathType(int v)
+{
+	Version_1_0->pathType = v;
+	pathTypeChanged();
+}
+
+
+bool CFileNameParamObject::hasPathType()
+{
+	 return Version_1_0->pathType.HasValue();
+}
+
+
+QString CFileNameParamObject::GetPath()
+{
+	if (Version_1_0->path.has_value()){
+		return Version_1_0->path.value();
+	}
+
+	return QString();
+}
+
+
+void CFileNameParamObject::SetPath(QString v)
+{
+	Version_1_0->path = v;
+	pathChanged();
+}
+
+
+bool CFileNameParamObject::hasPath()
+{
+	 return Version_1_0->path.HasValue();
+}
+
+
+QString CFileNameParamObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CFileNameParamObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CFileNameParamObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CFileNameParamObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CFileNameParamObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CFileNameParamObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "pathType")){
+		return "pathType";
+	}
+	if (propertyName == (QString("m_") + "path")){
+		return "path";
+	}
+
+	return propertyName;
+}
+
+
+CParamsSetObject::CParamsSetObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CParamsSetObject::paramIdsChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamsSetObject::paramTypeIdsChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamsSetObject::paramNamesChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamsSetObject::paramDescriptionsChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CParamsSetObject::parametersChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QList<QString> CParamsSetObject::GetParamIds()
+{
+	if (Version_1_0->paramIds.has_value()){
+		QStringList tempParamIdsList;
+		for (const auto& tempValue: Version_1_0->paramIds.value()){
+			tempParamIdsList << tempValue;
+		}
+		return tempParamIdsList;
+	}
+
+	return QStringList();
+}
+
+
+void CParamsSetObject::SetParamIds(QList<QString> v)
+{
+	Version_1_0->paramIds = QList<QByteArray>(); 
+	for (const auto& tempValue: v){
+		Version_1_0->paramIds->append(tempValue.toUtf8());
+	}
+
+	paramIdsChanged();
+}
+
+
+bool CParamsSetObject::hasParamIds()
+{
+	 return Version_1_0->paramIds.HasValue();
+}
+
+
+QList<QString> CParamsSetObject::GetParamTypeIds()
+{
+	if (Version_1_0->paramTypeIds.has_value()){
+		QStringList tempParamTypeIdsList;
+		for (const auto& tempValue: Version_1_0->paramTypeIds.value()){
+			tempParamTypeIdsList << tempValue;
+		}
+		return tempParamTypeIdsList;
+	}
+
+	return QStringList();
+}
+
+
+void CParamsSetObject::SetParamTypeIds(QList<QString> v)
+{
+	Version_1_0->paramTypeIds = QList<QByteArray>(); 
+	for (const auto& tempValue: v){
+		Version_1_0->paramTypeIds->append(tempValue.toUtf8());
+	}
+
+	paramTypeIdsChanged();
+}
+
+
+bool CParamsSetObject::hasParamTypeIds()
+{
+	 return Version_1_0->paramTypeIds.HasValue();
+}
+
+
+QList<QString> CParamsSetObject::GetParamNames()
+{
+	if (Version_1_0->paramNames.has_value()){
+		return Version_1_0->paramNames.value();
+	}
+
+	return QStringList();
+}
+
+
+void CParamsSetObject::SetParamNames(QList<QString> v)
+{
+	Version_1_0->paramNames = v;
+	paramNamesChanged();
+}
+
+
+bool CParamsSetObject::hasParamNames()
+{
+	 return Version_1_0->paramNames.HasValue();
+}
+
+
+QList<QString> CParamsSetObject::GetParamDescriptions()
+{
+	if (Version_1_0->paramDescriptions.has_value()){
+		return Version_1_0->paramDescriptions.value();
+	}
+
+	return QStringList();
+}
+
+
+void CParamsSetObject::SetParamDescriptions(QList<QString> v)
+{
+	Version_1_0->paramDescriptions = v;
+	paramDescriptionsChanged();
+}
+
+
+bool CParamsSetObject::hasParamDescriptions()
+{
+	 return Version_1_0->paramDescriptions.HasValue();
+}
+
+
+QList<QString> CParamsSetObject::GetParameters()
+{
+	if (Version_1_0->parameters.has_value()){
+		return Version_1_0->parameters.value();
+	}
+
+	return QStringList();
+}
+
+
+void CParamsSetObject::SetParameters(QList<QString> v)
+{
+	Version_1_0->parameters = v;
+	parametersChanged();
+}
+
+
+bool CParamsSetObject::hasParameters()
+{
+	 return Version_1_0->parameters.HasValue();
+}
+
+
+QString CParamsSetObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CParamsSetObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CParamsSetObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CParamsSetObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CParamsSetObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CParamsSetObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "paramIds")){
+		return "paramIds";
+	}
+	if (propertyName == (QString("m_") + "paramTypeIds")){
+		return "paramTypeIds";
+	}
+	if (propertyName == (QString("m_") + "paramNames")){
+		return "paramNames";
+	}
+	if (propertyName == (QString("m_") + "paramDescriptions")){
+		return "paramDescriptions";
+	}
+	if (propertyName == (QString("m_") + "parameters")){
+		return "parameters";
+	}
+
+	return propertyName;
+}
+
+
+CMimeTypeObject::CMimeTypeObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CMimeTypeObject::typeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CMimeTypeObject::treeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CMimeTypeObject::subTypeChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CMimeTypeObject::suffixChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CMimeTypeObject::parametersChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CMimeTypeObject::GetType()
+{
+	if (Version_1_0->type.has_value()){
+		return Version_1_0->type.value();
+	}
+
+	return QString();
+}
+
+
+void CMimeTypeObject::SetType(QString v)
+{
+	Version_1_0->type = v;
+	typeChanged();
+}
+
+
+bool CMimeTypeObject::hasType()
+{
+	 return Version_1_0->type.HasValue();
+}
+
+
+QList<QString> CMimeTypeObject::GetTree()
+{
+	if (Version_1_0->tree.has_value()){
+		return Version_1_0->tree.value();
+	}
+
+	return QStringList();
+}
+
+
+void CMimeTypeObject::SetTree(QList<QString> v)
+{
+	Version_1_0->tree = v;
+	treeChanged();
+}
+
+
+bool CMimeTypeObject::hasTree()
+{
+	 return Version_1_0->tree.HasValue();
+}
+
+
+QString CMimeTypeObject::GetSubType()
+{
+	if (Version_1_0->subType.has_value()){
+		return Version_1_0->subType.value();
+	}
+
+	return QString();
+}
+
+
+void CMimeTypeObject::SetSubType(QString v)
+{
+	Version_1_0->subType = v;
+	subTypeChanged();
+}
+
+
+bool CMimeTypeObject::hasSubType()
+{
+	 return Version_1_0->subType.HasValue();
+}
+
+
+QString CMimeTypeObject::GetSuffix()
+{
+	if (Version_1_0->suffix.has_value()){
+		return Version_1_0->suffix.value();
+	}
+
+	return QString();
+}
+
+
+void CMimeTypeObject::SetSuffix(QString v)
+{
+	Version_1_0->suffix = v;
+	suffixChanged();
+}
+
+
+bool CMimeTypeObject::hasSuffix()
+{
+	 return Version_1_0->suffix.HasValue();
+}
+
+
+QList<QString> CMimeTypeObject::GetParameters()
+{
+	if (Version_1_0->parameters.has_value()){
+		return Version_1_0->parameters.value();
+	}
+
+	return QStringList();
+}
+
+
+void CMimeTypeObject::SetParameters(QList<QString> v)
+{
+	Version_1_0->parameters = v;
+	parametersChanged();
+}
+
+
+bool CMimeTypeObject::hasParameters()
+{
+	 return Version_1_0->parameters.HasValue();
+}
+
+
+QString CMimeTypeObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CMimeTypeObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CMimeTypeObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CMimeTypeObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CMimeTypeObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CMimeTypeObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "type")){
+		return "type";
+	}
+	if (propertyName == (QString("m_") + "tree")){
+		return "tree";
+	}
+	if (propertyName == (QString("m_") + "subType")){
+		return "subType";
+	}
+	if (propertyName == (QString("m_") + "suffix")){
+		return "suffix";
+	}
+	if (propertyName == (QString("m_") + "parameters")){
+		return "parameters";
+	}
+
+	return propertyName;
+}
 
 
 } // namespace sdl::imtbase::ImtBaseTypes

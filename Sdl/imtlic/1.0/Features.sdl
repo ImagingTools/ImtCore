@@ -2,7 +2,6 @@ schema {
 	query: Query
 	mutation: Mutation
 	subscription: Subscription
-	name: Features
 	namespace: imtlic
 	version: 1.0
 }

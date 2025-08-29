@@ -54,6 +54,7 @@ public:
 	CGqlSchemaParser(QIODevice& device);
 
 	virtual bool ParseGqlSchema();
+	bool SetSchemaName(const QString& schemaName);
 
 	// reimplemented (ISdlTypeListProvider)
 	virtual QStringList GetTypeNames() const override;

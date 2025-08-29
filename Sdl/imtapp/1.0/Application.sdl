@@ -1,6 +1,5 @@
 schema {
 	query: Query
-	name: Application
 	namespace: imtapp
 	version: 1.0
 }

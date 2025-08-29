@@ -315,7 +315,6 @@ bool CGqlExtSchemaParser::ValidateSchema()
 bool CGqlExtSchemaParser::ProcessCustomSchemaValue(const QString& key, const QString& value)
 {
 	static QStringList acceptableKeys = {
-				SdlCustomSchemaKeys::SchemaName,
 				SdlCustomSchemaKeys::SchemaNamespace,
 				SdlCustomSchemaKeys::VersionName
 	};

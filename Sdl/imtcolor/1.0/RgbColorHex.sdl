@@ -1,5 +1,4 @@
 schema {
-	name: RgbColorHex
 	namespace: imtcolor
 	version: 1.0
 }
