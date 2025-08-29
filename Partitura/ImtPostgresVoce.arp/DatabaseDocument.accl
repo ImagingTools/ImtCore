@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="DatabaseDelegate" X="475" Y="275" Note=""/>
+        <Element ComponentName="PostgresXPathExtractor" X="325" Y="425" Note=""/>
+        <Element ComponentName="SearchController" X="475" Y="125" Note=""/>
+        <Element ComponentName="Types" X="600" Y="425" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
