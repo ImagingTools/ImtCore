@@ -25,6 +25,7 @@ DecoratorBase {
 	property alias contentY: popupMenuListView.contentY;
 	property alias topContentLoaderSourceComp: topContentLoader.sourceComponent;
 	property alias bottomContentLoaderSourceComp: bottomContentLoader.sourceComponent;
+	property alias noDataContentLoaderSourceComp: noDataContentLoader.sourceComponent;
 	property alias repeater: popupMenuListView;
 	property alias scrollbar: scrollbar;
 
@@ -55,10 +56,10 @@ DecoratorBase {
 	function setNoDataRecVisible(visible_){
 		itemBody.visible = !visible_
 		if(visible_){
-			root.bottomContentLoaderSourceComp = noDataRecComp
+			root.noDataContentLoaderSourceComp = noDataRecComp
 		}
 		else{
-			root.bottomContentLoaderSourceComp = null;
+			root.noDataContentLoaderSourceComp = null;
 		}
 	}
 
@@ -154,6 +155,7 @@ DecoratorBase {
 
 	Loader {
 		id: topContentLoader;
+		visible: !root.isUpwards
 	}
 
 	Loader {
@@ -258,7 +260,12 @@ DecoratorBase {
 
 	Loader {
 		id: bottomContentLoader;
-
 		anchors.top: itemBody.bottom;
+		visible: root.isUpwards
+	}
+
+	Loader{
+		id: noDataContentLoader;
+		anchors.top: bottomContentLoader.bottom;
 	}
 }

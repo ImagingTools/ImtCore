@@ -85,6 +85,8 @@
         <file alias="imtgui/View/PopupManager.qml">View/PopupManager.qml</file>
         <file alias="imtgui/View/ObjectVisualStatusProvider.qml">View/ObjectVisualStatusProvider.qml</file>
         <file alias="imtgui/View/ServerConnectionParamElementView.qml">View/ServerConnectionParamElementView.qml</file>
+        <file alias="imtgui/View/ComboBoxGqlElementView.qml">View/ComboBoxGqlElementView.qml</file>
+        <file alias="imtgui/View/ComboBoxGqlLegacyElementView.qml">View/ComboBoxGqlLegacyElementView.qml</file>
         <file alias="imtgui/Params/ComposedParamsGui.qml">Params/ComposedParamsGui.qml</file>
         <file alias="imtgui/Params/TextParamEditor.qml">Params/TextParamEditor.qml</file>
         <file alias="imtgui/Params/UrlParamEditor.qml">Params/UrlParamEditor.qml</file>

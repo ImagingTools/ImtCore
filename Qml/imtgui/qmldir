@@ -86,6 +86,8 @@ StickerView 1.0 View/StickerView.qml
 PopupContainer 1.0 View/PopupContainer.qml
 ObjectVisualStatusProvider 1.0 View/ObjectVisualStatusProvider.qml
 ServerConnectionParamElementView 1.0 View/ServerConnectionParamElementView.qml
+ComboBoxGqlElementView 1.0 View/ComboBoxGqlElementView.qml
+ComboBoxGqlLegacyElementView 1.0 View/ComboBoxGqlLegacyElementView.qml
 
 singleton PopupManager 1.0 View/PopupManager.qml
 

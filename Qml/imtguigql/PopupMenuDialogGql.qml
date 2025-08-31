@@ -39,6 +39,7 @@ PopupMenuDialog {
 
 		popup.forceActiveFocus()
 		popup.decorator_.topContentLoaderSourceComp = searchField
+		popup.decorator_.bottomContentLoaderSourceComp = searchField
 	}
 
 	function setY(){

@@ -110,7 +110,7 @@ ComboBox {
 				let y_ = point.y;
 
 				popup.isUpwards = (y_ + popup.height) > ModalDialogManager.activeView.height
-				popup.y = popup.isUpwards ? point.y - popup.height : point.y;
+				popup.y = popup.isUpwards ? point.y - popup.height + popup.comboDecorator.height : point.y;
 				popup.opacity = 1;
 			}
 
