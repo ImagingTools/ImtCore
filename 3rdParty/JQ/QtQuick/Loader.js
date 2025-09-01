@@ -32,6 +32,10 @@ class Loader extends Item {
         loaded: {type:Signal, slotName:'onLoaded', args:[]},
     })
 
+    __complete(){
+        super.__complete()
+    }
+
     SLOT_sourceComponentChanged(oldValue, newValue){
         if(this.item) this.item.destroy()
         if(!this.sourceComponent) return

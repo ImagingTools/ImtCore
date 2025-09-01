@@ -8,6 +8,8 @@ module.exports = {
     root: null,
 
     init: function(){ 
+        global.queueFlag = []
+        
         global.JQModules = {
             QtBase: require('../QtBase/QtBase'),
             Qt: require('../Qt/Qt'),

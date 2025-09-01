@@ -9,6 +9,8 @@ class QObject extends QBaseObject {
         objectName: {type:String, value:''},
 
         parentChanged: {type:Signal, slotName:'onParentChanged', args:[]},
+
+        JQDestruction: {type:Signal, slotName:'onJQDestruction', args:[]},
     }
 
     static create(parent = null, properties = {}){
@@ -173,6 +175,11 @@ class QObject extends QBaseObject {
         for(let child of this.__children){
             child.__completeProperties()
         }
+    }
+
+    __destroy(){
+        super.__destroy()
+        this.JQDestruction()
     }
 }
 

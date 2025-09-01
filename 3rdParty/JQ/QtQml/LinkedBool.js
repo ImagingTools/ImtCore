@@ -98,8 +98,9 @@ class LinkedBool extends Property {
      * @returns {Object}
      */
     static get(target, name, meta){
+        let flag = global.queueFlag[global.queueFlag.length - 1]
         let link = this.queueLink[this.queueLink.length - 1]
-        if(link){
+        if(link && flag){
             if(!link.target.__depends[link.name]) link.target.__depends[link.name] = []
 
             let found = false
@@ -138,6 +139,7 @@ class LinkedBool extends Property {
 
         if(typeof value === 'function'){
             try {
+                global.queueFlag.push(true)
                 this.queueLink.push({
                     target: target,
                     name: name,
@@ -148,6 +150,7 @@ class LinkedBool extends Property {
             } catch(error) {
                 console.error(error)
             } finally {
+                global.queueFlag.pop()
                 this.queueLink.pop()
             }
         } else {

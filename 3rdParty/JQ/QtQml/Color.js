@@ -73,6 +73,10 @@ class Color extends Property {
             }
         }
     }
+
+    static getDefaultValue(){
+        return '#000000'
+    }
 }
 
 module.exports = Color

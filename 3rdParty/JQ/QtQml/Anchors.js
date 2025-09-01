@@ -142,77 +142,121 @@ class Anchors extends GroupProperty {
     }
 
     SLOT_leftChanged(oldValue, newValue){
-        let target = newValue
-        let self = this.__parent.__proxy
-
-        if(target && this.right) {
-            this.onLeftRightChanged()
-            return
-        }
-
-        if(self && target){
-            let targetFloat = target.__float
-            target = target.__parent.__proxy
-
-            if(self.parent === target){
-                if(targetFloat === AnchorLine.Left){
-                    self.x = ()=>{return this.__proxy.leftMargin}
-                } else if(targetFloat === AnchorLine.Right){
-                    self.x = ()=>{return target.width + this.__proxy.leftMargin}
-                } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return target.width / 2 + this.__proxy.leftMargin}
+        if(newValue && newValue.__parent.__proxy instanceof JQModules.QtQml.QObject){
+            let destructionFunc = ()=>{
+                let self = this.__parent.__proxy 
+                if(self){
+                    if(this.__for_x === 2){
+                        self.x = self.x
+                        self.width = self.width
+                    } else if(this.__for_x === 1){
+                        self.x = self.x
+                    }
                 }
-            } else {
-                if(targetFloat === AnchorLine.Left){
-                    self.x = ()=>{return target.x + this.__proxy.leftMargin}
-                } else if(targetFloat === AnchorLine.Right){
-                    self.x = ()=>{return target.x + target.width + this.__proxy.leftMargin}
-                } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return target.x + target.width / 2 + this.__proxy.leftMargin}
-                }            
+                this.left = null
+            }
+            destructionFunc.meta = {
+                name: 'anchors_left__destruction',
+                destruction: true,
+                parent: newValue.__parent.__proxy
+            }
+            newValue.__parent.__proxy.__addLink()
+            if(newValue.__parent.__proxy instanceof JQModules.QtQml.QtObject){
+                destructionFunc.meta.parent = newValue.__parent.__proxy
+                newValue.__parent.__proxy['Component.destruction'].connect(destructionFunc)
             }
         }
+        if(oldValue && oldValue.__parent.__proxy instanceof JQModules.QtQml.QObject){
+            let destructionFunc = ()=>{
+                let self = this.__parent.__proxy 
+                if(self){
+                    if(this.__for_x === 2){
+                        self.x = self.x
+                        self.width = self.width
+                    } else if(this.__for_x === 1){
+                        self.x = self.x
+                    }
+                }
+                this.left = null
+            }
+            destructionFunc.meta = {
+                name: 'anchors_left__destruction',
+                destruction: true,
+                parent: oldValue.__parent.__proxy
+            }
+            if(oldValue.__parent.__proxy instanceof JQModules.QtQml.QtObject){
+                destructionFunc.meta.parent = oldValue.__parent.__proxy
+                oldValue.__parent.__proxy['Component.destruction'].disconnect(destructionFunc)
+            }
+            oldValue.__parent.__proxy.__removeLink()
+        }
+
+        this.onLeftRightChanged()
     }
 
     SLOT_rightChanged(oldValue, newValue){
-        let target = newValue
-        let self = this.__parent.__proxy
-
-        if(target && this.left) {
-            this.onLeftRightChanged()
-            return
-        }
-
-        if(self && target){
-            let targetFloat = target.__float
-            target = target.__parent.__proxy
-
-            if(self.parent === target){
-                if(targetFloat === AnchorLine.Left){
-                    self.x = ()=>{return -self.width - this.__proxy.rightMargin}
-                } else if(targetFloat === AnchorLine.Right){
-                    self.x = ()=>{return target.width - self.width - this.__proxy.rightMargin}
-                } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return target.width / 2 - self.width - this.__proxy.rightMargin}
+        if(newValue && newValue.__parent.__proxy instanceof JQModules.QtQml.QObject){
+            let destructionFunc = ()=>{
+                let self = this.__parent.__proxy 
+                if(self){
+                    if(this.__for_x === 2){
+                        self.x = self.x
+                        self.width = self.width
+                    } else if(this.__for_x === 1){
+                        self.x = self.x
+                    }
                 }
-            } else {
-                if(targetFloat === AnchorLine.Left){
-                    self.x = ()=>{return target.x - self.width - this.__proxy.rightMargin}
-                } else if(targetFloat === AnchorLine.Right){
-                    self.x = ()=>{return target.x + target.width - self.width - this.__proxy.rightMargin}
-                } else if(targetFloat === AnchorLine.HorizontalCenter){
-                    self.x = ()=>{return target.x + target.width / 2 - self.width - this.__proxy.rightMargin}
-                }              
+                this.right = null
+            }
+            destructionFunc.meta = {
+                name: 'anchors_right__destruction',
+                destruction: true,
+                parent: newValue.__parent.__proxy
+            }
+            newValue.__parent.__proxy.__addLink()
+            if(newValue.__parent.__proxy instanceof JQModules.QtQml.QtObject){
+                destructionFunc.meta.parent = newValue.__parent.__proxy
+                newValue.__parent.__proxy['Component.destruction'].connect(destructionFunc)
             }
         }
+        if(oldValue && oldValue.__parent.__proxy instanceof JQModules.QtQml.QObject){
+            let destructionFunc = ()=>{
+                let self = this.__parent.__proxy 
+                if(self){
+                    if(this.__for_x === 2){
+                        self.x = self.x
+                        self.width = self.width
+                    } else if(this.__for_x === 1){
+                        self.x = self.x
+                    }
+                }
+                this.right = null
+            }
+            destructionFunc.meta = {
+                name: 'anchors_right__destruction',
+                destruction: true,
+                parent: oldValue.__parent.__proxy
+            }
+            if(oldValue.__parent.__proxy instanceof JQModules.QtQml.QtObject){
+                destructionFunc.meta.parent = oldValue.__parent.__proxy
+                oldValue.__parent.__proxy['Component.destruction'].disconnect(destructionFunc)
+            }
+            oldValue.__parent.__proxy.__removeLink()
+        }
+
+        this.onLeftRightChanged()
     }
 
     onLeftRightChanged(){
         let left = this.__proxy.left
         let right = this.__proxy.right
-        let self = this.__parent.__proxy
+        let self = this.__parent.__proxy     
+
+        this.__for_x = 0
 
         if(self && left && right){
+            this.__for_x = 2
+
             let leftFloat = left.__float
             left = left.__parent.__proxy
 
@@ -254,72 +298,159 @@ class Anchors extends GroupProperty {
                     self.width = ()=>{return right.x + right.width / 2 - this.__proxy.rightMargin - self.x}
                 }
             }
+        } else if(self && left){
+            this.__for_x = 1
+
+            let leftFloat = left.__float
+            left = left.__parent.__proxy
+
+            if(self.parent === left){
+                if(leftFloat === AnchorLine.Left){
+                    self.x = ()=>{return this.__proxy.leftMargin}
+                } else if(leftFloat === AnchorLine.Right){
+                    self.x = ()=>{return left.width + this.__proxy.leftMargin}
+                } else if(leftFloat === AnchorLine.HorizontalCenter){
+                    self.x = ()=>{return left.width / 2 + this.__proxy.leftMargin}
+                }
+            } else {
+                if(leftFloat === AnchorLine.Left){
+                    self.x = ()=>{return left.x + this.__proxy.leftMargin}
+                } else if(leftFloat === AnchorLine.Right){
+                    self.x = ()=>{return left.x + left.width + this.__proxy.leftMargin}
+                } else if(leftFloat === AnchorLine.HorizontalCenter){
+                    self.x = ()=>{return left.x + left.width / 2 + this.__proxy.leftMargin}
+                }            
+            }
+        } else if(self && right){
+            this.__for_x = 1
+
+            let rightFloat = right.__float
+            right = right.__parent.__proxy
+
+            if(self.parent === right){
+                if(rightFloat === AnchorLine.Left){
+                    self.x = ()=>{return -self.width - this.__proxy.rightMargin}
+                } else if(rightFloat === AnchorLine.Right){
+                    self.x = ()=>{return right.width - self.width - this.__proxy.rightMargin}
+                } else if(rightFloat === AnchorLine.HorizontalCenter){
+                    self.x = ()=>{return right.width / 2 - self.width - this.__proxy.rightMargin}
+                }
+            } else {
+                if(rightFloat === AnchorLine.Left){
+                    self.x = ()=>{return right.x - self.width - this.__proxy.rightMargin}
+                } else if(rightFloat === AnchorLine.Right){
+                    self.x = ()=>{return right.x + right.width - self.width - this.__proxy.rightMargin}
+                } else if(rightFloat === AnchorLine.HorizontalCenter){
+                    self.x = ()=>{return right.x + right.width / 2 - self.width - this.__proxy.rightMargin}
+                }              
+            }
         }
     }
 
     SLOT_topChanged(oldValue, newValue){
-        let target = newValue
-        let self = this.__parent.__proxy
-
-        if(target && this.bottom) {
-            this.onTopBottomChanged()
-            return
-        }
-
-        if(self && target){
-            let targetFloat = target.__float
-            target = target.__parent.__proxy
-
-            if(self.parent === target){
-                if(targetFloat === AnchorLine.Top){
-                    self.y = ()=>{return this.__proxy.topMargin}
-                } else if(targetFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return target.height + this.__proxy.topMargin}
-                } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return target.height / 2 + this.__proxy.topMargin}
+        if(newValue && newValue.__parent.__proxy instanceof JQModules.QtQml.QObject){
+            let destructionFunc = ()=>{
+                let self = this.__parent.__proxy 
+                if(self){
+                    if(this.__for_y === 2){
+                        self.y = self.y
+                        self.height = self.height
+                    } else if(this.__for_y === 1){
+                        self.y = self.y
+                    }
                 }
-            } else {
-                if(targetFloat === AnchorLine.Top){
-                    self.y = ()=>{return target.y + this.__proxy.topMargin}
-                } else if(targetFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return target.y + target.height + this.__proxy.topMargin}
-                } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return target.y + target.height / 2 + this.__proxy.topMargin}
-                }               
+                this.top = null
+            }
+            destructionFunc.meta = {
+                name: 'anchors_top__destruction',
+                destruction: true,
+                parent: newValue.__parent.__proxy
+            }
+            newValue.__parent.__proxy.__addLink()
+            if(newValue.__parent.__proxy instanceof JQModules.QtQml.QtObject){
+                destructionFunc.meta.parent = newValue.__parent.__proxy
+                newValue.__parent.__proxy['Component.destruction'].connect(destructionFunc)
             }
         }
+        if(oldValue && oldValue.__parent.__proxy instanceof JQModules.QtQml.QObject){
+            let destructionFunc = ()=>{
+                let self = this.__parent.__proxy
+                if(self){ 
+                    if(this.__for_y === 2){
+                        self.y = self.y
+                        self.height = self.height
+                    } else if(this.__for_y === 1){
+                        self.y = self.y
+                    }
+                }
+                this.top = null
+            }
+            destructionFunc.meta = {
+                name: 'anchors_top__destruction',
+                destruction: true,
+                parent: oldValue.__parent.__proxy
+            }
+            if(oldValue.__parent.__proxy instanceof JQModules.QtQml.QtObject){
+                destructionFunc.meta.parent = oldValue.__parent.__proxy
+                oldValue.__parent.__proxy['Component.destruction'].disconnect(destructionFunc)
+            }
+            oldValue.__parent.__proxy.__removeLink()
+        }
+
+        this.onTopBottomChanged()
     }
 
     SLOT_bottomChanged(oldValue, newValue){
-        let target = newValue
-        let self = this.__parent.__proxy
+        this.onTopBottomChanged()
         
-        if(target && this.top) {
-            this.onTopBottomChanged()
-            return
-        }
-
-        if(self && target){
-            let targetFloat = target.__float
-            target = target.__parent.__proxy
-
-            if(self.parent === target){
-                if(targetFloat === AnchorLine.Top){
-                    self.y = ()=>{return -self.height - this.__proxy.bottomMargin}
-                } else if(targetFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return target.height - self.height - this.__proxy.bottomMargin}
-                } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return target.height / 2 - self.height - this.__proxy.bottomMargin}
+        if(newValue && newValue.__parent.__proxy instanceof JQModules.QtQml.QObject){
+            let destructionFunc = ()=>{
+                let self = this.__parent.__proxy 
+                if(self){
+                    if(this.__for_y === 2){
+                        self.y = self.y
+                        self.height = self.height
+                    } else if(this.__for_y === 1){
+                        self.y = self.y
+                    }
                 }
-            } else {
-                if(targetFloat === AnchorLine.Top){
-                    self.y = ()=>{return target.y - self.height - this.__proxy.bottomMargin}
-                } else if(targetFloat === AnchorLine.Bottom){
-                    self.y = ()=>{return target.y + target.height - self.height - this.__proxy.bottomMargin}
-                } else if(targetFloat === AnchorLine.VerticalCenter){
-                    self.y = ()=>{return target.y + target.height / 2 - self.height - this.__proxy.bottomMargin}
-                }               
+                this.bottom = null
             }
+            destructionFunc.meta = {
+                name: 'anchors_bottom__destruction',
+                destruction: true,
+                parent: newValue.__parent.__proxy
+            }
+            newValue.__parent.__proxy.__addLink()
+            if(newValue.__parent.__proxy instanceof JQModules.QtQml.QtObject){
+                destructionFunc.meta.parent = newValue.__parent.__proxy
+                newValue.__parent.__proxy['Component.destruction'].connect(destructionFunc)
+            }
+        }
+        if(oldValue && oldValue.__parent.__proxy instanceof JQModules.QtQml.QObject){
+            let destructionFunc = ()=>{
+                let self = this.__parent.__proxy 
+                if(self){
+                    if(this.__for_y === 2){
+                        self.y = self.y
+                        self.height = self.height
+                    } else if(this.__for_y === 1){
+                        self.y = self.y
+                    }
+                    this.bottom = null
+                }
+                
+            }
+            destructionFunc.meta = {
+                name: 'anchors_bottom__destruction',
+                destruction: true,
+                parent: oldValue.__parent.__proxy
+            }
+            if(oldValue.__parent.__proxy instanceof JQModules.QtQml.QtObject){
+                destructionFunc.meta.parent = oldValue.__parent.__proxy
+                oldValue.__parent.__proxy['Component.destruction'].disconnect(destructionFunc)
+            }
+            oldValue.__parent.__proxy.__removeLink()
         }
     }
 
@@ -328,7 +459,11 @@ class Anchors extends GroupProperty {
         let bottom = this.__proxy.bottom
         let self = this.__parent.__proxy
 
+        this.__for_y = 0
+
         if(self && top && bottom){
+            this.__for_y = 2
+
             let topFloat = top.__float
             top = top.__parent.__proxy
 
@@ -369,6 +504,52 @@ class Anchors extends GroupProperty {
                 } else if(bottomFloat === AnchorLine.VerticalCenter){
                     self.height = ()=>{return bottom.y + bottom.height / 2 - this.__proxy.bottomMargin - self.y}
                 }
+            }
+        } else if(self && top){
+            this.__for_y = 1
+
+            let topFloat = top.__float
+            top = top.__parent.__proxy
+
+            if(self.parent === top){
+                if(topFloat === AnchorLine.Top){
+                    self.y = ()=>{return this.__proxy.topMargin}
+                } else if(topFloat === AnchorLine.Bottom){
+                    self.y = ()=>{return top.height + this.__proxy.topMargin}
+                } else if(topFloat === AnchorLine.VerticalCenter){
+                    self.y = ()=>{return top.height / 2 + this.__proxy.topMargin}
+                }
+            } else {
+                if(topFloat === AnchorLine.Top){
+                    self.y = ()=>{return top.y + this.__proxy.topMargin}
+                } else if(topFloat === AnchorLine.Bottom){
+                    self.y = ()=>{return top.y + top.height + this.__proxy.topMargin}
+                } else if(topFloat === AnchorLine.VerticalCenter){
+                    self.y = ()=>{return top.y + top.height / 2 + this.__proxy.topMargin}
+                }               
+            }
+        } else if(self && bottom){
+            this.__for_y = 1
+
+            let bottomFloat = bottom.__float
+            bottom = bottom.__parent.__proxy
+
+            if(self.parent === bottom){
+                if(bottomFloat === AnchorLine.Top){
+                    self.y = ()=>{return -self.height - this.__proxy.bottomMargin}
+                } else if(bottomFloat === AnchorLine.Bottom){
+                    self.y = ()=>{return bottom.height - self.height - this.__proxy.bottomMargin}
+                } else if(bottomFloat === AnchorLine.VerticalCenter){
+                    self.y = ()=>{return bottom.height / 2 - self.height - this.__proxy.bottomMargin}
+                }
+            } else {
+                if(bottomFloat === AnchorLine.Top){
+                    self.y = ()=>{return bottom.y - self.height - this.__proxy.bottomMargin}
+                } else if(bottomFloat === AnchorLine.Bottom){
+                    self.y = ()=>{return bottom.y + bottom.height - self.height - this.__proxy.bottomMargin}
+                } else if(bottomFloat === AnchorLine.VerticalCenter){
+                    self.y = ()=>{return bottom.y + bottom.height / 2 - self.height - this.__proxy.bottomMargin}
+                }               
             }
         }
     }

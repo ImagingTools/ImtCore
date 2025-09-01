@@ -35,24 +35,32 @@ class Var extends Property {
         let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
         if(oldValue !== currentValue){
-            let destructionFunc = ()=>{
-                target[name] = null
-            }
-            destructionFunc.meta = {
-                name: name+'__destruction',
-                destruction: true
-            }
+            
 
             if(currentValue instanceof JQModules.QtQml.QObject){
+                let destructionFunc = ()=>{
+                    target[name] = null
+                }
+                destructionFunc.meta = {
+                    name: name+'__destruction',
+                    destruction: true,
+                    parent: currentValue
+                }
                 currentValue.__addLink()
                 if(oldValue instanceof JQModules.QtQml.QtObject){
-                    destructionFunc.meta.parent = currentValue
                     currentValue['Component.destruction'].connect(destructionFunc)
                 }
             }
             if(oldValue instanceof JQModules.QtQml.QObject){
+                let destructionFunc = ()=>{
+                    target[name] = null
+                }
+                destructionFunc.meta = {
+                    name: name+'__destruction',
+                    destruction: true,
+                    parent: oldValue
+                }
                 if(oldValue instanceof JQModules.QtQml.QtObject){
-                    destructionFunc.meta.parent = oldValue
                     oldValue['Component.destruction'].disconnect(destructionFunc)
                 }
                 oldValue.__removeLink()
@@ -75,6 +83,7 @@ class Var extends Property {
 
         if(typeof value === 'function'){
             try {
+                global.queueFlag.push(true)
                 this.queueLink.push({
                     target: target,
                     name: name,
@@ -85,6 +94,7 @@ class Var extends Property {
             } catch(error) {
                 console.error(error)
             } finally {
+                global.queueFlag.pop()
                 this.queueLink.pop()
             }
         } else {

@@ -13,6 +13,7 @@ class Signal extends BaseObject {
 
             let slotName = 'SLOT_' + name
 
+            global.queueFlag.push(false)
             if(slotName in target){
                 try {
                     target[slotName].call(target.__proxy, ...args)
@@ -34,6 +35,7 @@ class Signal extends BaseObject {
                     }
                 }
             }
+            global.queueFlag.pop()
         }
 
         f.connect = (...args)=>{

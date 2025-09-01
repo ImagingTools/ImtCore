@@ -9,6 +9,10 @@ class Geometry extends Real {
     static setAuto(target, name, value, meta){
         if(!target[name+'__prevent']) return super.set(target, name, value, meta)
     }
+
+    static error(target, key, meta){
+        this.set(target, key, this.getDefaultValue(), meta)
+    }
 }
 
 module.exports = Geometry

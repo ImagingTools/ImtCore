@@ -98,6 +98,23 @@ class JQContext {
     static handle = {
         get(target, key){
             if(key in target){
+                let caller = Property.queueLink[Property.queueLink.length-1]
+                if(caller && target[key]) {
+                    let found = false
+
+                    for(let _caller of target[key+'__depends']){
+                        if(caller.name === _caller.name && caller.target === _caller.target){
+                            found = true
+                            break
+                        }
+                    }
+
+                    if(!found){
+                        target[key+'__depends'].push(caller)
+                    }
+                    
+                }
+
                 return target[key]
             } else if(target.__parentContext){
                 return target.__parentContext[key]
@@ -108,6 +125,26 @@ class JQContext {
 
         set(target, key, value){
             target[key] = value
+            target[key+'__depends'] = []
+
+            target[key]['JQDestruction'].connect(()=>{
+                target[key] = null
+
+                for(let property of target[key+'__depends']){
+                    if(!property.target.__destroyed){
+                        try {
+                            property.target.__proxy[property.name] = property.func()
+                        } catch (error) {
+                            console.error(error)
+                            property.meta.type.error(property.target, property.name, property.meta)
+                        }
+                    }
+                    
+                    
+                }
+
+                delete target[key+'__depends']
+            })
 
             return true
         },
