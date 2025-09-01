@@ -9,6 +9,7 @@ Dialog {
 	title: qsTr("Message");
 	closeAfterPause: true;
 	centered: false;
+	pinned: true;
 
 	property bool hiddenBackground: true;
 	property bool noMouseArea: true;

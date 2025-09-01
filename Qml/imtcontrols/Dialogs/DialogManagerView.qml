@@ -76,30 +76,32 @@ Item {
 				clip: false;
 				
 				onMainWindowWidthChanged: {
-					var doNotCorrectPosition = !dialogLoader.item ? false : dialogLoader.item.doNotCorrectPosition == undefined ? false : dialogLoader.item.doNotCorrectPosition;
-					var centered = !dialogLoader.item ? false : dialogLoader.item.centered == undefined ? false : dialogLoader.item.centered;
+					let doNotCorrectPosition = !dialogLoader.item ? false : dialogLoader.item.doNotCorrectPosition == undefined ? false : dialogLoader.item.doNotCorrectPosition;
+					let centered = !dialogLoader.item ? false : dialogLoader.item.centered == undefined ? false : dialogLoader.item.centered;
+					let pinned = !dialogLoader.item ? false : dialogLoader.item.pinned == undefined ? false : dialogLoader.item.pinned;
 					if(dialogLoader.item && !doNotCorrectPosition){
 						if(dialogLoader.item && centered){
 							dialogLoader.x = container.width/2 - dialogLoader.width/2;
 							dialogLoader.y = container.height/2 - dialogLoader.height/2;
 						}
-						else if(dialogLoader.item && !centered){
-							var deltaWidth = mainWindowWidth - mainWindowWidth_prev;
+						else if(dialogLoader.item && !centered && !pinned){
+							let deltaWidth = mainWindowWidth - mainWindowWidth_prev;
 							mainWindowWidth_prev = mainWindowWidth;
-							dialogLoader.x += deltaWidth/2;
+							dialogLoader.x += deltaWidth;
 						}
 					}
 					
 				}
 				onMainWindowHeightChanged: {
 					var doNotCorrectPosition = !dialogLoader.item ? false : dialogLoader.item.doNotCorrectPosition == undefined ? false : dialogLoader.item.doNotCorrectPosition;
-					var centered = !dialogLoader.item ? false : dialogLoader.item.centered == undefined ? false : dialogLoader.item.centered;
+					let centered = !dialogLoader.item ? false : dialogLoader.item.centered == undefined ? false : dialogLoader.item.centered;
+					let pinned = !dialogLoader.item ? false : dialogLoader.item.pinned == undefined ? false : dialogLoader.item.pinned;
 					if(dialogLoader.item && !doNotCorrectPosition){
 						if(dialogLoader.item && centered){
 							dialogLoader.x = container.width/2 - dialogLoader.width/2;
 							dialogLoader.y = container.height/2 - dialogLoader.height/2;
 						}
-						else if(dialogLoader.item && !centered){
+						else if(dialogLoader.item && !centered && !pinned){
 							var deltaHeight = mainWindowHeight - mainWindowHeight_prev;
 							mainWindowHeight_prev = mainWindowHeight;
 							dialogLoader.y += deltaHeight/2;

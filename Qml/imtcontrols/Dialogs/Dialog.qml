@@ -19,6 +19,7 @@ ControlBase {
 	property bool forceFocus: false;
 
 	property bool centered: true;
+	property bool pinned: false;
 	property bool hasIcon: true;
 	property bool modal: false;
 
@@ -43,6 +44,7 @@ ControlBase {
 	property Component topPanelComp: Style.topPanelDialogDecorator;
 	property Component topPanelDefault: Component{TopPanelDialog{}};
 	property Component contentComp: null;
+	property Component selfComp: null;
 
 	property Item topPanel: null;
 	property Item contentItem: null;
@@ -141,7 +143,12 @@ ControlBase {
 	onFinished: {
 		if (dialogContainer.root){
 			if(!(dialogContainer.notClosingButtons & buttonId)){
-				dialogContainer.root.closeDialog();
+				if(dialogContainer.selfComp){
+					dialogContainer.root.closeByComp(dialogContainer.selfComp);
+				}
+				else {
+					dialogContainer.root.closeDialog();
+				}
 			}
 		}
 	}
@@ -209,7 +216,12 @@ ControlBase {
 		onFinished: {
 			if(dialogContainer.root){
 				dialogContainer.closed()
-				dialogContainer.root.closeDialog();
+				if(dialogContainer.selfComp){
+					dialogContainer.root.closeByComp(dialogContainer.selfComp);
+				}
+				else {
+					dialogContainer.root.closeDialog();
+				}
 
 			}
 		}

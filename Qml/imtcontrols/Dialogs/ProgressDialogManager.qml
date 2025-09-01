@@ -117,7 +117,15 @@ Dialog {
 			// 	messageOpened = true;
 			// }
 
-			root.closeDialog()
+			if(progressDialog.root){
+				if(progressDialog.selfComp){
+					progressDialog.root.closeByComp(progressDialog.selfComp);
+				}
+				else {
+					progressDialog.root.closeDialog();
+				}
+			}
+
 			taskComleted(taskId);
 		}
 	}
@@ -244,7 +252,6 @@ Dialog {
 			id: message;
 
 			Component.onDestruction: {
-				//progressDialog.root.closeDialog()
 			}
 		}
 	}
