@@ -46,15 +46,15 @@ MouseArea{
 
         wasMoving = false;
 
-		if(propagateMouseEvents){
-			mouse.accepted = false;
-		}
+        // if(propagateMouseEvents){
+        //     mouse.accepted = false;
+        // }
     }
     onReleased: {
         isPressed = false;
     }
 
-	onPositionChanged: {
+     onPositionChanged: {
         if(isPressed){
             var newCoords = mapToItem(this, mouse.x, mouse.y);
             var deltaX_ = newCoords.x - this.coord.x;

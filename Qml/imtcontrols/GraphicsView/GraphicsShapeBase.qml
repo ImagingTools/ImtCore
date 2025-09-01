@@ -135,7 +135,7 @@ QtObject {
 			let dist = AnalyticGeometry.distanceBetweenPoints2d(point, position)
 
 			if(dist <= pointSize){
-				console.log("DIST:: ", dist, i)
+				//console.log("DIST:: ", dist, i)
 				return i
 			}
 		}

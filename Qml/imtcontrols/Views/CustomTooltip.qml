@@ -45,6 +45,8 @@ ControlBase {
     property real lineHeight: 1;
 
     property Component tooltipContentComp: hint;
+    property Item targetItem: parent;
+
 
     Component.onDestruction: {
         customTooltip.closeTooltip();
@@ -76,7 +78,7 @@ ControlBase {
                 return;
             }
 
-            var point = mapToItem(null, xX, yY);
+            var point = customTooltip.targetItem ? customTooltip.targetItem.mapToItem(null, xX, yY) : mapToItem(null, xX, yY);
             var centeredAdd = customTooltip.fitToTextWidth ? customTooltip.fitToHCenter * (forWidthText.width/2 + customTooltip.textMargin + customTooltip.componentMargin) :
                                                              customTooltip.fitToHCenter * (customTooltip.tooltipWidth/2 + customTooltip.componentMargin);
             if(point.x > ModalDialogManager.activeView.width*2/3){

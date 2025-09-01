@@ -38,7 +38,7 @@ Rectangle {
 	property int restrictMoveMargin: -1;
 	property bool fitToBorders: false;
 
-	property bool autoFit: false;
+	property bool fitToViewMode: false;
 
 	property bool isSelectionMode: true;
 	property bool isEditMode: false;
@@ -79,7 +79,7 @@ Rectangle {
 	property bool restrictDrawing: false;
 	property int resizePauseDuration: 100;
 
-	property bool canvasAntialiasing
+	property bool canvasAntialiasing: true
 	property int renderStrategy: Canvas.Threaded
 
 	signal copySignal(int index);
@@ -136,12 +136,6 @@ Rectangle {
 		canvas.deltaY = -graphicsView.contentY
 	}
 
-	onAutoFitChanged: {
-		if (autoFit){
-			appSizeChanged();
-		}
-	}
-
 	onWidthChanged: {
 		graphicsView.restrictDrawing = true
 		sizeChangedPause.restart()
@@ -163,7 +157,16 @@ Rectangle {
 	}
 
 	function resize(){
-		requestPaintPause.restart()
+		if(graphicsView.fitToViewMode){
+			fitToView();
+		}
+		else {
+			requestPaintPause.restart();
+		}
+	}
+
+	function fitToView(){
+		fitToActiveLayer();
 	}
 
 	function requestPaint(){
@@ -221,15 +224,6 @@ Rectangle {
 	}
 
 	function appSizeChanged(params){
-		if (autoFit){
-			resetView(false);
-
-			requestPaint()
-		}
-	}
-
-	function setAutoFit(autoFit){
-		graphicsView.autoFit = autoFit;
 	}
 
 	function zoomIn(){
@@ -697,8 +691,6 @@ Rectangle {
 
 				//moving all scene
 				if(!found){
-					graphicsView.autoFit = false;
-
 					let borderMargin = graphicsView.restrictMoveMargin;
 
 					let wasLimitCorrection = false//canvas.deltaCorrection(canvas.deltaX + delta.x, canvas.deltaY + delta.y)
@@ -729,8 +721,6 @@ Rectangle {
 
 					return
 				}
-
-				graphicsView.autoFit = false;
 
 				let deltaX = (wheel.x + canvas.deltaX) / canvas.scaleCoeff
 				let wheelDelta = wheel.angleDelta.y
@@ -960,9 +950,6 @@ Rectangle {
 				}
 				startPaintTime = new Date().valueOf()
 				//console.log("Canvas::onPaint")
-				if (graphicsView.autoFit){
-					graphicsView.resetView(false);
-				}
 
 				var ctx = canvas.getContext('2d');
 				ctx.reset()
