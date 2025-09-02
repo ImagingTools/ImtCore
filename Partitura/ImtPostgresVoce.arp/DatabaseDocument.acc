@@ -19,6 +19,12 @@
                     <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="DocumentFactories">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="JsonBasedMetaInfoDelegate" Type="Reference" ExportId="JsonBasedMetaInfoDelegate">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -28,13 +34,22 @@
                     <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="DocumentId"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIdColumn" Type="Id" ExportId="ObjectTypeIdColumn">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Types"/>
+                        <Data IsEnabled="true" Value="DocumentTypes"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SqlJsonXPathExtractor" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PostgresXPathExtractor"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="TableName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableSchema" Type="Id" ExportId="TableSchema">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -49,6 +64,24 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="DocumentTypes" PackageId="BasePck" ComponentId="SelectionConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="OptionDescriptions" Type="Text[]" ExportId="DocumentTypeDescriptions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OptionEnablers" Type="Reference[]" ExportId="DocumentTypeEnablers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="DocumentTypeIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="DocumentTypeNames">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="PostgresXPathExtractor" PackageId="ImtDatabasePck" ComponentId="PostgresXPathExtractor">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
@@ -57,13 +90,25 @@
         <Element Id="SearchController" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollectionSearchController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionDataController" Type="Reference" ExportId="CollectionDataController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="FilteringParams" Type="Reference" ExportId="FilteringParams">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="MetaInfoCreator">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
@@ -78,16 +123,10 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="OptionIds">
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="OptionNames">
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -95,6 +134,20 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
-    <ExportedComponents/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="SearchController"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="SearchController"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="SearchController"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="SearchController"/>
+        <Interface InterfaceId="imtbase::IRevisionController" ComponentId="DatabaseDelegate"/>
+        <Interface InterfaceId="imtbase::ISearchController" ComponentId="SearchController"/>
+        <Interface InterfaceId="imtdb::IDependentMetaInfoController" ComponentId="DatabaseDelegate"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="DatabaseDelegate"/>
+        <Interface InterfaceId="imtdb::ISqlJsonXPathExtractor" ComponentId="PostgresXPathExtractor"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="SearchController"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="DatabaseDelegate"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="DocumentTypes" ComponentId="DocumentTypes"/>
+    </ExportedComponents>
 </Acf>
