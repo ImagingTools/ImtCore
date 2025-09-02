@@ -432,7 +432,7 @@ void CMaskContainer::AddMask(IMask* mask, bool isInversion)
 {
 	QList<QPair<IMask*,quint64>>& targetList = isInversion ? m_maskListInv : m_maskList;
 
-	targetList.append(QPair<IMask*,int>(mask, 0));
+	targetList.append(QPair<IMask*,quint64>(mask, 0));
 }
 
 
