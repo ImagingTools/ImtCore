@@ -88,6 +88,7 @@ ObjectVisualStatusProvider 1.0 View/ObjectVisualStatusProvider.qml
 ServerConnectionParamElementView 1.0 View/ServerConnectionParamElementView.qml
 ComboBoxGqlElementView 1.0 View/ComboBoxGqlElementView.qml
 ComboBoxGqlLegacyElementView 1.0 View/ComboBoxGqlLegacyElementView.qml
+SpinBoxElementView 1.0 View/SpinBoxElementView.qml
 
 singleton PopupManager 1.0 View/PopupManager.qml
 

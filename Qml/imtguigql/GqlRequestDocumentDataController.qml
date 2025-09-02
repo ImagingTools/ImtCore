@@ -251,7 +251,6 @@ DocumentDataController {
 
 	property GqlRequest gqlAddModel: GqlRequest {
 		function save(){
-			console.log("gqlAddModel save()", container.gqlAddCommandId)
 			var query = Gql.GqlRequest("mutation", container.gqlAddCommandId);
 			query.AddParam(container.addRequestInputParam);
 

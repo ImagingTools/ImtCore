@@ -5,231 +5,195 @@ import imtcontrols 1.0
 
 Item {
     id: spinBox;
-
+    
     width: 120;
-	height: Style.controlHeightM;
-
+    height: Style.controlHeightM;
+    
     property var baseElement: null;
-
+    
     property real value: !baseElement ? 0 : baseElement.startValue;
-
+    
     property var numberReg: !baseElement ? /^.*$/ : baseElement.numberReg;
-
+    
     property real startValue: !baseElement ? 0 : baseElement.startValue;
     property real from: !baseElement ? 0 : baseElement.from;
     property real to: !baseElement ? 99 : baseElement.to;
     property real stepSize: !baseElement ? 1 : baseElement.stepSize;
-
+    
     property bool editable: !baseElement ? true : baseElement.editable;
     property bool wrap: !baseElement ? false : baseElement.wrap;
-
+    
     property string icon: !baseElement ? "" : baseElement.icon;
-
-    property string fontColor: "#000000";
+    
+    property string fontColor: Style.textColor
     property int fontSize: Style.fontSizeM;
-
+    property bool textInputEnabled: true
+    
     Component.onCompleted: {
         numberTextField.text = String(startValue);
-        numberTextField.prevText = numberTextField.text;
     }
-
-    onValueChanged: {
-        if(numberTextField.text !== String(value)){
-            numberTextField.text = String(value)
-        }
-        if(baseElement){
-            baseElement.value = value;
+    
+    onStartValueChanged: {
+        numberTextField.text = String(startValue);
+    }
+    
+    Connections {
+        target: spinBox.baseElement ? spinBox.baseElement : undefined
+        function onValueChanged(){
+            numberTextField.text = target.value
         }
     }
-
+    
     Rectangle{
         id: mainRec;
-
+        
         anchors.fill: parent;
-
-		radius: Style.radiusM;
+        
+        radius: Style.radiusM;
         border.width: 1;
-		border.color: Style.borderColor;
-
+        border.color: Style.borderColor;
+        
         Item {
             id: numberBlock;
-
+            
             anchors.left: parent.left;
-
+            
             width: parent.width - buttonsBlock.width;
             height: parent.height;
-
-            TextField {
+            
+            CustomTextField {
                 id: numberTextField;
-
+                
                 anchors.centerIn: parent;
-
-				width: parent.width - Style.marginM;
+                
+                width: parent.width - Style.marginM;
                 height: parent.height - 2*mainRec.border.width;
                 fontColor: spinBox.fontColor;
                 textSize: spinBox.fontSize;
                 borderColorConst: "transparent";
-                readOnly: !spinBox.editable;
-                property string prevText: "";
+                readOnly: !spinBox.editable || !spinBox.textInputEnabled;
+                editingFinishedTimerInterval: 1000
 
                 onTextChanged: {
-                    numberTextField.text = numberTextField.text.replace(",",".");
-                    if(numberTextField.text.search(spinBox.numberReg) < 0){
-                        numberTextField.text = numberTextField.prevText;
+                    if (!spinBox.baseElement){
+                        return
                     }
-                    else {
-                        spinBox.value = parseFloat(numberTextField.text);
+
+                    text = text.replace(",",".");
+                }
+
+                onEditingFinished: {
+                    if (text === "" || text.search(spinBox.numberReg) < 0){
+                       text = spinBox.baseElement.value
                     }
-                    numberTextField.prevText = numberTextField.text;
+                    else{
+                        let value = parseFloat(text)
+                        if (value < spinBox.from || value > spinBox.to){
+                            text = spinBox.baseElement.value
+                        }
+                        else{
+                            spinBox.baseElement.value = value
+                        }
+                    }
                 }
             }
         }
-
+        
         Rectangle{
             id: buttonsBlock;
-
+            
             anchors.verticalCenter: parent.verticalCenter;
             anchors.right: parent.right;
             anchors.rightMargin: 2*mainRec.border.width;
-
-			width: Style.buttonWidthS;
+            
+            width: Style.buttonWidthS;
             height: parent.height - 2*mainRec.border.width;
+            
             Column {
                 id: buttonColumn;
-
+                
                 anchors.left: parent.left;
                 anchors.leftMargin: -mainRec.border.width;
                 anchors.verticalCenter: parent.verticalCenter;
                 spacing: -mainRec.border.width
-
+                
                 width: parent.width +  mainRec.border.width;
-
+                
                 Button {
                     id: upButton;
-
                     width: buttonColumn.width;
                     height: buttonsBlock.height/2 + mainRec.border.width/2;
-
                     iconSource: spinBox.icon;
-
                     rotation: 180
-
+                    enabled: !spinBox.baseElement ? true : spinBox.baseElement.value < spinBox.baseElement.to
                     onClicked: {
-
-                        spinBox.increase();
+                        if (spinBox.baseElement){
+                            spinBox.baseElement.increase();
+                        }
                     }
                 }
-
+                
                 Button {
                     id: downButton;
-
+                    
                     width: buttonColumn.width;
                     height: buttonsBlock.height/2 + mainRec.border.width/2;
-
+                    
                     iconSource: spinBox.icon;
-
+                    enabled: !spinBox.baseElement ? true : spinBox.baseElement.value > spinBox.baseElement.from
+                    
                     onClicked: {
-                        spinBox.decrease();
+                        if (spinBox.baseElement){
+                            spinBox.baseElement.decrease();
+                        }
                     }
                 }
             }
         }
-
-
     }//mainRec
-
-    function increase(){
-        let value = parseFloat(numberTextField.text)
-        if(value + spinBox.stepSize > spinBox.to){
-            if(spinBox.wrap){
-                numberTextField.text = spinBox.from;
-            }
-            else {
-                return;
-            }
-        }
-        else {
-            let precision = 0
-            if (numberTextField.text.includes('.')){
-                precision = numberTextField.text.split('.')[1].length
-            }
-
-            if (!numberTextField.text){
-                numberTextField.text = spinBox.stepSize
-            }
-            else {
-
-                value += spinBox.stepSize
-                numberTextField.text = value.toFixed(precision)
-            }
-        }
-        spinBox.value = parseFloat(numberTextField.text);
-    }
-
-    function decrease(){
-        let value = parseFloat(numberTextField.text)
-        if(value - spinBox.stepSize < spinBox.from){
-            if(spinBox.wrap){
-                numberTextField.text = spinBox.to;
-            }
-            else {
-                return;
-            }
-        }
-        else {
-            let precision = 0
-            if (numberTextField.text.includes('.')){
-                precision = numberTextField.text.split('.')[1].length
-            }
-
-            if (!numberTextField.text){
-                numberTextField.text = -spinBox.stepSize
-            }
-            else {
-                value -= spinBox.stepSize
-                numberTextField.text = value.toFixed(precision)
-            }
-        }
-        spinBox.value = parseFloat(numberTextField.text);
-    }
-
-
+    
     Shortcut {
         sequence: "Down";
         enabled: spinBox.focus || numberTextField.activeFocus;
         onActivated: {
-            spinBox.decrease();
+            if (spinBox.baseElement){
+                spinBox.baseElement.decrease();
+            }
         }
     }
-
+    
     Shortcut {
         sequence: "Up";
         enabled: spinBox.focus || numberTextField.activeFocus;
         onActivated: {
-            spinBox.increase();
+            if (spinBox.baseElement){
+                spinBox.baseElement.increase();
+            }
         }
     }
-
+    
     MouseArea{
         id: wheelMa;
-
         anchors.fill: parent;
-
         propagateComposedEvents: true;
+        
         onClicked: {
             if(spinBox.editable){
                 numberTextField.forceActiveFocus();
             }
             mouse.accepted = false;
         }
+        
         onWheel: {
+            if (!spinBox.baseElement){
+                return
+            }
             if(wheel.angleDelta.y > 0){
-                spinBox.increase();
+                spinBox.baseElement.increase();
             }
             else {
-                spinBox.decrease();
+                spinBox.baseElement.decrease();
             }
-
         }
     }
 }

@@ -47,6 +47,7 @@ FocusScope {
 	property bool fontBold: false;
 	property bool hasActionMenu: true;
 	property bool autoEditingFinished: true;
+	property int editingFinishedTimerInterval: 700;
 	
 	property real placeHolderOpacity: 1;
 	
@@ -230,7 +231,7 @@ FocusScope {
 	
 	Timer {
 		id: editingFinishedTimer;
-		interval: 700;
+		interval: containerTextField.editingFinishedTimerInterval;
 		
 		onTriggered: {
 			if (containerTextField.autoEditingFinished){
