@@ -100,7 +100,7 @@ void CDeviceIdBasedConfigurationComp::UpdateModel()
 
 			if (!deviceTypeId.isEmpty()){
 				DeviceConfigurationPtr configurationPtr =
-					m_configurationManagerCompPtr->GetDeviceConfiguration(deviceId, deviceTypeId);
+					m_configurationManagerCompPtr->GetDeviceConfiguration(deviceId);
 				if (configurationPtr != nullptr){
 					CopyFrom(*configurationPtr);
 				}
@@ -145,7 +145,7 @@ void CDeviceIdBasedConfigurationComp::OnConfigurationChanged(const istd::IChange
 			}
 
 			if (!deviceTypeId.isEmpty()){
-				m_configurationManagerCompPtr->SetDeviceConfiguration(deviceId, deviceTypeId, *this);
+				m_configurationManagerCompPtr->SetDeviceConfiguration(deviceId, *this);
 			}
 		}
 	}

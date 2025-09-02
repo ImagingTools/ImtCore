@@ -17,80 +17,46 @@ namespace imtdev
 
 // reimplemented (IDeviceConfigurationManager)
 
-DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfiguration(
-			const QByteArray& deviceId,
-			const QByteArray& deviceTypeId) const
+DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfiguration(const QByteArray& deviceId) const
 {
-	DeviceConfigurationPtr configurationPtr;
+	if (!deviceId.isEmpty()){
+		DeviceConfigurationPtr configurationPtr;
 
-	if (!deviceId.isEmpty() && !deviceTypeId.isEmpty()){
-		QByteArray typeId;
+		if (m_configurations.contains(deviceId)){
+			configurationPtr.reset(new iprm::CParamsSet());
+			configurationPtr->CopyFrom(*m_configurations[deviceId].configurationPtr);
 
-		if (deviceId == deviceTypeId){
-			typeId = deviceTypeId;
-		}
-		else {
-			DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
-			if (instanceInfoPtr != nullptr){
-				typeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
-			}
+			return configurationPtr;
 		}
 
-		if (!typeId.isEmpty() && deviceTypeId == typeId){
-			const IDeviceStaticInfo* staticInfoPtr = m_deviceControllerCompPtr->GetDeviceStaticInfo(typeId);
-			Q_ASSERT(staticInfoPtr != nullptr);
+		DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
+		if (instanceInfoPtr != nullptr){
+			const iprm::IParamsSet& defaultConfiguration = instanceInfoPtr->GetStaticInfo().GetDefaultConfiguration();
 
-			if (m_configurations.contains(deviceId) && m_configurations[deviceId].deviceTypeId == deviceTypeId){
-				if (staticInfoPtr->AreConfigurationAccepted(*m_configurations[deviceId].configurationPtr.data())){
-					configurationPtr.reset(new iprm::CParamsSet());
-					configurationPtr->CopyFrom(*m_configurations[deviceId].configurationPtr.data());
-				}
-			}
+			configurationPtr.reset(new iprm::CParamsSet());
+			configurationPtr->CopyFrom(defaultConfiguration);
 
-			if (configurationPtr.isNull()){
-				configurationPtr.reset(new iprm::CParamsSet());
-				configurationPtr->CopyFrom(staticInfoPtr->GetDefaultConfiguration());
-			}
+			return configurationPtr;
 		}
 	}
 
-	return configurationPtr;
+	return nullptr;
 }
 
 
-bool CDeviceIdBasedConfigurationManagerComp::SetDeviceConfiguration(
-			const QByteArray& deviceId,
-			const QByteArray& deviceTypeId,
-			const iprm::IParamsSet& configuration)
+bool CDeviceIdBasedConfigurationManagerComp::SetDeviceConfiguration(const QByteArray& deviceId, const iprm::IParamsSet& configuration)
 {
-	if (!deviceId.isEmpty() && !deviceTypeId.isEmpty()){
+	if (!deviceId.isEmpty()){
 		DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
+		if (instanceInfoPtr != nullptr && instanceInfoPtr->GetStaticInfo().AreConfigurationAccepted(configuration)){
+			DeviceConfigurationPtr configurationPtr(new iprm::CParamsSet);
+			if (configurationPtr->CopyFrom(configuration)){
+				istd::CChangeNotifier notifier(this);
 
-		QByteArray typeId;
-		if (instanceInfoPtr != nullptr){
-			typeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
-		}
+				m_configurations[deviceId].deviceTypeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
+				m_configurations[deviceId].configurationPtr = configurationPtr;
 
-		const IDeviceStaticInfo* staticInfoPtr = nullptr;
-		if (!typeId.isEmpty()){
-			m_deviceControllerCompPtr->GetDeviceStaticInfo(typeId);
-		}
-
-		if (staticInfoPtr == nullptr){
-			staticInfoPtr = m_deviceControllerCompPtr->GetDeviceStaticInfo(deviceTypeId);
-		}
-
-		if (staticInfoPtr != nullptr && staticInfoPtr->GetTypeId() == deviceTypeId){
-			if (staticInfoPtr->AreConfigurationAccepted(configuration)){
-				DeviceConfigurationPtr deviceConfigurationPtr(new iprm::CParamsSet);
-				if (deviceConfigurationPtr->CopyFrom(configuration)){
-					istd::CChangeNotifier notifier(this);
-
-					m_configurations[deviceId].deviceTypeId = deviceTypeId;
-					m_configurations[deviceId].configurationPtr = deviceConfigurationPtr;
-
-					return true;
-				}
+				return true;
 			}
 		}
 	}

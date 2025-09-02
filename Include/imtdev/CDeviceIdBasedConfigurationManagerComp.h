@@ -34,13 +34,8 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDeviceConfigurationManager)
-	virtual DeviceConfigurationPtr GetDeviceConfiguration(
-				const QByteArray& deviceId,
-				const QByteArray& deviceTypeId) const override;
-	virtual bool SetDeviceConfiguration(
-				const QByteArray& deviceId,
-				const QByteArray& deviceTypeId,
-				const iprm::IParamsSet& configuration) override;
+	virtual DeviceConfigurationPtr GetDeviceConfiguration(const QByteArray& deviceId) const override;
+	virtual bool SetDeviceConfiguration(const QByteArray& deviceId, const iprm::IParamsSet& configuration) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
