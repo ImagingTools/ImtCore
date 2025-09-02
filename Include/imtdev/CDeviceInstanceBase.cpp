@@ -1,4 +1,4 @@
-#include <imtdev/CDeviceInstanceInfoBase.h>
+#include <imtdev/CDeviceInstanceBase.h>
 
 
 // ACF includes
@@ -12,22 +12,22 @@ namespace imtdev
 
 // public methods
 
-CDeviceInstanceInfoBase::CDeviceInstanceInfoBase()
+CDeviceInstanceBase::CDeviceInstanceBase()
 	:m_updateBridge(this)
 {
 	m_versionInfo.AttachObserver(&m_updateBridge);
 }
 
 
-CDeviceInstanceInfoBase::~CDeviceInstanceInfoBase()
+CDeviceInstanceBase::~CDeviceInstanceBase()
 {
 	m_updateBridge.EnsureModelsDetached();
 }
 
 
-// reimplemented (imtdev::IEditableDeviceInstanceInfo)
+// reimplemented (imtdev::IEditableDeviceInstance)
 
-bool CDeviceInstanceInfoBase::SetIdentifier(IdentifierTypes idType, const QByteArray& value)
+bool CDeviceInstanceBase::SetIdentifier(IdentifierTypes idType, const QByteArray& value)
 {
 	istd::CChangeNotifier notifier(this);
 
@@ -37,13 +37,15 @@ bool CDeviceInstanceInfoBase::SetIdentifier(IdentifierTypes idType, const QByteA
 }
 
 
-bool CDeviceInstanceInfoBase::SetVersion(int /*versionId*/, quint32 /*version*/, const QString& /*name*/, const QString& /*description*/)
+bool CDeviceInstanceBase::SetVersion(int versionId, quint32 version, const QString& description)
 {
-	return false;
+	m_versionInfo.SetVersion(versionId,  version, description);
+
+	return true;
 }
 
 
-iattr::IAttributesManager* CDeviceInstanceInfoBase::GetAttributesManager()
+iattr::IAttributesManager* CDeviceInstanceBase::GetAttributesManager()
 {
 	EnsureAttributesCreated();
 
@@ -51,9 +53,9 @@ iattr::IAttributesManager* CDeviceInstanceInfoBase::GetAttributesManager()
 }
 
 
-// reimplemented (imtdev::IDeviceInstanceInfo)
+// reimplemented (imtdev::IDeviceInstance)
 
-QByteArray CDeviceInstanceInfoBase::GetIdentifier(int idType) const
+QByteArray CDeviceInstanceBase::GetIdentifier(int idType) const
 {
 	if (m_identifiers.contains(idType)){
 		return m_identifiers[idType];
@@ -63,13 +65,13 @@ QByteArray CDeviceInstanceInfoBase::GetIdentifier(int idType) const
 }
 
 
-const iser::IVersionInfo& CDeviceInstanceInfoBase::GetVersion() const
+const iser::IVersionInfo& CDeviceInstanceBase::GetVersion() const
 {
 	return m_versionInfo;
 }
 
 
-const iattr::IAttributesProvider* CDeviceInstanceInfoBase::GetAttributes() const
+const iattr::IAttributesProvider* CDeviceInstanceBase::GetAttributes() const
 {
 	EnsureAttributesCreated();
 
@@ -79,17 +81,17 @@ const iattr::IAttributesProvider* CDeviceInstanceInfoBase::GetAttributes() const
 
 // reimplemented (istd::IChangeable)
 
-int CDeviceInstanceInfoBase::GetSupportedOperations() const
+int CDeviceInstanceBase::GetSupportedOperations() const
 {
 	return SO_COPY | SO_RESET;
 }
 
 
-bool CDeviceInstanceInfoBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CDeviceInstanceBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const CDeviceInstanceInfoBase* sourcePtr = dynamic_cast<const CDeviceInstanceInfoBase*>(&object);
+	const CDeviceInstanceBase* sourcePtr = dynamic_cast<const CDeviceInstanceBase*>(&object);
 	if (sourcePtr != nullptr){
-		if (GetStaticInfo().GetTypeId() != sourcePtr->GetStaticInfo().GetTypeId()){
+		if (GetDeviceSpecification().GetTypeId() != sourcePtr->GetDeviceSpecification().GetTypeId()){
 			return false;
 		}
 
@@ -106,6 +108,9 @@ bool CDeviceInstanceInfoBase::CopyFrom(const IChangeable& object, CompatibilityM
 					retVal = m_attributesPtr->CopyFrom(*sourceAttributesPtr);
 				}
 			}
+			else{
+				m_attributesPtr.reset();
+			}
 		}
 
 		return retVal;
@@ -115,7 +120,7 @@ bool CDeviceInstanceInfoBase::CopyFrom(const IChangeable& object, CompatibilityM
 }
 
 
-bool CDeviceInstanceInfoBase::ResetData(CompatibilityMode /*mode*/)
+bool CDeviceInstanceBase::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier notifier(this);
 
@@ -128,23 +133,31 @@ bool CDeviceInstanceInfoBase::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-// private metods
+// protected methods
 
-bool CDeviceInstanceInfoBase::EnsureAttributesCreated() const
+bool CDeviceInstanceBase::EnsureAttributesCreated() const
 {
-	if (m_attributesPtr == nullptr){
-		m_attributesPtr.reset(GetStaticInfo().CreateInstanceAttributes());
-	}
-
-	return m_attributesPtr != nullptr;
+	return false;
 }
 
 
 // public methods of the embedded class VersionInfo
 
+bool CDeviceInstanceBase::VersionInfo::SetVersion(
+	int versionId,
+	quint32 version,
+	const QString& description)
+{
+	m_versions[versionId].versionNumber = version;
+	m_versions[versionId].versionDescription = description;
+
+	return true;
+}
+
+
 // reimplemenbted (iser::IVersionInfo)
 
-iser::IVersionInfo::VersionIds CDeviceInstanceInfoBase::VersionInfo::GetVersionIds() const
+iser::IVersionInfo::VersionIds CDeviceInstanceBase::VersionInfo::GetVersionIds() const
 {
 	QList<int> ids = m_versions.keys();
 
@@ -154,7 +167,7 @@ iser::IVersionInfo::VersionIds CDeviceInstanceInfoBase::VersionInfo::GetVersionI
 }
 
 
-bool CDeviceInstanceInfoBase::VersionInfo::GetVersionNumber(int versionId, quint32& result) const
+bool CDeviceInstanceBase::VersionInfo::GetVersionNumber(int versionId, quint32& result) const
 {
 	if (m_versions.contains(versionId)){
 		result = m_versions[versionId].versionNumber;
@@ -166,7 +179,7 @@ bool CDeviceInstanceInfoBase::VersionInfo::GetVersionNumber(int versionId, quint
 }
 
 
-QString CDeviceInstanceInfoBase::VersionInfo::GetVersionIdDescription(int versionId) const
+QString CDeviceInstanceBase::VersionInfo::GetVersionIdDescription(int versionId) const
 {
 	if (m_versions.contains(versionId)){
 		return m_versions[versionId].versionDescription;
@@ -176,7 +189,7 @@ QString CDeviceInstanceInfoBase::VersionInfo::GetVersionIdDescription(int versio
 }
 
 
-QString CDeviceInstanceInfoBase::VersionInfo::GetEncodedVersionName(int versionId, quint32 versionNumber) const
+QString CDeviceInstanceBase::VersionInfo::GetEncodedVersionName(int versionId, quint32 versionNumber) const
 {
 	if (m_versions.contains(versionId)){
 		return QString::number(versionNumber);
@@ -188,13 +201,13 @@ QString CDeviceInstanceInfoBase::VersionInfo::GetEncodedVersionName(int versionI
 
 // reimplemented (istd::IChangeable)
 
-int CDeviceInstanceInfoBase::VersionInfo::GetSupportedOperations() const
+int CDeviceInstanceBase::VersionInfo::GetSupportedOperations() const
 {
 	return SO_CLONE | SO_COPY | SO_RESET;
 }
 
 
-bool CDeviceInstanceInfoBase::VersionInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CDeviceInstanceBase::VersionInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const VersionInfo* sourcePtr = dynamic_cast<const VersionInfo*>(&object);
 	if (sourcePtr != nullptr){
@@ -209,7 +222,7 @@ bool CDeviceInstanceInfoBase::VersionInfo::CopyFrom(const IChangeable& object, C
 }
 
 
-istd::IChangeable* CDeviceInstanceInfoBase::VersionInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CDeviceInstanceBase::VersionInfo::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<istd::IChangeable> clonePtr(new VersionInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
@@ -220,7 +233,7 @@ istd::IChangeable* CDeviceInstanceInfoBase::VersionInfo::CloneMe(CompatibilityMo
 }
 
 
-bool CDeviceInstanceInfoBase::VersionInfo::ResetData(CompatibilityMode /*mode*/)
+bool CDeviceInstanceBase::VersionInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier notifier(this);
 

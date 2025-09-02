@@ -44,7 +44,7 @@ protected:
 	void OnComponentDestroyed() override;
 
 private:
-	DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const;
+	DeviceInstancePtr GetDeviceInstance(const QByteArray& deviceId) const;
 	void UpdateModel();
 
 	void OnSelectionChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::ISelection* objectPtr);

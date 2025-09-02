@@ -9,7 +9,7 @@
 #include <iser/IVersionInfo.h>
 
 // ImtCore includes
-#include <imtdev/IDeviceStaticInfo.h>
+#include <imtdev/IDeviceSpecification.h>
 
 
 namespace imtdev
@@ -19,7 +19,7 @@ namespace imtdev
 /**
 	Interface for describing information about a device instance
 */
-class IDeviceInstanceInfo: virtual public istd::IChangeable
+class IDeviceInstance: virtual public istd::IChangeable
 {
 public:
 	enum IdentifierTypes
@@ -40,7 +40,7 @@ public:
 	/**
 		Get device static info associated with device instance
 	*/
-	virtual const IDeviceStaticInfo& GetStaticInfo() const = 0;
+	virtual const IDeviceSpecification& GetDeviceSpecification() const = 0;
 
 	/**
 		Get the device-ID related to the given type of the identifier.
@@ -59,7 +59,7 @@ public:
 };
 
 
-typedef std::shared_ptr<IDeviceInstanceInfo> DeviceInstanceInfoPtr;
+typedef std::shared_ptr<IDeviceInstance> DeviceInstancePtr;
 
 
 } // namespace imtdev

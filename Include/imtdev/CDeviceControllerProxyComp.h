@@ -16,8 +16,8 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdev/IDeviceController.h>
-#include <imtdev/IDeviceInstanceInfo.h>
-#include <imtdev/IDeviceStaticInfo.h>
+#include <imtdev/IDeviceInstance.h>
+#include <imtdev/IDeviceSpecification.h>
 
 
 namespace imtdev
@@ -63,11 +63,11 @@ public:
 
 	// reimplemented (IDeviceController)
 	virtual const QByteArrayList& GetSupportedDeviceTypeIds() const override;
-	virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const override;
+	virtual const IDeviceSpecification* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const override;
 	virtual const imtbase::ICollectionInfo& GetDeviceInstanceList() const override;
 	virtual bool SetDeviceInstanceName(const QByteArray& deviceId, const QString& name) override;
 	virtual bool SetDeviceInstanceDescription(const QByteArray& deviceId, const QString& description) override;
-	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const override;
+	virtual DeviceInstancePtr GetDeviceInstance(const QByteArray& deviceId) const override;
 	virtual const IDeviceStateProvider& GetDeviceStateProvider() const override;
 	virtual imtdev::DeviceAccessorPtr OpenDevice(
 				const QByteArray& deviceId,

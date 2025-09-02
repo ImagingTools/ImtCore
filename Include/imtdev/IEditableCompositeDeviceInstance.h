@@ -2,20 +2,20 @@
 
 
 // ImtCore includes
-#include <imtdev/ICompositeDeviceInstanceInfo.h>
+#include <imtdev/ICompositeDeviceInstance.h>
 
 
 namespace imtdev
 {
 
 
-class IDeviceStaticInfo;
+class IDeviceSpecification;
 
 
 /**
 	Interface for changing information about a composite device instance
 */
-class IEditableCompositeDeviceInstanceInfo : virtual public ICompositeDeviceInstanceInfo
+class IEditableCompositeDeviceInstance : virtual public ICompositeDeviceInstance
 {
 public:
 	/**
@@ -34,7 +34,7 @@ public:
 };
 
 
-typedef std::shared_ptr<IEditableCompositeDeviceInstanceInfo> EditableCompositeDeviceInstanceInfoPtr;
+typedef std::shared_ptr<IEditableCompositeDeviceInstance> EditableCompositeDeviceInstancePtr;
 
 
 } // namespace imtdev

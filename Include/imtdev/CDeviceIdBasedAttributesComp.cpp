@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtdev/IDeviceController.h>
-#include <imtdev/IDeviceStaticInfo.h>
+#include <imtdev/IDeviceSpecification.h>
 
 
 namespace imtdev
@@ -52,14 +52,14 @@ void CDeviceIdBasedAttributesComp::OnComponentDestroyed()
 
 // private methods
 
-DeviceInstanceInfoPtr CDeviceIdBasedAttributesComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
+DeviceInstancePtr CDeviceIdBasedAttributesComp::GetDeviceInstance(const QByteArray& deviceId) const
 {
-	DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
+	DeviceInstancePtr deviceInstanceInfoPtr = m_controllerCompPtr->GetDeviceInstance(deviceId);
 	if (deviceInstanceInfoPtr != nullptr){
 		return deviceInstanceInfoPtr;
 	}
 
-	return m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
+	return m_controllerCompPtr->GetDeviceInstance(deviceId);
 }
 
 
@@ -76,13 +76,13 @@ void CDeviceIdBasedAttributesComp::UpdateModel()
 
 		QByteArray deviceId = *ids.begin();
 
-		const IDeviceStaticInfo* staticInfoPtr = nullptr;
+		const IDeviceSpecification* staticInfoPtr = nullptr;
 
-		DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
-		if (instanceInfoPtr != nullptr){
-			staticInfoPtr = &instanceInfoPtr->GetStaticInfo();
+		DeviceInstancePtr instancePtr = GetDeviceInstance(deviceId);
+		if (instancePtr != nullptr){
+			staticInfoPtr = &instancePtr->GetDeviceSpecification();
 
-			const iattr::IAttributesProvider* attributesPtr = instanceInfoPtr->GetAttributes();
+			const iattr::IAttributesProvider* attributesPtr = instancePtr->GetAttributes();
 			if (attributesPtr != nullptr){
 				m_instanceAttrs.CopyFrom(*attributesPtr);
 			}

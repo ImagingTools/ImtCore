@@ -4,7 +4,7 @@
 // ImtCore includes
 #include <imtdev/IDeviceAccessor.h>
 #include <imtdev/IDeviceEnumerator.h>
-#include <imtdev/IDeviceInstanceInfo.h>
+#include <imtdev/IDeviceInstance.h>
 #include <imtdev/IDeviceStateProvider.h>
 
 
@@ -18,7 +18,7 @@ namespace imtdev
 {
 
 
-class IDeviceStaticInfo;
+class IDeviceSpecification;
 
 
 /**
@@ -39,7 +39,7 @@ public:
 	/**
 		Get device static info for the given DeviceTypeId
 	*/
-	virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const = 0;
+	virtual const IDeviceSpecification* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const = 0;
 
 	/**
 		Get the list of available devices
@@ -60,7 +60,7 @@ public:
 		Get device instance info for the given DeviceId
 		For some devices DeviceInstanceInfo can only be obtained for open devices
 	*/
-	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const = 0;
+	virtual DeviceInstancePtr GetDeviceInstance(const QByteArray& deviceId) const = 0;
 
 	/**
 		Get provider of current device states

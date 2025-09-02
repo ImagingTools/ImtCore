@@ -5,14 +5,14 @@
 #include <iattr/IAttributesManager.h>
 
 // ImtCore includes
-#include <imtdev/IDeviceInstanceInfo.h>
+#include <imtdev/IDeviceInstance.h>
 
 
 namespace imtdev
 {
 
 
-class IEditableDeviceInstanceInfo : virtual public IDeviceInstanceInfo
+class IEditableDeviceInstance : virtual public IDeviceInstance
 {
 public:
 	/**
@@ -26,7 +26,6 @@ public:
 	virtual bool SetVersion(
 		int versionId,
 		quint32 version,
-		const QString& name,
 		const QString& description) = 0;
 
 	/**
@@ -36,7 +35,7 @@ public:
 };
 
 
-typedef std::shared_ptr<IEditableDeviceInstanceInfo> EditableDeviceInstanceInfoPtr;
+typedef std::shared_ptr<IEditableDeviceInstance> EditableDeviceInstancePtr;
 
 
 } // namespace imtdev

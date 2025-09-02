@@ -8,23 +8,23 @@
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
-#include <imtdev/IEditableCompositeDeviceInstanceInfo.h>
-#include <imtdev/CDeviceInstanceInfoBase.h>
+#include <imtdev/IEditableCompositeDeviceInstance.h>
+#include <imtdev/CDeviceInstanceBase.h>
 
 
 namespace imtdev
 {
 
 
-class CCompositeDeviceInstanceInfoBase : public CDeviceInstanceInfoBase, virtual public IEditableCompositeDeviceInstanceInfo
+class CCompositeDeviceInstanceBase : public CDeviceInstanceBase, virtual public IEditableCompositeDeviceInstance
 {
 public:
-	typedef CDeviceInstanceInfoBase BaseClass;
+	typedef CDeviceInstanceBase BaseClass;
 
-	CCompositeDeviceInstanceInfoBase();
-	~CCompositeDeviceInstanceInfoBase();
+	CCompositeDeviceInstanceBase();
+	~CCompositeDeviceInstanceBase();
 
-	// reimplemented (IEditableCompositeDeviceInstanceInfo)
+	// reimplemented (IEditableCompositeDeviceInstance)
 	virtual QByteArray AddSubDevice(
 		const QByteArray& deviceTypeId,
 		const QString& name,
@@ -33,11 +33,11 @@ public:
 		const QByteArray& proposedId = QByteArray()) override;
 	virtual bool RemoveSubDevice(const QByteArray& id) override;
 
-	// reimplemented (ICompositeDeviceInstanceInfo)
-	virtual const ICompositeDeviceStaticInfo* GetCompositeStaticInfo() const override;
+	// reimplemented (ICompositeDeviceInstance)
+	virtual const ICompositeDeviceSpecification* GetCompositeDeviceSpecification() const override;
 	virtual QSet<QByteArray> GetSupportedSubDeviceTypeIds() const override;
 	virtual const imtbase::ICollectionInfo& GetSubDeviceList() const override;
-	virtual const IDeviceInstanceInfo* GetSubDeviceInstanceInfo(const QByteArray& subDeviceId) const override;
+	virtual const IDeviceInstance* GetSubDeviceInstance(const QByteArray& subDeviceId) const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
@@ -45,13 +45,13 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	virtual IDeviceInstanceInfo* CreateDeviceInstanceInfo(const QByteArray& deviceTypeId) const;
+	virtual IDeviceInstance* CreateDeviceInstance(const QByteArray& deviceTypeId) const;
 
 private:
 	class SubDeviceCollectionInfo : virtual public imtbase::ICollectionInfo
 	{
 	public:
-		void SetParent(CCompositeDeviceInstanceInfoBase* parentPtr);
+		void SetParent(CCompositeDeviceInstanceBase* parentPtr);
 
 		// reimpolemented (imtbase::ICollectionInfo)
 		virtual int GetElementsCount(
@@ -89,7 +89,7 @@ private:
 					ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	private:
-		CCompositeDeviceInstanceInfoBase* m_parentPtr;
+		CCompositeDeviceInstanceBase* m_parentPtr;
 	};
 
 private:
@@ -100,7 +100,7 @@ private:
 	{
 		QString name;
 		QString description;
-		DeviceInstanceInfoPtr instanceInfoPtr;
+		DeviceInstancePtr instancePtr;
 	};
 
 	QMap<QByteArray, SubDeviceItem> m_subDeviceMap;

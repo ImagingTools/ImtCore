@@ -32,7 +32,7 @@ const QByteArrayList& CDeviceControllerProxyComp::GetSupportedDeviceTypeIds() co
 }
 
 
-const IDeviceStaticInfo* CDeviceControllerProxyComp::GetDeviceStaticInfo(const QByteArray& deviceTypeId) const
+const IDeviceSpecification* CDeviceControllerProxyComp::GetDeviceStaticInfo(const QByteArray& deviceTypeId) const
 {
 	IDeviceController* controllerPtr = FindDeviceController(deviceTypeId);
 	if (controllerPtr != nullptr){
@@ -71,11 +71,11 @@ bool CDeviceControllerProxyComp::SetDeviceInstanceDescription(const QByteArray& 
 }
 
 
-DeviceInstanceInfoPtr CDeviceControllerProxyComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
+DeviceInstancePtr CDeviceControllerProxyComp::GetDeviceInstance(const QByteArray& deviceId) const
 {
 	IDeviceController* controllerPtr = FindDeviceController(deviceId);
 	if (controllerPtr != nullptr){
-		return controllerPtr->GetDeviceInstanceInfo(deviceId);
+		return controllerPtr->GetDeviceInstance(deviceId);
 	}
 
 	return nullptr;
@@ -285,7 +285,7 @@ void CDeviceControllerProxyComp::UpdateDeviceTypeIdList()
 			if (deviceControllerPtr != nullptr){
 				QByteArrayList ids = deviceControllerPtr->GetSupportedDeviceTypeIds();
 				for (const QByteArray& id : ids){
-					const IDeviceStaticInfo* staticInfoPtr = deviceControllerPtr->GetDeviceStaticInfo(id);
+					const IDeviceSpecification* staticInfoPtr = deviceControllerPtr->GetDeviceStaticInfo(id);
 
 					if (staticInfoPtr != nullptr){
 						m_deviceTypeList.InsertItem(id, staticInfoPtr->GetTypeName(), "");
@@ -374,9 +374,9 @@ IDeviceController* CDeviceControllerProxyComp::FindDeviceController(const QByteA
 
 QByteArray CDeviceControllerProxyComp::GetDeviceTypeId(const QByteArray& deviceId) const
 {
-	DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
-	if (instanceInfoPtr != nullptr){
-		QByteArray deviceTypeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
+	DeviceInstancePtr instancePtr = GetDeviceInstance(deviceId);
+	if (instancePtr != nullptr){
+		QByteArray deviceTypeId = instancePtr->GetDeviceSpecification().GetTypeId();
 
 		return deviceTypeId;
 	}

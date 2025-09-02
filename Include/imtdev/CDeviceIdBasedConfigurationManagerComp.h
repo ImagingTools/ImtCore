@@ -50,7 +50,7 @@ private:
 	};
 
 private:
-	DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const;
+	DeviceInstancePtr GetDeviceInstance(const QByteArray& deviceId) const;
 	ConfigurationFactory* FindConfigurationFactory(const QByteArray& deviceTypeId) const;
 
 private:

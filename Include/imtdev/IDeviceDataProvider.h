@@ -7,7 +7,7 @@
 #include <idoc/IDocumentMetaInfo.h>
 
 // Acula includes
-#include <imtdev/IDeviceInstanceInfo.h>
+#include <imtdev/IDeviceInstance.h>
 
 
 namespace imtdev
@@ -18,7 +18,7 @@ namespace imtdev
 	Interface for device data provider.
 	The configuration data of the device is given as a group of parameter sets
 */
-class IDeviceDataProvider: virtual public imtdev::IDeviceInstanceInfo
+class IDeviceDataProvider: virtual public imtdev::IDeviceInstance
 {
 public:
 	/**

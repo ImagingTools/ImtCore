@@ -14,7 +14,7 @@ namespace imtdev
 /**
 	Interface for describing "static" information about a device type/class
 */
-class IDeviceStaticInfo: virtual public istd::IChangeable
+class IDeviceSpecification: virtual public istd::IChangeable
 {
 public:
 	/**
@@ -37,11 +37,6 @@ public:
 		Get device static attributes provider
 	*/
 	virtual const iattr::IAttributesProvider* GetAttributes() const = 0;
-
-	/**
-		Create device instance attributes manager
-	*/
-	virtual iattr::IAttributesProvider* CreateInstanceAttributes() const = 0;
 
 	/**
 		Get the default device configuration

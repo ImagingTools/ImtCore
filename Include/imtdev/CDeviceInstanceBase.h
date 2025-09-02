@@ -6,30 +6,29 @@
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
-#include <imtdev/IEditableDeviceInstanceInfo.h>
-#include <imtdev/IDeviceStaticInfo.h>
+#include <imtdev/IEditableDeviceInstance.h>
+#include <imtdev/IDeviceSpecification.h>
 
 
 namespace imtdev
 {
 
 
-class CDeviceInstanceInfoBase : virtual public IEditableDeviceInstanceInfo
+class CDeviceInstanceBase : virtual public IEditableDeviceInstance
 {
 public:
-	CDeviceInstanceInfoBase();
-	~CDeviceInstanceInfoBase();
+	CDeviceInstanceBase();
+	~CDeviceInstanceBase();
 
-	// reimplemented (imtdev::IEditableDeviceInstanceInfo)
+	// reimplemented (imtdev::IEditableDeviceInstance)
 	virtual bool SetIdentifier(IdentifierTypes idType, const QByteArray& id) override;
 	virtual bool SetVersion(
 		int versionId,
 		quint32 version,
-		const QString& name,
 		const QString& description) override;
 	virtual iattr::IAttributesManager* GetAttributesManager() override;
 
-	// reimplemented (imtdev::IDeviceInstanceInfo)
+	// reimplemented (imtdev::IDeviceInstance)
 	virtual QByteArray GetIdentifier(int idType) const override;
 	virtual const iser::IVersionInfo& GetVersion() const override;
 	virtual const iattr::IAttributesProvider* GetAttributes() const override;
@@ -40,9 +39,17 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	virtual bool EnsureAttributesCreated() const;
+
+protected:
 	class VersionInfo : virtual public iser::IVersionInfo
 	{
 	public:
+		bool SetVersion(
+			int versionId,
+			quint32 version,
+			const QString& description);
+
 		// reimplemenbted (iser::IVersionInfo)
 		virtual VersionIds GetVersionIds() const override;
 		virtual bool GetVersionNumber(int versionId, quint32& result) const override;
@@ -67,9 +74,6 @@ protected:
 
 	mutable imod::CModelUpdateBridge m_updateBridge;
 	mutable std::unique_ptr<iattr::IAttributesProvider> m_attributesPtr;
-
-private:
-	bool EnsureAttributesCreated() const;
 
 private:
 	QMap<int, QByteArray> m_identifiers;

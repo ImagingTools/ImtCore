@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtdev/IDeviceController.h>
-#include <imtdev/IDeviceStaticInfo.h>
+#include <imtdev/IDeviceSpecification.h>
 
 
 namespace imtdev
@@ -56,10 +56,10 @@ void CDeviceIdBasedConfigurationComp::OnComponentDestroyed()
 
 // private methods
 
-DeviceInstanceInfoPtr CDeviceIdBasedConfigurationComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
+DeviceInstancePtr CDeviceIdBasedConfigurationComp::GetDeviceInstance(const QByteArray& deviceId) const
 {
 	if (!deviceId.isEmpty() && m_controllerCompPtr.IsValid()){
-		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_controllerCompPtr->GetDeviceInstanceInfo(deviceId);
+		DeviceInstancePtr deviceInstanceInfoPtr = m_controllerCompPtr->GetDeviceInstance(deviceId);
 
 		return deviceInstanceInfoPtr;
 	}
@@ -87,9 +87,9 @@ void CDeviceIdBasedConfigurationComp::UpdateModel()
 			QByteArray deviceId = *ids.begin();
 			QByteArray deviceTypeId;
 
-			DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
-			if (instanceInfoPtr != nullptr){
-				deviceTypeId = instanceInfoPtr->GetStaticInfo().GetTypeId();
+			DeviceInstancePtr instancePtr = GetDeviceInstance(deviceId);
+			if (instancePtr != nullptr){
+				deviceTypeId = instancePtr->GetDeviceSpecification().GetTypeId();
 			}
 
 			if (deviceTypeId.isEmpty() && m_controllerCompPtr.IsValid()){
@@ -131,11 +131,11 @@ void CDeviceIdBasedConfigurationComp::OnConfigurationChanged(const istd::IChange
 		QByteArray deviceId = *ids.begin();
 
 		if (m_configurationManagerCompPtr.IsValid()){
-			DeviceInstanceInfoPtr deviceInstanceInfoPtr = GetDeviceInstanceInfo(deviceId);
+			DeviceInstancePtr deviceInstanceInfoPtr = GetDeviceInstance(deviceId);
 
 			QByteArray deviceTypeId;
 			if (deviceInstanceInfoPtr != nullptr){
-				deviceTypeId = deviceInstanceInfoPtr->GetStaticInfo().GetTypeId();
+				deviceTypeId = deviceInstanceInfoPtr->GetDeviceSpecification().GetTypeId();
 			}
 
 			if (deviceTypeId.isEmpty()){

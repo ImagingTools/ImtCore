@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtdev/IDeviceStaticInfo.h>
+#include <imtdev/IDeviceSpecification.h>
 #include <imtbase/ICollectionInfo.h>
 
 
@@ -13,7 +13,7 @@ namespace imtdev
 /**
 	Interface for describing "static" information about a composite device
 */
-class ICompositeDeviceStaticInfo: virtual public IDeviceStaticInfo
+class ICompositeDeviceSpecification: virtual public IDeviceSpecification
 {
 public:
 	/**
@@ -24,7 +24,7 @@ public:
 	/**
 		Get static device info of subdevice with given id
 	*/
-	virtual const IDeviceStaticInfo* GetSubDeviceStaticInfo(const QByteArray& id) const = 0;
+	virtual const IDeviceSpecification* GetSubDeviceSpecification(const QByteArray& id) const = 0;
 };
 
 
