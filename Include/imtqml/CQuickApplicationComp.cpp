@@ -89,6 +89,21 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 
 					QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
 					if (window != nullptr){
+						if (m_windowWidthAttrPtr.IsValid()){
+							window->setWidth(*m_windowWidthAttrPtr);
+						}
+						if (m_windowHeightAttrPtr.IsValid()){
+							window->setHeight(*m_windowHeightAttrPtr);
+						}
+						if (m_minimumWindowWidthAttrPtr.IsValid()){
+							window->setMinimumWidth(*m_minimumWindowWidthAttrPtr);
+						}
+						if (m_minimumWindowHeightAttrPtr.IsValid()){
+							window->setMinimumHeight(*m_minimumWindowHeightAttrPtr);
+						}
+						if (m_visibilityAttrPtr.IsValid()){
+							window->setVisibility(QWindow::Visibility(*m_visibilityAttrPtr));
+						}
 						window->setWindowState(Qt::WindowMaximized); // Qt::WindowActive
 						window->setIcon(QGuiApplication::windowIcon());
 						window->setTitle(QGuiApplication::applicationName());

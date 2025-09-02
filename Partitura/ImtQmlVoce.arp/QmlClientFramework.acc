@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5395" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -170,8 +170,23 @@
                     <AttributeInfo Id="MainQuickWindow" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainWindow"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MinimumWindowHeight" Type="Integer" ExportId="MinimumWindowHeight">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MinimumWindowWidth" Type="Integer" ExportId="MinimumWindowWidth">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Visibility" Type="Integer" ExportId="Visibility">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WindowHeight" Type="Integer" ExportId="WindowHeight">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WindowWidth" Type="Integer" ExportId="WindowWidth">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

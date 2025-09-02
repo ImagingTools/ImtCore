@@ -20,6 +20,11 @@ public:
 	I_BEGIN_COMPONENT(CQuickApplicationComp);
 		I_REGISTER_INTERFACE(ibase::IApplication);
 		I_ASSIGN(m_mainQuickCompPtr, "MainQuickWindow", "QuickWindow object shown as main window", false, "MainGui");
+		I_ASSIGN(m_windowWidthAttrPtr, "WindowWidth", "Window width", false, 800);
+		I_ASSIGN(m_windowHeightAttrPtr, "WindowHeight", "Window height", false, 600);
+		I_ASSIGN(m_minimumWindowWidthAttrPtr, "MinimumWindowWidth", "Minimum window width", false, 800);
+		I_ASSIGN(m_minimumWindowHeightAttrPtr, "MinimumWindowHeight", "Minimum window height", false, 600);
+		I_ASSIGN(m_visibilityAttrPtr, "Visibility", "The screen-occupation state of the window:\n0 - Hidden;\n1 - AutomaticVisibility;\n2 - Windowed;\n3 - Minimized;\n4 - Maximized;\n5 - FullScreen", false, 1);
 	I_END_COMPONENT;
 
 	CQuickApplicationComp();
@@ -42,6 +47,11 @@ private Q_SLOTS:
 
 protected:
 	I_REF(imtqml::IQuickObject, m_mainQuickCompPtr);
+	I_ATTR(int, m_windowWidthAttrPtr);
+	I_ATTR(int, m_windowHeightAttrPtr);
+	I_ATTR(int, m_minimumWindowWidthAttrPtr);
+	I_ATTR(int, m_minimumWindowHeightAttrPtr);
+	I_ATTR(int, m_visibilityAttrPtr);
 };
 
 
