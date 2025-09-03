@@ -51,6 +51,7 @@
         <file alias="imtgui/View/SimpleCommandsDecorator.qml">View/SimpleCommandsDecorator.qml</file>
         <file alias="imtgui/View/ServerNoConnectionView.qml">View/ServerNoConnectionView.qml</file>
         <file alias="imtgui/View/SearchComp.qml">View/SearchComp.qml</file>
+        <file alias="imtgui/View/SearchAddressComp.qml">View/SearchAddressComp.qml</file>
         <file alias="imtgui/View/SearchCompLegacy.qml">View/SearchCompLegacy.qml</file>
         <file alias="imtgui/View/ViewBase.qml">View/ViewBase.qml</file>
         <file alias="imtgui/View/ViewCommandsDelegateBase.qml">View/ViewCommandsDelegateBase.qml</file>

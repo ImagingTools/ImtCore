@@ -135,7 +135,9 @@ QtObject {
 
 		function onResult(data){
 			container.collectionModel = data.getData("items");
-			container.notificationModel = data.getData("notification");
+			if(data.containsKey("notification")){
+				container.notificationModel = data.getData("notification");
+			}
 
 			container.modelUpdated(data);
 		}

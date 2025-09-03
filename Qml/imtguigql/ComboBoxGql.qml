@@ -15,20 +15,27 @@ ComboBox {
 	property alias filter: dataProvider.filter
 	property alias commandId: dataProvider.commandId;
 
-	property int totalCount: -1;
-
 	property string excludeFilterPart: "";
 	property string filterText: "";
 
 	property bool endListStatus: false;
+	property bool closeOnFinished: true;
+	property bool keepFilterText: false;
+
+	property int modelUpdateDelay: 200
 
 	property Component popupDecorator: Style.popupDecoratorGql
 
+	onFilterTextChanged: {
+		if(comboBoxContainerGql.popup){
+			comboBoxContainerGql.popup.filterText = filterText
+		}
+	}
+
 	// signals
 	signal editSignal();
-	signal closeSignal(var model_);
 	signal clearSignal();
-	signal closeEmptySignal();
+	signal closeAction()
 
 	popupMenuComp: Component {
 		id: popupMenu;
@@ -55,8 +62,9 @@ ComboBox {
 			moveToIndex: comboBoxContainerGql.moveToIndex;
 			visibleScrollBar: comboBoxContainerGql.visibleScrollBar;
 
+			onFilterTextChanged: { comboBoxContainerGql.filterText = filterText }
+
 			Component.onCompleted: {
-				popup.closeSignal.connect(comboBoxContainerGql.closeSignal);
 				popup.clearSignal.connect(comboBoxContainerGql.clearSignal);
 			}
 
@@ -65,14 +73,20 @@ ComboBox {
 			}
 
 			onFinished: {
-				if (index >= 0){
-					comboBoxContainerGql.currentIndex = index;
-				}
-
-				comboBoxContainerGql.isOpen = false;
-
 				if (comboBoxContainerGql.currentText == ""){
 					comboBoxContainerGql.currentText = popup.filterText;
+				}
+
+				if (index < 0){
+					comboBoxContainerGql.isOpen = false;
+					closeCombo()
+				}
+				else{
+					comboBoxContainerGql.currentIndex = index;
+					if(comboBoxContainerGql.closeOnFinished){
+						comboBoxContainerGql.isOpen = false
+						closeCombo()
+					}
 				}
 
 				comboBoxContainerGql.finished(commandId, index)
@@ -83,7 +97,7 @@ ComboBox {
 					return
 				}
 
-				dataProvider.updateModel(0)
+				comboBoxContainerGql.updateModel(0)
 			}
 
 			onEditSignal: {
@@ -91,14 +105,18 @@ ComboBox {
 				comboBoxContainerGql.currentIndex = -1;
 
 				let str = filterText.replace(comboBoxContainerGql.excludeFilterPart, "");
-				if(dataProvider.filter.hasTextFilter()){
-					dataProvider.filter.m_textFilter.m_text = str
-				}
-				else{
-					dataProvider.filter.setTextFilter(str)
-				}
+				comboBoxContainerGql.setTextFilter(str)
 
 				pause.restart();
+			}
+
+			function close(){}
+
+			function closeCombo(){
+				if(root){
+					root.closeDialog();
+					comboBoxContainerGql.closeAction()
+				}
 			}
 
 			function setY(){
@@ -121,7 +139,7 @@ ComboBox {
 									&& dataProverState.toLowerCase() == "ready"
 									&& elemCountOk;
 				if(doRequest){
-					dataProvider.updateModel(dataProvider.offset + dataProvider.count)
+					comboBoxContainerGql.updateModel(dataProvider.offset + dataProvider.count)
 				}
 			}
 		}
@@ -134,9 +152,18 @@ ComboBox {
 		ModalDialogManager.openDialog(comboBoxContainerGql.popupMenuComp, {
 										"x":	 point.x,
 										"width": comboBoxContainerGql.width,
+										"filterText": filterText_,
 									});
 
 		comboBoxContainerGql.isOpen = true;
+	}
+
+	function updateModel(offset){
+		if(offset !== undefined && offset !== null && offset >= 0){
+			dataProvider.offset = offset
+		}
+
+		pause.restart()
 	}
 
 	function onMouseAreaClicked(){
@@ -151,15 +178,24 @@ ComboBox {
 		comboBoxContainerGql.clicked();
 	}
 
+	function setTextFilter(text){
+		if(dataProvider.filter.hasTextFilter()){
+			dataProvider.filter.m_textFilter.m_text = text
+		}
+		else{
+			dataProvider.filter.setTextFilter(text)
+		}
+	}
+
 	function setCustomFilters(inputParams){
 	}
 
 	PauseAnimation {
 		id: pause;
 
-		duration: 400;
+		duration: comboBoxContainerGql.modelUpdateDelay;
 		onFinished:{
-			dataProvider.updateModel(0);
+			dataProvider.updateModel();
 		}
 	}
 
@@ -167,7 +203,7 @@ ComboBox {
 		id: dataProvider;
 
 		offset: 0
-		count: 15
+		count: comboBoxContainerGql.shownItemsCount + 10
 		commandId: comboBoxContainerGql.commandId
 
 		function setCustomInputParams(inputParams){
@@ -179,18 +215,15 @@ ComboBox {
 		}
 
 		onModelUpdated: {
-			let canClose = data.containsKey("close") && data.getData("close");
-
-			if (dataProvider.notificationModel.containsKey("totalCount")){
-				comboBoxContainerGql.totalCount = dataProvider.notificationModel.getData("totalCount");
-			}
+			comboBoxContainerGql.closeOnFinished = data.containsKey("close") && data.getData("close");
 
 			if (dataProvider.offset == 0){
 				comboBoxContainerGql.model = dataProvider.collectionModel
 				comboBoxContainerGql.endListStatus = false;
 				comboBoxContainerGql.currentIndex = -1;
-				if(canClose){
-					comboBoxContainerGql.closePopupMenu();
+
+				if(comboBoxContainerGql.popup && comboBoxContainerGql.closeOnFinished){
+					comboBoxContainerGql.popup.finished('', -1)
 				}
 			}
 			else{

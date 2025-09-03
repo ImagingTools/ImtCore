@@ -5,6 +5,7 @@ import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 
+
 ComboBoxGql{
 	id: searchContainer;
 
@@ -19,6 +20,7 @@ ComboBoxGql{
 
 	placeHolderText: ""
 	visibleIcon: !clearButton.visible
+	keepFilterText: true
 
 	onClearSignal:{
 		reset()
@@ -26,6 +28,7 @@ ComboBoxGql{
 
 	function reset(){
 		searchContainer.filterText = ""
+		searchContainer.setTextFilter("")
 		searchContainer.currentText = "";
 		searchContainer.currentIndex = -1
 	}
@@ -44,7 +47,7 @@ ComboBoxGql{
 		decorator: Component{IconButtonDecorator{}}
 		iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
-		visible: searchContainer.currentText !== "" && !searchContainer.openST;
+		visible: searchContainer.currentText !== "" && !searchContainer.isOpen;
 		enabled: visible;
 
 		onClicked: {

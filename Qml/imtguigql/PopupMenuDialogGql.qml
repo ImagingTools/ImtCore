@@ -19,7 +19,12 @@ PopupMenuDialog {
 
 	signal editSignal();
 	signal clearSignal();
-	signal closeSignal();
+
+	onFilterTextChanged: {
+		if(popup.textField_ && popup.textField_.text !== popup.filterText){
+			popup.textField_.text = popup.filterText
+		}
+	}
 
 	onHeightChanged: {
 		popup.setY();
@@ -39,7 +44,7 @@ PopupMenuDialog {
 
 		popup.forceActiveFocus()
 		popup.decorator_.topContentLoaderSourceComp = searchField
-		popup.decorator_.bottomContentLoaderSourceComp = searchField
+		// popup.decorator_.bottomContentLoaderSourceComp = searchField
 	}
 
 	function setY(){
@@ -94,6 +99,7 @@ PopupMenuDialog {
 			anchors.left: parent.left;
 			textSize: popup.textSize;
 			fontColor: popup.fontColor;
+			text: popup.filterText
 
 			Component.onCompleted: {
 				popup.textField_ = filterField;
@@ -103,11 +109,10 @@ PopupMenuDialog {
 				target: filterField
 				property: "text"
 				value: popup.filterText
-				when: filterField.text !== popup.filterText
+				when: filterField.text !== filterField.filterText
 			}
 
 			onAccepted: {
-				popup.closeSignal(popup.model);
 				popup.close();
 			}
 

@@ -135,7 +135,7 @@ Rectangle{
 						deleg.hover_.destroy();
 						deleg.hover_ = null;
 					}
-					if (additionalItem){
+					if (additionalItem && typeof additionalItem.onRedraw === "function"){
 						additionalItem.onRedraw()
 					}
 				}
