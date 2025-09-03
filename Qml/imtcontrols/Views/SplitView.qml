@@ -93,6 +93,15 @@ Item{
                 children[0].children = list;
             }
 
+            if(Qt.platform.os == "web"){
+                let list = children[0].children
+                for(let i = 0; i < list.length; i++){
+                    if(!list[i].$completed){
+                        list[i].$complete()
+                    }
+                }
+            }
+
             fillSizeModelDefault(count);
             correctSize();
             sizeModel.modelChanged.connect(onModelDataChanged)
