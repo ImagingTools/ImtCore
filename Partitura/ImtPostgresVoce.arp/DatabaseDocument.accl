@@ -8,10 +8,10 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="DatabaseDelegate" X="475" Y="275" Note=""/>
-        <Element ComponentName="PostgresXPathExtractor" X="325" Y="425" Note=""/>
-        <Element ComponentName="SearchController" X="475" Y="125" Note=""/>
-        <Element ComponentName="Types" X="600" Y="425" Note=""/>
+        <Element ComponentName="DatabaseDelegate" X="500" Y="475" Note=""/>
+        <Element ComponentName="DocumentTypes" X="100" Y="475" Note=""/>
+        <Element ComponentName="PostgresXPathExtractor" X="875" Y="475" Note=""/>
+        <Element ComponentName="SqlDatabaseCollection" X="500" Y="350" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

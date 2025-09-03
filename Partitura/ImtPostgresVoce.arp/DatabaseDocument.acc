@@ -87,7 +87,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="SearchController" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollectionSearchController">
+        <Element Id="SqlDatabaseCollection" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CollectionDataController" Type="Reference" ExportId="CollectionDataController">
@@ -114,15 +114,6 @@
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="DatabaseDelegate"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SearchableHeadersIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Name</Value>
-                                <Value>TypeId</Value>
-                                <Value>Description</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -135,17 +126,16 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imod::IModel" ComponentId="SearchController"/>
-        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="SearchController"/>
-        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="SearchController"/>
-        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="SearchController"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="SqlDatabaseCollection"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="SqlDatabaseCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="SqlDatabaseCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="SqlDatabaseCollection"/>
         <Interface InterfaceId="imtbase::IRevisionController" ComponentId="DatabaseDelegate"/>
-        <Interface InterfaceId="imtbase::ISearchController" ComponentId="SearchController"/>
         <Interface InterfaceId="imtdb::IDependentMetaInfoController" ComponentId="DatabaseDelegate"/>
         <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="DatabaseDelegate"/>
         <Interface InterfaceId="imtdb::ISqlJsonXPathExtractor" ComponentId="PostgresXPathExtractor"/>
-        <Interface InterfaceId="istd::IChangeable" ComponentId="SearchController"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="DatabaseDelegate"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="SqlDatabaseCollection"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SqlDatabaseCollection"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="DocumentTypes" ComponentId="DocumentTypes"/>
