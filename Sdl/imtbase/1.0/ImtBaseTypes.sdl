@@ -140,6 +140,21 @@ type FileNameParam
 	path: String
 }
 
+type Parameter {
+	id: ID!
+	typeId: ID!
+	name: String!
+	description: String
+	## serialized parameter with JSON archive
+	data: String!
+}
+
+## TODO rename it
+type ParamsSet2 {
+	## \warning ALL id in parameters MUST be uinque
+	parameters: [Parameter]!
+}
+
 type ParamsSet
 {
 	paramIds: [ID]
