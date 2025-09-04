@@ -164,7 +164,7 @@ protected:
 	/**
 		Get  object type-Id.
 	*/
-	QByteArray GetObjectTypeIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
+	virtual QByteArray GetObjectTypeIdFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
 
 	/**
 		Create  representation from the data object.
