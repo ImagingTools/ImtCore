@@ -111,6 +111,10 @@ SearchComp{
 		if(textChange){
 			searchContainer.textChangeFunc(currentText);
 		}
+		else{
+			searchContainer.setTextFilter("")
+			dataProvider.updateModel()
+		}
 	}
 
 	/**

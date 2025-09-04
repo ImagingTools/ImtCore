@@ -107,6 +107,12 @@ PopupMenuDialog {
 				popup.editSignal();
 			}
 
+			Binding {
+				target: filterField
+				property: "text"
+				value: popup.filterText
+			}
+
 			Button{
 				id: clearButton;
 
