@@ -178,38 +178,40 @@ ParamEditorBase {
 				}
 			} // GroupElementView
 			
-			// GroupHeaderView {
-			// 	id: headerView;
-			// 	width: parent.width;
-			// 	title: qsTr("Backup Information");
-			// 	groupView: group;
-			// }
+			GroupHeaderView {
+				id: headerView;
+				width: parent.width;
+				title: qsTr("Backup Information");
+				groupView: group;
+				visible: dbEditor.databaseParams ? dbEditor.databaseParams.m_canBackupRestore : false
+			}
 			
-			// GroupElementView {
-			// 	id: group;
-			// 	width: parent.width;
+			GroupElementView {
+				id: group;
+				width: parent.width;
+				visible: dbEditor.databaseParams ? dbEditor.databaseParams.m_canBackupRestore : false
 				
-			// 	ButtonElementView {
-			// 		id: backupButton;
-			// 		width: parent.width;
-			// 		name: qsTr("Backup data");
-			// 		description: qsTr("Before performing the operation, check the connection to the server");
-			// 		text: qsTr("Backup");
-			// 		onClicked: {
-			// 			fileDialogSave.open();
-			// 		}
-			// 	}
+				ButtonElementView {
+					id: backupButton;
+					width: parent.width;
+					name: qsTr("Backup data");
+					description: qsTr("Before performing the operation, check the connection to the server");
+					text: qsTr("Backup");
+					onClicked: {
+						fileDialogSave.open();
+					}
+				}
 				
-			// 	ButtonElementView {
-			// 		width: parent.width;
-			// 		name: qsTr("Restore data from backup");
-			// 		text: qsTr("Restore");
-			// 		description: backupButton.description;
-			// 		onClicked: {
-			// 			fileDialog.open();
-			// 		}
-			// 	}
-			// } // GroupElementView
+				ButtonElementView {
+					width: parent.width;
+					name: qsTr("Restore data from backup");
+					text: qsTr("Restore");
+					description: backupButton.description;
+					onClicked: {
+						fileDialog.open();
+					}
+				}
+			} // GroupElementView
 		}
 	}
 }

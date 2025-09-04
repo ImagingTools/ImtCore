@@ -131,6 +131,7 @@ type DatabaseAccessSettings
 	dbPath: String
 	username: String
 	password: String
+	canBackupRestore: Boolean
 }
 
 type FileNameParam

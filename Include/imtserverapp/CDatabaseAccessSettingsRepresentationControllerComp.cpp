@@ -40,25 +40,27 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::GetSdlRepresentationFr
 	if (databaseLoginSettingsPtr == nullptr){
 		return false;
 	}
-	
+
 	QString dbName = databaseLoginSettingsPtr->GetDatabaseName();
 	sdlRepresentation.dbName = dbName;
-	
+
 	QString dbPath = databaseLoginSettingsPtr->GetDatabasePath();
 	sdlRepresentation.dbPath = dbPath;
-	
+
 	QString host = databaseLoginSettingsPtr->GetHost();
 	sdlRepresentation.host = host;
-	
+
 	QString password = databaseLoginSettingsPtr->GetPassword();
 	sdlRepresentation.password = password;
-	
+
 	QString userName = databaseLoginSettingsPtr->GetUserName();
 	sdlRepresentation.username = userName;
-	
+
 	int port = databaseLoginSettingsPtr->GetPort();
 	sdlRepresentation.port = port;
-	
+
+	sdlRepresentation.canBackupRestore = m_canBackupRestoreAttrPtr.IsValid() ? *m_canBackupRestoreAttrPtr : true;
+
 	return true;
 }
 
@@ -72,31 +74,31 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::GetDataModelFromSdlRep
 	if (databaseLoginSettingsPtr == nullptr){
 		return false;
 	}
-	
+
 	if (sdlRepresentation.dbName){
 		databaseLoginSettingsPtr->SetDatabaseName(*sdlRepresentation.dbName);
 	}
-	
+
 	if (sdlRepresentation.dbPath){
 		databaseLoginSettingsPtr->SetDatabasePath(*sdlRepresentation.dbPath);
 	}
-	
+
 	if (sdlRepresentation.host){
 		databaseLoginSettingsPtr->SetHost(*sdlRepresentation.host);
 	}
-	
+
 	if (sdlRepresentation.password){
 		databaseLoginSettingsPtr->SetPassword(*sdlRepresentation.password);
 	}
-	
+
 	if (sdlRepresentation.username){
 		databaseLoginSettingsPtr->SetUserName(*sdlRepresentation.username);
 	}
-	
+
 	if (sdlRepresentation.port){
 		databaseLoginSettingsPtr->SetPort(*sdlRepresentation.port);
 	}
-	
+
 	return true;
 }
 
