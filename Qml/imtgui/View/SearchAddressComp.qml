@@ -82,6 +82,10 @@ SearchComp{
 		\param appendCurrText - Optional text to append to the current text (default is an empty string).
 	*/
 	function setAddressCurrentText(index, appendCurrText){
+		if(!model){
+			return
+		}
+
 		let _appendCurrText = appendCurrText || "";
 
 		let fullAdress = model.getData(displayId, index) || ""
@@ -116,7 +120,7 @@ SearchComp{
 		If the text is decreased, it either keeps N elements based on comma count or resets the excludeFilterPart and parentIds.
 	*/
 	function textChangeFunc(filterText){
-		if(!searchContainer.isOpen || !filterText){
+		if(!model || !searchContainer.isOpen || !filterText){
 			return;
 		}
 

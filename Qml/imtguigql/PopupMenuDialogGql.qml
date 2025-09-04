@@ -11,7 +11,7 @@ PopupMenuDialog {
 	opacity: 0;
 
 	property string commandId: "";
-	property string dataProverState: ""
+	property string dataProviderState: ""
 	property string filterText: "";
 
 	property var comboDecorator: null;
@@ -30,13 +30,6 @@ PopupMenuDialog {
 		popup.setY();
 	}
 
-	onDataProverStateChanged: {
-		if(popup.decorator_){
-			let visible_ = popup.dataProverState.toLowerCase() == "loading"
-			popup.decorator_.setLoadingSplashRecVisible(visible_)
-		}
-	}
-
 	onDecorator_Changed: {
 		if(!popup.decorator_){
 			return
@@ -44,7 +37,6 @@ PopupMenuDialog {
 
 		popup.forceActiveFocus()
 		popup.decorator_.topContentLoaderSourceComp = searchField
-		// popup.decorator_.bottomContentLoaderSourceComp = searchField
 	}
 
 	function setY(){
@@ -103,13 +95,6 @@ PopupMenuDialog {
 
 			Component.onCompleted: {
 				popup.textField_ = filterField;
-			}
-
-			Binding {
-				target: filterField
-				property: "text"
-				value: popup.filterText
-				when: filterField.text !== filterField.filterText
 			}
 
 			onAccepted: {

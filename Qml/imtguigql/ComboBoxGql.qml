@@ -54,7 +54,7 @@ ComboBox {
 			model: comboBoxContainerGql.model;
 			shownItemsCount: comboBoxContainerGql.shownItemsCount
 			commandId: comboBoxContainerGql.commandId;
-			dataProverState: dataProvider.state
+			dataProviderState: dataProvider.state
 			filterText: comboBoxContainerGql.filterText;
 			selectedIndex: comboBoxContainerGql.currentIndex;
 
@@ -136,7 +136,7 @@ ComboBox {
 				let elementCount = popup.model.getItemsCount();
 				let elemCountOk = elementCount >= 0 ? elementCount > dataProvider.offset : true;
 				let doRequest = !comboBoxContainerGql.endListStatus
-									&& dataProverState.toLowerCase() == "ready"
+									&& dataProviderState.toLowerCase() == "ready"
 									&& elemCountOk;
 				if(doRequest){
 					comboBoxContainerGql.updateModel(dataProvider.offset + dataProvider.count)
