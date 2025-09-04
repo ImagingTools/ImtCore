@@ -128,17 +128,21 @@ ViewBase {
 	}
 	
 	function updateGui(){
-		descriptionInput.text = featureData.m_description;
-		featureNameInput.text = featureData.m_featureName;
-		featureIdInput.text = featureData.m_featureId;
-		featureEditor.updateTreeViewGui();
+		descriptionInput.text = featureData.m_description
+		featureNameInput.text = featureData.m_featureName
+		featureIdInput.text = featureData.m_featureId
+		optionalSwitch.setChecked(featureData.m_optional)
+		permissionSwitch.setChecked(featureData.m_isPermission)
+		featureEditor.updateTreeViewGui()
 	}
 	
 	function updateModel(){
-		featureData.m_description = descriptionInput.text;
-		featureData.m_featureName = featureNameInput.text;
-		featureData.m_featureId = featureIdInput.text;
-		tableView_.rowModel = featureData.m_subFeatures;
+		featureData.m_description = descriptionInput.text
+		featureData.m_featureName = featureNameInput.text
+		featureData.m_featureId = featureIdInput.text
+		featureData.m_optional = optionalSwitch.checked
+		featureData.m_isPermission = permissionSwitch.checked
+		tableView_.rowModel = featureData.m_subFeatures
 	}
 	
 	Rectangle {
@@ -214,6 +218,36 @@ ViewBase {
 			placeHolderText: qsTr("Enter the description");
 			onEditingFinished: {
 				featureEditor.doUpdateModel();
+			}
+		}
+		
+		BaseText {
+			anchors.verticalCenter: parent.verticalCenter
+			color: Style.buttonTextColor
+			font.family: Style.fontFamilyBold
+			text: qsTr("Is Optional")
+		}
+		
+		SwitchCustom {
+			id: optionalSwitch
+			anchors.verticalCenter: parent.verticalCenter
+			onCheckedChanged: {
+				featureEditor.doUpdateModel()
+			}
+		}
+		
+		BaseText {
+			anchors.verticalCenter: parent.verticalCenter
+			color: Style.buttonTextColor
+			font.family: Style.fontFamilyBold
+			text: qsTr("Is Permission")
+		}
+		
+		SwitchCustom {
+			id: permissionSwitch
+			anchors.verticalCenter: parent.verticalCenter
+			onCheckedChanged: {
+				featureEditor.doUpdateModel()
 			}
 		}
 	}

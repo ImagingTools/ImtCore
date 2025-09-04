@@ -67,6 +67,9 @@ RemoteCollectionView {
 
 							let childModel = featureEditor.featureData.m_subFeatures;
 							if (selectedIndex != null){
+								if (!selectedIndex.itemData.hasSubFeatures()){
+									selectedIndex.itemData.createSubFeatures()
+								}
 								childModel = selectedIndex.itemData.m_subFeatures;
 							}
 							let newFeatureData = featureDataComp.createObject(childModel)
