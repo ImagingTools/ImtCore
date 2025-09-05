@@ -18,10 +18,11 @@ DecoratorBase {
 
 	property bool moveToEnd: !baseElement ? false : baseElement.moveToEnd;
 	property bool isUpwards: !baseElement ? false: baseElement.isUpwards;
-	property bool modelLoadingState: dataProviderState.toLowerCase() === "loading"
+	property bool modelLoading: false
 
 	property string dataProviderState: !baseElement ? "ready": baseElement.dataProviderState;
 
+	property var modelLoadingStates: ["loading", "processing"]
 	property var model: !baseElement ? 0 : baseElement.model;
 	property var delegate: !baseElement ? null : baseElement.delegate;
 
@@ -38,11 +39,12 @@ DecoratorBase {
 	}
 
 	onDataProviderStateChanged: {
+		modelLoading = modelLoadingStates.includes(dataProviderState.toLowerCase())
 		if(model){
-			setLoadingSplashRecVisible(modelLoadingState)
+			setLoadingAnimVisible(modelLoading)
 		}
 		else{
-			setModelStateRecVisible(modelLoadingState)
+			setModelStateRecVisible(modelLoading)
 		}
 	}
 
@@ -65,7 +67,7 @@ DecoratorBase {
 	}
 
 	onIsUpwardsChanged: {
-		// swap search/no-data loader content
+		// swap search/model state loader content
 		let top = topContentLoader.sourceComponent
 		let bot = bottomContentLoader.sourceComponent
 
@@ -83,13 +85,15 @@ DecoratorBase {
 		}
 	}
 
-	function setLoadingSplashRecVisible(visible_){
-		loadingSplashRec.visible = visible_;
+	function setLoadingAnimVisible(visible_){
+		if(loadingAnimLoader.item){
+			loadingAnimLoader.item.visible = visible_
+		}
 	}
 
 	function setModelStateRecVisible(visible_){
 		itemBodyContainer.visible = !visible_
-		let comp = visible_ ? modelStateRecComp : null
+		let comp = visible_ ? modelStateComp : null
 
 		if (isUpwards){
 			topContentLoaderSourceComp = comp
@@ -149,6 +153,15 @@ DecoratorBase {
 				}
 			}
 
+			Loader{
+				id: loadingAnimLoader
+
+				anchors.fill: itemBody
+				sourceComponent: loadingAnimComp
+				clip: true
+				z: item ? (itemBody.z + 1) * item.visible : parent.z
+			}
+
 			Rectangle {
 				id: itemBody;
 
@@ -160,28 +173,6 @@ DecoratorBase {
 
 				radius: root.radius;
 				clip: true;
-
-				Rectangle{
-					id: loadingSplashRec;
-
-					anchors.fill: parent;
-					opacity: 0.5;
-					color: itemBody.color;
-					visible: false;
-					z: popupMenuListView.z + 1
-
-					Text {
-						id: loadingText
-
-						anchors.centerIn: parent;
-
-						color: Style.textColor;
-						font.pixelSize: Style.fontSizeM;
-						font.family: Style.fontFamily;
-
-						text: qsTr("Loading") + "..."
-					}
-				}
 
 				CustomScrollbar {
 					id: scrollbar;
@@ -264,20 +255,33 @@ DecoratorBase {
 		}
 	}
 
+
 	Component{
-		id: modelStateRecComp
+		id: loadingAnimComp
+
+		Loading{
+			anchors.fill: parent;
+			visible: false;
+			radius: root.radius;
+			opacity: 0.7;
+			clip: true
+
+			indicatorSize: Math.min(parent.height - 2 * Style.marginS, 50)
+
+			color: itemBody.color;
+		}
+	}
+
+	Component{
+		id: modelStateComp
 
 		Rectangle{
-			id: modelStateRecContainer
-
 			width: root ? root.width : 0;
 			height: Style.size_indicatorHeight;
 			radius: itemBody.radius;
 			color: itemBody.color;
 
 			Loader{
-				id: shadowLoaderNoData;
-
 				sourceComponent: dropShadow
 				anchors.fill: modelStateRec
 
@@ -294,16 +298,29 @@ DecoratorBase {
 				anchors.fill: parent
 				radius: parent.radius;
 				color: parent.color;
+				clip: true
 
 				Text{
-					id: noDataText;
-
 					anchors.centerIn: parent;
 
+					text: qsTr("No data")
 					font.pixelSize: !root.baseElement ? Style.fontSizeM : root.baseElement.textSize;
 					color: !root.baseElement ? Style.textColor : root.baseElement.fontColor;
+					visible: !root.modelLoading
 
-					text: root.modelLoadingState ? loadingText.text : qsTr("No data");
+					onVisibleChanged: {
+						if(mSLoadingAnimLoader.item){
+							mSLoadingAnimLoader.item.visible = !visible
+						}
+					}
+				}
+
+				Loader{
+					id: mSLoadingAnimLoader
+
+					anchors.fill: parent
+					sourceComponent: loadingAnimComp
+					clip: true
 				}
 			}
 		}
