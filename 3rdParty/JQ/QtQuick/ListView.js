@@ -60,6 +60,12 @@ class ListView extends Flickable {
     __middleWidth = 0
     __middleHeight = 0
 
+    __updatePrimaryProperties(){
+        super.__updatePrimaryProperties()
+        this.__updateProperty('delegate')
+        this.__initView(true)
+    }
+
     __complete() {
         this.__initView(true)
         super.__complete()

@@ -432,7 +432,7 @@ class BaseClass extends QtObject {
 
 					if (component) {
 						for (let sourceObjectInner of sourceObject[key]) {
-							let obj = this.createElement(_key).createObject()
+							let obj = this.createElement(_key).createObject(this)
 							obj.fromObject(sourceObjectInner)
 							this[_key].append({ item: obj })
 							obj.owner = this
@@ -445,7 +445,7 @@ class BaseClass extends QtObject {
 				} else {
 					let obj
 					if (!this[_key]) {
-						obj = this.createComponent(_key).createObject()
+						obj = this.createComponent(_key).createObject(this)
 					}
 					else {
 						obj = this[_key]

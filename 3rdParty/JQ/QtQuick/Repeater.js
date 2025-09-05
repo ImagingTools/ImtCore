@@ -29,6 +29,12 @@ class Repeater extends Item {
 
     __items = []
 
+    __updatePrimaryProperties(){
+        super.__updatePrimaryProperties()
+        this.__updateProperty('delegate')
+        this.__initView(true)
+    }
+
     __complete(){
         this.__initView(true)
         super.__complete()

@@ -138,6 +138,11 @@ class Item extends QtObject {
         value: true,
     }
 
+    // __updatePrimaryProperties(){
+    //     super.__updatePrimaryProperties()
+    //     this.__updateProperty('anchors')
+    // }
+
     __complete(){
         this.__checkVisibility()
         super.__complete()

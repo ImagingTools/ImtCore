@@ -118,7 +118,7 @@ class TreeItemModel extends JSONListModel {
             return retVal
 
         if(typeof retVal === 'object' && !(retVal instanceof QtObject)){
-            let retModel = TreeItemModel.create()
+            let retModel = TreeItemModel.create(this)
             retModel.__parentModel = this
 
             modelObject[key] = retModel
@@ -494,7 +494,7 @@ class TreeItemModel extends JSONListModel {
     }
 
     addTreeModel(key, row){
-        let retModel = TreeItemModel.create()
+        let retModel = TreeItemModel.create(this)
         retModel.__parentModel = this
 
         this.setUpdateEnabled(false)
@@ -575,7 +575,7 @@ class TreeItemModel extends JSONListModel {
             for(let index in keys){
                 let retVal = modelObject[keys[index]]
                 if(retVal !== null && typeof retVal === 'object' && !(retVal instanceof QtObject)){
-                    let retModel = TreeItemModel.create()
+                    let retModel = TreeItemModel.create(this)
                     retModel.__parentModel = this
 
                     modelObject[keys[index]] = retModel

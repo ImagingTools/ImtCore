@@ -57,6 +57,7 @@ class QObject extends QBaseObject {
     __init(){
         if(this.__dynamic){
             delete this.__dynamic
+            this.__updatePrimaryProperties()
             this.__updateAliases()
             this.__updateSimpleProperties()
             this.__updateProperties()
@@ -89,14 +90,20 @@ class QObject extends QBaseObject {
 
         delete this.__aliases
 
-        for(let child of this.__children){
-            child.__updateAliases()
+        for(let i = this.__children.length-1; i >= 0; i--){
+            this.__children[i].__updateAliases()
+        }
+    }
+
+    __updatePrimaryProperties(){
+        for(let i = this.__children.length-1; i >= 0; i--){
+            this.__children[i].__updatePrimaryProperties()
         }
     }
 
     __updateSimpleProperties(){
-        for(let child of this.__children){
-            child.__updateSimpleProperties()
+        for(let i = this.__children.length-1; i >= 0; i--){
+            this.__children[i].__updateSimpleProperties()
         }
 
         if(!this.__simpleProperties) return
@@ -109,6 +116,8 @@ class QObject extends QBaseObject {
     }
 
     __updateProperty(propName){
+        if(!(propName in this.__properties)) return
+
         let path = propName.split('.')
         let value = this.__properties[propName]
 
@@ -119,6 +128,7 @@ class QObject extends QBaseObject {
         delete this.__properties[propName]
 
         if(value instanceof QObject){
+            value.__updatePrimaryProperties()
             value.__updateAliases()
             value.__updateSimpleProperties()
             value.__updateProperties()
@@ -140,8 +150,8 @@ class QObject extends QBaseObject {
     __updateProperties(){
         JQApplication.beginUpdate()
 
-        for(let child of this.__children){
-            child.__updateProperties()
+        for(let i = this.__children.length-1; i >= 0; i--){
+            this.__children[i].__updateProperties()
         }
 
         JQApplication.endUpdate()
@@ -159,6 +169,7 @@ class QObject extends QBaseObject {
             delete this.__properties[propName]
 
             let obj = this.__proxy[path[0]]
+            obj.__updatePrimaryProperties()
             obj.__updateAliases()
             obj.__updateSimpleProperties()
             obj.__updateProperties()

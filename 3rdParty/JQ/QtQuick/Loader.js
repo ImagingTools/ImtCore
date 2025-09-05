@@ -32,6 +32,11 @@ class Loader extends Item {
         loaded: {type:Signal, slotName:'onLoaded', args:[]},
     })
 
+    __updatePrimaryProperties(){
+        super.__updatePrimaryProperties()
+        this.__updateProperty('sourceComponent')
+    }
+
     __complete(){
         super.__complete()
     }

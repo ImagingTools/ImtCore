@@ -49,6 +49,7 @@ class GroupProperty extends QBaseObject {
         let value = this.__properties[propName]
 
         if(value instanceof JQModules.QtQml.QObject){
+            value.__updatePrimaryProperties()
             value.__updateAliases()
             value.__updateSimpleProperties()
             value.__updateProperties()

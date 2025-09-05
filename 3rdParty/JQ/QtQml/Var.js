@@ -104,15 +104,15 @@ class Var extends Property {
         let currentValue = name in target ? target[name] : ('value' in meta ? meta.value : meta.type.getDefaultValue())
 
         if(oldValue !== currentValue){
-            let destructionFunc = ()=>{
-                target[name] = null
-            }
-            destructionFunc.meta = {
-                name: name+'__destruction',
-                destruction: true
-            }
-
             if(currentValue instanceof JQModules.QtQml.QObject){
+                let destructionFunc = ()=>{
+                    target[name] = null
+                }
+                destructionFunc.meta = {
+                    name: name+'__destruction',
+                    destruction: true,
+                    parent: currentValue
+                }
                 currentValue.__addLink()
                 if(oldValue instanceof JQModules.QtQml.QtObject){
                     destructionFunc.meta.parent = currentValue
@@ -120,6 +120,14 @@ class Var extends Property {
                 }
             }
             if(oldValue instanceof JQModules.QtQml.QObject){
+                let destructionFunc = ()=>{
+                    target[name] = null
+                }
+                destructionFunc.meta = {
+                    name: name+'__destruction',
+                    destruction: true,
+                    parent: oldValue
+                }
                 if(oldValue instanceof JQModules.QtQml.QtObject){
                     destructionFunc.meta.parent = oldValue
                     oldValue['Component.destruction'].disconnect(destructionFunc)

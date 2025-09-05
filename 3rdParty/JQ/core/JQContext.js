@@ -32,8 +32,8 @@ const Property = require("../QtQml/Property")
 //     __get(key){
 //         if(this.__has(key)){
 //             if(this[key] instanceof Property){
-//                 let caller = Property.queueLink[Property.queueLink.length-1]
-//                 if(caller) caller.__subscribe(this[key])
+//                 let link = Property.queueLink[Property.queueLink.length-1]
+//                 if(link) link.__subscribe(this[key])
 //                 return this[key].__get()
 //             }
 //             return this[key]
@@ -64,12 +64,12 @@ const Property = require("../QtQml/Property")
 //                 let obj = key in target ? target[key] : (parent ? parent[key] : undefined)
 
 //                 if(!obj){
-//                     let caller = Property.queueLink[Property.queueLink.length-1]
-//                     if(caller){
+//                     let link = Property.queueLink[Property.queueLink.length-1]
+//                     if(link){
 //                         if(key in __queue){
-//                             __queue[key].push(caller)
+//                             __queue[key].push(link)
 //                         } else {
-//                             __queue[key] = [caller]
+//                             __queue[key] = [link]
 //                         }
 //                     }
 //                 }
@@ -98,19 +98,20 @@ class JQContext {
     static handle = {
         get(target, key){
             if(key in target){
-                let caller = Property.queueLink[Property.queueLink.length-1]
-                if(caller && target[key]) {
+                let flag = global.queueFlag[global.queueFlag.length - 1]
+                let link = Property.queueLink[Property.queueLink.length-1]
+                if(link && flag && target[key]) {
                     let found = false
 
-                    for(let _caller of target[key+'__depends']){
-                        if(caller.name === _caller.name && caller.target === _caller.target){
+                    for(let _link of target[key+'__depends']){
+                        if(link.name === _link.name && link.target === _link.target){
                             found = true
                             break
                         }
                     }
 
                     if(!found){
-                        target[key+'__depends'].push(caller)
+                        target[key+'__depends'].push(link)
                     }
                     
                 }
