@@ -5543,7 +5543,7 @@ public:
 	void countChanged();
 };
 #ifdef QT_QML_LIB
-static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterQmlTypes()
 {
 	qmlRegisterType<CTimeRangeObject>("imtbaseImtBaseTypesSdl", 1, 0, "TimeRange");
 	qmlRegisterType<CSdlSizeObject>("imtbaseImtBaseTypesSdl", 1, 0, "SdlSize");

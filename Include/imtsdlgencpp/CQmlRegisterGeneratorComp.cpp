@@ -101,7 +101,7 @@ bool CQmlRegisterGeneratorComp::ProcessEntry (
 	FeedStream(stream, 1, false);
 
 	// add function
-	stream << QStringLiteral("static void RegisterQmlTypes()");
+	stream << QStringLiteral("[[maybe_unused]] static void RegisterQmlTypes()");
 	FeedStream(stream, 1, false);
 
 	stream << '{';

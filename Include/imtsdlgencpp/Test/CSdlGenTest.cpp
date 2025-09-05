@@ -156,9 +156,6 @@ void ExecuteTest(
 
 	// do processing
 	GetPrecessorAndExec(testSuite, "CppCodeGeneratorFramework");
-
-	/// \bug on WIN comparation incorrect \todo fix it
-#ifndef Q_OS_WIN
 	if (!referenceDataDirName.isEmpty() && !outputDirName.isEmpty()){
 		/// compare only CPP dirs \todo remove it when QML will be acceptable
 		const QString referenceDataAbsolutePath = s_testReferenceDataDirectoryPath + '/' + referenceDataDirName;
@@ -169,7 +166,6 @@ void ExecuteTest(
 		}
 		QVERIFY(isDataEqual);
 	}
-#endif
 }
 
 

@@ -120,7 +120,7 @@ bool CPrinterSpecificationBase::WriteToModel(::imtbase::CTreeItemModel& model, i
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -196,7 +196,7 @@ bool CPrinterSpecificationBase::WriteToGraphQlObject(::imtgql::CGqlParamObject& 
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -272,7 +272,7 @@ bool CPrinterSpecificationBase::WriteToJsonObject(QJsonObject& jsonObject, Proto
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -372,7 +372,7 @@ bool CLink::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int mode
 {
 	QVariant linkData = model.GetData("link", modelIndex);
 	if (linkData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "link");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -407,7 +407,7 @@ bool CLink::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) con
 bool CLink::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
 	if (!gqlObject.ContainsParam("link") || (gqlObject["link"].userType() != QMetaType::QString && gqlObject["link"].userType() != QMetaType::QByteArray)){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -441,7 +441,7 @@ bool CLink::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 bool CLink::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 {
 	if (!jsonObject.contains("link") || ! jsonObject["link"].isString()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "link").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -470,7 +470,7 @@ bool CLink::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Proto
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -546,7 +546,7 @@ bool CLink::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolV
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -622,7 +622,7 @@ bool CLink::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version) 
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -774,7 +774,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	QVariant specificationData = model.GetData("specification", modelIndex);
 	if (specificationData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "specification");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -798,7 +798,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	QVariant simpleTestData = model.GetData("simpleTest", modelIndex);
 	if (simpleTestData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -812,7 +812,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 
 	QVariant mixedTestData = model.GetData("mixedTest", modelIndex);
 	if (mixedTestData.isNull()){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field '%3' not exists, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -951,13 +951,13 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (!gqlObject.ContainsParam("specification")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
 
 		return false;
 	}
 	const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 	if (!specificationDataObjectPtr->ContainsParam("__typename")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -980,7 +980,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (!gqlObject.ContainsParam("simpleTest")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -993,13 +993,13 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 
 	if (!gqlObject.ContainsParam("mixedTest")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
 
 		return false;
 	}
 	const ::imtgql::CGqlParamObject* mixedTestDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedTest");
 	if (!mixedTestDataObjectPtr->ContainsParam("__typename")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1030,7 +1030,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 	if (gqlObject.ContainsParam("specification")){
 		const ::imtgql::CGqlParamObject* specificationDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("specification");
 		if (!specificationDataObjectPtr->ContainsParam("__typename")){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1066,7 +1066,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 	if (gqlObject.ContainsParam("mixedTest")){
 		const ::imtgql::CGqlParamObject* mixedTestDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("mixedTest");
 		if (!mixedTestDataObjectPtr->ContainsParam("__typename")){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1163,13 +1163,13 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (!jsonObject.contains("specification")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
 
 		return false;
 	}
 	const QJsonObject specificationObject = jsonObject.value("specification").toObject();
 	if (!jsonObject.value("specification").isObject() || !specificationObject.contains("__typename")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1192,7 +1192,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (!jsonObject.contains("simpleTest")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "simpleTest").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1205,13 +1205,13 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 
 	if (!jsonObject.contains("mixedTest")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Field: '%3' doesn't exist, but required").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
 
 		return false;
 	}
 	const QJsonObject mixedTestObject = jsonObject.value("mixedTest").toObject();
 	if (!jsonObject.value("mixedTest").isObject() || !mixedTestObject.contains("__typename")){
-		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+		I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
 
 		return false;
 	}
@@ -1242,7 +1242,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("specification")){
 		const QJsonObject specificationObject = jsonObject.value("specification").toObject();
 		if (!jsonObject.value("specification").isObject() || !specificationObject.contains("__typename")){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "specification").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1278,7 +1278,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("mixedTest")){
 		const QJsonObject mixedTestObject = jsonObject.value("mixedTest").toObject();
 		if (!jsonObject.value("mixedTest").isObject() || !mixedTestObject.contains("__typename")){
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedTest");)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: __typename for field '%3' is missing, but expected").arg(__FILE__, QString::number(__LINE__), "mixedTest").toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1310,7 +1310,7 @@ bool CPrinterBase::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1386,7 +1386,7 @@ bool CPrinterBase::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1462,7 +1462,7 @@ bool CPrinterBase::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1554,7 +1554,7 @@ bool CPrinterList::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		for (qsizetype dataIndex = 0; dataIndex < data->size(); ++dataIndex){
 			newDataModelPtr->InsertNewItem();
 			if (!(data->at(dataIndex).WriteToModel(*newDataModelPtr, dataIndex))){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "data");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1574,7 +1574,7 @@ bool CPrinterList::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
 			CPrinterBase::V1_0 data;
 			if (!data.ReadFromModel(*dataModel, dataIndex)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1597,7 +1597,7 @@ bool CPrinterList::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
 			CPrinterBase::V1_0 data;
 			if (!data.OptReadFromModel(*dataModel, dataIndex)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1618,7 +1618,7 @@ bool CPrinterList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		for (qsizetype dataIndex = 0; dataIndex < data->size(); ++dataIndex){
 			::imtgql::CGqlParamObject newDataGqlObject;
 			if (!data->at(dataIndex).WriteToGraphQlObject(newDataGqlObject)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "data");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1644,7 +1644,7 @@ bool CPrinterList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 			}
 			CPrinterBase::V1_0 tempData;
 			if (!tempData.ReadFromGraphQlObject(*dataDataObjectPtr)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1669,7 +1669,7 @@ bool CPrinterList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			}
 			CPrinterBase::V1_0 tempData;
 			if (!tempData.OptReadFromGraphQlObject(*dataDataObjectPtr)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1688,7 +1688,7 @@ bool CPrinterList::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		for (qsizetype dataIndex = 0; dataIndex < data->size(); ++dataIndex){
 			QJsonObject newDataJsonObject;
 			if (!data->at(dataIndex).WriteToJsonObject(newDataJsonObject)){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "data");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1710,7 +1710,7 @@ bool CPrinterList::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype dataIndex = 0; dataIndex < dataArrayCount; ++dataIndex){
 			CPrinterBase::V1_0 tempData;
 			if (!tempData.ReadFromJsonObject(dataJsonArray[dataIndex].toObject())){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1731,7 +1731,7 @@ bool CPrinterList::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		for (qsizetype dataIndex = 0; dataIndex < dataArrayCount; ++dataIndex){
 			CPrinterBase::V1_0 tempData;
 			if (!tempData.OptReadFromJsonObject(dataJsonArray[dataIndex].toObject())){
-				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data");)
+				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
@@ -1752,7 +1752,7 @@ bool CPrinterList::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1828,7 +1828,7 @@ bool CPrinterList::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1904,7 +1904,7 @@ bool CPrinterList::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__));)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1973,6 +1973,535 @@ bool CPrinterList::OptReadFromJsonObject(const QJsonObject& jsonObject, Protocol
 }
 
 
+
+
+CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CPrinterSpecificationBaseObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CPrinterSpecificationBaseObject::GetName()
+{
+	if (Version_1_0->name.has_value()){
+		return Version_1_0->name.value();
+	}
+
+	return QString();
+}
+
+
+void CPrinterSpecificationBaseObject::SetName(QString v)
+{
+	Version_1_0->name = v;
+	nameChanged();
+}
+
+
+bool CPrinterSpecificationBaseObject::hasName()
+{
+	 return Version_1_0->name.HasValue();
+}
+
+
+QString CPrinterSpecificationBaseObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CPrinterSpecificationBaseObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CPrinterSpecificationBaseObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CPrinterSpecificationBaseObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CPrinterSpecificationBaseObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CPrinterSpecificationBaseObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "name")){
+		return "name";
+	}
+
+	return propertyName;
+}
+
+
+CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CLinkObject::linkChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CLinkObject::GetLink()
+{
+	if (Version_1_0->link.has_value()){
+		return Version_1_0->link.value();
+	}
+
+	return QString();
+}
+
+
+void CLinkObject::SetLink(QString v)
+{
+	Version_1_0->link = v.toUtf8();
+	linkChanged();
+}
+
+
+bool CLinkObject::hasLink()
+{
+	 return Version_1_0->link.HasValue();
+}
+
+
+QString CLinkObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CLinkObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CLinkObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CLinkObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CLinkObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	return nullptr;
+}
+
+
+QString CLinkObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "link")){
+		return "link";
+	}
+
+	return propertyName;
+}
+
+
+CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_specificationQObjectPtr(nullptr)
+			, m_simpleTestQObjectPtr(nullptr)
+			, m_mixedTestQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CPrinterBaseObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CPrinterBaseObject::specificationChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CPrinterBaseObject::simpleTestChanged, this, &CItemModelBase::OnInternalModelChanged);
+	QObject::connect(this, &CPrinterBaseObject::mixedTestChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+QString CPrinterBaseObject::GetName()
+{
+	if (Version_1_0->name.has_value()){
+		return Version_1_0->name.value();
+	}
+
+	return QString();
+}
+
+
+void CPrinterBaseObject::SetName(QString v)
+{
+	Version_1_0->name = v;
+	nameChanged();
+}
+
+
+bool CPrinterBaseObject::hasName()
+{
+	 return Version_1_0->name.HasValue();
+}
+
+
+sdl::modsdl::PrinterBase::CPrinterSpecificationObject* CPrinterBaseObject::GetSpecification()
+{
+	if (Version_1_0->specification.has_value()){
+		if (!m_specificationQObjectPtr){
+			m_specificationQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CPrinterSpecificationObject*>(CreateObject("specification"));
+			m_specificationQObjectPtr->Version_1_0 = Version_1_0->specification;
+		}
+		return m_specificationQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CPrinterBaseObject::SetSpecification(sdl::modsdl::PrinterBase::CPrinterSpecificationObject* v)
+{
+	if (v){
+		Version_1_0->specification = v->Version_1_0;
+		m_specificationQObjectPtr = v;
+	}
+	else {
+		Version_1_0->specification = nullptr;
+	}
+
+	specificationChanged();
+}
+
+
+bool CPrinterBaseObject::hasSpecification()
+{
+	 return Version_1_0->specification.HasValue();
+}
+
+
+void CPrinterBaseObject::createSpecification()
+{	Version_1_0->specification.emplace();
+
+}
+
+
+sdl::modsdl::PrinterBase::CSimpleUnionObject* CPrinterBaseObject::GetSimpleTest()
+{
+	if (Version_1_0->simpleTest.has_value()){
+		if (!m_simpleTestQObjectPtr){
+			m_simpleTestQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CSimpleUnionObject*>(CreateObject("simpleTest"));
+			m_simpleTestQObjectPtr->Version_1_0 = Version_1_0->simpleTest;
+		}
+		return m_simpleTestQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CPrinterBaseObject::SetSimpleTest(sdl::modsdl::PrinterBase::CSimpleUnionObject* v)
+{
+	if (v){
+		Version_1_0->simpleTest = v->Version_1_0;
+		m_simpleTestQObjectPtr = v;
+	}
+	else {
+		Version_1_0->simpleTest = nullptr;
+	}
+
+	simpleTestChanged();
+}
+
+
+bool CPrinterBaseObject::hasSimpleTest()
+{
+	 return Version_1_0->simpleTest.HasValue();
+}
+
+
+void CPrinterBaseObject::createSimpleTest()
+{	Version_1_0->simpleTest.emplace();
+
+}
+
+
+sdl::modsdl::PrinterBase::CMixedUnionObject* CPrinterBaseObject::GetMixedTest()
+{
+	if (Version_1_0->mixedTest.has_value()){
+		if (!m_mixedTestQObjectPtr){
+			m_mixedTestQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CMixedUnionObject*>(CreateObject("mixedTest"));
+			m_mixedTestQObjectPtr->Version_1_0 = Version_1_0->mixedTest;
+		}
+		return m_mixedTestQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CPrinterBaseObject::SetMixedTest(sdl::modsdl::PrinterBase::CMixedUnionObject* v)
+{
+	if (v){
+		Version_1_0->mixedTest = v->Version_1_0;
+		m_mixedTestQObjectPtr = v;
+	}
+	else {
+		Version_1_0->mixedTest = nullptr;
+	}
+
+	mixedTestChanged();
+}
+
+
+bool CPrinterBaseObject::hasMixedTest()
+{
+	 return Version_1_0->mixedTest.HasValue();
+}
+
+
+void CPrinterBaseObject::createMixedTest()
+{	Version_1_0->mixedTest.emplace();
+
+}
+
+
+QString CPrinterBaseObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CPrinterBaseObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CPrinterBaseObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CPrinterBaseObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CPrinterBaseObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	if (key == "specification"){
+		return new sdl::modsdl::PrinterBase::CPrinterSpecificationObject(this);
+	}
+	if (key == "simpleTest"){
+		return new sdl::modsdl::PrinterBase::CSimpleUnionObject(this);
+	}
+	if (key == "mixedTest"){
+		return new sdl::modsdl::PrinterBase::CMixedUnionObject(this);
+	}
+	return nullptr;
+}
+
+
+QString CPrinterBaseObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "name")){
+		return "name";
+	}
+	if (propertyName == (QString("m_") + "specification")){
+		return "specification";
+	}
+	if (propertyName == (QString("m_") + "simpleTest")){
+		return "simpleTest";
+	}
+	if (propertyName == (QString("m_") + "mixedTest")){
+		return "mixedTest";
+	}
+
+	return propertyName;
+}
+
+
+CPrinterListObject::CPrinterListObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_dataQObjectPtr(nullptr)
+{
+	Version_1_0.emplace();
+
+	QObject::connect(this, &CPrinterListObject::dataChanged, this, &CItemModelBase::OnInternalModelChanged);
+}
+
+
+sdl::modsdl::PrinterBase::CPrinterBaseObjectList* CPrinterListObject::GetData()
+{
+	if (Version_1_0->data.has_value()){
+		if (!m_dataQObjectPtr){
+			m_dataQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>(CreateObject("data"));
+			m_dataQObjectPtr->Version_1_0 = Version_1_0->data;
+		}
+		return m_dataQObjectPtr;
+	}
+
+	return nullptr;
+}
+
+
+void CPrinterListObject::SetData(sdl::modsdl::PrinterBase::CPrinterBaseObjectList* v)
+{
+	if (v){
+		Version_1_0->data = v->Version_1_0;
+		m_dataQObjectPtr = v;
+	}
+	else {
+		Version_1_0->data = nullptr;
+	}
+
+	dataChanged();
+}
+
+
+bool CPrinterListObject::hasData()
+{
+	 return Version_1_0->data.HasValue();
+}
+
+
+void CPrinterListObject::createData()
+{	Version_1_0->data.emplace();
+
+}
+
+
+QString CPrinterListObject::toJson() const
+{
+	QJsonObject jsonObject;
+	bool res = WriteToJsonObject(jsonObject);
+	if (res){
+		QJsonDocument document;
+		document.setObject(jsonObject);
+		return document.toJson(QJsonDocument::Compact);
+	}
+
+	return QString();
+}
+
+
+bool CPrinterListObject::createFromJson(const QString& json)
+{
+	QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+	return fromObject(document.object());
+
+}
+
+
+bool CPrinterListObject::fromObject(const QJsonObject& jsonObject)
+{
+	beginChanges();
+	bool res = ReadFromJsonObject(jsonObject);
+	if (res){
+		QVariantList changelist;
+		modelChanged(changelist);
+	}
+
+	endChanges();
+
+	finished();
+
+	return res;
+}
+
+
+QString CPrinterListObject::toGraphQL() const
+{
+	return BaseClass::toGraphQL();
+}
+
+
+QObject* CPrinterListObject::CreateObject(const QString& key)
+{
+	Q_UNUSED(key);	if (key == "data"){
+		return new sdl::modsdl::PrinterBase::CPrinterBaseObjectList(this);
+	}
+	return nullptr;
+}
+
+
+QString CPrinterListObject::getJSONKeyForProperty(const QString& propertyName) const
+{
+	if (propertyName == (QString("m_") + "data")){
+		return "data";
+	}
+
+	return propertyName;
+}
 
 
 

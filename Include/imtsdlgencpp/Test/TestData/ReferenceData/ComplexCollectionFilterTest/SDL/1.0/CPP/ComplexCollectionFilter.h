@@ -1602,7 +1602,7 @@ public:
 	void countChanged();
 };
 #ifdef QT_QML_LIB
-static void RegisterQmlTypes()
+[[maybe_unused]] static void RegisterQmlTypes()
 {
 	qmlRegisterType<CTimeFilterObject>("imtbaseComplexCollectionFilterSdl", 1, 0, "TimeFilter");
 	qmlRegisterType<CFieldSortingInfoObject>("imtbaseComplexCollectionFilterSdl", 1, 0, "FieldSortingInfo");

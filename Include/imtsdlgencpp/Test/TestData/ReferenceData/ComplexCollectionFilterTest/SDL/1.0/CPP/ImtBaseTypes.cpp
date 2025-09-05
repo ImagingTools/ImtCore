@@ -159,7 +159,7 @@ bool CTimeRange::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, 
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -235,7 +235,7 @@ bool CTimeRange::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Prot
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -311,7 +311,7 @@ bool CTimeRange::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion vers
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -564,7 +564,7 @@ bool CSdlSize::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Pr
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -640,7 +640,7 @@ bool CSdlSize::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protoc
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -716,7 +716,7 @@ bool CSdlSize::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versio
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -969,7 +969,7 @@ bool CSdlPoint::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1045,7 +1045,7 @@ bool CSdlPoint::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1121,7 +1121,7 @@ bool CSdlPoint::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1814,7 +1814,7 @@ bool CParamTypeIds::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1890,7 +1890,7 @@ bool CParamTypeIds::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, P
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -1966,7 +1966,7 @@ bool CParamTypeIds::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion v
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2269,7 +2269,7 @@ bool CUrlParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2345,7 +2345,7 @@ bool CUrlParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2421,7 +2421,7 @@ bool CUrlParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2607,7 +2607,7 @@ bool CIdParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Pr
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2683,7 +2683,7 @@ bool CIdParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protoc
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2759,7 +2759,7 @@ bool CIdParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versio
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -2945,7 +2945,7 @@ bool CTextParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, 
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3021,7 +3021,7 @@ bool CTextParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Prot
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3097,7 +3097,7 @@ bool CTextParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion vers
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3283,7 +3283,7 @@ bool CEnableableParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3359,7 +3359,7 @@ bool CEnableableParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3435,7 +3435,7 @@ bool CEnableableParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersio
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3621,7 +3621,7 @@ bool CIntegerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelInde
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3697,7 +3697,7 @@ bool CIntegerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, P
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3773,7 +3773,7 @@ bool CIntegerParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion v
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -3961,7 +3961,7 @@ bool CDoubleParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4037,7 +4037,7 @@ bool CDoubleParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4113,7 +4113,7 @@ bool CDoubleParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4416,7 +4416,7 @@ bool COption::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, Pro
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4492,7 +4492,7 @@ bool COption::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Protoco
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4568,7 +4568,7 @@ bool COption::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -4936,7 +4936,7 @@ bool COptionsList::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5012,7 +5012,7 @@ bool COptionsList::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Pr
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5088,7 +5088,7 @@ bool COptionsList::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion ve
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5370,7 +5370,7 @@ bool CSelectionParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5446,7 +5446,7 @@ bool CSelectionParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5522,7 +5522,7 @@ bool CSelectionParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5747,7 +5747,7 @@ bool CSchedulerParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5823,7 +5823,7 @@ bool CSchedulerParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -5899,7 +5899,7 @@ bool CSchedulerParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6181,7 +6181,7 @@ bool CBackupSettings::WriteToModel(::imtbase::CTreeItemModel& model, int modelIn
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6257,7 +6257,7 @@ bool CBackupSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject,
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6333,7 +6333,7 @@ bool CBackupSettings::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6714,7 +6714,7 @@ bool CDatabaseAccessSettings::WriteToModel(::imtbase::CTreeItemModel& model, int
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6790,7 +6790,7 @@ bool CDatabaseAccessSettings::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -6866,7 +6866,7 @@ bool CDatabaseAccessSettings::WriteToJsonObject(QJsonObject& jsonObject, Protoco
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7091,7 +7091,7 @@ bool CFileNameParam::WriteToModel(::imtbase::CTreeItemModel& model, int modelInd
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7167,7 +7167,7 @@ bool CFileNameParam::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, 
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7243,7 +7243,7 @@ bool CFileNameParam::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion 
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7850,7 +7850,7 @@ bool CParamsSet::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, 
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -7926,7 +7926,7 @@ bool CParamsSet::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Prot
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -8002,7 +8002,7 @@ bool CParamsSet::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion vers
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -8474,7 +8474,7 @@ bool CMimeType::WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex, P
 			return Version_1_0->WriteToModel(model, modelIndex);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -8550,7 +8550,7 @@ bool CMimeType::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, Proto
 			return Version_1_0->WriteToGraphQlObject(gqlObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}
@@ -8626,7 +8626,7 @@ bool CMimeType::WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion versi
 			return Version_1_0->WriteToJsonObject(jsonObject);
 		}
 		else {
-			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
+			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: For auto version, 'version' object not initialized.").arg(__FILE__, QString::number(__LINE__)).toLocal8Bit().constData();)
 
 			return false;
 		}

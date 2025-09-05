@@ -196,7 +196,10 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 	stream << QStringLiteral("return ");
 	FeedStream(stream, 1, true);
 
-	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
+	QListIterator sdlFieldIter(sdlType.GetFields());
+	while (sdlFieldIter.hasNext()){
+		const imtsdl::CSdlField& sdlField = sdlFieldIter.next();
+
 		FeedStreamHorizontally(stream, 4);
 		const QString fieldType = sdlField.GetType();
 
@@ -232,11 +235,12 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const imtsdl::CSdlType& sd
 			stream << sdlField.GetId();
 		}
 
-		stream << QStringLiteral(" &&");
-		FeedStream(stream, 1, true);
+		if (sdlFieldIter.hasNext()){
+			stream << QStringLiteral(" &&");
+			FeedStream(stream, 1, true);
+		}
 	}
 
-	stream.seek(stream.pos() - 4); /// < remove last ' &&'
 	stream << ';';
 	FeedStream(stream, 1, false);
 
