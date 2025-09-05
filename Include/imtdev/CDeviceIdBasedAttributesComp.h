@@ -49,17 +49,18 @@ private:
 
 	void OnSelectionChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::ISelection* objectPtr);
 	void OnDeviceStateChanged(const istd::IChangeable::ChangeSet& changeSet, const IDeviceStateProvider* objectPtr);
+	void OnInstanceAttributesChanged(const istd::IChangeable::ChangeSet& changeSet, const iattr::IAttributesProvider* objectPtr);
 
 	template<class Interface>
 	static Interface* ExtractStaticAttributes(CDeviceIdBasedAttributesComp& parent)
 	{
-		return dynamic_cast<Interface*>(&parent.m_staticAttrs);
+		return dynamic_cast<Interface*>(&parent.m_staticAttributes);
 	}
 
 	template<class Interface>
 	static Interface* ExtractInstanceAttributes(CDeviceIdBasedAttributesComp& parent)
 	{
-		return dynamic_cast<Interface*>(&parent.m_instanceAttrs);
+		return dynamic_cast<Interface*>(&parent.m_instanceAttributes);
 	}
 
 private:
@@ -67,11 +68,12 @@ private:
 	I_REF(IDeviceController, m_controllerCompPtr);
 	I_REF(IDeviceStateProvider, m_stateProviderCompPtr);
 
-	imod::TModelWrap<iattr::CAttributesManager> m_staticAttrs;
-	imod::TModelWrap<iattr::CAttributesManager> m_instanceAttrs;
+	imod::TModelWrap<iattr::CAttributesManager> m_staticAttributes;
+	imod::TModelWrap<iattr::CAttributesManager> m_instanceAttributes;
 
 	imtbase::TModelUpdateBinder<imtbase::ISelection, CDeviceIdBasedAttributesComp> m_selectionObserver;
 	imtbase::TModelUpdateBinder<IDeviceStateProvider, CDeviceIdBasedAttributesComp> m_stateProviderObserver;
+	imtbase::TModelUpdateBinder<iattr::IAttributesProvider, CDeviceIdBasedAttributesComp> m_instanceAttributesObserver;
 
 	bool m_isConfigurationStoreBlocked = false;
 };

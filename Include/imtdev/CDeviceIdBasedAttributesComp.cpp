@@ -4,6 +4,7 @@
 // ACF includes
 #include <iprm/CParamsSet.h>
 #include <istd/CChangeNotifier.h>
+#include <istd/CChangeGroup.h>
 
 // ImtCore includes
 #include <imtdev/IDeviceController.h>
@@ -18,7 +19,8 @@ namespace imtdev
 
 CDeviceIdBasedAttributesComp::CDeviceIdBasedAttributesComp()
 	:m_selectionObserver(*this),
-	m_stateProviderObserver(*this)
+	m_stateProviderObserver(*this),
+	m_instanceAttributesObserver(*this)
 {
 }
 
@@ -45,6 +47,7 @@ void CDeviceIdBasedAttributesComp::OnComponentDestroyed()
 {
 	m_stateProviderObserver.UnregisterAllObjects();
 	m_selectionObserver.UnregisterAllObjects();
+	m_instanceAttributesObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -65,8 +68,12 @@ DeviceInstancePtr CDeviceIdBasedAttributesComp::GetDeviceInstance(const QByteArr
 
 void CDeviceIdBasedAttributesComp::UpdateModel()
 {
-	m_staticAttrs.ResetData();
-	m_instanceAttrs.ResetData();
+	istd::CChangeGroup group1(&m_staticAttributes);
+	istd::CChangeGroup group2(&m_instanceAttributes);
+
+	m_staticAttributes.ResetData();
+	m_instanceAttributes.ResetData();
+	m_instanceAttributesObserver.UnregisterAllObjects();
 
 	if (m_selectionCompPtr.IsValid() && m_controllerCompPtr.IsValid()){
 		imtbase::ISelection::Ids ids = m_selectionCompPtr->GetSelectedIds();
@@ -84,7 +91,9 @@ void CDeviceIdBasedAttributesComp::UpdateModel()
 
 			const iattr::IAttributesProvider* attributesPtr = instancePtr->GetAttributes();
 			if (attributesPtr != nullptr){
-				m_instanceAttrs.CopyFrom(*attributesPtr);
+				m_instanceAttributes.CopyFrom(*attributesPtr);
+
+				m_instanceAttributesObserver.RegisterObject(attributesPtr, &CDeviceIdBasedAttributesComp::OnInstanceAttributesChanged);
 			}
 		}
 
@@ -95,7 +104,7 @@ void CDeviceIdBasedAttributesComp::UpdateModel()
 		if (staticInfoPtr != nullptr){
 			const iattr::IAttributesProvider* attributesPtr = staticInfoPtr->GetAttributes();
 			if (attributesPtr != nullptr){
-				m_staticAttrs.CopyFrom(*attributesPtr);
+				m_staticAttributes.CopyFrom(*attributesPtr);
 			}
 		}
 	}
@@ -111,6 +120,15 @@ void CDeviceIdBasedAttributesComp::OnSelectionChanged(const istd::IChangeable::C
 void CDeviceIdBasedAttributesComp::OnDeviceStateChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdev::IDeviceStateProvider* /*objectPtr*/)
 {
 	UpdateModel();
+}
+
+
+void CDeviceIdBasedAttributesComp::OnInstanceAttributesChanged(const istd::IChangeable::ChangeSet& changeSet, const iattr::IAttributesProvider* objectPtr)
+{
+	istd::CChangeGroup group(&m_instanceAttributes);
+
+	m_instanceAttributes.ResetData();
+	m_instanceAttributes.CopyFrom(*objectPtr);
 }
 
 
