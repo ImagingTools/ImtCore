@@ -18,22 +18,14 @@ class Internal extends QtObject {
 	removed = []
 	changeList = []
 
-	static create(parent = null, properties = {}){
-		let proxy = super.create(parent, properties)
-
-		proxy.changeList = []
-
-		Signal.get(proxy, 'internalModelChanged').connect((name, sender) => {
-			if (proxy.isTransaction){
-				let changeObj = {"name":name,"sender":sender}
-					proxy.changeList.push(changeObj)
-					proxy.countChanges++
-					return
-				}
-			proxy.__base.modelChanged([{"name":name,"sender":sender}])
-		})
-
-		return proxy
+	SLOT_internalModelChanged(name, sender){
+		if (this.isTransaction){
+			let changeObj = {"name":name,"sender":sender}
+				this.changeList.push(changeObj)
+				this.countChanges++
+				return
+			}
+		this.__base.modelChanged([{"name":name,"sender":sender}])
 	}
 
 	startTransaction(){
@@ -96,13 +88,20 @@ class BaseClass extends QtObject {
 
 		proxy._internal = Internal.create()
 		proxy._internal.__base = proxy
-		Signal.get(proxy, 'modelChanged').connect(proxy, (changeSet)=>{
-			if (proxy.owner && proxy.owner.enableNotifications && proxy.owner.modelChanged) {
-				proxy.owner.modelChanged(changeSet)
-			}
-		})
 
 		return proxy
+	}
+
+	SLOT_modelChanged(changeSet){
+		if (this.owner && this.owner.enableNotifications && this.owner.modelChanged) {
+			if (this.owner._internal.isTransaction){
+				this.owner._internal.changeList.concat(changeSet)
+				this.owner._internal.countChanges++
+			}
+			else{
+				this.owner.modelChanged(changeSet)
+			}
+		}
 	}
 
 	__complete() {
@@ -425,7 +424,7 @@ class BaseClass extends QtObject {
 						}
 					} else {
 						if (component) {
-							let obj = BaseModel.create()
+							let obj = BaseModel.create(this)
 							this[_key] = obj
 						}
 					}
@@ -445,7 +444,12 @@ class BaseClass extends QtObject {
 				} else {
 					let obj
 					if (!this[_key]) {
-						obj = this.createComponent(_key).createObject(this)
+						let sourceData = sourceObject[key]
+						let sourceTypename
+						if (sourceData['__typename']){
+							sourceTypename = sourceData['__typename']
+						}	
+						obj = this.createComponent(_key, sourceTypename).createObject(this)
 					}
 					else {
 						obj = this[_key]
