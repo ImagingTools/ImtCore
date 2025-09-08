@@ -65,7 +65,7 @@ public:
 
 inline QDateTime CCollectionRepresentationConverter::GetLastModiffcationDate(const imtbase::IObjectCollectionIterator& objectCollectionIterator)
 {
-	QDateTime retVal = objectCollectionIterator.GetElementInfo(QByteArrayLiteral("Added")).toDateTime();
+	QDateTime retVal = objectCollectionIterator.GetElementInfo(QByteArrayLiteral("TimeStamp")).toDateTime();
 	if (retVal.isValid()) {
 		/// \known-limitation date in standard collection stored without timezone, and in UTC => explicit set UTC for date
 		retVal.setTimeSpec(Qt::UTC);
@@ -77,7 +77,7 @@ inline QDateTime CCollectionRepresentationConverter::GetLastModiffcationDate(con
 
 inline QDateTime CCollectionRepresentationConverter::GetCreationDate(const imtbase::IObjectCollectionIterator& objectCollectionIterator)
 {
-	QDateTime retVal = objectCollectionIterator.GetElementInfo(QByteArrayLiteral("TimeStamp")).toDateTime();
+	QDateTime retVal = objectCollectionIterator.GetElementInfo(QByteArrayLiteral("Added")).toDateTime();
 	if (retVal.isValid()) {
 		/// \known-limitation date in standard collection stored without timezone, and in UTC => explicit set UTC for date
 		retVal.setTimeSpec(Qt::UTC);
