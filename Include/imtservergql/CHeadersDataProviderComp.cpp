@@ -47,7 +47,10 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(
 	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("headers");
 
-	for (int i = 0; i < m_headersIdsAttrPtr.GetCount(); i++){
+	const int idsCount = m_headersIdsAttrPtr.GetCount();
+	const int namesCount = m_headersNamesAttrPtr.GetCount();
+	Q_ASSERT_X(idsCount == namesCount, __func__, "Not every header ID has an assigned name.");
+	for (int i = 0; i < qMin(idsCount, namesCount); i++){
 		QString headerId = m_headersIdsAttrPtr[i];
 
 		if (!CheckHeaderPermission(headerId.toUtf8(), *gqlContextPtr)){

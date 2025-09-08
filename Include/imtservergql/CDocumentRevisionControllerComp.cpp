@@ -25,10 +25,23 @@ bool CDocumentRevisionControllerComp::IsCollectionSupported(const QByteArray& ty
 
 imtbase::IObjectCollection* CDocumentRevisionControllerComp::FindObjectCollection(const QByteArray& typeId) const
 {
-	int index = m_collectionIdsAttrPtr.FindValue(typeId);
-	Q_ASSERT(index >= 0);
+	if (!m_collectionIdsAttrPtr.IsValid()){
+		return nullptr;
+	}
 
-	return m_objectCollectionsCompPtr[index];
+	const int indexOfCollection = m_collectionIdsAttrPtr.FindValue(typeId);
+	if (indexOfCollection < 0){
+		return nullptr;
+	}
+
+	const int collectionsCount = m_objectCollectionsCompPtr.GetCount();
+	if (indexOfCollection >= collectionsCount){
+		SendCriticalMessage(0, QString("Collection with id '%1' doesn't have a collection controller").arg(m_collectionIdsAttrPtr[indexOfCollection]));
+
+		return nullptr;
+	}
+	
+	return m_objectCollectionsCompPtr[indexOfCollection];
 }
 
 

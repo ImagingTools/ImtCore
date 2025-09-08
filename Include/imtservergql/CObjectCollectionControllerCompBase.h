@@ -204,6 +204,7 @@ protected:
 	virtual void SetObjectFilter(const imtgql::CGqlRequest& gqlRequest, const imtbase::CTreeItemModel& objectFilterModel, iprm::CParamsSet& filterParams) const;
 
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
+	virtual QString GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

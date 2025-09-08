@@ -583,7 +583,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	}
 
 	QByteArray typeId = GetObjectTypeIdFromRequest(gqlRequest);
-	QString name = gqlInputParamPtr->GetParamArgumentValue("name").toString();
+	QString name = GetObjectNameFromRequest(gqlRequest);
 	QString description = gqlInputParamPtr->GetParamArgumentValue("description").toString();
 
 	if (typeId.isEmpty()){
@@ -667,7 +667,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	}
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
-	QString name = inputParamPtr->GetParamArgumentValue("name").toString();
+	QString name = GetObjectNameFromRequest(gqlRequest);
 
 	imtbase::IObjectCollection::DataPtr savedObjectPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, savedObjectPtr)){
@@ -1767,6 +1767,20 @@ istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateObject(con
 	}
 
 	return nullptr;
+}
+
+
+QString CObjectCollectionControllerCompBase::GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const
+{
+	const imtgql::CGqlParamObject* gqlInputParamPtr = gqlRequest.GetParamObject("input");
+	if (gqlInputParamPtr == nullptr){
+		SendErrorMessage(0, "'input' parameter not found", "CObjectCollectionControllerCompBase::GetObjectNameFromRequest");
+
+		return QString();
+	}
+	QString name = gqlInputParamPtr->GetParamArgumentValue("name").toString();
+
+	return name;
 }
 
 
