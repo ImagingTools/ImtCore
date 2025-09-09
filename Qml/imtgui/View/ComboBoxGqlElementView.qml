@@ -87,6 +87,7 @@ ElementView {
 
 			onFinished: {
 				comboBoxGqlElementView.finished(itemId, index)
+				cb.popup.closeCombo();
 			}
 
 			Connections {
