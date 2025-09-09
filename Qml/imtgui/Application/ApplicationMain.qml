@@ -33,7 +33,7 @@ Item {
 	property alias webSocketPortProvider: webSocketPortProvider
 
 	property alias authConnectionState: connectionState.authConnectionState
-	property alias serverVersion: pageAboutProvider.serverVersion
+	property alias pageAboutProvider: pageAboutProvider
 	
 	// TODO: ConnectionStateMachine.qml
 	QtObject {
