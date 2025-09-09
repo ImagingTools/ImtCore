@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtcol/CObjectTypeIdFilter.h>
 #include <imtcol/CTextFilter.h>
+#include <imtcol/CCollectionHeadersProviderComp.h>
 
 
 namespace ImtColPck
@@ -16,6 +17,7 @@ namespace ImtColPck
 
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtcol::CObjectTypeIdFilter, imtcol::IObjectTypeIdFilter, iser::ISerializable>> ObjectTypeIdFilter;
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtcol::CTextFilter, imtcol::ITextFilter, iser::ISerializable>> TextFilter;
+typedef imtcol::CCollectionHeadersProviderComp CollectionHeadersProvider;
 
 
 } // namespace ImtColPck

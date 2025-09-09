@@ -28,9 +28,13 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_isSendItemSource, "IsSendItemSource", "Object collection", false, false);
+		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (imtgql::IGqlSubscriberController)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
@@ -42,6 +46,7 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imod::IModel, m_objectCollectionModelCompPtr);
 	I_ATTR(bool, m_isSendItemSource);
+	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 };
 
 

@@ -61,6 +61,12 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable,
 						istd::IChangeable>> AccountInfo;
 typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::CContactInfo,
+						imtauth::IContactInfo,
+						iser::ISerializable,
+						istd::IChangeable>> ContactInfo;
+typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtauth::CIdentifiableCompanyInfo,
 						imtauth::IContactBaseInfo,

@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
 			"Text filter",
 			"Text Filter");
 
+I_EXPORT_COMPONENT(
+			CollectionHeadersProvider,
+			"Collection headers provider",
+			"Collection Headers Provider");
+
 
 } // namespace ImtColPck
 

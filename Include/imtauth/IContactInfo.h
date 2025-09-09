@@ -23,7 +23,7 @@ class IAddressProvider;
 	Interface describing the contact information.
 	\ingroup Authentification
 */
-class IContactInfo: virtual public IContactBaseInfo
+class IContactInfo: virtual public iser::ISerializable
 {
 public:
 	enum GenderType
@@ -79,6 +79,8 @@ public:
 		MIT_NICKNAME
 	};
 
+	virtual QString GetEmail() const = 0;
+	virtual void SetEmail(const QString& email) = 0;
 	virtual GenderType GetGenderType() const = 0;
 	virtual void SetGenderType(GenderType genderType) = 0;
 	virtual QDate GetBirthday() const = 0;

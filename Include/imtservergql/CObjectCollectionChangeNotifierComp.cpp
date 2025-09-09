@@ -4,15 +4,32 @@
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
 
-// ImtCore includes
-#include<imtrest/IProtocolEngine.h>
-
 
 namespace imtservergql
 {
 
 
 // protected methods
+
+// reimplemented (imtgql::IGqlSubscriberController)
+
+bool CObjectCollectionChangeNotifierComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	bool isSupported = false;
+	if (m_collectionIdAttrPtr.IsValid()){
+		QByteArray collectionId = *m_collectionIdAttrPtr;
+		QByteArray gqlCommandId = gqlRequest.GetCommandId();
+		
+		isSupported = gqlCommandId == QByteArrayLiteral("On") + collectionId + QByteArrayLiteral("CollectionChanged");
+	}
+
+	if (isSupported){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
 
 // reimplemented (icomp::CComponentBase)
 

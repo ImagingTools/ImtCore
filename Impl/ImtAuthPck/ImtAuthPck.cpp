@@ -20,6 +20,11 @@ I_EXPORT_COMPONENT(
 			"Address Information Authority");
 
 I_EXPORT_COMPONENT(
+			ContactInfo,
+			"Contact information",
+			"Contact Information");
+
+I_EXPORT_COMPONENT(
 			AccountInfo,
 			"Account information",
 			"Account Information Authority");
