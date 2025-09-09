@@ -33,6 +33,7 @@ Item {
 	property alias webSocketPortProvider: webSocketPortProvider
 
 	property alias authConnectionState: connectionState.authConnectionState
+	property alias serverVersion: pageAboutProvider.serverVersion
 	
 	// TODO: ConnectionStateMachine.qml
 	QtObject {
@@ -193,7 +194,7 @@ Item {
 	}
 	
 	function getHeaders(){
-		return {"productId": context.appId};
+		return {"productId": AuthorizationController.productId};
 	}
 	
 	property alias thumbnailDecoratorGui: thumbnailDecorator;
