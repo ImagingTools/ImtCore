@@ -121,7 +121,7 @@ DecoratorBase {
 			anchors.verticalCenter: content.verticalCenter;
 			anchors.left: parent.left;
 
-			width: (!visible || !commonButtonDecorator.baseElement) ? 0 :
+			width: (isEmpty || !commonButtonDecorator.baseElement) ? 0 :
 																	  (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.width !== 0) ?
 																	  commonButtonDecorator.baseElement.icon.width : Style.iconSizeS
 
@@ -136,6 +136,7 @@ DecoratorBase {
 															 commonButtonDecorator.baseElement.icon.source :
 															 commonButtonDecorator.baseElement.iconSource ? commonButtonDecorator.baseElement.iconSource: "";
 			visible: source != "" && source != undefined;
+			property bool isEmpty : source == "" && source == undefined
 		}
 
 
