@@ -27,6 +27,15 @@ public:
 		I_ASSIGN(m_collectionImportControllerCompPtr, "CollectionImportController", "Collection import controller", false, "CollectionImportController");
 	I_END_COMPONENT;
 
+	template<typename GqlRequest>
+	static bool FillSessionInfo(
+		const GqlRequest& request,
+		imtservergql::ICollectionImportController::SessionInfo& sessionInfo,
+		QString& errorMessage);
+
+	template<typename GqlRequest>
+	static QByteArray GetCancelSessionId(const GqlRequest& request);
+
 protected:
 	// reimplemented (sdl::imtbase::CollectionImport::CGraphQlHandlerCompBase)
 	virtual collectionImport::CSessionStatus OnBeginCollectionImportSession(

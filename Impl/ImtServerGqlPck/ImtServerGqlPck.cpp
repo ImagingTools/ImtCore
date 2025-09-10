@@ -159,6 +159,10 @@ I_EXPORT_COMPONENT(
 			"Collection import controller",
 			"Collection Import Controller");
 
+I_EXPORT_COMPONENT(
+			CollectionImportJobParamsFiller,
+			"Collection import job params filler",
+			"Collection Import Job Params Filler");
 
 } // namespace ImtServerGqlPck
 

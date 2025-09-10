@@ -4,6 +4,7 @@
 // ACF includes
 #include <istd/IPolymorphic.h>
 #include <istd/TRange.h>
+#include <iprm/IParamsSet.h>
 
 
 namespace imtservergql
@@ -17,8 +18,10 @@ public:
 	{
 		QByteArray id;
 		QString name;
+		QString path; // Filled by CollectionImportController
 		int size;
 		QByteArray objectTypeId;
+		std::shared_ptr<iprm::IParamsSet> additionalParams;
 	};
 
 	struct SessionInfo
@@ -26,6 +29,7 @@ public:
 		QByteArray sessionId;
 		QByteArray collectionId;
 		std::vector<FileInfo> files;
+		std::shared_ptr<iprm::IParamsSet> additionalParams;
 	};
 
 	virtual bool BeginCollectionImportSession(const SessionInfo& sessionInfo, QString& errorMessage) = 0;

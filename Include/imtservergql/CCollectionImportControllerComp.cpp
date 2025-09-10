@@ -31,30 +31,43 @@ CCollectionImportControllerComp::CCollectionImportControllerComp()
 
 // reimplemented (imtbase::IProgressLoggerProvider)
 
-bool CCollectionImportControllerComp::BeginCollectionImportSession(const ICollectionImportController::SessionInfo& sessionInfo, QString& errorMessage)
+bool CCollectionImportControllerComp::BeginCollectionImportSession(const SessionInfo& sessionInfo, QString& errorMessage)
 {
-	std::shared_ptr<SessionInfo> sessionPtr(new SessionInfo);
-	sessionPtr->sessionId = sessionInfo.sessionId;
-	sessionPtr->collectionId = sessionInfo.collectionId;
+	std::shared_ptr<WorkingSessionInfo> sessionPtr(new WorkingSessionInfo);
+	*dynamic_cast<SessionInfo*>(sessionPtr.get()) = sessionInfo;
 
 	sessionPtr->tempFileSessionId = m_fileManagerCompPtr->BeginSession(QString(), sessionPtr->sessionId);
 
-	for (const ICollectionImportController::FileInfo& fileInfo : sessionInfo.files){
-		FileInfo file;
+	for (const FileInfo& fileInfo : sessionInfo.files){
+		WorkingFileInfo file;
 
-		static_cast<ICollectionImportController::FileInfo>(file) = fileInfo;
+		*dynamic_cast<FileInfo*>(&file) = fileInfo;
 
-		file.id = fileInfo.id;
-		file.name = fileInfo.name;
-		file.objectTypeId = fileInfo.objectTypeId;
-		file.size = fileInfo.size;
 		file.uploadProgressLoggerPtr.reset(new ProgressLogger);
 		file.uploadProgressLoggerPtr->SetParent(*this);
 		file.uploadProgressLoggerPtr->sessionId = sessionPtr->sessionId;
 		file.uploadProgressLoggerPtr->fileId = fileInfo.id;
 		file.tempFileId = m_fileManagerCompPtr->AddFileItem(sessionPtr->tempFileSessionId, fileInfo.name, fileInfo.id);
+		file.path = m_fileManagerCompPtr->GetPath(sessionPtr->tempFileSessionId, file.tempFileId);
 
-		sessionPtr->files[file.id] = file;
+		if (fileInfo.additionalParams != nullptr){
+			file.additionalParams.reset(dynamic_cast<iprm::IParamsSet*>(fileInfo.additionalParams->CloneMe()));
+			if (file.additionalParams == nullptr){
+				return false;
+			}
+		}
+
+		// Modify base file info ICollectionImportController::SessionInfo::files
+		sessionPtr->files[fileInfo.id] = file;
+		SessionInfo* baseSessionPtr = dynamic_cast<SessionInfo*>(sessionPtr.get());
+		Q_ASSERT(baseSessionPtr != nullptr);
+		for (FileInfo& baseFile : baseSessionPtr->files){
+			if (baseFile.id == file.id){
+				baseFile.path = file.path;
+
+				break;
+			}
+		}
 
 		if (!PrepareProgressManager(*sessionPtr)){
 			errorMessage = tr("Unable to initialize progress manager");
@@ -63,6 +76,8 @@ bool CCollectionImportControllerComp::BeginCollectionImportSession(const ICollec
 		}
 
 		if (!file.tempFileId.isEmpty()){
+			Q_ASSERT(!file.path.isEmpty());
+
 			QMutexLocker locker(&m_mutex);
 
 			m_sessions[sessionPtr->sessionId] = sessionPtr;
@@ -161,6 +176,7 @@ void CCollectionImportControllerComp::OnComponentCreated()
 		m_fileManagerCompPtr.IsValid() &&
 		m_progressSessionManagerCompPtr.IsValid() &&
 		m_jobQueueManagerCompPtr.IsValid() &&
+		m_paramsFillerCompPtr.IsValid() &&
 		m_jobParamsFactPtr.IsValid());
 
 	if (m_fileManagerCompPtr.IsValid()){
@@ -183,14 +199,14 @@ void CCollectionImportControllerComp::OnComponentDestroyed()
 
 // private methods
 
-bool CCollectionImportControllerComp::PrepareProgressManager(SessionInfo& session) const
+bool CCollectionImportControllerComp::PrepareProgressManager(WorkingSessionInfo& session) const
 {
 	session.mainProgressManagerPtr = m_progressSessionManagerCompPtr->BeginProgressSession(session.sessionId, tr("Import files to the collection"));
 	session.uploadProgressManagerPtr = session.mainProgressManagerPtr->CreateSubtaskManager("uploading", tr("Uploading files to the server"), 0.2);
 	session.fileProcessingProgressManagerPtr = session.mainProgressManagerPtr->CreateSubtaskManager("processing", tr("Processing files on the server"), 0.8);
 	session.fileProcessingProgressLoggerPtr = session.fileProcessingProgressManagerPtr->StartProgressLogger();
 
-	for (FileInfo& fileInfo: session.files){
+	for (WorkingFileInfo& fileInfo: session.files){
 		fileInfo.uploadProgressLoggerPtr->progressManagerPtr =
 			session.uploadProgressManagerPtr->CreateSubtaskManager(fileInfo.id, fileInfo.name, 1./session.files.size());
 		if (fileInfo.uploadProgressLoggerPtr->progressManagerPtr == nullptr){
@@ -215,7 +231,7 @@ void CCollectionImportControllerComp::UploadProgressChanged(QByteArray sessionId
 	if (m_sessions.contains(sessionId)){
 		bool uploadingFinished = true;
 
-		for (const FileInfo& fileInfo : m_sessions[sessionId]->files){
+		for (const WorkingFileInfo& fileInfo : m_sessions[sessionId]->files){
 			if (fileInfo.uploadProgressLoggerPtr->m_progress < 1.0){
 				uploadingFinished = false;
 
@@ -230,46 +246,36 @@ void CCollectionImportControllerComp::UploadProgressChanged(QByteArray sessionId
 }
 
 
-bool CCollectionImportControllerComp::StartImportJob(SessionInfo& session)
+bool CCollectionImportControllerComp::StartImportJob(WorkingSessionInfo& session)
 {
 	imtbase::CSimpleReferenceCollection refCollection;
 
-	iprm::IParamsSetUniquePtr jobParamsPtr = m_jobParamsFactPtr.CreateInstance();
-	if (!jobParamsPtr.IsValid()){
+	int index = FindCollectionIndex(session.collectionId);
+	if (index < 0){
 		return false;
 	}
 
-	iprm::TEditableParamsPtr<iprm::IParamsManager> fileParamsListPtr(jobParamsPtr.GetPtr(), "FileParamsList");
-	Q_ASSERT(fileParamsListPtr.IsValid());
+	QByteArray jobTypeId = m_jobTypeIdAttrPtr[index];
+	if (jobTypeId.isEmpty()){
+		return false;
+	}
 
-	QByteArrayList ids = session.files.keys();
-	for (const QByteArray& id: ids){
-		int index = fileParamsListPtr->InsertParamsSet();
-		if (index < 0){
-			return false;
-		}
+	if (m_jobTypeIdAttrPtr[index].isEmpty() || m_jobParamsFactPtr[index] == nullptr || m_paramsFillerCompPtr[index] != nullptr){
 
-		iprm::IParamsSet* fileParamsPtr = fileParamsListPtr->GetParamsSet(index);
-		Q_ASSERT(fileParamsPtr != nullptr);
+	}
 
-		iprm::TEditableParamsPtr<ifile::IFileNameParam> filePathPtr(fileParamsPtr, "FilePath");
-		iprm::TEditableParamsPtr<iprm::IIdParam> objectTypeIdPtr(fileParamsPtr, "ObjectTypeId");
-		iprm::TEditableParamsPtr<iprm::IIdParam> collectionIdPtr(fileParamsPtr, "CollectionId");
-		iprm::TEditableParamsPtr<iprm::IIdParam> proposedIdPtr(fileParamsPtr, "ProposedId");
-		Q_ASSERT(
-			filePathPtr.IsValid() &&
-			objectTypeIdPtr.IsValid() &&
-			collectionIdPtr.IsValid() &&
-			proposedIdPtr.IsValid());
+	iprm::IParamsSetUniquePtr jobParamsPtr = m_jobParamsFactPtr.CreateInstance(index);
+	if (!jobParamsPtr.IsValid()) {
+		return false;
+	}
 
-		filePathPtr->SetPath(m_fileManagerCompPtr->GetPath(session.sessionId, id));
-		objectTypeIdPtr->SetId(session.files[id].objectTypeId);
-		collectionIdPtr->SetId(session.collectionId);
+	if (!m_paramsFillerCompPtr[index]->FillCollectionImportJobParams(session, *jobParamsPtr.GetPtr())){
+		return false;
 	}
 
 	session.jobId = m_jobQueueManagerCompPtr->InsertNewJobIntoQueue(
 		session.sessionId,
-		"CharacterizationImport",
+		jobTypeId,
 		refCollection,
 		jobParamsPtr.GetPtr());
 
@@ -285,9 +291,9 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 
 		QMutexLocker locker(&m_mutex);
 
-		for (std::shared_ptr<SessionInfo>& session : m_sessions){
-			if (session->jobId == info.elementId){
-				session->fileProcessingProgressLoggerPtr->OnProgress(info.progress);
+		for (const SessionInfoPtr& sessionPtr : m_sessions){
+			if (sessionPtr->jobId == info.elementId){
+				sessionPtr->fileProcessingProgressLoggerPtr->OnProgress(info.progress);
 			}
 		}
 	}
@@ -304,15 +310,15 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 			QMutexLocker locker(&m_mutex);
 
 			if (!m_sessions.isEmpty()){
-				for (std::shared_ptr<SessionInfo>& session : m_sessions){
-					if (session->jobId == info.elementId){
-						QByteArray sessionId = session->sessionId;
+				for (SessionInfoPtr& sessionPtr : m_sessions){
+					if (sessionPtr->jobId == info.elementId){
+						QByteArray sessionId = sessionPtr->sessionId;
 
 						imthype::CStandardJobOutput jobOutput;
-						m_jobQueueManagerCompPtr->GetJobResult(session->jobId, jobOutput);
+						m_jobQueueManagerCompPtr->GetJobResult(sessionPtr->jobId, jobOutput);
 						istd::IInformationProvider::InformationCategory category = jobOutput.GetInformationCategory();
 
-						m_jobQueueManagerCompPtr->RemoveJob(session->jobId);
+						m_jobQueueManagerCompPtr->RemoveJob(sessionPtr->jobId);
 						m_fileManagerCompPtr->FinishSession(sessionId);
 
 						if (info.status == imthype::IJobQueueManager::PS_CANCELED){
@@ -338,6 +344,22 @@ void CCollectionImportControllerComp::OnJobQueueChanged(const istd::IChangeable:
 }
 
 
+int CCollectionImportControllerComp::FindCollectionIndex(const QByteArray& collectionId) const
+{
+	int count = qMin(m_collectionIdAttrPtr.GetCount(), m_jobTypeIdAttrPtr.GetCount());
+	count = qMin(count, m_jobParamsFactPtr.GetCount());
+	count = qMin(count, m_paramsFillerCompPtr.GetCount());
+
+	for (int i = 0; i < count; i++){
+		if (m_collectionIdAttrPtr[i] == collectionId){
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+
 QByteArray CCollectionImportControllerComp::FindSession(const QByteArray& fileId) const
 {
 	QMutexLocker locker(&m_mutex);
@@ -352,7 +374,7 @@ QByteArray CCollectionImportControllerComp::FindSession(const QByteArray& fileId
 }
 
 
-CCollectionImportControllerComp::FileInfo* CCollectionImportControllerComp::FindFileInfo(const QByteArray& fileId)
+CCollectionImportControllerComp::WorkingFileInfo* CCollectionImportControllerComp::FindFileInfo(const QByteArray& fileId)
 {
 	QMutexLocker locker(&m_mutex);
 
@@ -370,7 +392,7 @@ CCollectionImportControllerComp::FilelUploadStatus CCollectionImportControllerCo
 {
 	QMutexLocker locker(&m_mutex);
 
-	FileInfo* fileInfoPtr = FindFileInfo(fileId);
+	WorkingFileInfo* fileInfoPtr = FindFileInfo(fileId);
 	Q_ASSERT(fileInfoPtr != nullptr);
 
 	// Find intersections with uploaded chunks
@@ -401,7 +423,7 @@ double CCollectionImportControllerComp::GetFileProgress(const QByteArray& fileId
 {
 	QMutexLocker locker(&m_mutex);
 
-	FileInfo* fileInfoPtr = FindFileInfo(fileId);
+	WorkingFileInfo* fileInfoPtr = FindFileInfo(fileId);
 	Q_ASSERT(fileInfoPtr != nullptr);
 
 	int size = fileInfoPtr->size;
@@ -421,7 +443,7 @@ void CCollectionImportControllerComp::UpdateUploadProgress(const QByteArray& fil
 {
 	QMutexLocker locker(&m_mutex);
 
-	FileInfo* fileInfoPtr = FindFileInfo(fileId);
+	WorkingFileInfo* fileInfoPtr = FindFileInfo(fileId);
 	Q_ASSERT(fileInfoPtr != nullptr);
 
 	ibase::IProgressLogger* progressLoggerPtr = fileInfoPtr->uploadProgressLoggerPtr.get();

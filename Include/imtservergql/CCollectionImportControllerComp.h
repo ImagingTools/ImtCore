@@ -12,6 +12,7 @@
 #include <imtbase/IProgressSessionsManager.h>
 #include <imtservergql/ICollectionImportController.h>
 #include <imtservergql/IFileUploadHandler.h>
+#include <imtservergql/ICollectionImportJobParamsFiller.h>
 #include <imthype/IJobQueueManager.h>
 #include <imtbase/TModelUpdateBinder.h>
 
@@ -30,12 +31,15 @@ public:
 	typedef CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionImportControllerComp);
-		I_REGISTER_INTERFACE(ICollectionImportController)
+	I_REGISTER_INTERFACE(ICollectionImportController)
 		I_REGISTER_INTERFACE(IFileUploadHandler)
+		I_ASSIGN_MULTI_0(m_collectionIdAttrPtr, "CollectionId", "Collection ID associated with import job type ID", false);
+		I_ASSIGN_MULTI_0(m_jobTypeIdAttrPtr, "ImportJobTypeId", "Import job type ID associated with collection ID", false);
+		I_ASSIGN_MULTI_0(m_paramsFillerCompPtr, "CollectionImportJobParamsFiller", "Collection import job params filler associated with collection ID", false);
+		I_ASSIGN_MULTI_0(m_jobParamsFactPtr, "JobParamsFactory", "Job params factory associated with collection ID", false);
 		I_ASSIGN(m_fileManagerCompPtr, "TempFileManager", "Temporary file manager for uploaded files", true, "TempFileManager");
 		I_ASSIGN(m_progressSessionManagerCompPtr, "ProgressSessionManager", "ProgressSessionManager", true, "ProgressSessionManager");
 		I_ASSIGN(m_jobQueueManagerCompPtr, "JobQueueManager", "Job queue manager", true, "JobQueueManager");
-		I_ASSIGN(m_jobParamsFactPtr, "JobParamsFactory", "Job params", true, "JobParams");
 	I_END_COMPONENT;
 
 	CCollectionImportControllerComp();
@@ -76,18 +80,16 @@ private:
 	};
 	typedef std::shared_ptr<ProgressLogger> ProgressLoggerPtr;
 
-	struct FileInfo: public ICollectionImportController::FileInfo
+	struct WorkingFileInfo: public FileInfo
 	{
 		QByteArray tempFileId;
 		ProgressLoggerPtr uploadProgressLoggerPtr;
-		QVector<istd::CIntRange> uploadedChunks;
+		QList<istd::CIntRange> uploadedChunks;
 	};
 
-	struct SessionInfo
+	struct WorkingSessionInfo: public SessionInfo
 	{
-		QByteArray sessionId;
-		QByteArray collectionId;
-		QMap<QByteArray, FileInfo> files;
+		QMap<QByteArray, WorkingFileInfo> files;
 		QByteArray jobId;
 
 		QByteArray tempFileSessionId;
@@ -97,25 +99,29 @@ private:
 		std::unique_ptr<ibase::IProgressLogger> fileProcessingProgressLoggerPtr;
 	};
 
-	typedef std::shared_ptr<SessionInfo> SessionInfoPtr;
+	typedef std::shared_ptr<WorkingSessionInfo> SessionInfoPtr;
 
 private:
-	bool PrepareProgressManager(SessionInfo& session) const;
+	bool PrepareProgressManager(WorkingSessionInfo& session) const;
 	void UploadProgressChanged(QByteArray sessionId, QByteArray fileId);
-	bool StartImportJob(SessionInfo& session);
+	bool StartImportJob(WorkingSessionInfo& session);
 	void OnJobQueueChanged(const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr);
+	int FindCollectionIndex(const QByteArray& collectionId) const;
 
 	QByteArray FindSession(const QByteArray& fileId) const;
-	FileInfo* FindFileInfo(const QByteArray& fileId);
+	WorkingFileInfo* FindFileInfo(const QByteArray& fileId);
 	FilelUploadStatus AddFileChunk(const QByteArray& fileId, const istd::CIntRange& range);
 	double GetFileProgress(const QByteArray& fileId);
 	void UpdateUploadProgress(const QByteArray& fileId);
 
 private:
+	I_MULTIATTR(QByteArray, m_collectionIdAttrPtr);
+	I_MULTIATTR(QByteArray, m_jobTypeIdAttrPtr);
+	I_MULTIREF(imtservergql::ICollectionImportJobParamsFiller, m_paramsFillerCompPtr);
+	I_MULTIFACT(iprm::IParamsSet, m_jobParamsFactPtr);
 	I_REF(ifile::ITempFileManager, m_fileManagerCompPtr);
 	I_REF(imtbase::IProgressSessionsManager, m_progressSessionManagerCompPtr);
 	I_REF(imthype::IJobQueueManager, m_jobQueueManagerCompPtr);
-	I_FACT(iprm::IParamsSet, m_jobParamsFactPtr);
 
 	QMap<QByteArray, SessionInfoPtr> m_sessions;
 
