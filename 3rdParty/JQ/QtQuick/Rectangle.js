@@ -60,7 +60,7 @@ class Rectangle extends Item {
         // this.__setDOMStyle({
         //     backgroundColor: newValue
         // })
-        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
             opacity: 1,
             backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * this.opacity})`
@@ -76,7 +76,7 @@ class Rectangle extends Item {
     }
 
     SLOT_opacityChanged(oldValue, newValue){
-        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
             opacity: newValue > 0 ? 1 : 0,
             backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * newValue})`

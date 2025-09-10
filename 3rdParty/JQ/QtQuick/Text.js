@@ -154,7 +154,7 @@ class Text extends Item {
     }
 
     SLOT_colorChanged(oldValue, newValue){
-        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
             opacity: 1,
             color: `rgba(${rgba.r},${rgba.g},${rgba.b},${newValue === 'transparent' ? 0 : rgba.a * this.__proxy.opacity})`
@@ -162,7 +162,7 @@ class Text extends Item {
     }
 
     SLOT_opacityChanged(oldValue, newValue){
-        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta)
+        let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
         this.__setDOMStyle({
             opacity: 1,
             color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.__proxy.color === 'transparent' ? 0 : rgba.a * newValue})`

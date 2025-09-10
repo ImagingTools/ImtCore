@@ -164,12 +164,19 @@ class Item extends QtObject {
     }
 
     __addChild(child){
-        this.data.__push(child)
+        let index = -1
+
+        index = this.data.indexOf(child)
+        if(index < 0) this.data.__push(child)
 
         if(child instanceof Item){
-            this.children.__push(child)
+            index = this.children.indexOf(child)
+
+            if(index < 0) this.children.__push(child)
         } else {
-            this.data.__push(child)
+            index = this.resources.indexOf(child)
+
+            if(index < 0) this.resources.__push(child)
         }
     }
 

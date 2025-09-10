@@ -1143,12 +1143,12 @@ class Instruction {
                     
                     resultCode.add(properties.classCode)
 
-                    resultCode.add(`${assignProperty.value.name}.__aliases.push(function(){`)
+
                     resultCode.add(properties.aliasCode)
-                    resultCode.add(`})`)
+
 
                     resultCode.add(`${assignProperty.value.name}.__simpleProperties.push(function(){`)
-                    resultCode.add(`${assignProperty.value.name}.__${assignProperty.value.className}__${assignProperty.value.name}=true`)
+                    
                     resultCode.add(properties.code)
                     resultCode.add(`})`)
 
@@ -1164,6 +1164,7 @@ class Instruction {
                     resultCode.add(properties.lazyCode)
 
                     // resultCode.add(assignProperty.value.getConnectedSignals())
+                    resultCode.add(`${assignProperty.value.name}.__${assignProperty.value.className}__${assignProperty.value.name}=true`)
 
                     resultCode.add(`if(isRoot) {${assignProperty.value.name}.__updatePrimaryProperties();${assignProperty.value.name}.__updateAliases();${assignProperty.value.name}.__updateSimpleProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__complete();${assignProperty.value.name}.__completeProperties()}`)
 
@@ -1218,7 +1219,8 @@ class Instruction {
                         // console.log(assignProperty.name, stat.value.toString())
                         // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',function(){return ${stat.value}},function(newVal){${stat.value}=newVal})`)
                         let aliasPath = stat.value.toString().split('.')
-                        aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
+                        // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
+                        aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',()=>{return ${aliasPath.slice(0, aliasPath.length - 1).join('.')}}, '${aliasPath[aliasPath.length-1]}')`)
                         // code.add(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
                     } else {
                         // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
@@ -1238,7 +1240,8 @@ class Instruction {
                         if(this.checkDefineProperty(assignProperty.name)){
                             classCode.add(`${this.name}.__self['${assignProperty.name}']=${stat.value}`)
                         } else {
-                            lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
+                            // lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
+                            lazyCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
                         }
                         
                     }
@@ -1370,12 +1373,12 @@ class Instruction {
 
         code.add(properties.classCode) 
 
-        code.add(`${this.children[0].name}.__aliases.push(function(){`)
+ 
         code.add(properties.aliasCode)
-        code.add(`})`)
+
 
         code.add(`${this.children[0].name}.__simpleProperties.push(function(){`)
-        code.add(`${this.children[0].name}.__${this.children[0].className}__${this.children[0].name}=true`)
+        
         code.add(properties.code)
         code.add(`})`)
 
@@ -1391,6 +1394,7 @@ class Instruction {
         code.add(properties.lazyCode)
 
         // code.add(this.children[0].getConnectedSignals())
+        code.add(`${this.children[0].name}.__${this.children[0].className}__${this.children[0].name}=true`)
 
         code.add(`if(isRoot) {${this.children[0].name}.__updatePrimaryProperties();${this.children[0].name}.__updateAliases();${this.children[0].name}.__updateSimpleProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__complete();${this.children[0].name}.__completeProperties()}`)
 
@@ -1448,15 +1452,15 @@ class Instruction {
 
                 ${properties.classCode}
 
-                ${this.name}.__aliases.push(function(){
+                
                 ${properties.aliasCode}
-                })
+                
 
                 ${this.name}.__simpleProperties.push(function(){
-                ${this.name}.__${this.className}__${this.name}=true
+                
                 ${properties.code}
                 })
-
+                
                 return ${this.name}
             }
             ${this.getMethods()}
@@ -1482,7 +1486,8 @@ class Instruction {
         // children
 
         code.add(properties.lazyCode)
-
+        
+        code.add(`${this.name}.__${this.className}__${this.name}=true`)
         // code.add(this.getConnectedSignals())
 
         return code.join('\n')
@@ -1617,12 +1622,12 @@ class QmlFile {
         
         code.add(properties.classCode)
 
-        code.add(`${this.instruction.name}.__aliases.push(function(){`)
+
         code.add(properties.aliasCode)
-        code.add(`})`)
+
 
         code.add(`${this.instruction.name}.__simpleProperties.push(function(){`)
-        code.add(`${this.instruction.name}.__${this.instruction.className}__${this.instruction.name}=true`)
+        
         code.add(properties.code)
         code.add(`})`)
 
@@ -1638,6 +1643,7 @@ class QmlFile {
         code.add(properties.lazyCode)
 
         // code.add(this.instruction.getConnectedSignals())
+        code.add(`${this.instruction.name}.__${this.instruction.className}__${this.instruction.name}=true`)
 
         code.add(`if(isRoot) {${this.instruction.name}.__updatePrimaryProperties();${this.instruction.name}.__updateAliases();${this.instruction.name}.__updateSimpleProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__complete();${this.instruction.name}.__completeProperties()}`)
 

@@ -45,23 +45,36 @@ class Alias extends Property {
      * 
      * @param {Object} target 
      * @param {String} name
-     * @param {Object} obj 
+     * @param {Object} func 
      * @param {String} propName
      */
-    static init(target, name, obj, propName){
+    static init(target, name, func, propName){
         target.__self[name] = {
-            getter: ()=>{
+            getter: function(){   
+                let obj = func()
+                if(!this.connected){
+                    this.connected = true
+                    if(obj instanceof QBaseObject){
+                        Signal.get(obj, propName+'Changed').connect((oldValue, newValue)=>{
+                            Signal.get(target, name+'Changed')(oldValue, newValue)
+                        })
+                    }
+                }       
                 return obj[propName]
             },
-            setter: (val)=>{
+            setter: function(val){
+                let obj = func()
+                if(!this.connected){
+                    this.connected = true
+                    if(obj instanceof QBaseObject){
+                        Signal.get(obj, propName+'Changed').connect((oldValue, newValue)=>{
+                            Signal.get(target, name+'Changed')(oldValue, newValue)
+                        })
+                    }
+                } 
                 obj[propName] = val
             },
-        }
-
-        if(obj instanceof QBaseObject){
-            Signal.get(obj, propName+'Changed').connect((oldValue, newValue)=>{
-                Signal.get(target, name+'Changed')(oldValue, newValue)
-            })
+            connected: false,
         }
     }
 

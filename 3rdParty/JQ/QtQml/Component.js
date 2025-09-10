@@ -13,16 +13,16 @@ class Component extends QQmlComponent {
     __context = {}
 
     createObject(parent = null, properties = {}, forceUpdate = false){
-        if(!forceUpdate){
-            let obj = this.__component.create(parent, properties, this.__context, false)
-            obj.__updatePrimaryProperties()
-            obj.__updateAliases()
-            obj.__updateSimpleProperties()
-            JQApplication.initLater(obj)
-            return obj
-        } else {
+        // if(!forceUpdate){
+        //     let obj = this.__component.create(parent, properties, this.__context, false)
+        //     obj.__updatePrimaryProperties()
+        //     obj.__updateAliases()
+        //     obj.__updateSimpleProperties()
+        //     JQApplication.initLater(obj)
+        //     return obj
+        // } else {
             return this.__component.create(parent, properties, this.__context)
-        }
+        // }
     }
 
     __destroy(){

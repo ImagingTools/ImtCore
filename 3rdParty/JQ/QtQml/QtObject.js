@@ -118,8 +118,13 @@ class QtObject extends QObject {
     }
 
     __addChild(child){
-        this.data.__push(child)
-        this.resources.__push(child)
+        let index = -1
+
+        index = this.data.indexOf(child)
+        if(index < 0) this.data.__push(child)
+
+        index = this.resources.indexOf(child)
+        if(index < 0) this.resources.__push(child)
     }
 
     SLOT_childrenChanged(...args){
