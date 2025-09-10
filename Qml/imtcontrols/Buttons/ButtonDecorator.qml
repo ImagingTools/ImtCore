@@ -148,10 +148,11 @@ DecoratorBase {
 			anchors.left: iconObj && iconObj.visible ? iconObj.right : undefined;
 			anchors.leftMargin: iconObj && iconObj.visible ? commonButtonDecorator.contentSpacing : 0;
 
-			width: visible ? helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth : helperText.width : -Style.marginM;
+			width: !isEmpty ? helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth : helperText.width : -Style.marginM;
 			height: textObj.height;
 
-			visible: textObj.text !== "";
+			//visible: textObj.text !== "";
+			property bool isEmpty: textObj.text === "";
 
 
 
