@@ -33,6 +33,13 @@ public:
 				QString& errorMessage);
 
 	template<typename RequestInfo, typename Representation>
+	static bool FillTypeId(
+				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+				const RequestInfo& requestInfo,
+				Representation& representationObject,
+				QString& errorMessage);
+
+	template<typename RequestInfo, typename Representation>
 	static bool FillName(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
 				const RequestInfo& requestInfo,
@@ -84,6 +91,21 @@ inline QDateTime CCollectionRepresentationConverter::GetCreationDate(const imtba
 	}
 
 	return retVal;
+}
+
+
+template<typename RequestInfo, typename Representation>
+inline bool CCollectionRepresentationConverter::FillTypeId(
+	const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+	const RequestInfo& requestInfo,
+	Representation& representationObject,
+	QString& /* errorMessage */)
+{
+	if (requestInfo.items.isTypeIdRequested){
+		representationObject.typeId = objectCollectionIterator.GetObjectTypeId();
+	}
+
+	return true;
 }
 
 
