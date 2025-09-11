@@ -6,6 +6,7 @@ import imtcontrols 1.0
 
 
 QtObject {
+	id: shapeBase
 
 	property Item viewItem: null;
 	property var layer;
@@ -61,6 +62,9 @@ QtObject {
 		editNodeIndex = -1
 	}
 
+	onMouseClicked: {
+	}
+
 	function draw (ctx, transformMatrixArg){
 	}
 
@@ -79,7 +83,7 @@ QtObject {
 			drawBoundingBox(ctx)
 		}
 
-		if(isSelected && viewItem.isPointsEditMode){
+		if(isSelected && (viewItem.isPointsEditMode || viewItem.isPointsAdditionMode || viewItem.isPointsDeletionMode)){
 			drawEditPoints(ctx)
 		}
 	}
@@ -170,7 +174,63 @@ QtObject {
 		return obj
 	}
 
+	function deletePoint(point){
+		if(points.length < 3){
+			return;
+		}
+		if(isSelected && viewItem.isPointsDeletionMode){
+			let minDistance = Style.marginL
+			for(let i = 0; i < points.length; i++){
+				let shapePoint = getScreenPosition(points[i]);
+				let dist = AnalyticGeometry.distanceBetweenPoints2d(point, shapePoint);
+				if(dist <= minDistance){
+					points.splice(i, 1);
+					break
+				}
+			}
+		}
 
+	}
+	function addPoint(point){
+		if(isSelected && viewItem.isPointsAdditionMode){
+			let minDistancePointIndex = getNearestPointIndex(point);
+
+			let logPosition = getLogPosition(point)
+			if(minDistancePointIndex == points.length -1){
+				//points.push(logPosition)
+				points.splice(minDistancePointIndex, 0, logPosition);
+			}
+			else if(minDistancePointIndex == 0){
+				//points.splice(0, 0, logPosition);
+				points.splice(minDistancePointIndex + 1, 0, logPosition);
+			}
+			else {
+				let prevDist = AnalyticGeometry.distanceBetweenPoints2d(point, getScreenPosition(points[minDistancePointIndex - 1]))
+				let nextDist = AnalyticGeometry.distanceBetweenPoints2d(point, getScreenPosition(points[minDistancePointIndex + 1]))
+				if(prevDist < nextDist){
+					points.splice(minDistancePointIndex, 0, logPosition);
+				}
+				else {
+					points.splice(minDistancePointIndex + 1, 0, logPosition);
+				}
+			}
+		}
+	}
+
+	function getNearestPointIndex(point){
+		let minDistance = 1000000
+		let minDistancePointIndex = -1;
+		for(let i = 0; i < points.length; i++){
+			let shapePoint = getScreenPosition(points[i]);
+			let dist = AnalyticGeometry.distanceBetweenPoints2d(point, shapePoint);
+			if(dist <= minDistance){
+				minDistance  = dist;
+				minDistancePointIndex = i;
+
+			}
+		}
+		return minDistancePointIndex
+	}
 
 }
 

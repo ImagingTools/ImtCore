@@ -47,5 +47,33 @@ BoundingBox {
 		return AnalyticGeometry.pointInPolygon(mousePoint, points)
 	}
 
+	function addPoint(point){
+		if(isSelected && viewItem.isPointsAdditionMode){
+			let logPosition = getLogPosition(point)
+			let firstIndex = -1;
+			let secondIndex = -1;
+			let minDist = 1000000
+			for(let i = 0; i < points.length; i++){
+				let nextIndex = (i == points.length -1) ? 0 : i+1
+				let dist = AnalyticGeometry.distanceBetweenPointAndLineSection2d(point, getScreenPosition(points[i]), getScreenPosition(points[nextIndex]))
+				if(dist > -1 && dist < minDist){
+					minDist = dist;
+					firstIndex = i;
+					secondIndex = nextIndex;
+				}
+			}
+			if(firstIndex < 0 || secondIndex < 0){
+				return;
+			}
+			if(secondIndex == 0){
+				points.splice(0, 0, logPosition);
+			}
+			else {
+				points.splice(secondIndex, 0, logPosition);
+			}
+			console.log("First_INdex:: ", firstIndex, "Second_Index::", secondIndex)
+
+		}
+	}
 }
 

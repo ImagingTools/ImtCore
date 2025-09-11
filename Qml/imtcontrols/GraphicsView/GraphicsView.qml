@@ -566,7 +566,9 @@ Rectangle {
 								canvas.editShape = shape;
 							}
 						}
-						shape.isSelected = true;
+						if(!graphicsView.isPointsDeletionMode && !graphicsView.isPointsAdditionMode){
+							shape.isSelected = true;
+						}
 					}
 					else {
 						graphicsView.clearSelection()
@@ -616,6 +618,12 @@ Rectangle {
 							if(graphicsView.isEditMode){
 								canvas.editShape = shape;
 							}
+						}
+						if(graphicsView.isPointsDeletionMode && shape.isSelected){
+							shape.deletePoint(Qt.point(mouse.x, mouse.y))
+						}
+						if(graphicsView.isPointsAdditionMode && shape.isSelected){
+							shape.addPoint(Qt.point(mouse.x, mouse.y))
 						}
 						shape.isSelected = true;
 					}

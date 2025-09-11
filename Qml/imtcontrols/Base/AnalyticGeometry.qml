@@ -16,7 +16,16 @@ QtObject {
 		 return Math.sqrt((point2.x - point1.x)*(point2.x - point1.x) + (point2.y - point1.y)*(point2.y - point1.y))
 	}
 
-	function distanceBetweenPointAndLine2d(point, linePoint1, linePoint2){
+	function distanceBetweenPointAndLineSection2d(point, linePoint1, linePoint2){
+		let withinSection =
+			point.x >= Math.min(linePoint1.x, linePoint2.x)
+			&& point.x <= Math.max(linePoint1.x, linePoint2.x)
+			&& point.y >= Math.min(linePoint1.y, linePoint2.y)
+			&& point.y <= Math.max(linePoint1.y, linePoint2.y)
+
+		if(!withinSection){
+			return -1;
+		}
 		return Math.abs((linePoint2.y - linePoint1.y) * point.x  - (linePoint2.x - linePoint1.x) * point.y + linePoint2.x * linePoint1.y - linePoint2.y * linePoint1.x) / distanceBetweenPoints2d(linePoint1, linePoint2)
 	}
 
