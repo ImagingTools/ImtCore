@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -25,6 +25,14 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="RightAlignmentCommands" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>StandardCollectionCommands/Import</Value>
+                                <Value>StandardCollectionCommands/Export</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -40,37 +48,223 @@
         <Element Id="StandardCollectionCommands" PackageId="ImtCoreVoce" ComponentId="StandardCollectionCommands">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="EditAlignment" Type="Integer" ExportId="EditAlignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="EditCommandName" Type="String" ExportId="EditCommandName">
                         <Data IsEnabled="true" Value="Edit"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EditDescription" Type="Text" ExportId="EditDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EditIconPath" Type="String" ExportId="EditIconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="EditPermissions" Type="Id[]" ExportId="EditPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EditPriority" Type="Integer" ExportId="EditPriority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EditStatus" Type="Text" ExportId="EditStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ExportAlignment" Type="Integer" ExportId="ExportAlignment">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ExportCommandName" Type="String" ExportId="ExportCommandName">
                         <Data IsEnabled="true" Value="Export"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ExportDescription" Type="Text" ExportId="ExportDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ExportIconPath" Type="String" ExportId="ExportIconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ExportPermissions" Type="Id[]" ExportId="ExportPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ExportPriority" Type="Integer" ExportId="ExportPriority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ExportStatus" Type="Text" ExportId="ExportStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GroupAlignment" Type="Integer" ExportId="GroupAlignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ImportAlignment" Type="Integer" ExportId="ImportAlignment">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ImportCommandName" Type="String" ExportId="ImportCommandName">
                         <Data IsEnabled="true" Value="Import"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ImportDescription" Type="Text" ExportId="ImportDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ImportIconPath" Type="String" ExportId="ImportIconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ImportPermissions" Type="Id[]" ExportId="ImportPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ImportPriority" Type="Integer" ExportId="ImportPriority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ImportStatus" Type="Text" ExportId="ImportStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEditEnabled" Type="Boolean" ExportId="IsEditEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEditVisible" Type="Boolean" ExportId="IsEditVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsExportEnabled" Type="Boolean" ExportId="IsExportEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsExportVisible" Type="Boolean" ExportId="IsExportVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsImportEnabled" Type="Boolean" ExportId="IsImportEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsImportVisible" Type="Boolean" ExportId="IsImportVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsNewEnabled" Type="Boolean" ExportId="IsNewEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsNewVisible" Type="Boolean" ExportId="IsNewVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsRemoveAllEnabled" Type="Boolean" ExportId="IsRemoveAllEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsRemoveAllVisible" Type="Boolean" ExportId="IsRemoveAllVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsRemoveEnabled" Type="Boolean" ExportId="IsRemoveEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsRemoveVisible" Type="Boolean" ExportId="IsRemoveVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsRestoreAllEnabled" Type="Boolean" ExportId="IsRestoreAllEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsRestoreAllVisible" Type="Boolean" ExportId="IsRestoreAllVisible">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsRestoreEnabled" Type="Boolean" ExportId="IsRestoreEnabled">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsRestoreVisible" Type="Boolean" ExportId="IsRestoreVisible">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="NewAlignment" Type="Integer" ExportId="NewAlignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="NewCommandName" Type="String" ExportId="NewCommandName">
                         <Data IsEnabled="true" Value="New"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="NewDescription" Type="Text" ExportId="NewDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NewIconPath" Type="String" ExportId="NewIconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="NewPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NewPriority" Type="Integer" ExportId="NewPriority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="NewStatus" Type="Text" ExportId="NewStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoveAlignment" Type="Integer" ExportId="RemoveAlignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoveAllAlignment" Type="Integer" ExportId="RemoveAllAlignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoveAllCommandName" Type="String" ExportId="RemoveAllCommandName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoveAllDescription" Type="Text" ExportId="RemoveAllDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoveAllIconPath" Type="String" ExportId="RemoveAllIconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoveAllPermissions" Type="Id[]" ExportId="RemoveAllPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoveAllPriority" Type="Integer" ExportId="RemoveAllPriority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoveAllStatus" Type="Text" ExportId="RemoveAllStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RemoveCommandName" Type="String" ExportId="RemoveCommandName">
                         <Data IsEnabled="true" Value="Remove"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="RemoveDescription" Type="Text" ExportId="RemoveDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemoveIconPath" Type="String" ExportId="RemoveIconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RemovePermissions" Type="Id[]" ExportId="RemovePermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RemovePriority" Type="Integer" ExportId="RemovePriority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreAlignment" Type="Integer" ExportId="RestoreAlignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreAllAlignment" Type="Integer" ExportId="RestoreAllAlignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreAllCommandName" Type="String" ExportId="RestoreAllCommandName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreAllDescription" Type="Text" ExportId="RestoreAllDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreAllIconPath" Type="String" ExportId="RestoreAllIconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreAllPermissions" Type="Id[]" ExportId="RestoreAllPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreAllPriority" Type="Integer" ExportId="RestoreAllPriority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreAllStatus" Type="Text" ExportId="RestoreAllStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreCommandName" Type="String" ExportId="RestoreCommandName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreDescription" Type="Text" ExportId="RestoreDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreIconPath" Type="String" ExportId="RestoreIconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestorePermissions" Type="Id[]" ExportId="RestorePermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestorePriority" Type="Integer" ExportId="RestorePriority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RestoreStatus" Type="Text" ExportId="RestoreStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -85,9 +279,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="CommandsController"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="CommandsController"/>
-        <Interface InterfaceId="imtrest::IRepresentationController" ComponentId="CommandsController"/>
+        <Interface InterfaceId="imtserverapp::IGuiElementModel" ComponentId="StandardCollectionCommands"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="Edit" ComponentId="StandardCollectionCommands/Edit"/>
