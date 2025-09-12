@@ -215,14 +215,17 @@ ComboBox {
 		}
 
 		onModelUpdated: {
-			comboBoxContainerGql.closeOnFinished = data.containsKey("close") && data.getData("close");
+			let closeImmediatly = false;
+			if (data.containsKey("close") && data.getData("close")){
+				comboBoxContainerGql.closeOnFinished = closeImmediatly = data.getData("close");
+			}
 
 			if (dataProvider.offset == 0){
 				comboBoxContainerGql.model = dataProvider.collectionModel
 				comboBoxContainerGql.endListStatus = false;
 				comboBoxContainerGql.currentIndex = -1;
 
-				if(comboBoxContainerGql.popup && comboBoxContainerGql.closeOnFinished){
+				if(comboBoxContainerGql.popup && closeImmediatly){
 					comboBoxContainerGql.popup.finished('', -1)
 				}
 			}
