@@ -215,9 +215,9 @@ ComboBox {
 		}
 
 		onModelUpdated: {
-			let closeImmediatly = false;
+			let closeImmediately = false;
 			if (data.containsKey("close") && data.getData("close")){
-				comboBoxContainerGql.closeOnFinished = closeImmediatly = data.getData("close");
+				comboBoxContainerGql.closeOnFinished = closeImmediately = data.getData("close");
 			}
 
 			if (dataProvider.offset == 0){
@@ -225,7 +225,7 @@ ComboBox {
 				comboBoxContainerGql.endListStatus = false;
 				comboBoxContainerGql.currentIndex = -1;
 
-				if(comboBoxContainerGql.popup && closeImmediatly){
+				if(comboBoxContainerGql.popup && closeImmediately){
 					comboBoxContainerGql.popup.finished('', -1)
 				}
 			}
