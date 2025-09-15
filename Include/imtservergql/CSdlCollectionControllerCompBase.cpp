@@ -36,8 +36,8 @@ imtbase::CTreeItemModel* CSdlCollectionControllerCompBase::ListObjects(
 	iprm::CParamsSet filterParams;
 
 	if (viewParamsGql != nullptr){
-		offset = viewParamsGql->GetParamArgumentValue("Offset").toInt();
-		count = viewParamsGql->GetParamArgumentValue("Count").toInt();
+		offset = viewParamsGql->GetParamArgumentValue("offset").toInt();
+		count = viewParamsGql->GetParamArgumentValue("count").toInt();
 		PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 	}
 

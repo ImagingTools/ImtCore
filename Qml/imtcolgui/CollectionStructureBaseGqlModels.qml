@@ -61,8 +61,8 @@ QtObject {
             let offset = 0;
 
             var viewParams = Gql.GqlObject("viewParams");
-            viewParams.InsertField("Offset", offset);
-            viewParams.InsertField("Count", count);
+			viewParams.InsertField("offset", offset);
+			viewParams.InsertField("count", count);
             viewParams.InsertField("FilterModel");
 
             let filterModel = gqlModelBaseContainer.rootItem.modelFilter;

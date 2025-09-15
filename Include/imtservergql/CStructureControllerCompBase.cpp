@@ -457,8 +457,8 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 		int offset = 0, count = -1;
 
 		if (viewParamsGql != nullptr){
-			offset = viewParamsGql->GetParamArgumentValue("Offset").toInt();
-			count = viewParamsGql->GetParamArgumentValue("Count").toInt();
+			offset = viewParamsGql->GetParamArgumentValue("offset").toInt();
+			count = viewParamsGql->GetParamArgumentValue("count").toInt();
 			// PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 		}
 

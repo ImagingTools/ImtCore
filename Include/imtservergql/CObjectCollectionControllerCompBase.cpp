@@ -1003,8 +1003,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementIds(cons
 	iprm::CParamsSet filterParams;
 	const imtgql::CGqlParamObject* viewParamsPtr = inputParamPtr->GetParamArgumentObjectPtr("viewParams");
 	if (viewParamsPtr != nullptr){
-		offset = viewParamsPtr->GetParamArgumentValue("Offset").toInt();
-		count = viewParamsPtr->GetParamArgumentValue("Count").toInt();
+		offset = viewParamsPtr->GetParamArgumentValue("offset").toInt();
+		count = viewParamsPtr->GetParamArgumentValue("count").toInt();
 
 		PrepareFilters(gqlRequest, *viewParamsPtr, filterParams);
 	}

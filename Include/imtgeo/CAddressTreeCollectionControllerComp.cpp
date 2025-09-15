@@ -86,8 +86,8 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
         QString filterText = "";
         QString typeId = "";
         if (viewParamsGql != nullptr){
-            offset = viewParamsGql->GetParamArgumentValue("Offset").toInt();
-            count = viewParamsGql->GetParamArgumentValue("Count").toInt();
+			offset = viewParamsGql->GetParamArgumentValue("offset").toInt();
+			count = viewParamsGql->GetParamArgumentValue("count").toInt();
 
             QByteArray filterBA = viewParamsGql->GetParamArgumentValue("FilterModel").toByteArray();
             //qDebug() << "filterBA:: " << filterBA;

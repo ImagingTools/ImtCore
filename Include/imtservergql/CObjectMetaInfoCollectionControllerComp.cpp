@@ -51,8 +51,8 @@ imtbase::CTreeItemModel* CObjectMetaInfoCollectionControllerComp::ListObjects(co
 		imtbase::CCollectionFilter m_filter;
 		int offset = 0, count = -1;
 		if (viewParamsGql != nullptr){
-			offset = viewParamsGql->GetParamArgumentValue("Offset").toInt();
-			count = viewParamsGql->GetParamArgumentValue("Count").toInt();
+			offset = viewParamsGql->GetParamArgumentValue("offset").toInt();
+			count = viewParamsGql->GetParamArgumentValue("count").toInt();
 
 			QByteArray filterBA = viewParamsGql->GetParamArgumentValue("FilterModel").toByteArray();
 			if (!filterBA.isEmpty()){

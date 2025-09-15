@@ -80,8 +80,8 @@ Item {
             var query = Gql.GqlRequest("query", container.commandId + "List");
 
             var viewParams = Gql.GqlObject("viewParams");
-            viewParams.InsertField("Offset", container.offset);
-            viewParams.InsertField("Count", container.count);
+			viewParams.InsertField("offset", container.offset);
+			viewParams.InsertField("count", container.count);
 
             var jsonString = container.filterModel.toJson();
             viewParams.InsertField("FilterModel", jsonString);

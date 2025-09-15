@@ -500,8 +500,8 @@ Item {
 			var inputParams = Gql.GqlObject("input");
 			query.AddParam(inputParams);
 			var viewParams = Gql.GqlObject("viewParams");
-			viewParams.InsertField("Offset", offsetVar);
-			viewParams.InsertField("Count", popupMenuContainer.count);
+			viewParams.InsertField("offset", offsetVar);
+			viewParams.InsertField("count", popupMenuContainer.count);
 			viewParams.InsertField("FilterModel");
 			if(popupMenuContainer.additionalFilter != ""){
 				viewParams.InsertField("AdditionalFilter", popupMenuContainer.additionalFilter);
