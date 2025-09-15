@@ -58,19 +58,19 @@ class Binding extends QtObject {
     }  
 
     __update(){
-        if(this.__getPropertyValue('target') && this.__getPropertyValue('property')){
+        if(this.target && this.property){
            
-            let path = this.__getPropertyValue('property').split('.')
+            let path = this.property.split('.')
             let propName = path.pop()
 
-            let obj = this.__getPropertyValue('target')
+            let obj = this.target
 
             while(path.length){
                 let name = path.shift()
-                obj = obj.__getPropertyValue(name)
+                obj = obj[name]
             }
 
-            obj.__resetPropertyValue(propName, this.__getPropertyValue('value'))
+            obj[propName] = this.value
         }
     }
 }

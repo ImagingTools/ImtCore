@@ -1188,7 +1188,7 @@ class Instruction {
                     if(this.checkDefineProperty(assignProperty.name)){
                         // lazyCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
                         classCode.add(`${assignProperty.value.name}.__addLink()`)
-                        classCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
+                        classCode.add(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
                         lazyCode.add(`${this.name}.__properties['${assignProperty.name}']='JQObject'`)
                     } else {
                         lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${assignProperty.value.name}`)
@@ -1199,8 +1199,8 @@ class Instruction {
                         // lazyCode.add(`${assignProperty.value.toCode()}`)
                         // lazyCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
                         classCode.add(`${assignProperty.value.toCode()}`)
-                        classCode.add(`${assignProperty.value.name}.__addLink()`)
-                        classCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
+                        // classCode.add(`${assignProperty.value.name}.__addLink()`)
+                        classCode.add(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
                         lazyCode.add(`${this.name}.__properties['${assignProperty.name}']='JQObject'`)
                     } else {    
                         lazyCode.add(`${assignProperty.value.toCode()}`)
@@ -1225,10 +1225,10 @@ class Instruction {
                     } else {
                         // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
                         if(names.length > 1){
-                            code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){return ${stat.value}}`)
-                            code.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
+                            lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){return ${stat.value}}`)
+                            lazyCode.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
                         } else {
-                            code.add(`${this.name}.__properties['${assignProperty.name}']=function(){return ${stat.value}}`)
+                            lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=function(){return ${stat.value}}`)
                         }
                         
                     }
@@ -1238,7 +1238,7 @@ class Instruction {
                         code.add(`${this.name}['${names[0]}'].__updateProperties()`)
                     } else {
                         if(this.checkDefineProperty(assignProperty.name)){
-                            classCode.add(`${this.name}.__self['${assignProperty.name}']=${stat.value}`)
+                            classCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
                         } else {
                             // lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
                             lazyCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
