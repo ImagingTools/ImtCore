@@ -30,6 +30,12 @@ bool CTransactionableUndoManagerComp::StartTransaction()
 }
 
 
+bool CTransactionableUndoManagerComp::CancelTransaction()
+{
+	return false;
+}
+
+
 bool CTransactionableUndoManagerComp::EndTransaction()
 {
 	if (!m_updateInProgress && m_transactionInProgress){

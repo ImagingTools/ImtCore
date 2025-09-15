@@ -1,6 +1,6 @@
 #pragma once
 
- 
+
 // Qt includes
 #include <QtCore/QReadWriteLock>
 #include <QtSql/QtSql>
@@ -8,9 +8,10 @@
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/COptionsManager.h>
+#include <iprm/IEnableableParam.h>
 
 // ImtCore includes
-#include <imtbase/IObjectCollection.h>
+#include <imtdb/ISqlDatabaseObjectCollection.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IMetaInfoCreator.h>
@@ -29,14 +30,15 @@ namespace imtdb
 */
 class CSqlDatabaseObjectCollectionComp:
 			public QObject,
-			virtual public imtbase::IObjectCollection,
-			public ilog::CLoggerComponentBase
+			public ilog::CLoggerComponentBase,
+			virtual public imtdb::ISqlDatabaseObjectCollection
 {
 	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSqlDatabaseObjectCollectionComp);
+		I_REGISTER_INTERFACE(imtdb::ISqlDatabaseObjectCollection);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
@@ -50,6 +52,11 @@ public:
 	I_END_COMPONENT;
 
 	CSqlDatabaseObjectCollectionComp();
+
+	// reimplemented (ISqlDatabaseObjectCollection)
+	virtual QByteArray GetDatabaseId() const override;
+	virtual bool AreInternalTransactionsEnabled() const override;
+	virtual bool SetInternalTransactionsEnabled(bool isEnabled) override;
 
 	// reimplemented (imtbase::IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
@@ -154,6 +161,9 @@ private:
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;
 
 	bool m_isInitialized;
+
+	mutable QRecursiveMutex m_transactionDisableCountersMutex;
+	QMap<int, int> m_transactionDisableCounters;
 };
 
 

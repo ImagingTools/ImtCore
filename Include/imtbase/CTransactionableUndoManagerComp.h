@@ -27,6 +27,7 @@ public:
 
 	// reimplemented (ITransactionManager)
 	virtual bool StartTransaction() override;
+	virtual bool CancelTransaction() override;
 	virtual bool EndTransaction() override;
 
 	// reimplemented (imod::IObserver)

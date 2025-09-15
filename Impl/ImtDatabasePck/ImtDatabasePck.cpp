@@ -120,6 +120,11 @@ I_EXPORT_COMPONENT(
 			"SQLite X-Path extractor",
 			"SQLite XPath Extractor");
 
+I_EXPORT_COMPONENT(
+			SqlDatabaseTransactionManager,
+			"SQL database transaction manager",
+			"SQL Database Transaction Manager");
+
 
 } // namespace ImtDatabasePck
 

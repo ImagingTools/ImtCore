@@ -13,6 +13,7 @@ class ITransactionManager: virtual public istd::IChangeable
 {
 public:
 	virtual bool StartTransaction() = 0;
+	virtual bool CancelTransaction() = 0;
 	virtual bool EndTransaction() = 0;
 };
 

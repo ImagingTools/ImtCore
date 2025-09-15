@@ -30,6 +30,55 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 }
 
 
+// reimplemented (ISqlDatabaseObjectCollection)
+
+QByteArray CSqlDatabaseObjectCollectionComp::GetDatabaseId() const
+{
+	return QByteArrayLiteral("");
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::AreInternalTransactionsEnabled() const
+{
+	QMutexLocker locker(&m_transactionDisableCountersMutex);
+
+	int threadId = (int)(QThread::currentThread());
+
+	return !m_transactionDisableCounters.contains(threadId);
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::SetInternalTransactionsEnabled(bool isEnabled)
+{
+	QMutexLocker locker(&m_transactionDisableCountersMutex);
+
+	int threadId = (int)(QThread::currentThread());
+
+	if (m_transactionDisableCounters.contains(threadId)){
+		Q_ASSERT(m_transactionDisableCounters[threadId] > 0);
+
+		if (!isEnabled){
+			m_transactionDisableCounters[threadId]++;
+		}
+		else{
+			if (--m_transactionDisableCounters[threadId] == 0){
+				m_transactionDisableCounters.remove(threadId);
+			}
+		}
+	}
+	else{
+		if (!isEnabled){
+			m_transactionDisableCounters[threadId] = 1;
+		}
+		else{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 // reimplemented (imtbase::IObjectCollection)
 
 const imtbase::IRevisionController* CSqlDatabaseObjectCollectionComp::GetRevisionController() const
@@ -787,8 +836,12 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 
 	QStringList queryList = QString::fromUtf8(sqlQuery).split(';');
 
-	if(!m_dbEngineCompPtr->BeginTransaction()){
-		qCritical() << "Failed to begin SQL transaction with queries:" << sqlQuery;
+	if (AreInternalTransactionsEnabled()){
+		if (!m_dbEngineCompPtr->BeginTransaction()){
+			qCritical() << "Failed to begin SQL transaction with queries:" << sqlQuery;
+
+			return false;
+		}
 	}
 
 	for (QString& singleQuery: queryList){
@@ -801,19 +854,24 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 
 				qDebug() << "SQL-error: " << singleQuery;
 
-				m_dbEngineCompPtr->CancelTransaction();
+				if (AreInternalTransactionsEnabled()){
+					m_dbEngineCompPtr->CancelTransaction();
+				}
 
 				return false;
 			}
 		}
 	}
 
-	const bool transactionSuccess = m_dbEngineCompPtr->FinishTransaction();
-	if(!transactionSuccess){
-		qCritical() << "Failed to finish SQL transaction with queries:" << sqlQuery;
+	if (AreInternalTransactionsEnabled()){
+		if (!m_dbEngineCompPtr->FinishTransaction()){
+			qCritical() << "Failed to finish SQL transaction with queries:" << sqlQuery;
+
+			return false;
+		}
 	}
 
-	return transactionSuccess;
+	return true;
 }
 
 
@@ -825,8 +883,12 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 		return false;
 	}
 
-	if(!m_dbEngineCompPtr->BeginTransaction()){
-		qCritical() << "Failed to begin SQL transaction with queries:" << sqlQuery;
+	if (AreInternalTransactionsEnabled()){
+		if (!m_dbEngineCompPtr->BeginTransaction()){
+			qCritical() << "Failed to begin SQL transaction with queries:" << sqlQuery;
+
+			return false;
+		}
 	}
 
 	QSqlError error;
@@ -836,17 +898,22 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 		SendErrorMessage(0, error.text(), "Database collection");
 		qDebug() << "SQL-error: " << sqlQuery;
 
-		m_dbEngineCompPtr->CancelTransaction();
+		if (AreInternalTransactionsEnabled()){
+			m_dbEngineCompPtr->CancelTransaction();
+		}
 
 		return false;
 	}
 
-	const bool transactionSuccess = m_dbEngineCompPtr->FinishTransaction();
-	if(!transactionSuccess){
-		qCritical() << "Failed to finish SQL transaction with queries:" << sqlQuery;
+	if (AreInternalTransactionsEnabled()){
+		if (!m_dbEngineCompPtr->FinishTransaction()){
+			qCritical() << "Failed to finish SQL transaction with queries:" << sqlQuery;
+
+			return false;
+		}
 	}
 
-	return transactionSuccess;
+	return true;
 }
 
 

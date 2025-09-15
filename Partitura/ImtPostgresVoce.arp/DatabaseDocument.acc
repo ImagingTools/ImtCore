@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5422" Description="ACF"/>
             <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395267" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -132,6 +132,7 @@
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="SqlDatabaseCollection"/>
         <Interface InterfaceId="imtbase::IRevisionController" ComponentId="DatabaseDelegate"/>
         <Interface InterfaceId="imtdb::IDependentMetaInfoController" ComponentId="DatabaseDelegate"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectCollection" ComponentId="SqlDatabaseCollection"/>
         <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="DatabaseDelegate"/>
         <Interface InterfaceId="imtdb::ISqlJsonXPathExtractor" ComponentId="PostgresXPathExtractor"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="SqlDatabaseCollection"/>
