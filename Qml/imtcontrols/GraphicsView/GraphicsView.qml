@@ -219,8 +219,8 @@ Rectangle {
 
 
 	function designSchemeChanged(scheme){
-		//console.log("designSchemeChanged!!!!")
-		requestPaintPauseLong.restart()
+		console.log("designSchemeChanged!!!!")
+		requestPaintPauseVeryLong.restart()
 	}
 
 	function appSizeChanged(params){
@@ -566,9 +566,7 @@ Rectangle {
 								canvas.editShape = shape;
 							}
 						}
-						if(!graphicsView.isPointsDeletionMode && !graphicsView.isPointsAdditionMode){
-							shape.isSelected = true;
-						}
+						shape.isSelected = true;
 					}
 					else {
 						graphicsView.clearSelection()
@@ -618,12 +616,6 @@ Rectangle {
 							if(graphicsView.isEditMode){
 								canvas.editShape = shape;
 							}
-						}
-						if(graphicsView.isPointsDeletionMode && shape.isSelected){
-							shape.deletePoint(Qt.point(mouse.x, mouse.y))
-						}
-						if(graphicsView.isPointsAdditionMode && shape.isSelected){
-							shape.addPoint(Qt.point(mouse.x, mouse.y))
 						}
 						shape.isSelected = true;
 					}
@@ -879,6 +871,14 @@ Rectangle {
 			PauseAnimation {
 				id: requestPaintPauseLong;
 				duration: 100
+				onFinished: {
+					canvas.requestPaint();
+				}
+			}
+
+			PauseAnimation {
+				id: requestPaintPauseVeryLong;
+				duration: 500
 				onFinished: {
 					canvas.requestPaint();
 				}
