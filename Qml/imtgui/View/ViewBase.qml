@@ -25,6 +25,10 @@ Item {
 	property alias commandsViewComp: headerViewLoader.sourceComponent;
 	
 	property bool readOnly: false;
+
+	property string contentColor: Style.backgroundColor2
+
+	property bool commandsPanelVisible: true
 	
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId);
@@ -69,7 +73,7 @@ Item {
 		anchors.right: parent.right;
 		height: visible ? Style.controlHeightM + 2 * Style.marginM : 0;
 		objectName: "ViewBase";
-		visible: headerViewLoader.item && viewBase.commandsController != null;
+		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
 		
 		Loader {
 			id: headerViewLoader;
@@ -90,7 +94,7 @@ Item {
 		width: parent.width;
 		height: visible ? 1 : 0;
 		color: Style.borderColor;
-		visible: headerViewLoader.item && viewBase.commandsController != null;
+		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
 		objectName: "ViewBase";
 	}
 	
@@ -101,7 +105,7 @@ Item {
 		anchors.right: parent.right;
 		anchors.bottom: parent.bottom;
 		objectName: "ViewBase";
-		color: Style.backgroundColor2;
+		color: viewBase.contentColor;
 	}
 	
 	Component.onCompleted: {
