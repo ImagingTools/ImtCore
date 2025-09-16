@@ -163,7 +163,7 @@ private:
 	bool m_isInitialized;
 
 	mutable QRecursiveMutex m_transactionDisableCountersMutex;
-	QMap<int, int> m_transactionDisableCounters;
+	QMap<Qt::HANDLE, int> m_transactionDisableCounters;
 };
 
 

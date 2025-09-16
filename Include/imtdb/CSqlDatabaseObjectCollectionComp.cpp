@@ -42,7 +42,7 @@ bool CSqlDatabaseObjectCollectionComp::AreInternalTransactionsEnabled() const
 {
 	QMutexLocker locker(&m_transactionDisableCountersMutex);
 
-	int threadId = (int)(QThread::currentThread());
+	Qt::HANDLE threadId = QThread::currentThreadId();
 
 	return !m_transactionDisableCounters.contains(threadId);
 }
@@ -52,7 +52,7 @@ bool CSqlDatabaseObjectCollectionComp::SetInternalTransactionsEnabled(bool isEna
 {
 	QMutexLocker locker(&m_transactionDisableCountersMutex);
 
-	int threadId = (int)(QThread::currentThread());
+	Qt::HANDLE threadId = QThread::currentThreadId();
 
 	if (m_transactionDisableCounters.contains(threadId)){
 		Q_ASSERT(m_transactionDisableCounters[threadId] > 0);

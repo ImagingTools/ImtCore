@@ -21,7 +21,7 @@ public:
 
 	I_BEGIN_COMPONENT(CSqlDatabaseTransactionManagerComp);
 		I_REGISTER_INTERFACE(imtbase::ITransactionManager);
-		I_ASSIGN_MULTI_0(m_collectionCompPtr, "SqlDatabaseObjectCollection", "Sql database collections to disable their own transaction mechanism", false, "SqlDatabaseObjectCollection");
+		I_ASSIGN_MULTI_0(m_collectionCompPtr, "SqlDatabaseObjectCollection", "Sql database collections to disable their own transaction mechanism", false);
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine", false, "DatabaseEngine");
 	I_END_COMPONENT;
 
