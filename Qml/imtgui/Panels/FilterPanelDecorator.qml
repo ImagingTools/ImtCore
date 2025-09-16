@@ -18,10 +18,24 @@ DecoratorBase {
 	property CollectionFilter complexFilter: baseElement ? baseElement.complexFilter : null;
 	property DocCollectionFilter documentFilter: baseElement ? baseElement.documentFilter : null;
 	property bool canResetFilters: baseElement ? baseElement.canResetFilters : false
+	property bool hasDateFilter: true
+	property bool hasDocumentFilter: true
+
+	property alias searchTextInputWidth: tfc.width;
+	property alias clearAllButtonWidth: clearAllButton.width;
+
 
 	onBaseElementChanged: {
 		if (baseElement){
-			baseElement.registerFieldFilterDelegate("DateFilter", timeDelegateFilterComp)
+			console.log("onHasDateFilterChanged__1")
+			if (hasDateFilter){
+				baseElement.registerFieldFilterDelegate("DateFilter", timeDelegateFilterComp)
+			}
+			else {
+				console.log("onHasDateFilterChanged__2")
+				baseElement.removeFieldFilterDelegate("DateFilter")
+
+			}
 		}
 	}
 	
@@ -30,7 +44,7 @@ DecoratorBase {
 			return
 		}
 
-		if (documentFilter){
+		if (documentFilter && hasDocumentFilter){
 			baseElement.registerFieldFilterDelegate("DocumentState", stateDelegateFilterComp)
 		}
 		else{

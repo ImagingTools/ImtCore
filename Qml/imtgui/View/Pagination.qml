@@ -190,103 +190,45 @@ Row {
 			anchors.verticalCenter: parent.verticalCenter;
 			text: qsTr("Per page: ")
 		}
+		
+		TreeItemModel {
+			id: perPagemodel
+			Component.onCompleted: {
+				let index = insertNewItem()
+				setData("id", "25", index)
+				setData("name", "25", index)
 
-		Button {
-			id: count25;
+				index = insertNewItem()
+				setData("id", "50", index)
+				setData("name", "50", index)
 
-			anchors.verticalCenter: parent.verticalCenter;
-
-			width: 25;
-			height: Style.buttonHeightXS;
-
-			decorator: buttonDecorator;
-
-			enabled: paginationContainer.countElements != 25;
-
-			text: "25";
-
-			onClicked: {
-				paginationContainer.countElements = 25;
+				index = insertNewItem()
+				setData("id", "100", index)
+				setData("name", "100", index)
+				
+				index = insertNewItem()
+				setData("id", "250", index)
+				setData("name", "250", index)
+				
+				index = insertNewItem()
+				setData("id", "500", index)
+				setData("name", "500", index)
+				
+				comboBox.model = perPagemodel
+				comboBox.currentIndex = 0
 			}
 		}
+		
+		ComboBox {
+			id: comboBox
+			width: 65
+			height: Style.buttonHeightXS
 
-		Button {
-			id: count50;
-
-			anchors.verticalCenter: parent.verticalCenter;
-
-			width: 25;
-			height: Style.buttonHeightXS;
-
-			decorator: buttonDecorator;
-
-			enabled: paginationContainer.countElements != 50;
-
-			text: "50";
-
-			onClicked: {
-				paginationContainer.countElements = 50;
-			}
-		}
-
-		Item {
-
-		}
-
-		Button {
-			id: count100;
-
-			anchors.verticalCenter: parent.verticalCenter;
-
-			width: 50;
-			height: Style.buttonHeightXS;
-
-			decorator: buttonDecorator;
-
-			enabled: paginationContainer.countElements != 100;
-
-			text: "100";
-
-			onClicked: {
-				paginationContainer.countElements = 100;
-			}
-		}
-
-		Button {
-			id: count250;
-
-			anchors.verticalCenter: parent.verticalCenter;
-
-			width: 50;
-			height: Style.buttonHeightXS;
-
-			decorator: buttonDecorator;
-
-			enabled: paginationContainer.countElements != 250;
-
-			text: "250";
-
-			onClicked: {
-				paginationContainer.countElements = 250;
-			}
-		}
-
-		Button {
-			id: count500;
-
-			anchors.verticalCenter: parent.verticalCenter;
-
-			width: 50;
-			height: Style.buttonHeightXS;
-
-			decorator: buttonDecorator;
-
-			enabled: paginationContainer.countElements != 500;
-
-			text: "500";
-
-			onClicked: {
-				paginationContainer.countElements = 500;
+			onCurrentIndexChanged: {
+				if (currentIndex >= 0){
+					let itemId = model.getData("id", currentIndex)
+					paginationContainer.countElements = Number(itemId)
+				}
 			}
 		}
 	}

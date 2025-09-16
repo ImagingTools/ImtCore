@@ -250,9 +250,9 @@ ViewBase {
 
 				selectionManager.selectMultiple(selectedIndexes)
 				
-				collectionViewBaseContainer.elementsChanged();
-				
 				selectionBlock = false
+				
+				collectionViewBaseContainer.elementsChanged();
 			}
 			
 			onHeadersChanged: {
