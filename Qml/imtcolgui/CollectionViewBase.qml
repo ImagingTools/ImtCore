@@ -17,6 +17,7 @@ ViewBase {
 	
 	property bool hasSort: true;
 	property bool canResetFilters: true;
+	property bool headerRightClickEnabled: true;
 	property alias isMultiCheckable: tableInternal.isMultiCheckable;
 	
 	property alias filterMenu: filterMenu_;
@@ -267,7 +268,9 @@ ViewBase {
 			}
 			
 			onHeaderRightMouseClicked: {
-				ModalDialogManager.openDialog(tableHeaderParamComp, {});
+				if(collectionViewBaseContainer.headerRightClickEnabled){
+					ModalDialogManager.openDialog(tableHeaderParamComp, {});
+				}
 			}
 			
 			onRightButtonMouseClicked: {

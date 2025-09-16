@@ -7,7 +7,7 @@ import imtcontrols 1.0
 
 Item {
 	id: root;
-	
+
 	property alias viewId: container.viewId;
 	property alias collectionId: container.collectionId;
 	
@@ -40,7 +40,12 @@ Item {
 	property alias scrollbarItem: container.scrollbarItem
 	property alias scrollbarItemHoriz: container.scrollbarItemHoriz
 
+	property alias contentColor: container.contentColor;
+
 	property bool visibleMetaInfo: false;
+	property bool headerRightClickEnabled: true;
+	property bool commandsPanelVisible: true
+
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
 	
@@ -202,6 +207,9 @@ Item {
 		anchors.bottom: parent.bottom;
 		anchors.left: parent.left;
 		anchors.right: collectionMetaInfo.left;
+
+		headerRightClickEnabled: root.headerRightClickEnabled;
+		commandsPanelVisible: root.commandsPanelVisible;
 		
 		onTableViewParamsAccepted: {
 			root.tableViewParamsAccepted();
