@@ -52,8 +52,8 @@ class Alias extends Property {
         target.__self[name] = {
             getter: function(){   
                 let obj = func()
-                if(!this.connected){
-                    this.connected = true
+                if(!target.__self[name].connected){
+                    target.__self[name].connected = true
                     if(obj instanceof QBaseObject){
                         Signal.get(obj, propName+'Changed').connect((oldValue, newValue)=>{
                             Signal.get(target, name+'Changed')(oldValue, newValue)
@@ -64,8 +64,8 @@ class Alias extends Property {
             },
             setter: function(val){
                 let obj = func()
-                if(!this.connected){
-                    this.connected = true
+                if(!target.__self[name].connected){
+                    target.__self[name].connected = true
                     if(obj instanceof QBaseObject){
                         Signal.get(obj, propName+'Changed').connect((oldValue, newValue)=>{
                             Signal.get(target, name+'Changed')(oldValue, newValue)
