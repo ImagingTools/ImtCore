@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtCore>
+#include <QtCore/QObject>
 
 // ACF includes
 #include <istd/istd.h>
