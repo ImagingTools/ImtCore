@@ -9,13 +9,13 @@ const JQApplication = require("../../core/JQApplication")
 
 class ListModel extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        count: {type:Real, value:0, signalName:'countChanged'},
-        dynamicRoles: {type:Bool, value:false, signalName:'dynamicRolesChanged'},
-        data: {type:List, signalName:'dataChanged'},
+        count: {type:Real, value:0, },
+        dynamicRoles: {type:Bool, value:false, },
+        data: {type:List, },
 
-        countChanged: {type:Signal, slotName:'onCountChanged', args:[]},
-        dynamicRolesChanged: {type:Signal, slotName:'onDynamicRolesChanged', args:[]},
-        dataChanged: {type:Signal, slotName:'onDataChanged', args:['topLeft', 'bottomRight', 'roles']},
+        countChanged: {type:Signal, args:[]},
+        dynamicRolesChanged: {type:Signal, args:[]},
+        dataChanged: {type:Signal, args:['topLeft', 'bottomRight', 'roles']},
     })
 
     __views = []

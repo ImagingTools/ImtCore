@@ -13,12 +13,12 @@ class Font extends GroupProperty {
         pointSize: { type: Real, value: 14/0.75},
         pixelSize: { type: Real, value: 14},
 
-        boldChanged: {type:Signal, slotName:'onBoldChanged', args:[]},
-        familyChanged: {type:Signal, slotName:'onFamilyChanged', args:[]},
-        italicChanged: {type:Signal, slotName:'onItalicChanged', args:[]},
-        underlineChanged: {type:Signal, slotName:'onUnderlineChanged', args:[]},
-        pointSizeChanged: {type:Signal, slotName:'onPointSizeChanged', args:[]},
-        pixelSizeChanged: {type:Signal, slotName:'onPixelSizeChanged', args:[]},
+        boldChanged: {type:Signal, args:[]},
+        familyChanged: {type:Signal, args:[]},
+        italicChanged: {type:Signal, args:[]},
+        underlineChanged: {type:Signal, args:[]},
+        pointSizeChanged: {type:Signal, args:[]},
+        pixelSizeChanged: {type:Signal, args:[]},
     }
 
     onChanged(){

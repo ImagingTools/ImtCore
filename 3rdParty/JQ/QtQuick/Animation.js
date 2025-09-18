@@ -45,14 +45,14 @@ class Animation extends QtObject {
         paused: { type: Bool, value: false},
         alwaysRunToEnd: { type: Bool, value: false},
 
-        loopsChanged: { type:Signal, slotName:'onLoopsChanged', args:[] },
-        runningChanged: { type:Signal, slotName:'onRunningChanged', args:[] },
-        pausedChanged: { type:Signal, slotName:'onPausedChanged', args:[] },
-        alwaysRunToEndChanged: { type:Signal, slotName:'onAlwaysRunToEndChanged', args:[] },
+        loopsChanged: { type:Signal, args:[] },
+        runningChanged: { type:Signal, args:[] },
+        pausedChanged: { type:Signal, args:[] },
+        alwaysRunToEndChanged: { type:Signal, args:[] },
 
-        started: { type:Signal, slotName:'onStarted', args:[] },
-        stopped: { type:Signal, slotName:'onStopped', args:[] },
-        finished: { type:Signal, slotName:'onFinished', args:[] },
+        started: { type:Signal, args:[] },
+        stopped: { type:Signal, args:[] },
+        finished: { type:Signal, args:[] },
     })
 
     static create(parent = null, properties = {}){

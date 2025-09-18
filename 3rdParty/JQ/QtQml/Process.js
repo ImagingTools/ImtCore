@@ -4,7 +4,7 @@ const Signal = require("./Signal")
 
 class Process extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        finished: {type:Signal, slotName:'onFinished', args:[]},
+        finished: {type:Signal, args:[]},
     })
 
 

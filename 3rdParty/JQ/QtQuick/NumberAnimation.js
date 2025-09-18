@@ -7,8 +7,8 @@ class NumberAnimation extends PropertyAnimation {
         to: { type: Real, value: 0},
         from: { type: Real, value: 0},
 
-        toChanged: { type:Signal, slotName:'onToChanged', args:[] },
-        fromChanged: { type:Signal, slotName:'onFromChanged', args:[] },
+        toChanged: { type:Signal, args:[] },
+        fromChanged: { type:Signal, args:[] },
     })
 }
 

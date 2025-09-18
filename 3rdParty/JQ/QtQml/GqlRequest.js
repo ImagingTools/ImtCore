@@ -7,8 +7,8 @@ class GqlRequest extends QtObject {
         json: { type: String, value: ''},
         state: { type: String, value: ''},
 
-        jsonChanged: {type:Signal, slotName:'onJsonChanged', args:[]},
-        stateChanged: {type:Signal, slotName:'onStateChanged', args:[]},
+        jsonChanged: {type:Signal, args:[]},
+        stateChanged: {type:Signal, args:[]},
     })
 
     setGqlQuery(gqlData, headers){

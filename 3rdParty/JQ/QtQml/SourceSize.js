@@ -4,11 +4,11 @@ const Signal = require("./Signal")
 
 class SourceSize extends GroupProperty {
     static meta = {
-        width: {type:Real, value:0, signalName:'widthChanged'},
-        height: {type:Real, value:0, signalName:'heightChanged'},
+        width: {type:Real, value:0, },
+        height: {type:Real, value:0, },
         
-        widthChanged: {type:Signal, slotName:'onWidthChanged', args:[]},
-        heightChanged: {type:Signal, slotName:'onHeightChanged', args:[]},
+        widthChanged: {type:Signal, args:[]},
+        heightChanged: {type:Signal, args:[]},
     }
 
     onChanged(){

@@ -6,21 +6,21 @@ const Signal = require("../../QtQml/Signal")
 
 class DropShadow extends Item {
     static meta = Object.assign({}, Item.meta, {
-        color: {type: Color, value:'black', signalName:'colorChanged'},
-        horizontalOffset: {type: Real, value:0, signalName:'horizontalOffsetChanged'},
-        verticalOffset: {type: Real, value:0, signalName:'verticalOffsetChanged'},
-        radius: {type: Real, value:4, signalName:'radiusChanged'},
-        samples: {type: Real, value:9, signalName:'samplesChanged'},
-        spread: {type: Real, value:0, signalName:'spreadChanged'},
-        source: {type: Var, value:undefined, signalName:'sourceChanged'},
+        color: {type: Color, value:'black', },
+        horizontalOffset: {type: Real, value:0, },
+        verticalOffset: {type: Real, value:0, },
+        radius: {type: Real, value:4, },
+        samples: {type: Real, value:9, },
+        spread: {type: Real, value:0, },
+        source: {type: Var, value:undefined, },
         
-        colorChanged: {type:Signal, slotName:'onColorChanged', args:[]},
-        horizontalOffsetChanged: {type:Signal, slotName:'onHorizontalOffsetChanged', args:[]},
-        verticalOffsetChanged: {type:Signal, slotName:'onVerticalOffsetChanged', args:[]},
-        radiusChanged: {type:Signal, slotName:'onRadiusChanged', args:[]},
-        samplesChanged: {type:Signal, slotName:'onSamplesChanged', args:[]},
-        spreadChanged: {type:Signal, slotName:'onSpreadChanged', args:[]},
-        sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},
+        colorChanged: {type:Signal, args:[]},
+        horizontalOffsetChanged: {type:Signal, args:[]},
+        verticalOffsetChanged: {type:Signal, args:[]},
+        radiusChanged: {type:Signal, args:[]},
+        samplesChanged: {type:Signal, args:[]},
+        spreadChanged: {type:Signal, args:[]},
+        sourceChanged: {type:Signal, args:[]},
     })
 
     SLOT_visibleChanged(oldValue, newValue){

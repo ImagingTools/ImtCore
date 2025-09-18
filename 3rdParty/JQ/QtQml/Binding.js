@@ -20,12 +20,12 @@ class Binding extends QtObject {
         value: { type: Var, value: undefined},
         when: { type: Bool, value: true},
 
-        delayedChanged: {type:Signal, slotName:'onDelayedChanged', args:[]},
-        propertyChanged: {type:Signal, slotName:'onPropertyChanged', args:[]},
-        restoreModeChanged: {type:Signal, slotName:'onRestoreModeChanged', args:[]},
-        targetChanged: {type:Signal, slotName:'onTargetChanged', args:[]},
-        valueChanged: {type:Signal, slotName:'onValueChanged', args:[]},
-        whenChanged: {type:Signal, slotName:'onWhenChanged', args:[]},
+        delayedChanged: {type:Signal, args:[]},
+        propertyChanged: {type:Signal, args:[]},
+        restoreModeChanged: {type:Signal, args:[]},
+        targetChanged: {type:Signal, args:[]},
+        valueChanged: {type:Signal, args:[]},
+        whenChanged: {type:Signal, args:[]},
     })
 
     __complete(){

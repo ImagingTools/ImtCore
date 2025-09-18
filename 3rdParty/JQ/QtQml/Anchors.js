@@ -26,23 +26,23 @@ class Anchors extends GroupProperty {
         // horizontalCenterOffset: { type: real, value: 0},
         // verticalCenterOffset: { type: real, value: 0},
 
-        fillChanged: {type:Signal, slotName:'onFillChanged', args:[]},
-        centerInChanged: {type:Signal, slotName:'onCenterInChanged', args:[]},
+        fillChanged: {type:Signal, args:[]},
+        centerInChanged: {type:Signal, args:[]},
 
 
-        leftMarginChanged: {type:Signal, slotName:'onLeftMarginChanged', args:[]},
-        topMarginChanged: {type:Signal, slotName:'onTopMarginChanged', args:[]},
-        rightMarginChanged: {type:Signal, slotName:'onRightMarginChanged', args:[]},
-        bottomMarginChanged: {type:Signal, slotName:'onBottomMarginChanged', args:[]},
+        leftMarginChanged: {type:Signal, args:[]},
+        topMarginChanged: {type:Signal, args:[]},
+        rightMarginChanged: {type:Signal, args:[]},
+        bottomMarginChanged: {type:Signal, args:[]},
 
-        leftChanged: {type:Signal, slotName:'onLeftChanged', args:[]},
-        topChanged: {type:Signal, slotName:'onTopChanged', args:[]},
-        rightChanged: {type:Signal, slotName:'onRightChanged', args:[]},
-        bottomChanged: {type:Signal, slotName:'onBottomChanged', args:[]},
-        horizontalCenterChanged: {type:Signal, slotName:'onHorizontalCenterChanged', args:[]},
-        verticalCenterChanged: {type:Signal, slotName:'onVerticalCenterChanged', args:[]},
+        leftChanged: {type:Signal, args:[]},
+        topChanged: {type:Signal, args:[]},
+        rightChanged: {type:Signal, args:[]},
+        bottomChanged: {type:Signal, args:[]},
+        horizontalCenterChanged: {type:Signal, args:[]},
+        verticalCenterChanged: {type:Signal, args:[]},
 
-        marginsChanged: {type:Signal, slotName:'onMarginsChanged', args:[]},
+        marginsChanged: {type:Signal, args:[]},
     }
 
     SLOT_fillChanged(oldValue, newValue){

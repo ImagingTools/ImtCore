@@ -8,11 +8,11 @@ class Gradient extends QtObject {
     static Horizontal = 1
 
     static meta = Object.assign({}, QtObject.meta, {
-        stops: {type:Var, value:undefined, signalName:'stopsChanged'},
-        orientation: {type:Real, value:Gradient.Vertical, signalName:'orientationChanged'},
+        stops: {type:Var, value:undefined, },
+        orientation: {type:Real, value:Gradient.Vertical, },
 
-        stopsChanged: {type:Signal, slotName:'onStopsChanged', args:[]},
-        orientationChanged: {type:Signal, slotName:'onOrientationChanged', args:[]},
+        stopsChanged: {type:Signal, args:[]},
+        orientationChanged: {type:Signal, args:[]},
     })
 
     __rects = new Set()

@@ -16,11 +16,11 @@ class DoubleValidator extends QtObject {
         decimals: { type: Real, value: 1000},
         notation: { type: Real, value: DoubleValidator.ScientificNotation},
 
-        bottomChanged: { type:Signal, slotName:'onBottomChanged', args:[] },
-        topChanged: { type:Signal, slotName:'onTopChanged', args:[] },
-        localeChanged: { type:Signal, slotName:'onLocaleChanged', args:[] },
-        decimalsChanged: { type:Signal, slotName:'onDecimalsChanged', args:[] },
-        notationChanged: { type:Signal, slotName:'onNotationChanged', args:[] },
+        bottomChanged: { type:Signal, args:[] },
+        topChanged: { type:Signal, args:[] },
+        localeChanged: { type:Signal, args:[] },
+        decimalsChanged: { type:Signal, args:[] },
+        notationChanged: { type:Signal, args:[] },
     })
 
     getRegExpForNotation() {

@@ -5,12 +5,12 @@ const Signal = require("./Signal")
 
 class QObject extends QBaseObject {
     static meta = {
-        parent: {type:Var, signalName:'parentChanged'},
+        parent: {type:Var, },
         objectName: {type:String, value:''},
 
-        parentChanged: {type:Signal, slotName:'onParentChanged', args:[]},
+        parentChanged: {type:Signal, args:[]},
 
-        JQDestruction: {type:Signal, slotName:'onJQDestruction', args:[]},
+        JQDestruction: {type:Signal, args:[]},
     }
 
     static create(parent = null, properties = {}){
@@ -48,8 +48,6 @@ class QObject extends QBaseObject {
     }
 
     __children = []
-    __simpleProperties = []
-    __aliases = []
 
     setParent(parent){
         this.__proxy.parent = parent
@@ -59,8 +57,6 @@ class QObject extends QBaseObject {
         if(this.__dynamic){
             delete this.__dynamic
             this.__updatePrimaryProperties()
-            this.__updateAliases()
-            this.__updateSimpleProperties()
             this.__updateProperties()
             this.__complete()
             this.__completeProperties()
@@ -82,39 +78,12 @@ class QObject extends QBaseObject {
         }
     }
 
-    __updateAliases(){
-        if(!this.__aliases) return
-        
-        for(let func of this.__aliases){
-            func.call(this)
-        }
-
-        delete this.__aliases
-
-        for(let i = this.__children.length-1; i >= 0; i--){
-            this.__children[i].__updateAliases()
-        }
-    }
-
     __updatePrimaryProperties(){
         for(let i = this.__children.length-1; i >= 0; i--){
             this.__children[i].__updatePrimaryProperties()
         }
     }
 
-    __updateSimpleProperties(){
-        for(let i = this.__children.length-1; i >= 0; i--){
-            this.__children[i].__updateSimpleProperties()
-        }
-
-        if(!this.__simpleProperties) return
-        
-        for(let func of this.__simpleProperties){
-            func.call(this)
-        }
-
-        delete this.__simpleProperties
-    }
 
     __updateProperty(propName){
         if(!(propName in this.__properties)) return
@@ -130,8 +99,6 @@ class QObject extends QBaseObject {
 
         if(value instanceof QObject){
             value.__updatePrimaryProperties()
-            value.__updateAliases()
-            value.__updateSimpleProperties()
             value.__updateProperties()
             value.__complete()
             value.__completeProperties()
@@ -171,8 +138,6 @@ class QObject extends QBaseObject {
 
             let obj = this.__proxy[path[0]]
             obj.__updatePrimaryProperties()
-            obj.__updateAliases()
-            obj.__updateSimpleProperties()
             obj.__updateProperties()
             obj.__complete()
             obj.__completeProperties()

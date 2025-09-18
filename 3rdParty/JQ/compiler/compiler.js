@@ -1146,12 +1146,8 @@ class Instruction {
 
 
                     resultCode.add(properties.aliasCode)
-
-
-                    resultCode.add(`${assignProperty.value.name}.__simpleProperties.push(function(){`)
-                    
                     resultCode.add(properties.code)
-                    resultCode.add(`})`)
+
 
                     // // children 
 
@@ -1167,7 +1163,7 @@ class Instruction {
                     // resultCode.add(assignProperty.value.getConnectedSignals())
                     resultCode.add(`${assignProperty.value.name}.__${assignProperty.value.className}__${assignProperty.value.name}=true`)
 
-                    resultCode.add(`if(isRoot) {${assignProperty.value.name}.__updatePrimaryProperties();${assignProperty.value.name}.__updateAliases();${assignProperty.value.name}.__updateSimpleProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__complete();${assignProperty.value.name}.__completeProperties()}`)
+                    resultCode.add(`if(isRoot) {${assignProperty.value.name}.__updatePrimaryProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__complete();${assignProperty.value.name}.__completeProperties()}`)
 
                     resultCode.add(`return ${assignProperty.value.name}`)
 
@@ -1376,12 +1372,8 @@ class Instruction {
 
  
         code.add(properties.aliasCode)
-
-
-        code.add(`${this.children[0].name}.__simpleProperties.push(function(){`)
-        
         code.add(properties.code)
-        code.add(`})`)
+
 
         // // children 
 
@@ -1397,7 +1389,7 @@ class Instruction {
         // code.add(this.children[0].getConnectedSignals())
         code.add(`${this.children[0].name}.__${this.children[0].className}__${this.children[0].name}=true`)
 
-        code.add(`if(isRoot) {${this.children[0].name}.__updatePrimaryProperties();${this.children[0].name}.__updateAliases();${this.children[0].name}.__updateSimpleProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__complete();${this.children[0].name}.__completeProperties()}`)
+        code.add(`if(isRoot) {${this.children[0].name}.__updatePrimaryProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__complete();${this.children[0].name}.__completeProperties()}`)
 
         code.add(`return ${this.children[0].name}`)
 
@@ -1455,12 +1447,8 @@ class Instruction {
 
                 
                 ${properties.aliasCode}
-                
-
-                ${this.name}.__simpleProperties.push(function(){
-                
                 ${properties.code}
-                })
+                
                 
                 return ${this.name}
             }
@@ -1626,11 +1614,7 @@ class QmlFile {
 
         code.add(properties.aliasCode)
 
-
-        code.add(`${this.instruction.name}.__simpleProperties.push(function(){`)
-        
         code.add(properties.code)
-        code.add(`})`)
 
         // children
 
@@ -1646,7 +1630,7 @@ class QmlFile {
         // code.add(this.instruction.getConnectedSignals())
         code.add(`${this.instruction.name}.__${this.instruction.className}__${this.instruction.name}=true`)
 
-        code.add(`if(isRoot) {${this.instruction.name}.__updatePrimaryProperties();${this.instruction.name}.__updateAliases();${this.instruction.name}.__updateSimpleProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__complete();${this.instruction.name}.__completeProperties()}`)
+        code.add(`if(isRoot) {${this.instruction.name}.__updatePrimaryProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__complete();${this.instruction.name}.__completeProperties()}`)
 
         code.add(`return ${this.instruction.name}`)
 

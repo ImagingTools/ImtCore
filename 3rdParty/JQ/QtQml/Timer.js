@@ -10,12 +10,12 @@ class Timer extends QtObject {
         running: { type: Bool, value: false},
         triggeredOnStart: { type: Bool, value: false},
 
-        intervalChanged: {type:Signal, slotName:'onIntervalChanged', args:[]},
-        repeatChanged: {type:Signal, slotName:'onRepeatChanged', args:[]},
-        runningChanged: {type:Signal, slotName:'onRunningChanged', args:[]},
-        triggeredOnStartChanged: {type:Signal, slotName:'onTriggeredOnStartChanged', args:[]},
+        intervalChanged: {type:Signal, args:[]},
+        repeatChanged: {type:Signal, args:[]},
+        runningChanged: {type:Signal, args:[]},
+        triggeredOnStartChanged: {type:Signal, args:[]},
 
-        triggered: {type:Signal, slotName:'onTriggered', args:[]},
+        triggered: {type:Signal, args:[]},
     })
 
     __timer = null

@@ -29,24 +29,24 @@ class Image extends Item {
     static AlignVCenter = 2
 
     static meta = Object.assign({}, Item.meta, {
-        progress: {type: Real, value:0, signalName:'progressChanged'},
-        source: {type: String, value:'', signalName:'sourceChanged'},
+        progress: {type: Real, value:0, },
+        source: {type: String, value:'', },
         sourceSize: {type: SourceSize},
-        fillMode: {type: Real, value:Image.Stretch, signalName:'fillModeChanged'},
-        status: {type: Real, value:Image.Null, signalName:'statusChanged'},
-        paintedWidth: {type:Real, value:0, signalName:'paintedWidthChanged'},
-        paintedHeight: {type:Real, value:0, signalName:'paintedHeightChanged'},
-        horizontalAlignment: {type:Real, value:Image.AlignHCenter, signalName:'horizontalAlignmentChanged'},
-        verticalAlignment: {type:Real, value:Image.AlignVCenter, signalName:'verticalAlignmentChanged'},
+        fillMode: {type: Real, value:Image.Stretch, },
+        status: {type: Real, value:Image.Null, },
+        paintedWidth: {type:Real, value:0, },
+        paintedHeight: {type:Real, value:0, },
+        horizontalAlignment: {type:Real, value:Image.AlignHCenter, },
+        verticalAlignment: {type:Real, value:Image.AlignVCenter, },
         
-        progressChanged: {type:Signal, slotName:'onProgressChanged', args:[]},
-        sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},
-        fillModeChanged: {type:Signal, slotName:'onFillModeChanged', args:[]},
-        statusChanged: {type:Signal, slotName:'onStatusChanged', args:[]},
-        paintedWidthChanged: {type:Signal, slotName:'onPaintedWidthChanged', args:[]},
-        paintedHeightChanged: {type:Signal, slotName:'onPaintedHeightChanged', args:[]},
-        horizontalAlignmentChanged: {type:Signal, slotName:'onHorizontalAlignmentChanged', args:[]},
-        verticalAlignmentChanged: {type:Signal, slotName:'onVerticalAlignmentChanged', args:[]},
+        progressChanged: {type:Signal, args:[]},
+        sourceChanged: {type:Signal, args:[]},
+        fillModeChanged: {type:Signal, args:[]},
+        statusChanged: {type:Signal, args:[]},
+        paintedWidthChanged: {type:Signal, args:[]},
+        paintedHeightChanged: {type:Signal, args:[]},
+        horizontalAlignmentChanged: {type:Signal, args:[]},
+        verticalAlignmentChanged: {type:Signal, args:[]},
     })
 
     static create(parent = null, properties = {}){

@@ -8,19 +8,19 @@ const Signal = require("../../QtQml/Signal")
 
 class TreeItemModel extends JSONListModel {
     static meta = Object.assign({}, JSONListModel.meta, {
-        infoPath: {type:Var, value:undefined, signalName:'infoPathChanged'},
-        queryParams: {type:Var, value:undefined, signalName:'queryParamsChanged'},
-        baseUrl: {type:String, value:'', signalName:'baseUrlChanged'},
-        isArray: {type:Bool, value:false, signalName:'isArrayChanged'},
-        isUpdateEnabled: {type:Bool, value:true, signalName:'isUpdateEnabledChanged'},
+        infoPath: {type:Var, value:undefined, },
+        queryParams: {type:Var, value:undefined, },
+        baseUrl: {type:String, value:'', },
+        isArray: {type:Bool, value:false, },
+        isUpdateEnabled: {type:Bool, value:true, },
 
-        infoPathChanged: {type:Signal, slotName:'onInfoPathChanged', args:[]},
-        queryParamsChanged: {type:Signal, slotName:'onQueryParamsChanged', args:[]},
-        baseUrlChanged: {type:Signal, slotName:'onBaseUrlChanged', args:[]},
-        isArrayChanged: {type:Signal, slotName:'onIsArrayChanged', args:[]},
-        isUpdateEnabledChanged: {type:Signal, slotName:'onIsUpdateEnabledChanged', args:[]},
+        infoPathChanged: {type:Signal, args:[]},
+        queryParamsChanged: {type:Signal, args:[]},
+        baseUrlChanged: {type:Signal, args:[]},
+        isArrayChanged: {type:Signal, args:[]},
+        isUpdateEnabledChanged: {type:Signal, args:[]},
 
-        modelChanged: {type:Signal, slotName:'onModelChanged', args:['changeset']},
+        modelChanged: {type:Signal, args:['changeset']},
     })
 
     __m_countChanges = 0

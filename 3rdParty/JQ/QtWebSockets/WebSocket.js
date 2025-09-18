@@ -21,16 +21,16 @@ class QWebSocket extends QtObject {
         negotiatedSubprotocol: { type: String, value: ''},
         requestedSubprotocols: { type: Var, value: undefined},
 
-        statusChanged: {type:Signal, slotName:'onStatusChanged', args:[]},
-        urlChanged: {type:Signal, slotName:'onUrlChanged', args:[]},
-        activeChanged: {type:Signal, slotName:'onActiveChanged', args:[]},
-        errorStringChanged: {type:Signal, slotName:'onErrorStringChanged', args:[]},
-        negotiatedSubprotocolChanged: {type:Signal, slotName:'onNegotiatedSubprotocolChanged', args:[]},
-        requestedSubprotocolsChanged: {type:Signal, slotName:'onRequestedSubprotocolsChanged', args:[]},
+        statusChanged: {type:Signal, args:[]},
+        urlChanged: {type:Signal, args:[]},
+        activeChanged: {type:Signal, args:[]},
+        errorStringChanged: {type:Signal, args:[]},
+        negotiatedSubprotocolChanged: {type:Signal, args:[]},
+        requestedSubprotocolsChanged: {type:Signal, args:[]},
 
-        triggered: {type:Signal, slotName:'onTriggered', args:[]},
-        binaryMessageReceived: {type:Signal, slotName:'onBinaryMessageReceived', args:['message']},
-        textMessageReceived: {type:Signal, slotName:'onTextMessageReceived', args:['message']},
+        triggered: {type:Signal, args:[]},
+        binaryMessageReceived: {type:Signal, args:['message']},
+        textMessageReceived: {type:Signal, args:['message']},
     })
 
     SLOT_statusChanged() {

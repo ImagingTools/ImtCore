@@ -11,20 +11,20 @@ const QtPositioning = require("../QtPositioning/QtPositioning")
 
 class Map extends Item {
     static meta = Object.assign({}, Item.meta, {
-        plugin: {type: Var, value:'', signalName:'pluginChanged'},
-        center: {type: GeoCoordinate, value: QtPositioning.coordinate(0, 0), signalName:'centerChanged'},
-        zoomLevel: {type: Real, value:2, signalName:'zoomLevelChanged'},
-        copyrightsVisible: {type: Bool, value:true, signalName:'copyrightsVisibleChanged'},
-        bearing: {type: Real, value:0, signalName:'bearingChanged'},
-        mapReady: {type: Bool, value:false, signalName:'mapReadyChanged'},
+        plugin: {type: Var, value:'', },
+        center: {type: GeoCoordinate, value: QtPositioning.coordinate(0, 0), },
+        zoomLevel: {type: Real, value:2, },
+        copyrightsVisible: {type: Bool, value:true, },
+        bearing: {type: Real, value:0, },
+        mapReady: {type: Bool, value:false, },
         gesture: {type: MapGestureArea},
 
-        pluginChanged: {type:Signal, slotName:'onPluginChanged', args:[]},
-        centerChanged: {type:Signal, slotName:'onCenterChanged', args:[]},
-        zoomLevelChanged: {type:Signal, slotName:'onZoomLevelChanged', args:[]},
-        copyrightsVisibleChanged: {type:Signal, slotName:'oncopyrightsVisibleChanged', args:[]},
-        bearingChanged: {type:Signal, slotName:'onBearingChanged', args:[]},
-        mapReadyChanged: {type:Signal, slotName:'onMapReadyChanged', args:[]},
+        pluginChanged: {type:Signal, args:[]},
+        centerChanged: {type:Signal, args:[]},
+        zoomLevelChanged: {type:Signal, args:[]},
+        copyrightsVisibleChanged: {type:Signal, args:[]},
+        bearingChanged: {type:Signal, args:[]},
+        mapReadyChanged: {type:Signal, args:[]},
    
     })
 

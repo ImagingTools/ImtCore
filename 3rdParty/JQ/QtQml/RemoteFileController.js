@@ -11,19 +11,19 @@ class RemoteFileController extends QtObject {
         downloadedFilePath: { type: String, value: ''},
         prefix: { type: String, value: ''},
 
-        jsonChanged: {type:Signal, slotName:'onJsonChanged', args:[]},
-        stateChanged: {type:Signal, slotName:'onStateChanged', args:[]},
-        downloadedFileLocationChanged: {type:Signal, slotName:'onDownloadedFileLocationChanged', args:[]},
-        downloadedFilePathChanged: {type:Signal, slotName:'onDownloadedFilePathChanged', args:[]},
-        prefixChanged: {type:Signal, slotName:'onPrefixChanged', args:[]},
+        jsonChanged: {type:Signal, args:[]},
+        stateChanged: {type:Signal, args:[]},
+        downloadedFileLocationChanged: {type:Signal, args:[]},
+        downloadedFilePathChanged: {type:Signal, args:[]},
+        prefixChanged: {type:Signal, args:[]},
 
-        progress: {type:Signal, slotName:'onProgress', args:['bytesLoaded', 'bytesTotal']},
-        fileDeleted: {type:Signal, slotName:'onFileDeleted', args:['url']},
-        fileDownloaded: {type:Signal, slotName:'onFileDownloaded', args:['filePath']},
-        fileUploaded: {type:Signal, slotName:'onFileUploaded', args:['url']},
-        fileExists: {type:Signal, slotName:'onFileExists', args:['url']},
-        fileDownloadFailed: {type:Signal, slotName:'onFileDownloadFailed', args:[]},
-        fileUploadFailed: {type:Signal, slotName:'onFileUploadFailed', args:[]},
+        progress: {type:Signal, args:['bytesLoaded', 'bytesTotal']},
+        fileDeleted: {type:Signal, args:['url']},
+        fileDownloaded: {type:Signal, args:['filePath']},
+        fileUploaded: {type:Signal, args:['url']},
+        fileExists: {type:Signal, args:['url']},
+        fileDownloadFailed: {type:Signal, args:[]},
+        fileUploadFailed: {type:Signal, args:[]},
     })
 
 

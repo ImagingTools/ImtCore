@@ -26,16 +26,16 @@ class FileDialog extends Dialog {
         selectedNameFilter: { type: Var, value: undefined},
         nameFilters: { type: Var, value: undefined},
 
-        acceptLabelChanged: {type:Signal, slotName:'onAcceptLabelChanged', args:[]},
-        currentFileChanged: {type:Signal, slotName:'onCurrentFileChanged', args:[]},
-        currentFilesChanged: {type:Signal, slotName:'onCurrentFilesChanged', args:[]},
-        fileModeChanged: {type:Signal, slotName:'onFileModeChanged', args:[]},
-        selectedFileChanged: {type:Signal, slotName:'onSelectedFileChanged', args:[]},
-        selectedFilesChanged: {type:Signal, slotName:'onSelectedFilesChanged', args:[]},
-        optionsChanged: {type:Signal, slotName:'onOptionsChanged', args:[]},
-        rejectLabelChanged: {type:Signal, slotName:'onRejectLabelChanged', args:[]},
-        selectedNameFilterChanged: {type:Signal, slotName:'onSelectedNameFilterChanged', args:[]},
-        nameFiltersChanged: {type:Signal, slotName:'onNameFiltersChanged', args:[]},
+        acceptLabelChanged: {type:Signal, args:[]},
+        currentFileChanged: {type:Signal, args:[]},
+        currentFilesChanged: {type:Signal, args:[]},
+        fileModeChanged: {type:Signal, args:[]},
+        selectedFileChanged: {type:Signal, args:[]},
+        selectedFilesChanged: {type:Signal, args:[]},
+        optionsChanged: {type:Signal, args:[]},
+        rejectLabelChanged: {type:Signal, args:[]},
+        selectedNameFilterChanged: {type:Signal, args:[]},
+        nameFiltersChanged: {type:Signal, args:[]},
     })
 }
 

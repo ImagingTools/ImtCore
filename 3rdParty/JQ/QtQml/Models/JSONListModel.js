@@ -4,17 +4,17 @@ const Signal = require("../../QtQml/Signal")
 
 class JSONListModel extends ListModel {
     static meta = Object.assign({}, ListModel.meta, {
-        source: {type:String, value:'', signalName:'sourceChanged'},
-        inquiry: {type:String, value:'', signalName:'inquiryChanged'},
-        json: {type:String, value:'', signalName:'jsonChanged'},
-        target: {type:String, value:'', signalName:'targetChanged'},
-        state: {type:String, value:'', signalName:'stateChanged'},
+        source: {type:String, value:'', },
+        inquiry: {type:String, value:'', },
+        json: {type:String, value:'', },
+        target: {type:String, value:'', },
+        state: {type:String, value:'', },
 
-        sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},
-        inquiryChanged: {type:Signal, slotName:'onInquiryChanged', args:[]},
-        jsonChanged: {type:Signal, slotName:'onJsonChanged', args:[]},
-        targetChanged: {type:Signal, slotName:'onTargetChanged', args:[]},
-        stateChanged: {type:Signal, slotName:'onStateChanged', args:[]},
+        sourceChanged: {type:Signal, args:[]},
+        inquiryChanged: {type:Signal, args:[]},
+        jsonChanged: {type:Signal, args:[]},
+        targetChanged: {type:Signal, args:[]},
+        stateChanged: {type:Signal, args:[]},
     })
 
     'Component.onCompleted'(){

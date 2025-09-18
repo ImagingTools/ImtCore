@@ -20,11 +20,11 @@ class FolderDialog extends Dialog {
         options: { type: Var, value: undefined},
         rejectLabel: { type: String, value: ''},
 
-        acceptLabelChanged: {type:Signal, slotName:'onAcceptLabelChanged', args:[]},
-        folderChanged: {type:Signal, slotName:'onFolderChanged', args:[]},
-        currentFolderChanged: {type:Signal, slotName:'onCurrentFolderChanged', args:[]},
-        optionsChanged: {type:Signal, slotName:'onOptionsChanged', args:[]},
-        rejectLabelChanged: {type:Signal, slotName:'onRejectLabelChanged', args:[]},
+        acceptLabelChanged: {type:Signal, args:[]},
+        folderChanged: {type:Signal, args:[]},
+        currentFolderChanged: {type:Signal, args:[]},
+        optionsChanged: {type:Signal, args:[]},
+        rejectLabelChanged: {type:Signal, args:[]},
     })
 }
 

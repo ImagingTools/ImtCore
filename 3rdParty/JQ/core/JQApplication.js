@@ -31,11 +31,11 @@ module.exports = {
             static singleton = true
             static meta = {
                 appName: {type:JQModules.QtQml.string, value:''},
-                language: {type:JQModules.QtQml.string, value:'', signalName:'languageChanged'},
+                language: {type:JQModules.QtQml.string, value:'', },
                 application: {type:JQModules.QtQml.var, value:[]},
                 location: {type:JQModules.QtQml.var, value:window.location},
 
-                languageChanged: {type:JQModules.QtQml.Signal, slotName:'onLanguageChanged', args:[]},
+                languageChanged: {type:JQModules.QtQml.Signal, args:[]},
             }
 
             static create(...args){

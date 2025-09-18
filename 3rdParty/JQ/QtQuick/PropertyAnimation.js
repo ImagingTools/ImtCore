@@ -13,12 +13,12 @@ class PropertyAnimation extends Animation {
         properties: { type: String, value: ''},
         target: { type: Var, value: undefined},
 
-        durationChanged: { type:Signal, slotName:'onDurationChanged', args:[] },
-        toChanged: { type:Signal, slotName:'onToChanged', args:[] },
-        fromChanged: { type:Signal, slotName:'onFromChanged', args:[] },
-        propertyChanged: { type:Signal, slotName:'onPropertyChanged', args:[] },
-        propertiesChanged: { type:Signal, slotName:'onPropertiesChanged', args:[] },
-        targetChanged: { type:Signal, slotName:'onTargetChanged', args:[] },
+        durationChanged: { type:Signal, args:[] },
+        toChanged: { type:Signal, args:[] },
+        fromChanged: { type:Signal, args:[] },
+        propertyChanged: { type:Signal, args:[] },
+        propertiesChanged: { type:Signal, args:[] },
+        targetChanged: { type:Signal, args:[] },
     })
 
     static create(parent, ...args){

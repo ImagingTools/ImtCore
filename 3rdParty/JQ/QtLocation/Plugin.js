@@ -6,11 +6,11 @@ const Signal = require("../QtQml/Signal")
 
 class Plugin extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        name: {type: String, value:'osm', signalName:'nameChanged'},
-        parameters: {type: Var, signalName:'parametersChanged'},
+        name: {type: String, value:'osm', },
+        parameters: {type: Var, },
 
-        nameChanged: {type:Signal, slotName:'onNameChanged', args:[]},
-        parametersChanged: {type:Signal, slotName:'onParametersChanged', args:[]},
+        nameChanged: {type:Signal, args:[]},
+        parametersChanged: {type:Signal, args:[]},
    
     })
 

@@ -6,21 +6,21 @@ const Signal = require("../QtQml/Signal")
 
 class Flow extends Item {
     static meta = Object.assign({}, Item.meta, {
-        spacing: {type: Real, value:0, signalName:'spacingChanged'},
-        padding: {type: Real, value:0, signalName:'paddingChanged'},
-        leftPadding: {type: Real, value:0, signalName:'leftPaddingChanged'},
-        topPadding: {type: Real, value:0, signalName:'topPaddingChanged'},
-        rightPadding: {type: Real, value:0, signalName:'rightPaddingChanged'},
-        bottomPadding: {type: Real, value:0, signalName:'bottomPaddingChanged'},
+        spacing: {type: Real, value:0, },
+        padding: {type: Real, value:0, },
+        leftPadding: {type: Real, value:0, },
+        topPadding: {type: Real, value:0, },
+        rightPadding: {type: Real, value:0, },
+        bottomPadding: {type: Real, value:0, },
         
-        spacingChanged: {type:Signal, slotName:'onSpacingChanged', args:[]},
-        paddingChanged: {type:Signal, slotName:'onPaddingChanged', args:[]},
-        leftPaddingChanged: {type:Signal, slotName:'onLeftPaddingChanged', args:[]},
-        topPaddingChanged: {type:Signal, slotName:'onTopPaddingChanged', args:[]},
-        rightPaddingChanged: {type:Signal, slotName:'onRightPaddingChanged', args:[]},
-        bottomPaddingChanged: {type:Signal, slotName:'onBottomPaddingChanged', args:[]},
+        spacingChanged: {type:Signal, args:[]},
+        paddingChanged: {type:Signal, args:[]},
+        leftPaddingChanged: {type:Signal, args:[]},
+        topPaddingChanged: {type:Signal, args:[]},
+        rightPaddingChanged: {type:Signal, args:[]},
+        bottomPaddingChanged: {type:Signal, args:[]},
 
-        positioningComplete: {type:Signal, slotName:'onPositioningComplete', args:[]},
+        positioningComplete: {type:Signal, args:[]},
     })
 
     static create(parent = null, properties = {}){

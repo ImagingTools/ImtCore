@@ -15,21 +15,21 @@ class Loader extends Item {
     static Error = 3
 
     static meta = Object.assign({}, Item.meta, {
-        item: {type:Var, value:undefined, signalName:'itemChanged'},
-        source: {type:String, value:'', signalName:'sourceChanged'},
-        sourceComponent: {type:Variant, typeTarget:Component, value:undefined, signalName:'sourceComponentChanged'},
-        status: {type:Real, value:Loader.Null, signalName:'statusChanged'},
-        progress: {type:Real, value:0, signalName:'progressChanged'},
-        asynchronous: {type:Bool, value:false, signalName:'asynchronousChanged'},
+        item: {type:Var, value:undefined, },
+        source: {type:String, value:'', },
+        sourceComponent: {type:Variant, typeTarget:Component, value:undefined, },
+        status: {type:Real, value:Loader.Null, },
+        progress: {type:Real, value:0, },
+        asynchronous: {type:Bool, value:false, },
 
-        itemChanged: {type:Signal, slotName:'onItemChanged', args:[]},
-        sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},
-        sourceComponentChanged: {type:Signal, slotName:'onSourceComponentChanged', args:[]},
-        statusChanged: {type:Signal, slotName:'onStatusChanged', args:[]},
-        progressChanged: {type:Signal, slotName:'onProgressChanged', args:[]},
-        asynchronousChanged: {type:Signal, slotName:'onAsynchronousChanged', args:[]},
+        itemChanged: {type:Signal, args:[]},
+        sourceChanged: {type:Signal, args:[]},
+        sourceComponentChanged: {type:Signal, args:[]},
+        statusChanged: {type:Signal, args:[]},
+        progressChanged: {type:Signal, args:[]},
+        asynchronousChanged: {type:Signal, args:[]},
 
-        loaded: {type:Signal, slotName:'onLoaded', args:[]},
+        loaded: {type:Signal, args:[]},
     })
 
     __updatePrimaryProperties(){

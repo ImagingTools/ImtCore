@@ -9,9 +9,9 @@ class IntValidator extends QtObject {
         top: { type: Int, value: 2147483647},
         locale: { type: String, value: false},
 
-        bottomChanged: { type:Signal, slotName:'onBottomChanged', args:[] },
-        topChanged: { type:Signal, slotName:'onTopChanged', args:[] },
-        localeChanged: { type:Signal, slotName:'onLocaleChanged', args:[] },
+        bottomChanged: { type:Signal, args:[] },
+        topChanged: { type:Signal, args:[] },
+        localeChanged: { type:Signal, args:[] },
     })
 
     validate(str) {

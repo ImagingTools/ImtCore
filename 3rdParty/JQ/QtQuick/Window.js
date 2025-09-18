@@ -7,15 +7,15 @@ const Signal = require("../QtQml/Signal")
 
 class Window extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        title: {type:String, value:0, signalName:'titleChanged'},
-        width: {type:Geometry, value:0, signalName:'widthChanged'},
-        height: {type:Geometry, value:0, signalName:'heightChanged'},
+        title: {type:String, value:0, },
+        width: {type:Geometry, value:0, },
+        height: {type:Geometry, value:0, },
         visible: { type: LinkedBool, link: 'visible', value: true},
 
-        titleChanged: {type:Signal, slotName:'onTitleChanged', args:[]},
-        widthChanged: {type:Signal, slotName:'onWidthChanged', args:[]},
-        heightChanged: {type:Signal, slotName:'onHeightChanged', args:[]},
-        visibleChanged: {type:Signal, slotName:'onVisibleChanged', args:[]},
+        titleChanged: {type:Signal, args:[]},
+        widthChanged: {type:Signal, args:[]},
+        heightChanged: {type:Signal, args:[]},
+        visibleChanged: {type:Signal, args:[]},
 
     })
 

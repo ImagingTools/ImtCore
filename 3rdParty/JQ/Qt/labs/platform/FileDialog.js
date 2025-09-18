@@ -27,17 +27,17 @@ class FileDialog extends Dialog {
         seleectedNameFilter: { type: Var, value: undefined},
         nameFilters: { type: Var, value: undefined},
 
-        acceptLabelChanged: {type:Signal, slotName:'onAcceptLabelChanged', args:[]},
-        folderChanged: {type:Signal, slotName:'onFolderChanged', args:[]},
-        currentFileChanged: {type:Signal, slotName:'onCurrentFileChanged', args:[]},
-        currentFilesChanged: {type:Signal, slotName:'onCurrentFilesChanged', args:[]},
-        fileModeChanged: {type:Signal, slotName:'onFileModeChanged', args:[]},
-        fileChanged: {type:Signal, slotName:'onFileChanged', args:[]},
-        filesChanged: {type:Signal, slotName:'onFilesChanged', args:[]},
-        optionsChanged: {type:Signal, slotName:'onOptionsChanged', args:[]},
-        rejectLabelChanged: {type:Signal, slotName:'onRejectLabelChanged', args:[]},
-        seleectedNameFilterChanged: {type:Signal, slotName:'onSeleectedNameFilterChanged', args:[]},
-        nameFiltersChanged: {type:Signal, slotName:'onNameFiltersChanged', args:[]},
+        acceptLabelChanged: {type:Signal, args:[]},
+        folderChanged: {type:Signal, args:[]},
+        currentFileChanged: {type:Signal, args:[]},
+        currentFilesChanged: {type:Signal, args:[]},
+        fileModeChanged: {type:Signal, args:[]},
+        fileChanged: {type:Signal, args:[]},
+        filesChanged: {type:Signal, args:[]},
+        optionsChanged: {type:Signal, args:[]},
+        rejectLabelChanged: {type:Signal, args:[]},
+        seleectedNameFilterChanged: {type:Signal, args:[]},
+        nameFiltersChanged: {type:Signal, args:[]},
     })
 }
 

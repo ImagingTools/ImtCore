@@ -9,9 +9,9 @@ class Connections extends QtObject {
         target: { type: Var, value: undefined},
         ignoreUnknownSignals: { type: Bool, value: false},
 
-        enabledChanged: {type:Signal, slotName:'onEnabledChanged', args:[]},
-        targetChanged: {type:Signal, slotName:'onTargetChanged', args:[]},
-        ignoreUnknownSignalsChanged: {type:Signal, slotName:'onIgnoreUnknownSignalsChanged', args:[]},
+        enabledChanged: {type:Signal, args:[]},
+        targetChanged: {type:Signal, args:[]},
+        ignoreUnknownSignalsChanged: {type:Signal, args:[]},
     })
 
     __connectionsInfo = {}

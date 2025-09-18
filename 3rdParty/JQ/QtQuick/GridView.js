@@ -14,25 +14,25 @@ class GridView extends Flickable {
     static BottomToTop = 3
 
     static meta = Object.assign({}, Flickable.meta, {
-        model: {type: Var, value:undefined, signalName:'modelChanged'},
-        delegate: {type: Var, value:undefined, signalName:'delegateChanged'},
-        layoutDirection: {type: Real, value:GridView.LeftToRight, signalName:'layoutDirectionChanged'},
-        verticalLayoutDirection: {type: Real, value:GridView.TopToBottom, signalName:'verticalLayoutDirectionChanged'},
-        currentIndex: {type: Real, value:-1, signalName:'currentIndexChanged'},
-        currentItem: {type: Var, value:undefined, signalName:'currentItemChanged'},
-        count: {type: Real, value:0, signalName:'countChanged'},
-        cellWidth: {type: Real, value:100, signalName:'cellWidthChanged'},
-        cellHeight: {type: Real, value:100, signalName:'cellHeightChanged'},
+        model: {type: Var, value:undefined, },
+        delegate: {type: Var, value:undefined, },
+        layoutDirection: {type: Real, value:GridView.LeftToRight, },
+        verticalLayoutDirection: {type: Real, value:GridView.TopToBottom, },
+        currentIndex: {type: Real, value:-1, },
+        currentItem: {type: Var, value:undefined, },
+        count: {type: Real, value:0, },
+        cellWidth: {type: Real, value:100, },
+        cellHeight: {type: Real, value:100, },
         
-        modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},
-        delegateChanged: {type:Signal, slotName:'onDelegateChanged', args:[]},
-        layoutDirectionChanged: {type:Signal, slotName:'onLayoutDirectionChanged', args:[]},
-        verticalLayoutDirectionChanged: {type:Signal, slotName:'onVerticalLayoutDirectionChanged', args:[]},
-        currentIndexChanged: {type:Signal, slotName:'onCurrentIndexChanged', args:[]},
-        currentItemChanged: {type:Signal, slotName:'onCurrentItemChanged', args:[]},
-        countChanged: {type:Signal, slotName:'onCountChanged', args:[]},
-        cellWidthChanged: {type:Signal, slotName:'onCellWidthChanged', args:[]},
-        cellHeightChanged: {type:Signal, slotName:'onCellHeightChanged', args:[]},
+        modelChanged: {type:Signal, args:[]},
+        delegateChanged: {type:Signal, args:[]},
+        layoutDirectionChanged: {type:Signal, args:[]},
+        verticalLayoutDirectionChanged: {type:Signal, args:[]},
+        currentIndexChanged: {type:Signal, args:[]},
+        currentItemChanged: {type:Signal, args:[]},
+        countChanged: {type:Signal, args:[]},
+        cellWidthChanged: {type:Signal, args:[]},
+        cellHeightChanged: {type:Signal, args:[]},
     })
 
     static create(parent, ...args){

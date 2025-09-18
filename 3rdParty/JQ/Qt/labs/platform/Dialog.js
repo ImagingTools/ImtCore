@@ -17,16 +17,16 @@ class Dialog extends QtObject {
         title: { type: String, value:''},
         visible: { type: Bool, value:false},
 
-        dataChanged: {type:Signal, slotName:'onDataChanged', args:[]},
-        flagsChanged: {type:Signal, slotName:'onFlagsChanged', args:[]},
-        modalityChanged: {type:Signal, slotName:'onModalityChanged', args:[]},
-        parentWindowChanged: {type:Signal, slotName:'onParentWindowChanged', args:[]},
-        resultChanged: {type:Signal, slotName:'onResultChanged', args:[]},
-        titleChanged: {type:Signal, slotName:'onTitleChanged', args:[]},
-        visibleChanged: {type:Signal, slotName:'onVisibleChanged', args:[]},
+        dataChanged: {type:Signal, args:[]},
+        flagsChanged: {type:Signal, args:[]},
+        modalityChanged: {type:Signal, args:[]},
+        parentWindowChanged: {type:Signal, args:[]},
+        resultChanged: {type:Signal, args:[]},
+        titleChanged: {type:Signal, args:[]},
+        visibleChanged: {type:Signal, args:[]},
 
-        accepted: {type:Signal, slotName:'onAccepted', args:[]},
-        rejected: {type:Signal, slotName:'onRejected', args:[]},
+        accepted: {type:Signal, args:[]},
+        rejected: {type:Signal, args:[]},
     })
 
     accept(){}

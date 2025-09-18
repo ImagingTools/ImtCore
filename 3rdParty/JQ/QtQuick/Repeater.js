@@ -8,16 +8,16 @@ const JQApplication = require("../core/JQApplication")
 
 class Repeater extends Item {
     static meta = Object.assign({}, Item.meta, {
-        model: {type: Var, value:undefined, signalName:'modelChanged'},
-        delegate: {type:Variant, typeTarget:Component, value:undefined, signalName:'delegateChanged'},
-        count: {type: Real, value:0, signalName:'countChanged'},
+        model: {type: Var, value:undefined, },
+        delegate: {type:Variant, typeTarget:Component, value:undefined, },
+        count: {type: Real, value:0, },
         
-        modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},
-        delegateChanged: {type:Signal, slotName:'onDelegateChanged', args:[]},
-        countChanged: {type:Signal, slotName:'onCountChanged', args:[]},
+        modelChanged: {type:Signal, args:[]},
+        delegateChanged: {type:Signal, args:[]},
+        countChanged: {type:Signal, args:[]},
 
-        itemAdded: {type:Signal, slotName:'onItemAdded', args:['item']},
-        itemRemoved: {type:Signal, slotName:'onItemRemoved', args:['item']},
+        itemAdded: {type:Signal, args:['item']},
+        itemRemoved: {type:Signal, args:['item']},
     })
 
     static create(parent = null, properties = {}){

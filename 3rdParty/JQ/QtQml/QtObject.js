@@ -8,26 +8,26 @@ const QtFunctions = require("../Qt/functions")
 
 class QtObject extends QObject {
     static meta = Object.assign({}, QObject.meta, {
-        model: {type:Var, auto: true, value:undefined, signalName:'modelChanged'},
+        model: {type:Var, auto: true, value:undefined, },
         modelData: { type: Var, auto: true, value: undefined },
-        index: {type:Int, value:0, signalName:'indexChanged'},
-        children: {type:List, signalName:'childrenChanged'},
-        resources: {type:List, signalName:'resourcesChanged'},
-        data: {type:List, signalName:'dataChanged'},
+        index: {type:Int, value:0, },
+        children: {type:List, },
+        resources: {type:List, },
+        data: {type:List, },
         
-        modelChanged: {type:Signal, slotName:'onModelChanged', args:[]},
-        childrenChanged: {type:Signal, slotName:'onChildrenChanged', args:[]},
-        resourcesChanged: {type:Signal, slotName:'onResourcesChanged', args:[]},
-        dataChanged: {type:Signal, slotName:'onDataChanged', args:[]},
+        modelChanged: {type:Signal, args:[]},
+        childrenChanged: {type:Signal, args:[]},
+        resourcesChanged: {type:Signal, args:[]},
+        dataChanged: {type:Signal, args:[]},
 
-        'Component.completed': {type:Signal, slotName:'Component.onCompleted', args:[]},
-        'Component.destruction': {type:Signal, slotName:'Component.onDestruction', args:[]},
+        'Component.completed': {type:Signal, args:[]},
+        'Component.destruction': {type:Signal, args:[]},
 
-        JQAbstractModelData: {type:PropertyAuto, value:undefined, signalName:'JQAbstractModelDataChanged'},
-        JQAbstractModel: {type:PropertyAuto, value:undefined, signalName:'JQAbstractModelChanged'},
+        JQAbstractModelData: {type:PropertyAuto, value:undefined, },
+        JQAbstractModel: {type:PropertyAuto, value:undefined, },
 
-        JQAbstractModelDataChanged: {type:Signal, slotName:'onJQAbstractModelDataChanged', args:[]},
-        JQAbstractModelChanged: {type:Signal, slotName:'onJQAbstractModelChanged', args:[]},
+        JQAbstractModelDataChanged: {type:Signal, args:[]},
+        JQAbstractModelChanged: {type:Signal, args:[]},
     })  
 
     static create(parent = null, properties = {}){

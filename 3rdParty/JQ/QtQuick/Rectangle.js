@@ -8,14 +8,14 @@ const Border = require("../QtQml/Border")
 
 class Rectangle extends Item {
     static meta = Object.assign({}, Item.meta, {
-        color: {type: Color, value:'white', signalName:'colorChanged'},
+        color: {type: Color, value:'white', },
         radius: {type: Real, value: 0},
         gradient: {type: Var, value: undefined},
         border: {type:Border},
 
-        colorChanged: {type:Signal, slotName:'onColorChanged', args:[]},
-        radiusChanged: {type:Signal, slotName:'onRadiusChanged', args:[]},
-        gradientChanged: {type:Signal, slotName:'onGradientChanged', args:[]},
+        colorChanged: {type:Signal, args:[]},
+        radiusChanged: {type:Signal, args:[]},
+        gradientChanged: {type:Signal, args:[]},
     })
 
     static create(parent=null, properties = {}, context = {}){

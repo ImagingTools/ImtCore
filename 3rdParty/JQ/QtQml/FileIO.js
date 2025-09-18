@@ -7,7 +7,7 @@ class FileIO extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
         source: { type: String, value: ''},
 
-        sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},
+        sourceChanged: {type:Signal, args:[]},
     })
 
 

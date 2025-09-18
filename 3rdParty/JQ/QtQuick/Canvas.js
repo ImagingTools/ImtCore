@@ -21,17 +21,17 @@ class Canvas extends Item {
         renderTarget: {type: Real, value: Canvas.Image},
         contextType: {type: String, value: ''},
 
-        availableChanged: {type:Signal, slotName:'onAvailableChanged', args:[]},
-        canvasSizeChanged: {type:Signal, slotName:'onCanvasSizeChanged', args:[]},
-        antialiasingChanged: {type:Signal, slotName:'onAntialiasingChanged', args:[]},
-        contextChanged: {type:Signal, slotName:'onContextChanged', args:[]},
-        renderStrategyChanged: {type:Signal, slotName:'onRenderStrategyChanged', args:[]},
-        renderTargetChanged: {type:Signal, slotName:'onRenderTargetChanged', args:[]},
-        contextTypeChanged: {type:Signal, slotName:'onContextTypeChanged', args:[]},
+        availableChanged: {type:Signal, args:[]},
+        canvasSizeChanged: {type:Signal, args:[]},
+        antialiasingChanged: {type:Signal, args:[]},
+        contextChanged: {type:Signal, args:[]},
+        renderStrategyChanged: {type:Signal, args:[]},
+        renderTargetChanged: {type:Signal, args:[]},
+        contextTypeChanged: {type:Signal, args:[]},
 
-        imageLoaded: {type:Signal, slotName:'onImageLoaded', args:[]},
-        painted: {type:Signal, slotName:'onPainted', args:[]},
-        paint: {type:Signal, slotName:'onPaint', args:['region']},
+        imageLoaded: {type:Signal, args:[]},
+        painted: {type:Signal, args:[]},
+        paint: {type:Signal, args:['region']},
     })
 
     static create(parent, ...args){

@@ -16,16 +16,16 @@ class Shortcut extends QtObject {
         sequence: { type: String, value: ''},
         sequences: { type: Var, value: undefined},
 
-        contextChanged: { type:Signal, slotName:'onContextChanged', args:[] },
-        autoRepeatChanged: { type:Signal, slotName:'onAutoRepeatChanged', args:[] },
-        enabledChanged: { type:Signal, slotName:'onEnabledChanged', args:[] },
-        nativeTextChanged: { type:Signal, slotName:'onNativeTextChanged', args:[] },
-        portableTextChanged: { type:Signal, slotName:'onPortableTextChanged', args:[] },
-        sequenceChanged: { type:Signal, slotName:'onSequenceChanged', args:[] },
-        sequencesChanged: { type:Signal, slotName:'onSequencesChanged', args:[] },
+        contextChanged: { type:Signal, args:[] },
+        autoRepeatChanged: { type:Signal, args:[] },
+        enabledChanged: { type:Signal, args:[] },
+        nativeTextChanged: { type:Signal, args:[] },
+        portableTextChanged: { type:Signal, args:[] },
+        sequenceChanged: { type:Signal, args:[] },
+        sequencesChanged: { type:Signal, args:[] },
 
-        activated: { type:Signal, slotName:'onActivated', args:[] },
-        activatedAmbiguously: { type:Signal, slotName:'onActivatedAmbiguously', args:[] },
+        activated: { type:Signal, args:[] },
+        activatedAmbiguously: { type:Signal, args:[] },
     })
 
     static create(parent = null, properties = {}){

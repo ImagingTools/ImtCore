@@ -6,7 +6,7 @@ class PauseAnimation extends Animation {
     static meta = Object.assign({}, Animation.meta, {
         duration: { type: Real, value: 250},
 
-        durationChanged: { type:Signal, slotName:'onDurationChanged', args:[] },
+        durationChanged: { type:Signal, args:[] },
     })
 
     __duration = 250

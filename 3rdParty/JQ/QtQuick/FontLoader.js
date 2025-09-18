@@ -14,9 +14,9 @@ class FontLoader extends QtObject {
         source: { type: String, value: ''},
         status: { type: Real, value: FontLoader.Null},
 
-        nameChanged: { type:Signal, slotName:'onNameChanged', args:[] },
-        sourceChanged: { type:Signal, slotName:'onSourceChanged', args:[] },
-        statusChanged: { type:Signal, slotName:'onStatusChanged', args:[] },
+        nameChanged: { type:Signal, args:[] },
+        sourceChanged: { type:Signal, args:[] },
+        statusChanged: { type:Signal, args:[] },
     })
 }
 

@@ -12,25 +12,25 @@ class MapGestureArea extends GroupProperty {
     static TiltGesture = 5
 
     static meta = {
-        acceptedGestures: {type: Real, value:MapGestureArea.NoGesture, signalName:'acceptedGesturesChanged'},
-        enabled: {type: Bool, value:false, signalName:'enabledChanged'},
-        flickDeceleration: {type: Real, value:2500, signalName:'flickDecelerationChanged'},
-        maximumZoomLevelChange: {type: Real, value:4, signalName:'maximumZoomLevelChangeChanged'},
-        panActive: {type: Bool, value:false, signalName:'panActiveChanged'},
-        pinchActive: {type: Bool, value:false, signalName:'pinchActiveChanged'},
-        preventStealing: {type: Bool, value:false, signalName:'preventStealingChanged'},
-        rotationActive: {type: Bool, value:false, signalName:'rotationActiveChanged'},
-        tiltActive: {type: Bool, value:false, signalName:'tiltActiveChanged'},
+        acceptedGestures: {type: Real, value:MapGestureArea.NoGesture, },
+        enabled: {type: Bool, value:false, },
+        flickDeceleration: {type: Real, value:2500, },
+        maximumZoomLevelChange: {type: Real, value:4, },
+        panActive: {type: Bool, value:false, },
+        pinchActive: {type: Bool, value:false, },
+        preventStealing: {type: Bool, value:false, },
+        rotationActive: {type: Bool, value:false, },
+        tiltActive: {type: Bool, value:false, },
  
-        acceptedGesturesChanged: {type:Signal, slotName:'onAcceptedGesturesChanged', args:[]},
-        enabledChanged: {type:Signal, slotName:'onEnabledChanged', args:[]},
-        flickDecelerationChanged: {type:Signal, slotName:'onFlickDecelerationChanged', args:[]},
-        maximumZoomLevelChange: {type:Signal, slotName:'onMaximumZoomLevelChange', args:[]},
-        panActiveChanged: {type:Signal, slotName:'onPanActiveChanged', args:[]},
-        pinchActiveChanged: {type:Signal, slotName:'onPinchActiveChanged', args:[]},
-        preventStealingChanged: {type:Signal, slotName:'onPreventStealingChanged', args:[]},
-        rotationActiveChanged: {type:Signal, slotName:'onRotationActiveChanged', args:[]},
-        tiltActiveChanged: {type:Signal, slotName:'onTiltActiveChanged', args:[]},
+        acceptedGesturesChanged: {type:Signal, args:[]},
+        enabledChanged: {type:Signal, args:[]},
+        flickDecelerationChanged: {type:Signal, args:[]},
+        maximumZoomLevelChange: {type:Signal, args:[]},
+        panActiveChanged: {type:Signal, args:[]},
+        pinchActiveChanged: {type:Signal, args:[]},
+        preventStealingChanged: {type:Signal, args:[]},
+        rotationActiveChanged: {type:Signal, args:[]},
+        tiltActiveChanged: {type:Signal, args:[]},
     }
 
 }
