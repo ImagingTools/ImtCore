@@ -220,4 +220,94 @@ QtObject {
 
 		return str;
 	}
+
+	function hasElementInList(listArg, valueArg){
+		for (let i = 0; i < listArg.length; ++i){
+			if (listArg[i] == valueArg){
+				return true
+			}
+		}
+
+		return false
+	}
+
+	function lab2rgb(lab){
+		let y = (lab[0] + 16) / 116
+		let x = lab[1] / 500 + y
+		let z = y - lab[2] / 200
+		let r
+		let g
+		let b
+
+		x = 0.95047 * ((x * x * x > 0.008856) ? x * x * x : (x - 16/116) / 7.787);
+		y = 1.00000 * ((y * y * y > 0.008856) ? y * y * y : (y - 16/116) / 7.787);
+		z = 1.08883 * ((z * z * z > 0.008856) ? z * z * z : (z - 16/116) / 7.787);
+
+		r = x *  3.2406 + y * -1.5372 + z * -0.4986;
+		g = x * -0.9689 + y *  1.8758 + z *  0.0415;
+		b = x *  0.0557 + y * -0.2040 + z *  1.0570;
+
+		r = (r > 0.0031308) ? (1.055 * Math.pow(r, 1/2.4) - 0.055) : 12.92 * r;
+		g = (g > 0.0031308) ? (1.055 * Math.pow(g, 1/2.4) - 0.055) : 12.92 * g;
+		b = (b > 0.0031308) ? (1.055 * Math.pow(b, 1/2.4) - 0.055) : 12.92 * b;
+
+		return [Math.max(0, Math.min(1, r)) * 255,
+				Math.max(0, Math.min(1, g)) * 255,
+				Math.max(0, Math.min(1, b)) * 255]
+	}
+
+	function componentToHex(c) {
+		let hex = Math.trunc(c).toString(16);
+		return hex.length == 1 ? "0" + hex : hex;
+	}
+
+	function rgbToHex(r, g, b) {
+		return "#" + String(componentToHex(r)) + String(componentToHex(g)) + String(componentToHex(b));
+	}
+
+	function labToRgbHex(argL, argA, argB)
+	{
+		let y = (argL + 16) / 116
+		let x = argA / 500 + y
+		let z = y - argB / 200
+		let r
+		let g
+		let b
+
+		x = 0.95047 * ((x * x * x > 0.008856) ? x * x * x : (x - 16 / 116) / 7.787)
+		y = 1.00000 * ((y * y * y > 0.008856) ? y * y * y : (y - 16 / 116) / 7.787)
+		z = 1.08883 * ((z * z * z > 0.008856) ? z * z * z : (z - 16 / 116) / 7.787)
+
+		r = x * 3.2406 + y * -1.5372 + z * -0.4986
+		g = x * -0.9689 + y * 1.8758 + z * 0.0415
+		b = x * 0.0557 + y * -0.2040 + z * 1.0570
+
+		r = (r > 0.0031308) ? (1.055 * Math.pow(r, 1 / 2.4) - 0.055) : 12.92 * r
+		g = (g > 0.0031308) ? (1.055 * Math.pow(g, 1 / 2.4) - 0.055) : 12.92 * g
+		b = (b > 0.0031308) ? (1.055 * Math.pow(b, 1 / 2.4) - 0.055) : 12.92 * b
+
+		r = Math.max(0, Math.min(1, r)) * 255
+		g = Math.max(0, Math.min(1, g)) * 255
+		b = Math.max(0, Math.min(1, b)) * 255
+
+		let rHex = Math.trunc(r).toString(16)
+		if (rHex.length == 1) {
+			rHex = '0' + rHex
+		}
+
+		let gHex = Math.trunc(g).toString(16)
+		if (gHex.length == 1) {
+			gHex = '0' + gHex
+		}
+		let bHex = Math.trunc(b).toString(16)
+		if (bHex.length == 1) {
+			bHex = '0' + bHex
+		}
+
+		let retVal = '#' + rHex + gHex + bHex
+
+		return retVal
+	}
+
+
 }
