@@ -47,6 +47,10 @@ DecoratorBase {
 	}
 	
 	function updateFilter(){
+		if (!groupFilter.hasFieldFilters()){
+			groupFilter.createFieldFilters();
+		}
+
 		groupFilter.m_fieldFilters.clear()
 		
 		complexFilter.removeGroupFilter(groupFilter)

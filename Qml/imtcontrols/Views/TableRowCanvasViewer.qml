@@ -31,7 +31,7 @@ Canvas {
 	}
 
 	function drawCell(ctx, x, y, cellWidth, cellHeight, columnIndex){
-		let key = rowDelegate.tableItem.headers.getData("id", columnIndex)
+		let key = rowDelegate.tableItem.getHeaderId(columnIndex)
 		let registeredDrawCellFunctions = rowDelegate.tableItem.registeredDrawCellFunctions;
 
 		if (registeredDrawCellFunctions[key]){

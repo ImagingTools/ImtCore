@@ -16,6 +16,7 @@ input ProductsListInput {
 
 type LicenseData {
 	id: ID
+	name: String
 	licenseId: ID
 	licenseName: String
 }

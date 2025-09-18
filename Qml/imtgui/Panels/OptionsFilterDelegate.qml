@@ -36,8 +36,6 @@ FilterDelegateBase {
 		id: filterConnections
 		target: filterDelegate.selectionParam
 		function onM_selectedIndexChanged(){
-			console.log("onM_selectedIndexChanged", target.m_selectedIndex)
-			
 			if (!internal.block){
 				filterDelegate.setSelectedIndex(target.m_selectedIndex)
 			}

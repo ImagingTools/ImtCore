@@ -33,7 +33,7 @@ ViewBase {
 	property DocCollectionFilter documentCollectionFilter: DocCollectionFilter {}
 	property IdSelectionManager selectionManager: IdSelectionManager {}
 
-	property Component dataControllerComp: Component {CollectionDataController { collectionId: collectionViewBaseContainer.collectionId}}
+	property Component dataControllerComp: Component{CollectionDataController{}}
 	property var dataController: null;
 	
 	signal selectedIndexChanged(int index);
@@ -91,7 +91,11 @@ ViewBase {
 	function registerFieldFilterDelegate(filterId, filterDelegateComp){
 		filterMenu_.registerFieldFilterDelegate(filterId, filterDelegateComp)
 	}
-	
+
+	function setFilterDependency(filterId, dependsOnFilterId){
+		filterMenu_.setFilterDependency(filterId, dependsOnFilterId)
+	}
+
 	FilterMenu {
 		id: filterMenu_;
 		anchors.top: parent.top;
@@ -106,12 +110,12 @@ ViewBase {
 			filterMenu_.visible = false;
 		}
 	}
-	
+
 	onHeadersChanged: {
 		table.tableViewParams.clear();
 		
 		for (let i = 0; i < table.headers.getItemsCount(); i++){
-			let headerId = table.headers.getData("id", i);
+			let headerId = table.getHeaderId(i);
 			if (!table.tableViewParams.headerIsExists(headerId)){
 				table.tableViewParams.setHeaderSize(headerId, -1);
 				table.tableViewParams.setHeaderVisible(headerId, true);

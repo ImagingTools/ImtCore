@@ -115,11 +115,6 @@ input CreateSuperuserInput {
 	name: String!
 }
 
-input RemoveUserInput {
-	id: ID!
-}
-
-
 type CreateSuperuserPayload {
 	message: String
 	success: Boolean!
@@ -153,10 +148,6 @@ type SendEmailCodePayload {
 	message: String
 }
 
-type RemoveUserPayload {
-	success: Boolean
-}
-
 type Query {
 	UsersList (input:UsersListInput): UsersListPayload!
 	UserItem (input: UserItemInput): UserData!
@@ -172,7 +163,6 @@ type Mutation {
 	ChangePassword (input: ChangePasswordInput): ChangePasswordPayload!
 	RegisterUser (input: RegisterUserInput): RegisterUserPayload!
 	CreateSuperuser (input: CreateSuperuserInput): CreateSuperuserPayload!
-	UsersRemove (input: RemoveUserInput): RemoveUserPayload!
 }
 
 collectionSchema {

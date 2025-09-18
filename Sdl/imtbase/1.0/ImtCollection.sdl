@@ -6,6 +6,7 @@ schema {
 }
 
 import {
+	"../../imtbase/1.0/ImtBaseTypes.sdl"
 	"../../imtbase/1.0/ComplexCollectionFilter.sdl"
 	"../../imtbase/1.0/DocumentCollectionFilter.sdl"
 }
@@ -15,10 +16,6 @@ type HeaderInfo {
 	name: String!
 	filterable: Boolean
 	sortable: Boolean
-}
-
-type HeadersInfo {
-	headers: [HeaderInfo]!
 }
 
 type CollectionViewParams {
@@ -55,6 +52,10 @@ type SetDescriptionNotificationPayload {
 	description: String
 }
 
+type RemoveElementsPayload {
+	success: Boolean
+}
+
 type RemoveElementSetPayload {
 	success: Boolean
 }
@@ -84,48 +85,230 @@ type VisualStatus {
 	description: String
 }
 
-input RenameInput {
-	id: ID!
-	name: String!
-}
-
-input SetDescriptionInput {
-	id: ID!
-	description: String!
-}
-
 input RemoveElementsInput {
+	collectionId: ID!
 	elementIds: [ID]
 }
 
 input RemoveElementSetInput {
-	collectionId: ID
-	filterModel: ComplexCollectionFilter
+	collectionId: ID!
+	selectionParams: ParamsSet
 }
 
 input RestoreObjectsInput {
-	collectionId: ID
+	collectionId: ID!
 	objectIds: [ID]
 }
 
 input RestoreObjectSetInput {
-	collectionId: ID
-	filterModel: ComplexCollectionFilter
+	collectionId: ID!
+	selectionParams: ParamsSet
 }
 
 input ObjectVisualStatusInput {
 	objectId: ID!
 	typeId: ID!
+	collectionId: ID!
+}
+
+input SetObjectNameInput {
+	collectionId: ID!
+	objectId: ID!
+	name: String
+}
+
+type SetObjectNamePayload {
+	objectId: ID
+	name: String
+	success: Boolean
+}
+
+input SetObjectDescriptionInput {
+	objectId: ID!
+	collectionId: ID!
+	description: String
+}
+
+type SetObjectDescriptionPayload {
+	objectId: ID
+	description: String
+	success: Boolean
+}
+
+input ExportObjectInput {
+	objectId: ID!
+	collectionId: ID!
+	mimeType: String
+}
+
+type ExportObjectPayload {
+	objectId: ID!
+	success: Boolean
+	fileData: ID!
+	fileName: String!
+}
+
+input ImportObjectInput {
+	collectionId: ID!
+	typeId: ID!
+	name: String
+	description: String
+	fileData: ID!
+	mimeType: String
+}
+
+type ImportObjectPayload {
+	objectId: ID!
+	success: Boolean
+}
+
+input GetObjectTypeIdInput {
+	collectionId: ID!
+	objectId: ID!
+}
+
+type GetObjectTypeIdPayload {
+	typeId: ID!
+}
+
+input GetElementsCountInput {
+	collectionId: ID!
+	selectionParams: ParamsSet
+}
+
+type GetElementsCountPayload {
+	count: Integer!
+}
+
+input GetCollectionHeadersInput {
+	collectionId: ID!
+}
+
+type GetCollectionHeadersPayload {
+	headers: [HeaderInfo]
+}
+
+input GetElementIdsInput {
+	collectionId: ID!
+	offset: Integer
+	count: Integer
+	selectionParams: ParamsSet
+}
+
+type GetElementIdsPayload {
+	elementIds: [ID]
+}
+
+input InsertNewObjectInput {
+	collectionId: ID!
+	typeId: ID!
+	name: String
+	description: String
+	objectData: String # Object data serialization
+	proposedObjectId: ID
+	documentMetaInfo: String # Meta info serialization
+	collectionItemMetaInfo: String # Meta info serialization
+	operationContext: String # Operation context serialization
+}
+
+type InsertNewObjectPayload {
+	objectId: ID
+}
+
+input GetObjectDataInput {
+	collectionId: ID!
+	objectId: ID!
+}
+
+type GetObjectDataPayload {
+	objectData: String! # Object data serialization
+}
+
+input SetObjectDataInput {
+	collectionId: ID!
+	objectId: ID!
+	objectData: String! # Object data serialization
+	operationContext: String # Operation context serialization
+}
+
+type SetObjectDataPayload {
+	success: Boolean
+}
+
+input GetDataMetaInfoInput {
+	collectionId: ID!
+	objectId: ID!
+}
+
+type GetDataMetaInfoPayload {
+	metaInfoData: String! # Meta info data serialization
+}
+
+type ElementMetaInfo {
+	infoParams: [Parameter]
+}
+
+input GetElementInfoInput {
+	collectionId: ID!
+	elementId: ID!
+	infoType: Integer
+}
+
+type GetElementInfoPayload {
+	elementInfo: Parameter!
+}
+
+input GetElementMetaInfoInput {
+	collectionId: ID!
+	elementId: ID!
+}
+
+type GetElementMetaInfoPayload {
+	elementMetaInfo: ElementMetaInfo!
+}
+
+input CreateSubCollectionInput {
+	collectionId: ID
+	offset: Integer
+	count: Integer
+	selectionParams: ParamsSet
+}
+
+type SubCollectionItem {
+	itemInfo: Parameter
+	metaInfo: String
+	dataMetaInfo: String
+	operationContext: String
+}
+
+type CreateSubCollectionPayload {
+	items: [SubCollectionItem]
 }
 
 type Query {
 	GetObjectVisualStatus (input: ObjectVisualStatusInput): VisualStatus!
+	GetObjectTypeId (input: GetObjectTypeIdInput): GetObjectTypeIdPayload!
+	GetElementsCount (input: GetElementsCountInput): GetElementsCountPayload!
+	GetElementIds (input: GetElementIdsInput): GetElementIdsPayload!
+	GetCollectionHeaders (input: GetCollectionHeadersInput): GetCollectionHeadersPayload!
+	ExportObject (input: ExportObjectInput): ExportObjectPayload!
+	GetObjectData (input: GetObjectDataInput): GetObjectDataPayload!
+	GetDataMetaInfo (input: GetDataMetaInfoInput): GetDataMetaInfoPayload!
+	GetElementInfo (input: GetElementInfoInput): GetElementInfoPayload!
+	GetElementMetaInfo (input: GetElementMetaInfoInput): GetElementMetaInfoPayload!
 }
 
 type Mutation {
+	RemoveElements (input: RemoveElementsInput): RemoveElementsPayload!
 	RemoveElementSet (input: RemoveElementSetInput): RemoveElementSetPayload!
 	RestoreObjects (input: RestoreObjectsInput): RestoreObjectsPayload!
 	RestoreObjectSet (input: RestoreObjectSetInput): RestoreObjectSetPayload!
+	SetObjectName (input: SetObjectNameInput): SetObjectNamePayload!
+	SetObjectDescription (input: SetObjectDescriptionInput): SetObjectDescriptionPayload!
+	ImportObject (input: ImportObjectInput): ImportObjectPayload!
+	InsertNewObject (input: InsertNewObjectInput): InsertNewObjectPayload!
+	SetObjectData (input: SetObjectDataInput): SetObjectDataPayload!
+	CreateSubCollection (input: CreateSubCollectionInput): CreateSubCollectionPayload!
 }
 
 

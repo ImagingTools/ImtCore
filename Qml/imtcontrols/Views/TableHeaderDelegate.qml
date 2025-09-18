@@ -9,7 +9,8 @@ Item{
 	property TableBase tableItem
 	property int columnCount: tableItem ? tableItem.columnCount : 0
 	property int columnIndex: model.index
-	property string headerId: model.id || model.Id || "";
+	property string headerId: model.item ? model.item.m_id : model["id"]
+	property string headerName: model.item ? model.item.m_name : model["name"]
 
 	property bool compl: false;
 	property bool complCompl: headerDelegate.compl && headerDelegate.tableItem;
@@ -233,7 +234,7 @@ Item{
 			Qt.openUrlExternally(link)
 		}
 
-		text: model.name || model.Name || "";
+		text: headerDelegate.headerName
 	}
 
 	Text {
@@ -434,7 +435,7 @@ Item{
 					}
 
 					if(prevIndex >=0){
-						let prevHeaderId = headerDelegate.tableItem.headers.getData("id", prevIndex);
+						let prevHeaderId = headerDelegate.tableItem.getHeaderId(prevIndex);
 						headerDelegate.tableItem.tableViewParams.setHeaderSize(prevHeaderId, prevPercent)
 					}
 

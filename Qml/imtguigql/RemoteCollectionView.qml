@@ -64,8 +64,6 @@ CollectionView {
 
 	dataControllerComp: Component {
 		CollectionRepresentation {
-			property bool isReady: false;
-
 			collectionId: root.collectionId;
 			gqlGetListCommandId: root.gqlGetListCommandId
 
@@ -101,11 +99,6 @@ CollectionView {
 		if (!root.visibleMetaInfo){
 			return;
 		}
-
-		if (selectedIds.length === 1){
-			let elementId = selectedIds[0];
-			metaInfoProvider.getMetaInfo(elementId);
-		}
 	}
 
 	onVisibleChanged: {
@@ -123,29 +116,6 @@ CollectionView {
 
 			root.doUpdateGui();
 			root.setAlertPanel(undefined);
-		}
-	}
-
-	MetaInfoProvider {
-		id: metaInfoProvider;
-
-		getMetaInfoGqlCommand: root.collectionId + "MetaInfo";
-
-		onMetaInfoModelChanged: {
-			root.metaInfoView.metaInfoModel = metaInfoProvider.metaInfoModel
-		}
-
-		onStateChanged: {
-			if (state === "Loading"){
-				root.metaInfoView.startLoading();
-			}
-			else{
-				root.metaInfoView.stopLoading();
-			}
-		}
-
-		function getHeaders(){
-			return root.getHeaders();
 		}
 	}
 

@@ -21,8 +21,8 @@ public:
 		I_REGISTER_INTERFACE(imtcol::ICollectionHeadersProvider);
 		I_ASSIGN_MULTI_0(m_headersIdsAttrPtr, "HeaderIds", "Headers Ids", true);
 		I_ASSIGN_MULTI_0(m_headersNamesAttrPtr, "HeaderNames", "Headers names", true);
-		I_ASSIGN_MULTI_0(m_headerSortableAttrPtr, "HeaderSortable", "Whether header is sortable", false);
-		I_ASSIGN_MULTI_0(m_headerFilterableAttrPtr, "HeaderFilterable", "Whether header is filterable", false);
+		I_ASSIGN_MULTI_0(m_sortableHeaderIdsAttrPtr, "SortableHeaderIds", "Header-IDs that can be sorted", false);
+		I_ASSIGN_MULTI_0(m_filterableHeaderIdsAttrPtr, "FilterableHeaderIds", "Header-IDs that can be filtered", false);
 		I_ASSIGN_MULTI_0(m_headerPermissionsAttrPtr, "HeaderPermissions", "Header access permissions", false);
 	I_END_COMPONENT;
 
@@ -34,8 +34,8 @@ protected:
 private:
 	I_MULTIATTR(QByteArray, m_headersIdsAttrPtr);
 	I_MULTITEXTATTR(m_headersNamesAttrPtr);
-	I_MULTIATTR(bool, m_headerSortableAttrPtr);
-	I_MULTIATTR(bool, m_headerFilterableAttrPtr);
+	I_MULTIATTR(QByteArray, m_sortableHeaderIdsAttrPtr);
+	I_MULTIATTR(QByteArray, m_filterableHeaderIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_headerPermissionsAttrPtr);
 };
 

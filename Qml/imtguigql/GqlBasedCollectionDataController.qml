@@ -58,15 +58,15 @@ CollectionDataController {
 		// setDescriptionRequestSender.send(setDescriptionInput)
 	}
 	
-	property RenameInput renameInput: RenameInput {}
-	property SetDescriptionInput setDescriptionInput: SetDescriptionInput {}
+	// property RenameInput renameInput: RenameInput {}
+	// property SetDescriptionInput setDescriptionInput: SetDescriptionInput {}
 	
-	property InputId inputId: InputId {}
+	// property InputId inputId: InputId {}
 	// property AccountDataInput accountDataInput: AccountDataInput {}
-	property CollectionViewParams collectionViewParams: CollectionViewParams {
-		m_offset: 0
-		m_count: -1
-	}
+	// property CollectionViewParams collectionViewParams: CollectionViewParams {
+	// 	m_offset: 0
+	// 	m_count: -1
+	// }
 
 	// property GqlSdlRequestSender getRequestSender: GqlSdlRequestSender {
 	// 	gqlCommandId: ProlifeAccountsSdlCommandIds.s_accountItem

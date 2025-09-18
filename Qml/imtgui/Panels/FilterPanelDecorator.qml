@@ -139,8 +139,10 @@ DecoratorBase {
 						id: delegateLoader
 						sourceComponent: model.comp
 						onLoaded: {
+							item.filterId = model.id
 							item.collectionFilter = filterPanelDecorator.complexFilter
 							item.documentFilter = filterPanelDecorator.documentFilter
+							item.filterMenu = filterPanelDecorator.baseElement
 						}
 						
 						Connections {
@@ -148,12 +150,14 @@ DecoratorBase {
 							function onComplexFilterChanged(){
 								if (delegateLoader.item){
 									delegateLoader.item.collectionFilter = filterPanelDecorator.complexFilter
+									delegateLoader.item.filterMenu = filterPanelDecorator.baseElement
 								}
 							}
 							
 							function onDocumentFilterChanged(){
 								if (delegateLoader.item){
 									delegateLoader.item.documentFilter = filterPanelDecorator.documentFilter
+									delegateLoader.item.filterMenu = filterPanelDecorator.baseElement
 								}
 							}
 						}

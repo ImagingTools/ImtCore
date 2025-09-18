@@ -25,22 +25,20 @@ bool CRemoteJwtSessionControllerComp::ValidateSession(const QByteArray& sessionI
 	arguments.input.Version_1_0 = sessionsdl::CValidateSessionInput::V1_0();
 	arguments.input.Version_1_0->sessionId = sessionId;
 
-	sessionsdl::CValidateSessionPayload response;
-
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CValidateSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
-	
+
+	typedef sdl::imtauth::Sessions::CValidateSessionPayload Response;
+
 	QString errorMessage;
-	if (!SendModelRequest<
-			sdl::imtauth::Sessions::CValidateSessionPayload,
-			sessionsdl::CValidateSessionPayload>(gqlRequest, response, errorMessage)){
-		SendErrorMessage(0, QString("Unable to validate remote session. Error: %1").arg(errorMessage), "CRemoteJwtSessionControllerComp");
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
 		return false;
 	}
 
-	if (response.Version_1_0->isValid.has_value()){
+	if (response.Version_1_0 && response.Version_1_0->isValid.has_value()){
 		return *response.Version_1_0->isValid;
 	}
 
@@ -56,22 +54,20 @@ imtauth::IJwtSessionController::JwtState CRemoteJwtSessionControllerComp::Valida
 	arguments.input.Version_1_0 = sessionsdl::CValidateJwtInput::V1_0();
 	arguments.input.Version_1_0->jwt = token;
 
-	sessionsdl::CValidateJwtPayload response;
-
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CValidateJwtGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return imtauth::IJwtSessionController::JS_NONE;
 	}
-	
+
+	typedef sdl::imtauth::Sessions::CValidateJwtPayload Response;
+
 	QString errorMessage;
-	if (!SendModelRequest<
-			sdl::imtauth::Sessions::CValidateJwtPayload,
-			sessionsdl::CValidateJwtPayload>(gqlRequest, response, errorMessage)){
-		SendErrorMessage(0, QString("Unable to validate remote JWT session. Error: %1").arg(errorMessage), "CRemoteJwtSessionControllerComp");
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
 		return imtauth::IJwtSessionController::JS_NONE;
 	}
 
-	if (response.Version_1_0->state.has_value()){
+	if (response.Version_1_0 && response.Version_1_0->state.has_value()){
 		sessionsdl::JwtState state = *response.Version_1_0->state;
 
 		if (state == sessionsdl::JwtState::EXPIRED){
@@ -99,22 +95,20 @@ bool CRemoteJwtSessionControllerComp::RefreshToken(
 	arguments.input.Version_1_0 = sessionsdl::CRefreshTokenInput::V1_0();
 	arguments.input.Version_1_0->refreshToken = refreshToken;
 
-	sessionsdl::CRefreshTokenPayload response;
-
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CRefreshTokenGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
-	
+
+	typedef sdl::imtauth::Sessions::CRefreshTokenPayload Response;
+
 	QString errorMessage;
-	if (!SendModelRequest<
-			sdl::imtauth::Sessions::CRefreshTokenPayload,
-			sessionsdl::CRefreshTokenPayload>(gqlRequest, response, errorMessage)){
-		SendErrorMessage(0, QString("Unable to refresh remote token. Error: %1").arg(errorMessage), "CRemoteJwtSessionControllerComp");
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
 		return false;
 	}
 
-	if (response.Version_1_0->ok.has_value() && *response.Version_1_0->ok){
+	if (response.Version_1_0 && response.Version_1_0->ok.has_value() && *response.Version_1_0->ok){
 		if (response.Version_1_0->userSession.has_value()){
 			if (response.Version_1_0->userSession->userId.has_value()){
 				userSession.userId = *response.Version_1_0->userSession->userId;
@@ -146,22 +140,20 @@ bool CRemoteJwtSessionControllerComp::CreateNewSession(
 	arguments.input.Version_1_0 = sessionsdl::CCreateNewSessionInput::V1_0();
 	arguments.input.Version_1_0->userId = userId;
 
-	sessionsdl::CCreateNewSessionPayload response;
-
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CCreateNewSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
-	
+
+	typedef sdl::imtauth::Sessions::CCreateNewSessionPayload Response;
+
 	QString errorMessage;
-	if (!SendModelRequest<
-			sdl::imtauth::Sessions::CCreateNewSessionPayload,
-			sessionsdl::CCreateNewSessionPayload>(gqlRequest, response, errorMessage)){
-		SendErrorMessage(0, QString("Unable to create remote session. Error: %1").arg(errorMessage), "CRemoteJwtSessionControllerComp");
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
 		return false;
 	}
 
-	if (response.Version_1_0->ok.has_value() && *response.Version_1_0->ok){
+	if (response.Version_1_0 && response.Version_1_0->ok.has_value() && *response.Version_1_0->ok){
 		if (response.Version_1_0->userSession.has_value()){
 			if (response.Version_1_0->userSession->userId.has_value()){
 				userSession.userId = *response.Version_1_0->userSession->userId;
@@ -191,22 +183,20 @@ imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QBy
 	arguments.input.Version_1_0 = sessionsdl::CGetSessionInput::V1_0();
 	arguments.input.Version_1_0->sessionId = sessionId;
 
-	sessionsdl::CGetSessionPayload response;
-
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CGetSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return nullptr;
 	}
-	
+
+	typedef sdl::imtauth::Sessions::CGetSessionPayload Response;
+
 	QString errorMessage;
-	if (!SendModelRequest<
-			sdl::imtauth::Sessions::CGetSessionPayload,
-			sessionsdl::CGetSessionPayload>(gqlRequest, response, errorMessage)){
-		SendErrorMessage(0, QString("Unable to get remote session. Error: %1").arg(errorMessage), "CRemoteJwtSessionControllerComp");
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
 		return nullptr;
 	}
 
-	if (response.Version_1_0->sessionData.has_value() && m_sessionFactCompPtr.IsValid()){
+	if (response.Version_1_0 && response.Version_1_0->sessionData.has_value() && m_sessionFactCompPtr.IsValid()){
 		QByteArray sessionData = *response.Version_1_0->sessionData;
 
 		imtauth::ISessionUniquePtr sessionInfoPtr = m_sessionFactCompPtr.CreateInstance();
@@ -214,7 +204,6 @@ imtauth::ISessionSharedPtr CRemoteJwtSessionControllerComp::GetSession(const QBy
 		iser::CMemoryReadArchive archive(sessionData.data(), sessionData.length());
 		if (!sessionInfoPtr->Serialize(archive)){
 			SendErrorMessage(0, QString("Unable to deserialize session info. Error: Deserialization failed"));
-
 			return nullptr;
 		}
 
@@ -233,22 +222,20 @@ bool CRemoteJwtSessionControllerComp::RemoveSession(const QByteArray& sessionId)
 	arguments.input.Version_1_0 = sessionsdl::CRemoveSessionInput::V1_0();
 	arguments.input.Version_1_0->sessionId = sessionId;
 
-	sessionsdl::CRemoveSessionPayload response;
-
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CRemoveSessionGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
-	
+
+	typedef sdl::imtauth::Sessions::CRemoveSessionPayload Response;
+
 	QString errorMessage;
-	if (!SendModelRequest<
-			sdl::imtauth::Sessions::CRemoveSessionPayload,
-			sessionsdl::CRemoveSessionPayload>(gqlRequest, response, errorMessage)){
-		SendErrorMessage(0, QString("Unable to remove remote session. Error: %1").arg(errorMessage), "CRemoteJwtSessionControllerComp");
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
 		return false;
 	}
 
-	if (response.Version_1_0->ok.has_value()){
+	if (response.Version_1_0 && response.Version_1_0->ok.has_value()){
 		return *response.Version_1_0->ok;
 	}
 
@@ -264,22 +251,20 @@ QByteArray CRemoteJwtSessionControllerComp::GetUserFromJwt(const QByteArray& jwt
 	arguments.input.Version_1_0 = sessionsdl::CGetUserFromJwtInput::V1_0();
 	arguments.input.Version_1_0->jwt = jwt;
 
-	sessionsdl::CGetUserFromJwtPayload response;
-
 	imtgql::CGqlRequest gqlRequest;
 	if (!sessionsdl::CGetUserFromJwtGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return QByteArray();
 	}
-	
+
+	typedef sdl::imtauth::Sessions::CGetUserFromJwtPayload Response;
+
 	QString errorMessage;
-	if (!SendModelRequest<
-			sdl::imtauth::Sessions::CGetUserFromJwtPayload,
-			sessionsdl::CGetUserFromJwtPayload>(gqlRequest, response, errorMessage)){
-		SendErrorMessage(0, QString("Unable to get remote user from JWT. Error: %1").arg(errorMessage), "CRemoteJwtSessionControllerComp");
+	Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+	if (!errorMessage.isEmpty()){
 		return QByteArray();
 	}
 
-	if (response.Version_1_0->userId.has_value()){
+	if (response.Version_1_0 && response.Version_1_0->userId.has_value()){
 		return *response.Version_1_0->userId;
 	}
 

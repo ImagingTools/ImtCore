@@ -37,27 +37,20 @@ Item {
 			
 			ListView {
 				id: mainPanelRepeater;
-				
 				anchors.left: parent.left;
 				anchors.leftMargin: Style.marginM;
 				anchors.right: parent.right;
 				anchors.rightMargin: Style.marginM;
-				
 				height: contentHeight;
-				
 				spacing: Style.marginM;
-				model: root.paramsSet.m_paramIds;
-				
+				model: root.paramsSet.m_parameters;
 				boundsBehavior: Flickable.StopAtBounds;
-				
 				currentIndex: 0
-				
 				delegate: ItemDelegate {
-					highlighted: mainPanelRepeater.currentIndex == model.index;
-					text: root.paramsSet.m_paramNames[model.index]
-					
+					highlighted: mainPanelRepeater.currentIndex === model.index
+					text: model.item.m_name
 					onClicked: {
-						mainPanelRepeater.currentIndex = model.index;
+						mainPanelRepeater.currentIndex = model.index
 					}
 				}
 			}
@@ -69,7 +62,7 @@ Item {
 		anchors.left: mainPanelBackground.right
 		anchors.right: root.right
 		height: root.height
-		model: root.paramsSet.m_paramIds;
+		model: root.paramsSet.m_parameters
 		
 		delegate: Item {
 			anchors.fill: repeater
@@ -96,23 +89,25 @@ Item {
 					id: bodyPanel;
 					width: parent.width;
 					settingsController: root.settingsController
-					paramId: root.paramsSet.m_paramIds[model.index]
-					typeId: root.paramsSet.m_paramTypeIds[model.index]
-					name: root.paramsSet.m_paramNames[model.index]
-					description: root.paramsSet.m_paramDescriptions[model.index]
+					paramId: model.item.m_id
+					typeId: model.item.m_typeId
+					name: model.item.m_name
+					description: model.item.m_description
 					
 					onEditorModelDataChanged: {
 						if (mainPanelRepeater.currentIndex >= 0){
 							let json = bodyPanel.paramsSet.toJson()
-							root.paramsSet.m_parameters[mainPanelRepeater.currentIndex] = json
+							root.paramsSet.m_parameters.get(mainPanelRepeater.currentIndex).item.m_data = json
+							
+							console.log("json", root.paramsSet.m_parameters.get(mainPanelRepeater.currentIndex).item.m_data)
 						}
-						
+
 						root.editorModelDataChanged(paramId, key)
 					}
 					
 					Component.onCompleted: {
 						if (paramController){
-							let json = root.paramsSet.m_parameters[model.index]
+							let json = root.paramsSet.m_parameters.get(model.index).item.m_data
 							if (!paramController.createParamFromJson(json)){
 								console.error("Unable to create params set from JSON")
 							}

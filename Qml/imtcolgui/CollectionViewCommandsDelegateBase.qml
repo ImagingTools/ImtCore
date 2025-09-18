@@ -657,7 +657,8 @@ ViewCommandsDelegateBase {
 					let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
 					if (indexes.length >= 0){
 						let index = indexes[0];
-						collectionViewCommandsDelegate.collectionView.setElementDescription(index, inputValue)
+						let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("id", index)
+						collectionViewCommandsDelegate.collectionView.setElementDescription(selectedId, inputValue)
 					}
 				}
 
@@ -679,7 +680,8 @@ ViewCommandsDelegateBase {
 					let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
 					if (indexes.length >= 0){
 						let index = indexes[0];
-						collectionViewCommandsDelegate.collectionView.setElementName(index, inputValue)
+						let selectedId = collectionViewCommandsDelegate.collectionView.table.elements.getData("id", index)
+						collectionViewCommandsDelegate.collectionView.setElementName(selectedId, inputValue)
 					}
 				}
 

@@ -5,23 +5,21 @@ import imtcontrols 1.0
 import imtdocgui 1.0
 import imtgui 1.0
 import imtguigql 1.0
-import imtbaseImtCollectionSdl 1.0
 
 DocumentWorkspacePageView {
-	id: root;
+	id: root
 	
-	documentManagerView: documentManagerView;
+	documentManagerView: documentManagerView
 	
 	onStartItemSourceCompChanged: {
 		if (startItemSourceComp){
-			documentManagerView.addInitialItem(startItemSourceComp, pageName);
+			documentManagerView.addInitialItem(startItemSourceComp, pageName)
 		}
 	}
 	
 	SingleDocumentWorkspaceView {
-		id: documentManagerView;
-		anchors.fill: parent;
-		documentManager: root.documentManager;
-		visualStatusProvider: GqlBasedObjectVisualStatusProvider {}
+		id: documentManagerView
+		anchors.fill: parent
+		documentManager: root.documentManager
 	}
 }

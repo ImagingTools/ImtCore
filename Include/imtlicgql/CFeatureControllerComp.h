@@ -22,7 +22,7 @@ protected:
 	// reimplemented (imtservergql::CObjectCollectionControllerCompBase)
 	virtual istd::IChangeableUniquePtr CreateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, QByteArray &objectId, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlParamObject& gqlObject, QString& errorMessage, int& operationType) const override;
 
 	bool CreateFeatureFromRepresentationModel(const imtbase::CTreeItemModel& representationModel, imtlic::CFeatureInfo& featureInfo, const QByteArray& objectId, QString& errorMessage) const;

@@ -24,7 +24,15 @@ CollectionViewCommandsDelegateBase {
 	property var documentValidatorsComp: [];
 
 	Component.onCompleted: {
-		let documentManager = MainDocumentManager.getDocumentManager(collectionViewCommandsDelegateBase.documentManagerId);
+		updateDocumentManager()
+	}
+
+	onDocumentManagerIdChanged: {
+		updateDocumentManager()
+	}
+	
+	function updateDocumentManager(){
+		let documentManager = MainDocumentManager.getDocumentManager(documentManagerId);
 		if (documentManager){
 			collectionViewCommandsDelegateBase.documentManager = documentManager;
 		}
@@ -92,7 +100,7 @@ CollectionViewCommandsDelegateBase {
 
 	function createNewObject(typeId, viewTypeId){
 		if (collectionViewCommandsDelegateBase.documentManager){
-			collectionViewCommandsDelegateBase.documentManager.insertNewDocument(typeId, viewTypeId);
+			collectionViewCommandsDelegateBase.documentManager.insertNewDocument(typeId, viewTypeId, "");
 		}
 		else{
 			console.error("Unable to create new object:", typeId, viewTypeId, ". Error: Document manager is invalid")
@@ -101,7 +109,7 @@ CollectionViewCommandsDelegateBase {
 
 	function openDocumentEditor(objectId, typeId, viewTypeId){
 		if (collectionViewCommandsDelegateBase.documentManager){
-			collectionViewCommandsDelegateBase.documentManager.openDocument(objectId, typeId, viewTypeId);
+			collectionViewCommandsDelegateBase.documentManager.openDocument(objectId, "", typeId, viewTypeId);
 		}
 		else{
 			console.error("Unable to open document for editing", typeId, viewTypeId, ". Error: Document manager is invalid");
@@ -109,8 +117,6 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	function onEdit(){
-		console.log("onEdit", collectionId, documentManagerId);
-
 		let elementsModel = collectionViewCommandsDelegateBase.collectionView.table.elements;
 		if (!elementsModel){
 			console.error("Unable to edit document. Error: Elements for collection view is invalid");

@@ -7,7 +7,7 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 CONFIG += network websockets sql
 QT += websockets
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtgql -limtcom -limtrepo -limtappsdl -limtbasesdl -limthype -limtservergql -limtcol -limtbasesdl -limtappsdl 
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtgql -limtcom -limtrepo -limtappsdl -limtbasesdl -limthype -limtservergql -limtserverapp -limtcol -limtbasesdl -limtappsdl 
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)

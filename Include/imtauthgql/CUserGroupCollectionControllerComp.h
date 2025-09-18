@@ -5,7 +5,6 @@
 #include <imtauth/IUserGroupInfo.h>
 #include <imtauth/IUserInfoProvider.h>
 #include <imtauth/IUserGroupInfoProvider.h>
-#include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
@@ -37,6 +36,10 @@ protected:
 				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload OnGetElementMetaInfo(
+				const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (sdl::imtauth::Groups::CGroupCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
@@ -58,7 +61,6 @@ protected:
 				const sdl::imtauth::Groups::CGroupUpdateGqlRequest& groupUpdateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);

@@ -10,7 +10,7 @@ if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::QuickWidgets)
 endif()
 
-target_link_libraries(${PROJECT_NAME} imtbase imtbasesdl imtclientgql imtgql imtrest imtcom imtservergql)
+target_link_libraries(${PROJECT_NAME} imtbase imtbasesdl imtclientgql imtgql imtrest imtcom imtservergql imtserverapp)
 
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)

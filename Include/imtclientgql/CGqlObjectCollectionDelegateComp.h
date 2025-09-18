@@ -10,8 +10,13 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtserverapp/TJsonRepresentationControllerCompWrap.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtclientgql/IGqlObjectCollectionDelegate.h>
+#include <imtserverapp/CParamSetRepresentationController.h>
+#include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
+#include <imtserverapp/CDocumentFilterRepresentationController.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
 namespace imtclientgql
@@ -27,8 +32,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlObjectCollectionDelegateComp);
 		I_REGISTER_INTERFACE(IGqlObjectCollectionDelegate);
-		I_ASSIGN(m_clientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
-		I_ASSIGN(m_collectionIdAttrPtr, "Id", "Collection-ID", false, "");
+		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", false, "ObjectCollection");
 	I_END_COMPONENT;
@@ -100,6 +104,9 @@ public:
 				const imtgql::IGqlResponse& reqponse,
 				QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList) const override;
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 private:
 	struct ResponseData
 	{
@@ -111,10 +118,15 @@ private:
 	ResponseData GetResponseData(const imtgql::IGqlResponse& response) const;
 	bool SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const;
 	bool DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const;
+	bool GetParamsSetRepresentation(const iprm::IParamsSet& paramsSet, sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& representation) const;
+
+private:
+	imtserverapp::CParamSetRepresentationController m_paramSetRepresentationController;
+	imtserverapp::CDocumentFilterRepresentationController m_documentFilterRepresentationController;
+	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;
 
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
-	I_REF(IGqlClient, m_clientCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 };

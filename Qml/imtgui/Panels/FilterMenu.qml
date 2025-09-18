@@ -17,7 +17,8 @@ ControlBase {
     
     signal close()
     signal clear()
-    
+
+    property var filterDependencies: ({})
     property ListModel filtersModel: ListModel {}
     
     function registerFieldFilterDelegate(filterId, filterDelegateComp){
@@ -31,6 +32,23 @@ ControlBase {
                 return;
             }
         }
+    }
+
+    function setFilterDependency(filterId, dependsOnFilterId){
+        if (filterId in filterDependencies){
+            filterDependencies[filterId].push(dependsOnFilterId)
+        }
+        else{
+            filterDependencies[filterId] = [dependsOnFilterId]
+        }
+    }
+
+    function hasDependsOn(filterId, dependsOnFilterId){
+        if (filterId in filterDependencies){
+            return filterDependencies[filterId].includes(dependsOnFilterId)
+        }
+
+        return false
     }
 }
 

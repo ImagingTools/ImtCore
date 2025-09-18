@@ -123,12 +123,12 @@ Item {
 		}
 	}
 	
-	function setElementName(elementIndex, name){
-		container.setElementName(elementIndex, name);
+	function setElementName(elementId, name){
+		container.setElementName(elementId, name);
 	}
 	
-	function setElementDescription(elementIndex, description){
-		container.setElementDescription(elementIndex, description);
+	function setElementDescription(elementId, description){
+		container.setElementDescription(elementId, description);
 	}
 	
 	function setElementEnabled(elementId, enabled){
@@ -157,6 +157,14 @@ Item {
 	
 	function registerFieldFilterDelegate(filterId, filterDelegateComp){
 		container.registerFieldFilterDelegate(filterId, filterDelegateComp)
+	}
+
+	function setFilterDependency(filterId, dependsOnFilterId){
+		container.setFilterDependency(filterId, dependsOnFilterId)
+	}
+
+	function registerMetaInfoViewDelegate(metaInfoId, viewComp){
+		metaInfoView.registerViewDelegate(metaInfoId, viewComp)
 	}
 
 	Connections {
@@ -191,6 +199,13 @@ Item {
 		function onSelectionChanged(ids, indexes){
 			root.selectionChanged(ids, indexes);
 			
+			if (root.dataController){
+				if (root.visibleMetaInfo && ids.length === 1){
+					collectionMetaInfo.startLoading()
+					root.dataController.getObjectMetaInfo(ids[0])
+				}
+			}
+
 			collectionMetaInfo.contentVisible = ids.length === 1;
 			additionalInformation.visible = root.visibleMetaInfo && ids.length === 0;
 		}
@@ -235,10 +250,30 @@ Item {
 			function onEndUpdate(){
 				container.loading.stop();
 			}
+
+			function onObjectMetaInfoReceived(metaInfoData){
+				collectionMetaInfo.elementMetaInfo = metaInfoData
+				collectionMetaInfo.stopLoading()
+			}
 			
-			function onHeadersModelChanged(){
-				internal.isReady = true;
+			function onHeadersReceived(headers){
+				container.table.headers = headers
+
+				let filteringIds = []
+				for (let i = 0; i < headers.getItemsCount(); ++i){
+					let headerInfo = headers.get(i).item
+					if (headerInfo.m_filterable){
+						filteringIds.push(headerInfo.m_id)
+					}
+				}
+
+				container.collectionFilter.setFilteringInfoIds(filteringIds)
+
 				container.doUpdateGui();
+			}
+
+			function onElementsReceived(elements){
+				container.table.elements = elements
 			}
 
 			function onNotificationModelChanged(){
@@ -263,28 +298,10 @@ Item {
 					container.pagination.pagesSize = pagesCount;
 				}
 			}
-			
-			function onFilterableHeadersModelChanged(){
-				if (!container.dataController){
-					return;
-				}
-				
-				let filteringIds = []
-				let filteringModel = container.dataController.filterableHeadersModel;
-				for (let i = 0; i < filteringModel.getItemsCount(); i++){
-					let infoId = filteringModel.getData("id", i);
-					filteringIds.push(infoId)
-				}
-				
-				container.collectionFilter.setFilteringInfoIds(filteringIds);
-			}
 		}
 		
 		QtObject {
 			id: internal;
-			
-			property bool isReady: false;
-
 			function filterMenuActivate(){
 				if (container.hasFilter){
 					// container.filterMenuVisible = !container.filterMenuVisible;
@@ -303,14 +320,7 @@ Item {
 		Component.onDestruction: {
 			Events.unSubscribeEvent("FilterActivated", internal.filterMenuActivate);
 		}
-		
-		onDataControllerChanged: {
-			if (container.dataController){
-				bindHeaders.target = container.table;
-				bindElements.target = container.table;
-			}
-		}
-		
+
 		onRightButtonMouseClicked: {
 			openPopupMenu(mouseX, mouseY);
 		}
@@ -322,24 +332,8 @@ Item {
 		onFilterChanged: {
 			root.onFilterChanged(filterId, filterValue);
 		}
-		
-		Binding {
-			id: bindHeaders;
-			property: "headers";
-			value: container.dataController.headersModel;
-		}
-		
-		Binding {
-			id: bindElements;
-			property: "elements";
-			value: container.dataController.elementsModel;
-		}
-		
+
 		function doUpdateGui(){
-			if (!internal.isReady){
-				return;
-			}
-			
 			let count = -1;
 			let offset = 0;
 			
@@ -382,15 +376,15 @@ Item {
 			}
 		}
 		
-		function setElementName(elementIndex, name){
+		function setElementName(elementId, name){
 			if (container.dataController){
-				return container.dataController.setElementName(elementIndex, name);
+				container.dataController.setElementName(elementId, name);
 			}
 		}
 		
-		function setElementDescription(elementIndex, description){
+		function setElementDescription(elementId, description){
 			if (container.dataController){
-				return container.dataController.setElementDescription(elementIndex, description);
+				container.dataController.setElementDescription(elementId, description);
 			}
 		}
 		

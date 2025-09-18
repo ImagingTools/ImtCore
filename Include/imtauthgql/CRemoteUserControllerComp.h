@@ -17,7 +17,7 @@ class CRemoteUserControllerComp:
 						sdl::imtauth::Users::CGraphQlHandlerCompBase>
 {
 public:
-	typedef sdl::imtauth::Users::CGraphQlHandlerCompBase BaseClass;
+	typedef imtclientgql::TClientRequestManagerCompWrap<sdl::imtauth::Users::CGraphQlHandlerCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteUserControllerComp);
 	I_END_COMPONENT;
@@ -54,10 +54,6 @@ protected:
 				QString& errorMessage) const override;
 	virtual sdl::imtauth::Users::CCreateSuperuserPayload OnCreateSuperuser(
 				const sdl::imtauth::Users::CCreateSuperuserGqlRequest& createSuperuserRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CRemoveUserPayload OnUsersRemove(
-				const sdl::imtauth::Users::CUsersRemoveGqlRequest& removeUserRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 };

@@ -145,22 +145,14 @@ type Parameter {
 	typeId: ID!
 	name: String!
 	description: String
+	enabled: Boolean
 	## serialized parameter with JSON archive
 	data: String!
 }
 
-## TODO rename it
-type ParamsSet2 {
+type ParamsSet {
 	## \warning ALL id in parameters MUST be uinque
 	parameters: [Parameter]!
 }
 
-type ParamsSet
-{
-	paramIds: [ID]
-	paramTypeIds: [ID]
-	paramNames: [String]
-	paramDescriptions: [String]
-	parameters: [String]
-}
 

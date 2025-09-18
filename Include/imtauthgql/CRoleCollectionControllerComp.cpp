@@ -173,6 +173,93 @@ sdl::imtbase::ImtCollection::CVisualStatus CRoleCollectionControllerComp::OnGetO
 }
 
 
+sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CRoleCollectionControllerComp::OnGetElementMetaInfo(
+			const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload response;
+	response.Version_1_0.Emplace();
+
+	sdl::imtbase::ImtCollection::GetElementMetaInfoRequestArguments arguments = getElementMetaInfoRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	QByteArray objectId;
+	if (arguments.input.Version_1_0->elementId){
+		objectId = *arguments.input.Version_1_0->elementId;
+	}
+
+	QByteArray productId = gqlRequest.GetHeader("productId");
+
+	sdl::imtbase::ImtCollection::CElementMetaInfo::V1_0 elementMetaInfo;
+	QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> infoParams;
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
+		if (roleInfoPtr == nullptr){
+			errorMessage = QT_TR_NOOP("Unable to get a role info");
+			return response;
+		}
+
+		sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parentRolesParameter;
+		parentRolesParameter.id = QByteArrayLiteral("ParentRoles");
+		parentRolesParameter.typeId = parentRolesParameter.id;
+		parentRolesParameter.name = QStringLiteral("Parent Roles");
+
+		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
+
+		if (parentRolesIds.isEmpty()){
+			parentRolesParameter.data = QStringLiteral("No parent roles");
+		}
+		else{
+			QString parentRolesData;
+			for (const QByteArray& parentRoleId : parentRolesIds){
+				imtbase::IObjectCollection::DataPtr parentDataPtr;
+				if (m_objectCollectionCompPtr->GetObjectData(parentRoleId, parentDataPtr)){
+					const imtauth::IRole* parentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(parentDataPtr.GetPtr());
+					if (parentRoleInfoPtr != nullptr){
+						QString parentRoleName = parentRoleInfoPtr->GetRoleName();
+						parentRolesData += parentRoleName + "\n";
+					}
+				}
+			}
+			parentRolesParameter.data = parentRolesData;
+		}
+
+		infoParams << parentRolesParameter;
+
+		sdl::imtbase::ImtBaseTypes::CParameter::V1_0 permissionsParameter;
+		permissionsParameter.id = QByteArrayLiteral("Permissions");
+		permissionsParameter.typeId = parentRolesParameter.id;
+		permissionsParameter.name = QStringLiteral("Permissions");
+
+		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetPermissions();
+		if (permissionsIds.isEmpty()){
+			permissionsParameter.data = QStringLiteral("No permissions");
+		}
+		else{
+			QString permissionsData;
+			for (const QByteArray& permissionId : permissionsIds){
+				permissionsData += permissionId + "\n";
+			}
+			
+			permissionsParameter.data = permissionsData;
+		}
+
+		infoParams << permissionsParameter;
+	}
+
+	elementMetaInfo.infoParams = infoParams;
+	response.Version_1_0->elementMetaInfo = elementMetaInfo;
+
+	return response;
+}
+
+
 // reimplemented (sdl::imtauth::Roles::CRoleCollectionControllerCompBase)
 
 bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
@@ -337,110 +424,6 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.isGuest = bool(roleInfoPtr->IsGuest());
 
 	return true;
-}
-
-
-imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	if (!m_objectCollectionCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	QByteArray languageId;
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr != nullptr){
-		languageId = gqlContextPtr->GetLanguageId();
-	}
-
-	const imtgql::CGqlParamObject paramsPtr = gqlRequest.GetParams();
-
-	QByteArray productId;
-	productId = paramsPtr.GetParamArgumentValue("productId").toByteArray();
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-
-	QByteArray roleObjectId = GetObjectIdFromInputParams(paramsPtr);
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(roleObjectId, dataPtr)){
-		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
-		if (roleInfoPtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get a role info");
-			return nullptr;
-		}
-
-		int index = dataModelPtr->InsertNewItem();
-		dataModelPtr->SetData("id", "ParentRoles", index);
-
-		QString parentRoles = iqt::GetTranslation(
-					m_translationManagerCompPtr.GetPtr(),
-					QString(QT_TR_NOOP("Parent Roles")).toUtf8(),
-					languageId,
-					"CRoleCollectionControllerComp");
-		dataModelPtr->SetData("name", parentRoles, index);
-		imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("children", index);
-
-		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
-
-		if (parentRolesIds.isEmpty()){
-			QString noParentRoles = iqt::GetTranslation(
-						m_translationManagerCompPtr.GetPtr(),
-						QString(QT_TR_NOOP("No parent roles")).toUtf8(),
-						languageId,
-						"CRoleCollectionControllerComp");
-			children->SetData("value", noParentRoles);
-		}
-		else{
-			for (const QByteArray& parentRoleId : parentRolesIds){
-				imtbase::IObjectCollection::DataPtr parentDataPtr;
-				if (m_objectCollectionCompPtr->GetObjectData(parentRoleId, parentDataPtr)){
-					const imtauth::IRole* parentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(parentDataPtr.GetPtr());
-					if (parentRoleInfoPtr != nullptr){
-						QString parentRoleName = parentRoleInfoPtr->GetRoleName();
-
-						int childrenIndex = children->InsertNewItem();
-
-						children->SetData("value", parentRoleName, childrenIndex);
-					}
-				}
-			}
-		}
-
-		index = dataModelPtr->InsertNewItem();
-
-		dataModelPtr->SetData("id", "Permissions", index);
-
-		QString permissions = iqt::GetTranslation(
-					m_translationManagerCompPtr.GetPtr(),
-					QString(QT_TR_NOOP("Permissions")).toUtf8(),
-					languageId,
-					"CRoleCollectionControllerComp");
-
-		dataModelPtr->SetData("name", permissions, index);
-		children = dataModelPtr->AddTreeModel("children", index);
-
-		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetPermissions();
-
-		if (permissionsIds.isEmpty()){
-			QString noPermissions = iqt::GetTranslation(
-						m_translationManagerCompPtr.GetPtr(),
-						QString(QT_TR_NOOP("No permissions")).toUtf8(),
-						languageId,
-						"CRoleCollectionControllerComp");
-
-			children->SetData("value", noPermissions);
-		}
-		else{
-			for (const QByteArray& permissionId : permissionsIds){
-				int childrenIndex = children->InsertNewItem();
-
-				children->SetData("value", permissionId, childrenIndex);
-			}
-		}
-	}
-
-	return rootModelPtr.PopPtr();
 }
 
 

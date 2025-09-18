@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5405" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -73,12 +73,9 @@
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RoleMetaInfoControllerProxy</Value>
-                                <Value>RemoteRepresentationController</Value>
                                 <Value>RemoteDocumentRevisionController</Value>
-                                <Value>RemoteObjectVisualStatusController</Value>
                                 <Value>GqlJwtSessionController</Value>
-                                <Value>RemoteCommandsController</Value>
+                                <Value>RemoteControllers</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -141,16 +138,19 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteCommandsController" PackageId="ImtClientGqlPck" ComponentId="RemoteCommandsController">
+        <Element Id="RemoteControllers" PackageId="" ComponentId="RemoteControllers">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -158,18 +158,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Role</Value>
-                                <Value>Roles</Value>
-                                <Value>User</Value>
-                                <Value>Users</Value>
-                                <Value>Group</Value>
-                                <Value>Groups</Value>
-                            </Values>
-                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -186,17 +174,6 @@
                                 <Value>Roles</Value>
                                 <Value>Users</Value>
                                 <Value>Groups</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetRevisionInfoList</Value>
-                                <Value>RestoreRevision</Value>
-                                <Value>DeleteRevision</Value>
-                                <Value>BackupRevision</Value>
-                                <Value>ExportRevision</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -239,43 +216,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteObjectVisualStatusController" PackageId="ImtClientGqlPck" ComponentId="RemoteObjectVisualStatusController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApiClient"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetObjectVisualStatus</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Role</Value>
-                                <Value>User</Value>
-                                <Value>Group</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="RemoteRepositories" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepositories">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -306,91 +246,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteRepresentationController" PackageId="ImtClientGqlPck" ComponentId="PumaGqlRemoteRepresentationController">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApiClient"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetUserInfo</Value>
-                                <Value>GetRoleInfo</Value>
-                                <Value>GetUserGroupInfo</Value>
-                                <Value>GetDatabaseStatus</Value>
-                                <Value>UserToken</Value>
-                                <Value>SessionItem</Value>
-                                <Value>UsersObjectView</Value>
-                                <Value>UsersSetDescription</Value>
-                                <Value>UsersInfo</Value>
-                                <Value>UsersList</Value>
-                                <Value>UserItem</Value>
-                                <Value>UserAdd</Value>
-                                <Value>UserUpdate</Value>
-                                <Value>UsersRemove</Value>
-                                <Value>UsersRename</Value>
-                                <Value>UsersCommands</Value>
-                                <Value>UserCommands</Value>
-                                <Value>RolesList</Value>
-                                <Value>RoleItem</Value>
-                                <Value>RoleAdd</Value>
-                                <Value>RoleUpdate</Value>
-                                <Value>RolesRemove</Value>
-                                <Value>RolesObjectView</Value>
-                                <Value>RolesInfo</Value>
-                                <Value>RolesCommands</Value>
-                                <Value>RoleCommands</Value>
-                                <Value>RolesSetDescription</Value>
-                                <Value>GroupsList</Value>
-                                <Value>GroupsInfo</Value>
-                                <Value>GroupsObjectView</Value>
-                                <Value>GroupsSetDescription</Value>
-                                <Value>GroupItem</Value>
-                                <Value>GroupAdd</Value>
-                                <Value>GroupUpdate</Value>
-                                <Value>GroupsRemove</Value>
-                                <Value>GroupsRename</Value>
-                                <Value>GroupsCommands</Value>
-                                <Value>GroupCommands</Value>
-                                <Value>UsersMetaInfo</Value>
-                                <Value>GroupsMetaInfo</Value>
-                                <Value>ChangePassword</Value>
-                                <Value>Authorization</Value>
-                                <Value>GroupHistory</Value>
-                                <Value>RoleHistory</Value>
-                                <Value>UserHistory</Value>
-                                <Value>RoleItemTypeId</Value>
-                                <Value>GroupItemTypeId</Value>
-                                <Value>UserItemTypeId</Value>
-                                <Value>RegisterUser</Value>
-                                <Value>CheckEmail</Value>
-                                <Value>CheckEmailCode</Value>
-                                <Value>SendEmailCode</Value>
-                                <Value>CheckSuperuserExists</Value>
-                                <Value>CreateSuperuser</Value>
-                                <Value>Logout</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="RevisionPermissions" PackageId="ImtCoreVoce" ComponentId="RevisionPermissions">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -398,40 +253,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RoleMetaInfoControllerProxy" PackageId="ImtAuthGqlPck" ComponentId="RoleMetaInfoControllerProxy">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApiClient"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>RolesMetaInfo</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -488,7 +309,222 @@
             </Data>
         </Element>
     </ElementsList>
-    <EmbeddedRegistriesList/>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="RemoteControllers">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="Demultiplexer" PackageId="ImtServerGqlPck" ComponentId="GraphQLDemultiplexer">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>RemoteAuthorizationController</Value>
+                                            <Value>RemoteUserController</Value>
+                                            <Value>RemoteCommandsController</Value>
+                                            <Value>RoleMetaInfoControllerProxy</Value>
+                                            <Value>RemoteCollectionController</Value>
+                                            <Value>RemoteRepresentationController</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RemoteAuthorizationController" PackageId="ImtAuthGqlPck" ComponentId="RemoteAuthorizationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RemoteCollectionController" PackageId="ImtClientGqlPck" ComponentId="RemoteObjectCollectionController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>Roles</Value>
+                                            <Value>Users</Value>
+                                            <Value>Groups</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RemoteCommandsController" PackageId="ImtClientGqlPck" ComponentId="RemoteCommandsController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>Role</Value>
+                                            <Value>Roles</Value>
+                                            <Value>User</Value>
+                                            <Value>Users</Value>
+                                            <Value>Group</Value>
+                                            <Value>Groups</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RemoteRepresentationController" PackageId="ImtClientGqlPck" ComponentId="PumaGqlRemoteRepresentationController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>UsersList</Value>
+                                            <Value>UserItem</Value>
+                                            <Value>UserAdd</Value>
+                                            <Value>UserUpdate</Value>
+                                            <Value>RolesList</Value>
+                                            <Value>RoleItem</Value>
+                                            <Value>RoleAdd</Value>
+                                            <Value>RoleUpdate</Value>
+                                            <Value>GroupsList</Value>
+                                            <Value>GroupItem</Value>
+                                            <Value>GroupAdd</Value>
+                                            <Value>GroupUpdate</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RemoteUserController" PackageId="ImtAuthGqlPck" ComponentId="RemoteUserController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RoleMetaInfoControllerProxy" PackageId="ImtAuthGqlPck" ComponentId="RoleMetaInfoControllerProxy">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>RolesMetaInfo</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces>
+                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
+                </ExportedInterfaces>
+                <ExportedComponents/>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="imtauth::IJwtSessionController" ComponentId="RemoteJwtSessionController"/>
         <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="ApiClient"/>

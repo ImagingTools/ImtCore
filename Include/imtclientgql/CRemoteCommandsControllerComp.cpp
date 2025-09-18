@@ -45,18 +45,7 @@ sdl::imtbase::Commands::CGuiElementContainer CRemoteCommandsControllerComp::OnGe
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::Commands::CGuiElementContainer::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtbase::Commands::CGuiElementContainer::V1_0, sdl::imtbase::Commands::CGuiElementContainer>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to get remote commands. Error: %1").arg(errorMessage);
-		SendErrorMessage(0, errorMessage, "CRemoteCommandsControllerComp");
-		return sdl::imtbase::Commands::CGuiElementContainer();
-	}
-
-	sdl::imtbase::Commands::CGuiElementContainer retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtbase::Commands::CGuiElementContainer>(gqlRequest, errorMessage);
 }
 
 

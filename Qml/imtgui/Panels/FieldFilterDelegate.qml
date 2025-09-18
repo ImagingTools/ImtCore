@@ -17,6 +17,36 @@ OptionsFilterDelegate {
 		property var fieldFiltersMap: ({})
 	}
 
+	signal filterDependencyChanged(string filterId, var filterValue)
+	signal filterDependencyChanged(string filterId, var filterValue)
+
+	Connections {
+		target: filterDelegate.collectionFilter
+		
+		function onFieldFilterAdded(filterId, filterValue){
+			if (filterDelegate.filterMenu){
+				if (filterDelegate.filterMenu.hasDependsOn(filterDelegate.filterId, filterId)){
+					if (filterDelegate.selectionParam.m_selectedIndex >= 0){
+						filterDelegate.clearFilter()
+					}
+					filterDelegate.filterDependencyChanged(filterId, filterValue)
+				}
+			}
+		}
+		
+		function onFieldFilterRemoved(filterId){
+			if (filterDelegate.filterMenu){
+				if (filterDelegate.filterMenu.hasDependsOn(filterDelegate.filterId, filterId)){
+					if (filterDelegate.selectionParam.m_selectedIndex >= 0){
+						filterDelegate.clearFilter()
+					}
+
+					filterDelegate.filterDependencyChanged(filterId)
+				}
+			}
+		}
+	}
+
 	onOptionSelectionChanged: {
 		if (!collectionFilter){
 			return

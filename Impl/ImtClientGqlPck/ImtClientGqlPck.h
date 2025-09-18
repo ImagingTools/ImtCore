@@ -19,7 +19,7 @@
 #include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 #include <imtclientgql/CConnectionStatusSubscriberComp.h>
 #include <imtclientgql/CRemoteDocumentRevisionControllerComp.h>
-#include <imtclientgql/CRemoteObjectVisualStatusControllerComp.h>
+#include <imtclientgql/CRemoteObjectCollectionControllerComp.h>
 #include <imtclientgql/CObjectCollectionSubscriberComp.h>
 #include <imtclientgql/CRemoteCommandsControllerComp.h>
 
@@ -43,7 +43,7 @@ typedef imtclientgql::CModelSubscriberComp ModelSubscriber;
 typedef imtclientgql::CGqlHierarchicalStructureDelegateComp GqlHierarchicalStructureDelegate;
 typedef icomp::TModelCompWrap<imtclientgql::CConnectionStatusSubscriberComp> ConnectionStatusSubscriber;
 typedef imtclientgql::CRemoteDocumentRevisionControllerComp RemoteDocumentRevisionController;
-typedef imtclientgql::CRemoteObjectVisualStatusControllerComp RemoteObjectVisualStatusController;
+typedef imtclientgql::CRemoteObjectCollectionControllerComp RemoteObjectCollectionController;
 typedef imtclientgql::CObjectCollectionSubscriberComp ObjectCollectionSubscriber;
 typedef imtclientgql::CRemoteCommandsControllerComp RemoteCommandsController;
 

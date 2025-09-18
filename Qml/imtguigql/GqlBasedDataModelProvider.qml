@@ -6,15 +6,18 @@ import imtcontrols 1.0
 DataModelProvider {
 	id: root
 	
-	property string getCommandId
+	property string gqlCommandId
 	property var responseModel
 	property var inputModel
-	
-	function requestDataModel(paramsObj){
-		console.log("requestDataModel")
-		root.requestStarted(paramsObj)
 
-		var query = Gql.GqlRequest("query", getCommandId)
+	function requestDataModel(){
+		requestDataModelBase()
+	}
+
+	function requestDataModelBase(paramsObj){
+		requestStarted(paramsObj)
+
+		var query = Gql.GqlRequest("query", gqlCommandId)
 		
 		let inputObject = Gql.GqlObject("input")
 
@@ -36,7 +39,7 @@ DataModelProvider {
 		
 		query.AddParam(inputObject)
 		
-		gqlRequest.setGqlQuery(query.GetQuery(), root.getHeaders())
+		gqlRequest.setGqlQuery(query.GetQuery(), getHeaders())
 	}
 
 	function prepareInputModel(paramsObj){
@@ -44,7 +47,6 @@ DataModelProvider {
 	}
 
 	function prepareDataModel(){
-
 	}
 	
 	function getHeaders(){
@@ -65,8 +67,8 @@ DataModelProvider {
 				
 				if ("data" in responseObj){
 					let dataObject = responseObj["data"]
-					if (root.getCommandId in dataObject){
-						dataObject = dataObject[root.getCommandId]
+					if (root.gqlCommandId in dataObject){
+						dataObject = dataObject[root.gqlCommandId]
 					}
 
 					let responseModel = root.dataModel
@@ -91,8 +93,8 @@ DataModelProvider {
 				let message = ""
 				if ("errors" in responseObj){
 					let errorsObject = responseObj["errors"]
-					if (root.getCommandId in errorsObject){
-						errorsObject = errorsObject[root.getCommandId]
+					if (root.gqlCommandId in errorsObject){
+						errorsObject = errorsObject[root.gqlCommandId]
 					}
 
 					if ("message" in errorsObject){

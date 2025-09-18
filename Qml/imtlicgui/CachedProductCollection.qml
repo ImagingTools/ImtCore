@@ -24,7 +24,7 @@ CollectionDataProvider {
 	
 	property TreeItemModel hardwareProductsModel: TreeItemModel {};
 	property TreeItemModel softwareProductsModel: TreeItemModel {};
-	
+
 	onCollectionModelChanged: {
 		hardwareProductsModel.clear();
 		softwareProductsModel.clear();
@@ -43,6 +43,22 @@ CollectionDataProvider {
 
 		hardwareProductsModel.refresh();
 		softwareProductsModel.refresh();
+	}
+
+	function getLicensesModel(productId){
+		if (!collectionModel){
+			return null
+		}
+
+		for (let i = 0; i < collectionModel.getItemsCount(); ++i){
+			let id = collectionModel.getData(ProductItemTypeMetaInfo.s_id, i);
+			let category = collectionModel.getData(ProductItemTypeMetaInfo.s_categoryId, i);
+			if (id === productId){
+				return collectionModel.getData(ProductItemTypeMetaInfo.s_licenses, i);
+			}
+		}
+
+		return null
 	}
 }
 

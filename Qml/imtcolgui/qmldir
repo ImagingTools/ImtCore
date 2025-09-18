@@ -28,5 +28,9 @@ MessageCollectionView 1.0 MessageCollectionView.qml
 SchemeView 1.0 SchemeView.qml
 MetaInfo 1.0 MetaInfo.qml
 
+MetaInfoViewDelegateBase 1.0 MetaInfoViewDelegateBase.qml
+MetaInfoTextDelegate 1.0 MetaInfoTextDelegate.qml
+
 CollectionDataController 1.0 CollectionDataController.qml
 DocCollectionFilter 1.0 DocCollectionFilter.qml
+CollectionWorkspacePageView 1.0 CollectionWorkspacePageView.qml

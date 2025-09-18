@@ -2,28 +2,38 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5405" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApiClient" X="225" Y="325" Note=""/>
+        <Element ComponentName="ApiClient" X="175" Y="425" Note=""/>
         <Element ComponentName="CheckPermissionOr" X="950" Y="775" Note=""/>
         <Element ComponentName="ConnectionStatusSubscriberController" X="1080" Y="400" Note=""/>
-        <Element ComponentName="Demultiplexer" X="650" Y="150" Note=""/>
-        <Element ComponentName="GqlJwtSessionController" X="725" Y="275" Note=""/>
-        <Element ComponentName="GraphQLClientEngine" X="125" Y="500" Note=""/>
-        <Element ComponentName="RemoteCommandsController" X="575" Y="550" Note=""/>
+        <Element ComponentName="Demultiplexer" X="600" Y="100" Note=""/>
+        <Element ComponentName="GqlJwtSessionController" X="725" Y="225" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="150" Y="550" Note=""/>
+        <Element ComponentName="RemoteControllers" X="600" Y="425" Note=""/>
         <Element ComponentName="RemoteDocumentRevisionController" X="650" Y="675" Note=""/>
-        <Element ComponentName="RemoteJwtSessionController" X="450" Y="275" Note=""/>
-        <Element ComponentName="RemoteObjectVisualStatusController" X="450" Y="375" Note=""/>
-        <Element ComponentName="RemoteRepositories" X="1060" Y="160" Note=""/>
-        <Element ComponentName="RemoteRepresentationController" X="225" Y="150" Note=""/>
-        <Element ComponentName="RevisionPermissions" X="325" Y="775" Note=""/>
-        <Element ComponentName="RoleMetaInfoControllerProxy" X="550" Y="450" Note=""/>
+        <Element ComponentName="RemoteJwtSessionController" X="275" Y="225" Note=""/>
+        <Element ComponentName="RemoteRepositories" X="1050" Y="150" Note=""/>
+        <Element ComponentName="RevisionPermissions" X="375" Y="775" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="1060" Y="280" Note=""/>
         <Element ComponentName="Subscription" X="1080" Y="520" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="RemoteControllers">
+            <PositionMap>
+                <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
+                <Element ComponentName="RemoteAuthorizationController" X="939" Y="188" Note=""/>
+                <Element ComponentName="RemoteCollectionController" X="575" Y="550" Note=""/>
+                <Element ComponentName="RemoteCommandsController" X="575" Y="375" Note=""/>
+                <Element ComponentName="RemoteRepresentationController" X="600" Y="200" Note=""/>
+                <Element ComponentName="RemoteUserController" X="250" Y="200" Note=""/>
+                <Element ComponentName="RoleMetaInfoControllerProxy" X="250" Y="375" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

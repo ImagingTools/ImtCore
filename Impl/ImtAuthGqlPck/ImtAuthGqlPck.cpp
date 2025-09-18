@@ -144,6 +144,21 @@ I_EXPORT_COMPONENT(
 			"Remote user controller",
 			"Remote User Controller");
 
+I_EXPORT_COMPONENT(
+			RemoteAuthorizationController,
+			"Remote authorization controller",
+			"Remote Authorization Controller");
+
+I_EXPORT_COMPONENT(
+			UserActionCollectionController,
+			"User action collection controller",
+			"User Action Collection Controller");
+
+I_EXPORT_COMPONENT(
+			UserActionMetaInfoDelegate,
+			"User action meta info delegate",
+			"User Action Meta Info Delegate");
+
 
 } // namespace ImtAuthGqlPck
 

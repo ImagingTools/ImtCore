@@ -2,18 +2,22 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5405" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="DatabaseEngine" X="150" Y="500" Note=""/>
-        <Element ComponentName="HttpServerFramework" X="150" Y="125" Note=""/>
-        <Element ComponentName="IdentifiableProductInfo" X="850" Y="625" Note=""/>
-        <Element ComponentName="PumaClientEngine" X="850" Y="500" Note=""/>
-        <Element ComponentName="SlaveSubscriberController" X="675" Y="350" Note=""/>
-        <Element ComponentName="WebSocketServerFramework" X="825" Y="125" Note=""/>
+        <Element ComponentName="DatabaseEngine" X="275" Y="750" Note=""/>
+        <Element ComponentName="Demultiplexer" X="575" Y="150" Note=""/>
+        <Element ComponentName="HttpServerFramework" X="225" Y="175" Note=""/>
+        <Element ComponentName="IdentifiableProductInfo" X="975" Y="650" Note=""/>
+        <Element ComponentName="PumaClientEngine" X="950" Y="450" Note=""/>
+        <Element ComponentName="SlaveSubscriberController" X="650" Y="450" Note=""/>
+        <Element ComponentName="UserActionCollectionChangeNotifier" X="625" Y="600" Note=""/>
+        <Element ComponentName="UserActionCollectionController" X="250" Y="425" Note=""/>
+        <Element ComponentName="UserActionSqlRepository" X="275" Y="600" Note=""/>
+        <Element ComponentName="WebSocketServerFramework" X="975" Y="150" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

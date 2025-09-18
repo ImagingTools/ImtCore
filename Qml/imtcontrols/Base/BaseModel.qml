@@ -249,6 +249,22 @@ ListModel {
 			item[propName] = value
 		}
 	}
+
+	function swapItems(index1, index2){
+		if (index1 < 0 || index1 >= this.count || index2 < 0 || index2 >= this.count){
+			return false
+		}
+		
+		let item1 = this.get(index1).item.copyMe()
+		let item2 = this.get(index2).item.copyMe()
+		item1.owner = this.owner
+		item2.owner = this.owner
+
+		this.get(index1).item = item2
+		this.get(index2).item = item1
+
+		return true
+	}
 }
 
 

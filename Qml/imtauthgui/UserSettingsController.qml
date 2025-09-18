@@ -53,7 +53,6 @@ ParamsSetController {
 		sdlObjectComp: Component {
 			SetSettingsPayload {
 				onFinished: {
-					console.log("SetSettingsPayload", m_ok)
 					if (m_ok){
 						root.settingsSaved()
 						root.paramModelCreated()

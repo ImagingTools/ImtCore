@@ -23,18 +23,25 @@ imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderC
 
 	imtgql::CGqlRequest gqlRequest;
 	if (userssdl::CCheckSuperuserExistsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		userssdl::CCheckSuperuserPayload::V1_0 response;
-		if (!SendModelRequest<userssdl::CCheckSuperuserPayload::V1_0, userssdl::CCheckSuperuserPayload>(gqlRequest, response, errorMessage)){
+		typedef userssdl::CCheckSuperuserPayload Response;
+
+		QString errorMessage;
+		Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
 			return imtauth::ISuperuserProvider::ES_UNKNOWN;
 		}
 
-		if (response.message){
-			errorMessage = *response.message;
+		if (!response.Version_1_0){
+			return imtauth::ISuperuserProvider::ES_UNKNOWN;
+		}
+
+		if (response.Version_1_0->message){
+			errorMessage = *response.Version_1_0->message;
 		}
 
 		imtauth::ISuperuserProvider::ExistsStatus retVal = imtauth::ISuperuserProvider::ES_UNKNOWN;
-		if (response.status){
-			sdl::imtauth::Users::ExistsStatus status = *response.status;
+		if (response.Version_1_0->status){
+			sdl::imtauth::Users::ExistsStatus status = *response.Version_1_0->status;
 			if (status == sdl::imtauth::Users::ExistsStatus::EXISTS){
 				retVal = imtauth::ISuperuserProvider::ES_EXISTS;
 			}

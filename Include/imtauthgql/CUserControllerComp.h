@@ -63,10 +63,6 @@ protected:
 				const sdl::imtauth::Users::CCreateSuperuserGqlRequest& createSuperuserRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
-	virtual sdl::imtauth::Users::CRemoveUserPayload OnUsersRemove(
-				const sdl::imtauth::Users::CUsersRemoveGqlRequest& removeUserRequest,
-				const ::imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
 
 private:
 	bool SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const;

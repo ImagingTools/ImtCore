@@ -25,6 +25,11 @@ I_EXPORT_COMPONENT(
 			"Text Filter");
 
 I_EXPORT_COMPONENT(
+			DocumentFilter,
+			"Document filter",
+			"Document Filter");
+
+I_EXPORT_COMPONENT(
 			CollectionHeadersProvider,
 			"Collection headers provider",
 			"Collection Headers Provider");

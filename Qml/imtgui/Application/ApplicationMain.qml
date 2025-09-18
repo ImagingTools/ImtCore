@@ -239,15 +239,15 @@ Item {
 		
 		onParamModelCreated: {
 			let languageSelectionParam = application.languageProvider.selectionParam;
-			let languageParamter = getParamJsonByPath([application.languageProvider.typeId]);
-			if (languageParamter != languageSelectionParam.toJson()){
-				application.languageProvider.selectionParam.createFromJson(languageParamter)
+			let languageParamter = getParameterById(application.languageProvider.typeId);
+			if (languageParamter.m_data !== languageSelectionParam.toJson()){
+				application.languageProvider.selectionParam.createFromJson(languageParamter.m_data)
 			}
 			
 			let designSelectionParam = application.designProvider.selectionParam;
-			let designParamter = getParamJsonByPath([application.designProvider.typeId]);
-			if (designParamter != designSelectionParam.toJson()){
-				application.designProvider.selectionParam.createFromJson(designParamter)
+			let designParamter = getParameterById(application.designProvider.typeId)
+			if (designParamter.m_data !== designSelectionParam.toJson()){
+				application.designProvider.selectionParam.createFromJson(designParamter.m_data)
 			}
 		}
 	}
@@ -280,6 +280,7 @@ Item {
 	}
 	
 	function getWebSocketUrl(serverUrl){
+		console.log("getWebSocketUrl", serverUrl)
 		try {
 			let url = new URL(serverUrl);
 
@@ -323,7 +324,7 @@ Item {
 		}
 		
 		function fillPreferenceParamsSet(){
-			if (Qt.platform.os != "web"){
+			if (Qt.platform.os !== "web"){
 				settingsController.registerParamsSetController("Network", qsTr("Network"), clientSettingsController)
 			}
 			

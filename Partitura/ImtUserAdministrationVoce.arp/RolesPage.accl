@@ -2,13 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5385" Description="ACF"/>
-            <Version Id="1" Number="2247" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="CheckPermissionOr" X="675" Y="425" Note=""/>
+        <Element ComponentName="CollectionHeadersProvider" X="800" Y="225" Note=""/>
         <Element ComponentName="Demultiplexer" X="650" Y="75" Note=""/>
         <Element ComponentName="OperationContextController" X="1050" Y="200" Note=""/>
         <Element ComponentName="Role" X="775" Y="525" Note=""/>
@@ -19,7 +20,6 @@
         <Element ComponentName="RoleProvider" X="225" Y="75" Note=""/>
         <Element ComponentName="RolesCommands" X="625" Y="300" Note=""/>
         <Element ComponentName="RolesDataController" X="975" Y="325" Note=""/>
-        <Element ComponentName="RolesHeadersDataProvider" X="1075" Y="525" Note=""/>
         <Element ComponentName="SerializableRoleCollectionController" X="400" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>

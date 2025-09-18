@@ -11,6 +11,7 @@ Item {
     property Component startItemSourceComp;
 
     function createStartItemComp(){
+        console.log("startItemSource", startItemSource)
         startItemSourceComp = Qt.createComponent(startItemSource)
         if (startItemSourceComp && startItemSourceComp.status !== Component.Ready){
             console.error("Unable to create start item component. Error: ", startItemSourceComp.errorString());

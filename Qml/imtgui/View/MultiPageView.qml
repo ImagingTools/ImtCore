@@ -10,7 +10,7 @@ Item {
         dynamicRoles: true;
     }
 
-    property alias currentIndex: mainPanelRepeater.currentIndex;
+    property int currentIndex: -1
 
     property int mainMargin: Style.marginM;
 	property int panelWidth: Style.sizeHintXXXS;
@@ -134,10 +134,16 @@ Item {
                 delegate: ItemDelegate {
                     text: model.name;
 
-                    highlighted: mainPanelRepeater.currentIndex == model.index;
+                    highlighted: root.currentIndex === model.index;
 
                     onClicked: {
-                        mainPanelRepeater.currentIndex = model.index;
+                        root.currentIndex = model.index;
+                    }
+                    
+                    Component.onCompleted: {
+                        if (model.index === 0){
+                            root.currentIndex = 0
+                        }
                     }
                 }
             }
@@ -171,7 +177,7 @@ Item {
 
                 sourceComponent: model.SourceComponent;
 
-                visible: mainPanelRepeater.currentIndex == model.index;
+                visible: root.currentIndex === model.index;
 
                 onLoaded: {
                     root.pageLoaded(model.index, item);

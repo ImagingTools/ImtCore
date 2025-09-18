@@ -7,6 +7,7 @@ target_link_libraries(${PROJECT_NAME}
 	imtrest
 	imtfile
 	imtservergql
+	imtserverapp
 	imthype
 	imtgql
 	imtcol

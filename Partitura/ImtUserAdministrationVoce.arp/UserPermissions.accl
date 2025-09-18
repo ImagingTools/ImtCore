@@ -2,22 +2,23 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5347" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="GetCollectionHeaders" X="975" Y="375" Note=""/>
         <Element ComponentName="PermissionsJoiner" X="550" Y="125" Note=""/>
+        <Element ComponentName="RemoveElementSet" X="975" Y="550" Note=""/>
+        <Element ComponentName="RemoveElements" X="975" Y="475" Note=""/>
         <Element ComponentName="UserCommands" X="550" Y="375" Note=""/>
-        <Element ComponentName="UserItem" X="550" Y="500" Note=""/>
-        <Element ComponentName="UserUpdate" X="200" Y="375" Note=""/>
-        <Element ComponentName="UsersAdd" X="975" Y="225" Note=""/>
+        <Element ComponentName="UserItem" X="700" Y="650" Note=""/>
+        <Element ComponentName="UserUpdate" X="225" Y="600" Note=""/>
+        <Element ComponentName="UsersAdd" X="975" Y="750" Note=""/>
         <Element ComponentName="UsersCommands" X="550" Y="250" Note=""/>
-        <Element ComponentName="UsersInfo" X="975" Y="375" Note=""/>
-        <Element ComponentName="UsersList" X="200" Y="250" Note=""/>
+        <Element ComponentName="UsersList" X="300" Y="725" Note=""/>
         <Element ComponentName="UsersMetaInfo" X="200" Y="500" Note=""/>
-        <Element ComponentName="UsersRemove" X="975" Y="500" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

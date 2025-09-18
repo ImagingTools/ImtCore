@@ -10,6 +10,7 @@
 #include <imtbase/ISearchController.h>
 #include <imtgql/IGqlRequestProvider.h>
 #include <imtgql/CGqlRequest.h>
+#include <imtcol/ICollectionHeadersProvider.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 #undef GetObject
@@ -78,38 +79,30 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> headersResponseModelPtr = BaseClass::GetHeaders(gqlRequest, errorMessage);
-	if (!headersResponseModelPtr.IsValid()){
-		return nullptr;
-	}
+	typename imtcol::ICollectionHeadersProvider::HeaderIds headerIds = this->m_headersProviderCompPtr->GetHeaderIds();
 
-	imtbase::CTreeItemModel* headersDataModelPtr = headersResponseModelPtr->GetTreeItemModel("data");
-	if (headersDataModelPtr == nullptr){
-		return nullptr;
-	}
-
-	imtbase::CTreeItemModel* filterSearchModelPtr = headersDataModelPtr->GetTreeItemModel("filterSearch");
-	if (filterSearchModelPtr == nullptr){
-		return nullptr;
-	}
-	
 	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilter;
 	
 	sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0 groupFilter;
 	groupFilter.logicalOperation = sdl::imtbase::ComplexCollectionFilter::LogicalOperation::Or;
 	
 	QList<sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0> fieldList;
-	for (int i = 0; i < filterSearchModelPtr->GetItemsCount(); i++){
-		sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0 fieldFilter;
-		fieldFilter.fieldId = filterSearchModelPtr->GetData("id", i).toByteArray();
-		fieldFilter.filterValue = text;
-		fieldFilter.filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
-		
-		QList<sdl::imtbase::ComplexCollectionFilter::FilterOperation> filterOperations;
-		filterOperations << sdl::imtbase::ComplexCollectionFilter::FilterOperation::Contains;
-		fieldFilter.filterOperations = filterOperations;
-		
-		fieldList << fieldFilter;
+	for (const QByteArray& headerId : headerIds){
+		typename imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
+		if (this->m_headersProviderCompPtr->GetHeaderInfo(headerId, headerInfo)){
+			if (headerInfo.filterable){
+				sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0 fieldFilter;
+				fieldFilter.fieldId = headerInfo.headerId;
+				fieldFilter.filterValue = text;
+				fieldFilter.filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
+				
+				QList<sdl::imtbase::ComplexCollectionFilter::FilterOperation> filterOperations;
+				filterOperations << sdl::imtbase::ComplexCollectionFilter::FilterOperation::Contains;
+				fieldFilter.filterOperations = filterOperations;
+				
+				fieldList << fieldFilter;
+			}
+		}
 	}
 	
 	groupFilter.fieldFilters = fieldList;

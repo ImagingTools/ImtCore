@@ -10,10 +10,12 @@ Item {
 
 	property DocumentManager documentManager
 	property int popupWidth: Style.sizeHintXXS
-	property ObjectVisualStatusProvider visualStatusProvider: ObjectVisualStatusProvider {}
-	
+	property ObjectVisualStatusProvider visualStatusProvider: null
+
+	signal viewLoaded(string viewId, var view)
+
 	Connections {
-		target: workspaceView.visualStatusProvider
+		target: workspaceView.visualStatusProvider ? workspaceView.visualStatusProvider : undefined
 		
 		function onVisualStatusReceived(objectId, icon, text, description){
 			let name = text
@@ -40,7 +42,10 @@ Item {
 		function onDocumentSaved(documentId){
 			Events.sendEvent("StopLoading")
 			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
-			workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
+
+			if (workspaceView.visualStatusProvider){
+				workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
+			}
 		}
 		
 		function onDocumentSavingStarted(documentId){
@@ -53,15 +58,25 @@ Item {
 
 		function onDocumentAdded(documentId){
 			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
-			workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
-			
-			let documentData = workspaceView.documentManager.getDocumentDataById(documentId)
+			let documentName = workspaceView.documentManager.getDocumentName(documentId)
 
-			let name = workspaceView.documentManager.defaultDocumentName
+			let wait = false
+			if (workspaceView.visualStatusProvider){
+				documentName = ""
+				wait = true
+				workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
+			}
+			else{
+				if (documentName === ""){
+					documentName = workspaceView.documentManager.defaultDocumentName
+				}
+			}
+
+			let documentData = workspaceView.documentManager.getDocumentDataById(documentId)
 
 			let tabIndex = tabView.getIndexById(documentId)
 			if (tabIndex < 0){
-				tabView.addTab(documentData.documentId, "", documentData.viewComp, "", "", true)
+				tabView.addTab(documentData.documentId, documentName, documentData.viewComp, "", "", wait)
 				tabIndex = tabView.tabModel.count - 1
 			}
 
@@ -110,10 +125,10 @@ Item {
 		
 		function onTryCloseDirtyDocument(documentId, callback){
 			let dialogCallback = function(result){
-				if (result == Enums.yes){
+				if (result === Enums.yes){
 					callback(true)
 				}
-				else if (result == Enums.no){
+				else if (result === Enums.no){
 					callback(false)
 				}
 				else{
@@ -212,6 +227,7 @@ Item {
 
 		onTabLoaded: {
 			workspaceView.documentManager.setupDocumentView(tabId, tabItem)
+			workspaceView.viewLoaded(tabId, tabItem)
 		}
 
 		onTabClicked: {

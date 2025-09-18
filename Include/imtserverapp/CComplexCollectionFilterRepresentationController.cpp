@@ -1,0 +1,585 @@
+#include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
+
+
+// ImtCore includes
+#include <imtbase/CTimeFilterParam.h>
+#include <imtauth/IUserInfo.h>
+
+
+namespace imtserverapp
+{
+
+
+const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> CComplexCollectionFilterRepresentationController::s_allowableFlagsCombination = {
+	{FOF_EQUAL, imtbase::IComplexCollectionFilter::FieldOperation::FO_EQUAL},
+	{FOF_EQUAL | FOF_NOT, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_EQUAL},
+
+	{FOF_GREATER, imtbase::IComplexCollectionFilter::FieldOperation::FO_GREATER},
+	{FOF_GREATER | FOF_NOT, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_GREATER},
+	{FOF_GREATER | FOF_EQUAL, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_LESS},
+
+	{FOF_LESS, imtbase::IComplexCollectionFilter::FieldOperation::FO_LESS},
+	{FOF_LESS | FOF_NOT, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_LESS},
+	{FOF_LESS | FOF_EQUAL, imtbase::IComplexCollectionFilter::FieldOperation::FO_NOT_GREATER},
+
+	{FOF_CONTAINS, imtbase::IComplexCollectionFilter::FieldOperation::FO_CONTAINS}
+};
+
+
+// public methods
+
+CComplexCollectionFilterRepresentationController::CComplexCollectionFilterRepresentationController()
+{
+	m_modelId = QByteArrayLiteral("ComplexFilter");
+	m_name = QStringLiteral("Complex Filter");
+	m_description = QStringLiteral("Complex filter");
+}
+
+
+// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
+
+QByteArray CComplexCollectionFilterRepresentationController::GetTypeId() const
+{
+	return QByteArrayLiteral("ComplexFilter");
+}
+
+
+bool CComplexCollectionFilterRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
+{
+	const imtbase::IComplexCollectionFilter* complexFilterPtr = dynamic_cast<const imtbase::IComplexCollectionFilter*>(&dataModel);
+	if (complexFilterPtr != nullptr){
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromDataModel(
+			sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& sdlRepresentation,
+			const istd::IChangeable& dataModel,
+			const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	const imtbase::IComplexCollectionFilter* complexFilterPtr = dynamic_cast<const imtbase::IComplexCollectionFilter*>(&dataModel);
+	if (complexFilterPtr == nullptr){
+		return false;
+	}
+
+	// Sorting info
+	QList<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0> sdlFieldSortingInfoList;
+	const imtbase::IComplexCollectionFilter::FieldSortingInfoList& fieldSortingInfoList = complexFilterPtr->GetSortingInfo();
+	for (const imtbase::IComplexCollectionFilter::FieldSortingInfo& fieldSortingInfo : std::as_const(fieldSortingInfoList)){
+		sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0 sdlFieldSortingInfo;
+		sdlFieldSortingInfo.fieldId = fieldSortingInfo.fieldId;
+
+		if (fieldSortingInfo.sortingOrder == imtbase::IComplexCollectionFilter::SO_ASC){
+			sdlFieldSortingInfo.sortingOrder = "ASC";
+		}
+		else if (fieldSortingInfo.sortingOrder == imtbase::IComplexCollectionFilter::SO_DESC){
+			sdlFieldSortingInfo.sortingOrder = "DESC";
+		}
+		else{
+			return false; 
+		}
+
+		sdlFieldSortingInfoList << sdlFieldSortingInfo;
+	}
+	sdlRepresentation.sortingInfo = sdlFieldSortingInfoList;
+
+	// Time Filter
+	sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0 sdlTimeFilter;
+
+	const imtbase::ITimeFilterParam& timeFilter = complexFilterPtr->GetTimeFilter();
+	imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
+	sdlTimeFilter.timeRange.emplace();
+	sdlTimeFilter.timeRange->Begin = timeRange.GetBeginTime().toString(Qt::ISODateWithMs);
+	sdlTimeFilter.timeRange->End = timeRange.GetEndTime().toString(Qt::ISODateWithMs);
+
+	imtbase::ITimeFilterParam::TimeUnit timeUnit = timeFilter.GetTimeUnit();
+	switch (timeUnit){
+	case imtbase::ITimeFilterParam::TU_CUSTOM:
+		sdlTimeFilter.timeUnit = "Custom";
+		break;
+	case imtbase::ITimeFilterParam::TU_HOUR:
+		sdlTimeFilter.timeUnit = "Hour";
+		break;
+	case imtbase::ITimeFilterParam::TU_DAY:
+		sdlTimeFilter.timeUnit = "Day";
+		break;
+	case imtbase::ITimeFilterParam::TU_WEEK:
+		sdlTimeFilter.timeUnit = "Week";
+		break;
+	case imtbase::ITimeFilterParam::TU_MONTH:
+		sdlTimeFilter.timeUnit = "Month";
+		break;
+	case imtbase::ITimeFilterParam::TU_YEAR:
+		sdlTimeFilter.timeUnit = "Year";
+		break;
+	}
+
+	imtbase::ITimeFilterParam::InterpretationMode mode = timeFilter.GetInterpretationMode();
+	switch (mode){
+	case imtbase::ITimeFilterParam::IM_FOR:
+		sdlTimeFilter.interpretationMode = "For";
+		break;
+	case imtbase::ITimeFilterParam::IM_CURRENT:
+		sdlTimeFilter.interpretationMode = "Current";
+		break;
+	case imtbase::ITimeFilterParam::IM_LAST:
+		sdlTimeFilter.interpretationMode = "Last";
+		break;
+	}
+
+	sdlTimeFilter.unitMultiplier = timeFilter.GetUnitMultiplier();
+	sdlRepresentation.timeFilter = sdlTimeFilter;
+
+	// Distinct fields
+	const QByteArrayList& distinctFieldsList = complexFilterPtr->GetDistinctFieldsList();
+	sdlRepresentation.distinctFields = distinctFieldsList;
+
+	// Text filter
+	sdl::imtbase::ComplexCollectionFilter::CTextFilter::V1_0 sdlTextFilter;
+	sdlTextFilter.text = complexFilterPtr->GetTextFilter();
+	sdlTextFilter.fieldIds = complexFilterPtr->GetTextFilterFieldsList();
+	sdlRepresentation.textFilter = sdlTextFilter;
+
+	const imtbase::IComplexCollectionFilter::GroupFilter& groupFilter = complexFilterPtr->GetFieldsFilter();
+
+	sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0 sdlGroupFilter;
+	if (!GetSdlRepresentationFromGroupFilter(groupFilter, sdlGroupFilter)){
+		return false;
+	}
+	sdlRepresentation.fieldsFilter = sdlGroupFilter;
+
+	return true;
+}
+
+
+bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepresentation(
+			istd::IChangeable& dataModel,
+			const sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& sdlRepresentation) const
+{
+	imtbase::IComplexCollectionFilter* complexFilterPtr = dynamic_cast<imtbase::IComplexCollectionFilter*>(&dataModel);
+	if (complexFilterPtr == nullptr){
+		return false;
+	}
+
+	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+
+	QList<Filter::CFieldSortingInfo::V1_0> sourceSorting;
+	if (sdlRepresentation.sortingInfo){
+		sourceSorting = *sdlRepresentation.sortingInfo;
+	}
+
+	Filter::CGroupFilter::V1_0 sourceFilter;
+	if (sdlRepresentation.fieldsFilter){
+		sourceFilter = *sdlRepresentation.fieldsFilter;
+	}
+
+	Filter::CTimeFilter::V1_0 sourceTimeFilter;
+	if (sdlRepresentation.timeFilter){
+		sourceTimeFilter = *sdlRepresentation.timeFilter;
+	}
+
+	imtbase::IComplexCollectionFilter::FieldSortingInfoList sorting;
+	for (const Filter::CFieldSortingInfo::V1_0& sourceSortingItem  : std::as_const(sourceSorting)){
+		imtbase::IComplexCollectionFilter::FieldSortingInfo fieldSorting;
+
+		if (sourceSortingItem.fieldId){
+			fieldSorting.fieldId = sourceSortingItem.fieldId->toLatin1();
+		}
+
+		if (sourceSortingItem.sortingOrder && (*sourceSortingItem.sortingOrder == "ASC")){
+			fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
+		}
+		else if (sourceSortingItem.sortingOrder && (*sourceSortingItem.sortingOrder == "DESC")){
+			fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_DESC;
+		}
+		else{
+			return false;
+		}
+
+		sorting.append(fieldSorting);
+	}
+	complexFilterPtr->SetSortingInfo(sorting);
+
+	imtbase::IComplexCollectionFilter::GroupFilter targetFilter;
+	if (!GetGroupFilterFromSdlRepresentation(sourceFilter, targetFilter)){
+		return false;
+	}
+
+	complexFilterPtr->SetFieldsFilter(targetFilter);
+
+	imtbase::CTimeFilterParam timeFilter;
+	if (sdlRepresentation.timeFilter){
+		Filter::CTimeFilter::V1_0 timeFilterSdl = *sdlRepresentation.timeFilter;
+		if (timeFilterSdl.timeRange){
+			sdl::imtbase::ImtBaseTypes::CTimeRange::V1_0 timeRangeSdl = *timeFilterSdl.timeRange;
+
+			QString startRange;
+			if (timeRangeSdl.Begin){
+				startRange = *timeRangeSdl.Begin;
+			}
+			QString endRange;
+			if (timeRangeSdl.End){
+				endRange = *timeRangeSdl.End;
+			}
+			timeFilter.SetTimeRange(imtbase::CTimeRange(
+				QDateTime::fromString(startRange, Qt::ISODateWithMs),
+				QDateTime::fromString(endRange, Qt::ISODateWithMs)));
+		}
+
+		imtbase::ITimeFilterParam::TimeUnit timeUnit = imtbase::ITimeFilterParam::TU_CUSTOM;
+		if (timeFilterSdl.timeUnit){
+			QString timeUnitStr = *timeFilterSdl.timeUnit;
+
+			if (timeUnitStr == "Custom"){
+				timeUnit = imtbase::ITimeFilterParam::TU_CUSTOM;
+			}
+			else if (timeUnitStr == "Hour"){
+				timeUnit = imtbase::ITimeFilterParam::TU_HOUR;
+			}
+			else if (timeUnitStr == "Day"){
+				timeUnit = imtbase::ITimeFilterParam::TU_DAY;
+			}
+			else if (timeUnitStr == "Week"){
+				timeUnit = imtbase::ITimeFilterParam::TU_WEEK;
+			}
+			else if (timeUnitStr == "Month"){
+				timeUnit = imtbase::ITimeFilterParam::TU_MONTH;
+			}
+			else if (timeUnitStr == "Year"){
+				timeUnit = imtbase::ITimeFilterParam::TU_YEAR;
+			}
+		}
+
+		imtbase::ITimeFilterParam::InterpretationMode interpretationMode = imtbase::ITimeFilterParam::IM_FOR;
+		if (timeFilterSdl.interpretationMode){
+			QString interpretationModeStr = *timeFilterSdl.interpretationMode;
+
+			if (interpretationModeStr == "For"){
+				interpretationMode = imtbase::ITimeFilterParam::IM_FOR;
+			}
+			else if (interpretationModeStr == "Current"){
+				interpretationMode = imtbase::ITimeFilterParam::IM_CURRENT;
+			}
+			else if (interpretationModeStr == "Last"){
+				interpretationMode = imtbase::ITimeFilterParam::IM_LAST;
+			}
+		}
+
+		int multiplier = 1;
+		if (timeFilterSdl.unitMultiplier){
+			multiplier = *timeFilterSdl.unitMultiplier;
+		}
+
+		timeFilter.SetTimeUnit(timeUnit, interpretationMode, multiplier);
+	}
+	complexFilterPtr->SetTimeFilter(timeFilter);
+
+	if (sdlRepresentation.distinctFields){
+		complexFilterPtr->SetDistinctFieldsList(*sdlRepresentation.distinctFields);
+	}
+
+	if (sdlRepresentation.textFilter){
+		Filter::CTextFilter::V1_0 textFilter = *sdlRepresentation.textFilter;
+		if (textFilter.text){
+			complexFilterPtr->SetTextFilter(*textFilter.text);
+		}
+
+		if (textFilter.fieldIds){
+			complexFilterPtr->SetTextFilterFieldsList(*textFilter.fieldIds);
+		}
+	}
+
+	return true;
+}
+
+
+// private methods
+
+QString CComplexCollectionFilterRepresentationController::GetFlagsAsString(int flags) const
+{
+	QString retVal;
+
+	if (flags & FOF_NOT){
+		retVal = "NOT";
+	}
+
+	if (flags & FOF_EQUAL){
+		retVal += retVal.isEmpty() ? "EQUAL" : ", EQUAL";
+	}
+
+	if (flags & FOF_GREATER){
+		retVal += retVal.isEmpty() ? "GREATER" : ", GREATER";
+	}
+
+	if (flags & FOF_LESS){
+		retVal += retVal.isEmpty() ? "LESS" : ", LESS";
+	}
+
+	if (flags & FOF_CONTAINS){
+		retVal += retVal.isEmpty() ? "CONTAINS" : ", CONTAINS";
+	}
+
+	return retVal;
+}
+
+
+bool CComplexCollectionFilterRepresentationController::GetFieldFilterFromSdlRepresentation(
+			const sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& representation,
+			imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter) const
+{
+	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+
+	bool isOk = true;
+	bool retVal = true;
+
+	if (!representation.fieldId){
+		return false;
+	}
+	fieldFilter.fieldId = *representation.fieldId;
+
+	QString value;
+	if (!representation.filterValue){
+		return false;
+	}
+	value = *representation.filterValue;
+
+	if (!representation.filterValueType){
+		return false;
+	}
+
+	Filter::ValueType sourceFilterValueType = *representation.filterValueType;
+	switch (sourceFilterValueType){
+	case Filter::ValueType::Integer:
+		fieldFilter.filterValue = value.toLongLong(&isOk);
+		break;
+	case Filter::ValueType::Number:
+		fieldFilter.filterValue = value.toDouble(&isOk);
+		break;
+	case Filter::ValueType::String:
+		fieldFilter.filterValue = value;
+		break;
+	case Filter::ValueType::Bool:
+		if (value.compare("true", Qt::CaseInsensitive) == 0){
+			fieldFilter.filterValue = true;
+		}
+		else if (value.compare("false", Qt::CaseInsensitive) == 0){
+			fieldFilter.filterValue = false;
+		}
+		else{
+			return false;
+		}
+		break;
+	default:
+		return false;
+	}
+
+	retVal = retVal && isOk;
+
+	if (retVal){
+		if (!representation.filterOperations || representation.filterOperations->isEmpty()){
+			return false;
+		}
+		QList<Filter::FilterOperation> filterOperations = *representation.filterOperations;
+
+		int flags = 0;
+
+		if (filterOperations.contains(Filter::FilterOperation::Not)){
+			flags |= FOF_NOT;
+		}
+		if (filterOperations.contains(Filter::FilterOperation::Equal)){
+			flags |= FOF_EQUAL;
+		}
+		if (filterOperations.contains(Filter::FilterOperation::Less)){
+			flags |= FOF_LESS;
+		}
+		if (filterOperations.contains(Filter::FilterOperation::Greater)){
+			flags |= FOF_GREATER;
+		}
+		if (filterOperations.contains(Filter::FilterOperation::Contains)){
+			flags |= FOF_CONTAINS;
+		}
+
+		if (!s_allowableFlagsCombination.contains(flags)){
+			return false;
+		}
+
+		fieldFilter.filterOperation = s_allowableFlagsCombination[flags];
+	}
+
+	return retVal;
+}
+
+
+bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromFieldFilter(
+			const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter,
+			sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0& representation) const
+{
+	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+
+	representation.fieldId = fieldFilter.fieldId;
+
+	int typeId = fieldFilter.filterValue.typeId();
+	if (typeId == QMetaType::Int){
+		representation.filterValueType = Filter::ValueType::Integer;
+	}
+	else if (typeId == QMetaType::Bool){
+		representation.filterValueType = Filter::ValueType::Bool;
+	}
+	else if (typeId == QMetaType::QString || typeId == QMetaType::QByteArray ){
+		representation.filterValueType = Filter::ValueType::String;
+	}
+	else if (	typeId == QMetaType::Double ||
+				typeId == QMetaType::Float ||
+				typeId == QMetaType::LongLong ||
+				typeId == QMetaType::Long){
+		representation.filterValueType = Filter::ValueType::Number;
+	}
+	else{
+		return false;
+	}
+
+	representation.filterValue = fieldFilter.filterValue.toString();
+
+	switch(fieldFilter.filterOperation){
+	case imtbase::IComplexCollectionFilter::FO_EQUAL:
+		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Equal};
+		break;
+	case imtbase::IComplexCollectionFilter::FO_NOT_EQUAL:
+		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Not, Filter::FilterOperation::Equal};
+		break;
+	case imtbase::IComplexCollectionFilter::FO_LESS:
+		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Less};
+		break;
+	case imtbase::IComplexCollectionFilter::FO_GREATER:
+		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Greater};
+		break;
+	case imtbase::IComplexCollectionFilter::FO_NOT_LESS:
+		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Not, Filter::FilterOperation::Less};
+		break;
+	case imtbase::IComplexCollectionFilter::FO_NOT_GREATER:
+		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Not, Filter::FilterOperation::Greater};
+		break;
+	case imtbase::IComplexCollectionFilter::FO_CONTAINS:
+		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Contains};
+		break;
+	}
+
+	return true;
+}
+
+
+bool CComplexCollectionFilterRepresentationController::GetGroupFilterFromSdlRepresentation(
+			const sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& representation,
+			imtbase::IComplexCollectionFilter::GroupFilter& groupFilter) const
+{
+	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+
+	QList<Filter::CFieldFilter::V1_0> sourceFieldSubFilters;
+	if (representation.fieldFilters){
+		sourceFieldSubFilters = *representation.fieldFilters;
+	}
+	QList<Filter::CGroupFilter::V1_0> sourceGroupSubFilters;
+	if (representation.groupFilters){
+		sourceGroupSubFilters = *representation.groupFilters;
+	}
+	QVector<imtbase::IComplexCollectionFilter::FieldFilter> targetFieldSubFilters;
+	QVector<imtbase::IComplexCollectionFilter::GroupFilter> targetGroupSubFilters;
+
+	for (const Filter::CFieldFilter::V1_0& sourceFieldSubFilter : std::as_const(sourceFieldSubFilters)){
+		imtbase::IComplexCollectionFilter::FieldFilter targetFieldSubFilter;
+
+		if (!GetFieldFilterFromSdlRepresentation(sourceFieldSubFilter, targetFieldSubFilter)){
+			return false;
+		}
+
+		targetFieldSubFilters.append(targetFieldSubFilter);
+	}
+
+	for (const Filter::CGroupFilter::V1_0& sourceGroupSubFilter : std::as_const(sourceGroupSubFilters)){
+		imtbase::IComplexCollectionFilter::GroupFilter targetGroupSubFilter;
+
+		if (!GetGroupFilterFromSdlRepresentation(sourceGroupSubFilter, targetGroupSubFilter)){
+			return false;
+		}
+
+		targetGroupSubFilters.append(targetGroupSubFilter);
+	}
+
+	groupFilter.fieldFilters = targetFieldSubFilters;
+	groupFilter.groupFilters = targetGroupSubFilters;
+
+	if (!representation.groupFilters.has_value() && !representation.fieldFilters.has_value()){
+		return true;
+	}
+
+	if (!representation.logicalOperation){
+		return false;
+	}
+	Filter::LogicalOperation sourceLogicalOperation = *representation.logicalOperation;
+
+	switch (sourceLogicalOperation){
+	case Filter::LogicalOperation::And:
+		groupFilter.logicalOperation = imtbase::IComplexCollectionFilter::LO_AND;
+		break;
+	case Filter::LogicalOperation::Or:
+		groupFilter.logicalOperation = imtbase::IComplexCollectionFilter::LO_OR;
+		break;
+	default:
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromGroupFilter(
+			const imtbase::IComplexCollectionFilter::GroupFilter& groupFilter,
+			sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0& representation) const
+{
+	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
+
+	// Logical operation
+	imtbase::IComplexCollectionFilter::LogicalOperation logicalOperation = groupFilter.logicalOperation;
+	switch(logicalOperation){
+	case imtbase::IComplexCollectionFilter::LO_AND:
+		representation.logicalOperation = Filter::LogicalOperation::And;
+		break;
+	case imtbase::IComplexCollectionFilter::LO_OR:
+		representation.logicalOperation = Filter::LogicalOperation::Or;
+		break;
+	}
+
+	// Groups filter
+	QList<Filter::CGroupFilter::V1_0> sdlGroupFilters;
+	for (const imtbase::IComplexCollectionFilter::GroupFilter& groupFilter : std::as_const(groupFilter.groupFilters)){
+		Filter::CGroupFilter::V1_0 sdlGroupFilter;
+		if (!GetSdlRepresentationFromGroupFilter(groupFilter, sdlGroupFilter)){
+			return false;
+		}
+
+		sdlGroupFilters << sdlGroupFilter;
+	}
+	representation.groupFilters = sdlGroupFilters;
+
+	// Fields filter
+	QList<Filter::CFieldFilter::V1_0> sdlFieldFilters;
+	for (const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : std::as_const(groupFilter.fieldFilters)){
+		Filter::CFieldFilter::V1_0 sdlFieldFilter;
+		if (!GetSdlRepresentationFromFieldFilter(fieldFilter, sdlFieldFilter)){
+			return false;
+		}
+
+		sdlFieldFilters << sdlFieldFilter;
+	}
+	representation.fieldFilters = sdlFieldFilters;
+
+	return true;
+}
+
+
+} // namespace imtserverapp
+
+

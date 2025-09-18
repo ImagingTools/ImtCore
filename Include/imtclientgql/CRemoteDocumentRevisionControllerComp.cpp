@@ -14,18 +14,7 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CRemoteDocumentRevisionControl
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CRevisionInfoList::V1_0, sdl::imtbase::DocumentRevision::CRevisionInfoList>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to get remote revision info list. Error: %1").arg(errorMessage);
-
-		return sdl::imtbase::DocumentRevision::CRevisionInfoList();
-	}
-
-	sdl::imtbase::DocumentRevision::CRevisionInfoList retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtbase::DocumentRevision::CRevisionInfoList>(gqlRequest, errorMessage);
 }
 
 
@@ -34,18 +23,7 @@ sdl::imtbase::DocumentRevision::CBackupRevisionResponse CRemoteDocumentRevisionC
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CBackupRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CBackupRevisionResponse>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote backup revision. Error: %1").arg(errorMessage);
-
-		return sdl::imtbase::DocumentRevision::CBackupRevisionResponse();
-	}
-
-	sdl::imtbase::DocumentRevision::CBackupRevisionResponse retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtbase::DocumentRevision::CBackupRevisionResponse>(gqlRequest, errorMessage);
 }
 
 
@@ -54,18 +32,7 @@ sdl::imtbase::DocumentRevision::CRestoreRevisionResponse CRemoteDocumentRevision
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CRestoreRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CRestoreRevisionResponse>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote restore revision. Error: %1").arg(errorMessage);
-
-		return sdl::imtbase::DocumentRevision::CRestoreRevisionResponse();
-	}
-
-	sdl::imtbase::DocumentRevision::CRestoreRevisionResponse retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtbase::DocumentRevision::CRestoreRevisionResponse>(gqlRequest, errorMessage);
 }
 
 
@@ -74,17 +41,7 @@ sdl::imtbase::DocumentRevision::CExportRevisionResponse CRemoteDocumentRevisionC
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::DocumentRevision::CExportRevisionResponse::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CExportRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CExportRevisionResponse>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote export revision. Error: %1").arg(errorMessage);
-		return sdl::imtbase::DocumentRevision::CExportRevisionResponse();
-	}
-
-	sdl::imtbase::DocumentRevision::CExportRevisionResponse retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtbase::DocumentRevision::CExportRevisionResponse>(gqlRequest, errorMessage);
 }
 
 
@@ -93,19 +50,7 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse CRemoteDocumentRevisionC
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtbase::DocumentRevision::CDeleteRevisionResponse::V1_0, sdl::imtbase::DocumentRevision::CDeleteRevisionResponse>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote delete revision. Error: %1").arg(errorMessage);
-
-		return sdl::imtbase::DocumentRevision::CDeleteRevisionResponse();
-	}
-
-
-	sdl::imtbase::DocumentRevision::CDeleteRevisionResponse retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtbase::DocumentRevision::CDeleteRevisionResponse>(gqlRequest, errorMessage);
 }
 
 

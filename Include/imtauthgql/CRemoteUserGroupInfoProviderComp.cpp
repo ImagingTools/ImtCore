@@ -41,10 +41,15 @@ imtauth::IUserGroupInfoSharedPtr CRemoteUserGroupInfoProviderComp::GetUserGroup(
 
 	imtgql::CGqlRequest gqlRequest;
 	if (groupssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		groupssdl::CGroupData::V1_0 response;
-		
+		typedef groupssdl::CGroupData Response;
+
 		QString errorMessage;
-		if (!SendModelRequest<groupssdl::CGroupData::V1_0, groupssdl::CGroupData>(gqlRequest, response, errorMessage)){
+		Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			return nullptr;
+		}
+
+		if (!response.Version_1_0){
 			return nullptr;
 		}
 
@@ -54,7 +59,7 @@ imtauth::IUserGroupInfoSharedPtr CRemoteUserGroupInfoProviderComp::GetUserGroup(
 		}
 
 		QJsonObject object;
-		if (!response.WriteToJsonObject(object)){
+		if (!response.Version_1_0->WriteToJsonObject(object)){
 			return nullptr;
 		}
 

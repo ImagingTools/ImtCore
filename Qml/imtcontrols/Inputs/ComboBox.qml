@@ -97,7 +97,6 @@ ControlBase {
 		if (comboBoxContainer.currentIndex >= 0 && comboBoxContainer.model.containsKey(comboBoxContainer.displayId, comboBoxContainer.currentIndex)){
 			comboBoxContainer.currentText = comboBoxContainer.model.getData(comboBoxContainer.displayId, comboBoxContainer.currentIndex);
 		}
-
 	}
 
 	onCurrentIndexChanged: {

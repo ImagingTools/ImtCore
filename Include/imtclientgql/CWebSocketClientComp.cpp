@@ -441,7 +441,7 @@ void CWebSocketClientComp::EnsureWebSocketConnection()
 		}
 	}
 
-	SendInfoMessage(0, QString("Try connect to the WebSocket-server: %1").arg(url.toString()));
+	SendInfoMessage(0, QString("Try connect to the WebSocket-server: Host: %1; Port: %2").arg(url.host()).arg(url.port()));
 
 #if QT_VERSION >= QT_VERSION_CHECK(6,4,0)
 	QWebSocketHandshakeOptions handshakeOptions;

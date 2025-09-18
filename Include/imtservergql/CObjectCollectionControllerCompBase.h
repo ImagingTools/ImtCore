@@ -15,6 +15,12 @@
 #include <imtgql/IGqlRequestExtractor.h>
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtbase/CMimeType.h>
+#include <imtcol/ICollectionHeadersProvider.h>
+#include <imtserverapp/CParamSetRepresentationController.h>
+#include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
+#include <imtserverapp/CDocumentFilterRepresentationController.h>
+#include <imtcol/CDocumentCollectionFilter.h>
+#include <imtbase/CComplexCollectionFilter.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
@@ -38,8 +44,7 @@ public:
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
-		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
-		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
+		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Collection headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
 		I_ASSIGN_MULTI_0(m_objectTypeIdAttrPtr, "ObjectTypeIds", "Object type IDs", false);
 		I_ASSIGN_MULTI_0(m_objectIconPathsAttrPtr, "ObjectIconPaths", "List of item paths related to object type-IDs", false);
@@ -47,6 +52,7 @@ public:
 		I_ASSIGN_MULTI_0(m_mimeTypeAttrPtr, "MimeType", "Mime type for the import/export object", false);
 		I_ASSIGN_MULTI_0(m_importExportObjectFactCompPtr, "ImportExportObjectFactory", "Object factory for the import/export object", false);
 		I_ASSIGN_MULTI_0(m_filePersistenceCompPtr, "FilePersistence", "File persistence for the import/export object", false);
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -55,20 +61,7 @@ public:
 		OT_NEW,
 		OT_GET,
 		OT_UPDATE,
-		OT_UPDATE_COLLECTION,
-		OT_DELETE,
-		OT_RENAME,
-		OT_SET_DESCRIPTION,
-		OT_LIST,
-		OT_HEADERS,
-		OT_INFO,
-		OT_METAINFO,
-		OT_DATAMETAINFO,
-		OT_ELEMENTS_COUNT,
-		OT_ELEMENT_IDS,
-		OT_IMPORT,
-		OT_EXPORT,
-		OT_OBJECT_TYPE_ID
+		OT_LIST
 	};
 
 	virtual QMap<int, QByteArray> GetSupportedCommandIds() const;
@@ -76,6 +69,10 @@ public:
 	// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
 	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
 				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CRemoveElementsPayload OnRemoveElements(
+				const sdl::imtbase::ImtCollection::CRemoveElementsGqlRequest& removeElementsRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 	virtual sdl::imtbase::ImtCollection::CRemoveElementSetPayload OnRemoveElementSet(
@@ -88,6 +85,66 @@ public:
 				QString& errorMessage) const override;
 	virtual sdl::imtbase::ImtCollection::CRestoreObjectSetPayload OnRestoreObjectSet(
 				const sdl::imtbase::ImtCollection::CRestoreObjectSetGqlRequest& restoreObjectSetRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CSetObjectNamePayload OnSetObjectName(
+				const sdl::imtbase::ImtCollection::CSetObjectNameGqlRequest& setObjectNameRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload OnSetObjectDescription(
+				const sdl::imtbase::ImtCollection::CSetObjectDescriptionGqlRequest& setObjectDescriptionRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CExportObjectPayload OnExportObject(
+				const sdl::imtbase::ImtCollection::CExportObjectGqlRequest& exportObjectRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CImportObjectPayload OnImportObject(
+				const sdl::imtbase::ImtCollection::CImportObjectGqlRequest& importObjectRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload OnGetObjectTypeId(
+				const sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest& getObjectTypeIdRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload OnGetCollectionHeaders(
+				const sdl::imtbase::ImtCollection::CGetCollectionHeadersGqlRequest& getCollectionHeadersRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetElementsCountPayload OnGetElementsCount(
+				const sdl::imtbase::ImtCollection::CGetElementsCountGqlRequest& getElementsCountRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetElementIdsPayload OnGetElementIds(
+				const sdl::imtbase::ImtCollection::CGetElementIdsGqlRequest& getElementIdsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CInsertNewObjectPayload OnInsertNewObject(
+				const sdl::imtbase::ImtCollection::CInsertNewObjectGqlRequest& insertNewObjectRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CSetObjectDataPayload OnSetObjectData(
+				const sdl::imtbase::ImtCollection::CSetObjectDataGqlRequest& setObjectDataRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetObjectDataPayload OnGetObjectData(
+				const sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest& getObjectDataRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload OnGetDataMetaInfo(
+				const sdl::imtbase::ImtCollection::CGetDataMetaInfoGqlRequest& getDataMetaInfoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetElementInfoPayload OnGetElementInfo(
+				const sdl::imtbase::ImtCollection::CGetElementInfoGqlRequest& getElementInfoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload OnGetElementMetaInfo(
+				const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CCreateSubCollectionPayload OnCreateSubCollection(
+				const sdl::imtbase::ImtCollection::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
@@ -107,16 +164,11 @@ protected:
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* UpdateObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* UpdateCollection(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetElementIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetHeaders(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetDependencies(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	/// \todo rename to GetElementMetaInfo
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
@@ -198,29 +250,67 @@ protected:
 	
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const;
 
-	/**
-		Set object filter.
-	*/
-	virtual void SetObjectFilter(const imtgql::CGqlRequest& gqlRequest, const imtbase::CTreeItemModel& objectFilterModel, iprm::CParamsSet& filterParams) const;
-
 	virtual istd::IChangeableUniquePtr CreateObject(const QByteArray& typeId) const;
 	virtual QString GetObjectNameFromRequest(const imtgql::CGqlRequest& gqlRequest) const;
+	virtual bool CreateCollectionFilterFromViewParamsSdl(
+				const sdl::imtbase::ImtCollection::CCollectionViewParams::V1_0& viewParams,
+				int& offset,
+				int& count,
+				iprm::CParamsSet& filterParams) const;
+	virtual bool CreateCollectionFilterFromSdl(
+				sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& collectionFilter,
+				iprm::CParamsSet& filterParams) const;
+	virtual bool CreateDocumentFilterFromSdl(
+				sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0& documentFilter,
+				iprm::CParamsSet& filterParams) const;
+	virtual QString ConvertMetaInfoToString(int infoType, const QVariant& metaInfoValue) const;
+	bool GetParamsSetFromRepresentation(sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& representation, iprm::IParamsSet& paramsSet) const;
+	bool RegisterFilterToSelectionParams(
+				iser::ISerializable& filterParam,
+				const imtserverapp::IJsonRepresentationController& representationController);
+
+	// By returning False, you can prevent the deletion of elements.
+	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest) const;
+
+	virtual bool OnBeforeSetObjectName(const QByteArray& objectId, QString& name, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual void OnAfterSetObjectName(const QByteArray& objectId, const QString& name, const imtgql::CGqlRequest& gqlRequest) const;
+
+	virtual bool OnBeforeSetObjectDescription(
+				const QByteArray& objectId,
+				QString& description,
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const;
+	virtual void OnAfterSetObjectDescription(
+				const QByteArray& objectId,
+				const QString& description,
+				const imtgql::CGqlRequest& gqlRequest) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
 private:
 	virtual bool DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& newObjectId, QString& errorMessage) const;
+	bool SerializeObject(istd::IChangeable& object, QByteArray& objectData) const;
+	bool DeSerializeObject(istd::IChangeable& object, const QByteArray& objectData) const;
 
 protected:
 	QMap<QByteArray, QByteArray> m_fieldReplacementMap;
+
+private:
+	iprm::CParamsSet m_selectionParams;
+	imtcol::CDocumentCollectionFilter m_documentCollectionFilter;
+	imtbase::CComplexCollectionFilter m_complexCollectionFilter;
+	imtserverapp::CParamSetRepresentationController m_paramSetRepresentationController;
+	imtserverapp::CDocumentFilterRepresentationController m_documentFilterRepresentationController;
+	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;
 
 protected:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);
 	I_MULTIATTR(QByteArray, m_replacementFieldsAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
-	I_REF(imtgql::IGqlRequestHandler, m_headersProviderCompPtr);
+	I_REF(imtcol::ICollectionHeadersProvider, m_headersProviderCompPtr);
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 
 	I_MULTIATTR(QByteArray, m_objectTypeIdAttrPtr);
@@ -230,6 +320,7 @@ protected:
 	I_MULTIATTR(QString, m_mimeTypeAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_importExportObjectFactCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_filePersistenceCompPtr);
+	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 };
 
 

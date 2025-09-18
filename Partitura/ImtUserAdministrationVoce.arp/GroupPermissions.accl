@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5347" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -16,7 +16,8 @@
         <Element ComponentName="GroupsInfo" X="150" Y="275" Note=""/>
         <Element ComponentName="GroupsList" X="975" Y="575" Note=""/>
         <Element ComponentName="GroupsMetaInfo" X="150" Y="575" Note=""/>
-        <Element ComponentName="GroupsRemove" X="550" Y="425" Note=""/>
+        <Element ComponentName="GroupsRemove" X="550" Y="400" Note=""/>
+        <Element ComponentName="GroupsRemove_1" X="550" Y="467" Note=""/>
         <Element ComponentName="PermissionsJoiner" X="550" Y="125" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

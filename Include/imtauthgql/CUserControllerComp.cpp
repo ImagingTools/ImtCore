@@ -567,15 +567,6 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 }
 
 
-sdl::imtauth::Users::CRemoveUserPayload CUserControllerComp::OnUsersRemove(
-			const sdl::imtauth::Users::CUsersRemoveGqlRequest& /*removeUserRequest*/,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
-{
-	return sdl::imtauth::Users::CRemoveUserPayload();
-}
-
-
 // private methods
 
 bool CUserControllerComp::SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const

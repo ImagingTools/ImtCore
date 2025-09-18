@@ -19,6 +19,7 @@
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseLoginSettings.h>
+#include <imtauth/CUserRecentAction.h>
 
 
 namespace imtdb
@@ -49,6 +50,7 @@ public:
 		I_ASSIGN(m_filterParamsCompPtr, "FilteringParams", "Parameter using for the filterering the table", false, "FilteringParams");
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Database access settings", false, "DatabaseAccessSettings");
 		I_ASSIGN(m_collectionDataControllerCompPtr, "CollectionDataController", "Data export/import controller for the collection", false, "DataController");
+		I_ASSIGN(m_userActionCollectionCompPtr, "UserActionCollection", "User action collection", false, "UserActionCollection");
 	I_END_COMPONENT;
 
 	CSqlDatabaseObjectCollectionComp();
@@ -145,6 +147,11 @@ protected:
 	
 private:
 	void AddOperationContextToChangeSet(const imtbase::IOperationContext& operationContext, istd::IChangeable::ChangeSet& changeSet) const;
+	void CreateUserActionLog(
+				const QByteArray& targetId,
+				const QByteArray& targetTypeId,
+				imtauth::IUserRecentAction::ActionType actionType,
+				const imtbase::IOperationContext& operationContext) const;
 
 protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
@@ -156,6 +163,7 @@ private:
 	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_REF(imtbase::ICollectionDataController, m_collectionDataControllerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userActionCollectionCompPtr);
 
 	imtbase::TModelUpdateBinder<iprm::IParamsSet, CSqlDatabaseObjectCollectionComp> m_filterParamsObserver;
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;

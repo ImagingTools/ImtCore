@@ -8,12 +8,14 @@ import imtbaseImtCollectionSdl 1.0
 ObjectVisualStatusProvider {
 	id: root
 
-	property ObjectVisualStatusInput objectVisualStatusInput: ObjectVisualStatusInput {}
-	
+	property string collectionId
+	property ObjectVisualStatusInput objectVisualStatusInput: ObjectVisualStatusInput {
+		m_collectionId: root.collectionId
+	}
+
 	function getVisualStatus(id, typeId){
 		objectVisualStatusInput.m_objectId = id
 		objectVisualStatusInput.m_typeId = typeId
-		
 		getVisualStatusInfoRequest.send(objectVisualStatusInput)
 	}
 	
@@ -30,11 +32,11 @@ ObjectVisualStatusProvider {
 				}
 			}
 		}
-		
+
 		function onError(message, type){
 			root.visualStatusReceiveFailed(message)
 		}
-		
+
 		function getHeaders(){
 			return root.getHeaders()
 		}

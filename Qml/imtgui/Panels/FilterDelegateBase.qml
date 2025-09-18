@@ -9,13 +9,15 @@ Item {
 	width: rowDelegate.width
 	height: Style.controlHeightM
 
+	property string filterId
 	property string name
 	property string mainButtonText: name
 	property bool isActive: false
 	property bool readOnly: false
 	property CollectionFilter collectionFilter: null
 	property DocCollectionFilter documentFilter: null
-	
+	property FilterMenu filterMenu: null
+
 	signal clearFilter()
 	signal openFilter()
 	
@@ -50,7 +52,7 @@ Item {
 					id: buttonDecorator
 					radius: Style.radiusM
 					color: filterDelegateBase.isActive ? Style.buttonAccentColor : Style.baseColor
-					textColor: filterDelegateBase.isActive ? Style.baseColor : Style.textColor;
+					textColor: filterDelegateBase.isActive ? Style.baseColor : Style.textColor
 					border.width: filterDelegateBase.isActive ? 0 : 1
 					opacity: mainButton.hovered ? 0.85 : 1
 
@@ -87,7 +89,7 @@ Item {
 														"qrc:/" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal))
 			icon.width: Style.iconSizeS
 			icon.height: Style.iconSizeS
-			widthFromDecorator: true
+			// widthFromDecorator: true
 			enabled: !filterDelegateBase.readOnly
 			onClicked: {
 				filterDelegateBase.clearFilter()

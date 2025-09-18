@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="0" Number="5423" Description="ACF"/>
             <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -46,14 +46,20 @@
         <Element Id="CommandsController" PackageId="ImtServerGqlPck" ComponentId="CommandsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="CommandIds">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="GuiElementContainer" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GuiElementContainer"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Printer"/>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="TypeId">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -86,12 +92,8 @@
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Redo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ChangePrinter</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="RedoCommandPermissions">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Icons/Redo"/>
@@ -105,11 +107,14 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="">
+                    <AttributeInfo Id="Name" Type="String" ExportId="RedoCommandName">
                         <Data IsEnabled="true" Value="Redo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -123,12 +128,8 @@
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Save"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ChangePrinter</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="SaveCommandPermissions">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Icons/Save"/>
@@ -142,11 +143,14 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="">
+                    <AttributeInfo Id="Name" Type="String" ExportId="SaveCommandName">
                         <Data IsEnabled="true" Value="Save"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="2"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -160,12 +164,8 @@
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Undo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ChangePrinter</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="UndoCommandPermissions">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="Icons/Undo"/>
@@ -179,11 +179,14 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="">
+                    <AttributeInfo Id="Name" Type="String" ExportId="UndoCommandName">
                         <Data IsEnabled="true" Value="Undo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>

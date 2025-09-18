@@ -8,7 +8,7 @@ QtObject {
 
 	property string defaultDocumentName: qsTr("<no name>")
 	property int documentsCount: documentsModel.count
-	property Item activeView
+	property Item activeView // Document Manager view
 
 	property ListModel documentsModel: ListModel {
 		dynamicRoles: true
@@ -54,7 +54,7 @@ QtObject {
 
 	function getDocumentTypeId(documentId)
 	{
-		for (let documentIndex = 0; documentIndex < documentsModel.count; documentIndex++){
+		for (let documentIndex = 0; documentIndex < documentsModel.count; ++documentIndex){
 			let id = documentsModel.get(documentIndex).id;
 			if (id === documentId){
 				return documentsModel.get(documentIndex).typeId;
@@ -64,6 +64,19 @@ QtObject {
 		return String();
 	}
 
+	function getSupportedDocumentTypeIds(){
+		return Object.keys(internal.m_registeredView)
+	}
+
+	function getDocumentName(documentId){
+		for (let documentIndex = 0; documentIndex < documentsModel.count; ++documentIndex){
+			let id = documentsModel.get(documentIndex).id;
+			if (id === documentId){
+				return documentsModel.get(documentIndex).name;
+			}
+		}
+		return ""
+	}
 
 	function registerDocumentValidator(documentTypeId, validatorComp){
 		if (!documentIsRegistered(documentTypeId)){
@@ -216,7 +229,7 @@ QtObject {
 	}
 
 
-	function insertNewDocument(documentTypeId, viewTypeId)
+	function insertNewDocument(documentTypeId, viewTypeId, name)
 	{
 		let documentId = UuidGenerator.generateUUID()
 		let documentData = createTemplateDocument(documentId, documentTypeId, viewTypeId);
@@ -224,7 +237,7 @@ QtObject {
 			return false;
 		}
 
-		addDocumentToModel(documentId, documentTypeId, viewTypeId, documentData);
+		addDocumentToModel(documentId, name, documentTypeId, viewTypeId, documentData);
 
 		if (documentData.documentDataController){
 			documentData.documentDataController.createDocumentModel();
@@ -295,10 +308,8 @@ QtObject {
 		return null;
 	}
 
-	function openDocument(documentId, documentTypeId, viewTypeId)
+	function openDocument(documentId, name, documentTypeId, viewTypeId)
 	{
-		console.debug("openDocument", documentId, documentTypeId, viewTypeId)
-
 		let index = getDocumentIndexByDocumentId(documentId);
 		if (index >= 0){
 			// already opened
@@ -317,7 +328,7 @@ QtObject {
 		documentData.isNew = false;
 
 		let onResult = function(){
-			addDocumentToModel(documentId, documentTypeId, viewTypeId, documentData);
+			addDocumentToModel(documentId, name, documentTypeId, viewTypeId, documentData);
 
 			documentData.documentDataController.modelChanged.disconnect(onResult);
 		}
@@ -333,10 +344,11 @@ QtObject {
 		return true;
 	}
 
-	function addDocumentToModel(documentId, documentTypeId, viewTypeId, documentData)
+	function addDocumentToModel(documentId, name, documentTypeId, viewTypeId, documentData)
 	{
 		documentsModel.append({
 								"id": documentId,
+								"name": name,
 								"typeId": documentTypeId,
 								"viewTypeId": viewTypeId,
 								"documentData": documentData,

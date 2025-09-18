@@ -75,9 +75,9 @@ I_EXPORT_COMPONENT(
 			"Remote Document Revision Controller");
 
 I_EXPORT_COMPONENT(
-			RemoteObjectVisualStatusController,
-			"Remote object visual status controller",
-			"Remote Object Visual Status Controller");
+			RemoteObjectCollectionController,
+			"Remote object collection controller",
+			"Remote Object Collection Controller");
 
 I_EXPORT_COMPONENT(
 			ObjectCollectionSubscriber,

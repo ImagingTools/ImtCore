@@ -34,26 +34,27 @@ ParamEditorBase {
 			}
 			
 			function checkWidth(){
-				let newWidth = Math.min(rootWidth, contentWidth);
+				let newWidth = Math.min(rootWidth, contentWidth)
 				if (width !== newWidth){
-					width = newWidth;
+					width = newWidth
 				}
 			}
 			
 			Repeater {
 				id: bodyPanelRepeater
-				model: composedParamsGui.paramsSet ? composedParamsGui.paramsSet.m_paramTypeIds : 0
+				model: composedParamsGui.paramsSet ? composedParamsGui.paramsSet.m_parameters : 0
 				
 				delegate: Column {
 					id: paramItem
 					
 					width: column.width;
 					
-					property string paramId: composedParamsGui.paramsSet.m_paramIds[model.index]
-					property string paramTypeId: composedParamsGui.paramsSet.m_paramTypeIds[model.index]
-					property string paramName: composedParamsGui.paramsSet.m_paramNames[model.index]
-					property string paramDescription: composedParamsGui.paramsSet.m_paramDescriptions[model.index]
-					property string parameterJson: composedParamsGui.paramsSet.m_parameters[model.index]
+					property var parameter: model.item
+					property string paramId: parameter.m_id
+					property string paramTypeId: parameter.m_typeId
+					property string paramName: parameter.m_name
+					property string paramDescription: parameter.m_description
+					property string parameterJson: parameter.m_data
 					
 					Component.onCompleted: {
 						if (composedParamsGui.settingsController && paramTypeId in composedParamsGui.settingsController.supportedParamEditors){
@@ -140,8 +141,7 @@ ParamEditorBase {
 
 						function onEditorModelDataChanged(paramId, key){
 							let json = target.editorModel.toJson();
-							
-							composedParamsGui.paramsSet.m_parameters[model.index] = json
+							composedParamsGui.paramsSet.m_parameters.get(model.index).item.m_data = json
 							composedParamsGui.editorModelDataChanged(composedParamsGui.paramId + "/" + paramId, key)
 						}
 					}

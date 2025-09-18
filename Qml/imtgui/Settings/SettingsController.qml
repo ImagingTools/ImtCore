@@ -47,6 +47,8 @@ QtObject {
 	}
 	
 	function addParamsSet(id, name, paramsSet){
+		console.log("addParamsSet", id, name, paramsSet)
+		
 		if (!paramsSetController){
 			return false
 		}
@@ -75,6 +77,7 @@ QtObject {
 	}
 	
 	function registerParamsSetController(id, name, controller){
+		console.log("registerParamsSetController", id, name, controller)
 		let paramsSetInfo = paramsSetInfoComp.createObject(root)
 		
 		paramsSetInfo.m_paramId = id
@@ -112,7 +115,7 @@ QtObject {
 			let controller = registeredControllers[paramId].m_controller
 			let parameter = paramsSetController.getParameterById(paramId)
 			
-			if (controller.createParamFromJson(parameter, true)){
+			if (controller.createParamFromJson(parameter.m_data, true)){
 				controller.saveParam()
 			}
 			else{
@@ -124,10 +127,6 @@ QtObject {
 		}
 		
 		return false
-	}
-	
-	function getParamJsonByPath(path){
-		return paramsSetController.getParamJsonByPath(path)
 	}
 }
 

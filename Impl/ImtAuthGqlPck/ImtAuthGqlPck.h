@@ -32,6 +32,9 @@
 #include <imtauthgql/CUserMetaInfoDelegateComp.h>
 #include <imtauthgql/CGroupMetaInfoDelegateComp.h>
 #include <imtauthgql/CRemoteUserControllerComp.h>
+#include <imtauthgql/CRemoteAuthorizationControllerComp.h>
+#include <imtauthgql/CUserActionCollectionControllerComp.h>
+#include <imtauthgql/CUserActionMetaInfoDelegateComp.h>
 
 
 /**
@@ -67,6 +70,9 @@ typedef imtauthgql::CRoleMetaInfoDelegateComp RoleMetaInfoDelegate;
 typedef imtauthgql::CUserMetaInfoDelegateComp UserMetaInfoDelegate;
 typedef imtauthgql::CGroupMetaInfoDelegateComp GroupMetaInfoDelegate;
 typedef imtauthgql::CRemoteUserControllerComp RemoteUserController;
+typedef imtauthgql::CRemoteAuthorizationControllerComp RemoteAuthorizationController;
+typedef imtauthgql::CUserActionCollectionControllerComp UserActionCollectionController;
+typedef imtauthgql::CUserActionMetaInfoDelegateComp UserActionMetaInfoDelegate;
 
 
 } // namespace ImtAuthGqlPck

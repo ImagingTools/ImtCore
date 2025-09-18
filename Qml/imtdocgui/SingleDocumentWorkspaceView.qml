@@ -15,13 +15,13 @@ Rectangle {
 
 	property DocumentManager documentManager;
 	
-	property ObjectVisualStatusProvider visualStatusProvider: ObjectVisualStatusProvider {}
+	property ObjectVisualStatusProvider visualStatusProvider: null
 	
 	Connections {
-		target: root.visualStatusProvider
+		target: root.visualStatusProvider ? root.visualStatusProvider : undefined
 		
 		function onVisualStatusReceived(objectId, icon, text, description){
-			if (text == ""){
+			if (text === ""){
 				text = root.documentManager.defaultDocumentName
 			}
 
@@ -41,7 +41,9 @@ Rectangle {
 			Events.sendEvent("StopLoading")
 			let typeId = root.documentManager.getDocumentTypeId(documentId);
 			
-			root.visualStatusProvider.getVisualStatus(documentId, typeId)
+			if (root.visualStatusProvider){
+				root.visualStatusProvider.getVisualStatus(documentId, typeId)
+			}
 		}
 		
 		function onDocumentSavingStarted(documentId){
@@ -53,15 +55,24 @@ Rectangle {
 		}
 
 		function onDocumentAdded(documentId){
-			let typeId = root.documentManager.getDocumentTypeId(documentId);
-			
-			headersModel.addHeader(documentId, "")
-			
-			root.visualStatusProvider.getVisualStatus(documentId, typeId)
+			let typeId = root.documentManager.getDocumentTypeId(documentId)
+			let name = root.documentManager.getDocumentName(documentId)
 
-			let documentData = root.documentManager.getDocumentDataById(documentId);
+			if (root.visualStatusProvider){
+				name = ""
+				root.visualStatusProvider.getVisualStatus(documentId, typeId)
+			}
+			else{
+				if (name === ""){
+					name = root.documentManager.defaultDocumentName
+				}
+			}
+			
+			headersModel.addHeader(documentId, name)
+
+			let documentData = root.documentManager.getDocumentDataById(documentId)
 			if (documentData){
-				stackView.push(documentData.viewComp);
+				stackView.push(documentData.viewComp)
 			}
 		}
 
@@ -107,10 +118,10 @@ Rectangle {
 		
 		function onTryCloseDirtyDocument(documentId, callback){
 			let dialogCallback = function(result){
-				if (result == Enums.yes){
+				if (result === Enums.yes){
 					callback(true)
 				}
-				else if (result == Enums.no){
+				else if (result === Enums.no){
 					callback(false)
 				}
 				else{

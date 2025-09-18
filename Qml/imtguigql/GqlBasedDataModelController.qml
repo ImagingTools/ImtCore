@@ -10,25 +10,29 @@ DataModelController {
 	property var responseModel
 	property var inputModel
 
-	function saveDataModel(params, documentId, documentName, documentDescription, documentTypeId){
-		root.requestStarted(params)
+	function saveDataModel(paramsObj){
+		saveDataModelBase(paramsObj)
+	}
+
+	function saveDataModelBase(paramsObj){
+		root.requestStarted(paramsObj)
 
 		var query = Gql.GqlRequest("mutation", gqlCommandId)
 
 		let inputObject = Gql.GqlObject("input")
 
-		let inputParams = params
+		let inputParams = paramsObj
 		if (inputModel){
-			inputParams = prepareInputModel(params, documentId, documentName, documentDescription, documentTypeId)
+			inputParams = prepareInputModel(paramsObj)
 		}
 
 		if (inputParams && inputParams.toGraphQL !== undefined){
 			inputObject.fromObject(inputParams)
 		}
 		else if (typeof inputParams == "object"){
-			let keys = Object.keys(params)
-			for (let key in params){
-				inputObject.InsertField(key, params[key])
+			let keys = Object.keys(paramsObj)
+			for (let key in paramsObj){
+				inputObject.InsertField(key, paramsObj[key])
 			}
 		}
 
@@ -37,8 +41,8 @@ DataModelController {
 		gqlRequest.setGqlQuery(query.GetQuery(), root.getHeaders())
 	}
 
-	function prepareInputModel(params, documentId, documentName, documentDescription){
-		return params
+	function prepareInputModel(paramsObj){
+		return paramsObj
 	}
 
 	function getHeaders(){

@@ -35,6 +35,10 @@ protected:
 				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload OnGetElementMetaInfo(
+				const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (sdl::imtauth::Roles::CRoleCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
@@ -56,7 +60,6 @@ protected:
 				const sdl::imtauth::Roles::CRoleUpdateGqlRequest& roleUpdateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const override;
 

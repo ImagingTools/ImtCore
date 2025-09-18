@@ -35,9 +35,9 @@ ParamsSetController {
 	}
 	
 	function updateConnectionParam(){
-		let urlParamter = getParamJsonByPath(["ServerConnectionInterface"]);
-		if (urlParamter != container.serverConnectionParam.toJson()){
-			container.serverConnectionParam.createFromJson(urlParamter)
+		let urlParamter = getParameterById("ServerConnectionInterface")
+		if (urlParamter.m_data !== serverConnectionParam.toJson()){
+			serverConnectionParam.createFromJson(urlParamter.m_data)
 		}
 	}
 

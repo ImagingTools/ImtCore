@@ -40,6 +40,18 @@ Item {
     Component.onDestruction: {
         Events.unSubscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
+    
+    onDocumentManagerChanged: {
+        if (documentManager){
+            if (documentManager.activeView){
+                documentManager.activeView.visualStatusProvider = visualStatusProvider
+            }
+        }
+    }
+    
+    GqlBasedObjectVisualStatusProvider {
+        id: visualStatusProvider
+    }
 
     function onLocalizationChanged(language){
         let rolesIndex = multiPageView.getIndexById("Roles");
@@ -118,6 +130,14 @@ Item {
 
         Component.onCompleted: {
             updateModel();
+        }
+        
+        onCurrentIndexChanged: {
+            if (currentIndex >= 0){
+                console.log("MultiPageView onCurrentIndexChanged", currentIndex)
+                
+                visualStatusProvider.collectionId = pagesModel.get(currentIndex).id
+            }
         }
 
         function updateModel(){

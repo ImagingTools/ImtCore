@@ -16,7 +16,7 @@ RemoteCollectionView {
 	visibleMetaInfo: false;
 	
 	collectionId: "Features";
-	
+
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
 			collectionView: featureCollectionViewContainer;
 			documentTypeIds: ["Feature"]

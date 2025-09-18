@@ -36,12 +36,12 @@ bool CCollectionHeadersProviderComp::GetHeaderInfo(const QByteArray& headerId, H
 		headerInfo.headerName = m_headersNamesAttrPtr[headerIndex];
 	}
 
-	if (m_headerSortableAttrPtr.GetCount() > headerIndex){
-		headerInfo.sortable = m_headerSortableAttrPtr[headerIndex];
+	if (m_filterableHeaderIdsAttrPtr.IsValid()){
+		headerInfo.filterable = m_filterableHeaderIdsAttrPtr.FindValue(headerId) >= 0;
 	}
 
-	if (m_headerFilterableAttrPtr.GetCount() > headerIndex){
-		headerInfo.filterable = m_headerFilterableAttrPtr[headerIndex];
+	if (m_sortableHeaderIdsAttrPtr.IsValid()){
+		headerInfo.sortable =  m_sortableHeaderIdsAttrPtr.FindValue(headerId) >= 0;
 	}
 
 	if (m_headerPermissionsAttrPtr.GetCount() > headerIndex){

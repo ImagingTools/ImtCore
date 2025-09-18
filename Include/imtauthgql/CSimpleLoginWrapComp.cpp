@@ -55,12 +55,18 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 
 	imtgql::CGqlRequest gqlRequest;
 	if (authsdl::CAuthorizationGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		authsdl::CAuthorizationPayload response;
+		typedef authsdl::CAuthorizationPayload Response;
+
 		QString errorMessage;
-		if (!SendModelRequest<authsdl::CAuthorizationPayload, authsdl::CAuthorizationPayload>(gqlRequest, response, errorMessage)){
+		Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
 			return false;
 		}
-		
+
+		if (!response.Version_1_0){
+			return false;
+		}
+
 		m_loggedUserPassword = password.toUtf8();
 
 		QByteArray userId;

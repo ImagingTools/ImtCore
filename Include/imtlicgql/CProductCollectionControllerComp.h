@@ -23,6 +23,17 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CImportObjectPayload OnImportObject(
+				const sdl::imtbase::ImtCollection::CImportObjectGqlRequest& importObjectRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+
+	virtual void OnAfterSetObjectName(
+				const QByteArray& objectId,
+				const QString& name,
+				const imtgql::CGqlRequest& gqlRequest) const override;
+
 	// reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)
 	virtual bool CreateRepresentationFromObject(
 				const imtbase::IObjectCollectionIterator& objectCollectionIterator,
@@ -44,9 +55,6 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
-	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual imtbase::CTreeItemModel* ImportObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QString GetExtensionFromMimeType(const imtbase::CMimeType& mimeType) const override;
 	virtual QString GetExportFileName(const QByteArray& objectId) const override;
 

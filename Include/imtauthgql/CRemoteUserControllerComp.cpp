@@ -51,18 +51,7 @@ sdl::imtauth::Users::CChangePasswordPayload CRemoteUserControllerComp::OnChangeP
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CChangePasswordPayload::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtauth::Users::CChangePasswordPayload::V1_0, sdl::imtauth::Users::CChangePasswordPayload>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote change password. Error: %1").arg(errorMessage);
-		SendErrorMessage(0, errorMessage, "CRemoteUserControllerComp");
-		return sdl::imtauth::Users::CChangePasswordPayload();
-	}
-
-	sdl::imtauth::Users::CChangePasswordPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtauth::Users::CChangePasswordPayload>(gqlRequest, errorMessage);
 }
 
 
@@ -71,18 +60,7 @@ sdl::imtauth::Users::CRegisterUserPayload CRemoteUserControllerComp::OnRegisterU
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CRegisterUserPayload::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtauth::Users::CRegisterUserPayload::V1_0, sdl::imtauth::Users::CRegisterUserPayload>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote register user. Error: %1").arg(errorMessage);
-		SendErrorMessage(0, errorMessage, "CRemoteUserControllerComp");
-		return sdl::imtauth::Users::CRegisterUserPayload();
-	}
-
-	sdl::imtauth::Users::CRegisterUserPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtauth::Users::CRegisterUserPayload>(gqlRequest, errorMessage);
 }
 
 
@@ -91,18 +69,7 @@ sdl::imtauth::Users::CCheckEmailPayload CRemoteUserControllerComp::OnCheckEmail(
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CCheckEmailPayload::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtauth::Users::CCheckEmailPayload::V1_0, sdl::imtauth::Users::CCheckEmailPayload>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote check email. Error: %1").arg(errorMessage);
-		SendErrorMessage(0, errorMessage, "CRemoteUserControllerComp");
-		return sdl::imtauth::Users::CCheckEmailPayload();
-	}
-
-	sdl::imtauth::Users::CCheckEmailPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtauth::Users::CCheckEmailPayload>(gqlRequest, errorMessage);
 }
 
 
@@ -111,18 +78,7 @@ sdl::imtauth::Users::CSendEmailCodePayload CRemoteUserControllerComp::OnSendEmai
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CSendEmailCodePayload::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtauth::Users::CSendEmailCodePayload::V1_0, sdl::imtauth::Users::CSendEmailCodePayload>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote send email code. Error: %1").arg(errorMessage);
-		SendErrorMessage(0, errorMessage, "CRemoteUserControllerComp");
-		return sdl::imtauth::Users::CSendEmailCodePayload();
-	}
-
-	sdl::imtauth::Users::CSendEmailCodePayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtauth::Users::CSendEmailCodePayload>(gqlRequest, errorMessage);
 }
 
 
@@ -131,18 +87,7 @@ sdl::imtauth::Users::CCheckEmailCodePayload CRemoteUserControllerComp::OnCheckEm
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CCheckEmailCodePayload::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtauth::Users::CCheckEmailCodePayload::V1_0, sdl::imtauth::Users::CCheckEmailCodePayload>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote check email code. Error: %1").arg(errorMessage);
-		SendErrorMessage(0, errorMessage, "CRemoteUserControllerComp");
-		return sdl::imtauth::Users::CCheckEmailCodePayload();
-	}
-
-	sdl::imtauth::Users::CCheckEmailCodePayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtauth::Users::CCheckEmailCodePayload>(gqlRequest, errorMessage);
 }
 
 
@@ -151,18 +96,7 @@ sdl::imtauth::Users::CCheckSuperuserPayload CRemoteUserControllerComp::OnCheckSu
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CCheckSuperuserPayload::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtauth::Users::CCheckSuperuserPayload::V1_0, sdl::imtauth::Users::CCheckSuperuserPayload>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote check superuser exists. Error: %1").arg(errorMessage);
-		SendErrorMessage(0, errorMessage, "CRemoteUserControllerComp");
-		return sdl::imtauth::Users::CCheckSuperuserPayload();
-	}
-
-	sdl::imtauth::Users::CCheckSuperuserPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtauth::Users::CCheckSuperuserPayload>(gqlRequest, errorMessage);
 }
 
 
@@ -171,38 +105,7 @@ sdl::imtauth::Users::CCreateSuperuserPayload CRemoteUserControllerComp::OnCreate
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	sdl::imtauth::Users::CCreateSuperuserPayload::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtauth::Users::CCreateSuperuserPayload::V1_0, sdl::imtauth::Users::CCreateSuperuserPayload>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote create superuser. Error: %1").arg(errorMessage);
-		SendErrorMessage(0, errorMessage, "CRemoteUserControllerComp");
-		return sdl::imtauth::Users::CCreateSuperuserPayload();
-	}
-
-	sdl::imtauth::Users::CCreateSuperuserPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
-}
-
-
-sdl::imtauth::Users::CRemoveUserPayload CRemoteUserControllerComp::OnUsersRemove(
-			const sdl::imtauth::Users::CUsersRemoveGqlRequest& /*removeUserRequest*/,
-			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
-{
-	sdl::imtauth::Users::CRemoveUserPayload::V1_0 response;
-
-	if (!SendModelRequest<sdl::imtauth::Users::CRemoveUserPayload::V1_0, sdl::imtauth::Users::CRemoveUserPayload>(gqlRequest, response, errorMessage)){
-		errorMessage = QString("Unable to remote remove user. Error: %1").arg(errorMessage);
-		SendErrorMessage(0, errorMessage, "CRemoteUserControllerComp");
-		return sdl::imtauth::Users::CRemoveUserPayload();
-	}
-
-	sdl::imtauth::Users::CRemoveUserPayload retVal;
-	retVal.Version_1_0 = std::move(response);
-
-	return retVal;
+	return SendModelRequest<sdl::imtauth::Users::CCreateSuperuserPayload>(gqlRequest, errorMessage);
 }
 
 

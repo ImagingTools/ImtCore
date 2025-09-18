@@ -19,7 +19,7 @@ Item {
 	}
 	
 	function updateSearch(text){
-		if (text == ""){
+		if (text === ""){
 			searchResultsView.searchResults = null;
 			return;
 		}
@@ -44,7 +44,7 @@ Item {
 					return;
 				}
 
-				MainDocumentManager.openDocument(resultItem.m_id, item.m_contextId, item.m_contextTypeId);
+				MainDocumentManager.openDocument(item.m_contextId, item.m_contextTypeId);
 			}
 		}
 	}

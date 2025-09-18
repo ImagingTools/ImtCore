@@ -204,6 +204,16 @@ I_EXPORT_COMPONENT(
 			"User connection info",
 			"User Connection Info");
 
+I_EXPORT_COMPONENT(
+			UserRecentAction,
+			"User recent action",
+			"User Recent Action");
+
+I_EXPORT_COMPONENT(
+			UserActionMetaInfoCreator,
+			"User action meta info creator",
+			"User Action Meta Info Creator");
+
 
 } // namespace ImtAuthPck
 

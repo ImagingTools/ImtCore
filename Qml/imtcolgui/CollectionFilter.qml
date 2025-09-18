@@ -92,6 +92,9 @@ ComplexCollectionFilter{
 	*/
 	signal cleared()
 
+	signal fieldFilterAdded(string fieldId, var fieldValue)
+	signal fieldFilterRemoved(string fieldId)
+
 	/*!
 		\qmlmethod object createBaseModel()
 		Creates and returns a new base model object.
@@ -234,6 +237,8 @@ ComplexCollectionFilter{
 		}
 
 		m_fieldsFilter.m_fieldFilters.addElement(field)
+
+		fieldFilterAdded(field.m_fieldId, field.m_filterValue)
 	}
 
 	/*!
@@ -252,6 +257,7 @@ ComplexCollectionFilter{
 			let item = m_fieldsFilter.m_fieldFilters.get(i).item
 			if (item === field){
 				m_fieldsFilter.m_fieldFilters.remove(i)
+				fieldFilterRemoved(item.m_fieldId)
 				return true
 			}
 		}
@@ -279,6 +285,10 @@ ComplexCollectionFilter{
 				m_fieldsFilter.m_fieldFilters.remove(i)
 				retVal = true
 			}
+		}
+
+		if (retVal){
+			fieldFilterRemoved(fieldId)
 		}
 
 		return retVal

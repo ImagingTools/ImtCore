@@ -12,81 +12,67 @@ ParamController {
 		ParamsSet {}
 	}
 
-	function addParam(typeId, id, name, description, parameter, path){
+	property Component parameterComp: Component{
+		Parameter {}
+	}
+
+	function addParam(typeId, id, name, description, parameterData){
 		if (!paramsSet){
 			return false
 		}
 
-		let nodeObject = JSON.parse(paramsSet.toJson())
-		if (path){
-			if (!("paramIds" in nodeObject) || !("parameters" in nodeObject)){
-				console.error("Unable to add param to params set. Path is invalid")
-				return false
-			}
+		let parameterObj = parameterComp.createObject()
+		parameterObj.m_typeId = typeId
+		parameterObj.m_id = id
+		parameterObj.m_name = name
+		parameterObj.m_description = description
+		parameterObj.m_data = parameterData
 
-			for (let i = 0; i < path.length; i++){
-				let paramId = path[i]
-				let index = nodeObject.paramIds.indexOf(paramId)
-				if (index >= 0){
-					let json = nodeObject.parameters[index]
-					
-					nodeObject = JSON.parse(json)
-				}
-				else{
-					console.error("Unable to add param to params set. Path is invalid")
-					return false
-				}
-			}
+		if (!paramsSet.hasParameters()){
+			paramsSet.createParameters()
 		}
 
-		nodeObject.paramTypeIds.push(typeId)
-		nodeObject.paramIds.push(id)
-		nodeObject.paramNames.push(name)
-		nodeObject.paramDescriptions.push(description)
-		nodeObject.parameters.push(parameter)
+		paramsSet.m_parameters.addElement(parameterObj)
 
-		paramsSet.createFromJson(JSON.stringify(nodeObject))
-		
 		return true
 	}
-	
+
 	function clearParamsSet(){
 		if (!paramsSet){
 			return false
 		}
-		
-		paramsSet.m_paramIds = []
-		paramsSet.m_paramNames = []
-		paramsSet.m_paramDescriptions = []
-		paramsSet.m_parameters = []
-		paramsSet.m_paramTypeIds = []
-		
+
+		if (paramsSet.hasParameters()){
+			paramsSet.m_parameters.clear()
+		}
+
 		return true
 	}
 	
+	// Return <Parameter> object from params set by ID
 	function getParameterById(id){
-		let index = paramsSet.m_paramIds.indexOf(id)
-		if (index < 0){
-			return ""
+		if (!paramsSet){
+			return null
 		}
-		
-		return paramsSet.m_parameters[index]
-	}
 
-	function getParamJsonByPath(path){
-		let nodeObject = JSON.parse(paramsSet.toJson())
-		
-		for (let i = 0; i < path.length; i++){
-			let paramId = path[i]
-			
-			let index = nodeObject.paramIds.indexOf(paramId)
-			if (index >= 0){
-				let parameter = nodeObject.parameters[index]
-				nodeObject = JSON.parse(parameter)
+		if (!paramsSet.hasParameters()){
+			return null
+		}
+
+		let index = -1
+		for (let j = 0; j < paramsSet.m_parameters.count; ++j){
+			let parameterInfo = paramsSet.m_parameters.get(j).item
+			if (parameterInfo.m_id === id){
+				index = j
+				break
 			}
 		}
 
-		return JSON.stringify(nodeObject)
+		if (index < 0){
+			return null
+		}
+
+		return paramsSet.m_parameters.get(index).item
 	}
 }
 

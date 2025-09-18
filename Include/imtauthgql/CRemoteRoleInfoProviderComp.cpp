@@ -43,8 +43,15 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 	QString errorMessage;
 	imtgql::CGqlRequest gqlRequest;
 	if (rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		rolessdl::CRoleData::V1_0 response;
-		if (!SendModelRequest<rolessdl::CRoleData::V1_0, rolessdl::CRoleData>(gqlRequest, response, errorMessage)){
+		typedef rolessdl::CRoleData Response;
+
+		QString errorMessage;
+		Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
+		if (!errorMessage.isEmpty()){
+			return nullptr;
+		}
+
+		if (!response.Version_1_0){
 			return nullptr;
 		}
 
@@ -53,22 +60,22 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& rol
 			return nullptr;
 		}
 
-		roleInfoPtr->SetDefault(bool(response.isDefault && *response.isDefault));
-		roleInfoPtr->SetGuest(bool(response.isGuest) && *response.isGuest);
-		if (response.permissions){
-			roleInfoPtr->SetLocalPermissions(response.permissions->split(';'));
+		roleInfoPtr->SetDefault(bool(response.Version_1_0->isDefault && *response.Version_1_0->isDefault));
+		roleInfoPtr->SetGuest(bool(response.Version_1_0->isGuest) && *response.Version_1_0->isGuest);
+		if (response.Version_1_0->permissions){
+			roleInfoPtr->SetLocalPermissions(response.Version_1_0->permissions->split(';'));
 		}
-		if (response.productId){
-			roleInfoPtr->SetProductId(*response.productId);
+		if (response.Version_1_0->productId){
+			roleInfoPtr->SetProductId(*response.Version_1_0->productId);
 		}
-		if (response.description){
-			roleInfoPtr->SetRoleDescription(*response.description);
+		if (response.Version_1_0->description){
+			roleInfoPtr->SetRoleDescription(*response.Version_1_0->description);
 		}
-		if (response.roleId){
-			roleInfoPtr->SetRoleId(*response.roleId);
+		if (response.Version_1_0->roleId){
+			roleInfoPtr->SetRoleId(*response.Version_1_0->roleId);
 		}
-		if (response.name){
-			roleInfoPtr->SetRoleName(*response.name);
+		if (response.Version_1_0->name){
+			roleInfoPtr->SetRoleName(*response.Version_1_0->name);
 		}
 
 		return dynamic_cast<imtauth::IRole*>(roleInfoPtr.PopPtr());

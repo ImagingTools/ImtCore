@@ -28,7 +28,7 @@ Dialog {
 				leftTable.uncheckAll();
 				if (leftTable.elements){
 					for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
-						let id = leftTable.elements.getData("id", i)
+						let id = leftTable.elements.getData("m_id", i)
 
 						if (dialog.tableViewParamsCopied.headerIsVisible(id)){
 							leftTable.checkItem(i);
@@ -48,7 +48,7 @@ Dialog {
 
 			function updateHeadersOrder(){
 				for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
-					let id = leftTable.elements.getData("id", i)
+					let id = leftTable.elements.getData("m_id", i)
 					dialog.tableViewParamsCopied.setHeaderOrder(id, i);
 				}
 			}
@@ -72,7 +72,7 @@ Dialog {
 					errorText.visible = item.checkedIndexes.length < 1;
 
 					for (let i = 0; i < leftTable.elements.getItemsCount(); i++){
-						let id = leftTable.elements.getData("id", i)
+						let id = leftTable.elements.getData("m_id", i)
 						let visible = item.checkedIndexes.includes(i);
 						let headerSize = dialog.tableViewParamsCopied.getHeaderSize(id)
 

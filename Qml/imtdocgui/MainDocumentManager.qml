@@ -63,13 +63,29 @@ QtObject {
         return true;
     }
 
-    function openDocument(typeId, documentId, documentTypeId, viewTypeId){
-        if ((!typeId || typeId === "") || (!documentId || documentId === "") || (!documentTypeId || documentTypeId === "")){
+    function openDocument(documentId, documentTypeId){
+        if ((!documentId || documentId === "") || (!documentTypeId || documentTypeId === "")){
             console.error("Unable to open document, please check input parameters");
             return;
         }
 
-        let documentManager = root.documentManagers[typeId];
+        let typeId = ""
+        for (let managerTypeId in documentManagers){
+            if (documentManagers[managerTypeId]){
+                let typeIds = documentManagers[managerTypeId].getSupportedDocumentTypeIds()
+                if (typeIds.includes(documentTypeId)){
+                    typeId = managerTypeId
+                    break
+                }
+            }
+        }
+
+        if (typeId === ""){
+            console.error("Unable to open document '" + documentId + "' with type-ID '" + documentTypeId + "'. Error: Document manager does not found")
+            return
+        }
+
+        let documentManager = documentManagers[typeId];
         if (!documentManager){
             root.tryRegisterDocumentManager(typeId, function(result){
                 if (result){
@@ -82,6 +98,7 @@ QtObject {
             return;
         }
 
+        let viewTypeId = ""
         if (!viewTypeId || viewTypeId === ""){
             let viewTypeIds = documentManager.getViewTypeIds(documentTypeId);
             if (viewTypeIds.length === 0){
@@ -94,7 +111,7 @@ QtObject {
 
         documentOpened(typeId, documentId, documentTypeId);
 
-        documentManager.openDocument(documentId, documentTypeId, viewTypeId);
+        documentManager.openDocument(documentId, "", documentTypeId, viewTypeId);
     }
 
     function saveDirtyDocuments(){

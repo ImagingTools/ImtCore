@@ -7,7 +7,6 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
-#include <iqt/iqt.h>
 #include <imtauth/IUserInfo.h>
 
 
@@ -75,11 +74,7 @@ bool CParamSetRepresentationControllerComp::GetSdlRepresentationFromDataModel(
 	QByteArrayList parameterIds = paramSetIds.values();
 	std::sort(parameterIds.begin(), parameterIds.end());
 
-	QByteArrayList paramTypeIds;
-	QByteArrayList paramIds;
-	QStringList paramNames;
-	QStringList paramDescriptions;
-	QStringList parameters;
+	QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameterList;
 
 	for (const QByteArray& parameterId : parameterIds){
 		if (!parameterId.contains("/")){
@@ -92,35 +87,35 @@ bool CParamSetRepresentationControllerComp::GetSdlRepresentationFromDataModel(
 			if (subControllerPtr != nullptr){
 				QJsonObject parameterRepresentation;
 				if (subControllerPtr->GetRepresentationFromDataModel(*parameterPtr, parameterRepresentation, paramsPtr)){
+					sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter;
 					QJsonDocument jsonDocument(parameterRepresentation);
-					parameters << jsonDocument.toJson(QJsonDocument::Compact);
-
+					
+					parameter.data = jsonDocument.toJson(QJsonDocument::Compact);
+					
 					IJsonRepresentationController::RepresentationInfo representationInfo = subControllerPtr->GetRepresentationInfo();
 					QByteArray typeId = subControllerPtr->GetTypeId();
-
-					paramTypeIds << typeId;
-					paramIds << representationInfo.modelId;
-
+					
+					parameter.id = representationInfo.modelId;
+					parameter.typeId = typeId;
+					
 					QString name = representationInfo.name;
 					QString description = representationInfo.description;
-
+					
 					if (m_translationManagerCompPtr.IsValid()){
 						name = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), name.toUtf8(), languageId, "Attribute");
 						description = iqt::GetTranslation(m_translationManagerCompPtr.GetPtr(), description.toUtf8(), languageId, "Attribute");
 					}
-
-					paramNames << name;
-					paramDescriptions << description;
+					
+					parameter.name = name;
+					parameter.description = description;
+					
+					parameterList << parameter;
 				}
 			}
 		}
 	}
 
-	sdlRepresentation.paramIds = paramIds;
-	sdlRepresentation.paramTypeIds = paramTypeIds;
-	sdlRepresentation.paramNames = paramNames;
-	sdlRepresentation.paramDescriptions = paramDescriptions;
-	sdlRepresentation.parameters = parameters;
+	sdlRepresentation.parameters = parameterList;
 
 	return true;
 }
@@ -136,29 +131,29 @@ bool CParamSetRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 		return false;
 	}
 
-	if (!sdlRepresentation.paramIds.has_value()){
+	if (!sdlRepresentation.parameters){
 		return false;
 	}
 
-	if (!sdlRepresentation.parameters.has_value()){
-		return false;
-	}
+	QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameters = *sdlRepresentation.parameters;
 
-	QList<QByteArray> parameterIds = *sdlRepresentation.paramIds;
-	QList<QString> parameters = *sdlRepresentation.parameters;
+	for (const sdl::imtbase::ImtBaseTypes::CParameter::V1_0& parameter : parameters){
+		if (!parameter.id){
+			continue;
+		}
 
-	if (parameterIds.size() != parameters.size()){
-		return false;
-	}
-
-	for (int i = 0; i < parameterIds.size(); i++){
-		const QByteArray parameterId = parameterIds[i];
+		const QByteArray parameterId = *parameter.id;
 		iser::ISerializable* parameterPtr = paramsSetPtr->GetEditableParameter(parameterId);
 		if (parameterPtr == nullptr){
 			continue;
 		}
 
-		QJsonDocument document = QJsonDocument::fromJson(parameters[i].toUtf8());
+		QString parameterData;
+		if (parameter.data){
+			parameterData = *parameter.data;
+		}
+
+		QJsonDocument document = QJsonDocument::fromJson(parameterData.toUtf8());
 		if (document.isNull()){
 			return false;
 		}
@@ -167,12 +162,12 @@ bool CParamSetRepresentationControllerComp::GetDataModelFromSdlRepresentation(
 			return false;
 		}
 
-		const IJsonRepresentationController* jsonRepresentationControllerPtr = FindSubController(parameterId);
-		if (jsonRepresentationControllerPtr == nullptr){
+		const IJsonRepresentationController* subControllerPtr = FindSubController(parameterId);
+		if (subControllerPtr == nullptr){
 			return false;
 		}
 
-		if (!jsonRepresentationControllerPtr->GetDataModelFromRepresentation(document.object(), *parameterPtr)){
+		if (!subControllerPtr->GetDataModelFromRepresentation(document.object(), *parameterPtr)){
 			return false;
 		}
 	}
