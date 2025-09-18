@@ -19,6 +19,8 @@ target_link_libraries(${PROJECT_NAME}
 	imtcom
 	imtbasesdl
 	imtbase
+	i2d
+	iqt
 )
 
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)

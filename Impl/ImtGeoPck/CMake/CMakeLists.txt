@@ -19,6 +19,8 @@ target_link_libraries(${PROJECT_NAME}
 	imtbasesdl
 	imtdb
 	imtbase
+	i2d
+	iqt
 	Qt${QT_VERSION_MAJOR}::Sql
 )
 
