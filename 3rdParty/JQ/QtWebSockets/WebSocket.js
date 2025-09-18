@@ -14,12 +14,12 @@ class QWebSocket extends QtObject {
     static Error = 4
 
     static meta = Object.assign({}, QtObject.meta, {
-        status: { type: Real, value: QWebSocket.Closed, signalName: 'statusChanged' },
-        url: { type: String, value: '', signalName: 'urlChanged' },
-        active: { type: Bool, value: false, signalName: 'activeChanged' },
-        errorString: { type: String, value: '', signalName: 'errorStringChanged' },
-        negotiatedSubprotocol: { type: String, value: '', signalName: 'negotiatedSubprotocolChanged' },
-        requestedSubprotocols: { type: Var, value: undefined, signalName: 'requestedSubprotocolsChanged' },
+        status: { type: Real, value: QWebSocket.Closed},
+        url: { type: String, value: ''},
+        active: { type: Bool, value: false},
+        errorString: { type: String, value: ''},
+        negotiatedSubprotocol: { type: String, value: ''},
+        requestedSubprotocols: { type: Var, value: undefined},
 
         statusChanged: {type:Signal, slotName:'onStatusChanged', args:[]},
         urlChanged: {type:Signal, slotName:'onUrlChanged', args:[]},

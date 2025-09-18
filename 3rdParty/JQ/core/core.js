@@ -35,6 +35,7 @@ global.OpenLayers = {
     defaults: defaults,
 }
 
+global.objectsCount = 0
 global.JQContext = require('./JQContext')
 global.JQApplication = require('./JQApplication')
 global.JQApplication.init()

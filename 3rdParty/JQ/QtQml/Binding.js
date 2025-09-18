@@ -13,12 +13,12 @@ class Binding extends QtObject {
     static RestoreBindingOrValue = 3
 
     static meta = Object.assign({}, QtObject.meta, {
-        delayed: { type: Bool, value: false, signalName: 'delayedChanged' },
-        property: { type: String, value: '', signalName: 'propertyChanged' },
-        restoreMode: { type: Var, value: Binding.RestoreBindingOrValue, signalName: 'restoreModeChanged' },
-        target: { type: Var, value: undefined, signalName: 'targetChanged' },
-        value: { type: Var, value: undefined, signalName: 'valueChanged' },
-        when: { type: Bool, value: true, signalName: 'whenChanged' },
+        delayed: { type: Bool, value: false},
+        property: { type: String, value: ''},
+        restoreMode: { type: Var, value: Binding.RestoreBindingOrValue},
+        target: { type: Var, value: undefined},
+        value: { type: Var, value: undefined},
+        when: { type: Bool, value: true},
 
         delayedChanged: {type:Signal, slotName:'onDelayedChanged', args:[]},
         propertyChanged: {type:Signal, slotName:'onPropertyChanged', args:[]},

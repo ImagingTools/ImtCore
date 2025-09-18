@@ -6,12 +6,12 @@ const Signal = require("../QtQml/Signal")
 
 class PropertyAnimation extends Animation {
     static meta = Object.assign({}, Animation.meta, {
-        duration: { type: Real, value: 250, signalName: 'durationChanged' },
-        to: { type: Var, value: undefined, signalName: 'toChanged' },
-        from: { type: Var, value: undefined, signalName: 'fromChanged' },
+        duration: { type: Real, value: 250},
+        to: { type: Var, value: undefined},
+        from: { type: Var, value: undefined},
         property: { type: String, value: '', signalName: 'propertyChanged'},
-        properties: { type: String, value: '', signalName: 'propertiesChanged' },
-        target: { type: Var, value: undefined, signalName: 'targetChanged' },
+        properties: { type: String, value: ''},
+        target: { type: Var, value: undefined},
 
         durationChanged: { type:Signal, slotName:'onDurationChanged', args:[] },
         toChanged: { type:Signal, slotName:'onToChanged', args:[] },

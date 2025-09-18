@@ -29,15 +29,15 @@ class Dialog extends Popup {
     static NoButtonAn = 18
 
     static meta = Object.assign({}, Popup.meta, {
-        footer: { type: Variant, targetType: Item, signalName: 'footerChanged' },
-        header: { type: Variant, targetType: Item, signalName: 'headerChanged' },
-        implicitFooterHeight: { type: Real, value:0, signalName: 'implicitFooterHeightChanged' },
-        implicitFooterWidth: { type: Real, value:0, signalName: 'implicitFooterWidthChanged' },
-        implicitHeaderHeight: { type: Real, value:0, signalName: 'implicitHeaderHeightChanged' },
-        implicitHeaderWidth: { type: Real, value:0, signalName: 'implicitHeaderWidthChanged' },
-        result: { type: Int, value:0, signalName: 'resultChanged' },
-        standardButtons: { type: Real, value:0, signalName: 'standardButtonsChanged' },
-        title: { type: String, value:'', signalName: 'titleChanged' },
+        footer: { type: Variant, targetType: Item},
+        header: { type: Variant, targetType: Item},
+        implicitFooterHeight: { type: Real, value:0},
+        implicitFooterWidth: { type: Real, value:0},
+        implicitHeaderHeight: { type: Real, value:0},
+        implicitHeaderWidth: { type: Real, value:0},
+        result: { type: Int, value:0},
+        standardButtons: { type: Real, value:0},
+        title: { type: String, value:''},
 
         footerChanged: {type:Signal, slotName:'onFooterChanged', args:[]},
         headerChanged: {type:Signal, slotName:'onHeaderChanged', args:[]},

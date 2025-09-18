@@ -5,7 +5,7 @@ const QtFunctions = require('../Qt/functions')
 
 class FileIO extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        source: { type: String, value: '', signalName: 'sourceChanged' },
+        source: { type: String, value: ''},
 
         sourceChanged: {type:Signal, slotName:'onSourceChanged', args:[]},
     })

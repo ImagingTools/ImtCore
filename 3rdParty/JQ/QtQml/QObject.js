@@ -14,6 +14,7 @@ class QObject extends QBaseObject {
     }
 
     static create(parent = null, properties = {}){
+        global.objectsCount++
         let obj = super.create(parent, properties)
 
         if(!parent && !this.singleton) {
@@ -189,6 +190,7 @@ class QObject extends QBaseObject {
     }
 
     __destroy(){
+        global.objectsCount--
         super.__destroy()
         this.JQDestruction()
     }

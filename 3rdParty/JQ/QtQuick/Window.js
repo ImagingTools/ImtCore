@@ -10,7 +10,7 @@ class Window extends QtObject {
         title: {type:String, value:0, signalName:'titleChanged'},
         width: {type:Geometry, value:0, signalName:'widthChanged'},
         height: {type:Geometry, value:0, signalName:'heightChanged'},
-        visible: { type: LinkedBool, link: 'visible', value: true, signalName: 'visibleChanged' },
+        visible: { type: LinkedBool, link: 'visible', value: true},
 
         titleChanged: {type:Signal, slotName:'onTitleChanged', args:[]},
         widthChanged: {type:Signal, slotName:'onWidthChanged', args:[]},

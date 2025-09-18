@@ -4,8 +4,8 @@ const Signal = require("./Signal")
 
 class GqlRequest extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        json: { type: String, value: '', signalName: 'jsonChanged' },
-        state: { type: String, value: '', signalName: 'stateChanged' },
+        json: { type: String, value: ''},
+        state: { type: String, value: ''},
 
         jsonChanged: {type:Signal, slotName:'onJsonChanged', args:[]},
         stateChanged: {type:Signal, slotName:'onStateChanged', args:[]},

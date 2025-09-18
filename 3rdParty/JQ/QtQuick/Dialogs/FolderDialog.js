@@ -14,11 +14,11 @@ class FolderDialog extends Dialog {
     static HideNameFilterDetails = 0
 
     static meta = Object.assign({}, Dialog.meta, {
-        acceptLabel: { type: String, value: '', signalName: 'acceptLabelChanged' },
-        selectedFolder: { type: String, value: '', signalName: 'selectedFolderChanged' },
-        currentFolder: { type: String, value: '', signalName: 'currentFolderChanged' },
-        options: { type: Var, value: undefined, signalName: 'optionsChanged' },
-        rejectLabel: { type: String, value: '', signalName: 'rejectLabelChanged' },
+        acceptLabel: { type: String, value: ''},
+        selectedFolder: { type: String, value: ''},
+        currentFolder: { type: String, value: ''},
+        options: { type: Var, value: undefined},
+        rejectLabel: { type: String, value: ''},
 
         acceptLabelChanged: {type:Signal, slotName:'onAcceptLabelChanged', args:[]},
         selectedFolderChanged: {type:Signal, slotName:'onSelectedFolderChanged', args:[]},

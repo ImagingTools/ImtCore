@@ -8,23 +8,23 @@ const QtFunctions = require("../Qt/functions")
 
 class Anchors extends GroupProperty {
     static meta = {
-        fill: { type: Var, value: undefined, signalName: 'fillChanged' },
-        centerIn: { type: Var, value: undefined, signalName: 'centerInChanged' },
+        fill: { type: Var, value: undefined},
+        centerIn: { type: Var, value: undefined},
 
-        left: { type: Var, value: undefined, signalName: 'leftChanged' },
-        right: { type: Var, value: undefined, signalName: 'rightChanged' },
-        top: { type: Var, value: undefined, signalName: 'topChanged' },
-        bottom: { type: Var, value: undefined, signalName: 'bottomChanged' },
-        horizontalCenter: { type: Var, value: undefined, signalName: 'horizontalCenterChanged' },
-        verticalCenter: { type: Var, value: undefined, signalName: 'verticalCenterChanged' },
+        left: { type: Var, value: undefined},
+        right: { type: Var, value: undefined},
+        top: { type: Var, value: undefined},
+        bottom: { type: Var, value: undefined},
+        horizontalCenter: { type: Var, value: undefined},
+        verticalCenter: { type: Var, value: undefined},
 
-        leftMargin: { type: Real, value: 0, signalName: 'leftMarginChanged' },
-        topMargin: { type: Real, value: 0, signalName: 'topMarginChanged' },
-        rightMargin: { type: Real, value: 0, signalName: 'rightMarginChanged' },
-        bottomMargin: { type: Real, value: 0, signalName: 'bottomMarginChanged' },
-        margins: { type: Real, value: 0, signalName: 'marginsChanged' },
-        // horizontalCenterOffset: { type: real, value: 0, signalName: 'numberChanged' },
-        // verticalCenterOffset: { type: real, value: 0, signalName: 'numberChanged' },
+        leftMargin: { type: Real, value: 0},
+        topMargin: { type: Real, value: 0},
+        rightMargin: { type: Real, value: 0},
+        bottomMargin: { type: Real, value: 0},
+        margins: { type: Real, value: 0},
+        // horizontalCenterOffset: { type: real, value: 0},
+        // verticalCenterOffset: { type: real, value: 0},
 
         fillChanged: {type:Signal, slotName:'onFillChanged', args:[]},
         centerInChanged: {type:Signal, slotName:'onCenterInChanged', args:[]},

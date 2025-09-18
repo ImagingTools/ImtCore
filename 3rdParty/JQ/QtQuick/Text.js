@@ -39,17 +39,17 @@ class Text extends Item {
     static html = []
 
     static meta = Object.assign({}, Item.meta, {
-        text: { type: String, value: '', signalName: 'textChanged' },
-        color: { type: Color, value: 'black', signalName: 'colorChanged' },
-        font: { type: Font, signalName: 'fontChanged' },
-        contentWidth: { type: Real, value: 0, signalName: 'contentWidthChanged' },
-        contentHeight: { type: Real, value: 0, signalName: 'contentHeightChanged' },
-        horizontalAlignment: { type: Property, value: Text.AlignLeft, signalName: 'horizontalAlignmentChanged' },
-        verticalAlignment: { type: Property, value: Text.AlignTop, signalName: 'verticalAlignmentChanged' },
-        wrapMode: { type: Property, value: Text.NoWrap, signalName: 'wrapModeChanged' },
-        textFormat: { type: Property, value: Text.AutoText, signalName: 'textFormatChanged' },
-        elide: { type: Property, value: Text.ElideNone, signalName: 'elideChanged' },
-        lineHeight: { type: Real, value: 0, signalName: 'lineHeightChanged' },
+        text: { type: String, value: ''},
+        color: { type: Color, value: 'black'},
+        font: { type: Font},
+        contentWidth: { type: Real, value: 0},
+        contentHeight: { type: Real, value: 0},
+        horizontalAlignment: { type: Property, value: Text.AlignLeft},
+        verticalAlignment: { type: Property, value: Text.AlignTop},
+        wrapMode: { type: Property, value: Text.NoWrap},
+        textFormat: { type: Property, value: Text.AutoText},
+        elide: { type: Property, value: Text.ElideNone},
+        lineHeight: { type: Real, value: 0},
 
         textChanged: {type:Signal, slotName:'onTextChanged', args:[]},
         colorChanged: {type:Signal, slotName:'onColorChanged', args:[]},

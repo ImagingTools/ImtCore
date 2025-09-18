@@ -9,13 +9,13 @@ const Signal = require("../../../QtQml/Signal")
 
 class Dialog extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        data: { type: List, signalName: 'dataChanged' },
-        flags: { type: Real, value:0, signalName: 'flagsChanged' },
-        modality: { type: Real, value:0, signalName: 'modalityChanged' },
-        parentWindow: { type: Var, value:undefined, signalName: 'parentWindowChanged' },
-        result: { type: Int, value:0, signalName: 'resultChanged' },
-        title: { type: String, value:'', signalName: 'titleChanged' },
-        visible: { type: Bool, value:false, signalName: 'visibleChanged' },
+        data: { type: List},
+        flags: { type: Real, value:0},
+        modality: { type: Real, value:0},
+        parentWindow: { type: Var, value:undefined},
+        result: { type: Int, value:0},
+        title: { type: String, value:''},
+        visible: { type: Bool, value:false},
 
         dataChanged: {type:Signal, slotName:'onDataChanged', args:[]},
         flagsChanged: {type:Signal, slotName:'onFlagsChanged', args:[]},

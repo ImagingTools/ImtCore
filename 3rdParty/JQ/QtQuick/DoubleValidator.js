@@ -10,11 +10,11 @@ class DoubleValidator extends QtObject {
     static ScientificRegExp = /^(-|\+)?\s*[0-9]+(\.[0-9]+)?(E(-|\+)?[0-9]+)?$/
 
     static meta = Object.assign({}, QtObject.meta, {
-        bottom: { type: Real, value: -Infinity, signalName: 'bottomChanged' },
-        top: { type: Real, value: Infinity, signalName: 'topChanged' },
-        locale: { type: String, value: false, signalName: 'localeChanged' },
-        decimals: { type: Real, value: 1000, signalName: 'decimalsChanged' },
-        notation: { type: Real, value: DoubleValidator.ScientificNotation, signalName: 'notationChanged' },
+        bottom: { type: Real, value: -Infinity},
+        top: { type: Real, value: Infinity},
+        locale: { type: String, value: false},
+        decimals: { type: Real, value: 1000},
+        notation: { type: Real, value: DoubleValidator.ScientificNotation},
 
         bottomChanged: { type:Signal, slotName:'onBottomChanged', args:[] },
         topChanged: { type:Signal, slotName:'onTopChanged', args:[] },

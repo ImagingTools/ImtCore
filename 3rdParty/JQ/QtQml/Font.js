@@ -6,12 +6,12 @@ const Signal = require("./Signal")
 
 class Font extends GroupProperty {
     static meta = {
-        bold: { type: Bool, value: false, signalName: 'boldChanged' },
-        family: { type: String, value: 'Segoe UI', signalName: 'familyChanged' },
-        italic: { type: Bool, value: false, signalName: 'italicChanged' },
-        underline: { type: Bool, value: false, signalName: 'underlineChanged' },
-        pointSize: { type: Real, value: 14/0.75, signalName: 'pointSizeChanged' },
-        pixelSize: { type: Real, value: 14, signalName: 'pixelSizeChanged' },
+        bold: { type: Bool, value: false},
+        family: { type: String, value: 'Segoe UI'},
+        italic: { type: Bool, value: false},
+        underline: { type: Bool, value: false},
+        pointSize: { type: Real, value: 14/0.75},
+        pixelSize: { type: Real, value: 14},
 
         boldChanged: {type:Signal, slotName:'onBoldChanged', args:[]},
         familyChanged: {type:Signal, slotName:'onFamilyChanged', args:[]},

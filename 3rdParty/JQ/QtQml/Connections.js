@@ -5,9 +5,9 @@ const Signal = require("./Signal")
 
 class Connections extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        enabled: { type: Bool, value: true, signalName: 'enabledChanged' },
-        target: { type: Var, value: undefined, signalName: 'targetChanged' },
-        ignoreUnknownSignals: { type: Bool, value: false, signalName: 'ignoreUnknownSignalsChanged' },
+        enabled: { type: Bool, value: true},
+        target: { type: Var, value: undefined},
+        ignoreUnknownSignals: { type: Bool, value: false},
 
         enabledChanged: {type:Signal, slotName:'onEnabledChanged', args:[]},
         targetChanged: {type:Signal, slotName:'onTargetChanged', args:[]},

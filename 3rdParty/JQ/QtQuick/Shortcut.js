@@ -8,13 +8,13 @@ const Signal = require("../QtQml/Signal")
 
 class Shortcut extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        context: { type: Real, value: QtEnums.WindowShortcut, signalName: 'contextChanged' },
-        autoRepeat: { type: Bool, value: true, signalName: 'autoRepeatChanged' },
-        enabled: { type: Bool, value: true, signalName: 'enabledChanged' },
-        nativeText: { type: String, value: '', signalName: 'nativeTextChanged' },
-        portableText: { type: String, value: '', signalName: 'portableTextChanged' },
-        sequence: { type: String, value: '', signalName: 'sequenceChanged' },
-        sequences: { type: Var, value: undefined, signalName: 'sequencesChanged' },
+        context: { type: Real, value: QtEnums.WindowShortcut},
+        autoRepeat: { type: Bool, value: true},
+        enabled: { type: Bool, value: true},
+        nativeText: { type: String, value: ''},
+        portableText: { type: String, value: ''},
+        sequence: { type: String, value: ''},
+        sequences: { type: Var, value: undefined},
 
         contextChanged: { type:Signal, slotName:'onContextChanged', args:[] },
         autoRepeatChanged: { type:Signal, slotName:'onAutoRepeatChanged', args:[] },

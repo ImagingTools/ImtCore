@@ -10,9 +10,9 @@ class FontLoader extends QtObject {
     static Error = 3
 
     static meta = Object.assign({}, QtObject.meta, {
-        name: { type: String, value: '', signalName: 'nameChanged' },
-        source: { type: String, value: '', signalName: 'sourceChanged' },
-        status: { type: Real, value: FontLoader.Null, signalName: 'statusChanged' },
+        name: { type: String, value: ''},
+        source: { type: String, value: ''},
+        status: { type: Real, value: FontLoader.Null},
 
         nameChanged: { type:Signal, slotName:'onNameChanged', args:[] },
         sourceChanged: { type:Signal, slotName:'onSourceChanged', args:[] },

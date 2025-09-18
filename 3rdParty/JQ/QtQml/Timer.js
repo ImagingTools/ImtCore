@@ -5,10 +5,10 @@ const Signal = require("./Signal")
 
 class Timer extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        interval: { type: Real, value: 1000, signalName: 'intervalChanged' },
-        repeat: { type: Bool, value: false, signalName: 'repeatChanged' },
-        running: { type: Bool, value: false, signalName: 'runningChanged' },
-        triggeredOnStart: { type: Bool, value: false, signalName: 'triggeredOnStartChanged' },
+        interval: { type: Real, value: 1000},
+        repeat: { type: Bool, value: false},
+        running: { type: Bool, value: false},
+        triggeredOnStart: { type: Bool, value: false},
 
         intervalChanged: {type:Signal, slotName:'onIntervalChanged', args:[]},
         repeatChanged: {type:Signal, slotName:'onRepeatChanged', args:[]},

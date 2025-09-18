@@ -5,11 +5,11 @@ const QtFunctions = require('../Qt/functions')
 
 class RemoteFileController extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        json: { type: String, value: '', signalName: 'jsonChanged' },
-        state: { type: String, value: '', signalName: 'stateChanged' },
-        downloadedFileLocation: { type: String, value: '', signalName: 'downloadedFileLocationChanged' },
-        downloadedFilePath: { type: String, value: '', signalName: 'downloadedFilePathChanged' },
-        prefix: { type: String, value: '', signalName: 'prefixChanged' },
+        json: { type: String, value: ''},
+        state: { type: String, value: ''},
+        downloadedFileLocation: { type: String, value: ''},
+        downloadedFilePath: { type: String, value: ''},
+        prefix: { type: String, value: ''},
 
         jsonChanged: {type:Signal, slotName:'onJsonChanged', args:[]},
         stateChanged: {type:Signal, slotName:'onStateChanged', args:[]},

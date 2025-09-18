@@ -40,10 +40,10 @@ class Animation extends QtObject {
     static Infinite = -1
     
     static meta = Object.assign({}, QtObject.meta, {
-        loops: { type: Int, value: 1, signalName: 'loopsChanged' },
-        running: { type: Bool, value: false, signalName: 'runningChanged' },
-        paused: { type: Bool, value: false, signalName: 'pausedChanged' },
-        alwaysRunToEnd: { type: Bool, value: false, signalName: 'alwaysRunToEndChanged' },
+        loops: { type: Int, value: 1},
+        running: { type: Bool, value: false},
+        paused: { type: Bool, value: false},
+        alwaysRunToEnd: { type: Bool, value: false},
 
         loopsChanged: { type:Signal, slotName:'onLoopsChanged', args:[] },
         runningChanged: { type:Signal, slotName:'onRunningChanged', args:[] },

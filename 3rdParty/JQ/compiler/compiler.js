@@ -3,6 +3,7 @@ const os = require('os')
 const path = require('path')
 const parser = require('./parser')
 const { SourceMapGenerator, SourceNode } = require('source-map-generator')
+// const UglifyJS = require("uglify-js")
 
 // for compatibility with web
 global.window = {
@@ -1052,27 +1053,27 @@ class Instruction {
 
                 if (typeof defineProperty.value === 'object') {
                     if (_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)) {
-                        meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
+                        meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}},`)
                     } else {
-                        meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, signalName:'${defineProperty.signalName}'},`)
+                        meta.push(`${defineProperty.name}:{type:${_typeInfo.path}},`)
                     }
                     continue
                 }
 
                 if (typeof defineProperty.value === 'string') {
-                    meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}', signalName:'${defineProperty.signalName}'},`)
+                    meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}'},`)
                 } else {
                     if (_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)) {
-                        meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
+                        meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}},`)
                     } else {
-                        meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}, signalName:'${defineProperty.signalName}'},`)
+                        meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}},`)
                     }
 
                 }
 
             }
             for (let defineSignal of this.defineSignals) {
-                meta.push(`${defineSignal.name}:{type:JQModules.QtQml.Signal, slotName:'${defineSignal.slotName}', args:[${defineSignal.args.join(',')}]},`)
+                meta.push(`${defineSignal.name}:{type:JQModules.QtQml.Signal, args:[${defineSignal.args.join(',')}]},`)
             }
         }
 
@@ -1876,5 +1877,10 @@ if (config.output) {
     fs.writeFileSync(path.resolve(configDirPath, config.output), result.code)
 
     fs.writeFileSync(path.resolve(configDirPath, config.output)+'.map', result.map.toString())
-}
 
+
+
+    // fs.writeFileSync(path.resolve(configDirPath, config.output), UglifyJS.minify(result.code).code)
+
+    // fs.writeFileSync(path.resolve(configDirPath, config.output)+'.map', result.map.toString())
+}

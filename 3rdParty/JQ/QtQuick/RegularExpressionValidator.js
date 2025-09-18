@@ -4,7 +4,7 @@ const Signal = require("../QtQml/Signal")
 
 class RegularExpressionValidator extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        regularExpression: { type: Var, value: undefined, signalName: 'regularExpressionChanged' },
+        regularExpression: { type: Var, value: undefined},
 
         regularExpressionChanged: { type:Signal, slotName:'onRegularExpressionChanged', args:[] },
     })

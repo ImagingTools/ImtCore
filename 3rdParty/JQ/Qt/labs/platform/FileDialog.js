@@ -15,17 +15,17 @@ class FileDialog extends Dialog {
     static HideNameFilterDetails = 0
 
     static meta = Object.assign({}, Dialog.meta, {
-        acceptLabel: { type: String, value: '', signalName: 'acceptLabelChanged' },
-        folder: { type: String, value: '', signalName: 'folderChanged' },
-        currentFile: { type: String, value: '', signalName: 'currentFileChanged' },
-        currentFiles: { type: Var, value: undefined, signalName: 'currentFilesChanged' },
-        fileMode: { type: Int, value: FileDialog.OpenFile, signalName: 'fileModeChanged' },
-        file: { type: Var, value: undefined, signalName: 'fileChanged' },
-        files: { type: Var, value: undefined, signalName: 'filesChanged' },
-        options: { type: Var, value: undefined, signalName: 'optionsChanged' },
-        rejectLabel: { type: String, value: '', signalName: 'rejectLabelChanged' },
-        seleectedNameFilter: { type: Var, value: undefined, signalName: 'seleectedNameFilterChanged' },
-        nameFilters: { type: Var, value: undefined, signalName: 'nameFiltersChanged' },
+        acceptLabel: { type: String, value: ''},
+        folder: { type: String, value: ''},
+        currentFile: { type: String, value: ''},
+        currentFiles: { type: Var, value: undefined},
+        fileMode: { type: Int, value: FileDialog.OpenFile},
+        file: { type: Var, value: undefined},
+        files: { type: Var, value: undefined},
+        options: { type: Var, value: undefined},
+        rejectLabel: { type: String, value: ''},
+        seleectedNameFilter: { type: Var, value: undefined},
+        nameFilters: { type: Var, value: undefined},
 
         acceptLabelChanged: {type:Signal, slotName:'onAcceptLabelChanged', args:[]},
         folderChanged: {type:Signal, slotName:'onFolderChanged', args:[]},

@@ -4,7 +4,7 @@ const Signal = require("../QtQml/Signal")
 
 class PauseAnimation extends Animation {
     static meta = Object.assign({}, Animation.meta, {
-        duration: { type: Real, value: 250, signalName: 'durationChanged' },
+        duration: { type: Real, value: 250},
 
         durationChanged: { type:Signal, slotName:'onDurationChanged', args:[] },
     })

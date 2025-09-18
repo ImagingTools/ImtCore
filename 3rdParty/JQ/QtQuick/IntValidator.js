@@ -5,9 +5,9 @@ const Signal = require("../QtQml/Signal")
 
 class IntValidator extends QtObject {
     static meta = Object.assign({}, QtObject.meta, {
-        bottom: { type: Int, value: -2147483647, signalName: 'bottomChanged' },
-        top: { type: Int, value: 2147483647, signalName: 'topChanged' },
-        locale: { type: String, value: false, signalName: 'localeChanged' },
+        bottom: { type: Int, value: -2147483647},
+        top: { type: Int, value: 2147483647},
+        locale: { type: String, value: false},
 
         bottomChanged: { type:Signal, slotName:'onBottomChanged', args:[] },
         topChanged: { type:Signal, slotName:'onTopChanged', args:[] },
