@@ -14,10 +14,24 @@ DecoratorBase {
                    topLeftPanelDecorator.maxWidth:
                    tempText.width + 2*Style.marginM;
         height: topLeftPanelDecorator.height;
+
+        Image {
+            id: applicationIcon
+            anchors.verticalCenter: content.verticalCenter;
+            anchors.left: parent.left
+            anchors.leftMargin: Style.marginM
+            height: parent.height - Style.marginM
+            width: height
+            visible: source !== ''
+            source: context && context.appIcon && context.appIcon !== '' ? context.appIcon : ''
+            sourceSize.width: width;
+            sourceSize.height: height;
+        }
+
         Text {
             id: applicationName;
             anchors.verticalCenter: content.verticalCenter;
-            anchors.left: parent.left;
+            anchors.left: applicationIcon.right;
             anchors.leftMargin: Style.marginM;
             anchors.right: parent.right;
             anchors.rightMargin: Style.marginM;
