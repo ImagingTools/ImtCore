@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CollectionCommands" X="200" Y="300" Note=""/>
+        <Element ComponentName="CollectionCommandsController" X="175" Y="175" Note=""/>
+        <Element ComponentName="CollectionHeadersProvider" X="600" Y="475" Note=""/>
+        <Element ComponentName="Demultiplexer" X="600" Y="100" Note=""/>
+        <Element ComponentName="UserActionCollectionController" X="625" Y="300" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

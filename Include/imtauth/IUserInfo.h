@@ -17,32 +17,6 @@ namespace imtauth
 class IUserInfo: virtual public IUserBaseInfo
 {
 public:
-	/**
-		Supported action types.
-	*/
-	enum ActionType
-	{
-		/**
-			A login action.
-		*/
-		AT_LOGIN,
-
-		/**
-			A logout action.
-		*/
-		AT_LOGOUT,
-
-		/**
-			A password change action.
-		*/
-		AT_PASSWORD_CHANGE,
-
-		/**
-			A name change action.
-		*/
-		AT_NAME_CHANGE
-	};
-
 	enum MetaInfoTypes
 	{
 		MIT_EMAIL = MIT_ROLES + 1,

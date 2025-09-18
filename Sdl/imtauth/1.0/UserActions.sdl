@@ -1,0 +1,44 @@
+schema {
+	query: Query
+	namespace: imtauth
+	version: 1.0
+}
+
+import {
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+}
+
+input GetUserActionsInput {
+	productId: ID
+	viewParams: CollectionViewParams
+}
+
+type UserActionItemData {
+	id: ID!
+	typeId: ID!
+	userId: ID
+	targetId: ID
+	targetTypeId: ID
+	actionType: String
+	timeStamp: String
+}
+
+type GetUserActionsPayload {
+	items: [UserActionItemData]
+	notification: NotificationItem
+}
+
+type Query {
+	GetUserActions (input:GetUserActionsInput): GetUserActionsPayload!
+}
+
+collectionSchema {
+	type UserAction {
+		ref: UserActionItemData
+		operations {
+				list: GetUserActions
+		}
+	}
+}
+
+

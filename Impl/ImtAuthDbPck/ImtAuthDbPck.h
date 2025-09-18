@@ -12,6 +12,7 @@
 #include <imtauthdb/CSqliteUserDatabaseDelegateComp.h>
 #include <imtauthdb/CSqliteRoleDatabaseDelegateComp.h>
 #include <imtauthdb/CUsersSqlPathExtractorComp.h>
+#include <imtauthdb/CUserActionDatabaseDelegateComp.h>
 
 
 /**
@@ -32,6 +33,7 @@ typedef imtauthdb::CSuperuserProviderComp SuperuserProvider;
 typedef imtauthdb::CRoleDatabaseDelegateComp SqlJsonRoleDatabaseDelegate;
 typedef imtauthdb::CSqliteRoleDatabaseDelegateComp SqliteJsonRoleDatabaseDelegate;
 typedef imtauthdb::CUsersSqlPathExtractorComp UsersSqlPathExtractor;
+typedef imtauthdb::CUserActionDatabaseDelegateComp UserActionDatabaseDelegate;
 
 
 } // namespace ImtAuthDbPck

@@ -69,6 +69,11 @@ I_EXPORT_COMPONENT(
 			"Users sql path extractor",
 			"Users Sql Path Extractor");
 
+I_EXPORT_COMPONENT(
+			UserActionDatabaseDelegate,
+			"User action database delegate",
+			"User Action Database Delegate");
+
 
 } // namespace ImtAuthDbPck
 
