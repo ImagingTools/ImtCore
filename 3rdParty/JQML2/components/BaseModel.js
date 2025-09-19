@@ -193,12 +193,7 @@ class BaseModel extends ListModel {
 	}
 
 	addElement(element){
-		element.owner = this.owner
-		element.connectProperties()
-		this.append({item: element})
-		if (this.owner){
-			this.owner.modelChanged([])
-		}
+		this.insertElement(this.count, element)
 	}
 
 	removeElement(index){
@@ -224,6 +219,31 @@ class BaseModel extends ListModel {
 		let item = this.get(index).item
 		if (item[propName] !== value){
 			item[propName] = value
+		}
+	}
+	
+	swapItems(index1, index2){
+		if (index1 < 0 || index1 >= this.count || index2 < 0 || index2 >= this.count ){
+			return false
+		}
+		
+		let item1 = this.get(index1).item.copyMe()
+		let item2 = this.get(index2).item.copyMe()
+		item1.owner = this.owner
+		item2.owner = this.owner
+
+		this.get(index1).item = item2
+		this.get(index2).item = item1
+
+		return true
+	}
+
+	insertElement(index, element){
+		element.owner = this.owner
+		element.connectProperties()
+		this.insert(index, {item: element})
+		if (this.owner){
+			this.owner.modelChanged([])
 		}
 	}
 }

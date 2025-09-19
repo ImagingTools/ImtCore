@@ -200,9 +200,13 @@ ListModel {
 	}
 
 	function addElement(element){
+		insertElement(this.count, element)
+	}
+
+	function insertElement(index, element){
 		element.owner = this.owner
 		element.connectProperties()
-		this.append({item: element})
+		this.insert(index, {item: element})
 		if (owner){
 			owner.modelChanged([])
 		}
