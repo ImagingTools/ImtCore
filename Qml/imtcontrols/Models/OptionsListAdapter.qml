@@ -6,7 +6,11 @@ OptionsList {
     id: root
     
     property var collectionModel: null
-    
+
+    property string idKey: "id"
+    property string nameKey: "name"
+    property string descriptionKey: "description"
+
     Component {
         id: optionFactory
         Option {}
@@ -14,7 +18,7 @@ OptionsList {
     
     onCollectionModelChanged: {
         if (!hasOptions()){
-           createOptions()
+            createOptions()
         }
         
         m_options.clear()
@@ -22,18 +26,18 @@ OptionsList {
         if (collectionModel){
             for (let i = 0; i < collectionModel.getItemsCount(); i++){
                 let optionObj = optionFactory.createObject(root)
-                if (collectionModel.containsKey("id", i)){
-                    let id = collectionModel.getData("id", i)
+                if (collectionModel.containsKey(idKey, i)){
+                    let id = collectionModel.getData(idKey, i)
                     optionObj.m_id = id
                 }
                 
-                if (collectionModel.containsKey("name", i)){
-                    let name = collectionModel.getData("name", i)
+                if (collectionModel.containsKey(nameKey, i)){
+                    let name = collectionModel.getData(nameKey, i)
                     optionObj.m_name = name
                 }
                 
-                if (collectionModel.containsKey("description", i)){
-                    let description = collectionModel.getData("description", i)
+                if (collectionModel.containsKey(descriptionKey, i)){
+                    let description = collectionModel.getData(descriptionKey, i)
                     optionObj.m_description = description
                 }
                 

@@ -118,6 +118,7 @@ DataModelController 1.0 Models/DataModelController.qml
 DataModelProvider 1.0 Models/DataModelProvider.qml
 OptionManager 1.0 Models/OptionManager.qml
 OptionsListAdapter 1.0 Models/OptionsListAdapter.qml
+OptionsListManager 1.0 Models/OptionsListManager.qml
 
 Table 1.0 ./Views/Table.qml
 TableBase 1.0 ./Views/TableBase.qml

@@ -5,6 +5,8 @@ import com.imtcore.imtqml 1.0
 QtObject {
 	id: root
 
+	property string collectionId
+
 	signal collectionHeadersReceived(var headersModel)
 	signal collectionHeadersReceiveFailed(var headersModel)
 
@@ -23,7 +25,7 @@ QtObject {
 	signal objectsRestored(var ids)
 	signal restoreObjectsFailed(string message)
 
-	signal listObjectsReceived(var listObjects, var notification)
+	signal listObjectsReceived(var listObjects)
 	signal listObjectsReceiveFailed(string message)
 
 	signal objectRenamed(string id, string newName)
@@ -32,29 +34,32 @@ QtObject {
 	signal objectDescriptionSetted(string id, string description)
 	signal objectSetDescriptionFailed(string message)
 
+	signal subCollectionCreated(var subCollection)
+	signal subCollectionCreateFailed(string message)
+
 	function getCollectionHeaders(){
 		console.warn("getHeaders() should be implemented in a subclass")
 		collectionHeadersReceived(null)
 	}
 
-	function getObject(objectId){
-		console.warn("getObject() should be implemented in a subclass")
+	function getObjectData(objectId){
+		console.warn("getObjectData() should be implemented in a subclass")
 		objectReceived(null)
 	}
 
-	function insertNewObject(objectId, objectData){
+	function insertNewObject(typeId, name, description, objectData, objectId){
 		console.warn("insertNewObject() should be implemented in a subclass")
 		objectAdded(objectId)
 	}
 
-	function updateObject(objectId, newObjectData){
-		console.warn("updateObject() should be implemented in a subclass")
+	function setObjectData(objectId, newObjectData){
+		console.warn("setObjectData() should be implemented in a subclass")
 		objectUpdated(objectId)
 	}
 
 	function getElements(count, offset, filter){
 		console.warn("getElements() should be implemented in a subclass")
-		listObjectsReceived(null, null)
+		listObjectsReceived(null)
 	}
 
 	function removeObjects(objectIds){
@@ -85,6 +90,11 @@ QtObject {
 	function setObjectDescription(objectId, description){
 		console.warn("setObjectDescription() should be implemented in a subclass")
 		objectDescriptionSetted(objectId, description)
+	}
+
+	function createSubCollection(offset, count, selectionParams){
+		console.warn("createSubCollection() should be implemented in a subclass")
+		subCollectionCreated(null)
 	}
 }
 
