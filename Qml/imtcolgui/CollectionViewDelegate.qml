@@ -26,7 +26,7 @@ QtObject {
     }
 
     function updateObject(objectId){}
-    function openDocumentEditor(objectId, viewTypeId){}
+    function openDocumentEditor(objectId){}
     function setupContextMenu(menu){}
     function createNewObject(typeId, objectName, description){}
     function updateItemSelection(selectedItems, selectedTypeId){}

@@ -25,6 +25,9 @@ CollectionDataProvider {
 	property TreeItemModel hardwareProductsModel: TreeItemModel {};
 	property TreeItemModel softwareProductsModel: TreeItemModel {};
 
+	signal hardwareProductsModelReady()
+	signal softwareProductsModelReady()
+
 	onCollectionModelChanged: {
 		hardwareProductsModel.clear();
 		softwareProductsModel.clear();
@@ -41,8 +44,10 @@ CollectionDataProvider {
 			}
 		}
 
-		hardwareProductsModel.refresh();
-		softwareProductsModel.refresh();
+		hardwareProductsModel.refresh()
+		hardwareProductsModelReady()
+		softwareProductsModel.refresh()
+		softwareProductsModelReady()
 	}
 
 	function getLicensesModel(productId){

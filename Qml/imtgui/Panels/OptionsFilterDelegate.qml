@@ -215,7 +215,7 @@ FilterDelegateBase {
 		id: popupMenuDialogComp
 		PopupMenuDialog {
 			id: popupMenuContainer
-			model:	filterDelegate.isValidModel() ? filterDelegate.selectionParam.m_constraints.m_options : null
+			model: filterDelegate.isValidModel() ? filterDelegate.selectionParam.m_constraints.m_options : null
 			selectedIndex: filterDelegate.selectionParam ? filterDelegate.selectionParam.m_selectedIndex : -1
 			itemWidth: Style.sizeHintXS
 			moveToIndex: selectedIndex

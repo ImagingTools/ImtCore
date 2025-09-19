@@ -2,7 +2,6 @@ pragma Singleton
 
 import QtQuick 2.12
 import Acf 1.0
-import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 
 QtObject {
@@ -63,33 +62,17 @@ QtObject {
         return true;
     }
 
-    function openDocument(documentId, documentTypeId){
-        if ((!documentId || documentId === "") || (!documentTypeId || documentTypeId === "")){
+    function openDocument(typeId, documentId, documentTypeId){
+        if ((!typeId || typeId === "") || (!documentId || documentId === "") || (!documentTypeId || documentTypeId === "")){
             console.error("Unable to open document, please check input parameters");
             return;
         }
 
-        let typeId = ""
-        for (let managerTypeId in documentManagers){
-            if (documentManagers[managerTypeId]){
-                let typeIds = documentManagers[managerTypeId].getSupportedDocumentTypeIds()
-                if (typeIds.includes(documentTypeId)){
-                    typeId = managerTypeId
-                    break
-                }
-            }
-        }
-
-        if (typeId === ""){
-            console.error("Unable to open document '" + documentId + "' with type-ID '" + documentTypeId + "'. Error: Document manager does not found")
-            return
-        }
-
-        let documentManager = documentManagers[typeId];
+        let documentManager = root.documentManagers[typeId];
         if (!documentManager){
             root.tryRegisterDocumentManager(typeId, function(result){
                 if (result){
-                    root.openDocument(typeId, documentId, documentTypeId, viewTypeId);
+                    root.openDocument(typeId, documentId, documentTypeId);
                 }
                 else{
                     console.error("Unable to open document. Document manager with type-ID: '" , typeId, "' is invalid!");
@@ -98,20 +81,9 @@ QtObject {
             return;
         }
 
-        let viewTypeId = ""
-        if (!viewTypeId || viewTypeId === ""){
-            let viewTypeIds = documentManager.getViewTypeIds(documentTypeId);
-            if (viewTypeIds.length === 0){
-                console.error("Unable to open document. View none are registered for the manager with Type-ID: ", typeId);
-                return;
-            }
-
-            viewTypeId = viewTypeIds[0];
-        }
-
         documentOpened(typeId, documentId, documentTypeId);
 
-        documentManager.openDocument(documentId, "", documentTypeId, viewTypeId);
+        documentManager.openDocument(documentId, documentTypeId);
     }
 
     function saveDirtyDocuments(){

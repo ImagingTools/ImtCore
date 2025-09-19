@@ -20,10 +20,11 @@ RemoteCollectionView {
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
 			collectionView: userGroupCollectionViewContainer;
 			documentManager: userGroupCollectionViewContainer.documentManager;
-			
-			documentTypeId: "Group";
-			viewTypeId: "GroupEditor";
-			
+
+			documentTypeIds: ["Group"]
+			documentDataControllersComp: [documentDataControllerComp]
+			documentViewsComp: [userGroupDocumentComp]
+	
 			function updateStateBaseCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length > 0;
 				if(commandsController){
@@ -40,15 +41,6 @@ RemoteCollectionView {
 		}
 	}
 
-	Component.onCompleted: {
-		table.setSortingInfo(GroupItemDataTypeMetaInfo.s_name, "ASC");
-		
-		if (documentManager){
-			documentManager.registerDocumentView("Group", "GroupEditor", userGroupDocumentComp);
-			documentManager.registerDocumentDataController("Group", documentDataControllerComp);
-		}
-	}
-	
 	function handleSubscription(dataModel){
 		userGroupCollectionViewContainer.doUpdateGui();
 	}

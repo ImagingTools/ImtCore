@@ -21,9 +21,9 @@ RemoteCollectionView {
 			collectionView: roleCollectionViewContainer;
 			documentManager: roleCollectionViewContainer.documentManager;
 			
+			documentTypeIds: ["Role"]
 			documentViewsComp: [roleDocumentComp];
 			documentDataControllersComp: [dataControllerComp];
-			documentValidatorsComp: [];
 			
 			function getHeaders(){
 				return roleCollectionViewContainer.getHeaders()
@@ -37,14 +37,7 @@ RemoteCollectionView {
 	function handleSubscription(dataModel){
 		roleCollectionViewContainer.doUpdateGui();
 	}
-	
-	Component.onCompleted: {
-		if (roleCollectionViewContainer.documentManager){
-			documentManager.registerDocumentView("Role", "RoleEditor", roleDocumentComp);
-			documentManager.registerDocumentDataController("Role", dataControllerComp);
-		}
-	}
-	
+
 	onProductIdChanged: {
 		permissionsProvider.productId = productId;
 		permissionsProvider.updateModel();

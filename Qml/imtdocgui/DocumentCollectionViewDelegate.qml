@@ -12,13 +12,13 @@ CollectionViewCommandsDelegateBase {
 
 	property DocumentManager documentManager: null;
 
-	property string documentTypeId; // default document type-ID
-	property string viewTypeId; // default document view type-ID
+	/*deprecated*/property string documentTypeId;
+	/*deprecated*/property string viewTypeId;
 
 	property string documentManagerId: collectionId;
 
 	property var documentTypeIds: [];
-	property var documentViewTypeIds: [];
+	/*deprecated*/property var documentViewTypeIds: [];
 	property var documentViewsComp: [];
 	property var documentDataControllersComp: [];
 	property var documentValidatorsComp: [];
@@ -51,10 +51,9 @@ CollectionViewCommandsDelegateBase {
 
 		for (let i = 0; i < documentTypeIds.length; i++){
 			let documentTypeId = documentTypeIds[i];
-			if (documentViewsComp.length > i && documentViewTypeIds.length > i){
-				let viewTypeId = documentViewTypeIds[i];
+			if (documentViewsComp.length > i){
 				let documentViewComp = documentViewsComp[i];
-				if (!documentManager.registerDocumentView(documentTypeId, viewTypeId, documentViewComp)){
+				if (!documentManager.registerDocumentView(documentTypeId, documentViewComp)){
 					console.error("Unable to register view for document type ID: ", documentTypeId)
 				}
 			}
@@ -98,21 +97,22 @@ CollectionViewCommandsDelegateBase {
 		}
 	}
 
-	function createNewObject(typeId, viewTypeId){
+	function createNewObject(typeId){
 		if (collectionViewCommandsDelegateBase.documentManager){
-			collectionViewCommandsDelegateBase.documentManager.insertNewDocument(typeId, viewTypeId, "");
+			collectionViewCommandsDelegateBase.documentManager.insertNewDocument(typeId);
 		}
 		else{
-			console.error("Unable to create new object:", typeId, viewTypeId, ". Error: Document manager is invalid")
+			console.error("Unable to create new object:", typeId, ". Error: Document manager is invalid")
 		}
 	}
 
-	function openDocumentEditor(objectId, typeId, viewTypeId){
+	function openDocumentEditor(objectId, typeId){
+		console.debug("DocumentCollectionViewDelegate.qml openDocumentEditor", objectId, typeId)
 		if (collectionViewCommandsDelegateBase.documentManager){
-			collectionViewCommandsDelegateBase.documentManager.openDocument(objectId, "", typeId, viewTypeId);
+			collectionViewCommandsDelegateBase.documentManager.openDocument(objectId, typeId);
 		}
 		else{
-			console.error("Unable to open document for editing", typeId, viewTypeId, ". Error: Document manager is invalid");
+			console.error("Unable to open document for editing", typeId, ". Error: Document manager is invalid");
 		}
 	}
 
@@ -131,7 +131,7 @@ CollectionViewCommandsDelegateBase {
 				let typeId = elementsModel.getData("typeId", index);
 
 				if (documentTypeIds.length === 0){
-					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeId, viewTypeId);
+					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeId);
 					return;
 				}
 
@@ -140,7 +140,7 @@ CollectionViewCommandsDelegateBase {
 					console.error('Document with type-ID: "', typeId ,'" unsupported');
 				}
 				else{
-					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeIds[typeIdindex], documentViewTypeIds[typeIdindex]);
+					collectionViewCommandsDelegateBase.openDocumentEditor(itemId, documentTypeIds[typeIdindex]);
 				}
 			}
 		}
@@ -166,14 +166,14 @@ CollectionViewCommandsDelegateBase {
 	function onNew(){
 		if (documentTypeIds.length > 1){
 			// dialog
-			// collectionViewCommandsDelegateBase.createNewObject(documentTypeIds, viewTypeId);
+			// collectionViewCommandsDelegateBase.createNewObject(documentTypeIds);
 		}
 		else{
 			if (documentTypeIds.length > 0){
-				collectionViewCommandsDelegateBase.createNewObject(documentTypeIds[0], documentViewTypeIds[0]);
+				collectionViewCommandsDelegateBase.createNewObject(documentTypeIds[0]);
 			}
 			else{
-				collectionViewCommandsDelegateBase.createNewObject(documentTypeId, viewTypeId);
+				collectionViewCommandsDelegateBase.createNewObject(documentTypeId);
 			}
 		}
 	}

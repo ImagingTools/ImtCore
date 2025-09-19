@@ -9,6 +9,7 @@ QtObject {
 	property string defaultDocumentName: qsTr("<no name>")
 	property int documentsCount: documentsModel.count
 	property Item activeView // Document Manager view
+	property string typeId // Document Manager type-ID
 
 	property ListModel documentsModel: ListModel {
 		dynamicRoles: true
@@ -50,6 +51,11 @@ QtObject {
 	function getActiveView()
 	{
 		return activeView;
+	}
+
+	function getTypeId()
+	{
+		return typeId
 	}
 
 	function getDocumentTypeId(documentId)
@@ -104,65 +110,36 @@ QtObject {
 	}
 
 
-	function registerDocumentView(documentTypeId, viewTypeId, viewComp)
+	function registerDocumentView(documentTypeId, viewComp)
 	{
-		if (documentTypeId === "" || viewTypeId === "" || !viewComp){
+		if (documentTypeId === "" || !viewComp){
 			return false;
 		}
 
-		if (documentIsRegistered(documentTypeId)){
-			if (documentViewIsRegistered(viewTypeId)){
-				console.error("View with type-ID: ", viewTypeId, " already registered!");
+		internal.m_registeredView[documentTypeId] = viewComp
 
-				return false;
-			}
-
-			internal.m_registeredView[documentTypeId].push({"viewTypeId": viewTypeId, "viewComp": viewComp});
-		}
-		else{
-			internal.m_registeredView[documentTypeId] = [{"viewTypeId": viewTypeId, "viewComp": viewComp}]
-		}
-
-		return true;
+		return true
 	}
 
-	function unRegisterDocumentView(documentTypeId, viewTypeId)
+	function unRegisterDocumentTypeId(documentTypeId)
 	{
 		if (!documentIsRegistered(documentTypeId)){
 			return false;
 		}
 
-		let registeredViewList = internal.m_registeredView[documentTypeId];
-		for (let i = 0; i < registeredViewList.length; i++){
-			let registeredViewObj = registeredViewList[i];
-			if (registeredViewObj["viewTypeId"] === viewTypeId){
-				registeredViewList.splice(i,1)
+		delete internal.m_registeredView.documentTypeId
 
-				return true;
-			}
-		}
-
-		return false;
+		return true
 	}
 
 
-	function getDocumentViewComp(documentTypeId, viewTypeId)
+	function getDocumentViewComp(documentTypeId)
 	{
-		if (!documentViewIsRegistered(documentTypeId, viewTypeId)){
-			console.error("Unable to get a document view. View is unregistered!");
-
+		if (!documentIsRegistered(documentTypeId)){
 			return null;
 		}
 
-		let registeredViewList = internal.m_registeredView[documentTypeId];
-		for (let i = 0; i < registeredViewList.length; i++){
-			let registeredViewObj = registeredViewList[i];
-			if (registeredViewObj["viewTypeId"] === viewTypeId){
-				return registeredViewObj["viewComp"];
-			}
-		}
-
-		return null;
+		return internal.m_registeredView[documentTypeId]
 	}
 
 
@@ -194,22 +171,6 @@ QtObject {
 	}
 
 
-	function documentViewIsRegistered(documentTypeId, viewTypeId)
-	{
-		if (documentIsRegistered(documentTypeId)){
-			let registeredViewList = internal.m_registeredView[documentTypeId];
-			for (let i = 0; i < registeredViewList.length; i++){
-				let registeredViewObj = registeredViewList[i];
-				if (registeredViewObj["viewTypeId"] === viewTypeId){
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-
 	function dataControllerIsRegistered(documentTypeId)
 	{
 		return documentTypeId in internal.m_registeredDataControllers;
@@ -229,15 +190,15 @@ QtObject {
 	}
 
 
-	function insertNewDocument(documentTypeId, viewTypeId, name)
+	function insertNewDocument(documentTypeId, name)
 	{
 		let documentId = UuidGenerator.generateUUID()
-		let documentData = createTemplateDocument(documentId, documentTypeId, viewTypeId);
+		let documentData = createTemplateDocument(documentId, documentTypeId);
 		if (!documentData){
 			return false;
 		}
 
-		addDocumentToModel(documentId, name, documentTypeId, viewTypeId, documentData);
+		addDocumentToModel(documentId, name, documentTypeId, documentData);
 
 		if (documentData.documentDataController){
 			documentData.documentDataController.createDocumentModel();
@@ -265,30 +226,18 @@ QtObject {
 		return null;
 	}
 
-	function getViewTypeIds(documentTypeId){
-		if (!documentIsRegistered(documentTypeId)){
-			return []
-		}
-
-		let result = []
-		let registeredViewList = internal.m_registeredView[documentTypeId];
-		for (let i = 0; i < registeredViewList.length; i++){
-			let registeredViewObj = registeredViewList[i];
-			let viewTypeId = registeredViewObj["viewTypeId"];
-			result.push(viewTypeId)
-		}
-
-		return result;
-	}
-
-
-	function createTemplateDocument(documentId, documentTypeId, viewTypeId){
+	function createTemplateDocument(documentId, documentTypeId){
 		let singleDocumentData = singleDocumentDataComp.createObject(documentManager);
 		if (singleDocumentData){
 			singleDocumentData.documentId = documentId;
 			singleDocumentData.documentTypeId = documentTypeId;
 
-			let viewComp = getDocumentViewComp(documentTypeId, viewTypeId);
+			let viewComp = getDocumentViewComp(documentTypeId);
+			if (!viewComp){
+				console.error("Unable to create document with type-ID ''. Error: View is unregistered")
+				return null
+			}
+
 			singleDocumentData.viewComp = viewComp;
 
 			let documentDataController = getDocumentDataController(documentTypeId);
@@ -308,8 +257,9 @@ QtObject {
 		return null;
 	}
 
-	function openDocument(documentId, name, documentTypeId, viewTypeId)
+	function openDocument(documentId, documentTypeId, name)
 	{
+		console.debug("DocumentManager.qml openDocument", documentId, documentTypeId, name)
 		let index = getDocumentIndexByDocumentId(documentId);
 		if (index >= 0){
 			// already opened
@@ -318,9 +268,9 @@ QtObject {
 			return;
 		}
 
-		documentOpeningStarted(documentId, documentTypeId, viewTypeId)
+		documentOpeningStarted(documentId, documentTypeId)
 
-		let documentData = createTemplateDocument(documentId, documentTypeId, viewTypeId);
+		let documentData = createTemplateDocument(documentId, documentTypeId);
 		if (!documentData){
 			return false;
 		}
@@ -328,7 +278,7 @@ QtObject {
 		documentData.isNew = false;
 
 		let onResult = function(){
-			addDocumentToModel(documentId, name, documentTypeId, viewTypeId, documentData);
+			addDocumentToModel(documentId, name, documentTypeId, documentData);
 
 			documentData.documentDataController.modelChanged.disconnect(onResult);
 		}
@@ -344,13 +294,12 @@ QtObject {
 		return true;
 	}
 
-	function addDocumentToModel(documentId, name, documentTypeId, viewTypeId, documentData)
+	function addDocumentToModel(documentId, name, documentTypeId, documentData)
 	{
 		documentsModel.append({
 								"id": documentId,
 								"name": name,
 								"typeId": documentTypeId,
-								"viewTypeId": viewTypeId,
 								"documentData": documentData,
 								"isNew": documentData.isNew
 							});
@@ -561,6 +510,7 @@ QtObject {
 	}
 
 	function setupDocumentView(documentId, view){
+		console.log("setupDocumentView", documentId, view)
 		let documentData = getDocumentDataById(documentId)
 		if (documentData){
 			if (view.documentId !== undefined){
@@ -569,13 +519,6 @@ QtObject {
 
 			if (view.documentTypeId !== undefined){
 				view.documentTypeId = getDocumentTypeId(documentId);
-			}
-
-			if (view.viewTypeId !== undefined){
-				let viewTypeIds = getViewTypeIds(view.documentTypeId);
-				if (viewTypeIds.length > 0){
-					view.viewTypeId = viewTypeIds[0];
-				}
 			}
 
 			if (view.documentManager !== undefined){
