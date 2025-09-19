@@ -95,7 +95,11 @@ BoundingBox {
 		verticalLineTopY /= scaleMax1
 
 		//MINOR GRID
-		if(scaleCoeff >= 2){
+
+		//let hasMinorGrid = scaleCoeff >= 2
+		let hasMinorGrid = gridShape.gridStepMajorX * scaleCoeff > 40
+
+		if(hasMinorGrid){
 			ctx.strokeStyle = gridShape.minorGridColor;
 			let stepMinorX = gridShape.gridStepMinorX
 			let stepMinorY = gridShape.gridStepMinorY
@@ -193,7 +197,7 @@ BoundingBox {
 
 		// completing the grid to zero
 		//MINOR GRID
-		if(scaleCoeff >= 2){
+		if(hasMinorGrid){
 			//ctx.strokeStyle = "violet"
 			ctx.strokeStyle = gridShape.minorGridColor;
 			let stepMinorX = gridShape.gridStepMinorX
