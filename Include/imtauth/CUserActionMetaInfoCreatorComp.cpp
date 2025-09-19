@@ -37,8 +37,12 @@ bool CUserActionMetaInfoCreatorComp::CreateMetaInfo(
 	}
 
 	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID, userRecentActionPtr->GetUserId());
-	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_ID, userRecentActionPtr->GetTargetId());
-	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_ID, userRecentActionPtr->GetTargetTypeId());
+
+	imtauth::IUserRecentAction::TargetInfo targetInfo = userRecentActionPtr->GetTargetInfo();
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_ID, targetInfo.id);
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_ID, targetInfo.typeId);
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_NAME, targetInfo.name);
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_SOURCE, targetInfo.source);
 	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE, userRecentActionPtr->GetActionType());
 
 	return true;

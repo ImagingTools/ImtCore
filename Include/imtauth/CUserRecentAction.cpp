@@ -55,34 +55,18 @@ void CUserRecentAction::SetActionType(ActionType actionType)
 }
 
 
-QByteArray CUserRecentAction::GetTargetId() const
+imtauth::IUserRecentAction::TargetInfo CUserRecentAction::GetTargetInfo() const
 {
-	return m_targetId;
+	return m_targetInfo;
 }
 
 
-void CUserRecentAction::SetTargetId(const QByteArray& targetId)
+void CUserRecentAction::SetTargetInfo(TargetInfo targetInfo)
 {
-	if (m_targetId != targetId){
+	if (m_targetInfo != targetInfo){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_targetId = targetId;
-	}
-}
-
-
-QByteArray CUserRecentAction::GetTargetTypeId() const
-{
-	return m_targetTypeId;
-}
-
-
-void CUserRecentAction::SetTargetTypeId(const QByteArray& typeId)
-{
-	if (m_targetTypeId != typeId){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_targetTypeId = typeId;
+		m_targetInfo = targetInfo;
 	}
 }
 
@@ -121,20 +105,39 @@ bool CUserRecentAction::Serialize(iser::IArchive &archive)
 	retVal = retVal && I_SERIALIZE_ENUM(ActionType, archive, m_actionType);
 	retVal = retVal && archive.EndTag(actionTypeTag);
 
+	TargetInfo targetInfo;
+	if (archive.IsStoring()){
+		targetInfo = m_targetInfo;
+	}
+
 	iser::CArchiveTag targetIdTag("TargetId", "Target-ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(targetIdTag);
-	retVal = retVal && archive.Process(m_targetId);
+	retVal = retVal && archive.Process(targetInfo.id);
 	retVal = retVal && archive.EndTag(targetIdTag);
+
+	iser::CArchiveTag targetNameTag("TargetName", "Target Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(targetNameTag);
+	retVal = retVal && archive.Process(targetInfo.name);
+	retVal = retVal && archive.EndTag(targetNameTag);
 
 	iser::CArchiveTag targetTypeIdTag("TargetTypeId", "Target Type-ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(targetTypeIdTag);
-	retVal = retVal && archive.Process(m_targetTypeId);
+	retVal = retVal && archive.Process(targetInfo.typeId);
 	retVal = retVal && archive.EndTag(targetTypeIdTag);
+
+	iser::CArchiveTag targetSourceTag("TargetSource", "Target Source", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(targetSourceTag);
+	retVal = retVal && archive.Process(targetInfo.source);
+	retVal = retVal && archive.EndTag(targetSourceTag);
 
 	iser::CArchiveTag timestampTag("Timestamp", "Timestamp", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(timestampTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_timestamp);
 	retVal = retVal && archive.EndTag(timestampTag);
+
+	if (retVal && !archive.IsStoring()){
+		m_targetInfo = targetInfo;
+	}
 
 	return retVal;
 }
@@ -150,8 +153,7 @@ bool CUserRecentAction::CopyFrom(const IChangeable& object, CompatibilityMode /*
 
 		m_userId = sourcePtr->m_userId;
 		m_actionType = sourcePtr->m_actionType;
-		m_targetId = sourcePtr->m_targetId;
-		m_targetTypeId = sourcePtr->m_targetTypeId;
+		m_targetInfo = sourcePtr->m_targetInfo;
 		m_timestamp = sourcePtr->m_timestamp;
 
 		return true;
@@ -168,8 +170,7 @@ bool CUserRecentAction::IsEqual(const IChangeable& object) const
 	if (retVal && sourcePtr != nullptr){
 		retVal = retVal && m_userId == sourcePtr->m_userId;
 		retVal = retVal && m_actionType == sourcePtr->m_actionType;
-		retVal = retVal && m_targetId == sourcePtr->m_targetId;
-		retVal = retVal && m_targetTypeId == sourcePtr->m_targetTypeId;
+		retVal = retVal && m_targetInfo == sourcePtr->m_targetInfo;
 		retVal = retVal && m_timestamp == sourcePtr->m_timestamp;
 
 		return retVal;
@@ -196,8 +197,6 @@ bool CUserRecentAction::ResetData(CompatibilityMode mode)
 
 	m_userId.clear();
 	m_actionType = AT_UNKNOWN;
-	m_targetId.clear();
-	m_targetTypeId.clear();
 
 	return true;
 }

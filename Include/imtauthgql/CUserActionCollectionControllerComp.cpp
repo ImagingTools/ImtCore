@@ -43,16 +43,22 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 		representationObject.typeId = QByteArray(m_objectCollectionCompPtr->GetObjectTypeId(objectId));
 	}
 
-	if (requestInfo.items.isUserIdRequested){
-		representationObject.userId = userRecentActionPtr->GetUserId();
+	if (requestInfo.items.isTargetLinkRequested){
+		sdl::imtbase::ImtCollection::CObjectLink::V1_0 objectLink;
+		imtauth::IUserRecentAction::TargetInfo targetInfo = userRecentActionPtr->GetTargetInfo();
+		objectLink.id = targetInfo.id;
+		objectLink.typeId = targetInfo.typeId;
+		objectLink.name = targetInfo.name;
+		objectLink.source = targetInfo.source;
+		representationObject.targetLink = objectLink;
 	}
 
-	if (requestInfo.items.isTargetIdRequested){
-		representationObject.targetId = userRecentActionPtr->GetTargetId();
-	}
-
-	if (requestInfo.items.isTargetTypeIdRequested){
-		representationObject.targetTypeId = userRecentActionPtr->GetTargetTypeId();
+	if (requestInfo.items.isUserLinkRequested){
+		sdl::imtbase::ImtCollection::CObjectLink::V1_0 objectLink;
+		objectLink.id = userRecentActionPtr->GetUserId();
+		objectLink.typeId = QByteArrayLiteral("User");
+		objectLink.name = userRecentActionPtr->GetUserId();
+		representationObject.userLink = objectLink;
 	}
 
 	if (requestInfo.items.isActionTypeRequested){

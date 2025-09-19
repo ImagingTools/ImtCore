@@ -16,9 +16,8 @@ input GetUserActionsInput {
 type UserActionItemData {
 	id: ID!
 	typeId: ID!
-	userId: ID
-	targetId: ID
-	targetTypeId: ID
+	userLink: ObjectLink
+	targetLink: ObjectLink
 	actionType: String
 	timeStamp: String
 }

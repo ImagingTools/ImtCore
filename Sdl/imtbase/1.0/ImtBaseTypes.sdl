@@ -142,12 +142,12 @@ type FileNameParam
 
 type Parameter {
 	id: ID!
-	typeId: ID!
-	name: String!
+	typeId: ID
+	name: String
 	description: String
 	enabled: Boolean
 	## serialized parameter with JSON archive
-	data: String!
+	data: String
 }
 
 type ParamsSet {

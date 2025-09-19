@@ -23,6 +23,12 @@ bool CUserActionMetaInfoDelegateComp::FillRepresentation(QJsonObject& representa
 	QByteArray targetId = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_ID).toByteArray();
 	representation["targetId"] = QString(targetId);
 
+	QString targetName = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_NAME).toString();
+	representation["targetName"] = QString(targetName);
+
+	QString targetSource = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_SOURCE).toString();
+	representation["targetSource"] = QString(targetSource);
+
 	QByteArray targetTypeId = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_ID).toByteArray();
 	representation["targetTypeId"] = QString(targetTypeId);
 
@@ -41,6 +47,14 @@ bool CUserActionMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& meta
 
 	if (representation.contains("targetId")){
 		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_ID, representation.value("targetId"));
+	}
+
+	if (representation.contains("targetName")){
+		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_NAME, representation.value("targetName"));
+	}
+
+	if (representation.contains("targetSource")){
+		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_SOURCE, representation.value("targetSource"));
 	}
 
 	if (representation.contains("targetTypeId")){

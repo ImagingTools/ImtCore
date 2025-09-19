@@ -76,8 +76,8 @@
                     <AttributeInfo Id="FilterableHeaderIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>userId</Value>
-                                <Value>targetTypeId</Value>
+                                <Value>userLink</Value>
+                                <Value>targetLink</Value>
                                 <Value>actionType</Value>
                             </Values>
                         </Data>
@@ -85,8 +85,8 @@
                     <AttributeInfo Id="HeaderIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>userId</Value>
-                                <Value>targetTypeId</Value>
+                                <Value>userLink</Value>
+                                <Value>targetLink</Value>
                                 <Value>actionType</Value>
                                 <Value>timeStamp</Value>
                             </Values>
@@ -105,8 +105,8 @@
                     <AttributeInfo Id="SortableHeaderIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>userId</Value>
-                                <Value>targetTypeId</Value>
+                                <Value>userLink</Value>
+                                <Value>targetLink</Value>
                                 <Value>actionType</Value>
                                 <Value>timeStamp</Value>
                             </Values>
@@ -158,6 +158,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>timeStamp</Value>
+                                <Value>targetLink</Value>
+                                <Value>userLink</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -165,6 +167,8 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>TimeStamp</Value>
+                                <Value>targetName</Value>
+                                <Value>userId</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

@@ -25,25 +25,6 @@ istd::IChangeableUniquePtr CUserActionDatabaseDelegateComp::CreateObjectFromReco
 		return nullptr;
 	}
 
-	if (record.contains("TimeStamp")){
-		userRecentActionPtr->SetTimestamp(record.value("TimeStamp").toDateTime());
-	}
-
-	if (record.contains("UserId")){
-		QByteArray userId = record.value("UserId").toByteArray();
-		userRecentActionPtr->SetUserId(userId);
-	}
-
-	if (record.contains("TargetId")){
-		QByteArray targetId = record.value("TargetId").toByteArray();
-		userRecentActionPtr->SetTargetId(targetId);
-	}
-
-	if (record.contains("TargetTypeId")){
-		QByteArray targetTypeId = record.value("TargetTypeId").toByteArray();
-		userRecentActionPtr->SetTargetTypeId(targetTypeId);
-	}
-
 	return documentPtr;
 }
 

@@ -184,8 +184,8 @@ sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControlle
 	}
 
 	iprm::CParamsSet filterParams;
-	if (filterParams.CopyFrom(m_selectionParams)){
-		if (arguments.input.Version_1_0->selectionParams){
+	if (arguments.input.Version_1_0->selectionParams){
+		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to remove element set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
@@ -250,10 +250,12 @@ sdl::imtbase::ImtCollection::CRestoreObjectSetPayload CObjectCollectionControlle
 
 	iprm::CParamsSet filterParams;
 	if (arguments.input.Version_1_0->selectionParams){
-		sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
-		if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
-			errorMessage = QString("Unable to restore object set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
-			return sdl::imtbase::ImtCollection::CRestoreObjectSetPayload();
+		if (filterParams.CopyFrom(m_selectionParams)){
+			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
+			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
+				errorMessage = QString("Unable to restore object set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
+				return sdl::imtbase::ImtCollection::CRestoreObjectSetPayload();
+			}
 		}
 	}
 
@@ -730,8 +732,8 @@ sdl::imtbase::ImtCollection::CGetElementsCountPayload CObjectCollectionControlle
 	}
 
 	iprm::CParamsSet filterParams;
-	if (filterParams.CopyFrom(m_selectionParams)){
-		if (arguments.input.Version_1_0->selectionParams){
+	if (arguments.input.Version_1_0->selectionParams){
+		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to get elements count for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
@@ -778,8 +780,8 @@ sdl::imtbase::ImtCollection::CGetElementIdsPayload CObjectCollectionControllerCo
 	}
 
 	iprm::CParamsSet filterParams;
-	if (filterParams.CopyFrom(m_selectionParams)){
-		if (arguments.input.Version_1_0->selectionParams){
+	if (arguments.input.Version_1_0->selectionParams){
+		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to get element IDs for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
@@ -1108,13 +1110,15 @@ sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CObjectCollectionContro
 		return sdl::imtbase::ImtCollection::CCreateSubCollectionPayload();
 	}
 
+	sdl::imtbase::ImtCollection::CreateSubCollectionRequestInfo requestInfo = createSubCollectionRequest.GetRequestInfo();
+
 	sdl::imtbase::ImtCollection::CreateSubCollectionRequestArguments arguments = createSubCollectionRequest.GetRequestedArguments();
 	if (!arguments.input.Version_1_0){
 		Q_ASSERT(false);
 		return sdl::imtbase::ImtCollection::CCreateSubCollectionPayload();
 	}
 
-	int offset = -1;
+	int offset = 0;
 	if (arguments.input.Version_1_0->offset){
 		offset = *arguments.input.Version_1_0->offset;
 	}
@@ -1125,8 +1129,8 @@ sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CObjectCollectionContro
 	}
 
 	iprm::CParamsSet filterParams;
-	if (filterParams.CopyFrom(m_selectionParams)){
-		if (arguments.input.Version_1_0->selectionParams){
+	if (arguments.input.Version_1_0->selectionParams){
+		if (filterParams.CopyFrom(m_selectionParams)){
 			sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet = *arguments.input.Version_1_0->selectionParams;
 			if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
 				errorMessage = QString("Unable to create sub collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
@@ -1135,36 +1139,59 @@ sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CObjectCollectionContro
 		}
 	}
 
-	QList<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0> collectionItems;
-	imtbase::ICollectionInfo::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-	for (const imtbase::ICollectionInfo::Id& id: ids){
-		sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0 collectionItem;
+	if (requestInfo.isItemsRequested){
+		QList<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0> collectionItems;
+		imtbase::ICollectionInfo::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
+		for (const imtbase::ICollectionInfo::Id& id: ids){
+			sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0 collectionItem;
 
-		sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
-		parameterInfo.id = id;
-		parameterInfo.typeId = m_objectCollectionCompPtr->GetObjectTypeId(id);
-		parameterInfo.name = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
-		parameterInfo.enabled = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_ENABLED).toBool();
-		parameterInfo.description = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			if (requestInfo.items.isItemInfoRequested){
+				sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameterInfo;
 
-		collectionItem.itemInfo = parameterInfo;
+				if (requestInfo.items.itemInfo.isIdRequested){
+					parameterInfo.id = id;
+				}
 
-		QByteArray elementMetaInfoData;
-		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(id);
-		if (SerializeObject(*metaInfo.GetPtr(), elementMetaInfoData)){
-			collectionItem.metaInfo = elementMetaInfoData;
+				if (requestInfo.items.itemInfo.isTypeIdRequested){
+					parameterInfo.typeId = m_objectCollectionCompPtr->GetObjectTypeId(id);
+				}
+
+				if (requestInfo.items.itemInfo.isNameRequested){
+					parameterInfo.name = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+				}
+
+				if (requestInfo.items.itemInfo.isEnabledRequested){
+					parameterInfo.enabled = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_ENABLED).toBool();
+				}
+
+				if (requestInfo.items.itemInfo.isDescriptionRequested){
+					parameterInfo.description = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+				}
+	
+				collectionItem.itemInfo = parameterInfo;
+			}
+
+			if (requestInfo.items.isMetaInfoRequested){
+				QByteArray elementMetaInfoData;
+				idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(id);
+				if (SerializeObject(*metaInfo.GetPtr(), elementMetaInfoData)){
+					collectionItem.metaInfo = elementMetaInfoData;
+				}
+			}
+
+			if (requestInfo.items.isDataMetaInfoRequested){
+				QByteArray dataMetaInfo;
+				idoc::MetaInfoPtr dataMetaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(id);
+				if (SerializeObject(*dataMetaInfoPtr.GetPtr(), dataMetaInfo)){
+					collectionItem.dataMetaInfo = dataMetaInfo;
+				}
+			}
+
+			collectionItems << collectionItem;
 		}
 
-		QByteArray dataMetaInfo;
-		idoc::MetaInfoPtr dataMetaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(id);
-		if (SerializeObject(*dataMetaInfoPtr.GetPtr(), dataMetaInfo)){
-			collectionItem.dataMetaInfo = dataMetaInfo;
-		}
-
-		collectionItems << collectionItem;
+		response.items = collectionItems;
 	}
-
-	response.items = collectionItems;
 
 	sdl::imtbase::ImtCollection::CCreateSubCollectionPayload retVal;
 	retVal.Version_1_0 = std::move(response);

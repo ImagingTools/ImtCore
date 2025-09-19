@@ -23,10 +23,8 @@ public:
 	virtual void SetUserId(const QByteArray& userId) override;
 	virtual ActionType GetActionType() const override;
 	virtual void SetActionType(ActionType actionType) override;
-	virtual QByteArray GetTargetId() const override;
-	virtual void SetTargetId(const QByteArray& targetId) override;
-	virtual QByteArray GetTargetTypeId() const override;
-	virtual void SetTargetTypeId(const QByteArray& typeId) override;
+	virtual TargetInfo GetTargetInfo() const override;
+	virtual void SetTargetInfo(TargetInfo targetInfo) override;
 	virtual QDateTime GetTimestamp() const override;
 	virtual void SetTimestamp(const QDateTime& timestamp) override;
 
@@ -42,8 +40,7 @@ public:
 private:
 	QByteArray m_userId;
 	ActionType m_actionType;
-	QByteArray m_targetId;
-	QByteArray m_targetTypeId;
+	TargetInfo m_targetInfo;
 	QDateTime m_timestamp;
 };
 

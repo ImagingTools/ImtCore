@@ -11,6 +11,13 @@ import {
 	"../../imtbase/1.0/DocumentCollectionFilter.sdl"
 }
 
+type ObjectLink {
+	id: ID!
+	typeId: ID!
+	name: String
+	source: String
+}
+
 type HeaderInfo {
 	id: ID!
 	name: String!

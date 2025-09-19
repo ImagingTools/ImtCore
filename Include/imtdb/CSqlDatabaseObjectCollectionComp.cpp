@@ -1038,8 +1038,17 @@ void CSqlDatabaseObjectCollectionComp::CreateUserActionLog(
 
 	imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContext.GetOperationOwnerId();
 	userRecentActionPtr->SetUserId(objectInfo.id);
-	userRecentActionPtr->SetTargetId(targetId);
-	userRecentActionPtr->SetTargetTypeId(targetTypeId);
+
+	imtauth::IUserRecentAction::TargetInfo targetInfo;
+	targetInfo.id = targetId;
+	targetInfo.typeId = targetTypeId;
+
+	QString elementName = GetElementInfo(targetId, imtbase::ICollectionInfo::ElementInfoType::EIT_NAME).toString();
+	targetInfo.name = elementName;
+
+	targetInfo.source = m_objectDelegateCompPtr->GetTableName();
+
+	userRecentActionPtr->SetTargetInfo(targetInfo);
 	userRecentActionPtr->SetActionType(actionType);
 	userRecentActionPtr->SetTimestamp(QDateTime::currentDateTime());
 
