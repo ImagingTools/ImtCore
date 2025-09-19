@@ -22,17 +22,17 @@
         <Element ComponentName="UserGroupProvider" X="150" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="UserCommands">
+            <PositionMap>
+                <Element ComponentName="StandardDocumentCommandsController" X="600" Y="325" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="UsersCommands">
             <PositionMap>
                 <Element ComponentName="CollectionCommands" X="550" Y="475" Note=""/>
                 <Element ComponentName="CollectionCommandsController" X="575" Y="200" Note=""/>
                 <Element ComponentName="Revision" X="950" Y="475" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="UserCommands">
-            <PositionMap>
-                <Element ComponentName="StandardDocumentCommandsController" X="600" Y="325" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

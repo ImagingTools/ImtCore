@@ -200,6 +200,9 @@
                     <AttributeInfo Id="UserInfoProvider" Type="Reference" ExportId="UserInfoProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
