@@ -21,7 +21,7 @@ DecoratorBase {
             anchors.left: parent.left
             anchors.leftMargin: Style.marginM
             height: parent.height - Style.marginM
-            width: height
+            width: visible ? height : 0
             visible: source !== ''
             source: context && context.appIcon && context.appIcon !== '' ? context.appIcon : ''
             sourceSize.width: width;
@@ -31,7 +31,7 @@ DecoratorBase {
         Text {
             id: applicationName;
             anchors.verticalCenter: content.verticalCenter;
-            anchors.left: applicationIcon.right;
+            anchors.left: applicationIcon.visible ? applicationIcon.right : parent.left;
             anchors.leftMargin: Style.marginM;
             anchors.right: parent.right;
             anchors.rightMargin: Style.marginM;
