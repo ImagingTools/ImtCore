@@ -39,3 +39,18 @@ global.objectsCount = 0
 global.JQContext = require('./JQContext')
 global.JQApplication = require('./JQApplication')
 global.JQApplication.init()
+
+global.objectsNames = {}
+global.addObjectName = function(name){
+    if(!(name in global.objectsNames)){
+        global.objectsNames[name] = 0
+    }
+
+    global.objectsNames[name]++
+}
+
+global.removeObjectName = function(name){
+    if(name in global.objectsNames){
+        global.objectsNames[name]--
+    }
+}

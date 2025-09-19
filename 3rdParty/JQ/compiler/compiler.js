@@ -1597,6 +1597,9 @@ class QmlFile {
 
         code.add(`static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})`)
 
+        code.add(`__removeObjectName(){removeObjectName('${this.instruction.className}')}`)
+        code.add(`__addObjectName(){addObjectName('${this.instruction.className}')}`)
+
         code.add('static create(parent,properties={},context={},isRoot=true){')
 
         code.add(`let __root = this`)
@@ -1605,6 +1608,7 @@ class QmlFile {
         // code.add(`let __currentModule=${this.moduleName ? "JQModules['" + this.moduleName + "']" : 'null'}`)
 
         code.add(`let ${this.instruction.name} = super.create(parent,properties,context,false)`)
+
         code.add(`${this.instruction.name}.__${this.getContextName()} = __context`)
 
         if (this.instruction.id) code.add(`${this.instruction.name}.__${this.getContextName()}.${this.instruction.id}=${this.instruction.name}`)

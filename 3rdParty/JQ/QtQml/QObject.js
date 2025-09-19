@@ -12,10 +12,14 @@ class QObject extends QBaseObject {
 
         JQDestruction: {type:Signal, args:[]},
     }
+    
+    __addObjectName(){}
+    __removeObjectName(){}
 
     static create(parent = null, properties = {}){
         global.objectsCount++
         let obj = super.create(parent, properties)
+        obj.__addObjectName()
 
         if(!parent && !this.singleton) {
             obj.__smart = true
@@ -156,6 +160,7 @@ class QObject extends QBaseObject {
 
     __destroy(){
         global.objectsCount--
+        this.__removeObjectName()
         super.__destroy()
         this.JQDestruction()
     }

@@ -64,7 +64,7 @@ class Image extends Item {
             return
         }
 
-        let url = JQApplication.rootPath + this.source.replaceAll('../','')
+        let url = JQApplication.rootPath + this.source.replaceAll('qrc:/','').replaceAll('../','')
         this.$url = url
 
         this.status = Image.Loading
