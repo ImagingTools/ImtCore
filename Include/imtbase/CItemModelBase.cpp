@@ -228,9 +228,9 @@ bool CItemModelBase::copyTo(CItemModelBase* otherObjectPtr)
 }
 
 
-QObject* CItemModelBase::CreateObject(const QString& /*key*/)
+QVariant CItemModelBase::CreateObject(const QString& /*key*/)
 {
-	return nullptr;
+	return QVariant();
 }
 
 

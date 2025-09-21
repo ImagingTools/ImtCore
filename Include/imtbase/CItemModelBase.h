@@ -24,7 +24,7 @@ public:
 	Q_INVOKABLE virtual CItemModelBase* copyMe();
 	Q_INVOKABLE virtual bool copyFrom(CItemModelBase* other);
 	Q_INVOKABLE virtual bool copyTo(CItemModelBase* other);
-	Q_INVOKABLE virtual QObject* CreateObject(const QString& key);
+	Q_INVOKABLE virtual QVariant CreateObject(const QString& key);
 	Q_INVOKABLE virtual QStringList getProperties() const;
 	Q_INVOKABLE virtual QString getJSONKeyForProperty(const QString& propertyName) const;
 
