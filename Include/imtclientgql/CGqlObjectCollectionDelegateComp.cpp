@@ -247,7 +247,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectsReques
 	sdl::imtbase::ImtCollection::RemoveElementsRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
-	arguments.input.Version_1_0->elementIds = objectIds.ToList();
+	arguments.input.Version_1_0->elementIds.Emplace();
+	arguments.input.Version_1_0->elementIds->FromList(objectIds);
 
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY);
 	if (!sdl::imtbase::ImtCollection::CRemoveElementsGqlRequest::SetupGqlRequest(*requestPtr, arguments)){
@@ -563,7 +564,7 @@ bool CGqlObjectCollectionDelegateComp::GetItemIds(const imtgql::IGqlResponse& re
 	ResponseData responseData = GetResponseData(response);
 	if (getElementIdsPayload.ReadFromJsonObject(responseData.data)){
 		if (getElementIdsPayload.elementIds.HasValue()){
-			out.FromList(*getElementIdsPayload.elementIds);
+			out = getElementIdsPayload.elementIds->ToList();
 
 			return true;
 		}
