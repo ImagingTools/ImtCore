@@ -164,7 +164,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionCont
 		if (userGroupInfoPtr != nullptr){
 			sdl::imtbase::ImtCollection::CElementMetaInfo::V1_0 elementMetaInfo;
 		
-			QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> infoParams;
+			imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> infoParams;
 
 			sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parentGroupsParameter;
 			parentGroupsParameter.id = QByteArrayLiteral("ParentGroups");

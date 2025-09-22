@@ -344,7 +344,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 	imtsdl::CSdlUnion foundUnion;
 	const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 	if (isUnion){
-		const static QString unionSourceVarName = QStringLiteral("replyPayload");
+		const static QString unionSourceVarName = QStringLiteral("&replyPayload");
 		CSdlUnionConverter::WriteConversionFromUnion(stream,
 					foundUnion,
 					unionSourceVarName,
@@ -357,7 +357,7 @@ void CGqlHandlerBaseClassGeneratorComp::AddImplCodeForRequest(QTextStream& strea
 					*m_sdlUnionListCompPtr,
 					hIndents + 1,
 					CSdlUnionConverter::CT_MODEL_SCALAR,
-					QString(),
+					QStringLiteral("dataModelPtr->SetData("), //QString(),
 					QStringLiteral("*dataModelPtr"),
 					QStringLiteral("nullptr"));
 	}

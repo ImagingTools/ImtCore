@@ -50,7 +50,7 @@ bool CDocumentFilterRepresentationController::GetSdlRepresentationFromDataModel(
 
 	sdlRepresentation.documentId = documentCollectionFilter->GetDocumentId();
 
-	QList<Filter::DocumentState> sdlDocumentStates;
+	imtsdl::TElementList<Filter::DocumentState> sdlDocumentStates;
 	imtcol::IDocumentCollectionFilter::DocumentStates states = documentCollectionFilter->GetDocumentStates();
 	if (states.contains(imtcol::IDocumentCollectionFilter::DS_ACTIVE)){
 		sdlDocumentStates << Filter::DocumentState::ACTIVE;
@@ -84,7 +84,7 @@ bool CDocumentFilterRepresentationController::GetDataModelFromSdlRepresentation(
 	}
 
 	if (sdlRepresentation.documentStates){
-		QList<Filter::DocumentState> sdlDocumentStates = *sdlRepresentation.documentStates;
+		imtsdl::TElementList<Filter::DocumentState> sdlDocumentStates = *sdlRepresentation.documentStates;
 		if (sdlDocumentStates.contains(Filter::DocumentState::ACTIVE)){
 			documentCollectionFilter->AddDocumentState(imtcol::IDocumentCollectionFilter::DS_ACTIVE);
 		}

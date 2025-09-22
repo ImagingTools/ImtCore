@@ -195,7 +195,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CRoleCollectionControlle
 	QByteArray productId = gqlRequest.GetHeader("productId");
 
 	sdl::imtbase::ImtCollection::CElementMetaInfo::V1_0 elementMetaInfo;
-	QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> infoParams;
+	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> infoParams;
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){

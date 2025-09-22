@@ -41,7 +41,7 @@ bool CSelectionParamRepresentationControllerComp::GetSdlRepresentationFromDataMo
 		return false;
 	}
 	
-	QList<sdl::imtbase::ImtBaseTypes::COption::V1_0> optionList;
+	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::COption::V1_0> optionList;
 	
 	const iprm::IOptionsList* optionListPtr = selectionParamPtr->GetSelectionConstraints();
 	if (optionListPtr != nullptr){

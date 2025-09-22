@@ -81,14 +81,18 @@ bool CFeatureCollectionControllerComp::CreateFeatureFromRepresentationModel(
 	bool isPermission = bool(featureRepresentationData.isPermission && *featureRepresentationData.isPermission);
 	featureInfo.SetIsPermission(isPermission);
 
-	QList<sdl::imtlic::Features::CFeatureData::V1_0> subFeatureDataList;
+	imtsdl::TElementList<sdl::imtlic::Features::CFeatureData::V1_0> subFeatureDataList;
 	if (featureRepresentationData.subFeatures){
 		subFeatureDataList = *featureRepresentationData.subFeatures;
 	}
-	for (const sdl::imtlic::Features::CFeatureData::V1_0& subFeatureData : subFeatureDataList){
+	for (const istd::TSharedNullable<sdl::imtlic::Features::CFeatureData::V1_0>& subFeatureData : subFeatureDataList){
+		if (!subFeatureData.HasValue()){
+			continue;
+		}
+
 		imtlic::CFeatureInfo* subFeatureInfoPtr = new imtlic::CFeatureInfo();
 
-		bool ok = CreateFeatureFromRepresentationModel(subFeatureData, rootFeatureId, *subFeatureInfoPtr, errorMessage);
+		bool ok = CreateFeatureFromRepresentationModel(*subFeatureData, rootFeatureId, *subFeatureInfoPtr, errorMessage);
 		if (!ok){
 			return false;
 		}
@@ -125,7 +129,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 	bool isPermission = featureInfo.IsPermission();
 	featureRepresentationData.isPermission = isPermission;
 
-	QList<sdl::imtlic::Features::CFeatureData::V1_0> subFeatureDataList;
+	imtsdl::TElementList<sdl::imtlic::Features::CFeatureData::V1_0> subFeatureDataList;
 	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	if (!subFeatures.IsEmpty()){
 		for (int i = 0; i < subFeatures.GetCount(); i++){
@@ -231,7 +235,7 @@ bool CFeatureCollectionControllerComp::CreateRepresentationFromObject(
 		sdl::imtlic::Features::CFeatureData::V1_0 featureData;
 		bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, featureData, errorMessage);
 		if (ok){
-			representationObject.subFeatures = QList<sdl::imtlic::Features::CFeatureData::V1_0>(*featureData.subFeatures);
+			representationObject.subFeatures = *featureData.subFeatures;
 		}
 	}
 

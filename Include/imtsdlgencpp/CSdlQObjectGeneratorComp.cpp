@@ -25,11 +25,13 @@ bool CSdlQObjectGeneratorComp::ProcessEntry(const imtsdl::CSdlEntryBase& sdlEntr
 	if (headerDevicePtr != nullptr){
 		QTextStream stream(headerDevicePtr);
 		ok = ok && ProcessHeaderClassFile(stream, sdlEntry);
+		ok = ok && ProcessHeaderClassListFile(stream, sdlEntry);
 	}
 
 	if (sourceDevicePtr != nullptr){
 		QTextStream stream(sourceDevicePtr);
 		ok = ok && ProcessSourceClassFile(stream, sdlEntry);
+		ok = ok && ProcessSourceClassListFile(stream, sdlEntry);
 	}
 
 	return ok;
@@ -81,7 +83,8 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("Q_PROPERTY(") + GetQObjectTypeName(field); // QVariant");
+		// stream << QStringLiteral("Q_PROPERTY(") + CSdlGenTools::GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false)); // QVariant");
+		stream << QStringLiteral("Q_PROPERTY(QVariant");
 		stream << QStringLiteral(" m_") << GetDecapitalizedValue(field.GetId());
 		stream << QStringLiteral(" READ Get") << GetCapitalizedValue(field.GetId());
 		stream << QStringLiteral(" WRITE Set") << GetCapitalizedValue(field.GetId());
@@ -108,13 +111,15 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 
 		FeedStreamHorizontally(stream);
-		stream << GetQObjectTypeName(field);
+		// stream << CSdlGenTools::GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
+		stream << QStringLiteral("QVariant");
 		stream << QStringLiteral(" Get") << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("void Set") << GetCapitalizedValue(field.GetId());
-		stream << QStringLiteral("(") << GetQObjectTypeName(field);
+		stream << QStringLiteral("(QVariant");
+		// stream << QStringLiteral("(") + CSdlGenTools::GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
 		stream << QStringLiteral(" v);");
 		FeedStream(stream, 1, false);
 
@@ -151,7 +156,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QObject* CreateObject(const QString& key) override;");
+	stream << QStringLiteral("Q_INVOKABLE QVariant CreateObject(const QString& key) override;");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream);
@@ -163,7 +168,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 	stream << QStringLiteral("signals:");
 	FeedStream(stream, 1, false);
 	for (const imtsdl::CSdlField& field: fieldList){
-		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);		FeedStreamHorizontally(stream);
+		// const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);		FeedStreamHorizontally(stream);
 		stream << QStringLiteral("void ") << GetDecapitalizedValue(field.GetId());
 		stream << QStringLiteral("Changed();");
 		FeedStream(stream, 1, false);
@@ -180,7 +185,8 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
 		if (isCustom && !isEnum){
 			FeedStreamHorizontally(stream);
-			stream << GetQObjectTypeName(field);
+			// stream << CSdlGenTools::GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));;
+			stream << QStringLiteral("QVariant");
 			stream << QStringLiteral(" m_") << GetDecapitalizedValue(field.GetId());
 			stream << QStringLiteral("QObjectPtr;");
 			FeedStream(stream, 1, false);
@@ -191,6 +197,22 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 	stream << QStringLiteral("};");
 	FeedStream(stream, 3, false);
 
+	// stream.flush();
+
+	return true;
+}
+
+
+bool CSdlQObjectGeneratorComp::ProcessHeaderClassListFile(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry) const
+{
+	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<const imtsdl::CSdlType*>(&sdlEntry);
+	if (sdlTypePtr == nullptr){
+		return true;
+	}
+
+	FeedStream(stream, 3, false);
+
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlEntry.GetSchemaParams());
 	QString itemClassName = sdlNamespace + QStringLiteral("::C") + sdlEntry.GetName();
 	QString modelDataTypeName = itemClassName + QStringLiteral("::V1_0");
 	QString modelObjectDataTypeName = itemClassName + QStringLiteral("Object");
@@ -198,7 +220,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 	QString objectListClassNameWithNamespace = sdlNamespace + QStringLiteral("::") + objectListClassName;
 
 	stream << QStringLiteral("class ") << objectListClassName;
-	stream << QStringLiteral(": public ::imtbase::TListModelBase<");
+	stream << QStringLiteral(": public ::imtsdl::TListModelBase<");
 	stream << modelDataTypeName << QStringLiteral(", ") << modelObjectDataTypeName;
 	stream << QStringLiteral(">");
 	FeedStream(stream, 1, false);
@@ -215,7 +237,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("typedef ::imtbase::TListModelBase<");
+	stream << QStringLiteral("typedef ::imtsdl::TListModelBase<");
 	stream << modelDataTypeName << QStringLiteral(", ") << modelObjectDataTypeName;
 	stream << QStringLiteral("> BaseClass;");
 	FeedStream(stream, 2, false);
@@ -226,615 +248,74 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, const
 	FeedStream(stream, 2, false);
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){");
+	stream << QStringLiteral("Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return true;");
+	stream << QStringLiteral("Q_INVOKABLE int getItemsCount();");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE int getItemsCount(){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return rowCount();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
 
 	// get method begin
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QVariantMap get(int row) const{");
+	stream << QStringLiteral("Q_INVOKABLE QVariantMap get(int row) const;");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("QVariantMap data;");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("QModelIndex idx = index(row, 0);");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("if (!idx.isValid()) return data;");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("QHash<int, QByteArray> roles = roleNames();");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("for (auto it = roles.begin(); it != roles.end(); ++it)");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("data[it.value()] = idx.data(it.key());");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return data;");
-	FeedStream(stream, 1, false);
-
+	// append method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
+	stream << QStringLiteral("Q_INVOKABLE void append(") << modelObjectDataTypeName << QStringLiteral("* item);");
 	FeedStream(stream, 1, false);
-	// get method end
 
-	// append method begin
+	// append method
+
+	// copyMe method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void append(") << modelObjectDataTypeName << QStringLiteral("* item){");
+	stream << QStringLiteral("Q_INVOKABLE ") << objectListClassNameWithNamespace << QStringLiteral("* copyMe();");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("beginInsertRows(QModelIndex(), rowCount(), rowCount());");
-	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("Version_1_0->append(*item->Version_1_0);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("ClearCache();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("endInsertRows();");
-	FeedStream(stream, 1, false);
-
+	// toJson method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
+	stream << QStringLiteral("Q_INVOKABLE QString toJson();");
 	FeedStream(stream, 1, false);
-	// append method end
 
-	// copyMe method begin
+	// toGraphQL method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE ") << objectListClassNameWithNamespace << QStringLiteral("* copyMe(){");
+	stream << QStringLiteral("Q_INVOKABLE QString toGraphQL();");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << objectListClassNameWithNamespace << QStringLiteral("* objectListPtr = new ") << objectListClassNameWithNamespace << QStringLiteral("();");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("for (int i = 0; i < this->rowCount(); i++){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("QVariant item = this->getData(\"item\", i);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (!item.canConvert<") + modelObjectDataTypeName + QStringLiteral(">()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return nullptr;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream <<  modelObjectDataTypeName + QStringLiteral("* itemObjectPtr = item.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (itemObjectPtr == nullptr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return nullptr;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("objectListPtr->addElement(dynamic_cast<") + modelObjectDataTypeName + QStringLiteral("*>(itemObjectPtr->copyMe()));");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return objectListPtr;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-	// copyMe method end
-
-	// toJson method begin
+	// addElement method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QString toJson(){");
+	stream << QStringLiteral("Q_INVOKABLE void addElement(") + modelObjectDataTypeName + QStringLiteral("* item);");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("QString retVal = QStringLiteral(\"[\");");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("for (int i = 0; i < this->rowCount(); i++){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (i > 0 && i < this->rowCount() - 1){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("retVal += QStringLiteral(\", \");");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("QVariant item = this->getData(\"item\", i);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (!item.canConvert<") + modelObjectDataTypeName + QStringLiteral(">()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return nullptr;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << modelObjectDataTypeName + QStringLiteral("* itemObjectPtr = item.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (itemObjectPtr == nullptr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return QString();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("retVal += itemObjectPtr->toJson();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("retVal += QStringLiteral(\"]\");");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return retVal;");
-	FeedStream(stream, 1, false);
-
+	// removeElement method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-	// toJson method end
+	stream << QStringLiteral("Q_INVOKABLE void removeElement(int index);");
+	FeedStream(stream, 1, false);
 
-	// toGraphQL method begin
+	// isEqualWithModel method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QString toGraphQL(){");
+	stream << QStringLiteral("Q_INVOKABLE bool isEqualWithModel(") << objectListClassNameWithNamespace << QStringLiteral("* otherModelPtr);");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("QString retVal = QStringLiteral(\"[\");");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("for (int i = 0; i < this->rowCount(); i++){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (i > 0 && i < this->rowCount() - 1){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("retVal += QStringLiteral(\", \");");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("QVariant item = this->getData(\"item\", i);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (!item.canConvert<") + modelObjectDataTypeName + QStringLiteral(">()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return nullptr;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << modelObjectDataTypeName + QStringLiteral("* itemObjectPtr = item.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (itemObjectPtr == nullptr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return QString();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("retVal += itemObjectPtr->toGraphQL();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("retVal += QStringLiteral(\"]\");");
-	FeedStream(stream, 2, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return retVal;");
-	FeedStream(stream, 1, false);
-
+	// insert method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-	// toGraphQL method end
+	stream << QStringLiteral("Q_INVOKABLE void insert(int index, ") << modelObjectDataTypeName << QStringLiteral("* item);");
+	FeedStream(stream, 1, false);
 
-	// addElement method begin
+	// remove method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void addElement(") + modelObjectDataTypeName + QStringLiteral("* item){");
+	stream << QStringLiteral("Q_INVOKABLE void remove(int index);");
 	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("append(item);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-	// addElement method end
-
-	// removeElement method begin
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void removeElement(int index){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("remove(index);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-	// removeElement method end
-
-	// isEqualWithModel method begin
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE bool isEqualWithModel(") << objectListClassNameWithNamespace << QStringLiteral("* otherModelPtr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("if (otherModelPtr == nullptr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("if (this == otherModelPtr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("if (this->rowCount() != otherModelPtr->rowCount()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("for (int i = 0; i < this->rowCount(); i++){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("QVariant selfItem = this->getData(\"item\", i);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("QVariant otherItem = otherModelPtr->getData(\"item\", i);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (!selfItem.canConvert<") + modelObjectDataTypeName + QStringLiteral(">()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << modelObjectDataTypeName + QStringLiteral("* selfItemObjectPtr = selfItem.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (selfItemObjectPtr == nullptr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream <<  modelObjectDataTypeName + QStringLiteral("* otherItemObjectPtr = selfItem.value<") + modelObjectDataTypeName + QStringLiteral("*>();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (otherItemObjectPtr == nullptr){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 4);
-	stream << QStringLiteral("return false;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return true;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	FeedStream(stream, 1, false);
-	// isEqualWithModel method end
-
-	// insert method begin
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void insert(int index, ") << modelObjectDataTypeName << QStringLiteral("* item){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("if (index < 0 || index > Version_1_0->size()) return;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("beginInsertRows(QModelIndex(), index, index);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("Version_1_0->insert(index, *item->Version_1_0);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("ClearCache();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("endInsertRows();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	// insert method end
-
-	// remove method begin
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void remove(int index){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("if (index < 0 || index >= Version_1_0->size()) return;");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("beginRemoveRows(QModelIndex(), index, index);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("Version_1_0->removeAt(index);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("ClearCache();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("endRemoveRows();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	// remove method end
 
 	// clear method begin
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void clear(){");
+	stream << QStringLiteral("Q_INVOKABLE void clear();");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("beginResetModel();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("ClearCache();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("Version_1_0->clear();");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("endResetModel();");
-	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-	// clear method end
-
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QVariant getData(const QString& nameId, int index){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("if (nameId == \"item\" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << modelObjectDataTypeName << QStringLiteral("* retVal = GetOrCreateCachedObject(index);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 3);
-	stream << QStringLiteral("return QVariant::fromValue(retVal);");
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 1, false);
-
-	for (const imtsdl::CSdlField& field: fieldList){
-		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-		// if (isCustom && !isEnum){
-		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("if (nameId == \"m_") << GetDecapitalizedValue(field.GetId());
-		stream << QStringLiteral("\"){");
-		FeedStream(stream, 1, false);
-
-		if (!isCustom || isEnum){
-			FeedStreamHorizontally(stream, 3);
-			stream << QStringLiteral("return QVariant::fromValue(Version_1_0.GetPtr()->at(index).");
-			stream << field.GetId() << QStringLiteral(".value());");
-			FeedStream(stream, 1, false);
-		}
-		else{
-			// FeedStreamHorizontally(stream, 3);
-			// stream << modelObjectDataTypeName << QStringLiteral("* retVal = GetOrCreateCachedObject(index);");
-			// FeedStream(stream, 1, false);
-
-			FeedStreamHorizontally(stream, 3);
-			stream << sdlNamespace << QStringLiteral("::C") << sdlEntry.GetName();
-			stream << QStringLiteral("Object* retVal = GetOrCreateCachedObject(index);");
-			FeedStream(stream, 1, false);
-
-			FeedStreamHorizontally(stream, 3);
-			stream << QStringLiteral("return QVariant::fromValue(retVal->Get");
-			stream << GetCapitalizedValue(field.GetId()) << QStringLiteral("());");
-			FeedStream(stream, 1, false);
-		}
-
-		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("}");
-		FeedStream(stream, 1, false);
-		// }
-	}
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return QVariant();");
-	// if ( && !isEnum){
-	// stream << QStringLiteral("return Version_1_0.GetPtr()->at(index).property(nameId.toUtf8());"); //Version_1_0.GetPtr()->at(index)
-	// }
-	FeedStream(stream, 1, false);
-
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
+	stream << QStringLiteral("Q_INVOKABLE QVariant getData(const QString& nameId, int index);");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream);
@@ -873,16 +354,6 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 	stream << QStringLiteral("::")<< className;
 	stream << QStringLiteral("(QObject* parent): ::imtbase::CItemModelBase(parent)");
 
-	for (const imtsdl::CSdlField& field: fieldList){
-		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-		if (isCustom && !isEnum){
-			FeedStreamHorizontally(stream,3);
-			stream << QStringLiteral(", m_") << GetDecapitalizedValue(field.GetId());
-			stream << QStringLiteral("QObjectPtr(nullptr)");
-			FeedStream(stream, 1, false);
-		}
-	}
-
 	stream << QStringLiteral("{");
 	FeedStream(stream, 1, false);
 
@@ -907,7 +378,9 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 
 		// Getter implemented
 
-		stream << GetQObjectTypeName(field);
+		QString typeName = GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
+		// stream << typeName;
+		stream << QStringLiteral("QVariant");
 		stream << QStringLiteral(" C") << sdlEntry.GetName() << QStringLiteral("Object");
 		stream << QStringLiteral("::Get") << GetCapitalizedValue(field.GetId()) << QStringLiteral("()");
 		FeedStream(stream, 1, false);
@@ -945,10 +418,10 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		}
 		else {
 			if (!isCustom){
-				if (isArray && field.GetType() == "ID"){
+				if (isArray){
 					QString tempVariableName = QStringLiteral("temp") + GetCapitalizedValue(field.GetId()) + QStringLiteral("List");
 
-					stream << QStringLiteral("QStringList ") << tempVariableName << ';';
+					stream << typeName << ' ' << tempVariableName << ';';
 					FeedStream(stream, 1, false);
 
 					FeedStreamHorizontally(stream, 2);
@@ -958,33 +431,108 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 					FeedStream(stream, 1, false);
 
 					FeedStreamHorizontally(stream, 3);
-					stream << tempVariableName << QStringLiteral(" << tempValue;");
+					stream << tempVariableName << QStringLiteral(" << *tempValue;");
 					FeedStream(stream, 1, false);
 
 					FeedStreamHorizontally(stream, 2);
 					stream << '}';
 					FeedStream(stream, 1, false);
 					FeedStreamHorizontally(stream, 2);
-					stream << QStringLiteral("return ") << tempVariableName << QStringLiteral(";");
+					stream << QStringLiteral("return QVariant::fromValue(") << tempVariableName << QStringLiteral(");");
 				}
 				else {
 					stream << QStringLiteral("return Version_1_0->") << field.GetId() << QStringLiteral(".value();");
 				}
 			}
 			else{
-				stream << QStringLiteral("if (!m_") << GetDecapitalizedValue(field.GetId());
-				stream << QStringLiteral("QObjectPtr){");
-				FeedStream(stream, 1, false);
-				FeedStreamHorizontally(stream, 3);
-				stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
-				stream << QStringLiteral("QObjectPtr = dynamic_cast<") << GetQObjectTypeName(field, true);
-				stream << QStringLiteral(">(CreateObject(\"") << field.GetId() << QStringLiteral("\"));");
-				FeedStream(stream, 1, false);
+				if (isUnion && !isArray){
+					stream << QStringLiteral("if (m_") << GetDecapitalizedValue(field.GetId());
+					stream << QStringLiteral("QObjectPtr.isValid()){");
+					FeedStream(stream, 1, false);
+					const imtsdl::CSdlUnion* sdlUnion = dynamic_cast<const imtsdl::CSdlUnion*>(sdlEntryBase.get());
 
-				FeedStreamHorizontally(stream, 3);
-				stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
-				stream << QStringLiteral("QObjectPtr->Version_1_0 = Version_1_0->") << field.GetId() << ';';
-				FeedStream(stream, 1, false);
+					if (sdlUnion != nullptr){
+						QList<QString> convertedTypeList;
+						for (const auto& sdlType : sdlUnion->GetTypes()){
+							imtsdl::CSdlField sdlField;
+							sdlField.SetType(sdlType);
+							bool isCustom = false;
+							QString convertedType = OptListConvertTypeWithNamespaceStruct(
+								sdlField,
+								GetNamespaceFromSchemaParams(sdlUnion->GetSchemaParams()),
+								*m_sdlTypeListCompPtr,
+								*m_sdlEnumListCompPtr,
+								*m_sdlUnionListCompPtr,
+								true,
+								&isCustom,
+								nullptr,
+								nullptr,
+								nullptr,
+								nullptr,
+								false);
+							FeedStreamHorizontally(stream, 3);
+							const QString sourceVariableName = QStringLiteral("Version_1_0->") + field.GetId();
+
+							stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">((");
+							stream << sourceVariableName;
+							stream << QStringLiteral(").GetPtr())){");
+
+							FeedStream(stream, 1, false);
+							FeedStreamHorizontally(stream, 4);
+
+							if (isCustom){
+								imtsdl::CSdlField lookupField;
+								lookupField.SetType(sdlType);
+								std::shared_ptr<imtsdl::CSdlEntryBase> foundType = GetSdlTypeOrEnumOrUnionForField(lookupField, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
+								if (!foundType){
+									SendCriticalMessage(0, QString("Unable to find type %1").arg(sdlType));
+									I_CRITICAL();
+								}
+								stream << convertedType << QStringLiteral("Object *newObjectPtr = new ");
+								stream << convertedType << QStringLiteral("Object(this);");
+								FeedStream(stream, 1, false);
+
+								FeedStreamHorizontally(stream, 4);
+								stream << QStringLiteral("newObjectPtr->Version_1_0 = val->Version_1_0;");
+								FeedStream(stream, 1, false);
+								FeedStreamHorizontally(stream, 4);
+								stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+								stream << QStringLiteral("QObjectPtr = QVariant::fromValue(newObjectPtr);");
+								FeedStream(stream, 1, false);
+							}
+							else{
+								stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+								stream << QStringLiteral("QObjectPtr = QVariant::fromValue(val);");
+								FeedStream(stream, 1, false);
+							}
+
+							FeedStreamHorizontally(stream, 3);
+							stream << '}';
+							FeedStream(stream, 1, false);
+						}
+					}
+					else {
+						I_CRITICAL();
+					}
+				}
+				else{
+					stream << QStringLiteral("if (!m_") << GetDecapitalizedValue(field.GetId());
+					stream << QStringLiteral("QObjectPtr.isValid()){");
+					FeedStream(stream, 1, false);
+					FeedStreamHorizontally(stream, 3);
+					stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+					stream << QStringLiteral("QObjectPtr = CreateObject(\"") << field.GetId() << QStringLiteral("\");");
+					FeedStream(stream, 1, false);
+
+					FeedStreamHorizontally(stream, 3);
+					stream << typeName << QStringLiteral(" itemPtr = m_") << GetDecapitalizedValue(field.GetId());
+					stream << QStringLiteral("QObjectPtr.value<") << typeName << QStringLiteral(">();");
+					FeedStream(stream, 1, false);
+
+					FeedStreamHorizontally(stream, 3);
+					stream << QStringLiteral("if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->") << field.GetId() << ';';
+					FeedStream(stream, 1, false);
+				}
 
 				FeedStreamHorizontally(stream, 2);
 				stream << QStringLiteral("}");
@@ -1004,63 +552,8 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		FeedStream(stream, 2, false);
 
 		FeedStreamHorizontally(stream);
-		if (isCustom && !isEnum){
-			stream << QStringLiteral("return nullptr;");
-		}
-		else{
-			stream << QStringLiteral("return ");
-			if (field.GetType() == "String" || isEnum){
-				if (isArray){
-					stream << QStringLiteral("QStringList();");
-				}
-				else{
-					stream << QStringLiteral("QString();");
-				}
-			}
-			else if (field.GetType() == "Integer" || field.GetType() == "Int"){
-				if (isArray){
-					stream << QStringLiteral("QList<int>();");
-				}
-				else{
-					stream << QStringLiteral("0;");
-				}
-			}
-			else if (field.GetType() == "LongLong" || field.GetType() == "longLong"){
-				if (isArray){
-					stream << QStringLiteral("QList<int>();");
-				}
-				else{
-					stream << QStringLiteral("0;");
-				}
-			}
-			else if (field.GetType() == "Double" || field.GetType() == "Float"){
-				if (isArray){
-					stream << QStringLiteral("QList<double>();");
-				}
-				else{
-					stream << QStringLiteral("0;");
-				}
-			}
-			else if (field.GetType() == "Boolean" || field.GetType() == "Bool"){
-				if (isArray){
-					stream << QStringLiteral("QList<bool>();");
-				}
-				else{
-					stream << QStringLiteral("false;");
-				}
-			}
-			else if (field.GetType() == "ID"){
-				if (isArray){
-					stream << QStringLiteral("QStringList();");
-				}
-				else{
-					stream << QStringLiteral("QString();");
-				}
-			}
-			else {
-				Q_ASSERT_X(false, "CSdlQObjectGeneratorComp::ProcessSourceClassFile", field.GetType().toUtf8() + " field.GetType() not implemented");
-			}
-		}
+		stream << QStringLiteral("return QVariant();");
+
 		FeedStream(stream, 1, false);
 		stream << QStringLiteral("}");
 		FeedStream(stream, 3, false);
@@ -1068,24 +561,33 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		// Setter implemented
 		stream << QStringLiteral("void C") << sdlEntry.GetName() << QStringLiteral("Object");
 		stream << QStringLiteral("::Set") << GetCapitalizedValue(field.GetId());
-		stream << QStringLiteral("(") << GetQObjectTypeName(field);
+		stream << QStringLiteral("(QVariant"); // << typeName;
 		stream << QStringLiteral(" v)");
 		FeedStream(stream, 1, false);
 		stream << QStringLiteral("{");
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream);
-		QString tempVariableName = QStringLiteral("temp") + GetCapitalizedValue(field.GetId()) + QStringLiteral("List");
-		if (isArray && field.GetType() == "ID"){
-			stream << QStringLiteral("Version_1_0->") << field.GetId() << QStringLiteral(" = QList<QByteArray>(); ");
+		if (isArray && !isCustom){
+			stream << QStringLiteral("Version_1_0->") << field.GetId() << QStringLiteral("->clear(); ");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 1);
-			stream << QStringLiteral("for (const auto& tempValue: v"); // << tempVariableName;
-			stream << QStringLiteral("){");
+			stream << QStringLiteral("for (const auto& tempValue: v.value<") << typeName; // << tempVariableName;
+			stream << QStringLiteral(">()){");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("Version_1_0->") << field.GetId() << QStringLiteral("->append(tempValue.toUtf8());");
+			stream << QStringLiteral("istd::TSharedNullable<") << convertedType;
+			if (field.GetType() == "ID"){
+				stream << QStringLiteral("> value(tempValue.toUtf8());");
+			}
+			else{
+				stream << QStringLiteral("> value(tempValue);");
+			}
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 2);
+			stream << QStringLiteral("Version_1_0->") << field.GetId() << QStringLiteral("->append(value);");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 1);
@@ -1104,7 +606,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 				stream << fieldNameSpace << QStringLiteral("::") << field.GetType() << QStringLiteral(">();");
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 1);
-				stream << QStringLiteral("int key = metaEnum.keyToValue(v.toUtf8());");
+				stream << QStringLiteral("int key = metaEnum.keyToValue(v.value<") << typeName << QStringLiteral(">().toUtf8());");
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 1);
 				stream << QStringLiteral("if (key > -1){");
@@ -1120,25 +622,75 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 		else if (!isCustom){
 			stream << QStringLiteral("Version_1_0->") << field.GetId();
 			if (field.GetType() == "ID"){
-				stream << QStringLiteral(" = v.toUtf8();");
+				stream << QStringLiteral(" = v.value<") << typeName << QStringLiteral(">().toUtf8();");
 			}
 			else{
-				stream << QStringLiteral(" = v;");
+				stream << QStringLiteral(" = v.value<") << typeName << QStringLiteral(">();");
 			}
 		}
 		else{
-			stream << QStringLiteral("if (v){");
-			FeedStream(stream, 1, false);
+			if (isUnion && !isArray){
+				stream << QStringLiteral("if (v.isValid()){");
+				FeedStream(stream, 1, false);
+				const imtsdl::CSdlUnion* sdlUnion = dynamic_cast<const imtsdl::CSdlUnion*>(sdlEntryBase.get());
 
-			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("Version_1_0->") << field.GetId();
-			stream << QStringLiteral(" = v->Version_1_0;");
-			FeedStream(stream, 1, false);
+				if (sdlUnion != nullptr){
+					// QList<QString> convertedTypeList;
+					for (const auto& sdlType : sdlUnion->GetTypes()){
+						imtsdl::CSdlField sdlField;
+						sdlField.SetType(sdlType);
+						bool isCustom = false;
+						QString convertedType = OptListConvertTypeWithNamespaceStruct(
+							sdlField,
+							GetNamespaceFromSchemaParams(sdlUnion->GetSchemaParams()),
+							*m_sdlTypeListCompPtr,
+							*m_sdlEnumListCompPtr,
+							*m_sdlUnionListCompPtr,
+							true,
+							&isCustom,
+							nullptr,
+							nullptr,
+							nullptr,
+							nullptr,
+							false);
+						FeedStreamHorizontally(stream, 2);
+						const QString sourceVariableName = QStringLiteral("*Version_1_0->") + field.GetId();
+						QString objectConvertedType = convertedType;
+						if (isCustom){
+							objectConvertedType += "Object";
+						}
 
-			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
-			stream << QStringLiteral("QObjectPtr = v;");
-			FeedStream(stream, 1, false);
+						stream << QStringLiteral("if (const ") << objectConvertedType;
+
+						stream << QStringLiteral("* val = v.value<const ") << convertedType;
+						if (isCustom){
+							stream << QStringLiteral("Object");
+						}
+						stream << QStringLiteral("*>()){");
+						FeedStream(stream, 1, false);
+
+						FeedStreamHorizontally(stream, 3);
+						stream << sourceVariableName << QStringLiteral(" = *val;");;
+						FeedStream(stream, 1, false);
+
+						FeedStreamHorizontally(stream, 2);
+						stream << QStringLiteral("}");;
+						FeedStream(stream, 1, false);
+					}
+				}
+			}
+			else{
+				stream << QStringLiteral("if (v.isValid()){");
+				FeedStream(stream, 1, false);
+
+				FeedStreamHorizontally(stream, 2);
+				stream << typeName << QStringLiteral(" itemPtr = v.value<") << typeName << QStringLiteral(">();");
+				FeedStream(stream, 1, false);
+
+				FeedStreamHorizontally(stream, 2);
+				stream << QStringLiteral("if (itemPtr != nullptr)  Version_1_0->") << field.GetId() << QStringLiteral(" = itemPtr->Version_1_0;");
+				FeedStream(stream, 1, false);
+			}
 
 			FeedStreamHorizontally(stream);
 			stream << QStringLiteral("}");
@@ -1155,6 +707,11 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 
 			FeedStreamHorizontally(stream);
 			stream << QStringLiteral("}");
+			FeedStream(stream, 1, false);
+
+			FeedStreamHorizontally(stream, 1);
+			stream << QStringLiteral("m_") << GetDecapitalizedValue(field.GetId());
+			stream << QStringLiteral("QObjectPtr = v;");
 			FeedStream(stream, 1, false);
 		}
 		FeedStream(stream, 1, false);
@@ -1320,7 +877,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 	stream << QStringLiteral("}");
 	FeedStream(stream,3, false);
 
-	stream << QStringLiteral("QObject* C") << sdlEntry.GetName();
+	stream << QStringLiteral("QVariant C") << sdlEntry.GetName();
 	stream << QStringLiteral("Object::CreateObject(const QString& key)");
 	FeedStream(stream, 1, false);
 	stream << QStringLiteral("{");
@@ -1331,12 +888,12 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 
 	for (const imtsdl::CSdlField& field: fieldList){
 		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-		if (isCustom && !isEnum){
+		if ((isCustom && !isEnum && !isUnion) || (isUnion && isArray)){
 			FeedStreamHorizontally(stream);
 			stream << QStringLiteral("if (key == \"") << field.GetId() << QStringLiteral("\"){");
 			FeedStream(stream, 1, false);
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("return new ") << GetQObjectTypeName(field, false) << QStringLiteral("(this);");
+			stream << QStringLiteral("return QVariant::fromValue(new ") << CSdlGenTools::GetQObjectTypeName(field, m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), false) << QStringLiteral("(this));");
 			FeedStream(stream, 1, false);
 			FeedStreamHorizontally(stream);
 			stream << QStringLiteral("}");
@@ -1345,7 +902,7 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 	}
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("return nullptr;");
+	stream << QStringLiteral("return QVariant();");
 	FeedStream(stream,1, false);
 
 	stream << QStringLiteral("}");
@@ -1382,77 +939,278 @@ bool CSdlQObjectGeneratorComp::ProcessSourceClassFile(QTextStream& stream, const
 }
 
 
-QString CSdlQObjectGeneratorComp::GetQObjectTypeName(const imtsdl::CSdlField& field, bool withPointer) const
+bool CSdlQObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry) const
 {
-	QString retVal = "";
+	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<const imtsdl::CSdlType*>(&sdlEntry);
+	if (sdlTypePtr == nullptr){
+		return true;
+	}
+
+	FeedStream(stream, 3, false);
+
+	const QString sdlNamespace = GetNamespaceFromSchemaParams(sdlEntry.GetSchemaParams());
+	QString itemClassName = QStringLiteral("C") + sdlEntry.GetName();
+	QString itemClassNameWithNamespace = sdlNamespace + "::" + itemClassName;
+	QString modelDataTypeName = itemClassName + QStringLiteral("::V1_0");
+	QString modelObjectDataTypeName = itemClassNameWithNamespace + QStringLiteral("Object");
+	QString objectListClassName = QStringLiteral("C") + sdlEntry.GetName() + QStringLiteral("ObjectList");
+	QString objectListClassNameWithNamespace = sdlNamespace + QStringLiteral("::") + objectListClassName;
+	const imtsdl::SdlFieldList fieldList =  sdlTypePtr->GetFields();
 	bool isArray = false;
 	bool isCustom = false;
 	bool isEnum = false;
 	bool isUnion = false;
 
-	const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-	std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBase = GetSdlTypeOrEnumOrUnionForField(field,
-																						  m_sdlTypeListCompPtr->GetSdlTypes(false),
-																						  m_sdlEnumListCompPtr->GetEnums(false),
-																						  m_sdlUnionListCompPtr->GetUnions(false));
+	stream << QStringLiteral("bool ") + objectListClassName + QStringLiteral("::containsKey(const QString& /*nameId*/, int /*index*/)");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
 
-	QString sdlNamespace;
-	if (sdlEntryBase != nullptr){
-		sdlNamespace = GetNamespaceFromSchemaParams(sdlEntryBase->GetSchemaParams());
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return true;");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+
+	stream << QStringLiteral("int ") + objectListClassName + QStringLiteral("::getItemsCount()");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return rowCount();");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+
+	// get method begin
+	stream << QStringLiteral("QVariantMap ") + objectListClassName + QStringLiteral("::get(int row) const");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return BaseClass::get(row);");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// get method end
+
+	// append method begin
+	stream << QStringLiteral("void ") + objectListClassName + QStringLiteral("::append(") << modelObjectDataTypeName << QStringLiteral("* item)");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("BaseClass::append(item);");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// append method end
+
+	// copyMe method begin
+	stream << objectListClassNameWithNamespace << QStringLiteral("* ") + objectListClassNameWithNamespace + QStringLiteral("::copyMe()");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << objectListClassNameWithNamespace << QStringLiteral("* retVal = new ");
+	stream << objectListClassNameWithNamespace << QStringLiteral("();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("BaseClass::fromMe(retVal);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return retVal;");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// copyMe method end
+
+	// toJson method begin
+	stream << QStringLiteral("QString ") + objectListClassNameWithNamespace + QStringLiteral("::toJson()");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return BaseClass::toJson();");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// toJson method end
+
+	// toGraphQL method begin
+	stream << QStringLiteral("QString ") + objectListClassNameWithNamespace + QStringLiteral("::toGraphQL()");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return BaseClass::toGraphQL();");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// toGraphQL method end
+
+	// addElement method begin
+	stream << QStringLiteral("void ") + objectListClassNameWithNamespace + QStringLiteral("::addElement(") + modelObjectDataTypeName + QStringLiteral("* item)");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("append(item);");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// addElement method end
+
+	// removeElement method begin
+	stream << QStringLiteral("void ") + objectListClassNameWithNamespace + QStringLiteral("::removeElement(int index)");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("remove(index);");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// removeElement method end
+
+	// isEqualWithModel method begin
+	stream << QStringLiteral("bool ") + objectListClassNameWithNamespace + QStringLiteral("::isEqualWithModel(") << objectListClassNameWithNamespace << QStringLiteral("* otherModelPtr)");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return BaseClass::isEqualWithModel(otherModelPtr);");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// isEqualWithModel method end
+
+	// insert method begin
+	stream << QStringLiteral("void ") + objectListClassNameWithNamespace + QStringLiteral("::insert(int index, ") << modelObjectDataTypeName << QStringLiteral("* item)");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return BaseClass::insert(index, item);");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// insert method end
+
+	// remove method begin
+	stream << QStringLiteral("void ") + objectListClassNameWithNamespace + QStringLiteral("::remove(int index)");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return BaseClass::remove(index);");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// remove method end
+
+	// clear method begin
+	stream << QStringLiteral("void ") + objectListClassNameWithNamespace + QStringLiteral("::clear()");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return BaseClass::clear();");
+	FeedStream(stream, 1, false);
+
+	stream << QStringLiteral("}");
+	FeedStream(stream, 3, false);
+	// clear method end
+
+	stream << QStringLiteral("QVariant ") + objectListClassNameWithNamespace + QStringLiteral("::getData(const QString& nameId, int index)");
+	FeedStream(stream, 1, false);
+	stream << '{';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("QVariant item = GetOrCreateCachedObject(index);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << modelObjectDataTypeName << QStringLiteral("* itemPtr = item.value<") << modelObjectDataTypeName << QStringLiteral("*>();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("if (itemPtr == nullptr) return QVariant();");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("if (nameId == \"item\" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("return QVariant::fromValue(item);");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
+
+	for (const imtsdl::CSdlField& field: fieldList){
+		const QString convertedType = ConvertTypeOrEnumOrUnion(field, m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false), &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+		// if (isCustom && !isEnum){
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("if (nameId == \"m_") << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("\"){");
+		FeedStream(stream, 1, false);
+
+		if (!isCustom || isEnum){
+			FeedStreamHorizontally(stream, 3);
+			stream << QStringLiteral("return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->");
+			stream << field.GetId() << QStringLiteral(".value());");
+			FeedStream(stream, 1, false);
+		}
+		else{
+			FeedStreamHorizontally(stream, 3);
+			stream << QStringLiteral("return itemPtr->Get");
+			stream << GetCapitalizedValue(field.GetId()) << QStringLiteral("();");
+			FeedStream(stream, 1, false);
+		}
+
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("}");
+		FeedStream(stream, 1, false);
+		// }
 	}
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("return QVariant();");
+	FeedStream(stream, 1, false);
 
-	if (!isCustom || isEnum){
-		if (isArray){
-			retVal = QStringLiteral("QList<");
-		}
+	stream << QStringLiteral("}");
+	FeedStream(stream, 1, false);
 
-		if (field.GetType() == "String" || isEnum){
-			retVal += QStringLiteral("QString");
-		}
-		else if (field.GetType() == "Integer" || field.GetType() == "Int"){
-			retVal += QStringLiteral("int");
-		}
-		else if (field.GetType() == "Double" || field.GetType() == "Float"){
-			retVal += QStringLiteral("double");
-		}
-		else if (field.GetType() == "Boolean" || field.GetType() == "Bool"){
-			retVal += QStringLiteral("bool");
-		}
-		else if (field.GetType() == "LongLong" || field.GetType() == "longLong"){
-			retVal += QStringLiteral("int");
-		}
-		else if (field.GetType() == "ID"){
-			retVal += QStringLiteral("QString");
-		}
-		else {
-			Q_ASSERT_X(false, "CSdlQObjectGeneratorComp::ProcessSourceClassFile", field.GetType().toUtf8() + " field.GetType() not implemented");
-		}
-
-		if (isArray){
-			retVal += QStringLiteral(">");
-		}
-	}
-	else if(isArray){
-
-		retVal = sdlNamespace;
-		retVal += QStringLiteral("::C") + field.GetType();
-		retVal += QStringLiteral("ObjectList");
-
-		if (withPointer){
-			retVal += "*";
-		}
-	}
-	else{
-		retVal = sdlNamespace;
-		retVal += QStringLiteral("::C") + field.GetType();
-		retVal += QStringLiteral("Object");
-
-		if (withPointer){
-			retVal += "*";
-		}
-	}
-
-	return retVal;
+	return true;
 }
 
 

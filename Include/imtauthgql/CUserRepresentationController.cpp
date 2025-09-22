@@ -88,7 +88,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 
 	userInfoPtr->SetName(name);
 
-	QList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
+	imtsdl::TElementList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
 	if (representation.systemInfos){
 		systemInfos = *representation.systemInfos;
 	}
@@ -98,18 +98,21 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 		userInfoPtr->AddToSystem(systemInfo);
 	}
 	else{
-		for (const sdl::imtauth::Users::CSystemInfo::V1_0& sdlSystemInfo : systemInfos){
+		for (const istd::TSharedNullable<sdl::imtauth::Users::CSystemInfo::V1_0>& sdlSystemInfo : systemInfos){
 			QByteArray systemId;
-			if (sdlSystemInfo.id){
-				systemId = *sdlSystemInfo.id;
+			if (!sdlSystemInfo.HasValue()){
+				continue;
+			}
+			if (sdlSystemInfo->id){
+				systemId = *sdlSystemInfo->id;
 			}
 			QString systemName;
-			if (sdlSystemInfo.name){
-				systemName = *sdlSystemInfo.name;
+			if (sdlSystemInfo->name){
+				systemName = *sdlSystemInfo->name;
 			}
 			bool enabled = false;
-			if (sdlSystemInfo.enabled){
-				enabled = *sdlSystemInfo.enabled;
+			if (sdlSystemInfo->enabled){
+				enabled = *sdlSystemInfo->enabled;
 			}
 
 			imtauth::IUserInfo::SystemInfo systemInfo;

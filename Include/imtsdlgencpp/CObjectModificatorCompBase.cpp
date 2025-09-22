@@ -320,7 +320,7 @@ void CObjectModificatorCompBase::AddScalarFieldWriteToObjectCode(QTextStream& st
 		AddFieldValueWriteToObject(stream, field, enumConvertedVarName, hIndents);
 	}
 	else if (isUnion){
-		const QString unionSourceVarName = '*' + field.GetId();
+		const QString unionSourceVarName = field.GetId() + ".GetPtr()";
 		imtsdl::CSdlUnion foundUnion;
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		Q_ASSERT(found);
@@ -481,7 +481,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
-	QString variableName = (field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')');
+	QString variableName = '*' + (field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')');
 
 	bool isEnum = false;
 	bool isUnion = false;
@@ -499,7 +499,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 		imtsdl::CSdlEnum sdlEnum;
 		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), sdlEnum);
 
-		const QString enumSourceVarName = variableName;
+		const QString enumSourceVarName =  variableName;
 		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
 		variableName = enumConvertedVarName;
 
@@ -515,7 +515,7 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 		imtsdl::CSdlUnion sdlUnion;
 		[[maybe_unused]] bool found = GetSdlUnionForField(field, m_sdlUnionListCompPtr->GetUnions(false), sdlUnion);
 
-		const QString unionSourceVarName = variableName;
+		const QString unionSourceVarName = variableName + QStringLiteral(".GetPtr()");
 
 		WriteConversionFromUnion(stream,
 			sdlUnion,
@@ -613,7 +613,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldWriteToObjectImplCode(
 				stream,
 				(optional ? MT_OPT_WRITE : MT_WRITE),
 				field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')',
-				false);
+				true);
 	stream << '(';
 	stream << newObjectVarName;
 	stream << QStringLiteral(")){");
@@ -1016,13 +1016,12 @@ void CObjectModificatorCompBase::AddArrayFieldReadFromObjectImplCode(
 		Q_ASSERT(found);
 
 		FeedStreamHorizontally(stream, hIndents + 1);
-		stream << QStringLiteral("std::shared_ptr<");
 		stream << OptListConvertTypeWithNamespace(field,
 			m_originalSchemaNamespaceCompPtr->GetText(),
 			*m_sdlTypeListCompPtr,
 			*m_sdlEnumListCompPtr,
 			*m_sdlUnionListCompPtr);
-		stream << QStringLiteral("> ") << dataVarName << QStringLiteral(";");
+		stream << ' ' << dataVarName << QStringLiteral(";");
 		FeedStream(stream, 1, false);
 
 		WriteUnionConversionFromData(

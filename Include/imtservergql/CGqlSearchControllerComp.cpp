@@ -33,7 +33,7 @@ sdl::imtbase::Search::CSearchResults CGqlSearchControllerComp::OnSearch(
 		text = *arguments.input.Version_1_0->text;
 	}
 
-	QList<sdl::imtbase::Search::CSearchResult::V1_0> searchResultList;
+	imtsdl::TElementList<sdl::imtbase::Search::CSearchResult::V1_0> searchResultList;
 
 	for (int i = 0; i < m_searchControllersCompPtr.GetCount(); i++){
 		imtbase::ISearchController* searchControllerPtr = m_searchControllersCompPtr[i];
@@ -46,7 +46,7 @@ sdl::imtbase::Search::CSearchResults CGqlSearchControllerComp::OnSearch(
 					searchRepresentation.id = m_optionListCompPtr->GetOptionId(i);
 					searchRepresentation.name = m_optionListCompPtr->GetOptionName(i);
 
-					QList<sdl::imtbase::Search::CResultItem::V1_0> resultItemList;
+					imtsdl::TElementList<sdl::imtbase::Search::CResultItem::V1_0> resultItemList;
 
 					for (int resultIndex = 0; resultIndex < count; ++resultIndex){
 						imtbase::ISearchResults::SearchResult searchResult = searchResultsPtr->GetSearchResult(resultIndex);

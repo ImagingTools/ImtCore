@@ -105,7 +105,7 @@ sdl::imtbase::DocumentRevision::CRevisionInfoList CDocumentRevisionControllerCom
 	}
 
 	imtbase::IRevisionController::RevisionInfoList revisionInfoList = revisionControllerPtr->GetRevisionInfoList(*objectCollectionPtr, documentId);
-	QList<sdl::imtbase::DocumentRevision::CRevisionItem::V1_0> revisionItemList;
+	imtsdl::TElementList<sdl::imtbase::DocumentRevision::CRevisionItem::V1_0> revisionItemList;
 
 	for (const imtbase::IRevisionController::RevisionInfo& revisionInfo : revisionInfoList){
 		sdl::imtbase::DocumentRevision::CRevisionItem::V1_0 revisionItem;

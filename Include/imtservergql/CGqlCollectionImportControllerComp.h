@@ -67,12 +67,15 @@ bool CGqlCollectionImportControllerComp::FillSessionInfo(
 			sessionInfo.collectionId = *sdlImportParamsV1_0.collectionId;
 
 			for (const auto& fileInfo : *sdlImportParamsV1_0.fileList){
-				if (fileInfo.fileId && fileInfo.fileName && fileInfo.fileSize && fileInfo.objectTypeId){
+				if (!fileInfo.HasValue()){
+					continue;
+				}
+				if (fileInfo->fileId && fileInfo->fileName && fileInfo->fileSize && fileInfo->objectTypeId){
 					sessionInfo.files.emplace_back();
-					sessionInfo.files.back().id = *fileInfo.fileId;
-					sessionInfo.files.back().name = *fileInfo.fileName;
-					sessionInfo.files.back().size = *fileInfo.fileSize;
-					sessionInfo.files.back().objectTypeId = *fileInfo.objectTypeId;
+					sessionInfo.files.back().id = *fileInfo->fileId;
+					sessionInfo.files.back().name = *fileInfo->fileName;
+					sessionInfo.files.back().size = *fileInfo->fileSize;
+					sessionInfo.files.back().objectTypeId = *fileInfo->objectTypeId;
 				}
 				else{
 					errorMessage = tr("Invalid file info in the request");

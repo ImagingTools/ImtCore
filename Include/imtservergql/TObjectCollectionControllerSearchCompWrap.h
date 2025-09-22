@@ -86,7 +86,7 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 	sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0 groupFilter;
 	groupFilter.logicalOperation = sdl::imtbase::ComplexCollectionFilter::LogicalOperation::Or;
 	
-	QList<sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0> fieldList;
+	imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0> fieldList;
 	for (const QByteArray& headerId : headerIds){
 		typename imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
 		if (this->m_headersProviderCompPtr->GetHeaderInfo(headerId, headerInfo)){
@@ -96,7 +96,7 @@ const imtbase::ISearchResults* TObjectCollectionControllerSearchCompWrap<Collect
 				fieldFilter.filterValue = text;
 				fieldFilter.filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
 				
-				QList<sdl::imtbase::ComplexCollectionFilter::FilterOperation> filterOperations;
+				imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::FilterOperation> filterOperations;
 				filterOperations << sdl::imtbase::ComplexCollectionFilter::FilterOperation::Contains;
 				fieldFilter.filterOperations = filterOperations;
 				

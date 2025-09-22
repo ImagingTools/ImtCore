@@ -59,7 +59,7 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 	QByteArrayList parameterIds = paramSetIds.values();
 	std::sort(parameterIds.begin(), parameterIds.end());
 
-	QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameterList;
+	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameterList;
 
 	for (const QByteArray& parameterId : parameterIds){
 		if (!parameterId.contains("/")){
@@ -124,22 +124,22 @@ bool CParamSetRepresentationController::GetDataModelFromSdlRepresentation(
 		return false;
 	}
 
-	QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameters = *sdlRepresentation.parameters;
+	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> parameters = *sdlRepresentation.parameters;
 
-	for (const sdl::imtbase::ImtBaseTypes::CParameter::V1_0& parameter : parameters){
-		if (!parameter.id){
+	for (const istd::TSharedNullable<sdl::imtbase::ImtBaseTypes::CParameter::V1_0>& parameter : parameters){
+		if (!parameter->id){
 			continue;
 		}
 
-		const QByteArray parameterId = *parameter.id;
+		const QByteArray parameterId = *parameter->id;
 		iser::ISerializable* parameterPtr = paramsSetPtr->GetEditableParameter(parameterId);
 		if (parameterPtr == nullptr){
 			continue;
 		}
 
 		QString parameterData;
-		if (parameter.data){
-			parameterData = *parameter.data;
+		if (parameter->data){
+			parameterData = *parameter->data;
 		}
 
 		QJsonDocument document = QJsonDocument::fromJson(parameterData.toUtf8());

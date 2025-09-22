@@ -100,9 +100,11 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 		if (!isFirstIteration){
 			stream << QStringLiteral("else ");
 		}
-		stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">((");
+
+		stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">(");
 		stream << sourceVariableName;
-		stream << QStringLiteral(").get())){");
+		stream << QStringLiteral(")){");
+
 		FeedStream(stream, 1, false);
 		if (conversionType == CT_MODEL_ARRAY){
 			FeedStreamHorizontally(stream, hIndents + 1);
@@ -222,7 +224,7 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			}
 		}
 		else{
-			if (conversionType == CT_GQL_SCALAR){
+			if (conversionType == CT_GQL_SCALAR || conversionType == CT_GQL_ARRAY){
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << targetName;
 				stream << QStringLiteral("DataObject");
@@ -265,18 +267,37 @@ void CSdlUnionConverter::WriteConversionFromUnion(
 			}
 			else{
 				FeedStreamHorizontally(stream, hIndents + 1);
-				stream << targetVariableName;
-				stream << QStringLiteral(" = *val;");
+
+
+				if (!addCommand.isEmpty()){
+					// if (customModelTarget == "dataModelPtr" || customModelTarget == "*dataModelPtr"){
+					// 	stream << customModelTarget << QStringLiteral("->SetData(\"\", *val);");
+					// }
+					// else{
+					// 	stream << customModelTarget << QStringLiteral(".SetData(\"\", *val);");
+					// }
+
+					stream << addCommand <<  QStringLiteral("\"\", *val);");
+
+				}
+				else{
+					stream << targetVariableName;
+					stream << QStringLiteral(" = *val;");
+				}
 				FeedStream(stream, 1, false);
 			}
 
-			if (!addCommand.isEmpty()){
-				FeedStreamHorizontally(stream, hIndents + 1);
-				stream << addCommand << QStringLiteral("\"") << targetName;
-				stream << QStringLiteral("\", ") << targetVariableName << QStringLiteral(", ");
-				stream << modelIndex << QStringLiteral(");");
-				FeedStream(stream, 1, false);
-			}
+			// if (!addCommand.isEmpty() && customModelTarget.isEmpty()){
+			// 	FeedStreamHorizontally(stream, hIndents + 1);
+			// 	stream << addCommand;
+			// 	if (conversionType != CT_MODEL_ARRAY){
+			// 		stream << QStringLiteral("\"") << targetName;
+			// 		stream << QStringLiteral("\", ");
+			// 	}
+			// 	stream << targetVariableName << QStringLiteral(", ");
+			// 	stream << modelIndex << QStringLiteral(");");
+			// 	FeedStream(stream, 1, false);
+			// }
 		}
 
 		FeedStreamHorizontally(stream, hIndents);
@@ -386,7 +407,8 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << targetVariableName << QStringLiteral(" = ");
-				stream << QStringLiteral("std::make_shared<") << sdlUnion.GetName() << QStringLiteral(">(");
+				// stream << QStringLiteral("istd::TSharedNullable<") << sdlUnion.GetName() << QStringLiteral(">(");
+				stream << sdlUnion.GetName() << QStringLiteral("(");
 				stream << tempVar << QStringLiteral(");");
 				FeedStream(stream, 1, false);
 			}
@@ -418,7 +440,8 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << targetVariableName << QStringLiteral(" = ");
-				stream << QStringLiteral("std::make_shared<") << sdlUnion.GetName() << QStringLiteral(">(");
+				// stream << QStringLiteral("istd::TSharedNullable<") << sdlUnion.GetName() << QStringLiteral(">(");
+				stream << sdlUnion.GetName() << QStringLiteral("(");
 				stream << tempVar << QStringLiteral(");");
 				FeedStream(stream, 1, false);
 			}
@@ -443,20 +466,30 @@ void CSdlUnionConverter::WriteUnionConversionFromData(
 
 				FeedStreamHorizontally(stream, hIndents + 1);
 				stream << targetVariableName << QStringLiteral(" = ");
-				stream << QStringLiteral("std::make_shared<") << sdlUnion.GetName() << QStringLiteral(">(");
+				// stream << QStringLiteral("istd::TSharedNullable<") << sdlUnion.GetName() << QStringLiteral(">(");
+				stream << sdlUnion.GetName() << QStringLiteral("(");
 				stream << tempVar << QStringLiteral(");");
 				FeedStream(stream, 1, false);
 			}
 		}
 		else{
-			stream << QStringLiteral("if (") << sourceVariableName << QStringLiteral(".canConvert<") << convertedType << QStringLiteral(">()){");
+			stream << QStringLiteral("if (") << sourceVariableName;
+			if (conversionType == CT_GQL_ARRAY){
+				stream << QStringLiteral("->GetParamArgumentValue(\"\")");
+			}
+			stream << QStringLiteral(".canConvert<") << convertedType << QStringLiteral(">()){");
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, hIndents + 1);
 			stream << targetVariableName;
 			stream << QStringLiteral(" = ");
-			stream << QStringLiteral("std::make_shared<") << sdlUnion.GetName() << QStringLiteral(">(");
-			stream << sourceVariableName << QStringLiteral(".value<") << convertedType << QStringLiteral(">());");
+			// stream << QStringLiteral("istd::TSharedNullable<") << sdlUnion.GetName() << QStringLiteral(">(");
+			stream << sdlUnion.GetName() << QStringLiteral("(");
+			stream << sourceVariableName;
+			if (conversionType == CT_GQL_ARRAY){
+				stream << QStringLiteral("->GetParamArgumentValue(\"\")");
+			}
+			stream << QStringLiteral(".value<") << convertedType << QStringLiteral(">());");
 			FeedStream(stream, 1, false);
 		}
 

@@ -247,7 +247,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectsReques
 	sdl::imtbase::ImtCollection::RemoveElementsRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
-	arguments.input.Version_1_0->elementIds = objectIds;
+	arguments.input.Version_1_0->elementIds = objectIds.ToList();
 
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY);
 	if (!sdl::imtbase::ImtCollection::CRemoveElementsGqlRequest::SetupGqlRequest(*requestPtr, arguments)){
@@ -562,8 +562,9 @@ bool CGqlObjectCollectionDelegateComp::GetItemIds(const imtgql::IGqlResponse& re
 	sdl::imtbase::ImtCollection::CGetElementIdsPayload::V1_0 getElementIdsPayload;
 	ResponseData responseData = GetResponseData(response);
 	if (getElementIdsPayload.ReadFromJsonObject(responseData.data)){
-		if (getElementIdsPayload.elementIds){
-			out = *getElementIdsPayload.elementIds;
+		if (getElementIdsPayload.elementIds.HasValue()){
+			out.FromList(*getElementIdsPayload.elementIds);
+
 			return true;
 		}
 	}
@@ -583,12 +584,12 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 	ResponseData responseData = GetResponseData(response);
 	if (createSubCollectionPayload.ReadFromJsonObject(responseData.data)){
 		if (createSubCollectionPayload.items){
-			QList<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0> subCollectionItems = *createSubCollectionPayload.items;
-			for (const sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0& subCollectionItem : subCollectionItems){
-				QByteArray objectId = *subCollectionItem.itemInfo->id;
-				QByteArray objectTypeId = *subCollectionItem.itemInfo->typeId;
-				QString name = *subCollectionItem.itemInfo->name;
-				QString description = *subCollectionItem.itemInfo->description;
+			imtsdl::TElementList<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0> subCollectionItems = *createSubCollectionPayload.items;
+			for (const istd::TSharedNullable<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0>& subCollectionItem : subCollectionItems){
+				QByteArray objectId = *subCollectionItem->itemInfo->id;
+				QByteArray objectTypeId = *subCollectionItem->itemInfo->typeId;
+				QString name = *subCollectionItem->itemInfo->name;
+				QString description = *subCollectionItem->itemInfo->description;
 
 				idoc::MetaInfoPtr dataMetainfoPtr;
 				auto CreateMetaInfo = [&objectId, this, &objectTypeId](const QByteArray typeId,
@@ -622,16 +623,16 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 				dataMetainfoPtr = CreateMetaInfo(objectTypeId, metaInfoCreatorList);
 
 				idoc::CStandardDocumentMetaInfo metainfo;
-				if (subCollectionItem.metaInfo){
-					QByteArray metaInfoData = (*subCollectionItem.metaInfo).toUtf8();
+				if (subCollectionItem->metaInfo){
+					QByteArray metaInfoData = (*subCollectionItem->metaInfo).toUtf8();
 					bool retVal = DeSerializeObject(&metainfo, metaInfoData);
 					if (!retVal){
 						qDebug() << "Deserialization of the meta.information was failed!";
 					}
 				}
 
-				if (subCollectionItem.dataMetaInfo){
-					QByteArray dataMetaInfo = (*subCollectionItem.dataMetaInfo).toUtf8();
+				if (subCollectionItem->dataMetaInfo){
+					QByteArray dataMetaInfo = (*subCollectionItem->dataMetaInfo).toUtf8();
 					bool retVal = DeSerializeObject(dataMetainfoPtr.GetPtr(), dataMetaInfo);
 					if (!retVal){
 						qDebug() << "Deserialization of the object was failed!";
@@ -639,8 +640,8 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 				}
 				
 				imtbase::COperationContext operationContext;
-				if (subCollectionItem.operationContext){
-					QByteArray operationContextData = (*subCollectionItem.operationContext).toUtf8();
+				if (subCollectionItem->operationContext){
+					QByteArray operationContextData = (*subCollectionItem->operationContext).toUtf8();
 					DeSerializeObject(&operationContext, operationContextData);
 				}
 

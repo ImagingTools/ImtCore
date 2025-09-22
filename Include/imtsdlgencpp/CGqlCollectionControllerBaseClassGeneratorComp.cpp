@@ -742,7 +742,7 @@ void CGqlCollectionControllerBaseClassGeneratorComp::AddPayloadModelWriteCode(
 	imtsdl::CSdlUnion foundUnion;
 	const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 	if (isUnion){
-		const static QString unionSourceVarName = QStringLiteral("replyPayload");
+		const static QString unionSourceVarName = QStringLiteral("&replyPayload");
 		CSdlUnionConverter::WriteConversionFromUnion(stream,
 													 foundUnion,
 													 unionSourceVarName,
@@ -1332,7 +1332,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 		imtsdl::CSdlUnion foundUnion;
 		const bool isUnion = GetSdlUnionForField(outputArgument, m_sdlUnionListCompPtr->GetUnions(false), foundUnion);
 		if (isUnion){
-			const static QString unionSourceVarName = QStringLiteral("representationObject");
+			const static QString unionSourceVarName = QStringLiteral("&representationObject");
 			CSdlUnionConverter::WriteConversionFromUnion(stream,
 														 foundUnion,
 														 unionSourceVarName,
@@ -1345,7 +1345,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::AddImplCodeForRequest(
 														 *m_sdlUnionListCompPtr,
 														 hIndents + 1,
 														 CSdlUnionConverter::CT_MODEL_SCALAR,
-														 QString(),
+														 QStringLiteral("dataModel.SetData("), //QString(),
 														 QStringLiteral("dataModel"));
 		}
 		else{

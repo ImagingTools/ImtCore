@@ -73,7 +73,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 	profileData.email = QString(userInfoPtr->GetMail());
 	profileData.username = QString(userInfoPtr->GetId());
 
-	QList<sdl::imtauth::Profile::CRoleInfo::V1_0> roleList;
+	imtsdl::TElementList<sdl::imtauth::Profile::CRoleInfo::V1_0> roleList;
 
 	if (m_roleCollectionCompPtr.IsValid()){
 		QByteArrayList roles = userInfoPtr->GetRoles(productId);
@@ -96,7 +96,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 
 	profileData.roles = std::move(roleList);
 
-	QList<sdl::imtauth::Profile::CGroupInfo::V1_0> groupList;
+	imtsdl::TElementList<sdl::imtauth::Profile::CGroupInfo::V1_0> groupList;
 
 	if (m_groupCollectionCompPtr.IsValid()){
 		QByteArrayList groups = userInfoPtr->GetGroups();
@@ -120,7 +120,7 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 
 	profileData.groups = std::move(groupList);
 
-	QList<sdl::imtauth::Profile::CPermissionInfo::V1_0> permissionList;
+	imtsdl::TElementList<sdl::imtauth::Profile::CPermissionInfo::V1_0> permissionList;
 
 	if (m_productInfoCompPtr.IsValid()){
 		imtbase::IObjectCollection* featureCollectionPtr = m_productInfoCompPtr->GetFeatures();

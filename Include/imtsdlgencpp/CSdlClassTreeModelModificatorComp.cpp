@@ -177,7 +177,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			stream << enumConvertedVarName;
 		}
 		else if (isUnion){
-			const QString unionSourceVarName = QStringLiteral("*") + field.GetId();
+			const QString unionSourceVarName = field.GetId();
 			const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
 
 			// declare target value, to store value
@@ -190,7 +190,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 
 			WriteConversionFromUnion(stream,
 				foundUnion,
-				unionSourceVarName,
+				unionSourceVarName + QStringLiteral(".GetPtr()"),
 				unionConvertedVarName,
 				m_originalSchemaNamespaceCompPtr->GetText(),
 				field.GetId(),
@@ -245,7 +245,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 			stream << enumConvertedVarName;
 		}
 		else if (isUnion){
-			const QString unionSourceVarName = QStringLiteral("*") + field.GetId();
+			const QString unionSourceVarName = field.GetId();
 			const QString unionConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("VariantValue");
 
 
@@ -259,7 +259,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(
 
 			WriteConversionFromUnion(stream,
 				foundUnion,
-				unionSourceVarName,
+				unionSourceVarName + QStringLiteral(".GetPtr()"),
 				unionConvertedVarName,
 				m_originalSchemaNamespaceCompPtr->GetText(),
 				field.GetId(),
@@ -719,7 +719,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 
 	if(isEnum){
 		FeedStreamHorizontally(stream, hIndents + 1);
-		const QString enumSourceVarName =  field.GetId() + QStringLiteral("->at(") + treeModelIndexVarName + ')';
+		const QString enumSourceVarName =  '*' + field.GetId() + QStringLiteral("->at(") + treeModelIndexVarName + ')';
 		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
 
 		// declare target value, to store value
@@ -748,7 +748,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 		Q_ASSERT(found);
 
 		WriteConversionFromUnion(stream, foundUnion,
-			unionSourceVarName,
+			unionSourceVarName + QStringLiteral(".GetPtr()"),
 			unionConvertedVarName,
 			m_originalSchemaNamespaceCompPtr->GetText(),
 			newTreeModelVarName,
@@ -758,7 +758,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 			*m_sdlUnionListCompPtr,
 			hIndents + 1,
 			CSdlUnionConverter::ConversionType::CT_MODEL_ARRAY,
-			newTreeModelVarName + QString("->SetData(QByteArray(), "));
+			newTreeModelVarName + QString("->SetData("));
 	}
 
 	if (!isUnion){
@@ -774,6 +774,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldWriteToModelImplCo
 			stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("StringValue");
 		}
 		else{
+			stream << '*';
 			stream << field.GetId();
 			stream << QStringLiteral("->at(") << treeModelIndexVarName << ')';
 		}
@@ -1066,7 +1067,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 	stream << QStringLiteral("");
 	stream << field.GetId();
 	stream << QStringLiteral("->at(") << treeModelIndexVarName;
-	stream << QStringLiteral(").WriteToModel(*") << newTreeModelVarName;
+	stream << QStringLiteral(")->WriteToModel(*") << newTreeModelVarName;
 	stream << QStringLiteral(", ") << treeModelIndexVarName;
 	stream << QStringLiteral("))){");
 	FeedStream(stream, 1, false);

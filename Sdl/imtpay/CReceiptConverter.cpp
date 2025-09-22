@@ -133,7 +133,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::ImtPay::CReceipt::V1_0&
 	iprm::TParamsPtr<iprm::IParamsManager> paymentsManagerParamsPtr(&params, ReceiptParamKeys::Payments, false);
 	if (paymentsManagerParamsPtr.IsValid()){
 		const int paymentsCount = paymentsManagerParamsPtr->GetParamsSetsCount();
-		QList<ImtPayV1::CPayment::V1_0> payments;
+		imtsdl::TElementList<ImtPayV1::CPayment::V1_0> payments;
 		for (int index = 0; index < paymentsCount; ++index){
 			ImtPayV1::CPayment::V1_0 payment;
 			iprm::IParamsSet* paymentParamsPtr = paymentsManagerParamsPtr->GetParamsSet(index);
@@ -246,7 +246,7 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::ImtPay::CReceipt::V1_0&
 	iprm::TParamsPtr<iprm::IParamsManager> itemsParamsManagerPtr(&params, ReceiptParamKeys::Items);
 	Q_ASSERT(itemsParamsManagerPtr.IsValid());
 	const int itemsCount = itemsParamsManagerPtr->GetParamsSetsCount();
-	QList<ImtPayV1::CItem::V1_0> itemList;
+	imtsdl::TElementList<ImtPayV1::CItem::V1_0> itemList;
 	for (int intmIndex = 0; intmIndex < itemsCount; ++intmIndex){
 		ImtPayV1::CItem::V1_0 paymentItem;
 
@@ -397,10 +397,10 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 
 	// set payments
 	if (receipt.payments){
-		const QList<ImtPayV1::CPayment::V1_0> receiptPaymentList = *receipt.payments;
+		const imtsdl::TElementList<ImtPayV1::CPayment::V1_0> receiptPaymentList = *receipt.payments;
 		iprm::IParamsManager* paymentsManagerParamsPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Payments));
 		if (!receiptPaymentList.isEmpty() && paymentsManagerParamsPtr != nullptr){
-			for (const ImtPayV1::CPayment::V1_0& receiptPayment: receiptPaymentList){
+			for (const istd::TSharedNullable<ImtPayV1::CPayment::V1_0>& receiptPayment: receiptPaymentList){
 				const int insertedParamsIndex = paymentsManagerParamsPtr->InsertParamsSet();
 				Q_ASSERT(insertedParamsIndex >= 0);
 
@@ -414,7 +414,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 				const iprm::IOptionsList* typeSelectionConstraints = typeSelectionParamPtr->GetSelectionConstraints();
 				Q_ASSERT(typeSelectionConstraints != nullptr);
 
-				const QByteArray paymentTypeId = receiptPayment.type->toUtf8();
+				const QByteArray paymentTypeId = receiptPayment->type->toUtf8();
 				const int indexOfType = iprm::FindOptionIndexById(paymentTypeId, *typeSelectionConstraints);
 				if (indexOfType < 0){
 					qWarning() << "CReceiptConverter:: Unexpected payment type id";
@@ -427,7 +427,7 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 				imeas::INumericValue* sumNumericParamPtr = dynamic_cast<imeas::INumericValue*>(paymentParamsPtr->GetEditableParameter(ReceiptPaymentKeys::Sum));
 				Q_ASSERT(sumNumericParamPtr != nullptr);
 
-				const int sum = *receiptPayment.sum;
+				const int sum = *receiptPayment->sum;
 				imath::CVarVector sumList(1, sum);
 				sumNumericParamPtr->SetValues(sumList);
 			}
@@ -471,28 +471,28 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 	}
 
 	Q_ASSERT_X(receipt.items.HasValue(), __func__, "Receipt items expected but missing");
-	const QList<ImtPayV1::CItem::V1_0> receiptItemList = *receipt.items;
+	const imtsdl::TElementList<ImtPayV1::CItem::V1_0> receiptItemList = *receipt.items;
 	iprm::IParamsManager* itemsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Items));
 	if (!receiptItemList.isEmpty() && itemsParamsManagerPtr != nullptr){
-		for (const ImtPayV1::CItem::V1_0& receiptItem: receiptItemList){
+		for (const istd::TSharedNullable<ImtPayV1::CItem::V1_0>& receiptItem: receiptItemList){
 			const int insertedParamsIndex = itemsParamsManagerPtr->InsertParamsSet();
 			Q_ASSERT(insertedParamsIndex >= 0);
 
 			iprm::IParamsSet* paymentItemParamsSetPtr = itemsParamsManagerPtr->GetParamsSet(insertedParamsIndex);
 			Q_ASSERT(paymentItemParamsSetPtr != nullptr);
 
-			SetTextForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Name, *receiptItem.name);
-			SetDigitValueForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Price, *receiptItem.price);
-			SetDigitValueForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Amount, *receiptItem.amount);
-			SetDigitValueForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Quantity, *receiptItem.quantity);
-			if (!receiptItem.type->isEmpty()){
-				SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::ItemType, *receiptItem.type);
+			SetTextForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Name, *receiptItem->name);
+			SetDigitValueForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Price, *receiptItem->price);
+			SetDigitValueForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Amount, *receiptItem->amount);
+			SetDigitValueForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::Quantity, *receiptItem->quantity);
+			if (!receiptItem->type->isEmpty()){
+				SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::ItemType, *receiptItem->type);
 			}
-			if (!receiptItem.paymentMethod->isEmpty()){
-				SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::PaymentMethod, *receiptItem.paymentMethod);
+			if (!receiptItem->paymentMethod->isEmpty()){
+				SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::PaymentMethod, *receiptItem->paymentMethod);
 			}
-			if (!receiptItem.measurementUnit->isEmpty()){
-				SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::MeasurementUnit, *receiptItem.measurementUnit);
+			if (!receiptItem->measurementUnit->isEmpty()){
+				SelectOptionByIdForParamsSet(*paymentItemParamsSetPtr, ReceiptItemKeys::MeasurementUnit, *receiptItem->measurementUnit);
 			}
 		}
 	}

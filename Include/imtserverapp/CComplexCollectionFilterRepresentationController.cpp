@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtbase/CTimeFilterParam.h>
 #include <imtauth/IUserInfo.h>
+#include <imtsdl/TElementList.h>
 
 
 namespace imtserverapp
@@ -66,7 +67,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromD
 	}
 
 	// Sorting info
-	QList<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0> sdlFieldSortingInfoList;
+	imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0> sdlFieldSortingInfoList;
 	const imtbase::IComplexCollectionFilter::FieldSortingInfoList& fieldSortingInfoList = complexFilterPtr->GetSortingInfo();
 	for (const imtbase::IComplexCollectionFilter::FieldSortingInfo& fieldSortingInfo : std::as_const(fieldSortingInfoList)){
 		sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0 sdlFieldSortingInfo;
@@ -134,13 +135,14 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromD
 	sdlRepresentation.timeFilter = sdlTimeFilter;
 
 	// Distinct fields
-	const QByteArrayList& distinctFieldsList = complexFilterPtr->GetDistinctFieldsList();
+	imtsdl::TElementList<QByteArray> distinctFieldsList;
+	distinctFieldsList.FromList(complexFilterPtr->GetDistinctFieldsList());
 	sdlRepresentation.distinctFields = distinctFieldsList;
 
 	// Text filter
 	sdl::imtbase::ComplexCollectionFilter::CTextFilter::V1_0 sdlTextFilter;
 	sdlTextFilter.text = complexFilterPtr->GetTextFilter();
-	sdlTextFilter.fieldIds = complexFilterPtr->GetTextFilterFieldsList();
+	sdlTextFilter.fieldIds->FromList(complexFilterPtr->GetTextFilterFieldsList());
 	sdlRepresentation.textFilter = sdlTextFilter;
 
 	const imtbase::IComplexCollectionFilter::GroupFilter& groupFilter = complexFilterPtr->GetFieldsFilter();
@@ -166,7 +168,7 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 
 	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
 
-	QList<Filter::CFieldSortingInfo::V1_0> sourceSorting;
+	imtsdl::TElementList<Filter::CFieldSortingInfo::V1_0> sourceSorting;
 	if (sdlRepresentation.sortingInfo){
 		sourceSorting = *sdlRepresentation.sortingInfo;
 	}
@@ -182,17 +184,17 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 	}
 
 	imtbase::IComplexCollectionFilter::FieldSortingInfoList sorting;
-	for (const Filter::CFieldSortingInfo::V1_0& sourceSortingItem  : std::as_const(sourceSorting)){
+	for (const istd::TSharedNullable<Filter::CFieldSortingInfo::V1_0>& sourceSortingItem  : std::as_const(sourceSorting)){
 		imtbase::IComplexCollectionFilter::FieldSortingInfo fieldSorting;
 
-		if (sourceSortingItem.fieldId){
-			fieldSorting.fieldId = sourceSortingItem.fieldId->toLatin1();
+		if (sourceSortingItem->fieldId){
+			fieldSorting.fieldId = sourceSortingItem->fieldId->toLatin1();
 		}
 
-		if (sourceSortingItem.sortingOrder && (*sourceSortingItem.sortingOrder == "ASC")){
+		if (sourceSortingItem->sortingOrder && (*sourceSortingItem->sortingOrder == "ASC")){
 			fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
 		}
-		else if (sourceSortingItem.sortingOrder && (*sourceSortingItem.sortingOrder == "DESC")){
+		else if (sourceSortingItem->sortingOrder && (*sourceSortingItem->sortingOrder == "DESC")){
 			fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_DESC;
 		}
 		else{
@@ -278,7 +280,7 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 	complexFilterPtr->SetTimeFilter(timeFilter);
 
 	if (sdlRepresentation.distinctFields){
-		complexFilterPtr->SetDistinctFieldsList(*sdlRepresentation.distinctFields);
+		complexFilterPtr->SetDistinctFieldsList(sdlRepresentation.distinctFields->ToList());
 	}
 
 	if (sdlRepresentation.textFilter){
@@ -288,7 +290,7 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 		}
 
 		if (textFilter.fieldIds){
-			complexFilterPtr->SetTextFilterFieldsList(*textFilter.fieldIds);
+			complexFilterPtr->SetTextFilterFieldsList(textFilter.fieldIds->ToList());
 		}
 	}
 
@@ -382,7 +384,7 @@ bool CComplexCollectionFilterRepresentationController::GetFieldFilterFromSdlRepr
 		if (!representation.filterOperations || representation.filterOperations->isEmpty()){
 			return false;
 		}
-		QList<Filter::FilterOperation> filterOperations = *representation.filterOperations;
+		imtsdl::TElementList<Filter::FilterOperation> filterOperations = *representation.filterOperations;
 
 		int flags = 0;
 
@@ -445,25 +447,25 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromF
 
 	switch(fieldFilter.filterOperation){
 	case imtbase::IComplexCollectionFilter::FO_EQUAL:
-		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Equal};
+		representation.filterOperations = imtsdl::TElementList<Filter::FilterOperation> ({Filter::FilterOperation::Equal});
 		break;
 	case imtbase::IComplexCollectionFilter::FO_NOT_EQUAL:
-		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Not, Filter::FilterOperation::Equal};
+		representation.filterOperations = imtsdl::TElementList<Filter::FilterOperation> {Filter::FilterOperation::Not, Filter::FilterOperation::Equal};
 		break;
 	case imtbase::IComplexCollectionFilter::FO_LESS:
-		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Less};
+		representation.filterOperations = imtsdl::TElementList<Filter::FilterOperation> {Filter::FilterOperation::Less};
 		break;
 	case imtbase::IComplexCollectionFilter::FO_GREATER:
-		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Greater};
+		representation.filterOperations = imtsdl::TElementList<Filter::FilterOperation> {Filter::FilterOperation::Greater};
 		break;
 	case imtbase::IComplexCollectionFilter::FO_NOT_LESS:
-		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Not, Filter::FilterOperation::Less};
+		representation.filterOperations = imtsdl::TElementList<Filter::FilterOperation> {Filter::FilterOperation::Not, Filter::FilterOperation::Less};
 		break;
 	case imtbase::IComplexCollectionFilter::FO_NOT_GREATER:
-		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Not, Filter::FilterOperation::Greater};
+		representation.filterOperations = imtsdl::TElementList<Filter::FilterOperation> {Filter::FilterOperation::Not, Filter::FilterOperation::Greater};
 		break;
 	case imtbase::IComplexCollectionFilter::FO_CONTAINS:
-		representation.filterOperations = QList<Filter::FilterOperation> {Filter::FilterOperation::Contains};
+		representation.filterOperations = imtsdl::TElementList<Filter::FilterOperation> {Filter::FilterOperation::Contains};
 		break;
 	}
 
@@ -477,31 +479,31 @@ bool CComplexCollectionFilterRepresentationController::GetGroupFilterFromSdlRepr
 {
 	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
 
-	QList<Filter::CFieldFilter::V1_0> sourceFieldSubFilters;
+	imtsdl::TElementList<Filter::CFieldFilter::V1_0> sourceFieldSubFilters;
 	if (representation.fieldFilters){
 		sourceFieldSubFilters = *representation.fieldFilters;
 	}
-	QList<Filter::CGroupFilter::V1_0> sourceGroupSubFilters;
+	imtsdl::TElementList<Filter::CGroupFilter::V1_0> sourceGroupSubFilters;
 	if (representation.groupFilters){
 		sourceGroupSubFilters = *representation.groupFilters;
 	}
 	QVector<imtbase::IComplexCollectionFilter::FieldFilter> targetFieldSubFilters;
 	QVector<imtbase::IComplexCollectionFilter::GroupFilter> targetGroupSubFilters;
 
-	for (const Filter::CFieldFilter::V1_0& sourceFieldSubFilter : std::as_const(sourceFieldSubFilters)){
+	for (const istd::TSharedNullable<Filter::CFieldFilter::V1_0>& sourceFieldSubFilter : std::as_const(sourceFieldSubFilters)){
 		imtbase::IComplexCollectionFilter::FieldFilter targetFieldSubFilter;
 
-		if (!GetFieldFilterFromSdlRepresentation(sourceFieldSubFilter, targetFieldSubFilter)){
+		if (!GetFieldFilterFromSdlRepresentation(*sourceFieldSubFilter, targetFieldSubFilter)){
 			return false;
 		}
 
 		targetFieldSubFilters.append(targetFieldSubFilter);
 	}
 
-	for (const Filter::CGroupFilter::V1_0& sourceGroupSubFilter : std::as_const(sourceGroupSubFilters)){
+	for (const istd::TSharedNullable<Filter::CGroupFilter::V1_0>& sourceGroupSubFilter : std::as_const(sourceGroupSubFilters)){
 		imtbase::IComplexCollectionFilter::GroupFilter targetGroupSubFilter;
 
-		if (!GetGroupFilterFromSdlRepresentation(sourceGroupSubFilter, targetGroupSubFilter)){
+		if (!GetGroupFilterFromSdlRepresentation(*sourceGroupSubFilter, targetGroupSubFilter)){
 			return false;
 		}
 
@@ -553,7 +555,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromG
 	}
 
 	// Groups filter
-	QList<Filter::CGroupFilter::V1_0> sdlGroupFilters;
+	imtsdl::TElementList<Filter::CGroupFilter::V1_0> sdlGroupFilters;
 	for (const imtbase::IComplexCollectionFilter::GroupFilter& groupFilter : std::as_const(groupFilter.groupFilters)){
 		Filter::CGroupFilter::V1_0 sdlGroupFilter;
 		if (!GetSdlRepresentationFromGroupFilter(groupFilter, sdlGroupFilter)){
@@ -565,7 +567,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromG
 	representation.groupFilters = sdlGroupFilters;
 
 	// Fields filter
-	QList<Filter::CFieldFilter::V1_0> sdlFieldFilters;
+	imtsdl::TElementList<Filter::CFieldFilter::V1_0> sdlFieldFilters;
 	for (const imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : std::as_const(groupFilter.fieldFilters)){
 		Filter::CFieldFilter::V1_0 sdlFieldFilter;
 		if (!GetSdlRepresentationFromFieldFilter(fieldFilter, sdlFieldFilter)){

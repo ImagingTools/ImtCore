@@ -95,7 +95,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 
 	userInfoPtr->SetName(name);
 
-	QList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
+	imtsdl::TElementList<sdl::imtauth::Users::CSystemInfo::V1_0> systemInfos;
 	if (representation.systemInfos){
 		systemInfos = *representation.systemInfos;
 	}
@@ -105,18 +105,22 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 		userInfoPtr->AddToSystem(systemInfo);
 	}
 	else{
-		for (const sdl::imtauth::Users::CSystemInfo::V1_0& sdlSystemInfo : systemInfos){
+		for (const istd::TSharedNullable<sdl::imtauth::Users::CSystemInfo::V1_0>& sdlSystemInfo : systemInfos){
 			QByteArray systemId;
-			if (sdlSystemInfo.id){
-				systemId = *sdlSystemInfo.id;
+			if (!sdlSystemInfo.HasValue()){
+				continue;
+			}
+
+			if (sdlSystemInfo->id){
+				systemId = *sdlSystemInfo->id;
 			}
 			QString systemName;
-			if (sdlSystemInfo.name){
-				systemName = *sdlSystemInfo.name;
+			if (sdlSystemInfo->name){
+				systemName = *sdlSystemInfo->name;
 			}
 			bool enabled = false;
-			if (sdlSystemInfo.enabled){
-				enabled = *sdlSystemInfo.enabled;
+			if (sdlSystemInfo->enabled){
+				enabled = *sdlSystemInfo->enabled;
 			}
 
 			imtauth::IUserInfo::SystemInfo systemInfo;
@@ -271,7 +275,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserCollectionControlle
 
 	sdl::imtbase::ImtCollection::CElementMetaInfo::V1_0 elementMetaInfo;
 
-	QList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> infoParams;
+	imtsdl::TElementList<sdl::imtbase::ImtBaseTypes::CParameter::V1_0> infoParams;
 
 	if (m_roleInfoProviderCompPtr.IsValid()){
 		sdl::imtbase::ImtBaseTypes::CParameter::V1_0 roleParameter;
@@ -618,7 +622,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 	std::sort(permissions.begin(), permissions.end());
 	representationPayload.permissions = permissions.join(';');
 
-	QList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
+	imtsdl::TElementList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();
 	for (const imtauth::IUserInfo::SystemInfo& systemInfo : systemInfoList){
 		sdl::imtauth::Users::CSystemInfo::V1_0 info;

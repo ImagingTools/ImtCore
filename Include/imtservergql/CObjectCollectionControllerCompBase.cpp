@@ -148,7 +148,7 @@ sdl::imtbase::ImtCollection::CRemoveElementsPayload CObjectCollectionControllerC
 
 	QByteArrayList elementIds;
 	if (arguments.input.Version_1_0->elementIds.has_value()){
-		elementIds = *arguments.input.Version_1_0->elementIds;
+		elementIds = arguments.input.Version_1_0->elementIds->ToList();
 	}
 
 	if (elementIds.isEmpty()){
@@ -224,7 +224,7 @@ sdl::imtbase::ImtCollection::CRestoreObjectsPayload CObjectCollectionControllerC
 
 	QByteArrayList objectIds;
 	if (arguments.input.Version_1_0->objectIds){
-		objectIds = *arguments.input.Version_1_0->objectIds;
+		objectIds = arguments.input.Version_1_0->objectIds->ToList();
 	}
 
 	response.success = m_objectCollectionCompPtr->RestoreObjects(imtbase::ICollectionInfo::Ids(objectIds.constBegin(), objectIds.constEnd()));
@@ -704,7 +704,8 @@ sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload CObjectCollectionContr
 		}
 	}
 
-	response.headers = headersRepresentationList;
+	response.headers.Emplace();
+	response.headers->FromList(headersRepresentationList);
 
 	sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload retVal;
 	retVal.Version_1_0 = std::move(response);
@@ -790,7 +791,8 @@ sdl::imtbase::ImtCollection::CGetElementIdsPayload CObjectCollectionControllerCo
 		}
 	}
 
-	response.elementIds= m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
+	imtbase::IObjectCollection::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
+	response.elementIds->FromList(ids);
 
 	sdl::imtbase::ImtCollection::CGetElementIdsPayload retVal;
 	retVal.Version_1_0 = std::move(response);
@@ -1088,7 +1090,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CObjectCollectionControl
 	}
 
 	sdl::imtbase::ImtCollection::CElementMetaInfo::V1_0 elementMetaInfo;
-	elementMetaInfo.infoParams = parameterInfos;
+	elementMetaInfo.infoParams->FromList(parameterInfos);
 	response.elementMetaInfo = elementMetaInfo;
 
 	sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload retVal;
@@ -1140,7 +1142,7 @@ sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CObjectCollectionContro
 	}
 
 	if (requestInfo.isItemsRequested){
-		QList<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0> collectionItems;
+		imtsdl::TElementList<sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0> collectionItems;
 		imtbase::ICollectionInfo::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
 		for (const imtbase::ICollectionInfo::Id& id: ids){
 			sdl::imtbase::ImtCollection::CSubCollectionItem::V1_0 collectionItem;
@@ -1777,7 +1779,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 	}
 
 	sdl::imtbase::ImtCollection::CRemovedNotificationPayload::V1_0 response;
-	response.elementIds = QByteArrayList(objectIds.constBegin(), objectIds.constEnd());
+	response.elementIds->FromList(objectIds);
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -2156,7 +2158,7 @@ imtbase::ICollectionInfo::Ids CObjectCollectionControllerCompBase::ExtractObject
 	}
 
 	if (removeElementsInput.elementIds.has_value()){
-		retVal = imtbase::ICollectionInfo::Ids((*removeElementsInput.elementIds).constBegin(), (*removeElementsInput.elementIds).constEnd());
+		retVal = removeElementsInput.elementIds->ToList();
 	}
 	else{
 		errorMessage = QString("Failed to delete objects: 'elementIds' list is empty.");

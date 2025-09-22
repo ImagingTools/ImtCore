@@ -101,7 +101,7 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 	
 	QByteArrayList elementIds = guiElementContainer.GetElementIds();
 	
-	QList<sdl::imtbase::Commands::CGuiElementModel::V1_0> elementList;
+	imtsdl::TElementList<sdl::imtbase::Commands::CGuiElementModel::V1_0> elementList;
 	
 	for (const QByteArray& elementId : elementIds){
 		const imtserverapp::IGuiElementModel* guiElementPtr = guiElementContainer.GetGuiElementModel(elementId);
@@ -130,9 +130,9 @@ bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
 					return false;
 				}
 				
-				QList<sdl::imtbase::Commands::CGuiElementModel::V1_0> subElementList;
-				for (const sdl::imtbase::Commands::CGuiElementModel::V1_0& subElement : *subElements.elements){
-					subElementList << subElement;
+				imtsdl::TElementList<sdl::imtbase::Commands::CGuiElementModel::V1_0> subElementList;
+				for (const istd::TSharedNullable<sdl::imtbase::Commands::CGuiElementModel::V1_0>& subElement : *subElements.elements){
+					subElementList << *subElement;
 				}
 
 				element.subElements = subElementList;

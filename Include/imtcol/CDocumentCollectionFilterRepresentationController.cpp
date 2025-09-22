@@ -18,9 +18,9 @@ bool CDocumentCollectionFilterRepresentationController::DocumentCollectionFilter
 	}
 
 	if (filterRepresentaion.documentStates.has_value()){
-		QList<Filter::DocumentState> documentStates = *filterRepresentaion.documentStates;
-		for (const Filter::DocumentState& state : documentStates){
-			switch (state){
+		imtsdl::TElementList<Filter::DocumentState> documentStates = *filterRepresentaion.documentStates;
+		for (const istd::TSharedNullable<Filter::DocumentState>& state : documentStates){
+			switch (*state){
 			case Filter::DocumentState::ACTIVE:
 				filterModel.AddDocumentState(imtcol::IDocumentCollectionFilter::DS_ACTIVE);
 				break;

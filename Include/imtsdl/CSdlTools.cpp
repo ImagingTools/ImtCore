@@ -44,8 +44,8 @@ QString CSdlTools::s_sdlGlobalPrefix = QStringLiteral("sdl");
 
 void CSdlTools::WrapTypeToList(QString& text)
 {
-	text.prepend(QStringLiteral("QList<"));
-	text.append('>');
+	text.prepend(QStringLiteral("imtsdl::TElementList<"));
+	text.append(">");
 }
 
 
@@ -134,10 +134,6 @@ QString CSdlTools::OptListConvertTypeWithNamespace(
 			// use global namespace
 			if (!retVal.startsWith(QStringLiteral("::")) && !isUnion && !isEnum){
 				retVal.prepend(QStringLiteral("::"));
-			}
-			// add pointer to union, if it is needed
-			if (isUnion && listWrap){
-				retVal = QStringLiteral("std::shared_ptr<") + retVal + QStringLiteral(">");
 			}
 		}
 	}

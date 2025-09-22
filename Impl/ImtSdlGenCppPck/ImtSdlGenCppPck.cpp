@@ -79,7 +79,10 @@ I_EXPORT_COMPONENT(
 			"A C++ class generator of QObject implementations",
 			"Schema Definition Language SDL Class Generator QObject")
 
-
+I_EXPORT_COMPONENT(
+			SdlUnionObjectGenerator,
+			"A C++ class generator of union QObject implementations",
+			"Schema Definition Language SDL Class Generator QObject Union")
 
 } // namespace ImtSdlGenCppPck
 

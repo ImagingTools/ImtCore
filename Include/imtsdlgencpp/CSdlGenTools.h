@@ -112,6 +112,12 @@ public:
 				QTextStream& stream,
 				const imtsdl::SdlRequestList& requestList,
 				const QString& className);
+
+	static QString GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
+									  const imtsdl::SdlTypeList& typeList,
+									  const imtsdl::SdlEnumList& enumList,
+									  const imtsdl::SdlUnionList& unionList,
+									  bool withPointer = true);
 };
 
 

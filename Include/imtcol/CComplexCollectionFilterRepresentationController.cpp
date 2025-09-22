@@ -119,7 +119,7 @@ bool CComplexCollectionFilterRepresentationController::ProcessFieldFilter(
 			SendErrorMessage("ComplexCollectionFilter: Filter operation not available", messageConsumerPtr);
 			return false;
 		}
-		QList<Filter::FilterOperation> filterOperations = *source.filterOperations;
+		imtsdl::TElementList<Filter::FilterOperation> filterOperations = *source.filterOperations;
 
 		int flags = 0;
 
@@ -158,31 +158,31 @@ bool CComplexCollectionFilterRepresentationController::ProcessGroupFilter(
 {
 	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
 
-	QList<Filter::CFieldFilter::V1_0> sourceFieldSubFilters;
+	imtsdl::TElementList<Filter::CFieldFilter::V1_0> sourceFieldSubFilters;
 	if (source.fieldFilters){
 		sourceFieldSubFilters = *source.fieldFilters;
 	}
-	QList<Filter::CGroupFilter::V1_0> sourceGroupSubFilters;
+	imtsdl::TElementList<Filter::CGroupFilter::V1_0> sourceGroupSubFilters;
 	if (source.groupFilters){
 		sourceGroupSubFilters = *source.groupFilters;
 	}
 	QVector<imtbase::IComplexCollectionFilter::FieldFilter> targetFieldSubFilters;
 	QVector<imtbase::IComplexCollectionFilter::GroupFilter> targetGroupSubFilters;
 
-	for (const Filter::CFieldFilter::V1_0& sourceFieldSubFilter : std::as_const(sourceFieldSubFilters)){
+	for (const istd::TSharedNullable<Filter::CFieldFilter::V1_0>& sourceFieldSubFilter : std::as_const(sourceFieldSubFilters)){
 		imtbase::IComplexCollectionFilter::FieldFilter targetFieldSubFilter;
 
-		if (!ProcessFieldFilter(sourceFieldSubFilter, targetFieldSubFilter, messageConsumerPtr)){
+		if (!ProcessFieldFilter(*sourceFieldSubFilter, targetFieldSubFilter, messageConsumerPtr)){
 			return false;
 		}
 
 		targetFieldSubFilters.append(targetFieldSubFilter);
 	}
 
-	for (const Filter::CGroupFilter::V1_0& sourceGroupSubFilter : std::as_const(sourceGroupSubFilters)){
+	for (const istd::TSharedNullable<Filter::CGroupFilter::V1_0>& sourceGroupSubFilter : std::as_const(sourceGroupSubFilters)){
 		imtbase::IComplexCollectionFilter::GroupFilter targetGroupSubFilter;
 
-		if (!ProcessGroupFilter(sourceGroupSubFilter, targetGroupSubFilter, messageConsumerPtr)){
+		if (!ProcessGroupFilter(*sourceGroupSubFilter, targetGroupSubFilter, messageConsumerPtr)){
 			return false;
 		}
 
@@ -224,7 +224,7 @@ bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRe
 {
 	namespace Filter = sdl::imtbase::ComplexCollectionFilter;
 
-	QList<Filter::CFieldSortingInfo::V1_0> sourceSorting;
+	imtsdl::TElementList<Filter::CFieldSortingInfo::V1_0> sourceSorting;
 	if (filterRepresentaion.sortingInfo){
 		sourceSorting = *filterRepresentaion.sortingInfo;
 	}
@@ -239,17 +239,17 @@ bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRe
 
 	// ---
 	imtbase::IComplexCollectionFilter::FieldSortingInfoList sorting;
-	for (const Filter::CFieldSortingInfo::V1_0& sourceSortingItem  : std::as_const(sourceSorting)){
+	for (const istd::TSharedNullable<Filter::CFieldSortingInfo::V1_0>& sourceSortingItem  : std::as_const(sourceSorting)){
 		imtbase::IComplexCollectionFilter::FieldSortingInfo fieldSorting;
 
-		if (sourceSortingItem.fieldId){
-			fieldSorting.fieldId = sourceSortingItem.fieldId->toLatin1();
+		if (sourceSortingItem->fieldId){
+			fieldSorting.fieldId = sourceSortingItem->fieldId->toLatin1();
 		}
 
-		if (sourceSortingItem.sortingOrder && (*sourceSortingItem.sortingOrder == "ASC")){
+		if (sourceSortingItem->sortingOrder && (*sourceSortingItem->sortingOrder == "ASC")){
 			fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
 		}
-		else if (sourceSortingItem.sortingOrder && (*sourceSortingItem.sortingOrder == "DESC")){
+		else if (sourceSortingItem->sortingOrder && (*sourceSortingItem->sortingOrder == "DESC")){
 			fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_DESC;
 		}
 		else{
@@ -336,7 +336,7 @@ bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRe
 	filter.SetTimeFilter(timeFilter);
 
 	if (filterRepresentaion.distinctFields){
-		filter.SetDistinctFieldsList(*filterRepresentaion.distinctFields);
+		filter.SetDistinctFieldsList(filterRepresentaion.distinctFields->ToList());
 	}
 
 	if (filterRepresentaion.textFilter){
@@ -346,7 +346,7 @@ bool CComplexCollectionFilterRepresentationController::ComplexCollectionFilterRe
 		}
 
 		if (textFilter.fieldIds){
-			filter.SetTextFilterFieldsList(*textFilter.fieldIds);
+			filter.SetTextFilterFieldsList(textFilter.fieldIds->ToList());
 		}
 	}
 

@@ -129,129 +129,129 @@ bool CSdlUnionGeneratorComp::ProcessEntry(
 	stream << QStringLiteral("};");
 	FeedStream(stream, 2, false);
 
-	QString unionTypeObjectName = QStringLiteral("C%1Object").arg(sdlUnion->GetName());
-	stream << QStringLiteral("class %1: public ::imtbase::CItemModelBase").arg(unionTypeObjectName);
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream, 0);
-	stream << QStringLiteral("{");
-	FeedStream(stream, 1, false);
+	// QString unionTypeObjectName = QStringLiteral("C%1Object").arg(sdlUnion->GetName());
+	// stream << QStringLiteral("class %1: public ::imtbase::CItemModelBase").arg(unionTypeObjectName);
+	// FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 0);
+	// stream << QStringLiteral("{");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_OBJECT");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream);
+	// stream << QStringLiteral("Q_OBJECT");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream);
+	// stream << QStringLiteral("Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)");
-	FeedStream(stream, 2, false);
+	// FeedStreamHorizontally(stream);
+	// stream << QStringLiteral("Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)");
+	// FeedStream(stream, 2, false);
 
-	FeedStreamHorizontally(stream, 0);
-	stream << QStringLiteral("public:");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 0);
+	// stream << QStringLiteral("public:");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("typedef ::imtbase::CItemModelBase BaseClass;");
-	FeedStream(stream, 2, false);
+	// FeedStreamHorizontally(stream, 1);
+	// stream << QStringLiteral("typedef ::imtbase::CItemModelBase BaseClass;");
+	// FeedStream(stream, 2, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("%1(QObject* parent = nullptr): BaseClass(parent) {}").arg(unionTypeObjectName);
-	FeedStream(stream, 2, false);
+	// FeedStreamHorizontally(stream, 1);
+	// stream << QStringLiteral("%1(QObject* parent = nullptr): BaseClass(parent) {}").arg(unionTypeObjectName);
+	// FeedStream(stream, 2, false);
 
-	// GetType function begin
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QString GetType() const{");
-	FeedStream(stream, 1, false);
+	// // GetType function begin
+	// FeedStreamHorizontally(stream);
+	// stream << QStringLiteral("Q_INVOKABLE QString GetType() const{");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return m_type;");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 2);
+	// stream << QStringLiteral("return m_type;");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-	// GetType function end
+	// FeedStreamHorizontally(stream);
+	// stream << QStringLiteral("}");
+	// FeedStream(stream, 2, false);
+	// // GetType function end
 
-	// SetValue function begin
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void SetValue(const QVariant& value){");
-	FeedStream(stream, 1, false);
+	// // SetValue function begin
+	// FeedStreamHorizontally(stream);
+	// stream << QStringLiteral("Q_INVOKABLE void SetValue(const QVariant& value){");
+	// FeedStream(stream, 1, false);
 
-	QStringList unionTypeList = sdlUnion->GetTypes();
-	for (int unionIndex = 0; unionIndex < unionTypeList.count(); unionIndex++){
-		QString unionTypeWithNamespace = convertedTypeList[unionIndex];
-		QString unionType = unionTypeList[unionIndex];
-		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("if (value.canConvert<") << unionTypeWithNamespace;
-		stream << QStringLiteral(">()){");
-		FeedStream(stream, 1, false);
+	// QStringList unionTypeList = sdlUnion->GetTypes();
+	// for (int unionIndex = 0; unionIndex < unionTypeList.count(); unionIndex++){
+	// 	QString unionTypeWithNamespace = convertedTypeList[unionIndex];
+	// 	QString unionType = unionTypeList[unionIndex];
+	// 	FeedStreamHorizontally(stream, 2);
+	// 	stream << QStringLiteral("if (value.canConvert<") << unionTypeWithNamespace;
+	// 	stream << QStringLiteral(">()){");
+	// 	FeedStream(stream, 1, false);
 
-		FeedStreamHorizontally(stream, 3);
-		stream << QStringLiteral("m_type = ") << QStringLiteral("\"") << unionType << QStringLiteral("\";");
-		FeedStream(stream, 1, false);
+	// 	FeedStreamHorizontally(stream, 3);
+	// 	stream << QStringLiteral("m_type = ") << QStringLiteral("\"") << unionType << QStringLiteral("\";");
+	// 	FeedStream(stream, 1, false);
 
-		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("}");
-		FeedStream(stream, 2, false);
-	}
+	// 	FeedStreamHorizontally(stream, 2);
+	// 	stream << QStringLiteral("}");
+	// 	FeedStream(stream, 2, false);
+	// }
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("m_value = value;");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 2);
+	// stream << QStringLiteral("m_value = value;");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-	// SetValue function end
+	// FeedStreamHorizontally(stream, 1);
+	// stream << QStringLiteral("}");
+	// FeedStream(stream, 2, false);
+	// // SetValue function end
 
-	// GetValue function begin
-	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QVariant GetValue(){");
-	FeedStream(stream, 1, false);
+	// // GetValue function begin
+	// FeedStreamHorizontally(stream);
+	// stream << QStringLiteral("Q_INVOKABLE QVariant GetValue(){");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
-	stream << QStringLiteral("return QVariant();");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 2);
+	// stream << QStringLiteral("return QVariant();");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("}");
-	FeedStream(stream, 2, false);
-	// GetValue function end
+	// FeedStreamHorizontally(stream, 1);
+	// stream << QStringLiteral("}");
+	// FeedStream(stream, 2, false);
+	// // GetValue function end
 
-	FeedStreamHorizontally(stream, 0);
-	stream << QStringLiteral("signals:");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 0);
+	// stream << QStringLiteral("signals:");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("void typeChanged();");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 1);
+	// stream << QStringLiteral("void typeChanged();");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("void valueChanged();");
-	FeedStream(stream, 2, false);
+	// FeedStreamHorizontally(stream, 1);
+	// stream << QStringLiteral("void valueChanged();");
+	// FeedStream(stream, 2, false);
 
-	FeedStreamHorizontally(stream, 0);
-	stream << QStringLiteral("public:");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 0);
+	// stream << QStringLiteral("public:");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("istd::TSharedNullable<std::shared_ptr<%1>> Version_1_0;").arg(sdlUnion->GetName());
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 1);
+	// stream << QStringLiteral("istd::TSharedNullable<std::shared_ptr<%1>> Version_1_0;").arg(sdlUnion->GetName());
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("QVariant m_value;");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 1);
+	// stream << QStringLiteral("QVariant m_value;");
+	// FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("QString m_type;");
-	FeedStream(stream, 1, false);
+	// FeedStreamHorizontally(stream, 1);
+	// stream << QStringLiteral("QString m_type;");
+	// FeedStream(stream, 1, false);
 
-	// Union Type end
-	FeedStreamHorizontally(stream, 0);
-	stream << QStringLiteral("};");
-	FeedStream(stream, 2, false);
+	// // Union Type end
+	// FeedStreamHorizontally(stream, 0);
+	// stream << QStringLiteral("};");
+	// FeedStream(stream, 2, false);
 
 
 	return true;

@@ -44,12 +44,11 @@ public:
 	// reimplemented (IIncludeDirectivesProvider)
 	virtual QList<imtsdl::IncludeDirective> GetIncludeDirectives() const override;
 
-protected:
-	QString GetQObjectTypeName(const imtsdl::CSdlField& field, bool withPointer = true) const;
-
 private:
 	bool ProcessHeaderClassFile(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry) const;
+	bool ProcessHeaderClassListFile(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry) const;
 	bool ProcessSourceClassFile(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry) const;
+	bool ProcessSourceClassListFile(QTextStream& stream, const imtsdl::CSdlEntryBase& sdlEntry) const;
 	void CreatePropertiesForType(QTextStream& stream, const imtsdl::SdlFieldList& fieldList) const;
 	void CreateAccessMethodsDefinition(QTextStream& stream, const imtsdl::SdlFieldList& fieldList) const;
 

@@ -162,7 +162,7 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 	}
 	
 	if (requestInfo.items.isLicensesRequested){
-		QList<sdl::imtlic::Products::CLicenseData::V1_0> licenseDataList;
+		imtsdl::TElementList<sdl::imtlic::Products::CLicenseData::V1_0> licenseDataList;
 		
 		if (m_licenseCollectionCompPtr.IsValid()){
 			imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;

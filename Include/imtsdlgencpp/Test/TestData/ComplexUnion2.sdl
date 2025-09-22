@@ -7,6 +7,7 @@ schema {
 
 import{
 	"ComplexUnion1.sdl"
+	"ComplexCollectionFilter.sdl"
 }
 
 type Result{
@@ -128,6 +129,12 @@ type CDMResult {
 
 type PointsInCoordinateFormat {
 	pointAsCoordinates: Boolean
+}
+
+type CollectionViewParamsTest {
+	count: Int
+	offset: Int
+	filterModel: ComplexCollectionFilter
 }
 
 type Query {

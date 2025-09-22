@@ -17,11 +17,13 @@ type Link {
 	link: ID!
 }
 
-union PrinterSpecification = PrinterSpecificationBase | Link
+union PrinterSpecification = PrinterSpecificationBase | Link | String | Double
 
 type PrinterBase {
 	name: String
-	specification: PrinterSpecification
+	linkList: [Link]!
+	specification: PrinterSpecification!
+	specificationList: [PrinterSpecification]!
 }
 
 type Query {

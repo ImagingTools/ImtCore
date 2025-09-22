@@ -186,10 +186,6 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 		}
 	}
 
-	if (sdlUnionPtr != nullptr){
-		retVal = QStringLiteral("std::shared_ptr<") + retVal + QStringLiteral(">");
-	}
-
 	if (sdlFieldPtr != nullptr && listWrap && sdlFieldPtr->IsArray()){
 		imtsdl::CSdlTools::WrapTypeToList(retVal);
 	}
@@ -446,5 +442,87 @@ void CSdlGenTools::GenerateIsRequestSupportedMethodImpl(
 	stream << '}';
 	imtsdl::CSdlTools::FeedStream(stream, 1, false);
 }
+
+
+QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
+			const imtsdl::SdlTypeList& typeList,
+			const imtsdl::SdlEnumList& enumList,
+			const imtsdl::SdlUnionList& unionList,
+			bool withPointer)
+{
+	QString retVal = "";
+	bool isArray = false;
+	bool isCustom = false;
+	bool isEnum = false;
+	bool isUnion = false;
+
+	const QString convertedType = imtsdl::CSdlTools::ConvertTypeOrEnumOrUnion(sdlField, enumList, unionList, &isCustom, nullptr, &isArray, &isEnum, &isUnion);
+	std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBase = imtsdl::CSdlTools::GetSdlTypeOrEnumOrUnionForField(sdlField,
+																						  typeList,
+																						  enumList,
+																						  unionList);
+
+	QString sdlNamespace;
+	if (sdlEntryBase != nullptr){
+		sdlNamespace = GetNamespaceFromSchemaParams(sdlEntryBase->GetSchemaParams());
+	}
+
+	if (!isCustom || isEnum){
+		if (isArray){
+			retVal = QStringLiteral("QList<");
+		}
+
+		if (sdlField.GetType() == "String" || isEnum){
+			retVal += QStringLiteral("QString");
+		}
+		else if (sdlField.GetType() == "Integer" || sdlField.GetType() == "Int"){
+			retVal += QStringLiteral("int");
+		}
+		else if (sdlField.GetType() == "Double" || sdlField.GetType() == "Float"){
+			retVal += QStringLiteral("double");
+		}
+		else if (sdlField.GetType() == "Boolean" || sdlField.GetType() == "Bool"){
+			retVal += QStringLiteral("bool");
+		}
+		else if (sdlField.GetType() == "LongLong" || sdlField.GetType() == "longLong"){
+			retVal += QStringLiteral("int");
+		}
+		else if (sdlField.GetType() == "ID"){
+			retVal += QStringLiteral("QString");
+		}
+		else {
+			Q_ASSERT_X(false, "CSdlQObjectGeneratorComp::ProcessSourceClassFile", sdlField.GetType().toUtf8() + " field.GetType() not implemented");
+		}
+
+		if (isArray){
+			retVal += QStringLiteral(">");
+		}
+	}
+	else if(isArray){
+
+		retVal = sdlNamespace;
+		retVal += QStringLiteral("::C") + sdlField.GetType();
+		retVal += QStringLiteral("ObjectList");
+
+		if (withPointer){
+			retVal += "*";
+		}
+	}
+	else if(isUnion){
+		retVal = "QVariant";
+	}
+	else{
+		retVal = sdlNamespace;
+		retVal += QStringLiteral("::C") + sdlField.GetType();
+		retVal += QStringLiteral("Object");
+
+		if (withPointer){
+			retVal += "*";
+		}
+	}
+
+	return retVal;
+}
+
 
 } // namespace imtsdlgencpp
