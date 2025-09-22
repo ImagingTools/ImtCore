@@ -121,6 +121,7 @@ NOTE
 		I_ASSIGN_TO(m_paginationGuiObserverCompPtr, m_paginationGuiCompPtr, false);
 		I_ASSIGN(m_complexFilterCompPtr, "CompelxCollectionFilter", "Compelx collection filter", false, "CompelxCollectionFilter");
 		I_ASSIGN_TO(m_complexFilterModelCompPtr, m_complexFilterCompPtr, true);
+		I_ASSIGN(m_filterEditPlaceholderTextAttrPtr, "FilterEditPlaceholderText", "Filter text box placeholder text", false, "");
 	I_END_COMPONENT;
 
 	enum ModelId
@@ -385,6 +386,7 @@ private:
 	I_REF(imod::IObserver, m_paginationGuiObserverCompPtr);
 	I_REF(imtbase::IComplexCollectionFilter, m_complexFilterCompPtr);
 	I_REF(imod::IModel, m_complexFilterModelCompPtr);
+	I_TEXTATTR(m_filterEditPlaceholderTextAttrPtr);
 
 	imtgui::CCommandToolBar m_collectionCommandsLeftToolBar;
 	imtgui::CCommandToolBar m_collectionCommandsCenterToolBar;

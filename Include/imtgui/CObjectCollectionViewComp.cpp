@@ -422,6 +422,10 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	if (m_complexFilterModelCompPtr.IsValid()){
 		m_complexFilterObserver.RegisterObject(m_complexFilterCompPtr.GetPtr(), &CObjectCollectionViewComp::OnComplexFilterUpdate);
 	}
+
+	if (m_filterEditPlaceholderTextAttrPtr.IsValid()) {
+		FilterEdit->setPlaceholderText(*m_filterEditPlaceholderTextAttrPtr);
+	}
 }
 
 
@@ -459,6 +463,10 @@ void CObjectCollectionViewComp::OnGuiRetranslate()
 
 	if (IsModelAttached()){
 		UpdateGui(istd::IChangeable::GetAnyChange());
+	}
+
+	if (m_filterEditPlaceholderTextAttrPtr.IsValid()) {
+		FilterEdit->setPlaceholderText(*m_filterEditPlaceholderTextAttrPtr);
 	}
 }
 
