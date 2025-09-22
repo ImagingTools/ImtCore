@@ -187,10 +187,6 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 			}
 		}
 
-		if (operationContextPtr != nullptr){
-			CreateUserActionLog(objectId, typeId, imtauth::IUserRecentAction::AT_CREATE, *operationContextPtr);
-		}
-
 		return objectId;
 	}
 
@@ -229,10 +225,6 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElements(const Ids& elementIds, con
 	else{
 		changeNotifier.Abort();
 	}
-	
-	if (operationContextPtr != nullptr){
-		// CreateUserActionLog(objectId, typeId, imtauth::IUserRecentAction::AT_DELETE, *operationContextPtr);
-	}
 
 	return false;
 }
@@ -270,10 +262,6 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElementSet(
 	}
 	else{
 		changeNotifier.Abort();
-	}
-	
-	if (operationContextPtr != nullptr){
-		// CreateUserActionLog(objectId, typeId, imtauth::IUserRecentAction::AT_DELETE, *operationContextPtr);
 	}
 
 	return false;
@@ -429,11 +417,6 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (ExecuteTransaction(query)){
-		if (operationContextPtr != nullptr){
-			QByteArray typeId = GetObjectTypeId(objectId);
-			CreateUserActionLog(objectId, typeId, imtauth::IUserRecentAction::AT_UPDATE, *operationContextPtr);
-		}
-
 		return true;
 	}
 	else{
@@ -1017,42 +1000,6 @@ void CSqlDatabaseObjectCollectionComp::AddOperationContextToChangeSet(const imtb
 	changeSet.SetChangeInfo(
 				imtbase::IOperationContext::OPERATION_CONTEXT_INFO,
 				QVariant::fromValue<imtbase::IOperationContext::OperationContextInfo>(info));
-}
-
-
-void CSqlDatabaseObjectCollectionComp::CreateUserActionLog(
-			const QByteArray& targetId,
-			const QByteArray& targetTypeId,
-			imtauth::IUserRecentAction::ActionType actionType,
-			const imtbase::IOperationContext& operationContext) const
-{
-	if (!m_userActionCollectionCompPtr.IsValid()){
-		return;
-	}
-
-	istd::TDelPtr<imtauth::CIdentifiableUserRecentAction> userRecentActionPtr;
-	userRecentActionPtr.SetPtr(new imtauth::CIdentifiableUserRecentAction);
-	if (!userRecentActionPtr.IsValid()){
-		return;
-	}
-
-	imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContext.GetOperationOwnerId();
-	userRecentActionPtr->SetUserId(objectInfo.id);
-
-	imtauth::IUserRecentAction::TargetInfo targetInfo;
-	targetInfo.id = targetId;
-	targetInfo.typeId = targetTypeId;
-
-	QString elementName = GetElementInfo(targetId, imtbase::ICollectionInfo::ElementInfoType::EIT_NAME).toString();
-	targetInfo.name = elementName;
-
-	targetInfo.source = m_objectDelegateCompPtr->GetTableName();
-
-	userRecentActionPtr->SetTargetInfo(targetInfo);
-	userRecentActionPtr->SetActionType(actionType);
-	userRecentActionPtr->SetTimestamp(QDateTime::currentDateTime());
-
-	m_userActionCollectionCompPtr->InsertNewObject(QByteArrayLiteral("UserAction"), "", "", userRecentActionPtr.GetPtr());
 }
 
 

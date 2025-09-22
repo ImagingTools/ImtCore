@@ -127,11 +127,20 @@ Item {
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
+        
+        NavigableItem {
+            parentSegment: "Administration"
+            paths: ["Roles", "Users", "Groups"]
+            onActivated: {
+                let index = paths.indexOf(matchedPath)
+                multiPageView.currentIndex = index
+            }
+        }
 
         Component.onCompleted: {
             updateModel();
         }
-        
+
         onCurrentIndexChanged: {
             if (currentIndex >= 0){
                 console.log("MultiPageView onCurrentIndexChanged", currentIndex)

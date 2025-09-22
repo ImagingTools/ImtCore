@@ -21,6 +21,7 @@
 #include <imtserverapp/CDocumentFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
+#include <imtauth/CUserRecentAction.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
 
 
@@ -44,6 +45,7 @@ public:
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN(m_userActionCollectionCompPtr, "UserActionCollection", "User action collection", false, "UserActionCollection");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Collection headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
 		I_ASSIGN_MULTI_0(m_objectTypeIdAttrPtr, "ObjectTypeIds", "Object type IDs", false);
@@ -293,6 +295,12 @@ private:
 	virtual bool DoUpdateObjectFromRequest(const imtgql::CGqlRequest& gqlRequest, istd::IChangeable& object, QByteArray& newObjectId, QString& errorMessage) const;
 	bool SerializeObject(istd::IChangeable& object, QByteArray& objectData) const;
 	bool DeSerializeObject(istd::IChangeable& object, const QByteArray& objectData) const;
+	bool CreateUserActionLog(
+				const QByteArray& targetId,
+				const QByteArray& targetTypeId,
+				const QString& targetName,
+				imtauth::IUserRecentAction::ActionType actionType,
+				const imtbase::IOperationContext* operationContextPtr) const;
 
 protected:
 	QMap<QByteArray, QByteArray> m_fieldReplacementMap;
@@ -310,6 +318,7 @@ protected:
 	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);
 	I_MULTIATTR(QByteArray, m_replacementFieldsAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userActionCollectionCompPtr);
 	I_REF(imtcol::ICollectionHeadersProvider, m_headersProviderCompPtr);
 	I_REF(imtbase::IOperationContextController, m_operationContextControllerCompPtr);
 

@@ -39,6 +39,7 @@ void CUserRecentAction::SetUserId(const QByteArray& userId)
 }
 
 
+
 imtauth::IUserRecentAction::ActionType CUserRecentAction::GetActionType() const
 {
 	return m_actionType;
@@ -196,6 +197,10 @@ bool CUserRecentAction::ResetData(CompatibilityMode mode)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_userId.clear();
+	m_targetInfo.id.clear();
+	m_targetInfo.name.clear();
+	m_targetInfo.typeId.clear();
+	m_targetInfo.source.clear();
 	m_actionType = AT_UNKNOWN;
 
 	return true;

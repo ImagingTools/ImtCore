@@ -1,6 +1,9 @@
 #pragma once
 
 
+// ACF includes
+#include <ibase/IApplicationInfo.h>
+
 // ImtCore includes
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/UserActions.h>
 
@@ -15,6 +18,7 @@ public:
 	typedef sdl::imtauth::UserActions::CUserActionCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserActionCollectionControllerComp);
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
 protected:
@@ -24,6 +28,8 @@ protected:
 				const sdl::imtauth::UserActions::CGetUserActionsGqlRequest& getUserActionsRequest,
 				sdl::imtauth::UserActions::CUserActionItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
+
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 
 

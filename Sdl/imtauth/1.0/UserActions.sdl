@@ -17,6 +17,7 @@ type UserActionItemData {
 	id: ID!
 	typeId: ID!
 	userLink: ObjectLink
+	targetTypeLink: ObjectLink
 	targetLink: ObjectLink
 	actionType: String
 	timeStamp: String

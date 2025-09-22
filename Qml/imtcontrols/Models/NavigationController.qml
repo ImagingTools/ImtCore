@@ -1,22 +1,28 @@
 pragma Singleton
 
 import QtQuick 2.12
+import imtcontrols 1.0
 
 QtObject {
     id: root;
 
-    property var stack: [];
-    property int currentIndex: -1;
-    property int maxSize: 99;
+    property var stack: []
+    property int currentIndex: -1
+    property int maxSize: 10
 
-    function goTo(path){}
+    signal navigatePath(var path, var params, var activeSegments)
+
+    function navigate(path, params) {
+        let segments = path.split("/")
+        navigatePath(segments, params, [])
+    }
 
     function next(){
         if (hasNext()){
             currentIndex++;
 
-            let elem = stack[currentIndex]["Element"]
-            stack[currentIndex]["Callback"](elem);
+            let elem = stack[currentIndex]
+            navigate(elem)
         }
     }
 
@@ -27,9 +33,9 @@ QtObject {
     function prev(){
         if (hasPrev()){
             currentIndex--;
-            let elem = stack[currentIndex]["Element"]
+            let elem = stack[currentIndex]
 
-            stack[currentIndex]["Callback"](elem);
+            navigate(elem)
         }
     }
 
@@ -37,7 +43,7 @@ QtObject {
         return currentIndex > 0;
     }
 
-    function push(elementRef, callback){
+    function push(path){
         if (stack.length >= maxSize){
             stack.shift();
 
@@ -46,16 +52,8 @@ QtObject {
             }
         }
 
-        let obj = {}
-        obj["Element"] = elementRef;
-        obj["Callback"] = callback;
-
-        stack.push(obj);
+        stack.push(path);
         currentIndex = stack.length - 1;
-    }
-
-    function currentIndexCorrection(){
-
     }
 
     function pop(){

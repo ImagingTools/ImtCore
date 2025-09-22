@@ -16,16 +16,31 @@ RemoteCollectionView {
 	id: root
 	gqlGetListCommandId: "GetUserActions"
 	documentCollectionFilter: null
-	commandsDelegateComp: null
+	commandsControllerComp: null
 
 	Component.onCompleted: {
 		registerFieldFilterDelegate("userId", userDelegateFilterComp)
+		registerFieldFilterDelegate("actionType", actionDelegateFilterComp)
 	}
 	
 	onHeadersChanged: {
 		table.setColumnContentById("actionType", actionCellDelegateComp);
-		table.setColumnContentById("targetLink", targetLinkDelegateComp);
-		table.setColumnContentById("userLink", targetLinkDelegateComp);
+	}
+
+	Component {
+		id: actionDelegateFilterComp
+		FieldFilterDelegate {
+			id: actionDelegateFilter
+			name: qsTr("Action")
+			defaultFieldFilter.m_fieldId: "actionType"
+			defaultFieldFilter.m_filterValueType: "Integer"
+
+			Component.onCompleted: {
+				createAndAddOption("1", qsTr("Create"), "", true)
+				createAndAddOption("2", qsTr("Update"), "", true)
+				createAndAddOption("3", qsTr("Delete"), "", true)
+			}
+		}
 	}
 
 	Component {
@@ -112,43 +127,6 @@ RemoteCollectionView {
 
 					statusLable.text = cellDelegate.getValue();
 				}
-			}
-		}
-	}
-
-	Component {
-		id: targetLinkDelegateComp
-		TableCellDelegateBase {
-			id: cellDelegate
-
-			Text {
-				id: linkText
-				anchors.verticalCenter: parent.verticalCenter
-				font.pixelSize: Style.fontSizeM
-				font.family: Style.fontFamily
-				elide: Text.ElideRight
-				color: "#0b5ed7"
-				font.underline: true
-			}
-			
-			MouseArea {
-				id: mouseArea
-				anchors.fill: linkText
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: {
-					let targetLink = cellDelegate.getValue()
-					let targetId = targetLink.getData("id")
-					let targetTypeId = targetLink.getData("typeId")
-					let targetSource = targetLink.getData("source")
-					
-					MainDocumentManager.openDocument(targetSource, targetId, targetTypeId)
-				}
-			}
-
-			onReused: {
-				let targetLink = cellDelegate.getValue()
-				linkText.text = targetLink.getData("name")
 			}
 		}
 	}

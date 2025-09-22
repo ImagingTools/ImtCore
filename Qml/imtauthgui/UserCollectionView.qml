@@ -30,10 +30,10 @@ RemoteCollectionView {
 			documentManager: userCollectionViewContainer.documentManager;
 			
 			documentTypeIds: ["User"];
-			documentViewTypeIds: ["UserEditor"];
 			documentViewsComp: [userDocumentComp];
 			documentDataControllersComp: [documentDataControllerComp];
 			documentValidatorsComp: [documentValidator];
+			isSingleDocManager: true
 			
 			function updateStateBaseCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length > 0;

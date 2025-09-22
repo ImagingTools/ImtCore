@@ -79,6 +79,7 @@
                                 <Value>userLink</Value>
                                 <Value>targetLink</Value>
                                 <Value>actionType</Value>
+                                <Value>targetTypeLink</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -86,6 +87,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>userLink</Value>
+                                <Value>targetTypeLink</Value>
                                 <Value>targetLink</Value>
                                 <Value>actionType</Value>
                                 <Value>timeStamp</Value>
@@ -96,6 +98,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>User</Value>
+                                <Value>Target Type-ID</Value>
                                 <Value>Target</Value>
                                 <Value>Action</Value>
                                 <Value>Timestamp</Value>
@@ -109,6 +112,7 @@
                                 <Value>targetLink</Value>
                                 <Value>actionType</Value>
                                 <Value>timeStamp</Value>
+                                <Value>targetTypeLink</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -135,6 +139,9 @@
         <Element Id="UserActionCollectionController" PackageId="ImtAuthGqlPck" ComponentId="UserActionCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="UserActions"/>
                     </AttributeInfo>
@@ -160,6 +167,7 @@
                                 <Value>timeStamp</Value>
                                 <Value>targetLink</Value>
                                 <Value>userLink</Value>
+                                <Value>targetTypeLink</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -169,6 +177,7 @@
                                 <Value>TimeStamp</Value>
                                 <Value>targetName</Value>
                                 <Value>userId</Value>
+                                <Value>targetTypeId</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

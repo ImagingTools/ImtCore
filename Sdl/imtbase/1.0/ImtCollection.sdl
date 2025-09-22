@@ -15,7 +15,7 @@ type ObjectLink {
 	id: ID!
 	typeId: ID!
 	name: String
-	source: String
+	url: UrlParam
 }
 
 type HeaderInfo {

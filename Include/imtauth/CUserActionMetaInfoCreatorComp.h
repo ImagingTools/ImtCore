@@ -5,6 +5,7 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtbase/CObjectMetaInfoCreatorCompBase.h>
 
 
@@ -18,6 +19,7 @@ public:
 	typedef imtbase::CObjectMetaInfoCreatorCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserActionMetaInfoCreatorComp);
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -33,6 +35,9 @@ private:
 		// reimplemented (idoc::IDocumentMetaInfo)
 		virtual QString GetMetaInfoName(int metaInfoType) const override;
 	};
+	
+private:
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
 
 

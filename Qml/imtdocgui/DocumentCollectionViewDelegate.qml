@@ -26,6 +26,20 @@ CollectionViewCommandsDelegateBase {
 	Component.onCompleted: {
 		updateDocumentManager()
 	}
+	
+	NavigableItem {
+		parentSegment: collectionViewCommandsDelegateBase.collectionId
+		paths: collectionViewCommandsDelegateBase.documentTypeIds
+		onActivated: {
+			if (collectionViewCommandsDelegateBase.documentManager){
+				if (restPath.length === 1){
+					let documentTypeId = matchedPath
+					let documentId = restPath[0]
+					collectionViewCommandsDelegateBase.openDocumentEditor(documentId, documentTypeId)
+				}
+			}
+		}
+	}
 
 	onDocumentManagerIdChanged: {
 		updateDocumentManager()
@@ -108,8 +122,8 @@ CollectionViewCommandsDelegateBase {
 
 	function openDocumentEditor(objectId, typeId){
 		console.debug("DocumentCollectionViewDelegate.qml openDocumentEditor", objectId, typeId)
-		if (collectionViewCommandsDelegateBase.documentManager){
-			collectionViewCommandsDelegateBase.documentManager.openDocument(objectId, typeId);
+		if (documentManager){
+			documentManager.openDocument(objectId, typeId);
 		}
 		else{
 			console.error("Unable to open document for editing", typeId, ". Error: Document manager is invalid");

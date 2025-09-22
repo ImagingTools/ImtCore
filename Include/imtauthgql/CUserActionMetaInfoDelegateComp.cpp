@@ -20,6 +20,9 @@ bool CUserActionMetaInfoDelegateComp::FillRepresentation(QJsonObject& representa
 	QByteArray userId = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID).toByteArray();
 	representation["userId"] = QString(userId);
 
+	QString userName = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_USER_NAME).toString();
+	representation["userName"] = QString(userName);
+
 	QByteArray targetId = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_ID).toByteArray();
 	representation["targetId"] = QString(targetId);
 
@@ -43,6 +46,10 @@ bool CUserActionMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& meta
 {
 	if (representation.contains("userId")){
 		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID, representation.value("userId"));
+	}
+
+	if (representation.contains("userName")){
+		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_USER_NAME, representation.value("userName"));
 	}
 
 	if (representation.contains("targetId")){

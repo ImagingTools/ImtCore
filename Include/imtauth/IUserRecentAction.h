@@ -37,6 +37,7 @@ public:
 	enum MetaInfoTypes
 	{
 		MIT_USER_ID = idoc::IDocumentMetaInfo::MIT_USER + 1,
+		MIT_USER_NAME,
 		MIT_TARGET_ID,
 		MIT_TARGET_NAME,
 		MIT_TARGET_SOURCE,

@@ -70,21 +70,6 @@ Rectangle {
 		}
 	}
 
-	property bool block: false;
-	onActivePageIndexChanged: {
-		if (block || activePageIndex < 0){
-			return;
-		}
-
-		let index = menuPanel.activePageIndex
-		NavigationController.push(menuPanel, function(menuPanel){
-			menuPanel.block = true;
-			menuPanel.activePageIndex = index;
-			menuPanel.block = false;
-		}
-		);
-	}
-
 	function onMenuModelRequest(ok){
 		Events.sendEvent("MenuModelChanged", menuPanel.model);
 	}
@@ -216,6 +201,13 @@ Rectangle {
 
 			onHeightChanged: {
 				menuPanel.buttonHeight = height;
+			}
+
+			NavigableItem {
+				paths: [model["id"]]
+				onActivated: {
+					menuPanel.activePageIndex = model.index
+				}
 			}
 		}
 	}

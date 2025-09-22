@@ -54,7 +54,7 @@ bool CUserMetaInfoCreatorComp::CreateMetaInfo(
 			break;
 		}
 	}
-	
+
 	return true;
 }
 
