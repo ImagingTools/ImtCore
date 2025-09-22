@@ -216,7 +216,7 @@ ComboBox {
 
 		onModelUpdated: {
 			let closeImmediately = false;
-			if (data.containsKey("close") && data.getData("close")){
+			if (data.containsKey("close")){
 				comboBoxContainerGql.closeOnFinished = closeImmediately = data.getData("close");
 			}
 
