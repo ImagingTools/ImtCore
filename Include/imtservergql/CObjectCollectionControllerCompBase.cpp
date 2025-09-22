@@ -156,11 +156,25 @@ sdl::imtbase::ImtCollection::CRemoveElementsPayload CObjectCollectionControllerC
 		return sdl::imtbase::ImtCollection::CRemoveElementsPayload();
 	}
 
+	imtbase::ICollectionInfo::Ids allElementIds = m_objectCollectionCompPtr->GetElementIds();
+	for (const QByteArray& elementId : elementIds){
+		if (!allElementIds.contains(elementId)){
+			errorMessage = QString("Unable to delete object. Object with ID '%1' does not exists").arg(QString(elementId));
+			SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+			return sdl::imtbase::ImtCollection::CRemoveElementsPayload();
+		}
+	}
+
 	if (!OnBeforeRemoveElements(elementIds, gqlRequest, errorMessage)){
 		return sdl::imtbase::ImtCollection::CRemoveElementsPayload();
 	}
 
-	response.success = m_objectCollectionCompPtr->RemoveElements(elementIds);
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", elementIds.toList().join(';'));
+	}
+
+	response.success = m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr.GetPtr());
 
 	OnAfterRemoveElements(elementIds, gqlRequest);
 
@@ -199,7 +213,12 @@ sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControlle
 		return sdl::imtbase::ImtCollection::CRemoveElementSetPayload();
 	}
 
-	response.success = m_objectCollectionCompPtr->RemoveElementSet(&filterParams);
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Remove", elementIds.toList().join(';'));
+	}
+
+	response.success = m_objectCollectionCompPtr->RemoveElementSet(&filterParams, operationContextPtr.GetPtr());
 
 	OnAfterRemoveElements(elementIds, gqlRequest);
 
@@ -227,7 +246,12 @@ sdl::imtbase::ImtCollection::CRestoreObjectsPayload CObjectCollectionControllerC
 		objectIds = arguments.input.Version_1_0->objectIds->ToList();
 	}
 
-	response.success = m_objectCollectionCompPtr->RestoreObjects(imtbase::ICollectionInfo::Ids(objectIds.constBegin(), objectIds.constEnd()));
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Restore", objectIds.toList().join(';'));
+	}
+
+	response.success = m_objectCollectionCompPtr->RestoreObjects(imtbase::ICollectionInfo::Ids(objectIds.constBegin(), objectIds.constEnd()), operationContextPtr.GetPtr());
 	
 	sdl::imtbase::ImtCollection::CRestoreObjectsPayload retVal;
 	retVal.Version_1_0 = std::move(response);
@@ -259,7 +283,14 @@ sdl::imtbase::ImtCollection::CRestoreObjectSetPayload CObjectCollectionControlle
 		}
 	}
 
-	response.success = m_objectCollectionCompPtr->RestoreObjectSet(&filterParams);
+	imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParams);
+
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Restore", elementIds.toList().join(';'));
+	}
+
+	response.success = m_objectCollectionCompPtr->RestoreObjectSet(&filterParams, operationContextPtr.GetPtr());
 
 	sdl::imtbase::ImtCollection::CRestoreObjectSetPayload retVal;
 	retVal.Version_1_0 = std::move(response);
@@ -792,6 +823,7 @@ sdl::imtbase::ImtCollection::CGetElementIdsPayload CObjectCollectionControllerCo
 	}
 
 	imtbase::IObjectCollection::Ids ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
+	response.elementIds.Emplace();
 	response.elementIds->FromList(ids);
 
 	sdl::imtbase::ImtCollection::CGetElementIdsPayload retVal;
@@ -852,7 +884,12 @@ sdl::imtbase::ImtCollection::CInsertNewObjectPayload CObjectCollectionController
 		}
 	}
 
-	QByteArray result = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, objectPtr.GetPtr(), objectId);
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Create", objectId, objectPtr.GetPtr());
+	}
+
+	QByteArray result = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, objectPtr.GetPtr(), objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (result.isEmpty()){
 		errorMessage = QString("Unable to insert new object to collection '%1'").arg(QString::fromUtf8(*m_collectionIdAttrPtr));
 		return sdl::imtbase::ImtCollection::CInsertNewObjectPayload();
@@ -906,7 +943,12 @@ sdl::imtbase::ImtCollection::CSetObjectDataPayload CObjectCollectionControllerCo
 		}
 	}
 
-	response.success = m_objectCollectionCompPtr->SetObjectData(objectId, *objectPtr.GetPtr());
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext("Update", objectId, objectPtr.GetPtr());
+	}
+
+	response.success = m_objectCollectionCompPtr->SetObjectData(objectId, *objectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr());
 
 	sdl::imtbase::ImtCollection::CSetObjectDataPayload retVal;
 	retVal.Version_1_0 = std::move(response);
@@ -1090,6 +1132,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CObjectCollectionControl
 	}
 
 	sdl::imtbase::ImtCollection::CElementMetaInfo::V1_0 elementMetaInfo;
+	elementMetaInfo.infoParams.Emplace();
 	elementMetaInfo.infoParams->FromList(parameterInfos);
 	response.elementMetaInfo = elementMetaInfo;
 
@@ -1779,6 +1822,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 	}
 
 	sdl::imtbase::ImtCollection::CRemovedNotificationPayload::V1_0 response;
+	response.elementIds.Emplace();
 	response.elementIds->FromList(objectIds);
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());

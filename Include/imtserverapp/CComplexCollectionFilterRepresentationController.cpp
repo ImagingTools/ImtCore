@@ -142,6 +142,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromD
 	// Text filter
 	sdl::imtbase::ComplexCollectionFilter::CTextFilter::V1_0 sdlTextFilter;
 	sdlTextFilter.text = complexFilterPtr->GetTextFilter();
+	sdlTextFilter.fieldIds.Emplace();
 	sdlTextFilter.fieldIds->FromList(complexFilterPtr->GetTextFilterFieldsList());
 	sdlRepresentation.textFilter = sdlTextFilter;
 
