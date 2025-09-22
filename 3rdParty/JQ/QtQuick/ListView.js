@@ -90,35 +90,35 @@ class ListView extends Flickable {
 
     }
     positionViewAtIndex(index, mode) {
-        // let pos = 'start'
-        // switch(mode){
-        //     case ListView.Beginning: pos = 'start'; break;
-        //     case ListView.Center: pos = 'center'; break;
-        //     case ListView.End: pos = 'end'; break;
-        //     case ListView.Visible: break;
-        //     case ListView.Contain: {
-        //         if(this.__items[index]){
-        //             if(this.orientation') === ListView.Horizontal){
-        //                 if(this.contentWidth') <= this.width')) return
+        let pos = 'start'
+        switch(mode){
+            case ListView.Beginning: pos = 'start'; break;
+            case ListView.Center: pos = 'center'; break;
+            case ListView.End: pos = 'end'; break;
+            case ListView.Visible: break;
+            case ListView.Contain: {
+                if(this.__items[index]){
+                    if(this.orientation === ListView.Horizontal){
+                        if(this.contentWidth <= this.width) return
 
-        //                 if(this.__items[index].x') <= this.contentX')){
-        //                     this.getProperty('contentX').reset(this.__items[index].x'))
-        //                 } else if(this.__items[index].x') + this.__items[index].width') >= this.contentX') + this.width')){
-        //                     this.getProperty('contentX').reset(this.__items[index].x') + this.__items[index].width') - this.width'))
-        //                 }
-        //             } else {
-        //                 if(this.contentHeight') <= this.height')) return
+                        if(this.__items[index].x <= this.contentX){
+                            this.contentX = this.__items[index].x
+                        } else if(this.__items[index].x + this.__items[index].width >= this.contentX + this.width){
+                            this.contentX = this.__items[index].x + this.__items[index].width - this.width
+                        }
+                    } else {
+                        if(this.contentHeight <= this.height) return
 
-        //                 if(this.__items[index].y') <= this.contentY')){
-        //                     this.getProperty('contentY').reset(this.__items[index].y'))
-        //                 } else if(this.__items[index].y') + this.__items[index].height') >= this.contentY') + this.height')){
-        //                     this.getProperty('contentY').reset(this.__items[index].y') + this.__items[index].height') - this.height'))
-        //                 }
-        //             }
-        //         }
-        //         break;
-        //     }
-        // }
+                        if(this.__items[index].y <= this.contentY){
+                            this.contentY = this.__items[index].y
+                        } else if(this.__items[index].y + this.__items[index].height >= this.contentY + this.height){
+                            this.contentY = this.__items[index].y + this.__items[index].height - this.height
+                        }
+                    }
+                }
+                break;
+            }
+        }
 
     }
 
