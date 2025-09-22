@@ -136,7 +136,7 @@ DecoratorBase {
 															 commonButtonDecorator.baseElement.icon.source :
 															 commonButtonDecorator.baseElement.iconSource ? commonButtonDecorator.baseElement.iconSource: "";
 			visible: source != "" && source != undefined;
-			property bool isEmpty : source == "" && source == undefined
+			property bool isEmpty : source == "" || source == undefined
 		}
 
 
