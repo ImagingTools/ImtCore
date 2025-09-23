@@ -912,34 +912,39 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRevisionInfoQuery(
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateJsonBuildObjectQuery(const QVariantMap& paramMap) const
 {
-	QString revisionInfo = QString(R"(jsonb_build_object()");
+	QString revisionInfo = QStringLiteral(R"(jsonb_build_object()");
 
-	QStringList keys = paramMap.keys();
+	const QStringList keys = paramMap.keys();
 
 	for (int i = 0; i < keys.size(); i++){
 		if (i > 0){
-			revisionInfo += ", ";
+			revisionInfo += QStringLiteral(", ");
 		}
 
 		QString key = keys[i];
 		QVariant value = paramMap[key];
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+		const int typeId = value.typeId();
+#else
+		const int typeId = value.type();
+#endif
 		if (value.canConvert<RawSqlExpression>()){
 			RawSqlExpression raw = value.value<RawSqlExpression>();
-			revisionInfo += QString("'%1', %2").arg(key, raw.sql);
+			revisionInfo += QStringLiteral("'%1', %2").arg(key, raw.sql);
 		}
-		else if (value.type() == QMetaType::QString || value.type() == QMetaType::QByteArray){
-			revisionInfo += QString("'%1', '%2'").arg(key, value.toString());
+		else if (typeId == QMetaType::QString || typeId == QMetaType::QByteArray){
+			revisionInfo += QStringLiteral("'%1', '%2'").arg(key, value.toString());
 		}
-		else if (value.type() == QMetaType::Int){
-			revisionInfo += QString("'%1', %2").arg(key).arg(value.toInt());
+		else if (typeId == QMetaType::Int){
+			revisionInfo += QStringLiteral("'%1', %2").arg(key).arg(value.toInt());
 		}
-		else if (value.type() == QMetaType::Bool){
-			revisionInfo += QString("'%1', %2").arg(key).arg(value.toBool());
+		else if (typeId == QMetaType::Bool){
+			revisionInfo += QStringLiteral("'%1', %2").arg(key).arg(value.toBool());
 		}
 	}
 
-	revisionInfo += ")";
+	revisionInfo += ')';
 
 	return revisionInfo.toUtf8();
 }
