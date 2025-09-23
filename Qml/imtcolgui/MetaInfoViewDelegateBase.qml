@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 
 Item {
-	property MetaInfo metaInfoView: null
+	property var metaInfoView: null
 	property string viewData
 }
 
