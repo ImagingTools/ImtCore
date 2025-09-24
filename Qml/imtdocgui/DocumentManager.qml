@@ -47,6 +47,8 @@ QtObject {
 	
 	// callback(undefined) - cancel, callback(false) - close, callback(true) - save and close
 	signal tryCloseDirtyDocument(string documentId, var callback)
+
+	signal documentTypeIdRegistered(string documentTypeId)
 	
 	function getActiveView()
 	{
@@ -117,6 +119,8 @@ QtObject {
 		}
 
 		internal.m_registeredView[documentTypeId] = viewComp
+
+		documentTypeIdRegistered(documentTypeId)
 
 		return true
 	}

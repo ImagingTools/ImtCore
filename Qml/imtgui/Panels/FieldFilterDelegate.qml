@@ -18,7 +18,6 @@ OptionsFilterDelegate {
 	}
 
 	signal filterDependencyChanged(string filterId, var filterValue)
-	signal filterDependencyChanged(string filterId, var filterValue)
 
 	Connections {
 		target: filterDelegate.collectionFilter

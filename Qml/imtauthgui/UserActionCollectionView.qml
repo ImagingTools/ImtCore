@@ -20,10 +20,10 @@ RemoteCollectionView {
 
 	Component.onCompleted: {
 		registerFieldFilterDelegate("userId", userDelegateFilterComp)
-		registerFieldFilterDelegate("actionType", actionDelegateFilterComp)
 	}
 	
 	onHeadersChanged: {
+		table.setSortingInfo("timeStamp", "DESC")
 		table.setColumnContentById("actionType", actionCellDelegateComp);
 	}
 
@@ -67,7 +67,6 @@ RemoteCollectionView {
 
 			OptionsListAdapter {
 				id: optionsListAdapter
-				idKey: "userId"
 				onCollectionModelChanged: {
 					userDelegateFilter.setOptionsList(m_options)
 				}
@@ -113,16 +112,16 @@ RemoteCollectionView {
 				if (rowIndex >= 0){
 					let actionType = cellDelegate.rowDelegate.tableItem.elements.getData("actionType", rowIndex)
 					if (actionType === "Update"){
-						image.source = "../../../" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal) 
+						image.source = "../../../" + Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal) 
 					}
 					else if (actionType === "Create"){
 						image.source = "../../../" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal) 
 					}
 					else if (actionType === "Delete"){
-						image.source = "../../../" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal) 
+						image.source = "../../../" + Style.getIconPath("Icons/Garbage", Icon.State.On, Icon.Mode.Normal) 
 					}
 					else{
-						image.source = ""
+						image.source = "../../../" + Style.getIconPath("Icons/Restore", Icon.State.On, Icon.Mode.Normal) 
 					}
 
 					statusLable.text = cellDelegate.getValue();

@@ -214,6 +214,11 @@ I_EXPORT_COMPONENT(
 			"User action meta info creator",
 			"User Action Meta Info Creator");
 
+I_EXPORT_COMPONENT(
+			UserActionManager,
+			"User action manager",
+			"User Action manager");
+
 
 } // namespace ImtAuthPck
 

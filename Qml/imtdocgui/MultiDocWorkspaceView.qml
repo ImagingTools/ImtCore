@@ -35,9 +35,36 @@ Item {
 		}
 	}
 
+	onDocumentManagerChanged: {
+		if (documentManager){
+			navigableItem.parentSegment = documentManager.typeId
+		}
+	}
+
+	NavigableItem {
+		id: navigableItem
+		onActivated: {
+			if (workspaceView.documentManager){
+				if (restPath.length === 0){
+					tabView.currentIndex = 0
+				}
+				else if (restPath.length === 1){
+					let documentTypeId = matchedPath
+					let documentId = restPath[0]
+					
+					workspaceView.documentManager.openDocument(documentId, documentTypeId)
+				}
+			}
+		}
+	}
+
 	Connections {
 		id: connections
 		target: workspaceView.documentManager
+
+		function onDocumentTypeIdRegistered(documentTypeId){
+			navigableItem.paths = target.getSupportedDocumentTypeIds()
+		}
 
 		function onDocumentSaved(documentId){
 			Events.sendEvent("StopLoading")

@@ -7,6 +7,7 @@
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
+#include <imtauth/CUserInfo.h>
 #include <imtauth/IUserSettings.h>
 #include <imtauth/ISession.h>
 #include <imtauth/IUserInfo.h>
@@ -48,10 +49,10 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 		return nullptr;
 	}
 
-	const imtauth::IUserInfo* userInfoPtr = nullptr;
+	const imtauth::CIdentifiableUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr userDataPtr;
 	if (m_userCollectionCompPtr->GetObjectData(userObjectId, userDataPtr)){
-		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+		userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(userDataPtr.GetPtr());
 	}
 
 	if (userInfoPtr == nullptr){

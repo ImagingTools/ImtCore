@@ -186,6 +186,7 @@
         <file alias="imtcontrols/Views/TooltipArea.qml">Views/TooltipArea.qml</file>
         <file alias="imtcontrols/Views/TableViewParams.qml">Views/TableViewParams.qml</file>
         <file alias="imtcontrols/Views/TableRowCanvasViewer.qml">Views/TableRowCanvasViewer.qml</file>
+	<file alias="imtcontrols/Views/TextLinkCellDelegate.qml">Views/TextLinkCellDelegate.qml</file>
         <file alias="imtcontrols/Views/Arrowhead.qml">Views/Arrowhead.qml</file>
         <file alias="imtcontrols/GraphicsView/GraphicsView.qml">GraphicsView/GraphicsView.qml</file>
         <file alias="imtcontrols/GraphicsView/GraphicsLayer.qml">GraphicsView/GraphicsLayer.qml</file>

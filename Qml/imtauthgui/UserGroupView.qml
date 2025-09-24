@@ -158,6 +158,28 @@ ViewBase {
 						function onCheckedItemsChanged(){
 							container.doUpdateModel();
 						}
+						
+						function onHeadersChanged(){
+							target.setColumnContentById("name", groupObjectLinkDelegateComp)
+						}
+					}
+					
+					Component {
+						id: groupObjectLinkDelegateComp
+						
+						TextLinkCellDelegate {
+							id: objectLinkDelegate
+							onLinkActivated: {
+								let groupId = table.elements.getData("id", rowIndex)
+								NavigationController.navigate("Administration/Groups/Group/" + groupId)
+							}
+							
+							onReused: {
+								if (table){
+									text = table.elements.getData("name", rowIndex)
+								}
+							}
+						}
 					}
 					
 					TreeItemModel {
@@ -316,11 +338,33 @@ ViewBase {
 						usersTable.table.readOnly = container.readOnly;
 					}
 					
+					Component {
+						id: userObjectLinkDelegateComp
+						
+						TextLinkCellDelegate {
+							id: objectLinkDelegate
+							onLinkActivated: {
+								let userId = table.elements.getData("id", rowIndex)
+								NavigationController.navigate("Administration/Users/User/" + userId)
+							}
+							
+							onReused: {
+								if (table){
+									text = table.elements.getData("name", rowIndex)
+								}
+							}
+						}
+					}
+					
 					Connections {
 						target: usersTable.table;
 						
 						function onCheckedItemsChanged(){
 							container.doUpdateModel();
+						}
+						
+						function onHeadersChanged(){
+							target.setColumnContentById("name", userObjectLinkDelegateComp)
 						}
 					}
 				}
@@ -404,11 +448,33 @@ ViewBase {
 						rolesTable.table.readOnly = container.readOnly;
 					}
 					
+					Component {
+						id: roleObjectLinkDelegateComp
+						
+						TextLinkCellDelegate {
+							id: objectLinkDelegate
+							onLinkActivated: {
+								let roleId = table.elements.getData("id", rowIndex)
+								NavigationController.navigate("Administration/Roles/Role/" + roleId)
+							}
+							
+							onReused: {
+								if (table){
+									text = table.elements.getData("roleName", rowIndex)
+								}
+							}
+						}
+					}
+					
 					Connections {
 						target: rolesTable.table;
 						
 						function onCheckedItemsChanged(){
 							container.doUpdateModel();
+						}
+						
+						function onHeadersChanged(){
+							target.setColumnContentById("roleName", roleObjectLinkDelegateComp)
 						}
 					}
 				}

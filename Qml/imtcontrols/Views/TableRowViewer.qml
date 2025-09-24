@@ -13,41 +13,22 @@ Row {
 
 	Component {
 		id: objectLinkDelegateComp
-		TableCellDelegateBase {
+		TextLinkCellDelegate {
 			id: objectLinkDelegate
-
-			Text {
-				id: linkText
-				anchors.verticalCenter: parent.verticalCenter
-				anchors.left: parent.left
-				anchors.leftMargin: Style.marginM
-				font.pixelSize: Style.fontSizeM
-				font.family: Style.fontFamily
-				elide: Text.ElideRight
-				color: "#0b5ed7"
-				font.underline: true
-			}
-			
-			MouseArea {
-				id: mouseArea
-				anchors.fill: linkText
-				hoverEnabled: true
-				cursorShape: Qt.PointingHandCursor
-				onClicked: {
-					let targetLink = objectLinkDelegate.getValue()
-					if (targetLink.containsKey("url")){
-						let targetUrl = targetLink.getData("url")
-						if (targetUrl && targetUrl.containsKey("path")){
-							let path = targetUrl.getData("path")
-							NavigationController.navigate(path)
-						}
+			onLinkActivated: {
+				let targetLink = getValue()
+				if (targetLink.containsKey("url")){
+					let targetUrl = targetLink.getData("url")
+					if (targetUrl && targetUrl.containsKey("path")){
+						let path = targetUrl.getData("path")
+						NavigationController.navigate(path)
 					}
 				}
 			}
 
 			onReused: {
-				let targetLink = objectLinkDelegate.getValue()
-				linkText.text = targetLink.getData("name")
+				let targetLink = getValue()
+				text = targetLink.getData("name")
 			}
 		}
 	}

@@ -24,6 +24,7 @@ RemoteCollectionView {
 			documentTypeIds: ["Role"]
 			documentViewsComp: [roleDocumentComp];
 			documentDataControllersComp: [dataControllerComp];
+			isSingleDocumentMode: true
 
 			function getHeaders(){
 				return roleCollectionViewContainer.getHeaders()

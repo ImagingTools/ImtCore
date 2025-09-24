@@ -163,11 +163,33 @@ ViewBase {
 						parentRolesTable.table.checkable = true;
 					}
 					
+					Component {
+						id: roleObjectLinkDelegateComp
+						
+						TextLinkCellDelegate {
+							id: objectLinkDelegate
+							onLinkActivated: {
+								let roleId = table.elements.getData("id", rowIndex)
+								NavigationController.navigate("Administration/Roles/Role/" + roleId)
+							}
+							
+							onReused: {
+								if (table){
+									text = table.elements.getData("roleName", rowIndex)
+								}
+							}
+						}
+					}
+					
 					Connections {
 						target: parentRolesTable.table;
 						
 						function onCheckedItemsChanged(){
 							container.doUpdateModel();
+						}
+						
+						function onHeadersChanged(){
+							target.setColumnContentById("roleName", roleObjectLinkDelegateComp)
 						}
 					}
 				}

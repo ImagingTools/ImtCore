@@ -27,7 +27,6 @@ ViewBase {
 	}
 	
 	function updateGui(){
-		console.log("updateGui", profileData)
 		usernameView.text = profileData.m_username;
 		nameInput.text = profileData.m_name;
 		mailInput.text = profileData.m_email;

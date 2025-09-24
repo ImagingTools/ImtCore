@@ -16,6 +16,7 @@
         <Element ComponentName="SlaveSubscriberController" X="650" Y="450" Note=""/>
         <Element ComponentName="UserActionCollectionChangeNotifier" X="625" Y="600" Note=""/>
         <Element ComponentName="UserActionCollectionController" X="250" Y="425" Note=""/>
+        <Element ComponentName="UserActionManager" X="525" Y="775" Note=""/>
         <Element ComponentName="UserActionSqlRepository" X="275" Y="600" Note=""/>
         <Element ComponentName="WebSocketServerFramework" X="975" Y="150" Note=""/>
     </PositionMap>

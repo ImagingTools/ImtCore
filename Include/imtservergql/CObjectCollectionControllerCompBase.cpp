@@ -178,7 +178,7 @@ sdl::imtbase::ImtCollection::CRemoveElementsPayload CObjectCollectionControllerC
 
 	bool ok = m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr.GetPtr());
 	if (ok){
-		CreateUserActionLog("", typeId, "", imtauth::IUserRecentAction::AT_DELETE, operationContextPtr.GetPtr());
+		CreateUserActionLog(elementIds[0], typeId, "Delete", operationContextPtr.GetPtr());
 		OnAfterRemoveElements(elementIds, gqlRequest);
 	}
 
@@ -228,7 +228,7 @@ sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControlle
 
 	bool ok = m_objectCollectionCompPtr->RemoveElementSet(&filterParams, operationContextPtr.GetPtr());
 	if (ok){
-		CreateUserActionLog("", typeId, "", imtauth::IUserRecentAction::AT_DELETE, operationContextPtr.GetPtr());
+		CreateUserActionLog(elementIds[0], typeId, "Delete", operationContextPtr.GetPtr());
 		OnAfterRemoveElements(elementIds, gqlRequest);
 	}
 
@@ -907,7 +907,7 @@ sdl::imtbase::ImtCollection::CInsertNewObjectPayload CObjectCollectionController
 		return sdl::imtbase::ImtCollection::CInsertNewObjectPayload();
 	}
 
-	CreateUserActionLog(objectId, typeId, name, imtauth::IUserRecentAction::AT_CREATE, operationContextPtr.GetPtr());
+	CreateUserActionLog(objectId, typeId, "Create", operationContextPtr.GetPtr());
 	response.objectId = objectId;
 
 	sdl::imtbase::ImtCollection::CInsertNewObjectPayload retVal;
@@ -963,7 +963,7 @@ sdl::imtbase::ImtCollection::CSetObjectDataPayload CObjectCollectionControllerCo
 
 	bool ok = m_objectCollectionCompPtr->SetObjectData(objectId, *objectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr());
 	if (ok){
-		CreateUserActionLog(objectId, typeId, "", imtauth::IUserRecentAction::AT_UPDATE, operationContextPtr.GetPtr());
+		CreateUserActionLog(objectId, typeId, "Update", operationContextPtr.GetPtr());
 	}
 	
 	response.success = ok;
@@ -1527,7 +1527,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		return nullptr;
 	}
 
-	CreateUserActionLog(newObjectId, typeId, name, imtauth::IUserRecentAction::AT_CREATE, operationContextPtr.GetPtr());
+	CreateUserActionLog(objectId, typeId, "Create", operationContextPtr.GetPtr());
 
 	sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 response;
 	response.id = newObjectId;
@@ -1607,7 +1607,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	}
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-	CreateUserActionLog(objectId, typeId, name, imtauth::IUserRecentAction::AT_UPDATE, operationContextPtr.GetPtr());
+	CreateUserActionLog(objectId, typeId, "Update", operationContextPtr.GetPtr());
 
 	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 response;
 	response.id = objectId;
@@ -2744,11 +2744,14 @@ bool CObjectCollectionControllerCompBase::DeSerializeObject(
 bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 			const QByteArray& objectId,
 			const QByteArray& objectTypeId,
-			const QString& targetName,
-			imtauth::IUserRecentAction::ActionType actionType,
+			const QByteArray& actionTypeId,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
-	if (!m_userActionCollectionCompPtr.IsValid()){
+	if (!m_userActionManagerCompPtr.IsValid()){
+		return false;
+	}
+
+	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
 	}
 
@@ -2756,42 +2759,63 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 		return false;
 	}
 
-	istd::TDelPtr<imtauth::CIdentifiableUserRecentAction> userRecentActionPtr;
-	userRecentActionPtr.SetPtr(new imtauth::CIdentifiableUserRecentAction);
-	if (!userRecentActionPtr.IsValid()){
-		return false;
+	imtauth::IUserRecentAction::TargetInfo targetInfo;
+	targetInfo.id = objectId;
+	if (objectTypeId.isEmpty()){
+		targetInfo.typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
+	}
+	else{
+		targetInfo.typeId = objectTypeId;
 	}
 
-	imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContextPtr->GetOperationOwnerId();
-	userRecentActionPtr->SetUserId(objectInfo.id);
+	const iprm::IOptionsList* optionsListPtr = m_objectCollectionCompPtr->GetObjectTypesInfo();
+	if (optionsListPtr != nullptr){
+		int optionsCount = optionsListPtr->GetOptionsCount();
+		for (int i = 0; i < optionsCount; ++i){
+			QByteArray optionId = optionsListPtr->GetOptionId(i);
+			if (optionId == targetInfo.typeId){
+				targetInfo.typeName = optionsListPtr->GetOptionName(i);
+				break;
+			}
+		}
+	}
 
-	imtauth::IUserRecentAction::TargetInfo targetInfo;
-
-	targetInfo.id = objectId;
-	targetInfo.typeId = objectTypeId;
-
-	if (actionType == imtauth::IUserRecentAction::ActionType::AT_DELETE){
+	if (actionTypeId == "Delete"){
 		targetInfo.name = "";
 	}
 	else{
-		targetInfo.name = targetName;
 		if (targetInfo.name.isEmpty()){
-			targetInfo.name = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::ElementInfoType::EIT_NAME).toString();
+			targetInfo.name = m_objectCollectionCompPtr->GetElementInfo(targetInfo.id, imtbase::ICollectionInfo::ElementInfoType::EIT_NAME).toString();
 		}
 	
 		if (targetInfo.name.isEmpty()){
-			targetInfo.name = objectId;
+			targetInfo.name = targetInfo.id;
 		}
 	}
 
 	targetInfo.source = *m_collectionIdAttrPtr;
 
-	userRecentActionPtr->SetTargetInfo(targetInfo);
-	userRecentActionPtr->SetActionType(actionType);
-	userRecentActionPtr->SetTimestamp(QDateTime::currentDateTime());
+	imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo;
+	actionTypeInfo.id = actionTypeId;
+	if (actionTypeId == "Create"){
+		actionTypeInfo.name = QT_TR_NOOP(QStringLiteral("Create"));
+		actionTypeInfo.description = QT_TR_NOOP(QStringLiteral("Object created"));
+	}
+	else if (actionTypeId == "Update"){
+		actionTypeInfo.name = QT_TR_NOOP(QStringLiteral("Update"));
+		actionTypeInfo.description = QT_TR_NOOP(QStringLiteral("Object changed"));
+	}
+	else if (actionTypeId == "Delete"){
+		actionTypeInfo.name = QT_TR_NOOP(QStringLiteral("Delete"));
+		actionTypeInfo.description = QT_TR_NOOP(QStringLiteral("Objects was deleted"));
+	}
 
-	QByteArray retVal = m_userActionCollectionCompPtr->InsertNewObject(QByteArrayLiteral("UserAction"), "", "", userRecentActionPtr.GetPtr());
-	return !retVal.isEmpty();
+	imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContextPtr->GetOperationOwnerId();
+	imtauth::IUserRecentAction::UserInfo userInfo;
+	userInfo.id = objectInfo.id;
+	userInfo.name = objectInfo.name;
+
+	return m_userActionManagerCompPtr->CreateUserAction(userInfo, actionTypeInfo, targetInfo);
 }
 
 

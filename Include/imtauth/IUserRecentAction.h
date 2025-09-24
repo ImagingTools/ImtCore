@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <iser/IObject.h>
+#include <iprm/IParamsSet.h>
 #include <idoc/IDocumentMetaInfo.h>
 
 
@@ -10,30 +11,9 @@ namespace imtauth
 {
 
 
-/**
-* @brief The IUserRecentAction class
-* @details
-* Interface for storing and accessing information about user actions in the system.
-*/
 class IUserRecentAction : virtual public iser::IObject
 {
 public:
-	/**
-	* @brief Enumeration of possible user action types.
-	*/
-	enum ActionType
-	{
-		AT_UNKNOWN,	///< Unknown action (default).
-		AT_CREATE,	///< Entity creation.
-		AT_UPDATE,	///< Updating an existing entity.
-		AT_DELETE,	///< Deleting an entity.
-		AT_USER		///< Custom user-defined action.
-	};
-	I_DECLARE_ENUM(ActionType, AT_UNKNOWN, AT_CREATE, AT_UPDATE, AT_UPDATE, AT_DELETE, AT_USER);
-
-	/**
-	* @brief Enumeration of metadata types related to the action.
-	*/
 	enum MetaInfoTypes
 	{
 		MIT_USER_ID = idoc::IDocumentMetaInfo::MIT_USER + 1,
@@ -42,23 +22,37 @@ public:
 		MIT_TARGET_NAME,
 		MIT_TARGET_SOURCE,
 		MIT_TARGET_TYPE_ID,
-		MIT_ACTION_TYPE
+		MIT_TARGET_TYPE_NAME,
+		MIT_ACTION_TYPE_ID,
+		MIT_ACTION_TYPE_NAME,
+		MIT_ACTION_TYPE_DESCRIPTION
 	};
 
-	/**
-	* @brief Information about the action target entity.
-	*/
 	struct TargetInfo
 	{
+		TargetInfo(
+				const QByteArray& id = QByteArray(),
+				const QByteArray& typeId = QByteArray(),
+				const QString& typeName = QString(),
+				const QString& source = QString(),
+				const QString& name = QString()):
+			id(id),
+			typeId(typeId),
+			typeName(typeName),
+			source(source),
+			name(name){}
+
 		QByteArray id;		///< Target entity identifier.
 		QByteArray typeId;	///< Target entity type identifier (e.g., "Order", "Task").
-		QByteArray source;	///< Source or origin of the target entity (e.g., module or subsystem).
+		QString typeName;	///< Target entity type name
+		QString source;		///< Source or origin of the target entity (e.g., module or subsystem).
 		QString name;		///< Human-readable target entity name.
 
 		bool operator == (const TargetInfo& other) const
 		{
 			return	(id == other.id) &&
 					(typeId == other.typeId) &&
+					(typeName == other.typeName) &&
 					(source == other.source) &&
 					(name == other.name);
 		}
@@ -69,53 +63,66 @@ public:
 		}
 	};
 
-	/**
-	* @brief Returns the user identifier.
-	* @return QByteArray containing the user ID.
-	*/
-	virtual QByteArray GetUserId() const = 0;
+	struct ActionTypeInfo
+	{
+		ActionTypeInfo(
+				const QByteArray& id = QByteArray(),
+				const QString& name = QString(),
+				const QString& description = QString()):
+			id(id),
+			description(description),
+			name(name){}
 
-	/**
-	* @brief Sets the user identifier.
-	* @param userId User ID to assign.
-	*/
-	virtual void SetUserId(const QByteArray& userId) = 0;
+		QByteArray id;
+		QString name;
+		QString description;
 
-	/**
-	* @brief Returns the type of action.
-	* @return ActionType describing the action.
-	*/
-	virtual ActionType GetActionType() const = 0;
+		bool operator == (const ActionTypeInfo& other) const
+		{
+			return	(id == other.id) &&
+					(description == other.description) &&
+					(name == other.name);
+		}
 
-	/**
-	* @brief Sets the type of action.
-	* @param actionType Value from the ActionType enumeration.
-	*/
-	virtual void SetActionType(ActionType actionType) = 0;
+		bool operator != (const ActionTypeInfo& other) const
+		{
+			return !(*this == other);
+		}
+	};
 
-	/**
-	* @brief Returns detailed information about the target entity.
-	* @return TargetInfo structure with target details.
-	*/
+	struct UserInfo
+	{
+		UserInfo(const QByteArray& id = QByteArray(), const QString& name = QString()): id(id), name(name){}
+
+		QByteArray id;
+		QString name;
+
+		bool operator == (const UserInfo& other) const
+		{
+			return	(id == other.id) &&
+					(name == other.name);
+		}
+
+		bool operator != (const UserInfo& other) const
+		{
+			return !(*this == other);
+		}
+	};
+
+	virtual UserInfo GetUserInfo() const = 0;
+	virtual void SetUserInfo(UserInfo userInfo) = 0;
+
+	virtual ActionTypeInfo GetActionTypeInfo() const = 0;
+	virtual void SetActionTypeInfo(ActionTypeInfo actionTypeInfo) = 0;
+
 	virtual TargetInfo GetTargetInfo() const = 0;
-
-	/**
-	* @brief Sets detailed information about the target entity.
-	* @param targetInfo TargetInfo structure with target details.
-	*/
 	virtual void SetTargetInfo(TargetInfo targetInfo) = 0;
 
-	/**
-	* @brief Returns the timestamp of the action.
-	* @return QDateTime representing when the action was performed.
-	*/
 	virtual QDateTime GetTimestamp() const = 0;
-
-	/**
-	* @brief Sets the timestamp of the action.
-	* @param timestamp Date and time of the action.
-	*/
 	virtual void SetTimestamp(const QDateTime& timestamp) = 0;
+
+	virtual const iprm::IParamsSet* GetParams() const = 0;
+	virtual void SetParams(iprm::IParamsSet* paramsPtr) = 0;
 };
 
 

@@ -24,6 +24,7 @@ RemoteCollectionView {
 			documentTypeIds: ["Group"]
 			documentDataControllersComp: [documentDataControllerComp]
 			documentViewsComp: [userGroupDocumentComp]
+			isSingleDocumentMode: true
 	
 			function updateStateBaseCommands(selection, commandsController, elementsModel){
 				let isEnabled = selection.length > 0;

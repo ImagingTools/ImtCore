@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/COperationContext.h>
+#include <imtauth/CUserInfo.h>
 #include <imtgql/IGqlRequestProvider.h>
 
 
@@ -39,7 +40,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 		return nullptr;
 	}
 
-	imtauth::IUserInfo* userInfoPtr = requestContextPtr->GetUserInfo();
+	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(requestContextPtr->GetUserInfo());
 	if (userInfoPtr == nullptr){
 		SendErrorMessage(0, QString("Unable to create operation context. Error:  User info from GraphQL context is invalid"), "COperationContextControllerComp");
 
@@ -47,7 +48,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 	}
 
 	imtbase::IOperationContext::IdentifableObjectInfo objectInfo;
-	objectInfo.id = userInfoPtr->GetId();
+	objectInfo.id = userInfoPtr->GetObjectUuid();
 	objectInfo.name = userInfoPtr->GetName();
 
 	istd::TDelPtr<imtbase::COperationContext> operationContextPtr;

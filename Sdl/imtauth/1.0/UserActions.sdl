@@ -20,6 +20,7 @@ type UserActionItemData {
 	targetTypeLink: ObjectLink
 	targetLink: ObjectLink
 	actionType: String
+	description: String
 	timeStamp: String
 }
 

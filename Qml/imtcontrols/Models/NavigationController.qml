@@ -13,6 +13,7 @@ QtObject {
     signal navigatePath(var path, var params, var activeSegments)
 
     function navigate(path, params) {
+        console.log("navigate", path)
         let segments = path.split("/")
         navigatePath(segments, params, [])
     }

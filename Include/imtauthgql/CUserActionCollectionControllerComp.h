@@ -29,6 +29,7 @@ protected:
 				sdl::imtauth::UserActions::CUserActionItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
 
+private:
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 

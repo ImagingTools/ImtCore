@@ -23,22 +23,10 @@ CollectionViewCommandsDelegateBase {
 	property var documentDataControllersComp: [];
 	property var documentValidatorsComp: [];
 
+	property bool isSingleDocumentMode: false
+
 	Component.onCompleted: {
 		updateDocumentManager()
-	}
-	
-	NavigableItem {
-		parentSegment: collectionViewCommandsDelegateBase.collectionId
-		paths: collectionViewCommandsDelegateBase.documentTypeIds
-		onActivated: {
-			if (collectionViewCommandsDelegateBase.documentManager){
-				if (restPath.length === 1){
-					let documentTypeId = matchedPath
-					let documentId = restPath[0]
-					collectionViewCommandsDelegateBase.openDocumentEditor(documentId, documentTypeId)
-				}
-			}
-		}
 	}
 
 	onDocumentManagerIdChanged: {
@@ -122,6 +110,13 @@ CollectionViewCommandsDelegateBase {
 
 	function openDocumentEditor(objectId, typeId){
 		console.debug("DocumentCollectionViewDelegate.qml openDocumentEditor", objectId, typeId)
+		if (isSingleDocumentMode){
+			let openedDocumentIds = documentManager.getOpenedDocumentIds()
+			for (let i = 0; i < openedDocumentIds.length; ++i){
+				documentManager.closeDocument(openedDocumentIds[i], true)
+			}
+		}
+
 		if (documentManager){
 			documentManager.openDocument(objectId, typeId);
 		}

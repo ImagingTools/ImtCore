@@ -80,16 +80,18 @@
                                 <Value>targetLink</Value>
                                 <Value>actionType</Value>
                                 <Value>targetTypeLink</Value>
+                                <Value>description</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="HeaderIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>actionType</Value>
+                                <Value>description</Value>
                                 <Value>userLink</Value>
                                 <Value>targetTypeLink</Value>
                                 <Value>targetLink</Value>
-                                <Value>actionType</Value>
                                 <Value>timeStamp</Value>
                             </Values>
                         </Data>
@@ -97,10 +99,11 @@
                     <AttributeInfo Id="HeaderNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>User</Value>
-                                <Value>Target Type-ID</Value>
-                                <Value>Target</Value>
                                 <Value>Action</Value>
+                                <Value>Description</Value>
+                                <Value>User</Value>
+                                <Value>Type</Value>
+                                <Value>Target</Value>
                                 <Value>Timestamp</Value>
                             </Values>
                         </Data>
@@ -108,11 +111,12 @@
                     <AttributeInfo Id="SortableHeaderIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>userLink</Value>
-                                <Value>targetLink</Value>
                                 <Value>actionType</Value>
-                                <Value>timeStamp</Value>
+                                <Value>description</Value>
+                                <Value>userLink</Value>
                                 <Value>targetTypeLink</Value>
+                                <Value>targetLink</Value>
+                                <Value>timeStamp</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -168,6 +172,8 @@
                                 <Value>targetLink</Value>
                                 <Value>userLink</Value>
                                 <Value>targetTypeLink</Value>
+                                <Value>actionType</Value>
+                                <Value>description</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -176,8 +182,10 @@
                             <Values>
                                 <Value>TimeStamp</Value>
                                 <Value>targetName</Value>
-                                <Value>userId</Value>
-                                <Value>targetTypeId</Value>
+                                <Value>userName</Value>
+                                <Value>targetTypeName</Value>
+                                <Value>actionTypeName</Value>
+                                <Value>actionDescription</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

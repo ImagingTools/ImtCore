@@ -15,43 +15,36 @@ namespace imtauth
 
 // public methods
 
-CUserRecentAction::CUserRecentAction()
-	:m_actionType(AT_UNKNOWN)
-{
-}
-
-
 // reimplemented (imtauth::IUserRecentAction)
 
-QByteArray CUserRecentAction::GetUserId() const
+imtauth::IUserRecentAction::UserInfo CUserRecentAction::GetUserInfo() const
 {
-	return m_userId;
+	return m_userInfo;
 }
 
 
-void CUserRecentAction::SetUserId(const QByteArray& userId)
+void CUserRecentAction::SetUserInfo(imtauth::IUserRecentAction::UserInfo userInfo)
 {
-	if (m_userId != userId){
+	if (m_userInfo != userInfo){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_userId = userId;
+		m_userInfo = userInfo;
 	}
 }
 
 
-
-imtauth::IUserRecentAction::ActionType CUserRecentAction::GetActionType() const
+imtauth::IUserRecentAction::ActionTypeInfo CUserRecentAction::GetActionTypeInfo() const
 {
-	return m_actionType;
+	return m_actionTypeInfo;
 }
 
 
-void CUserRecentAction::SetActionType(ActionType actionType)
+void CUserRecentAction::SetActionTypeInfo(imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo)
 {
-	if (m_actionType != actionType){
+	if (m_actionTypeInfo != actionTypeInfo){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_actionType = actionType;
+		m_actionTypeInfo = actionTypeInfo;
 	}
 }
 
@@ -62,7 +55,7 @@ imtauth::IUserRecentAction::TargetInfo CUserRecentAction::GetTargetInfo() const
 }
 
 
-void CUserRecentAction::SetTargetInfo(TargetInfo targetInfo)
+void CUserRecentAction::SetTargetInfo(imtauth::IUserRecentAction::TargetInfo targetInfo)
 {
 	if (m_targetInfo != targetInfo){
 		istd::CChangeNotifier changeNotifier(this);
@@ -88,6 +81,18 @@ void CUserRecentAction::SetTimestamp(const QDateTime& timestamp)
 }
 
 
+const iprm::IParamsSet* CUserRecentAction::GetParams() const
+{
+	return m_paramsPtr.GetPtr();
+}
+
+
+void CUserRecentAction::SetParams(iprm::IParamsSet* paramsPtr)
+{
+	m_paramsPtr.SetPtr(paramsPtr);
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CUserRecentAction::Serialize(iser::IArchive &archive)
@@ -96,15 +101,48 @@ bool CUserRecentAction::Serialize(iser::IArchive &archive)
 
 	bool retVal = true;
 
+	UserInfo userInfo;
+	if (archive.IsStoring()){
+		userInfo = m_userInfo;
+	}
+
 	iser::CArchiveTag userIdTag("UserId", "User-ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(userIdTag);
-	retVal = retVal && archive.Process(m_userId);
+	retVal = retVal && archive.Process(userInfo.id);
 	retVal = retVal && archive.EndTag(userIdTag);
 
-	iser::CArchiveTag actionTypeTag("ActionType", "Action Type", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(actionTypeTag);
-	retVal = retVal && I_SERIALIZE_ENUM(ActionType, archive, m_actionType);
-	retVal = retVal && archive.EndTag(actionTypeTag);
+	iser::CArchiveTag userNameTag("UserName", "User Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(userNameTag);
+	retVal = retVal && archive.Process(userInfo.name);
+	retVal = retVal && archive.EndTag(userNameTag);
+
+	if (retVal && !archive.IsStoring()){
+		m_userInfo = userInfo;
+	}
+
+	ActionTypeInfo actionTypeInfo;
+	if (archive.IsStoring()){
+		actionTypeInfo = m_actionTypeInfo;
+	}
+
+	iser::CArchiveTag actionTypeIdTag("ActionTypeId", "Action Type-ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(actionTypeIdTag);
+	retVal = retVal && archive.Process(actionTypeInfo.id);
+	retVal = retVal && archive.EndTag(actionTypeIdTag);
+
+	iser::CArchiveTag actionTypeNameTag("ActionTypeName", "Action Type Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(actionTypeNameTag);
+	retVal = retVal && archive.Process(actionTypeInfo.name);
+	retVal = retVal && archive.EndTag(actionTypeNameTag);
+
+	iser::CArchiveTag actionTypeDescriptionTag("ActionTypeDescription", "Action Type Description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(actionTypeDescriptionTag);
+	retVal = retVal && archive.Process(actionTypeInfo.description);
+	retVal = retVal && archive.EndTag(actionTypeDescriptionTag);
+
+	if (retVal && !archive.IsStoring()){
+		m_actionTypeInfo = actionTypeInfo;
+	}
 
 	TargetInfo targetInfo;
 	if (archive.IsStoring()){
@@ -125,6 +163,11 @@ bool CUserRecentAction::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.BeginTag(targetTypeIdTag);
 	retVal = retVal && archive.Process(targetInfo.typeId);
 	retVal = retVal && archive.EndTag(targetTypeIdTag);
+
+	iser::CArchiveTag targetTypeNameTag("TargetTypeName", "Target Type Name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(targetTypeNameTag);
+	retVal = retVal && archive.Process(targetInfo.typeName);
+	retVal = retVal && archive.EndTag(targetTypeNameTag);
 
 	iser::CArchiveTag targetSourceTag("TargetSource", "Target Source", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(targetSourceTag);
@@ -152,8 +195,8 @@ bool CUserRecentAction::CopyFrom(const IChangeable& object, CompatibilityMode /*
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_userId = sourcePtr->m_userId;
-		m_actionType = sourcePtr->m_actionType;
+		m_userInfo = sourcePtr->m_userInfo;
+		m_actionTypeInfo = sourcePtr->m_actionTypeInfo;
 		m_targetInfo = sourcePtr->m_targetInfo;
 		m_timestamp = sourcePtr->m_timestamp;
 
@@ -169,8 +212,8 @@ bool CUserRecentAction::IsEqual(const IChangeable& object) const
 	bool retVal = true;
 	const CUserRecentAction* sourcePtr = dynamic_cast<const CUserRecentAction*>(&object);
 	if (retVal && sourcePtr != nullptr){
-		retVal = retVal && m_userId == sourcePtr->m_userId;
-		retVal = retVal && m_actionType == sourcePtr->m_actionType;
+		retVal = retVal && m_userInfo == sourcePtr->m_userInfo;
+		retVal = retVal && m_actionTypeInfo == sourcePtr->m_actionTypeInfo;
 		retVal = retVal && m_targetInfo == sourcePtr->m_targetInfo;
 		retVal = retVal && m_timestamp == sourcePtr->m_timestamp;
 
@@ -196,12 +239,16 @@ bool CUserRecentAction::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_userId.clear();
+	m_userInfo.id.clear();
+	m_userInfo.name.clear();
 	m_targetInfo.id.clear();
 	m_targetInfo.name.clear();
 	m_targetInfo.typeId.clear();
+	m_targetInfo.typeName.clear();
 	m_targetInfo.source.clear();
-	m_actionType = AT_UNKNOWN;
+	m_actionTypeInfo.id.clear();
+	m_actionTypeInfo.name.clear();
+	m_actionTypeInfo.description.clear();
 
 	return true;
 }

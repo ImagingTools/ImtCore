@@ -47,6 +47,7 @@
 #include <imtauth/CUserConnectionInfo.h>
 #include <imtauth/CUserRecentAction.h>
 #include <imtauth/CUserActionMetaInfoCreatorComp.h>
+#include <imtauth/CUserActionManagerComp.h>
 
 
 namespace ImtAuthPck
@@ -139,6 +140,7 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable,
 						istd::IChangeable>> UserRecentAction;
 typedef imtauth::CUserActionMetaInfoCreatorComp UserActionMetaInfoCreator;
+typedef imtauth::CUserActionManagerComp UserActionManager;
 
 
 } // namespace ImtAuthPck

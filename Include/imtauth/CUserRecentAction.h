@@ -16,17 +16,17 @@ namespace imtauth
 class CUserRecentAction: virtual public IUserRecentAction
 {
 public:
-	CUserRecentAction();
-
 	// reimplemented (imtauth::IUserRecentAction)
-	virtual QByteArray GetUserId() const override;
-	virtual void SetUserId(const QByteArray& userId) override;
-	virtual ActionType GetActionType() const override;
-	virtual void SetActionType(ActionType actionType) override;
+	virtual UserInfo GetUserInfo() const override;
+	virtual void SetUserInfo(UserInfo userInfo) override;
+	virtual ActionTypeInfo GetActionTypeInfo() const override;
+	virtual void SetActionTypeInfo(ActionTypeInfo actionTypeInfo) override;
 	virtual TargetInfo GetTargetInfo() const override;
 	virtual void SetTargetInfo(TargetInfo targetInfo) override;
 	virtual QDateTime GetTimestamp() const override;
 	virtual void SetTimestamp(const QDateTime& timestamp) override;
+	virtual const iprm::IParamsSet* GetParams() const override;
+	virtual void SetParams(iprm::IParamsSet* paramsPtr) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -38,10 +38,11 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
-	QByteArray m_userId;
-	ActionType m_actionType;
+	UserInfo m_userInfo;
+	ActionTypeInfo m_actionTypeInfo;
 	TargetInfo m_targetInfo;
 	QDateTime m_timestamp;
+	istd::TSmartPtr<iprm::IParamsSet> m_paramsPtr;
 };
 
 

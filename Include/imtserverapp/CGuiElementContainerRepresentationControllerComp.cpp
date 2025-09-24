@@ -112,6 +112,30 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 			return false;
 		}
 	}
+	
+	int n = representation.GetItemsCount();
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n - i - 1; j++) {
+			int alignment1 = representation.GetData("alignment", j).toInt();
+			int alignment2 = representation.GetData("alignment", j + 1).toInt();
+			int priority1   = representation.GetData("priority", j).toInt();
+			int priority2   = representation.GetData("priority", j + 1).toInt();
+	
+			bool needSwap = false;
+	
+			if (alignment1 != alignment2) {
+				// Сначала Qt::AlignTop
+				needSwap = (alignment1 == Qt::AlignBottom && alignment2 == Qt::AlignTop);
+			} else {
+				// Если alignment одинаковый → сортируем по priority
+				needSwap = (priority1 < priority2);
+			}
+	
+			if (needSwap) {
+				representation.swapItems(j, j + 1);
+			}
+		}
+	}
 
 	return true;
 }

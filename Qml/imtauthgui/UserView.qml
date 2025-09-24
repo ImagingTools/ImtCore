@@ -315,6 +315,24 @@ ViewBase {
 				
 				width: parent.width;
 				
+				Component {
+					id: roleObjectLinkDelegateComp
+					
+					TextLinkCellDelegate {
+						id: objectLinkDelegate
+						onLinkActivated: {
+							let roleId = table.elements.getData("id", rowIndex)
+							NavigationController.navigate("Administration/Roles/Role/" + roleId)
+						}
+						
+						onReused: {
+							if (table){
+								text = table.elements.getData("roleName", rowIndex)
+							}
+						}
+					}
+				}
+				
 				TableElementView {
 					id: rolesTable;
 					
@@ -326,6 +344,10 @@ ViewBase {
 						
 						function onCheckedItemsChanged(){
 							container.doUpdateModel();
+						}
+						
+						function onHeadersChanged(){
+							target.setColumnContentById("roleName", roleObjectLinkDelegateComp)
 						}
 					}
 				}
@@ -405,6 +427,24 @@ ViewBase {
 				
 				width: parent.width;
 				
+				Component {
+					id: groupObjectLinkDelegateComp
+					
+					TextLinkCellDelegate {
+						id: objectLinkDelegate
+						onLinkActivated: {
+							let groupId = table.elements.getData("id", rowIndex)
+							NavigationController.navigate("Administration/Groups/Group/" + groupId)
+						}
+						
+						onReused: {
+							if (table){
+								text = table.elements.getData("name", rowIndex)
+							}
+						}
+					}
+				}
+				
 				TableElementView {
 					id: groupsTable;
 					
@@ -422,6 +462,10 @@ ViewBase {
 						
 						function onCheckedItemsChanged(){
 							container.doUpdateModel();
+						}
+						
+						function onHeadersChanged(){
+							target.setColumnContentById("name", groupObjectLinkDelegateComp)
 						}
 					}
 				}

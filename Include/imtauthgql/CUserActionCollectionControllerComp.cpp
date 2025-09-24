@@ -57,13 +57,14 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	QString scheme = "applink";
 	QByteArray targetId = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_ID).toString().toUtf8();
 	QByteArray targetTypeId = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_ID).toString().toUtf8();
+	QString targetTypeName = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_NAME).toString();
 	QString targetSource = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_SOURCE).toString();
 
 	if (requestInfo.items.isTargetTypeLinkRequested){
 		sdl::imtbase::ImtCollection::CObjectLink::V1_0 objectLink;
 		objectLink.id = targetTypeId;
 		objectLink.typeId = targetTypeId;
-		objectLink.name = targetTypeId;
+		objectLink.name = targetTypeName;
 
 		sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
 		urlParam.scheme = scheme;
@@ -116,24 +117,13 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isActionTypeRequested){
-		imtauth::IUserRecentAction::ActionType actionType = userRecentActionPtr->GetActionType();
-		switch(actionType){
-		case imtauth::IUserRecentAction::AT_UNKNOWN:
-			representationObject.actionType = QString("Unknown");
-			break;
-		case imtauth::IUserRecentAction::AT_CREATE:
-			representationObject.actionType = QString("Create");
-			break;
-		case imtauth::IUserRecentAction::AT_UPDATE:
-			representationObject.actionType = QString("Update");
-			break;
-		case imtauth::IUserRecentAction::AT_DELETE:
-			representationObject.actionType = QString("Delete");
-			break;
-		case imtauth::IUserRecentAction::AT_USER:
-			representationObject.actionType = QString("Unknown");
-			break;
-		}
+		imtauth::IUserRecentAction::ActionTypeInfo actionType = userRecentActionPtr->GetActionTypeInfo();
+		representationObject.actionType = actionType.name;
+	}
+
+	if (requestInfo.items.isDescriptionRequested){
+		imtauth::IUserRecentAction::ActionTypeInfo actionType = userRecentActionPtr->GetActionTypeInfo();
+		representationObject.description = actionType.description;
 	}
 
 	if (requestInfo.items.isTimeStampRequested){

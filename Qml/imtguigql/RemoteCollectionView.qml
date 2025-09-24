@@ -186,7 +186,7 @@ CollectionView {
 			
 			if (operationContextInfo.containsKey("ownerId")){
 				let ownerId = operationContextInfo.getData("ownerId");
-				let currentUserId = AuthorizationController.getLoggedUserId();
+				let currentUserId = AuthorizationController.getUserId();
 				if (ownerId === currentUserId){
 					root.doUpdateGui();
 				}

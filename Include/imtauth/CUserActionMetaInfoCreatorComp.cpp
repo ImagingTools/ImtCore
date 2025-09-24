@@ -38,38 +38,43 @@ bool CUserActionMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-
 	imtauth::IUserRecentAction::TargetInfo targetInfo = userRecentActionPtr->GetTargetInfo();
 	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_ID, targetInfo.id);
 	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_ID, targetInfo.typeId);
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_NAME, targetInfo.typeName);
 	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_NAME, targetInfo.name);
 	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_SOURCE, targetInfo.source);
-	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE, userRecentActionPtr->GetActionType());
 
-	// Username
-	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_USER_NAME, userRecentActionPtr->GetUserId());
+	imtauth::IUserRecentAction::ActionTypeInfo actionTypeInfo = userRecentActionPtr->GetActionTypeInfo();
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE_ID, actionTypeInfo.id);
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE_NAME, actionTypeInfo.name);
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE_DESCRIPTION, actionTypeInfo.description);
 
-	if (m_userCollectionCompPtr.IsValid()){
-		QByteArray userId = userRecentActionPtr->GetUserId();
+	imtauth::IUserRecentAction::UserInfo userInfo = userRecentActionPtr->GetUserInfo();
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID, userInfo.id);
+	metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_USER_NAME, userInfo.name);
 
-		imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
-		fieldFilter.fieldId = "Id";
-		fieldFilter.filterValue = userId;
+	// if (m_userCollectionCompPtr.IsValid()){
+	// 	QByteArray userId = userRecentActionPtr->GetUserId();
 
-		imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
-		groupFilter.fieldFilters << fieldFilter;
+	// 	imtbase::IComplexCollectionFilter::FieldFilter fieldFilter;
+	// 	fieldFilter.fieldId = "Id";
+	// 	fieldFilter.filterValue = userId;
+
+	// 	imtbase::IComplexCollectionFilter::GroupFilter groupFilter;
+	// 	groupFilter.fieldFilters << fieldFilter;
 	
-		imtbase::CComplexCollectionFilter complexFilter;
-		complexFilter.SetFieldsFilter(groupFilter);
+	// 	imtbase::CComplexCollectionFilter complexFilter;
+	// 	complexFilter.SetFieldsFilter(groupFilter);
 
-		iprm::CParamsSet filterParam;
-		filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
+	// 	iprm::CParamsSet filterParam;
+	// 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
-		QByteArrayList elementIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
-		if (!elementIds.isEmpty()){
-			metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID, elementIds[0]);
-		}
-	}
+	// 	QByteArrayList elementIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+	// 	if (!elementIds.isEmpty()){
+	// 		metaInfoPtr->SetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID, elementIds[0]);
+	// 	}
+	// }
 
 	return true;
 }

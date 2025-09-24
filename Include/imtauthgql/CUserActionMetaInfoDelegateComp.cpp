@@ -35,8 +35,17 @@ bool CUserActionMetaInfoDelegateComp::FillRepresentation(QJsonObject& representa
 	QByteArray targetTypeId = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_ID).toByteArray();
 	representation["targetTypeId"] = QString(targetTypeId);
 
-	int actionType = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE).toInt();
-	representation["actionType"] = actionType;
+	QString targetTypeName = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_NAME).toString();
+	representation["targetTypeName"] = QString(targetTypeName);
+
+	QByteArray actionTypeId = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE_ID).toByteArray();
+	representation["actionTypeId"] = QString(actionTypeId);
+
+	QString actionTypeName = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE_NAME).toByteArray();
+	representation["actionTypeName"] = QString(actionTypeName);
+
+	QString actionTypeDescription = metaInfo.GetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE_DESCRIPTION).toByteArray();
+	representation["actionTypeDescription"] = QString(actionTypeDescription);
 
 	return true;
 }
@@ -68,8 +77,20 @@ bool CUserActionMetaInfoDelegateComp::FillMetaInfo(idoc::IDocumentMetaInfo& meta
 		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_ID, representation.value("targetTypeId"));
 	}
 
-	if (representation.contains("actionType")){
-		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE, representation.value("actionType"));
+	if (representation.contains("targetTypeName")){
+		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_TYPE_NAME, representation.value("targetTypeName"));
+	}
+
+	if (representation.contains("actionTypeId")){
+		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE_ID, representation.value("actionTypeId"));
+	}
+
+	if (representation.contains("actionTypeName")){
+		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE_NAME, representation.value("actionTypeName"));
+	}
+
+	if (representation.contains("actionTypeDescription")){
+		metaInfo.SetMetaInfo(imtauth::IUserRecentAction::MIT_ACTION_TYPE_DESCRIPTION, representation.value("actionTypeDescription"));
 	}
 
 	return true;

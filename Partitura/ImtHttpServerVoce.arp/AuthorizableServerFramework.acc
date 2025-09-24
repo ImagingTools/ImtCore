@@ -179,6 +179,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="UserActionManager" PackageId="ImtAuthPck" ComponentId="UserActionManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="UserActionCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserActionSqlRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="UserActionSqlRepository" PackageId="ImtAuthVoce" ComponentId="UserActionSqlRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -251,6 +260,7 @@
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
         <Component ExportedId="PumaGQLClientEngine" ComponentId="PumaClientEngine"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
+        <Component ExportedId="UserActionManager" ComponentId="UserActionManager"/>
         <Component ExportedId="UserActionSqlRepository" ComponentId="UserActionSqlRepository"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="PumaClientEngine/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaClientEngine/UserSessionRemoteRepository"/>

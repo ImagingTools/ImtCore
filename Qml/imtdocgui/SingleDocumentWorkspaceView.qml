@@ -32,10 +32,40 @@ Rectangle {
 			headersModel.setHeaderName(objectId, root.documentManager.defaultDocumentName)
 		}
 	}
+
+	onDocumentManagerChanged: {
+		if (documentManager){
+			navigableItem.parentSegment = documentManager.typeId
+		}
+	}
+
+	NavigableItem {
+		id: navigableItem
+		onActivated: {
+			if (root.documentManager){
+				console.log("SingleDocumentWorkspaceView.qml", restPath, matchedPath)
+				console.log("getOpenedDocumentIds.qml", root.documentManager.getOpenedDocumentIds())
+				let openedDocumentIds = root.documentManager.getOpenedDocumentIds()
+				for (let i = 0; i < openedDocumentIds.length; ++i){
+					root.documentManager.closeDocument(openedDocumentIds[i], true)
+				}
+				if (restPath.length === 1){
+					let documentTypeId = matchedPath
+					let documentId = restPath[0]
+					
+					root.documentManager.openDocument(documentId, documentTypeId)
+				}
+			}
+		}
+	}
 	
 	Connections {
 		id: connections;
 		target: root.documentManager;
+
+		function onDocumentTypeIdRegistered(documentTypeId){
+			navigableItem.paths = target.getSupportedDocumentTypeIds()
+		}
 
 		function onDocumentSaved(documentId){
 			Events.sendEvent("StopLoading")

@@ -8,6 +8,7 @@ Item {
 	id: delegateContainer;
 
 	property TableRowDelegateBase rowDelegate: null;
+	property var table: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem : null
 
 	height: rowDelegate ? rowDelegate.contentHeight : 0;
 	width: !rowDelegate || !rowDelegate.columnCount  ? 0 : rowDelegate.width/rowDelegate.columnCount;
