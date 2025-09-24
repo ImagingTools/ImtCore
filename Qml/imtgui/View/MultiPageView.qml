@@ -15,7 +15,7 @@ Item {
     property int mainMargin: Style.marginM;
 	property int panelWidth: Style.sizeHintXXXS;
 
-    signal pageLoaded(int index, var pageItem);
+    signal pageLoaded(int index, var pageItem, string pageId);
 
     Component{
         id: emptyDecorator;
@@ -180,7 +180,7 @@ Item {
                 visible: root.currentIndex === model.index;
 
                 onLoaded: {
-                    root.pageLoaded(model.index, item);
+                    root.pageLoaded(model.index, item, model.id);
                 }
 
                 onStatusChanged: {

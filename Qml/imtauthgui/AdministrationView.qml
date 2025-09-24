@@ -133,19 +133,32 @@ Item {
             paths: ["Roles", "Users", "Groups"]
             onActivated: {
                 let index = paths.indexOf(matchedPath)
+                multiPageView.block = true
                 multiPageView.currentIndex = index
+                if (administrationContainer.documentManager){
+                    administrationContainer.documentManager.closeAllDocuments()
+                }
+
+                multiPageView.block = false
             }
         }
 
         Component.onCompleted: {
+            MainDocumentManager.registerDocumentManager("Administration/Roles", administrationContainer.documentManager)
+            MainDocumentManager.registerDocumentManager("Administration/Users", administrationContainer.documentManager)
+            MainDocumentManager.registerDocumentManager("Administration/Groups", administrationContainer.documentManager)
+            
             updateModel();
         }
 
+        property bool block: false
         onCurrentIndexChanged: {
             if (currentIndex >= 0){
-                console.log("MultiPageView onCurrentIndexChanged", currentIndex)
-                
-                visualStatusProvider.collectionId = pagesModel.get(currentIndex).id
+                let pageId = pagesModel.get(currentIndex).id
+                visualStatusProvider.collectionId = pageId
+                if (!block){
+                    NavigationController.push("Administration/" + pageId)
+                }
             }
         }
 

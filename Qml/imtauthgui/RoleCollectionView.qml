@@ -14,13 +14,13 @@ RemoteCollectionView {
 	
 	collectionId: "Roles";
 	visibleMetaInfo: true;
+	documentCollectionFilter: null
 
 	additionalFieldIds: [RoleItemDataTypeMetaInfo.s_productId, RoleItemDataTypeMetaInfo.s_parentRoles]
 	
 	commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
 			collectionView: roleCollectionViewContainer;
-			documentManager: roleCollectionViewContainer.documentManager;
-			
+			documentManagerId: "Administration/Roles"
 			documentTypeIds: ["Role"]
 			documentViewsComp: [roleDocumentComp];
 			documentDataControllersComp: [dataControllerComp];

@@ -51,8 +51,10 @@ Rectangle {
 	}
 
 	onActivePageIdChanged: {
-		if(menuPanel.activePageId !== ""){
-			Events.sendEvent("ActivePageIdChanged", menuPanel.activePageId);
+		if(activePageId !== ""){
+			Events.sendEvent("ActivePageIdChanged", activePageId);
+			
+			NavigationController.push(activePageId)
 		}
 	}
 
@@ -206,6 +208,7 @@ Rectangle {
 			NavigableItem {
 				paths: [model["id"]]
 				onActivated: {
+					console.log("MenuPanel onActivated")
 					menuPanel.activePageIndex = model.index
 				}
 			}

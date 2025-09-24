@@ -43,8 +43,6 @@ Rectangle {
 		id: navigableItem
 		onActivated: {
 			if (root.documentManager){
-				console.log("SingleDocumentWorkspaceView.qml", restPath, matchedPath)
-				console.log("getOpenedDocumentIds.qml", root.documentManager.getOpenedDocumentIds())
 				let openedDocumentIds = root.documentManager.getOpenedDocumentIds()
 				for (let i = 0; i < openedDocumentIds.length; ++i){
 					root.documentManager.closeDocument(openedDocumentIds[i], true)

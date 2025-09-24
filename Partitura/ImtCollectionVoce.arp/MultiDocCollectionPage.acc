@@ -43,6 +43,9 @@
                     <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtcolgui/CollectionWorkspacePageView.qml"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="Priority" Type="Integer" ExportId="Priority">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="CollectionViewQmlPath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

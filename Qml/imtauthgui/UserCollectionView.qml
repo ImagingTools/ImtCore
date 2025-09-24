@@ -15,6 +15,7 @@ RemoteCollectionView {
 	
 	collectionId: "Users";
 	visibleMetaInfo: true;
+	documentCollectionFilter: null
 
 	additionalFieldIds: [UserItemDataTypeMetaInfo.s_systemId]
 	
@@ -27,8 +28,7 @@ RemoteCollectionView {
 	
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
 			collectionView: userCollectionViewContainer;
-			documentManager: userCollectionViewContainer.documentManager;
-			
+			documentManagerId: "Administration/Users"
 			documentTypeIds: ["User"];
 			documentViewsComp: [userDocumentComp];
 			documentDataControllersComp: [documentDataControllerComp];

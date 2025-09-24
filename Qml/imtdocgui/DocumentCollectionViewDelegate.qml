@@ -34,10 +34,15 @@ CollectionViewCommandsDelegateBase {
 	}
 	
 	function updateDocumentManager(){
-		let documentManager = MainDocumentManager.getDocumentManager(documentManagerId);
-		if (documentManager){
-			collectionViewCommandsDelegateBase.documentManager = documentManager;
+		let documentManager = MainDocumentManager.getDocumentManager(documentManagerId)
+		if (!documentManager){
+			console.error("Unable to register document views. Error: Document manager with type-ID: '" +documentManagerId+ "' does not exists")
+			return
 		}
+
+		collectionViewCommandsDelegateBase.documentManager = documentManager
+
+		registerDocumentViews()
 	}
 
 	onCollectionViewChanged: {
@@ -45,8 +50,8 @@ CollectionViewCommandsDelegateBase {
 			collectionView.dataController.removed.connect(internal.onRemoved);
 		}
 	}
-
-	onDocumentManagerChanged: {
+	
+	function registerDocumentViews(){
 		if (!documentManager){
 			return
 		}
@@ -56,7 +61,7 @@ CollectionViewCommandsDelegateBase {
 			if (documentViewsComp.length > i){
 				let documentViewComp = documentViewsComp[i];
 				if (!documentManager.registerDocumentView(documentTypeId, documentViewComp)){
-					console.error("Unable to register view for document type ID: ", documentTypeId)
+					console.error("Unable to register document view for type-ID '" +documentTypeId+ "' into document manager '" +documentManagerId+"'")
 				}
 			}
 
@@ -104,12 +109,17 @@ CollectionViewCommandsDelegateBase {
 			collectionViewCommandsDelegateBase.documentManager.insertNewDocument(typeId);
 		}
 		else{
-			console.error("Unable to create new object:", typeId, ". Error: Document manager is invalid")
+			console.error("Unable to create new object with type-ID: '"+ typeId + "' . Error: Document manager is invalid")
 		}
 	}
 
 	function openDocumentEditor(objectId, typeId){
 		console.debug("DocumentCollectionViewDelegate.qml openDocumentEditor", objectId, typeId)
+		if (!documentManager){
+			console.log("Unable to open document editor for type-ID: '" + typeId + "'. Error: Document manager is invalid")
+			return
+		}
+
 		if (isSingleDocumentMode){
 			let openedDocumentIds = documentManager.getOpenedDocumentIds()
 			for (let i = 0; i < openedDocumentIds.length; ++i){
@@ -117,12 +127,8 @@ CollectionViewCommandsDelegateBase {
 			}
 		}
 
-		if (documentManager){
-			documentManager.openDocument(objectId, typeId);
-		}
-		else{
-			console.error("Unable to open document for editing", typeId, ". Error: Document manager is invalid");
-		}
+		documentManager.openDocument(objectId, typeId);
+		NavigationController.push(documentManagerId+"/"+typeId+"/"+objectId)
 	}
 
 	function onEdit(){

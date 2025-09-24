@@ -35,9 +35,10 @@ Item {
 		}
 	}
 
-	onDocumentManagerChanged: {
-		if (documentManager){
-			navigableItem.parentSegment = documentManager.typeId
+	NavigableItem {
+		id: firstTabNavigation
+		onActivated: {
+			tabView.currentIndex = 0
 		}
 	}
 
@@ -61,7 +62,12 @@ Item {
 	Connections {
 		id: connections
 		target: workspaceView.documentManager
-
+		
+		function onTypeIdChanged(){
+			navigableItem.parentSegment = target.typeId
+			firstTabNavigation.paths = [target.typeId]
+		}
+		
 		function onDocumentTypeIdRegistered(documentTypeId){
 			navigableItem.paths = target.getSupportedDocumentTypeIds()
 		}

@@ -13,14 +13,14 @@ RemoteCollectionView {
 	
 	collectionId: "Groups";
 	visibleMetaInfo: true;
+	documentCollectionFilter: null
 	
 	property string productId;
 	property var documentManager: null;
 	
 	commandsDelegateComp: Component {DocumentCollectionViewDelegate {
 			collectionView: userGroupCollectionViewContainer;
-			documentManager: userGroupCollectionViewContainer.documentManager;
-
+			documentManagerId: "Administration/Groups"
 			documentTypeIds: ["Group"]
 			documentDataControllersComp: [documentDataControllerComp]
 			documentViewsComp: [userGroupDocumentComp]

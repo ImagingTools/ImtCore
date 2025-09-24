@@ -16,7 +16,6 @@ TableCellDelegateBase {
 		font.family: Style.fontFamily
 		elide: Text.ElideRight
 		color: "#0b5ed7"
-		font.underline: true
 		text: objectLinkDelegate.text
 	}
 	

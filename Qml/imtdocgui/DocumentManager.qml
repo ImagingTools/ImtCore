@@ -500,6 +500,13 @@ QtObject {
 		return documentData.documentValidator.isValid(data);
 	}
 
+	function closeAllDocuments(){
+		let openedDocumentIds = getOpenedDocumentIds()
+		for (let i = 0; i < openedDocumentIds.length; ++i){
+			closeDocument(openedDocumentIds[i], true)
+		}
+	}
+
 	function getOpenedDocumentIds(){
 		let result = []
 

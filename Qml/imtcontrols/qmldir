@@ -122,6 +122,7 @@ OptionsListManager 1.0 Models/OptionsListManager.qml
 NavigableItem 1.0 Models/NavigableItem.qml
 
 Table 1.0 ./Views/Table.qml
+TableHeaders 1.0 ./Views/TableHeaders.qml
 TableBase 1.0 ./Views/TableBase.qml
 TableCellDelegate 1.0 ./Views/TableCellDelegate.qml
 TableCellDelegateBase 1.0 ./Views/TableCellDelegateBase.qml

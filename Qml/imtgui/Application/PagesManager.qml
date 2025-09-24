@@ -22,7 +22,8 @@ Item {
 		onLocalizationChanged: {
 			let loggedUserId = AuthorizationController.getLoggedUserId();
 			if (loggedUserId !== ""){
-				pagesProvider.updateModel();
+
+				container.updateModel();
 			}
 		}
 	}

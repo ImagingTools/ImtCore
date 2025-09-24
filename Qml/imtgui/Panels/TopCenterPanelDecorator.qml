@@ -65,7 +65,7 @@ DecoratorBase {
 		Connections {
 			target: NavigationController;
 			
-			function onCurrentIndexChanged(){
+			function onCurrentIndexChanged(index){
 				leftButton.enabled = NavigationController.hasPrev();
 				rightButton.enabled = NavigationController.hasNext();
 			}

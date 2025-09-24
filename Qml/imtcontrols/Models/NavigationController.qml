@@ -1,76 +1,87 @@
 pragma Singleton
-
 import QtQuick 2.12
-import imtcontrols 1.0
 
 QtObject {
-    id: root;
+    id: root
 
-    property var stack: []
-    property int currentIndex: -1
     property int maxSize: 10
 
     signal navigatePath(var path, var params, var activeSegments)
+    signal currentIndexChanged(int index)
 
     function navigate(path, params) {
-        console.log("navigate", path)
-        let segments = path.split("/")
-        navigatePath(segments, params, [])
+        __internal.push(path, params)
+        __internal.navigateInternal()
     }
 
-    function next(){
-        if (hasNext()){
-            currentIndex++;
+    function push(path, params) {
+        __internal.push(path, params)
+    }
 
-            let elem = stack[currentIndex]
-            navigate(elem)
+    function next() {
+        if (hasNext()) {
+            __internal.currentIndex++
+            __internal.navigateInternal()
         }
     }
 
-    function hasNext(){
-        return currentIndex < stack.length - 1;
+    function hasNext() {
+        return __internal.currentIndex < __internal.stack.length - 1
     }
 
-    function prev(){
-        if (hasPrev()){
-            currentIndex--;
-            let elem = stack[currentIndex]
-
-            navigate(elem)
+    function prev() {
+        if (hasPrev()) {
+            __internal.currentIndex--
+            __internal.navigateInternal()
         }
     }
 
-    function hasPrev(){
-        return currentIndex > 0;
+    function hasPrev() {
+        return __internal.currentIndex > 0
     }
 
-    function push(path){
-        if (stack.length >= maxSize){
-            stack.shift();
+    function clear() {
+        __internal.clear()
+    }
 
-            if (currentIndex > 0){
-                currentIndex--;
+    // Внутренний объект
+    property QtObject __internal: QtObject {
+        property var stack: []          // [{ path, params }, ...]
+        property int currentIndex: -1
+
+        onCurrentIndexChanged: {
+            root.currentIndexChanged(currentIndex)
+        }
+
+        function clear() {
+            stack = []
+            currentIndex = -1
+        }
+
+        function push(path, params) {
+            if (currentIndex < stack.length - 1) {
+                stack.splice(currentIndex + 1, stack.length - (currentIndex + 1))
             }
+
+            stack.push({ path: path, params: params || {} })
+
+            while (stack.length > root.maxSize){
+                stack.shift()
+                if (currentIndex > 0) currentIndex--
+            }
+
+            currentIndex = stack.length - 1
         }
 
-        stack.push(path);
-        currentIndex = stack.length - 1;
-    }
+        function navigateInternal() {
+            if (currentIndex < 0 || currentIndex >= stack.length) {
+                console.log("Unable to navigate internal. Current index is invalid")
+                return
+            }
 
-    function pop(){
-        if (stack.length == 0){
-            return;
+            let entry = stack[currentIndex]
+            let segments = entry.path.split("/")
+            root.navigatePath(segments, entry.params || {}, [])
         }
-
-        if (currentIndex == stack.length - 1){
-            currentIndex--;
-        }
-
-        stack.pop();
-    }
-
-    function clear(){
-        root.currentIndex = -1;
-        root.stack = []
     }
 }

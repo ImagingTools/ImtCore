@@ -10,6 +10,7 @@ PageContainer {
 	
 	property DocumentManager documentManager: DocumentManager {
 		activeView: root.documentManagerView;
+		typeId: root.pageId
 	};
 	
 	property Item documentManagerView: null;
