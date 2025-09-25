@@ -37,8 +37,12 @@ Item {
 
 	NavigableItem {
 		id: firstTabNavigation
+		forwardRest: false
 		onActivated: {
-			tabView.currentIndex = 0
+			console.log("NavigableItem::MultiDocWorkspaceView::onActivated firstTabNavigation", restPath, matchedPath)
+			if (restPath.length <= 1){
+				tabView.currentIndex = 0
+			}
 		}
 	}
 
@@ -46,12 +50,10 @@ Item {
 		id: navigableItem
 		onActivated: {
 			if (workspaceView.documentManager){
-				if (restPath.length === 0){
-					tabView.currentIndex = 0
-				}
-				else if (restPath.length === 1){
+				if (restPath.length === 1){
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
+					console.log("NavigableItem::MultiDocWorkspaceView::onActivated", restPath, matchedPath)
 					
 					workspaceView.documentManager.openDocument(documentId, documentTypeId)
 				}

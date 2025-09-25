@@ -19,7 +19,9 @@ RemoteCollectionView {
 	commandsControllerComp: null
 
 	Component.onCompleted: {
-		registerFieldFilterDelegate("userId", userDelegateFilterComp)
+		if (PermissionsController.checkPermission("ViewUsers")){
+			registerFieldFilterDelegate("userId", userDelegateFilterComp)
+		}
 	}
 	
 	onHeadersChanged: {

@@ -23,13 +23,21 @@ QtObject {
 		}
 	}
 
-	function setLanguage(langId){
-		console.log("setLanguage", langId)
+	function setLanguage(langId, beQuiet){
+		if (!beQuiet){
+			beQuiet = false
+		}
+
+		if (context.language === ""){
+			beQuiet = true
+		}
 		
 		if (context.language !== langId){
 			context.language = langId;
 			
-			Events.sendEvent("OnLocalizationChanged", langId);
+			if (!beQuiet){
+				Events.sendEvent("OnLocalizationChanged", langId);
+			}
 		}
 	}
 }
