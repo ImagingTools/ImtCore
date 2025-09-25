@@ -22,6 +22,7 @@ Row {
 	property int countAllElements: 0;
 
 	property alias pageCount: listModel.count;
+	property bool perPageTitleVisible: false;
 
 	Component.onCompleted: {
 		paginationContainer.refreshBtn();
@@ -187,6 +188,7 @@ Row {
 		spacing: 4;
 
 		BaseText {
+			visible: paginationContainer.perPageTitleVisible;
 			anchors.verticalCenter: parent.verticalCenter;
 			text: qsTr("Per page: ")
 		}
