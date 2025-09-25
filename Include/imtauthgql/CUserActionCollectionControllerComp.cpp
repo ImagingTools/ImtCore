@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtauth/IUserRecentAction.h>
+#include <imtauth/CUserInfo.h>
 
 
 namespace imtauthgql
@@ -132,6 +133,32 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	return true;
+}
+
+
+void CUserActionCollectionControllerComp::SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const
+{
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
+		if (userInfoPtr != nullptr){
+			if (!userInfoPtr->IsAdmin()){
+				QByteArrayList userPermissions = userInfoPtr->GetPermissions();
+				bool viewAllUserActions = false;
+
+				if (m_checkPermissionCompPtr.IsValid()){
+					viewAllUserActions = m_checkPermissionCompPtr->CheckPermission(userPermissions, QByteArrayList {QByteArrayLiteral("ViewAllUserActions")});
+				}
+
+				if (!viewAllUserActions){
+					imtbase::IComplexCollectionFilter::FieldFilter userFieldFilter;
+					userFieldFilter.fieldId = "userId";
+					userFieldFilter.filterValue = userInfoPtr->GetObjectUuid();
+					complexFilter.AddFieldFilter(userFieldFilter);
+				}
+			}
+		}
+	}
 }
 
 

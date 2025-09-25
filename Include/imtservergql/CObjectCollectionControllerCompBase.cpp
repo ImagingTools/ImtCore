@@ -1438,7 +1438,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		errorMessage = QString("Unable to get data with ID: '%1'. The object does not exist.").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to get document. Error: Document does not exists");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return nullptr;

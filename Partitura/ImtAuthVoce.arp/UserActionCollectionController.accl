@@ -8,6 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="CheckPermissionOr" X="225" Y="475" Note=""/>
         <Element ComponentName="CollectionCommands" X="200" Y="300" Note=""/>
         <Element ComponentName="CollectionCommandsController" X="175" Y="175" Note=""/>
         <Element ComponentName="CollectionHeadersProvider" X="600" Y="475" Note=""/>
