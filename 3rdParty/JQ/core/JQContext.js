@@ -136,7 +136,7 @@ class JQContext {
                         try {
                             property.target.__proxy[property.name] = property.func()
                         } catch (error) {
-                            console.error(error)
+                            //console.error(error)
                             property.meta.type.error(property.target, property.name, property.meta)
                         }
                     }

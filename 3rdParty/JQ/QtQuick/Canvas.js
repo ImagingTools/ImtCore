@@ -90,15 +90,15 @@ class Canvas extends Item {
     }
 
     SLOT_widthChanged(oldValue, newValue){
-        super.SLOT_widthChanged()
-        this.__getDOM().setAttribute('width', this.width)
-        if(this.width > 0 && this.height > 0) this.paint()
+        super.SLOT_widthChanged(oldValue, newValue)
+        this.__getDOM().setAttribute('width', newValue)
+        if(newValue > 0 && this.height > 0) this.paint()
     }
 
     SLOT_heightChanged(oldValue, newValue){
-        super.SLOT_heightChanged()
-        this.__getDOM().setAttribute('height', this.height)
-        if(this.width > 0 && this.height > 0) this.paint()
+        super.SLOT_heightChanged(oldValue, newValue)
+        this.__getDOM().setAttribute('height', newValue)
+        if(this.width > 0 && newValue > 0) this.paint()
     }
 
     cancelRequestAnimationFrame(handle){

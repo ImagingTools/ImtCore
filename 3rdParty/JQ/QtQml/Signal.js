@@ -18,7 +18,7 @@ class Signal extends BaseObject {
                 try {
                     target[slotName].call(target.__proxy, ...args)
                 } catch (error) {
-                    console.error(error)
+                    //console.error(error)
                 }  
             }
 
@@ -31,7 +31,7 @@ class Signal extends BaseObject {
                             connection.slot(...args)
                         }
                     } catch (error) {
-                        console.error(error)
+                        //console.error(error)
                     }
                 }
             }

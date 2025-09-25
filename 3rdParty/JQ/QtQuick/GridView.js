@@ -294,13 +294,13 @@ class GridView extends Flickable {
     }
 
     SLOT_widthChanged(oldValue, newValue){
-        super.SLOT_widthChanged()
+        super.SLOT_widthChanged(oldValue, newValue)
 
         JQApplication.updateLater(this)
     }
 
     SLOT_heightChanged(oldValue, newValue){
-        super.SLOT_heightChanged()
+        super.SLOT_heightChanged(oldValue, newValue)
 
         JQApplication.updateLater(this)
     }
