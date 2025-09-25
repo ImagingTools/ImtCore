@@ -1500,9 +1500,13 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 		return false;
 	}
 
-	imtsdl::CSdlType sdlType;
-	bool isTypeExsists = GetSdlTypeForField(aSdlField, m_sdlTypeListCompPtr->GetSdlTypes(false), sdlType);
-	Q_ASSERT(isTypeExsists);
+	std::shared_ptr<imtsdl::CSdlEntryBase> foundEntry = FindEntryByName(
+		aSdlField.GetType(),
+		m_sdlTypeListCompPtr->GetSdlTypes(false),
+		m_sdlEnumListCompPtr->GetEnums(false),
+		m_sdlUnionListCompPtr->GetUnions(false));
+
+	Q_ASSERT(foundEntry);
 
 	// special case if a ref is the required type
 	if (_isRoot && aSdlField.GetType() == typeName){
@@ -1510,17 +1514,20 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::FindCallChainForField(const
 		return true;
 	}
 
-	for (const imtsdl::CSdlField& sdlField: sdlType.GetFields()){
-		if (sdlField.GetType() == typeName || FindCallChainForField(sdlField, typeName, callChain, false)){
-			callChain.prepend(sdlField.GetId());
-			
-			// add '->' if reference is inside other object, because they are "pointers"/optional
-			if (!_isRoot){
-				callChain.prepend('>');
-				callChain.prepend('-');
-			}
+	imtsdl::CSdlType* sdlTypePtr = dynamic_cast<imtsdl::CSdlType*>(foundEntry.get());
+	if (sdlTypePtr != nullptr){
+		for (const imtsdl::CSdlField& sdlField: sdlTypePtr->GetFields()){
+			if (sdlField.GetType() == typeName || FindCallChainForField(sdlField, typeName, callChain, false)){
+				callChain.prepend(sdlField.GetId());
 
-			return true;
+				// add '->' if reference is inside other object, because they are "pointers"/optional
+				if (!_isRoot){
+					callChain.prepend('>');
+					callChain.prepend('-');
+				}
+
+				return true;
+			}
 		}
 	}
 
