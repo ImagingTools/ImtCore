@@ -12,7 +12,8 @@ Rectangle {
 	property bool isPressed: false;
 	property int leftLimit: 0;
 	property int rightLimit: parent ? parent.widht - width : 1000000;
-	property real limitMargin: Style.marginM
+	property real leftLimitMargin: Style.spacingXXXL
+	property real rightLimitMargin: Style.spacingXXXL
 
 	property bool isClickMode: false;
 
@@ -47,10 +48,10 @@ Rectangle {
 						(newX < splitterContainer.x && newX > splitterContainer.leftLimit)){
 
 					splitterContainer.x += mouseX;
-					if(splitterContainer.x < splitterContainer.leftLimit + splitterContainer.limitMargin){
+					if(splitterContainer.x < splitterContainer.leftLimit + splitterContainer.leftLimitMargin){
 						splitterContainer.x = splitterContainer.leftLimit;
 					}
-					if(splitterContainer.x > splitterContainer.rightLimit - splitterContainer.limitMargin){
+					if(splitterContainer.x > splitterContainer.rightLimit - splitterContainer.rightLimitMargin){
 						splitterContainer.x = splitterContainer.rightLimit;
 					}
 				}
