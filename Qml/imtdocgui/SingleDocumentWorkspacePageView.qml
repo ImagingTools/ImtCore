@@ -10,6 +10,7 @@ DocumentWorkspacePageView {
 	id: root
 	
 	documentManagerView: documentManagerView
+	property alias visualStatusProvider: documentManagerView.visualStatusProvider
 	
 	onStartItemSourceCompChanged: {
 		if (startItemSourceComp){

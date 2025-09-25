@@ -23,10 +23,22 @@ CollectionViewCommandsDelegateBase {
 	property var documentDataControllersComp: [];
 	property var documentValidatorsComp: [];
 
-	property bool isSingleDocumentMode: false
-
 	Component.onCompleted: {
 		updateDocumentManager()
+	}
+	
+	NavigableItem {
+		parentSegment: collectionViewCommandsDelegateBase.collectionId
+		paths: collectionViewCommandsDelegateBase.documentTypeIds
+		onActivated: {
+			if (collectionViewCommandsDelegateBase.documentManager){
+				if (restPath.length === 1){
+					let documentTypeId = matchedPath
+					let documentId = restPath[0]
+					collectionViewCommandsDelegateBase.openDocumentEditor(documentId, documentTypeId)
+				}
+			}
+		}
 	}
 
 	onDocumentManagerIdChanged: {
@@ -34,15 +46,12 @@ CollectionViewCommandsDelegateBase {
 	}
 	
 	function updateDocumentManager(){
-		let documentManager = MainDocumentManager.getDocumentManager(documentManagerId)
-		if (!documentManager){
-			console.error("Unable to register document views. Error: Document manager with type-ID: '" +documentManagerId+ "' does not exists")
-			return
+		let documentManager = MainDocumentManager.getDocumentManager(documentManagerId);
+		console.log("updateDocumentManager", documentManagerId, documentManager, documentTypeIds)
+		if (documentManager){
+			collectionViewCommandsDelegateBase.documentManager = documentManager;
+			registerDocumentViews()
 		}
-
-		collectionViewCommandsDelegateBase.documentManager = documentManager
-
-		registerDocumentViews()
 	}
 
 	onCollectionViewChanged: {
@@ -50,8 +59,10 @@ CollectionViewCommandsDelegateBase {
 			collectionView.dataController.removed.connect(internal.onRemoved);
 		}
 	}
-	
-	function registerDocumentViews(){
+
+
+	function registerDocumentViews() {
+		console.log("onDocumentManagerChanged", documentTypeIds, documentViewsComp)
 		if (!documentManager){
 			return
 		}
@@ -60,8 +71,9 @@ CollectionViewCommandsDelegateBase {
 			let documentTypeId = documentTypeIds[i];
 			if (documentViewsComp.length > i){
 				let documentViewComp = documentViewsComp[i];
+				console.log("onDocumentManagerChanged2", documentTypeId, documentViewComp)
 				if (!documentManager.registerDocumentView(documentTypeId, documentViewComp)){
-					console.error("Unable to register document view for type-ID '" +documentTypeId+ "' into document manager '" +documentManagerId+"'")
+					console.error("Unable to register view for document type ID: ", documentTypeId)
 				}
 			}
 
@@ -109,26 +121,18 @@ CollectionViewCommandsDelegateBase {
 			collectionViewCommandsDelegateBase.documentManager.insertNewDocument(typeId);
 		}
 		else{
-			console.error("Unable to create new object with type-ID: '"+ typeId + "' . Error: Document manager is invalid")
+			console.error("Unable to create new object:", typeId, ". Error: Document manager is invalid")
 		}
 	}
 
 	function openDocumentEditor(objectId, typeId){
 		console.debug("DocumentCollectionViewDelegate.qml openDocumentEditor", objectId, typeId)
-		if (!documentManager){
-			console.log("Unable to open document editor for type-ID: '" + typeId + "'. Error: Document manager is invalid")
-			return
+		if (documentManager){
+			documentManager.openDocument(objectId, typeId);
 		}
-
-		if (isSingleDocumentMode){
-			let openedDocumentIds = documentManager.getOpenedDocumentIds()
-			for (let i = 0; i < openedDocumentIds.length; ++i){
-				documentManager.closeDocument(openedDocumentIds[i], true)
-			}
+		else{
+			console.error("Unable to open document for editing", typeId, ". Error: Document manager is invalid");
 		}
-
-		documentManager.openDocument(objectId, typeId);
-		NavigationController.push(documentManagerId+"/"+typeId+"/"+objectId)
 	}
 
 	function onEdit(){

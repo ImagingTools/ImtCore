@@ -481,7 +481,6 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
-	QString variableName = '*' + (field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')');
 
 	bool isEnum = false;
 	bool isUnion = false;
@@ -495,11 +494,13 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 		&isEnum,
 		&isUnion);
 
+	QString variableName = (field.GetId() + QStringLiteral("->at(") + dataIndexVarName + ')');
+
 	if (isEnum){
 		imtsdl::CSdlEnum sdlEnum;
 		[[maybe_unused]] bool found = GetSdlEnumForField(field, m_sdlEnumListCompPtr->GetEnums(false), sdlEnum);
 
-		const QString enumSourceVarName =  variableName;
+		const QString enumSourceVarName =  '*' + variableName;
 		const QString enumConvertedVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("StringValue");
 		variableName = enumConvertedVarName;
 
@@ -533,6 +534,9 @@ void CObjectModificatorCompBase::AddArrayFieldWriteToObjectImplCode(
 
 	// inLoop: add item
 	if (!isUnion){
+		if (!isEnum){
+			variableName.prepend('*');
+		}
 		FeedStreamHorizontally(stream, hIndents + 1);
 		AddFieldValueAppendToObjectArray(
 			stream,

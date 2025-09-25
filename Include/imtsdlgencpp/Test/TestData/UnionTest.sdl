@@ -13,9 +13,18 @@ type PrinterSpecificationBase {
 	name: String
 }
 
+enum LinkStatus {
+	OPEN
+	CLOSE
+}
+
 type Link {
 	link: ID!
+	status: LinkStatus
+	statusList: [LinkStatus]
 }
+
+
 
 union PrinterSpecification = PrinterSpecificationBase | Link | String | Double
 

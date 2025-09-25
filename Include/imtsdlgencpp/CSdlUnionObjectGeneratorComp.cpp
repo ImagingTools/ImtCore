@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtsdl/CSdlEntryBase.h>
 #include <imtsdl/CSdlType.h>
+#include <qassert.h>
 
 
 namespace imtsdlgencpp
@@ -80,7 +81,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessHeaderClassFile(QTextStream& stream, c
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("istd::TSharedNullable<%1> Version_1_0;").arg(sdlUnion->GetName());
+	stream << QStringLiteral("istd::TSharedNullable<%1> Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(";").arg(sdlUnion->GetName());
 	FeedStream(stream, 1, false);
 
 
@@ -108,7 +109,6 @@ bool CSdlUnionObjectGeneratorComp::ProcessHeaderClassListFile(QTextStream& strea
 
 
 	QString itemClassName = sdlNamespace + QStringLiteral("::") + sdlEntry.GetName();
-	// QString modelDataTypeName = itemClassName + QStringLiteral("::V1_0");
 	QString modelObjectDataTypeName = "QVariant"; // itemClassName + QStringLiteral("Object");
 	QString objectListClassName = QStringLiteral("C") + sdlEntry.GetName() + QStringLiteral("ObjectList");
 	QString objectListClassNameWithNamespace = sdlNamespace + QStringLiteral("::") + objectListClassName;
@@ -264,8 +264,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 
 
 	QString itemClassName = sdlNamespace + QStringLiteral("::") + sdlEntry.GetName();
-	// QString modelDataTypeName = itemClassName + QStringLiteral("::V1_0");
-	QString modelObjectDataTypeName = "QVariant"; // itemClassName + QStringLiteral("Object");
+	QString modelObjectDataTypeName = "QVariant";
 	QString objectListClassName = QStringLiteral("C") + sdlEntry.GetName() + QStringLiteral("ObjectList");
 	QString objectListClassNameWithNamespace = sdlNamespace + QStringLiteral("::") + objectListClassName;
 
@@ -319,9 +318,12 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 				nullptr,
 				false);
 			FeedStreamHorizontally(stream, 2);
-			// const QString sourceVariableName = QStringLiteral("*Version_1_0->") + sdlField.GetId();
+			std::shared_ptr<imtsdl::CSdlEntryBase> entryField  = FindEntryByName(sdlField.GetType(), m_sdlTypeListCompPtr->GetSdlTypes(false), m_sdlEnumListCompPtr->GetEnums(false), m_sdlUnionListCompPtr->GetUnions(false));
+			if (isCustom && !entryField){
+				qFatal() << __func__ << "Invalid field: " << sdlType.toUtf8();
+			}
 
-			stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">(this->Version_1_0->at(index).GetPtr())){");
+			stream << QStringLiteral("if (const ") << convertedType << QStringLiteral("* val = std::get_if<") << convertedType << QStringLiteral(">(this->Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->at(index).GetPtr())){");
 			FeedStream(stream, 1, false);
 			FeedStreamHorizontally(stream, 3);
 
@@ -331,7 +333,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 				FeedStream(stream, 1, false);
 
 				FeedStreamHorizontally(stream, 3);
-				stream << QStringLiteral("newObjectPtr->Version_1_0 = val->Version_1_0;");
+				stream << QStringLiteral("newObjectPtr->Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(" = val->Version_") << GetSdlEntryVersion(*entryField, false) << QStringLiteral(";");
 				FeedStream(stream, 1, false);
 				FeedStreamHorizontally(stream, 3);
 				stream << QStringLiteral("retVal = QVariant::fromValue(newObjectPtr);");
@@ -408,7 +410,8 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 	stream << '{';
 	FeedStream(stream, 1, false);
 
-	ProcessInsertToList(stream, sdlEntry, "Version_1_0->append(newItem);");
+	QString insertData = QStringLiteral("Version_") + GetSdlEntryVersion(sdlEntry, false) + QStringLiteral("->append(newItem);");
+	ProcessInsertToList(stream, sdlEntry, insertData.toUtf8());
 
 	stream << QStringLiteral("}");
 	FeedStream(stream, 3, false);
@@ -452,7 +455,6 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 			nullptr,
 			false);
 
-		// const QString sourceVariableName = QStringLiteral("*Version_1_0->") + field.GetId();
 		QString objectConvertedType = convertedType;
 		if (isCustom){
 			objectConvertedType += "Object*";
@@ -622,10 +624,11 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("if (index < 0 || index > Version_1_0->size()) return;");
+	stream << QStringLiteral("if (index < 0 || index > Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->size()) return;");
 	FeedStream(stream, 1, false);
 
-	ProcessInsertToList(stream, sdlEntry, "Version_1_0->insert(index, newItem);");
+	insertData = QStringLiteral("Version_") + GetSdlEntryVersion(sdlEntry, false).toUtf8() + QStringLiteral("->insert(index, newItem);");
+	ProcessInsertToList(stream, sdlEntry, insertData.toUtf8());
 
 	stream << QStringLiteral("}");
 	FeedStream(stream, 3, false);
@@ -665,7 +668,7 @@ bool CSdlUnionObjectGeneratorComp::ProcessSourceClassListFile(QTextStream& strea
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("if (nameId == \"item\" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){");
+	stream << QStringLiteral("if (nameId == \"item\" && Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral(".has_value() && index >= 0 && index < Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->count()){");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream, 2);
@@ -704,15 +707,8 @@ bool CSdlUnionObjectGeneratorComp::ProcessInsertToList(QTextStream& stream, cons
 	}
 
 	FeedStreamHorizontally(stream, 1);
-	stream << QStringLiteral("beginInsertRows(QModelIndex(), Version_1_0->count(), 0);");
+	stream << QStringLiteral("beginInsertRows(QModelIndex(), Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->count(), 0);");
 	FeedStream(stream, 1, false);
-
-
-	// if (item.canConvert<CPrinterSpecificationBaseObject*>()){
-	// 	CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
-	// 	CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
-	// 	Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
-	// }
 
 	for (const auto& sdlType : sdlUnion->GetTypes()){
 		imtsdl::CSdlField sdlField;
@@ -732,12 +728,10 @@ bool CSdlUnionObjectGeneratorComp::ProcessInsertToList(QTextStream& stream, cons
 			nullptr,
 			false);
 
-		// const QString sourceVariableName = QStringLiteral("*Version_1_0->") + field.GetId();
 		QString objectConvertedType = convertedType;
 		if (isCustom){
 			objectConvertedType += "Object*";
 		}
-		// QString unionTypeObjectName = QStringLiteral("%1Object").arg(sdlUnion->GetName());
 
 		FeedStream(stream, 1, false);
 		FeedStreamHorizontally(stream, 1);
@@ -754,12 +748,12 @@ bool CSdlUnionObjectGeneratorComp::ProcessInsertToList(QTextStream& stream, cons
 			FeedStream(stream, 1, false);
 
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("Version_1_0->append(istd::TSharedNullable<") << sdlUnion->GetName() << QStringLiteral(">(*newItemPtr));");
+			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->append(istd::TSharedNullable<") << sdlUnion->GetName() << QStringLiteral(">(*newItemPtr));");
 			FeedStream(stream, 1, false);
 		}
 		else{
 			FeedStreamHorizontally(stream, 2);
-			stream << QStringLiteral("Version_1_0->append(istd::TSharedNullable<") << sdlUnion->GetName() << QStringLiteral(">(val));");
+			stream << QStringLiteral("Version_") << GetSdlEntryVersion(sdlEntry, false) << QStringLiteral("->append(istd::TSharedNullable<") << sdlUnion->GetName() << QStringLiteral(">(val));");
 			FeedStream(stream, 1, false);
 		}
 
@@ -835,7 +829,6 @@ bool CSdlUnionObjectGeneratorComp::ProcessConvertListData(QTextStream& stream, c
 			nullptr,
 			false);
 
-		// const QString sourceVariableName = QStringLiteral("*Version_1_0->") + field.GetId();
 		QString objectConvertedType = convertedType;
 		if (isCustom){
 			objectConvertedType += "Object*";
