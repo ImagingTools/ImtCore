@@ -38,7 +38,7 @@ ControlBase {
     }
 
     onDecoratorChanged: {
-        if(customRadioButton.decorator_.checked !==undefined){
+        if(customRadioButton.decorator_ && customRadioButton.decorator_.checked !== undefined){
             customRadioButton.decorator_.checked = checked;
         }
     }
