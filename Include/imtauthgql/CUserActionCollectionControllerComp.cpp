@@ -143,7 +143,8 @@ void CUserActionCollectionControllerComp::SetAdditionalFilters(const imtgql::CGq
 		const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
 		if (userInfoPtr != nullptr){
 			if (!userInfoPtr->IsAdmin()){
-				QByteArrayList userPermissions = userInfoPtr->GetPermissions();
+				QByteArray productId = gqlRequest.GetHeader("productid");
+				QByteArrayList userPermissions = userInfoPtr->GetPermissions(productId);
 				bool viewAllUserActions = false;
 
 				if (m_checkPermissionCompPtr.IsValid()){

@@ -193,7 +193,7 @@
                                 <Value>userName</Value>
                                 <Value>targetTypeName</Value>
                                 <Value>actionTypeName</Value>
-                                <Value>actionDescription</Value>
+                                <Value>actionTypeDescription</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

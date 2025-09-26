@@ -27,6 +27,7 @@ RemoteCollectionView {
 	onHeadersChanged: {
 		table.setSortingInfo("timeStamp", "DESC")
 		table.setColumnContentById("actionType", actionCellDelegateComp);
+		table.setColumnContentById("userLink", userCellDelegateComp);
 	}
 
 	Component {
@@ -72,6 +73,28 @@ RemoteCollectionView {
 				onCollectionModelChanged: {
 					userDelegateFilter.setOptionsList(m_options)
 				}
+			}
+		}
+	}
+	
+	Component {
+		id: userCellDelegateComp
+		TextLinkCellDelegate {
+			onLinkActivated: {
+				let targetLink = getValue()
+				if (targetLink.containsKey("url")){
+					let targetUrl = targetLink.getData("url")
+					if (targetUrl && targetUrl.containsKey("path")){
+						let path = targetUrl.getData("path")
+						NavigationController.navigate(path)
+					}
+				}
+			}
+			
+			onReused: {
+				imageSource = "../../../" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal)
+				let targetLink = getValue()
+				text = targetLink.getData("name")
 			}
 		}
 	}

@@ -1,62 +1,78 @@
 #include <imtauthdb/CUserActionDatabaseDelegateComp.h>
 
 
-// ImtCore includes
-#include <imtauth/IUserRecentAction.h>
-
-
 namespace imtauthdb
 {
 
 
-// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
+// protected methods
 
-istd::IChangeableUniquePtr CUserActionDatabaseDelegateComp::CreateObjectFromRecord(
-			const QSqlRecord& record,
-			const iprm::IParamsSet* paramsPtr) const
+// reimplemented (icomp::CComponentBase)
+
+void CUserActionDatabaseDelegateComp::OnComponentCreated()
 {
-	istd::IChangeableUniquePtr documentPtr = CreateObject("UserAction");
-	if (!documentPtr.IsValid()){
-		return nullptr;
-	}
+	BaseClass::OnComponentCreated();
 
-	imtauth::IUserRecentAction* userRecentActionPtr = dynamic_cast<imtauth::IUserRecentAction*>(documentPtr.GetPtr());
-	if (userRecentActionPtr == nullptr){
-		return nullptr;
-	}
+	if (m_databaseEngineCompPtr.IsValid()){
+		QString tableName = GetTableName();
 
-	return documentPtr;
-}
-
-
-QByteArray CUserActionDatabaseDelegateComp::GetSelectionQuery(
-			const QByteArray& objectId,
-			int offset,
-			int count,
-			const iprm::IParamsSet* paramsPtr) const
-{
-	int tableCount = m_databaseDelegatesCompPtr.GetCount();
-	if (tableCount == 0){
-		return QByteArray();
-	}
-
-	QByteArray retVal = QString(R"(SELECT "Id","DocumentId" as "TargetId","TypeId" as "TargetTypeId","RevisionInfo"->>'OwnerId' as "UserId","TimeStamp" FROM ()").toUtf8();
-
-	for (int i = 0; i < tableCount; ++i){
-		const imtdb::ISqlDatabaseObjectDelegate* databaseDelegatePtr = m_databaseDelegatesCompPtr[i];
-		if (databaseDelegatePtr != nullptr){
-			QString tableName = databaseDelegatePtr->GetTableName();
-			retVal += QString(R"(SELECT * FROM "%1")").arg(tableName).toUtf8();
-
-			if (i < tableCount - 1){
-				retVal += QString(R"( UNION ALL )").toUtf8();
+		if (!TableExists(tableName)){
+			QFile scriptFile(":/SQL/CreateCollectionTable.sql");
+			if (!scriptFile.open(QFile::ReadOnly)){
+				SendErrorMessage(0, QT_TR_NOOP(QString("Collection table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
+				return;
+			}
+	
+			QByteArray createTableQuery = scriptFile.readAll();
+			scriptFile.close();
+	
+			createTableQuery.replace("${TableName}", tableName.toUtf8());
+			QSqlError sqlError;
+			m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
+	
+			if (sqlError.type() != QSqlError::NoError){
+				qCritical() << __FILE__ << __LINE__
+							<< "\n\t| Table could not be created"
+							<< "\n\t| Error: " << sqlError
+							<< "\n\t| Query: " << createTableQuery;
+	
+				SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Table could not be created"
+													   "\n\t| Error: %1"
+													   "\n\t| Query: %2")
+												   .arg(sqlError.text(), qPrintable(createTableQuery))));
 			}
 		}
 	}
+}
 
-	retVal += QString(R"() AS "UserActions" ORDER BY "TimeStamp" DESC)").toUtf8();
 
-	return retVal;
+// private methods
+
+bool CUserActionDatabaseDelegateComp::TableExists(const QString& tableName) const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	QString tableExistsQuery = QString(R"(SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '%1');)").arg(tableName);
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(tableExistsQuery.toUtf8(), &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		return false;
+	}
+
+	if (!sqlQuery.next()){
+		return false;
+	}
+
+	QSqlRecord record = sqlQuery.record();
+	if (record.contains("exists")){
+		return record.value("exists").toBool();
+	}
+
+	return false;
 }
 
 

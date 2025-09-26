@@ -56,7 +56,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserActionDatabaseDelegate" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseDocumentDelegate">
+        <Element Id="UserActionDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="UserActionDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
