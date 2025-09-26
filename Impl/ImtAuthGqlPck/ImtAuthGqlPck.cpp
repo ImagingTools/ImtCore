@@ -110,9 +110,9 @@ I_EXPORT_COMPONENT(
 			"Profile Controller");
 
 I_EXPORT_COMPONENT(
-			RoleMetaInfoControllerProxy,
-			"Role meta info controller proxy",
-			"Role Meta Info Controller Proxy");
+			RoleRemoteCollectionController,
+			"Role remote collection controller",
+			"Role Remote Collection Controller");
 
 I_EXPORT_COMPONENT(
 			RemoteJwtSessionController,

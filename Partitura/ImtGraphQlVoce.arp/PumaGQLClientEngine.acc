@@ -325,7 +325,7 @@
                                             <Value>RemoteAuthorizationController</Value>
                                             <Value>RemoteUserController</Value>
                                             <Value>RemoteCommandsController</Value>
-                                            <Value>RoleMetaInfoControllerProxy</Value>
+                                            <Value>RoleRemoteCollectionController</Value>
                                             <Value>RemoteCollectionController</Value>
                                             <Value>RemoteRepresentationController</Value>
                                         </Values>
@@ -367,7 +367,6 @@
                                 <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>Roles</Value>
                                             <Value>Users</Value>
                                             <Value>Groups</Value>
                                         </Values>
@@ -481,26 +480,20 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="RoleMetaInfoControllerProxy" PackageId="ImtAuthGqlPck" ComponentId="RoleMetaInfoControllerProxy">
+                    <Element Id="RoleRemoteCollectionController" PackageId="ImtAuthGqlPck" ComponentId="RoleRemoteCollectionController">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                                <AttributeInfo Id="CollectionIds" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RolesMetaInfo</Value>
+                                            <Value>Roles</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
-                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ProductInfo" Type="Reference" ExportId="ProductInfo">

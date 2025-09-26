@@ -25,7 +25,7 @@
 #include <imtauthgql/CUserSerializableCollectionControllerComp.h>
 #include <imtauthgql/CUserSettingsControllerComp.h>
 #include <imtauthgql/CProfileControllerComp.h>
-#include <imtauthgql/CRoleMetaInfoControllerProxyComp.h>
+#include <imtauthgql/CRoleRemoteCollectionControllerComp.h>
 #include <imtauthgql/CRemoteJwtSessionControllerComp.h>
 #include <imtauthgql/CGqlJwtSessionControllerComp.h>
 #include <imtauthgql/CRoleMetaInfoDelegateComp.h>
@@ -63,7 +63,7 @@ typedef imtauthgql::CLdapAuthorizationControllerComp LdapAuthorizationController
 typedef imtauthgql::CUserSerializableCollectionControllerComp UserSerializableCollectionController;
 typedef imtauthgql::CUserSettingsControllerComp UserSettingsController;
 typedef imtauthgql::CProfileControllerComp ProfileController;
-typedef imtauthgql::CRoleMetaInfoControllerProxyComp RoleMetaInfoControllerProxy;
+typedef imtauthgql::CRoleRemoteCollectionControllerComp RoleRemoteCollectionController;
 typedef imtauthgql::CRemoteJwtSessionControllerComp RemoteJwtSessionController;
 typedef imtauthgql::CGqlJwtSessionControllerComp GqlJwtSessionController;
 typedef imtauthgql::CRoleMetaInfoDelegateComp RoleMetaInfoDelegate;

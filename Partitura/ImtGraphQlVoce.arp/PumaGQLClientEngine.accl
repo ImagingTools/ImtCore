@@ -31,7 +31,7 @@
                 <Element ComponentName="RemoteCommandsController" X="575" Y="375" Note=""/>
                 <Element ComponentName="RemoteRepresentationController" X="600" Y="200" Note=""/>
                 <Element ComponentName="RemoteUserController" X="250" Y="200" Note=""/>
-                <Element ComponentName="RoleMetaInfoControllerProxy" X="250" Y="375" Note=""/>
+                <Element ComponentName="RoleRemoteCollectionController" X="950" Y="550" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
