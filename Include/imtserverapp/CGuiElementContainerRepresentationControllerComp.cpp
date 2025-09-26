@@ -69,12 +69,21 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 		return false;
 	}
 
+	QByteArray productId;
+	iprm::TParamsPtr<iprm::IIdParam> productIdParamPtr(paramsPtr, "ProductId");
+	if (productIdParamPtr.IsValid()){
+		productId = productIdParamPtr->GetId();
+	}
+
 	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
 
 	imtauth::IUserInfo::FeatureIds userPermissions;
 	bool isAdmin = false;
 	if (userInfoParamPtr.IsValid()){
-		userPermissions = userInfoParamPtr->GetPermissions();
+		if (!productId.isEmpty()){
+			userPermissions = userInfoParamPtr->GetPermissions(productId);
+		}
+
 		isAdmin = userInfoParamPtr->IsAdmin();
 	}
 
@@ -112,7 +121,7 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 			return false;
 		}
 	}
-	
+
 	int n = representation.GetItemsCount();
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < n - i - 1; j++) {
@@ -122,15 +131,14 @@ bool CGuiElementContainerRepresentationControllerComp::GetRepresentationFromData
 			int priority2   = representation.GetData("priority", j + 1).toInt();
 	
 			bool needSwap = false;
-	
-			if (alignment1 != alignment2) {
-				// Сначала Qt::AlignTop
+
+			if (alignment1 != alignment2){
 				needSwap = (alignment1 == Qt::AlignBottom && alignment2 == Qt::AlignTop);
-			} else {
-				// Если alignment одинаковый → сортируем по priority
+			} 
+			else {
 				needSwap = (priority1 < priority2);
 			}
-	
+
 			if (needSwap) {
 				representation.swapItems(j, j + 1);
 			}

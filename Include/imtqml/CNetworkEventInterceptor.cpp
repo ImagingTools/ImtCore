@@ -21,8 +21,6 @@ void CNetworkEventInterceptor::OnReplyFinished()
 		int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		QByteArray requestBody = reply->property("requestBody").toByteArray();
 
-		qDebug() << "OnReplyFinished" << statusCode << requestBody;
-
 		CGqlRequest* gqlRequestPtr = nullptr;
 		if (m_replyOwners.contains(reply)){
 			gqlRequestPtr = m_replyOwners.take(reply);

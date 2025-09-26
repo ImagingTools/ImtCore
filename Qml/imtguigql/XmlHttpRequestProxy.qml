@@ -16,8 +16,6 @@ QtObject {
 	signal internalError(string gqlData, var gqlRequestRef);
 
 	Component.onCompleted: {
-		console.log("XmlHttpRequestProxy onCompleted");
-
 		if (Qt.platform.os == "web"){
 			var originalXHROpen = XMLHttpRequest.prototype.open;
 			var originalXHRSend = XMLHttpRequest.prototype.send;
@@ -34,6 +32,10 @@ QtObject {
 				var xhr = this;
 				var originalOnReadyStateChange = xhr.onreadystatechange;
 				var gqlRequestRef = xhr.gqlRequest;
+
+				if (context && context.appId) {
+					xhr.setRequestHeader("productId", context.appId);
+				}
 
 				xhr.onreadystatechange = function(){
 					if (xhr.readyState === XMLHttpRequest.DONE){
@@ -53,7 +55,6 @@ QtObject {
 			};
 		}
 		else{
-			console.log("NetworkEventInterceptor connect");
 			NetworkEventInterceptor.unauthorized.connect(unauthorized)
 			NetworkEventInterceptor.forbidden.connect(forbidden)
 		}

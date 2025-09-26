@@ -111,10 +111,13 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 		productId = inputParamPtr->GetParamArgumentValue("productId").toByteArray();
 	}
 
+	if (productId.isEmpty()){
+		productId = gqlRequest.GetHeader("productid");
+	}
+
 	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();
 	if (gqlRequest.GetRequestContext() != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
-		// Q_ASSERT(userInfoPtr != nullptr);
 		if (userInfoPtr != nullptr){
 			istd::TDelPtr<imtauth::IUserInfo> userInfoParamPtr;
 
