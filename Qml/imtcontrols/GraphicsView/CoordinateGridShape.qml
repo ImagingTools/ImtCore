@@ -21,6 +21,7 @@ BoundingBox {
 	property string backgroundColor: Style.baseColor;
 	property string majorGridColor: Style.borderColor2;
 	property string minorGridColor: Style.borderColor;
+	property real majorGridOpacity: 0.5
 	property string axesColor: Style.borderColor2;
 
 	property string labelX: "X";
@@ -32,6 +33,8 @@ BoundingBox {
 	property int legendMargin: -1;
 
 	property bool  canDrawText: true;
+	property bool showGridLines: true;
+	property bool showGridFrame: !showGridLines;
 
 	property int labelPrecision : 0;
 
@@ -97,6 +100,7 @@ BoundingBox {
 		//MINOR GRID
 
 		//let hasMinorGrid = scaleCoeff >= 2
+		if(gridShape.showGridLines){
 		let hasMinorGrid = gridShape.gridStepMajorX * scaleCoeff > 40
 
 		if(hasMinorGrid){
@@ -147,6 +151,7 @@ BoundingBox {
 
 		//MAJOR GRID
 		ctx.strokeStyle = gridShape.majorGridColor;
+		ctx.globalAlpha = gridShape.majorGridOpacity
 		//vertical major lines
 		for(let i = 0; i * stepX  <= (gridShape.viewItem.drawingAreaWidth  /*- labelXWidth*/ + deltaAddX)/scaleCoeff; i++){//vertical lines
 			if(gridShape.thinningCheck(scaleCoeff, i)){
@@ -194,6 +199,8 @@ BoundingBox {
 			ctx.closePath()
 			ctx.stroke();
 		}
+
+		ctx.globalAlpha = 1
 
 		// completing the grid to zero
 		//MINOR GRID
@@ -245,6 +252,8 @@ BoundingBox {
 				ctx.stroke();
 			}
 		}
+
+		ctx.globalAlpha = gridShape.majorGridOpacity
 
 		//MAJOR GRID
 		//ctx.strokeStyle = "red"
@@ -298,6 +307,8 @@ BoundingBox {
 			ctx.stroke();
 		}
 
+		ctx.globalAlpha = 1
+		}
 
 		//AXES BACKGROUND
 
@@ -433,6 +444,8 @@ BoundingBox {
 		}
 
 		//horizontal axe
+		ctx.globalAlpha = gridShape.majorGridOpacity
+
 		ctx.lineWidth = 2;
 		ctx.strokeStyle = gridShape.axesColor;
 		ctx.beginPath()
@@ -443,10 +456,33 @@ BoundingBox {
 
 		//vertical axe
 		ctx.beginPath()
-		ctx.moveTo(topYAxePointTr.x, topYAxePoint.y + marginForXNameLabel);
+		ctx.moveTo(topYAxePointTr.x, topYAxePoint.y + marginForYNameLabel);
 		ctx.lineTo(bottomYAxePointTr.x, bottomYAxePoint.y);
 		ctx.closePath()
 		ctx.stroke();
+
+
+		//frame
+		if(gridShape.showGridFrame){
+
+			let leftBottomFrame = Qt.point(labelXWidth, gridShape.viewItem.drawingAreaHeight - labelYHeight)
+			let leftTopFrame = Qt.point(labelXWidth, marginForYNameLabel)
+			let rightTopFrame = Qt.point(gridShape.viewItem.drawingAreaWidth - marginForXNameLabel, marginForYNameLabel)
+			let rightBottomFrame = Qt.point(gridShape.viewItem.drawingAreaWidth - marginForXNameLabel, gridShape.viewItem.drawingAreaHeight - labelYHeight)
+
+			ctx.beginPath()
+			ctx.moveTo(leftBottomFrame.x, leftBottomFrame.y);
+			ctx.lineTo(leftTopFrame.x, leftTopFrame.y);
+			ctx.lineTo(rightTopFrame.x, rightTopFrame.y);
+			ctx.lineTo(rightBottomFrame.x, rightBottomFrame.y);
+			ctx.closePath()
+			ctx.stroke();
+
+		}
+
+
+		ctx.globalAlpha = 1
+
 
 
 		//Legend
