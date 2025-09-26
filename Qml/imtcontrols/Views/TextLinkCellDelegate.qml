@@ -5,12 +5,27 @@ TableCellDelegateBase {
 	id: objectLinkDelegate
 
 	property string text
+	property string imageSource
 	signal linkActivated()
+
+	Image {
+		id: image
+
+		anchors.verticalCenter: parent.verticalCenter
+		anchors.left: parent.left
+		anchors.leftMargin: Style.marginM
+		width: visible ? 20 : 0
+		height: width
+		visible: source !== ""
+		sourceSize.width: width
+		sourceSize.height: height
+		source: objectLinkDelegate.imageSource
+	}
 
 	Text {
 		id: linkText
 		anchors.verticalCenter: parent.verticalCenter
-		anchors.left: parent.left
+		anchors.left: image.visible ? image.right : parent.left
 		anchors.leftMargin: Style.marginM
 		font.pixelSize: Style.fontSizeM
 		font.family: Style.fontFamily

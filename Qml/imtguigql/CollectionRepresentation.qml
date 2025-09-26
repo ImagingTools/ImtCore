@@ -197,7 +197,7 @@ Item {
 	}
 
 	function getHeaders(){
-		return {};
+		return {}
 	}
 	
 	RemoveElementsInput {

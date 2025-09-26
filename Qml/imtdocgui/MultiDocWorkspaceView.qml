@@ -39,7 +39,6 @@ Item {
 		id: firstTabNavigation
 		forwardRest: false
 		onActivated: {
-			console.log("NavigableItem::MultiDocWorkspaceView::onActivated firstTabNavigation", restPath, matchedPath)
 			if (restPath.length <= 1){
 				tabView.currentIndex = 0
 			}
@@ -53,8 +52,6 @@ Item {
 				if (restPath.length === 1){
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
-					console.log("NavigableItem::MultiDocWorkspaceView::onActivated", restPath, matchedPath)
-					
 					workspaceView.documentManager.openDocument(documentId, documentTypeId)
 				}
 			}

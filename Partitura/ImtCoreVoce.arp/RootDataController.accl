@@ -8,14 +8,14 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfoController" X="160" Y="20" Note=""/>
-        <Element ComponentName="AuthorizationOptions" X="340" Y="-140" Note=""/>
-        <Element ComponentName="Demultiplexer" X="640" Y="-220" Note=""/>
-        <Element ComponentName="PagesController" X="1020" Y="120" Note=""/>
-        <Element ComponentName="PermissionsController" X="-60" Y="-140" Note=""/>
-        <Element ComponentName="ProfileController" X="760" Y="120" Note=""/>
-        <Element ComponentName="SlaveDemultiplexer" X="1180" Y="-240" Note=""/>
-        <Element ComponentName="UserSettings" X="460" Y="120" Note=""/>
+        <Element ComponentName="ApplicationInfoController" X="225" Y="400" Note=""/>
+        <Element ComponentName="AuthorizationOptions" X="425" Y="275" Note=""/>
+        <Element ComponentName="Demultiplexer" X="600" Y="75" Note=""/>
+        <Element ComponentName="PagesController" X="1000" Y="500" Note=""/>
+        <Element ComponentName="PermissionsController" X="150" Y="150" Note=""/>
+        <Element ComponentName="ProfileController" X="725" Y="500" Note=""/>
+        <Element ComponentName="SlaveDemultiplexer" X="1050" Y="150" Note=""/>
+        <Element ComponentName="UserSettings" X="500" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="UserSettings">

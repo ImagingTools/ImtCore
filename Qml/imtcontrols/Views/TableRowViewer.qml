@@ -63,14 +63,14 @@ Row {
 						contentComp = dataList.rowDelegate.tableItem.cellDelegate;
 					}
 
+					if (headerId.toLowerCase().endsWith("link")){
+						contentComp = objectLinkDelegateComp;
+					}
+
 					if (Object.keys(contents).includes(headerId)){
 						if (contents[headerId]){
 							contentComp = contents[headerId];
 						}
-					}
-
-					if (headerId.toLowerCase().endsWith("link")){
-						contentComp = objectLinkDelegateComp;
 					}
 
 					loader.sourceComponent = contentComp;

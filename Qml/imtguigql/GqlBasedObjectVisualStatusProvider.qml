@@ -14,6 +14,11 @@ ObjectVisualStatusProvider {
 	}
 
 	function getVisualStatus(id, typeId){
+		if (collectionId === ""){
+			console.error("Unable to get visual status for object: '"+id+"', type-ID: '"+typeId+"'. Error: Collection-ID is empty")
+			return
+		}
+
 		objectVisualStatusInput.m_objectId = id
 		objectVisualStatusInput.m_typeId = typeId
 		getVisualStatusInfoRequest.send(objectVisualStatusInput)

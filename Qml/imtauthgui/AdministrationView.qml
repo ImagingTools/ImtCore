@@ -77,11 +77,11 @@ Item {
 
     Component {
         id: roleCollectionComp;
-
+        
         RoleCollectionView {
             productId: administrationContainer.productId;
             documentManager: administrationContainer.documentManager;
-            rolesModel: administrationContainer.rolesModel;
+            rolesModel: administrationContainer.rolesModel
 
             function getHeaders(){
                 return administrationContainer.getHeaders()
@@ -170,7 +170,7 @@ Item {
                 roleCollectionDataProvider.productId = administrationContainer.productId;
                 roleCollectionDataProvider.updateModel();
 
-                multiPageView.addPage("Roles", qsTr("Roles"), roleCollectionComp);
+                multiPageView.addPage("Roles", qsTr("Roles"), roleCollectionComp, "Icons/Role");
             }
             else{
                 console.warn("Role collection cannot be displayed. Error: Permission denied");
@@ -179,7 +179,7 @@ Item {
             ok = PermissionsController.checkPermission("ViewUsers");
             if (ok){
                 userCollectionDataProvider.updateModel();
-                multiPageView.addPage("Users", qsTr("Users"), userCollectionComp);
+                multiPageView.addPage("Users", qsTr("Users"), userCollectionComp, "Icons/Account");
             }
             else{
                 console.warn("User collection cannot be displayed. Error: Permission denied");
@@ -188,7 +188,7 @@ Item {
             ok = PermissionsController.checkPermission("ViewGroups");
             if (ok){
                 groupCollectionDataProvider.updateModel();
-                multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp);
+                multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp, "Icons/MultipleUser");
             }
             else{
                 console.warn("Group collection cannot be displayed. Error: Permission denied");

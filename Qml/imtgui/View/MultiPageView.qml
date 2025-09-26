@@ -28,8 +28,8 @@ Item {
         pagesModel.clear();
     }
 
-    function addPage(pageId, pageName, pageComp){
-        pagesModel.append({id: pageId, name: pageName, SourceComponent: pageComp})
+    function addPage(pageId, pageName, pageComp, icon){
+        pagesModel.append({id: pageId, name: pageName, SourceComponent: pageComp, icon: icon})
     }
 
     function removePage(pageId){
@@ -133,7 +133,7 @@ Item {
 
                 delegate: ItemDelegate {
                     text: model.name;
-
+                    iconSource: model.icon ? "../../../" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) : ""
                     highlighted: root.currentIndex === model.index;
 
                     onClicked: {
