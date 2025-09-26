@@ -51,7 +51,7 @@
                     <AttributeInfo Id="EditAlignment" Type="Integer" ExportId="EditAlignment">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="EditCommandName" Type="String" ExportId="EditCommandName">
+                    <AttributeInfo Id="EditCommandName" Type="Text" ExportId="EditCommandName">
                         <Data IsEnabled="true" Value="Edit"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EditDescription" Type="Text" ExportId="EditDescription">
@@ -72,7 +72,7 @@
                     <AttributeInfo Id="ExportAlignment" Type="Integer" ExportId="ExportAlignment">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ExportCommandName" Type="String" ExportId="ExportCommandName">
+                    <AttributeInfo Id="ExportCommandName" Type="Text" ExportId="ExportCommandName">
                         <Data IsEnabled="true" Value="Export"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ExportDescription" Type="Text" ExportId="ExportDescription">
@@ -96,7 +96,7 @@
                     <AttributeInfo Id="ImportAlignment" Type="Integer" ExportId="ImportAlignment">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ImportCommandName" Type="String" ExportId="ImportCommandName">
+                    <AttributeInfo Id="ImportCommandName" Type="Text" ExportId="ImportCommandName">
                         <Data IsEnabled="true" Value="Import"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ImportDescription" Type="Text" ExportId="ImportDescription">
@@ -168,7 +168,7 @@
                     <AttributeInfo Id="NewAlignment" Type="Integer" ExportId="NewAlignment">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="NewCommandName" Type="String" ExportId="NewCommandName">
+                    <AttributeInfo Id="NewCommandName" Type="Text" ExportId="NewCommandName">
                         <Data IsEnabled="true" Value="New"/>
                     </AttributeInfo>
                     <AttributeInfo Id="NewDescription" Type="Text" ExportId="NewDescription">
@@ -192,7 +192,7 @@
                     <AttributeInfo Id="RemoveAllAlignment" Type="Integer" ExportId="RemoveAllAlignment">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RemoveAllCommandName" Type="String" ExportId="RemoveAllCommandName">
+                    <AttributeInfo Id="RemoveAllCommandName" Type="Text" ExportId="RemoveAllCommandName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RemoveAllDescription" Type="Text" ExportId="RemoveAllDescription">
@@ -210,7 +210,7 @@
                     <AttributeInfo Id="RemoveAllStatus" Type="Text" ExportId="RemoveAllStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RemoveCommandName" Type="String" ExportId="RemoveCommandName">
+                    <AttributeInfo Id="RemoveCommandName" Type="Text" ExportId="RemoveCommandName">
                         <Data IsEnabled="true" Value="Remove"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RemoveDescription" Type="Text" ExportId="RemoveDescription">
@@ -231,7 +231,7 @@
                     <AttributeInfo Id="RestoreAllAlignment" Type="Integer" ExportId="RestoreAllAlignment">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RestoreAllCommandName" Type="String" ExportId="RestoreAllCommandName">
+                    <AttributeInfo Id="RestoreAllCommandName" Type="Text" ExportId="RestoreAllCommandName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RestoreAllDescription" Type="Text" ExportId="RestoreAllDescription">
@@ -249,7 +249,7 @@
                     <AttributeInfo Id="RestoreAllStatus" Type="Text" ExportId="RestoreAllStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RestoreCommandName" Type="String" ExportId="RestoreCommandName">
+                    <AttributeInfo Id="RestoreCommandName" Type="Text" ExportId="RestoreCommandName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RestoreDescription" Type="Text" ExportId="RestoreDescription">

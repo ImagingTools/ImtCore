@@ -89,7 +89,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="EditCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="EditCommandName">
                         <Data IsEnabled="true" Value="Edit"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
@@ -141,7 +141,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="NewCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="NewCommandName">
                         <Data IsEnabled="true" Value="New"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
@@ -174,7 +174,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="REmoveCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="REmoveCommandName">
                         <Data IsEnabled="true" Value="Remove"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
@@ -207,7 +207,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="RevisionCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="RevisionCommandName">
                         <Data IsEnabled="true" Value="Revision"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">

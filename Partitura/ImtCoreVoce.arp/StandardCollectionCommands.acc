@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5422" Description="ACF"/>
             <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+            <Version Id="1023" Number="395522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -25,6 +25,9 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="EditDescription">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="EditIconPath">
                         <Data IsEnabled="true" Value="Icons/Edit"/>
                     </AttributeInfo>
@@ -37,13 +40,19 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="EditCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="EditCommandName">
                         <Data IsEnabled="true" Value="Edit"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="EditPriority">
                         <Data IsEnabled="true" Value="3"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Status" Type="Text" ExportId="EditStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubCommands" Type="Reference[]" ExportId="EditSubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -67,6 +76,9 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="ExportDescription">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="ExportIconPath">
                         <Data IsEnabled="true" Value="Icons/Export"/>
                     </AttributeInfo>
@@ -79,13 +91,19 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="ExportCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="ExportCommandName">
                         <Data IsEnabled="true" Value="Export"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="ExportPriority">
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Status" Type="Text" ExportId="ExportStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubCommands" Type="Reference[]" ExportId="ExportSubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -147,6 +165,9 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="ImportDescription">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="ImportIconPath">
                         <Data IsEnabled="true" Value="Icons/Import"/>
                     </AttributeInfo>
@@ -159,13 +180,19 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="ImportCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="ImportCommandName">
                         <Data IsEnabled="true" Value="Import"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="ImportPriority">
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Status" Type="Text" ExportId="ImportStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubCommands" Type="Reference[]" ExportId="ImportSubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -189,6 +216,9 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="NewDescription">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="NewIconPath">
                         <Data IsEnabled="true" Value="Icons/Add"/>
                     </AttributeInfo>
@@ -201,13 +231,19 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="NewCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="NewCommandName">
                         <Data IsEnabled="true" Value="New"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="NewPriority">
                         <Data IsEnabled="true" Value="1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Status" Type="Text" ExportId="NewStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubCommands" Type="Reference[]" ExportId="NewSubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -231,6 +267,9 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="RemoveDescription">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="RemoveIconPath">
                         <Data IsEnabled="true" Value="Icons/Delete"/>
                     </AttributeInfo>
@@ -243,11 +282,20 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="RemoveCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="RemoveCommandName">
                         <Data IsEnabled="true" Value="Remove"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="RemovePriority">
                         <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Status" Type="Text" ExportId="Status">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubCommands" Type="Reference[]" ExportId="RemoveSubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -270,6 +318,9 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="RemoveAllDescription">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="RemoveAllIconPath">
                         <Data IsEnabled="true" Value="Icons/Delete"/>
                     </AttributeInfo>
@@ -282,13 +333,19 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="RemoveAllCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="RemoveAllCommandName">
                         <Data IsEnabled="true" Value="Remove All"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="RemoveAllPriority">
                         <Data IsEnabled="true" Value="-1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Status" Type="Text" ExportId="RemoveAllStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubCommands" Type="Reference[]" ExportId="RemoveAllSubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -312,6 +369,9 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="RestoreDescription">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="RestoreIconPath">
                         <Data IsEnabled="true" Value="Icons/Restore"/>
                     </AttributeInfo>
@@ -324,13 +384,19 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="RestoreCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="RestoreCommandName">
                         <Data IsEnabled="true" Value="Restore"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="RestorePriority">
                         <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Status" Type="Text" ExportId="RestoreStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubCommands" Type="Reference[]" ExportId="RestoreSubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -354,6 +420,9 @@
                     <AttributeInfo Id="Description" Type="Text" ExportId="RestoreAllDescription">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="String" ExportId="RestoreAllIconPath">
                         <Data IsEnabled="true" Value="Icons/Restore"/>
                     </AttributeInfo>
@@ -366,13 +435,19 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="RestoreAllCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="RestoreAllCommandName">
                         <Data IsEnabled="true" Value="Restore All"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="RestoreAllPriority">
                         <Data IsEnabled="true" Value="-1"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Status" Type="Text" ExportId="RestoreAllStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubCommands" Type="Reference[]" ExportId="RestoreAllSubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">

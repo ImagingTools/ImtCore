@@ -107,7 +107,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="RedoCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="RedoCommandName">
                         <Data IsEnabled="true" Value="Redo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
@@ -143,7 +143,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="SaveCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="SaveCommandName">
                         <Data IsEnabled="true" Value="Save"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">
@@ -179,7 +179,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Name" Type="String" ExportId="UndoCommandName">
+                    <AttributeInfo Id="Name" Type="Text" ExportId="UndoCommandName">
                         <Data IsEnabled="true" Value="Undo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Priority" Type="Integer" ExportId="">

@@ -389,7 +389,7 @@
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="NewCommandName" Type="String" ExportId="">
+                                <AttributeInfo Id="NewCommandName" Type="Text" ExportId="">
                                     <Data IsEnabled="true" Value="New Role"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">
@@ -474,7 +474,7 @@
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="Name" Type="String" ExportId="">
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
                                     <Data IsEnabled="true" Value="Revision"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">

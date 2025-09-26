@@ -18,13 +18,13 @@
         <Element Id="CollectionCommands" PackageId="ImtCoreVoce" ComponentId="StandardCollectionCommands">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="EditCommandName" Type="String" ExportId="">
+                    <AttributeInfo Id="EditCommandName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Open"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="NewCommandName" Type="String" ExportId="">
+                    <AttributeInfo Id="NewCommandName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="New Customer"/>
                     </AttributeInfo>
                     <AttributeInfo Id="NewPermissions" Type="Id[]" ExportId="">

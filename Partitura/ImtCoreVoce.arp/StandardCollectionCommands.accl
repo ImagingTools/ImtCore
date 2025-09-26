@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5422" Description="ACF"/>
             <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395267" Description="Qt Framework"/>
+            <Version Id="1023" Number="395522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
