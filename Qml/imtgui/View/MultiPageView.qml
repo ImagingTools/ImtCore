@@ -179,7 +179,7 @@ Item {
 
                 visible: root.currentIndex === model.index;
 
-                onLoaded: {
+				onLoaded: {
                     root.pageLoaded(model.index, item, model.id);
                 }
 
