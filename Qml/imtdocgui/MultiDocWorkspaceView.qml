@@ -50,6 +50,7 @@ Item {
 		onActivated: {
 			if (workspaceView.documentManager){
 				if (restPath.length === 1){
+
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
 					workspaceView.documentManager.openDocument(documentId, documentTypeId)
