@@ -18,6 +18,15 @@ class IDeviceSpecification: virtual public istd::IChangeable
 {
 public:
 	/**
+		Binary flags for describing capabilities of a device
+	*/
+	enum DeviceCapabilities
+	{
+		DC_READ = 1,
+		DC_WRITE = 2
+	};
+
+	/**
 		Get device class. e.g. "Mouse"
 	*/
 	virtual QByteArray GetClass() const = 0;
@@ -47,15 +56,6 @@ public:
 		Check if device configuration is valid
 	*/
 	virtual bool AreConfigurationAccepted(const iprm::IParamsSet& configuration) const = 0;
-
-	/**
-		Binary flags for describing capabilities of a device
-	*/
-	enum DeviceCapabilities
-	{
-		DC_READ = 1,
-		DC_WRITE = 2
-	};
 
 	/**
 		Get capability flags for the given device
