@@ -10,26 +10,16 @@
 #include <imtbase/TModelUpdateBinder.h>
 #include <imthype/IJobQueueManager.h>
 #include <imthype/TIJobController.h>
+#include <imthype/CStandardJobOutput.h>
+#include <imtbase/CSimpleReferenceCollection.h>
 
 
 namespace imthype
 {
 
 
-class CJobControllerBase: public QObject
-{
-	Q_OBJECT
-
-Q_SIGNALS:
-	void EmitNewJobAdded(const QByteArray& jobId);
-
-protected Q_SLOTS:
-	virtual void OnNewJobAdded(const QByteArray& jobId) = 0;
-};
-
-
 template<typename JobParams, typename JobResult, typename JobInfoExtension>
-class TJobControllerCompBase: public CJobControllerBase, public icomp::CComponentBase, virtual public TIJobController<JobParams, JobResult>
+class TJobControllerCompBase: public icomp::CComponentBase, virtual public TIJobController<JobParams, JobResult>
 {
 public:
 	typedef CComponentBase BaseClass;
@@ -41,8 +31,11 @@ public:
 	I_BEGIN_BASE_COMPONENT(TJobControllerCompBase)
 		I_REGISTER_INTERFACE(IJobController)
 		I_ASSIGN(m_defaultJobTypeIdAttrPtr, "DefaultJobTypeId", "Default job type ID", true, "");
-		I_ASSIGN(m_progressSessionManagerCompPtr, "ProgressSessionManager", "ProgressSessionManager", true, "ProgressSessionManager");
-		I_ASSIGN(m_jobQueueManagerCompPtr, "JobQueueManager", "Job queue manager", true, "JobQueueManager");
+		I_ASSIGN(m_progressSessionManagerCompPtr, "ProgressSessionManager", "ProgressSessionManager", false, "ProgressSessionManager");
+		I_ASSIGN(m_jobQueueManagerCompPtr, "JobQueueManager", "Job queue manager", false, "JobQueueManager");
+		I_ASSIGN(m_inputCollectionCompPtr, "InputCollection", "Input collection", false, "InputCollection");
+		I_ASSIGN(m_resultCollectionCompPtr, "ResultCollection", "Result collection", false, "ResultCollection");
+		I_ASSIGN(m_jobParamsCompPtr , "JobParams", "Job params", false, "JobParams");
 	I_END_COMPONENT;
 
 	TJobControllerCompBase();
@@ -57,6 +50,8 @@ public:
 protected:
 	struct JobInfo
 	{
+		QByteArray queueJobId;
+
 		JobParams params;
 		JobResultPtr resultPtr;
 		typename IJobController::JobStatus status = IJobController::JS_FAILED;
@@ -65,32 +60,43 @@ protected:
 
 		ibase::IProgressManager* jobProgressManagerPtr = nullptr;
 		std::unique_ptr<ibase::IProgressLogger> progressLoggerPtr;
+
+		imtbase::CSimpleReferenceCollection inputRefCollection;
+
+		CStandardJobOutput jobOutput;
 	};
 	typedef std::shared_ptr<JobInfo> JobInfoPtr;
 
 protected:
-	virtual void OnNewJobAdded(const QByteArray& jobId) = 0;
-	virtual void OnTaskStatusChanged(const QByteArray& taskId, imthype::IJobQueueManager::ProcessingStatus taskStatus) = 0;
-	virtual void OnTaskProgressChanged(const QByteArray& taskId, double progress) = 0;
+	virtual bool PrepareJobParamsSet(const JobInfo& jobInfo, iprm::IParamsSet& jobParamsSet) const = 0;
+	virtual bool PrepareInputObjects(JobInfo& jobInfo) = 0;
+	virtual bool PrepareResult(JobInfo& jobInfo) = 0;
 
 	// reimplemented (icomp::CComponentBase)
 	void OnComponentCreated() override;
 	void OnComponentDestroyed() override;
 
 protected:
-	QMap<QByteArray, JobInfoPtr> m_jobs;
+	I_REF(imtbase::IObjectCollection, m_inputCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_resultCollectionCompPtr);
 
+	QMap<QByteArray, JobInfoPtr> m_jobs;
 	mutable QRecursiveMutex m_mutex;
 
+private:
+	void OnJobQueueChanged(
+		const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr);
+	void OnTaskStatusChanged(const QByteArray& queueJobId, imthype::IJobQueueManager::ProcessingStatus taskStatus);
+	void OnTaskProgressChanged(const QByteArray& queueJobId, double progress);
+	QByteArray FindJob(const QByteArray& queueJobId) const;
+
+private:
 	I_ATTR(QByteArray, m_defaultJobTypeIdAttrPtr);
 	I_REF(imtbase::IProgressSessionsManager, m_progressSessionManagerCompPtr);
 	I_REF(imthype::IJobQueueManager, m_jobQueueManagerCompPtr);
+	I_FACT(iprm::IParamsSet, m_jobParamsCompPtr);
 
 	imtbase::TModelUpdateBinder<imthype::IJobQueueManager, TJobControllerCompBase> m_jobQueueObserver;
-
-private:
-	virtual void OnJobQueueChanged(
-		const istd::IChangeable::ChangeSet& changeset, const imthype::IJobQueueManager* modelPtr);
 };
 
 
@@ -100,7 +106,6 @@ template<typename JobParams, typename JobResult, typename JobInfoExtension>
 TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::TJobControllerCompBase()
 	:m_jobQueueObserver(*this)
 {
-	connect(this, &TJobControllerCompBase::EmitNewJobAdded, this, &TJobControllerCompBase::OnNewJobAdded, Qt::QueuedConnection);
 }
 
 
@@ -109,7 +114,7 @@ TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::TJobControllerCo
 template<typename JobParams, typename JobResult, typename JobInfoExtension>
 typename TIJobController<JobParams, JobResult>::RequestStatus TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::BeginJob(const QByteArray& jobId, const JobParams& jobParams)
 {
-	if (m_jobQueueManagerCompPtr.IsValid()){
+	if (m_jobQueueManagerCompPtr.IsValid() && m_jobParamsCompPtr.IsValid()){
 		QMutexLocker locker(&m_mutex);
 
 		if (!m_jobs.contains(jobId)){
@@ -117,15 +122,28 @@ typename TIJobController<JobParams, JobResult>::RequestStatus TJobControllerComp
 			jobPtr->params = jobParams;
 			jobPtr->status = IJobController::JS_IN_PROGRESS;
 
-			if (m_progressSessionManagerCompPtr.IsValid()){
-				jobPtr->jobProgressManagerPtr = m_progressSessionManagerCompPtr->BeginProgressSession(jobId, "Job processing progress");
+			istd::TUniqueInterfacePtr<iprm::IParamsSet> jobParamsPtr;
+			jobParamsPtr = m_jobParamsCompPtr.CreateInstance();
+
+			if (PrepareInputObjects(*jobPtr)){
+				if (PrepareJobParamsSet(*jobPtr, *jobParamsPtr)){
+					jobPtr->queueJobId = m_jobQueueManagerCompPtr->InsertNewJobIntoQueue(jobId, *m_defaultJobTypeIdAttrPtr, jobPtr->inputRefCollection, jobParamsPtr.GetPtr());
+					if (!jobPtr->queueJobId.isEmpty()){
+						jobPtr->status = IJobController::JS_IN_PROGRESS;
+
+						if (m_progressSessionManagerCompPtr.IsValid()){
+							jobPtr->jobProgressManagerPtr = m_progressSessionManagerCompPtr->BeginProgressSession(jobId, "Job processing progress");
+							jobPtr->progressLoggerPtr = jobPtr->jobProgressManagerPtr->StartProgressLogger(true);
+						}
+
+						QMutexLocker locker(&m_mutex);
+
+						m_jobs[jobId] = jobPtr;
+
+						return IJobController::RS_SUCCESS;
+					}
+				}
 			}
-
-			m_jobs[jobId] = jobPtr;
-
-			EmitNewJobAdded(jobId);
-
-			return IJobController::RS_SUCCESS;
 		}
 	}
 
@@ -165,13 +183,18 @@ typename TIJobController<JobParams, JobResult>::RequestStatus TJobControllerComp
 	QMutexLocker locker(&m_mutex);
 
 	if (m_jobs.contains(jobId)){
-		if (m_progressSessionManagerCompPtr.IsValid()){
-			m_progressSessionManagerCompPtr->CancelProgressSession(jobId, "Job canceled");
+		//if (m_progressSessionManagerCompPtr.IsValid()){
+		//	m_progressSessionManagerCompPtr->CancelProgressSession(jobId, "Job canceled");
+		//}
+
+		//m_jobs.remove(jobId);
+		if (m_jobQueueManagerCompPtr.IsValid() && m_jobParamsCompPtr.IsValid()){
+			if (m_jobQueueManagerCompPtr->CancelJob(m_jobs[jobId]->queueJobId)){
+				return IJobController::RS_SUCCESS;
+			}
 		}
 
-		m_jobs.remove(jobId);
-
-		return IJobController::RS_SUCCESS;
+		return IJobController::RS_FAILED;
 	}
 
 	return IJobController::RS_INVALID_JOB_ID;
@@ -242,4 +265,77 @@ void TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::OnJobQueueC
 }
 
 
+template<typename JobParams, typename JobResult, typename JobInfoExtension>
+inline void TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::OnTaskStatusChanged(const QByteArray& queueJobId, imthype::IJobQueueManager::ProcessingStatus taskStatus)
+{
+	QMutexLocker locker(&m_mutex);
+
+	QByteArray jobId = FindJob(queueJobId);
+
+	if (!jobId.isEmpty()){
+		switch (taskStatus){
+		case IJobQueueManager::PS_RUNNING:
+			m_jobs[jobId]->status = IJobController::JS_IN_PROGRESS;
+			break;
+		case IJobQueueManager::PS_CANCELING:
+			m_jobs[jobId]->status = IJobController::JS_CANCELLATION;
+			break;
+		case IJobQueueManager::PS_CANCELED:
+			m_jobs[jobId]->status = IJobController::JS_CANCELLED;
+			if (m_progressSessionManagerCompPtr.IsValid()){
+				m_progressSessionManagerCompPtr->CancelProgressSession(jobId, "Task processing has been cancelled");
+			}
+			break;
+		case IJobQueueManager::PS_REJECTED:
+			m_jobs[jobId]->status = IJobController::JS_FAILED;
+			if (m_progressSessionManagerCompPtr.IsValid()){
+				m_progressSessionManagerCompPtr->CancelProgressSession(jobId, "Task processing failed");
+			}
+			break;
+		case IJobQueueManager::PS_FINISHED:
+			m_jobs[jobId]->status = IJobController::JS_COMPLETED;
+
+			if (m_jobQueueManagerCompPtr->GetJobResult(queueJobId, m_jobs[jobId]->jobOutput)){
+				PrepareResult(*m_jobs[jobId]);
+			}
+
+			if (m_progressSessionManagerCompPtr.IsValid()){
+				m_progressSessionManagerCompPtr->EndProgressSession(jobId);
+			}
+
+			break;
+		}
+	}
+}
+
+
+template<typename JobParams, typename JobResult, typename JobInfoExtension>
+inline void TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::OnTaskProgressChanged(const QByteArray& queueJobId, double progress)
+{
+	QMutexLocker locker(&m_mutex);
+
+	QByteArray jobId = FindJob(queueJobId);
+
+	if (!jobId.isEmpty() && m_jobs[jobId]->progressLoggerPtr != nullptr){
+		m_jobs[jobId]->progressLoggerPtr->OnProgress(progress);
+	}
+}
+
+
+template<typename JobParams, typename JobResult, typename JobInfoExtension>
+inline QByteArray TJobControllerCompBase<JobParams, JobResult, JobInfoExtension>::FindJob(const QByteArray& queueJobId) const
+{
+	QMutexLocker locker(&m_mutex);
+	for (const QByteArray& id : m_jobs.keys()){
+		if (m_jobs[id]->queueJobId == queueJobId){
+			return id;
+		}
+	}
+
+	return QByteArray();
+}
+
+
 } // namespace imtservergql
+
+
