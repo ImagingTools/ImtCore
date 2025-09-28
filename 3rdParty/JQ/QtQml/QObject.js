@@ -33,10 +33,22 @@ class QObject extends QBaseObject {
                     obj.setParent(parent)
                 } else {
                     parent.contentItem.__children.push(obj)
+
+                    obj.JQDestruction.connect(()=>{
+                        let index = parent.contentItem.__children.indexOf(obj)
+                        if(index >= 0) parent.contentItem.__children.splice(index, 1)
+                    })
+
                     obj.setParent(parent.contentItem)
                 }
             } else {
                 parent.__children.push(obj)
+
+                obj.JQDestruction.connect(()=>{
+                    let index = parent.__children.indexOf(obj)
+                    if(index >= 0) parent.__children.splice(index, 1)
+                })
+
                 obj.setParent(parent)
             }
             

@@ -3,7 +3,7 @@ const os = require('os')
 const path = require('path')
 const parser = require('./parser')
 const { SourceMapGenerator, SourceNode } = require('source-map-generator')
-// const UglifyJS = require("uglify-js")
+const UglifyJS = require("uglify-js")
 
 // for compatibility with web
 global.window = {
@@ -1868,7 +1868,10 @@ if (config.output) {
 
 
 
-    // fs.writeFileSync(path.resolve(configDirPath, config.output), UglifyJS.minify(result.code).code)
+    // let resultCode = UglifyJS.minify(result.code, {compress: {}}).code
 
-    // fs.writeFileSync(path.resolve(configDirPath, config.output)+'.map', result.map.toString())
+
+    // fs.writeFileSync(path.resolve(configDirPath, config.output), resultCode)
+
+    // // fs.writeFileSync(path.resolve(configDirPath, config.output)+'.map', result.map.toString())
 }
