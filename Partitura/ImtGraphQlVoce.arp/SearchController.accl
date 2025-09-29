@@ -2,14 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5270" Description="ACF"/>
-            <Version Id="1" Number="2220" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5423" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="SearchController" X="575" Y="125" Note=""/>
-        <Element ComponentName="SearchControllersInfo" X="575" Y="300" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

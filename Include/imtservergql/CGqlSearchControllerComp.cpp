@@ -43,8 +43,15 @@ sdl::imtbase::Search::CSearchResults CGqlSearchControllerComp::OnSearch(
 				int count = searchResultsPtr->GetSearchResultsCount();
 				if (count > 0){
 					sdl::imtbase::Search::CSearchResult::V1_0 searchRepresentation;
-					searchRepresentation.id = m_optionListCompPtr->GetOptionId(i);
-					searchRepresentation.name = m_optionListCompPtr->GetOptionName(i);
+
+					QByteArray controllerId = searchControllerPtr->GetControllerId();
+					searchRepresentation.id = controllerId;
+
+					QString controllerName = searchControllerPtr->GetControllerName();
+					if (controllerName.isEmpty()){
+						controllerName = controllerId;
+					}
+					searchRepresentation.name = controllerName;
 
 					imtsdl::TElementList<sdl::imtbase::Search::CResultItem::V1_0> resultItemList;
 

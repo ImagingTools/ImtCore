@@ -149,12 +149,6 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="OptionIds">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="OptionNames">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="SearchControllers" Type="Reference[]" ExportId="SearchControllers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

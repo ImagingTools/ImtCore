@@ -32,6 +32,7 @@ public:
 
 	// reimplemented (ISearchController)
 	virtual QByteArray GetControllerId() const override;
+	virtual QString GetControllerName() const override;
 	virtual const imtbase::ISearchResults* Search(const QString& text) const override;
 
 protected:
@@ -45,6 +46,13 @@ template<class ObjectCollection>
 QByteArray TObjectCollectionSearchControllerCompWrap<ObjectCollection>::GetControllerId() const
 {
 	return QByteArray();
+}
+
+
+template<class ObjectCollection>
+QString TObjectCollectionSearchControllerCompWrap<ObjectCollection>::GetControllerName() const
+{
+	return QString();
 }
 
 

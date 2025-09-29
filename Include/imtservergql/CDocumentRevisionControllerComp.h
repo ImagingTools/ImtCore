@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtbase/ISearchController.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtservergql/CGqlRequestHandlerCompBase.h>

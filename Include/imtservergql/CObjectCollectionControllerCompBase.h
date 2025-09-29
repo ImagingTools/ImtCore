@@ -32,18 +32,33 @@ namespace imtservergql
 {
 
 
-class CObjectCollectionControllerCompBase:
-			public imtgql::IGqlRequestExtractor,
-			virtual public sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase
+class CObjectCollectionControllerAttrCompBase: 
+			virtual public imtgql::IGqlRequestExtractor,
+			public sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase
 {
 public:
 	typedef sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
+	I_BEGIN_BASE_COMPONENT(CObjectCollectionControllerAttrCompBase)
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
+		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", true, "");
+		I_ASSIGN(m_collectionNameAttrPtr, "CollectionName", "Collection Name", true, "");
+	I_END_COMPONENT
+
+protected:
+	I_ATTR(QByteArray, m_collectionIdAttrPtr);
+	I_ATTR(QString, m_collectionNameAttrPtr);
+};
+
+
+class CObjectCollectionControllerCompBase: public CObjectCollectionControllerAttrCompBase
+{
+public:
+	typedef CObjectCollectionControllerAttrCompBase BaseClass;
+
+	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_ASSIGN_MULTI_0(m_replaceableFieldsAttrPtr, "ReplaceableFilterFields", "List of filter fields to be replaced", false);
 		I_ASSIGN_MULTI_0(m_replacementFieldsAttrPtr, "ReplacementFilterFields", "List of filter fields to replace with", false);
-		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", false, "");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_userActionManagerCompPtr, "UserActionManager", "User action manager", false, "UserActionManager");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Collection headers provider", false, "HeadersProvider");
@@ -313,7 +328,6 @@ private:
 	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;
 
 protected:
-	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);
 	I_MULTIATTR(QByteArray, m_replacementFieldsAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
