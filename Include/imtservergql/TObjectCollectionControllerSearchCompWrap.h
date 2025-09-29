@@ -44,14 +44,16 @@ public:
 template<class ObjectCollection>
 QByteArray TObjectCollectionControllerSearchCompWrap<ObjectCollection>::GetControllerId() const
 {
-	return *BaseClass::m_collectionIdAttrPtr;
+	QByteArray retVal = BaseClass::m_collectionIdAttrPtr.IsValid() ? *BaseClass::m_collectionIdAttrPtr : QByteArrayLiteral("");
+	return retVal;
 }
 
 
 template<class ObjectCollection>
 QString TObjectCollectionControllerSearchCompWrap<ObjectCollection>::GetControllerName() const
 {
-	return *BaseClass::m_collectionNameAttrPtr;
+	QString retVal = BaseClass::m_collectionNameAttrPtr.IsValid() ? *BaseClass::m_collectionNameAttrPtr : QStringLiteral("");
+	return retVal;
 }
 
 
