@@ -702,17 +702,35 @@ bool CGqlSchemaParser::ValidateSchema()
 			bool isCustom = false;
 			CSdlTools::ConvertType(sdlField, &isCustom);
 			if (isCustom && !CSdlTools::EnsureFieldHasValidType(sdlField, m_sdlTypes, m_enums, m_unions)){
-				QString errorString = QString("Schema error! Type '%1' has field '%2' with unknown type '%3' at %4")
+				QString errorString = QString("Schema error! Type '%1' has field '%2' with unknown type '%3'")
 							.arg(sdlType.GetName(),
 							sdlField.GetId(),
-							sdlField.GetType(),
-							QString::number(m_sdlTypes.indexOf(sdlType) + 1));
+							sdlField.GetType());
 
 				SendLogMessage(
 							istd::IInformationProvider::InformationCategory::IC_ERROR,
 							0,
 							errorString,
 							"ValidateSchema");
+
+				return false;
+			}
+		}
+	}
+
+	for (const CSdlUnion& sdlUnion: std::as_const(m_unions)){
+		for (const QString& unionName: sdlUnion.GetTypes()){
+			bool isCustom = false;
+			CSdlTools::ConvertType(unionName, &isCustom);
+			if (isCustom && !CSdlTools::FindEntryByName(unionName, m_sdlTypes, m_enums, m_unions)){
+				QString errorString = QString("Schema error! Union '%1' has variant '%2' with option type")
+							.arg(sdlUnion.GetName(), unionName);
+
+				SendLogMessage(
+					istd::IInformationProvider::InformationCategory::IC_ERROR,
+					0,
+					errorString,
+					"ValidateSchema");
 
 				return false;
 			}
