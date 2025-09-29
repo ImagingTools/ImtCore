@@ -151,6 +151,8 @@ Item {
 				viewBase.internal__.updateStatesFromCache()
 				viewBase.internal__.localizationChanged = false
 			}
+
+			viewBase.commandsModelChanged(commands)
 		}
 	}
 	

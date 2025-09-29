@@ -27,14 +27,12 @@ DecoratorBase {
 
 	onBaseElementChanged: {
 		if (baseElement){
-			console.log("onHasDateFilterChanged__1")
 			if (hasDateFilter){
 				baseElement.registerFieldFilterDelegate("DateFilter", timeDelegateFilterComp)
 			}
 			else {
 				console.log("onHasDateFilterChanged__2")
 				baseElement.removeFieldFilterDelegate("DateFilter")
-
 			}
 		}
 	}
@@ -51,12 +49,12 @@ DecoratorBase {
 			baseElement.removeFieldFilterDelegate("DocumentState")
 		}
 	}
-	
+
 	LocalizationEvent {
 		onLocalizationChanged: {
 		}
 	}
-	
+
 	Connections {
 		target: filterPanelDecorator.complexFilter
 		function onFilterChanged(){
