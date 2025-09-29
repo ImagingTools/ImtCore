@@ -111,7 +111,7 @@ var GqlObject = function(objectId){
 			delete this.m_fieldsMap[fieldId]
 		},
 		
-		Clear(){
+		Clear: function(){
 			this.m_fieldsMap = {}
 		}
 	}
@@ -158,7 +158,7 @@ var GqlRequest = function(requestType, commandId){
 			if(index >= 0) this.m_params.splice(index, 1)
 		},
 		
-		Clear(){
+		Clear: function(){
 			this.m_fields = []
 			this.m_params = []
 		},

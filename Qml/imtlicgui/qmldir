@@ -5,9 +5,16 @@ FeaturesDependenciesProvider 1.0 FeaturesDependenciesProvider.qml
 
 FeatureCollectionView 1.0 FeatureCollectionView.qml
 FeatureEditor 1.0 FeatureEditor.qml
+FeatureEditorCommandsDelegate 1.0 FeatureEditorCommandsDelegate.qml
+
+
+LicenseCollectionView 1.0 LicenseCollectionView.qml
+LicenseEditor 1.0 LicenseEditor.qml
+
+
 PackageCollectionViewCommandsDelegate 1.0 PackageCollectionViewCommandsDelegate.qml
 
-FeatureEditorCommandsDelegate 1.0 FeatureEditorCommandsDelegate.qml
+
 PackageViewItemDelegate 1.0 PackageViewItemDelegate.qml
 
 singleton CachedProductCollection 1.0 CachedProductCollection.qml

@@ -18,10 +18,21 @@
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthGroupsSdl",
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthRolesSdl",
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthUsersSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthAuthorizationSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthAuthorizationOptionsSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthSessionsSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthProfileSdl",
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtlicsdl\\SDL\\1.0\\QML\\imtlicProductsSdl",
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtlicsdl\\SDL\\1.0\\QML\\imtlicLicensesSdl",
-        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthAuthorizationSdl",
-	"${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtauthsdl\\SDL\\1.0\\QML\\imtauthProfileSdl"
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseImtCollectionSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseImtBaseTypesSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseComplexCollectionFilterSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseDocumentCollectionFilterSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseDocumentRevisionSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseMimeTypeSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseSettingsSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseCommandsSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseSearchSdl"
     ],
     "output": "${IMTCOREDIR}\\Bin\\web\\Resources\\jqml.controlsgallery.js"
 }

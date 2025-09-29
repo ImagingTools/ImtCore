@@ -193,6 +193,8 @@ TooltipArea 1.0 ./Views/TooltipArea.qml
 TableViewParams 1.0 ./Views/TableViewParams.qml
 TableHeaderDelegate 1.0 ./Views/TableHeaderDelegate.qml
 TableRowCanvasViewer 1.0 ./Views/TableRowCanvasViewer.qml
+BarChartSimple 1.0 ./Views/BarChartSimple.qml
+
 
 GraphicsView 1.0 ./GraphicsView/GraphicsView.qml
 GraphicsLayer 1.0 ./GraphicsView/GraphicsLayer.qml

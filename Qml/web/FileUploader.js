@@ -5,7 +5,7 @@ var FileUploader = {
 	 * @param {Number} maxLength
 	 * @returns {Object}
 	 */
-	create(file, maxLength){
+	create: function(file, maxLength){
 		let parts = []
 
 		for(let i = 0; i < Math.ceil(file.size / maxLength); i++){
@@ -19,7 +19,7 @@ var FileUploader = {
 			_status: 0, // -1 - error, 2 - completed, 1 - process, 0 - idle
 			_progress: 0,
 
-			setRequestHeader(xhr, headers = {}){
+			setRequestHeader: function(xhr, headers){
 				xhr.setRequestHeader('Content-Type', 'application/octet-stream')
 				xhr.setRequestHeader('Content-Range', this.step === 0 ? `bytes 0-${this.parts[0].size}/${this.file.size}` : `bytes ${this.parts[0].size*this.step}-${Math.min(this.parts[0].size*(this.step+1), file.size)}/${this.file.size}`)
 
@@ -29,26 +29,27 @@ var FileUploader = {
 				}
 			},
 
-			send(method, ulr, headers = {}){
+			send: function(method, ulr, headers){
 				this.status = 1
 				let xhr = new XMLHttpRequest()
 				xhr.open(method, ulr)
 
 				this.setRequestHeader(xhr, headers)
+				let self = this
 
-				xhr.onload = ()=>{
+				xhr.onload = function(){
 					if(xhr.status === 206){
-						this.step++
-						if(this.step < this.parts.length){
+						self.step++
+						if(self.step < self.parts.length){
 							xhr.open(method, ulr)
-							this.setRequestHeader(xhr, headers)
+							self.setRequestHeader(xhr, headers)
 
-							xhr.send(this.parts[this.step])
+							xhr.send(self.parts[self.step])
 						} else {
-							this.status = 2
+							self.status = 2
 						}
 					} else {
-						this.status = -1
+						self.status = -1
 					}
 
 				}
@@ -56,7 +57,7 @@ var FileUploader = {
 				xhr.send(this.parts[this.step])
 			},
 
-			resend(method, ulr, headers = {}){
+			resend: function(method, ulr, headers){
 				if(this.status !== 1){
 					this._step = 0
 					this._progress = 0
@@ -99,11 +100,11 @@ var FileUploader = {
 				}
 			},
 
-			onStatusChanged(val){
+			onStatusChanged: function(val){
 
 			},
 
-			onProgressChanged(val){
+			onProgressChanged: function(val){
 
 			}
 		}
