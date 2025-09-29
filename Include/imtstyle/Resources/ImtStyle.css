@@ -51,6 +51,11 @@ QToolBar[ImtToolBar=true]
 	qproperty-iconSize: 24px;
 }
 
+QMainWindow > QToolBar {
+	border: none;
+}
+
+
 QPushButton#LoadWorkflowButton
 {
 	text-align: left;

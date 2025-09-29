@@ -69,7 +69,13 @@ QLabel[Header=true]
 
 QToolButton
 {
-	color: ${Active.Text}; 
+	color: ${Active.Text};
+}
+
+
+QToolButton:checked
+{
+	background-color: ${Active.Base};
 }
 
 QToolButton#windowTitle
