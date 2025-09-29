@@ -290,8 +290,8 @@ protected:
 	virtual bool OnBeforeRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual void OnAfterRemoveElements(const QByteArrayList& elementIds, const imtgql::CGqlRequest& gqlRequest) const;
 
-	virtual bool OnBeforeSetObjectName(const QByteArray& objectId, QString& name, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual void OnAfterSetObjectName(const QByteArray& objectId, const QString& name, const imtgql::CGqlRequest& gqlRequest) const;
+	virtual bool OnBeforeSetObjectName(const QByteArray& objectId, QString& newName, const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual void OnAfterSetObjectName(const QByteArray& objectId, const QString& oldName, const QString& newName, const imtgql::CGqlRequest& gqlRequest) const;
 
 	virtual bool OnBeforeSetObjectDescription(
 				const QByteArray& objectId,
@@ -328,6 +328,7 @@ private:
 	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;
 
 protected:
+	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);
 	I_MULTIATTR(QByteArray, m_replacementFieldsAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);

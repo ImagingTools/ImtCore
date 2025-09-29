@@ -330,27 +330,29 @@ sdl::imtbase::ImtCollection::CSetObjectNamePayload CObjectCollectionControllerCo
 		objectId = *arguments.input.Version_1_0->objectId;
 	}
 
-	QString name;
+	QString newName;
 	if (arguments.input.Version_1_0->name){
-		name = *arguments.input.Version_1_0->name;
+		newName = *arguments.input.Version_1_0->name;
 	}
 
-	if (!OnBeforeSetObjectName(objectId, name, gqlRequest, errorMessage)){
+	if (!OnBeforeSetObjectName(objectId, newName, gqlRequest, errorMessage)){
 		return sdl::imtbase::ImtCollection::CSetObjectNamePayload();
 	}
 
-	if (!m_objectCollectionCompPtr->SetElementName(objectId, name)){
-		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(name, QString::fromUtf8(objectId));
+	QString oldName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
+	if (!m_objectCollectionCompPtr->SetElementName(objectId, newName)){
+		errorMessage = QString("Unable to set name '%1' for element with ID: '%2'").arg(newName, QString::fromUtf8(objectId));
 		return sdl::imtbase::ImtCollection::CSetObjectNamePayload();
 	}
 
-	OnAfterSetObjectName(objectId, name, gqlRequest);
+	OnAfterSetObjectName(objectId, oldName, newName, gqlRequest);
 
 	sdl::imtbase::ImtCollection::CSetObjectNamePayload retVal;
 	retVal.Version_1_0 = std::move(response);
 
 	retVal.Version_1_0->objectId = objectId;
-	retVal.Version_1_0->name = name;
+	retVal.Version_1_0->name = newName;
 	retVal.Version_1_0->success = true;
 
 	return retVal;
@@ -2663,7 +2665,7 @@ void CObjectCollectionControllerCompBase::OnAfterRemoveElements(
 
 bool CObjectCollectionControllerCompBase::OnBeforeSetObjectName(
 			const QByteArray& /*objectId*/,
-			QString& /*name*/,
+			QString& /*newName*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& /*errorMessage*/) const
 {
@@ -2673,7 +2675,8 @@ bool CObjectCollectionControllerCompBase::OnBeforeSetObjectName(
 
 void CObjectCollectionControllerCompBase::OnAfterSetObjectName(
 			const QByteArray& /*objectId*/,
-			const QString& /*name*/,
+			const QString& /* oldName */,
+			const QString& /*newName*/,
 			const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 }

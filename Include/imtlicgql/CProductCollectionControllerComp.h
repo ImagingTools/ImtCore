@@ -31,7 +31,8 @@ protected:
 
 	virtual void OnAfterSetObjectName(
 				const QByteArray& objectId,
-				const QString& name,
+				const QString& oldName,
+				const QString& newName,
 				const imtgql::CGqlRequest& gqlRequest) const override;
 
 	// reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)

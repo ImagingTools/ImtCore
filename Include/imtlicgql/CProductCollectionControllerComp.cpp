@@ -71,17 +71,19 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CProductCollectionControllerCo
 
 
 void CProductCollectionControllerComp::OnAfterSetObjectName(
-		const QByteArray& objectId,
-		const QString& name,
-		const imtgql::CGqlRequest& /*gqlRequest*/) const
+	const QByteArray& objectId,
+	const QString& oldName,
+	const QString& newName,
+	const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(dataPtr.GetPtr());
 		if (productInfoPtr != nullptr){
-			productInfoPtr->SetName(name);
-			QString newName = name;
-			productInfoPtr->SetProductId(newName.replace(" ", "").toUtf8());
+			productInfoPtr->SetName(newName);
+			QByteArray newId = newName.toUtf8();
+			newId.replace(" ", "");
+			productInfoPtr->SetProductId(newId);
 
 			istd::TDelPtr<imtbase::IOperationContext> operationContextPtr =  nullptr;
 			if (m_operationContextControllerCompPtr.IsValid()){
