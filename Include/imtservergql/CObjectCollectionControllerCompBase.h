@@ -328,7 +328,6 @@ private:
 	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;
 
 protected:
-	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);
 	I_MULTIATTR(QByteArray, m_replacementFieldsAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
