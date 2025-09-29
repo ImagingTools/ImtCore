@@ -15,10 +15,7 @@ RemoteCollectionView {
 	visibleMetaInfo: false;
 	
 	collectionId: "Products";
-	onCollectionIdChanged: {
-		console.log("ProductCollectionView.qml onCollectionIdChanged", collectionId)
-	}
-	
+
 	additionalFieldIds: [ProductItemTypeMetaInfo.s_productId]
 	
 	commandsDelegateComp: Component {ProductCollectionViewCommandsDelegate {

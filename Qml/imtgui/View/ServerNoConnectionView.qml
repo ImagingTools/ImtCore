@@ -13,15 +13,11 @@ Rectangle {
 	property alias loadingVisible: loading.visible;
 	
 	Component.onCompleted: {
-		console.log("ServerNoConnectionView.qml onCompleted")
-		console.log("loading.visible", loading.visible)
 		if (loading.visible){
 			timer.start()
 		}
 		
 		textNoConnection.visible = !loading.visible
-		console.log("textNoConnection.visible", textNoConnection.visible)
-		
 	}
 	
 	Timer {
@@ -29,8 +25,6 @@ Rectangle {
 		interval: 2000
 		repeat: false
 		onTriggered: {
-			console.log("onTriggered", textNoConnection.visible)
-			
 			textNoConnection.visible = true
 		}
 	}

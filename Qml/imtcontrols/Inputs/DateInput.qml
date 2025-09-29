@@ -67,7 +67,6 @@ Item {
 	}
 
 	function setDateAsString(str){
-		console.log("setDateAsString", str)
 		str = correctDateFormat(str);
 		if(!dateInput.checkDateFormat(str)){
 			return false;
@@ -103,7 +102,6 @@ Item {
 	}
 
 	function showCurrentDate(){
-		//console.log("showCurrentDate")
 		let date = new Date();
 
 		let day = date.getDate();
@@ -152,7 +150,6 @@ Item {
 	}
 
 	function checkDateFormat(str){
-		//console.log("Check Date Format")
 		dateInput.isError = false;
 		dateInput.isMonthError = false;
 		dateInput.isDayError = false;

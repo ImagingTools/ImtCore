@@ -62,8 +62,6 @@ Item {
 		}
 		
 		function checkState(){
-			console.log("checkState", appConnectionState, authConnectionState)
-			
 			if (authConnectionState == 1 && appConnectionState == 1){
 				totalStatus = status.CONNECTION_SUCCESFUL
 			}
@@ -82,8 +80,6 @@ Item {
 		}
 		
 		onTotalStatusChanged: {
-			console.log("Test: onTotalStatusChanged", totalStatus)
-			
 			if (totalStatus == status.TRY_CONNECTING_TO_AUTH_SERVER){
 				internal.errorMessage = qsTr("Try connecting to authorization server ...")
 				internal.loadingVisible = true
@@ -140,8 +136,6 @@ Item {
 			loadingVisible = false
 		}
 
-		console.log("Test: showMessagePage", message, loadingVisible)
-		
 		internal.errorMessage = message;
 		internal.loadingVisible = loadingVisible;
 		
@@ -280,7 +274,6 @@ Item {
 	}
 	
 	function getWebSocketUrl(serverUrl){
-		console.log("getWebSocketUrl", serverUrl)
 		try {
 			let url = new URL(serverUrl);
 
@@ -352,8 +345,6 @@ Item {
 	}
 	
 	function firstModelsInit(force){
-		console.log("firstModelsInit", force)
-		
 		if (!force){
 			force = false
 		}
@@ -395,7 +386,6 @@ Item {
 		}
 		
 		function onSuperuserExistResult(status, message){
-			console.log("onSuperuserExistResult", status, message)
 			if (status === "EXISTS"){
 				thumbnailDecorator.showPage(thumbnailDecorator.authorizationPageComp)
 			}

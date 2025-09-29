@@ -15,15 +15,9 @@ Rectangle {
     property alias model: listView.model;
 
     function setValue(value){
-        console.log("setValue", value)
-        console.log("currentValue", root.currentValue)
         if (root.currentValue !== value){
-            console.log("listView.count", listView.count)
             for (let i = 0; i < listView.count; i++){
                 if (value === listView.model.get(i).value){
-
-                    console.log("gotoIndex", listView.count)
-
                     root.gotoIndex(i);
 
                     break;

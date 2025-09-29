@@ -24,7 +24,6 @@ QtObject {
             return null;
         }
 
-        console.log("getAvailableModel", statusId);
         let index = root.getStateIndex(statusId);
         if (index >= 0){
             root.availableModel.clear();

@@ -32,7 +32,6 @@ QtObject {
 		}
 
 		function startTransaction(){
-			// console.log("startTransaction")
 			if (isTransaction){
 				console.error("Unable to start transaction. Error: transaction already started.");
 
@@ -44,7 +43,6 @@ QtObject {
 		}
 
 		function stopTransaction(){
-			// console.log("stopTransaction")
 			if (!isTransaction){
 				console.error("Unable to stop transaction. Error: there is no active transaction.");
 
@@ -368,7 +366,6 @@ QtObject {
 	}
 
 	function fromJSON(json){
-		// console.log("fromJSON", json)
 		let obj;
 		try {
 			obj = JSON.parse(escapeSpecialChars(json));

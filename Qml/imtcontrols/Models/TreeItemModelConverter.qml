@@ -17,8 +17,6 @@ Item {
     }
 
     function convertToListModel(treeItemModel){
-        console.log("convertToListModel");
-
         let obj = listModelComp.createObject(converter);
 
         privateBlock.convertToListModelRecursive(obj, treeItemModel);
@@ -27,8 +25,6 @@ Item {
     }
 
     function convertFromListModel(listModel){
-        console.log("convertFromListModel");
-
         let obj = treeItemModelComp.createObject(converter);
 
         privateBlock.convertFromListModelRecursive(listModel, obj);

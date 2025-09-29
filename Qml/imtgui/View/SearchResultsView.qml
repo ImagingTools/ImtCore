@@ -43,7 +43,6 @@ Item {
 		tabPanelContainer.visible = count > 0;
 		
 		if (count > 0){
-			console.log("searchResults.m_searchResults", searchResults.m_searchResults.toJson())
 			tabPanelContainer.model = searchResults.m_searchResults
 			tabPanelContainer.selectedIndex = 0;
 		}

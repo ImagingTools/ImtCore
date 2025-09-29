@@ -23,9 +23,6 @@ ElementView {
     }
 
     onFromChanged: {
-        console.log("onFromChanged", from)
-        console.log("spinBox", spinBox)
-        console.log("controlItem", controlItem)
         if (spinBox){
             spinBox.from = from
         }
@@ -60,10 +57,6 @@ ElementView {
             editable: !root.readOnly
             Component.onCompleted: {
                 root.spinBox = this
-            }
-            
-            onFromChanged: {
-                console.log("spinBoxComp onFromChanged", from)
             }
             
             onValueChanged: {

@@ -34,7 +34,6 @@ Item{
 
     onReadyChanged: {
         if(ready){
-            console.log("children.length:: ", children.length)
             let count = children.length;
             splitView._childrenCount = count;
 
@@ -163,13 +162,11 @@ Item{
 
                 let coeff = height / prevHeight;
                 let count = splitView.children[0].children.length;
-                console.log("count", count)
 
                 for(let i = 0; i < count ; i++){
                     if(!(i % 2)){
                         splitView.children[0].children[i].height =
                                 coeff * splitView.children[0].children[i].height;
-                        console.log(splitView.children[0].children[i].height, i, coeff)
                     }
                 }
             }
@@ -363,7 +360,6 @@ Item{
             color: Style.scrollBackgroundColor;
             property int rowIndex: -1;
             function correctSizes(delta_){
-                //console.log("delta_ :: ", delta_, rowIndex)
                 if (!splitView.children[0]){
                     return
                 }
@@ -476,7 +472,6 @@ Item{
             color: Style.scrollBackgroundColor;
             property int rowIndex: -1;
             function correctSizes(delta_){
-                //console.log("delta_ :: ", delta_, rowIndex)
                 if (!splitView.children[0]){
                     return
                 }

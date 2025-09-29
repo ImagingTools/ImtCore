@@ -42,8 +42,6 @@ OptionManager {
 		}
 
 		onRequestStarted: {
-			console.log("GqlBasedOptionManager onRequestStarted")
-
 			container.requestStarted(params)
 		}
 	}

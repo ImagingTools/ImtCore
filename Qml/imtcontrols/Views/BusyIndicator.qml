@@ -9,17 +9,13 @@ ControlBase{
     decorator: Style.busyIndicatorDecorator;
 
     function start(){
-        console.log("BusyIndicator start");
-
         stop();
 
         visible = true;
     }
 
     function stop(){
-        console.log("BusyIndicator stop");
         visible = false;
     }
-
 }
 

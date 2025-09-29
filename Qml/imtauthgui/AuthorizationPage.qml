@@ -49,8 +49,6 @@ Rectangle {
 	}
 
 	function passwordRecovery(){
-		console.log("passwordRecovery");
-
 		ModalDialogManager.openDialog(passwordRecoveryDialogComp, {});
 	}
 

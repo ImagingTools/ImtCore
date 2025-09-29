@@ -152,8 +152,6 @@ QtObject {
 		gqlCommandId: container.subscriptionCommandId;
 
 		onMessageReceived: {
-			console.log("CollectionDataProvider.qml onMessageReceived", container.commandId);
-
 			container.clearModel();
 			container.itemsInfoModel.send();
 		}

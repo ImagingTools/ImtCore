@@ -221,7 +221,6 @@ Dialog {
 					repeat: true;
 
 					onTriggered: {
-						console.log("onTriggered");
 						if (passwordRecoveryDialog.secs > 0){
 							passwordRecoveryDialog.secs--;
 						}

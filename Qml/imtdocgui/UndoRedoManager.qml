@@ -117,7 +117,6 @@ Item {
 	
 	function registerModel(model)
 	{
-		console.log("registerModel", model.toJson())
 		if (modelIsRegistered()){
 			console.warn("Model is already registered in the undo manager")
 			

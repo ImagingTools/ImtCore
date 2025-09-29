@@ -110,7 +110,6 @@ CollectionViewCommandsDelegateBase {
 	}
 
 	function openDocumentEditor(objectId, typeId){
-		console.debug("DocumentCollectionViewDelegate.qml openDocumentEditor", objectId, typeId)
 		if (!documentManager){
 			console.log("Unable to open document editor for type-ID: '" + typeId + "'. Error: Document manager is invalid")
 			return
@@ -355,10 +354,6 @@ CollectionViewCommandsDelegateBase {
 					width: Style.sizeHintXXL;
 					height: Style.sizeHintXL;
 
-					Component.onCompleted: {
-						console.log("contentItem onCompleted")
-					}
-
 					Connections {
 						target: documentRevisionDialog;
 
@@ -413,10 +408,6 @@ CollectionViewCommandsDelegateBase {
 						id: splitView;
 						anchors.fill: parent
 						anchors.margins: Style.marginM
-
-						Component.onCompleted: {
-							console.log("splitView onCompleted")
-						}
 
 						Table {
 							id: table;

@@ -10,11 +10,7 @@ ParamEditorBase {
 	id: serverLogProvider
 	
 	typeId: "ServerLog"
-	
-	Component.onCompleted: {
-		console.log("ServerLogProvider onCompleted")
-	}
-	
+
 	sourceComp: Component {
 		ButtonElementView {
 			id: root;

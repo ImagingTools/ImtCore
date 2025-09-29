@@ -260,7 +260,6 @@ RemoteCollectionView {
 			property var regExp: new RegExp(mailRegExp.regularExpression)
 			
 			function isValid(data){
-				console.log("isValid", data)
 				if (!data.editor){
 					return false;
 				}

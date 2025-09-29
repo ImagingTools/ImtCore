@@ -40,7 +40,6 @@ Row{
 	}
 
 	function setDateTime(datetime){
-		console.log("setDateTime", datetime)
 		setDate(datetime);
 		signalPause.stop()
 		setTime(datetime);
@@ -153,7 +152,6 @@ Row{
 			forFocus.forceActiveFocus();
 		}
 		onDateChanged: {
-			console.log("onDateChanged", value)
 			if(value !== dateTimeInput.dateStr){
 				dateTimeInput.dateStr = value;
 
@@ -183,7 +181,6 @@ Row{
 
 		tabKeyItem: forFocus;
 		onTimeChanged: {
-			//console.log("onTimeChanged", value)
 			if(value !== dateTimeInput.timeStr){
 				dateTimeInput.timeStr = value;
 

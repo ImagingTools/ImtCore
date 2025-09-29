@@ -18,7 +18,6 @@ Rectangle {
     signal deleteSignal(int index);
 
     onDeleteSignal: {
-        console.log("Delete selected photo: ", index);
         model.removeItem(index);
         model.refresh();
         list.positionViewAtIndex(0, ListView.Center);
@@ -324,7 +323,6 @@ Rectangle {
                     onPositionChanged: {
                         let delta = startX - mouse.x;
                         lastDeltaX = delta;
-						//console.log(delta); //left +, right -
                         if(delta > 0){
                             let ok  = (listPreview.addToMargin + delta) < (listPreview.selectedIndex + 1) * listPreview.delegateWidth && (listPreview.selectedIndex + 1) < listPreview.count;
                             if(ok){

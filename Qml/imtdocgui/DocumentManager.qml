@@ -521,7 +521,6 @@ QtObject {
 	}
 
 	function setupDocumentView(documentId, view){
-		console.log("setupDocumentView", documentId, view)
 		let documentData = getDocumentDataById(documentId)
 		if (documentData){
 			if (view.documentId !== undefined){

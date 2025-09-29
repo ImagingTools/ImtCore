@@ -98,8 +98,6 @@ Item {
 						if (mainPanelRepeater.currentIndex >= 0){
 							let json = bodyPanel.paramsSet.toJson()
 							root.paramsSet.m_parameters.get(mainPanelRepeater.currentIndex).item.m_data = json
-							
-							console.log("json", root.paramsSet.m_parameters.get(mainPanelRepeater.currentIndex).item.m_data)
 						}
 
 						root.editorModelDataChanged(paramId, key)

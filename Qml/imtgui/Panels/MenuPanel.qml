@@ -208,7 +208,6 @@ Rectangle {
 			NavigableItem {
 				paths: [model["id"]]
 				onActivated: {
-					console.log("MenuPanel onActivated")
 					menuPanel.activePageIndex = model.index
 				}
 			}

@@ -62,7 +62,6 @@ ViewBase {
 	}
 	
 	function updateTreeViewGui(){
-		console.log("FeatureEditor.qml updateTreeViewGui")
 		let selectedIndex = null;
 		if (tableView.tableSelection.items.length > 0){
 			selectedIndex = tableView.tableSelection.items[0];

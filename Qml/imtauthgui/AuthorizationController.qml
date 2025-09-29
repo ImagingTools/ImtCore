@@ -28,7 +28,7 @@ QtObject {
 		onForbidden: {
 			root.logoutForce();
 		}
-		
+
 		onUnauthorized: {
 			root.setAccessToken("");
 			let cb = function(status){

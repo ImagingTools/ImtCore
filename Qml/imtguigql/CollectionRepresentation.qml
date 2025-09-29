@@ -103,7 +103,6 @@ Item {
 	}
 
 	onCollectionIdChanged: {
-		console.log("CollectionRepresentation.qml onCollectionIdChanged", collectionId)
 		updateModel();
 	}
 	

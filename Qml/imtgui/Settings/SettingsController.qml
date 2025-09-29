@@ -47,8 +47,6 @@ QtObject {
 	}
 	
 	function addParamsSet(id, name, paramsSet){
-		console.log("addParamsSet", id, name, paramsSet)
-		
 		if (!paramsSetController){
 			return false
 		}
@@ -77,7 +75,6 @@ QtObject {
 	}
 	
 	function registerParamsSetController(id, name, controller){
-		console.log("registerParamsSetController", id, name, controller)
 		let paramsSetInfo = paramsSetInfoComp.createObject(root)
 		
 		paramsSetInfo.m_paramId = id

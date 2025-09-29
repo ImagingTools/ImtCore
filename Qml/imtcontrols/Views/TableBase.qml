@@ -112,7 +112,6 @@ Rectangle {
 	property IndexSelectionManager selectionManager: IndexSelectionManager {
 		multiSelect: tableContainer.isMultiSelect
 		onSelectionChanged: {
-			console.log("onSelectionChanged", selectedIndexes)
 			tableContainer.selectionChanged(selectedIndexes);
 		}
 	}

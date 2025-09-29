@@ -115,7 +115,6 @@ ControlBase {
 
 
 	function decoratorChangedFunc(){
-		//console.log("RangeSlider: redefinition of base function");
 	}
 
 	function correctPositionParams(){

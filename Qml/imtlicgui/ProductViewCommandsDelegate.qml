@@ -38,7 +38,6 @@ ViewCommandsDelegateBase {
         }
 
         if (commandId === "New"){
-			console.log("FeaturesDialog open")
             let features = container.view.model.m_features;
 
             let featureIds = []

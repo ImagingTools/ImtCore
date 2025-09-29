@@ -81,8 +81,6 @@ SingleDocumentWorkspacePageView {
     }
 
     function login(login, password){
-		console.log("login",login, password);
-		
         AuthorizationController.login(login, password)
     }
 

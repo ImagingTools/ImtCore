@@ -90,7 +90,6 @@ DecoratorBase {
 			clip: true;
 
 			onContentHeightChanged: {
-				// console.log("onContentHeightChanged", root, popupMenuListView);
 				let height_ = Math.min(root.shownItemsCount * root.itemHeight, contentHeight);
 				popupMenuListView.height = height_;
 			}

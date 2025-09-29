@@ -98,7 +98,6 @@ ControlBase {
 	}
 
 	function decoratorChangedFunc(){
-		//console.log("Slider: redefinition of base function");
 	}
 
 	function correctPositionParams(){

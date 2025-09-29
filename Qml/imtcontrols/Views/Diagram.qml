@@ -73,21 +73,11 @@ Item {
 		clear();
 	}
 
-	onParentYChanged: {
-		//console.log("ParentYChanged");
-	}
-
-
-	onModelChanged: {
-		//diagram.setMaxValue();
-	}
-
 	onVisibleChanged: {
 		if(!visible && bigIndicatorItem){
 			ModalDialogManager.closeByComp(diagram.bigIndicatorComp)
 			diagram.bigIndicatorItem = null;
 		}
-
 	}
 
 	function clear(){

@@ -21,14 +21,6 @@ Item{
 
 	signal modelDataChanged(string role, int index);
 
-	onModelDataChanged: {
-		// console.log("Role:: ", role, "Index:: ", index);
-	}
-
-	onModelChanged: {
-		// console.log("INPUT_MODEL:: ", model.count,model.toJson())
-	}
-
 	function setChildParam(param, val, index_){
 		list.children[0].children[index_].item[param] = val;
 	}
@@ -94,14 +86,12 @@ Item{
 					let keys = [];
 					keys = inputView.model.getKeys(model.index);
 					for(let i = 0; i < keys.length; i++){
-						//console.log("KEY::", keys[i], item[keys[i]])
 						if(keys[i] == "value"){
 							loader.setValue(inputView.model.getData(keys[i], model.index));
 						}
 						else {
 							if(item[keys[i]] !==undefined){
 								if(inputView.model.isTreeModel(keys[i], model.index)){
-									//console.log("IS_MODEL:: ", keys[i])
 									item[keys[i]] = inputView.model.getTreeItemModel(keys[i], model.index);
 								}
 								else {

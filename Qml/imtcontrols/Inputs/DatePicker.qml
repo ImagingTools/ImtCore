@@ -146,7 +146,6 @@ Item {
 	}
 
 	onSelectedYearChanged: {
-		// console.log("onSelectedYearChanged");
 		if(datePicker.hasMonthCombo && datePicker.endComboOnCurrentMonth && datePicker.completed){
 			datePicker.fillMonthModel();
 		}

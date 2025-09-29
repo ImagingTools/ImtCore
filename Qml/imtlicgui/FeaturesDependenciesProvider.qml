@@ -38,7 +38,6 @@ QtObject {
     }
 
     function getAllDependenciesRecursive(featureId, dependenciesModel, retVal){
-        console.log("getAllDependenciesRecursive", featureId, dependenciesModel, retVal);
         if (dependenciesModel.containsKey(featureId)){
             let dependencies = dependenciesModel.getData(featureId);
 

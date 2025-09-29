@@ -11,7 +11,6 @@ DataModelProvider {
 	property var inputModel
 	
 	function requestDataModel(paramsObj){
-		console.log("requestDataModel")
 		root.requestStarted(paramsObj)
 
 		var query = Gql.GqlRequest("query", getCommandId)

@@ -64,7 +64,6 @@ Item {
 
         onAccepted: {
             var pathDir = fileDialog.folder.toString();
-            console.log("fileUrl", fileDialog.folder);
             pathDir = pathDir.replace('file:///', '')
             root.path = pathDir;
         }
