@@ -35,7 +35,7 @@ Dialog {
 
 	property bool messageOpened: false;
 
-	signal taskComleted(string id);
+	signal taskCompleted(string id);
 	signal taskCanceled(string id);
 	signal taskClosed();
 	signal subtaskCanceled(string id);
@@ -126,7 +126,7 @@ Dialog {
 				}
 			}
 
-			taskComleted(taskId);
+			taskCompleted(taskId);
 		}
 	}
 
