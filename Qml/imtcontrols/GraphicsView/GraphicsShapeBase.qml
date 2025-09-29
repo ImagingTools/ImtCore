@@ -78,6 +78,10 @@ QtObject {
 
 
 	function drawComplex(ctx, transformMatrixArg){
+		//console.log("!!!!!_____", LinearAlgebra.isIdentityMatrix(shapeMatrix.matrix))
+		if(!LinearAlgebra.isIdentityMatrix(shapeMatrix.matrix)){
+			transformMatrixArg.matrix = LinearAlgebra.multiplyByMatrix3x3(transformMatrixArg.matrix, shapeMatrix.matrix)
+		}
 		draw (ctx, transformMatrixArg)
 		if(isSelected && viewItem.isEditMode){
 			drawBoundingBox(ctx)
@@ -100,6 +104,7 @@ QtObject {
 
 	function getScreenPosition(logPosition){
 		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
+		matrix = LinearAlgebra.multiplyByMatrix3x3(matrix, shapeMatrix.matrix)
 		if(hasCalibration){
 			logPosition = getCalibratedPosition(logPosition)
 		}
@@ -109,6 +114,7 @@ QtObject {
 
 	function getLogPosition(screenPosition){
 		let matrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
+		matrix = LinearAlgebra.multiplyByMatrix3x3(matrix, shapeMatrix.matrix)
 		matrix = LinearAlgebra.getInvertedMatrix3x3(matrix)
 		let logPosition = LinearAlgebra.transformPoint2d(screenPosition, matrix)
 		if(hasCalibration){

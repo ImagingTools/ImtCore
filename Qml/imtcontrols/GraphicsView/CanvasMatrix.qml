@@ -104,12 +104,11 @@ Matrix3x3 {
 	//	cos(angle)	-sin(angle)		0
 	//	sin(angle)	cos(angle)		0
 	//	0			0				1
-	function rotateContext(ctx, angle, center){
-		//console.log("rotateContext")
-		if(center == undefined){
-			center = Qt.point(0,0);
+	function getRotationMatrix(matrixArg, angle, center){
+		let retMatrix;
+		if(matrixArg == undefined){
+			matrixArg = matrix;
 		}
-
 		let rotationMatrix = [
 				[Math.cos(angle), -1*Math.sin(angle), center.x],
 				[Math.sin(angle), Math.cos(angle), center.y],
@@ -122,11 +121,20 @@ Matrix3x3 {
 			  ];
 
 		if(center.x == 0 && center.y == 0){
-			matrix = rotationMatrix
+			retMatrix = multiplyByMatrix(matrixArg, rotationMatrix)
 		}
 		else {
-			matrix = multiplyByMatrix(rotationMatrix, translateMatrix)
+			retMatrix = multiplyByMatrix(matrixArg, rotationMatrix)
+			retMatrix = multiplyByMatrix(retMatrix, translateMatrix)
 		}
+		return retMatrix;
+	}
+
+
+	function rotateContext(ctx, angle, center){
+		//console.log("rotateContext")
+
+		matrix = getRotationMatrix(matrix, angle, center)
 		setContextTransform(ctx);
 	}
 

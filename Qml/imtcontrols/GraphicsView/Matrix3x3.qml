@@ -76,7 +76,16 @@ QtObject {
 	}
 
 	function copyFrom(externMatrix){
-		matrix = externMatrix;
+		let newMatrix = []
+		for(let i = 0; i < externMatrix.length; i++){
+			let row = externMatrix[i]
+			let newRow = []
+			for(let j = 0; j < row.length; j++){
+				newRow.push(row[j])
+			}
+			newMatrix.push(newRow);
+		}
+		matrix = newMatrix;
 	}
 
 	function  reset(){

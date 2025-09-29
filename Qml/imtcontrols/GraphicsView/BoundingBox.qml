@@ -17,34 +17,51 @@ GraphicsShapeBase {
 		if(!Object.keys(cornerPointsObj).length){
 			return;
 		}
-		drawBoundingBoxBorder(ctx, cornerPointsObj);
-		drawBoundingBoxRotationControl(ctx, cornerPointsObj);
-		drawBoundingBoxControlPoints(ctx, cornerPointsObj);
+		if(!_isInsideRotationArea){
+			drawBoundingBoxBorder(ctx, cornerPointsObj);
+			drawBoundingBoxRotationControl(ctx, cornerPointsObj);
+			drawBoundingBoxControlPoints(ctx, cornerPointsObj);
+		}
+		else {//rotation
+			let transformMatrix = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
+			transformMatrix = LinearAlgebra.multiplyByMatrix3x3(transformMatrix, shapeMatrixBackup.matrix)
+			let rotationMatrix = LinearAlgebra.multiplyByMatrix3x3(transformMatrix, rotationTempMatrix.matrix)
+
+			drawBoundingBoxBorder(ctx, bbPointsBackupScreen, rotationTempMatrixScreen.matrix);
+			drawBoundingBoxRotationControl(ctx, bbPointsBackupScreen, rotationTempMatrixScreen.matrix);
+			drawBoundingBoxControlPoints(ctx, bbPointsBackupScreen, rotationTempMatrixScreen.matrix);
+		}
 	}
 
-	function drawBoundingBoxBorder(ctx, cornerPointsObj){
-		DesignScheme.drawBoundingBoxBorder(ctx, cornerPointsObj)
+	function drawBoundingBoxBorder(ctx, cornerPointsObj, transformMatrix){
+		DesignScheme.drawBoundingBoxBorder(ctx, cornerPointsObj, transformMatrix)
 	}
 
-	function drawBoundingBoxControlPoints(ctx, cornerPointsObj){
-		let midPoints  = getBoundingBoxMidPoints(true, cornerPointsObj)
+	function drawBoundingBoxControlPoints(ctx, cornerPointsObj, transformMatrix){
+		let midPoints;
+		if(!_isInsideRotationArea){
+			midPoints  = getBoundingBoxMidPoints(true, cornerPointsObj)
+		}
+		else {
+			midPoints  = getBoundingBoxMidPoints(true, bbPointsBackupScreen)
+		}
 
 		//corner points
-		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.topLeftPoint);
-		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.topRightPoint);
-		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.bottomRightPoint);
-		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.bottomLeftPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.topLeftPoint, transformMatrix);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.topRightPoint, transformMatrix);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.bottomRightPoint, transformMatrix);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, cornerPointsObj.bottomLeftPoint, transformMatrix);
 
 		//midPoints
-		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.leftPoint);
-		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.rightPoint);
-		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.topPoint);
-		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.bottomPoint);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.leftPoint , transformMatrix);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.rightPoint , transformMatrix);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.topPoint, transformMatrix);
+		DesignScheme.drawBoundingBoxControlPoint(ctx, midPoints.bottomPoint , transformMatrix);
 
 	}
 
-	function drawBoundingBoxRotationControl(ctx, cornerPointsObj){
-		DesignScheme.drawBoundingBoxRotationControl(ctx, cornerPointsObj);
+	function drawBoundingBoxRotationControl(ctx, cornerPointsObj, transformMatrix){
+		DesignScheme.drawBoundingBoxRotationControl(ctx, cornerPointsObj, transformMatrix);
 	}
 
 	function getBoundingBoxCenter(cornerPointsObj){
@@ -206,6 +223,53 @@ GraphicsShapeBase {
 		return pointsObj;
 	}
 
+	function boundingBoxPointsTransform(pointsObjLog, matrixArg){
+		if(!Object.keys(pointsObjLog).length){
+			return ({});
+		}
+
+		let pointsObj = ({});
+
+		let minX = 1000000;
+		let minY = 1000000;
+		let maxX  = -1000000
+		let maxY = -1000000;
+
+		let points = []
+
+		points.push(Qt.point(pointsObjLog.topLeftPoint.x, pointsObjLog.topLeftPoint.y))
+		points.push(Qt.point(pointsObjLog.topRightPoint.x, pointsObjLog.topRightPoint.y))
+		points.push(Qt.point(pointsObjLog.bottomLeftPoint.x, pointsObjLog.bottomLeftPoint.y))
+		points.push(Qt.point(pointsObjLog.bottomRightPoint.x, pointsObjLog.bottomRightPoint.y))
+
+		for(let i = 0; i < points.length; i++){
+			let point = points[i]
+			point = LinearAlgebra.transformPoint2d(point, matrixArg);
+
+			let x_ = point.x
+			let y_ = point.y
+			if(x_ < minX){
+				minX = x_
+			}
+			if(y_ < minY){
+				minY = y_
+			}
+			if(x_ > maxX){
+				maxX = x_
+			}
+			if(y_ > maxY){
+				maxY = y_
+			}
+		}
+
+		pointsObj.topLeftPoint = Qt.point(minX, minY)
+		pointsObj.topRightPoint = Qt.point(maxX, minY)
+		pointsObj.bottomLeftPoint = Qt.point(minX, maxY)
+		pointsObj.bottomRightPoint = Qt.point(maxX, maxY)
+
+		return pointsObj;
+	}
+
 	function editFunction(position){
 		//console.log("editFunction:::::")
 
@@ -221,17 +285,29 @@ GraphicsShapeBase {
 		let xArg = mousePressedCoord.x
 		let yArg = mousePressedCoord.y
 
-		if(0/*isInsideRotationArea(positionLog.x, positionLog.y, cornerPoints)*/){//rotation
-			// console.log("ROTATE")
-			// let center = getBoundingBoxCenter(cornerPoints)
-			// let angle  = getAngle(xArg, yArg, center)
-			// let startPoint = getLogPosition(Qt.point(mousePressedCoord.x, mousePressedCoord.y))
-			// let angle0 = getAngle(startPoint.x, startPoint.y , center)
+		if(_isInsideRotationArea){//rotation
+			//console.log("ROTATE")
+			let center = getBoundingBoxCenter(cornerPoints)
+			let startPoint = Qt.point(mousePressedCoord.x, mousePressedCoord.y)
+			let newPoint = Qt.point(position.x, position.y)
+			let angle0 = getAngle(startPoint.x, startPoint.y , center)
+			let angle  = getAngle(newPoint.x, newPoint.y, center)
 
-			// angle = angle - angle0
+			let angleRad = (Math.PI / 180) * (angle - angle0);
 
-			// console.log("ROTATE", angle)
-			// //rotate(angle, center);
+			let matrixLayer = LinearAlgebra.multiplyByMatrix3x3(viewItem.viewMatrix.matrix, layer.layerMatrix.matrix)
+			let matrixShape = LinearAlgebra.multiplyByMatrix3x3(matrixLayer, shapeMatrixBackup.matrix)
+			let matrixShapeInv = LinearAlgebra.getInvertedMatrix3x3(matrixShape)
+			let logPositionCenter = LinearAlgebra.transformPoint2d(center, matrixShapeInv)
+			let startPointLog = LinearAlgebra.transformPoint2d(startPoint, matrixShapeInv)
+			let newPointLog = LinearAlgebra.transformPoint2d(newPoint, matrixShapeInv)
+			let angle0Log = getAngle(startPointLog.x, startPointLog.y , logPositionCenter)
+			let angleLog  = getAngle(newPointLog.x, newPointLog.y, logPositionCenter)
+			let angleRadLog = (Math.PI / 180) * (angleLog - angle0Log);
+
+			rotationTempMatrix.matrix = rotationTempMatrix.getRotationMatrix(identityMatrix.matrix, angleRadLog, logPositionCenter)
+			rotationTempMatrixScreen.matrix = rotationTempMatrixScreen.getRotationMatrix(identityMatrix.matrix, angleRad, center)
+			shapeMatrix.matrix = LinearAlgebra.multiplyByMatrix3x3(shapeMatrixBackup.matrix, rotationTempMatrix.matrix)
 		}
 		else {//Bounding box edges moving
 			let margin = 10;
@@ -473,6 +549,13 @@ GraphicsShapeBase {
 	property real bbWidthBackupScreen: 1
 	property real bbHeightBackupScreen: 1
 	property var bbPointsBackupScreen
+	property var bbPointsBackup
+	property CanvasMatrix shapeMatrixBackup : CanvasMatrix{}
+	property CanvasMatrix rotationTempMatrix: CanvasMatrix{};
+	property CanvasMatrix rotationTempMatrixScreen: CanvasMatrix{};
+
+	property bool _isInsideRotationArea: false;
+
 
 	onIsSelectedChanged: {
 		setBackup()
@@ -480,6 +563,28 @@ GraphicsShapeBase {
 
 	onMousePressed: {
 		setBackup()
+		if(viewItem.isEditMode && isSelected){
+			_isInsideRotationArea = isInsideRotationArea(mouseEvent.x, mouseEvent.y, bbPointsBackupScreen)
+			//console.log("_isInsideRotationArea::", _isInsideRotationArea)
+			if(_isInsideRotationArea){
+				bbPointsBackup = getBoundingBoxCornerPoints(false)
+				shapeMatrixBackup.copyFrom(shapeMatrix.matrix)
+			}
+		}
+	}
+
+	onMouseReleased: {
+		if(_isInsideRotationArea){
+			_isInsideRotationArea = false;
+			let newPoints = []
+			for(let i = 0; i < points.length; i++){
+				newPoints.push(LinearAlgebra.transformPoint2d(points[i], rotationTempMatrix.matrix))
+			}
+			points = newPoints
+			shapeMatrix.copyFrom(shapeMatrixBackup.matrix)
+			rotationTempMatrix.reset()
+			rotationTempMatrixScreen.reset()
+		}
 	}
 
 	function setBackup(){
