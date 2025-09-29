@@ -94,18 +94,20 @@ iproc::IProcessor::TaskState CQmlCodeRequestGeneratorComp::DoProcessing(
 		QString qmlClassName;
 		switch (requestType){
 		case imtsdl::CSdlRequest::T_QUERY:
-			qmlClassName = sdlRequest.GetName() + QStringLiteral("ModelProvider.qml");
+			qmlClassName = sdlRequest.GetName() + QStringLiteral("ModelProvider");
 			functionName = QStringLiteral("requestDataModel");
 			parentQmlName = QStringLiteral("GqlBasedDataModelProvider");
 			break; 
 		case imtsdl::CSdlRequest::T_MUTATION:
-			qmlClassName = sdlRequest.GetName() + QStringLiteral("ModelController.qml");
+			qmlClassName = sdlRequest.GetName() + QStringLiteral("ModelController");
 			functionName = QStringLiteral("saveDataModel");
 			parentQmlName = QStringLiteral("GqlBasedDataModelController");
 			break;
 		}
+		
+		QString qmlClassFileName = qmlClassName + QStringLiteral(".qml");
 
-		file.setFileName(outputDirectoryPath + '/' + qmlClassName);
+		file.setFileName(outputDirectoryPath + '/' + qmlClassFileName);
 
 		if (!file.open(QIODevice::WriteOnly)){
 			SendCriticalMessage(0, QString("Unable to open file: '%1'. Error: %2").arg(file.fileName(), file.errorString()));
