@@ -20,7 +20,8 @@
 #include <imtbase/CItemModelBase.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
-#include <imtbase/TListModelBase.h>
+#include <imtsdl/TListModelBase.h>
+#include <imtsdl/TElementList.h>
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
@@ -30,6 +31,29 @@ namespace sdl::modsdl::UnionTest
 
 
 Q_NAMESPACE
+
+enum class LinkStatus {
+	OPEN,
+	CLOSE,
+};
+
+Q_ENUM_NS(LinkStatus)
+
+
+class EnumLinkStatus: public QObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString OPEN READ GetOPEN NOTIFY OPENChanged)
+	Q_PROPERTY(QString CLOSE READ GetCLOSE NOTIFY CLOSEChanged)
+
+protected:
+	QString GetOPEN() { return "OPEN"; }
+	QString GetCLOSE() { return "CLOSE"; }
+signals:
+	void OPENChanged();
+	void CLOSEChanged();
+};
+
 
 // forward declaration for union types
 class PrinterSpecification;
@@ -158,9 +182,13 @@ public:
 		struct LinkFields
 		{
 			static const inline QString Link = "link";
+			static const inline QString Status = "status";
+			static const inline QString StatusList = "statusList";
 		};
 
 		istd::TSharedNullable<QByteArray> link;
+		istd::TSharedNullable<LinkStatus> status;
+		istd::TSharedNullable<imtsdl::TElementList<LinkStatus>> statusList;
 
 		static QByteArray GetVersionId();
 
@@ -210,11 +238,15 @@ public:
 		struct PrinterBaseFields
 		{
 			static const inline QString Name = "name";
+			static const inline QString LinkList = "linkList";
 			static const inline QString Specification = "specification";
+			static const inline QString SpecificationList = "specificationList";
 		};
 
 		istd::TSharedNullable<QString> name;
-		istd::TSharedNullable<std::shared_ptr<PrinterSpecification>> specification;
+		istd::TSharedNullable<imtsdl::TElementList<CLink::V1_0>> linkList;
+		istd::TSharedNullable<PrinterSpecification> specification;
+		istd::TSharedNullable<imtsdl::TElementList<PrinterSpecification>> specificationList;
 
 		static QByteArray GetVersionId();
 
@@ -256,219 +288,63 @@ class CCoordsObjectList;
 class CCoordsObject: public ::imtbase::CItemModelBase, public CCoords
 {
 	Q_OBJECT
-	Q_PROPERTY(double m_x READ GetX WRITE SetX NOTIFY xChanged)
-	Q_PROPERTY(double m_y READ GetY WRITE SetY NOTIFY yChanged)
+	Q_PROPERTY(QVariant m_x READ GetX WRITE SetX NOTIFY xChanged)
+	Q_PROPERTY(QVariant m_y READ GetY WRITE SetY NOTIFY yChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CCoordsObject(QObject* parent = nullptr);
 
-	double GetX();
-	void SetX(double v);
+	QVariant GetX();
+	void SetX(QVariant v);
 	Q_INVOKABLE bool hasX();
-	double GetY();
-	void SetY(double v);
+	QVariant GetY();
+	void SetY(QVariant v);
 	Q_INVOKABLE bool hasY();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void xChanged();
-	void yChanged();
+void xChanged();
+void yChanged();
 	void finished();
 
 protected:
 };
 
 
-class CCoordsObjectList: public ::imtbase::TListModelBase<sdl::modsdl::UnionTest::CCoords::V1_0, sdl::modsdl::UnionTest::CCoordsObject>
+
+
+
+class CCoordsObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CCoords::V1_0, sdl::modsdl::UnionTest::CCoordsObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::modsdl::UnionTest::CCoords::V1_0, sdl::modsdl::UnionTest::CCoordsObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CCoords::V1_0, sdl::modsdl::UnionTest::CCoordsObject> BaseClass;
 
 	CCoordsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CCoordsObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::modsdl::UnionTest::CCoordsObjectList* copyMe(){
-		sdl::modsdl::UnionTest::CCoordsObjectList* objectListPtr = new sdl::modsdl::UnionTest::CCoordsObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CCoordsObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CCoordsObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CCoordsObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::modsdl::UnionTest::CCoordsObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CCoordsObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CCoordsObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CCoordsObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CCoordsObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CCoordsObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CCoordsObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::modsdl::UnionTest::CCoordsObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::UnionTest::CCoordsObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::modsdl::UnionTest::CCoordsObject>()){
-				return false;
-			}
-
-			sdl::modsdl::UnionTest::CCoordsObject* selfItemObjectPtr = selfItem.value<sdl::modsdl::UnionTest::CCoordsObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::modsdl::UnionTest::CCoordsObject* otherItemObjectPtr = selfItem.value<sdl::modsdl::UnionTest::CCoordsObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::modsdl::UnionTest::CCoordsObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::modsdl::UnionTest::CCoordsObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_x"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).X.value());
-		}
-		if (nameId == "m_y"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Y.value());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CCoordsObject* item);
+	Q_INVOKABLE sdl::modsdl::UnionTest::CCoordsObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::modsdl::UnionTest::CCoordsObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::UnionTest::CCoordsObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::modsdl::UnionTest::CCoordsObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -480,211 +356,58 @@ class CPrinterSpecificationBaseObjectList;
 class CPrinterSpecificationBaseObject: public ::imtbase::CItemModelBase, public CPrinterSpecificationBase
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_name READ GetName WRITE SetName NOTIFY nameChanged)
+	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CPrinterSpecificationBaseObject(QObject* parent = nullptr);
 
-	QString GetName();
-	void SetName(QString v);
+	QVariant GetName();
+	void SetName(QVariant v);
 	Q_INVOKABLE bool hasName();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void nameChanged();
+void nameChanged();
 	void finished();
 
 protected:
 };
 
 
-class CPrinterSpecificationBaseObjectList: public ::imtbase::TListModelBase<sdl::modsdl::UnionTest::CPrinterSpecificationBase::V1_0, sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject>
+
+
+
+class CPrinterSpecificationBaseObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CPrinterSpecificationBase::V1_0, sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::modsdl::UnionTest::CPrinterSpecificationBase::V1_0, sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CPrinterSpecificationBase::V1_0, sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject> BaseClass;
 
 	CPrinterSpecificationBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList* copyMe(){
-		sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList* objectListPtr = new sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject>()){
-				return false;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* selfItemObjectPtr = selfItem.value<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* otherItemObjectPtr = selfItem.value<sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).name.value());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item);
+	Q_INVOKABLE sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -696,211 +419,68 @@ class CLinkObjectList;
 class CLinkObject: public ::imtbase::CItemModelBase, public CLink
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_link READ GetLink WRITE SetLink NOTIFY linkChanged)
+	Q_PROPERTY(QVariant m_link READ GetLink WRITE SetLink NOTIFY linkChanged)
+	Q_PROPERTY(QVariant m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
+	Q_PROPERTY(QVariant m_statusList READ GetStatusList WRITE SetStatusList NOTIFY statusListChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CLinkObject(QObject* parent = nullptr);
 
-	QString GetLink();
-	void SetLink(QString v);
+	QVariant GetLink();
+	void SetLink(QVariant v);
 	Q_INVOKABLE bool hasLink();
+	QVariant GetStatus();
+	void SetStatus(QVariant v);
+	Q_INVOKABLE bool hasStatus();
+	QVariant GetStatusList();
+	void SetStatusList(QVariant v);
+	Q_INVOKABLE bool hasStatusList();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void linkChanged();
+void linkChanged();
+void statusChanged();
+void statusListChanged();
 	void finished();
 
 protected:
 };
 
 
-class CLinkObjectList: public ::imtbase::TListModelBase<sdl::modsdl::UnionTest::CLink::V1_0, sdl::modsdl::UnionTest::CLinkObject>
+
+
+
+class CLinkObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CLink::V1_0, sdl::modsdl::UnionTest::CLinkObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::modsdl::UnionTest::CLink::V1_0, sdl::modsdl::UnionTest::CLinkObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CLink::V1_0, sdl::modsdl::UnionTest::CLinkObject> BaseClass;
 
 	CLinkObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CLinkObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::modsdl::UnionTest::CLinkObjectList* copyMe(){
-		sdl::modsdl::UnionTest::CLinkObjectList* objectListPtr = new sdl::modsdl::UnionTest::CLinkObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CLinkObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CLinkObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CLinkObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::modsdl::UnionTest::CLinkObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CLinkObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CLinkObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CLinkObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CLinkObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CLinkObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CLinkObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::modsdl::UnionTest::CLinkObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::UnionTest::CLinkObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::modsdl::UnionTest::CLinkObject>()){
-				return false;
-			}
-
-			sdl::modsdl::UnionTest::CLinkObject* selfItemObjectPtr = selfItem.value<sdl::modsdl::UnionTest::CLinkObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::modsdl::UnionTest::CLinkObject* otherItemObjectPtr = selfItem.value<sdl::modsdl::UnionTest::CLinkObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::modsdl::UnionTest::CLinkObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::modsdl::UnionTest::CLinkObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_link"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).link.value());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CLinkObject* item);
+	Q_INVOKABLE sdl::modsdl::UnionTest::CLinkObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::modsdl::UnionTest::CLinkObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::UnionTest::CLinkObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::modsdl::UnionTest::CLinkObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -912,232 +492,89 @@ class CPrinterBaseObjectList;
 class CPrinterBaseObject: public ::imtbase::CItemModelBase, public CPrinterBase
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_name READ GetName WRITE SetName NOTIFY nameChanged)
-	Q_PROPERTY(sdl::modsdl::UnionTest::CPrinterSpecificationObject* m_specification READ GetSpecification WRITE SetSpecification NOTIFY specificationChanged)
+	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
+	Q_PROPERTY(QVariant m_linkList READ GetLinkList WRITE SetLinkList NOTIFY linkListChanged)
+	Q_PROPERTY(QVariant m_specification READ GetSpecification WRITE SetSpecification NOTIFY specificationChanged)
+	Q_PROPERTY(QVariant m_specificationList READ GetSpecificationList WRITE SetSpecificationList NOTIFY specificationListChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CPrinterBaseObject(QObject* parent = nullptr);
 
-	QString GetName();
-	void SetName(QString v);
+	QVariant GetName();
+	void SetName(QVariant v);
 	Q_INVOKABLE bool hasName();
-	sdl::modsdl::UnionTest::CPrinterSpecificationObject* GetSpecification();
-	void SetSpecification(sdl::modsdl::UnionTest::CPrinterSpecificationObject* v);
+	QVariant GetLinkList();
+	void SetLinkList(QVariant v);
+	Q_INVOKABLE bool hasLinkList();
+	Q_INVOKABLE void createLinkList();
+	QVariant GetSpecification();
+	void SetSpecification(QVariant v);
 	Q_INVOKABLE bool hasSpecification();
 	Q_INVOKABLE void createSpecification();
+	QVariant GetSpecificationList();
+	void SetSpecificationList(QVariant v);
+	Q_INVOKABLE bool hasSpecificationList();
+	Q_INVOKABLE void createSpecificationList();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void nameChanged();
-	void specificationChanged();
+void nameChanged();
+void linkListChanged();
+void specificationChanged();
+void specificationListChanged();
 	void finished();
 
 protected:
-	sdl::modsdl::UnionTest::CPrinterSpecificationObject* m_specificationQObjectPtr;
+	QVariant m_linkListQObjectPtr;
+	QVariant m_specificationQObjectPtr;
+	QVariant m_specificationListQObjectPtr;
 };
 
 
-class CPrinterBaseObjectList: public ::imtbase::TListModelBase<sdl::modsdl::UnionTest::CPrinterBase::V1_0, sdl::modsdl::UnionTest::CPrinterBaseObject>
+
+
+
+class CPrinterBaseObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CPrinterBase::V1_0, sdl::modsdl::UnionTest::CPrinterBaseObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::modsdl::UnionTest::CPrinterBase::V1_0, sdl::modsdl::UnionTest::CPrinterBaseObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CPrinterBase::V1_0, sdl::modsdl::UnionTest::CPrinterBaseObject> BaseClass;
 
 	CPrinterBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CPrinterBaseObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::modsdl::UnionTest::CPrinterBaseObjectList* copyMe(){
-		sdl::modsdl::UnionTest::CPrinterBaseObjectList* objectListPtr = new sdl::modsdl::UnionTest::CPrinterBaseObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CPrinterBaseObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterBaseObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CPrinterBaseObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::modsdl::UnionTest::CPrinterBaseObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CPrinterBaseObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterBaseObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CPrinterBaseObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::modsdl::UnionTest::CPrinterBaseObject>()){
-				return nullptr;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterBaseObject* itemObjectPtr = item.value<sdl::modsdl::UnionTest::CPrinterBaseObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::modsdl::UnionTest::CPrinterBaseObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::UnionTest::CPrinterBaseObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::modsdl::UnionTest::CPrinterBaseObject>()){
-				return false;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterBaseObject* selfItemObjectPtr = selfItem.value<sdl::modsdl::UnionTest::CPrinterBaseObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::modsdl::UnionTest::CPrinterBaseObject* otherItemObjectPtr = selfItem.value<sdl::modsdl::UnionTest::CPrinterBaseObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::modsdl::UnionTest::CPrinterBaseObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::modsdl::UnionTest::CPrinterBaseObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).name.value());
-		}
-		if (nameId == "m_specification"){
-			sdl::modsdl::UnionTest::CPrinterBaseObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetSpecification());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CPrinterBaseObject* item);
+	Q_INVOKABLE sdl::modsdl::UnionTest::CPrinterBaseObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::modsdl::UnionTest::CPrinterBaseObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::UnionTest::CPrinterBaseObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::modsdl::UnionTest::CPrinterBaseObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
 
 
-class PrinterSpecification: public std::variant<CPrinterSpecificationBase, CLink> {
+class PrinterSpecification: public std::variant<CPrinterSpecificationBase, CLink, QString, double> {
 
 public:
 
-	typedef std::variant<CPrinterSpecificationBase, CLink> BaseClass;
+	typedef std::variant<CPrinterSpecificationBase, CLink, QString, double> BaseClass;
 
 	PrinterSpecification(){};
 	PrinterSpecification(const CPrinterSpecificationBase& ref)
@@ -1146,49 +583,45 @@ public:
 	PrinterSpecification(const CLink& ref)
 		: BaseClass(ref){};
 
+	PrinterSpecification(const QString& ref)
+		: BaseClass(ref){};
+
+	PrinterSpecification(const double& ref)
+		: BaseClass(ref){};
+
 };
 
-class CPrinterSpecificationObject: public ::imtbase::CItemModelBase
+
+
+
+class CPrinterSpecificationObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::modsdl::UnionTest::PrinterSpecification, QVariant>
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)
-	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
-
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::CItemModelBase BaseClass;
+	typedef ::imtsdl::TSdlAbstractListModel<sdl::modsdl::UnionTest::PrinterSpecification, QVariant> BaseClass;
 
-	CPrinterSpecificationObject(QObject* parent = nullptr): BaseClass(parent) {}
+	CPrinterSpecificationObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE QString GetType() const{
-		return m_type;
-	}
+	virtual QVariant GetOrCreateCachedObject(int index) const override;
 
-	Q_INVOKABLE void SetValue(const QVariant& value){
-		if (value.canConvert<CPrinterSpecificationBase>()){
-			m_type = "PrinterSpecificationBase";
-		}
-
-		if (value.canConvert<CLink>()){
-			m_type = "Link";
-		}
-
-		m_value = value;
-	}
-
-	Q_INVOKABLE QVariant GetValue(){
-		return QVariant();
-	}
-
+	Q_INVOKABLE bool containsKey(const QString& nameId, int /*index*/);
+	Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(QVariant item);
+	Q_INVOKABLE sdl::modsdl::UnionTest::CPrinterSpecificationObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(QVariant item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::modsdl::UnionTest::CPrinterSpecificationObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, QVariant item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 signals:
-	void typeChanged();
-	void valueChanged();
-
-public:
-	istd::TSharedNullable<std::shared_ptr<PrinterSpecification>> Version_1_0;
-	QVariant m_value;
-	QString m_type;
+	void countChanged();
 };
-
 
 
 struct GetSpecificationsRequestInfo
@@ -1245,7 +678,7 @@ protected:
 	virtual bool CreateRepresentationFromObject(
 				const istd::IChangeable& data,
 				const CGetSpecificationsGqlRequest& getSpecificationsRequest,
-				std::shared_ptr<PrinterSpecification>& representationPayload,
+				PrinterSpecification& representationPayload,
 				QString& errorMessage) const = 0;
 
 };
@@ -1266,7 +699,7 @@ public:
 
 protected:
 	// abstract methods
-	virtual std::shared_ptr<PrinterSpecification> OnGetSpecifications(const CGetSpecificationsGqlRequest& getSpecificationsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual PrinterSpecification OnGetSpecifications(const CGetSpecificationsGqlRequest& getSpecificationsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
 
 
@@ -1277,6 +710,13 @@ protected:
 	qmlRegisterType<CPrinterSpecificationBaseObject>("modsdlUnionTestSdl", 1, 0, "PrinterSpecificationBase");
 	qmlRegisterType<CLinkObject>("modsdlUnionTestSdl", 1, 0, "Link");
 	qmlRegisterType<CPrinterBaseObject>("modsdlUnionTestSdl", 1, 0, "PrinterBase");
+	qmlRegisterSingletonType<EnumLinkStatus>("modsdlUnionTestSdl", 1, 0, "LinkStatus", [](QQmlEngine *engine, QJSEngine *scriptEngine) -> QObject * {
+		Q_UNUSED(engine)
+		Q_UNUSED(scriptEngine)
+
+		EnumLinkStatus *enumType = new EnumLinkStatus();
+		return enumType;
+	});
 }
 #endif
 

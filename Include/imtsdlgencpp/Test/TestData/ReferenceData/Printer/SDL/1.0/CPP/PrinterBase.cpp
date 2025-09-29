@@ -719,12 +719,12 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		return false;
 	}
 	QVariant specificationVariantValue;
-		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((*specification).get())){
+		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
 			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
 			}
 		}
-		else if (const CLink* val = std::get_if<CLink>((*specification).get())){
+		else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
 			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
 			}
@@ -735,13 +735,11 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		return false;
 	}
 	QVariant simpleTestVariantValue;
-		if (const QString* val = std::get_if<QString>((*simpleTest).get())){
-			simpleTestVariantValue = *val;
-			model.SetData("simpleTest", simpleTestVariantValue, modelIndex);
+		if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
+			model.SetData("", *val);
 		}
-		else if (const double* val = std::get_if<double>((*simpleTest).get())){
-			simpleTestVariantValue = *val;
-			model.SetData("simpleTest", simpleTestVariantValue, modelIndex);
+		else if (const double* val = std::get_if<double>(simpleTest.GetPtr())){
+			model.SetData("", *val);
 		}
 
 
@@ -749,11 +747,10 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		return false;
 	}
 	QVariant mixedTestVariantValue;
-		if (const QString* val = std::get_if<QString>((*mixedTest).get())){
-			mixedTestVariantValue = *val;
-			model.SetData("mixedTest", mixedTestVariantValue, modelIndex);
+		if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){
+			model.SetData("", *val);
 		}
-		else if (const CLink* val = std::get_if<CLink>((*mixedTest).get())){
+		else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
 			if (!val->WriteToModel(*(model.AddTreeModel("mixedTest", modelIndex)), 0)){
 				return false;
 			}
@@ -785,7 +782,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		if (!isspecificationRead){
 			return false;
 		}
-		specification = std::make_shared<PrinterSpecification>(specificationConvert);
+		specification = PrinterSpecification(specificationConvert);
 	}
 	else if (specificationTypename == "Link") {
 		CLink specificationConvert;
@@ -793,7 +790,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		if (!isspecificationRead){
 			return false;
 		}
-		specification = std::make_shared<PrinterSpecification>(specificationConvert);
+		specification = PrinterSpecification(specificationConvert);
 	}
 
 	QVariant simpleTestData = model.GetData("simpleTest", modelIndex);
@@ -804,10 +801,10 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 	}
 	QString simpleTestTypename = simpleTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 	if (simpleTestData.canConvert<QString>()){
-		simpleTest = std::make_shared<SimpleUnion>(simpleTestData.value<QString>());
+		simpleTest = SimpleUnion(simpleTestData.value<QString>());
 	}
 	else if (simpleTestData.canConvert<double>()){
-		simpleTest = std::make_shared<SimpleUnion>(simpleTestData.value<double>());
+		simpleTest = SimpleUnion(simpleTestData.value<double>());
 	}
 
 	QVariant mixedTestData = model.GetData("mixedTest", modelIndex);
@@ -818,7 +815,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 	}
 	QString mixedTestTypename = mixedTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 	if (mixedTestData.canConvert<QString>()){
-		mixedTest = std::make_shared<MixedUnion>(mixedTestData.value<QString>());
+		mixedTest = MixedUnion(mixedTestData.value<QString>());
 	}
 	else if (mixedTestTypename == "Link") {
 		CLink mixedTestConvert;
@@ -826,7 +823,7 @@ bool CPrinterBase::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		if (!ismixedTestRead){
 			return false;
 		}
-		mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+		mixedTest = MixedUnion(mixedTestConvert);
 	}
 
 	return true;
@@ -849,7 +846,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 			if (!isspecificationRead){
 				return false;
 			}
-			specification = std::make_shared<PrinterSpecification>(specificationConvert);
+			specification = PrinterSpecification(specificationConvert);
 		}
 		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
@@ -857,7 +854,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 			if (!isspecificationRead){
 				return false;
 			}
-			specification = std::make_shared<PrinterSpecification>(specificationConvert);
+			specification = PrinterSpecification(specificationConvert);
 		}
 	}
 
@@ -865,10 +862,10 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 	if (!simpleTestData.isNull()){
 		QString simpleTestTypename = simpleTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 		if (simpleTestData.canConvert<QString>()){
-			simpleTest = std::make_shared<SimpleUnion>(simpleTestData.value<QString>());
+			simpleTest = SimpleUnion(simpleTestData.value<QString>());
 		}
 		else if (simpleTestData.canConvert<double>()){
-			simpleTest = std::make_shared<SimpleUnion>(simpleTestData.value<double>());
+			simpleTest = SimpleUnion(simpleTestData.value<double>());
 		}
 	}
 
@@ -876,7 +873,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 	if (!mixedTestData.isNull()){
 		QString mixedTestTypename = mixedTestData.value<::imtbase::CTreeItemModel*>()->GetData("__typename").toString();
 		if (mixedTestData.canConvert<QString>()){
-			mixedTest = std::make_shared<MixedUnion>(mixedTestData.value<QString>());
+			mixedTest = MixedUnion(mixedTestData.value<QString>());
 		}
 		else if (mixedTestTypename == "Link") {
 			CLink mixedTestConvert;
@@ -884,7 +881,7 @@ bool CPrinterBase::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 			if (!ismixedTestRead){
 				return false;
 			}
-			mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+			mixedTest = MixedUnion(mixedTestConvert);
 		}
 	}
 
@@ -902,12 +899,12 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 	::imtgql::CGqlParamObject specificationDataObject;
-	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((*specification).get())){
+	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
 		if (!val->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
 	}
-	else if (const CLink* val = std::get_if<CLink>((*specification).get())){
+	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
 		if (!val->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
@@ -918,10 +915,10 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 	::imtgql::CGqlParamObject simpleTestDataObject;
-	if (const QString* val = std::get_if<QString>((*simpleTest).get())){
+	if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
 		simpleTestDataObject.InsertParam("simpleTest", *val);
 	}
-	else if (const double* val = std::get_if<double>((*simpleTest).get())){
+	else if (const double* val = std::get_if<double>(simpleTest.GetPtr())){
 		simpleTestDataObject.InsertParam("simpleTest", *val);
 	}
 	gqlObject.InsertParam("simpleTest", simpleTestDataObject);
@@ -930,10 +927,10 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		return false;
 	}
 	::imtgql::CGqlParamObject mixedTestDataObject;
-	if (const QString* val = std::get_if<QString>((*mixedTest).get())){
+	if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){
 		mixedTestDataObject.InsertParam("mixedTest", *val);
 	}
-	else if (const CLink* val = std::get_if<CLink>((*mixedTest).get())){
+	else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
 		if (!val->WriteToGraphQlObject(mixedTestDataObject)){
 			return false;
 		}
@@ -968,7 +965,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		if (!isSpecificationRead){
 			return false;
 		}
-		specification = std::make_shared<PrinterSpecification>(specificationConvert);
+		specification = PrinterSpecification(specificationConvert);
 	}
 	else if (specificationTypename == "Link") {
 		CLink specificationConvert;
@@ -976,7 +973,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		if (!isSpecificationRead){
 			return false;
 		}
-		specification = std::make_shared<PrinterSpecification>(specificationConvert);
+		specification = PrinterSpecification(specificationConvert);
 	}
 
 	if (!gqlObject.ContainsParam("simpleTest")){
@@ -986,10 +983,10 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	}
 	QVariant simpleTestVariantValue = gqlObject["simpleTest"];
 	if (simpleTestVariantValue.canConvert<QString>()){
-		simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<QString>());
+		simpleTest = SimpleUnion(simpleTestVariantValue.value<QString>());
 	}
 	else if (simpleTestVariantValue.canConvert<double>()){
-		simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<double>());
+		simpleTest = SimpleUnion(simpleTestVariantValue.value<double>());
 	}
 
 	if (!gqlObject.ContainsParam("mixedTest")){
@@ -1006,7 +1003,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	QString mixedTestTypename = mixedTestDataObjectPtr->GetParamArgumentValue("__typename").toString();
 	QVariant mixedTestVariantValue = gqlObject["mixedTest"];
 	if (mixedTestVariantValue.canConvert<QString>()){
-		mixedTest = std::make_shared<MixedUnion>(mixedTestVariantValue.value<QString>());
+		mixedTest = MixedUnion(mixedTestVariantValue.value<QString>());
 	}
 	else if (mixedTestTypename == "Link") {
 		CLink mixedTestConvert;
@@ -1014,7 +1011,7 @@ bool CPrinterBase::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		if (!isMixedTestRead){
 			return false;
 		}
-		mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+		mixedTest = MixedUnion(mixedTestConvert);
 	}
 
 	return true;
@@ -1041,7 +1038,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			if (!isSpecificationRead){
 				return false;
 			}
-			specification = std::make_shared<PrinterSpecification>(specificationConvert);
+			specification = PrinterSpecification(specificationConvert);
 		}
 		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
@@ -1049,17 +1046,17 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			if (!isSpecificationRead){
 				return false;
 			}
-			specification = std::make_shared<PrinterSpecification>(specificationConvert);
+			specification = PrinterSpecification(specificationConvert);
 		}
 	}
 
 	if (gqlObject.ContainsParam("simpleTest")){
 		QVariant simpleTestVariantValue = gqlObject["simpleTest"];
 		if (simpleTestVariantValue.canConvert<QString>()){
-			simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<QString>());
+			simpleTest = SimpleUnion(simpleTestVariantValue.value<QString>());
 		}
 		else if (simpleTestVariantValue.canConvert<double>()){
-			simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<double>());
+			simpleTest = SimpleUnion(simpleTestVariantValue.value<double>());
 		}
 	}
 
@@ -1073,7 +1070,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		QString mixedTestTypename = mixedTestDataObjectPtr->GetParamArgumentValue("__typename").toString();
 		QVariant mixedTestVariantValue = gqlObject["mixedTest"];
 		if (mixedTestVariantValue.canConvert<QString>()){
-			mixedTest = std::make_shared<MixedUnion>(mixedTestVariantValue.value<QString>());
+			mixedTest = MixedUnion(mixedTestVariantValue.value<QString>());
 		}
 		else if (mixedTestTypename == "Link") {
 			CLink mixedTestConvert;
@@ -1081,7 +1078,7 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 			if (!isMixedTestRead){
 				return false;
 			}
-			mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+			mixedTest = MixedUnion(mixedTestConvert);
 		}
 	}
 
@@ -1098,7 +1095,7 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (!specification){
 		return false;
 	}
-	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((*specification).get())){
+	if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(specification.GetPtr())){
 		QJsonObject specificationJsonObject;
 		const bool isspecificationAdded = val->WriteToJsonObject(specificationJsonObject);
 		if (!isspecificationAdded){
@@ -1106,7 +1103,7 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		}
 		jsonObject["specification"] = specificationJsonObject;
 	}
-	else if (const CLink* val = std::get_if<CLink>((*specification).get())){
+	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
 		QJsonObject specificationJsonObject;
 		const bool isspecificationAdded = val->WriteToJsonObject(specificationJsonObject);
 		if (!isspecificationAdded){
@@ -1119,13 +1116,13 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (!simpleTest){
 		return false;
 	}
-	if (const QString* val = std::get_if<QString>((*simpleTest).get())){
+	if (const QString* val = std::get_if<QString>(simpleTest.GetPtr())){
 		if (!simpleTest){
 			return false;
 		}
 		jsonObject["simpleTest"] = QJsonValue::fromVariant(*val);
 	}
-	else if (const double* val = std::get_if<double>((*simpleTest).get())){
+	else if (const double* val = std::get_if<double>(simpleTest.GetPtr())){
 		if (!simpleTest){
 			return false;
 		}
@@ -1136,13 +1133,13 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	if (!mixedTest){
 		return false;
 	}
-	if (const QString* val = std::get_if<QString>((*mixedTest).get())){
+	if (const QString* val = std::get_if<QString>(mixedTest.GetPtr())){
 		if (!mixedTest){
 			return false;
 		}
 		jsonObject["mixedTest"] = QJsonValue::fromVariant(*val);
 	}
-	else if (const CLink* val = std::get_if<CLink>((*mixedTest).get())){
+	else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
 		QJsonObject mixedTestJsonObject;
 		const bool ismixedTestAdded = val->WriteToJsonObject(mixedTestJsonObject);
 		if (!ismixedTestAdded){
@@ -1180,7 +1177,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		if (!isspecificationRead){
 			return false;
 		}
-		specification = std::make_shared<PrinterSpecification>(specificationConvert);
+		specification = PrinterSpecification(specificationConvert);
 	}
 	else if (specificationTypename == "Link") {
 		CLink specificationConvert;
@@ -1188,7 +1185,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		if (!isspecificationRead){
 			return false;
 		}
-		specification = std::make_shared<PrinterSpecification>(specificationConvert);
+		specification = PrinterSpecification(specificationConvert);
 	}
 
 	if (!jsonObject.contains("simpleTest")){
@@ -1198,10 +1195,10 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	QVariant simpleTestVariantValue = jsonObject["simpleTest"].toVariant();
 	if (simpleTestVariantValue.canConvert<QString>()){
-		simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<QString>());
+		simpleTest = SimpleUnion(simpleTestVariantValue.value<QString>());
 	}
 	else if (simpleTestVariantValue.canConvert<double>()){
-		simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<double>());
+		simpleTest = SimpleUnion(simpleTestVariantValue.value<double>());
 	}
 
 	if (!jsonObject.contains("mixedTest")){
@@ -1218,7 +1215,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	QString mixedTestTypename = mixedTestObject.value("__typename").toString();
 	QVariant mixedTestVariantValue = jsonObject["mixedTest"].toVariant();
 	if (mixedTestVariantValue.canConvert<QString>()){
-		mixedTest = std::make_shared<MixedUnion>(mixedTestVariantValue.value<QString>());
+		mixedTest = MixedUnion(mixedTestVariantValue.value<QString>());
 	}
 	else if (mixedTestTypename == "Link") {
 		CLink mixedTestConvert;
@@ -1226,7 +1223,7 @@ bool CPrinterBase::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 		if (!ismixedTestRead){
 			return false;
 		}
-		mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+		mixedTest = MixedUnion(mixedTestConvert);
 	}
 
 	return true;
@@ -1253,7 +1250,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			if (!isspecificationRead){
 				return false;
 			}
-			specification = std::make_shared<PrinterSpecification>(specificationConvert);
+			specification = PrinterSpecification(specificationConvert);
 		}
 		else if (specificationTypename == "Link") {
 			CLink specificationConvert;
@@ -1261,17 +1258,17 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			if (!isspecificationRead){
 				return false;
 			}
-			specification = std::make_shared<PrinterSpecification>(specificationConvert);
+			specification = PrinterSpecification(specificationConvert);
 		}
 	}
 
 	if (jsonObject.contains("simpleTest")){
 		QVariant simpleTestVariantValue = jsonObject["simpleTest"].toVariant();
 		if (simpleTestVariantValue.canConvert<QString>()){
-			simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<QString>());
+			simpleTest = SimpleUnion(simpleTestVariantValue.value<QString>());
 		}
 		else if (simpleTestVariantValue.canConvert<double>()){
-			simpleTest = std::make_shared<SimpleUnion>(simpleTestVariantValue.value<double>());
+			simpleTest = SimpleUnion(simpleTestVariantValue.value<double>());
 		}
 	}
 
@@ -1285,7 +1282,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 		QString mixedTestTypename = mixedTestObject.value("__typename").toString();
 		QVariant mixedTestVariantValue = jsonObject["mixedTest"].toVariant();
 		if (mixedTestVariantValue.canConvert<QString>()){
-			mixedTest = std::make_shared<MixedUnion>(mixedTestVariantValue.value<QString>());
+			mixedTest = MixedUnion(mixedTestVariantValue.value<QString>());
 		}
 		else if (mixedTestTypename == "Link") {
 			CLink mixedTestConvert;
@@ -1293,7 +1290,7 @@ bool CPrinterBase::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 			if (!ismixedTestRead){
 				return false;
 			}
-			mixedTest = std::make_shared<MixedUnion>(mixedTestConvert);
+			mixedTest = MixedUnion(mixedTestConvert);
 		}
 	}
 
@@ -1553,7 +1550,7 @@ bool CPrinterList::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		newDataModelPtr->setIsArray(true);
 		for (qsizetype dataIndex = 0; dataIndex < data->size(); ++dataIndex){
 			newDataModelPtr->InsertNewItem();
-			if (!(data->at(dataIndex).WriteToModel(*newDataModelPtr, dataIndex))){
+			if (!(data->at(dataIndex)->WriteToModel(*newDataModelPtr, dataIndex))){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
@@ -1570,7 +1567,7 @@ bool CPrinterList::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 	::imtbase::CTreeItemModel* dataModel = model.GetTreeItemModel("data", modelIndex);
 	if (dataModel != nullptr){
 		int dataCount = dataModel->GetItemsCount();
-		QList<CPrinterBase::V1_0> dataList;
+		imtsdl::TElementList<CPrinterBase::V1_0> dataList;
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
 			CPrinterBase::V1_0 data;
 			if (!data.ReadFromModel(*dataModel, dataIndex)){
@@ -1593,7 +1590,7 @@ bool CPrinterList::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 	::imtbase::CTreeItemModel* dataModel = model.GetTreeItemModel("data", modelIndex);
 	if (dataModel != nullptr){
 		int dataCount = dataModel->GetItemsCount();
-		QList<CPrinterBase::V1_0> dataList;
+		imtsdl::TElementList<CPrinterBase::V1_0> dataList;
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
 			CPrinterBase::V1_0 data;
 			if (!data.OptReadFromModel(*dataModel, dataIndex)){
@@ -1617,7 +1614,7 @@ bool CPrinterList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		QList<::imtgql::CGqlParamObject> dataDataObjectList;
 		for (qsizetype dataIndex = 0; dataIndex < data->size(); ++dataIndex){
 			::imtgql::CGqlParamObject newDataGqlObject;
-			if (!data->at(dataIndex).WriteToGraphQlObject(newDataGqlObject)){
+			if (!data->at(dataIndex)->WriteToGraphQlObject(newDataGqlObject)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
@@ -1635,7 +1632,7 @@ bool CPrinterList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 {
 	if (gqlObject.ContainsParam("data") && (gqlObject.GetObjectsCount("data") > 0)){
 		const qsizetype dataElementsCount = gqlObject.GetObjectsCount("data");
-		data = QList<CPrinterBase::V1_0>();
+		data = imtsdl::TElementList<CPrinterBase::V1_0>();
 		for (qsizetype dataIndex = 0; dataIndex < dataElementsCount; ++dataIndex){
 			const ::imtgql::CGqlParamObject* dataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("data", dataIndex);
 			if (dataDataObjectPtr == nullptr){
@@ -1660,7 +1657,7 @@ bool CPrinterList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 {
 	if (gqlObject.ContainsParam("data") && (gqlObject.GetObjectsCount("data") > 0)){
 		const qsizetype dataElementsCount = gqlObject.GetObjectsCount("data");
-		data = QList<CPrinterBase::V1_0>();
+		data = imtsdl::TElementList<CPrinterBase::V1_0>();
 		for (qsizetype dataIndex = 0; dataIndex < dataElementsCount; ++dataIndex){
 			const ::imtgql::CGqlParamObject* dataDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("data", dataIndex);
 			if (dataDataObjectPtr == nullptr){
@@ -1687,7 +1684,7 @@ bool CPrinterList::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		QJsonArray newDataArray;
 		for (qsizetype dataIndex = 0; dataIndex < data->size(); ++dataIndex){
 			QJsonObject newDataJsonObject;
-			if (!data->at(dataIndex).WriteToJsonObject(newDataJsonObject)){
+			if (!data->at(dataIndex)->WriteToJsonObject(newDataJsonObject)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
@@ -1706,7 +1703,7 @@ bool CPrinterList::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("data") && jsonObject["data"].isArray()){
 		const QJsonArray dataJsonArray = jsonObject["data"].toArray();
 		const qsizetype dataArrayCount = dataJsonArray.size();
-		data = QList<CPrinterBase::V1_0>();
+		data = imtsdl::TElementList<CPrinterBase::V1_0>();
 		for (qsizetype dataIndex = 0; dataIndex < dataArrayCount; ++dataIndex){
 			CPrinterBase::V1_0 tempData;
 			if (!tempData.ReadFromJsonObject(dataJsonArray[dataIndex].toObject())){
@@ -1727,7 +1724,7 @@ bool CPrinterList::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("data") && jsonObject["data"].isArray()){
 		const QJsonArray dataJsonArray = jsonObject["data"].toArray();
 		const qsizetype dataArrayCount = dataJsonArray.size();
-		data = QList<CPrinterBase::V1_0>();
+		data = imtsdl::TElementList<CPrinterBase::V1_0>();
 		for (qsizetype dataIndex = 0; dataIndex < dataArrayCount; ++dataIndex){
 			CPrinterBase::V1_0 tempData;
 			if (!tempData.OptReadFromJsonObject(dataJsonArray[dataIndex].toObject())){
@@ -1982,19 +1979,19 @@ CPrinterSpecificationBaseObject::CPrinterSpecificationBaseObject(QObject* parent
 }
 
 
-QString CPrinterSpecificationBaseObject::GetName()
+QVariant CPrinterSpecificationBaseObject::GetName()
 {
 	if (Version_1_0->name.has_value()){
 		return Version_1_0->name.value();
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CPrinterSpecificationBaseObject::SetName(QString v)
+void CPrinterSpecificationBaseObject::SetName(QVariant v)
 {
-	Version_1_0->name = v;
+	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
 
@@ -2050,9 +2047,9 @@ QString CPrinterSpecificationBaseObject::toGraphQL() const
 }
 
 
-QObject* CPrinterSpecificationBaseObject::CreateObject(const QString& key)
+QVariant CPrinterSpecificationBaseObject::CreateObject(const QString& key)
 {
-	Q_UNUSED(key);	return nullptr;
+	Q_UNUSED(key);	return QVariant();
 }
 
 
@@ -2066,6 +2063,102 @@ QString CPrinterSpecificationBaseObject::getJSONKeyForProperty(const QString& pr
 }
 
 
+
+
+
+bool CPrinterSpecificationBaseObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+{
+	return true;
+}
+
+
+int CPrinterSpecificationBaseObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CPrinterSpecificationBaseObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CPrinterSpecificationBaseObjectList::append(sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* item)
+{
+	BaseClass::append(item);
+}
+
+
+sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList* sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::copyMe()
+{
+	sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList* retVal = new sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList();
+	BaseClass::fromMe(retVal);
+	return retVal;
+}
+
+
+QString sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::toJson()
+{
+	return BaseClass::toJson();
+}
+
+
+QString sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::toGraphQL()
+{
+	return BaseClass::toGraphQL();
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::addElement(sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* item)
+{
+	append(item);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+
+bool sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::isEqualWithModel(sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList* otherModelPtr)
+{
+	return BaseClass::isEqualWithModel(otherModelPtr);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::insert(int index, sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* item)
+{
+	return BaseClass::insert(index, item);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::remove(int index)
+{
+	return BaseClass::remove(index);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::clear()
+{
+	return BaseClass::clear();
+}
+
+
+QVariant sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::getData(const QString& nameId, int index)
+{
+	QVariant item = GetOrCreateCachedObject(index);
+	sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
+	if (itemPtr == nullptr) return QVariant();
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		return QVariant::fromValue(item);
+	}
+		if (nameId == "m_name"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
+		}
+	return QVariant();
+}
 CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 	Version_1_0.emplace();
 
@@ -2073,19 +2166,19 @@ CLinkObject::CLinkObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 }
 
 
-QString CLinkObject::GetLink()
+QVariant CLinkObject::GetLink()
 {
 	if (Version_1_0->link.has_value()){
 		return Version_1_0->link.value();
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CLinkObject::SetLink(QString v)
+void CLinkObject::SetLink(QVariant v)
 {
-	Version_1_0->link = v.toUtf8();
+	Version_1_0->link = v.value<QString>().toUtf8();
 	linkChanged();
 }
 
@@ -2141,9 +2234,9 @@ QString CLinkObject::toGraphQL() const
 }
 
 
-QObject* CLinkObject::CreateObject(const QString& key)
+QVariant CLinkObject::CreateObject(const QString& key)
 {
-	Q_UNUSED(key);	return nullptr;
+	Q_UNUSED(key);	return QVariant();
 }
 
 
@@ -2157,10 +2250,103 @@ QString CLinkObject::getJSONKeyForProperty(const QString& propertyName) const
 }
 
 
-CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_specificationQObjectPtr(nullptr)
-			, m_simpleTestQObjectPtr(nullptr)
-			, m_mixedTestQObjectPtr(nullptr)
+
+
+
+bool CLinkObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
 {
+	return true;
+}
+
+
+int CLinkObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CLinkObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CLinkObjectList::append(sdl::modsdl::PrinterBase::CLinkObject* item)
+{
+	BaseClass::append(item);
+}
+
+
+sdl::modsdl::PrinterBase::CLinkObjectList* sdl::modsdl::PrinterBase::CLinkObjectList::copyMe()
+{
+	sdl::modsdl::PrinterBase::CLinkObjectList* retVal = new sdl::modsdl::PrinterBase::CLinkObjectList();
+	BaseClass::fromMe(retVal);
+	return retVal;
+}
+
+
+QString sdl::modsdl::PrinterBase::CLinkObjectList::toJson()
+{
+	return BaseClass::toJson();
+}
+
+
+QString sdl::modsdl::PrinterBase::CLinkObjectList::toGraphQL()
+{
+	return BaseClass::toGraphQL();
+}
+
+
+void sdl::modsdl::PrinterBase::CLinkObjectList::addElement(sdl::modsdl::PrinterBase::CLinkObject* item)
+{
+	append(item);
+}
+
+
+void sdl::modsdl::PrinterBase::CLinkObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+
+bool sdl::modsdl::PrinterBase::CLinkObjectList::isEqualWithModel(sdl::modsdl::PrinterBase::CLinkObjectList* otherModelPtr)
+{
+	return BaseClass::isEqualWithModel(otherModelPtr);
+}
+
+
+void sdl::modsdl::PrinterBase::CLinkObjectList::insert(int index, sdl::modsdl::PrinterBase::CLinkObject* item)
+{
+	return BaseClass::insert(index, item);
+}
+
+
+void sdl::modsdl::PrinterBase::CLinkObjectList::remove(int index)
+{
+	return BaseClass::remove(index);
+}
+
+
+void sdl::modsdl::PrinterBase::CLinkObjectList::clear()
+{
+	return BaseClass::clear();
+}
+
+
+QVariant sdl::modsdl::PrinterBase::CLinkObjectList::getData(const QString& nameId, int index)
+{
+	QVariant item = GetOrCreateCachedObject(index);
+	sdl::modsdl::PrinterBase::CLinkObject* itemPtr = item.value<sdl::modsdl::PrinterBase::CLinkObject*>();
+	if (itemPtr == nullptr) return QVariant();
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		return QVariant::fromValue(item);
+	}
+		if (nameId == "m_link"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->link.value());
+		}
+	return QVariant();
+}
+CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 	Version_1_0.emplace();
 
 	QObject::connect(this, &CPrinterBaseObject::nameChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -2170,19 +2356,19 @@ CPrinterBaseObject::CPrinterBaseObject(QObject* parent): ::imtbase::CItemModelBa
 }
 
 
-QString CPrinterBaseObject::GetName()
+QVariant CPrinterBaseObject::GetName()
 {
 	if (Version_1_0->name.has_value()){
 		return Version_1_0->name.value();
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CPrinterBaseObject::SetName(QString v)
+void CPrinterBaseObject::SetName(QVariant v)
 {
-	Version_1_0->name = v;
+	Version_1_0->name = v.value<QString>();
 	nameChanged();
 }
 
@@ -2193,29 +2379,42 @@ bool CPrinterBaseObject::hasName()
 }
 
 
-sdl::modsdl::PrinterBase::CPrinterSpecificationObject* CPrinterBaseObject::GetSpecification()
+QVariant CPrinterBaseObject::GetSpecification()
 {
 	if (Version_1_0->specification.has_value()){
-		if (!m_specificationQObjectPtr){
-			m_specificationQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CPrinterSpecificationObject*>(CreateObject("specification"));
-			m_specificationQObjectPtr->Version_1_0 = Version_1_0->specification;
+		if (m_specificationQObjectPtr.isValid()){
+			if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>((Version_1_0->specification).GetPtr())){
+				CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject(this);
+				newObjectPtr->Version_1_0 = val->Version_1_0;
+				m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
+			}
+			if (const CLink* val = std::get_if<CLink>((Version_1_0->specification).GetPtr())){
+				CLinkObject *newObjectPtr = new CLinkObject(this);
+				newObjectPtr->Version_1_0 = val->Version_1_0;
+				m_specificationQObjectPtr = QVariant::fromValue(newObjectPtr);
+			}
 		}
 		return m_specificationQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CPrinterBaseObject::SetSpecification(sdl::modsdl::PrinterBase::CPrinterSpecificationObject* v)
+void CPrinterBaseObject::SetSpecification(QVariant v)
 {
-	if (v){
-		Version_1_0->specification = v->Version_1_0;
-		m_specificationQObjectPtr = v;
+	if (v.isValid()){
+		if (const CPrinterSpecificationBaseObject* val = v.value<const CPrinterSpecificationBaseObject*>()){
+			*Version_1_0->specification = *val;
+		}
+		if (const CLinkObject* val = v.value<const CLinkObject*>()){
+			*Version_1_0->specification = *val;
+		}
 	}
 	else {
 		Version_1_0->specification = nullptr;
 	}
+	m_specificationQObjectPtr = v;
 
 	specificationChanged();
 }
@@ -2233,29 +2432,38 @@ void CPrinterBaseObject::createSpecification()
 }
 
 
-sdl::modsdl::PrinterBase::CSimpleUnionObject* CPrinterBaseObject::GetSimpleTest()
+QVariant CPrinterBaseObject::GetSimpleTest()
 {
 	if (Version_1_0->simpleTest.has_value()){
-		if (!m_simpleTestQObjectPtr){
-			m_simpleTestQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CSimpleUnionObject*>(CreateObject("simpleTest"));
-			m_simpleTestQObjectPtr->Version_1_0 = Version_1_0->simpleTest;
+		if (m_simpleTestQObjectPtr.isValid()){
+			if (const QString* val = std::get_if<QString>((Version_1_0->simpleTest).GetPtr())){
+				m_simpleTestQObjectPtr = QVariant::fromValue(val);
+			}
+			if (const double* val = std::get_if<double>((Version_1_0->simpleTest).GetPtr())){
+				m_simpleTestQObjectPtr = QVariant::fromValue(val);
+			}
 		}
 		return m_simpleTestQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CPrinterBaseObject::SetSimpleTest(sdl::modsdl::PrinterBase::CSimpleUnionObject* v)
+void CPrinterBaseObject::SetSimpleTest(QVariant v)
 {
-	if (v){
-		Version_1_0->simpleTest = v->Version_1_0;
-		m_simpleTestQObjectPtr = v;
+	if (v.isValid()){
+		if (const QString* val = v.value<const QString*>()){
+			*Version_1_0->simpleTest = *val;
+		}
+		if (const double* val = v.value<const double*>()){
+			*Version_1_0->simpleTest = *val;
+		}
 	}
 	else {
 		Version_1_0->simpleTest = nullptr;
 	}
+	m_simpleTestQObjectPtr = v;
 
 	simpleTestChanged();
 }
@@ -2273,29 +2481,40 @@ void CPrinterBaseObject::createSimpleTest()
 }
 
 
-sdl::modsdl::PrinterBase::CMixedUnionObject* CPrinterBaseObject::GetMixedTest()
+QVariant CPrinterBaseObject::GetMixedTest()
 {
 	if (Version_1_0->mixedTest.has_value()){
-		if (!m_mixedTestQObjectPtr){
-			m_mixedTestQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CMixedUnionObject*>(CreateObject("mixedTest"));
-			m_mixedTestQObjectPtr->Version_1_0 = Version_1_0->mixedTest;
+		if (m_mixedTestQObjectPtr.isValid()){
+			if (const QString* val = std::get_if<QString>((Version_1_0->mixedTest).GetPtr())){
+				m_mixedTestQObjectPtr = QVariant::fromValue(val);
+			}
+			if (const CLink* val = std::get_if<CLink>((Version_1_0->mixedTest).GetPtr())){
+				CLinkObject *newObjectPtr = new CLinkObject(this);
+				newObjectPtr->Version_1_0 = val->Version_1_0;
+				m_mixedTestQObjectPtr = QVariant::fromValue(newObjectPtr);
+			}
 		}
 		return m_mixedTestQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CPrinterBaseObject::SetMixedTest(sdl::modsdl::PrinterBase::CMixedUnionObject* v)
+void CPrinterBaseObject::SetMixedTest(QVariant v)
 {
-	if (v){
-		Version_1_0->mixedTest = v->Version_1_0;
-		m_mixedTestQObjectPtr = v;
+	if (v.isValid()){
+		if (const QString* val = v.value<const QString*>()){
+			*Version_1_0->mixedTest = *val;
+		}
+		if (const CLinkObject* val = v.value<const CLinkObject*>()){
+			*Version_1_0->mixedTest = *val;
+		}
 	}
 	else {
 		Version_1_0->mixedTest = nullptr;
 	}
+	m_mixedTestQObjectPtr = v;
 
 	mixedTestChanged();
 }
@@ -2358,18 +2577,9 @@ QString CPrinterBaseObject::toGraphQL() const
 }
 
 
-QObject* CPrinterBaseObject::CreateObject(const QString& key)
+QVariant CPrinterBaseObject::CreateObject(const QString& key)
 {
-	Q_UNUSED(key);	if (key == "specification"){
-		return new sdl::modsdl::PrinterBase::CPrinterSpecificationObject(this);
-	}
-	if (key == "simpleTest"){
-		return new sdl::modsdl::PrinterBase::CSimpleUnionObject(this);
-	}
-	if (key == "mixedTest"){
-		return new sdl::modsdl::PrinterBase::CMixedUnionObject(this);
-	}
-	return nullptr;
+	Q_UNUSED(key);	return QVariant();
 }
 
 
@@ -2392,37 +2602,143 @@ QString CPrinterBaseObject::getJSONKeyForProperty(const QString& propertyName) c
 }
 
 
-CPrinterListObject::CPrinterListObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_dataQObjectPtr(nullptr)
+
+
+
+bool CPrinterBaseObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
 {
+	return true;
+}
+
+
+int CPrinterBaseObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CPrinterBaseObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CPrinterBaseObjectList::append(sdl::modsdl::PrinterBase::CPrinterBaseObject* item)
+{
+	BaseClass::append(item);
+}
+
+
+sdl::modsdl::PrinterBase::CPrinterBaseObjectList* sdl::modsdl::PrinterBase::CPrinterBaseObjectList::copyMe()
+{
+	sdl::modsdl::PrinterBase::CPrinterBaseObjectList* retVal = new sdl::modsdl::PrinterBase::CPrinterBaseObjectList();
+	BaseClass::fromMe(retVal);
+	return retVal;
+}
+
+
+QString sdl::modsdl::PrinterBase::CPrinterBaseObjectList::toJson()
+{
+	return BaseClass::toJson();
+}
+
+
+QString sdl::modsdl::PrinterBase::CPrinterBaseObjectList::toGraphQL()
+{
+	return BaseClass::toGraphQL();
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterBaseObjectList::addElement(sdl::modsdl::PrinterBase::CPrinterBaseObject* item)
+{
+	append(item);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterBaseObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+
+bool sdl::modsdl::PrinterBase::CPrinterBaseObjectList::isEqualWithModel(sdl::modsdl::PrinterBase::CPrinterBaseObjectList* otherModelPtr)
+{
+	return BaseClass::isEqualWithModel(otherModelPtr);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterBaseObjectList::insert(int index, sdl::modsdl::PrinterBase::CPrinterBaseObject* item)
+{
+	return BaseClass::insert(index, item);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterBaseObjectList::remove(int index)
+{
+	return BaseClass::remove(index);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterBaseObjectList::clear()
+{
+	return BaseClass::clear();
+}
+
+
+QVariant sdl::modsdl::PrinterBase::CPrinterBaseObjectList::getData(const QString& nameId, int index)
+{
+	QVariant item = GetOrCreateCachedObject(index);
+	sdl::modsdl::PrinterBase::CPrinterBaseObject* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
+	if (itemPtr == nullptr) return QVariant();
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		return QVariant::fromValue(item);
+	}
+		if (nameId == "m_name"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->name.value());
+		}
+		if (nameId == "m_specification"){
+			return itemPtr->GetSpecification();
+		}
+		if (nameId == "m_simpleTest"){
+			return itemPtr->GetSimpleTest();
+		}
+		if (nameId == "m_mixedTest"){
+			return itemPtr->GetMixedTest();
+		}
+	return QVariant();
+}
+CPrinterListObject::CPrinterListObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 	Version_1_0.emplace();
 
 	QObject::connect(this, &CPrinterListObject::dataChanged, this, &CItemModelBase::OnInternalModelChanged);
 }
 
 
-sdl::modsdl::PrinterBase::CPrinterBaseObjectList* CPrinterListObject::GetData()
+QVariant CPrinterListObject::GetData()
 {
 	if (Version_1_0->data.has_value()){
-		if (!m_dataQObjectPtr){
-			m_dataQObjectPtr = dynamic_cast<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>(CreateObject("data"));
-			m_dataQObjectPtr->Version_1_0 = Version_1_0->data;
+		if (!m_dataQObjectPtr.isValid()){
+			m_dataQObjectPtr = CreateObject("data");
+			sdl::modsdl::PrinterBase::CPrinterBaseObjectList* itemPtr = m_dataQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->data;
 		}
 		return m_dataQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CPrinterListObject::SetData(sdl::modsdl::PrinterBase::CPrinterBaseObjectList* v)
+void CPrinterListObject::SetData(QVariant v)
 {
-	if (v){
-		Version_1_0->data = v->Version_1_0;
-		m_dataQObjectPtr = v;
+	if (v.isValid()){
+		sdl::modsdl::PrinterBase::CPrinterBaseObjectList* itemPtr = v.value<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>();
+		if (itemPtr != nullptr)  Version_1_0->data = itemPtr->Version_1_0;
 	}
 	else {
 		Version_1_0->data = nullptr;
 	}
+	m_dataQObjectPtr = v;
 
 	dataChanged();
 }
@@ -2485,12 +2801,12 @@ QString CPrinterListObject::toGraphQL() const
 }
 
 
-QObject* CPrinterListObject::CreateObject(const QString& key)
+QVariant CPrinterListObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "data"){
-		return new sdl::modsdl::PrinterBase::CPrinterBaseObjectList(this);
+		return QVariant::fromValue(new sdl::modsdl::PrinterBase::CPrinterBaseObjectList(this));
 	}
-	return nullptr;
+	return QVariant();
 }
 
 
@@ -2504,6 +2820,759 @@ QString CPrinterListObject::getJSONKeyForProperty(const QString& propertyName) c
 }
 
 
+
+
+
+bool CPrinterListObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+{
+	return true;
+}
+
+
+int CPrinterListObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CPrinterListObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CPrinterListObjectList::append(sdl::modsdl::PrinterBase::CPrinterListObject* item)
+{
+	BaseClass::append(item);
+}
+
+
+sdl::modsdl::PrinterBase::CPrinterListObjectList* sdl::modsdl::PrinterBase::CPrinterListObjectList::copyMe()
+{
+	sdl::modsdl::PrinterBase::CPrinterListObjectList* retVal = new sdl::modsdl::PrinterBase::CPrinterListObjectList();
+	BaseClass::fromMe(retVal);
+	return retVal;
+}
+
+
+QString sdl::modsdl::PrinterBase::CPrinterListObjectList::toJson()
+{
+	return BaseClass::toJson();
+}
+
+
+QString sdl::modsdl::PrinterBase::CPrinterListObjectList::toGraphQL()
+{
+	return BaseClass::toGraphQL();
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterListObjectList::addElement(sdl::modsdl::PrinterBase::CPrinterListObject* item)
+{
+	append(item);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterListObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+
+bool sdl::modsdl::PrinterBase::CPrinterListObjectList::isEqualWithModel(sdl::modsdl::PrinterBase::CPrinterListObjectList* otherModelPtr)
+{
+	return BaseClass::isEqualWithModel(otherModelPtr);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterListObjectList::insert(int index, sdl::modsdl::PrinterBase::CPrinterListObject* item)
+{
+	return BaseClass::insert(index, item);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterListObjectList::remove(int index)
+{
+	return BaseClass::remove(index);
+}
+
+
+void sdl::modsdl::PrinterBase::CPrinterListObjectList::clear()
+{
+	return BaseClass::clear();
+}
+
+
+QVariant sdl::modsdl::PrinterBase::CPrinterListObjectList::getData(const QString& nameId, int index)
+{
+	QVariant item = GetOrCreateCachedObject(index);
+	sdl::modsdl::PrinterBase::CPrinterListObject* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
+	if (itemPtr == nullptr) return QVariant();
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		return QVariant::fromValue(item);
+	}
+		if (nameId == "m_data"){
+			return itemPtr->GetData();
+		}
+	return QVariant();
+}
+
+
+
+QVariant CPrinterSpecificationObjectList::GetOrCreateCachedObject(int index) const
+{
+	QVariant retVal;
+	if (this->m_objectDataTypeMap.contains(index)){
+		retVal = this->m_objectDataTypeMap[index];
+	}
+	else{
+		if (const CPrinterSpecificationBase* val = std::get_if<CPrinterSpecificationBase>(this->Version_1_0->at(index).GetPtr())){
+			CPrinterSpecificationBaseObject *newObjectPtr = new CPrinterSpecificationBaseObject();
+			newObjectPtr->Version_1_0 = val->Version_1_0;
+			retVal = QVariant::fromValue(newObjectPtr);
+		}
+
+		if (const CLink* val = std::get_if<CLink>(this->Version_1_0->at(index).GetPtr())){
+			CLinkObject *newObjectPtr = new CLinkObject();
+			newObjectPtr->Version_1_0 = val->Version_1_0;
+			retVal = QVariant::fromValue(newObjectPtr);
+		}
+
+		this->m_objectDataTypeMap.insert(index, retVal);
+	}
+	return retVal;
+}
+
+
+bool CPrinterSpecificationObjectList::containsKey(const QString& nameId, int /*index*/)
+{
+	return nameId == "item";
+}
+
+
+int CPrinterSpecificationObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CPrinterSpecificationObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CPrinterSpecificationObjectList::append(QVariant item)
+{
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+
+	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
+		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
+		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
+		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+	}
+
+	if (item.canConvert<CLinkObject*>()){
+		CLinkObject* val = item.value<CLinkObject*>();
+		CLink* newItemPtr = dynamic_cast<CLink*>(val);
+		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+	}
+
+	ClearCache();
+	endInsertRows();
+}
+
+
+sdl::modsdl::PrinterBase::CPrinterSpecificationObjectList* CPrinterSpecificationObjectList::copyMe()
+{
+	sdl::modsdl::PrinterBase::CPrinterSpecificationObjectList* objectListPtr = new sdl::modsdl::PrinterBase::CPrinterSpecificationObjectList();
+
+	for (int i = 0; i < this->rowCount(); i++){
+		QVariant item = this->getData("item", i);
+
+		if (item.canConvert<CPrinterSpecificationBaseObject*>()){
+			CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
+			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+		}
+
+		if (item.canConvert<CLinkObject*>()){
+			CLinkObject* val = item.value<CLinkObject*>();
+			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+		}
+	}
+	return objectListPtr;
+}
+
+
+QString CPrinterSpecificationObjectList::toJson()
+{
+	QString retVal = QStringLiteral("[");
+
+	for (int i = 0; i < this->rowCount(); i++){
+		if (i > 0 && i < this->rowCount() - 1){
+			retVal += QStringLiteral(", ");
+		}
+
+		QVariant item = this->getData("item", i);
+
+		if (item.canConvert<CPrinterSpecificationBaseObject*>()){
+			CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
+			retVal += val->toJson();
+		}
+
+		if (item.canConvert<CLinkObject*>()){
+			CLinkObject* val = item.value<CLinkObject*>();
+			retVal += val->toJson();
+		}
+	}
+
+	retVal += QStringLiteral("]");
+
+	return retVal;
+}
+
+
+QString CPrinterSpecificationObjectList::toGraphQL()
+{
+	QString retVal = QStringLiteral("[");
+
+	for (int i = 0; i < this->rowCount(); i++){
+		if (i > 0 && i < this->rowCount() - 1){
+			retVal += QStringLiteral(", ");
+		}
+
+		QVariant item = this->getData("item", i);
+
+		if (item.canConvert<CPrinterSpecificationBaseObject*>()){
+			CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
+			retVal += val->toGraphQL();
+		}
+
+		if (item.canConvert<CLinkObject*>()){
+			CLinkObject* val = item.value<CLinkObject*>();
+			retVal += val->toGraphQL();
+		}
+	}
+
+	retVal += QStringLiteral("]");
+
+	return retVal;
+}
+
+
+void CPrinterSpecificationObjectList::addElement(QVariant item)
+{
+	append(item);
+}
+
+void CPrinterSpecificationObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+bool CPrinterSpecificationObjectList::isEqualWithModel(sdl::modsdl::PrinterBase::CPrinterSpecificationObjectList* otherModelPtr)
+{
+	if (otherModelPtr == nullptr){
+		return false;
+	}
+
+	if (this == otherModelPtr){
+		return false;
+	}
+
+	if (this->rowCount() != otherModelPtr->rowCount()){
+		return false;
+	}
+
+	for (int i = 0; i < this->rowCount(); i++){
+		QVariant selfItem = this->getData("item", i);
+		QVariant otherItem = otherModelPtr->getData("item", i);
+		if (selfItem != otherItem){
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+
+void CPrinterSpecificationObjectList::insert(int index, QVariant item)
+{
+	if (index < 0 || index > Version_1_0->size()) return;
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+
+	if (item.canConvert<CPrinterSpecificationBaseObject*>()){
+		CPrinterSpecificationBaseObject* val = item.value<CPrinterSpecificationBaseObject*>();
+		CPrinterSpecificationBase* newItemPtr = dynamic_cast<CPrinterSpecificationBase*>(val);
+		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+	}
+
+	if (item.canConvert<CLinkObject*>()){
+		CLinkObject* val = item.value<CLinkObject*>();
+		CLink* newItemPtr = dynamic_cast<CLink*>(val);
+		Version_1_0->append(istd::TSharedNullable<PrinterSpecification>(*newItemPtr));
+	}
+
+	ClearCache();
+	endInsertRows();
+}
+
+
+void CPrinterSpecificationObjectList::remove(int index)
+{
+	BaseClass::remove(index);
+}
+
+
+void CPrinterSpecificationObjectList::clear()
+{
+	BaseClass::clear();
+}
+
+
+QVariant CPrinterSpecificationObjectList::getData(const QString& nameId, int index)
+{
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		QVariant retVal = GetOrCreateCachedObject(index);
+		return retVal;
+	}
+	return QVariant();
+}
+
+
+
+QVariant CSimpleUnionObjectList::GetOrCreateCachedObject(int index) const
+{
+	QVariant retVal;
+	if (this->m_objectDataTypeMap.contains(index)){
+		retVal = this->m_objectDataTypeMap[index];
+	}
+	else{
+		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(val);
+		}
+
+		if (const double* val = std::get_if<double>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(val);
+		}
+
+		this->m_objectDataTypeMap.insert(index, retVal);
+	}
+	return retVal;
+}
+
+
+bool CSimpleUnionObjectList::containsKey(const QString& nameId, int /*index*/)
+{
+	return nameId == "item";
+}
+
+
+int CSimpleUnionObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CSimpleUnionObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CSimpleUnionObjectList::append(QVariant item)
+{
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+
+	if (item.canConvert<QString>()){
+		QString val = item.value<QString>();
+		Version_1_0->append(istd::TSharedNullable<SimpleUnion>(val));
+	}
+
+	if (item.canConvert<double>()){
+		double val = item.value<double>();
+		Version_1_0->append(istd::TSharedNullable<SimpleUnion>(val));
+	}
+
+	ClearCache();
+	endInsertRows();
+}
+
+
+sdl::modsdl::PrinterBase::CSimpleUnionObjectList* CSimpleUnionObjectList::copyMe()
+{
+	sdl::modsdl::PrinterBase::CSimpleUnionObjectList* objectListPtr = new sdl::modsdl::PrinterBase::CSimpleUnionObjectList();
+
+	for (int i = 0; i < this->rowCount(); i++){
+		QVariant item = this->getData("item", i);
+
+		if (item.canConvert<QString>()){
+			QString val = item.value<QString>();
+			objectListPtr->addElement(val);
+		}
+
+		if (item.canConvert<double>()){
+			double val = item.value<double>();
+			objectListPtr->addElement(val);
+		}
+	}
+	return objectListPtr;
+}
+
+
+QString CSimpleUnionObjectList::toJson()
+{
+	QString retVal = QStringLiteral("[");
+
+	for (int i = 0; i < this->rowCount(); i++){
+		if (i > 0 && i < this->rowCount() - 1){
+			retVal += QStringLiteral(", ");
+		}
+
+		QVariant item = this->getData("item", i);
+
+		if (item.canConvert<QString>()){
+			QString val = item.value<QString>();
+			retVal += QString(val);
+		}
+
+		if (item.canConvert<double>()){
+			double val = item.value<double>();
+			retVal += QString::number(val);
+		}
+	}
+
+	retVal += QStringLiteral("]");
+
+	return retVal;
+}
+
+
+QString CSimpleUnionObjectList::toGraphQL()
+{
+	QString retVal = QStringLiteral("[");
+
+	for (int i = 0; i < this->rowCount(); i++){
+		if (i > 0 && i < this->rowCount() - 1){
+			retVal += QStringLiteral(", ");
+		}
+
+		QVariant item = this->getData("item", i);
+
+		if (item.canConvert<QString>()){
+			QString val = item.value<QString>();
+			retVal += QString(val);
+		}
+
+		if (item.canConvert<double>()){
+			double val = item.value<double>();
+			retVal += QString::number(val);
+		}
+	}
+
+	retVal += QStringLiteral("]");
+
+	return retVal;
+}
+
+
+void CSimpleUnionObjectList::addElement(QVariant item)
+{
+	append(item);
+}
+
+void CSimpleUnionObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+bool CSimpleUnionObjectList::isEqualWithModel(sdl::modsdl::PrinterBase::CSimpleUnionObjectList* otherModelPtr)
+{
+	if (otherModelPtr == nullptr){
+		return false;
+	}
+
+	if (this == otherModelPtr){
+		return false;
+	}
+
+	if (this->rowCount() != otherModelPtr->rowCount()){
+		return false;
+	}
+
+	for (int i = 0; i < this->rowCount(); i++){
+		QVariant selfItem = this->getData("item", i);
+		QVariant otherItem = otherModelPtr->getData("item", i);
+		if (selfItem != otherItem){
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+
+void CSimpleUnionObjectList::insert(int index, QVariant item)
+{
+	if (index < 0 || index > Version_1_0->size()) return;
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+
+	if (item.canConvert<QString>()){
+		QString val = item.value<QString>();
+		Version_1_0->append(istd::TSharedNullable<SimpleUnion>(val));
+	}
+
+	if (item.canConvert<double>()){
+		double val = item.value<double>();
+		Version_1_0->append(istd::TSharedNullable<SimpleUnion>(val));
+	}
+
+	ClearCache();
+	endInsertRows();
+}
+
+
+void CSimpleUnionObjectList::remove(int index)
+{
+	BaseClass::remove(index);
+}
+
+
+void CSimpleUnionObjectList::clear()
+{
+	BaseClass::clear();
+}
+
+
+QVariant CSimpleUnionObjectList::getData(const QString& nameId, int index)
+{
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		QVariant retVal = GetOrCreateCachedObject(index);
+		return retVal;
+	}
+	return QVariant();
+}
+
+
+
+QVariant CMixedUnionObjectList::GetOrCreateCachedObject(int index) const
+{
+	QVariant retVal;
+	if (this->m_objectDataTypeMap.contains(index)){
+		retVal = this->m_objectDataTypeMap[index];
+	}
+	else{
+		if (const QString* val = std::get_if<QString>(this->Version_1_0->at(index).GetPtr())){
+			retVal =  QVariant::fromValue(val);
+		}
+
+		if (const CLink* val = std::get_if<CLink>(this->Version_1_0->at(index).GetPtr())){
+			CLinkObject *newObjectPtr = new CLinkObject();
+			newObjectPtr->Version_1_0 = val->Version_1_0;
+			retVal = QVariant::fromValue(newObjectPtr);
+		}
+
+		this->m_objectDataTypeMap.insert(index, retVal);
+	}
+	return retVal;
+}
+
+
+bool CMixedUnionObjectList::containsKey(const QString& nameId, int /*index*/)
+{
+	return nameId == "item";
+}
+
+
+int CMixedUnionObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CMixedUnionObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CMixedUnionObjectList::append(QVariant item)
+{
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+
+	if (item.canConvert<QString>()){
+		QString val = item.value<QString>();
+		Version_1_0->append(istd::TSharedNullable<MixedUnion>(val));
+	}
+
+	if (item.canConvert<CLinkObject*>()){
+		CLinkObject* val = item.value<CLinkObject*>();
+		CLink* newItemPtr = dynamic_cast<CLink*>(val);
+		Version_1_0->append(istd::TSharedNullable<MixedUnion>(*newItemPtr));
+	}
+
+	ClearCache();
+	endInsertRows();
+}
+
+
+sdl::modsdl::PrinterBase::CMixedUnionObjectList* CMixedUnionObjectList::copyMe()
+{
+	sdl::modsdl::PrinterBase::CMixedUnionObjectList* objectListPtr = new sdl::modsdl::PrinterBase::CMixedUnionObjectList();
+
+	for (int i = 0; i < this->rowCount(); i++){
+		QVariant item = this->getData("item", i);
+
+		if (item.canConvert<QString>()){
+			QString val = item.value<QString>();
+			objectListPtr->addElement(val);
+		}
+
+		if (item.canConvert<CLinkObject*>()){
+			CLinkObject* val = item.value<CLinkObject*>();
+			objectListPtr->addElement(QVariant::fromValue(val->copyMe()));
+		}
+	}
+	return objectListPtr;
+}
+
+
+QString CMixedUnionObjectList::toJson()
+{
+	QString retVal = QStringLiteral("[");
+
+	for (int i = 0; i < this->rowCount(); i++){
+		if (i > 0 && i < this->rowCount() - 1){
+			retVal += QStringLiteral(", ");
+		}
+
+		QVariant item = this->getData("item", i);
+
+		if (item.canConvert<QString>()){
+			QString val = item.value<QString>();
+			retVal += QString(val);
+		}
+
+		if (item.canConvert<CLinkObject*>()){
+			CLinkObject* val = item.value<CLinkObject*>();
+			retVal += val->toJson();
+		}
+	}
+
+	retVal += QStringLiteral("]");
+
+	return retVal;
+}
+
+
+QString CMixedUnionObjectList::toGraphQL()
+{
+	QString retVal = QStringLiteral("[");
+
+	for (int i = 0; i < this->rowCount(); i++){
+		if (i > 0 && i < this->rowCount() - 1){
+			retVal += QStringLiteral(", ");
+		}
+
+		QVariant item = this->getData("item", i);
+
+		if (item.canConvert<QString>()){
+			QString val = item.value<QString>();
+			retVal += QString(val);
+		}
+
+		if (item.canConvert<CLinkObject*>()){
+			CLinkObject* val = item.value<CLinkObject*>();
+			retVal += val->toGraphQL();
+		}
+	}
+
+	retVal += QStringLiteral("]");
+
+	return retVal;
+}
+
+
+void CMixedUnionObjectList::addElement(QVariant item)
+{
+	append(item);
+}
+
+void CMixedUnionObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+bool CMixedUnionObjectList::isEqualWithModel(sdl::modsdl::PrinterBase::CMixedUnionObjectList* otherModelPtr)
+{
+	if (otherModelPtr == nullptr){
+		return false;
+	}
+
+	if (this == otherModelPtr){
+		return false;
+	}
+
+	if (this->rowCount() != otherModelPtr->rowCount()){
+		return false;
+	}
+
+	for (int i = 0; i < this->rowCount(); i++){
+		QVariant selfItem = this->getData("item", i);
+		QVariant otherItem = otherModelPtr->getData("item", i);
+		if (selfItem != otherItem){
+			return false;
+		}
+
+	}
+
+	return true;
+}
+
+
+void CMixedUnionObjectList::insert(int index, QVariant item)
+{
+	if (index < 0 || index > Version_1_0->size()) return;
+	beginInsertRows(QModelIndex(), Version_1_0->count(), 0);
+
+	if (item.canConvert<QString>()){
+		QString val = item.value<QString>();
+		Version_1_0->append(istd::TSharedNullable<MixedUnion>(val));
+	}
+
+	if (item.canConvert<CLinkObject*>()){
+		CLinkObject* val = item.value<CLinkObject*>();
+		CLink* newItemPtr = dynamic_cast<CLink*>(val);
+		Version_1_0->append(istd::TSharedNullable<MixedUnion>(*newItemPtr));
+	}
+
+	ClearCache();
+	endInsertRows();
+}
+
+
+void CMixedUnionObjectList::remove(int index)
+{
+	BaseClass::remove(index);
+}
+
+
+void CMixedUnionObjectList::clear()
+{
+	BaseClass::clear();
+}
+
+
+QVariant CMixedUnionObjectList::getData(const QString& nameId, int index)
+{
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		QVariant retVal = GetOrCreateCachedObject(index);
+		return retVal;
+	}
+	return QVariant();
+}
 
 
 QByteArray CGetPrintersGqlRequest::GetCommandId()

@@ -20,11 +20,14 @@
 #include <imtbase/CItemModelBase.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlParamObject.h>
-#include <imtbase/TListModelBase.h>
+#include <imtsdl/TListModelBase.h>
+#include <imtsdl/TElementList.h>
 #include <imtservergql/CPermissibleGqlRequestHandlerComp.h>
 
 // custom types includes
 #include <complextestsdl/SDL/1.0/CPP/ComplexUnion1.h>
+#include <imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
+#include <imtbasesdl/SDL/1.0/CPP/ImtBaseTypes.h>
 
 
 namespace sdl::complextest::ComplexUnion2
@@ -144,7 +147,7 @@ public:
 		istd::TSharedNullable<ComplexUnion1::StatusCode> Status;
 		istd::TSharedNullable<ComplexUnion1::CPoint::V1_0> IconPosition;
 		istd::TSharedNullable<ComplexUnion1::ErrorCode> ErrorType;
-		istd::TSharedNullable<QList<CResult::V1_0>> Results;
+		istd::TSharedNullable<imtsdl::TElementList<CResult::V1_0>> Results;
 
 		static QByteArray GetVersionId();
 
@@ -200,7 +203,7 @@ public:
 
 		istd::TSharedNullable<QString> AnalyzerName;
 		istd::TSharedNullable<ComplexUnion1::StatusCode> AnalyzerResult;
-		istd::TSharedNullable<QList<CArea::V1_0>> Areas;
+		istd::TSharedNullable<imtsdl::TElementList<CArea::V1_0>> Areas;
 
 		static QByteArray GetVersionId();
 
@@ -260,7 +263,7 @@ public:
 		istd::TSharedNullable<QString> TypeID;
 		istd::TSharedNullable<QString> Name;
 		istd::TSharedNullable<ComplexUnion1::StatusCode> Status;
-		istd::TSharedNullable<QList<CAnalyzer::V1_0>> Analyzers;
+		istd::TSharedNullable<imtsdl::TElementList<CAnalyzer::V1_0>> Analyzers;
 
 		static QByteArray GetVersionId();
 
@@ -324,7 +327,7 @@ public:
 		istd::TSharedNullable<QString> PartSerialNumber;
 		istd::TSharedNullable<QString> Timestamp;
 		istd::TSharedNullable<QString> ProductImage;
-		istd::TSharedNullable<QList<CInspection::V1_0>> Inspections;
+		istd::TSharedNullable<imtsdl::TElementList<CInspection::V1_0>> Inspections;
 
 		static QByteArray GetVersionId();
 
@@ -488,7 +491,7 @@ public:
 		};
 
 		istd::TSharedNullable<QString> key;
-		istd::TSharedNullable<std::shared_ptr<ExtendedMetaDataUnionType>> value;
+		istd::TSharedNullable<ExtendedMetaDataUnionType> value;
 
 		static QByteArray GetVersionId();
 
@@ -554,7 +557,7 @@ public:
 		istd::TSharedNullable<QString> name;
 		istd::TSharedNullable<int> classification;
 		istd::TSharedNullable<CLocalizedText::V1_0> description;
-		istd::TSharedNullable<QList<CExtendedMetaData::V1_0>> extendedMetaData;
+		istd::TSharedNullable<imtsdl::TElementList<CExtendedMetaData::V1_0>> extendedMetaData;
 
 		static QByteArray GetVersionId();
 
@@ -668,9 +671,9 @@ public:
 			static const inline QString MixedUnion = "mixedUnion";
 		};
 
-		istd::TSharedNullable<std::shared_ptr<ExtendedMetaDataUnionSimpleType>> simpleUnion;
-		istd::TSharedNullable<std::shared_ptr<CDMResultUnionType>> complexUnion;
-		istd::TSharedNullable<std::shared_ptr<ExtendedMetaDataUnionType>> mixedUnion;
+		istd::TSharedNullable<ExtendedMetaDataUnionSimpleType> simpleUnion;
+		istd::TSharedNullable<CDMResultUnionType> complexUnion;
+		istd::TSharedNullable<ExtendedMetaDataUnionType> mixedUnion;
 
 		static QByteArray GetVersionId();
 
@@ -729,8 +732,8 @@ public:
 		istd::TSharedNullable<QString> dataModelTitle;
 		istd::TSharedNullable<QString> dataModelVersion;
 		istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
-		istd::TSharedNullable<QList<std::shared_ptr<CDMResultUnionType>>> resultContent;
-		istd::TSharedNullable<QList<COverallResultValues::V1_0>> overallResultValues;
+		istd::TSharedNullable<imtsdl::TElementList<CDMResultUnionType>> resultContent;
+		istd::TSharedNullable<imtsdl::TElementList<COverallResultValues::V1_0>> overallResultValues;
 
 		static QByteArray GetVersionId();
 
@@ -789,8 +792,8 @@ public:
 		istd::TSharedNullable<QString> dataModelTitle;
 		istd::TSharedNullable<QString> dataModelVersion;
 		istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
-		istd::TSharedNullable<QList<QString>> resultContent;
-		istd::TSharedNullable<QList<COverallResultValues::V1_0>> overallResultValues;
+		istd::TSharedNullable<imtsdl::TElementList<QString>> resultContent;
+		istd::TSharedNullable<imtsdl::TElementList<COverallResultValues::V1_0>> overallResultValues;
 
 		static QByteArray GetVersionId();
 
@@ -849,8 +852,8 @@ public:
 		istd::TSharedNullable<QString> dataModelTitle;
 		istd::TSharedNullable<QString> dataModelVersion;
 		istd::TSharedNullable<CResultMetaData::V1_0> resultMetaData;
-		istd::TSharedNullable<QList<std::shared_ptr<CDMResultUnionType>>> resultContent;
-		istd::TSharedNullable<QList<COverallResultValues::V1_0>> overallResultValues;
+		istd::TSharedNullable<imtsdl::TElementList<CDMResultUnionType>> resultContent;
+		istd::TSharedNullable<imtsdl::TElementList<COverallResultValues::V1_0>> overallResultValues;
 
 		static QByteArray GetVersionId();
 
@@ -936,6 +939,62 @@ public:
 	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
 };
 
+class CCollectionViewParamsTest
+{
+public:
+	enum ProtocolVersion
+	{
+		PV_AUTO = -1, ///< acceptable ONLY for write methods. Uses available member with highest version to serialize
+		PV_1_0,
+		PV_LAST = PV_1_0
+	};
+
+	// V1_0 struct
+	struct V1_0
+	{
+		struct CollectionViewParamsTestFields
+		{
+			static const inline QString Count = "count";
+			static const inline QString Offset = "offset";
+			static const inline QString FilterModel = "filterModel";
+		};
+
+		istd::TSharedNullable<int> count;
+		istd::TSharedNullable<int> offset;
+		istd::TSharedNullable<imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0> filterModel;
+
+		static QByteArray GetVersionId();
+
+		[[nodiscard]] bool operator==(const V1_0& other) const;
+		[[nodiscard]] bool operator!=(const V1_0& other) const {return !(operator==(other));}
+		[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0) const;
+		[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0);
+		[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject) const;
+		[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+		[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject);
+		[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject) const;
+		[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject);
+		[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject);
+	};
+
+	// available version members
+	istd::TSharedNullable<V1_0> Version_1_0;
+
+	// serialize methods
+	[[nodiscard]] bool WriteToModel(::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_AUTO) const;
+	[[nodiscard]] bool ReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
+	[[nodiscard]] bool OptReadFromModel(const ::imtbase::CTreeItemModel& model, int modelIndex = 0, ProtocolVersion version = PV_LAST);
+
+	[[nodiscard]] bool WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_AUTO) const;
+	[[nodiscard]] bool ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
+	[[nodiscard]] bool OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject, ProtocolVersion version = PV_LAST);
+
+	[[nodiscard]] bool WriteToJsonObject(QJsonObject& jsonObject, ProtocolVersion version = PV_AUTO) const;
+	[[nodiscard]] bool ReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
+	[[nodiscard]] bool OptReadFromJsonObject(const QJsonObject& jsonObject, ProtocolVersion version = PV_LAST);
+};
+
 
 
 
@@ -944,59 +1003,59 @@ class CResultObjectList;
 class CResultObject: public ::imtbase::CItemModelBase, public CResult
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_areaResult READ GetAreaResult WRITE SetAreaResult NOTIFY areaResultChanged)
-	Q_PROPERTY(double m_expectedMinValue READ GetExpectedMinValue WRITE SetExpectedMinValue NOTIFY expectedMinValueChanged)
-	Q_PROPERTY(double m_expectedMaxValue READ GetExpectedMaxValue WRITE SetExpectedMaxValue NOTIFY expectedMaxValueChanged)
-	Q_PROPERTY(double m_measuredValue READ GetMeasuredValue WRITE SetMeasuredValue NOTIFY measuredValueChanged)
-	Q_PROPERTY(double m_minMeasuredValue READ GetMinMeasuredValue WRITE SetMinMeasuredValue NOTIFY minMeasuredValueChanged)
-	Q_PROPERTY(double m_maxMeasuredValue READ GetMaxMeasuredValue WRITE SetMaxMeasuredValue NOTIFY maxMeasuredValueChanged)
-	Q_PROPERTY(double m_meanMeasuredValue READ GetMeanMeasuredValue WRITE SetMeanMeasuredValue NOTIFY meanMeasuredValueChanged)
-	Q_PROPERTY(QString m_measurementType READ GetMeasurementType WRITE SetMeasurementType NOTIFY measurementTypeChanged)
-	Q_PROPERTY(QString m_measurementUnit READ GetMeasurementUnit WRITE SetMeasurementUnit NOTIFY measurementUnitChanged)
-	Q_PROPERTY(double m_length READ GetLength WRITE SetLength NOTIFY lengthChanged)
-	Q_PROPERTY(QString m_errorType READ GetErrorType WRITE SetErrorType NOTIFY errorTypeChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion1::CGeometryObject* m_geometry READ GetGeometry WRITE SetGeometry NOTIFY geometryChanged)
+	Q_PROPERTY(QVariant m_areaResult READ GetAreaResult WRITE SetAreaResult NOTIFY areaResultChanged)
+	Q_PROPERTY(QVariant m_expectedMinValue READ GetExpectedMinValue WRITE SetExpectedMinValue NOTIFY expectedMinValueChanged)
+	Q_PROPERTY(QVariant m_expectedMaxValue READ GetExpectedMaxValue WRITE SetExpectedMaxValue NOTIFY expectedMaxValueChanged)
+	Q_PROPERTY(QVariant m_measuredValue READ GetMeasuredValue WRITE SetMeasuredValue NOTIFY measuredValueChanged)
+	Q_PROPERTY(QVariant m_minMeasuredValue READ GetMinMeasuredValue WRITE SetMinMeasuredValue NOTIFY minMeasuredValueChanged)
+	Q_PROPERTY(QVariant m_maxMeasuredValue READ GetMaxMeasuredValue WRITE SetMaxMeasuredValue NOTIFY maxMeasuredValueChanged)
+	Q_PROPERTY(QVariant m_meanMeasuredValue READ GetMeanMeasuredValue WRITE SetMeanMeasuredValue NOTIFY meanMeasuredValueChanged)
+	Q_PROPERTY(QVariant m_measurementType READ GetMeasurementType WRITE SetMeasurementType NOTIFY measurementTypeChanged)
+	Q_PROPERTY(QVariant m_measurementUnit READ GetMeasurementUnit WRITE SetMeasurementUnit NOTIFY measurementUnitChanged)
+	Q_PROPERTY(QVariant m_length READ GetLength WRITE SetLength NOTIFY lengthChanged)
+	Q_PROPERTY(QVariant m_errorType READ GetErrorType WRITE SetErrorType NOTIFY errorTypeChanged)
+	Q_PROPERTY(QVariant m_geometry READ GetGeometry WRITE SetGeometry NOTIFY geometryChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CResultObject(QObject* parent = nullptr);
 
-	QString GetAreaResult();
-	void SetAreaResult(QString v);
+	QVariant GetAreaResult();
+	void SetAreaResult(QVariant v);
 	Q_INVOKABLE bool hasAreaResult();
-	double GetExpectedMinValue();
-	void SetExpectedMinValue(double v);
+	QVariant GetExpectedMinValue();
+	void SetExpectedMinValue(QVariant v);
 	Q_INVOKABLE bool hasExpectedMinValue();
-	double GetExpectedMaxValue();
-	void SetExpectedMaxValue(double v);
+	QVariant GetExpectedMaxValue();
+	void SetExpectedMaxValue(QVariant v);
 	Q_INVOKABLE bool hasExpectedMaxValue();
-	double GetMeasuredValue();
-	void SetMeasuredValue(double v);
+	QVariant GetMeasuredValue();
+	void SetMeasuredValue(QVariant v);
 	Q_INVOKABLE bool hasMeasuredValue();
-	double GetMinMeasuredValue();
-	void SetMinMeasuredValue(double v);
+	QVariant GetMinMeasuredValue();
+	void SetMinMeasuredValue(QVariant v);
 	Q_INVOKABLE bool hasMinMeasuredValue();
-	double GetMaxMeasuredValue();
-	void SetMaxMeasuredValue(double v);
+	QVariant GetMaxMeasuredValue();
+	void SetMaxMeasuredValue(QVariant v);
 	Q_INVOKABLE bool hasMaxMeasuredValue();
-	double GetMeanMeasuredValue();
-	void SetMeanMeasuredValue(double v);
+	QVariant GetMeanMeasuredValue();
+	void SetMeanMeasuredValue(QVariant v);
 	Q_INVOKABLE bool hasMeanMeasuredValue();
-	QString GetMeasurementType();
-	void SetMeasurementType(QString v);
+	QVariant GetMeasurementType();
+	void SetMeasurementType(QVariant v);
 	Q_INVOKABLE bool hasMeasurementType();
-	QString GetMeasurementUnit();
-	void SetMeasurementUnit(QString v);
+	QVariant GetMeasurementUnit();
+	void SetMeasurementUnit(QVariant v);
 	Q_INVOKABLE bool hasMeasurementUnit();
-	double GetLength();
-	void SetLength(double v);
+	QVariant GetLength();
+	void SetLength(QVariant v);
 	Q_INVOKABLE bool hasLength();
-	QString GetErrorType();
-	void SetErrorType(QString v);
+	QVariant GetErrorType();
+	void SetErrorType(QVariant v);
 	Q_INVOKABLE bool hasErrorType();
-	sdl::complextest::ComplexUnion1::CGeometryObject* GetGeometry();
-	void SetGeometry(sdl::complextest::ComplexUnion1::CGeometryObject* v);
+	QVariant GetGeometry();
+	void SetGeometry(QVariant v);
 	Q_INVOKABLE bool hasGeometry();
 	Q_INVOKABLE void createGeometry();
 	// CItemModelBase implemented
@@ -1004,242 +1063,55 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void areaResultChanged();
-	void expectedMinValueChanged();
-	void expectedMaxValueChanged();
-	void measuredValueChanged();
-	void minMeasuredValueChanged();
-	void maxMeasuredValueChanged();
-	void meanMeasuredValueChanged();
-	void measurementTypeChanged();
-	void measurementUnitChanged();
-	void lengthChanged();
-	void errorTypeChanged();
-	void geometryChanged();
+void areaResultChanged();
+void expectedMinValueChanged();
+void expectedMaxValueChanged();
+void measuredValueChanged();
+void minMeasuredValueChanged();
+void maxMeasuredValueChanged();
+void meanMeasuredValueChanged();
+void measurementTypeChanged();
+void measurementUnitChanged();
+void lengthChanged();
+void errorTypeChanged();
+void geometryChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion1::CGeometryObject* m_geometryQObjectPtr;
+	QVariant m_geometryQObjectPtr;
 };
 
 
-class CResultObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CResult::V1_0, sdl::complextest::ComplexUnion2::CResultObject>
+
+
+
+class CResultObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResult::V1_0, sdl::complextest::ComplexUnion2::CResultObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CResult::V1_0, sdl::complextest::ComplexUnion2::CResultObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResult::V1_0, sdl::complextest::ComplexUnion2::CResultObject> BaseClass;
 
 	CResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CResultObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CResultObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CResultObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CResultObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CResultObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CResultObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CResultObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CResultObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CResultObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CResultObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CResultObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CResultObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CResultObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CResultObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CResultObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CResultObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CResultObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CResultObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_areaResult"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).AreaResult.value());
-		}
-		if (nameId == "m_expectedMinValue"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).ExpectedMinValue.value());
-		}
-		if (nameId == "m_expectedMaxValue"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).ExpectedMaxValue.value());
-		}
-		if (nameId == "m_measuredValue"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).MeasuredValue.value());
-		}
-		if (nameId == "m_minMeasuredValue"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).MinMeasuredValue.value());
-		}
-		if (nameId == "m_maxMeasuredValue"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).MaxMeasuredValue.value());
-		}
-		if (nameId == "m_meanMeasuredValue"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).MeanMeasuredValue.value());
-		}
-		if (nameId == "m_measurementType"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).MeasurementType.value());
-		}
-		if (nameId == "m_measurementUnit"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).MeasurementUnit.value());
-		}
-		if (nameId == "m_length"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Length.value());
-		}
-		if (nameId == "m_errorType"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).ErrorType.value());
-		}
-		if (nameId == "m_geometry"){
-			sdl::complextest::ComplexUnion2::CResultObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetGeometry());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CResultObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CResultObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CResultObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CResultObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CResultObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -1251,32 +1123,32 @@ class CAreaObjectList;
 class CAreaObject: public ::imtbase::CItemModelBase, public CArea
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_areaName READ GetAreaName WRITE SetAreaName NOTIFY areaNameChanged)
-	Q_PROPERTY(QString m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion1::CPointObject* m_iconPosition READ GetIconPosition WRITE SetIconPosition NOTIFY iconPositionChanged)
-	Q_PROPERTY(QString m_errorType READ GetErrorType WRITE SetErrorType NOTIFY errorTypeChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CResultObjectList* m_results READ GetResults WRITE SetResults NOTIFY resultsChanged)
+	Q_PROPERTY(QVariant m_areaName READ GetAreaName WRITE SetAreaName NOTIFY areaNameChanged)
+	Q_PROPERTY(QVariant m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
+	Q_PROPERTY(QVariant m_iconPosition READ GetIconPosition WRITE SetIconPosition NOTIFY iconPositionChanged)
+	Q_PROPERTY(QVariant m_errorType READ GetErrorType WRITE SetErrorType NOTIFY errorTypeChanged)
+	Q_PROPERTY(QVariant m_results READ GetResults WRITE SetResults NOTIFY resultsChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CAreaObject(QObject* parent = nullptr);
 
-	QString GetAreaName();
-	void SetAreaName(QString v);
+	QVariant GetAreaName();
+	void SetAreaName(QVariant v);
 	Q_INVOKABLE bool hasAreaName();
-	QString GetStatus();
-	void SetStatus(QString v);
+	QVariant GetStatus();
+	void SetStatus(QVariant v);
 	Q_INVOKABLE bool hasStatus();
-	sdl::complextest::ComplexUnion1::CPointObject* GetIconPosition();
-	void SetIconPosition(sdl::complextest::ComplexUnion1::CPointObject* v);
+	QVariant GetIconPosition();
+	void SetIconPosition(QVariant v);
 	Q_INVOKABLE bool hasIconPosition();
 	Q_INVOKABLE void createIconPosition();
-	QString GetErrorType();
-	void SetErrorType(QString v);
+	QVariant GetErrorType();
+	void SetErrorType(QVariant v);
 	Q_INVOKABLE bool hasErrorType();
-	sdl::complextest::ComplexUnion2::CResultObjectList* GetResults();
-	void SetResults(sdl::complextest::ComplexUnion2::CResultObjectList* v);
+	QVariant GetResults();
+	void SetResults(QVariant v);
 	Q_INVOKABLE bool hasResults();
 	Q_INVOKABLE void createResults();
 	// CItemModelBase implemented
@@ -1284,216 +1156,49 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void areaNameChanged();
-	void statusChanged();
-	void iconPositionChanged();
-	void errorTypeChanged();
-	void resultsChanged();
+void areaNameChanged();
+void statusChanged();
+void iconPositionChanged();
+void errorTypeChanged();
+void resultsChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion1::CPointObject* m_iconPositionQObjectPtr;
-	sdl::complextest::ComplexUnion2::CResultObjectList* m_resultsQObjectPtr;
+	QVariant m_iconPositionQObjectPtr;
+	QVariant m_resultsQObjectPtr;
 };
 
 
-class CAreaObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CArea::V1_0, sdl::complextest::ComplexUnion2::CAreaObject>
+
+
+
+class CAreaObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CArea::V1_0, sdl::complextest::ComplexUnion2::CAreaObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CArea::V1_0, sdl::complextest::ComplexUnion2::CAreaObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CArea::V1_0, sdl::complextest::ComplexUnion2::CAreaObject> BaseClass;
 
 	CAreaObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CAreaObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CAreaObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CAreaObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CAreaObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CAreaObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CAreaObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CAreaObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CAreaObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CAreaObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CAreaObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CAreaObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CAreaObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CAreaObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CAreaObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CAreaObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CAreaObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CAreaObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CAreaObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CAreaObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CAreaObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CAreaObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CAreaObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CAreaObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_areaName"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).AreaName.value());
-		}
-		if (nameId == "m_status"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Status.value());
-		}
-		if (nameId == "m_iconPosition"){
-			sdl::complextest::ComplexUnion2::CAreaObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetIconPosition());
-		}
-		if (nameId == "m_errorType"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).ErrorType.value());
-		}
-		if (nameId == "m_results"){
-			sdl::complextest::ComplexUnion2::CAreaObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetResults());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CAreaObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CAreaObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CAreaObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CAreaObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CAreaObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -1505,23 +1210,23 @@ class CAnalyzerObjectList;
 class CAnalyzerObject: public ::imtbase::CItemModelBase, public CAnalyzer
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_analyzerName READ GetAnalyzerName WRITE SetAnalyzerName NOTIFY analyzerNameChanged)
-	Q_PROPERTY(QString m_analyzerResult READ GetAnalyzerResult WRITE SetAnalyzerResult NOTIFY analyzerResultChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CAreaObjectList* m_areas READ GetAreas WRITE SetAreas NOTIFY areasChanged)
+	Q_PROPERTY(QVariant m_analyzerName READ GetAnalyzerName WRITE SetAnalyzerName NOTIFY analyzerNameChanged)
+	Q_PROPERTY(QVariant m_analyzerResult READ GetAnalyzerResult WRITE SetAnalyzerResult NOTIFY analyzerResultChanged)
+	Q_PROPERTY(QVariant m_areas READ GetAreas WRITE SetAreas NOTIFY areasChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CAnalyzerObject(QObject* parent = nullptr);
 
-	QString GetAnalyzerName();
-	void SetAnalyzerName(QString v);
+	QVariant GetAnalyzerName();
+	void SetAnalyzerName(QVariant v);
 	Q_INVOKABLE bool hasAnalyzerName();
-	QString GetAnalyzerResult();
-	void SetAnalyzerResult(QString v);
+	QVariant GetAnalyzerResult();
+	void SetAnalyzerResult(QVariant v);
 	Q_INVOKABLE bool hasAnalyzerResult();
-	sdl::complextest::ComplexUnion2::CAreaObjectList* GetAreas();
-	void SetAreas(sdl::complextest::ComplexUnion2::CAreaObjectList* v);
+	QVariant GetAreas();
+	void SetAreas(QVariant v);
 	Q_INVOKABLE bool hasAreas();
 	Q_INVOKABLE void createAreas();
 	// CItemModelBase implemented
@@ -1529,206 +1234,46 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void analyzerNameChanged();
-	void analyzerResultChanged();
-	void areasChanged();
+void analyzerNameChanged();
+void analyzerResultChanged();
+void areasChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion2::CAreaObjectList* m_areasQObjectPtr;
+	QVariant m_areasQObjectPtr;
 };
 
 
-class CAnalyzerObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CAnalyzer::V1_0, sdl::complextest::ComplexUnion2::CAnalyzerObject>
+
+
+
+class CAnalyzerObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CAnalyzer::V1_0, sdl::complextest::ComplexUnion2::CAnalyzerObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CAnalyzer::V1_0, sdl::complextest::ComplexUnion2::CAnalyzerObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CAnalyzer::V1_0, sdl::complextest::ComplexUnion2::CAnalyzerObject> BaseClass;
 
 	CAnalyzerObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CAnalyzerObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CAnalyzerObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CAnalyzerObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CAnalyzerObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CAnalyzerObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CAnalyzerObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CAnalyzerObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CAnalyzerObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CAnalyzerObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CAnalyzerObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CAnalyzerObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CAnalyzerObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CAnalyzerObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CAnalyzerObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CAnalyzerObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CAnalyzerObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CAnalyzerObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CAnalyzerObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CAnalyzerObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CAnalyzerObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CAnalyzerObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CAnalyzerObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CAnalyzerObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_analyzerName"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).AnalyzerName.value());
-		}
-		if (nameId == "m_analyzerResult"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).AnalyzerResult.value());
-		}
-		if (nameId == "m_areas"){
-			sdl::complextest::ComplexUnion2::CAnalyzerObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetAreas());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CAnalyzerObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CAnalyzerObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CAnalyzerObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CAnalyzerObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CAnalyzerObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -1740,31 +1285,31 @@ class CInspectionObjectList;
 class CInspectionObject: public ::imtbase::CItemModelBase, public CInspection
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_iD READ GetID WRITE SetID NOTIFY iDChanged)
-	Q_PROPERTY(QString m_typeID READ GetTypeID WRITE SetTypeID NOTIFY typeIDChanged)
-	Q_PROPERTY(QString m_name READ GetName WRITE SetName NOTIFY nameChanged)
-	Q_PROPERTY(QString m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CAnalyzerObjectList* m_analyzers READ GetAnalyzers WRITE SetAnalyzers NOTIFY analyzersChanged)
+	Q_PROPERTY(QVariant m_iD READ GetID WRITE SetID NOTIFY iDChanged)
+	Q_PROPERTY(QVariant m_typeID READ GetTypeID WRITE SetTypeID NOTIFY typeIDChanged)
+	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
+	Q_PROPERTY(QVariant m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
+	Q_PROPERTY(QVariant m_analyzers READ GetAnalyzers WRITE SetAnalyzers NOTIFY analyzersChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CInspectionObject(QObject* parent = nullptr);
 
-	QString GetID();
-	void SetID(QString v);
+	QVariant GetID();
+	void SetID(QVariant v);
 	Q_INVOKABLE bool hasID();
-	QString GetTypeID();
-	void SetTypeID(QString v);
+	QVariant GetTypeID();
+	void SetTypeID(QVariant v);
 	Q_INVOKABLE bool hasTypeID();
-	QString GetName();
-	void SetName(QString v);
+	QVariant GetName();
+	void SetName(QVariant v);
 	Q_INVOKABLE bool hasName();
-	QString GetStatus();
-	void SetStatus(QString v);
+	QVariant GetStatus();
+	void SetStatus(QVariant v);
 	Q_INVOKABLE bool hasStatus();
-	sdl::complextest::ComplexUnion2::CAnalyzerObjectList* GetAnalyzers();
-	void SetAnalyzers(sdl::complextest::ComplexUnion2::CAnalyzerObjectList* v);
+	QVariant GetAnalyzers();
+	void SetAnalyzers(QVariant v);
 	Q_INVOKABLE bool hasAnalyzers();
 	Q_INVOKABLE void createAnalyzers();
 	// CItemModelBase implemented
@@ -1772,214 +1317,48 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void iDChanged();
-	void typeIDChanged();
-	void nameChanged();
-	void statusChanged();
-	void analyzersChanged();
+void iDChanged();
+void typeIDChanged();
+void nameChanged();
+void statusChanged();
+void analyzersChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion2::CAnalyzerObjectList* m_analyzersQObjectPtr;
+	QVariant m_analyzersQObjectPtr;
 };
 
 
-class CInspectionObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CInspection::V1_0, sdl::complextest::ComplexUnion2::CInspectionObject>
+
+
+
+class CInspectionObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CInspection::V1_0, sdl::complextest::ComplexUnion2::CInspectionObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CInspection::V1_0, sdl::complextest::ComplexUnion2::CInspectionObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CInspection::V1_0, sdl::complextest::ComplexUnion2::CInspectionObject> BaseClass;
 
 	CInspectionObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CInspectionObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CInspectionObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CInspectionObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CInspectionObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CInspectionObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CInspectionObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CInspectionObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CInspectionObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CInspectionObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CInspectionObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CInspectionObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CInspectionObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CInspectionObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CInspectionObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CInspectionObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CInspectionObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CInspectionObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CInspectionObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CInspectionObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CInspectionObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CInspectionObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CInspectionObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CInspectionObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_iD"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).ID.value());
-		}
-		if (nameId == "m_typeID"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).TypeID.value());
-		}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Name.value());
-		}
-		if (nameId == "m_status"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Status.value());
-		}
-		if (nameId == "m_analyzers"){
-			sdl::complextest::ComplexUnion2::CInspectionObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetAnalyzers());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CInspectionObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CInspectionObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CInspectionObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CInspectionObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CInspectionObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -1991,39 +1370,39 @@ class CProductOverviewObjectList;
 class CProductOverviewObject: public ::imtbase::CItemModelBase, public CProductOverview
 {
 	Q_OBJECT
-	Q_PROPERTY(int m_productID READ GetProductID WRITE SetProductID NOTIFY productIDChanged)
-	Q_PROPERTY(QString m_name READ GetName WRITE SetName NOTIFY nameChanged)
-	Q_PROPERTY(QString m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
-	Q_PROPERTY(QString m_partSerialNumber READ GetPartSerialNumber WRITE SetPartSerialNumber NOTIFY partSerialNumberChanged)
-	Q_PROPERTY(QString m_timestamp READ GetTimestamp WRITE SetTimestamp NOTIFY timestampChanged)
-	Q_PROPERTY(QString m_productImage READ GetProductImage WRITE SetProductImage NOTIFY productImageChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CInspectionObjectList* m_inspections READ GetInspections WRITE SetInspections NOTIFY inspectionsChanged)
+	Q_PROPERTY(QVariant m_productID READ GetProductID WRITE SetProductID NOTIFY productIDChanged)
+	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
+	Q_PROPERTY(QVariant m_status READ GetStatus WRITE SetStatus NOTIFY statusChanged)
+	Q_PROPERTY(QVariant m_partSerialNumber READ GetPartSerialNumber WRITE SetPartSerialNumber NOTIFY partSerialNumberChanged)
+	Q_PROPERTY(QVariant m_timestamp READ GetTimestamp WRITE SetTimestamp NOTIFY timestampChanged)
+	Q_PROPERTY(QVariant m_productImage READ GetProductImage WRITE SetProductImage NOTIFY productImageChanged)
+	Q_PROPERTY(QVariant m_inspections READ GetInspections WRITE SetInspections NOTIFY inspectionsChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CProductOverviewObject(QObject* parent = nullptr);
 
-	int GetProductID();
-	void SetProductID(int v);
+	QVariant GetProductID();
+	void SetProductID(QVariant v);
 	Q_INVOKABLE bool hasProductID();
-	QString GetName();
-	void SetName(QString v);
+	QVariant GetName();
+	void SetName(QVariant v);
 	Q_INVOKABLE bool hasName();
-	QString GetStatus();
-	void SetStatus(QString v);
+	QVariant GetStatus();
+	void SetStatus(QVariant v);
 	Q_INVOKABLE bool hasStatus();
-	QString GetPartSerialNumber();
-	void SetPartSerialNumber(QString v);
+	QVariant GetPartSerialNumber();
+	void SetPartSerialNumber(QVariant v);
 	Q_INVOKABLE bool hasPartSerialNumber();
-	QString GetTimestamp();
-	void SetTimestamp(QString v);
+	QVariant GetTimestamp();
+	void SetTimestamp(QVariant v);
 	Q_INVOKABLE bool hasTimestamp();
-	QString GetProductImage();
-	void SetProductImage(QString v);
+	QVariant GetProductImage();
+	void SetProductImage(QVariant v);
 	Q_INVOKABLE bool hasProductImage();
-	sdl::complextest::ComplexUnion2::CInspectionObjectList* GetInspections();
-	void SetInspections(sdl::complextest::ComplexUnion2::CInspectionObjectList* v);
+	QVariant GetInspections();
+	void SetInspections(QVariant v);
 	Q_INVOKABLE bool hasInspections();
 	Q_INVOKABLE void createInspections();
 	// CItemModelBase implemented
@@ -2031,222 +1410,50 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void productIDChanged();
-	void nameChanged();
-	void statusChanged();
-	void partSerialNumberChanged();
-	void timestampChanged();
-	void productImageChanged();
-	void inspectionsChanged();
+void productIDChanged();
+void nameChanged();
+void statusChanged();
+void partSerialNumberChanged();
+void timestampChanged();
+void productImageChanged();
+void inspectionsChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion2::CInspectionObjectList* m_inspectionsQObjectPtr;
+	QVariant m_inspectionsQObjectPtr;
 };
 
 
-class CProductOverviewObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CProductOverview::V1_0, sdl::complextest::ComplexUnion2::CProductOverviewObject>
+
+
+
+class CProductOverviewObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CProductOverview::V1_0, sdl::complextest::ComplexUnion2::CProductOverviewObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CProductOverview::V1_0, sdl::complextest::ComplexUnion2::CProductOverviewObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CProductOverview::V1_0, sdl::complextest::ComplexUnion2::CProductOverviewObject> BaseClass;
 
 	CProductOverviewObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CProductOverviewObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CProductOverviewObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CProductOverviewObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CProductOverviewObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CProductOverviewObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CProductOverviewObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CProductOverviewObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CProductOverviewObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CProductOverviewObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CProductOverviewObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CProductOverviewObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CProductOverviewObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CProductOverviewObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CProductOverviewObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CProductOverviewObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CProductOverviewObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CProductOverviewObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CProductOverviewObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CProductOverviewObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CProductOverviewObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CProductOverviewObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CProductOverviewObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CProductOverviewObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_productID"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).ProductID.value());
-		}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Name.value());
-		}
-		if (nameId == "m_status"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Status.value());
-		}
-		if (nameId == "m_partSerialNumber"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).PartSerialNumber.value());
-		}
-		if (nameId == "m_timestamp"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).Timestamp.value());
-		}
-		if (nameId == "m_productImage"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).ProductImage.value());
-		}
-		if (nameId == "m_inspections"){
-			sdl::complextest::ComplexUnion2::CProductOverviewObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetInspections());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CProductOverviewObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CProductOverviewObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CProductOverviewObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CProductOverviewObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CProductOverviewObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -2258,219 +1465,63 @@ class CLocalizedTextObjectList;
 class CLocalizedTextObject: public ::imtbase::CItemModelBase, public CLocalizedText
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_text READ GetText WRITE SetText NOTIFY textChanged)
-	Q_PROPERTY(QString m_locale READ GetLocale WRITE SetLocale NOTIFY localeChanged)
+	Q_PROPERTY(QVariant m_text READ GetText WRITE SetText NOTIFY textChanged)
+	Q_PROPERTY(QVariant m_locale READ GetLocale WRITE SetLocale NOTIFY localeChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CLocalizedTextObject(QObject* parent = nullptr);
 
-	QString GetText();
-	void SetText(QString v);
+	QVariant GetText();
+	void SetText(QVariant v);
 	Q_INVOKABLE bool hasText();
-	QString GetLocale();
-	void SetLocale(QString v);
+	QVariant GetLocale();
+	void SetLocale(QVariant v);
 	Q_INVOKABLE bool hasLocale();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void textChanged();
-	void localeChanged();
+void textChanged();
+void localeChanged();
 	void finished();
 
 protected:
 };
 
 
-class CLocalizedTextObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CLocalizedText::V1_0, sdl::complextest::ComplexUnion2::CLocalizedTextObject>
+
+
+
+class CLocalizedTextObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CLocalizedText::V1_0, sdl::complextest::ComplexUnion2::CLocalizedTextObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CLocalizedText::V1_0, sdl::complextest::ComplexUnion2::CLocalizedTextObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CLocalizedText::V1_0, sdl::complextest::ComplexUnion2::CLocalizedTextObject> BaseClass;
 
 	CLocalizedTextObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CLocalizedTextObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CLocalizedTextObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CLocalizedTextObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CLocalizedTextObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CLocalizedTextObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CLocalizedTextObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CLocalizedTextObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CLocalizedTextObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CLocalizedTextObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CLocalizedTextObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CLocalizedTextObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CLocalizedTextObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CLocalizedTextObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CLocalizedTextObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CLocalizedTextObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_text"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).text.value());
-		}
-		if (nameId == "m_locale"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).locale.value());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CLocalizedTextObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CLocalizedTextObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CLocalizedTextObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -2482,227 +1533,68 @@ class CCoordinatesObjectList;
 class CCoordinatesObject: public ::imtbase::CItemModelBase, public CCoordinates
 {
 	Q_OBJECT
-	Q_PROPERTY(double m_x READ GetX WRITE SetX NOTIFY xChanged)
-	Q_PROPERTY(double m_y READ GetY WRITE SetY NOTIFY yChanged)
-	Q_PROPERTY(double m_z READ GetZ WRITE SetZ NOTIFY zChanged)
+	Q_PROPERTY(QVariant m_x READ GetX WRITE SetX NOTIFY xChanged)
+	Q_PROPERTY(QVariant m_y READ GetY WRITE SetY NOTIFY yChanged)
+	Q_PROPERTY(QVariant m_z READ GetZ WRITE SetZ NOTIFY zChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CCoordinatesObject(QObject* parent = nullptr);
 
-	double GetX();
-	void SetX(double v);
+	QVariant GetX();
+	void SetX(QVariant v);
 	Q_INVOKABLE bool hasX();
-	double GetY();
-	void SetY(double v);
+	QVariant GetY();
+	void SetY(QVariant v);
 	Q_INVOKABLE bool hasY();
-	double GetZ();
-	void SetZ(double v);
+	QVariant GetZ();
+	void SetZ(QVariant v);
 	Q_INVOKABLE bool hasZ();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void xChanged();
-	void yChanged();
-	void zChanged();
+void xChanged();
+void yChanged();
+void zChanged();
 	void finished();
 
 protected:
 };
 
 
-class CCoordinatesObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CCoordinates::V1_0, sdl::complextest::ComplexUnion2::CCoordinatesObject>
+
+
+
+class CCoordinatesObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCoordinates::V1_0, sdl::complextest::ComplexUnion2::CCoordinatesObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CCoordinates::V1_0, sdl::complextest::ComplexUnion2::CCoordinatesObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCoordinates::V1_0, sdl::complextest::ComplexUnion2::CCoordinatesObject> BaseClass;
 
 	CCoordinatesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCoordinatesObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCoordinatesObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CCoordinatesObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CCoordinatesObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCoordinatesObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCoordinatesObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCoordinatesObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CCoordinatesObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCoordinatesObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCoordinatesObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCoordinatesObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCoordinatesObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCoordinatesObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCoordinatesObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCoordinatesObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCoordinatesObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CCoordinatesObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CCoordinatesObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CCoordinatesObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CCoordinatesObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CCoordinatesObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCoordinatesObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CCoordinatesObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_x"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).x.value());
-		}
-		if (nameId == "m_y"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).y.value());
-		}
-		if (nameId == "m_z"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).z.value());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCoordinatesObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCoordinatesObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCoordinatesObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCoordinatesObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCoordinatesObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -2714,19 +1606,19 @@ class CExtendedMetaDataObjectList;
 class CExtendedMetaDataObject: public ::imtbase::CItemModelBase, public CExtendedMetaData
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_key READ GetKey WRITE SetKey NOTIFY keyChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObject* m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
+	Q_PROPERTY(QVariant m_key READ GetKey WRITE SetKey NOTIFY keyChanged)
+	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CExtendedMetaDataObject(QObject* parent = nullptr);
 
-	QString GetKey();
-	void SetKey(QString v);
+	QVariant GetKey();
+	void SetKey(QVariant v);
 	Q_INVOKABLE bool hasKey();
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObject* GetValue();
-	void SetValue(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObject* v);
+	QVariant GetValue();
+	void SetValue(QVariant v);
 	Q_INVOKABLE bool hasValue();
 	Q_INVOKABLE void createValue();
 	// CItemModelBase implemented
@@ -2734,202 +1626,45 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void keyChanged();
-	void valueChanged();
+void keyChanged();
+void valueChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObject* m_valueQObjectPtr;
+	QVariant m_valueQObjectPtr;
 };
 
 
-class CExtendedMetaDataObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CExtendedMetaData::V1_0, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject>
+
+
+
+class CExtendedMetaDataObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CExtendedMetaData::V1_0, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CExtendedMetaData::V1_0, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CExtendedMetaData::V1_0, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject> BaseClass;
 
 	CExtendedMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CExtendedMetaDataObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_key"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).key.value());
-		}
-		if (nameId == "m_value"){
-			sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetValue());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -2941,44 +1676,44 @@ class CResultMetaDataObjectList;
 class CResultMetaDataObject: public ::imtbase::CItemModelBase, public CResultMetaData
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_resultId READ GetResultId WRITE SetResultId NOTIFY resultIdChanged)
-	Q_PROPERTY(QString m_creationTime READ GetCreationTime WRITE SetCreationTime NOTIFY creationTimeChanged)
-	Q_PROPERTY(QString m_partId READ GetPartId WRITE SetPartId NOTIFY partIdChanged)
-	Q_PROPERTY(QString m_productId READ GetProductId WRITE SetProductId NOTIFY productIdChanged)
-	Q_PROPERTY(QString m_name READ GetName WRITE SetName NOTIFY nameChanged)
-	Q_PROPERTY(int m_classification READ GetClassification WRITE SetClassification NOTIFY classificationChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CLocalizedTextObject* m_description READ GetDescription WRITE SetDescription NOTIFY descriptionChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* m_extendedMetaData READ GetExtendedMetaData WRITE SetExtendedMetaData NOTIFY extendedMetaDataChanged)
+	Q_PROPERTY(QVariant m_resultId READ GetResultId WRITE SetResultId NOTIFY resultIdChanged)
+	Q_PROPERTY(QVariant m_creationTime READ GetCreationTime WRITE SetCreationTime NOTIFY creationTimeChanged)
+	Q_PROPERTY(QVariant m_partId READ GetPartId WRITE SetPartId NOTIFY partIdChanged)
+	Q_PROPERTY(QVariant m_productId READ GetProductId WRITE SetProductId NOTIFY productIdChanged)
+	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
+	Q_PROPERTY(QVariant m_classification READ GetClassification WRITE SetClassification NOTIFY classificationChanged)
+	Q_PROPERTY(QVariant m_description READ GetDescription WRITE SetDescription NOTIFY descriptionChanged)
+	Q_PROPERTY(QVariant m_extendedMetaData READ GetExtendedMetaData WRITE SetExtendedMetaData NOTIFY extendedMetaDataChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CResultMetaDataObject(QObject* parent = nullptr);
 
-	QString GetResultId();
-	void SetResultId(QString v);
+	QVariant GetResultId();
+	void SetResultId(QVariant v);
 	Q_INVOKABLE bool hasResultId();
-	QString GetCreationTime();
-	void SetCreationTime(QString v);
+	QVariant GetCreationTime();
+	void SetCreationTime(QVariant v);
 	Q_INVOKABLE bool hasCreationTime();
-	QString GetPartId();
-	void SetPartId(QString v);
+	QVariant GetPartId();
+	void SetPartId(QVariant v);
 	Q_INVOKABLE bool hasPartId();
-	QString GetProductId();
-	void SetProductId(QString v);
+	QVariant GetProductId();
+	void SetProductId(QVariant v);
 	Q_INVOKABLE bool hasProductId();
-	QString GetName();
-	void SetName(QString v);
+	QVariant GetName();
+	void SetName(QVariant v);
 	Q_INVOKABLE bool hasName();
-	int GetClassification();
-	void SetClassification(int v);
+	QVariant GetClassification();
+	void SetClassification(QVariant v);
 	Q_INVOKABLE bool hasClassification();
-	sdl::complextest::ComplexUnion2::CLocalizedTextObject* GetDescription();
-	void SetDescription(sdl::complextest::ComplexUnion2::CLocalizedTextObject* v);
+	QVariant GetDescription();
+	void SetDescription(QVariant v);
 	Q_INVOKABLE bool hasDescription();
 	Q_INVOKABLE void createDescription();
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* GetExtendedMetaData();
-	void SetExtendedMetaData(sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* v);
+	QVariant GetExtendedMetaData();
+	void SetExtendedMetaData(QVariant v);
 	Q_INVOKABLE bool hasExtendedMetaData();
 	Q_INVOKABLE void createExtendedMetaData();
 	// CItemModelBase implemented
@@ -2986,228 +1721,52 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void resultIdChanged();
-	void creationTimeChanged();
-	void partIdChanged();
-	void productIdChanged();
-	void nameChanged();
-	void classificationChanged();
-	void descriptionChanged();
-	void extendedMetaDataChanged();
+void resultIdChanged();
+void creationTimeChanged();
+void partIdChanged();
+void productIdChanged();
+void nameChanged();
+void classificationChanged();
+void descriptionChanged();
+void extendedMetaDataChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion2::CLocalizedTextObject* m_descriptionQObjectPtr;
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* m_extendedMetaDataQObjectPtr;
+	QVariant m_descriptionQObjectPtr;
+	QVariant m_extendedMetaDataQObjectPtr;
 };
 
 
-class CResultMetaDataObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CResultMetaData::V1_0, sdl::complextest::ComplexUnion2::CResultMetaDataObject>
+
+
+
+class CResultMetaDataObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResultMetaData::V1_0, sdl::complextest::ComplexUnion2::CResultMetaDataObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CResultMetaData::V1_0, sdl::complextest::ComplexUnion2::CResultMetaDataObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResultMetaData::V1_0, sdl::complextest::ComplexUnion2::CResultMetaDataObject> BaseClass;
 
 	CResultMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CResultMetaDataObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CResultMetaDataObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CResultMetaDataObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultMetaDataObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CResultMetaDataObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultMetaDataObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CResultMetaDataObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultMetaDataObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CResultMetaDataObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CResultMetaDataObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultMetaDataObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CResultMetaDataObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CResultMetaDataObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CResultMetaDataObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CResultMetaDataObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_resultId"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).resultId.value());
-		}
-		if (nameId == "m_creationTime"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).creationTime.value());
-		}
-		if (nameId == "m_partId"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).partId.value());
-		}
-		if (nameId == "m_productId"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).productId.value());
-		}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).name.value());
-		}
-		if (nameId == "m_classification"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).classification.value());
-		}
-		if (nameId == "m_description"){
-			sdl::complextest::ComplexUnion2::CResultMetaDataObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetDescription());
-		}
-		if (nameId == "m_extendedMetaData"){
-			sdl::complextest::ComplexUnion2::CResultMetaDataObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetExtendedMetaData());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CResultMetaDataObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CResultMetaDataObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CResultMetaDataObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -3219,243 +1778,78 @@ class COverallResultValuesObjectList;
 class COverallResultValuesObject: public ::imtbase::CItemModelBase, public COverallResultValues
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_name READ GetName WRITE SetName NOTIFY nameChanged)
-	Q_PROPERTY(QString m_valueId READ GetValueId WRITE SetValueId NOTIFY valueIdChanged)
-	Q_PROPERTY(double m_measuredValue READ GetMeasuredValue WRITE SetMeasuredValue NOTIFY measuredValueChanged)
-	Q_PROPERTY(double m_lowLimit READ GetLowLimit WRITE SetLowLimit NOTIFY lowLimitChanged)
-	Q_PROPERTY(double m_highLimit READ GetHighLimit WRITE SetHighLimit NOTIFY highLimitChanged)
+	Q_PROPERTY(QVariant m_name READ GetName WRITE SetName NOTIFY nameChanged)
+	Q_PROPERTY(QVariant m_valueId READ GetValueId WRITE SetValueId NOTIFY valueIdChanged)
+	Q_PROPERTY(QVariant m_measuredValue READ GetMeasuredValue WRITE SetMeasuredValue NOTIFY measuredValueChanged)
+	Q_PROPERTY(QVariant m_lowLimit READ GetLowLimit WRITE SetLowLimit NOTIFY lowLimitChanged)
+	Q_PROPERTY(QVariant m_highLimit READ GetHighLimit WRITE SetHighLimit NOTIFY highLimitChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	COverallResultValuesObject(QObject* parent = nullptr);
 
-	QString GetName();
-	void SetName(QString v);
+	QVariant GetName();
+	void SetName(QVariant v);
 	Q_INVOKABLE bool hasName();
-	QString GetValueId();
-	void SetValueId(QString v);
+	QVariant GetValueId();
+	void SetValueId(QVariant v);
 	Q_INVOKABLE bool hasValueId();
-	double GetMeasuredValue();
-	void SetMeasuredValue(double v);
+	QVariant GetMeasuredValue();
+	void SetMeasuredValue(QVariant v);
 	Q_INVOKABLE bool hasMeasuredValue();
-	double GetLowLimit();
-	void SetLowLimit(double v);
+	QVariant GetLowLimit();
+	void SetLowLimit(QVariant v);
 	Q_INVOKABLE bool hasLowLimit();
-	double GetHighLimit();
-	void SetHighLimit(double v);
+	QVariant GetHighLimit();
+	void SetHighLimit(QVariant v);
 	Q_INVOKABLE bool hasHighLimit();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void nameChanged();
-	void valueIdChanged();
-	void measuredValueChanged();
-	void lowLimitChanged();
-	void highLimitChanged();
+void nameChanged();
+void valueIdChanged();
+void measuredValueChanged();
+void lowLimitChanged();
+void highLimitChanged();
 	void finished();
 
 protected:
 };
 
 
-class COverallResultValuesObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::COverallResultValues::V1_0, sdl::complextest::ComplexUnion2::COverallResultValuesObject>
+
+
+
+class COverallResultValuesObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::COverallResultValues::V1_0, sdl::complextest::ComplexUnion2::COverallResultValuesObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::COverallResultValues::V1_0, sdl::complextest::ComplexUnion2::COverallResultValuesObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::COverallResultValues::V1_0, sdl::complextest::ComplexUnion2::COverallResultValuesObject> BaseClass;
 
 	COverallResultValuesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::COverallResultValuesObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::COverallResultValuesObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::COverallResultValuesObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::COverallResultValuesObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::COverallResultValuesObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::COverallResultValuesObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::COverallResultValuesObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::COverallResultValuesObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::COverallResultValuesObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::COverallResultValuesObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::COverallResultValuesObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::COverallResultValuesObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::COverallResultValuesObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::COverallResultValuesObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::COverallResultValuesObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::COverallResultValuesObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::COverallResultValuesObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::COverallResultValuesObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::COverallResultValuesObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::COverallResultValuesObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_name"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).name.value());
-		}
-		if (nameId == "m_valueId"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).valueId.value());
-		}
-		if (nameId == "m_measuredValue"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).measuredValue.value());
-		}
-		if (nameId == "m_lowLimit"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).lowLimit.value());
-		}
-		if (nameId == "m_highLimit"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).highLimit.value());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::COverallResultValuesObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::COverallResultValuesObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::COverallResultValuesObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -3467,25 +1861,25 @@ class CUnionTestingTypeObjectList;
 class CUnionTestingTypeObject: public ::imtbase::CItemModelBase, public CUnionTestingType
 {
 	Q_OBJECT
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObject* m_simpleUnion READ GetSimpleUnion WRITE SetSimpleUnion NOTIFY simpleUnionChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObject* m_complexUnion READ GetComplexUnion WRITE SetComplexUnion NOTIFY complexUnionChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObject* m_mixedUnion READ GetMixedUnion WRITE SetMixedUnion NOTIFY mixedUnionChanged)
+	Q_PROPERTY(QVariant m_simpleUnion READ GetSimpleUnion WRITE SetSimpleUnion NOTIFY simpleUnionChanged)
+	Q_PROPERTY(QVariant m_complexUnion READ GetComplexUnion WRITE SetComplexUnion NOTIFY complexUnionChanged)
+	Q_PROPERTY(QVariant m_mixedUnion READ GetMixedUnion WRITE SetMixedUnion NOTIFY mixedUnionChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CUnionTestingTypeObject(QObject* parent = nullptr);
 
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObject* GetSimpleUnion();
-	void SetSimpleUnion(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObject* v);
+	QVariant GetSimpleUnion();
+	void SetSimpleUnion(QVariant v);
 	Q_INVOKABLE bool hasSimpleUnion();
 	Q_INVOKABLE void createSimpleUnion();
-	sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObject* GetComplexUnion();
-	void SetComplexUnion(sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObject* v);
+	QVariant GetComplexUnion();
+	void SetComplexUnion(QVariant v);
 	Q_INVOKABLE bool hasComplexUnion();
 	Q_INVOKABLE void createComplexUnion();
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObject* GetMixedUnion();
-	void SetMixedUnion(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObject* v);
+	QVariant GetMixedUnion();
+	void SetMixedUnion(QVariant v);
 	Q_INVOKABLE bool hasMixedUnion();
 	Q_INVOKABLE void createMixedUnion();
 	// CItemModelBase implemented
@@ -3493,210 +1887,48 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void simpleUnionChanged();
-	void complexUnionChanged();
-	void mixedUnionChanged();
+void simpleUnionChanged();
+void complexUnionChanged();
+void mixedUnionChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObject* m_simpleUnionQObjectPtr;
-	sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObject* m_complexUnionQObjectPtr;
-	sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObject* m_mixedUnionQObjectPtr;
+	QVariant m_simpleUnionQObjectPtr;
+	QVariant m_complexUnionQObjectPtr;
+	QVariant m_mixedUnionQObjectPtr;
 };
 
 
-class CUnionTestingTypeObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CUnionTestingType::V1_0, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject>
+
+
+
+class CUnionTestingTypeObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CUnionTestingType::V1_0, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CUnionTestingType::V1_0, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CUnionTestingType::V1_0, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject> BaseClass;
 
 	CUnionTestingTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CUnionTestingTypeObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_simpleUnion"){
-			sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetSimpleUnion());
-		}
-		if (nameId == "m_complexUnion"){
-			sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetComplexUnion());
-		}
-		if (nameId == "m_mixedUnion"){
-			sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetMixedUnion());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -3708,33 +1940,33 @@ class CCDMResultVarRecursiveObjectList;
 class CCDMResultVarRecursiveObject: public ::imtbase::CItemModelBase, public CCDMResultVarRecursive
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_dataModelTitle READ GetDataModelTitle WRITE SetDataModelTitle NOTIFY dataModelTitleChanged)
-	Q_PROPERTY(QString m_dataModelVersion READ GetDataModelVersion WRITE SetDataModelVersion NOTIFY dataModelVersionChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CResultMetaDataObject* m_resultMetaData READ GetResultMetaData WRITE SetResultMetaData NOTIFY resultMetaDataChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* m_resultContent READ GetResultContent WRITE SetResultContent NOTIFY resultContentChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* m_overallResultValues READ GetOverallResultValues WRITE SetOverallResultValues NOTIFY overallResultValuesChanged)
+	Q_PROPERTY(QVariant m_dataModelTitle READ GetDataModelTitle WRITE SetDataModelTitle NOTIFY dataModelTitleChanged)
+	Q_PROPERTY(QVariant m_dataModelVersion READ GetDataModelVersion WRITE SetDataModelVersion NOTIFY dataModelVersionChanged)
+	Q_PROPERTY(QVariant m_resultMetaData READ GetResultMetaData WRITE SetResultMetaData NOTIFY resultMetaDataChanged)
+	Q_PROPERTY(QVariant m_resultContent READ GetResultContent WRITE SetResultContent NOTIFY resultContentChanged)
+	Q_PROPERTY(QVariant m_overallResultValues READ GetOverallResultValues WRITE SetOverallResultValues NOTIFY overallResultValuesChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CCDMResultVarRecursiveObject(QObject* parent = nullptr);
 
-	QString GetDataModelTitle();
-	void SetDataModelTitle(QString v);
+	QVariant GetDataModelTitle();
+	void SetDataModelTitle(QVariant v);
 	Q_INVOKABLE bool hasDataModelTitle();
-	QString GetDataModelVersion();
-	void SetDataModelVersion(QString v);
+	QVariant GetDataModelVersion();
+	void SetDataModelVersion(QVariant v);
 	Q_INVOKABLE bool hasDataModelVersion();
-	sdl::complextest::ComplexUnion2::CResultMetaDataObject* GetResultMetaData();
-	void SetResultMetaData(sdl::complextest::ComplexUnion2::CResultMetaDataObject* v);
+	QVariant GetResultMetaData();
+	void SetResultMetaData(QVariant v);
 	Q_INVOKABLE bool hasResultMetaData();
 	Q_INVOKABLE void createResultMetaData();
-	sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* GetResultContent();
-	void SetResultContent(sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* v);
+	QVariant GetResultContent();
+	void SetResultContent(QVariant v);
 	Q_INVOKABLE bool hasResultContent();
 	Q_INVOKABLE void createResultContent();
-	sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* GetOverallResultValues();
-	void SetOverallResultValues(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* v);
+	QVariant GetOverallResultValues();
+	void SetOverallResultValues(QVariant v);
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void createOverallResultValues();
 	// CItemModelBase implemented
@@ -3742,218 +1974,50 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void dataModelTitleChanged();
-	void dataModelVersionChanged();
-	void resultMetaDataChanged();
-	void resultContentChanged();
-	void overallResultValuesChanged();
+void dataModelTitleChanged();
+void dataModelVersionChanged();
+void resultMetaDataChanged();
+void resultContentChanged();
+void overallResultValuesChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion2::CResultMetaDataObject* m_resultMetaDataQObjectPtr;
-	sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* m_resultContentQObjectPtr;
-	sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* m_overallResultValuesQObjectPtr;
+	QVariant m_resultMetaDataQObjectPtr;
+	QVariant m_resultContentQObjectPtr;
+	QVariant m_overallResultValuesQObjectPtr;
 };
 
 
-class CCDMResultVarRecursiveObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarRecursive::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject>
+
+
+
+class CCDMResultVarRecursiveObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarRecursive::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarRecursive::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarRecursive::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject> BaseClass;
 
 	CCDMResultVarRecursiveObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_dataModelTitle"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).dataModelTitle.value());
-		}
-		if (nameId == "m_dataModelVersion"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).dataModelVersion.value());
-		}
-		if (nameId == "m_resultMetaData"){
-			sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetResultMetaData());
-		}
-		if (nameId == "m_resultContent"){
-			sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetResultContent());
-		}
-		if (nameId == "m_overallResultValues"){
-			sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetOverallResultValues());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -3965,32 +2029,32 @@ class CCDMResultVarStringObjectList;
 class CCDMResultVarStringObject: public ::imtbase::CItemModelBase, public CCDMResultVarString
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_dataModelTitle READ GetDataModelTitle WRITE SetDataModelTitle NOTIFY dataModelTitleChanged)
-	Q_PROPERTY(QString m_dataModelVersion READ GetDataModelVersion WRITE SetDataModelVersion NOTIFY dataModelVersionChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CResultMetaDataObject* m_resultMetaData READ GetResultMetaData WRITE SetResultMetaData NOTIFY resultMetaDataChanged)
-	Q_PROPERTY(QList<QString> m_resultContent READ GetResultContent WRITE SetResultContent NOTIFY resultContentChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* m_overallResultValues READ GetOverallResultValues WRITE SetOverallResultValues NOTIFY overallResultValuesChanged)
+	Q_PROPERTY(QVariant m_dataModelTitle READ GetDataModelTitle WRITE SetDataModelTitle NOTIFY dataModelTitleChanged)
+	Q_PROPERTY(QVariant m_dataModelVersion READ GetDataModelVersion WRITE SetDataModelVersion NOTIFY dataModelVersionChanged)
+	Q_PROPERTY(QVariant m_resultMetaData READ GetResultMetaData WRITE SetResultMetaData NOTIFY resultMetaDataChanged)
+	Q_PROPERTY(QVariant m_resultContent READ GetResultContent WRITE SetResultContent NOTIFY resultContentChanged)
+	Q_PROPERTY(QVariant m_overallResultValues READ GetOverallResultValues WRITE SetOverallResultValues NOTIFY overallResultValuesChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CCDMResultVarStringObject(QObject* parent = nullptr);
 
-	QString GetDataModelTitle();
-	void SetDataModelTitle(QString v);
+	QVariant GetDataModelTitle();
+	void SetDataModelTitle(QVariant v);
 	Q_INVOKABLE bool hasDataModelTitle();
-	QString GetDataModelVersion();
-	void SetDataModelVersion(QString v);
+	QVariant GetDataModelVersion();
+	void SetDataModelVersion(QVariant v);
 	Q_INVOKABLE bool hasDataModelVersion();
-	sdl::complextest::ComplexUnion2::CResultMetaDataObject* GetResultMetaData();
-	void SetResultMetaData(sdl::complextest::ComplexUnion2::CResultMetaDataObject* v);
+	QVariant GetResultMetaData();
+	void SetResultMetaData(QVariant v);
 	Q_INVOKABLE bool hasResultMetaData();
 	Q_INVOKABLE void createResultMetaData();
-	QList<QString> GetResultContent();
-	void SetResultContent(QList<QString> v);
+	QVariant GetResultContent();
+	void SetResultContent(QVariant v);
 	Q_INVOKABLE bool hasResultContent();
-	sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* GetOverallResultValues();
-	void SetOverallResultValues(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* v);
+	QVariant GetOverallResultValues();
+	void SetOverallResultValues(QVariant v);
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void createOverallResultValues();
 	// CItemModelBase implemented
@@ -3998,216 +2062,49 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void dataModelTitleChanged();
-	void dataModelVersionChanged();
-	void resultMetaDataChanged();
-	void resultContentChanged();
-	void overallResultValuesChanged();
+void dataModelTitleChanged();
+void dataModelVersionChanged();
+void resultMetaDataChanged();
+void resultContentChanged();
+void overallResultValuesChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion2::CResultMetaDataObject* m_resultMetaDataQObjectPtr;
-	sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* m_overallResultValuesQObjectPtr;
+	QVariant m_resultMetaDataQObjectPtr;
+	QVariant m_overallResultValuesQObjectPtr;
 };
 
 
-class CCDMResultVarStringObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarString::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject>
+
+
+
+class CCDMResultVarStringObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarString::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarString::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarString::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject> BaseClass;
 
 	CCDMResultVarStringObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CCDMResultVarStringObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_dataModelTitle"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).dataModelTitle.value());
-		}
-		if (nameId == "m_dataModelVersion"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).dataModelVersion.value());
-		}
-		if (nameId == "m_resultMetaData"){
-			sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetResultMetaData());
-		}
-		if (nameId == "m_resultContent"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).resultContent.value());
-		}
-		if (nameId == "m_overallResultValues"){
-			sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetOverallResultValues());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -4219,33 +2116,33 @@ class CCDMResultObjectList;
 class CCDMResultObject: public ::imtbase::CItemModelBase, public CCDMResult
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_dataModelTitle READ GetDataModelTitle WRITE SetDataModelTitle NOTIFY dataModelTitleChanged)
-	Q_PROPERTY(QString m_dataModelVersion READ GetDataModelVersion WRITE SetDataModelVersion NOTIFY dataModelVersionChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CResultMetaDataObject* m_resultMetaData READ GetResultMetaData WRITE SetResultMetaData NOTIFY resultMetaDataChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* m_resultContent READ GetResultContent WRITE SetResultContent NOTIFY resultContentChanged)
-	Q_PROPERTY(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* m_overallResultValues READ GetOverallResultValues WRITE SetOverallResultValues NOTIFY overallResultValuesChanged)
+	Q_PROPERTY(QVariant m_dataModelTitle READ GetDataModelTitle WRITE SetDataModelTitle NOTIFY dataModelTitleChanged)
+	Q_PROPERTY(QVariant m_dataModelVersion READ GetDataModelVersion WRITE SetDataModelVersion NOTIFY dataModelVersionChanged)
+	Q_PROPERTY(QVariant m_resultMetaData READ GetResultMetaData WRITE SetResultMetaData NOTIFY resultMetaDataChanged)
+	Q_PROPERTY(QVariant m_resultContent READ GetResultContent WRITE SetResultContent NOTIFY resultContentChanged)
+	Q_PROPERTY(QVariant m_overallResultValues READ GetOverallResultValues WRITE SetOverallResultValues NOTIFY overallResultValuesChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CCDMResultObject(QObject* parent = nullptr);
 
-	QString GetDataModelTitle();
-	void SetDataModelTitle(QString v);
+	QVariant GetDataModelTitle();
+	void SetDataModelTitle(QVariant v);
 	Q_INVOKABLE bool hasDataModelTitle();
-	QString GetDataModelVersion();
-	void SetDataModelVersion(QString v);
+	QVariant GetDataModelVersion();
+	void SetDataModelVersion(QVariant v);
 	Q_INVOKABLE bool hasDataModelVersion();
-	sdl::complextest::ComplexUnion2::CResultMetaDataObject* GetResultMetaData();
-	void SetResultMetaData(sdl::complextest::ComplexUnion2::CResultMetaDataObject* v);
+	QVariant GetResultMetaData();
+	void SetResultMetaData(QVariant v);
 	Q_INVOKABLE bool hasResultMetaData();
 	Q_INVOKABLE void createResultMetaData();
-	sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* GetResultContent();
-	void SetResultContent(sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* v);
+	QVariant GetResultContent();
+	void SetResultContent(QVariant v);
 	Q_INVOKABLE bool hasResultContent();
 	Q_INVOKABLE void createResultContent();
-	sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* GetOverallResultValues();
-	void SetOverallResultValues(sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* v);
+	QVariant GetOverallResultValues();
+	void SetOverallResultValues(QVariant v);
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void createOverallResultValues();
 	// CItemModelBase implemented
@@ -4253,218 +2150,50 @@ public:
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void dataModelTitleChanged();
-	void dataModelVersionChanged();
-	void resultMetaDataChanged();
-	void resultContentChanged();
-	void overallResultValuesChanged();
+void dataModelTitleChanged();
+void dataModelVersionChanged();
+void resultMetaDataChanged();
+void resultContentChanged();
+void overallResultValuesChanged();
 	void finished();
 
 protected:
-	sdl::complextest::ComplexUnion2::CResultMetaDataObject* m_resultMetaDataQObjectPtr;
-	sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* m_resultContentQObjectPtr;
-	sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* m_overallResultValuesQObjectPtr;
+	QVariant m_resultMetaDataQObjectPtr;
+	QVariant m_resultContentQObjectPtr;
+	QVariant m_overallResultValuesQObjectPtr;
 };
 
 
-class CCDMResultObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResult::V1_0, sdl::complextest::ComplexUnion2::CCDMResultObject>
+
+
+
+class CCDMResultObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResult::V1_0, sdl::complextest::ComplexUnion2::CCDMResultObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResult::V1_0, sdl::complextest::ComplexUnion2::CCDMResultObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResult::V1_0, sdl::complextest::ComplexUnion2::CCDMResultObject> BaseClass;
 
 	CCDMResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
-
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CCDMResultObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CCDMResultObjectList();
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCDMResultObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
-
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CCDMResultObject*>(itemObjectPtr->copyMe()));
-		}
-
-		return objectListPtr;
-	}
-
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCDMResultObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toJson();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
-
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
-
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CCDMResultObject>()){
-				return nullptr;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CCDMResultObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCDMResultObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CCDMResultObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CCDMResultObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CCDMResultObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CCDMResultObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCDMResultObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CCDMResultObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_dataModelTitle"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).dataModelTitle.value());
-		}
-		if (nameId == "m_dataModelVersion"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).dataModelVersion.value());
-		}
-		if (nameId == "m_resultMetaData"){
-			sdl::complextest::ComplexUnion2::CCDMResultObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetResultMetaData());
-		}
-		if (nameId == "m_resultContent"){
-			sdl::complextest::ComplexUnion2::CCDMResultObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetResultContent());
-		}
-		if (nameId == "m_overallResultValues"){
-			sdl::complextest::ComplexUnion2::CCDMResultObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal->GetOverallResultValues());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCDMResultObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCDMResultObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -4476,211 +2205,133 @@ class CPointsInCoordinateFormatObjectList;
 class CPointsInCoordinateFormatObject: public ::imtbase::CItemModelBase, public CPointsInCoordinateFormat
 {
 	Q_OBJECT
-	Q_PROPERTY(bool m_pointAsCoordinates READ GetPointAsCoordinates WRITE SetPointAsCoordinates NOTIFY pointAsCoordinatesChanged)
+	Q_PROPERTY(QVariant m_pointAsCoordinates READ GetPointAsCoordinates WRITE SetPointAsCoordinates NOTIFY pointAsCoordinatesChanged)
 
 	typedef ::imtbase::CItemModelBase BaseClass;
 
 public:
 	CPointsInCoordinateFormatObject(QObject* parent = nullptr);
 
-	bool GetPointAsCoordinates();
-	void SetPointAsCoordinates(bool v);
+	QVariant GetPointAsCoordinates();
+	void SetPointAsCoordinates(QVariant v);
 	Q_INVOKABLE bool hasPointAsCoordinates();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
 	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
 	Q_INVOKABLE QString toGraphQL() const override;
-	Q_INVOKABLE QObject* CreateObject(const QString& key) override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-	void pointAsCoordinatesChanged();
+void pointAsCoordinatesChanged();
 	void finished();
 
 protected:
 };
 
 
-class CPointsInCoordinateFormatObjectList: public ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat::V1_0, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject>
+
+
+
+class CPointsInCoordinateFormatObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat::V1_0, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject>
 {
 	Q_OBJECT
 	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::TListModelBase<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat::V1_0, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject> BaseClass;
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat::V1_0, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject> BaseClass;
 
 	CPointsInCoordinateFormatObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/){
-		return true;
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+	signals:
+	void countChanged();
+};
 
-	Q_INVOKABLE int getItemsCount(){
-		return rowCount();
-	}
-	Q_INVOKABLE QVariantMap get(int row) const{
-		QVariantMap data;
-		QModelIndex idx = index(row, 0);
-		if (!idx.isValid()) return data;
-		QHash<int, QByteArray> roles = roleNames();
-		for (auto it = roles.begin(); it != roles.end(); ++it)
-			data[it.value()] = idx.data(it.key());
-		return data;
-	}
-	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item){
-		beginInsertRows(QModelIndex(), rowCount(), rowCount());
-		Version_1_0->append(*item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* copyMe(){
-		sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* objectListPtr = new sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList();
 
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject>()){
-				return nullptr;
-			}
 
-			sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject*>();
-			if (itemObjectPtr == nullptr){
-				return nullptr;
-			}
+class CCollectionViewParamsTestObjectList;
 
-			objectListPtr->addElement(dynamic_cast<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject*>(itemObjectPtr->copyMe()));
-		}
+class CCollectionViewParamsTestObject: public ::imtbase::CItemModelBase, public CCollectionViewParamsTest
+{
+	Q_OBJECT
+	Q_PROPERTY(QVariant m_count READ GetCount WRITE SetCount NOTIFY countChanged)
+	Q_PROPERTY(QVariant m_offset READ GetOffset WRITE SetOffset NOTIFY offsetChanged)
+	Q_PROPERTY(QVariant m_filterModel READ GetFilterModel WRITE SetFilterModel NOTIFY filterModelChanged)
 
-		return objectListPtr;
-	}
+	typedef ::imtbase::CItemModelBase BaseClass;
 
-	Q_INVOKABLE QString toJson(){
-		QString retVal = QStringLiteral("[");
+public:
+	CCollectionViewParamsTestObject(QObject* parent = nullptr);
 
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
+	QVariant GetCount();
+	void SetCount(QVariant v);
+	Q_INVOKABLE bool hasCount();
+	QVariant GetOffset();
+	void SetOffset(QVariant v);
+	Q_INVOKABLE bool hasOffset();
+	QVariant GetFilterModel();
+	void SetFilterModel(QVariant v);
+	Q_INVOKABLE bool hasFilterModel();
+	Q_INVOKABLE void createFilterModel();
+	// CItemModelBase implemented
+	Q_INVOKABLE QString toJson() const override;
+	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
+	Q_INVOKABLE virtual bool fromObject(const QJsonObject& jsonObject) override;
+	Q_INVOKABLE QString toGraphQL() const override;
+	Q_INVOKABLE QVariant CreateObject(const QString& key) override;
+	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject>()){
-				return nullptr;
-			}
+signals:
+void countChanged();
+void offsetChanged();
+void filterModelChanged();
+	void finished();
 
-			sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
+protected:
+	QVariant m_filterModelQObjectPtr;
+};
 
-			retVal += itemObjectPtr->toJson();
-		}
 
-		retVal += QStringLiteral("]");
 
-		return retVal;
-	}
 
-	Q_INVOKABLE QString toGraphQL(){
-		QString retVal = QStringLiteral("[");
 
-		for (int i = 0; i < this->rowCount(); i++){
-			if (i > 0 && i < this->rowCount() - 1){
-				retVal += QStringLiteral(", ");
-			}
+class CCollectionViewParamsTestObjectList: public ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCollectionViewParamsTest::V1_0, sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject>
+{
+	Q_OBJECT
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
+public:
+	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCollectionViewParamsTest::V1_0, sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject> BaseClass;
 
-			QVariant item = this->getData("item", i);
-			if (!item.canConvert<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject>()){
-				return nullptr;
-			}
+	CCollectionViewParamsTestObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-			sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* itemObjectPtr = item.value<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject*>();
-			if (itemObjectPtr == nullptr){
-				return QString();
-			}
-
-			retVal += itemObjectPtr->toGraphQL();
-		}
-
-		retVal += QStringLiteral("]");
-
-		return retVal;
-	}
-
-	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item){
-		append(item);
-	}
-
-	Q_INVOKABLE void removeElement(int index){
-		remove(index);
-	}
-
-	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* otherModelPtr){
-		if (otherModelPtr == nullptr){
-			return false;
-		}
-
-		if (this == otherModelPtr){
-			return false;
-		}
-
-		if (this->rowCount() != otherModelPtr->rowCount()){
-			return false;
-		}
-
-		for (int i = 0; i < this->rowCount(); i++){
-			QVariant selfItem = this->getData("item", i);
-			QVariant otherItem = otherModelPtr->getData("item", i);
-			if (!selfItem.canConvert<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject>()){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* selfItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject*>();
-			if (selfItemObjectPtr == nullptr){
-				return false;
-			}
-
-			sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* otherItemObjectPtr = selfItem.value<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject*>();
-			if (otherItemObjectPtr == nullptr){
-				return false;
-			}
-
-			if (!selfItemObjectPtr->isEqualWithModel(otherItemObjectPtr)){
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item){
-		if (index < 0 || index > Version_1_0->size()) return;
-		beginInsertRows(QModelIndex(), index, index);
-		Version_1_0->insert(index, *item->Version_1_0);
-		ClearCache();
-		endInsertRows();
-	}
-	Q_INVOKABLE void remove(int index){
-		if (index < 0 || index >= Version_1_0->size()) return;
-		beginRemoveRows(QModelIndex(), index, index);
-		Version_1_0->removeAt(index);
-		ClearCache();
-		endRemoveRows();
-	}
-	Q_INVOKABLE void clear(){
-		beginResetModel();
-		ClearCache();
-		Version_1_0->clear();
-		endResetModel();
-	}
-	Q_INVOKABLE QVariant getData(const QString& nameId, int index){
-		if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
-			sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* retVal = GetOrCreateCachedObject(index);
-			return QVariant::fromValue(retVal);
-		}
-		if (nameId == "m_pointAsCoordinates"){
-			return QVariant::fromValue(Version_1_0.GetPtr()->at(index).pointAsCoordinates.value());
-		}
-		return QVariant();
-	}
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
+Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 	signals:
 	void countChanged();
 };
@@ -4707,55 +2358,6 @@ public:
 
 };
 
-class CExtendedMetaDataUnionTypeObject: public ::imtbase::CItemModelBase
-{
-	Q_OBJECT
-	Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)
-	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
-
-public:
-	typedef ::imtbase::CItemModelBase BaseClass;
-
-	CExtendedMetaDataUnionTypeObject(QObject* parent = nullptr): BaseClass(parent) {}
-
-	Q_INVOKABLE QString GetType() const{
-		return m_type;
-	}
-
-	Q_INVOKABLE void SetValue(const QVariant& value){
-		if (value.canConvert<CCoordinates>()){
-			m_type = "Coordinates";
-		}
-
-		if (value.canConvert<double>()){
-			m_type = "Float";
-		}
-
-		if (value.canConvert<bool>()){
-			m_type = "Boolean";
-		}
-
-		if (value.canConvert<QString>()){
-			m_type = "String";
-		}
-
-		m_value = value;
-	}
-
-	Q_INVOKABLE QVariant GetValue(){
-		return QVariant();
-	}
-
-signals:
-	void typeChanged();
-	void valueChanged();
-
-public:
-	istd::TSharedNullable<std::shared_ptr<ExtendedMetaDataUnionType>> Version_1_0;
-	QVariant m_value;
-	QString m_type;
-};
-
 
 
 class ExtendedMetaDataUnionSimpleType: public std::variant<double, bool, QString> {
@@ -4776,51 +2378,6 @@ public:
 
 };
 
-class CExtendedMetaDataUnionSimpleTypeObject: public ::imtbase::CItemModelBase
-{
-	Q_OBJECT
-	Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)
-	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
-
-public:
-	typedef ::imtbase::CItemModelBase BaseClass;
-
-	CExtendedMetaDataUnionSimpleTypeObject(QObject* parent = nullptr): BaseClass(parent) {}
-
-	Q_INVOKABLE QString GetType() const{
-		return m_type;
-	}
-
-	Q_INVOKABLE void SetValue(const QVariant& value){
-		if (value.canConvert<double>()){
-			m_type = "Float";
-		}
-
-		if (value.canConvert<bool>()){
-			m_type = "Boolean";
-		}
-
-		if (value.canConvert<QString>()){
-			m_type = "String";
-		}
-
-		m_value = value;
-	}
-
-	Q_INVOKABLE QVariant GetValue(){
-		return QVariant();
-	}
-
-signals:
-	void typeChanged();
-	void valueChanged();
-
-public:
-	istd::TSharedNullable<std::shared_ptr<ExtendedMetaDataUnionSimpleType>> Version_1_0;
-	QVariant m_value;
-	QString m_type;
-};
-
 
 
 class CDMResultUnionType: public std::variant<CCDMResultVarString, CCDMResultVarRecursive> {
@@ -4838,47 +2395,99 @@ public:
 
 };
 
-class CCDMResultUnionTypeObject: public ::imtbase::CItemModelBase
+
+
+
+class CExtendedMetaDataUnionTypeObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::ExtendedMetaDataUnionType, QVariant>
 {
 	Q_OBJECT
-	Q_PROPERTY(QString m_type READ GetType NOTIFY typeChanged)
-	Q_PROPERTY(QVariant m_value READ GetValue WRITE SetValue NOTIFY valueChanged)
-
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
 public:
-	typedef ::imtbase::CItemModelBase BaseClass;
+	typedef ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::ExtendedMetaDataUnionType, QVariant> BaseClass;
 
-	CCDMResultUnionTypeObject(QObject* parent = nullptr): BaseClass(parent) {}
+	CExtendedMetaDataUnionTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE QString GetType() const{
-		return m_type;
-	}
+	virtual QVariant GetOrCreateCachedObject(int index) const override;
 
-	Q_INVOKABLE void SetValue(const QVariant& value){
-		if (value.canConvert<CCDMResultVarString>()){
-			m_type = "CDMResultVarString";
-		}
-
-		if (value.canConvert<CCDMResultVarRecursive>()){
-			m_type = "CDMResultVarRecursive";
-		}
-
-		m_value = value;
-	}
-
-	Q_INVOKABLE QVariant GetValue(){
-		return QVariant();
-	}
-
+	Q_INVOKABLE bool containsKey(const QString& nameId, int /*index*/);
+	Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(QVariant item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(QVariant item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionTypeObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, QVariant item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
 signals:
-	void typeChanged();
-	void valueChanged();
-
-public:
-	istd::TSharedNullable<std::shared_ptr<CDMResultUnionType>> Version_1_0;
-	QVariant m_value;
-	QString m_type;
+	void countChanged();
 };
 
+
+
+class CExtendedMetaDataUnionSimpleTypeObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::ExtendedMetaDataUnionSimpleType, QVariant>
+{
+	Q_OBJECT
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
+public:
+	typedef ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::ExtendedMetaDataUnionSimpleType, QVariant> BaseClass;
+
+	CExtendedMetaDataUnionSimpleTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+
+	virtual QVariant GetOrCreateCachedObject(int index) const override;
+
+	Q_INVOKABLE bool containsKey(const QString& nameId, int /*index*/);
+	Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(QVariant item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(QVariant item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CExtendedMetaDataUnionSimpleTypeObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, QVariant item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+signals:
+	void countChanged();
+};
+
+
+
+class CCDMResultUnionTypeObjectList: public ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::CDMResultUnionType, QVariant>
+{
+	Q_OBJECT
+	Q_PROPERTY(int count READ rowCount() NOTIFY countChanged())
+public:
+	typedef ::imtsdl::TSdlAbstractListModel<sdl::complextest::ComplexUnion2::CDMResultUnionType, QVariant> BaseClass;
+
+	CCDMResultUnionTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+
+	virtual QVariant GetOrCreateCachedObject(int index) const override;
+
+	Q_INVOKABLE bool containsKey(const QString& nameId, int /*index*/);
+	Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE QVariantMap get(int row) const override;
+	Q_INVOKABLE void append(QVariant item);
+	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* copyMe();
+	Q_INVOKABLE QString toJson();
+	Q_INVOKABLE QString toGraphQL();
+	Q_INVOKABLE void addElement(QVariant item);
+	Q_INVOKABLE void removeElement(int index);
+	Q_INVOKABLE bool isEqualWithModel(sdl::complextest::ComplexUnion2::CCDMResultUnionTypeObjectList* otherModelPtr);
+	Q_INVOKABLE void insert(int index, QVariant item);
+	Q_INVOKABLE void remove(int index) override;
+	Q_INVOKABLE void clear() override;
+	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
+signals:
+	void countChanged();
+};
 
 
 struct GetLastProductionResultsRequestInfo
@@ -5090,6 +2699,7 @@ protected:
 	qmlRegisterType<CCDMResultVarStringObject>("complextestComplexUnion2Sdl", 1, 0, "CDMResultVarString");
 	qmlRegisterType<CCDMResultObject>("complextestComplexUnion2Sdl", 1, 0, "CDMResult");
 	qmlRegisterType<CPointsInCoordinateFormatObject>("complextestComplexUnion2Sdl", 1, 0, "PointsInCoordinateFormat");
+	qmlRegisterType<CCollectionViewParamsTestObject>("complextestComplexUnion2Sdl", 1, 0, "CollectionViewParamsTest");
 }
 #endif
 
@@ -5126,3 +2736,5 @@ Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCDMResult::V1_0);
 Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCDMResult);
 Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat::V1_0);
 Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat);
+Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCollectionViewParamsTest::V1_0);
+Q_DECLARE_METATYPE(sdl::complextest::ComplexUnion2::CCollectionViewParamsTest);

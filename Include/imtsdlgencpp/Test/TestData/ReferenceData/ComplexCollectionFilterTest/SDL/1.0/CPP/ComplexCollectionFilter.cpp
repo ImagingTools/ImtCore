@@ -973,7 +973,7 @@ bool CFieldFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 	newFilterOperationsModelPtr->setIsArray(true);
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperations->size(); ++filterOperationsIndex){
 		QString filterOperationsStringValue;
-		switch (filterOperations->at(filterOperationsIndex)){
+		switch (*filterOperations->at(filterOperationsIndex)){
 		case FilterOperation::Not:
 			filterOperationsStringValue = "Not";
 			break;
@@ -1052,7 +1052,7 @@ bool CFieldFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		return false;
 	}
 	int filterOperationsCount = filterOperationsModel->GetItemsCount();
-	QList<FilterOperation> filterOperationsList;
+	imtsdl::TElementList<FilterOperation> filterOperationsList;
 	for (int filterOperationsIndex = 0; filterOperationsIndex < filterOperationsCount; ++filterOperationsIndex){
 		FilterOperation filterOperationsData;
 		QString filterOperationsStringValue = filterOperationsModel->GetData(QByteArray(), filterOperationsIndex).toString();
@@ -1122,7 +1122,7 @@ bool CFieldFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 	::imtbase::CTreeItemModel* filterOperationsModel = model.GetTreeItemModel("filterOperations", modelIndex);
 	if (filterOperationsModel != nullptr){
 		int filterOperationsCount = filterOperationsModel->GetItemsCount();
-		QList<FilterOperation> filterOperationsList;
+		imtsdl::TElementList<FilterOperation> filterOperationsList;
 		for (int filterOperationsIndex = 0; filterOperationsIndex < filterOperationsCount; ++filterOperationsIndex){
 			FilterOperation filterOperationsData;
 			QString filterOperationsStringValue = filterOperationsModel->GetData(QByteArray(), filterOperationsIndex).toString();
@@ -1195,7 +1195,7 @@ bool CFieldFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 	QVariantList filterOperationsDataObjectList;
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperations->size(); ++filterOperationsIndex){
 		QString filterOperationsStringValue;
-		switch (filterOperations->at(filterOperationsIndex)){
+		switch (*filterOperations->at(filterOperationsIndex)){
 		case FilterOperation::Not:
 			filterOperationsStringValue = "Not";
 			break;
@@ -1271,7 +1271,7 @@ bool CFieldFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 	const QVariant filterOperationsData = gqlObject["filterOperations"];
 	const QVariantList filterOperationsDataList = filterOperationsData.toList();
 	const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
-	filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
+	filterOperations = imtsdl::TElementList<imtbase::ComplexCollectionFilter::FilterOperation>();
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
 		const QString tempFilterOperations = filterOperationsDataList[filterOperationsIndex].toString();
 		imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
@@ -1337,7 +1337,7 @@ bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		const QVariant filterOperationsData = gqlObject["filterOperations"];
 		const QVariantList filterOperationsDataList = filterOperationsData.toList();
 		const qsizetype filterOperationsElementsCount = filterOperationsDataList.size();
-		filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
+		filterOperations = imtsdl::TElementList<imtbase::ComplexCollectionFilter::FilterOperation>();
 		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsElementsCount; ++filterOperationsIndex){
 			const QString tempFilterOperations = filterOperationsDataList[filterOperationsIndex].toString();
 			imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
@@ -1407,7 +1407,7 @@ bool CFieldFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 	QJsonArray newFilterOperationsArray;
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperations->size(); ++filterOperationsIndex){
 		QString filterOperationsStringValue;
-		switch (filterOperations->at(filterOperationsIndex)){
+		switch (*filterOperations->at(filterOperationsIndex)){
 		case FilterOperation::Not:
 			filterOperationsStringValue = "Not";
 			break;
@@ -1482,7 +1482,7 @@ bool CFieldFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	}
 	const QJsonArray filterOperationsJsonArray = jsonObject["filterOperations"].toArray();
 	const qsizetype filterOperationsArrayCount = filterOperationsJsonArray.size();
-	filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
+	filterOperations = imtsdl::TElementList<imtbase::ComplexCollectionFilter::FilterOperation>();
 	for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
 		const QString tempFilterOperations = filterOperationsJsonArray[filterOperationsIndex].toString();
 		imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
@@ -1547,7 +1547,7 @@ bool CFieldFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("filterOperations") && jsonObject["filterOperations"].isArray()){
 		const QJsonArray filterOperationsJsonArray = jsonObject["filterOperations"].toArray();
 		const qsizetype filterOperationsArrayCount = filterOperationsJsonArray.size();
-		filterOperations = QList<imtbase::ComplexCollectionFilter::FilterOperation>();
+		filterOperations = imtsdl::TElementList<imtbase::ComplexCollectionFilter::FilterOperation>();
 		for (qsizetype filterOperationsIndex = 0; filterOperationsIndex < filterOperationsArrayCount; ++filterOperationsIndex){
 			const QString tempFilterOperations = filterOperationsJsonArray[filterOperationsIndex].toString();
 			imtbase::ComplexCollectionFilter::FilterOperation filterOperationsDataValue;
@@ -1833,7 +1833,7 @@ bool CGroupFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		newFieldFiltersModelPtr->setIsArray(true);
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
 			newFieldFiltersModelPtr->InsertNewItem();
-			if (!(fieldFilters->at(fieldFiltersIndex).WriteToModel(*newFieldFiltersModelPtr, fieldFiltersIndex))){
+			if (!(fieldFilters->at(fieldFiltersIndex)->WriteToModel(*newFieldFiltersModelPtr, fieldFiltersIndex))){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
 
 				return false;
@@ -1845,7 +1845,7 @@ bool CGroupFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		newGroupFiltersModelPtr->setIsArray(true);
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
 			newGroupFiltersModelPtr->InsertNewItem();
-			if (!(groupFilters->at(groupFiltersIndex).WriteToModel(*newGroupFiltersModelPtr, groupFiltersIndex))){
+			if (!(groupFilters->at(groupFiltersIndex)->WriteToModel(*newGroupFiltersModelPtr, groupFiltersIndex))){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
 
 				return false;
@@ -1879,7 +1879,7 @@ bool CGroupFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 	::imtbase::CTreeItemModel* fieldFiltersModel = model.GetTreeItemModel("fieldFilters", modelIndex);
 	if (fieldFiltersModel != nullptr){
 		int fieldFiltersCount = fieldFiltersModel->GetItemsCount();
-		QList<CFieldFilter::V1_0> fieldFiltersList;
+		imtsdl::TElementList<CFieldFilter::V1_0> fieldFiltersList;
 		for (int fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 fieldFilters;
 			if (!fieldFilters.ReadFromModel(*fieldFiltersModel, fieldFiltersIndex)){
@@ -1896,7 +1896,7 @@ bool CGroupFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 	::imtbase::CTreeItemModel* groupFiltersModel = model.GetTreeItemModel("groupFilters", modelIndex);
 	if (groupFiltersModel != nullptr){
 		int groupFiltersCount = groupFiltersModel->GetItemsCount();
-		QList<CGroupFilter::V1_0> groupFiltersList;
+		imtsdl::TElementList<CGroupFilter::V1_0> groupFiltersList;
 		for (int groupFiltersIndex = 0; groupFiltersIndex < groupFiltersCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 groupFilters;
 			if (!groupFilters.ReadFromModel(*groupFiltersModel, groupFiltersIndex)){
@@ -1938,7 +1938,7 @@ bool CGroupFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 	::imtbase::CTreeItemModel* fieldFiltersModel = model.GetTreeItemModel("fieldFilters", modelIndex);
 	if (fieldFiltersModel != nullptr){
 		int fieldFiltersCount = fieldFiltersModel->GetItemsCount();
-		QList<CFieldFilter::V1_0> fieldFiltersList;
+		imtsdl::TElementList<CFieldFilter::V1_0> fieldFiltersList;
 		for (int fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 fieldFilters;
 			if (!fieldFilters.OptReadFromModel(*fieldFiltersModel, fieldFiltersIndex)){
@@ -1955,7 +1955,7 @@ bool CGroupFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 	::imtbase::CTreeItemModel* groupFiltersModel = model.GetTreeItemModel("groupFilters", modelIndex);
 	if (groupFiltersModel != nullptr){
 		int groupFiltersCount = groupFiltersModel->GetItemsCount();
-		QList<CGroupFilter::V1_0> groupFiltersList;
+		imtsdl::TElementList<CGroupFilter::V1_0> groupFiltersList;
 		for (int groupFiltersIndex = 0; groupFiltersIndex < groupFiltersCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 groupFilters;
 			if (!groupFilters.OptReadFromModel(*groupFiltersModel, groupFiltersIndex)){
@@ -1995,7 +1995,7 @@ bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		QList<::imtgql::CGqlParamObject> fieldFiltersDataObjectList;
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
 			::imtgql::CGqlParamObject newFieldFiltersGqlObject;
-			if (!fieldFilters->at(fieldFiltersIndex).WriteToGraphQlObject(newFieldFiltersGqlObject)){
+			if (!fieldFilters->at(fieldFiltersIndex)->WriteToGraphQlObject(newFieldFiltersGqlObject)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
 
 				return false;
@@ -2009,7 +2009,7 @@ bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		QList<::imtgql::CGqlParamObject> groupFiltersDataObjectList;
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
 			::imtgql::CGqlParamObject newGroupFiltersGqlObject;
-			if (!groupFilters->at(groupFiltersIndex).WriteToGraphQlObject(newGroupFiltersGqlObject)){
+			if (!groupFilters->at(groupFiltersIndex)->WriteToGraphQlObject(newGroupFiltersGqlObject)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
 
 				return false;
@@ -2044,7 +2044,7 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 {
 	if (gqlObject.ContainsParam("fieldFilters") && (gqlObject.GetObjectsCount("fieldFilters") > 0)){
 		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
-		fieldFilters = QList<CFieldFilter::V1_0>();
+		fieldFilters = imtsdl::TElementList<CFieldFilter::V1_0>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
 			if (fieldFiltersDataObjectPtr == nullptr){
@@ -2063,7 +2063,7 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 
 	if (gqlObject.ContainsParam("groupFilters") && (gqlObject.GetObjectsCount("groupFilters") > 0)){
 		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
-		groupFilters = QList<CGroupFilter::V1_0>();
+		groupFilters = imtsdl::TElementList<CGroupFilter::V1_0>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
 			if (groupFiltersDataObjectPtr == nullptr){
@@ -2106,7 +2106,7 @@ bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 {
 	if (gqlObject.ContainsParam("fieldFilters") && (gqlObject.GetObjectsCount("fieldFilters") > 0)){
 		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
-		fieldFilters = QList<CFieldFilter::V1_0>();
+		fieldFilters = imtsdl::TElementList<CFieldFilter::V1_0>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersElementsCount; ++fieldFiltersIndex){
 			const ::imtgql::CGqlParamObject* fieldFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("fieldFilters", fieldFiltersIndex);
 			if (fieldFiltersDataObjectPtr == nullptr){
@@ -2125,7 +2125,7 @@ bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 
 	if (gqlObject.ContainsParam("groupFilters") && (gqlObject.GetObjectsCount("groupFilters") > 0)){
 		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
-		groupFilters = QList<CGroupFilter::V1_0>();
+		groupFilters = imtsdl::TElementList<CGroupFilter::V1_0>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersElementsCount; ++groupFiltersIndex){
 			const ::imtgql::CGqlParamObject* groupFiltersDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("groupFilters", groupFiltersIndex);
 			if (groupFiltersDataObjectPtr == nullptr){
@@ -2167,7 +2167,7 @@ bool CGroupFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		QJsonArray newFieldFiltersArray;
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFilters->size(); ++fieldFiltersIndex){
 			QJsonObject newFieldFiltersJsonObject;
-			if (!fieldFilters->at(fieldFiltersIndex).WriteToJsonObject(newFieldFiltersJsonObject)){
+			if (!fieldFilters->at(fieldFiltersIndex)->WriteToJsonObject(newFieldFiltersJsonObject)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "fieldFilters").toLocal8Bit().constData();)
 
 				return false;
@@ -2181,7 +2181,7 @@ bool CGroupFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		QJsonArray newGroupFiltersArray;
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFilters->size(); ++groupFiltersIndex){
 			QJsonObject newGroupFiltersJsonObject;
-			if (!groupFilters->at(groupFiltersIndex).WriteToJsonObject(newGroupFiltersJsonObject)){
+			if (!groupFilters->at(groupFiltersIndex)->WriteToJsonObject(newGroupFiltersJsonObject)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "groupFilters").toLocal8Bit().constData();)
 
 				return false;
@@ -2217,7 +2217,7 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
 		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
 		const qsizetype fieldFiltersArrayCount = fieldFiltersJsonArray.size();
-		fieldFilters = QList<CFieldFilter::V1_0>();
+		fieldFilters = imtsdl::TElementList<CFieldFilter::V1_0>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 tempFieldFilters;
 			if (!tempFieldFilters.ReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
@@ -2232,7 +2232,7 @@ bool CGroupFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
 		const QJsonArray groupFiltersJsonArray = jsonObject["groupFilters"].toArray();
 		const qsizetype groupFiltersArrayCount = groupFiltersJsonArray.size();
-		groupFilters = QList<CGroupFilter::V1_0>();
+		groupFilters = imtsdl::TElementList<CGroupFilter::V1_0>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 tempGroupFilters;
 			if (!tempGroupFilters.ReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
@@ -2271,7 +2271,7 @@ bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("fieldFilters") && jsonObject["fieldFilters"].isArray()){
 		const QJsonArray fieldFiltersJsonArray = jsonObject["fieldFilters"].toArray();
 		const qsizetype fieldFiltersArrayCount = fieldFiltersJsonArray.size();
-		fieldFilters = QList<CFieldFilter::V1_0>();
+		fieldFilters = imtsdl::TElementList<CFieldFilter::V1_0>();
 		for (qsizetype fieldFiltersIndex = 0; fieldFiltersIndex < fieldFiltersArrayCount; ++fieldFiltersIndex){
 			CFieldFilter::V1_0 tempFieldFilters;
 			if (!tempFieldFilters.OptReadFromJsonObject(fieldFiltersJsonArray[fieldFiltersIndex].toObject())){
@@ -2286,7 +2286,7 @@ bool CGroupFilter::V1_0::OptReadFromJsonObject(const QJsonObject& jsonObject)
 	if (jsonObject.contains("groupFilters") && jsonObject["groupFilters"].isArray()){
 		const QJsonArray groupFiltersJsonArray = jsonObject["groupFilters"].toArray();
 		const qsizetype groupFiltersArrayCount = groupFiltersJsonArray.size();
-		groupFilters = QList<CGroupFilter::V1_0>();
+		groupFilters = imtsdl::TElementList<CGroupFilter::V1_0>();
 		for (qsizetype groupFiltersIndex = 0; groupFiltersIndex < groupFiltersArrayCount; ++groupFiltersIndex){
 			CGroupFilter::V1_0 tempGroupFilters;
 			if (!tempGroupFilters.OptReadFromJsonObject(groupFiltersJsonArray[groupFiltersIndex].toObject())){
@@ -2572,7 +2572,7 @@ bool CComplexCollectionFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& mod
 		newSortingInfoModelPtr->setIsArray(true);
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
 			newSortingInfoModelPtr->InsertNewItem();
-			if (!(sortingInfo->at(sortingInfoIndex).WriteToModel(*newSortingInfoModelPtr, sortingInfoIndex))){
+			if (!(sortingInfo->at(sortingInfoIndex)->WriteToModel(*newSortingInfoModelPtr, sortingInfoIndex))){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
 
 				return false;
@@ -2606,7 +2606,7 @@ bool CComplexCollectionFilter::V1_0::WriteToModel(::imtbase::CTreeItemModel& mod
 		newDistinctFieldsModelPtr->setIsArray(true);
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFields->size(); ++distinctFieldsIndex){
 			newDistinctFieldsModelPtr->InsertNewItem();
-			newDistinctFieldsModelPtr->SetData(QByteArray(), distinctFields->at(distinctFieldsIndex), distinctFieldsIndex);
+			newDistinctFieldsModelPtr->SetData(QByteArray(), *distinctFields->at(distinctFieldsIndex), distinctFieldsIndex);
 		}
 	}
 
@@ -2620,7 +2620,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemMod
 	::imtbase::CTreeItemModel* sortingInfoModel = model.GetTreeItemModel("sortingInfo", modelIndex);
 	if (sortingInfoModel != nullptr){
 		int sortingInfoCount = sortingInfoModel->GetItemsCount();
-		QList<CFieldSortingInfo::V1_0> sortingInfoList;
+		imtsdl::TElementList<CFieldSortingInfo::V1_0> sortingInfoList;
 		for (int sortingInfoIndex = 0; sortingInfoIndex < sortingInfoCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 sortingInfo;
 			if (!sortingInfo.ReadFromModel(*sortingInfoModel, sortingInfoIndex)){
@@ -2659,7 +2659,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromModel(const ::imtbase::CTreeItemMod
 	::imtbase::CTreeItemModel* distinctFieldsModel = model.GetTreeItemModel("distinctFields", modelIndex);
 	if (distinctFieldsModel != nullptr){
 		int distinctFieldsCount = distinctFieldsModel->GetItemsCount();
-		QList<QByteArray> distinctFieldsList;
+		imtsdl::TElementList<QByteArray> distinctFieldsList;
 		for (int distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsCount; ++distinctFieldsIndex){
 			QByteArray distinctFields = distinctFieldsModel->GetData(QByteArray(), distinctFieldsIndex).toByteArray();
 			distinctFieldsList << distinctFields;
@@ -2677,7 +2677,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItem
 	::imtbase::CTreeItemModel* sortingInfoModel = model.GetTreeItemModel("sortingInfo", modelIndex);
 	if (sortingInfoModel != nullptr){
 		int sortingInfoCount = sortingInfoModel->GetItemsCount();
-		QList<CFieldSortingInfo::V1_0> sortingInfoList;
+		imtsdl::TElementList<CFieldSortingInfo::V1_0> sortingInfoList;
 		for (int sortingInfoIndex = 0; sortingInfoIndex < sortingInfoCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 sortingInfo;
 			if (!sortingInfo.OptReadFromModel(*sortingInfoModel, sortingInfoIndex)){
@@ -2716,7 +2716,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromModel(const ::imtbase::CTreeItem
 	::imtbase::CTreeItemModel* distinctFieldsModel = model.GetTreeItemModel("distinctFields", modelIndex);
 	if (distinctFieldsModel != nullptr){
 		int distinctFieldsCount = distinctFieldsModel->GetItemsCount();
-		QList<QByteArray> distinctFieldsList;
+		imtsdl::TElementList<QByteArray> distinctFieldsList;
 		for (int distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsCount; ++distinctFieldsIndex){
 			QByteArray distinctFields = distinctFieldsModel->GetData(QByteArray(), distinctFieldsIndex).toByteArray();
 			distinctFieldsList << distinctFields;
@@ -2735,7 +2735,7 @@ bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObj
 		QList<::imtgql::CGqlParamObject> sortingInfoDataObjectList;
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
 			::imtgql::CGqlParamObject newSortingInfoGqlObject;
-			if (!sortingInfo->at(sortingInfoIndex).WriteToGraphQlObject(newSortingInfoGqlObject)){
+			if (!sortingInfo->at(sortingInfoIndex)->WriteToGraphQlObject(newSortingInfoGqlObject)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
 
 				return false;
@@ -2770,7 +2770,7 @@ bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObj
 	if (distinctFields){
 		QVariantList distinctFieldsDataObjectList;
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFields->size(); ++distinctFieldsIndex){
-			distinctFieldsDataObjectList << distinctFields->at(distinctFieldsIndex);
+			distinctFieldsDataObjectList << *distinctFields->at(distinctFieldsIndex);
 		}
 		gqlObject.InsertParam("distinctFields", distinctFieldsDataObjectList);
 	}
@@ -2783,7 +2783,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 {
 	if (gqlObject.ContainsParam("sortingInfo") && (gqlObject.GetObjectsCount("sortingInfo") > 0)){
 		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
-		sortingInfo = QList<CFieldSortingInfo::V1_0>();
+		sortingInfo = imtsdl::TElementList<CFieldSortingInfo::V1_0>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
 			if (sortingInfoDataObjectPtr == nullptr){
@@ -2824,7 +2824,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 		const QVariant distinctFieldsData = gqlObject["distinctFields"];
 		const QVariantList distinctFieldsDataList = distinctFieldsData.toList();
 		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();
-		distinctFields = QList<QByteArray>();
+		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsElementsCount; ++distinctFieldsIndex){
 			QByteArray tempDistinctFields = distinctFieldsDataList[distinctFieldsIndex].toByteArray();
 			distinctFields->append(tempDistinctFields);
@@ -2839,7 +2839,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 {
 	if (gqlObject.ContainsParam("sortingInfo") && (gqlObject.GetObjectsCount("sortingInfo") > 0)){
 		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
-		sortingInfo = QList<CFieldSortingInfo::V1_0>();
+		sortingInfo = imtsdl::TElementList<CFieldSortingInfo::V1_0>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoElementsCount; ++sortingInfoIndex){
 			const ::imtgql::CGqlParamObject* sortingInfoDataObjectPtr = gqlObject.GetParamArgumentObjectPtr("sortingInfo", sortingInfoIndex);
 			if (sortingInfoDataObjectPtr == nullptr){
@@ -2880,7 +2880,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 		const QVariant distinctFieldsData = gqlObject["distinctFields"];
 		const QVariantList distinctFieldsDataList = distinctFieldsData.toList();
 		const qsizetype distinctFieldsElementsCount = distinctFieldsDataList.size();
-		distinctFields = QList<QByteArray>();
+		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsElementsCount; ++distinctFieldsIndex){
 			QByteArray tempDistinctFields = distinctFieldsDataList[distinctFieldsIndex].toByteArray();
 			distinctFields->append(tempDistinctFields);
@@ -2897,7 +2897,7 @@ bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) 
 		QJsonArray newSortingInfoArray;
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfo->size(); ++sortingInfoIndex){
 			QJsonObject newSortingInfoJsonObject;
-			if (!sortingInfo->at(sortingInfoIndex).WriteToJsonObject(newSortingInfoJsonObject)){
+			if (!sortingInfo->at(sortingInfoIndex)->WriteToJsonObject(newSortingInfoJsonObject)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to write field: '%3'").arg(__FILE__, QString::number(__LINE__), "sortingInfo").toLocal8Bit().constData();)
 
 				return false;
@@ -2932,7 +2932,7 @@ bool CComplexCollectionFilter::V1_0::WriteToJsonObject(QJsonObject& jsonObject) 
 	if (distinctFields){
 		QJsonArray newDistinctFieldsArray;
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFields->size(); ++distinctFieldsIndex){
-			newDistinctFieldsArray << QString(distinctFields->at(distinctFieldsIndex));
+			newDistinctFieldsArray << QString(*distinctFields->at(distinctFieldsIndex));
 		}
 		jsonObject["distinctFields"] = newDistinctFieldsArray;
 	}
@@ -2946,7 +2946,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonO
 	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
 		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
 		const qsizetype sortingInfoArrayCount = sortingInfoJsonArray.size();
-		sortingInfo = QList<CFieldSortingInfo::V1_0>();
+		sortingInfo = imtsdl::TElementList<CFieldSortingInfo::V1_0>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 tempSortingInfo;
 			if (!tempSortingInfo.ReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
@@ -2981,7 +2981,7 @@ bool CComplexCollectionFilter::V1_0::ReadFromJsonObject(const QJsonObject& jsonO
 	if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isArray()){
 		const QJsonArray distinctFieldsJsonArray = jsonObject["distinctFields"].toArray();
 		const qsizetype distinctFieldsArrayCount = distinctFieldsJsonArray.size();
-		distinctFields = QList<QByteArray>();
+		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsArrayCount; ++distinctFieldsIndex){
 			QByteArray tempDistinctFields = distinctFieldsJsonArray[distinctFieldsIndex].toString().toUtf8();
 			distinctFields->append(tempDistinctFields);
@@ -2997,7 +2997,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromJsonObject(const QJsonObject& js
 	if (jsonObject.contains("sortingInfo") && jsonObject["sortingInfo"].isArray()){
 		const QJsonArray sortingInfoJsonArray = jsonObject["sortingInfo"].toArray();
 		const qsizetype sortingInfoArrayCount = sortingInfoJsonArray.size();
-		sortingInfo = QList<CFieldSortingInfo::V1_0>();
+		sortingInfo = imtsdl::TElementList<CFieldSortingInfo::V1_0>();
 		for (qsizetype sortingInfoIndex = 0; sortingInfoIndex < sortingInfoArrayCount; ++sortingInfoIndex){
 			CFieldSortingInfo::V1_0 tempSortingInfo;
 			if (!tempSortingInfo.OptReadFromJsonObject(sortingInfoJsonArray[sortingInfoIndex].toObject())){
@@ -3032,7 +3032,7 @@ bool CComplexCollectionFilter::V1_0::OptReadFromJsonObject(const QJsonObject& js
 	if (jsonObject.contains("distinctFields") && jsonObject["distinctFields"].isArray()){
 		const QJsonArray distinctFieldsJsonArray = jsonObject["distinctFields"].toArray();
 		const qsizetype distinctFieldsArrayCount = distinctFieldsJsonArray.size();
-		distinctFields = QList<QByteArray>();
+		distinctFields = imtsdl::TElementList<QByteArray>();
 		for (qsizetype distinctFieldsIndex = 0; distinctFieldsIndex < distinctFieldsArrayCount; ++distinctFieldsIndex){
 			QByteArray tempDistinctFields = distinctFieldsJsonArray[distinctFieldsIndex].toString().toUtf8();
 			distinctFields->append(tempDistinctFields);
@@ -3275,8 +3275,7 @@ bool CComplexCollectionFilter::OptReadFromJsonObject(const QJsonObject& jsonObje
 
 
 
-CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_timeRangeQObjectPtr(nullptr)
-{
+CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 	Version_1_0.emplace();
 
 	QObject::connect(this, &CTimeFilterObject::timeRangeChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -3286,29 +3285,31 @@ CTimeFilterObject::CTimeFilterObject(QObject* parent): ::imtbase::CItemModelBase
 }
 
 
-sdl::imtbase::ImtBaseTypes::CTimeRangeObject* CTimeFilterObject::GetTimeRange()
+QVariant CTimeFilterObject::GetTimeRange()
 {
 	if (Version_1_0->timeRange.has_value()){
-		if (!m_timeRangeQObjectPtr){
-			m_timeRangeQObjectPtr = dynamic_cast<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>(CreateObject("timeRange"));
-			m_timeRangeQObjectPtr->Version_1_0 = Version_1_0->timeRange;
+		if (!m_timeRangeQObjectPtr.isValid()){
+			m_timeRangeQObjectPtr = CreateObject("timeRange");
+			sdl::imtbase::ImtBaseTypes::CTimeRangeObject* itemPtr = m_timeRangeQObjectPtr.value<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->timeRange;
 		}
 		return m_timeRangeQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CTimeFilterObject::SetTimeRange(sdl::imtbase::ImtBaseTypes::CTimeRangeObject* v)
+void CTimeFilterObject::SetTimeRange(QVariant v)
 {
-	if (v){
-		Version_1_0->timeRange = v->Version_1_0;
-		m_timeRangeQObjectPtr = v;
+	if (v.isValid()){
+		sdl::imtbase::ImtBaseTypes::CTimeRangeObject* itemPtr = v.value<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>();
+		if (itemPtr != nullptr)  Version_1_0->timeRange = itemPtr->Version_1_0;
 	}
 	else {
 		Version_1_0->timeRange = nullptr;
 	}
+	m_timeRangeQObjectPtr = v;
 
 	timeRangeChanged();
 }
@@ -3326,19 +3327,19 @@ void CTimeFilterObject::createTimeRange()
 }
 
 
-QString CTimeFilterObject::GetTimeUnit()
+QVariant CTimeFilterObject::GetTimeUnit()
 {
 	if (Version_1_0->timeUnit.has_value()){
 		return Version_1_0->timeUnit.value();
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CTimeFilterObject::SetTimeUnit(QString v)
+void CTimeFilterObject::SetTimeUnit(QVariant v)
 {
-	Version_1_0->timeUnit = v;
+	Version_1_0->timeUnit = v.value<QString>();
 	timeUnitChanged();
 }
 
@@ -3349,19 +3350,19 @@ bool CTimeFilterObject::hasTimeUnit()
 }
 
 
-QString CTimeFilterObject::GetInterpretationMode()
+QVariant CTimeFilterObject::GetInterpretationMode()
 {
 	if (Version_1_0->interpretationMode.has_value()){
 		return Version_1_0->interpretationMode.value();
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CTimeFilterObject::SetInterpretationMode(QString v)
+void CTimeFilterObject::SetInterpretationMode(QVariant v)
 {
-	Version_1_0->interpretationMode = v;
+	Version_1_0->interpretationMode = v.value<QString>();
 	interpretationModeChanged();
 }
 
@@ -3372,19 +3373,19 @@ bool CTimeFilterObject::hasInterpretationMode()
 }
 
 
-int CTimeFilterObject::GetUnitMultiplier()
+QVariant CTimeFilterObject::GetUnitMultiplier()
 {
 	if (Version_1_0->unitMultiplier.has_value()){
 		return Version_1_0->unitMultiplier.value();
 	}
 
-	return 0;
+	return QVariant();
 }
 
 
-void CTimeFilterObject::SetUnitMultiplier(int v)
+void CTimeFilterObject::SetUnitMultiplier(QVariant v)
 {
-	Version_1_0->unitMultiplier = v;
+	Version_1_0->unitMultiplier = v.value<int>();
 	unitMultiplierChanged();
 }
 
@@ -3440,12 +3441,12 @@ QString CTimeFilterObject::toGraphQL() const
 }
 
 
-QObject* CTimeFilterObject::CreateObject(const QString& key)
+QVariant CTimeFilterObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "timeRange"){
-		return new sdl::imtbase::ImtBaseTypes::CTimeRangeObject(this);
+		return QVariant::fromValue(new sdl::imtbase::ImtBaseTypes::CTimeRangeObject(this));
 	}
-	return nullptr;
+	return QVariant();
 }
 
 
@@ -3468,6 +3469,111 @@ QString CTimeFilterObject::getJSONKeyForProperty(const QString& propertyName) co
 }
 
 
+
+
+
+bool CTimeFilterObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+{
+	return true;
+}
+
+
+int CTimeFilterObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CTimeFilterObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CTimeFilterObjectList::append(sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* item)
+{
+	BaseClass::append(item);
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList* sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::copyMe()
+{
+	sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList();
+	BaseClass::fromMe(retVal);
+	return retVal;
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::toJson()
+{
+	return BaseClass::toJson();
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::toGraphQL()
+{
+	return BaseClass::toGraphQL();
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* item)
+{
+	append(item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+
+bool sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList* otherModelPtr)
+{
+	return BaseClass::isEqualWithModel(otherModelPtr);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* item)
+{
+	return BaseClass::insert(index, item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::remove(int index)
+{
+	return BaseClass::remove(index);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::clear()
+{
+	return BaseClass::clear();
+}
+
+
+QVariant sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList::getData(const QString& nameId, int index)
+{
+	QVariant item = GetOrCreateCachedObject(index);
+	sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject*>();
+	if (itemPtr == nullptr) return QVariant();
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		return QVariant::fromValue(item);
+	}
+		if (nameId == "m_timeRange"){
+			return itemPtr->GetTimeRange();
+		}
+		if (nameId == "m_timeUnit"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->timeUnit.value());
+		}
+		if (nameId == "m_interpretationMode"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->interpretationMode.value());
+		}
+		if (nameId == "m_unitMultiplier"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->unitMultiplier.value());
+		}
+	return QVariant();
+}
 CFieldSortingInfoObject::CFieldSortingInfoObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 	Version_1_0.emplace();
 
@@ -3476,19 +3582,19 @@ CFieldSortingInfoObject::CFieldSortingInfoObject(QObject* parent): ::imtbase::CI
 }
 
 
-QString CFieldSortingInfoObject::GetFieldId()
+QVariant CFieldSortingInfoObject::GetFieldId()
 {
 	if (Version_1_0->fieldId.has_value()){
 		return Version_1_0->fieldId.value();
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CFieldSortingInfoObject::SetFieldId(QString v)
+void CFieldSortingInfoObject::SetFieldId(QVariant v)
 {
-	Version_1_0->fieldId = v;
+	Version_1_0->fieldId = v.value<QString>();
 	fieldIdChanged();
 }
 
@@ -3499,19 +3605,19 @@ bool CFieldSortingInfoObject::hasFieldId()
 }
 
 
-QString CFieldSortingInfoObject::GetSortingOrder()
+QVariant CFieldSortingInfoObject::GetSortingOrder()
 {
 	if (Version_1_0->sortingOrder.has_value()){
 		return Version_1_0->sortingOrder.value();
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CFieldSortingInfoObject::SetSortingOrder(QString v)
+void CFieldSortingInfoObject::SetSortingOrder(QVariant v)
 {
-	Version_1_0->sortingOrder = v;
+	Version_1_0->sortingOrder = v.value<QString>();
 	sortingOrderChanged();
 }
 
@@ -3567,9 +3673,9 @@ QString CFieldSortingInfoObject::toGraphQL() const
 }
 
 
-QObject* CFieldSortingInfoObject::CreateObject(const QString& key)
+QVariant CFieldSortingInfoObject::CreateObject(const QString& key)
 {
-	Q_UNUSED(key);	return nullptr;
+	Q_UNUSED(key);	return QVariant();
 }
 
 
@@ -3586,6 +3692,105 @@ QString CFieldSortingInfoObject::getJSONKeyForProperty(const QString& propertyNa
 }
 
 
+
+
+
+bool CFieldSortingInfoObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+{
+	return true;
+}
+
+
+int CFieldSortingInfoObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CFieldSortingInfoObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CFieldSortingInfoObjectList::append(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject* item)
+{
+	BaseClass::append(item);
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::copyMe()
+{
+	sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList();
+	BaseClass::fromMe(retVal);
+	return retVal;
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::toJson()
+{
+	return BaseClass::toJson();
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::toGraphQL()
+{
+	return BaseClass::toGraphQL();
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject* item)
+{
+	append(item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+
+bool sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* otherModelPtr)
+{
+	return BaseClass::isEqualWithModel(otherModelPtr);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject* item)
+{
+	return BaseClass::insert(index, item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::remove(int index)
+{
+	return BaseClass::remove(index);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::clear()
+{
+	return BaseClass::clear();
+}
+
+
+QVariant sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList::getData(const QString& nameId, int index)
+{
+	QVariant item = GetOrCreateCachedObject(index);
+	sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject*>();
+	if (itemPtr == nullptr) return QVariant();
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		return QVariant::fromValue(item);
+	}
+		if (nameId == "m_fieldId"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->fieldId.value());
+		}
+		if (nameId == "m_sortingOrder"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->sortingOrder.value());
+		}
+	return QVariant();
+}
 CFieldFilterObject::CFieldFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 	Version_1_0.emplace();
 
@@ -3596,19 +3801,19 @@ CFieldFilterObject::CFieldFilterObject(QObject* parent): ::imtbase::CItemModelBa
 }
 
 
-QString CFieldFilterObject::GetFieldId()
+QVariant CFieldFilterObject::GetFieldId()
 {
 	if (Version_1_0->fieldId.has_value()){
 		return Version_1_0->fieldId.value();
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CFieldFilterObject::SetFieldId(QString v)
+void CFieldFilterObject::SetFieldId(QVariant v)
 {
-	Version_1_0->fieldId = v.toUtf8();
+	Version_1_0->fieldId = v.value<QString>().toUtf8();
 	fieldIdChanged();
 }
 
@@ -3619,19 +3824,19 @@ bool CFieldFilterObject::hasFieldId()
 }
 
 
-QString CFieldFilterObject::GetFilterValue()
+QVariant CFieldFilterObject::GetFilterValue()
 {
 	if (Version_1_0->filterValue.has_value()){
 		return Version_1_0->filterValue.value();
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CFieldFilterObject::SetFilterValue(QString v)
+void CFieldFilterObject::SetFilterValue(QVariant v)
 {
-	Version_1_0->filterValue = v;
+	Version_1_0->filterValue = v.value<QString>();
 	filterValueChanged();
 }
 
@@ -3642,7 +3847,7 @@ bool CFieldFilterObject::hasFilterValue()
 }
 
 
-QString CFieldFilterObject::GetFilterValueType()
+QVariant CFieldFilterObject::GetFilterValueType()
 {
 	if (Version_1_0->filterValueType.has_value()){
 		sdl::imtbase::ComplexCollectionFilter::ValueType valueType = Version_1_0->filterValueType.value();
@@ -3652,15 +3857,15 @@ QString CFieldFilterObject::GetFilterValueType()
 		return retval;
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CFieldFilterObject::SetFilterValueType(QString v)
+void CFieldFilterObject::SetFilterValueType(QVariant v)
 {
 	Version_1_0->filterValueType.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::ValueType>();
-	int key = metaEnum.keyToValue(v.toUtf8());
+	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
 		Version_1_0->filterValueType = (sdl::imtbase::ComplexCollectionFilter::ValueType)key;
 	}
@@ -3674,17 +3879,17 @@ bool CFieldFilterObject::hasFilterValueType()
 }
 
 
-QList<QString> CFieldFilterObject::GetFilterOperations()
+QVariant CFieldFilterObject::GetFilterOperations()
 {
 	if (Version_1_0->filterOperations.has_value()){
 		
 	}
 
-	return QStringList();
+	return QVariant();
 }
 
 
-void CFieldFilterObject::SetFilterOperations(QList<QString> v)
+void CFieldFilterObject::SetFilterOperations(QVariant v)
 {
 	
 	filterOperationsChanged();
@@ -3742,9 +3947,9 @@ QString CFieldFilterObject::toGraphQL() const
 }
 
 
-QObject* CFieldFilterObject::CreateObject(const QString& key)
+QVariant CFieldFilterObject::CreateObject(const QString& key)
 {
-	Q_UNUSED(key);	return nullptr;
+	Q_UNUSED(key);	return QVariant();
 }
 
 
@@ -3767,9 +3972,112 @@ QString CFieldFilterObject::getJSONKeyForProperty(const QString& propertyName) c
 }
 
 
-CGroupFilterObject::CGroupFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_fieldFiltersQObjectPtr(nullptr)
-			, m_groupFiltersQObjectPtr(nullptr)
+
+
+
+bool CFieldFilterObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
 {
+	return true;
+}
+
+
+int CFieldFilterObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CFieldFilterObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CFieldFilterObjectList::append(sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject* item)
+{
+	BaseClass::append(item);
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::copyMe()
+{
+	sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList();
+	BaseClass::fromMe(retVal);
+	return retVal;
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::toJson()
+{
+	return BaseClass::toJson();
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::toGraphQL()
+{
+	return BaseClass::toGraphQL();
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject* item)
+{
+	append(item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+
+bool sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* otherModelPtr)
+{
+	return BaseClass::isEqualWithModel(otherModelPtr);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject* item)
+{
+	return BaseClass::insert(index, item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::remove(int index)
+{
+	return BaseClass::remove(index);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::clear()
+{
+	return BaseClass::clear();
+}
+
+
+QVariant sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList::getData(const QString& nameId, int index)
+{
+	QVariant item = GetOrCreateCachedObject(index);
+	sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject*>();
+	if (itemPtr == nullptr) return QVariant();
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		return QVariant::fromValue(item);
+	}
+		if (nameId == "m_fieldId"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->fieldId.value());
+		}
+		if (nameId == "m_filterValue"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->filterValue.value());
+		}
+		if (nameId == "m_filterValueType"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->filterValueType.value());
+		}
+		if (nameId == "m_filterOperations"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->filterOperations.value());
+		}
+	return QVariant();
+}
+CGroupFilterObject::CGroupFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 	Version_1_0.emplace();
 
 	QObject::connect(this, &CGroupFilterObject::fieldFiltersChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -3778,29 +4086,31 @@ CGroupFilterObject::CGroupFilterObject(QObject* parent): ::imtbase::CItemModelBa
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* CGroupFilterObject::GetFieldFilters()
+QVariant CGroupFilterObject::GetFieldFilters()
 {
 	if (Version_1_0->fieldFilters.has_value()){
-		if (!m_fieldFiltersQObjectPtr){
-			m_fieldFiltersQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList*>(CreateObject("fieldFilters"));
-			m_fieldFiltersQObjectPtr->Version_1_0 = Version_1_0->fieldFilters;
+		if (!m_fieldFiltersQObjectPtr.isValid()){
+			m_fieldFiltersQObjectPtr = CreateObject("fieldFilters");
+			sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* itemPtr = m_fieldFiltersQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->fieldFilters;
 		}
 		return m_fieldFiltersQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CGroupFilterObject::SetFieldFilters(sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* v)
+void CGroupFilterObject::SetFieldFilters(QVariant v)
 {
-	if (v){
-		Version_1_0->fieldFilters = v->Version_1_0;
-		m_fieldFiltersQObjectPtr = v;
+	if (v.isValid()){
+		sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList*>();
+		if (itemPtr != nullptr)  Version_1_0->fieldFilters = itemPtr->Version_1_0;
 	}
 	else {
 		Version_1_0->fieldFilters = nullptr;
 	}
+	m_fieldFiltersQObjectPtr = v;
 
 	fieldFiltersChanged();
 }
@@ -3818,29 +4128,31 @@ void CGroupFilterObject::createFieldFilters()
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* CGroupFilterObject::GetGroupFilters()
+QVariant CGroupFilterObject::GetGroupFilters()
 {
 	if (Version_1_0->groupFilters.has_value()){
-		if (!m_groupFiltersQObjectPtr){
-			m_groupFiltersQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList*>(CreateObject("groupFilters"));
-			m_groupFiltersQObjectPtr->Version_1_0 = Version_1_0->groupFilters;
+		if (!m_groupFiltersQObjectPtr.isValid()){
+			m_groupFiltersQObjectPtr = CreateObject("groupFilters");
+			sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* itemPtr = m_groupFiltersQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->groupFilters;
 		}
 		return m_groupFiltersQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CGroupFilterObject::SetGroupFilters(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* v)
+void CGroupFilterObject::SetGroupFilters(QVariant v)
 {
-	if (v){
-		Version_1_0->groupFilters = v->Version_1_0;
-		m_groupFiltersQObjectPtr = v;
+	if (v.isValid()){
+		sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList*>();
+		if (itemPtr != nullptr)  Version_1_0->groupFilters = itemPtr->Version_1_0;
 	}
 	else {
 		Version_1_0->groupFilters = nullptr;
 	}
+	m_groupFiltersQObjectPtr = v;
 
 	groupFiltersChanged();
 }
@@ -3858,7 +4170,7 @@ void CGroupFilterObject::createGroupFilters()
 }
 
 
-QString CGroupFilterObject::GetLogicalOperation()
+QVariant CGroupFilterObject::GetLogicalOperation()
 {
 	if (Version_1_0->logicalOperation.has_value()){
 		sdl::imtbase::ComplexCollectionFilter::LogicalOperation valueType = Version_1_0->logicalOperation.value();
@@ -3868,15 +4180,15 @@ QString CGroupFilterObject::GetLogicalOperation()
 		return retval;
 	}
 
-	return QString();
+	return QVariant();
 }
 
 
-void CGroupFilterObject::SetLogicalOperation(QString v)
+void CGroupFilterObject::SetLogicalOperation(QVariant v)
 {
 	Version_1_0->logicalOperation.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::imtbase::ComplexCollectionFilter::LogicalOperation>();
-	int key = metaEnum.keyToValue(v.toUtf8());
+	int key = metaEnum.keyToValue(v.value<QString>().toUtf8());
 	if (key > -1){
 		Version_1_0->logicalOperation = (sdl::imtbase::ComplexCollectionFilter::LogicalOperation)key;
 	}
@@ -3935,15 +4247,15 @@ QString CGroupFilterObject::toGraphQL() const
 }
 
 
-QObject* CGroupFilterObject::CreateObject(const QString& key)
+QVariant CGroupFilterObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "fieldFilters"){
-		return new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList(this);
+		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList(this));
 	}
 	if (key == "groupFilters"){
-		return new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList(this);
+		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList(this));
 	}
-	return nullptr;
+	return QVariant();
 }
 
 
@@ -3963,10 +4275,109 @@ QString CGroupFilterObject::getJSONKeyForProperty(const QString& propertyName) c
 }
 
 
-CComplexCollectionFilterObject::CComplexCollectionFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent)			, m_sortingInfoQObjectPtr(nullptr)
-			, m_fieldsFilterQObjectPtr(nullptr)
-			, m_timeFilterQObjectPtr(nullptr)
+
+
+
+bool CGroupFilterObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
 {
+	return true;
+}
+
+
+int CGroupFilterObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CGroupFilterObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CGroupFilterObjectList::append(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* item)
+{
+	BaseClass::append(item);
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::copyMe()
+{
+	sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList();
+	BaseClass::fromMe(retVal);
+	return retVal;
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::toJson()
+{
+	return BaseClass::toJson();
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::toGraphQL()
+{
+	return BaseClass::toGraphQL();
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* item)
+{
+	append(item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+
+bool sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* otherModelPtr)
+{
+	return BaseClass::isEqualWithModel(otherModelPtr);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* item)
+{
+	return BaseClass::insert(index, item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::remove(int index)
+{
+	return BaseClass::remove(index);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::clear()
+{
+	return BaseClass::clear();
+}
+
+
+QVariant sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList::getData(const QString& nameId, int index)
+{
+	QVariant item = GetOrCreateCachedObject(index);
+	sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject*>();
+	if (itemPtr == nullptr) return QVariant();
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		return QVariant::fromValue(item);
+	}
+		if (nameId == "m_fieldFilters"){
+			return itemPtr->GetFieldFilters();
+		}
+		if (nameId == "m_groupFilters"){
+			return itemPtr->GetGroupFilters();
+		}
+		if (nameId == "m_logicalOperation"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->logicalOperation.value());
+		}
+	return QVariant();
+}
+CComplexCollectionFilterObject::CComplexCollectionFilterObject(QObject* parent): ::imtbase::CItemModelBase(parent){
 	Version_1_0.emplace();
 
 	QObject::connect(this, &CComplexCollectionFilterObject::sortingInfoChanged, this, &CItemModelBase::OnInternalModelChanged);
@@ -3976,29 +4387,31 @@ CComplexCollectionFilterObject::CComplexCollectionFilterObject(QObject* parent):
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* CComplexCollectionFilterObject::GetSortingInfo()
+QVariant CComplexCollectionFilterObject::GetSortingInfo()
 {
 	if (Version_1_0->sortingInfo.has_value()){
-		if (!m_sortingInfoQObjectPtr){
-			m_sortingInfoQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList*>(CreateObject("sortingInfo"));
-			m_sortingInfoQObjectPtr->Version_1_0 = Version_1_0->sortingInfo;
+		if (!m_sortingInfoQObjectPtr.isValid()){
+			m_sortingInfoQObjectPtr = CreateObject("sortingInfo");
+			sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* itemPtr = m_sortingInfoQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->sortingInfo;
 		}
 		return m_sortingInfoQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CComplexCollectionFilterObject::SetSortingInfo(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* v)
+void CComplexCollectionFilterObject::SetSortingInfo(QVariant v)
 {
-	if (v){
-		Version_1_0->sortingInfo = v->Version_1_0;
-		m_sortingInfoQObjectPtr = v;
+	if (v.isValid()){
+		sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList*>();
+		if (itemPtr != nullptr)  Version_1_0->sortingInfo = itemPtr->Version_1_0;
 	}
 	else {
 		Version_1_0->sortingInfo = nullptr;
 	}
+	m_sortingInfoQObjectPtr = v;
 
 	sortingInfoChanged();
 }
@@ -4016,29 +4429,31 @@ void CComplexCollectionFilterObject::createSortingInfo()
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* CComplexCollectionFilterObject::GetFieldsFilter()
+QVariant CComplexCollectionFilterObject::GetFieldsFilter()
 {
 	if (Version_1_0->fieldsFilter.has_value()){
-		if (!m_fieldsFilterQObjectPtr){
-			m_fieldsFilterQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject*>(CreateObject("fieldsFilter"));
-			m_fieldsFilterQObjectPtr->Version_1_0 = Version_1_0->fieldsFilter;
+		if (!m_fieldsFilterQObjectPtr.isValid()){
+			m_fieldsFilterQObjectPtr = CreateObject("fieldsFilter");
+			sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* itemPtr = m_fieldsFilterQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->fieldsFilter;
 		}
 		return m_fieldsFilterQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CComplexCollectionFilterObject::SetFieldsFilter(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* v)
+void CComplexCollectionFilterObject::SetFieldsFilter(QVariant v)
 {
-	if (v){
-		Version_1_0->fieldsFilter = v->Version_1_0;
-		m_fieldsFilterQObjectPtr = v;
+	if (v.isValid()){
+		sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject*>();
+		if (itemPtr != nullptr)  Version_1_0->fieldsFilter = itemPtr->Version_1_0;
 	}
 	else {
 		Version_1_0->fieldsFilter = nullptr;
 	}
+	m_fieldsFilterQObjectPtr = v;
 
 	fieldsFilterChanged();
 }
@@ -4056,29 +4471,31 @@ void CComplexCollectionFilterObject::createFieldsFilter()
 }
 
 
-sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* CComplexCollectionFilterObject::GetTimeFilter()
+QVariant CComplexCollectionFilterObject::GetTimeFilter()
 {
 	if (Version_1_0->timeFilter.has_value()){
-		if (!m_timeFilterQObjectPtr){
-			m_timeFilterQObjectPtr = dynamic_cast<sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject*>(CreateObject("timeFilter"));
-			m_timeFilterQObjectPtr->Version_1_0 = Version_1_0->timeFilter;
+		if (!m_timeFilterQObjectPtr.isValid()){
+			m_timeFilterQObjectPtr = CreateObject("timeFilter");
+			sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* itemPtr = m_timeFilterQObjectPtr.value<sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject*>();
+			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->timeFilter;
 		}
 		return m_timeFilterQObjectPtr;
 	}
 
-	return nullptr;
+	return QVariant();
 }
 
 
-void CComplexCollectionFilterObject::SetTimeFilter(sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* v)
+void CComplexCollectionFilterObject::SetTimeFilter(QVariant v)
 {
-	if (v){
-		Version_1_0->timeFilter = v->Version_1_0;
-		m_timeFilterQObjectPtr = v;
+	if (v.isValid()){
+		sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* itemPtr = v.value<sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject*>();
+		if (itemPtr != nullptr)  Version_1_0->timeFilter = itemPtr->Version_1_0;
 	}
 	else {
 		Version_1_0->timeFilter = nullptr;
 	}
+	m_timeFilterQObjectPtr = v;
 
 	timeFilterChanged();
 }
@@ -4096,25 +4513,26 @@ void CComplexCollectionFilterObject::createTimeFilter()
 }
 
 
-QList<QString> CComplexCollectionFilterObject::GetDistinctFields()
+QVariant CComplexCollectionFilterObject::GetDistinctFields()
 {
 	if (Version_1_0->distinctFields.has_value()){
-		QStringList tempDistinctFieldsList;
+		QList<QString> tempDistinctFieldsList;
 		for (const auto& tempValue: Version_1_0->distinctFields.value()){
-			tempDistinctFieldsList << tempValue;
+			tempDistinctFieldsList << *tempValue;
 		}
-		return tempDistinctFieldsList;
+		return QVariant::fromValue(tempDistinctFieldsList);
 	}
 
-	return QStringList();
+	return QVariant();
 }
 
 
-void CComplexCollectionFilterObject::SetDistinctFields(QList<QString> v)
+void CComplexCollectionFilterObject::SetDistinctFields(QVariant v)
 {
-	Version_1_0->distinctFields = QList<QByteArray>(); 
-	for (const auto& tempValue: v){
-		Version_1_0->distinctFields->append(tempValue.toUtf8());
+	Version_1_0->distinctFields->clear(); 
+	for (const auto& tempValue: v.value<QList<QString>>()){
+		istd::TSharedNullable<QByteArray> value(tempValue.toUtf8());
+		Version_1_0->distinctFields->append(value);
 	}
 
 	distinctFieldsChanged();
@@ -4172,18 +4590,18 @@ QString CComplexCollectionFilterObject::toGraphQL() const
 }
 
 
-QObject* CComplexCollectionFilterObject::CreateObject(const QString& key)
+QVariant CComplexCollectionFilterObject::CreateObject(const QString& key)
 {
 	Q_UNUSED(key);	if (key == "sortingInfo"){
-		return new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList(this);
+		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList(this));
 	}
 	if (key == "fieldsFilter"){
-		return new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject(this);
+		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject(this));
 	}
 	if (key == "timeFilter"){
-		return new sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject(this);
+		return QVariant::fromValue(new sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject(this));
 	}
-	return nullptr;
+	return QVariant();
 }
 
 
@@ -4206,4 +4624,109 @@ QString CComplexCollectionFilterObject::getJSONKeyForProperty(const QString& pro
 }
 
 
+
+
+
+bool CComplexCollectionFilterObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+{
+	return true;
+}
+
+
+int CComplexCollectionFilterObjectList::getItemsCount()
+{
+	return rowCount();
+}
+
+
+QVariantMap CComplexCollectionFilterObjectList::get(int row) const
+{
+	return BaseClass::get(row);
+}
+
+
+void CComplexCollectionFilterObjectList::append(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject* item)
+{
+	BaseClass::append(item);
+}
+
+
+sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList* sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::copyMe()
+{
+	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList* retVal = new sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList();
+	BaseClass::fromMe(retVal);
+	return retVal;
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::toJson()
+{
+	return BaseClass::toJson();
+}
+
+
+QString sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::toGraphQL()
+{
+	return BaseClass::toGraphQL();
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::addElement(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject* item)
+{
+	append(item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::removeElement(int index)
+{
+	remove(index);
+}
+
+
+bool sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::isEqualWithModel(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList* otherModelPtr)
+{
+	return BaseClass::isEqualWithModel(otherModelPtr);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::insert(int index, sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject* item)
+{
+	return BaseClass::insert(index, item);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::remove(int index)
+{
+	return BaseClass::remove(index);
+}
+
+
+void sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::clear()
+{
+	return BaseClass::clear();
+}
+
+
+QVariant sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList::getData(const QString& nameId, int index)
+{
+	QVariant item = GetOrCreateCachedObject(index);
+	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject* itemPtr = item.value<sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject*>();
+	if (itemPtr == nullptr) return QVariant();
+	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
+		return QVariant::fromValue(item);
+	}
+		if (nameId == "m_sortingInfo"){
+			return itemPtr->GetSortingInfo();
+		}
+		if (nameId == "m_fieldsFilter"){
+			return itemPtr->GetFieldsFilter();
+		}
+		if (nameId == "m_timeFilter"){
+			return itemPtr->GetTimeFilter();
+		}
+		if (nameId == "m_distinctFields"){
+			return QVariant::fromValue(Version_1_0.GetPtr()->at(index)->distinctFields.value());
+		}
+	return QVariant();
+}
 } // namespace sdl::imtbase::ComplexCollectionFilter

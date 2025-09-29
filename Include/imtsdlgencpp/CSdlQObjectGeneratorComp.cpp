@@ -257,7 +257,7 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassListFile(QTextStream& stream, c
 
 	// get method begin
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QVariantMap get(int row) const;");
+	stream << QStringLiteral("Q_INVOKABLE QVariantMap get(int row) const override;");
 	FeedStream(stream, 1, false);
 
 	// append method
@@ -305,17 +305,17 @@ bool CSdlQObjectGeneratorComp::ProcessHeaderClassListFile(QTextStream& stream, c
 
 	// remove method
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void remove(int index);");
+	stream << QStringLiteral("Q_INVOKABLE void remove(int index) override;");
 	FeedStream(stream, 1, false);
 
 	// clear method begin
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE void clear();");
+	stream << QStringLiteral("Q_INVOKABLE void clear() override;");
 	FeedStream(stream, 1, false);
 
 
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("Q_INVOKABLE QVariant getData(const QString& nameId, int index);");
+	stream << QStringLiteral("Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;");
 	FeedStream(stream, 1, false);
 
 	FeedStreamHorizontally(stream);
