@@ -4,12 +4,51 @@ const path = require('path')
 const parser = require('./parser')
 const { SourceMapGenerator, SourceNode } = require('source-map-generator')
 const UglifyJS = require("uglify-js")
+const { Command, Option } = require('commander')
 
 // for compatibility with web
 global.window = {
     addEventListener: function () { }
     
 }
+
+const program = new Command()
+
+program.addOption(new Option('-c, --config <path>', 'config file path'))
+    .addOption(new Option('-o, --output <path>', 'output dir path'))
+    .addOption(new Option('-e, --entry <path>', 'entry qml file path'))
+    .addOption(new Option('-i, --icon <path>', 'icon file path for compile mode html'))
+    .addOption(new Option('-n, --name <string>', 'application name').default(''))
+    .addOption(new Option('-r, --root <string>', 'root path').default('/'))
+    .addOption(new Option('-m, --mode <string>', 'compile mode').choices(['js', 'html']))
+
+program.parse(process.argv)
+
+const options = program.opts()
+
+
+if(options.mode === 'html'){
+    let icon = `<link rel="${options.name} icon" type="image" href="${options.icon}">`
+    let html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${options.name}</title>
+        ${'icon' in options ? icon : ''}
+        <script src="${options.name}.js"></script>
+    </head>
+    <body>
+        
+    </body>
+    </html>
+    `
+
+    fs.writeFileSync(options.output + `/${options.name}.html`, html)
+    return
+}
+
 
 const BaseObject = require('../QtBase/BaseObject')
 const Qt = require('../Qt/Qt')
@@ -20,14 +59,15 @@ const QtWebSockets = require('../QtWebSockets/QtWebSockets')
 const QtPositioning = require('../QtPositioning/QtPositioning')
 const QtLocation = require('../QtLocation/QtLocation')
 
+const env = process.env
+
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\Qml\\web\\imtcore.json'//process.argv.slice(2)[0]
-// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\lisa.json'//process.argv.slice(2)[0]
+// const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\Lisa\\Include\\lisaqml\\lisa.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\agentino.json'//process.argv.slice(2)[0]
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\test\\jq.json'
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\Rosa\\rosa.json'
-const argv = process.argv
-const env = process.env
-const configFilePath = argv.slice(2)[0]
+
+const configFilePath = options.config
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 
 function envFill(source) {
@@ -843,7 +883,7 @@ class Instruction {
                             this.prepare(tree[2][i][0], stat)
                             stat.value.add(`:`)
                             this.prepare(tree[2][i][1], stat)
-
+                            stat.value.add(`break;`)
                         }
 
                     }
@@ -1754,7 +1794,7 @@ for (let dirPath of config.dirs) {
 }
 
 console.log(`JQ: preparation of single files`)
-for (let fileName of getFiles(path.resolve(configDirPath, config.base))) {
+for (let fileName of getFiles(options.entry.replaceAll(/.\w+.qml/g, ''))) {
     let qmlFile = new QmlFile(fileName)
     SingleFiles[fileName.split(/[\/\\]+/g).pop().replace('.qml', '')] = qmlFile
 }
@@ -1854,24 +1894,27 @@ while (compiledFiles.length) {
 }
 
 
-if (config.entry) {
-    fullCode.add(`window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='${config.rootPath}';${config.entry.replaceAll('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)
+if(options.mode === 'js'){
+    if (options.entry) {
+        fullCode.add(`window.addEventListener('load', ()=>{console.time('build');JQApplication.rootPath='${options.root}';${options.entry.split(/[\/\\]+/g).pop().replace('.qml', '')}.create(JQApplication.root);console.timeEnd('build')})`)
+    }
+
+    if (options.output) {
+        let output = options.output + `/${options.name}.js`
+
+        fullCode.add(`//# sourceMappingURL=${output + '.map'}`)
+        let result = fullCode.join('\n').toStringWithSourceMap({ file: output })
+
+        // fs.writeFileSync(output, result.code)
+
+        // fs.writeFileSync(output+'.map', result.map.toString())
+
+
+
+        let resultCode = UglifyJS.minify(result.code, {compress: {}}).code
+        fs.writeFileSync(output, resultCode)
+
+        // fs.writeFileSync(path.resolve(configDirPath, config.output)+'.map', result.map.toString())
+    }
 }
 
-if (config.output) {
-    fullCode.add(`//# sourceMappingURL=${path.resolve(configDirPath, config.output)+'.map'}`)
-    let result = fullCode.join('\n').toStringWithSourceMap({ file: path.resolve(configDirPath, config.output) })
-
-    fs.writeFileSync(path.resolve(configDirPath, config.output), result.code)
-
-    fs.writeFileSync(path.resolve(configDirPath, config.output)+'.map', result.map.toString())
-
-
-
-    // let resultCode = UglifyJS.minify(result.code, {compress: {}}).code
-
-
-    // fs.writeFileSync(path.resolve(configDirPath, config.output), resultCode)
-
-    // // fs.writeFileSync(path.resolve(configDirPath, config.output)+'.map', result.map.toString())
-}

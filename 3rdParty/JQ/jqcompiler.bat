@@ -1,1 +1,1 @@
-node %~dp0\compiler\compiler.js %1
+node %~dp0\compiler\compiler.js %*
