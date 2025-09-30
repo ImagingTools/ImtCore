@@ -57,8 +57,6 @@ ControlBase {
 
     Keys.onPressed: {
         if (containerTextField.activeFocus){
-            console.log("CustomTextField onPressed");
-
             if (event.key == Qt.Key_Escape){
                 console.log("Key_Escape");
                 containerTextField.cancelled();

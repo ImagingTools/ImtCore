@@ -238,7 +238,7 @@ QtObject {
 
 			let viewComp = getDocumentViewComp(documentTypeId);
 			if (!viewComp){
-				console.error("Unable to create document with type-ID ''. Error: View is unregistered")
+				console.error("Unable to create view for document with type-ID '"+documentTypeId+"'")
 				return null
 			}
 

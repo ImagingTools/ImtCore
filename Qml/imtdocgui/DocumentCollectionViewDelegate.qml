@@ -57,7 +57,7 @@ CollectionViewCommandsDelegateBase {
 			if (documentViewsComp.length > i){
 				let documentViewComp = documentViewsComp[i];
 				if (!documentManager.registerDocumentView(documentTypeId, documentViewComp)){
-					console.error("Unable to register view for document type ID: ", documentTypeId)
+					console.error("Unable to register view for document type ID: '" +documentTypeId+"'")
 				}
 			}
 
