@@ -122,6 +122,9 @@
                     <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Groups"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="CollectionName" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Groups"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -221,69 +224,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SerializableGroupCollectionController" PackageId="ImtServerGqlPck" ComponentId="SerializableObjectCollectionController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="GroupItem"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CollectionObjectFactory" Type="Factory[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>UserGroupInfo</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GroupInfo</Value>
-                                <Value>GroupDataMetaInfo</Value>
-                                <Value>GroupMetaInfo</Value>
-                                <Value>GroupList</Value>
-                                <Value>GroupView</Value>
-                                <Value>GroupRemove</Value>
-                                <Value>GroupSetDescription</Value>
-                                <Value>GroupAdd</Value>
-                                <Value>GroupUpdate</Value>
-                                <Value>GroupItem</Value>
-                                <Value>GroupCount</Value>
-                                <Value>GroupIds</Value>
-                                <Value>GroupSubCollection</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GroupPermissions"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserGroupRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Group</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CheckPermissionOr"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="UserGroupChangeGenerator" PackageId="ImtAuthPck" ComponentId="UserGroupChangeGenerator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -318,31 +258,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserProvider" Type="Reference" ExportId="UserInfoProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserGroupProvider" PackageId="ImtServerGqlPck" ComponentId="CollectionObjectProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetUserGroupInfo</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserGroupRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

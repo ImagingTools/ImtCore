@@ -155,4 +155,11 @@ type ParamsSet {
 	parameters: [Parameter]!
 }
 
+type ObjectLink {
+	id: ID
+	typeId: ID
+	name: String
+	url: UrlParam
+}
+
 

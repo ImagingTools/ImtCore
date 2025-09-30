@@ -62,7 +62,7 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	QString targetSource = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_SOURCE).toString();
 
 	if (requestInfo.items.isTargetTypeLinkRequested){
-		sdl::imtbase::ImtCollection::CObjectLink::V1_0 objectLink;
+		sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 objectLink;
 		objectLink.id = targetTypeId;
 		objectLink.typeId = targetTypeId;
 		objectLink.name = targetTypeName;
@@ -78,7 +78,7 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isTargetLinkRequested){
-		sdl::imtbase::ImtCollection::CObjectLink::V1_0 objectLink;
+		sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 objectLink;
 		objectLink.id = targetId;
 		objectLink.name = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_TARGET_NAME).toString();
 		objectLink.typeId = targetTypeId;
@@ -102,7 +102,7 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 	}
 
 	if (requestInfo.items.isUserLinkRequested){
-		sdl::imtbase::ImtCollection::CObjectLink::V1_0 objectLink;
+		sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 objectLink;
 		objectLink.id = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_USER_ID).toString().toUtf8();
 		objectLink.typeId = QByteArrayLiteral("User");
 		objectLink.name = metaInfoPtr->GetMetaInfo(imtauth::IUserRecentAction::MIT_USER_NAME).toString();

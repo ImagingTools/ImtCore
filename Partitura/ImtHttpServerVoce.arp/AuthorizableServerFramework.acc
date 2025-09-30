@@ -37,7 +37,7 @@
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserActionCollectionController</Value>
+                                <Value>UserActionController</Value>
                                 <Value>PumaClientEngine</Value>
                             </Values>
                         </Data>
@@ -134,32 +134,14 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserActionCollectionChangeNotifier" PackageId="ImtServerGqlPck" ComponentId="ObjectCollectionChangeNotifier">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserActions"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserActionSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserActionCollectionController" PackageId="ImtAuthVoce" ComponentId="UserActionCollectionController">
+        <Element Id="UserActionController" PackageId="ImtAuthVoce" ComponentId="UserActionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DatabaseEngine"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -170,41 +152,14 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UserActionCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserActionSqlRepository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserActionManager" PackageId="ImtAuthPck" ComponentId="UserActionManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="UserActionCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserActionSqlRepository"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserActionSqlRepository" PackageId="ImtAuthVoce" ComponentId="UserActionSqlRepository">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="PumaClientEngine/UserRemoteRepository"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketRequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServerFramework"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -217,7 +172,7 @@
                             <Values>
                                 <Value>SlaveSubscriberController</Value>
                                 <Value>PumaClientEngine</Value>
-                                <Value>UserActionCollectionChangeNotifier</Value>
+                                <Value>UserActionController/UserActionCollectionChangeNotifier</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -260,8 +215,8 @@
         <Component ExportedId="HttpServerFramework" ComponentId="HttpServerFramework"/>
         <Component ExportedId="PumaGQLClientEngine" ComponentId="PumaClientEngine"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
-        <Component ExportedId="UserActionManager" ComponentId="UserActionManager"/>
-        <Component ExportedId="UserActionSqlRepository" ComponentId="UserActionSqlRepository"/>
+        <Component ExportedId="UserActionManager" ComponentId="UserActionController/UserActionManager"/>
+        <Component ExportedId="UserActionSqlRepository" ComponentId="UserActionController/UserActionSqlRepository"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="PumaClientEngine/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaClientEngine/UserSessionRemoteRepository"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
