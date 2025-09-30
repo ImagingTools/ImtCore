@@ -5,6 +5,7 @@
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
+#include <imtbase/ISearchController.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/IOperationContext.h>
@@ -34,6 +35,7 @@ namespace imtservergql
 
 class CObjectCollectionControllerAttrCompBase: 
 			virtual public imtgql::IGqlRequestExtractor,
+			virtual public imtbase::ISearchController,
 			public sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase
 {
 public:
@@ -41,6 +43,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CObjectCollectionControllerAttrCompBase)
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
+		I_REGISTER_INTERFACE(imtbase::ISearchController)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection-ID", true, "");
 		I_ASSIGN(m_collectionNameAttrPtr, "CollectionName", "Collection Name", true, "");
 	I_END_COMPONENT
@@ -82,6 +85,11 @@ public:
 	};
 
 	virtual QMap<int, QByteArray> GetSupportedCommandIds() const;
+
+	// reimplemented (ISearchController)
+	virtual QByteArray GetControllerId() const override;
+	virtual QString GetControllerName() const override;
+	virtual const imtbase::ISearchResults* Search(const QString& text) const override;
 
 	// reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
 	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(

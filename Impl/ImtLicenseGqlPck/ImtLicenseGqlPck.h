@@ -6,7 +6,6 @@
 #include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
-#include <imtservergql/TObjectCollectionControllerSearchCompWrap.h>
 #include <imtlicgql/CProductCollectionControllerComp.h>
 #include <imtlicgql/CProductControllerComp.h>
 #include <imtlicgql/CLicenseControllerComp.h>
@@ -31,14 +30,14 @@ namespace ImtLicenseGqlPck
 {
 
 
-typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CProductCollectionControllerComp> ProductCollectionController;
+typedef imtlicgql::CProductCollectionControllerComp ProductCollectionController;
 typedef imtlicgql::CProductControllerComp ProductController;
 typedef imtlicgql::CLicenseControllerComp LicenseController;
-typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CLicenseCollectionControllerComp> LicenseCollectionController;
+typedef imtlicgql::CLicenseCollectionControllerComp LicenseCollectionController;
 typedef imtlicgql::CAccountControllerComp AccountController;
 typedef imtlicgql::CProductPermissionsControllerComp ProductPermissionController;
 typedef imtlicgql::CFeatureControllerComp FeatureController;
-typedef imtservergql::TObjectCollectionControllerSearchCompWrap<imtlicgql::CFeatureCollectionControllerComp> FeatureCollectionController;
+typedef imtlicgql::CFeatureCollectionControllerComp FeatureCollectionController;
 typedef imtlicgql::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
 typedef imtlicgql::CProductInfoProviderComp ProductInfoProvider;
 typedef imtlicgql::CPermissionsProviderComp PermissionsProvider;

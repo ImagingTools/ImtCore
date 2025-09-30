@@ -19,7 +19,7 @@ Item {
 	}
 	
 	function updateSearch(text){
-		if (text == ""){
+		if (text === ""){
 			searchResultsView.searchResults = null;
 			return;
 		}
@@ -44,7 +44,19 @@ Item {
 					return;
 				}
 
-				MainDocumentManager.openDocument(resultItem.m_id, item.m_contextId, item.m_contextTypeId);
+				let objectLink = item.m_objectLink
+				if (!objectLink){
+					console.error("Unable to navigate to item. Error: Object Link is invalid")
+					return
+				}
+
+				let url = objectLink.m_url
+				if (!url){
+					console.error("Unable to navigate to item. Error: URL is invalid")
+					return
+				}
+				
+				NavigationController.navigate(url.m_path)
 			}
 		}
 	}

@@ -18,7 +18,6 @@
 #include <imtdb/CSqlStructureDelegateComp.h>
 #include <imtdb/CSqliteJsonDatabaseDelegateComp.h>
 #include <imtdb/TMessageDatabaseDelegateComp.h>
-#include <imtbase/TObjectCollectionSearchControllerCompWrap.h>
 #include <imtdb/CMigrationControllerComp.h>
 #include <imtdb/CCompositeMigrationControllerComp.h>
 #include <imtdb/CObjectCollectionMigrationControllerComp.h>
@@ -39,7 +38,6 @@ namespace ImtDatabasePck
 
 typedef imtdb::CDatabaseEngineComp SqlDatabaseEngine;
 typedef icomp::TModelCompWrap<imtdb::CSqlDatabaseObjectCollectionComp> SqlDatabaseCollection;
-typedef imtbase::TObjectCollectionSearchControllerCompWrap<SqlDatabaseCollection> SqlDatabaseCollectionSearchController;
 typedef icomp::TModelCompWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAccessSettings;
 typedef imtdb::CSqlDatabaseDocumentDelegateLegacyComp SqlDatabaseDocumentDelegateLegacy;
 typedef imtdb::CSqlDatabaseDocumentDelegateComp SqlDatabaseDocumentDelegate;

@@ -22,6 +22,7 @@
 #include <iqt/iqt.h>
 
 // ImtCore includes
+#include <imtbase/CSearchResults.h>
 #include <imtbase/IIdentifiable.h>
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
@@ -32,6 +33,7 @@
 #include <imtbase/COperationDescription.h>
 #include <imtbase/IRevisionController.h>
 #include <imtgql/imtgql.h>
+#include <imtgql/IGqlRequestProvider.h>
 #include <imtcol/CComplexCollectionFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilter.h>
@@ -51,6 +53,149 @@ QMap<int, QByteArray> CObjectCollectionControllerCompBase::GetSupportedCommandId
 	static QMap<int, QByteArray> retVal;
 
 	return retVal;
+}
+
+
+// reimplemented (ISearchController)
+
+QByteArray CObjectCollectionControllerCompBase::GetControllerId() const
+{
+	if (m_collectionIdAttrPtr.IsValid()){
+		return *m_collectionIdAttrPtr;
+	}
+
+	return QByteArray();
+}
+
+
+QString CObjectCollectionControllerCompBase::GetControllerName() const
+{
+	if (m_collectionNameAttrPtr.IsValid()){
+		return *m_collectionNameAttrPtr;
+	}
+
+	return QString();
+}
+
+
+const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const QString& text) const
+{
+	if (!m_headersProviderCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	QMap<int, QByteArray> commandIds = GetSupportedCommandIds();
+	QByteArray listCommandId = commandIds.value(OT_LIST);
+	if (listCommandId.isEmpty()){
+		Q_ASSERT(false);
+		return nullptr;
+	}
+
+	imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_QUERY, listCommandId);
+
+	imtgql::IGqlRequestProvider* gqlRequestProviderPtr = QueryInterface<imtgql::IGqlRequestProvider>(const_cast<CObjectCollectionControllerCompBase*>(this));
+	if (gqlRequestProviderPtr != nullptr){
+		const imtgql::IGqlRequest* gqlRequestPtr = gqlRequestProviderPtr->GetGqlRequest();
+		if (gqlRequestPtr != nullptr){
+			istd::TDelPtr<imtgql::IGqlContext> gqlContextPtr;
+			gqlContextPtr.SetCastedOrRemove(gqlRequestPtr->GetRequestContext()->CloneMe());
+			if (!gqlContextPtr.IsValid()){
+				return nullptr;
+			}
+
+			gqlRequest.SetGqlContext(gqlContextPtr.PopPtr());
+		}
+	}
+
+	QString errorMessage;
+	bool ok = CheckPermissions(gqlRequest, errorMessage);
+	if (!ok){
+		return nullptr;
+	}
+
+	typename imtcol::ICollectionHeadersProvider::HeaderIds headerIds = m_headersProviderCompPtr->GetHeaderIds();
+
+	sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilter;
+
+	sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0 groupFilter;
+	groupFilter.logicalOperation = sdl::imtbase::ComplexCollectionFilter::LogicalOperation::Or;
+
+	imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0> fieldList;
+	for (const QByteArray& headerId : headerIds){
+		typename imtcol::ICollectionHeadersProvider::HeaderInfo headerInfo;
+		if (m_headersProviderCompPtr->GetHeaderInfo(headerId, headerInfo)){
+			if (headerInfo.filterable){
+				sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0 fieldFilter;
+				fieldFilter.fieldId = headerInfo.headerId;
+				fieldFilter.filterValue = text;
+				fieldFilter.filterValueType = sdl::imtbase::ComplexCollectionFilter::ValueType::String;
+
+				imtsdl::TElementList<sdl::imtbase::ComplexCollectionFilter::FilterOperation> filterOperations;
+				filterOperations << sdl::imtbase::ComplexCollectionFilter::FilterOperation::Contains;
+				fieldFilter.filterOperations = filterOperations;
+
+				fieldList << fieldFilter;
+			}
+		}
+	}
+
+	groupFilter.fieldFilters = fieldList;
+	complexFilter.fieldsFilter = groupFilter;
+
+	imtgql::CGqlParamObject input;
+	imtgql::CGqlParamObject viewParams;
+	viewParams.InsertParam("offset", 0);
+	viewParams.InsertParam("count", -1);
+
+	imtgql::CGqlParamObject complexFilterGqlOblect;
+	if (complexFilter.WriteToGraphQlObject(complexFilterGqlOblect)){
+		viewParams.InsertParam("filterModel", complexFilterGqlOblect);
+	}
+
+	input.InsertParam("viewParams", viewParams);
+	gqlRequest.AddParam("input", input);
+
+	imtgql::CGqlFieldObject items;
+	items.InsertField("id");
+	items.InsertField("name");
+	items.InsertField("typeId");
+	items.InsertField("description");
+	gqlRequest.AddField("items", items);
+
+	istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = ListObjects(gqlRequest, errorMessage);
+	if (!resultModelPtr.IsValid()){
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* dataModelPtr = resultModelPtr->GetTreeItemModel("data");
+	if (dataModelPtr == nullptr){
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->GetTreeItemModel("items");
+	if (itemsModelPtr == nullptr){
+		return nullptr;
+	}
+
+	imtbase::CSearchResults* searchResultsPtr = new imtbase::CSearchResults();
+	for (int i = 0; i < itemsModelPtr->GetItemsCount(); i++){
+		imtbase::ISearchResults::SearchResult searchResult;
+
+		searchResult.contextId = itemsModelPtr->GetData("id", i).toByteArray();
+		searchResult.resultName = itemsModelPtr->GetData("name", i).toString();
+		searchResult.resultDescription = itemsModelPtr->GetData("description", i).toString();
+		searchResult.contextTypeId = itemsModelPtr->GetData("typeId", i).toByteArray();
+
+		QUrl url;
+		url.setScheme("applink");
+
+		url.setPath(*m_collectionIdAttrPtr + "/" + searchResult.contextTypeId + "/" + searchResult.contextId);
+		searchResult.url = url;
+
+		searchResultsPtr->AddSearchResult(searchResult);
+	}
+
+	return searchResultsPtr;
 }
 
 

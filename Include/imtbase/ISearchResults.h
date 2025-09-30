@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QUrl>
+
 // ACF includes
 #include <iser/ISerializable.h>
 
@@ -18,12 +21,14 @@ public:
 		QByteArray contextTypeId;
 		QString resultName;
 		QString resultDescription;
+		QUrl url;
 
 		bool operator == (const SearchResult& other) const
 		{
 			return (contextId == other.contextId) &&
 					(contextTypeId == other.contextTypeId) &&
 					(resultName == other.resultName) &&
+					(url == other.url) &&
 					(resultDescription == other.resultDescription);
 		}
 	};

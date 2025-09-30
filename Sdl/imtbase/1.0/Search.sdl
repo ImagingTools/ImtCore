@@ -4,6 +4,10 @@ schema {
 	query: Query
 }
 
+import {
+	"../../imtbase/1.0/ImtBaseTypes.sdl"
+}
+
 input SearchInput
 {
 	text: String
@@ -11,10 +15,11 @@ input SearchInput
 
 type ResultItem
 {
-	contextId: ID
-	contextTypeId: ID
+	contextId: ID#???
+	contextTypeId: ID#???
 	resultName: String
 	resultDescription: String
+	objectLink: ObjectLink
 }
 
 type SearchResult

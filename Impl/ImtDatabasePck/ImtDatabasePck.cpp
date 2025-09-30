@@ -26,11 +26,6 @@ I_EXPORT_COMPONENT(
 			"SQL Database");
 
 I_EXPORT_COMPONENT(
-			SqlDatabaseCollectionSearchController,
-			"SQL-based object collection",
-			"Sql Database Collection Search Controller")
-
-I_EXPORT_COMPONENT(
 			DatabaseAccessSettings,
 			"Settings for database access",
 			"Database User Access Login Settings Parameters");

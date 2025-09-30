@@ -66,6 +66,13 @@ sdl::imtbase::Search::CSearchResults CGqlSearchControllerComp::OnSearch(
 						itemRepresentation.contextId = searchResult.contextId;
 						itemRepresentation.contextTypeId = searchResult.contextTypeId;
 						itemRepresentation.resultDescription = searchResult.resultDescription;
+						
+						sdl::imtbase::ImtBaseTypes::CObjectLink::V1_0 objectLink;
+						sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0 urlParam;
+						urlParam.scheme = "applink";
+						urlParam.path = searchResult.url.path();
+						objectLink.url = urlParam;
+						itemRepresentation.objectLink = objectLink;
 
 						resultItemList << itemRepresentation;
 					}
