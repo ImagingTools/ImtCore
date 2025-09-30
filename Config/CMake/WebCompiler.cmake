@@ -248,12 +248,22 @@ function(jq_compile_web)
 
 	add_custom_command(
 		OUTPUT
-		${buildwebdir}/Resources/jqml.${resname}.js
+		${buildwebdir}/Resources/index.html
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
-		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQML2/preparesources.py ${webdirs}
 		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQ
-		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js ${inputjs}
+		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js -n ${resname} -i ${appicon} -o ${buildwebdir}/Resources/ -m html
+		DEPENDS ${DEPEND_LIST} ${sdldependency}
+		COMMENT "Create html for ${PROJECT_NAME}"
+		VERBATIM
+	)
+
+	add_custom_command(
+		OUTPUT
+		${buildwebdir}/Resources/jqml.${resname}.js
+		POST_BUILD
+		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQ
+		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js -c ${inputjs} -n ${resname} -o ${buildwebdir}/Resources/ -r ${dataroot} -e ${startqml} -m js
 		DEPENDS ${DEPEND_LIST} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 		VERBATIM
