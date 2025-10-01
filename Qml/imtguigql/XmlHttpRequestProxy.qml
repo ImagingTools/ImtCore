@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
+import imtauthgui 1.0
 
 
 /*
@@ -33,8 +34,8 @@ QtObject {
 				var originalOnReadyStateChange = xhr.onreadystatechange;
 				var gqlRequestRef = xhr.gqlRequest;
 
-				if (context && context.appId) {
-					xhr.setRequestHeader("productId", context.appId);
+				if (AuthorizationController.productId) {
+					xhr.setRequestHeader("productId", AuthorizationController.productId);
 				}
 
 				xhr.onreadystatechange = function(){

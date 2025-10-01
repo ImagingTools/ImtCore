@@ -136,11 +136,7 @@ QtObject {
 		localStorage.removeItem("productId");
 		localStorage.removeItem("permissions");
 	}
-	
-	function getHeaders(){
-		return {"productId": root.productId}
-	}
-	
+
 	function updateSuperuserModel(){
 		superuserProvider.superuserExists();
 	}
