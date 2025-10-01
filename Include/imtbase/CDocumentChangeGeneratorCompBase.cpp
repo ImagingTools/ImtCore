@@ -54,14 +54,9 @@ void CDocumentChangeGeneratorCompBase::GenerateChanges(
 
 bool CDocumentChangeGeneratorCompBase::IsUuid(const QByteArray& data) const
 {
-	if (data.size() == 16){
-		QUuid uuid = QUuid::fromRfc4122(data);
-		return !uuid.isNull();
-	}
-
-	if (data.size() == 36){
-		QString str = QString::fromUtf8(data);
-		QUuid uuid = QUuid(str);
+	if (data.size() == 36 || data.size() == 38){
+		const QString str = QString::fromLatin1(data);
+		QUuid uuid(str);
 		return !uuid.isNull();
 	}
 

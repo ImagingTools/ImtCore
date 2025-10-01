@@ -322,7 +322,7 @@ private:
 				const QByteArray& objectId,
 				const QByteArray& objectTypeId,
 				const QByteArray& actionTypeId,
-				const imtbase::IOperationContext* operationContextPtr) const;
+				const imtgql::CGqlRequest& gqlRequest) const;
 
 protected:
 	QMap<QByteArray, QByteArray> m_fieldReplacementMap;

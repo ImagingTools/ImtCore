@@ -259,7 +259,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserCollectionControlle
 		objectId = *arguments.input.Version_1_0->elementId;
 	}
 
-	QByteArray productId = gqlRequest.GetHeader("productId");
+	QByteArray productId = gqlRequest.GetHeader("productid");
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){

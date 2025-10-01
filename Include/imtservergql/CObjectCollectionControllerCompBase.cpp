@@ -32,6 +32,7 @@
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
 #include <imtbase/IRevisionController.h>
+#include <imtauth/CUserInfo.h>
 #include <imtgql/imtgql.h>
 #include <imtgql/IGqlRequestProvider.h>
 #include <imtcol/CComplexCollectionFilterRepresentationController.h>
@@ -323,7 +324,7 @@ sdl::imtbase::ImtCollection::CRemoveElementsPayload CObjectCollectionControllerC
 
 	bool ok = m_objectCollectionCompPtr->RemoveElements(elementIds, operationContextPtr.GetPtr());
 	if (ok){
-		CreateUserActionLog(elementIds[0], typeId, "Delete", operationContextPtr.GetPtr());
+		CreateUserActionLog(elementIds[0], typeId, "Delete", gqlRequest);
 		OnAfterRemoveElements(elementIds, gqlRequest);
 	}
 
@@ -373,7 +374,7 @@ sdl::imtbase::ImtCollection::CRemoveElementSetPayload CObjectCollectionControlle
 
 	bool ok = m_objectCollectionCompPtr->RemoveElementSet(&filterParams, operationContextPtr.GetPtr());
 	if (ok){
-		CreateUserActionLog(elementIds[0], typeId, "Delete", operationContextPtr.GetPtr());
+		CreateUserActionLog(elementIds[0], typeId, "Delete", gqlRequest);
 		OnAfterRemoveElements(elementIds, gqlRequest);
 	}
 
@@ -1054,7 +1055,7 @@ sdl::imtbase::ImtCollection::CInsertNewObjectPayload CObjectCollectionController
 		return sdl::imtbase::ImtCollection::CInsertNewObjectPayload();
 	}
 
-	CreateUserActionLog(objectId, typeId, "Create", operationContextPtr.GetPtr());
+	CreateUserActionLog(objectId, typeId, "Create", gqlRequest);
 	response.objectId = objectId;
 
 	sdl::imtbase::ImtCollection::CInsertNewObjectPayload retVal;
@@ -1066,7 +1067,7 @@ sdl::imtbase::ImtCollection::CInsertNewObjectPayload CObjectCollectionController
 
 sdl::imtbase::ImtCollection::CSetObjectDataPayload CObjectCollectionControllerCompBase::OnSetObjectData(
 			const sdl::imtbase::ImtCollection::CSetObjectDataGqlRequest& setObjectDataRequest,
-			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CSetObjectDataPayload::V1_0 response;
@@ -1110,7 +1111,7 @@ sdl::imtbase::ImtCollection::CSetObjectDataPayload CObjectCollectionControllerCo
 
 	bool ok = m_objectCollectionCompPtr->SetObjectData(objectId, *objectPtr.GetPtr(), istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr());
 	if (ok){
-		CreateUserActionLog(objectId, typeId, "Update", operationContextPtr.GetPtr());
+		CreateUserActionLog(objectId, typeId, "Update", gqlRequest);
 	}
 	
 	response.success = ok;
@@ -1674,7 +1675,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		return nullptr;
 	}
 
-	CreateUserActionLog(objectId, typeId, "Create", operationContextPtr.GetPtr());
+	CreateUserActionLog(objectId, typeId, "Create", gqlRequest);
 
 	sdl::imtbase::ImtCollection::CAddedNotificationPayload::V1_0 response;
 	response.id = newObjectId;
@@ -1754,7 +1755,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	}
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-	CreateUserActionLog(objectId, typeId, "Update", operationContextPtr.GetPtr());
+	CreateUserActionLog(objectId, typeId, "Update", gqlRequest);
 
 	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload::V1_0 response;
 	response.id = objectId;
@@ -2893,17 +2894,13 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 			const QByteArray& objectId,
 			const QByteArray& objectTypeId,
 			const QByteArray& actionTypeId,
-			const imtbase::IOperationContext* operationContextPtr) const
+			const imtgql::CGqlRequest& gqlRequest) const
 {
 	if (!m_userActionManagerCompPtr.IsValid()){
 		return false;
 	}
 
 	if (!m_objectCollectionCompPtr.IsValid()){
-		return false;
-	}
-
-	if (operationContextPtr == nullptr){
 		return false;
 	}
 
@@ -2958,10 +2955,15 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 		actionTypeInfo.description = QT_TR_NOOP(QStringLiteral("Objects was deleted"));
 	}
 
-	imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContextPtr->GetOperationOwnerId();
 	imtauth::IUserRecentAction::UserInfo userInfo;
-	userInfo.id = objectInfo.id;
-	userInfo.name = objectInfo.name;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
+		if (userInfoPtr != nullptr){
+			userInfo.id = userInfoPtr->GetObjectUuid();
+			userInfo.name = userInfoPtr->GetName();
+		}
+	}
 
 	return m_userActionManagerCompPtr->CreateUserAction(userInfo, actionTypeInfo, targetInfo);
 }
