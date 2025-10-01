@@ -59,7 +59,7 @@ Item {
 				continue;
 			}
 
-			if (!allElements[j].element["m_visible"]){
+			if (allElements[j].priority === -1){
 				return true;
 			}
 		}
@@ -77,7 +77,7 @@ Item {
 		for (let i = 0; i < priorityElements.length; i++) {
 			let item = priorityElements[i];
 			if (item.element) {
-				item.element.m_visible = false;
+				item.hidden = true
 			}
 		}
 
@@ -91,9 +91,10 @@ Item {
 			let projectedWidth = totalWidth > 0 ? totalWidth + spacing + elementWidth : elementWidth;
 			
 			if (projectedWidth <= maxWidth) {
-				item.element.m_visible = true;
+				item.hidden = false
 				totalWidth = projectedWidth;
-			} else {
+			}
+			else {
 				break;
 			}
 		}
@@ -108,11 +109,27 @@ Item {
 			id: repeater;
 			delegate: Component { Button {
 					id: button;
-					
+
 					Connections {
 						target: model.item
 						function onModelChanged(){
 							button.checked = model.item.m_toggled
+							
+							button.checkHidden()
+						}
+					}
+
+					property bool hidden: false
+					onHiddenChanged: {
+						checkHidden()
+					}
+
+					function checkHidden(){
+						if (hidden){
+							button.visible = false
+						}
+						else{
+							button.visible = model.item.m_visible
 						}
 					}
 
@@ -147,8 +164,9 @@ Item {
 					property int priority: element ? element.m_priority : 0;
 					property int maxWidth: -1;
 					
-					visible: !element || priority < 0 ? false : element.m_visible;
-					
+					// visible: !element || priority < 0 ? false : element.m_visible;
+					visible: !hidden
+
 					onClicked: {
 						let params = {}
 						params["x"] = mouseArea.mouseX

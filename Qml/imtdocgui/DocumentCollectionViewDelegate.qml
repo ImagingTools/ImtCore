@@ -41,9 +41,17 @@ CollectionViewCommandsDelegateBase {
 		}
 	}
 
-	onCollectionViewChanged: {
-		if (collectionView && collectionView.dataController){
-			collectionView.dataController.removed.connect(internal.onRemoved);
+	Connections {
+		target: collectionViewCommandsDelegateBase.collectionView && collectionViewCommandsDelegateBase.collectionView.dataController ? collectionViewCommandsDelegateBase.collectionView.dataController : undefined
+		function onRemoved(objectIds){
+			if (collectionViewCommandsDelegateBase.documentManager){
+				for (let i = 0; i < objectIds.length; ++i){
+					let index = collectionViewCommandsDelegateBase.documentManager.getDocumentIndexByDocumentId(objectIds[i])
+					if (index >= 0){
+						collectionViewCommandsDelegateBase.documentManager.closeDocument(objectIds[i], true)
+					}
+				}
+			}
 		}
 	}
 
@@ -85,19 +93,6 @@ CollectionViewCommandsDelegateBase {
 
 	function getHeaders(){
 		return {};
-	}
-
-	QtObject {
-		id: internal;
-
-		function onRemoved(objectId){
-			if (collectionViewCommandsDelegateBase.documentManager){
-				let index = collectionViewCommandsDelegateBase.documentManager.getDocumentIndexByDocumentId(objectId);
-				if (index >= 0){
-					collectionViewCommandsDelegateBase.documentManager.closeDocument(objectId, true);
-				}
-			}
-		}
 	}
 
 	function createNewObject(typeId){

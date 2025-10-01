@@ -21,18 +21,6 @@ Item {
     property TreeItemModel usersModel;
     property TreeItemModel groupsModel;
 
-    function getHeaders(){
-        if (administrationContainer.productId === ""){
-            console.error("Unable to get additional parameters. Product-ID is empty");
-            return {};
-        }
-
-        let obj = {}
-        obj["productId"] = administrationContainer.productId;
-
-        return obj;
-    }
-
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
@@ -82,10 +70,6 @@ Item {
             productId: administrationContainer.productId;
             documentManager: administrationContainer.documentManager;
             rolesModel: administrationContainer.rolesModel
-
-            function getHeaders(){
-                return administrationContainer.getHeaders()
-            }
         }
     }
 
@@ -97,10 +81,6 @@ Item {
             documentManager: administrationContainer.documentManager;
             rolesModel: administrationContainer.rolesModel;
             groupsModel: administrationContainer.groupsModel;
-
-            function getHeaders(){
-                return administrationContainer.getHeaders()
-            }
         }
     }
 
@@ -113,10 +93,6 @@ Item {
             rolesModel: administrationContainer.rolesModel;
             groupsModel: administrationContainer.groupsModel;
             usersModel: administrationContainer.usersModel;
-
-            function getHeaders(){
-                return administrationContainer.getHeaders()
-            }
         }
     }
 

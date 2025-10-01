@@ -292,7 +292,7 @@ Item {
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
 				onFinished: {
-					root.removed()
+					root.removed([])
 				}
 			}
 		}

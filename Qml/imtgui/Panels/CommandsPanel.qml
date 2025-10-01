@@ -9,6 +9,7 @@ Item {
 	id: commandsItem;
 	height: Style.controlHeightM;
 
+	signal commandsReady();
 	signal commandActivated(string commandId, var params);
 	
 	function setNegativeAccentCommandIds(commandIds){
@@ -50,6 +51,8 @@ Item {
 				}
 			}
 		}
+
+		commandsReady()
 	}
 	
 	function clearModel(){
@@ -210,7 +213,7 @@ Item {
 		function addModel(elements){
 			let result = false;
 			for (let i = 0; i < elements.length; i++){
-				if (!elements[i].visible){
+				if (elements[i].priority === -1){
 					insertNewItem({
 									  "id": elements[i].modelData.m_elementId,
 									  "name": elements[i].modelData.m_elementName,
