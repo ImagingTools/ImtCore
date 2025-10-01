@@ -34,7 +34,7 @@ QtObject {
 			let cb = function(status){
 				if (status >= 0){
 					if (gqlRequestRef){
-						gqlRequestRef.setGqlQuery(gqlData, root.getHeaders());
+						gqlRequestRef.setGqlQuery(gqlData);
 					}
 				}
 				
@@ -51,9 +51,6 @@ QtObject {
 			root.userModeChanged(userMode);
 		}
 		
-		function getHeaders(){
-			return root.getHeaders();
-		}
 	}
 	
 	property SuperuserProvider superuserProvider: SuperuserProvider {
@@ -77,10 +74,6 @@ QtObject {
 			
 			root.superuserExistResult(status, error)
 		}
-		
-		function getHeaders(){
-			return root.getHeaders();
-		}
 	}
 	
 	property UserTokenProvider userTokenProvider: UserTokenProvider {
@@ -100,10 +93,6 @@ QtObject {
 		
 		onFailed: {
 			root.loginFailed();
-		}
-		
-		function getHeaders(){
-			return root.getHeaders();
 		}
 	}
 	
