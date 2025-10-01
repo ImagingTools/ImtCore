@@ -26,7 +26,6 @@ program.parse(process.argv)
 
 const options = program.opts()
 
-
 if(options.mode === 'html'){
     let icon = `<link rel="${options.name} icon" type="image" href="${options.icon}">`
     let html = `
@@ -67,7 +66,7 @@ const env = process.env
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\test\\jq.json'
 // const configFilePath = 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQ\\tests\\Rosa\\rosa.json'
 
-const configFilePath = options.config
+const configFilePath = path.normalize(options.config.trim())
 const configDirPath = configFilePath.split(/[\\\/]+/g).slice(0, -1).join('/')
 
 function envFill(source) {
@@ -1794,7 +1793,7 @@ for (let dirPath of config.dirs) {
 }
 
 console.log(`JQ: preparation of single files`)
-for (let fileName of getFiles(options.entry.replaceAll(/.\w+.qml/g, ''))) {
+for (let fileName of getFiles(options.entry.replaceAll(/.\w+\.qml/g, ''))) {
     let qmlFile = new QmlFile(fileName)
     SingleFiles[fileName.split(/[\/\\]+/g).pop().replace('.qml', '')] = qmlFile
 }
