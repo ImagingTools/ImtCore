@@ -300,7 +300,7 @@ DecoratorBase {
 		anchors.right: parent.right
 		icon.source: enabled ? "qrc:/" + Style.getIconPath("Icons/FilterRemove", Icon.State.On, Icon.Mode.Normal)
 							 : "qrc:/" + Style.getIconPath("Icons/FilterRemove", Icon.State.Off, Icon.Mode.Disabled)
-		width: Style.buttonWidthL
+		width: visible ? Style.buttonWidthL : 0
 		height: width
 		enabled: false
 		tooltipText: qsTr("Reset all filters")
