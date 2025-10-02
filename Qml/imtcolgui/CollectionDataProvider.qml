@@ -52,7 +52,13 @@ QtObject {
 	}
 
 	onTextFilteringInfoIdsChanged: {
-		filter.textFilteringInfoIds = textFilteringInfoIds
+		if(textFilteringInfoIds && typeof textFilteringInfoIds === 'object'){
+			if(!filter.hasTextFilter() && textFilteringInfoIds.length === 0){
+				return
+			}
+
+			filter.setFilteringInfoIds(textFilteringInfoIds)
+		}
 	}
 
 	onDistinctSelectionFieldsChanged: {
