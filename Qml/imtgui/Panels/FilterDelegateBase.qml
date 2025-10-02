@@ -20,7 +20,7 @@ Item {
 
 	signal clearFilter()
 	signal openFilter()
-	
+
 	Connections {
 		target: filterDelegateBase.collectionFilter
 		function onFilterChanged(){
@@ -28,8 +28,12 @@ Item {
 				filterDelegateBase.collectionFilter.isEmpty()
 			}
 		}
+
+		function onCleared(){
+			filterDelegateBase.clearFilter()
+		}
 	}
-	
+
 	Row {
 		id: rowDelegate
 		height: filterDelegateBase.height

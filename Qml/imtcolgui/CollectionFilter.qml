@@ -112,7 +112,7 @@ ComplexCollectionFilter{
 			return ""
 		}
 
-		return m_textFilter.text
+		return m_textFilter.m_text
 	}
 
 	/*!
@@ -339,7 +339,7 @@ ComplexCollectionFilter{
 		clearFieldsFilter()
 		clearTimeFilter()
 		clearDistinctFilter()
-
+		clearTextFilter()
 		cleared()
 	}
 
@@ -376,6 +376,16 @@ ComplexCollectionFilter{
 	function clearTimeFilter(){
 		if (hasTimeFilter()){
 			removeTimeFilter()
+		}
+	}
+
+	/*!
+		\qmlmethod void clearTextFilter()
+		Clears the text filter.
+	*/
+	function clearTextFilter(){
+		if (hasTextFilter()){
+			m_textFilter.m_text = ""
 		}
 	}
 

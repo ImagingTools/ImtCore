@@ -31,7 +31,6 @@ DecoratorBase {
 				baseElement.registerFieldFilterDelegate("DateFilter", timeDelegateFilterComp)
 			}
 			else {
-				console.log("onHasDateFilterChanged__2")
 				baseElement.removeFieldFilterDelegate("DateFilter")
 			}
 		}
@@ -59,6 +58,8 @@ DecoratorBase {
 		target: filterPanelDecorator.complexFilter
 		function onFilterChanged(){
 			clearAllButton.enabled = !filterPanelDecorator.complexFilter.isEmpty()
+			let textFilter = filterPanelDecorator.complexFilter.getTextFilter()
+			tfc.text = textFilter
 		}
 
 		function onCleared(){
@@ -232,12 +233,14 @@ DecoratorBase {
 			name: qsTr("Date")
 			onClearFilter: {
 				timeDelegateFilter.mainButtonText = name
-				timeDelegateFilter.isActive = false;
-				timeFilter.clear();
+				timeDelegateFilter.isActive = false
+				timeFilter.clear()
 				
 				if (filterPanelDecorator.complexFilter){
-					filterPanelDecorator.complexFilter.clearTimeFilter();
-					filterPanelDecorator.complexFilter.filterChanged()
+					if (filterPanelDecorator.complexFilter.hasTimeFilter()){
+						filterPanelDecorator.complexFilter.clearTimeFilter()
+						filterPanelDecorator.complexFilter.filterChanged()
+					}
 				}
 			}
 			
@@ -276,14 +279,17 @@ DecoratorBase {
 		anchors.rightMargin: Style.marginM
 		height: Style.controlHeightM
 		spacing: Style.marginM
-		
+
 		SearchTextInput {
 			id: tfc;
 
 			onSearchChanged: {
 				if (filterPanelDecorator.complexFilter){
-					filterPanelDecorator.complexFilter.setTextFilter(tfc.text);
-					filterPanelDecorator.complexFilter.filterChanged()
+					let currentTextFilter = filterPanelDecorator.complexFilter.getTextFilter()
+					if (currentTextFilter !== tfc.text){
+						filterPanelDecorator.complexFilter.setTextFilter(tfc.text);
+						filterPanelDecorator.complexFilter.filterChanged()
+					}
 				}
 			}
 		}

@@ -15,14 +15,6 @@ FilterDelegateBase {
 
 	signal optionSelectionChanged(var optionIds, var optionIndexes)
 
-	Connections {
-		target: filterDelegate.collectionFilter
-		
-		function onCleared(){
-			filterDelegate.clearFilter()
-		}
-	}
-	
 	onCollectionFilterChanged: {
 		if (collectionFilter && selectionParam && internal.delaySignal){
 			let optionId = getOptionId(selectionParam.m_selectedIndex)
