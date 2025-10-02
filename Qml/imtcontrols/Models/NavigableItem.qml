@@ -135,9 +135,6 @@ Item {
 			return
 
 		if (parentSegment === "" && activeSegments.length > 0){
-			console.log("processPath", path, activeSegments)
-			console.log("parentSegment", parentSegment)
-			console.log("paths", paths)
 			return
 		}
 
