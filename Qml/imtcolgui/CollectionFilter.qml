@@ -43,12 +43,6 @@ ComplexCollectionFilter{
 	property Component baseModelFact: Component{ BaseModel{} }
 
 	/*!
-		\qmlproperty var textFilteringInfoIds
-		Array of field IDs used for text-based filtering.
-	*/
-	property var textFilteringInfoIds: []
-
-	/*!
 		\qmlproperty var logicalOperation
 		Enumeration of logical operations: AND and OR.
 	*/
@@ -132,7 +126,6 @@ ComplexCollectionFilter{
 			}
 
 			m_textFilter.m_text = filter
-			m_textFilter.m_fieldIds = textFilteringInfoIds
 		}
 	}
 
@@ -169,7 +162,15 @@ ComplexCollectionFilter{
 		Sets the array of text filtering field IDs.
 	*/
 	function setFilteringInfoIds(filteringInfoIds){
-		textFilteringInfoIds = filteringInfoIds
+		if (!hasTextFilter()){
+			createTextFilter()
+		}
+
+		if (!m_textFilter.hasFieldIds()){
+			m_textFilter.createFieldIds()
+		}
+
+		m_textFilter.m_fieldIds = filteringInfoIds
 	}
 
 	/*!
