@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 
+#undef GetObject
 
 namespace imtlicgql
 {
