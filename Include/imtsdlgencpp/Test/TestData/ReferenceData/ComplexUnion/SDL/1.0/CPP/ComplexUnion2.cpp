@@ -8766,6 +8766,9 @@ bool CExtendedMetaData::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int
 			if (!val->WriteToModel(*(model.AddTreeModel("value", modelIndex)), 0)){
 				return false;
 			}
+			if(model.GetTreeItemModel("value", modelIndex) != nullptr){
+				model.GetTreeItemModel("value", modelIndex)->SetData("__typename", "Coordinates", 0);
+			}
 		}
 		else if (const double* val = std::get_if<double>(value.GetPtr())){
 			model.SetData("", *val);
@@ -8862,6 +8865,7 @@ bool CExtendedMetaData::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 			if (!val->WriteToGraphQlObject(valueDataObject)){
 				return false;
 			}
+			valueDataObject.InsertParam("__typename", QVariant("Coordinates"));
 		}
 		else if (const double* val = std::get_if<double>(value.GetPtr())){
 			valueDataObject.InsertParam("value", *val);
@@ -8968,6 +8972,7 @@ bool CExtendedMetaData::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 			if (!isvalueAdded){
 				return false;
 			}
+			valueJsonObject["__typename"] = "Coordinates";
 			jsonObject["value"] = valueJsonObject;
 		}
 		else if (const double* val = std::get_if<double>(value.GetPtr())){
@@ -10648,10 +10653,16 @@ bool CUnionTestingType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int
 			if (!val->WriteToModel(*(model.AddTreeModel("complexUnion", modelIndex)), 0)){
 				return false;
 			}
+			if(model.GetTreeItemModel("complexUnion", modelIndex) != nullptr){
+				model.GetTreeItemModel("complexUnion", modelIndex)->SetData("__typename", "CDMResultVarString", 0);
+			}
 		}
 		else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
 			if (!val->WriteToModel(*(model.AddTreeModel("complexUnion", modelIndex)), 0)){
 				return false;
+			}
+			if(model.GetTreeItemModel("complexUnion", modelIndex) != nullptr){
+				model.GetTreeItemModel("complexUnion", modelIndex)->SetData("__typename", "CDMResultVarRecursive", 0);
 			}
 		}
 
@@ -10662,6 +10673,9 @@ bool CUnionTestingType::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int
 		if (const CCoordinates* val = std::get_if<CCoordinates>(mixedUnion.GetPtr())){
 			if (!val->WriteToModel(*(model.AddTreeModel("mixedUnion", modelIndex)), 0)){
 				return false;
+			}
+			if(model.GetTreeItemModel("mixedUnion", modelIndex) != nullptr){
+				model.GetTreeItemModel("mixedUnion", modelIndex)->SetData("__typename", "Coordinates", 0);
 			}
 		}
 		else if (const double* val = std::get_if<double>(mixedUnion.GetPtr())){
@@ -10829,11 +10843,13 @@ bool CUnionTestingType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 			if (!val->WriteToGraphQlObject(complexUnionDataObject)){
 				return false;
 			}
+			complexUnionDataObject.InsertParam("__typename", QVariant("CDMResultVarString"));
 		}
 		else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
 			if (!val->WriteToGraphQlObject(complexUnionDataObject)){
 				return false;
 			}
+			complexUnionDataObject.InsertParam("__typename", QVariant("CDMResultVarRecursive"));
 		}
 		gqlObject.InsertParam("complexUnion", complexUnionDataObject);
 	}
@@ -10844,6 +10860,7 @@ bool CUnionTestingType::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gq
 			if (!val->WriteToGraphQlObject(mixedUnionDataObject)){
 				return false;
 			}
+			mixedUnionDataObject.InsertParam("__typename", QVariant("Coordinates"));
 		}
 		else if (const double* val = std::get_if<double>(mixedUnion.GetPtr())){
 			mixedUnionDataObject.InsertParam("mixedUnion", *val);
@@ -11038,6 +11055,7 @@ bool CUnionTestingType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 			if (!iscomplexUnionAdded){
 				return false;
 			}
+			complexUnionJsonObject["__typename"] = "CDMResultVarString";
 			jsonObject["complexUnion"] = complexUnionJsonObject;
 		}
 		else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(complexUnion.GetPtr())){
@@ -11046,6 +11064,7 @@ bool CUnionTestingType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 			if (!iscomplexUnionAdded){
 				return false;
 			}
+			complexUnionJsonObject["__typename"] = "CDMResultVarRecursive";
 			jsonObject["complexUnion"] = complexUnionJsonObject;
 		}
 
@@ -11058,6 +11077,7 @@ bool CUnionTestingType::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 			if (!ismixedUnionAdded){
 				return false;
 			}
+			mixedUnionJsonObject["__typename"] = "Coordinates";
 			jsonObject["mixedUnion"] = mixedUnionJsonObject;
 		}
 		else if (const double* val = std::get_if<double>(mixedUnion.GetPtr())){
@@ -11513,12 +11533,14 @@ bool CCDMResultVarRecursive::V1_0::WriteToModel(::imtbase::CTreeItemModel& model
 				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
+				newResultContentModelPtr->SetData("__typename", "CDMResultVarString", resultContentIndex);
 			}
 			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
 				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
+				newResultContentModelPtr->SetData("__typename", "CDMResultVarRecursive", resultContentIndex);
 			}
 		}
 	}
@@ -11733,11 +11755,13 @@ bool CCDMResultVarRecursive::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObjec
 				if (!val->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
+				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarString"));
 			}
 			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				if (!val->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
+				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarRecursive"));
 			}
 			resultContentDataObjectList << resultContentDataObject;
 		}
@@ -11954,6 +11978,7 @@ bool CCDMResultVarRecursive::V1_0::WriteToJsonObject(QJsonObject& jsonObject) co
 				if (!isresultContentAdded){
 					return false;
 				}
+				resultContentJsonObject["__typename"] = "CDMResultVarString";
 				newResultContentArray << resultContentJsonObject;
 			}
 			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
@@ -11962,6 +11987,7 @@ bool CCDMResultVarRecursive::V1_0::WriteToJsonObject(QJsonObject& jsonObject) co
 				if (!isresultContentAdded){
 					return false;
 				}
+				resultContentJsonObject["__typename"] = "CDMResultVarRecursive";
 				newResultContentArray << resultContentJsonObject;
 			}
 		}
@@ -13146,12 +13172,14 @@ bool CCDMResult::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int modelI
 				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
+				newResultContentModelPtr->SetData("__typename", "CDMResultVarString", resultContentIndex);
 			}
 			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				newResultContentModelPtr->InsertNewItem();
 				if(!val->WriteToModel(*newResultContentModelPtr, resultContentIndex)){
 					return false;
 				}
+				newResultContentModelPtr->SetData("__typename", "CDMResultVarRecursive", resultContentIndex);
 			}
 		}
 	}
@@ -13366,11 +13394,13 @@ bool CCDMResult::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 				if (!val->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
+				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarString"));
 			}
 			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
 				if (!val->WriteToGraphQlObject(resultContentDataObject)){
 					return false;
 				}
+				resultContentDataObject.InsertParam("__typename", QVariant("CDMResultVarRecursive"));
 			}
 			resultContentDataObjectList << resultContentDataObject;
 		}
@@ -13587,6 +13617,7 @@ bool CCDMResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 				if (!isresultContentAdded){
 					return false;
 				}
+				resultContentJsonObject["__typename"] = "CDMResultVarString";
 				newResultContentArray << resultContentJsonObject;
 			}
 			else if (const CCDMResultVarRecursive* val = std::get_if<CCDMResultVarRecursive>(resultContent->at(resultContentIndex).GetPtr())){
@@ -13595,6 +13626,7 @@ bool CCDMResult::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 				if (!isresultContentAdded){
 					return false;
 				}
+				resultContentJsonObject["__typename"] = "CDMResultVarRecursive";
 				newResultContentArray << resultContentJsonObject;
 			}
 		}

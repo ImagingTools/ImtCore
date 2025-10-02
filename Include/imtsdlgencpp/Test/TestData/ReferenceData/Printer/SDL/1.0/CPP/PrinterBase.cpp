@@ -723,10 +723,16 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
 			}
+			if(model.GetTreeItemModel("specification", modelIndex) != nullptr){
+				model.GetTreeItemModel("specification", modelIndex)->SetData("__typename", "PrinterSpecificationBase", 0);
+			}
 		}
 		else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
 			if (!val->WriteToModel(*(model.AddTreeModel("specification", modelIndex)), 0)){
 				return false;
+			}
+			if(model.GetTreeItemModel("specification", modelIndex) != nullptr){
+				model.GetTreeItemModel("specification", modelIndex)->SetData("__typename", "Link", 0);
 			}
 		}
 
@@ -753,6 +759,9 @@ bool CPrinterBase::V1_0::WriteToModel(::imtbase::CTreeItemModel& model, int mode
 		else if (const CLink* val = std::get_if<CLink>(mixedTest.GetPtr())){
 			if (!val->WriteToModel(*(model.AddTreeModel("mixedTest", modelIndex)), 0)){
 				return false;
+			}
+			if(model.GetTreeItemModel("mixedTest", modelIndex) != nullptr){
+				model.GetTreeItemModel("mixedTest", modelIndex)->SetData("__typename", "Link", 0);
 			}
 		}
 
@@ -903,11 +912,13 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		if (!val->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
+		specificationDataObject.InsertParam("__typename", QVariant("PrinterSpecificationBase"));
 	}
 	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
 		if (!val->WriteToGraphQlObject(specificationDataObject)){
 			return false;
 		}
+		specificationDataObject.InsertParam("__typename", QVariant("Link"));
 	}
 	gqlObject.InsertParam("specification", specificationDataObject);
 
@@ -934,6 +945,7 @@ bool CPrinterBase::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 		if (!val->WriteToGraphQlObject(mixedTestDataObject)){
 			return false;
 		}
+		mixedTestDataObject.InsertParam("__typename", QVariant("Link"));
 	}
 	gqlObject.InsertParam("mixedTest", mixedTestDataObject);
 
@@ -1101,6 +1113,7 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		if (!isspecificationAdded){
 			return false;
 		}
+		specificationJsonObject["__typename"] = "PrinterSpecificationBase";
 		jsonObject["specification"] = specificationJsonObject;
 	}
 	else if (const CLink* val = std::get_if<CLink>(specification.GetPtr())){
@@ -1109,6 +1122,7 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		if (!isspecificationAdded){
 			return false;
 		}
+		specificationJsonObject["__typename"] = "Link";
 		jsonObject["specification"] = specificationJsonObject;
 	}
 
@@ -1145,6 +1159,7 @@ bool CPrinterBase::V1_0::WriteToJsonObject(QJsonObject& jsonObject) const
 		if (!ismixedTestAdded){
 			return false;
 		}
+		mixedTestJsonObject["__typename"] = "Link";
 		jsonObject["mixedTest"] = mixedTestJsonObject;
 	}
 

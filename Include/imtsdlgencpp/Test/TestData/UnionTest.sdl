@@ -24,8 +24,6 @@ type Link {
 	statusList: [LinkStatus]
 }
 
-
-
 union PrinterSpecification = PrinterSpecificationBase | Link | String | Double
 
 type PrinterBase {
