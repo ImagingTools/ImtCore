@@ -108,11 +108,18 @@ Item {
             parentSegment: "Administration"
             paths: ["Roles", "Users", "Groups"]
             onActivated: {
+                console.log("AdministrationView onActivated", restPath, matchedPath)
                 let index = paths.indexOf(matchedPath)
                 multiPageView.block = true
                 multiPageView.currentIndex = index
                 if (administrationContainer.documentManager){
                     administrationContainer.documentManager.closeAllDocuments()
+                }
+
+                if (restPath.length >= 2){
+                    let documentTypeId = restPath[0]
+                    let documentId = restPath[1]
+                    administrationContainer.documentManager.openDocument(documentId, documentTypeId)
                 }
 
                 multiPageView.block = false
@@ -182,10 +189,6 @@ Item {
         onModelUpdated: {
             administrationContainer.rolesModel = collectionModel;
         }
-
-        function getHeaders(){
-            return administrationContainer.getHeaders()
-        }
     }
 
     UserCollectionDataProvider {
@@ -194,19 +197,12 @@ Item {
         onModelUpdated: {
             administrationContainer.usersModel = collectionModel;
         }
-
-        function getHeaders(){
-            return administrationContainer.getHeaders()
-        }
     }
 
     GroupCollectionDataProvider {
         id: groupCollectionDataProvider;
         onModelUpdated: {
             administrationContainer.groupsModel = collectionModel;
-        }
-        function getHeaders(){
-            return administrationContainer.getHeaders();
         }
     }
 }

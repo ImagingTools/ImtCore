@@ -34,6 +34,7 @@ QtObject {
 
 	/*!
 		Emitted when navigation is requested.
+
 		\param path            Array of path segments
 		\param params          Arbitrary parameters
 		\param activeSegments  Already matched path segments
@@ -42,13 +43,56 @@ QtObject {
 	signal navigatePath(var path, var params, var activeSegments, var resultCallback)
 
 	/*!
+		List of currently registered NavigableItem objects.
+		Each NavigableItem must register itself on creation and can
+		be later queried using \c getNavigableItem().
+	*/
+	property var navigableItems: []
+
+	/*!
 		Emitted when the current navigation index changes.
+		\param index New stack index
 	*/
 	signal currentIndexChanged(int index)
 
 	/*!
+		Registers a new NavigableItem in the controller.
+
+		\param navigableItem NavigableItem instance to register
+		\return true if registration was successful, false if already registered
+	*/
+	function registerNavigableItem(navigableItem){
+		if (navigableItems.includes(navigableItem)){
+			return false
+		}
+
+		navigableItems.push(navigableItem)
+
+		return true
+	}
+
+	/*!
+		Returns the first registered NavigableItem that supports
+		the given \a segment, or null if none match.
+
+		\param segment Path segment string
+		\return NavigableItem or null
+	*/
+	function getNavigableItem(segment){
+		for (let i = 0; i < navigableItems.length; ++i){
+			let navigableItem = navigableItems[i]
+			if (navigableItem.paths.includes(segment)){
+				return navigableItem
+			}
+		}
+
+		return null
+	}
+
+	/*!
 		Navigates to the given path.
 		If the path is handled, it is pushed to the navigation stack.
+
 		\param path   Full navigation path (e.g. "Orders/Order/123")
 		\param params Arbitrary parameters
 	*/
