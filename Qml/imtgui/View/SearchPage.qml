@@ -56,7 +56,13 @@ Item {
 					return
 				}
 				
-				NavigationController.navigate(url.m_path)
+				let params = {}
+				params["textFilter"] = searchInput.m_text
+				params["resultName"] = item.m_resultName
+				params["resultDescription"] = item.m_resultDescription
+				params["contextId"] = item.m_contextId
+				params["contextTypeId"] = item.m_contextTypeId
+				NavigationController.navigate(url.m_path, params)
 			}
 		}
 	}
