@@ -513,6 +513,7 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 		const QString convertedType = QmlConvertType(sdlField.GetType(), &isCustom);
 		const bool isEnum = bool(dynamic_cast<const imtsdl::CSdlEnum*>(foundEntryPtr.get()) != nullptr);
 		const bool isUserType = isCustom && !isEnum;
+		const imtsdl::CSdlUnion* unionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(foundEntryPtr.get());
 
 		// skip simple scalars and list of scalars
 		if (!sdlField.IsArray() || !isUserType || (sdlField.IsArray() && !isUserType)){
@@ -521,10 +522,46 @@ bool CQmlCodeGeneratorComp::BeginQmlFile(const imtsdl::CSdlType& sdlType)
 
 		FeedStreamHorizontally(ifStream, 3);
 		ifStream << QStringLiteral("case 'm_") << GetDecapitalizedValue(sdlField.GetId());
-		ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
-		ifStream << BuildQmlImportDeclarationFromParams(foundEntryPtr->GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
-		ifStream << convertedType << QStringLiteral(".qml')");
-		FeedStream(ifStream, 1, false);
+
+		if (unionPtr != nullptr){
+			const QStringList typeList = unionPtr->GetTypes();
+
+			ifStream << QStringLiteral("': {");
+			FeedStream(ifStream, 1, false);
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << QStringLiteral("switch (typename){");
+			FeedStream(ifStream, 1, false);
+
+			for (const QString& typeName: typeList){
+				std::shared_ptr<imtsdl::CSdlEntryBase> foundTypePtr = FindEntryByName(typeName, m_sdlTypeListCompPtr->GetSdlTypes(false));
+
+				if (!foundTypePtr){
+					continue;
+				}
+
+				const QString convertedSubtype = QmlConvertType(typeName);
+				FeedStreamHorizontally(ifStream, 5);
+				ifStream << QStringLiteral("case '") << typeName;
+				ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
+				ifStream << BuildQmlImportDeclarationFromParams(foundTypePtr->GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
+				ifStream << convertedSubtype << QStringLiteral(".qml')");
+				FeedStream(ifStream, 1, false);
+			}
+
+			FeedStreamHorizontally(ifStream, 4);
+			ifStream << '}';
+			FeedStream(ifStream, 1, false);
+
+			FeedStreamHorizontally(ifStream, 3);
+			ifStream << '}';
+			FeedStream(ifStream, 1, false);
+		}
+		else {
+			ifStream << QStringLiteral("': return Qt.createComponent('qrc:/qml/");
+			ifStream << BuildQmlImportDeclarationFromParams(foundEntryPtr->GetSchemaParams(), QStringLiteral("Sdl"), false) << '/';
+			ifStream << convertedType << QStringLiteral(".qml')");
+			FeedStream(ifStream, 1, false);
+		}
 	}
 
 	FeedStreamHorizontally(ifStream, 2);
