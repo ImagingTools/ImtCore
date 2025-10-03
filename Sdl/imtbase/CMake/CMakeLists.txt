@@ -16,6 +16,8 @@ add_custom_target(${PROJECT_NAME}-SDL-related-files SOURCES
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/Settings.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/CollectionImport.sdl
 			${CMAKE_CURRENT_LIST_DIR}/../1.0/ProgressManager.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentManager.sdl
+			${CMAKE_CURRENT_LIST_DIR}/../1.0/UndoManager.sdl
 		)
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
@@ -60,6 +62,14 @@ ImtCoreCustomConfigureSdlCppQml(CXX QML
 
 ImtCoreCustomConfigureSdlCppQml(CXX QML
 	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/ProgressManager.sdl"
+	VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/DocumentManager.sdl"
+	VERSION		"1.0")
+
+ImtCoreCustomConfigureSdlCppQml(CXX QML
+	SCHEMA_PATH	"${CMAKE_CURRENT_LIST_DIR}/../1.0/UndoManager.sdl"
 	VERSION		"1.0")
 
 

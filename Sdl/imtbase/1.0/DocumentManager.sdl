@@ -1,0 +1,38 @@
+schema {
+	namespace: imtbase
+	version: 1.0
+}
+
+enum EDocumentOperationStatus {
+	Success
+	InvalidUserId
+	InvalidDocumentId
+	Failed
+}
+
+type DocumentOperationStatus {
+	status: EDocumentOperationStatus!
+}
+
+type ObjectId {
+	id: ID!
+}
+
+type DocumentId {
+	id: ID!
+}
+
+type DocumentInfo {
+	documentId: ID!
+	objectId: ID!
+	name: String!
+	hasChanges: Bool!
+}
+
+type DocumentList {
+	documentList: [DocumentInfo]!
+}
+
+type DocumentTypeId {
+	typeId: ID!
+}

@@ -1,0 +1,30 @@
+schema {
+	namespace: imtbase
+	version: 1.0
+}
+
+enum EUndoStatus {
+	InvalidUserId
+	InvalidDocumentId
+	Success
+	InvalidStepCount
+	Failed
+}
+
+type UndoStatus {
+	status: EUndoStatus!
+}
+
+type UndoInfo {
+	status: UndoStatus!
+	availableUndoSteps: Int!
+	availableRedoSteps: Int!
+	UndoLevelDescriptions: [String!]!
+	RedoLevelDescriptions: [String!]!
+}
+
+type UndoRedoInput {
+	documentId: ID!
+	steps: Int!
+}
+

@@ -14,6 +14,9 @@ imtfile.file = ../../Include/imtfile/QMake/imtfile.pro
 SUBDIRS += imtddl
 imtddl.file = ../../Include/imtddl/QMake/imtddl.pro
 
+SUBDIRS += imtdoc
+imtdoc.file = ../../Include/imtdoc/QMake/imtdoc.pro
+
 SUBDIRS += imtsdl
 imtsdl.file = ../../Include/imtsdl/QMake/imtsdl.pro
 
@@ -41,6 +44,10 @@ DesignTokenCreator.depends = imtbase imtdesign ImtDesignPck
 SUBDIRS += ImtDdlPck
 ImtDdlPck.file = ../../Impl/ImtDdlPck/QMake/ImtDdlPck.pro
 ImtDdlPck.depends = imtddl
+
+SUBDIRS += ImtDocPck
+ImtDocPck.file = ../../Impl/ImtDocPck/QMake/ImtDocPck.pro
+ImtDocPck.depends = imtdoc
 
 SUBDIRS += ImtFilePck
 ImtFilePck.file = ../../Impl/ImtFilePck/QMake/ImtFilePck.pro

@@ -116,6 +116,8 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 	add_subdirectory("${INCLUDE_DIR}/imtdev/CMake" "${AUX_INCLUDE_DIR}/imtdev")
 	add_subdirectory("${INCLUDE_DIR}/imtdevgui/CMake" "${AUX_INCLUDE_DIR}/imtdevgui")
 	add_dependencies(imtdevgui imtdev)
+	add_subdirectory("${INCLUDE_DIR}/imtdoc/CMake" "${AUX_INCLUDE_DIR}/imtdoc")
+	add_dependencies(imtdoc imtbase)
 	add_subdirectory("${INCLUDE_DIR}/imtrest/CMake" "${AUX_INCLUDE_DIR}/imtrest")
 	add_dependencies(imtrest imtbasesdl)
 	add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
@@ -222,6 +224,9 @@ if(NOT DEFINED IMT_BUILD_ONLYTOOLS OR NOT IMT_BUILD_ONLYTOOLS)
 
 		add_subdirectory("${IMPL_DIR}/ImtDevGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtDevGuiPck")
 		add_dependencies(ImtDevGuiPck imtdevgui)
+
+		add_subdirectory("${IMPL_DIR}/ImtDocPck/CMake" "${AUX_INCLUDE_DIR}/ImtDocPck")
+		add_dependencies(ImtDocPck imtdoc)
 
 		add_subdirectory("${IMPL_DIR}/ImtStylePck/CMake" "${AUX_INCLUDE_DIR}/ImtStylePck")
 		add_dependencies(ImtStylePck imtstyle)
