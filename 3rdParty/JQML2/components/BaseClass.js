@@ -474,7 +474,11 @@ class BaseClass extends QtObject {
 
 					if (component) {
 						for (let sourceObjectInner of sourceObject[key]) {
-							let obj = this.createElement(_key).createObject(this)
+							let sourceTypename
+							if (sourceObjectInner['__typename']){
+								sourceTypename = sourceObjectInner['__typename']
+							}
+							let obj = this.createElement(_key, sourceTypename).createObject(this)
 							obj.fromObject(sourceObjectInner)
 							this[_key].append({ item: obj })
 							obj.owner = this
