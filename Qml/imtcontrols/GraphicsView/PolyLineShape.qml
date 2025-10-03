@@ -12,6 +12,7 @@ BoundingBox {
 	property int lineWidth: 1;
 	property real shapePointSize: DesignScheme.shapePointSize;
 	property real shapeSelectedPointSize: DesignScheme.shapeSelectedPointSize;
+	property bool showLine: true
 
 
 	function draw(ctx, transformMatrixArg){
@@ -23,6 +24,10 @@ BoundingBox {
 	}
 
 	function drawBase(ctx, transformMatrixArg){
+
+		if(!showLine || points.length < 2){
+			return;
+		}
 
 		let params = getParams()
 		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
