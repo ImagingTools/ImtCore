@@ -180,7 +180,8 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 
 		for (const QFileInfo& pluginPath : pluginsList){
 #ifdef Q_OS_WIN
-			SetDllDirectory(pluginPath.absolutePath().toStdWString().c_str());
+			std::wstring path = pluginPath.absolutePath().toStdWString();
+			SetDllDirectory(path.c_str());
 #endif
 			m_logger.SendInfoMessage(0, QString("Load: '%1'").arg(pluginPath.canonicalFilePath()));
 

@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
-#include <imtbase/CCollectionInfo.h>
 #include <imtauth/IUserInfoProvider.h>
 #include <imtauth/CUserInfo.h>
 
@@ -21,8 +20,10 @@ public:
 
 	// reimplemented (IAccountInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetUserList() const override;
-    virtual const IUserInfo* GetUser(const QByteArray& userId) const override;
+	virtual const IUserInfo* GetUser(const QByteArray& userId) const override;
 };
 
 
 } // namespace imtauth
+
+
