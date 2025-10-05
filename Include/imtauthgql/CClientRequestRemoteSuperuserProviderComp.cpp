@@ -25,7 +25,6 @@ imtauth::ISuperuserProvider::ExistsStatus CClientRequestRemoteSuperuserProviderC
 	if (userssdl::CCheckSuperuserExistsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		typedef userssdl::CCheckSuperuserPayload Response;
 
-		QString errorMessage;
 		Response response = SendModelRequest<Response>(gqlRequest, errorMessage);
 		if (!errorMessage.isEmpty()){
 			return imtauth::ISuperuserProvider::ES_UNKNOWN;

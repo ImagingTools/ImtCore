@@ -328,6 +328,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 	sdl::imtbase::ImtCollection::GetElementIdsRequestArguments arguments;
 	arguments.input.Version_1_0.emplace();
 	arguments.input.Version_1_0->collectionId = *m_collectionIdAttrPtr;
+	arguments.input.Version_1_0->count = count;
+	arguments.input.Version_1_0->offset = offset;
 
 	if (selectionParamsPtr != nullptr){
 		if (selectionParamsPtr != nullptr){
