@@ -209,7 +209,8 @@ endfunction(jqml_compile_web2)
 
 function(jq_compile_web)
 
-	set(QRC_WEB_FILE ${buildwebdir}/Resources/${PROJECT_NAME}JsWeb.qrc)
+	# set(QRC_WEB_FILE ${buildwebdir}/Resources/${PROJECT_NAME}JsWeb.qrc)
+	set(QRC_WEB_FILE ${buildwebdir}/Resources/qmlJsWeb.qrc)
 	set(QRC_CPP_WEB_FILE ${buildwebdir}/Resources/qrc_${PROJECT_NAME}Web.cpp)
 
 	if(NOT PYTHONEXE)
@@ -245,14 +246,19 @@ function(jq_compile_web)
 	endwhile()
 
 	message(VERBOSE "QRC_CPP_WEB_FILE ${QRC_CPP_WEB_FILE}")
+	list(APPEND webdirs_n ${IMTCOREDIR}/3rdParty/JQ/dist)
+	list(APPEND webdirs_n ${buildwebdir}/Resources)
+
+	message("PREPARE RESOURCES ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQ/preparesources.py ${webdirs_n}")
 
 	add_custom_command(
 		OUTPUT
 		${buildwebdir}/Resources/index.html
 		POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQ/preparesources.py ${webdirs_n}
 		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQ
-		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js -n ${resname} -i ${appicon} -o ${buildwebdir}/Resources/ -m html
+		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js -n index -i ${appicon} -o ${buildwebdir}/Resources/ -m html
 		DEPENDS ${DEPEND_LIST} ${sdldependency}
 		COMMENT "Create html for ${PROJECT_NAME}"
 		VERBATIM
@@ -260,10 +266,10 @@ function(jq_compile_web)
 
 	add_custom_command(
 		OUTPUT
-		${buildwebdir}/Resources/jqml.${resname}.js
+		${buildwebdir}/Resources/index.js
 		POST_BUILD
 		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQ
-		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js -c ${inputjs} -n ${resname} -o ${buildwebdir}/Resources/ -r ${dataroot} -e ${startqml} -m js
+		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQ/compiler/compiler.js -c ${inputjs} -n index -o ${buildwebdir}/Resources/ -r ${dataroot} -e ${startqml} -m js
 		DEPENDS ${DEPEND_LIST} ${sdldependency}
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 		VERBATIM
@@ -276,7 +282,7 @@ function(jq_compile_web)
 		ARGS
 		-name ${PROJECT_NAME}Web ${QRC_WEB_FILE} -o ${QRC_CPP_WEB_FILE}
 		DEPENDS
-		${buildwebdir}/Resources/jqml.${resname}.js
+		${buildwebdir}/Resources/index.js ${buildwebdir}/Resources/index.html
 		COMMENT
 		"Compile QRC_WEB_FILE"
 	)
