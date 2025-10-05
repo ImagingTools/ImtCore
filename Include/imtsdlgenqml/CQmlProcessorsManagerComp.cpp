@@ -5,6 +5,7 @@
 #include <iostream>
 
 // Qt includes
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QFileInfo>
 #include <QtCore/QLockFile>
 #include <QtCore/QThread>
