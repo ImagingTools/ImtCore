@@ -19,6 +19,9 @@ BoundingBox {
 
 
 	function draw(ctx, transformMatrixArg){
+		if(isHidden){
+			return;
+		}
 
 		drawBase(ctx, transformMatrixArg);
 		if(showNodes){
@@ -33,7 +36,7 @@ BoundingBox {
 		}
 
 		let params = getParams()
-		ctx.strokeStyle = isHidden ? "transparent" : isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
+		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : lineWidth
 		ctx.beginPath()
 		for(let i = 0;i < points.length; i++){
@@ -52,8 +55,8 @@ BoundingBox {
 
 	function drawNodes(ctx, transformMatrixArg){
 		let params = getParams()
-		ctx.strokeStyle = isHidden ? "transparent" : isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
-		ctx.fillStyle = isHidden ? "transparent" : isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
+		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
+		ctx.fillStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
 
 		let drawMultiColor = isMultiColor && colorList.length == points.length
@@ -63,8 +66,8 @@ BoundingBox {
 		for(let i = 0;i < points.length; i++){
 			if(drawMultiColor){
 				ctx.beginPath()
-				ctx.strokeStyle = isHidden ? "transparent" : colorList[i]
-				ctx.fillStyle = isHidden ? "transparent" : colorList[i]
+				ctx.strokeStyle = colorList[i]
+				ctx.fillStyle = colorList[i]
 			}
 			let point = getScreenPosition(points[i]);
 			if(i == highlightedNodeIndex){
