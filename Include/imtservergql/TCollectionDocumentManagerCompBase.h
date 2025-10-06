@@ -20,7 +20,7 @@ namespace imtservergql
 {
 
 
-namespace DM = sdl::imtbase::DocumentManager;
+namespace CDM = sdl::imtbase::DocumentManager;
 namespace UM = sdl::imtbase::UndoManager;
 
 
@@ -45,23 +45,23 @@ public:
 
 protected:
 	// reimplemented (CGraphQlHandlerCompBase)
-	DM::CDocumentList OnGetOpenedDocumentList(
+	CDM::CDocumentList OnGetOpenedDocumentList(
 		const typename Defs::GetOpenedDocumentListGqlRequest& getDocumentListRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	DM::CDocumentId OnCreateNewDocument(
+	CDM::CDocumentId OnCreateNewDocument(
 		const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	DM::CDocumentId OnOpenDocument(
+	CDM::CDocumentId OnOpenDocument(
 		const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	DM::CDocumentOperationStatus OnSaveDocument(
+	CDM::CDocumentOperationStatus OnSaveDocument(
 		const typename Defs::SaveDocumentGqlRequest& saveDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
-	DM::CDocumentOperationStatus OnCloseDocument(
+	CDM::CDocumentOperationStatus OnCloseDocument(
 		const typename Defs::CloseDocumentGqlRequest& closeDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
@@ -221,13 +221,13 @@ inline bool TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentMana
 // reimplemented (CGraphQlHandlerCompBase)
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline DM::CDocumentList TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
+inline CDM::CDocumentList TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
 	OnGetOpenedDocumentList(
 		const typename Defs::GetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	DM::CDocumentList retVal;
+	CDM::CDocumentList retVal;
 	retVal.Version_1_0.emplace();
 	retVal.Version_1_0->documentList.emplace();
 
@@ -236,7 +236,7 @@ inline DM::CDocumentList TCollectionDocumentManagerCompBase<Base, ColorCollectio
 	if (!userId.isEmpty()) {
 		DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
 		for (const DocumentInfo& info : list) {
-			DM::CDocumentInfo sdlInfo;
+			CDM::CDocumentInfo sdlInfo;
 			sdlInfo.Version_1_0.emplace();
 
 			sdlInfo.Version_1_0->documentId = info.documentId;
@@ -251,13 +251,13 @@ inline DM::CDocumentList TCollectionDocumentManagerCompBase<Base, ColorCollectio
 }
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline DM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
+inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
 	OnCreateNewDocument(
 		const typename Defs::CreateNewDocumentGqlRequest& createDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	DM::CDocumentId retVal;
+	CDM::CDocumentId retVal;
 
 	const auto& arguments = createDocumentRequest.GetRequestedArguments();
 	const auto& info = createDocumentRequest.GetRequestInfo();
@@ -290,12 +290,12 @@ inline DM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionD
 
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline DM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::OnOpenDocument(
+inline CDM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::OnOpenDocument(
 	const typename Defs::OpenDocumentGqlRequest& openDocumentRequest,
 	const ::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	DM::CDocumentId retVal;
+	CDM::CDocumentId retVal;
 
 	const auto& arguments = openDocumentRequest.GetRequestedArguments();
 	const auto& info = openDocumentRequest.GetRequestInfo();
@@ -327,13 +327,13 @@ inline DM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionD
 }
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline DM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
+inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
 	OnSaveDocument(
 		const typename Defs::SaveDocumentGqlRequest& saveDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	DM::CDocumentOperationStatus retVal;
+	CDM::CDocumentOperationStatus retVal;
 
 	const auto& arguments = saveDocumentRequest.GetRequestedArguments();
 	const auto& info = saveDocumentRequest.GetRequestInfo();
@@ -357,16 +357,16 @@ inline DM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Col
 	OperationStatus status = GetNonConstThis()->SaveDocument(userId, *documentId->id);
 	switch (status) {
 	case imtdoc::ICollectionDocumentManager::OS_OK:
-		retVal.Version_1_0->status = DM::EDocumentOperationStatus::Success;
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
-		retVal.Version_1_0->status = DM::EDocumentOperationStatus::InvalidUserId;
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_ID:
-		retVal.Version_1_0->status = DM::EDocumentOperationStatus::InvalidDocumentId;
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_FAILED:
-		retVal.Version_1_0->status = DM::EDocumentOperationStatus::Failed;
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
 		break;
 	default:
 		break;
@@ -381,13 +381,13 @@ inline DM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Col
 
 
 template<class Base, class ColorCollectionDocumentManagerDefs>
-inline DM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
+inline CDM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, ColorCollectionDocumentManagerDefs>::
 	OnCloseDocument(
 		const typename Defs::CloseDocumentGqlRequest& closeDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
-	DM::CDocumentOperationStatus retVal;
+	CDM::CDocumentOperationStatus retVal;
 
 	const auto& arguments = closeDocumentRequest.GetRequestedArguments();
 	const auto& info = closeDocumentRequest.GetRequestInfo();
@@ -411,16 +411,16 @@ inline DM::CDocumentOperationStatus TCollectionDocumentManagerCompBase<Base, Col
 	OperationStatus status = GetNonConstThis()->CloseDocument(userId, *documentId->id);
 	switch (status) {
 	case imtdoc::ICollectionDocumentManager::OS_OK:
-		retVal.Version_1_0->status = DM::EDocumentOperationStatus::Success;
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
-		retVal.Version_1_0->status = DM::EDocumentOperationStatus::InvalidUserId;
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_ID:
-		retVal.Version_1_0->status = DM::EDocumentOperationStatus::InvalidDocumentId;
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 		break;
 	case imtdoc::ICollectionDocumentManager::OS_FAILED:
-		retVal.Version_1_0->status = DM::EDocumentOperationStatus::Failed;
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
 		break;
 	default:
 		break;

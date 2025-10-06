@@ -36,6 +36,7 @@
 #include <imtservergql/CGqlCollectionImportControllerComp.h>
 #include <imtservergql/CCollectionImportControllerComp.h>
 #include <imtservergql/CCollectionImportJobParamsFillerComp.h>
+#include <imtservergql/CCollectionDocumentManagerComp.h>
 
 
 /**
@@ -75,6 +76,7 @@ typedef imtservergql::CProgressManagerPublisherComp ProgressManagerPublisher;
 typedef imtservergql::CGqlCollectionImportControllerComp GqlCollectionImportController;
 typedef imtservergql::CCollectionImportControllerComp CollectionImportController;
 typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobParamsFiller;
+typedef imtservergql::CCollectionDocumentManagerComp CollectionDocumentManager;
 
 
 } // namespace ImtServerGqlPck

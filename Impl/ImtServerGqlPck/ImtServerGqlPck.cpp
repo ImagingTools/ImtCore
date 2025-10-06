@@ -164,6 +164,12 @@ I_EXPORT_COMPONENT(
 			"Collection import job params filler",
 			"Collection Import Job Params Filler");
 
+I_EXPORT_COMPONENT(
+			CollectionDocumentManager,
+			"Collection document manager",
+			"Collection Document Manager");
+
+
 } // namespace ImtServerGqlPck
 
 

@@ -23,16 +23,16 @@ class CCollectionDocumentManager : virtual public imtdoc::ICollectionDocumentMan
 {
 public:
 	// reimplemented (imtdoc::IDocumentManager)
-	DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
-	QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
-	QByteArray OpenDocument(const QByteArray& userId, const QByteArray& objectId) override;
-	istd::IChangeable* GetDocument(const QByteArray& userId, const QByteArray& documentId) const override;
-	OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) override;
-	OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
-	idoc::IUndoManager* GetDocumentUndoManager(const QByteArray& userId, const QByteArray& documentId) const override;
+	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
+	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
+	virtual QByteArray OpenDocument(const QByteArray& userId, const QByteArray& objectId) override;
+	virtual istd::IChangeable* GetDocument(const QByteArray& userId, const QByteArray& documentId) const override;
+	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) override;
+	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
+	virtual idoc::IUndoManager* GetDocumentUndoManager(const QByteArray& userId, const QByteArray& documentId) const override;
 
 	// reimplemented (iser::ISerializable)
-	bool Serialize(iser::IArchive& archive) override;
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;

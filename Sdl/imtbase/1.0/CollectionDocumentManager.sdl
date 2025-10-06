@@ -1,0 +1,78 @@
+schema {
+	namespace: imtbase
+	version: 1.0
+
+	query: Query
+	mutation: Mutation
+}
+
+import {
+	"UndoManager.sdl"
+}
+
+enum EDocumentOperationStatus {
+	Success
+	InvalidUserId
+	InvalidDocumentId
+	Failed
+}
+
+type DocumentOperationStatus {
+	status: EDocumentOperationStatus!
+}
+
+type CollectionId {
+	collectionId: ID!
+}
+
+type ObjectId {
+	collectionId: ID!
+	id: ID!
+}
+
+type DocumentId {
+	collectionId: ID!
+	id: ID!
+}
+
+type DocumentInfo {
+	documentId: ID!
+	objectId: ID!
+	hasChanges: Bool!
+}
+
+type DocumentList {
+	documentList: [DocumentInfo]!
+}
+
+type DocumentTypeId {
+	collectionId: ID!
+	typeId: ID!
+}
+
+type DocumentManagerNotification {
+	documentId: ID!
+	objectId: ID!
+	hasChanges: Bool!
+	undoInfo: UndoInfo!
+}
+
+type Query {
+	GetOpenedDocumentList(input: CollectionId): DocumentList!
+	GetUndoInfo(input: DocumentId): UndoInfo!
+}
+
+type CollectionUndoRedoInput {
+	collectionId: ID!
+	undoRedoInput: UndoRedoInput!
+}
+
+type Mutation {
+	CreateNewDocument(input: DocumentTypeId): DocumentId!
+	OpenDocument(input: ObjectId): DocumentId!
+	SaveDocument(input: DocumentId): DocumentOperationStatus!
+	CloseDocument(input: DocumentId): DocumentOperationStatus!
+	DoUndo(input: CollectionUndoRedoInput): UndoStatus!
+	DoRedo(input: CollectionUndoRedoInput): UndoStatus!
+	ResetUndo(input: DocumentId): UndoStatus!
+}
