@@ -462,6 +462,21 @@ Rectangle {
 		fitToLayer(activeLayer)
 	}
 
+	function fitToInactivAndActiveLayer(){
+		let activeLayer = getActiveLayer()
+		let inactioveLayer = getInactiveLayer()
+		let activeShapes = activeLayer.shapeModel
+		let inactiveShapes = inactioveLayer.shapeModel
+		let shapeList = []
+		for(let i = 0; i < activeShapes.length; i++){
+			shapeList.push(activeShapes[i])
+		}
+		for(let i = 0; i < inactiveShapes.length; i++){
+			shapeList.push(inactiveShapes[i])
+		}
+		fitToShapeList(shapeList)
+	}
+
 	function boundingBoxPointsToScreen(pointsObjLog, shape){
 
 		let pointsObj = ({});
