@@ -234,14 +234,13 @@ inline DM::CDocumentList TCollectionDocumentManagerCompBase<Base, ColorCollectio
 	QByteArray userId = GetUserId(gqlRequest);
 
 	if (!userId.isEmpty()) {
-		DocumentList list = BaseClass2::GetDocumentList(userId);
+		DocumentList list = BaseClass2::GetOpenedDocumentList(userId);
 		for (const DocumentInfo& info : list) {
 			DM::CDocumentInfo sdlInfo;
 			sdlInfo.Version_1_0.emplace();
 
 			sdlInfo.Version_1_0->documentId = info.documentId;
 			sdlInfo.Version_1_0->objectId = info.objectId;
-			sdlInfo.Version_1_0->name = info.name;
 			sdlInfo.Version_1_0->hasChanges = info.hasChanges;
 
 			retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
@@ -277,7 +276,7 @@ inline DM::CDocumentId TCollectionDocumentManagerCompBase<Base, ColorCollectionD
 		return retVal;
 	}
 
-	QByteArray documentId = GetNonConstThis()->CreateDocument(userId, *documentTypeId->typeId);
+	QByteArray documentId = GetNonConstThis()->CreateNewDocument(userId, *documentTypeId->typeId);
 	if (documentId.isEmpty()) {
 		errorMessage = "Unable to create document or undo manager";
 
@@ -468,18 +467,18 @@ inline UM::CUndoInfo TCollectionDocumentManagerCompBase<Base, ColorCollectionDoc
 
 		int count = undoManagerPtr->GetAvailableUndoSteps();
 		retVal.Version_1_0->availableUndoSteps = count;
-		retVal.Version_1_0->UndoLevelDescriptions.emplace();
+		retVal.Version_1_0->undoLevelDescriptions.emplace();
 		for (int i = 0; i < count; i++) {
 			QString description = undoManagerPtr->GetUndoLevelDescription(i);
-			retVal.Version_1_0->UndoLevelDescriptions->append(description);
+			retVal.Version_1_0->undoLevelDescriptions->append(description);
 		}
 
 		count = undoManagerPtr->GetAvailableRedoSteps();
 		retVal.Version_1_0->availableRedoSteps = count;
-		retVal.Version_1_0->RedoLevelDescriptions.emplace();
+		retVal.Version_1_0->redoLevelDescriptions.emplace();
 		for (int i = 0; i < count; i++) {
 			QString description = undoManagerPtr->GetRedoLevelDescription(i);
-			retVal.Version_1_0->RedoLevelDescriptions->append(description);
+			retVal.Version_1_0->redoLevelDescriptions->append(description);
 		}
 	}
 

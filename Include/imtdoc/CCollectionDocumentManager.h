@@ -23,8 +23,8 @@ class CCollectionDocumentManager : virtual public imtdoc::ICollectionDocumentMan
 {
 public:
 	// reimplemented (imtdoc::IDocumentManager)
-	DocumentList GetDocumentList(const QByteArray& userId) const override;
-	QByteArray CreateDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
+	DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
+	QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
 	QByteArray OpenDocument(const QByteArray& userId, const QByteArray& objectId) override;
 	istd::IChangeable* GetDocument(const QByteArray& userId, const QByteArray& documentId) const override;
 	OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) override;
@@ -44,7 +44,6 @@ protected:
 	{
 		QByteArray objectId;
 		QByteArray objectTypeId;
-		QString name;
 		istd::IChangeableSharedPtr objectPtr;
 		idoc::IUndoManagerSharedPtr undoManagerPtr;
 		bool hasChanges;
@@ -54,6 +53,10 @@ protected:
 	QMap<QString, WorkingDocumentList> m_userDocuments;
 	mutable QMutex m_mutex;
 
+private:
+	std::shared_ptr<DocumentNotification> CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
+
+private:
 	imtbase::IObjectCollection* m_collectionPtr = nullptr;
 };
 

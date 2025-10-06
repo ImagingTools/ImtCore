@@ -3,6 +3,10 @@ schema {
 	version: 1.0
 }
 
+import {
+	"UndoManager.sdl"
+}
+
 enum EDocumentOperationStatus {
 	Success
 	InvalidUserId
@@ -25,7 +29,6 @@ type DocumentId {
 type DocumentInfo {
 	documentId: ID!
 	objectId: ID!
-	name: String!
 	hasChanges: Bool!
 }
 
@@ -35,4 +38,11 @@ type DocumentList {
 
 type DocumentTypeId {
 	typeId: ID!
+}
+
+type DocumentManagerNotification {
+	documentId: ID!
+	objectId: ID!
+	hasChanges: Bool!
+	undoInfo: UndoInfo!
 }
