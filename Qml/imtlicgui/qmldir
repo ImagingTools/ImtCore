@@ -6,11 +6,16 @@ FeaturesDependenciesProvider 1.0 FeaturesDependenciesProvider.qml
 FeatureCollectionView 1.0 FeatureCollectionView.qml
 FeatureEditor 1.0 FeatureEditor.qml
 FeatureEditorCommandsDelegate 1.0 FeatureEditorCommandsDelegate.qml
+FeaturesDialog 1.0 FeaturesDialog.qml
 
 
 LicenseCollectionView 1.0 LicenseCollectionView.qml
 LicenseEditor 1.0 LicenseEditor.qml
 
+ProductCollectionView 1.0 ProductCollectionView.qml
+ProductCollectionViewCommandsDelegate 1.0 ProductCollectionViewCommandsDelegate.qml
+ProductViewCommandsDelegate 1.0 ProductViewCommandsDelegate.qml
+ProductView 1.0 ProductView.qml
 
 PackageCollectionViewCommandsDelegate 1.0 PackageCollectionViewCommandsDelegate.qml
 
