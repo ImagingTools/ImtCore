@@ -60,6 +60,8 @@ public:
 		Q_INIT_RESOURCE(imtappApplicationSdl);
 		Q_INIT_RESOURCE(imtcolorLabSdl);
 		Q_INIT_RESOURCE(imtcolorRgbColorHexSdl);
+		Q_INIT_RESOURCE(imtbaseCollectionDocumentManagerSdl);
+		Q_INIT_RESOURCE(imtbaseUndoManagerSdl);
 	}
 
 	static void InitQml()

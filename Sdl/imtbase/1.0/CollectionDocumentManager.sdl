@@ -26,12 +26,12 @@ type CollectionId {
 }
 
 type ObjectId {
-	collectionId: ID!
+	collectionId: ID
 	id: ID!
 }
 
 type DocumentId {
-	collectionId: ID!
+	collectionId: ID
 	id: ID!
 }
 
@@ -46,7 +46,7 @@ type DocumentList {
 }
 
 type DocumentTypeId {
-	collectionId: ID!
+	collectionId: ID
 	typeId: ID!
 }
 
@@ -63,7 +63,7 @@ type Query {
 }
 
 type CollectionUndoRedoInput {
-	collectionId: ID!
+	collectionId: ID
 	undoRedoInput: UndoRedoInput!
 }
 

@@ -171,10 +171,10 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_nickName);
 	retVal = retVal && archive.EndTag(nickNameTag);
 
-	iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(addressesTag);
-	retVal = retVal && m_addresses.Serialize(archive);
-	retVal = retVal && archive.EndTag(addressesTag);
+	// iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
+	// retVal = retVal && archive.BeginTag(addressesTag);
+	// retVal = retVal && m_addresses.Serialize(archive);
+	// retVal = retVal && archive.EndTag(addressesTag);
 
 	return retVal;
 }

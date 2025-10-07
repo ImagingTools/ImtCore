@@ -46,7 +46,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentId CCollectionDocumentManagerC
 	const auto& info = createNewDocumentRequest.GetRequestInfo();
 
 	auto documentTypeId = arguments.input.Version_1_0;
-	if (!documentTypeId || documentTypeId->typeId){
+	if (!documentTypeId || !documentTypeId->typeId){
 		errorMessage = "Invalid GQL request params";
 
 		return retVal;
@@ -83,7 +83,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentId CCollectionDocumentManagerC
 	const auto& info = openDocumentRequest.GetRequestInfo();
 
 	auto objectId = arguments.input.Version_1_0;
-	if (!objectId || objectId->id){
+	if (!objectId || !objectId->id){
 		errorMessage = "Invalid GQL request params";
 
 		return retVal;
@@ -524,7 +524,6 @@ bool CCollectionDocumentManagerComp::IsRequestSupported(const imtgql::CGqlReques
 imtdoc::CCollectionDocumentManager* CCollectionDocumentManagerComp::GetNonConstThis() const
 {
 	return const_cast<CCollectionDocumentManager*>(dynamic_cast<const CCollectionDocumentManager*>(this));
-
 }
 
 
@@ -551,7 +550,7 @@ QByteArray CCollectionDocumentManagerComp::GetUserId(const ::imtgql::CGqlRequest
 		}
 	}
 
-	return QByteArray();
+	return QByteArray("Test");
 }
 
 

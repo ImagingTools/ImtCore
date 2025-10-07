@@ -55,9 +55,6 @@ protected:
 
 private:
 	std::shared_ptr<DocumentNotification> CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
-
-private:
-	imtbase::IObjectCollection* m_collectionPtr = nullptr;
 };
 
 

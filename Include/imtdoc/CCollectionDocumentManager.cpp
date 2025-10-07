@@ -84,14 +84,15 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 {
 	QByteArray retVal;
 
-	if (m_collectionPtr == nullptr) {
+	imtbase::IObjectCollection* collectionPtr = GetCollection();
+	if (collectionPtr == nullptr) {
 		return retVal;
 	}
 
-	QByteArray objectTypeId = m_collectionPtr->GetObjectTypeId(objectId);
+	QByteArray objectTypeId = collectionPtr->GetObjectTypeId(objectId);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!objectTypeId.isEmpty() && m_collectionPtr->GetObjectData(objectId, dataPtr)) {
+	if (!objectTypeId.isEmpty() && collectionPtr->GetObjectData(objectId, dataPtr)) {
 		if (dataPtr.IsValid()) {
 			idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
 			if (!undoManagerPtr.IsValid()) {
@@ -147,7 +148,8 @@ istd::IChangeable* CCollectionDocumentManager::GetDocument(const QByteArray& use
 imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
-	if (m_collectionPtr == nullptr) {
+	imtbase::IObjectCollection* collectionPtr = GetCollection();
+	if (collectionPtr == nullptr) {
 		return OS_FAILED;
 	}
 
@@ -164,7 +166,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 	WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
 
 	if (!workingDocument.objectId.isEmpty()) {
-		bool retVal = m_collectionPtr->SetObjectData(workingDocument.objectId, *workingDocument.objectPtr);
+		bool retVal = collectionPtr->SetObjectData(workingDocument.objectId, *workingDocument.objectPtr);
 
 		if (retVal){
 			workingDocument.hasChanges = false;
@@ -184,7 +186,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 	Q_ASSERT(false);
 
 	workingDocument.objectId =
-		m_collectionPtr->InsertNewObject(workingDocument.objectTypeId, "", "", workingDocument.objectPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocument.objectTypeId, "", "", workingDocument.objectPtr.GetPtr());
 
 	if (!workingDocument.objectId.isEmpty()){
 		workingDocument.hasChanges = false;
@@ -207,7 +209,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 {
 	QMutexLocker locker(&m_mutex);
 
-	if (m_userDocuments.contains(userId)) {
+	if (!m_userDocuments.contains(userId)) {
 		return OS_INVALID_USER_ID;
 	}
 
