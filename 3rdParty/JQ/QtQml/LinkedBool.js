@@ -27,7 +27,7 @@ class LinkedBool extends Property {
             try {
                 target.__self[name].value = value.call(target)
             } catch(error) {
-                //console.error(error)
+                if(location.hash === '#jqdebug')console.error(error)
             }
         } else {
             target.__self[name].value = value
@@ -62,7 +62,7 @@ class LinkedBool extends Property {
             try {
                 target.__self[name].value = value.call(target)
             } catch(error) {
-                //console.error(error)
+                if(location.hash === '#jqdebug')console.error(error)
             }
         } else {
             target.__self[name].value = value
@@ -148,7 +148,7 @@ class LinkedBool extends Property {
                 })
                 target.__self[name].value = value.call(target)
             } catch(error) {
-                //console.error(error)
+                if(location.hash === '#jqdebug')console.error(error)
             } finally {
                 global.queueFlag.pop()
                 this.queueLink.pop()

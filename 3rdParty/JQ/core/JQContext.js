@@ -129,7 +129,7 @@ class JQContext {
             target[key+'__depends'] = []
 
             target[key]['JQDestruction'].connect(()=>{
-                target[key] = null
+                // target[key] = null
 
                 for(let property of target[key+'__depends']){
                     if(!property.target.__destroyed){

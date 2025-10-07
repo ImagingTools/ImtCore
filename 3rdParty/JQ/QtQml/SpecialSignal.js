@@ -91,7 +91,7 @@ class Signal extends BaseObject{
                         connection.slot(...args)
                     }
                 } catch (error) {
-                    //console.error(error)
+                    if(location.hash === '#jqdebug')console.error(error)
                 }
             }
 
@@ -108,7 +108,7 @@ class Signal extends BaseObject{
                 if(slotSuper) slotSuper.call(this.__parent, ...args)
                 slot.call(this.__parent, ...args)
             } catch (error) {
-                //console.error(error)
+                if(location.hash === '#jqdebug')console.error(error)
             }
             
         }
