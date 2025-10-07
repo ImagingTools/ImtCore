@@ -9,7 +9,6 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtdoc/CCollectionDocumentManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
-#include <imtbasesdl/SDL/1.0/CPP/DocumentManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
 
