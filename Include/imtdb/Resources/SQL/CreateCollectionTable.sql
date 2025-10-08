@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS "${TableName}"
 CREATE INDEX IF NOT EXISTS "${TableName}DocumentIdIndex"
     ON public."${TableName}" USING btree
     ("DocumentId" ASC NULLS LAST)
-    WITH (deduplicate_items=True)
     TABLESPACE pg_default;
 
 CREATE INDEX IF NOT EXISTS "${TableName}StateIndex"
