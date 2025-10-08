@@ -125,15 +125,15 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 
 			QMutexLocker locker(&m_mutex);
 
-			NewDocumentCreatedInfo info;
+			DocumentOpenedInfo info;
 			info.documentId = retVal;
 			info.objectId = objectId;
 			info.hasChanges = false;
 			info.availableUndoSteps = 0;
 			info.availableRedoSteps = 0;
 
-			istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
-			changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
+			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_OPENED);
+			changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
 			istd::CChangeNotifier notifier(this, &changeSet);
 
 			m_userDocuments[userId][retVal].objectId = objectId;
