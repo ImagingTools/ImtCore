@@ -31,20 +31,16 @@ QtObject {
 	signal resetUndoDone(string documentId)
 	signal resetUndoFailed(string documentId, string message)
 
-	signal documentModelChanged(string documentId, var changeSet)
-
 	signal documentNameChanged(string documentId, string oldName, string newName)
+	signal documentIsDirtyChanged(string documentId, bool isDirty)
 
 	signal startUndoInfoReceive(string documentId)
 	signal undoInfoReceived(string documentId, int availableUndoSteps, int availableRedoSteps)
 	signal undoInfoReceiveFailed(string documentId, string message)
 
-	// typeOperation: OPENED, CREATED, CLOSED, SAVED, DOCUMENT_CHANGED
-	signal documentManagerChanged(string typeOperation, string objectId, string documentId)
-
-	onDocumentModelChanged: {
-		setDocumentIsDirty(documentId, true)
-	}
+	// typeOperation: NewDocumentCreated, DocumentOpened, DocumentChanged, DocumentSaved, DocumentClosed
+	// hasChanges - has document changes
+	signal documentManagerChanged(string typeOperation, string objectId, string documentId, bool hasChanges)
 
 	onDocumentSaved: {
 		setDocumentIsDirty(documentId, false)
@@ -52,6 +48,10 @@ QtObject {
 	}
 
 	onDocumentManagerChanged: {
+		if (typeOperation === "DocumentChanged"){
+			setDocumentIsDirty(documentId, true)
+		}
+
 		getUndoInfo(documentId)
 	}
 
@@ -246,6 +246,8 @@ QtObject {
 		}
 
 		__internal.openedDocuments[index].isDirty = isDirty
+		
+		documentIsDirtyChanged(documentId, isDirty)
 	}
 
 	function getDocumentViewInstance(documentId, viewTypeId){
@@ -260,7 +262,7 @@ QtObject {
 		}
 
 		let viewTypeIds = Object.keys(__internal.openedDocuments[index].views)
-		if (viewTypeIds.include(viewTypeId)){
+		if (viewTypeIds.includes(viewTypeId)){
 			return __internal.openedDocuments[index].views[viewTypeId]
 		}
 
@@ -311,6 +313,9 @@ QtObject {
 				property bool isNew: true
 				property var views: ({})
 				property DocumentDecorator documentDecorator: DocumentDecorator {
+					documentId: documentData.id
+					documentTypeId: documentData.typeId
+					documentManager: root
 					onViewRegistered: {
 						console.log("DocumentDecorator onViewRegistered", documentData.isNew)
 						if (representationController.representationModel === null){

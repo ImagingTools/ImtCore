@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import imtgui 1.0
+import imtbaseCollectionDocumentManagerSdl 1.0
 
 QtObject {
 	id: root
@@ -40,10 +41,25 @@ QtObject {
 			}
 		}
 
-		function onDocumentModelChanged(documentId, changeSet){
+		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
+			if (documentId !== root.documentId){
+				return
+			}
+
+			console.log("DocumentDecorator onDocumentManagerChanged", documentId, typeOperation, objectId, documentId, hasChanges)
+			
 			let documentView = target.getDocumentViewInstance(documentId)
-			if (documentView){
-				documentView.commandsController.setCommandIsEnabled("Save", isDirty)
+			if (!documentView){
+				return
+			}
+
+			documentView.commandsController.setCommandIsEnabled("Save", true)
+
+			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
+				let viewTypeIds = Object.keys(root.registeredViews)
+				for (let i = 0; i < viewTypeIds.length; ++i){
+					// root.updateRepresentationFromDocument(viewTypeIds[i])
+				}
 			}
 		}
 	}
@@ -93,6 +109,8 @@ QtObject {
 			console.error("Unable to handle Save command. Error: Document manager is invalid")
 			return
 		}
+
+		console.log("onSave", documentId)
 
 		documentManager.saveDocument(documentId)
 	}

@@ -17,9 +17,15 @@ DocumentManagerBase {
 		}
 
 		onMessageReceived: {
-			let objectId = data.getData("objectId")
-			let documentId = data.getData("documentId")
-			root.documentManagerChanged("", objectId, documentId)
+			console.log("onMessageReceived")
+			documentManagerNotification.createFromJson(data.toJson())
+
+			let objectId = documentManagerNotification.m_objectId
+			let documentId = documentManagerNotification.m_documentId
+			let operation = documentManagerNotification.m_documentOperation
+			let hasChanges = documentManagerNotification.m_hasChanges
+
+			root.documentManagerChanged(operation, objectId, documentId, hasChanges)
 		}
 	}
 
@@ -64,7 +70,7 @@ DocumentManagerBase {
 		documentIdInput.m_collectionId = collectionId
 		saveDocumentRequest.documentId = documentId
 
-		saveDocumentRequest.send(objectIdInput)
+		saveDocumentRequest.send(documentIdInput)
 	}
 
 	function closeDocument(documentId){
@@ -286,6 +292,7 @@ DocumentManagerBase {
 		sdlObjectComp: Component {
 			UndoInfo {
 				onFinished: {
+					console.log("UndoInfo onFinished", this.toJson())
 					root.undoInfoReceived(root.getUndoInfoRequest.documentId, m_availableUndoSteps, m_availableRedoSteps)
 				}
 			}

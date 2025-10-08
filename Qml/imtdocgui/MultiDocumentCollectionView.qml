@@ -5,6 +5,7 @@ import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 import imtbaseImtCollectionSdl 1.0
+import imtbaseCollectionDocumentManagerSdl 1.0
 
 Item {
 	id: workspaceView
@@ -68,17 +69,13 @@ Item {
 		id: connections
 		target: workspaceView.documentManager
 
-		function onDocumentManagerChanged(notification){
-			let objectId = notification.m_objectId
-			let documentId = notification.m_documentId
-
-			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
-			let name = workspaceView.documentManager.getDocumentName(documentId)
-			if (name === ""){
-				if (workspaceView.visualStatusProvider){
-					workspaceView.visualStatusProvider.getVisualStatus(objectId, typeId)
-				}
+		function onDocumentManagerChanged(typeOperation, objectId, documentId){
+			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
+				tabView.removeTab(documentId)
 			}
+		}
+
+		function onDocumentIsDirtyChanged(documentId, isDirty){
 		}
 
 		// Open document signals
@@ -130,8 +127,6 @@ Item {
 			}
 
 			loading.stop()
-			workspaceView.documentManager.documentModelChanged(documentId)
-			workspaceView.documentManager.getUndoInfo(documentId)
 		}
 
 		function onSaveDocumentFailed(documentId, message){
