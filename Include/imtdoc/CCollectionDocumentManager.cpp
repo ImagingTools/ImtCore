@@ -198,8 +198,6 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 		return retVal ? OS_OK : OS_FAILED;
 	}
 
-	Q_ASSERT(false);
-
 	workingDocument.objectId =
 		collectionPtr->InsertNewObject(workingDocument.objectTypeId, "", "", workingDocument.objectPtr.GetPtr());
 
