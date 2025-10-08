@@ -202,7 +202,7 @@ ControlBase {
 		anchors.fill: parent
 		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor
-		visible: !switchCustom.readOnly
+		visible: !switchCustom.readOnly && parent.enabled
 		
 		/*!
 			\qmlmethod SwitchCustom::onClicked
