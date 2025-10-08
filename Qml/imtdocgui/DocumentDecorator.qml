@@ -8,7 +8,9 @@ QtObject {
 	property string documentId
 	property string documentTypeId
 	property DocumentManagerBase documentManager: null
-	property var registeredViews: ({})
+
+	property var registeredViews: []
+	property var registeredRepresentation: []
 
 	signal viewRegistered(var view, var representationController)
 
@@ -38,12 +40,16 @@ QtObject {
 			if (documentId !== root.documentId){
 				return
 			}
+
+			root.updateRepresentationForAllViews()
 		}
 
 		function onRedoDone(documentId){
 			if (documentId !== root.documentId){
 				return
 			}
+
+			root.updateRepresentationForAllViews()
 		}
 
 		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps){
@@ -67,18 +73,35 @@ QtObject {
 			documentView.commandsController.setCommandIsEnabled("Save", hasChanges)
 
 			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
-				let viewTypeIds = Object.keys(root.registeredViews)
-				for (let i = 0; i < viewTypeIds.length; ++i){
-					// root.updateRepresentationFromDocument(viewTypeIds[i])
+				for (let i = 0; i < root.registeredViews.length; ++i){
+					root.registeredRepresentation[i].updateRepresentationFromDocument()
 				}
 			}
 		}
 	}
 
+	function onRepresentationUpdated(documentId, representation){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		console.log("onRepresentationUpdated", documentId, representation)
+
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i].model === representation){
+				registeredViews[i].setBlockingUpdateModel(false)
+				
+				registeredViews[i].doUpdateGui()
+				return
+			}
+		}
+	}
+	
 	function onModelDataChanged(view, model){
-		console.log("onModelDataChanged", view)
-		if (view in registeredViews){
-			registeredViews[view].updateDocumentFromRepresentation()
+		console.log("onModelDataChanged", view, model)
+		if (registeredViews.includes(view)){
+			let index = registeredViews.indexOf(view)
+			registeredRepresentation[index].updateDocumentFromRepresentation()
 		}
 	}
 
@@ -93,7 +116,11 @@ QtObject {
 			return
 		}
 
-		registeredViews[view] = representationController
+		representationController.representationUpdated.connect(root.onRepresentationUpdated)
+
+		registeredViews.push(view)
+		registeredRepresentation.push(representationController)
+		
 		viewRegistered(view, representationController)
 	}
 
@@ -121,26 +148,21 @@ QtObject {
 			return
 		}
 
-		console.log("onSave", documentId)
-
 		documentManager.saveDocument(documentId)
 	}
 
-	function updateRepresentationFromDocument(viewTypeId){
-		if (viewTypeId in registeredViews){
-			registeredViews[viewTypeId].updateRepresentationFromDocument()
-		}
-		else{
-			console.error("Unable to update representation for view: '" +viewTypeId+"'. Error: Document data controller not registered")
+	function updateRepresentationForAllViews(){
+		console.log("updateRepresentationForAllViews", documentId, representation)
+		
+		for (let i = 0; i < registeredViews.length; ++i){
+			registeredViews[i].setBlockingUpdateModel(true)
+			registeredRepresentation[i].updateRepresentationFromDocument()
 		}
 	}
 
-	function updateDocumentFromRepresentation(viewTypeId){
-		if (viewTypeId in registeredViews){
-			registeredViews[viewTypeId].updateDocumentFromRepresentation()
-		}
-		else{
-			console.error("Unable to update document from view: '" +viewTypeId+"'. Error: Document data controller not registered")
+	function updateDocumentForAllViews(){
+		for (let i = 0; i < registeredViews.length; ++i){
+			registeredRepresentation[i].updateDocumentFromRepresentation()
 		}
 	}
 }
