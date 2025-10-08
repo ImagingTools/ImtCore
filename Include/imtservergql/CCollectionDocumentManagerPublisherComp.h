@@ -21,11 +21,18 @@ public:
 	typedef CGqlPublisherCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentManagerPublisherComp)
+		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "DummyCollection");
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (imtgql::IGqlSubscriberController)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
+
 	// reimplemented (iomod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
+
+private:
+	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 };
 
 

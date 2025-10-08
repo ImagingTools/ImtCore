@@ -14,6 +14,26 @@ namespace imtservergql
 
 // protected methods
 
+// reimplemented (imtgql::IGqlSubscriberController)
+
+bool CCollectionDocumentManagerPublisherComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	bool isSupported = false;
+	if (m_collectionIdAttrPtr.IsValid()){
+		QByteArray collectionId = *m_collectionIdAttrPtr;
+		QByteArray gqlCommandId = gqlRequest.GetCommandId();
+
+		isSupported = gqlCommandId == QByteArrayLiteral("On") + collectionId + QByteArrayLiteral("DocumentChanged");
+	}
+
+	if (isSupported){
+		return true;
+	}
+
+	return BaseClass::IsRequestSupported(gqlRequest);
+}
+
+
 // reimplemented (iomod::CSingleModelObserverBase)
 
 void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
