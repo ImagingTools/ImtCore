@@ -191,7 +191,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 			if (notificationPtr != nullptr){
 				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
 				changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
-				istd::CChangeNotifier notifier(this);
+				istd::CChangeNotifier notifier(this, &changeSet);
 			}
 		}
 
@@ -211,7 +211,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 		if (notificationPtr != nullptr){
 			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
 			changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
-			istd::CChangeNotifier notifier(this);
+			istd::CChangeNotifier notifier(this, &changeSet);
 		}
 	}
 
@@ -234,7 +234,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 
 	istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CLOSED);
 	changeSet.SetChangeInfo(CN_DOCUMENT_CLOSED, documentId);
-	istd::CChangeNotifier notifier(this);
+	istd::CChangeNotifier notifier(this, &changeSet);
 
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_userDocuments[userId][documentId].undoManagerPtr.GetPtr());
 	if (modelPtr != nullptr) {
