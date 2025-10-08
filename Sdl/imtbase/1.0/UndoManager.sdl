@@ -19,8 +19,8 @@ type UndoInfo {
 	status: UndoStatus!
 	availableUndoSteps: Int!
 	availableRedoSteps: Int!
-	undoLevelDescriptions: [String!]!
-	redoLevelDescriptions: [String!]!
+	undoLevelDescriptions: [String]!
+	redoLevelDescriptions: [String]!
 }
 
 type UndoRedoInput {

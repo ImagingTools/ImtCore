@@ -59,7 +59,7 @@ CollectionView {
 	}
 
 	function getHeaders(){
-		return {};
+		return {}
 	}
 
 	dataControllerComp: Component {

@@ -37,6 +37,8 @@ QtObject {
 	signal undoInfoReceived(string documentId, int availableUndoSteps, int availableRedoSteps)
 	signal undoInfoReceiveFailed(string documentId, string message)
 
+	signal documentManagerChanged(var notification)
+
 	onDocumentModelChanged: {
 		setDocumentIsDirty(documentId, true)
 	}

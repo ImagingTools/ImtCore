@@ -78,7 +78,7 @@ typedef imtservergql::CProgressManagerPublisherComp ProgressManagerPublisher;
 typedef imtservergql::CGqlCollectionImportControllerComp GqlCollectionImportController;
 typedef imtservergql::CCollectionImportControllerComp CollectionImportController;
 typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobParamsFiller;
-typedef imtservergql::CCollectionDocumentManagerComp CollectionDocumentManager;
+typedef icomp::TModelCompWrap<imtservergql::CCollectionDocumentManagerComp> CollectionDocumentManager;
 typedef ibase::TModelObserverCompWrap<imtservergql::CCollectionDocumentManagerPublisherComp> CollectionDocumentManagerPublisher;
 
 

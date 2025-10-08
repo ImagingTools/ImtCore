@@ -68,6 +68,10 @@ Item {
 		id: connections
 		target: workspaceView.documentManager
 
+		function onDocumentManagerChanged(notification){
+			let objectId = notification.m_objectId
+		}
+
 		// Open document signals
 		function onStartOpenDocument(documentId, typeId){
 			loading.start()

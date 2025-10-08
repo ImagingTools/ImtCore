@@ -9,6 +9,30 @@ DocumentManagerBase {
 
 	property string collectionId
 
+	SubscriptionClient {
+		id: documentManagerSubscription
+
+		function getHeaders(){
+			return root.getHeaders()
+		}
+
+		onMessageReceived: {
+			console.log("Document manager subscription message received", data.toJson())
+			documentManagerNotification.createFromJson(data.toJson())
+			root.documentManagerChanged(documentManagerNotification)
+		}
+	}
+
+	DocumentManagerNotification {
+		id: documentManagerNotification
+	}
+
+	onCollectionIdChanged: {
+		if (collectionId !== ""){
+			documentManagerSubscription.gqlCommandId = "On" + root.collectionId + "DocumentChanged"
+		}
+	}
+
 	function getHeaders(){
 		return {}
 	}

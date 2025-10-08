@@ -81,7 +81,7 @@ DataModelController {
 
 					root.prepareResultModel()
 
-					root.resultModelReady(root.dataModel)
+					root.resultModelReady(root.resultModel)
 
 					return
 				}
