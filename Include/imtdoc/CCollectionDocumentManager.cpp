@@ -100,16 +100,16 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 		return retVal;
 	}
 
+	idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
+	if (!undoManagerPtr.IsValid()){
+		return retVal;
+	}
+
 	QByteArray objectTypeId = collectionPtr->GetObjectTypeId(objectId);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!objectTypeId.isEmpty() && collectionPtr->GetObjectData(objectId, dataPtr)) {
 		if (dataPtr.IsValid()) {
-			idoc::IUndoManagerSharedPtr undoManagerPtr = CreateUndoManager();
-			if (!undoManagerPtr.IsValid()) {
-				return retVal;
-			}
-
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(dataPtr.GetPtr());
 			imod::IObserver* undoObserverPtr = dynamic_cast<imod::IObserver*>(undoManagerPtr.GetPtr());
 

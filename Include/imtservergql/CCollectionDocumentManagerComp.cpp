@@ -244,12 +244,16 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerComp::OnGetUndoIn
 		errorMessage = "Invalid user ID";
 
 		retVal.Version_1_0->status->status = UM::EUndoStatus::InvalidUserId;
+
+		return retVal;
 	}
 
 	if (!m_userDocuments[userId].contains(*documentId->id)){
 		errorMessage = "Invalid document ID";
 
 		retVal.Version_1_0->status->status = UM::EUndoStatus::InvalidDocumentId;
+
+		return retVal;
 	}
 
 	idoc::IUndoManager* undoManagerPtr = m_userDocuments[userId][*documentId->id].undoManagerPtr.GetPtr();
