@@ -57,6 +57,17 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 		return retVal;
 	}
 
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(objectPtr.GetPtr());
+	imod::IObserver* undoObserverPtr = dynamic_cast<imod::IObserver*>(undoManagerPtr.GetPtr());
+
+	if (modelPtr != nullptr){
+		if (undoObserverPtr != nullptr){
+			modelPtr->AttachObserver(undoObserverPtr);
+		}
+
+		modelPtr->AttachObserver(this);
+	}
+
 	retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	QMutexLocker locker(&m_mutex);
@@ -100,10 +111,14 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 			}
 
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(dataPtr.GetPtr());
-			imod::IObserver* observerPtr = dynamic_cast<imod::IObserver*>(undoManagerPtr.GetPtr());
+			imod::IObserver* undoObserverPtr = dynamic_cast<imod::IObserver*>(undoManagerPtr.GetPtr());
 
-			if (modelPtr != nullptr && observerPtr != nullptr) {
-				modelPtr->AttachObserver(observerPtr);
+			if (modelPtr != nullptr){
+				if (undoObserverPtr != nullptr){
+					modelPtr->AttachObserver(undoObserverPtr);
+				}
+
+				modelPtr->AttachObserver(this);
 			}
 
 			retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
@@ -250,10 +265,30 @@ idoc::IUndoManager* CCollectionDocumentManager::GetDocumentUndoManager(
 
 // reimplemented (iser::ISerializable)
 
-
 bool CCollectionDocumentManager::Serialize(iser::IArchive& archive)
 {
 	return false;
+}
+
+
+// reimplemented (imod::CMultiModelObserverBase)
+
+void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
+{
+	for (const QByteArray& userId : m_userDocuments.keys()){
+		const WorkingDocumentList& documents = m_userDocuments[userId];
+		for (const QByteArray& documentId : documents.keys()){
+			if ((void*)documents[documentId].objectPtr.GetPtr() == (void*)modelPtr){
+				DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
+				Q_ASSERT(notificationPtr != nullptr);
+				if (notificationPtr != nullptr){
+					istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
+					changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
+					istd::CChangeNotifier notifier(this);
+				}
+			}
+		}
+	}
 }
 
 
