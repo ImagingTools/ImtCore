@@ -21,7 +21,7 @@ namespace imtdoc
 
 
 class CCollectionDocumentManager :
-	private imod::TMultiModelObserverBase<istd::IChangeable>,
+	protected imod::TMultiModelObserverBase<istd::IChangeable>,
 	virtual public imtdoc::ICollectionDocumentManager
 {
 public:
