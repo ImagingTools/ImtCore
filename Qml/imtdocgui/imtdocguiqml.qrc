@@ -21,7 +21,6 @@
         <file alias="imtdocgui/DocumentViewBase.qml">DocumentViewBase.qml</file>
 	<file alias="imtdocgui/DocumentManagerBase.qml">DocumentManagerBase.qml</file>
 	<file alias="imtdocgui/MultiDocumentCollectionView.qml">MultiDocumentCollectionView.qml</file>
-	<file alias="imtdocgui/MultiDocCollectionPageView.qml">MultiDocCollectionPageView.qml</file>
 	<file alias="imtdocgui/DocumentDecorator.qml">DocumentDecorator.qml</file>
 	<file alias="imtdocgui/DocCollectionViewDelegate.qml">DocCollectionViewDelegate.qml</file>
     </qresource>
