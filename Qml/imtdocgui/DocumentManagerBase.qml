@@ -49,7 +49,7 @@ QtObject {
 
 	onDocumentManagerChanged: {
 		if (typeOperation === "DocumentChanged"){
-			setDocumentIsDirty(documentId, true)
+			setDocumentIsDirty(documentId, hasChanges)
 		}
 
 		if (typeOperation !== "DocumentClosed"){

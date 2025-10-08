@@ -74,15 +74,42 @@ Item {
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
-			else if (typeOperation === EDocumentOperationEnum.s_documentOpened){
+			else if (typeOperation === EDocumentOperationEnum.s_documentOpened || typeOperation === EDocumentOperationEnum.s_documentSaved){
 				if (workspaceView.visualStatusProvider){
+					let cb = function(objectId, icon, text, description){
+						workspaceView.documentManager.setDocumentName(documentId, text)
+						workspaceView.visualStatusProvider.visualStatusReceived.disconnect(cb)
+						workspaceView.visualStatusProvider.visualStatusReceiveFailed.disconnect(cbFailed)
+					}
+
+					let cbFailed = function(objectId, errorMessage){
+						let defaultName = workspaceView.documentManager.getDefaultDocumentName()
+						workspaceView.documentManager.setDocumentName(documentId, defaultName)
+						workspaceView.visualStatusProvider.visualStatusReceived.disconnect(cb)
+					}
+
+					workspaceView.visualStatusProvider.visualStatusReceived.connect(cb)
+					workspaceView.visualStatusProvider.visualStatusReceiveFailed.connect(cbFailed)
+
 					let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
 					workspaceView.visualStatusProvider.getVisualStatus(objectId, typeId)
 				}
 			}
 		}
 
+		function onDocumentNameChanged(documentId, oldName, newName){
+			tabView.setTabName(documentId, newName)
+		}
+
 		function onDocumentIsDirtyChanged(documentId, isDirty){
+			let documentName = workspaceView.documentManager.getDocumentName(documentId)
+			if (isDirty){
+				let newName = "* " + documentName
+				tabView.setTabName(documentId, newName)
+			}
+			else{
+				tabView.setTabName(documentId, documentName)
+			}
 		}
 
 		// Open document signals
@@ -128,11 +155,6 @@ Item {
 		}
 
 		function onDocumentSaved(documentId){
-			if (workspaceView.visualStatusProvider){
-				let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
-				workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
-			}
-
 			loading.stop()
 		}
 
