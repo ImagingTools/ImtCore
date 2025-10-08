@@ -276,11 +276,13 @@ bool CCollectionDocumentManager::Serialize(iser::IArchive& archive)
 void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
 {
 	for (const QByteArray& userId : m_userDocuments.keys()){
-		const WorkingDocumentList& documents = m_userDocuments[userId];
+		WorkingDocumentList& documents = m_userDocuments[userId];
 		for (const QByteArray& documentId : documents.keys()){
 			istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(modelPtr);
 
 			if (documents[documentId].objectPtr.GetPtr() == changeablePtr){
+				documents[documentId].hasChanges = true;
+
 				DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
 				Q_ASSERT(notificationPtr != nullptr);
 				if (notificationPtr != nullptr){
