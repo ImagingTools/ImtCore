@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <ibase/TMakeModelObserverCompWrap.h>
 #include <icomp/TModelCompWrap.h>
 #include <icomp/TMakeComponentWrap.h>
 
@@ -37,6 +38,7 @@
 #include <imtservergql/CCollectionImportControllerComp.h>
 #include <imtservergql/CCollectionImportJobParamsFillerComp.h>
 #include <imtservergql/CCollectionDocumentManagerComp.h>
+#include <imtservergql/CCollectionDocumentManagerPublisherComp.h>
 
 
 /**
@@ -77,6 +79,7 @@ typedef imtservergql::CGqlCollectionImportControllerComp GqlCollectionImportCont
 typedef imtservergql::CCollectionImportControllerComp CollectionImportController;
 typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobParamsFiller;
 typedef imtservergql::CCollectionDocumentManagerComp CollectionDocumentManager;
+typedef ibase::TModelObserverCompWrap<imtservergql::CCollectionDocumentManagerPublisherComp> CollectionDocumentManagerPublisher;
 
 
 } // namespace ImtServerGqlPck

@@ -22,7 +22,7 @@ namespace imtdoc
 class CCollectionDocumentManager : virtual public imtdoc::ICollectionDocumentManager
 {
 public:
-	// reimplemented (imtdoc::IDocumentManager)
+	// reimplemented (imtdoc::ICollectionDocumentManager)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
 	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
 	virtual QByteArray OpenDocument(const QByteArray& userId, const QByteArray& objectId) override;

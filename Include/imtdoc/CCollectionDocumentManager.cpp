@@ -16,7 +16,7 @@ namespace imtdoc
 
 // protected methods
 
-// reimplemented (imtdoc::IDocumentManager)
+// reimplemented (imtdoc::ICollectionDocumentManager)
 
 imtdoc::ICollectionDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList(
 	const QByteArray& userId) const

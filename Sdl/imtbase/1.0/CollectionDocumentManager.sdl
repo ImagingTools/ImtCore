@@ -52,9 +52,11 @@ type DocumentTypeId {
 
 type DocumentManagerNotification {
 	documentId: ID!
-	objectId: ID!
-	hasChanges: Bool!
-	undoInfo: UndoInfo!
+	objectId: ID
+	hasChanges: Bool
+	isClosed: Bool!
+
+	undoInfo: UndoInfo
 }
 
 type Query {

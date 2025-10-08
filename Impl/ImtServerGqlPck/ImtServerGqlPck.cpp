@@ -169,6 +169,11 @@ I_EXPORT_COMPONENT(
 			"Collection document manager",
 			"Collection Document Manager");
 
+I_EXPORT_COMPONENT(
+			CollectionDocumentManagerPublisher,
+			"Collection document manager publisher",
+			"Collection Document Manager Publisher");
+
 
 } // namespace ImtServerGqlPck
 
