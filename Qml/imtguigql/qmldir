@@ -29,3 +29,5 @@ GqlBasedObjectVisualStatusProvider 1.0 GqlBasedObjectVisualStatusProvider.qml
 GqlBasedDataModelController 1.0 GqlBasedDataModelController.qml
 GqlBasedDataModelProvider 1.0 GqlBasedDataModelProvider.qml
 GqlBasedOptionManager 1.0 GqlBasedOptionManager.qml
+GqlBasedCollectionDocumentManager 1.0 GqlBasedCollectionDocumentManager.qml
+GqlCollectionDocManagerPageView 1.0 GqlCollectionDocManagerPageView.qml

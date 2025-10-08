@@ -6,217 +6,29 @@ import imtcontrols 1.0
 import imtdocgui 1.0
 
 DocumentDataController {
-    id: container;
+	id: root
 
-    property string gqlGetCommandId;
-    property string gqlAddCommandId;
-    property string gqlUpdateCommandId;
+	function updateRepresentationFromDocument(params){
+		dataModelProvider.requestDataModel(params)
+	}
 
-    property string subscriptionCommandId;
+	function updateDocumentFromRepresentation(params){
+		dataModelController.saveDataModel(params)
+	}
 
-    documentModelComp: Component {
-        id: treeItemModelComp;
-
-        TreeItemModel {}
-    }
-
-    Component.onDestruction: {
-        Events.sendEvent("UnregisterSubscription", container.subscriptionClient);
-    }
-
-    onError: {
-        ModalDialogManager.showWarningDialog(message)
-    }
-
-    onDocumentIdChanged: {
-        if (documentId !== ""){
-            container.subscriptionClient.register();
+	property GqlBasedDataModelProvider dataModelProvider: GqlBasedDataModelProvider {
+        dataModel: root.representationModel
+        onDataModelReady: {
+            root.representationUpdated(dataModel)
         }
-    }
+	}
 
-    function updateDocumentModel(){
-        gqlGetModel.send();
-    }
-
-    function insertDocument(){
-        gqlAddModel.send();
-    }
-
-    function saveDocument(){
-        gqlUpdateModel.send();
-    }
-
-    function getHeaders(){
-        let obj = {}
-        return obj;
-    }
-
-    function createGetInputParams(){
-        return {};
-    }
-
-    function createUpdateInputParams(){
-        return {};
-    }
-
-    function createAddInputParams(){
-        return {};
-    }
-
-    property SubscriptionClient subscriptionClient: SubscriptionClient {
-        function register(){
-            if (container.subscriptionCommandId === ""){
-                console.warn("Unable to register subscription for document because command-ID is empty");
-                return;
-            }
-
-            let subscriptionRequestId = container.subscriptionCommandId;
-            var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-            var queryFields = Gql.GqlObject("notification");
-            queryFields.InsertField("id");
-            query.AddField(queryFields);
-
-            Events.sendEvent("RegisterSubscription", {"Query": query, "Client": container.subscriptionClient});
+	property GqlBasedDataModelController dataModelController: GqlBasedDataModelController {
+        resultModel: root.representationModel
+        onResultModelReady: {
+            root.documentUpdated()
         }
-
-        onStateChanged: {
-            if (state === "Ready"){
-                container.hasRemoteChanges = true;
-            }
-        }
-    }
-
-    property GqlRequestSender gqlUpdateModel: GqlRequestSender {
-        requestType: 1; // Mutation
-        gqlCommandId: container.gqlUpdateCommandId;
-
-        function createQueryParams(query){
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel.toJson());
-
-            let additionInputParams = container.getHeaders();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("updatedNotification");
-            queryFields.InsertField("id");
-            query.AddField(queryFields);
-        }
-
-        function getHeaders(){
-            return container.getHeaders();
-        }
-
-        function onError(message, type){
-            container.error(message, type);
-        }
-
-        function onResult(data){
-            let dataModelLocal = data.getData("updatedNotification");
-
-            let documentId = dataModelLocal.getData("id");
-            let documentName = dataModelLocal.getData("name");
-
-            container.saved(documentId, documentName);
-        }
-    }
-
-    property GqlRequestSender gqlGetModel: GqlRequestSender {
-        requestType: 0; // Query
-        gqlCommandId: container.gqlGetCommandId;
-
-        function createQueryParams(query){
-            var queryFields = Gql.GqlObject("item");
-            query.AddField(queryFields);
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("id", container.documentId);
-
-            let inputObj = container.createGetInputParams();
-            for (let key in inputObj){
-                inputParams.InsertField(key, inputObj[key]);
-            }
-
-            let additionInputParams = container.getHeaders();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
-            query.AddParam(inputParams);
-        }
-
-        function getHeaders(){
-            return container.getHeaders();
-        }
-
-        function onError(message, type){
-            container.error(message, type);
-        }
-
-        function onResult(data){
-            container.documentModel = data;
-        }
-    }
-
-    property GqlRequestSender gqlAddModel: GqlRequestSender {
-        requestType: 1; // Mutation
-        gqlCommandId: container.gqlAddCommandId;
-
-        function createQueryParams(query){
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel.toJson());
-
-            let additionInputParams = container.getHeaders();
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("addedNotification");
-            queryFields.InsertField("id");
-            query.AddField(queryFields);
-        }
-
-        function getHeaders(){
-            return container.getHeaders();
-        }
-
-        function onError(message, type){
-            container.error(message, type);
-        }
-
-        function onResult(data){
-            let dataModelLocal = data.getData("addedNotification");
-
-            let documentId = ""
-            let documentName = ""
-
-            if (dataModelLocal){
-                documentId = dataModelLocal.getData("id");
-                documentName = dataModelLocal.getData("name");
-            }
-
-            container.saved(documentId, documentName);
-        }
-    }
+	}
 }
 
 

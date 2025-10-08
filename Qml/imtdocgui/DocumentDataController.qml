@@ -1,74 +1,20 @@
 import QtQuick 2.12
 import Acf 1.0
-import com.imtcore.imtqml 1.0
 
 QtObject {
-	id: root;
-	
-	property var documentModel;
-	
-	property string documentId;
-	property string documentName;
-	property string documentDescription;
-	property string typeId;
-	
-	property bool hasRemoteChanges: false;
-	
-	property Component documentModelComp;
-	
-	signal saved(string id, string name);
-	signal error(string message, string type);
-	signal modelChanged();
-	
-	Component.onDestruction: {
-		if (documentModel){
-			documentModel.destroy();
-		}
+	id: root
+
+	property string documentId
+	property var representationModel: null
+
+	signal representationUpdated(string documentId, var representation)
+	signal documentUpdated(string documentId)
+
+	function updateRepresentationFromDocument(){
+		console.warn("updateRepresentationFromDocument() should be implemented in a subclass")
 	}
-	
-	onDocumentModelChanged: {
-		hasRemoteChanges = false;
-		modelChanged();
-	}
-	
-	function getDocumentId(){
-		return documentId;
-	}
-	
-	function getDocumentName(){
-		return documentName;
-	}
-	
-	function getDocumentTypeId(){
-		return typeId;
-	}
-	
-	function getDocumentModel(){
-		return documentModel;
-	}
-	
-	function getDocumentDescription(){
-		return documentDescription;
-	}
-	
-	function updateDocumentModel(){
-		modelChanged();
-	}
-	
-	function insertDocument(){
-		saved(documentId, documentName)
-	}
-	
-	function saveDocument(){
-		saved(documentId, documentName)
-	}
-	
-	function createDocumentModel(){
-		if (root.documentModelComp){
-			documentModel = root.documentModelComp.createObject(root);
-		}
-		else{
-			console.error("Unable to create document model for DocumentDataController. Error: 'documentModelComp' is invalid")
-		}
+
+	function updateDocumentFromRepresentation(){
+		console.warn("updateDocumentFromRepresentation() should be implemented in a subclass")
 	}
 }

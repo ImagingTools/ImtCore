@@ -7,9 +7,16 @@ import imtguigql 1.0
 import imtcontrols 1.0
 import imtdocgui 1.0
 
-DocumentDataController {
+QtObject {
 	id: container;
 
+	property string documentId;
+	property string documentName;
+	property string documentDescription;
+	property string typeId;
+	property Component documentModelComp;
+	property var documentModel;
+	
 	property string gqlGetCommandId: "";
 	property string gqlAddCommandId: "";
 	property string gqlUpdateCommandId: "";
@@ -23,10 +30,44 @@ DocumentDataController {
 	signal beforeSaveModel();
 	signal beforeInsertModel();
 
+	signal saved(string id, string name);
+	signal error(string message, string type);
+	signal modelChanged();
+
+	Component.onDestruction: {
+		if (documentModel){
+			documentModel.destroy();
+		}
+	}
+
+	onDocumentModelChanged: {
+		modelChanged()
+	}
+
 	onSubscriptionCommandIdChanged: {
 		if (subscriptionCommandId !== ""){
 			subscriptionClient.gqlCommandId = subscriptionCommandId;
 		}
+	}
+
+	function getDocumentId(){
+		return documentId;
+	}
+	
+	function getDocumentName(){
+		return documentName;
+	}
+	
+	function getDocumentTypeId(){
+		return typeId;
+	}
+	
+	function getDocumentModel(){
+		return documentModel;
+	}
+	
+	function getDocumentDescription(){
+		return documentDescription;
 	}
 
 	onError: {

@@ -2,13 +2,15 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
+import imtdocgui 1.0
 import imtcontrols 1.0
 
 Item {
 	id: viewBase;
-	
-	property string viewId;
-	property var model: null;
+
+	property string viewTypeId
+	property string viewId
+	property var model: null
 	
 	property Component commandsControllerComp: null;
 	property CommandsController commandsController: null;
@@ -32,6 +34,18 @@ Item {
 	
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId);
+	signal modelDataChanged(var view, var model);
+
+	Connections {
+		target: viewBase.model
+		function onModelChanged(){
+			if (viewBase.internal__.blockingUpdateModel){
+				return
+			}
+
+			viewBase.modelDataChanged(viewBase, viewBase.model)
+		}
+	}
 	
 	Connections {
 		target: viewBase.commandsDelegate
@@ -217,8 +231,6 @@ Item {
 	function doUpdateGui()
 	{
 		console.debug("doUpdateGui");
-		console.debug("viewBase.internal__", viewBase.internal__);
-		
 		if (!model || !viewBase.internal__){
 			return;
 		}
@@ -226,7 +238,6 @@ Item {
 		if (viewBase.internal__.blockingUpdateGui || viewBase.internal__.blockingUpdateModel){
 			return;
 		}
-		
 		
 		viewBase.internal__.blockingUpdateModel = true;
 		
@@ -257,6 +268,9 @@ Item {
 		property bool localizationChanged: false;
 		property bool blockingUpdateGui: false;
 		property bool blockingUpdateModel: false;
+		onBlockingUpdateModelChanged: {
+			console.log("onBlockingUpdateModelChanged",blockingUpdateModel )
+		}
 		
 		property var commandStates: ({})
 		

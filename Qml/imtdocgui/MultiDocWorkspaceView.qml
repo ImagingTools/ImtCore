@@ -73,9 +73,8 @@ Item {
 
 		function onDocumentSaved(documentId){
 			Events.sendEvent("StopLoading")
-			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
-
 			if (workspaceView.visualStatusProvider){
+				let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
 				workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
 			}
 		}

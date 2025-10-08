@@ -19,3 +19,8 @@ DocumentHistoryPanel 1.0 DocumentHistoryPanel.qml
 DocumentView 1.0 DocumentView.qml
 DocumentViewBase 1.0 DocumentViewBase.qml
 CommandsProvider 1.0 CommandsProvider.qml
+DocumentManagerBase 1.0 DocumentManagerBase.qml
+MultiDocumentCollectionView 1.0 MultiDocumentCollectionView.qml
+MultiDocCollectionPageView 1.0 MultiDocCollectionPageView.qml
+DocumentDecorator 1.0 DocumentDecorator.qml
+DocCollectionViewDelegate 1.0 DocCollectionViewDelegate.qml
