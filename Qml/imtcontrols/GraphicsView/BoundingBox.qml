@@ -150,8 +150,8 @@ GraphicsShapeBase {
 		if(!points.length){
 			return null;
 		}
-		let point = getBoundingBoxPoints()
-		return point.topLeftPoint
+		let pointsBB = getBoundingBoxPoints()
+		return pointsBB.topLeftPoint
 	}
 
 	function getBoundingBoxWidth(pointsBB){
@@ -588,7 +588,7 @@ GraphicsShapeBase {
 	}
 
 	function setBackup(){
-		if(isSelected && viewItem.isEditMode){
+		if(isSelected && viewItem && viewItem.isEditMode){
 			pointsBackupScreen = []
 			for(let i = 0; i < points.length; i++){
 				pointsBackupScreen.push(getScreenPosition(points[i]))

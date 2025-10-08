@@ -11,9 +11,6 @@ BoundingBox {
 	property string color: "transparent";
 
 	function draw(ctx, transformMatrixArg){
-		if(isSelected){
-			ctx.globalAlpha = 0.7
-		}
 
 		let params = getParams()
 		ctx.fillStyle = params.color !== undefined ? params.color : polygonShape.color;
@@ -33,7 +30,11 @@ BoundingBox {
 
 		ctx.closePath();
 		ctx.stroke();
+		if(isSelected){
+			ctx.globalAlpha = 0.7
+		}
 		ctx.fill();
+		ctx.globalAlpha = 1
 
 	}
 

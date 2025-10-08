@@ -34,6 +34,8 @@ QtObject {
 	property bool mouseIsPressed: false;
 	property var mousePressedCoord: Qt.point(0,0);
 
+	property bool isHidden: false;
+
 	signal shapeChanged();
 	signal shapeInfo(var info);
 	signal pointInfo(var info);
@@ -78,6 +80,9 @@ QtObject {
 
 
 	function drawComplex(ctx, transformMatrixArg){
+		if(isHidden){
+			return;
+		}
 		//console.log("!!!!!_____", LinearAlgebra.isIdentityMatrix(shapeMatrix.matrix))
 		if(!LinearAlgebra.isIdentityMatrix(shapeMatrix.matrix)){
 			transformMatrixArg.matrix = LinearAlgebra.multiplyByMatrix3x3(transformMatrixArg.matrix, shapeMatrix.matrix)

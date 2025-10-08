@@ -47,6 +47,8 @@ BoundingBox {
 		ctx.fill();
 		ctx.closePath();
 
+		ctx.globalAlpha = 1
+
 		if(isSelected){
 			drawSelection(ctx, transformMatrixArg, x1, y1, width_, height_, radius_)
 		}

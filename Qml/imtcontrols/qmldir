@@ -49,6 +49,7 @@ TopButtonDecorator 1.0 ./Buttons/TopButtonDecorator.qml
 IconButtonDecorator 1.0 ./Buttons/IconButtonDecorator.qml
 RadioButtonDecorator 1.0 ./Buttons/RadioButtonDecorator.qml
 SegmentedButton 1.0 ./Buttons/SegmentedButton.qml
+MenuButton 1.0 ./Buttons/MenuButton.qml
 
 singleton ModalDialogManager 1.0 ./Dialogs/ModalDialogManager.qml
 DialogButtons 1.0 ./Dialogs/DialogButtons.qml
@@ -213,6 +214,9 @@ QuadraticCurveShape 1.0 ./GraphicsView/QuadraticCurveShape.qml
 TextShape 1.0 ./GraphicsView/TextShape.qml
 ImageShape 1.0 ./GraphicsView/ImageShape.qml
 CoordinateGridShape 1.0 ./GraphicsView/CoordinateGridShape.qml
+SegmentShape 1.0 ./GraphicsView/SegmentShape.qml
+DiskSegmentShape 1.0 ./GraphicsView/DiskSegmentShape.qml
+SegmentBaseShape 1.0 ./GraphicsView/SegmentBaseShape.qml
 
 PolygonParams 1.0 ./GraphicsView/PolygonParams.qml
 RectangleParams 1.0 ./GraphicsView/RectangleParams.qml

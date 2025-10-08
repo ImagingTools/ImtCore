@@ -309,5 +309,26 @@ QtObject {
 		return retVal
 	}
 
+	function getRadians(degreesArg){
+		return degreesArg * Math.PI / 180
+	}
 
+	function getAngle(xArg, yArg, center){
+		let x0 = center.x
+		let y0 = center.y
+		let x_ = (xArg- x0)
+		let y_ = (yArg - y0)
+		let r = Math.sqrt(x_*x_+y_*y_)
+		let angle = 0
+		if(x_ >= 0 && y_ <= 0)
+			angle = Math.asin(Math.abs(x_)/r)*180/Math.PI
+		else if(x_ > 0 && y_ > 0)
+			angle = Math.acos(Math.abs(x_)/r)*180/Math.PI + 90
+		else if(x_ <= 0 && y_ > 0)
+			angle = Math.asin(Math.abs(x_)/r)*180/Math.PI + 180
+		else if(x_ <= 0 && y_ <= 0)
+			angle = Math.acos(Math.abs(x_)/r)*180/Math.PI + 270
+
+		return angle;
+	}
 }
