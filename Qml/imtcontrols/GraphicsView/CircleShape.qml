@@ -55,7 +55,7 @@ BoundingBox {
 	}
 
 	function getBoundingBoxCoordinate(){
-		return Qt.point(center.x - radius/2, center.y - radius/2);
+		return Qt.point(center.x - radius, center.y - radius);
 	}
 
 	function getBoundingBoxWidth(){
@@ -75,10 +75,10 @@ BoundingBox {
 
 		let pointsObj = ({});
 
-		pointsObj.topLeftPoint = Qt.point(center.x - radius/2, center.y - radius/2)
-		pointsObj.topRightPoint = Qt.point(center.x + radius/2, center.y - radius/2)
-		pointsObj.bottomLeftPoint = Qt.point(center.x - radius/2, center.y + radius/2)
-		pointsObj.bottomRightPoint = Qt.point(center.x + radius/2, center.y + radius/2)
+		pointsObj.topLeftPoint = Qt.point(center.x - radius, center.y - radius)
+		pointsObj.topRightPoint = Qt.point(center.x + radius, center.y - radius)
+		pointsObj.bottomLeftPoint = Qt.point(center.x - radius, center.y + radius)
+		pointsObj.bottomRightPoint = Qt.point(center.x + radius, center.y + radius)
 
 		return pointsObj;
 	}
@@ -91,5 +91,20 @@ BoundingBox {
 		center = getLogPosition(centerNew)
 	}
 
+	function drawControlPoints(ctx, transformMatrixArg){
+		let pointsObj = getBoundingBoxMidPoints();
+		ctx.strokeStyle = DesignScheme.boundingBoxBorderColor
+		ctx.fillStyle = DesignScheme.boundingBoxBorderColor
+		ctx.lineWidth = DesignScheme.boundingBoxLineWidth
+		ctx.beginPath()
+
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.topPoint)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.bottomPoint)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.leftPoint)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.rightPoint)
+
+		ctx.stroke()
+		ctx.fill()
+	}
 }
 

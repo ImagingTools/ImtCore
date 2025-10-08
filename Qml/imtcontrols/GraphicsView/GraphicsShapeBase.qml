@@ -15,6 +15,7 @@ QtObject {
 	property bool isTouched: false;
 	property bool isSelected: false;
 	property bool showNodes: false;
+	property bool showControlPoints: false;
 	property int touchedNodeIndex: -1;
 	property int highlightedNodeIndex: -1;
 	property int editNodeIndex: -1;
@@ -95,6 +96,14 @@ QtObject {
 		if(isSelected && (viewItem.isPointsEditMode || viewItem.isPointsAdditionMode || viewItem.isPointsDeletionMode)){
 			drawEditPoints(ctx)
 		}
+
+		if(showControlPoints){
+			drawControlPoints(ctx, transformMatrixArg)
+		}
+	}
+
+	function drawControlPoints(ctx, transformMatrixArg){
+
 	}
 
 	function drawEditPoints(ctx){

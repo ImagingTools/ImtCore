@@ -72,10 +72,10 @@ GraphicsShapeBase {
 		return Qt.point((cornerPointsObj.topLeftPoint.x + cornerPointsObj.topRightPoint.x)/2, (cornerPointsObj.topRightPoint.y + cornerPointsObj.bottomRightPoint.y)/2);
 	}
 
-	function getBoundingBoxPoints(){
+	function getLimitsObject(pointsArg){
 		let pointCount = 0
-		if(points.length){
-			pointCount = points.length
+		if(pointsArg.length){
+			pointCount = pointsArg.length
 		}
 		let pointsObj = ({});
 
@@ -85,7 +85,7 @@ GraphicsShapeBase {
 		let maxY = 0;
 
 		for(let i = 0; i < pointCount; i++){
-			let point = points[i]
+			let point = pointsArg[i]
 			if (i == 0){
 				minX = maxX = point.x
 				minY = maxY = point.y
@@ -115,6 +115,11 @@ GraphicsShapeBase {
 		pointsObj.bottomRightPoint = Qt.point(maxX, maxY)
 
 		return pointsObj;
+	}
+
+
+	function getBoundingBoxPoints(){
+		return getLimitsObject(points)
 	}
 
 	function getBoundingBoxCornerPoints(isScreenPosition){

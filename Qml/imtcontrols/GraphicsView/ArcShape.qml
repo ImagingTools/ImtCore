@@ -23,7 +23,12 @@ SegmentBaseShape {
 		let startRad = Functions.getRadians(startAngle)
 		let endRad = Functions.getRadians(endAngle)
 
-		ctx.arc(centerScreen.x, centerScreen.y, radiusScreen,  startRad, endRad, anticlockwise)
+		if(!equalAngles){
+			ctx.arc(centerScreen.x, centerScreen.y, radiusScreen,  startRad, endRad, anticlockwise)
+		}
+		else {
+			ctx.arc(centerScreen.x, centerScreen.y, radiusScreen,  0, 2*Math.PI, anticlockwise)
+		}
 		ctx.stroke();
 	}
 
@@ -32,5 +37,17 @@ SegmentBaseShape {
 		return (dist < radius + margin_ && dist > radius - margin_)
 	}
 
+	function getBoundingBoxPoints(){
+		let pointsObj = ({});
+
+		if(equalAngles){
+			pointsObj.topLeftPoint = Qt.point(center.x - radius, center.y - radius)
+			pointsObj.topRightPoint = Qt.point(center.x + radius, center.y - radius)
+			pointsObj.bottomLeftPoint = Qt.point(center.x - radius, center.y + radius)
+			pointsObj.bottomRightPoint = Qt.point(center.x + radius, center.y + radius)
+		}
+
+		return pointsObj;
+	}
 }
 

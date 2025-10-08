@@ -9,7 +9,7 @@ SegmentBaseShape {
 	id: sector;
 
 	property real innerRadius: Style.sizeHintBXS;
-	property real outerRadius: Style.sizeHintBXS/2;
+	property real outerRadius: Style.sizeHintBXS;
 
 	function draw(ctx, transformMatrixArg){
 		let startAngle_ = startAngle
@@ -75,6 +75,39 @@ SegmentBaseShape {
 		return (dist <= outerRadius && dist >= innerRadius)
 	}
 
+	function getBoundingBoxPoints(){
+		let pointsObj = ({});
+
+		if(equalAngles){
+			pointsObj.topLeftPoint = Qt.point(center.x - outerRadius, center.y - outerRadius)
+			pointsObj.topRightPoint = Qt.point(center.x + outerRadius, center.y - outerRadius)
+			pointsObj.bottomLeftPoint = Qt.point(center.x - outerRadius, center.y + outerRadius)
+			pointsObj.bottomRightPoint = Qt.point(center.x + outerRadius, center.y + outerRadius)
+		}
+
+		return pointsObj;
+	}
+
+	function drawControlPoints(ctx, transformMatrixArg){
+		let pointsObj = getBoundingBoxMidPoints();
+		ctx.strokeStyle = DesignScheme.boundingBoxBorderColor
+		ctx.fillStyle = DesignScheme.boundingBoxBorderColor
+		ctx.lineWidth = DesignScheme.boundingBoxLineWidth
+		ctx.beginPath()
+
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.topPoint)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.bottomPoint)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.leftPoint)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.rightPoint)
+
+		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x + innerRadius, center.y))
+		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x, center.y + innerRadius))
+		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x - innerRadius, center.y))
+		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x, center.y - innerRadius))
+
+		ctx.stroke()
+		ctx.fill()
+	}
 
 }
 

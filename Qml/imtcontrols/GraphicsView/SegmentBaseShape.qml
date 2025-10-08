@@ -20,6 +20,8 @@ BoundingBox {
 	property real precision: 0.0001
 
 	readonly property bool anticlockwise: true;
+	property bool equalAngles: Math.abs(startAngle - endAngle) < precision;
+
 
 	function isInside(xArg, yArg){
 		let margin_ = Style.marginM
@@ -39,7 +41,7 @@ BoundingBox {
 	}
 
 	function isInsideAngles(angle){
-		if(Math.abs(startAngle - endAngle) < precision){
+		if(equalAngles){
 			return true;
 		}
 

@@ -32,6 +32,7 @@ Rectangle {
 	property var translateYPositiveLimit;
 	property var translateXNegativeLimit;
 	property var translateYNegativeLimit;
+	property bool onlyMouseEvents: false;
 	property bool restrictZoom: false;
 	property bool restrictMove: false;
 	property bool restrictSelect: false;
@@ -62,6 +63,7 @@ Rectangle {
 	property alias deltaX: canvas.deltaX;
 	property alias deltaY: canvas.deltaY;
 	property alias viewMatrix: canvasMatrix;
+	property alias mouseArea: controlArea;
 
 	property var hintShapeModel: []
 	property var hintShapePointModel: []
@@ -94,6 +96,12 @@ Rectangle {
 	signal hintShapePoint(int shapeIndex,int pointIndex)
 
 	signal paintTime(int time)
+
+	signal mouseClicked(var mouse)
+	signal mousePressed(var mouse)
+	signal mouseReleased(var mouse)
+	signal mouseDoubleClicked(var mouse)
+	signal mousePositionChanged(var mouse)
 
 	Component.onCompleted: {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
@@ -551,6 +559,10 @@ Rectangle {
 
 			onClicked: {
 				//console.log("CLICKED!!!")
+				if(graphicsView.onlyMouseEvents){
+					graphicsView.mouseClicked(mouse)
+					return
+				}
 
 				let activeLayer = graphicsView.getActiveLayer()
 
@@ -562,6 +574,10 @@ Rectangle {
 
 			onPressed: {
 				//console.log("PRESSED!!!")
+				if(graphicsView.onlyMouseEvents){
+					graphicsView.mousePressed(mouse)
+					return
+				}
 				let activeLayer = graphicsView.getActiveLayer()
 
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
@@ -599,6 +615,10 @@ Rectangle {
 
 			onReleased: {
 				//console.log("RELEASED!!!")
+				if(graphicsView.onlyMouseEvents){
+					graphicsView.mouseReleased(mouse)
+					return
+				}
 				let activeLayer = graphicsView.getActiveLayer()
 
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
@@ -640,6 +660,10 @@ Rectangle {
 			}
 
 			onDoubleClicked: {
+				if(graphicsView.onlyMouseEvents){
+					graphicsView.mouseDoubleClicked(mouse)
+					return
+				}
 				wasMoving = false;
 				isPressed = false;
 
@@ -799,6 +823,10 @@ Rectangle {
 			}
 
 			onPositionChanged: {
+				if(graphicsView.onlyMouseEvents){
+					graphicsView.mousePositionChanged(mouse)
+					return
+				}
 				if(!graphicsView.isSelectionMode && controlArea.isPressed){
 					let activeLayer = graphicsView.getActiveLayer()
 
