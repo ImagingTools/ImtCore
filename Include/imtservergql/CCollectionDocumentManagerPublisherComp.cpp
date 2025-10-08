@@ -44,29 +44,37 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 	const istd::IChangeable::ChangeInfoMap& map = changeSet.GetChangeInfoMap();
 	Q_ASSERT(map.count() <= 1);
 
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification sdlNotification;
+	sdlNotification.Version_1_0.emplace();
+	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0& sdlNotificationV1 = *sdlNotification.Version_1_0;
+
 	if (map.contains(imtdoc::ICollectionDocumentManager::CN_NEW_DOCUMENT_CREATED)){
 		Q_ASSERT(map.values(imtdoc::ICollectionDocumentManager::CN_NEW_DOCUMENT_CREATED).size() == 1);
 		varChanged = map.value(imtdoc::ICollectionDocumentManager::CN_NEW_DOCUMENT_CREATED);
+
+		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::NewDocumentCreated;
 	}
 	else if (map.contains(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_OPENED)){
 		Q_ASSERT(map.values(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_OPENED).size() == 1);
 		varChanged = map.value(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_OPENED);
+
+		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentOpened;
 	}
 	else if (map.contains(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_CHANGED)){
 		Q_ASSERT(map.values(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_CHANGED).size() == 1);
 		varChanged = map.value(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_CHANGED);
+
+		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentChanged;
 	}
 	else if (map.contains(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_CLOSED)){
 		Q_ASSERT(map.values(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_CLOSED).size() == 1);
 		varClosed = map.value(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_CLOSED);
+
+		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentClosed;
 	}
 	else{
 		return;
 	}
-
-	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification sdlNotification;
-	sdlNotification.Version_1_0.emplace();
-	sdl::imtbase::CollectionDocumentManager::CDocumentManagerNotification::V1_0& sdlNotificationV1 = *sdlNotification.Version_1_0;
 
 	if (varChanged.canConvert<imtdoc::ICollectionDocumentManager::DocumentNotification>()){
 		imtdoc::ICollectionDocumentManager::DocumentNotification notification =
@@ -75,26 +83,10 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 		sdlNotificationV1.documentId = notification.documentId;
 		sdlNotificationV1.objectId = notification.objectId;
 		sdlNotificationV1.hasChanges = notification.hasChanges;
-		sdlNotificationV1.isClosed = false;
-
-		sdlNotificationV1.undoInfo.emplace();
-		sdlNotificationV1.undoInfo->availableUndoSteps = notification.availableUndoSteps;
-		sdlNotificationV1.undoInfo->availableRedoSteps = notification.availableRedoSteps;
-		sdlNotificationV1.undoInfo->status.emplace().status = sdl::imtbase::UndoManager::EUndoStatus::Success;
-
-		sdlNotificationV1.undoInfo->undoLevelDescriptions.emplace();
-		for (const QString& description : notification.undoLevelDescriptions){
-			sdlNotificationV1.undoInfo->undoLevelDescriptions->append(description);
-		}
-
-		sdlNotificationV1.undoInfo->redoLevelDescriptions.emplace();
-		for (const QString& description : notification.redoLevelDescriptions){
-			sdlNotificationV1.undoInfo->redoLevelDescriptions->append(description);
-		}
 	}
 	else if (varClosed.metaType().id() == QMetaType::QByteArray){
+		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentClosed;
 		sdlNotificationV1.documentId = varClosed.toByteArray();
-		sdlNotificationV1.isClosed = true;
 	}
 	else{
 		return;

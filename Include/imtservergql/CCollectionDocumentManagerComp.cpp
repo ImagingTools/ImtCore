@@ -225,7 +225,7 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerComp::OnGetUndoIn
 	if (!documentId || !documentId->id){
 		errorMessage = "Invalid GQL request params";
 
-		retVal.Version_1_0->status->status = UM::EUndoStatus::InvalidDocumentId;
+		retVal.Version_1_0->status->status = UM::EUndoStatus::Failed;
 
 		return retVal;
 	}
@@ -234,30 +234,40 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerComp::OnGetUndoIn
 	if (userId.isEmpty()){
 		errorMessage = "Unable to get user ID from context";
 
-		retVal.Version_1_0->status->status = UM::EUndoStatus::InvalidUserId;
+		retVal.Version_1_0->status->status = UM::EUndoStatus::Failed;
 
 		return retVal;
 	}
 
 	QMutexLocker locker(&m_mutex);
-	if (!m_userDocuments.contains(userId) || !m_userDocuments[userId].contains(*documentId->id)){
-		idoc::IUndoManager* undoManagerPtr = m_userDocuments[userId][*documentId->id].undoManagerPtr.GetPtr();
+	if (!m_userDocuments.contains(userId)){
+		errorMessage = "Invalid user ID";
 
-		int count = undoManagerPtr->GetAvailableUndoSteps();
-		retVal.Version_1_0->availableUndoSteps = count;
-		retVal.Version_1_0->undoLevelDescriptions.emplace();
-		for (int i = 0; i < count; i++){
-			QString description = undoManagerPtr->GetUndoLevelDescription(i);
-			retVal.Version_1_0->undoLevelDescriptions->append(description);
-		}
+		retVal.Version_1_0->status->status = UM::EUndoStatus::InvalidUserId;
+	}
 
-		count = undoManagerPtr->GetAvailableRedoSteps();
-		retVal.Version_1_0->availableRedoSteps = count;
-		retVal.Version_1_0->redoLevelDescriptions.emplace();
-		for (int i = 0; i < count; i++){
-			QString description = undoManagerPtr->GetRedoLevelDescription(i);
-			retVal.Version_1_0->redoLevelDescriptions->append(description);
-		}
+	if (!m_userDocuments[userId].contains(*documentId->id)){
+		errorMessage = "Invalid document ID";
+
+		retVal.Version_1_0->status->status = UM::EUndoStatus::InvalidDocumentId;
+	}
+
+	idoc::IUndoManager* undoManagerPtr = m_userDocuments[userId][*documentId->id].undoManagerPtr.GetPtr();
+
+	int count = undoManagerPtr->GetAvailableUndoSteps();
+	retVal.Version_1_0->availableUndoSteps = count;
+	retVal.Version_1_0->undoLevelDescriptions.emplace();
+	for (int i = 0; i < count; i++){
+		QString description = undoManagerPtr->GetUndoLevelDescription(i);
+		retVal.Version_1_0->undoLevelDescriptions->append(description);
+	}
+
+	count = undoManagerPtr->GetAvailableRedoSteps();
+	retVal.Version_1_0->availableRedoSteps = count;
+	retVal.Version_1_0->redoLevelDescriptions.emplace();
+	for (int i = 0; i < count; i++){
+		QString description = undoManagerPtr->GetRedoLevelDescription(i);
+		retVal.Version_1_0->redoLevelDescriptions->append(description);
 	}
 
 	retVal.Version_1_0->status->status = UM::EUndoStatus::Success;

@@ -10,6 +10,14 @@ import {
 	"UndoManager.sdl"
 }
 
+enum EDocumentOperation{
+	NewDocumentCreated
+	DocumentOpened
+	DocumentChanged
+	DocumentSaved
+	DocumentClosed
+}
+
 enum EDocumentOperationStatus {
 	Success
 	InvalidUserId
@@ -51,12 +59,10 @@ type DocumentTypeId {
 }
 
 type DocumentManagerNotification {
+	documentOperation: EDocumentOperation!
 	documentId: ID!
 	objectId: ID
 	hasChanges: Bool
-	isClosed: Bool!
-
-	undoInfo: UndoInfo
 }
 
 type Query {
