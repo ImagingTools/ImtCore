@@ -286,7 +286,7 @@ void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IC
 				if (notificationPtr != nullptr){
 					istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
 					changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
-					istd::CChangeNotifier notifier(this);
+					istd::CChangeNotifier notifier(this, &changeSet);
 				}
 			}
 		}
