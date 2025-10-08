@@ -319,27 +319,8 @@ QtObject {
 					documentTypeId: documentData.typeId
 					documentManager: root
 					onViewRegistered: {
-						if (representationController.representationModel === null){
-							console.error("Unable to register view for document '"+documentData.id+"'. Error: Representation model from controller is invalid")
-							return
-						}
-
-						view.model = representationController.representationModel
 						if (documentData.isNew){
 							view.doUpdateModel()
-						}
-						else{
-							let cb = function(documentId, representation){
-								view.setBlockingUpdateModel(false)
-								if (documentId === documentData.id){
-									view.doUpdateGui()
-								}
-								representationController.representationUpdated.disconnect(cb)
-							}
-	
-							representationController.representationUpdated.connect(cb)
-							view.setBlockingUpdateModel(true)
-							representationController.updateRepresentationFromDocument()
 						}
 					}
 				}

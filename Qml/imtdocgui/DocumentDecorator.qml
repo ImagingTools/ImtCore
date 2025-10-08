@@ -16,8 +16,13 @@ QtObject {
 
 	onViewRegistered: {
 		if (view){
+			view.setBlockingUpdateModel(true)
+			view.model = representationController.representationModel
 			view.commandActivated.connect(onCommandActivated)
 			view.modelDataChanged.connect(onModelDataChanged)
+
+			representationController.representationUpdated.connect(onRepresentationUpdated)
+			representationController.updateRepresentationFromDocument()
 		}
 	}
 
@@ -73,9 +78,7 @@ QtObject {
 			documentView.commandsController.setCommandIsEnabled("Save", hasChanges)
 
 			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
-				for (let i = 0; i < root.registeredViews.length; ++i){
-					root.registeredRepresentation[i].updateRepresentationFromDocument()
-				}
+				root.updateRepresentationForAllViews()
 			}
 		}
 	}
@@ -115,8 +118,6 @@ QtObject {
 			console.error("Unable to register view with invalid representation controller")
 			return
 		}
-
-		representationController.representationUpdated.connect(root.onRepresentationUpdated)
 
 		registeredViews.push(view)
 		registeredRepresentation.push(representationController)
@@ -162,6 +163,7 @@ QtObject {
 
 	function updateDocumentForAllViews(){
 		for (let i = 0; i < registeredViews.length; ++i){
+			registeredViews[i].setBlockingUpdateModel(true)
 			registeredRepresentation[i].updateDocumentFromRepresentation()
 		}
 	}
