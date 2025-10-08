@@ -170,7 +170,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 
 	QMutexLocker locker(&m_mutex);
 
-	if (m_userDocuments.contains(userId)) {
+	if (!m_userDocuments.contains(userId)) {
 		return OS_INVALID_USER_ID;
 	}
 
