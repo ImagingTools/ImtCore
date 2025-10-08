@@ -53,7 +53,7 @@ QtObject {
 				return
 			}
 
-			documentView.commandsController.setCommandIsEnabled("Save", true)
+			documentView.commandsController.setCommandIsEnabled("Save", hasChanges)
 
 			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
 				let viewTypeIds = Object.keys(root.registeredViews)

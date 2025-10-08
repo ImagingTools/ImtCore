@@ -69,9 +69,16 @@ Item {
 		id: connections
 		target: workspaceView.documentManager
 
-		function onDocumentManagerChanged(typeOperation, objectId, documentId){
+		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
+			console.log("MultiDocumentCollectionView onDocumentManagerChanged", typeOperation, objectId, documentId, hasChanges)
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
+			}
+			else if (typeOperation === EDocumentOperationEnum.s_documentOpened){
+				if (workspaceView.visualStatusProvider){
+					let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
+					workspaceView.visualStatusProvider.getVisualStatus(objectId, typeId)
+				}
 			}
 		}
 

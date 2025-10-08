@@ -52,7 +52,9 @@ QtObject {
 			setDocumentIsDirty(documentId, true)
 		}
 
-		getUndoInfo(documentId)
+		if (typeOperation !== "DocumentClosed"){
+			getUndoInfo(documentId)
+		}
 	}
 
 	onDocumentCreated: {
