@@ -175,6 +175,7 @@ Item {
 		function onDocumentCreated(documentId, documentTypeId){
 			let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(documentTypeId)
 			let defaultName = workspaceView.documentManager.getDefaultDocumentName()
+			workspaceView.documentManager.setDocumentName(documentId, defaultName)
 			tabView.addTab(documentId, defaultName, documentEditorComp, "", "", false)
 
 			tabView.currentIndex = tabView.tabModel.count - 1
