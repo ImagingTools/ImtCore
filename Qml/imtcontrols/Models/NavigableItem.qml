@@ -57,16 +57,6 @@ Item {
 	property bool forwardRest: true
 
 	/*!
-		Stores the remaining (unprocessed) path when navigation
-		is interrupted at this Navigable. This allows child
-		Navigables to later pick up the pending path once they
-		are created and ready to handle it.
-
-		\internal
-	*/
-	property var pendingPath: null
-
-	/*!
 		Emitted when this Navigable is activated.
 
 		\param params      Arbitrary parameters passed with navigation
@@ -76,93 +66,65 @@ Item {
 	signal activated(var params, var restPath, string matchedPath)
 
 	Component.onCompleted: {
-		NavigationController.navigatePath.connect(processPath)
-		NavigationController.registerNavigableItem(root)
-		checkParentSegmentPending()
-	}
-
-	/*!
-		Checks whether the parent Navigable has a pending path that
-		this Navigable can handle. If so, the pending path is consumed
-		and navigation is resumed from this Navigable.
-
-		Called automatically when this Navigable is created, and also
-		when \c parentSegment or \c paths change.
-	*/
-	function checkParentSegmentPending(){
-		let parentNavigableItem = NavigationController.getNavigableItem(parentSegment)
-		if (parentNavigableItem !== null){
-			let pendingPath = parentNavigableItem.pendingPath
-			if (pendingPath !== null){
-				if (paths.includes(pendingPath.rest[0])){
-					NavigationController.navigatePath(pendingPath.rest, pendingPath.params, pendingPath.activeSegments, function(){})
-					parentNavigableItem.pendingPath.rest = parentNavigableItem.pendingPath.rest.slice(1)
-					root.pendingPath = {
-						rest: parentNavigableItem.pendingPath.rest,
-						params: parentNavigableItem.pendingPath.params,
-						activeSegments: parentNavigableItem.pendingPath.activeSegments
-					}
-					parentNavigableItem.pendingPath = null
-				}
-			}
-		}
-	}
-
-	onParentSegmentChanged: {
-		checkParentSegmentPending()
-	}
-
-	onPathsChanged: {
-		checkParentSegmentPending()
+		internal.tryRegister()
 	}
 
 	Component.onDestruction: {
-		NavigationController.navigatePath.disconnect(processPath)
+		NavigationController.unregisterNavigableItem(root)
 	}
 
-	/*!
-		Processes a navigation request for the given \a path.
+	QtObject {
+		id: internal
+		property bool registered: false
+		function tryRegister() {
+			if (!registered && root.paths.length > 0) {
+				NavigationController.registerNavigableItem(root)
+				registered = true
+			}
+		}
+	}
 
-		If the first segment of the path matches one of this Navigable's
-		\c paths, the \c activated signal is emitted. The remaining
-		segments may be forwarded further if \c forwardRest is true.
+	onPathsChanged: {
+		internal.tryRegister()
+	}
 
-		Any leftover path is stored in \c pendingPath, allowing child
-		Navigables to continue navigation later.
-	*/
-	function processPath(path, params, activeSegments, markHandled) {
-		if (path.length === 0)
-			return
-
-		if (parentSegment === "" && activeSegments.length > 0){
-			return
+	function segmentIsSupported(segment){
+		return paths.includes(segment)
+	}
+	
+	function processSegment(segment, params, restPath) {
+		if (!segmentIsSupported(segment)) {
+			console.error("Unable to process segment '"+segment+"'. Supported segments: '"+paths+"'")
+			return false
 		}
 
-		if (parentSegment !== "" && activeSegments.indexOf(parentSegment) === -1)
-			return
+		activated(params, restPath, segment)
 
-		for (let i = 0; i < paths.length; i++) {
-			let pattern = paths[i]
-			if (pattern === path[0]) {
-				let rest = path.slice(1)
-				root.activated(params, rest, pattern)
+		console.log("processSegment", segment, restPath)
+		
+		if (restPath.length === 0) {
+			return true
+		}
 
-				let newActiveSegments = activeSegments.slice()
-				newActiveSegments.push(path[0])
+		if (!forwardRest){
+			return true
+		}
 
-				if (forwardRest && rest.length > 0) {
-					NavigationController.navigatePath(rest, params, newActiveSegments, markHandled)
-				}
-
-				root.pendingPath = {
-					rest: rest,
-					params: params,
-					activeSegments: newActiveSegments
-				}
-
-				markHandled()
+		let next = restPath[0]
+		let delivered = false
+		for (let i = 0; i < NavigationController.navigableItems.length; ++i) {
+			let child = NavigationController.navigableItems[i]
+			if (child.parentSegment === segment && child.segmentIsSupported(next)) {
+				child.processSegment(next, params, restPath.slice(1))
+				delivered = true
 				break
 			}
 		}
+
+		if (!delivered) {
+			NavigationController.setPending(segment, restPath, params)
+		}
+
+		return true
 	}
 }

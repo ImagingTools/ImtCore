@@ -68,47 +68,57 @@ QtObject {
 
 		navigableItems.push(navigableItem)
 
-		return true
-	}
-
-	/*!
-		Returns the first registered NavigableItem that supports
-		the given \a segment, or null if none match.
-
-		\param segment Path segment string
-		\return NavigableItem or null
-	*/
-	function getNavigableItem(segment){
-		for (let i = 0; i < navigableItems.length; ++i){
-			let navigableItem = navigableItems[i]
-			if (navigableItem.paths.includes(segment)){
-				return navigableItem
+		// Проверяем, есть ли pending для этого сегмента
+		let key = navigableItem.parentSegment
+		if (key && pending[key]) {
+			let p = pending[key]
+			if (navigableItem.paths.includes(p.rest[0])) {
+				console.log("Delivering pending path", p, "to", navigableItem.paths)
+				navigableItem.processSegment(p.rest[0], p.params, p.rest.slice(1))
+				delete pending[key]
 			}
 		}
 
-		return null
+		return true
 	}
 
-	/*!
-		Navigates to the given path.
-		If the path is handled, it is pushed to the navigation stack.
-
-		\param path   Full navigation path (e.g. "Orders/Order/123")
-		\param params Arbitrary parameters
-	*/
-	function navigate(path, params) {
-		let segments = path.split("/")
-		let handled = false
-
-		let markHandledFunc = function() { handled = true }
-
-		root.navigatePath(segments, params || {}, [], markHandledFunc)
-
-		if (handled) {
-			__internal.push(path, params)
-		} else {
-			console.error("Path not handled:", path)
+	property var pending: ({})
+	function setPending(parentSegment, rest, params) {
+		pending[parentSegment] = {
+			rest: rest,
+			params: params
 		}
+	}
+
+	function unregisterNavigableItem(navigableItem){
+		let index = navigableItems.indexOf(navigableItem)
+		if (index > -1) {
+			navigableItems.splice(index, 1)
+			return true
+		}
+
+		return false
+	}
+
+	function navigate(path, params) {
+		console.log("navigate", path)
+		let segments = path.split("/")
+		if (segments.length === 0)
+			return
+		
+		let first = segments[0]
+		let rest = segments.slice(1)
+		
+		for (let i = 0; i < navigableItems.length; ++i) {
+			let item = navigableItems[i]
+			if (item.segmentIsSupported(first)) {
+				item.processSegment(first, params || {}, rest)
+				__internal.push(path, params || {})
+				return
+			}
+		}
+		
+		console.error("No NavigableItem found for:", first)
 	}
 
 	/*!
@@ -165,68 +175,77 @@ QtObject {
 		Private object that maintains the navigation stack and index.
 	*/
 	property QtObject __internal: QtObject {
-		/*!
-			Stack of navigation entries: [{ path, params }, ...]
-		*/
-		property var stack: []
-
-		/*!
-			Current index in the stack.
-		*/
-		property int currentIndex: -1
-
-		onCurrentIndexChanged: {
-			root.currentIndexChanged(currentIndex)
-		}
-
-		/*!
-			Clears the navigation stack and resets index.
-		*/
-		function clear() {
-			stack = []
-			currentIndex = -1
-		}
-
-		/*!
-			Pushes a new navigation entry into the stack.
-			If there are forward entries, they are discarded.
-			Ensures the stack size does not exceed \c root.maxSize.
-		*/
-		function push(path, params) {
-			if (currentIndex < stack.length - 1) {
-				stack.splice(currentIndex + 1, stack.length - (currentIndex + 1))
+			property var stack: []          // [{ path, params }, ...]
+			property int currentIndex: -1
+	
+			// forward currentIndex changes
+			onCurrentIndexChanged: {
+				root.currentIndexChanged(currentIndex)
 			}
-
-			stack.push({ path: path, params: params || {} })
-
-			while (stack.length > root.maxSize) {
-				stack.shift()
-				if (currentIndex > 0) currentIndex--
+	
+			function clear() {
+				stack = []
+				currentIndex = -1
 			}
-
-			currentIndex = stack.length - 1
-		}
-
-		/*!
-			Performs internal navigation to the current stack entry.
-			Used when moving back/forward in the stack.
-		*/
-		function navigateInternal() {
-			if (currentIndex < 0 || currentIndex >= stack.length) {
-				console.log("Unable to navigate internal. Current index is invalid")
-				return
+	
+			/*
+				Push new entry. If we are not at the end of the stack,
+				discard forward entries. Trim by maxSize.
+			*/
+			function push(path, params) {
+				// drop forward entries
+				if (currentIndex < stack.length - 1) {
+					stack.splice(currentIndex + 1, stack.length - (currentIndex + 1))
+				}
+	
+				stack.push({ path: path, params: params || {} })
+	
+				// trim by maxSize
+				while (stack.length > root.maxSize) {
+					stack.shift()
+					if (currentIndex > 0) currentIndex = currentIndex - 1
+				}
+	
+				// set to last
+				currentIndex = stack.length - 1
 			}
-
-			let entry = stack[currentIndex]
-			let segments = entry.path.split("/")
-			let handled = false
-
-			let markHandledFunc = function() { handled = true }
-
-			root.navigatePath(segments, entry.params || {}, [], markHandledFunc)
-
-			if (!handled)
-				console.log("Internal navigation failed:", entry.path)
+	
+			/*
+				Replay current stack entry WITHOUT pushing it to history.
+				This is used by prev()/next() to replay saved routes.
+			*/
+			function navigateInternal() {
+				if (currentIndex < 0 || currentIndex >= stack.length) {
+					console.log("Unable to navigate internal. Current index is invalid")
+					return
+				}
+	
+				let entry = stack[currentIndex]
+				if (!entry || !entry.path) {
+					console.log("navigateInternal: empty entry")
+					return
+				}
+	
+				let segments = entry.path.split("/")
+				if (segments.length === 0) return
+	
+				let first = segments[0]
+				let rest = segments.slice(1)
+	
+				for (let i = 0; i < root.navigableItems.length; ++i) {
+					let item = root.navigableItems[i]
+					if (item && item.segmentIsSupported && item.segmentIsSupported(first)) {
+						try {
+							// We call processSegment but DO NOT push again
+							item.processSegment(first, entry.params || {}, rest)
+						} catch (e) {
+							console.error("navigateInternal: processing error:", e)
+						}
+						return
+					}
+				}
+	
+				console.warn("navigateInternal: no item found for root segment:", first)
+			}
 		}
-	}
 }
