@@ -18,6 +18,7 @@ public:
 		CF_NEW_DOCUMENT_CREATED = 170000,
 		CF_DOCUMENT_OPENED,
 		CF_DOCUMENT_CHANGED,
+		CF_DOCUMENT_SAVED,
 		CF_DOCUMENT_CLOSED
 	};
 
@@ -55,6 +56,9 @@ public:
 
 	static const QByteArray CN_DOCUMENT_CHANGED;
 	typedef DocumentNotification DocumentChangedInfo;
+
+	static const QByteArray CN_DOCUMENT_SAVED;
+	typedef DocumentNotification DocumentSavedInfo;
 
 	static const QByteArray CN_DOCUMENT_CLOSED;
 	typedef QByteArray DocumentClosedInfo;

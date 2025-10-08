@@ -66,6 +66,12 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 
 		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentChanged;
 	}
+	else if (map.contains(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_SAVED)){
+		Q_ASSERT(map.values(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_SAVED).size() == 1);
+		varChanged = map.value(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_SAVED);
+
+		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentSaved;
+	}
 	else if (map.contains(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_CLOSED)){
 		Q_ASSERT(map.values(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_CLOSED).size() == 1);
 		varClosed = map.value(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_CLOSED);

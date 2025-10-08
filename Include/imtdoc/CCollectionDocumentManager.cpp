@@ -14,6 +14,14 @@ namespace imtdoc
 {
 
 
+// public methods
+
+CCollectionDocumentManager::CCollectionDocumentManager()
+	:m_undoManagerObserver(*this)
+{
+}
+
+
 // protected methods
 
 // reimplemented (imtdoc::ICollectionDocumentManager)
@@ -57,20 +65,7 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 		return retVal;
 	}
 
-	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(objectPtr.GetPtr());
-	imod::IObserver* undoObserverPtr = dynamic_cast<imod::IObserver*>(undoManagerPtr.GetPtr());
-
-	if (modelPtr != nullptr){
-		if (undoObserverPtr != nullptr){
-			modelPtr->AttachObserver(undoObserverPtr);
-		}
-
-		modelPtr->AttachObserver(this);
-	}
-
 	retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-
-	QMutexLocker locker(&m_mutex);
 
 	NewDocumentCreatedInfo info;
 	info.documentId = retVal;
@@ -82,10 +77,15 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 	changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
 	istd::CChangeNotifier notifier(this, &changeSet);
 
-	m_userDocuments[userId][retVal].objectTypeId = documentTypeId;
-	m_userDocuments[userId][retVal].objectPtr = objectPtr;
-	m_userDocuments[userId][retVal].undoManagerPtr = undoManagerPtr;
-	m_userDocuments[userId][retVal].hasChanges = false;
+	QMutexLocker locker(&m_mutex);
+
+	WorkingDocument& document = m_userDocuments[userId][retVal];
+	document.objectTypeId = documentTypeId;
+	document.objectPtr = objectPtr;
+	document.undoManagerPtr = undoManagerPtr;
+	document.hasChanges = false;
+
+	InitializeDocumentObservers(document, userId);
 
 	return retVal;
 }
@@ -110,20 +110,7 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (!objectTypeId.isEmpty() && collectionPtr->GetObjectData(objectId, dataPtr)) {
 		if (dataPtr.IsValid()) {
-			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(dataPtr.GetPtr());
-			imod::IObserver* undoObserverPtr = dynamic_cast<imod::IObserver*>(undoManagerPtr.GetPtr());
-
-			if (modelPtr != nullptr){
-				if (undoObserverPtr != nullptr){
-					modelPtr->AttachObserver(undoObserverPtr);
-				}
-
-				modelPtr->AttachObserver(this);
-			}
-
 			retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
-
-			QMutexLocker locker(&m_mutex);
 
 			DocumentOpenedInfo info;
 			info.documentId = retVal;
@@ -136,11 +123,16 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 			changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
 			istd::CChangeNotifier notifier(this, &changeSet);
 
-			m_userDocuments[userId][retVal].objectId = objectId;
-			m_userDocuments[userId][retVal].objectTypeId = objectTypeId;
-			m_userDocuments[userId][retVal].objectPtr = dataPtr;
-			m_userDocuments[userId][retVal].undoManagerPtr = undoManagerPtr;
-			m_userDocuments[userId][retVal].hasChanges = false;
+			QMutexLocker locker(&m_mutex);
+
+			WorkingDocument& document = m_userDocuments[userId][retVal];
+			document.objectId = objectId;
+			document.objectTypeId = objectTypeId;
+			document.objectPtr = dataPtr;
+			document.undoManagerPtr = undoManagerPtr;
+			document.hasChanges = false;
+
+			InitializeDocumentObservers(document, userId);
 		}
 	}
 
@@ -189,10 +181,12 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 			DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
 			Q_ASSERT(notificationPtr != nullptr);
 			if (notificationPtr != nullptr){
-				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
-				changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
+				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED);
+				changeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(*notificationPtr));
 				istd::CChangeNotifier notifier(this, &changeSet);
 			}
+
+			workingDocument.undoManagerPtr->StoreDocumentState();
 		}
 
 		return retVal ? OS_OK : OS_FAILED;
@@ -207,10 +201,12 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 		DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
 		Q_ASSERT(notificationPtr != nullptr);
 		if (notificationPtr != nullptr){
-			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
-			changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
+			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED);
+			changeSet.SetChangeInfo(CN_DOCUMENT_SAVED, QVariant::fromValue(*notificationPtr));
 			istd::CChangeNotifier notifier(this, &changeSet);
 		}
+
+		workingDocument.undoManagerPtr->StoreDocumentState();
 	}
 
 	return workingDocument.objectId.isEmpty() ? OS_FAILED : OS_OK;
@@ -279,8 +275,6 @@ void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IC
 			istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(modelPtr);
 
 			if (documents[documentId].objectPtr.GetPtr() == changeablePtr){
-				documents[documentId].hasChanges = true;
-
 				DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
 				Q_ASSERT(notificationPtr != nullptr);
 				if (notificationPtr != nullptr){
@@ -290,6 +284,125 @@ void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IC
 				}
 			}
 		}
+	}
+}
+
+
+// protected methods
+
+void CCollectionDocumentManager::OnUndoManagerChanged(int modelId)
+{
+	QByteArray userId;
+	QByteArray documentId;
+
+	if (!FindDocument(modelId, userId, documentId)){
+		Q_ASSERT(false);
+
+		return;
+	}
+
+	WorkingDocument* documentPtr = FindDocument(userId, documentId);
+	Q_ASSERT(documentPtr != nullptr);
+	if (documentPtr == nullptr){
+		return;
+	}
+
+	bool hasChanges = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+	if (documentPtr->hasChanges != hasChanges){
+		documentPtr->hasChanges = hasChanges;
+
+		DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
+		Q_ASSERT(notificationPtr != nullptr);
+		if (notificationPtr != nullptr){
+			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
+			changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
+			istd::CChangeNotifier notifier(this, &changeSet);
+		}
+	}
+}
+
+
+int CCollectionDocumentManager::GetUndoManagerNextModelId(const QByteArray& userId)
+{
+	QSet<int> ids;
+
+	if (!m_userDocuments.contains(userId)){
+		return -1;
+	}
+
+	WorkingDocumentList& documents = m_userDocuments[userId];
+	for (const QByteArray& documentId : documents.keys()){
+		ids += m_userDocuments[userId][documentId].undoManagerModelId;
+	}
+
+	int retVal = 0;
+	while (true){
+		if (!ids.contains(retVal)){
+			return retVal;
+		}
+
+		retVal++;
+	}
+}
+
+
+CCollectionDocumentManager::WorkingDocument* CCollectionDocumentManager::FindDocument(
+	const QByteArray& userId,
+	const QByteArray& documentId)
+{
+	if (m_userDocuments.contains(userId)){
+		if (m_userDocuments[userId].contains(documentId)){
+			return &m_userDocuments[userId][documentId];
+		}
+	}
+
+	return nullptr;
+}
+
+
+bool CCollectionDocumentManager::FindDocument(
+	int undoManagerModelId,
+	QByteArray& outUserId,
+	QByteArray& outDocumentId)
+{
+	for (const QByteArray& userId : m_userDocuments.keys()){
+		WorkingDocumentList& documents = m_userDocuments[userId];
+		for (const QByteArray& documentId : documents.keys()){
+			if (m_userDocuments[userId][documentId].undoManagerModelId == undoManagerModelId){
+				outUserId = userId;
+				outDocumentId = documentId;
+
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+void CCollectionDocumentManager::InitializeDocumentObservers(
+	WorkingDocument& document,
+	const QByteArray& userId)
+{
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(document.objectPtr.GetPtr());
+	imod::IModel* undoModelPtr = dynamic_cast<imod::IModel*>(document.undoManagerPtr.GetPtr());
+	imod::IObserver* undoObserverPtr = dynamic_cast<imod::IObserver*>(document.undoManagerPtr.GetPtr());
+
+	if (modelPtr != nullptr){
+		if (undoObserverPtr != nullptr){
+			modelPtr->AttachObserver(undoObserverPtr);
+		}
+
+		modelPtr->AttachObserver(this);
+	}
+
+	document.undoManagerPtr->StoreDocumentState();
+
+	int undoManagerModelId = GetUndoManagerNextModelId(userId);
+	document.undoManagerModelId = undoManagerModelId;
+	if (undoModelPtr != nullptr){
+		m_undoManagerObserver.RegisterModel(undoModelPtr, undoManagerModelId);
 	}
 }
 
@@ -330,6 +443,23 @@ std::shared_ptr<ICollectionDocumentManager::DocumentNotification> CCollectionDoc
 
 	return retVal;
 }
+
+
+// public methods of the embedded class UndoManagerObserver
+
+CCollectionDocumentManager::UndoManagerObserver::UndoManagerObserver(CCollectionDocumentManager& parent)
+	:m_parent(parent)
+{
+}
+
+
+// protected methods of the embedded class UndoManagerObserver
+
+void CCollectionDocumentManager::UndoManagerObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+{
+	m_parent.OnUndoManagerChanged(modelId);
+}
+
 
 
 } // namespace imtdoc
