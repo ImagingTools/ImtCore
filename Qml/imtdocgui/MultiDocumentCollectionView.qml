@@ -70,15 +70,20 @@ Item {
 
 		function onDocumentManagerChanged(notification){
 			let objectId = notification.m_objectId
+			let documentId = notification.m_documentId
+
+			let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
+			let name = workspaceView.documentManager.getDocumentName(documentId)
+			if (name === ""){
+				if (workspaceView.visualStatusProvider){
+					workspaceView.visualStatusProvider.getVisualStatus(objectId, typeId)
+				}
+			}
 		}
 
 		// Open document signals
 		function onStartOpenDocument(documentId, typeId){
 			loading.start()
-
-			if (workspaceView.visualStatusProvider){
-				workspaceView.visualStatusProvider.getVisualStatus(documentId, typeId)
-			}
 		}
 
 		function onDocumentOpened(documentId, typeId){

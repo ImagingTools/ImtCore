@@ -17,9 +17,9 @@ DocumentManagerBase {
 		}
 
 		onMessageReceived: {
-			console.log("Document manager subscription message received", data.toJson())
-			documentManagerNotification.createFromJson(data.toJson())
-			root.documentManagerChanged(documentManagerNotification)
+			let objectId = data.getData("objectId")
+			let documentId = data.getData("documentId")
+			root.documentManagerChanged("", objectId, documentId)
 		}
 	}
 

@@ -33,11 +33,14 @@ QtObject {
 
 	signal documentModelChanged(string documentId, var changeSet)
 
+	signal documentNameChanged(string documentId, string oldName, string newName)
+
 	signal startUndoInfoReceive(string documentId)
 	signal undoInfoReceived(string documentId, int availableUndoSteps, int availableRedoSteps)
 	signal undoInfoReceiveFailed(string documentId, string message)
 
-	signal documentManagerChanged(var notification)
+	// typeOperation: OPENED, CREATED, CLOSED, SAVED, DOCUMENT_CHANGED
+	signal documentManagerChanged(string typeOperation, string objectId, string documentId)
 
 	onDocumentModelChanged: {
 		setDocumentIsDirty(documentId, true)
@@ -46,6 +49,10 @@ QtObject {
 	onDocumentSaved: {
 		setDocumentIsDirty(documentId, false)
 		setDocumentIsNew(documentId, false)
+	}
+
+	onDocumentManagerChanged: {
+		getUndoInfo(documentId)
 	}
 
 	onDocumentCreated: {
@@ -201,6 +208,27 @@ QtObject {
 		return -1
 	}
 
+	function setDocumentName(documentId, name){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return ""
+		}
+
+		let oldName = __internal.openedDocuments[index].name
+		__internal.openedDocuments[index].name = name
+
+		documentNameChanged(documentId, oldName, name)
+	}
+
+	function getDocumentName(documentId){
+		let index = getDocumentIndexByDocumentId(documentId)
+		if (index < 0){
+			return ""
+		}
+
+		return __internal.openedDocuments[index].name
+	}
+
 	function documentIsDirty(documentId){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
@@ -278,6 +306,7 @@ QtObject {
 
 				property string id
 				property string typeId
+				property string name
 				property bool isDirty: false
 				property bool isNew: true
 				property var views: ({})
