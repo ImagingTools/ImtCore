@@ -52,8 +52,8 @@ QtObject {
 			setDocumentIsDirty(documentId, true)
 		}
 
+		getUndoInfo(documentId)
 		if (typeOperation !== "DocumentClosed"){
-			getUndoInfo(documentId)
 		}
 	}
 
@@ -319,7 +319,6 @@ QtObject {
 					documentTypeId: documentData.typeId
 					documentManager: root
 					onViewRegistered: {
-						console.log("DocumentDecorator onViewRegistered", documentData.isNew)
 						if (representationController.representationModel === null){
 							console.error("Unable to register view for document '"+documentData.id+"'. Error: Representation model from controller is invalid")
 							return

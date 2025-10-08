@@ -33,6 +33,19 @@ QtObject {
 
 	Connections {
 		target: root.documentManager
+
+		function onUndoDone(documentId){
+			if (documentId !== root.documentId){
+				return
+			}
+		}
+
+		function onRedoDone(documentId){
+			if (documentId !== root.documentId){
+				return
+			}
+		}
+
 		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps){
 			let documentView = target.getDocumentViewInstance(documentId)
 			if (documentView){
@@ -46,8 +59,6 @@ QtObject {
 				return
 			}
 
-			console.log("DocumentDecorator onDocumentManagerChanged", documentId, typeOperation, objectId, documentId, hasChanges)
-			
 			let documentView = target.getDocumentViewInstance(documentId)
 			if (!documentView){
 				return
