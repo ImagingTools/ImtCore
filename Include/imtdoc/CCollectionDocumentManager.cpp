@@ -278,7 +278,9 @@ void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IC
 	for (const QByteArray& userId : m_userDocuments.keys()){
 		const WorkingDocumentList& documents = m_userDocuments[userId];
 		for (const QByteArray& documentId : documents.keys()){
-			if ((void*)documents[documentId].objectPtr.GetPtr() == (void*)modelPtr){
+			istd::IChangeable* changeablePtr = dynamic_cast<istd::IChangeable*>(modelPtr);
+
+			if (documents[documentId].objectPtr.GetPtr() == changeablePtr){
 				DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
 				Q_ASSERT(notificationPtr != nullptr);
 				if (notificationPtr != nullptr){
@@ -301,7 +303,7 @@ std::shared_ptr<ICollectionDocumentManager::DocumentNotification> CCollectionDoc
 	std::shared_ptr<DocumentNotification> retVal;
 
 	if (m_userDocuments.contains(userId) && m_userDocuments[userId].contains(documentId)){
-		const WorkingDocument& document = m_userDocuments[userId][documentId];
+		const WorkingDocument document = m_userDocuments[userId][documentId];
 
 		retVal.reset(new DocumentNotification);
 		retVal->userId = userId;
