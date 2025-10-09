@@ -70,7 +70,7 @@ QtObject {
 		__internal.createDocumentData(documentId, typeId, false)
 	}
 
-	function openDocument(typeId, documentId){
+	function openDocument(objectTypeId, objectId){
 		console.warn("openDocument() should be implemented in a subclass")
 	}
 

@@ -34,6 +34,7 @@ public:
 	{
 		QByteArray documentId;
 		QByteArray objectId;
+		QByteArray objectTypeId;
 		bool hasChanges;
 		int availableUndoSteps;
 		int availableRedoSteps;

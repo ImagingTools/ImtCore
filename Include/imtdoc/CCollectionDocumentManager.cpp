@@ -41,6 +41,7 @@ imtdoc::ICollectionDocumentManager::DocumentList CCollectionDocumentManager::Get
 			DocumentInfo info;
 			info.documentId = id;
 			info.objectId = workingDocument.objectId;
+			info.objectTypeId = workingDocument.objectTypeId;
 			info.hasChanges = workingDocument.hasChanges;
 
 			list.append(info);

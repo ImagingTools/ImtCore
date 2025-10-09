@@ -42,12 +42,6 @@ Item {
 		}
 	}
 
-	onDocumentManagerChanged: {
-		if (documentManager){
-			// documentManager.getOpenedDocumentList()
-		}
-	}
-
 	NavigableItem {
 		id: firstTabNavigation
 		forwardRest: false
@@ -71,6 +65,52 @@ Item {
 		}
 	}
 
+	function updateDocumentName(objectId, documentId){
+		if (!documentManager){
+			console.error("Unable to update document name for '"+documentId+"'. Error: Document manager is invalid")
+			return
+		}
+
+		if (!workspaceView.visualStatusProvider){
+			console.error("Unable to update document name for '"+documentId+"'. Error: Visual status provider is invalid")
+			return
+		}
+
+		console.log("updateDocumentName", objectId, documentId)
+		let callbackOk = function(objectId2, icon, text, description){
+			if (objectId2 === objectId){
+				let documentName = text
+				if (documentName === ""){
+					documentName = workspaceView.documentManager.getDefaultDocumentName()
+				}
+				console.log("callbackOk", objectId, documentId, documentName)
+
+				workspaceView.documentManager.setDocumentName(documentId, text)
+				workspaceView.visualStatusProvider.visualStatusReceived.disconnect(callbackOk)
+				workspaceView.visualStatusProvider.visualStatusReceiveFailed.disconnect(cbFailed)
+			}
+		}
+
+		let cbFailed = function(objectId2, errorMessage){
+			if (objectId2 === objectId){
+				let defaultName = workspaceView.documentManager.getDefaultDocumentName()
+				workspaceView.documentManager.setDocumentName(documentId, defaultName)
+				workspaceView.visualStatusProvider.visualStatusReceived.disconnect(callbackOk)
+				workspaceView.visualStatusProvider.visualStatusReceiveFailed.disconnect(cbFailed)
+			}
+		}
+
+		if (objectId === ""){
+			callbackOk("", "", "", "")
+		}
+		else{
+			let documentTypeId = documentManager.getDocumentTypeId(documentId)
+			workspaceView.visualStatusProvider.visualStatusReceived.connect(callbackOk)
+			workspaceView.visualStatusProvider.visualStatusReceiveFailed.connect(cbFailed)
+			workspaceView.visualStatusProvider.getVisualStatus(objectId, documentTypeId)
+		}
+	}
+
 	Connections {
 		id: connections
 		target: workspaceView.documentManager
@@ -84,47 +124,45 @@ Item {
 				let documentInfo = documentInfoList.get(i).item
 				let objectId = documentInfo.m_objectId
 				let documentId = documentInfo.m_documentId
-				workspaceView.documentManager.openDocument("ContactInfo", objectId)
+				let objectTypeId = documentInfo.m_objectTypeId
+				let hasChanges = documentInfo.m_hasChanges
+
+				if (objectId === ""){
+					workspaceView.documentManager.documentCreated(documentId, objectTypeId)
+				}
+				else{
+					workspaceView.updateDocumentName(objectId, documentId)
+					workspaceView.documentManager.documentOpened(documentId, objectTypeId)
+				}
+
+				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId, hasChanges)
 			}
 
 			loading.stop()
 		}
 
 		function onDocumentRepresentationUpdated(documentId, representation){
-			console.log("onDocumentRepresentationUpdated", documentId, representation)
 			loading.stop()
 		}
 
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
-			console.log("MultiDocumentCollectionView onDocumentManagerChanged", typeOperation, objectId, documentId, hasChanges)
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
 			else if (typeOperation === EDocumentOperationEnum.s_documentOpened || typeOperation === EDocumentOperationEnum.s_documentSaved){
-				if (workspaceView.visualStatusProvider){
-					let cb = function(objectId, icon, text, description){
-						workspaceView.documentManager.setDocumentName(documentId, text)
-						workspaceView.visualStatusProvider.visualStatusReceived.disconnect(cb)
-						workspaceView.visualStatusProvider.visualStatusReceiveFailed.disconnect(cbFailed)
-					}
-
-					let cbFailed = function(objectId, errorMessage){
-						let defaultName = workspaceView.documentManager.getDefaultDocumentName()
-						workspaceView.documentManager.setDocumentName(documentId, defaultName)
-						workspaceView.visualStatusProvider.visualStatusReceived.disconnect(cb)
-					}
-
-					workspaceView.visualStatusProvider.visualStatusReceived.connect(cb)
-					workspaceView.visualStatusProvider.visualStatusReceiveFailed.connect(cbFailed)
-
-					let typeId = workspaceView.documentManager.getDocumentTypeId(documentId)
-					workspaceView.visualStatusProvider.getVisualStatus(objectId, typeId)
-				}
+				workspaceView.updateDocumentName(objectId, documentId)
 			}
 		}
 
 		function onDocumentNameChanged(documentId, oldName, newName){
 			tabView.setTabName(documentId, newName)
+			let isDirty = workspaceView.documentManager.documentIsDirty(documentId)
+			if (isDirty){
+				tabView.setTabName(documentId, "* " + newName)
+			}
+			else{
+				tabView.setTabName(documentId, newName)
+			}
 		}
 
 		function onDocumentIsDirtyChanged(documentId, isDirty){
@@ -162,10 +200,6 @@ Item {
 
 		// Close document signals
 		function onStartCloseDocument(documentId){
-			if (workspaceView.documentManager.documentIsDirty(documentId)){
-				
-			}
-
 			loading.start()
 		}
 
@@ -278,10 +312,6 @@ Item {
 						qsTr("Save all changes ?"),
 						dialogCallback)
 		}
-	}
-
-	function setDocumentName(documentId, name){
-		tabView.setTabName(documentId, name)
 	}
 
 	function setCollectionViewComp(name, collectionViewComp){

@@ -10,15 +10,53 @@ QtObject {
 	property string typeId;
 	property GuiElementContainer commands: GuiElementContainer {}
 
+	property var pendingChanges: ({}) // { commandId: { m_enabled: true, m_visible: false, ... } }
+
 	signal commandsReceived(string typeId, var commands)
 	signal commandsReceiveFailed()
-	
-	function getStatesMap(){
-		let statesMap = {}
-		
-		return statesMap
+
+	onCommandsReceived: {
+		applyPendingChanges()
 	}
-	
+
+	function applyPendingChanges(){
+		for (let commandId in pendingChanges) {
+			let command = getCommandById(commandId)
+			if (!command)
+				continue
+			
+			let changes = pendingChanges[commandId]
+			for (let key in changes) {
+				if (command.hasOwnProperty(key)) {
+					command[key] = changes[key]
+				}
+			}
+		}
+		pendingChanges = {}
+	}
+
+	function setCommandProperty(commandId, propertyName, value){
+		let command = getCommandById(commandId)
+		if (command){
+			command[propertyName] = value
+		}
+		else{
+			if (!pendingChanges[commandId])
+				pendingChanges[commandId] = {}
+			
+			pendingChanges[commandId][propertyName] = value
+		}
+	}
+
+	function getCommandProperty(commandId, propertyName){
+		let command = getCommandById(commandId)
+		if (command){
+			return command[propertyName]
+		}
+
+		return null
+	}
+
 	function getCommandIds(){
 		let commandIds = []
 
@@ -101,64 +139,24 @@ QtObject {
 	}
 	
 	function setCommandIsEnabled(commandId, isEnabled){
-		let command = getCommandById(commandId);
-		if (!command){
-			return;
-		}
-
-		command.m_enabled = isEnabled;
+		setCommandProperty(commandId, "m_enabled", isEnabled)
 	}
 	
 	function setCommandIcon(commandId, icon){
-		if(!commands){
-			return;
-		}
-		
-		let command = getCommandById(commandId);
-		if (!command){
-			return;
-		}
-		
-		command.m_icon = icon;
+		setCommandProperty(commandId, "m_icon", icon)
 	}
 	
 	function setCommandName(commandId, commandName){
-		if(!commands){
-			return;
-		}
-		
-		let command = getCommandById(commandId);
-		if (!command){
-			return;
-		}
-		
-		command.m_commandName = commandName;
+		setCommandProperty(commandId, "m_commandName", commandName)
 	}
 	
 	function setCommandNotification(commandId, notification){
-		if(!commands){
-			return;
-		}
-		
-		let command = getCommandById(commandId);
-		if (!command){
-			return;
-		}
-		
-		command.m_commandStatus = notification;
+		setCommandProperty(commandId, "m_commandStatus", notification)
 	}
 	
 	function setCommandVisible(commandId, isVisible){
-		if(!commands){
-			return;
-		}
+		setCommandProperty(commandId, "m_visible", isVisible)
 		
-		let command = getCommandById(commandId);
-		if (!command){
-			return;
-		}
-		
-		command.m_visible = isVisible;
 	}
 	
 	function getCommandIndex(commandId){
@@ -177,12 +175,7 @@ QtObject {
 	}
 	
 	function setIsToggleable(commandId, toggleable){
-		let command = getCommandById(commandId);
-		if (!command){
-			return;
-		}
-		
-		command.m_toggleable = toggleable;
+		setCommandProperty(commandId, "m_toggleable", toggleable)
 	}
 	
 	function isToggleable(commandId){
@@ -204,16 +197,7 @@ QtObject {
 	}
 	
 	function setToggled(commandId, toggled){
-		if(!commands){
-			return;
-		}
-		
-		let command = getCommandById(commandId);
-		if (!command){
-			return;
-		}
-		
-		command.m_toggled = toggled;
+		setCommandProperty(commandId, "m_toggled", toggled)
 	}
 	
 	function commandExists(commandId){

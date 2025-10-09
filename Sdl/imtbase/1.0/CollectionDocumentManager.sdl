@@ -45,6 +45,7 @@ type DocumentId {
 
 type DocumentInfo {
 	documentId: ID!
+	objectTypeId: ID!
 	objectId: ID!
 	hasChanges: Bool!
 }

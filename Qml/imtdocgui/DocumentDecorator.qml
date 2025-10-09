@@ -58,10 +58,15 @@ QtObject {
 		}
 
 		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps){
-			let documentView = target.getDocumentViewInstance(documentId)
-			if (documentView){
-				documentView.commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0)
-				documentView.commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0)
+			if (documentId !== root.documentId){
+				return
+			}
+
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				if (root.registeredViews[i].commandsController){
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0)
+				}
 			}
 		}
 
@@ -70,12 +75,11 @@ QtObject {
 				return
 			}
 
-			let documentView = target.getDocumentViewInstance(documentId)
-			if (!documentView){
-				return
+			for (let i = 0; i < root.registeredViews.length; ++i){
+				if (root.registeredViews[i].commandsController){
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", hasChanges)
+				}
 			}
-
-			documentView.commandsController.setCommandIsEnabled("Save", hasChanges)
 
 			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
 				root.updateRepresentationForAllViews()
@@ -87,8 +91,6 @@ QtObject {
 		if (root.documentId !== documentId){
 			return
 		}
-
-		console.log("onRepresentationUpdated", documentId, representation)
 
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].model === representation){

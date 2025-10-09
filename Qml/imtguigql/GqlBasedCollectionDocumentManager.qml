@@ -36,7 +36,7 @@ DocumentManagerBase {
 	onCollectionIdChanged: {
 		if (collectionId !== ""){
 			documentManagerSubscription.gqlCommandId = "On" + root.collectionId + "DocumentChanged"
-			// getOpenedDocumentList()
+			getOpenedDocumentList()
 		}
 	}
 
@@ -160,7 +160,6 @@ DocumentManagerBase {
 
 		documentIdInput.m_id = documentId
 		documentIdInput.m_collectionId = collectionId
-		getUndoInfoRequest.documentId = documentId
 
 		getUndoInfoRequest.send(documentIdInput)
 	}
@@ -353,12 +352,10 @@ DocumentManagerBase {
 			UndoInfo {
 				onFinished: {
 					console.log("UndoInfo onFinished", this.toJson())
-					root.undoInfoReceived(root.getUndoInfoRequest.documentId, m_availableUndoSteps, m_availableRedoSteps)
+					root.undoInfoReceived(m_documentId, m_availableUndoSteps, m_availableRedoSteps)
 				}
 			}
 		}
-
-		property string documentId
 
 		function getHeaders(){
 			return root.getHeaders()

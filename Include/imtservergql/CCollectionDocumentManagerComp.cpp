@@ -28,6 +28,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentList CCollectionDocumentManage
 
 			sdlInfo.Version_1_0->documentId = info.documentId;
 			sdlInfo.Version_1_0->objectId = info.objectId;
+			sdlInfo.Version_1_0->objectTypeId = info.objectTypeId;
 			sdlInfo.Version_1_0->hasChanges = info.hasChanges;
 
 			retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
@@ -229,6 +230,8 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerComp::OnGetUndoIn
 
 		return retVal;
 	}
+
+	retVal.Version_1_0->documentId = documentId->id;
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
