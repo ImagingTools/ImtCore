@@ -15,6 +15,7 @@ BoundingBox {
 	property real shapeSelectedPointSize: DesignScheme.shapeSelectedPointSize;
 	property bool showLine: true
 	property bool isMultiColor: false;
+	property bool shapePointBorderColor: color;
 	property bool isHidden: false;
 
 
@@ -55,7 +56,7 @@ BoundingBox {
 
 	function drawNodes(ctx, transformMatrixArg){
 		let params = getParams()
-		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
+		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.shapePointBorderColor;
 		ctx.fillStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
 		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
 
