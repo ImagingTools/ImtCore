@@ -251,6 +251,17 @@ Item {
 				container.loading.stop();
 			}
 
+			function onElementsRemoved(elementIds){
+				console.log("onElementsRemoved", elementIds)
+				container.selectionManager.deselect(elementIds)
+				container.table.resetSelection()
+			}
+
+			function onElementSetRemoved(){
+				container.selectionManager.clear()
+				container.table.resetSelection()
+			}
+
 			function onObjectMetaInfoReceived(metaInfoData){
 				collectionMetaInfo.elementMetaInfo = metaInfoData
 				collectionMetaInfo.stopLoading()

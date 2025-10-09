@@ -222,17 +222,24 @@ ViewBase {
 			property bool selectionBlock: false
 			
 			onSelectionChanged: {
+				console.log("onSelectionChanged", selectionBlock)
 				if (selectionBlock){
 					return
 				}
 
-				let selectedIds = []
-				for (let i = 0; i < selection.length; i++){
-					let elementId = elements.getData("id", selection[i])
-					selectedIds.push(elementId)
+				let count = elements.getItemsCount()
+				if (count > 0){
+					let selectedIds = []
+					for (let i = 0; i < selection.length; i++){
+						let elementId = elements.getData("id", selection[i])
+						selectedIds.push(elementId)
+					}
+					collectionViewBaseContainer.selectionManager.selectMultiple(selectedIds)
 				}
-
-				collectionViewBaseContainer.selectionManager.selectMultiple(selectedIds)
+				else{
+					collectionViewBaseContainer.selectionManager.clear()
+				}
+				
 				collectionViewBaseContainer.selectionChanged(collectionViewBaseContainer.selectionManager.selectedIds, selectionManager.selectedIndexes);
 			}
 			
@@ -245,8 +252,9 @@ ViewBase {
 				resetSelection()
 
 				let elementsModel = collectionViewBaseContainer.dataController.elementsModel
+				let count = elementsModel.getItemsCount()
 				let selectedIndexes = []
-				for (let i = 0; i < elementsModel.getItemsCount(); i++){
+				for (let i = 0; i < count; i++){
 					let elementId = elementsModel.getData("id", i)
 					if (collectionViewBaseContainer.selectionManager.isSelected(elementId)){
 						selectedIndexes.push(i)
@@ -256,7 +264,7 @@ ViewBase {
 				selectionManager.selectMultiple(selectedIndexes)
 				
 				selectionBlock = false
-				
+
 				collectionViewBaseContainer.elementsChanged();
 			}
 			

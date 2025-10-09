@@ -22,7 +22,10 @@ Item {
 	
 	property var additionalFieldIds: []
 
-	signal removed(var objectIds);
+	signal removed();
+	signal elementsRemoved(var elementIds)
+	signal elementSetRemoved()
+	
 	signal renamed(string objectId, string newName);
 	signal imported(string objectId);
 	signal exported(string fileName, string data);
@@ -163,6 +166,7 @@ Item {
 
 	function removeElements(elementIds){
 		removeElementsInput.m_elementIds = elementIds
+		removeGqlSender.elementIds = elementIds
 		removeGqlSender.send(removeElementsInput)
 	}
 
@@ -274,7 +278,7 @@ Item {
 			RemoveElementSetPayload {
 				onFinished: {
 					if (m_success){
-						root.removed([])
+						root.elementSetRemoved()
 					}
 				}
 			}
@@ -292,11 +296,12 @@ Item {
 		sdlObjectComp: Component {
 			RemoveElementsPayload {
 				onFinished: {
-					root.removed([])
+					root.elementsRemoved(removeGqlSender.elementIds)
 				}
 			}
 		}
 
+		property var elementIds: []
 		function getHeaders(){
 			return root.getHeaders();
 		}

@@ -55,7 +55,21 @@ QtObject {
 		firstSelectedId = id
 		selectionChanged(selectedIds)
 	}
-	
+
+	function deselect(ids){
+		let wasChanges = false
+		for (let i = 0; i < ids.length; ++i){
+			let index = selectedIds.indexOf(ids[i])
+			if (index >= 0){
+				wasChanges = true
+				selectedIds.splice(index, 1)
+			}
+		}
+
+		if (wasChanges){
+			selectionChanged(selectedIds)
+		}
+	}
 	/*!
 		\qmlmethod void toggleSelect(string id)
 		Toggles the selection state of the item with the specified ID.
