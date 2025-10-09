@@ -107,11 +107,6 @@ ViewBase {
 		onClose: {
 			filterMenu_.visible = false;
 		}
-
-		onFilterChanged: {
-			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
-			collectionViewBaseContainer.doUpdateGui();
-		}
 	}
 
 	onHeadersChanged: {
