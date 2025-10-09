@@ -23,6 +23,7 @@
 	<file alias="imtdocgui/MultiDocumentCollectionView.qml">MultiDocumentCollectionView.qml</file>
 	<file alias="imtdocgui/DocumentDecorator.qml">DocumentDecorator.qml</file>
 	<file alias="imtdocgui/DocCollectionViewDelegate.qml">DocCollectionViewDelegate.qml</file>
+	<file alias="imtdocgui/DocumentRepresentationController.qml">DocumentRepresentationController.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

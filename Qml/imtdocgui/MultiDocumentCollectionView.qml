@@ -122,7 +122,7 @@ Item {
 
 			let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(typeId)
 			let defaultName = workspaceView.documentManager.getDefaultDocumentName()
-			tabView.addTab(documentId, "no name", documentEditorComp, "", "", false)
+			tabView.addTab(documentId, defaultName, documentEditorComp, "", "", false)
 
 			let view = tabView.getTabById(documentId)
 
