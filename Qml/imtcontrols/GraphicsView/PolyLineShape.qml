@@ -15,14 +15,10 @@ BoundingBox {
 	property real shapeSelectedPointSize: DesignScheme.shapeSelectedPointSize;
 	property bool showLine: true
 	property bool isMultiColor: false;
-	property bool shapePointBorderColor: color;
-	property bool isHidden: false;
+	property string shapePointBorderColor: color;
 
 
 	function draw(ctx, transformMatrixArg){
-		if(isHidden){
-			return;
-		}
 
 		drawBase(ctx, transformMatrixArg);
 		if(showNodes){
@@ -36,9 +32,8 @@ BoundingBox {
 			return;
 		}
 
-		let params = getParams()
-		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
-		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : lineWidth
+		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : polylineShape.color;
+		ctx.lineWidth = lineWidth
 		ctx.beginPath()
 		for(let i = 0;i < points.length; i++){
 			let point = getScreenPosition(points[i]);
@@ -55,10 +50,9 @@ BoundingBox {
 	}
 
 	function drawNodes(ctx, transformMatrixArg){
-		let params = getParams()
-		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.shapePointBorderColor;
-		ctx.fillStyle = isSelected ? DesignScheme.selectionColor : params.color !== undefined ? params.color : polylineShape.color;
-		ctx.lineWidth = params.lineWidth !== undefined ? params.lineWidth : 2
+		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : polylineShape.shapePointBorderColor;
+		ctx.fillStyle = isSelected ? DesignScheme.selectionColor :  polylineShape.color;
+		ctx.lineWidth = 2
 
 		let drawMultiColor = isMultiColor && colorList.length == points.length
 		if(!drawMultiColor){
