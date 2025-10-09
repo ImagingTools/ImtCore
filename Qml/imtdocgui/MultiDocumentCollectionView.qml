@@ -42,6 +42,12 @@ Item {
 		}
 	}
 
+	onDocumentManagerChanged: {
+		if (documentManager){
+			// documentManager.getOpenedDocumentList()
+		}
+	}
+
 	NavigableItem {
 		id: firstTabNavigation
 		forwardRest: false
@@ -68,6 +74,26 @@ Item {
 	Connections {
 		id: connections
 		target: workspaceView.documentManager
+
+		function onStartGetOpenedDocumentList(){
+			loading.start()
+		}
+
+		function onOpenedDocumentListReceived(documentInfoList){
+			for (let i = 0; i < documentInfoList.count; ++i){
+				let documentInfo = documentInfoList.get(i).item
+				let objectId = documentInfo.m_objectId
+				let documentId = documentInfo.m_documentId
+				workspaceView.documentManager.openDocument("ContactInfo", objectId)
+			}
+
+			loading.stop()
+		}
+
+		function onDocumentRepresentationUpdated(documentId, representation){
+			console.log("onDocumentRepresentationUpdated", documentId, representation)
+			loading.stop()
+		}
 
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
 			console.log("MultiDocumentCollectionView onDocumentManagerChanged", typeOperation, objectId, documentId, hasChanges)
@@ -118,7 +144,7 @@ Item {
 		}
 
 		function onDocumentOpened(documentId, typeId){
-			loading.stop()
+			// loading.stop()
 
 			let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(typeId)
 			let defaultName = workspaceView.documentManager.getDefaultDocumentName()
@@ -136,6 +162,10 @@ Item {
 
 		// Close document signals
 		function onStartCloseDocument(documentId){
+			if (workspaceView.documentManager.documentIsDirty(documentId)){
+				
+			}
+
 			loading.start()
 		}
 
@@ -185,7 +215,7 @@ Item {
 
 		// Undo info signals
 		function onStartUndoInfoReceive(documentId){
-			loading.start()
+			// loading.start()
 		}
 
 		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps){
@@ -199,12 +229,11 @@ Item {
 
 		// Undo signals
 		function onStartUndo(documentId, steps){
-			loading.start()
+			// loading.start()
 		}
 
 		function onUndoDone(documentId){
-			loading.stop()
-			workspaceView.documentManager.getUndoInfo(documentId)
+			// loading.stop()
 		}
 
 		function onUndoFailed(documentId, message){
@@ -214,17 +243,40 @@ Item {
 
 		// Redo signals
 		function onStartRedo(documentId, steps){
-			loading.start()
+			// loading.start()
 		}
 
 		function onRedoDone(documentId){
-			loading.stop()
-			workspaceView.documentManager.getUndoInfo(documentId)
+			// loading.stop()
 		}
 
 		function onRedoFailed(documentId, message){
 			loading.stop()
 			ModalDialogManager.showErrorDialog(message)
+		}
+
+		function onTryCloseDirtyDocument(documentId, callback){
+			if (!workspaceView.documentManager.documentIsDirty(documentId)){
+				callback(false)
+				return
+			}
+
+			let dialogCallback = function(result){
+				if (result === Enums.yes){
+					callback(true)
+				}
+				else if (result === Enums.no){
+					callback(false)
+				}
+				else{
+					callback(undefined)
+				}
+			}
+
+			ModalDialogManager.showConfirmationDialog(
+						qsTr("Save document"),
+						qsTr("Save all changes ?"),
+						dialogCallback)
 		}
 	}
 
@@ -258,7 +310,7 @@ Item {
 					let documentIds = workspaceView.documentManager.getOpenedDocumentIds()
 
 					for (let i = 0; i < documentIds.length; i++){
-						workspaceView.documentManager.closeDocument(documentIds[i], true)
+						workspaceView.documentManager.closeDocument(documentIds[i])
 					}
 				}
 			}

@@ -36,11 +36,18 @@ DocumentManagerBase {
 	onCollectionIdChanged: {
 		if (collectionId !== ""){
 			documentManagerSubscription.gqlCommandId = "On" + root.collectionId + "DocumentChanged"
+			// getOpenedDocumentList()
 		}
 	}
 
 	function getHeaders(){
 		return {}
+	}
+
+	function getOpenedDocumentList(){
+		startGetOpenedDocumentList()
+		collectionIdInput.m_collectionId = collectionId
+		getOpenedDocumentListRequest.send(collectionIdInput)
 	}
 
 	function openDocument(typeId, documentId){
@@ -74,13 +81,50 @@ DocumentManagerBase {
 	}
 
 	function closeDocument(documentId){
-		startCloseDocument(documentId)
+		let closeFunc = function(result){
+			if (result === undefined){
+				// Cancel
+				return
+			}
 
-		documentIdInput.m_id = documentId
-		documentIdInput.m_collectionId = collectionId
-		closeDocumentRequest.documentId = documentId
+			if (result){
+				// Try save
+				let savedFunc = function(savedDocumentId){
+					if (documentId === savedDocumentId){
+						documentSaved.disconnect(savedFunc)
+						closeFunc(false)
+					}
+				}
 
-		closeDocumentRequest.send(documentIdInput)
+				let savedFailedFunc = function(savedDocumentId, message){
+					if (documentId === savedDocumentId){
+						documentSaved.disconnect(savedFunc)
+						saveDocumentFailed.disconnect(savedFailedFunc)
+					}
+				}
+
+				documentSaved.connect(savedFunc)
+				saveDocumentFailed.connect(savedFailedFunc)
+				saveDocument(documentId)
+			}
+			else{
+				// Close
+				startCloseDocument(documentId)
+
+				documentIdInput.m_id = documentId
+				documentIdInput.m_collectionId = collectionId
+				closeDocumentRequest.documentId = documentId
+		
+				closeDocumentRequest.send(documentIdInput)
+			}
+		}
+
+		if (documentIsDirty(documentId)){
+			tryCloseDirtyDocument(documentId, closeFunc)
+		}
+		else{
+			closeFunc(false)
+		}
 	}
 
 	function doUndo(documentId, steps){
@@ -121,11 +165,27 @@ DocumentManagerBase {
 		getUndoInfoRequest.send(documentIdInput)
 	}
 
+	property CollectionId collectionIdInput: CollectionId {}
 	property ObjectId objectIdInput: ObjectId {}
 	property DocumentId documentIdInput: DocumentId {}
 	property DocumentTypeId documentTypeIdInput: DocumentTypeId {}
 	property CollectionUndoRedoInput collectionUndoRedoInput: CollectionUndoRedoInput {}
 	property UndoRedoInput undoRedoInput: UndoRedoInput {}
+
+	property GqlSdlRequestSender getOpenedDocumentListRequest: GqlSdlRequestSender {
+		gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_getOpenedDocumentList
+		sdlObjectComp: Component {
+			DocumentList {
+				onFinished: {
+					root.openedDocumentListReceived(m_documentList)
+				}
+			}
+		}
+
+		function getHeaders(){
+			return root.getHeaders()
+		}
+	}
 
 	property GqlSdlRequestSender openDocumentRequest: GqlSdlRequestSender {
 		gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_openDocument

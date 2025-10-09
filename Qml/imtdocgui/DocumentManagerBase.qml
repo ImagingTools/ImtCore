@@ -2,6 +2,10 @@ import QtQuick 2.12
 
 QtObject {
 	id: root
+	
+	signal startGetOpenedDocumentList()
+	signal openedDocumentListReceived(var documentListInfo)
+	signal openedDocumentListReceiveFailed(string message)
 
 	signal startOpenDocument(string documentId, string typeId)
 	signal documentOpened(string documentId, string typeId)
@@ -41,18 +45,19 @@ QtObject {
 	// typeOperation: NewDocumentCreated, DocumentOpened, DocumentChanged, DocumentSaved, DocumentClosed
 	// hasChanges - has document changes
 	signal documentManagerChanged(string typeOperation, string objectId, string documentId, bool hasChanges)
+	signal documentRepresentationUpdated(string documentId, var representation)
+
+	// callback(undefined) - cancel, callback(false) - close, callback(true) - save and close
+	signal tryCloseDirtyDocument(string documentId, var callback)
 
 	onDocumentSaved: {
-		setDocumentIsDirty(documentId, false)
 		setDocumentIsNew(documentId, false)
 	}
 
 	onDocumentManagerChanged: {
-		if (typeOperation === "DocumentChanged"){
-			setDocumentIsDirty(documentId, hasChanges)
-		}
+		setDocumentIsDirty(documentId, hasChanges)
 
-		if (typeOperation !== "DocumentClosed"){
+		if (typeOperation !== "DocumentClosed" && typeOperation !== "DocumentSaved"){
 			getUndoInfo(documentId)
 		}
 	}
@@ -99,6 +104,20 @@ QtObject {
 
 	function getUndoInfo(documentId){
 		console.warn("getUndoInfo() should be implemented in a subclass")
+	}
+
+	function getOpenedDocumentList(){
+		console.warn("getOpenedDocumentList() should be implemented in a subclass")
+	}
+
+	function getOpenedDocumentIds(){
+		let retVal = []
+
+		for (let i = 0; i < __internal.openedDocuments.length; ++i){
+			retVal.push(__internal.openedDocuments[i].id)
+		}
+
+		return retVal
 	}
 
 	function registerDocumentViewData(documentTypeId, viewTypeId, viewEditorComp, representationControllerComp){

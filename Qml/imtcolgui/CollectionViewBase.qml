@@ -60,8 +60,7 @@ ViewBase {
 		target: collectionViewBaseContainer.collectionFilter;
 		
 		function onFilterChanged(){
-			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
-			collectionViewBaseContainer.doUpdateGui();
+			collectionViewBaseContainer.filterMenu.filterChanged()
 		}
 	}
 	
@@ -69,8 +68,7 @@ ViewBase {
 		target: collectionViewBaseContainer.documentCollectionFilter;
 		
 		function onFilterChanged(){
-			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
-			collectionViewBaseContainer.doUpdateGui();
+			collectionViewBaseContainer.filterMenu.filterChanged()
 		}
 	}
 	
@@ -108,6 +106,11 @@ ViewBase {
 		visible: collectionViewBaseContainer.filterMenuVisible
 		onClose: {
 			filterMenu_.visible = false;
+		}
+
+		onFilterChanged: {
+			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
+			collectionViewBaseContainer.doUpdateGui();
 		}
 	}
 

@@ -98,6 +98,8 @@ QtObject {
 				return
 			}
 		}
+
+		documentManager.documentRepresentationUpdated(documentId, representation)
 	}
 	
 	function onModelDataChanged(view, model){
