@@ -24,6 +24,8 @@ SegmentBaseShape {
 		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : sector.borderColor
 		ctx.lineWidth = isSelected ? DesignScheme.selectionLineWidth : sector.borderWidth
 
+		ctx.globalAlpha = opacity
+
 		let centerScreen = getScreenPosition(center)
 
 		let innerRadiusScreen = innerRadius * transformMatrixArg.xScale()
@@ -89,21 +91,21 @@ SegmentBaseShape {
 	}
 
 	function drawControlPoints(ctx, transformMatrixArg){
-		let pointsObj = getBoundingBoxMidPoints();
+		let pointsObj = getBoundingBoxMidPoints(true);
 		ctx.strokeStyle = DesignScheme.boundingBoxBorderColor
 		ctx.fillStyle = DesignScheme.boundingBoxBorderColor
 		ctx.lineWidth = DesignScheme.boundingBoxLineWidth
 		ctx.beginPath()
 
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.topPoint)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.bottomPoint)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.leftPoint)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.rightPoint)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.topPoint, identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.bottomPoint, identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.leftPoint, identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.rightPoint, identityMatrix.matrix, controlPointColor)
 
-		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x + innerRadius, center.y))
-		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x, center.y + innerRadius))
-		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x - innerRadius, center.y))
-		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x, center.y - innerRadius))
+		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x + innerRadius, center.y), identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x, center.y + innerRadius), identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x - innerRadius, center.y), identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x, center.y - innerRadius), identityMatrix.matrix, controlPointColor)
 
 		ctx.stroke()
 		ctx.fill()

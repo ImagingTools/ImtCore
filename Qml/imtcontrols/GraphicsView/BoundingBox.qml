@@ -10,6 +10,8 @@ GraphicsShapeBase {
 	id: root;
 
 	property bool editMode: false;
+	property string controlPointColor: DesignScheme.boundingBoxBorderColor
+
 
 	function drawBoundingBox(ctx){
 		ctx.globalAlpha = 1

@@ -18,6 +18,8 @@ BoundingBox {
 		ctx.strokeStyle = borderColor;
 		ctx.lineWidth = borderWidth
 
+		ctx.globalAlpha = opacity
+
 		if(isSelected){
 			ctx.globalAlpha = 0.7
 		}
@@ -92,16 +94,16 @@ BoundingBox {
 	}
 
 	function drawControlPoints(ctx, transformMatrixArg){
-		let pointsObj = getBoundingBoxMidPoints();
+		let pointsObj = getBoundingBoxMidPoints(true);
 		ctx.strokeStyle = DesignScheme.boundingBoxBorderColor
 		ctx.fillStyle = DesignScheme.boundingBoxBorderColor
 		ctx.lineWidth = DesignScheme.boundingBoxLineWidth
 		ctx.beginPath()
 
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.topPoint)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.bottomPoint)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.leftPoint)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.rightPoint)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.topPoint, identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.bottomPoint, identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.leftPoint, identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.rightPoint, identityMatrix.matrix, controlPointColor)
 
 		ctx.stroke()
 		ctx.fill()

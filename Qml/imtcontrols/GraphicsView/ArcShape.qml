@@ -15,6 +15,9 @@ SegmentBaseShape {
 
 		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : color
 		ctx.lineWidth = isSelected ? DesignScheme.selectionLineWidth : lineWidth
+
+		ctx.globalAlpha = opacity
+
 		ctx.beginPath()
 
 		let centerScreen = getScreenPosition(center)
@@ -30,6 +33,8 @@ SegmentBaseShape {
 			ctx.arc(centerScreen.x, centerScreen.y, radiusScreen,  0, 2*Math.PI, anticlockwise)
 		}
 		ctx.stroke();
+
+		ctx.globalAlpha = 1
 	}
 
 	function isInsideRadius(dist){

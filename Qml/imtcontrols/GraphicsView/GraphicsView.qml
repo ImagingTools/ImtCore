@@ -32,7 +32,7 @@ Rectangle {
 	property var translateYPositiveLimit;
 	property var translateXNegativeLimit;
 	property var translateYNegativeLimit;
-	property bool onlyMouseEvents: false;
+	property bool receiveMouseEvents: false;
 	property bool restrictZoom: false;
 	property bool restrictMove: false;
 	property bool restrictSelect: false;
@@ -559,9 +559,8 @@ Rectangle {
 
 			onClicked: {
 				//console.log("CLICKED!!!")
-				if(graphicsView.onlyMouseEvents){
+				if(graphicsView.receiveMouseEvents){
 					graphicsView.mouseClicked(mouse)
-					return
 				}
 
 				let activeLayer = graphicsView.getActiveLayer()
@@ -574,9 +573,8 @@ Rectangle {
 
 			onPressed: {
 				//console.log("PRESSED!!!")
-				if(graphicsView.onlyMouseEvents){
+				if(graphicsView.receiveMouseEvents){
 					graphicsView.mousePressed(mouse)
-					return
 				}
 				let activeLayer = graphicsView.getActiveLayer()
 
@@ -615,9 +613,8 @@ Rectangle {
 
 			onReleased: {
 				//console.log("RELEASED!!!")
-				if(graphicsView.onlyMouseEvents){
+				if(graphicsView.receiveMouseEvents){
 					graphicsView.mouseReleased(mouse)
-					return
 				}
 				let activeLayer = graphicsView.getActiveLayer()
 
@@ -660,9 +657,8 @@ Rectangle {
 			}
 
 			onDoubleClicked: {
-				if(graphicsView.onlyMouseEvents){
+				if(graphicsView.receiveMouseEvents){
 					graphicsView.mouseDoubleClicked(mouse)
-					return
 				}
 				wasMoving = false;
 				isPressed = false;
@@ -823,9 +819,8 @@ Rectangle {
 			}
 
 			onPositionChanged: {
-				if(graphicsView.onlyMouseEvents){
+				if(graphicsView.receiveMouseEvents){
 					graphicsView.mousePositionChanged(mouse)
-					return
 				}
 				if(!graphicsView.isSelectionMode && controlArea.isPressed){
 					let activeLayer = graphicsView.getActiveLayer()
