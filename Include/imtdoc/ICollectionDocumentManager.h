@@ -84,7 +84,7 @@ public:
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const = 0;
 	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) = 0;
 	virtual QByteArray OpenDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
-	virtual istd::IChangeable* GetDocument(const QByteArray& userId, const QByteArray& documentId) const = 0;
+	virtual istd::IChangeableSharedPtr GetDocument(const QByteArray& userId, const QByteArray& documentId) const = 0;
 	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
 	virtual idoc::IUndoManager* GetDocumentUndoManager(

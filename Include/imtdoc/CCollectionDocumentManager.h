@@ -32,7 +32,7 @@ public:
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
 	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
 	virtual QByteArray OpenDocument(const QByteArray& userId, const QByteArray& objectId) override;
-	virtual istd::IChangeable* GetDocument(const QByteArray& userId, const QByteArray& documentId) const override;
+	virtual istd::IChangeableSharedPtr GetDocument(const QByteArray& userId, const QByteArray& documentId) const override;
 	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) override;
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
 	virtual idoc::IUndoManager* GetDocumentUndoManager(const QByteArray& userId, const QByteArray& documentId) const override;

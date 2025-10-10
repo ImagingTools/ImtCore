@@ -146,12 +146,12 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 }
 
 
-istd::IChangeable* CCollectionDocumentManager::GetDocument(const QByteArray& userId, const QByteArray& documentId) const
+istd::IChangeableSharedPtr CCollectionDocumentManager::GetDocument(const QByteArray& userId, const QByteArray& documentId) const
 {
 	QMutexLocker locker(&m_mutex);
 
 	if (m_userDocuments.contains(userId) && m_userDocuments[userId].contains(documentId)) {
-		return m_userDocuments[userId][documentId].objectPtr.GetPtr();
+		return m_userDocuments[userId][documentId].objectPtr;
 	}
 
 	return nullptr;
