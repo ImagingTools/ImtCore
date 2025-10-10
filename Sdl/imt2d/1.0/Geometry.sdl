@@ -37,3 +37,11 @@ type Annulus {
 	innerRadius: Double!
 	outerRadius: Double!
 }
+
+type AnnulusSegment {
+	center: Point2d!
+	innerRadius: Double!
+	outerRadius: Double!
+	beginAngle: Double!
+	endAngle: Double!
+}

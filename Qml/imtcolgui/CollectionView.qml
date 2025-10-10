@@ -4,6 +4,7 @@ import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
+import imtbaseImtBaseTypesSdl 1.0
 
 Item {
 	id: root;
@@ -48,7 +49,8 @@ Item {
 
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
-	
+	property var registeredFilters: ({})
+
 	signal selectedIndexChanged(int index);
 	signal elementsChanged();
 	signal headersChanged();
@@ -86,7 +88,23 @@ Item {
 		
 		collectionMetaInfo.width = width / 5 <= metaInfoWidth ? 0 : metaInfoWidth
 	}
-	
+
+	Component.onCompleted: {
+		registerFilter("ComplexFilter", root.collectionFilter)
+		registerFilter("DocumentFilter", root.documentCollectionFilter)
+	}
+
+	onCollectionFilterChanged: {
+		registerFilter("ComplexFilter", root.collectionFilter)
+	}
+
+	onDocumentCollectionFilterChanged: {
+		registerFilter("DocumentFilter", root.documentCollectionFilter)
+	}
+
+	function registerFilter(filterId, filterModel){
+		root.registeredFilters[filterId] = filterModel
+	}
 	function doubleClicked(id, index){
 		container.doubleClicked(id, index)
 	}
@@ -344,6 +362,17 @@ Item {
 			root.onFilterChanged(filterId, filterValue);
 		}
 
+		ParamsSetController {
+			id: paramsSetController
+		}
+
+		Component {
+			id: paramsSetComp
+			ParamsSet{
+
+			}
+		}
+
 		function doUpdateGui(){
 			let count = -1;
 			let offset = 0;
@@ -359,7 +388,22 @@ Item {
 					documentFilter = documentCollectionFilter
 				}
 
-				dataController.updateElements(count, offset, collectionFilter, documentFilter);
+				let paramsSet = paramsSetComp.createObject(this)
+				paramsSetController.paramsSet = paramsSet
+
+				console.log("registeredFilters", root.registeredFilters)
+
+				for (let filterKey in root.registeredFilters){
+					if (root.filterMenu.enabledFilters[filterKey]){
+						let filterModel = root.registeredFilters[filterKey]
+						if (filterModel){
+							paramsSetController.addParam(filterKey, filterKey, "", "", Functions.escapeSpecialChars(filterModel.toJson()))
+						}
+					}
+				}
+
+				dataController.updateElements(count, offset, paramsSet);
+				paramsSetController.paramsSet.destroy()
 			}
 		}
 		

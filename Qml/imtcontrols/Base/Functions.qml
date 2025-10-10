@@ -309,6 +309,14 @@ QtObject {
 		return retVal
 	}
 
+	function escapeSpecialChars(jsonString) {
+		return jsonString.replace(/\n/g, "\\n")
+		.replace(/\r/g, "\\r")
+		.replace(/\t/g, "\\t")
+		.replace(/\f/g, "\\f")
+		.replace(/"/g, '\\"');
+	}
+
 	function getRadians(degreesArg){
 		return degreesArg * Math.PI / 180
 	}

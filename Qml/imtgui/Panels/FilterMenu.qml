@@ -14,13 +14,23 @@ ControlBase {
     property bool canResetFilters: true
     property CollectionFilter complexFilter: CollectionFilter {}
     property DocCollectionFilter documentFilter: DocCollectionFilter {}
+    property var enabledFilters: ({})
     
     signal close()
     signal clear()
+    signal filterChanged()
 
     property var filterDependencies: ({})
     property ListModel filtersModel: ListModel {}
     
+    Component.onCompleted: {
+        setFilterIsEnabled("ComplexFilter", true)
+    }
+
+    function setFilterIsEnabled(filterId, enabled){
+        enabledFilters[filterId] = enabled
+    }
+
     function registerFieldFilterDelegate(filterId, filterDelegateComp){
         filtersModel.append({id: filterId, comp:filterDelegateComp})
     }

@@ -1881,6 +1881,14 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 
 		PrepareFilters(gqlRequest, *viewParamsPtr, filterParams);
 	}
+	else if (inputParamsPtr->ContainsParam("selectionParams")){
+		const imtgql::CGqlParamObject* selectionParamsPtr = inputParamsPtr->GetParamArgumentObjectPtr("selectionParams");
+		if (selectionParamsPtr != nullptr){
+			offset = inputParamsPtr->GetParamArgumentValue("offset").toInt();
+			count = inputParamsPtr->GetParamArgumentValue("count").toInt();
+			PrepareFilters(gqlRequest, *selectionParamsPtr, filterParams);
+		}
+	}
 
 	if (count == 0){
 		count = -1;
@@ -1931,8 +1939,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 		return nullptr;
 	}
 
-	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
-	if (inputParamPtr == nullptr){
+	const imtgql::CGqlParamObject* inputParamsPtr = gqlRequest.GetParamObject("input");
+	if (inputParamsPtr == nullptr){
 		errorMessage = QString("Unable to rename object. GraphQL input params is invalid.");
 		SendErrorMessage(0, errorMessage, "Object collection controller");
 
@@ -1940,9 +1948,15 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 	}
 
 	iprm::CParamsSet filterParams;
-	const imtgql::CGqlParamObject* viewParamsPtr = inputParamPtr->GetParamArgumentObjectPtr("viewParams");
+	const imtgql::CGqlParamObject* viewParamsPtr = inputParamsPtr->GetParamArgumentObjectPtr("viewParams");
 	if (viewParamsPtr != nullptr){
 		PrepareFilters(gqlRequest, *viewParamsPtr, filterParams);
+	}
+	else if (inputParamsPtr->ContainsParam("selectionParams")){
+		const imtgql::CGqlParamObject* selectionParamsPtr = inputParamsPtr->GetParamArgumentObjectPtr("selectionParams");
+		if (selectionParamsPtr != nullptr){
+			PrepareFilters(gqlRequest, *selectionParamsPtr, filterParams);
+		}
 	}
 
 	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
@@ -2567,12 +2581,33 @@ istd::IChangeableUniquePtr CObjectCollectionControllerCompBase::CreateObjectFrom
 
 void CObjectCollectionControllerCompBase::PrepareFilters(
 			const imtgql::CGqlRequest& gqlRequest,
-			const imtgql::CGqlParamObject& viewParamsGql,
+			const imtgql::CGqlParamObject& inputParamsGql,
 			iprm::CParamsSet& filterParams) const
 {
-	this->SetAdditionalFilters(gqlRequest, viewParamsGql, &filterParams);
+	this->SetAdditionalFilters(gqlRequest, inputParamsGql, &filterParams);
 
-	const imtgql::CGqlParamObject* complexFilterModelPtr = viewParamsGql.GetParamArgumentObjectPtr("filterModel");
+	const imtgql::CGqlParamObject* complexFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("filterModel");
+	const imtgql::CGqlParamObject* documentFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("documentFilterModel");
+
+	sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet;
+	if (paramsSet.ReadFromGraphQlObject(inputParamsGql)){
+		for (sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter: paramsSet.parameters->ToList()){
+			if (parameter.id){
+				const iser::ISerializable* parameterPtr = m_selectionParams.GetParameter(*parameter.id);
+				if (parameterPtr != nullptr){
+					istd::TDelPtr<iser::ISerializable> filterParameterPtr;
+					filterParameterPtr.SetCastedOrRemove(parameterPtr->CloneMe());
+					if (filterParameterPtr.IsValid()){
+						filterParams.SetEditableParameter(*parameter.id, filterParameterPtr.PopPtr(), true);
+					}
+				}
+			}
+		}
+		if (!GetParamsSetFromRepresentation(paramsSet, filterParams)){
+			SendErrorMessage(0, QString("Unable to read filter params set for collection '%1'. Error: Selection Params parsing failed").arg(QString::fromUtf8(*m_collectionIdAttrPtr)));
+		}
+	}
+
 	if (complexFilterModelPtr != nullptr){
 		sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0 complexFilterSdl;
 		bool isComplexFilterOk = complexFilterSdl.ReadFromGraphQlObject(*complexFilterModelPtr);
@@ -2593,7 +2628,6 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 		}
 	}
 
-	const imtgql::CGqlParamObject* documentFilterModelPtr = viewParamsGql.GetParamArgumentObjectPtr("documentFilterModel");
 	if (documentFilterModelPtr != nullptr){
 		sdl::imtbase::DocumentCollectionFilter::CDocumentCollectionFilter::V1_0 documentFilterSdl;
 		bool isDocumentFilterOk = documentFilterSdl.ReadFromGraphQlObject(*documentFilterModelPtr);
@@ -2753,6 +2787,7 @@ bool CObjectCollectionControllerCompBase::DoUpdateObjectFromRequest(
 
 		return false;
 	}
+
 
 	return object.CopyFrom(*savedObjectPtr);
 }

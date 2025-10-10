@@ -106,8 +106,14 @@ ViewBase {
 		complexFilter: collectionViewBaseContainer.collectionFilter;
 		documentFilter: collectionViewBaseContainer.documentCollectionFilter;
 		visible: collectionViewBaseContainer.filterMenuVisible
+
 		onClose: {
 			filterMenu_.visible = false;
+		}
+
+		onFilterChanged: {
+			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
+			collectionViewBaseContainer.doUpdateGui();
 		}
 	}
 

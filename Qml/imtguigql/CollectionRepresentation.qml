@@ -133,19 +133,24 @@ Item {
 		getCollectionHeadersRequest.send(getCollectionHeadersInput)
 	}
 
-	function updateElements(count, offset, filterModel, documentFilterModel){
+	function updateElements(count, offset, paramsSet){
 		if (internal.elementsUpdatingBlock){
 			return;
 		}
-		
+
 		if (root.collectionId === ""){
 			console.error("Unable to update elements 'collectionId' is empty!");
 			return;
 		}
-		
+
 		root.beginUpdate();
 		elementsGqlModel.gqlCommandId = gqlGetListCommandId;
-		elementsGqlModel.send({"count":count, "offset":offset,"filterModel":filterModel,"documentFilterModel":documentFilterModel})
+		collectionParams.m_collectionId = root.collectionId
+		collectionParams.m_count = count
+		collectionParams.m_offset = offset
+		collectionParams.m_selectionParams = paramsSet
+
+		elementsGqlModel.send(collectionParams)
 	}
 	
 	function clearElements(){
@@ -397,6 +402,10 @@ Item {
 			return root.getHeaders();
 		}
 	}
+
+	CreateSubCollectionInput {
+		id: collectionParams
+	}
 	
 	GqlRequestSender {
 		id: elementsGqlModel;
@@ -404,14 +413,9 @@ Item {
 		
 		function createQueryParams(query, params){
 			var viewParams = Gql.GqlObject("viewParams");
-			viewParams.InsertField("count", params["count"]);
-			viewParams.InsertField("offset", params["offset"]);
-			viewParams.InsertField("filterModel", params["filterModel"]);
-			viewParams.InsertField("documentFilterModel", params["documentFilterModel"]);
 
 			var inputParams = Gql.GqlObject("input");
-			inputParams.InsertField("collectionId", root.collectionId);
-			inputParams.InsertFieldObject(viewParams);
+			inputParams.fromObject(params);
 
 			root.addAdditionalInputParams(inputParams)
 			query.AddParam(inputParams);

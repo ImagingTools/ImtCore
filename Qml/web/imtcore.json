@@ -29,10 +29,13 @@
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseComplexCollectionFilterSdl",
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseDocumentCollectionFilterSdl",
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseDocumentRevisionSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseDocumentManagerSdl",
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseMimeTypeSdl",
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseSettingsSdl",
         "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseCommandsSdl",
-        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseSearchSdl"
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseSearchSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseCollectionDocumentManagerSdl",
+        "${IMTCOREDIR}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseUndoManagerSdl"
     ],
     "output": "${IMTCOREDIR}\\Bin\\web\\Resources\\jqml.controlsgallery.js"
 }
