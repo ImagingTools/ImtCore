@@ -102,10 +102,10 @@ SegmentBaseShape {
 		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.leftPoint, identityMatrix.matrix, controlPointColor)
 		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.rightPoint, identityMatrix.matrix, controlPointColor)
 
-		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x + innerRadius, center.y), identityMatrix.matrix, controlPointColor)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x, center.y + innerRadius), identityMatrix.matrix, controlPointColor)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x - innerRadius, center.y), identityMatrix.matrix, controlPointColor)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(center.x, center.y - innerRadius), identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, getScreenPosition(Qt.point(center.x + innerRadius, center.y)), identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, getScreenPosition(Qt.point(center.x, center.y + innerRadius)), identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, getScreenPosition(Qt.point(center.x - innerRadius, center.y)), identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawBoundingBoxControlPoint(ctx, getScreenPosition(Qt.point(center.x, center.y - innerRadius)), identityMatrix.matrix, controlPointColor)
 
 		ctx.stroke()
 		ctx.fill()
