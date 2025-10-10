@@ -60,12 +60,12 @@ SegmentBaseShape {
 
 		let pointsObj = ({});
 
-		if(equalAngles){
+		//if(equalAngles){
 			pointsObj.topLeftPoint = Qt.point(center.x - radius, center.y - radius)
 			pointsObj.topRightPoint = Qt.point(center.x + radius, center.y - radius)
 			pointsObj.bottomLeftPoint = Qt.point(center.x - radius, center.y + radius)
 			pointsObj.bottomRightPoint = Qt.point(center.x + radius, center.y + radius)
-		}
+		//}
 
 		return pointsObj;
 	}

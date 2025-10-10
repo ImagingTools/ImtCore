@@ -80,12 +80,12 @@ SegmentBaseShape {
 	function getBoundingBoxPoints(){
 		let pointsObj = ({});
 
-		if(equalAngles){
+		//if(equalAngles){
 			pointsObj.topLeftPoint = Qt.point(center.x - outerRadius, center.y - outerRadius)
 			pointsObj.topRightPoint = Qt.point(center.x + outerRadius, center.y - outerRadius)
 			pointsObj.bottomLeftPoint = Qt.point(center.x - outerRadius, center.y + outerRadius)
 			pointsObj.bottomRightPoint = Qt.point(center.x + outerRadius, center.y + outerRadius)
-		}
+		//}
 
 		return pointsObj;
 	}

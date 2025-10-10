@@ -36,6 +36,7 @@ Rectangle {
 	property bool restrictZoom: false;
 	property bool restrictMove: false;
 	property bool restrictSelect: false;
+	property bool zoomOnlyInCenter: false;
 	property int restrictMoveMargin: -1;
 	property bool fitToBorders: false;
 
@@ -804,7 +805,12 @@ Rectangle {
 					}
 				}
 
-				canvas.setScale(scaleCoeff_, wheel.x, wheel.y)
+				if(graphicsView.zoomOnlyInCenter){
+					canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
+				}
+				else {
+					canvas.setScale(scaleCoeff_, wheel.x, wheel.y)
+				}
 			}
 
 
