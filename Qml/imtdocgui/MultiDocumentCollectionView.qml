@@ -122,7 +122,7 @@ Item {
 				let objectId = documentInfo.m_objectId
 				let documentId = documentInfo.m_documentId
 				let objectTypeId = documentInfo.m_objectTypeId
-				let hasChanges = documentInfo.m_hasChanges
+				let isDirty = documentInfo.m_isDirty
 
 				if (objectId === ""){
 					workspaceView.documentManager.documentCreated(documentId, objectTypeId)
@@ -133,7 +133,7 @@ Item {
 				}
 
 				workspaceView.documentManager.getUndoInfo(documentId)
-				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId, hasChanges)
+				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId)
 			}
 
 			loading.stop()

@@ -17,15 +17,12 @@ DocumentManagerBase {
 		}
 
 		onMessageReceived: {
-			console.log("onMessageReceived")
-			documentManagerNotification.createFromJson(data.toJson())
+			console.log("Document Manager onMessageReceived")
+			let objectId = data.getData("objectId")
+			let documentId = data.getData("documentId")
+			let operation = data.getData("documentOperation")
 
-			let objectId = documentManagerNotification.m_objectId
-			let documentId = documentManagerNotification.m_documentId
-			let operation = documentManagerNotification.m_documentOperation
-			let hasChanges = documentManagerNotification.m_hasChanges
-
-			root.documentManagerChanged(operation, objectId, documentId, hasChanges)
+			root.documentManagerChanged(operation, objectId, documentId)
 		}
 	}
 
@@ -38,22 +35,13 @@ DocumentManagerBase {
 
 		onMessageReceived: {
 			console.log("UndoChanged onMessageReceived", data.toJson())
-			undoInfoNotification.createFromJson(data.toJson())
+			let documentId = data.getData("documentId")
+			let availableUndoSteps = data.getData("availableUndoSteps")
+			let availableRedoSteps = data.getData("availableRedoSteps")
+			let isDirty = data.getData("isDirty")
 
-			let documentId = undoInfoNotification.m_documentId
-			let availableUndoSteps = undoInfoNotification.m_availableUndoSteps
-			let availableRedoSteps = undoInfoNotification.m_availableRedoSteps
-
-			root.undoInfoReceived(documentId, availableUndoSteps, availableRedoSteps)
+			root.undoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty)
 		}
-	}
-
-	UndoInfo {
-		id: undoInfoNotification
-	}
-
-	DocumentManagerNotification {
-		id: documentManagerNotification
 	}
 
 	onCollectionIdChanged: {
@@ -375,8 +363,7 @@ DocumentManagerBase {
 		sdlObjectComp: Component {
 			UndoInfo {
 				onFinished: {
-					console.log("UndoInfo onFinished", this.toJson())
-					root.undoInfoReceived(m_documentId, m_availableUndoSteps, m_availableRedoSteps)
+					root.undoInfoReceived(m_documentId, m_availableUndoSteps, m_availableRedoSteps, m_isDirty)
 				}
 			}
 		}
@@ -385,36 +372,4 @@ DocumentManagerBase {
 			return root.getHeaders()
 		}
 	}
-
-	// property GqlSdlRequestSender resetUndoRequest: GqlSdlRequestSender {
-	// 	gqlCommandId: ImtbaseCollectionDocumentManagerSdlCommandIds.s_resetUndo
-	// 	requestType: 1
-	// 	sdlObjectComp: Component {
-	// 		UndoStatus {
-	// 			onFinished: {
-	// 				if (m_status === "Success"){
-	// 					root.un(root.doRedoRequest.documentId)
-	// 				}
-	// 				else if (m_status === "InvalidUserId"){
-	// 					root.redoFailed(root.doRedoRequest.documentId, qsTr("Invalid user-ID"))
-	// 				}
-	// 				else if (m_status === "InvalidDocumentId"){
-	// 					root.redoFailed(root.doRedoRequest.documentId, qsTr("Invalid document-ID"))
-	// 				}
-	// 				else if (m_status === "Failed"){
-	// 					root.redoFailed(root.doRedoRequest.documentId, qsTr("Redo failed"))
-	// 				}
-	// 				else if (m_status === "InvalidStepCount"){
-	// 					root.redoFailed(root.doRedoRequest.documentId, qsTr("Invalid step count"))
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-
-	// 	property string documentId
-
-	// 	function getHeaders(){
-	// 		return root.getHeaders()
-	// 	}
-	// }
 }

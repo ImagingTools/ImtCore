@@ -12,7 +12,7 @@ QtObject {
 	property var registeredViews: []
 	property var registeredRepresentation: []
 
-	signal viewRegistered(var view, var representationController)
+	signal viewRegistered(var view, var representationController, bool updateRepresentation)
 
 	onViewRegistered: {
 		if (view){
@@ -23,7 +23,13 @@ QtObject {
 			view.guiUpdated.connect(onGuiUpdated)
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
-			representationController.updateRepresentationFromDocument()
+
+			if (updateRepresentation){
+				representationController.updateRepresentationFromDocument()
+			}
+			else{
+				representationController.representationUpdated(documentId, view.model)
+			}
 		}
 	}
 
@@ -58,7 +64,7 @@ QtObject {
 			root.updateRepresentationForAllViews()
 		}
 
-		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps){
+		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty){
 			if (documentId !== root.documentId){
 				return
 			}
@@ -67,6 +73,7 @@ QtObject {
 				if (root.registeredViews[i].commandsController){
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Undo", availableUndoSteps > 0)
 					root.registeredViews[i].commandsController.setCommandIsEnabled("Redo", availableRedoSteps > 0)
+					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", isDirty)
 				}
 			}
 		}
@@ -74,12 +81,6 @@ QtObject {
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
 			if (documentId !== root.documentId){
 				return
-			}
-
-			for (let i = 0; i < root.registeredViews.length; ++i){
-				if (root.registeredViews[i].commandsController){
-					root.registeredViews[i].commandsController.setCommandIsEnabled("Save", hasChanges)
-				}
 			}
 
 			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
@@ -119,7 +120,7 @@ QtObject {
 		}
 	}
 
-	function registerView(view, representationController){
+	function registerView(view, representationController, updateRepr){
 		if (!view){
 			console.error("Unable to register invalid view")
 			return
@@ -133,7 +134,7 @@ QtObject {
 		registeredViews.push(view)
 		registeredRepresentation.push(representationController)
 		
-		viewRegistered(view, representationController)
+		viewRegistered(view, representationController, updateRepr)
 	}
 
 	function onUndo(){

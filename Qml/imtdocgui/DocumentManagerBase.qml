@@ -39,12 +39,12 @@ QtObject {
 	signal documentIsDirtyChanged(string documentId, bool isDirty)
 
 	signal startUndoInfoReceive(string documentId)
-	signal undoInfoReceived(string documentId, int availableUndoSteps, int availableRedoSteps)
+	signal undoInfoReceived(string documentId, int availableUndoSteps, int availableRedoSteps, bool isDirty)
 	signal undoInfoReceiveFailed(string documentId, string message)
 
 	// typeOperation: NewDocumentCreated, DocumentOpened, DocumentChanged, DocumentSaved, DocumentClosed
 	// hasChanges - has document changes
-	signal documentManagerChanged(string typeOperation, string objectId, string documentId, bool hasChanges)
+	signal documentManagerChanged(string typeOperation, string objectId, string documentId)
 	signal documentRepresentationUpdated(string documentId, var representation)
 	signal documentGuiUpdated(string documentId, var representation)
 
@@ -55,12 +55,8 @@ QtObject {
 		setDocumentIsNew(documentId, false)
 	}
 
-	onDocumentManagerChanged: {
-		setDocumentIsDirty(documentId, hasChanges)
-
-		if (typeOperation !== "DocumentClosed" && typeOperation !== "DocumentSaved"){
-			getUndoInfo(documentId)
-		}
+	onUndoInfoReceived: {
+		setDocumentIsDirty(documentId, isDirty)
 	}
 
 	onDocumentCreated: {
@@ -337,7 +333,7 @@ QtObject {
 					documentManager: root
 					onViewRegistered: {
 						if (documentData.isNew){
-							view.doUpdateModel()
+							// view.doUpdateModel()
 						}
 					}
 				}
@@ -353,7 +349,7 @@ QtObject {
 
 					let representationController = representationControllerFactory.createObject(documentData)
 					representationController.documentId = id
-					documentDecorator.registerView(view, representationController)
+					documentDecorator.registerView(view, representationController, !isNew)
 				}
 
 				function addView(viewTypeId, view){
