@@ -65,7 +65,7 @@ protected:
 		QByteArray objectTypeId;
 		istd::IChangeableSharedPtr objectPtr;
 		idoc::IUndoManagerSharedPtr undoManagerPtr;
-		bool hasChanges;
+		bool isDirty;
 		int undoManagerModelId = -1;
 	};
 
@@ -83,12 +83,12 @@ protected:
 
 	typedef QMap<QByteArray, WorkingDocument> WorkingDocumentList;
 	QMap<QByteArray, WorkingDocumentList> m_userDocuments;
-	mutable QMutex m_mutex;
+	mutable QRecursiveMutex m_mutex;
 
 	UndoManagerObserver m_undoManagerObserver;
 
 private:
-	std::shared_ptr<DocumentNotification> CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
+	DocumentNotificationPtr CreateDocumentNotification(const QByteArray& userId, const QByteArray& documentId) const;
 };
 
 

@@ -29,7 +29,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentList CCollectionDocumentManage
 			sdlInfo.Version_1_0->documentId = info.documentId;
 			sdlInfo.Version_1_0->objectId = info.objectId;
 			sdlInfo.Version_1_0->objectTypeId = info.objectTypeId;
-			sdlInfo.Version_1_0->hasChanges = info.hasChanges;
+			sdlInfo.Version_1_0->isDirty = info.isDirty;
 
 			retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
 		}
@@ -243,6 +243,7 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerComp::OnGetUndoIn
 	}
 
 	QMutexLocker locker(&m_mutex);
+
 	if (!m_userDocuments.contains(userId)){
 		errorMessage = "Invalid user ID";
 
@@ -260,6 +261,9 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerComp::OnGetUndoIn
 	}
 
 	idoc::IUndoManager* undoManagerPtr = m_userDocuments[userId][*documentId->id].undoManagerPtr.GetPtr();
+
+	retVal.Version_1_0->isDirty = undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+	retVal.Version_1_0->status.emplace().status = sdl::imtbase::UndoManager::EUndoStatus::Success;
 
 	int count = undoManagerPtr->GetAvailableUndoSteps();
 	retVal.Version_1_0->availableUndoSteps = count;

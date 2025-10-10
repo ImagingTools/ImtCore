@@ -42,7 +42,7 @@ imtdoc::ICollectionDocumentManager::DocumentList CCollectionDocumentManager::Get
 			info.documentId = id;
 			info.objectId = workingDocument.objectId;
 			info.objectTypeId = workingDocument.objectTypeId;
-			info.hasChanges = workingDocument.hasChanges;
+			info.isDirty = workingDocument.isDirty;
 
 			list.append(info);
 		}
@@ -69,22 +69,25 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 	retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 	NewDocumentCreatedInfo info;
+	info.userId = userId;
 	info.documentId = retVal;
-	info.hasChanges = false;
-	info.availableUndoSteps = 0;
-	info.availableRedoSteps = 0;
-
-	istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
-	changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
-	istd::CChangeNotifier notifier(this, &changeSet);
+	info.isDirty = false;
 
 	QMutexLocker locker(&m_mutex);
 
 	WorkingDocument& document = m_userDocuments[userId][retVal];
-	document.objectTypeId = documentTypeId;
-	document.objectPtr = objectPtr;
-	document.undoManagerPtr = undoManagerPtr;
-	document.hasChanges = false;
+
+	{
+		istd::IChangeable::ChangeSet changeSet(CF_NEW_DOCUMENT_CREATED);
+		changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
+		istd::CChangeNotifier notifier(this, &changeSet);
+
+		WorkingDocument& document = m_userDocuments[userId][retVal];
+		document.objectTypeId = documentTypeId;
+		document.objectPtr = objectPtr;
+		document.undoManagerPtr = undoManagerPtr;
+		document.isDirty = false;
+	}
 
 	InitializeDocumentObservers(document, userId);
 
@@ -114,24 +117,26 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 			retVal = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 			DocumentOpenedInfo info;
+			info.userId = userId;
 			info.documentId = retVal;
 			info.objectId = objectId;
-			info.hasChanges = false;
-			info.availableUndoSteps = 0;
-			info.availableRedoSteps = 0;
-
-			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_OPENED);
-			changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
-			istd::CChangeNotifier notifier(this, &changeSet);
+			info.isDirty = false;
 
 			QMutexLocker locker(&m_mutex);
 
 			WorkingDocument& document = m_userDocuments[userId][retVal];
-			document.objectId = objectId;
-			document.objectTypeId = objectTypeId;
-			document.objectPtr = dataPtr;
-			document.undoManagerPtr = undoManagerPtr;
-			document.hasChanges = false;
+
+			{
+				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_OPENED);
+				changeSet.SetChangeInfo(CN_DOCUMENT_OPENED, QVariant::fromValue(info));
+				istd::CChangeNotifier notifier(this, &changeSet);
+
+				document.objectId = objectId;
+				document.objectTypeId = objectTypeId;
+				document.objectPtr = dataPtr;
+				document.undoManagerPtr = undoManagerPtr;
+				document.isDirty = false;
+			}
 
 			InitializeDocumentObservers(document, userId);
 		}
@@ -177,7 +182,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 		bool retVal = collectionPtr->SetObjectData(workingDocument.objectId, *workingDocument.objectPtr);
 
 		if (retVal){
-			workingDocument.hasChanges = false;
+			workingDocument.isDirty = false;
 
 			DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
 			Q_ASSERT(notificationPtr != nullptr);
@@ -197,7 +202,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 		collectionPtr->InsertNewObject(workingDocument.objectTypeId, "", "", workingDocument.objectPtr.GetPtr());
 
 	if (!workingDocument.objectId.isEmpty()){
-		workingDocument.hasChanges = false;
+		workingDocument.isDirty = false;
 
 		DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
 		Q_ASSERT(notificationPtr != nullptr);
@@ -227,8 +232,11 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 		return OS_INVALID_DOCUMENT_ID;
 	}
 
+	DocumentClosedNotification notification;
+	notification.userId = userId;
+	notification.documentId = documentId;
 	istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CLOSED);
-	changeSet.SetChangeInfo(CN_DOCUMENT_CLOSED, documentId);
+	changeSet.SetChangeInfo(CN_DOCUMENT_CLOSED, QVariant::fromValue(notification));
 	istd::CChangeNotifier notifier(this, &changeSet);
 
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_userDocuments[userId][documentId].undoManagerPtr.GetPtr());
@@ -296,6 +304,8 @@ void CCollectionDocumentManager::OnUndoManagerChanged(int modelId)
 	QByteArray userId;
 	QByteArray documentId;
 
+	QMutexLocker locker(&m_mutex);
+
 	if (!FindDocument(modelId, userId, documentId)){
 		Q_ASSERT(false);
 
@@ -308,18 +318,34 @@ void CCollectionDocumentManager::OnUndoManagerChanged(int modelId)
 		return;
 	}
 
-	bool hasChanges = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
-	if (documentPtr->hasChanges != hasChanges){
-		documentPtr->hasChanges = hasChanges;
+	bool isDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
+	if (documentPtr->isDirty != isDirty){
+		documentPtr->isDirty = isDirty;
+	}
 
-		DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-		Q_ASSERT(notificationPtr != nullptr);
-		if (notificationPtr != nullptr){
-			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
-			changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
-			istd::CChangeNotifier notifier(this, &changeSet);
+	DocumentUndoNotification notification;
+	notification.userId = userId;
+	notification.documentId = documentId;
+
+	Q_ASSERT(documentPtr->undoManagerPtr.IsValid());
+	if (documentPtr->undoManagerPtr.IsValid()){
+		notification.availableUndoSteps = documentPtr->undoManagerPtr->GetAvailableUndoSteps();
+		notification.availableRedoSteps = documentPtr->undoManagerPtr->GetAvailableRedoSteps();
+
+		int count = documentPtr->undoManagerPtr->GetAvailableUndoSteps();
+		for (int i = 0; i < count; i++){
+			notification.undoLevelDescriptions.append(documentPtr->undoManagerPtr->GetUndoLevelDescription(i));
+		}
+
+		count = documentPtr->undoManagerPtr->GetAvailableRedoSteps();
+		for (int i = 0; i < count; i++){
+			notification.redoLevelDescriptions.append(documentPtr->undoManagerPtr->GetRedoLevelDescription(i));
 		}
 	}
+
+	istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_UNDO_CHANGED);
+	changeSet.SetChangeInfo(CN_DOCUMENT_UNDO_CHANGED, QVariant::fromValue(notification));
+	istd::CChangeNotifier notifier(this, &changeSet);
 }
 
 
@@ -410,7 +436,7 @@ void CCollectionDocumentManager::InitializeDocumentObservers(
 
 // private methods
 
-std::shared_ptr<ICollectionDocumentManager::DocumentNotification> CCollectionDocumentManager::CreateDocumentNotification(
+ICollectionDocumentManager::DocumentNotificationPtr CCollectionDocumentManager::CreateDocumentNotification(
 	const QByteArray& userId,
 	const QByteArray& documentId) const
 {
@@ -423,23 +449,7 @@ std::shared_ptr<ICollectionDocumentManager::DocumentNotification> CCollectionDoc
 		retVal->userId = userId;
 		retVal->documentId = documentId;
 		retVal->objectId = document.objectId;
-		retVal->hasChanges = document.hasChanges;
-
-		Q_ASSERT(document.undoManagerPtr.IsValid());
-		if (document.undoManagerPtr.IsValid()){
-			retVal->availableUndoSteps = document.undoManagerPtr->GetAvailableUndoSteps();
-			retVal->availableRedoSteps = document.undoManagerPtr->GetAvailableRedoSteps();
-
-			int count = document.undoManagerPtr->GetAvailableUndoSteps();
-			for (int i = 0; i < count; i++){
-				retVal->undoLevelDescriptions.append(document.undoManagerPtr->GetUndoLevelDescription(i));
-			}
-
-			count = document.undoManagerPtr->GetAvailableRedoSteps();
-			for (int i = 0; i < count; i++){
-				retVal->redoLevelDescriptions.append(document.undoManagerPtr->GetRedoLevelDescription(i));
-			}
-		}
+		retVal->isDirty = document.isDirty;
 	}
 
 	return retVal;

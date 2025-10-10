@@ -47,7 +47,7 @@ type DocumentInfo {
 	documentId: ID!
 	objectTypeId: ID!
 	objectId: ID!
-	hasChanges: Bool!
+	isDirty: Bool!
 }
 
 type DocumentList {
@@ -63,7 +63,6 @@ type DocumentManagerNotification {
 	documentOperation: EDocumentOperation!
 	documentId: ID!
 	objectId: ID
-	hasChanges: Bool
 }
 
 type Query {

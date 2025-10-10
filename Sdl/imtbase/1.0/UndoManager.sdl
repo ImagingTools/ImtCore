@@ -18,6 +18,7 @@ type UndoStatus {
 type UndoInfo {
 	documentId: ID!
 	status: UndoStatus!
+	isDirty: Bool
 	availableUndoSteps: Int
 	availableRedoSteps: Int
 	undoLevelDescriptions: [String]

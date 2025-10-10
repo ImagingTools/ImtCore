@@ -18,6 +18,7 @@ public:
 		CF_NEW_DOCUMENT_CREATED = 170000,
 		CF_DOCUMENT_OPENED,
 		CF_DOCUMENT_CHANGED,
+		CF_DOCUMENT_UNDO_CHANGED,
 		CF_DOCUMENT_SAVED,
 		CF_DOCUMENT_CLOSED
 	};
@@ -35,11 +36,7 @@ public:
 		QByteArray documentId;
 		QByteArray objectId;
 		QByteArray objectTypeId;
-		bool hasChanges;
-		int availableUndoSteps;
-		int availableRedoSteps;
-		QStringList undoLevelDescriptions;
-		QStringList redoLevelDescriptions;
+		bool isDirty;
 	};
 	typedef QList<DocumentInfo> DocumentList;
 
@@ -48,6 +45,22 @@ public:
 		QByteArray userId;
 	};
 	typedef std::shared_ptr<DocumentNotification> DocumentNotificationPtr;
+
+	struct DocumentUndoNotification
+	{
+		QByteArray userId;
+		QByteArray documentId;
+		int availableUndoSteps;
+		int availableRedoSteps;
+		QStringList undoLevelDescriptions;
+		QStringList redoLevelDescriptions;
+	};
+
+	struct DocumentClosedNotification
+	{
+		QByteArray userId;
+		QByteArray documentId;
+	};
 
 	static const QByteArray CN_NEW_DOCUMENT_CREATED;
 	typedef DocumentNotification NewDocumentCreatedInfo;
@@ -58,11 +71,14 @@ public:
 	static const QByteArray CN_DOCUMENT_CHANGED;
 	typedef DocumentNotification DocumentChangedInfo;
 
+	static const QByteArray CN_DOCUMENT_UNDO_CHANGED;
+	typedef DocumentUndoNotification DocumentUndoChangedInfo;
+
 	static const QByteArray CN_DOCUMENT_SAVED;
 	typedef DocumentNotification DocumentSavedInfo;
 
 	static const QByteArray CN_DOCUMENT_CLOSED;
-	typedef QByteArray DocumentClosedInfo;
+	typedef DocumentClosedNotification DocumentClosedInfo;
 
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const = 0;
 	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) = 0;
@@ -79,3 +95,5 @@ public:
 
 
 Q_DECLARE_METATYPE(imtdoc::ICollectionDocumentManager::DocumentNotification);
+Q_DECLARE_METATYPE(imtdoc::ICollectionDocumentManager::DocumentUndoNotification);
+Q_DECLARE_METATYPE(imtdoc::ICollectionDocumentManager::DocumentClosedNotification);

@@ -32,8 +32,56 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
+
+
+	template<class Representation>
+	void PublishRepresentation(
+		const QByteArray& commandId,
+		const QByteArray& userId,
+		const Representation& representation);
+
+private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 };
+
+
+
+// privte methods
+
+template<class Representation>
+void CCollectionDocumentManagerPublisherComp::PublishRepresentation(
+	const QByteArray& commandId,
+	const QByteArray& userId,
+	const Representation& representation)
+{
+	QJsonObject jsonObject;
+	if (!representation.WriteToJsonObject(jsonObject)){
+		Q_ASSERT(false);
+	}
+
+	QJsonDocument jsonDoc;
+	jsonDoc.setObject(jsonObject);
+
+	QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
+
+	for (const RequestNetworks& networkRequest : m_registeredSubscribers){
+		if (!userId.isEmpty()){
+			const imtgql::IGqlContext* contextPtr = networkRequest.gqlRequest.GetRequestContext();
+			if (contextPtr != nullptr){
+				const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+				if (userInfoPtr != nullptr){
+					if (userInfoPtr->GetId() != userId){
+						continue;
+					}
+				}
+			}
+		}
+
+		if (commandId == networkRequest.gqlRequest.GetCommandId()){
+			PublishData(commandId, data);
+		}
+	}
+}
 
 
 } // namespace imtservergql

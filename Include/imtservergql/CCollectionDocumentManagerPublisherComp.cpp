@@ -24,6 +24,7 @@ bool CCollectionDocumentManagerPublisherComp::IsRequestSupported(const imtgql::C
 		QByteArray gqlCommandId = gqlRequest.GetCommandId();
 
 		isSupported = gqlCommandId == QByteArrayLiteral("On") + collectionId + QByteArrayLiteral("DocumentChanged");
+		isSupported = isSupported || gqlCommandId == QByteArrayLiteral("On") + collectionId + QByteArrayLiteral("UndoChanged");
 	}
 
 	if (isSupported){
@@ -66,6 +67,42 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 
 		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentChanged;
 	}
+	else if (map.contains(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_UNDO_CHANGED)){
+		Q_ASSERT(map.values(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_UNDO_CHANGED).size() == 1);
+		varChanged = map.value(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_UNDO_CHANGED);
+
+		if (!varChanged.canConvert<imtdoc::ICollectionDocumentManager::DocumentUndoNotification>()){
+			Q_ASSERT(false);
+
+			return;
+		}
+
+		imtdoc::ICollectionDocumentManager::DocumentUndoNotification notification =
+			varChanged.value<imtdoc::ICollectionDocumentManager::DocumentUndoNotification>();
+
+		sdl::imtbase::UndoManager::CUndoInfo sdlNotification;
+		sdl::imtbase::UndoManager::CUndoInfo::V1_0& sdlNotificationV1 = sdlNotification.Version_1_0.emplace();
+
+		sdlNotificationV1.documentId = notification.documentId;
+		sdlNotificationV1.status.emplace().status = sdl::imtbase::UndoManager::EUndoStatus::Success;
+		sdlNotificationV1.availableUndoSteps = notification.availableUndoSteps;
+		sdlNotificationV1.availableRedoSteps = notification.availableRedoSteps;
+		sdlNotificationV1.undoLevelDescriptions.emplace();
+		sdlNotificationV1.redoLevelDescriptions.emplace();
+		for (int i = 0; i < notification.undoLevelDescriptions.count(); i++){
+			sdlNotificationV1.undoLevelDescriptions->append(notification.undoLevelDescriptions[i]);
+		}
+		for (int i = 0; i < notification.redoLevelDescriptions.count(); i++){
+			sdlNotificationV1.redoLevelDescriptions->append(notification.redoLevelDescriptions[i]);
+		}
+
+		PublishRepresentation(
+			QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("UndoChanged"),
+			notification.userId,
+			sdlNotification);
+
+		return;
+	}
 	else if (map.contains(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_SAVED)){
 		Q_ASSERT(map.values(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_SAVED).size() == 1);
 		varChanged = map.value(imtdoc::ICollectionDocumentManager::CN_DOCUMENT_SAVED);
@@ -82,37 +119,35 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 		return;
 	}
 
+	QByteArray userId;
+
 	if (varChanged.canConvert<imtdoc::ICollectionDocumentManager::DocumentNotification>()){
 		imtdoc::ICollectionDocumentManager::DocumentNotification notification =
 			varChanged.value<imtdoc::ICollectionDocumentManager::DocumentNotification>();
 
+		userId = notification.userId;
+
 		sdlNotificationV1.documentId = notification.documentId;
 		sdlNotificationV1.objectId = notification.objectId;
-		sdlNotificationV1.hasChanges = notification.hasChanges;
 	}
-	else if (varClosed.metaType().id() == QMetaType::QByteArray){
-		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentClosed;
-		sdlNotificationV1.documentId = varClosed.toByteArray();
+	else if (varClosed.canConvert<imtdoc::ICollectionDocumentManager::DocumentClosedNotification>()){
+		imtdoc::ICollectionDocumentManager::DocumentClosedNotification notification =
+			varClosed.value<imtdoc::ICollectionDocumentManager::DocumentClosedNotification>();
+
+		userId = notification.userId;
+
+		sdlNotificationV1.documentId = notification.documentId;
 	}
 	else{
 		return;
 	}
 
-	QJsonObject jsonObject;
-	if (!sdlNotification.WriteToJsonObject(jsonObject)){
-		Q_ASSERT(false);
-	}
+	Q_ASSERT(!userId.isEmpty());
 
-	QJsonDocument jsonDoc;
-	jsonDoc.setObject(jsonObject);
-
-	QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
-
-	for (const RequestNetworks& networkRequest : m_registeredSubscribers){
-		QByteArray commandId = networkRequest.gqlRequest.GetCommandId();
-
-		PublishData(commandId, data);
-	}
+	PublishRepresentation(
+		QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("DocumentChanged"),
+		userId,
+		sdlNotification);
 }
 
 
