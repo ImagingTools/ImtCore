@@ -35,29 +35,29 @@ Dialog {
 
 		stackView.clear();
 		if (currentIndex === -1){
-			stackView.push(loadingPageComp);
+			stackView.addPage(loadingPageComp);
 		}
 		else if (currentIndex === 0){
 			passwordRecoveryDialog.setButtonEnabled(Enums.yes, false);
 			passwordRecoveryDialog.setButtonName(Enums.yes, qsTr("Check the email"));
 
-			stackView.push(pageComp0);
+			stackView.addPage(pageComp0);
 		}
 		else if (currentIndex === 1){
 			passwordRecoveryDialog.setButtonName(Enums.yes, qsTr("Yes"));
 
-			stackView.push(pageComp1);
+			stackView.addPage(pageComp1);
 		}
 		else if (currentIndex === 2){
 			passwordRecoveryDialog.setButtonEnabled(Enums.yes, false);
 			passwordRecoveryDialog.setButtonName(Enums.yes, qsTr("Check the code"));
 
-			stackView.push(pageComp2);
+			stackView.addPage(pageComp2);
 		}
 		else if (currentIndex === 3){
 			passwordRecoveryDialog.setButtonEnabled(Enums.yes, false);
 			passwordRecoveryDialog.setButtonName(Enums.yes, qsTr("Change password"));
-			stackView.push(pageComp3);
+			stackView.addPage(pageComp3);
 		}
 	}
 

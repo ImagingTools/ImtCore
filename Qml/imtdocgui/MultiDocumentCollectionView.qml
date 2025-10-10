@@ -172,8 +172,8 @@ Item {
 		function onDocumentOpened(documentId, typeId){
 			// loading.stop()
 
-			let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(typeId)
-			tabView.addTab(documentId, "", documentEditorComp, "", "", true)
+			// let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(typeId)
+			tabView.addTab(documentId, "", stackViewComp, "", "", true)
 			tabView.currentIndex = tabView.tabModel.count - 1
 		}
 
@@ -221,10 +221,10 @@ Item {
 		}
 
 		function onDocumentCreated(documentId, documentTypeId){
-			let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(documentTypeId)
+			// let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(documentTypeId)
 			let defaultName = workspaceView.documentManager.getDefaultDocumentName()
 			workspaceView.documentManager.setDocumentName(documentId, defaultName)
-			tabView.addTab(documentId, defaultName, documentEditorComp, "", "", false)
+			tabView.addTab(documentId, defaultName, stackViewComp, "", "", false)
 
 			tabView.currentIndex = tabView.tabModel.count - 1
 
@@ -350,6 +350,67 @@ Item {
 		}
 	}
 
+	Component {
+		id: stackViewComp
+		StackView {
+			anchors.fill: parent
+
+			property string documentId
+			property string documentTypeId
+
+			property var itemViewTypes: ({}) // ViewTypeId -> Item
+
+			function initialize(id, typeId){
+				documentId = id
+				documentTypeId = typeId
+				
+				let viewTypeIds = workspaceView.documentManager.getSupportedDocumentViewTypeIds(documentTypeId)
+				for (let i = 0; i < viewTypeIds.length; ++i){
+					let viewComp = workspaceView.documentManager.getDocumentEditorFactory(documentTypeId, viewTypeIds[i])
+					addPage(viewComp)
+				}
+
+				setCurrentIndex(0)
+			}
+
+			onPageAdded: {
+				let comp = getComponent(index)
+				let viewTypeId = workspaceView.documentManager.getViewTypeIdByViewFactory(documentTypeId, comp)
+
+				itemViewTypes[viewTypeId] = item
+
+				item.commandActivated.connect(onCommandActivated)
+				workspaceView.documentManager.onViewInstanceCreated(documentId, item, viewTypeId)
+			}
+
+			onCurrentPageChanged: {
+				for (let viewTypeId in itemViewTypes){
+					if (itemViewTypes[viewTypeId] === item){
+						onCommandActivated(viewTypeId)
+						break
+					}
+				}
+			}
+
+			function onCommandActivated(commandId){
+				let viewTypeIds = Object.keys(itemViewTypes)
+				for (let i = 0; i < viewTypeIds.length; ++i){
+					let viewTypeId = viewTypeIds[i]
+					if (viewTypeId === commandId && currentIndex !== i){
+						setCurrentIndex(i)
+						break
+					}
+
+					let currentItem = itemViewTypes[viewTypeId]
+					if (currentItem.commandsController){
+						currentItem.commandsController.setIsToggleable(viewTypeId, true)
+						currentItem.commandsController.setToggled(viewTypeId, viewTypeId === commandId)
+					}
+				}
+			}
+		}
+	}
+
 	TabView {
 		id: tabView
 		anchors.fill: parent
@@ -360,7 +421,9 @@ Item {
 				workspaceView.collectionView = tabItem
 			}
 			else{
-				workspaceView.documentManager.onViewInstanceCreated(tabId, tabItem)
+				// Stack View loaded
+				let typeId = workspaceView.documentManager.getDocumentTypeId(tabId)
+				tabItem.initialize(tabId, typeId)
 			}
 		}
 

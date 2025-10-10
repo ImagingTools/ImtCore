@@ -72,12 +72,12 @@ Rectangle {
 
 			let documentData = root.documentManager.getDocumentDataById(documentId)
 			if (documentData){
-				stackView.push(documentData.viewComp)
+				stackView.addPage(documentData.viewComp)
 			}
 		}
 
 		function onDocumentClosed(documentId){
-			stackView.pop();
+			stackView.removePage(stackView.count - 1)
 			headersModel.removeHeader(documentId);
 		}
 
@@ -146,7 +146,7 @@ Rectangle {
 			return;
 		}
 
-		stackView.push(viewComp);
+		stackView.addPage(viewComp);
 		headersModel.addHeader(UuidGenerator.generateUUID(), name)
 	}
 
@@ -280,7 +280,7 @@ Rectangle {
 		anchors.left: parent.left;
 		anchors.right: parent.right;
 
-		onItemAdded: {
+		onPageAdded: {
 			let documentData = root.documentManager.getDocumentData(root.documentManager.documentsModel.count - 1);
 			if (documentData){
 				root.documentManager.setupDocumentView(documentData.documentId, item);

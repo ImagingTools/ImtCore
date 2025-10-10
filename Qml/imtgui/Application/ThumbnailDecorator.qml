@@ -206,10 +206,10 @@ Rectangle {
 	}
 	
 	function showPage(pageComp){
-		stackView.pagesModel.clear();
+		stackView.clear()
 		
 		if (pageComp){
-			stackView.push(pageComp)
+			stackView.addPage(pageComp)
 		}
 	}
 	

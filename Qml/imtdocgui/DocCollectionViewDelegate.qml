@@ -61,6 +61,15 @@ CollectionViewCommandsDelegateBase {
 		}
 	}
 
+	function getDocumentTypeName(typeId){
+		let index = documentTypeIds.indexOf(typeId)
+		if (index >= 0){
+			return documentTypeNames[index]
+		}
+
+		return ""
+	}
+
 	function onEdit(){
 		if (!collectionView){
 			console.error("Unable to edit element. Error: Collection view is invalid")
@@ -97,11 +106,18 @@ CollectionViewCommandsDelegateBase {
 			return
 		}
 
-		if (documentTypeIds.length > 1){
-			ModalDialogManager.openDialog(selectTypeIdDialogComp)
+		let typeIds = []
+		for (let i = 0; i < documentTypeIds.length; ++i){
+			if (!typeIds.includes(documentTypeIds[i])){
+				typeIds.push(documentTypeIds[i])
+			}
+		}
+
+		if (typeIds.length > 1){
+			ModalDialogManager.openDialog(selectTypeIdDialogComp, {"documentTypeIds": typeIds})
 		}
 		else{
-			let documentTypeId = documentTypeIds[0]
+			let documentTypeId = typeIds[0]
 			documentManager.createDocument(documentTypeId)
 		}
 	}
@@ -116,6 +132,7 @@ CollectionViewCommandsDelegateBase {
 			width: 300
 			
 			property string selectedDocumentTypeId
+			property var documentTypeIds: []
 			
 			Component.onCompleted: {
 				addButton(Enums.ok, qsTr("OK"), true)
@@ -167,9 +184,12 @@ CollectionViewCommandsDelegateBase {
 							TreeItemModel {
 								id: documentTypeCbModel
 								Component.onCompleted: {
-									for (let i = 0; i < commandsDelegate.documentTypeIds.length; ++i){
-										let documentTypeId = commandsDelegate.documentTypeIds[i]
-										let documentTypeName = commandsDelegate.documentTypeNames[i]
+									for (let i = 0; i < selectTypeIdDialog.documentTypeIds.length; ++i){
+										let documentTypeId = selectTypeIdDialog.documentTypeIds[i]
+										let documentTypeName = commandsDelegate.getDocumentTypeName(documentTypeId)
+										if (documentTypeName === ""){
+											documentTypeName = documentTypeId
+										}
 										
 										let index = insertNewItem()
 										setData("id", documentTypeId, index)

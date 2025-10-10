@@ -9,9 +9,7 @@ DocumentManagerBase {
 
 	property string collectionId
 
-	SubscriptionClient {
-		id: documentManagerSubscription
-
+	property SubscriptionClient documentManagerSubscription: SubscriptionClient{
 		function getHeaders(){
 			return root.getHeaders()
 		}
@@ -26,9 +24,7 @@ DocumentManagerBase {
 		}
 	}
 
-	SubscriptionClient {
-		id: undoManagerSubscription
-
+	property SubscriptionClient undoManagerSubscription: SubscriptionClient {
 		function getHeaders(){
 			return root.getHeaders()
 		}

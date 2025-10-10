@@ -7,7 +7,7 @@ QtObject {
 
 	property string documentId
 	property string documentTypeId
-	property DocumentManagerBase documentManager: null
+	property var documentManager: null
 
 	property var registeredViews: []
 	property var registeredRepresentation: []
@@ -45,7 +45,7 @@ QtObject {
 		}
 	}
 
-	Connections {
+	property Connections documentManagerConnections: Connections {
 		target: root.documentManager
 
 		function onUndoDone(documentId){

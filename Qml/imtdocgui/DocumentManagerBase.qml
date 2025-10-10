@@ -15,7 +15,7 @@ QtObject {
 	signal documentClosed(string documentId)
 	signal closeDocumentFailed(string documentId, string message)
 
-	signal startSaveDocument(string documentId, var documentData)
+	signal startSaveDocument(string documentId)
 	signal saveDocumentFailed(string documentId, string message)
 	signal documentSaved(string documentId)
 
@@ -121,6 +121,14 @@ QtObject {
 		let obj = {"viewTypeId": viewTypeId, "viewEditorComp": viewEditorComp, "representationControllerComp": representationControllerComp}
 
 		if (documentTypeId in __internal.documentTypeEditors){
+			let registeredViews = __internal.documentTypeEditors[documentTypeId]
+			for (let i = 0; i < registeredViews.length; ++i){
+				if (registeredViews[i].viewTypeId === viewTypeId){
+					console.error("Unable to register view with type-ID '"+viewTypeId+"' for document type: '"+documentTypeId+"'. Error: View already registered")
+					return
+				}
+			}
+
 			__internal.documentTypeEditors[documentTypeId].push(obj)
 		}
 		else{
@@ -265,6 +273,19 @@ QtObject {
 		__internal.openedDocuments[index].isDirty = isDirty
 		
 		documentIsDirtyChanged(documentId, isDirty)
+	}
+
+	function getViewTypeIdByViewFactory(documentTypeId, viewFactory){
+		if (documentTypeId in __internal.documentTypeEditors){
+			let editors = __internal.documentTypeEditors[documentTypeId]
+			for (let i = 0; i < editors.length; ++i){
+				if (editors[i].viewEditorComp === viewFactory){
+					return editors[i].viewTypeId
+				}
+			}
+		}
+
+		return ""
 	}
 
 	function getDocumentViewInstance(documentId, viewTypeId){
