@@ -110,7 +110,7 @@ QtObject {
 
 	function drawBoundingBoxControlPoint(ctx, point, matrix, color){
 		let radius = boundingBoxControlPointRadius;
-		if(matrix !== undefined && mat){
+		if(matrix !== undefined){
 			point = LinearAlgebra.transformPoint2d(point, matrix)
 		}
 		ctx.strokeStyle = color !== undefined ? color : boundingBoxBorderColor;
