@@ -46,6 +46,7 @@ QtObject {
 	// hasChanges - has document changes
 	signal documentManagerChanged(string typeOperation, string objectId, string documentId, bool hasChanges)
 	signal documentRepresentationUpdated(string documentId, var representation)
+	signal documentGuiUpdated(string documentId, var representation)
 
 	// callback(undefined) - cancel, callback(false) - close, callback(true) - save and close
 	signal tryCloseDirtyDocument(string documentId, var callback)
@@ -262,7 +263,6 @@ QtObject {
 	function setDocumentIsDirty(documentId, isDirty){
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
-			console.error("Unable to set is dirty for document '"+documentId+"'. Error: Document not found")
 			return
 		}
 
@@ -296,8 +296,6 @@ QtObject {
 	}
 
 	function onViewInstanceCreated(documentId, view, viewTypeId){
-		console.log("onViewInstanceCreated", documentId, viewTypeId, view)
-
 		if (!viewTypeId){
 			viewTypeId = ""
 		}

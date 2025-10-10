@@ -20,6 +20,7 @@ QtObject {
 			view.model = representationController.representationModel
 			view.commandActivated.connect(onCommandActivated)
 			view.modelDataChanged.connect(onModelDataChanged)
+			view.guiUpdated.connect(onGuiUpdated)
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 			representationController.updateRepresentationFromDocument()
@@ -103,7 +104,13 @@ QtObject {
 
 		documentManager.documentRepresentationUpdated(documentId, representation)
 	}
-	
+
+	function onGuiUpdated(view, model){
+		if (registeredViews.includes(view)){
+			documentManager.documentGuiUpdated(documentId, model)
+		}
+	}
+
 	function onModelDataChanged(view, model){
 		console.log("onModelDataChanged", view, model)
 		if (registeredViews.includes(view)){
@@ -157,8 +164,6 @@ QtObject {
 	}
 
 	function updateRepresentationForAllViews(){
-		console.log("updateRepresentationForAllViews", documentId, representation)
-		
 		for (let i = 0; i < registeredViews.length; ++i){
 			registeredViews[i].setBlockingUpdateModel(true)
 			registeredRepresentation[i].updateRepresentationFromDocument()

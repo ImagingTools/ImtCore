@@ -15,27 +15,6 @@ Item {
 
 	property ObjectVisualStatusProvider visualStatusProvider: null
 
-	Connections {
-		target: workspaceView.visualStatusProvider ? workspaceView.visualStatusProvider : undefined
-		
-		function onVisualStatusReceived(objectId, icon, text, description){
-			let name = text
-			if (name === ""){
-				name = workspaceView.documentManager.defaultDocumentName
-			}
-
-			tabView.setTabName(objectId, name)
-			tabView.setTabDescription(objectId, description)
-			tabView.setTabIcon(objectId, icon)
-		}
-		
-		function onVisualStatusReceiveFailed(objectId, errorMessage){
-			tabView.setTabName(objectId, workspaceView.documentManager.defaultDocumentName)
-			tabView.setTabDescription(objectId, "")
-			tabView.setTabIcon(objectId, "")
-		}
-	}
-
 	onCollectionViewChanged: {
 		if (collectionView){
 			collectionView.documentManager = documentManager
@@ -76,14 +55,12 @@ Item {
 			return
 		}
 
-		console.log("updateDocumentName", objectId, documentId)
 		let callbackOk = function(objectId2, icon, text, description){
 			if (objectId2 === objectId){
 				let documentName = text
 				if (documentName === ""){
 					documentName = workspaceView.documentManager.getDefaultDocumentName()
 				}
-				console.log("callbackOk", objectId, documentId, documentName)
 
 				workspaceView.documentManager.setDocumentName(documentId, text)
 				workspaceView.visualStatusProvider.visualStatusReceived.disconnect(callbackOk)
@@ -111,6 +88,26 @@ Item {
 		}
 	}
 
+	function updateTabName(documentId){
+		if (!documentManager){
+			console.error("Unable to update tab name for document '"+documentId+"'. Error: Document manager is invalid")
+			return
+		}
+
+		let documentName = documentManager.getDocumentName(documentId)
+		if (documentName === ""){
+			documentName = documentManager.getDefaultDocumentName()
+		}
+
+		let isDirty = documentManager.documentIsDirty(documentId)
+		if (isDirty){
+			tabView.setTabName(documentId, "* " + documentName)
+		}
+		else{
+			tabView.setTabName(documentId, documentName)
+		}
+	}
+
 	Connections {
 		id: connections
 		target: workspaceView.documentManager
@@ -135,14 +132,19 @@ Item {
 					workspaceView.documentManager.documentOpened(documentId, objectTypeId)
 				}
 
+				workspaceView.documentManager.getUndoInfo(documentId)
 				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId, hasChanges)
 			}
 
 			loading.stop()
 		}
 
-		function onDocumentRepresentationUpdated(documentId, representation){
+		function onDocumentGuiUpdated(documentId, representation){
 			loading.stop()
+		}
+
+		function onDocumentRepresentationUpdated(documentId, representation){
+			// loading.stop()
 		}
 
 		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
@@ -155,25 +157,11 @@ Item {
 		}
 
 		function onDocumentNameChanged(documentId, oldName, newName){
-			tabView.setTabName(documentId, newName)
-			let isDirty = workspaceView.documentManager.documentIsDirty(documentId)
-			if (isDirty){
-				tabView.setTabName(documentId, "* " + newName)
-			}
-			else{
-				tabView.setTabName(documentId, newName)
-			}
+			workspaceView.updateTabName(documentId)
 		}
 
 		function onDocumentIsDirtyChanged(documentId, isDirty){
-			let documentName = workspaceView.documentManager.getDocumentName(documentId)
-			if (isDirty){
-				let newName = "* " + documentName
-				tabView.setTabName(documentId, newName)
-			}
-			else{
-				tabView.setTabName(documentId, documentName)
-			}
+			workspaceView.updateTabName(documentId)
 		}
 
 		// Open document signals
@@ -185,11 +173,7 @@ Item {
 			// loading.stop()
 
 			let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(typeId)
-			let defaultName = workspaceView.documentManager.getDefaultDocumentName()
-			tabView.addTab(documentId, defaultName, documentEditorComp, "", "", false)
-
-			let view = tabView.getTabById(documentId)
-
+			tabView.addTab(documentId, "", documentEditorComp, "", "", true)
 			tabView.currentIndex = tabView.tabModel.count - 1
 		}
 
@@ -253,7 +237,7 @@ Item {
 		}
 
 		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps){
-			loading.stop()
+			// loading.stop()
 		}
 
 		function onUndoInfoReceiveFailed(documentId, message){

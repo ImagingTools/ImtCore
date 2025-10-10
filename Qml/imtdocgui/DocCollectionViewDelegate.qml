@@ -68,25 +68,24 @@ CollectionViewCommandsDelegateBase {
 		}
 
 		if (!documentManager){
-			console.error("Unable to remove elements. Error: Document manager is invalid")
+			console.error("Unable to edit elements. Error: Document manager is invalid")
 			return
 		}
-		
+
 		let elementsModel = collectionView.table.elements
 		if (!elementsModel){
 			console.error("Unable to edit document. Error: Elements for collection view is invalid")
 			return
 		}
-		
+
 		let indexes = collectionView.table.getSelectedIndexes()
-		if (indexes.length >= 0){
-			let itemId = elementsModel.getData("id", indexes[0]);
-			let typeId = elementsModel.getData("typeId", indexes[0]);
-			
+		for (let i = 0; i < indexes.length; ++i){
+			let itemId = elementsModel.getData("id", indexes[i]);
+			let typeId = elementsModel.getData("typeId", indexes[i]);
 			documentManager.openDocument(typeId, itemId)
 		}
 	}
-	
+
 	function onNew(){
 		if (!documentManager){
 			console.error("Unable to create object. Error: Document manager is invalid")

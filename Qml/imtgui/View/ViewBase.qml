@@ -33,8 +33,9 @@ Item {
 	property bool commandsPanelVisible: true
 	
 	signal commandsModelChanged(var commandsModel)
-	signal commandActivated(string commandId);
-	signal modelDataChanged(var view, var model);
+	signal commandActivated(string commandId)
+	signal modelDataChanged(var view, var model)
+	signal guiUpdated(var view, var model)
 
 	Connections {
 		target: viewBase.model
@@ -244,6 +245,8 @@ Item {
 		updateGui();
 		
 		viewBase.internal__.blockingUpdateModel = false;
+
+		guiUpdated(this, model)
 	}
 	
 	function setBlockingUpdateModel(value){

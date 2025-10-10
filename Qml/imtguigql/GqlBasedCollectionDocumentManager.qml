@@ -29,6 +29,29 @@ DocumentManagerBase {
 		}
 	}
 
+	SubscriptionClient {
+		id: undoManagerSubscription
+
+		function getHeaders(){
+			return root.getHeaders()
+		}
+
+		onMessageReceived: {
+			console.log("UndoChanged onMessageReceived", data.toJson())
+			undoInfoNotification.createFromJson(data.toJson())
+
+			let documentId = undoInfoNotification.m_documentId
+			let availableUndoSteps = undoInfoNotification.m_availableUndoSteps
+			let availableRedoSteps = undoInfoNotification.m_availableRedoSteps
+
+			root.undoInfoReceived(documentId, availableUndoSteps, availableRedoSteps)
+		}
+	}
+
+	UndoInfo {
+		id: undoInfoNotification
+	}
+
 	DocumentManagerNotification {
 		id: documentManagerNotification
 	}
@@ -36,6 +59,7 @@ DocumentManagerBase {
 	onCollectionIdChanged: {
 		if (collectionId !== ""){
 			documentManagerSubscription.gqlCommandId = "On" + root.collectionId + "DocumentChanged"
+			undoManagerSubscription.gqlCommandId = "On" + root.collectionId + "UndoChanged"
 			getOpenedDocumentList()
 		}
 	}
