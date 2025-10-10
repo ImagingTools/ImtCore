@@ -85,6 +85,7 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 
 		sdlNotificationV1.documentId = notification.documentId;
 		sdlNotificationV1.status.emplace().status = sdl::imtbase::UndoManager::EUndoStatus::Success;
+		sdlNotificationV1.isDirty = notification.isDirty;
 		sdlNotificationV1.availableUndoSteps = notification.availableUndoSteps;
 		sdlNotificationV1.availableRedoSteps = notification.availableRedoSteps;
 		sdlNotificationV1.undoLevelDescriptions.emplace();

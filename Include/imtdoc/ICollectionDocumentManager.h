@@ -50,8 +50,9 @@ public:
 	{
 		QByteArray userId;
 		QByteArray documentId;
-		int availableUndoSteps;
-		int availableRedoSteps;
+		bool isDirty = false;
+		int availableUndoSteps = 0;
+		int availableRedoSteps = 0;
 		QStringList undoLevelDescriptions;
 		QStringList redoLevelDescriptions;
 	};

@@ -318,14 +318,12 @@ void CCollectionDocumentManager::OnUndoManagerChanged(int modelId)
 		return;
 	}
 
-	bool isDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
-	if (documentPtr->isDirty != isDirty){
-		documentPtr->isDirty = isDirty;
-	}
+	documentPtr->isDirty = documentPtr->undoManagerPtr->GetDocumentChangeFlag() != idoc::IDocumentStateComparator::DCF_EQUAL;
 
 	DocumentUndoNotification notification;
 	notification.userId = userId;
 	notification.documentId = documentId;
+	notification.isDirty = documentPtr->isDirty;
 
 	Q_ASSERT(documentPtr->undoManagerPtr.IsValid());
 	if (documentPtr->undoManagerPtr.IsValid()){
