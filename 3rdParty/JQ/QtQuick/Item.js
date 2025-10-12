@@ -385,6 +385,9 @@ class Item extends QtObject {
         let dom = this.__DOM
         if(dom) dom.remove()
         super.__destroy()
+        
+        let index = JQApplication.focusTree.indexOf(this)
+        if(index >= 0) JQApplication.focusTree.splice(index, 1)
     }
 
     __onMouseCanceled(mouse){}

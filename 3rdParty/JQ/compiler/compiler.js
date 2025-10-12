@@ -26,7 +26,9 @@ program.parse(process.argv)
 
 const options = program.opts()
 
+
 if(options.mode === 'html'){
+    
     let icon = `<link rel="${options.name} icon" type="image" href="${options.icon}">`
     let html = `
     <!DOCTYPE html>
@@ -1073,7 +1075,7 @@ class Instruction {
 
     }
 
-    getMeta() {
+    getMeta(isRoot = false) {
         let meta = []
         meta.push(`{`)
         if (this.defineProperties.length || this.defineSignals.length) {
@@ -1082,7 +1084,7 @@ class Instruction {
                 try {
                     _typeInfo = this.getTypeInfo(defineProperty.type)
 
-                    if (_typeInfo.type instanceof QmlFile) {
+                    if (isRoot && _typeInfo.type instanceof QmlFile) {
                         this.qmlFile.dependencies.add(_typeInfo.type)
                     }
                 } catch (error) {
@@ -1164,9 +1166,9 @@ class Instruction {
                     let childTypeInfo = assignProperty.value.getTypeInfo()
                     let childMeta = assignProperty.value.getMeta()
 
-                    if (childTypeInfo.type instanceof QmlFile) {
-                        this.qmlFile.dependencies.add(childTypeInfo.type)
-                    }
+                    // if (childTypeInfo.type instanceof QmlFile) {
+                    //     this.qmlFile.dependencies.add(childTypeInfo.type)
+                    // }
 
                     let properties = assignProperty.value.getProperties()
 
@@ -1389,9 +1391,9 @@ class Instruction {
         let childTypeInfo = this.children[0].getTypeInfo()
         let childMeta = this.children[0].getMeta()
 
-        if (childTypeInfo.type instanceof QmlFile) {
-            this.qmlFile.dependencies.add(childTypeInfo.type)
-        }
+        // if (childTypeInfo.type instanceof QmlFile) {
+        //     this.qmlFile.dependencies.add(childTypeInfo.type)
+        // }
 
         let properties = this.children[0].getProperties()
 
@@ -1454,9 +1456,9 @@ class Instruction {
         let childrenCode = new SourceNode()
         let typeInfo = this.getTypeInfo()
 
-        if (typeInfo.type instanceof QmlFile) {
-            this.qmlFile.dependencies.add(typeInfo.type)
-        }
+        // if (typeInfo.type instanceof QmlFile) {
+        //     this.qmlFile.dependencies.add(typeInfo.type)
+        // }
 
         // if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.Component)) return this.toComponentCode()
         if (typeInfo.type === JQModules.QtQml.Component) return this.toComponentCode()
@@ -1521,6 +1523,8 @@ class Instruction {
         return code.join('\n')
     }
 }
+
+let singletonList = []
 
 class QmlFile {
     imports = []
@@ -1612,7 +1616,7 @@ class QmlFile {
     toCode() {
         let code = new SourceNode()
         let typeInfo = this.instruction.getTypeInfo()
-        let meta = this.instruction.getMeta()
+        let meta = this.instruction.getMeta(true)
 
         if (typeInfo.type instanceof QmlFile) {
             this.dependencies.add(typeInfo.type)
@@ -1875,11 +1879,38 @@ function getFiles(dir, _files) {
 
 while (compiledFiles.length) {
     let compiledFile = compiledFiles.shift()
+    if(compiledFile.file instanceof QmlFile && compiledFile.file.singleton){
+        singletonList.push(compiledFile)
+        continue
+    }
+
     if (compiledFile.file instanceof QmlFile && compiledFile.file.dependencies.size) {
         let found = false
         for (let i = 0; i < compiledFiles.length; i++) {
             if (compiledFile.file.dependencies.has(compiledFiles[i].file)) {
                 compiledFiles.splice(i + 1, 0, compiledFile)
+                found = true
+                console.log('compiledFiles[i].file ', compiledFiles[i].file.fileName)
+                break
+            }
+        }
+        if (!found) {
+            fullCode.add(compiledFile.code)
+        }
+    } else {
+        fullCode.add(compiledFile.code)
+    }
+    
+}
+
+while (singletonList.length) {
+    let compiledFile = singletonList.shift()
+
+    if (compiledFile.file instanceof QmlFile && compiledFile.file.dependencies.size) {
+        let found = false
+        for (let i = 0; i < singletonList.length; i++) {
+            if (compiledFile.file.dependencies.has(singletonList[i].file)) {
+                singletonList.splice(i + 1, 0, compiledFile)
                 found = true
                 break
             }
@@ -1890,6 +1921,7 @@ while (compiledFiles.length) {
     } else {
         fullCode.add(compiledFile.code)
     }
+    
 }
 
 
@@ -1904,14 +1936,14 @@ if(options.mode === 'js'){
         fullCode.add(`//# sourceMappingURL=${output + '.map'}`)
         let result = fullCode.join('\n').toStringWithSourceMap({ file: output })
 
-        // fs.writeFileSync(output, result.code)
+        fs.writeFileSync(output, result.code)
 
-        // fs.writeFileSync(output+'.map', result.map.toString())
+        fs.writeFileSync(output+'.map', result.map.toString())
 
 
 
-        let resultCode = UglifyJS.minify(result.code, {compress: {}}).code
-        fs.writeFileSync(output, resultCode)
+        // let resultCode = UglifyJS.minify(result.code, {compress: {}}).code
+        // fs.writeFileSync(output, resultCode)
 
         // fs.writeFileSync(path.resolve(configDirPath, config.output)+'.map', result.map.toString())
     }

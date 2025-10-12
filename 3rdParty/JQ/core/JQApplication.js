@@ -229,10 +229,13 @@ module.exports = {
             let current = tree.pop()
 
             if(origin === current){
+                if(current.__destroyed) continue
                 unionTree.unshift(current)
             } else if(current){
+                if(current.__destroyed) continue
                 unionTree.unshift(current)
             } else if(origin){
+                if(origin.__destroyed) continue
                 unionTree.unshift(origin)
             }
         }
