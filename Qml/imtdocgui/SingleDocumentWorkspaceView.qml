@@ -73,6 +73,7 @@ Rectangle {
 			let documentData = root.documentManager.getDocumentDataById(documentId)
 			if (documentData){
 				stackView.addPage(documentData.viewComp)
+				stackView.setCurrentIndex(stackView.count - 1)
 			}
 		}
 

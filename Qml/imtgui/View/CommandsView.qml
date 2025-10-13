@@ -59,7 +59,7 @@ Item {
 				continue;
 			}
 
-			if (allElements[j].priority === -1){
+			if (allElements[j].hidden){
 				return true;
 			}
 		}
@@ -166,6 +166,10 @@ Item {
 					
 					// visible: !element || priority < 0 ? false : element.m_visible;
 					visible: !hidden
+
+					onPriorityChanged: {
+						hidden = priority === -1
+					}
 
 					onClicked: {
 						let params = {}
