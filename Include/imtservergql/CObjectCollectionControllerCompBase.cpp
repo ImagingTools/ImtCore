@@ -410,7 +410,7 @@ sdl::imtbase::ImtCollection::CRestoreObjectsPayload CObjectCollectionControllerC
 	}
 
 	response.success = m_objectCollectionCompPtr->RestoreObjects(imtbase::ICollectionInfo::Ids(objectIds.constBegin(), objectIds.constEnd()), operationContextPtr.GetPtr());
-	
+
 	sdl::imtbase::ImtCollection::CRestoreObjectsPayload retVal;
 	retVal.Version_1_0 = std::move(response);
 
@@ -1113,7 +1113,7 @@ sdl::imtbase::ImtCollection::CSetObjectDataPayload CObjectCollectionControllerCo
 	if (ok){
 		CreateUserActionLog(objectId, typeId, "Update", gqlRequest);
 	}
-	
+
 	response.success = ok;
 
 	sdl::imtbase::ImtCollection::CSetObjectDataPayload retVal;
@@ -1378,7 +1378,7 @@ sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CObjectCollectionContro
 				if (requestInfo.items.itemInfo.isDescriptionRequested){
 					parameterInfo.description = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 				}
-	
+
 				collectionItem.itemInfo = parameterInfo;
 			}
 
@@ -1476,19 +1476,19 @@ void CObjectCollectionControllerCompBase::ReplaceComplexFilterFields(imtbase::IC
 		}
 	}
 	filter.SetSortingInfo(sortingInfoList);
-	
+
 	std::function<void (imtbase::IComplexCollectionFilter::GroupFilter&)> ProcessGroupFilter = [&](imtbase::IComplexCollectionFilter::GroupFilter& groupFilter){
 		for (imtbase::IComplexCollectionFilter::FieldFilter& fieldFilter : groupFilter.fieldFilters){
 			if (m_fieldReplacementMap.contains(fieldFilter.fieldId)){
 				fieldFilter.fieldId = m_fieldReplacementMap[fieldFilter.fieldId];
 			}
 		}
-		
+
 		for (imtbase::IComplexCollectionFilter::GroupFilter& groupFilterItem : groupFilter.groupFilters){
 			ProcessGroupFilter(groupFilterItem);
 		}
 	};
-	
+
 	imtbase::IComplexCollectionFilter::GroupFilter fieldsFilter = filter.GetFieldsFilter();
 	ProcessGroupFilter(fieldsFilter);
 	filter.SetFieldsFilter(fieldsFilter);
@@ -1714,12 +1714,18 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		return nullptr;
 	}
 
+	if (!inputParamPtr->ContainsParam("id")){
+		errorMessage = "Bad request. Unable to update object. Parameter 'id' missing.";
+
+		return nullptr;
+	}
+
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QString name = GetObjectNameFromRequest(gqlRequest);
 
 	imtbase::IObjectCollection::DataPtr savedObjectPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, savedObjectPtr)){
-		errorMessage = QString("Can't get object from collection: '%1'").arg(qPrintable(objectId));
+		errorMessage = QString("Unable to find object with id '%1'").arg(qPrintable(objectId));
 
 		return nullptr;
 	}
@@ -1746,8 +1752,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		return nullptr;
 	}
 
-	const bool isNameUpdateRquired = inputParamPtr->GetParamIds().contains("name");
-	if (isNameUpdateRquired){
+	if (name.length() > 0){
 		QString currentName = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 		if (currentName != name){
 			m_objectCollectionCompPtr->SetElementName(objectId, name);
@@ -1970,8 +1975,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+	const imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Unable to remove the object from the collection. Component reference 'ObjectCollection' was not set");
@@ -2166,12 +2171,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ImportObject(const
 
 	int typeIdIndex = GetObjectTypeIdIndex(typeId);
 	Q_ASSERT_X(typeIdIndex >= 0, "Type ID is invalid", "CObjectCollectionControllerCompBase");
-	
+
 	istd::IChangeableUniquePtr collectionObjectInstancePtr = m_objectFactCompPtr.CreateInstance(typeIdIndex);
 	if (!collectionObjectInstancePtr.IsValid()){
 		errorMessage = QString("Unable to import object to the collection. Error: Object instance is invalid");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
-		
+
 		return nullptr;
 	}
 
@@ -2976,7 +2981,7 @@ bool CObjectCollectionControllerCompBase::CreateUserActionLog(
 		if (targetInfo.name.isEmpty()){
 			targetInfo.name = m_objectCollectionCompPtr->GetElementInfo(targetInfo.id, imtbase::ICollectionInfo::ElementInfoType::EIT_NAME).toString();
 		}
-	
+
 		if (targetInfo.name.isEmpty()){
 			targetInfo.name = targetInfo.id;
 		}
