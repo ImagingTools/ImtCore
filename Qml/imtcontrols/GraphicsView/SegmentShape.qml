@@ -112,8 +112,11 @@ SegmentBaseShape {
 			let centerScreen = getScreenPosition(center)
 			let radiusScreen = radius * transformMatrixArg.xScale()
 
+			let middleAngle = isInsideAngles((startAngle + endAngle)/2) ? (startAngle + endAngle)/2 : (startAngle + endAngle)/2 + 180
+
 			let startRad = Functions.getRadians(startAngle)
 			let endRad = Functions.getRadians(endAngle)
+			let middleRad = Functions.getRadians(middleAngle)
 
 			// let startX = centerScreen.x + radiusScreen * Math.cos(startRad)
 			// let startY =  centerScreen.y + radiusScreen * Math.sin(startRad)
@@ -125,8 +128,8 @@ SegmentBaseShape {
 			let middleEdgeEndX  = centerScreen.x + 0.5*radiusScreen * Math.cos(endRad)
 			let middleEdgeEndY  = centerScreen.y + 0.5*radiusScreen * Math.sin(endRad)
 
-			let arcCenterX = centerScreen.x + radiusScreen * Math.cos((startRad + endRad)/2)
-			let arcCenterY = centerScreen.y + radiusScreen * Math.sin((startRad + endRad)/2)
+			let arcCenterX = centerScreen.x + radiusScreen * Math.cos(middleRad)
+			let arcCenterY = centerScreen.y + radiusScreen * Math.sin(middleRad)
 
 			//start and end points
 			// DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(startX, startY), identityMatrix.matrix, controlPointColor)
