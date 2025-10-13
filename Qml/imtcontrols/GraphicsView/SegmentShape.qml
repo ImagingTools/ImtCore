@@ -60,19 +60,37 @@ SegmentBaseShape {
 
 		let pointsObj = ({});
 
-		//if(equalAngles){
+		if(equalAngles){
 			pointsObj.topLeftPoint = Qt.point(center.x - radius, center.y - radius)
 			pointsObj.topRightPoint = Qt.point(center.x + radius, center.y - radius)
 			pointsObj.bottomLeftPoint = Qt.point(center.x - radius, center.y + radius)
 			pointsObj.bottomRightPoint = Qt.point(center.x + radius, center.y + radius)
-		//}
-		// else {
-		// 	let pointsList = []
-		// 	let startAngle_ = startAngle < 0 ? strartAngle + 360 : startAngle
-		// 	let endAngle_ = endAngle < 0 ? endAngle + 360 : endAngle
+		}
+		else {
+			let pointsList = []
+			let startRad = Functions.getRadians(startAngle)
+			let endRad = Functions.getRadians(endAngle)
 
+			if(isInsideAngles(0)){
+				pointsList.push(Qt.point(center.x + radius, center.y))
+			}
+			if(isInsideAngles(90)){
+				pointsList.push(Qt.point(center.x, center.y + radius))
+			}
+			if(isInsideAngles(180)){
+				pointsList.push(Qt.point(center.x - radius, center.y))
+			}
+			if(isInsideAngles(270)){
+				pointsList.push(Qt.point(center.x, center.y - radius))
+			}
 
-		// }
+			pointsList.push(center)
+
+			pointsList.push(Qt.point(center.x + radius * Math.cos(startRad), center.y + radius * Math.sin(startRad)))
+			pointsList.push(Qt.point(center.x + radius * Math.cos(endRad), center.y + radius * Math.sin(endRad)))
+
+			return getLimitsObject(pointsList)
+		}
 
 		return pointsObj;
 	}

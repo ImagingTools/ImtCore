@@ -80,12 +80,42 @@ SegmentBaseShape {
 	function getBoundingBoxPoints(){
 		let pointsObj = ({});
 
-		//if(equalAngles){
+		if(equalAngles){
 			pointsObj.topLeftPoint = Qt.point(center.x - outerRadius, center.y - outerRadius)
 			pointsObj.topRightPoint = Qt.point(center.x + outerRadius, center.y - outerRadius)
 			pointsObj.bottomLeftPoint = Qt.point(center.x - outerRadius, center.y + outerRadius)
 			pointsObj.bottomRightPoint = Qt.point(center.x + outerRadius, center.y + outerRadius)
-		//}
+		}
+		else {
+			let pointsList = []
+			let startRad = Functions.getRadians(startAngle)
+			let endRad = Functions.getRadians(endAngle)
+
+			if(isInsideAngles(0)){
+				pointsList.push(Qt.point(center.x + outerRadius, center.y))
+				pointsList.push(Qt.point(center.x + innerRadius, center.y))
+			}
+			if(isInsideAngles(90)){
+				pointsList.push(Qt.point(center.x, center.y + outerRadius))
+				pointsList.push(Qt.point(center.x, center.y + innerRadius))
+			}
+			if(isInsideAngles(180)){
+				pointsList.push(Qt.point(center.x - outerRadius, center.y))
+				pointsList.push(Qt.point(center.x - innerRadius, center.y))
+			}
+			if(isInsideAngles(270)){
+				pointsList.push(Qt.point(center.x, center.y - outerRadius))
+				pointsList.push(Qt.point(center.x, center.y - innerRadius))
+			}
+
+			pointsList.push(Qt.point(center.x + outerRadius * Math.cos(startRad), center.y + outerRadius * Math.sin(startRad)))
+			pointsList.push(Qt.point(center.x + outerRadius * Math.cos(endRad), center.y + outerRadius * Math.sin(endRad)))
+
+			pointsList.push(Qt.point(center.x + innerRadius * Math.cos(startRad), center.y + innerRadius * Math.sin(startRad)))
+			pointsList.push(Qt.point(center.x + innerRadius * Math.cos(endRad), center.y + innerRadius * Math.sin(endRad)))
+
+			return getLimitsObject(pointsList)
+		}
 
 		return pointsObj;
 	}
