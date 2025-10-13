@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/CTimeFilterParam.h>
 #include <imtauth/IUserInfo.h>
 #include <imtsdl/TElementList.h>
@@ -61,7 +62,7 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromD
 			const istd::IChangeable& dataModel,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
-	const imtbase::IComplexCollectionFilter* complexFilterPtr = dynamic_cast<const imtbase::IComplexCollectionFilter*>(&dataModel);
+	const imtbase::CComplexCollectionFilter* complexFilterPtr = dynamic_cast<const imtbase::CComplexCollectionFilter*>(&dataModel);
 	if (complexFilterPtr == nullptr){
 		return false;
 	}
@@ -162,7 +163,7 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 			istd::IChangeable& dataModel,
 			const sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0& sdlRepresentation) const
 {
-	imtbase::IComplexCollectionFilter* complexFilterPtr = dynamic_cast<imtbase::IComplexCollectionFilter*>(&dataModel);
+	imtbase::CComplexCollectionFilter* complexFilterPtr = dynamic_cast<imtbase::CComplexCollectionFilter*>(&dataModel);
 	if (complexFilterPtr == nullptr){
 		return false;
 	}
@@ -211,7 +212,7 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 		return false;
 	}
 
-	complexFilterPtr->SetFieldsFilter(targetFilter);
+	complexFilterPtr->AddGroupFilter(targetFilter);
 
 	imtbase::CTimeFilterParam timeFilter;
 	if (sdlRepresentation.timeFilter){

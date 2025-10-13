@@ -2593,12 +2593,21 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	if (paramsSet.ReadFromGraphQlObject(inputParamsGql)){
 		for (sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter: paramsSet.parameters->ToList()){
 			if (parameter.id){
-				const iser::ISerializable* parameterPtr = m_selectionParams.GetParameter(*parameter.id);
+				QByteArray parameterId = *parameter.id;
+				const iser::ISerializable* parameterPtr = m_selectionParams.GetParameter(parameterId);
 				if (parameterPtr != nullptr){
 					istd::TDelPtr<iser::ISerializable> filterParameterPtr;
 					filterParameterPtr.SetCastedOrRemove(parameterPtr->CloneMe());
 					if (filterParameterPtr.IsValid()){
-						filterParams.SetEditableParameter(*parameter.id, filterParameterPtr.PopPtr(), true);
+						if (parameterId == m_complexCollectionFilterRepresentationController.GetTypeId()){
+							imtbase::CComplexCollectionFilter* complexFilterPtr = dynamic_cast<imtbase::CComplexCollectionFilter*>(filterParameterPtr.GetPtr());
+							if (complexFilterPtr != nullptr){
+								ReplaceComplexFilterFields(*complexFilterPtr);
+								SetAdditionalFilters(gqlRequest, *complexFilterPtr);
+							}
+						}
+
+						filterParams.SetEditableParameter(parameterId, filterParameterPtr.PopPtr(), true);
 					}
 				}
 			}
