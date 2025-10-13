@@ -25,6 +25,11 @@ ControlBase {
     
     Component.onCompleted: {
         setFilterIsEnabled("ComplexFilter", true)
+        setFilterIsEnabled("DocumentFilter", documentFilter !== null)
+    }
+
+    onDocumentFilterChanged: {
+        setFilterIsEnabled("DocumentFilter", documentFilter !== null)
     }
 
     function setFilterIsEnabled(filterId, enabled){
