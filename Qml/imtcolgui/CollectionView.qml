@@ -177,6 +177,10 @@ Item {
 		container.registerFieldFilterDelegate(filterId, filterDelegateComp)
 	}
 
+	function unregisterFieldFilterDelegate(filterId){
+		container.filterMenu.removeFieldFilterDelegate(filterId)
+	}
+
 	function setFilterDependency(filterId, dependsOnFilterId){
 		container.setFilterDependency(filterId, dependsOnFilterId)
 	}
