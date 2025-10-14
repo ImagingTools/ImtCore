@@ -139,7 +139,7 @@ Item {
 		internal.errorMessage = message;
 		internal.loadingVisible = loadingVisible;
 		
-		thumbnailDecorator.stackView.push(messagePageComp);
+		thumbnailDecorator.stackView.addPage(messagePageComp);
 	}
 	
 	signal saveSettings(string json);

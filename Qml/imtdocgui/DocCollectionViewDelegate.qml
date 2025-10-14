@@ -7,31 +7,74 @@ import imtguigql 1.0
 import imtauthgui 1.0
 import imtbaseDocumentRevisionSdl 1.0
 
-CollectionViewCommandsDelegateBase {
+CollectionViewCommandsDelegateBase{
 	id: commandsDelegate
 	
 	property DocumentManagerBase documentManager: null
 	property string documentManagerId: collectionId
 
-	property var documentTypeIds: []
-	property var documentTypeNames: []
-	property var documentViewTypeIds: []
-	property var documentEditorsComp: []
-	property var documentDataControllersComp: []
+	property var documentConfigs: ({})
 
-	Component.onCompleted: {
+	QtObject {
+		id: internal
+		property var registeredDocumentViews: []
+	}
+
+	function registerDocumentType(typeId, typeName){
+		if (!typeId){
+			console.error("Cannot register document type with empty ID")
+			return
+		}
+
+		if (!documentConfigs[typeId]){
+			documentConfigs[typeId] = {
+				typeName: typeName || typeId,
+				views: []
+			}
+		}
+		else{
+			if (typeName){
+				documentConfigs[typeId].typeName = typeName
+			}
+		}
+	}
+
+	function addDocumentView(typeId, viewTypeId, editorComp, controllerComp){
+		if (!documentConfigs[typeId]){
+			console.error("Cannot add view. Document type '" + typeId + "' is not registered")
+			return
+		}
+
+		if (!viewTypeId || !editorComp || !controllerComp){
+			console.error("Cannot add view for '" + typeId + "'. Missing arguments")
+			return
+		}
+
+		documentConfigs[typeId].views.push({
+											viewTypeId: viewTypeId,
+											editorComp: editorComp,
+											controllerComp: controllerComp,
+											registered: false
+											})
+
+		if (documentManager){
+			registerDocumentTypes()
+		}
+	}
+	
+	Component.onCompleted:{
 		if (documentManager){
 			registerDocumentTypes()
 		}
 	}
 
-	onDocumentManagerIdChanged: {
+	onDocumentManagerIdChanged:{
 		if (documentManagerId !== ""){
 			documentManager = MainDocumentManager.getDocumentManager(documentManagerId)
 		}
 	}
 
-	onDocumentManagerChanged: {
+	onDocumentManagerChanged:{
 		if (documentManager){
 			registerDocumentTypes()
 		}
@@ -39,35 +82,36 @@ CollectionViewCommandsDelegateBase {
 
 	function registerDocumentTypes(){
 		if (!documentManager){
-			console.error("Unable to register document types: '"+documentTypeIds+"'. Error: Document manager is invalid")
+			console.error("Unable to register document types. Document manager is invalid.")
 			return
 		}
-		
-		if (!(documentTypeIds.length === documentTypeNames.length &&
-			  documentTypeNames.length && documentViewTypeIds.length && 
-			  documentViewTypeIds.length === documentEditorsComp.length &&
-			  documentEditorsComp.length === documentDataControllersComp.length)){
-			console.error("Unable to register document types. Error: inconsistent or missing document type configuration arrays")
-			return
-		}
-		
-		for (let i = 0; i < documentTypeIds.length; ++i){
-			let documentTypeId = documentTypeIds[i]
-			let documentViewTypeId = documentViewTypeIds[i]
-			let documentEditorComp = documentEditorsComp[i]
-			let documentDataControllerComp = documentDataControllersComp[i]
-			
-			documentManager.registerDocumentViewData(documentTypeId, documentViewTypeId, documentEditorComp, documentDataControllerComp)
+
+		for (let typeId in documentConfigs){
+			let config = documentConfigs[typeId]
+			if (!config.views || config.views.length === 0){
+				console.warn("Document type '" + typeId + "' has no views")
+				continue
+			}
+
+			for (let i = 0; i < config.views.length; ++i){
+				let v = config.views[i]
+				if (!v.registered){
+					documentManager.registerDocumentViewData(
+								typeId, v.viewTypeId, v.editorComp, v.controllerComp
+								)
+					v.registered = true
+				}
+			}
 		}
 	}
 
-	function getDocumentTypeName(typeId){
-		let index = documentTypeIds.indexOf(typeId)
-		if (index >= 0){
-			return documentTypeNames[index]
-		}
+	function getRegisteredDocumentTypeIds(){
+		return Object.keys(documentConfigs)
+	}
 
-		return ""
+	function getDocumentTypeName(typeId) {
+		let config = documentConfigs[typeId]
+		return config ? config.typeName : ""
 	}
 
 	function onEdit(){
@@ -101,31 +145,26 @@ CollectionViewCommandsDelegateBase {
 			return
 		}
 
+		let documentTypeIds = getRegisteredDocumentTypeIds()
+		console.log("onNew documentTypeIds", documentTypeIds)
 		if (documentTypeIds.length === 0){
 			console.error("Unable to create new document. Type-ID is empty")
 			return
 		}
 
-		let typeIds = []
-		for (let i = 0; i < documentTypeIds.length; ++i){
-			if (!typeIds.includes(documentTypeIds[i])){
-				typeIds.push(documentTypeIds[i])
-			}
-		}
-
-		if (typeIds.length > 1){
-			ModalDialogManager.openDialog(selectTypeIdDialogComp, {"documentTypeIds": typeIds})
+		if (documentTypeIds.length > 1){
+			ModalDialogManager.openDialog(selectTypeIdDialogComp,{"documentTypeIds": documentTypeIds})
 		}
 		else{
-			let documentTypeId = typeIds[0]
+			let documentTypeId = documentTypeIds[0]
 			documentManager.createDocument(documentTypeId)
 		}
 	}
 	
-	Component {
+	Component{
 		id: selectTypeIdDialogComp
 		
-		Dialog {
+		Dialog{
 			id: selectTypeIdDialog
 			title: qsTr("Select Document Type")
 			canMove: false
@@ -133,15 +172,21 @@ CollectionViewCommandsDelegateBase {
 			
 			property string selectedDocumentTypeId
 			property var documentTypeIds: []
-			
-			Component.onCompleted: {
+			onDocumentTypeIdsChanged: {
+				if (contentItem){
+					contentItem.createDocumentTypesModel(documentTypeIds)
+				}
+			}
+
+			Component.onCompleted:{
 				addButton(Enums.ok, qsTr("OK"), true)
 				addButton(Enums.cancel, qsTr("Cancel"), true)
 			}
 			
-			onFinished: {
+			onFinished:{
 				if (buttonId === Enums.ok){
 					if (selectedDocumentTypeId !== ""){
+						console.log("onFinished selectedDocumentTypeId", selectedDocumentTypeId)
 						commandsDelegate.documentManager.createDocument(selectedDocumentTypeId)
 					}
 					else{
@@ -150,11 +195,35 @@ CollectionViewCommandsDelegateBase {
 				}
 			}
 			
-			contentComp: Component {
-				Item {
+			contentComp: Component{
+				Item{
 					width: selectTypeIdDialog.width
 					height: content.height
-					Column {
+
+					function createDocumentTypesModel(documentTypeIds){
+						documentTypeCbModel.clear()
+
+						for (let i = 0; i < documentTypeIds.length; ++i){
+							let documentTypeId = documentTypeIds[i]
+							let documentTypeName = commandsDelegate.getDocumentTypeName(documentTypeId)
+							if (documentTypeName === ""){
+								documentTypeName = documentTypeId
+							}
+
+							let index = documentTypeCbModel.insertNewItem()
+							documentTypeCbModel.setData("id", documentTypeId, index)
+							documentTypeCbModel.setData("name", documentTypeName, index)
+						}
+						
+						documentTypeCb.model = documentTypeCbModel
+						documentTypeCb.currentIndex = 0
+					}
+
+					TreeItemModel{
+						id: documentTypeCbModel
+					}
+
+					Column{
 						id: content
 						anchors.top: parent.top
 						anchors.topMargin: Style.marginL
@@ -170,33 +239,13 @@ CollectionViewCommandsDelegateBase {
 						ComboBox {
 							id: documentTypeCb
 							width: parent.width
-							currentIndex: 0
-							
-							onCurrentIndexChanged: {
+
+							onCurrentIndexChanged:{
 								if (currentIndex >= 0){
 									selectTypeIdDialog.selectedDocumentTypeId = documentTypeCbModel.getData("id", currentIndex)
 								}
 								else{
 									selectTypeIdDialog.selectedDocumentTypeId = ""
-								}
-							}
-							
-							TreeItemModel {
-								id: documentTypeCbModel
-								Component.onCompleted: {
-									for (let i = 0; i < selectTypeIdDialog.documentTypeIds.length; ++i){
-										let documentTypeId = selectTypeIdDialog.documentTypeIds[i]
-										let documentTypeName = commandsDelegate.getDocumentTypeName(documentTypeId)
-										if (documentTypeName === ""){
-											documentTypeName = documentTypeId
-										}
-										
-										let index = insertNewItem()
-										setData("id", documentTypeId, index)
-										setData("name", documentTypeName, index)
-									}
-									
-									documentTypeCb.model = documentTypeCbModel
 								}
 							}
 						}
