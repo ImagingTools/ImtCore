@@ -36,6 +36,7 @@ Item {
 	signal commandActivated(string commandId)
 	signal modelDataChanged(var view, var model)
 	signal guiUpdated(var view, var model)
+	signal guiVisibleChanged(var view, bool visible)
 
 	Connections {
 		target: viewBase.model
@@ -159,6 +160,8 @@ Item {
 		if (commandsController && visible && viewBase.internal__.localizationChanged){
 			commandsController.getCommands()
 		}
+
+		guiVisibleChanged(viewBase, visible)
 	}
 	
 	Connections {

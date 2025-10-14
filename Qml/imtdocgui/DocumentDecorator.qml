@@ -21,11 +21,19 @@ QtObject {
 			view.commandActivated.connect(onCommandActivated)
 			view.modelDataChanged.connect(onModelDataChanged)
 			view.guiUpdated.connect(onGuiUpdated)
+			view.guiVisibleChanged.connect(onGuiVisibleChanged)
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
 
 			if (updateRepresentation){
-				representationController.updateRepresentationFromDocument()
+				if (view.visible){
+					representationController.updateRepresentationFromDocument()
+				}
+				else{
+					if (!_internal.requestUpdateViews.includes(view)){
+						_internal.requestUpdateViews.push(view)
+					}
+				}
 			}
 			else{
 				representationController.representationUpdated(documentId, view.model)
@@ -112,8 +120,23 @@ QtObject {
 		}
 	}
 
+	function onGuiVisibleChanged(view, visible){
+		if (registeredViews.includes(view)){
+			if (visible && _internal.requestUpdateViews.includes(view)){
+				let index = registeredViews.indexOf(view)
+				
+				view.setBlockingUpdateModel(true)
+				registeredRepresentation[index].updateRepresentationFromDocument()
+				
+				let viewIndex = _internal.requestUpdateViews.indexOf(view)
+				if (viewIndex >= 0){
+					_internal.requestUpdateViews.splice(viewIndex, 1)
+				}
+			}
+		}
+	}
+
 	function onModelDataChanged(view, model){
-		console.log("onModelDataChanged", view, model)
 		if (registeredViews.includes(view)){
 			let index = registeredViews.indexOf(view)
 			registeredRepresentation[index].updateDocumentFromRepresentation()
@@ -166,8 +189,15 @@ QtObject {
 
 	function updateRepresentationForAllViews(){
 		for (let i = 0; i < registeredViews.length; ++i){
-			registeredViews[i].setBlockingUpdateModel(true)
-			registeredRepresentation[i].updateRepresentationFromDocument()
+			if (registeredViews[i].visible){
+				registeredViews[i].setBlockingUpdateModel(true)
+				registeredRepresentation[i].updateRepresentationFromDocument()
+			}
+			else{
+				if (!_internal.requestUpdateViews.includes(registeredViews[i])){
+					_internal.requestUpdateViews.push(registeredViews[i])
+				}
+			}
 		}
 	}
 
@@ -176,5 +206,9 @@ QtObject {
 			registeredViews[i].setBlockingUpdateModel(true)
 			registeredRepresentation[i].updateDocumentFromRepresentation()
 		}
+	}
+
+	property QtObject _internal: QtObject {
+		property var requestUpdateViews: []
 	}
 }
