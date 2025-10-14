@@ -139,4 +139,17 @@ QtObject {
 		ctx.closePath();
 	}
 
+	function drawPoint(ctx, point, radius , color, borderColor, lineWidth){
+		ctx.strokeStyle = borderColor
+		ctx.fillStyle = color
+		ctx.lineWidth = lineWidth
+
+		ctx.moveTo(point.x, point.y)
+		ctx.beginPath()
+		ctx.arc(point.x, point.y, radius, 0, 2*Math.PI, true);
+		ctx.stroke()
+		ctx.fill()
+		ctx.closePath();
+	}
+
 }
