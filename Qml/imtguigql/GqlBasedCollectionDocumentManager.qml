@@ -210,6 +210,10 @@ DocumentManagerBase {
 		function getHeaders(){
 			return root.getHeaders()
 		}
+
+		function onError(message, type){
+			root.openDocumentFailed("", message)
+		}
 	}
 
 	property GqlSdlRequestSender createDocumentRequest: GqlSdlRequestSender {
@@ -227,6 +231,10 @@ DocumentManagerBase {
 
 		function getHeaders(){
 			return root.getHeaders()
+		}
+
+		function onError(message, type){
+			root.createDocumentFailed("", message)
 		}
 	}
 
@@ -257,6 +265,10 @@ DocumentManagerBase {
 		function getHeaders(){
 			return root.getHeaders()
 		}
+
+		function onError(message, type){
+			root.saveDocumentFailed(root.saveDocumentRequest.documentId, message)
+		}
 	}
 
 	property GqlSdlRequestSender closeDocumentRequest: GqlSdlRequestSender {
@@ -285,6 +297,10 @@ DocumentManagerBase {
 
 		function getHeaders(){
 			return root.getHeaders()
+		}
+
+		function onError(message, type){
+			root.closeDocumentFailed("", message)
 		}
 	}
 
@@ -319,6 +335,10 @@ DocumentManagerBase {
 		function getHeaders(){
 			return root.getHeaders()
 		}
+
+		function onError(message, type){
+			root.undoFailed(documentId, message)
+		}
 	}
 
 	property GqlSdlRequestSender doRedoRequest: GqlSdlRequestSender {
@@ -351,6 +371,10 @@ DocumentManagerBase {
 
 		function getHeaders(){
 			return root.getHeaders()
+		}
+
+		function onError(message, type){
+			root.redoFailed(documentId, message)
 		}
 	}
 

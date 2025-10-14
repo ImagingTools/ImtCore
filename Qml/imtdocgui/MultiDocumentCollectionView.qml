@@ -139,6 +139,11 @@ Item {
 			loading.stop()
 		}
 
+		function onOpenedDocumentListReceiveFailed(message){
+			loading.stop()
+			ModalDialogManager.showErrorDialog(message)
+		}
+
 		function onDocumentGuiUpdated(documentId, representation){
 			loading.stop()
 		}
@@ -218,6 +223,7 @@ Item {
 
 		function onCreateDocumentFailed(documentTypeId, message){
 			loading.stop()
+			ModalDialogManager.showErrorDialog(message)
 		}
 
 		function onDocumentCreated(documentId, documentTypeId){
