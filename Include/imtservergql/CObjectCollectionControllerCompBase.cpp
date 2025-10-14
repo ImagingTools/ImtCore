@@ -2595,7 +2595,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 	const imtgql::CGqlParamObject* documentFilterModelPtr = inputParamsGql.GetParamArgumentObjectPtr("documentFilterModel");
 
 	sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0 paramsSet;
-	if (paramsSet.ReadFromGraphQlObject(inputParamsGql)){
+	if (inputParamsGql.ContainsParam("parameters") && paramsSet.ReadFromGraphQlObject(inputParamsGql)){
 		for (sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter: paramsSet.parameters->ToList()){
 			if (parameter.id){
 				QByteArray parameterId = *parameter.id;
