@@ -97,7 +97,9 @@ sdl::imtbase::CollectionDocumentManager::CDocumentId CCollectionDocumentManagerC
 		return retVal;
 	}
 
-	QByteArray documentId = GetNonConstThis()->OpenDocument(userId, *objectId->id);
+	QUrl url(QString("collection:///%1").arg(*objectId->id));
+
+	QByteArray documentId = GetNonConstThis()->OpenDocument(userId, url);
 	if (documentId.isEmpty()){
 		errorMessage = "Unable to open document or create undo manager";
 
@@ -138,16 +140,16 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CCollectionDoc
 
 	OperationStatus status = GetNonConstThis()->SaveDocument(userId, *documentId->id);
 	switch (status){
-	case imtdoc::ICollectionDocumentManager::OS_OK:
+	case imtdoc::IDocumentManager::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
 		break;
-	case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
+	case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
 		break;
-	case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_ID:
+	case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 		break;
-	case imtdoc::ICollectionDocumentManager::OS_FAILED:
+	case imtdoc::IDocumentManager::OS_FAILED:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
 		break;
 	default:
@@ -190,16 +192,16 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CCollectionDoc
 
 	OperationStatus status = GetNonConstThis()->CloseDocument(userId, *documentId->id);
 	switch (status){
-	case imtdoc::ICollectionDocumentManager::OS_OK:
+	case imtdoc::IDocumentManager::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
 		break;
-	case imtdoc::ICollectionDocumentManager::OS_INVALID_USER_ID:
+	case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
 		break;
-	case imtdoc::ICollectionDocumentManager::OS_INVALID_DOCUMENT_ID:
+	case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
 		break;
-	case imtdoc::ICollectionDocumentManager::OS_FAILED:
+	case imtdoc::IDocumentManager::OS_FAILED:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
 		break;
 	default:

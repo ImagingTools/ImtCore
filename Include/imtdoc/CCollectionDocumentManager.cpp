@@ -24,9 +24,9 @@ CCollectionDocumentManager::CCollectionDocumentManager()
 
 // protected methods
 
-// reimplemented (imtdoc::ICollectionDocumentManager)
+// reimplemented (imtdoc::IDocumentManager)
 
-imtdoc::ICollectionDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList(
+imtdoc::IDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList(
 	const QByteArray& userId) const
 {
 	QMutexLocker locker(&m_mutex);
@@ -95,9 +95,22 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 }
 
 
-QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, const QByteArray& objectId)
+QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, const QUrl& url)
 {
 	QByteArray retVal;
+
+	if (url.scheme() != "collection"){
+		return retVal;
+	}
+
+	QString path = url.path();
+
+	QStringList parts = path.split('/', Qt::SkipEmptyParts);
+	if (parts.count() != 1){
+		return retVal;
+	}
+
+	QByteArray objectId = parts.first().toUtf8();
 
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr) {
@@ -146,19 +159,33 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 }
 
 
-istd::IChangeableSharedPtr CCollectionDocumentManager::GetDocument(const QByteArray& userId, const QByteArray& documentId) const
+bool CCollectionDocumentManager::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
 {
 	QMutexLocker locker(&m_mutex);
 
 	if (m_userDocuments.contains(userId) && m_userDocuments[userId].contains(documentId)) {
-		return m_userDocuments[userId][documentId].objectPtr;
+		documentPtr.SetPtr(m_userDocuments[userId][documentId].objectPtr->CloneMe());
+
+		return documentPtr.IsValid();
 	}
 
-	return nullptr;
+	return false;
 }
 
 
-imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
+bool CCollectionDocumentManager::SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document)
+{
+	QMutexLocker locker(&m_mutex);
+
+	if (m_userDocuments.contains(userId) && m_userDocuments[userId].contains(documentId)){
+		return m_userDocuments[userId][documentId].objectPtr->CopyFrom(document);
+	}
+
+	return false;
+}
+
+
+imtdoc::IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
@@ -219,7 +246,7 @@ imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::
 }
 
 
-imtdoc::ICollectionDocumentManager::OperationStatus CCollectionDocumentManager::CloseDocument(
+imtdoc::IDocumentManager::OperationStatus CCollectionDocumentManager::CloseDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
 	QMutexLocker locker(&m_mutex);
@@ -434,7 +461,7 @@ void CCollectionDocumentManager::InitializeDocumentObservers(
 
 // private methods
 
-ICollectionDocumentManager::DocumentNotificationPtr CCollectionDocumentManager::CreateDocumentNotification(
+IDocumentManager::DocumentNotificationPtr CCollectionDocumentManager::CreateDocumentNotification(
 	const QByteArray& userId,
 	const QByteArray& documentId) const
 {

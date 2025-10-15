@@ -14,7 +14,7 @@
 #include <imtbase/IObjectCollection.h>
 
 // GmgCore includes
-#include <imtdoc/ICollectionDocumentManager.h>
+#include <imtdoc/IDocumentManager.h>
 
 
 namespace imtdoc
@@ -23,7 +23,7 @@ namespace imtdoc
 
 class CCollectionDocumentManager :
 	protected imod::TMultiModelObserverBase<istd::IChangeable>,
-	virtual public imtdoc::ICollectionDocumentManager
+	virtual public imtdoc::IDocumentManager
 {
 public:
 	CCollectionDocumentManager();
@@ -31,8 +31,9 @@ public:
 	// reimplemented (imtdoc::ICollectionDocumentManager)
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
 	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
-	virtual QByteArray OpenDocument(const QByteArray& userId, const QByteArray& objectId) override;
-	virtual istd::IChangeableSharedPtr GetDocument(const QByteArray& userId, const QByteArray& documentId) const override;
+	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) override;
+	virtual bool GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
+	virtual bool SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
 	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) override;
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
 	virtual idoc::IUndoManager* GetDocumentUndoManager(const QByteArray& userId, const QByteArray& documentId) const override;

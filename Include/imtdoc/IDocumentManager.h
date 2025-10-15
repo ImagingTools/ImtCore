@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QUrl>
+
 // ACF includes
 #include <idoc/IUndoManager.h>
 #include <iser/ISerializable.h>
@@ -10,7 +13,7 @@ namespace imtdoc
 {
 
 
-class ICollectionDocumentManager : virtual public iser::ISerializable
+class IDocumentManager : virtual public iser::ISerializable
 {
 public:
 	enum ChangeFlags
@@ -83,8 +86,16 @@ public:
 
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const = 0;
 	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) = 0;
-	virtual QByteArray OpenDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
-	virtual istd::IChangeableSharedPtr GetDocument(const QByteArray& userId, const QByteArray& documentId) const = 0;
+	/*
+		From file:
+			file:///etc/fstab					- *nix style path
+			file:///c:/pagefile.sys				- Windows style path
+		From object collection:
+			collection:///objectId				- for single collection document manager (or default collection)
+	*/
+	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) = 0;
+	virtual bool GetDocumentData(const QByteArray & userId, const QByteArray & documentId, istd::IChangeableSharedPtr& documentPtr) const = 0;
+	virtual bool SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
 	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
 	virtual idoc::IUndoManager* GetDocumentUndoManager(
@@ -95,6 +106,6 @@ public:
 } // namespace imtdoc
 
 
-Q_DECLARE_METATYPE(imtdoc::ICollectionDocumentManager::DocumentNotification);
-Q_DECLARE_METATYPE(imtdoc::ICollectionDocumentManager::DocumentUndoNotification);
-Q_DECLARE_METATYPE(imtdoc::ICollectionDocumentManager::DocumentClosedNotification);
+Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentNotification);
+Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentUndoNotification);
+Q_DECLARE_METATYPE(imtdoc::IDocumentManager::DocumentClosedNotification);

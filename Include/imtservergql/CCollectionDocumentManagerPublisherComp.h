@@ -5,7 +5,7 @@
 #include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
-#include <imtdoc/ICollectionDocumentManager.h>
+#include <imtdoc/IDocumentManager.h>
 #include <imtservergql/CGqlPublisherCompBase.h>
 
 
@@ -15,7 +15,7 @@ namespace imtservergql
 
 class CCollectionDocumentManagerPublisherComp:
 	public CGqlPublisherCompBase,
-	public imod::TSingleModelObserverBase<imtdoc::ICollectionDocumentManager>
+	public imod::TSingleModelObserverBase<imtdoc::IDocumentManager>
 {
 public:
 	typedef CGqlPublisherCompBase BaseClass;

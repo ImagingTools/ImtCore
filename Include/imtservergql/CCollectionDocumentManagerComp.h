@@ -29,7 +29,7 @@ public:
 	typedef imtdoc::CCollectionDocumentManager BaseClass2;
 
 	I_BEGIN_COMPONENT(CCollectionDocumentManagerComp)
-		I_REGISTER_INTERFACE(imtdoc::ICollectionDocumentManager)
+		I_REGISTER_INTERFACE(imtdoc::IDocumentManager)
 		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "CollectiondId");
 		I_ASSIGN_MULTI_0(m_objectTypeIdAttrPtr, "ObjectTypeId", "Object type ID", false);
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Collection", false, "");
