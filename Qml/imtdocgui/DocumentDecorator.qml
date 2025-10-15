@@ -24,6 +24,7 @@ QtObject {
 			view.guiVisibleChanged.connect(onGuiVisibleChanged)
 
 			representationController.representationUpdated.connect(onRepresentationUpdated)
+			representationController.startUpdateRepresentation.connect(onStartUpdateRepresentation)
 
 			if (updateRepresentation){
 				if (view.visible){
@@ -36,6 +37,7 @@ QtObject {
 				}
 			}
 			else{
+				representationController.startUpdateRepresentation(documentId, view.model)
 				representationController.representationUpdated(documentId, view.model)
 			}
 		}
@@ -55,22 +57,6 @@ QtObject {
 
 	property Connections documentManagerConnections: Connections {
 		target: root.documentManager
-
-		function onUndoDone(documentId){
-			if (documentId !== root.documentId){
-				return
-			}
-
-			root.updateRepresentationForAllViews()
-		}
-
-		function onRedoDone(documentId){
-			if (documentId !== root.documentId){
-				return
-			}
-
-			root.updateRepresentationForAllViews()
-		}
 
 		function onUndoInfoReceived(documentId, availableUndoSteps, availableRedoSteps, isDirty){
 			if (documentId !== root.documentId){
@@ -97,6 +83,19 @@ QtObject {
 		}
 	}
 
+	function onStartUpdateRepresentation(documentId, representation){
+		if (root.documentId !== documentId){
+			return
+		}
+
+		for (let i = 0; i < registeredViews.length; ++i){
+			if (registeredViews[i].model === representation){
+				registeredViews[i].setBlockingUpdateModel(true)
+				break
+			}
+		}
+	}
+
 	function onRepresentationUpdated(documentId, representation){
 		if (root.documentId !== documentId){
 			return
@@ -107,7 +106,7 @@ QtObject {
 				registeredViews[i].setBlockingUpdateModel(false)
 				
 				registeredViews[i].doUpdateGui()
-				return
+				break
 			}
 		}
 
@@ -124,8 +123,7 @@ QtObject {
 		if (registeredViews.includes(view)){
 			if (visible && _internal.requestUpdateViews.includes(view)){
 				let index = registeredViews.indexOf(view)
-				
-				view.setBlockingUpdateModel(true)
+
 				registeredRepresentation[index].updateRepresentationFromDocument()
 				
 				let viewIndex = _internal.requestUpdateViews.indexOf(view)
@@ -190,7 +188,6 @@ QtObject {
 	function updateRepresentationForAllViews(){
 		for (let i = 0; i < registeredViews.length; ++i){
 			if (registeredViews[i].visible){
-				registeredViews[i].setBlockingUpdateModel(true)
 				registeredRepresentation[i].updateRepresentationFromDocument()
 			}
 			else{

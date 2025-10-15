@@ -192,6 +192,22 @@ QtObject {
 		return Object.keys(__internal.documentTypeEditors)
 	}
 
+	function getDocumentIdByView(view){
+		for (let i = 0; i < __internal.openedDocuments.length; ++i){
+			let documentData = __internal.openedDocuments[i]
+
+			let views = documentData.views
+			let viewTypeIds = Object.keys(views)
+			for (let j = 0; j < viewTypeIds.length; ++j){
+				if (views[viewTypeIds[j]] === view){
+					return documentData.id
+				}
+			}
+		}
+
+		return ""
+	}
+
 	function getSupportedDocumentViewTypeIds(documentTypeId){
 		if (!(documentTypeId in __internal.documentTypeEditors)){
 			return []
@@ -370,6 +386,7 @@ QtObject {
 
 					let representationController = representationControllerFactory.createObject(documentData)
 					representationController.documentId = id
+					representationController.view = view
 					documentDecorator.registerView(view, representationController, !isNew)
 				}
 
