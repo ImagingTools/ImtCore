@@ -179,7 +179,7 @@ class BaseClass extends QtObject {
 			}
 
 			if (typeof this[key] === 'object') {
-				if (this[key].isEqualWithModel) {
+				if (this[key] && this[key].isEqualWithModel) {
 					let ok = this[key].isEqualWithModel(model[key])
 					if (!ok) {
 						return false
@@ -289,8 +289,11 @@ class BaseClass extends QtObject {
 
 					json += "]"
 				}
-				else if (this[key]) {
+				else if (this[key] !== null) {
 					json += '"' + this.getJSONKeyForProperty(key) + '":' + this[key].toJson()
+				}
+				else{
+					json += '"' + this.getJSONKeyForProperty(key) + '": null'
 				}
 			} else {
 				let value = this[key]
@@ -431,7 +434,11 @@ class BaseClass extends QtObject {
 
 					if (component) {
 						for (let sourceObjectInner of sourceObject[key]) {
-							let obj = this.createElement(_key).createObject(this)
+							let sourceTypename
+							if (sourceObjectInner['__typename']){
+								sourceTypename = sourceObjectInner['__typename']
+							}
+							let obj = this.createElement(_key, sourceTypename).createObject(this)
 							obj.fromObject(sourceObjectInner)
 							this[_key].append({ item: obj })
 							obj.owner = this
