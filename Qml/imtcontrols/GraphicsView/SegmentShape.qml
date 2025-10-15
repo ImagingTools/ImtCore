@@ -38,12 +38,13 @@ SegmentBaseShape {
 			ctx.arc(centerScreen.x, centerScreen.y, radiusScreen,  0, 2 * Math.PI, anticlockwise)
 		}
 
-		ctx.stroke();
+
 		if(isSelected){
 			ctx.globalAlpha = 0.7
 		}
 		ctx.fill();
 		ctx.globalAlpha = 1
+		ctx.stroke();
 
 		// ctx.beginPath()
 		// DesignScheme.drawNode(ctx, center, 4)
@@ -102,11 +103,18 @@ SegmentBaseShape {
 		ctx.lineWidth = DesignScheme.boundingBoxLineWidth
 		ctx.beginPath()
 
+		let controlPointsList = []
 		if(equalAngles){
-			DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.topPoint, identityMatrix.matrix, controlPointColor)
-			DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.bottomPoint, identityMatrix.matrix, controlPointColor)
-			DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.leftPoint, identityMatrix.matrix, controlPointColor)
-			DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.rightPoint, identityMatrix.matrix, controlPointColor)
+			DesignScheme.drawPoint(ctx, pointsObj.topPoint, controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+			DesignScheme.drawPoint(ctx, pointsObj.bottomPoint, controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+			DesignScheme.drawPoint(ctx, pointsObj.leftPoint, controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+			DesignScheme.drawPoint(ctx, pointsObj.rightPoint, controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+
+			controlPointsList.push(pointsObj.topPoint)
+			controlPointsList.push(pointsObj.bottomPoint)
+			controlPointsList.push(pointsObj.leftPoint)
+			controlPointsList.push(pointsObj.rightPoint)
+
 		}
 		else {
 			let centerScreen = getScreenPosition(center)
@@ -132,16 +140,22 @@ SegmentBaseShape {
 			let arcCenterY = centerScreen.y + radiusScreen * Math.sin(middleRad)
 
 			//start and end points
-			// DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(startX, startY), identityMatrix.matrix, controlPointColor)
-			// DesignScheme.drawBoundingBoxControlPoint(ctx,  Qt.point(endX, endY), identityMatrix.matrix, controlPointColor)
+			// DesignScheme.drawPoint(ctx, Qt.point(startX, startY), controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+			// DesignScheme.drawPoint(ctx,  Qt.point(endX, endY), controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
 
 			//middel edge points
-			DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(middleEdgeStartX, middleEdgeStartY), identityMatrix.matrix, controlPointColor)
-			DesignScheme.drawBoundingBoxControlPoint(ctx,  Qt.point(middleEdgeEndX, middleEdgeEndY), identityMatrix.matrix, controlPointColor)
+			DesignScheme.drawPoint(ctx, Qt.point(middleEdgeStartX, middleEdgeStartY), controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+			DesignScheme.drawPoint(ctx,  Qt.point(middleEdgeEndX, middleEdgeEndY), controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
 
 			//arc center point
-			DesignScheme.drawBoundingBoxControlPoint(ctx, Qt.point(arcCenterX, arcCenterY), identityMatrix.matrix, controlPointColor)
+			DesignScheme.drawPoint(ctx, Qt.point(arcCenterX, arcCenterY), controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+
+			controlPointsList.push(Qt.point(middleEdgeStartX, middleEdgeStartY))
+			controlPointsList.push(Qt.point(middleEdgeEndX, middleEdgeEndY))
+			controlPointsList.push(Qt.point(arcCenterX, arcCenterY))
 		}
+
+		controlPointsScreen = controlPointsList
 
 		ctx.stroke()
 		ctx.fill()

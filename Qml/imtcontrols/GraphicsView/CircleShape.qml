@@ -31,11 +31,11 @@ BoundingBox {
 
 		ctx.arc(centerScreen.x, centerScreen.y, radiusScreen,  0, 2 * Math.PI, true)
 
-		ctx.stroke();
 		ctx.fill();
+		ctx.globalAlpha = 1;
+		ctx.stroke();
 		ctx.closePath();
 
-		ctx.globalAlpha = 1;
 
 		if(isSelected){
 			drawSelection(ctx, transformMatrixArg, centerScreen, radiusScreen)
@@ -95,15 +95,22 @@ BoundingBox {
 
 	function drawControlPoints(ctx, transformMatrixArg){
 		let pointsObj = getBoundingBoxMidPoints(true);
-		ctx.strokeStyle = DesignScheme.boundingBoxBorderColor
-		ctx.fillStyle = DesignScheme.boundingBoxBorderColor
-		ctx.lineWidth = DesignScheme.boundingBoxLineWidth
+		ctx.strokeStyle = controlPointBorderColor
+		ctx.fillStyle = controlPointBorderColor
+		ctx.lineWidth = controlPointBorderWidth
 		ctx.beginPath()
 
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.topPoint, identityMatrix.matrix, controlPointColor)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.bottomPoint, identityMatrix.matrix, controlPointColor)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.leftPoint, identityMatrix.matrix, controlPointColor)
-		DesignScheme.drawBoundingBoxControlPoint(ctx, pointsObj.rightPoint, identityMatrix.matrix, controlPointColor)
+		DesignScheme.drawPoint(ctx, pointsObj.topPoint, controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+		DesignScheme.drawPoint(ctx, pointsObj.bottomPoint, controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+		DesignScheme.drawPoint(ctx, pointsObj.leftPoint, controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+		DesignScheme.drawPoint(ctx, pointsObj.rightPoint, controlPointRadius, controlPointColor, controlPointBorderColor, controlPointBorderWidth)
+
+		let controlPointsList = []
+		controlPointsList.push(pointsObj.topPoint)
+		controlPointsList.push(pointsObj.bottomPoint)
+		controlPointsList.push(pointsObj.leftPoint)
+		controlPointsList.push(pointsObj.rightPoint)
+		controlPointsScreen = controlPointsList
 
 		ctx.stroke()
 		ctx.fill()

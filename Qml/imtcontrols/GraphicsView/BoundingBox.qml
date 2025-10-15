@@ -10,7 +10,13 @@ GraphicsShapeBase {
 	id: root;
 
 	property bool editMode: false;
+
 	property string controlPointColor: DesignScheme.boundingBoxBorderColor
+	property string controlPointBorderColor: DesignScheme.boundingBoxBorderColor
+	property int controlPointBorderWidth: DesignScheme.boundingBoxControlPointLineWidth
+	property int controlPointRadius: DesignScheme.boundingBoxControlPointRadius
+
+	property var controlPointsScreen: []
 
 
 	function drawBoundingBox(ctx){

@@ -1,5 +1,6 @@
 pragma Singleton
 import QtQuick 2.12
+import imtcontrols 1.0
 
 
 QtObject {
@@ -8,6 +9,7 @@ QtObject {
 	property real shapePointSize: 4;
 	property real shapeSelectedPointSize: 6;
 	property int boundingBoxLineWidth: 2;
+	property int boundingBoxControlPointLineWidth: 1;
 	property int boundingBoxControlPointRadius: 6;
 	property string boundingBoxBorderColor: "#3a3b3b"
 
