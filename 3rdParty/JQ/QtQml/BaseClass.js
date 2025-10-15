@@ -242,6 +242,8 @@ class BaseClass extends QtObject {
 		let meta = this.__self.constructor.meta
 		let list = []
 
+		if('__typename' in this) list.push('__typename')
+
 		for (let key in meta) {
 			if (meta[key].type !== Signal && key[0] === 'm' && key[1] === '_') {
 				list.push(key)
