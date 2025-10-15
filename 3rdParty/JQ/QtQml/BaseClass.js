@@ -245,7 +245,7 @@ class BaseClass extends QtObject {
 		let list = []
 
 		for (let key in meta) {
-			if (meta[key].type !== Signal && key[0] === 'm' && key[1] === '_') {
+			if ((meta[key].type !== Signal && key[0] === 'm' && key[1] === '_') || (key === '__typename')) {
 				list.push(key)
 			}
 		}
@@ -265,7 +265,7 @@ class BaseClass extends QtObject {
 		for (let i = 0; i < list.length; i++) {
 			let key = list[i]
 			if(key === '__typename' && this[key] === '') continue
-			
+
 			if (this[key] == null && this._internal.containceInRemoved(key)){
 				continue
 			}
