@@ -2,6 +2,7 @@ const QtObject = require("./QtObject")
 const Bool = require("./Bool")
 const Int = require("./Int")
 const Var = require("./Var")
+const String = require("./String")
 const Signal = require("./Signal")
 const BaseModel = require("./BaseModel")
 
@@ -11,6 +12,7 @@ class Internal extends QtObject {
 		countChanges: { type: Int, value: 0 },
 		changeList: { type: Var, value: null },
 		removed: { type: Var, value: null },
+		__typename: { type: String, value: '' },
 
 		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
     })
@@ -241,8 +243,6 @@ class BaseClass extends QtObject {
 	getProperties() {
 		let meta = this.__self.constructor.meta
 		let list = []
-
-		if('__typename' in this) list.push('__typename')
 
 		for (let key in meta) {
 			if (meta[key].type !== Signal && key[0] === 'm' && key[1] === '_') {
