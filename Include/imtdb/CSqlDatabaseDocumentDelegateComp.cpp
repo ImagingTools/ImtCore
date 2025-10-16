@@ -70,6 +70,22 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetCountQuery(const iprm::IParamsSe
 }
 
 
+QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectIdFromRecord(const QSqlRecord& record) const
+{
+	const QString columnId = QString::fromUtf8(*m_objectIdColumnAttrPtr);
+	if (!record.contains(columnId)){
+		return QByteArray();
+	}
+
+	const QUuid objectId = record.value(columnId).toUuid();
+	if(objectId.isNull()){
+		return QByteArray();
+	}
+
+	return objectId.toByteArray(QUuid::WithoutBraces);
+}
+
+
 QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 			const QByteArray& objectId,
 			int offset,
@@ -1370,7 +1386,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICom
 
 void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool castToStr) const
 {
-	static QRegularExpression regexp("(\\\"[^\\\"]{1,}\\\")");
+	static const QRegularExpression regexp(R"((?<!')\"[^\"]+\"(?!'))");
 
 	QStringList list;
 
