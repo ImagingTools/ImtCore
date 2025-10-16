@@ -648,6 +648,7 @@ QtObject {
 			}
 
 			function initModelForView(){
+				console.log("initModelForView")
 				if (!singleDocumentData.view){
 					console.error("Unable to init model for view. Error: View is invalid")
 					return;

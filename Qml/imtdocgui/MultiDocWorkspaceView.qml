@@ -142,6 +142,7 @@ Item {
 		}
 		
 		function onDocumentOpened(documentId){
+			console.log("onDocumentOpened", documentId)
 			Events.sendEvent("StopLoading")
 		}
 		

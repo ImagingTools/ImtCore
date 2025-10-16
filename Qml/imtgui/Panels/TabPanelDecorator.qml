@@ -131,7 +131,7 @@ DecoratorBase {
 			anchors.verticalCenter: parent.verticalCenter;
 			width: Style.iconSizeS;
 			height: width;
-			visible: !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
+			visible: tabPanelDecorator.baseElement && !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
 			iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 			decorator: Component {
 				ToolButtonDecorator {
