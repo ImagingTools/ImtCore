@@ -305,7 +305,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 
 	if (requestInfo.items.isAddedRequested){
 		QDateTime addedTime = objectCollectionIterator.GetElementInfo("Added").toDateTime();
-		addedTime.setTimeSpec(Qt::UTC);
+		addedTime.setTimeZone(QTimeZone::utc());
 
 		QString added = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 		representationObject.added = QString(added);
@@ -313,7 +313,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 
 	if (requestInfo.items.isLastModifiedRequested){
 		QDateTime lastModifiedTime = objectCollectionIterator.GetElementInfo("LastModified").toDateTime();
-		lastModifiedTime.setTimeSpec(Qt::UTC);
+		lastModifiedTime.setTimeZone(QTimeZone::utc());
 
 		QString lastModified = lastModifiedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 		representationObject.lastModified = QString(lastModified);

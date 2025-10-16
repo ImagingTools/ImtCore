@@ -18,7 +18,7 @@ Rectangle {
 	property ObjectVisualStatusProvider visualStatusProvider: null
 	
 	Connections {
-		target: root.visualStatusProvider ? root.visualStatusProvider : undefined
+		target: root.visualStatusProvider ? root.visualStatusProvider : null
 		
 		function onVisualStatusReceived(objectId, icon, text, description){
 			if (text === ""){

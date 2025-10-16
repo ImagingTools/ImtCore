@@ -112,8 +112,9 @@ ViewCommandsDelegateBase {
 
 	Connections {
 		id: controllerConnections;
+		target: null
 
-		function onImported(){
+		function onImported(objectId){
 			ModalDialogManager.showInfoDialog(qsTr("The object has been successfully imported"));
 		}
 

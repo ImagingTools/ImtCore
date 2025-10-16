@@ -19,7 +19,7 @@ public:
 
 	I_BEGIN_COMPONENT(CAddressControllerComp);
         I_ASSIGN(m_addressInfoFactCompPtr, "AddressFactory", "Factory used for creation of the new address element", true, "AddressFactory");
-		I_ASSIGN(m_addressTypeCollectionPtr, "AddressTypeComponent", "The string address type collection", true, "AddressTypeCollection");
+		I_ASSIGN(m_addressTypeCollectionPtr, "AddressTypeComponent", "The string address type collection", false, "AddressTypeCollection");
 	I_END_COMPONENT;
 
 protected:

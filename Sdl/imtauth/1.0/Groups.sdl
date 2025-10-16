@@ -11,7 +11,7 @@ import {
 }
 
 input GroupsListInput {
-	productId: ID!
+	productId: ID
 	viewParams: CollectionViewParams
 }
 

@@ -954,7 +954,7 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::GetObjectHis
 		QString ownerName = objectCollectionIterator->GetElementInfo("OwnerName").toString();
 		QByteArray operationsDescriptionJson = objectCollectionIterator->GetElementInfo("OperationDescription").toByteArray();
 		QDateTime lastModified =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
-		lastModified.setTimeSpec(Qt::UTC);
+		lastModified.setTimeZone(QTimeZone::utc());
 
 		if (!ownerId.isEmpty() && !operationsDescriptionJson.isEmpty()){
 			imtbase::CObjectCollection changeCollection;

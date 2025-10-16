@@ -127,7 +127,7 @@ DecoratorBase {
 
 			height: !commonButtonDecorator.baseElement ? 0 :
 														 (commonButtonDecorator.baseElement.icon && commonButtonDecorator.baseElement.icon.height !== 0) ?
-														 commonButtonDecorator.baseElement.icon.height : width
+														 commonButtonDecorator.baseElement.icon.height : Style.iconSizeS
 
 			sourceSize.width: width
 			sourceSize.height: height

@@ -11,7 +11,7 @@ import {
 }
 
 input RolesListInput {
-	productId: ID!
+	productId: ID
 	viewParams: CollectionViewParams
 }
 
