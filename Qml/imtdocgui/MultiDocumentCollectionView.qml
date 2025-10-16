@@ -253,7 +253,7 @@ Item {
 
 		// Undo signals
 		function onStartUndo(documentId, steps){
-			// loading.start()
+			loading.start()
 		}
 
 		function onUndoDone(documentId){
@@ -267,7 +267,7 @@ Item {
 
 		// Redo signals
 		function onStartRedo(documentId, steps){
-			// loading.start()
+			loading.start()
 		}
 
 		function onRedoDone(documentId){
@@ -448,7 +448,11 @@ Item {
 
 	Loading {
 		id: loading
-		anchors.fill: parent
+		anchors.top: parent.top
+		anchors.topMargin: Style.controlHeightL
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: parent.bottom
 		visible: false
 	}
 }
