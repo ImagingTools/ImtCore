@@ -21,6 +21,9 @@ ElementView {
 	
 	property string errorText: qsTr("Enter the correct value");
 	property bool showErrorWhenInvalid: false;
+
+	property int textSize: Style.fontSizeM;
+	property int placeHolderTextSize: textSize;
 	
 	signal accepted();
 	signal cancelled();
@@ -90,6 +93,8 @@ ElementView {
 			placeHolderText: root.placeHolderText;
 			echoMode: root.echoMode;
 			textInputValidator: root.textInputValidator ? root.textInputValidator : null;
+			textSize: root.textSize
+			placeHolderTextSize: root.placeHolderTextSize
 			
 			onAccepted: {
 				root.accepted();

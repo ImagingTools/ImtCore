@@ -16,6 +16,8 @@ Rectangle {
 	radius: Style.radiusM
 	
 	color: Style.baseColor
+
+	property int titleFontSize:  Style.fontSizeXL;
 	
 	property alias name: textName.text
 	property alias description: textDescription.text
@@ -38,6 +40,7 @@ Rectangle {
 	
 	property int controlWidth: Style.sizeHintM
 	property int contentMargin: Style.marginXL
+	property int nameMargin: Style.marginXL
 	property int contentHeight: content.height
 	property int controlHeight: Style.controlHeightM
 	
@@ -121,10 +124,10 @@ Rectangle {
 				anchors.verticalCenter: parent.verticalCenter
 				anchors.left: parent.left
 				anchors.right: controlLoader.left
-				anchors.rightMargin: Style.marginXL
+				anchors.rightMargin: rootElement.nameMargin
 				color: Style.textColor
 				font.family: Style.fontFamilyBold
-				font.pixelSize: Style.fontSizeXL
+				font.pixelSize: rootElement.titleFontSize
 				elide: Text.ElideRight
 				wrapMode: Text.NoWrap
 			}
