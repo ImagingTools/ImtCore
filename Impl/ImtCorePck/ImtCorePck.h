@@ -46,6 +46,7 @@
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/CDelegatedParamsSetComp.h>
+#include <imtbase/CApplicationInfoControllerComp.h>
 
 
 /**
@@ -110,6 +111,7 @@ typedef imtbase::CSelectionParamSummaryRepresentationControllerComp SelectionPar
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtbase::CComplexCollectionFilter, imtbase::IComplexCollectionFilter, iser::ISerializable>> ComplexCollectionFilter;
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtbase::CCollectionFilter, imtbase::ICollectionFilter, iser::ISerializable>> CollectionFilter;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedParamsSetComp> DelegatedParamsSet;
+typedef imtbase::CApplicationInfoControllerComp ApplicationInfoController;
 
 
 } // namespace ImtCorePck

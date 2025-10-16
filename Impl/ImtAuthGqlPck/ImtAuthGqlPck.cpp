@@ -159,6 +159,11 @@ I_EXPORT_COMPONENT(
 			"User action meta info delegate",
 			"User Action Meta Info Delegate");
 
+I_EXPORT_COMPONENT(
+			SimpleLogin,
+			"Simple login",
+			"Simple Login");
+
 
 } // namespace ImtAuthGqlPck
 

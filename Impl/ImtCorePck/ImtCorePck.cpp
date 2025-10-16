@@ -214,6 +214,11 @@ I_EXPORT_COMPONENT(
 			"Delegated params set",
 			"Delegated Params Set");
 
+I_EXPORT_COMPONENT(
+			ApplicationInfoController,
+			"Application info controller",
+			"Application Info Controller");
+
 
 } // namespace ImtCorePck
 
