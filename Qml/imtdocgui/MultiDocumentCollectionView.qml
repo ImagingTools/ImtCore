@@ -148,6 +148,10 @@ Item {
 			loading.stop()
 		}
 
+		function onStartUpdateRepresentation(documentId, representation){
+			loading.start()
+		}
+
 		function onDocumentRepresentationUpdated(documentId, representation){
 			// loading.stop()
 		}
@@ -177,7 +181,6 @@ Item {
 		function onDocumentOpened(documentId, typeId){
 			// loading.stop()
 
-			// let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(typeId)
 			tabView.addTab(documentId, "", stackViewComp, "", "", true)
 			tabView.currentIndex = tabView.tabModel.count - 1
 		}

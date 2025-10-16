@@ -2,7 +2,7 @@ import QtQuick 2.12
 
 QtObject {
 	id: root
-	
+
 	signal startGetOpenedDocumentList()
 	signal openedDocumentListReceived(var documentListInfo)
 	signal openedDocumentListReceiveFailed(string message)
@@ -45,6 +45,7 @@ QtObject {
 	// typeOperation: NewDocumentCreated, DocumentOpened, DocumentChanged, DocumentSaved, DocumentClosed
 	// hasChanges - has document changes
 	signal documentManagerChanged(string typeOperation, string objectId, string documentId)
+	signal startUpdateRepresentation(string documentId, var representation)
 	signal documentRepresentationUpdated(string documentId, var representation)
 	signal documentGuiUpdated(string documentId, var representation)
 
@@ -287,7 +288,7 @@ QtObject {
 		}
 
 		__internal.openedDocuments[index].isDirty = isDirty
-		
+
 		documentIsDirtyChanged(documentId, isDirty)
 	}
 

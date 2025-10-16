@@ -94,6 +94,8 @@ QtObject {
 				break
 			}
 		}
+
+		documentManager.startUpdateRepresentation(documentId, representation)
 	}
 
 	function onRepresentationUpdated(documentId, representation){
