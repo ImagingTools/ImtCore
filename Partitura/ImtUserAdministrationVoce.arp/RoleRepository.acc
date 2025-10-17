@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5352" Description="ACF"/>
-            <Version Id="1" Number="2237" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -82,6 +82,7 @@
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="PostgresDatabaseObjectCollection"/>
         <Interface InterfaceId="imtbase::IRevisionController" ComponentId="PostgresDatabaseObjectCollection"/>
         <Interface InterfaceId="imtdb::IDependentMetaInfoController" ComponentId="PostgresDatabaseObjectCollection"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectCollection" ComponentId="PostgresDatabaseObjectCollection"/>
         <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="PostgresDatabaseObjectCollection"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="PostgresDatabaseObjectCollection"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="PostgresDatabaseObjectCollection"/>
