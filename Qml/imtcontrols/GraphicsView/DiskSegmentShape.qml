@@ -48,7 +48,7 @@ SegmentBaseShape {
 		ctx.arc(centerScreen.x, centerScreen.y, outerRadiusScreen,  startRad, endRad, anticlockwise)
 
 		//ctx.lineTo(innerEndX, innerEndY)
-		if(innerRadius > 0){
+		if(innerRadius >= 0){
 			ctx.arc(centerScreen.x, centerScreen.y, innerRadiusScreen, endRad, startRad, !anticlockwise)
 		}
 		//ctx.lineTo(outerStartX, outerStartY)
