@@ -20,7 +20,8 @@ class QObject extends ComplexObject {
         resources: { type: QList, changed: '$resourcesChanged' },
         data: { type: QList, changed: '$dataChanged' },
 
-        _testId: { type: QString, changed: '$_testIdChanged' },
+
+        objectName: {type:QString, value:'', changed: '$objectNameChanged'},
     }
 
     static defaultSignals = {

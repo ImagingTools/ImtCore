@@ -115,8 +115,8 @@ class Item extends QtObject {
         }
     }
 
-    $_testIdChanged(){
-        if(this.$dom) this.$dom.setAttribute('_testId', this._testId)
+    $objectNameChanged(){
+        if(this.$dom) this.$dom.setAttribute('objectName', this.objectName)
     }
 
     $complete(){
