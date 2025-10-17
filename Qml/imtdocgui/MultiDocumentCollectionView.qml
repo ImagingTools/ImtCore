@@ -389,6 +389,16 @@ Item {
 				itemViewTypes[viewTypeId] = item
 
 				item.commandActivated.connect(onCommandActivated)
+				if (item.commandsController){
+					item.commandsController.setIsToggleable(viewTypeId, true)
+				}
+
+				if (index === 0){
+					if (item.commandsController){
+						item.commandsController.setToggled(viewTypeId, true)
+					}
+				}
+
 				workspaceView.documentManager.onViewInstanceCreated(documentId, item, viewTypeId)
 			}
 
@@ -403,6 +413,10 @@ Item {
 
 			function onCommandActivated(commandId){
 				let viewTypeIds = Object.keys(itemViewTypes)
+				if (!viewTypeIds.includes(commandId)){
+					return
+				}
+
 				for (let i = 0; i < viewTypeIds.length; ++i){
 					let viewTypeId = viewTypeIds[i]
 					if (viewTypeId === commandId && currentIndex !== i){
@@ -412,8 +426,9 @@ Item {
 
 					let currentItem = itemViewTypes[viewTypeId]
 					if (currentItem.commandsController){
-						currentItem.commandsController.setIsToggleable(viewTypeId, true)
-						currentItem.commandsController.setToggled(viewTypeId, viewTypeId === commandId)
+						for (let j = 0; j < viewTypeIds.length; ++j){
+							currentItem.commandsController.setToggled(viewTypeIds[j], viewTypeIds[j] === commandId)
+						}
 					}
 				}
 			}

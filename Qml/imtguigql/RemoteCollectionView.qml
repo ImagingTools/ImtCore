@@ -70,7 +70,7 @@ CollectionView {
 			additionalFieldIds: root.additionalFieldIds;
 
 			onRemoved: {
-				root.removed(objectIds)
+				root.removed()
 			}
 
 			function getHeaders(){

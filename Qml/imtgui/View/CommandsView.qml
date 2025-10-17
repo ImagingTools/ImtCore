@@ -113,8 +113,6 @@ Item {
 					Connections {
 						target: model.item
 						function onModelChanged(){
-							button.checked = model.item.m_toggled
-							
 							button.checkHidden()
 						}
 					}
@@ -141,7 +139,8 @@ Item {
 					widthFromDecorator: true;
 					heightFromDecorator: true;
 					checkable: element ? element.m_toggleable : false;
-					checked: element ? element.m_toggled : false;
+					checked: element ? element.m_toggled : false
+
 					iconSource: !element ? "" : element.m_elementItemPath === "" ? "" : element.m_enabled ? "../../../../" + Style.getIconPath(element.m_elementItemPath, Icon.State.On, Icon.Mode.Normal) :
 																						"../../../../" + Style.getIconPath(element.m_elementItemPath, Icon.State.Off, Icon.Mode.Disabled);
 					decorator: Component {

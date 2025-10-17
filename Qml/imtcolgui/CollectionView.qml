@@ -395,8 +395,6 @@ Item {
 				let paramsSet = paramsSetComp.createObject(this)
 				paramsSetController.paramsSet = paramsSet
 
-				console.log("registeredFilters", root.registeredFilters)
-
 				for (let filterKey in root.registeredFilters){
 					if (root.filterMenu.enabledFilters[filterKey]){
 						let filterModel = root.registeredFilters[filterKey]
