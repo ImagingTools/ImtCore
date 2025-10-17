@@ -27,7 +27,7 @@ BoundingBox {
 		let margin_ = Style.marginM
 		let point = getLogPosition(Qt.point(xArg, yArg))
 		let dist = AnalyticGeometry.distanceBetweenPoints2d(point, center)
-		let angle = getAngle(point.x, point.y, center)
+		let angle = getAngle(point.x, point.y, center, true)
 
 		let radiusOk = isInsideRadius(dist)
 
@@ -40,22 +40,34 @@ BoundingBox {
 		return false;
 	}
 
+	function transformAngle(angle){
+		return angle
+	}
+
 	function isInsideAngles(angle){
 		if(equalAngles){
 			return true;
 		}
 
-		let startAngle_ = startAngle >= 0 ? startAngle : startAngle + 360
-		let endAngle_ = endAngle >= 0 ? endAngle : endAngle + 360
+		let startAngle_ = startAngle
+		let endAngle_ = endAngle
+
+		if(startAngle_ < 0){
+			startAngle_ +=360
+		}
+		if(endAngle_ < 0){
+			endAngle_ +=360
+		}
 
 		let angleOk = angle >= Math.min(startAngle_, endAngle_) && angle <= Math.max(startAngle_, endAngle_);
 		if(endAngle_  > startAngle_){
 			angleOk = !angleOk
 		}
+
 		return angleOk;
 	}
 
-	function getAngle(xArg, yArg, center){
+	function getAngle(xArg, yArg, center, hasTransform){
 		let x0 = center.x
 		let y0 = center.y
 		let x_ = (xArg- x0)
@@ -74,6 +86,10 @@ BoundingBox {
 		}
 		else if(x_ <= 0 && y_ <= 0){
 			angle = Math.acos(Math.abs(x_)/r)*180/Math.PI - 180 + 360
+		}
+
+		if(hasTransform){
+			angle = transformAngle(angle)
 		}
 
 		return angle;

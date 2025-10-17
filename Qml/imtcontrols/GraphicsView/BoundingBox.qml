@@ -517,7 +517,7 @@ GraphicsShapeBase {
 		}
 	}
 
-	function getAngle(xArg, yArg, center){
+	function getAngle(xArg, yArg, center, hasTransform){
 		let x0 = center.x
 		let y0 = center.y
 		let x_ = (xArg- x0)
