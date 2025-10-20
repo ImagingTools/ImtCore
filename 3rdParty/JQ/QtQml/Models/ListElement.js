@@ -31,6 +31,10 @@ class ListElement extends QtObject {
             }
         },
     }
+
+    get index(){
+        if(this.parent) return this.parent.data.indexOf(this.__proxy)
+    }
 }
 
 

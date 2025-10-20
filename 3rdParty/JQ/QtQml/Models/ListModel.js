@@ -1,4 +1,5 @@
 const QtObject = require("../../QtQml/QtObject")
+const ListElement = require("./ListElement")
 const AbstractItemModel = require("./AbstractItemModel")
 const Real = require("../../QtQml/Real")
 const Bool = require("../../QtQml/Bool")
@@ -82,6 +83,18 @@ class ListModel extends QtObject {
 
         index = this.resources.indexOf(child)
         if(index < 0) this.resources.__push(child)
+
+        if(child instanceof ListElement){
+            index = this.data.indexOf(child)
+
+            JQApplication.updateLater(this)
+            if(index < 0) {
+                this.__changeSet.push([this.data.length, this.data.length + 1, 'append'])
+                this.data.__push(child)
+            }
+            
+            
+        }
     }
 
     append(dict){

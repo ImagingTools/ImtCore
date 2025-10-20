@@ -1890,7 +1890,6 @@ while (compiledFiles.length) {
             if (compiledFile.file.dependencies.has(compiledFiles[i].file)) {
                 compiledFiles.splice(i + 1, 0, compiledFile)
                 found = true
-                console.log('compiledFiles[i].file ', compiledFiles[i].file.fileName)
                 break
             }
         }
