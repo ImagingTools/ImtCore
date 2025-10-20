@@ -12,6 +12,9 @@ SegmentBaseShape {
 	property int lineWidth: 1;
 
 	function draw(ctx, transformMatrixArg){
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash(lineDashArray)
+		}
 
 		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : color
 		ctx.lineWidth = isSelected ? DesignScheme.selectionLineWidth : lineWidth
@@ -35,6 +38,10 @@ SegmentBaseShape {
 		ctx.stroke();
 
 		ctx.globalAlpha = 1
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash([])
+		}
+
 	}
 
 	function isInsideRadius(dist){

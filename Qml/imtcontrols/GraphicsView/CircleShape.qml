@@ -14,6 +14,10 @@ BoundingBox {
 	property real opacity: 1;
 
 	function draw(ctx, transformMatrixArg){
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash(lineDashArray)
+		}
+
 		ctx.fillStyle = color;
 		ctx.strokeStyle = borderColor;
 		ctx.lineWidth = borderWidth
@@ -36,6 +40,9 @@ BoundingBox {
 		ctx.stroke();
 		ctx.closePath();
 
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash([])
+		}
 
 		if(isSelected){
 			drawSelection(ctx, transformMatrixArg, centerScreen, radiusScreen)

@@ -12,6 +12,10 @@ SegmentBaseShape {
 	property real outerRadius: Style.sizeHintBXS;
 
 	function draw(ctx, transformMatrixArg){
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash(lineDashArray)
+		}
+
 		let startAngle_ = startAngle
 		let endAngle_ = endAngle
 		let equalAngles = Math.abs(startAngle - endAngle) < precision
@@ -71,6 +75,11 @@ SegmentBaseShape {
 			ctx.arc(centerScreen.x, centerScreen.y, innerRadiusScreen, endRad, startRad, !anticlockwise)
 			ctx.stroke();
 		}
+
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash([])
+		}
+
 	}
 
 	function isInsideRadius(dist){

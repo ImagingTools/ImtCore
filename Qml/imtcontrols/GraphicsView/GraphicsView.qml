@@ -596,7 +596,9 @@ Rectangle {
 								canvas.editShape = shape;
 							}
 						}
-						shape.isSelected = true;
+						if(shape.canSelect){
+							shape.isSelected = true;
+						}
 					}
 					else {
 						graphicsView.clearSelection()
@@ -627,7 +629,7 @@ Rectangle {
 				let shape = graphicsView.findObject(mouse.x, mouse.y)
 				if(graphicsView.isSelectionMode && mouse.modifiers & Qt.ControlModifier && !graphicsView.restrictSelect){//Ctrl
 					if(shape !== null){
-						if(!shape.isSelected){
+						if(!shape.isSelected && shape.canSelect){
 							shape.isSelected = true;
 							canvas.selectedShapeCount++
 						}
@@ -650,7 +652,9 @@ Rectangle {
 								canvas.editShape = shape;
 							}
 						}
-						shape.isSelected = true;
+						if(shape.canSelect){
+							shape.isSelected = true;
+						}
 					}
 				}
 				requestPaintPause.restart();

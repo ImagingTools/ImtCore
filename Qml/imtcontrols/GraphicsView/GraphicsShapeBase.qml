@@ -14,6 +14,7 @@ QtObject {
 	property bool hasCalibration: false
 	property bool isTouched: false;
 	property bool isSelected: false;
+	property bool canSelect: false;
 	property bool showNodes: false;
 	property bool showControlPoints: false;
 	property int touchedNodeIndex: -1;
@@ -36,6 +37,7 @@ QtObject {
 	property var mousePressedCoord: Qt.point(0,0);
 
 	property bool isHidden: false;
+	property var lineDashArray: [];
 
 	signal shapeChanged();
 	signal shapeInfo(var info);

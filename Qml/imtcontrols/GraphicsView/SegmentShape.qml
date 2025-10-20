@@ -12,6 +12,9 @@ SegmentBaseShape {
 
 	function draw(ctx, transformMatrixArg){
 
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash(lineDashArray)
+		}
 		ctx.fillStyle = sector.color
 		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : sector.borderColor
 		ctx.lineWidth = isSelected ? DesignScheme.selectionLineWidth : sector.borderWidth
@@ -45,6 +48,11 @@ SegmentBaseShape {
 		ctx.fill();
 		ctx.globalAlpha = 1
 		ctx.stroke();
+
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash([])
+		}
+
 
 		// ctx.beginPath()
 		// DesignScheme.drawNode(ctx, center, 4)
