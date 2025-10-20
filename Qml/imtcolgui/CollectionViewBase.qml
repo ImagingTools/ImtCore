@@ -233,7 +233,7 @@ ViewBase {
 					return
 				}
 
-				let count = elements.getItemsCount()
+				let count = !elements ? 0 : elements.getItemsCount()
 				if (count > 0){
 					let selectedIds = []
 					for (let i = 0; i < selection.length; i++){
