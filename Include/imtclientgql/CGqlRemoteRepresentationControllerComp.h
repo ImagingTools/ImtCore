@@ -1,6 +1,9 @@
 #pragma once
 
 
+// ACF includes
+#include <ibase/IApplicationInfo.h>
+
 // ImtCore includes
 #include <imtclientgql/CGqlRemoteRepresentationControllerCompBase.h>
 
@@ -17,6 +20,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlRemoteRepresentationControllerComp)
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID", false, "");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", false, "");
 	I_END_COMPONENT;
 
 protected:
@@ -25,6 +29,7 @@ protected:
 
 private:
 	I_ATTR(QByteArray, m_productIdAttrPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 
 

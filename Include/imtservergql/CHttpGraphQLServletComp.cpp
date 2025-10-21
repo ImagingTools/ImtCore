@@ -18,6 +18,23 @@ namespace imtservergql
 {
 
 
+// protected methods
+
+// reimplemented (IRequestHandler)
+
+bool CHttpGraphQLServletComp::IsCommandSupported(const QByteArray& commandId) const
+{
+	if (m_applicationInfoCompPtr.IsValid()){
+		QString appId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
+		if (commandId == appId + QStringLiteral("/graphql")){
+			return true;
+		}
+	}
+
+	return BaseClass::IsCommandSupported(commandId);
+}
+
+
 // reimplemented (imtrest::IRequestServlet)
 
 imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(

@@ -64,6 +64,11 @@ I_EXPORT_COMPONENT(
 			"Server connection configuration",
 			"SSL Secure Connection Server Interface Host" IM_AUTHOR("Kirill Lepskiy"));
 
+I_EXPORT_COMPONENT(
+			ServerController,
+			"Server controller",
+			"Server Controller" IM_AUTHOR("Roman Kucherenko"));
+
 
 } // namespace ImtComPck
 

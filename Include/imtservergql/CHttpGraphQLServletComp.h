@@ -29,6 +29,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (IRequestHandler)
+	virtual bool IsCommandSupported(const QByteArray& commandId) const override;
+
 	// reimplemented (imtrest::CHttpServletCompBase)
 	virtual imtrest::ConstResponsePtr OnPost(const QByteArray& commandId, const imtrest::IRequest::CommandParams& commandParams, const HeadersMap& headers, const imtrest::CHttpRequest& request) const override;
 

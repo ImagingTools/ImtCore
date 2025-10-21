@@ -20,6 +20,7 @@
 #include <imtauth/IPermissionChecker.h>
 #include <imtauth/CUserInfo.h>
 #include <imtauth/ISuperuserProvider.h>
+#include <imtauth/IUserPermissionsController.h>
 
 
 namespace imtauthgql
@@ -30,7 +31,8 @@ class CSimpleLoginWrapComp:
 			public imtclientgql::CClientRequestManagerCompBase,
 			public iauth::ILogin,
 			public iauth::IRightsProvider,
-			public imtauth::IAccessTokenProvider
+			public imtauth::IAccessTokenProvider,
+			virtual public imtauth::IUserPermissionsController
 {
 public:
 	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
@@ -39,6 +41,7 @@ public:
 		I_REGISTER_INTERFACE(ILogin);
 		I_REGISTER_INTERFACE(IRightsProvider);
 		I_REGISTER_INTERFACE(IAccessTokenProvider);
+		I_REGISTER_INTERFACE(imtauth::IUserPermissionsController);
 		I_ASSIGN(m_userInfoFactCompPtr, "UserFactory", "Factory used for creation of the new user", true, "UserFactory");
 		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
 		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Superuser provider", false, "SuperuserProvider");
@@ -59,6 +62,10 @@ public:
 
 	// reimplemented (imtauth::IAccessTokenProvider)
 	virtual QByteArray GetToken(const QByteArray& userId) const override;
+
+	// reimplemented (imtauth::IUserPermissionsController)
+	virtual QByteArrayList GetPermissions(const QByteArray& userId) const override;
+	virtual void SetPermissions(const QByteArray& userId, const QByteArrayList& permissions) override;
 
 private:
 	mutable iauth::CUser m_loggedUser;

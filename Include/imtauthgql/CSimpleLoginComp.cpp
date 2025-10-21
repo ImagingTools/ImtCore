@@ -73,6 +73,9 @@ QByteArrayList CSimpleLoginComp::GetPermissions(const QByteArray& /*userId*/) co
 void CSimpleLoginComp::SetPermissions(const QByteArray& userId, const QByteArrayList& permissions)
 {
 	if (m_userPermissionIds != permissions){
+		istd::CChangeNotifier notifier(this);
+		Q_UNUSED(notifier);
+
 		m_userPermissionIds = permissions;
 	}
 }

@@ -40,8 +40,6 @@ public:
 		I_ASSIGN(m_quickItemCreatedCompPtr, "QuickItemCreated", "Quick item created", false, "QuickItemCreated");
 		I_ASSIGN_TO(m_quickItemCreatedModelCompPtr, m_quickItemCreatedCompPtr, false);
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product-ID", false, "");
-		I_ASSIGN(m_productIdParamCompPtr, "ProductIdParam", "Product-ID parameter", false, "ProductIdParam");
-		I_ASSIGN_TO(m_productIdModelCompPtr, m_productIdParamCompPtr, false);
 	I_END_COMPONENT;
 
 	CAdministrationObserverQmlComp();
@@ -61,7 +59,7 @@ private Q_SLOTS:
 private:
 	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
 	void OnQuickItemCreatedUpdate(const istd::IChangeable::ChangeSet& changeSet, const iprm::IEnableableParam* objectPtr);
-	void OnProductIdUpdate(const istd::IChangeable::ChangeSet& changeSet, const iprm::IIdParam* objectPtr);
+	void OnServerConnectionParamUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IServerConnectionInterface* objectPtr);
 
 private:
 	I_REF(iauth::ILogin, m_loginCompPtr);
@@ -69,13 +67,11 @@ private:
 	I_REF(iprm::IEnableableParam, m_quickItemCreatedCompPtr);
 	I_REF(imod::IModel, m_quickItemCreatedModelCompPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionParamCompPtr);
-	I_REF(iprm::IIdParam, m_productIdParamCompPtr);
-	I_REF(imod::IModel, m_productIdModelCompPtr);
 	I_ATTR(QByteArray, m_productIdAttrPtr);
 
 	imtbase::TModelUpdateBinder<iauth::ILogin, CAdministrationObserverQmlComp> m_loginObserver;
 	imtbase::TModelUpdateBinder<iprm::IEnableableParam, CAdministrationObserverQmlComp> m_quickItemCreatedObserver;
-	imtbase::TModelUpdateBinder<iprm::IIdParam, CAdministrationObserverQmlComp> m_productIdParamObserver;
+	imtbase::TModelUpdateBinder<imtcom::IServerConnectionInterface, CAdministrationObserverQmlComp> m_serverConnectionParamObserver;
 	iqtgui::CHierarchicalCommand m_commandsList;
 };
 

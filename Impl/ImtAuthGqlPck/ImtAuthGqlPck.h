@@ -74,7 +74,7 @@ typedef imtauthgql::CRemoteUserControllerComp RemoteUserController;
 typedef imtauthgql::CRemoteAuthorizationControllerComp RemoteAuthorizationController;
 typedef imtauthgql::CUserActionCollectionControllerComp UserActionCollectionController;
 typedef imtauthgql::CUserActionMetaInfoDelegateComp UserActionMetaInfoDelegate;
-typedef imtauthgql::CSimpleLoginComp SimpleLogin;
+typedef icomp::TModelCompWrap<imtauthgql::CSimpleLoginComp> SimpleLogin;
 
 
 } // namespace ImtAuthGqlPck

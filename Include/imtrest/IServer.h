@@ -25,12 +25,14 @@ public:
 		Start server
 	*/
 	virtual bool StartServer() = 0;
+
 	/**
-	   Stop server
+		Stop server
 	*/
 	virtual bool StopServer() = 0;
+
 	/**
-	   Get current server status
+		Get current server status
 	*/
 	virtual ServerStatus GetServerStatus() const = 0;
 };

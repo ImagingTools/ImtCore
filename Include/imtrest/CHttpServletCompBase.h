@@ -5,6 +5,7 @@
 #include <QtCore/QMutex>
 
 // ACF includes
+#include <ibase/IApplicationInfo.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFileNameParam.h>
 #include <iprm/IIdParam.h>
@@ -35,6 +36,7 @@ public:
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "List of command-ID used with corresponded handlers", true, "");
 		I_ASSIGN(m_commandIdCompPtr, "CommandIdParam", "Component provided list of command-ID used with corresponded handlers", false, "CommandIdParam");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", false, "ApplicationInfo");
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)
@@ -102,6 +104,7 @@ protected:
 protected:
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
 	I_REF(iprm::IIdParam, m_commandIdCompPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 
 

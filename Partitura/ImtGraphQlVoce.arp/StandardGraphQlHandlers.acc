@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5347" Description="ACF"/>
-            <Version Id="1" Number="2236" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Server framework for GraphQL-based implementations</Description>
@@ -91,6 +91,9 @@
         <Element Id="GraphQlRoot" PackageId="ImtServerGqlPck" ComponentId="GraphQLServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="GraphQlCommandId">
                         <Data IsEnabled="true" Value="&lt;ProductName&gt;/graphql"/>
                     </AttributeInfo>

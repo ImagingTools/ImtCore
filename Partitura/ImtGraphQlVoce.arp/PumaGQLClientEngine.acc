@@ -144,6 +144,9 @@
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -424,6 +427,9 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">

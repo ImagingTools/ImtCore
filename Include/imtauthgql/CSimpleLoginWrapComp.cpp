@@ -89,7 +89,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			m_userInfoPtr->SetLocalPermissions(productId, response.Version_1_0->permissions->split(';'));
 		}
 
-		m_userPermissionIds = m_userInfoPtr->GetPermissions(productId);
+		m_userPermissionIds = m_userInfoPtr->GetLocalPermissions(productId);
 
 		if (response.Version_1_0->token){
 			m_loggedUserToken = *response.Version_1_0->token;
@@ -153,6 +153,25 @@ bool CSimpleLoginWrapComp::HasRight(
 QByteArray CSimpleLoginWrapComp::GetToken(const QByteArray& /*userId*/) const
 {
 	return m_loggedUserToken;
+}
+
+
+// reimplemented (imtauth::IUserPermissionsController)
+
+QByteArrayList CSimpleLoginWrapComp::GetPermissions(const QByteArray& userId) const
+{
+	return m_userPermissionIds;
+}
+
+
+void CSimpleLoginWrapComp::SetPermissions(const QByteArray& userId, const QByteArrayList& permissions)
+{
+	if (m_userPermissionIds != permissions){
+		istd::CChangeNotifier notifier(this);
+		Q_UNUSED(notifier);
+
+		m_userPermissionIds = permissions;
+	}
 }
 
 

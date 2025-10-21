@@ -33,6 +33,15 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		return nullptr;
 	}
 
+	QByteArray productId;
+	if (m_productIdAttrPtr.IsValid()){
+		productId = *m_productIdAttrPtr;
+	}
+
+	if (m_applicationInfoCompPtr.IsValid()){
+		productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
 	const imtgql::CGqlParamObject* inputParam = gqlRequestPtr->GetParamObject("input");
 	if (inputParam != nullptr){
 		istd::TDelPtr<imtgql::CGqlParamObject> newInputParamPtr;
@@ -44,12 +53,12 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 			return nullptr;
 		}
 
-		newInputParamPtr->InsertParam("productId", QVariant(*m_productIdAttrPtr));
+		newInputParamPtr->InsertParam("productId", QVariant(productId));
 		gqlRequestPtr->AddParam("input", *newInputParamPtr.GetPtr());
 	}
 	else{
 		imtgql::CGqlParamObject inputGqlObject;
-		inputGqlObject.InsertParam("productId", QVariant(*m_productIdAttrPtr));
+		inputGqlObject.InsertParam("productId", QVariant(productId));
 
 		gqlRequestPtr->AddParam("input", inputGqlObject);
 	}

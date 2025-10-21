@@ -8,7 +8,7 @@ namespace imtauthgui
 CAdministrationObserverQmlComp::CAdministrationObserverQmlComp()
 	:m_loginObserver(*this),
 	m_quickItemCreatedObserver(*this),
-	m_productIdParamObserver(*this)
+	m_serverConnectionParamObserver(*this)
 {
 }
 
@@ -37,8 +37,8 @@ void CAdministrationObserverQmlComp::OnComponentCreated()
 		m_quickItemCreatedObserver.RegisterObject(m_quickItemCreatedCompPtr.GetPtr(), &CAdministrationObserverQmlComp::OnQuickItemCreatedUpdate);
 	}
 
-	if (m_productIdParamCompPtr.IsValid()){
-		m_productIdParamObserver.RegisterObject(m_productIdParamCompPtr.GetPtr(), &CAdministrationObserverQmlComp::OnProductIdUpdate);
+	if (m_serverConnectionParamCompPtr.IsValid()){
+		m_serverConnectionParamObserver.RegisterObject(m_serverConnectionParamCompPtr.GetPtr(), &CAdministrationObserverQmlComp::OnServerConnectionParamUpdate);
 	}
 }
 
@@ -47,7 +47,7 @@ void CAdministrationObserverQmlComp::OnComponentDestroyed()
 {
 	m_loginObserver.UnregisterAllObjects();
 	m_quickItemCreatedObserver.UnregisterAllObjects();
-	m_productIdParamObserver.UnregisterAllObjects();
+	m_serverConnectionParamObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -164,10 +164,6 @@ void CAdministrationObserverQmlComp::OnQuickItemCreatedUpdate(const istd::IChang
 				productId = *m_productIdAttrPtr;
 			}
 
-			if (m_productIdParamCompPtr.IsValid()){
-				productId = m_productIdParamCompPtr->GetId();
-			}
-
 			if (!productId.isEmpty()){
 				quickItem->setProperty("productId", *m_productIdAttrPtr);
 			}
@@ -186,18 +182,24 @@ void CAdministrationObserverQmlComp::OnQuickItemCreatedUpdate(const istd::IChang
 }
 
 
-void CAdministrationObserverQmlComp::OnProductIdUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IIdParam* /*objectPtr*/)
+void CAdministrationObserverQmlComp::OnServerConnectionParamUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtcom::IServerConnectionInterface* objectPtr)
 {
-	if (!m_productIdParamCompPtr.IsValid()){
+	if (objectPtr == nullptr){
 		return;
 	}
 
-	if (m_quickObjectCompPtr.IsValid()){
-		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
-		if (quickItem != nullptr){
-			QByteArray productId = m_productIdParamCompPtr->GetId();
-			quickItem->setProperty("productId", productId);
-		}
+	if (!m_quickObjectCompPtr.IsValid()){
+		return;
+	}
+
+	QQuickItem* quickItemPtr = m_quickObjectCompPtr->GetQuickItem();
+	if (quickItemPtr == nullptr){
+		return;
+	}
+
+	QUrl url;
+	if (objectPtr->GetUrl(imtcom::IServerConnectionInterface::PT_WEBSOCKET, url)){
+		quickItemPtr->setProperty("webSocketUrl", url.toString());
 	}
 }
 

@@ -12,16 +12,17 @@ namespace imtqml
 // public methods
 
 CGqlQuickObjectComp::CGqlQuickObjectComp()
-	:m_serverConnectionObserver(*this)
+	:m_serverConnectionObserver(*this),
+	m_applicationInfoObserver(*this)
 {
 }
 
 
 // reimplemented (CQuickObjectCompBase)
 
-bool CGqlQuickObjectComp::InitializeEngine(QQmlEngine& qmlEngine) const
+bool CGqlQuickObjectComp::InitializeEngine(QQmlEngine& /*qmlEngine*/) const
 {
-	SetBaseUrl(qmlEngine);
+	SetBaseUrl();
 
 	return true;
 }
@@ -54,12 +55,17 @@ void CGqlQuickObjectComp::OnComponentCreated()
 	if (m_serverConnectionParamPtr.IsValid()){
 		m_serverConnectionObserver.RegisterObject(m_serverConnectionParamPtr.GetPtr(), &CGqlQuickObjectComp::OnServerConnectionParamChanged);
 	}
+
+	if (m_applicationInfoCompPtr.IsValid()){
+		m_applicationInfoObserver.RegisterObject(m_applicationInfoCompPtr.GetPtr(), &CGqlQuickObjectComp::OnApplicationInfoChanged);
+	}
 }
 
 
 void CGqlQuickObjectComp::OnComponentDestroyed()
 {
 	m_serverConnectionObserver.UnregisterAllObjects();
+	m_applicationInfoObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -67,24 +73,29 @@ void CGqlQuickObjectComp::OnComponentDestroyed()
 
 // private methods
 
-void CGqlQuickObjectComp::OnServerConnectionParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtcom::IServerConnectionInterface* serverConnectionParamPtr)
+void CGqlQuickObjectComp::OnServerConnectionParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtcom::IServerConnectionInterface* /*serverConnectionParamPtr*/)
 {
-	if (!m_applicationInfoCompPtr.IsValid()){
+	SetBaseUrl();
+}
+
+
+void CGqlQuickObjectComp::OnApplicationInfoChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IApplicationInfoController* /*applicationInfoControllerPtr*/)
+{
+	SetBaseUrl();
+}
+
+
+void CGqlQuickObjectComp::SetBaseUrl() const 
+{
+	if (m_quickItemPtr == nullptr){
 		return;
 	}
 
-	if (serverConnectionParamPtr != nullptr){
-		if (m_quickItemPtr != nullptr){
-			QQmlEngine* qmlEnginePtr = qmlEngine(m_quickItemPtr);
-			if (qmlEnginePtr != nullptr){
-				SetBaseUrl(*qmlEnginePtr);
-			}
-		}
+	QQmlEngine* qmlEnginePtr = qmlEngine(m_quickItemPtr);
+	if (qmlEnginePtr == nullptr){
+		return;
 	}
-}
 
-void CGqlQuickObjectComp::SetBaseUrl(QQmlEngine& qmlEngine) const
-{
 	QString baseUrl;
 	if (m_serverConnectionParamPtr.IsValid()){
 		QUrl url;
@@ -97,12 +108,16 @@ void CGqlQuickObjectComp::SetBaseUrl(QQmlEngine& qmlEngine) const
 		baseUrl = *m_baseUrlAttrPtr;
 	}
 
-	QString appId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID);
-	if (!appId.isEmpty() && !baseUrl.isEmpty()){
-		baseUrl += "/" + appId;
+	QByteArray suffix;
+	if (m_applicationInfoCompPtr.IsValid()){
+		suffix = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	qmlEngine.setBaseUrl(baseUrl);
+	if (!suffix.isEmpty() && !baseUrl.isEmpty()){
+		baseUrl += "/" + suffix;
+	}
+
+	qmlEnginePtr->setBaseUrl(baseUrl);
 }
 
 

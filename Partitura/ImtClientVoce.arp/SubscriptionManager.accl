@@ -8,10 +8,10 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="SslConfigurationManager" X="280" Y="60" Note=""/>
-        <Element ComponentName="SubscriptionManager" X="560" Y="-240" Note=""/>
-        <Element ComponentName="WebSocketClient" X="300" Y="-60" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="880" Y="-60" Note=""/>
+        <Element ComponentName="SslConfigurationManager" X="275" Y="500" Note=""/>
+        <Element ComponentName="SubscriptionManager" X="550" Y="75" Note=""/>
+        <Element ComponentName="WebSocketClient" X="275" Y="275" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="850" Y="275" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

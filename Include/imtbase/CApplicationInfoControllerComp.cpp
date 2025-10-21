@@ -15,7 +15,9 @@ namespace imtbase
 
 void CApplicationInfoControllerComp::SetApplicationAttribute(ApplicationAttribute attributeId, const QString& attribute)
 {
-	QMutexLocker locker(&m_attributesMutex);
+	// QMutexLocker locker(&m_attributesMutex);
+
+	istd::CChangeNotifier changeNotifier(this);
 
 	m_attributes[attributeId] = attribute;
 }
@@ -25,7 +27,7 @@ void CApplicationInfoControllerComp::SetApplicationAttribute(ApplicationAttribut
 
 QString CApplicationInfoControllerComp::GetApplicationAttribute(int attributeId, bool /*allowTranslation*/) const
 {
-	QMutexLocker locker(&m_attributesMutex);
+	// QMutexLocker locker(&m_attributesMutex);
 
 	if (m_attributes.contains(attributeId)){
 		return m_attributes[attributeId];

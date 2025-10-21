@@ -17,10 +17,11 @@
 #include <imtcom/CSslProtocolOptionList.h>
 #include <imtcom/CSslVerifyModeOptionList.h>
 #include <imtcom/CServerConnectionInterfaceParamComp.h>
+#include <imtcom/CServerDispatcherComp.h>
 
 
 /**
-	ImtGuiPck package
+	ImtComPck package
 */
 namespace ImtComPck
 {
@@ -51,6 +52,7 @@ typedef icomp::TModelCompWrap<
 		imtcom::CSslVerifyModeOptionList,
 		iser::ISerializable, iprm::IOptionsManager, iprm::IOptionsList, iprm::ISelectionParam>> SslVerifyModeOptionList;
 typedef icomp::TModelCompWrap<imtcom::CServerConnectionInterfaceParamComp> ServerConnectionInterfaceParam;
+typedef imtcom::CServerDispatcherComp ServerController;
 
 
 } // namespace ImtComPck
