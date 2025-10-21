@@ -79,6 +79,7 @@ QtObject {
 	property UserTokenProvider userTokenProvider: UserTokenProvider {
 		productId: root.productId;
 		onAccepted: {
+			console.log("UserTokenProvider onAccepted")
 			if (Qt.platform.os == "web"){
 				root.saveDataToStorage();
 			}
@@ -218,6 +219,10 @@ QtObject {
 	function registerUser(userData){
 		registerUserInput.m_userData = userData;
 		registerUserRequestSender.send(registerUserInput)
+	}
+
+	function setLoginData(refreshToken, accessToken, userId, login, systemId, permissions){
+		userTokenProvider.setLoginData(refreshToken, accessToken, userId, login, systemId, permissions)
 	}
 
 	property RegisterUserInput registerUserInput: RegisterUserInput {

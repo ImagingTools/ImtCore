@@ -577,7 +577,7 @@ QtObject {
 			property bool isNew: true;
 			property string documentId;
 			property string documentTypeId;
-			property DocumentDataController documentDataController: null;
+			property var documentDataController: null;
 			property DocumentValidator documentValidator: DocumentValidator {};
 
 			property UndoRedoManager undoManager: UndoRedoManager {

@@ -1,6 +1,5 @@
 import QtQuick 2.12
 import Acf 1.0
-import com.imtcore.imtqml 1.0
 import imtgui 1.0
 import imtdocgui 1.0
 import imtguigql 1.0
@@ -8,8 +7,7 @@ import imtcontrols 1.0
 
 SingleDocumentWorkspacePageView {
     id: container;
-    anchors.fill: parent;
-
+    anchors.fill: parent
     pageId: "Administration";
     pageName: qsTr("Administration");
 
@@ -21,7 +19,7 @@ SingleDocumentWorkspacePageView {
     Component.onCompleted: {
         Style.setDecorators(decorators_)
     }
-	
+
 	onProductIdChanged: {
 		AuthorizationController.productId = productId
 	}
@@ -30,6 +28,7 @@ SingleDocumentWorkspacePageView {
         target: AuthorizationController;
 
 		function onLoggedIn(){
+            console.log("AuthorizationController onLoggedIn", container.productId)
             if (container.productId !== ""){
                 container.startItemSourceComp = administrationViewComp
             }
@@ -80,7 +79,13 @@ SingleDocumentWorkspacePageView {
         }
     }
 
+    function setLoginData(accessToken, username, permissions){
+        console.log("setLoginData", accessToken, username, permissions)
+		AuthorizationController.setLoginData("", accessToken, "", username, "", permissions)
+	}
+
     function login(login, password){
+        console.log("login", login, password)
         AuthorizationController.login(login, password)
     }
 

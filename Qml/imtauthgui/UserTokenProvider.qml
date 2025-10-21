@@ -34,22 +34,24 @@ QtObject {
         request.send();
     }
 
+    function setLoginData(refreshToken, accessToken, userId, login, systemId, permissions){
+		container.refreshToken = refreshToken
+		container.accessToken = accessToken
+		container.userId = userId
+		container.login = login
+		container.systemId = systemId
+		container.permissions = permissions
+
+        accepted()
+	}
+
     property GqlSdlRequestSender request : GqlSdlRequestSender {
         gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_authorization;
         sdlObjectComp:
             Component {
             AuthorizationPayload {
                 onFinished: {
-					container.refreshToken = m_refreshToken;
-					container.accessToken = m_token;
-
-                    container.userId = m_userId;
-                    container.login = m_username;
-                    container.systemId = m_systemId;
-                    if (m_permissions){
-                        container.permissions = m_permissions.split(';')
-                    }
-                    container.accepted();
+                    container.setLoginData(m_refreshToken, m_token, m_userId, m_username, m_systemId, m_permissions.split(';'))
                 }
             }
         }
