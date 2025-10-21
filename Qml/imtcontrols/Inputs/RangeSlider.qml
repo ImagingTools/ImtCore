@@ -117,6 +117,15 @@ ControlBase {
 		correctPositionParams();
 	}
 
+	onValueFirstChanged: {
+		positionFirst = (valueFirst - from)/(to - from)
+		controlRecXFirst = positionFirst * (width - controlWidth)
+	}
+
+	onValueSecondChanged: {
+		positionSecond = (valueSecond - from)/(to - from)
+		controlRecXSecond = positionSecond * (width - controlWidth)
+	}
 
 	function decoratorChangedFunc(){
 	}

@@ -87,6 +87,11 @@ ControlBase {
 
 	}
 
+	onValueChanged: {
+		position = (value - from)/(to - from)
+		controlRecX = position * (width - controlWidth)
+	}
+
 	onWidthChanged: {
 		controlRecX = position * (width - controlWidth)
 	}
