@@ -7,6 +7,7 @@ ControlBase {
 	id: slider;
 
 	rotation: orientation == Qt.Vertical ? -90 : 0;
+	transformOrigin: Item.TopRight
 
 	decorator: Style.sliderDecorator
 

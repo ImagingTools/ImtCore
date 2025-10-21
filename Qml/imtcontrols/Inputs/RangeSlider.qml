@@ -8,6 +8,8 @@ ControlBase {
 
 	rotation: orientation == Qt.Vertical ? -90 : 0;
 
+	transformOrigin: Item.TopRight
+
 	decorator: Style.rangeSliderDecorator
 
 	property real _backgroundWidth: width - controlWidth;
@@ -49,6 +51,8 @@ ControlBase {
 
 	property alias tooltipText: tooltip.text;
 	property alias tooltipItem: tooltip;
+
+	property bool marginsChanged: false
 
 
 	Component.onCompleted: {
@@ -179,7 +183,7 @@ ControlBase {
 		}
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom && indicatorPosition == RelativePosition.top){
 			controlCenterY = indicatorHeight;
-			height = majorTickHeight + indicatorHeight;
+			height = majorTickHeight + indicatorHeight + fontSize;
 		}
 
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter && indicatorPosition == RelativePosition.top){
@@ -189,6 +193,17 @@ ControlBase {
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter && indicatorPosition == RelativePosition.bottom){
 			controlCenterY =  majorTickHeight/2
 			height = majorTickHeight/2 + indicatorHeight;
+		}
+
+		if(!marginsChanged && orientation == Qt.Vertical){
+			if(anchors.right !==undefined){
+				anchors.rightMargin += height
+			}
+			else if(anchors.left !==undefined){
+				// anchors.leftMargin += width
+			}
+
+			marginsChanged = true;
 		}
 	}
 
