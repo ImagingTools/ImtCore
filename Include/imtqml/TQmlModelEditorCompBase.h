@@ -38,7 +38,7 @@ protected:
 	/**
 		Update the data model based on the UI-representation given as a JSON-document.
 	*/
-	virtual void UpdeteObjectFromRepresentation(const QJsonDocument& representation, ModelInterface& object) const = 0;
+	virtual void UpdateObjectFromRepresentation(const QJsonDocument& representation, ModelInterface& object) const = 0;
 
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
@@ -158,7 +158,7 @@ inline void TQmlModelEditorCompBase<ModelInterface>::OnRepresentationChanged()
 
 				QJsonDocument jsonDocument = QJsonDocument::fromJson(jsonRepresentation.toUtf8());
 
-				UpdeteObjectFromRepresentation(jsonDocument, *objectPtr);
+				UpdateObjectFromRepresentation(jsonDocument, *objectPtr);
 			}
 		}
 	}
