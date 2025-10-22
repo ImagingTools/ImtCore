@@ -18,7 +18,7 @@ BoundingBox {
 			ctx.setLineDash(lineDashArray)
 		}
 
-		ctx.fillStyle = color;
+		ctx.fillStyle = getFillStyle(ctx, transformMatrixArg)
 		ctx.strokeStyle = borderColor;
 		ctx.lineWidth = borderWidth
 
@@ -121,6 +121,10 @@ BoundingBox {
 
 		ctx.stroke()
 		ctx.fill()
+	}
+
+	function getFillStyle(ctx, transformMatrixArg){
+		return color;
 	}
 }
 

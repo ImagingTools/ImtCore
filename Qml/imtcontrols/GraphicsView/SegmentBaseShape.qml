@@ -103,5 +103,8 @@ BoundingBox {
 		center = getLogPosition(centerNew)
 	}
 
+	function getFillStyle(ctx, transformMatrixArg){
+		return color;
+	}
 }
 

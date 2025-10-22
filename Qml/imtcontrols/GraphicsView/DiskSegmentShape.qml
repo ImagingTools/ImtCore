@@ -24,7 +24,7 @@ SegmentBaseShape {
 			endAngle_ = 360
 		}
 
-		ctx.fillStyle = sector.color
+		ctx.fillStyle = getFillStyle(ctx, transformMatrixArg)
 		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : sector.borderColor
 		ctx.lineWidth = isSelected ? DesignScheme.selectionLineWidth : sector.borderWidth
 
