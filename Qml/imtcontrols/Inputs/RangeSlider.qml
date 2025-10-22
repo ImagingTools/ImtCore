@@ -12,10 +12,10 @@ ControlBase {
 
 	decorator: Style.rangeSliderDecorator
 
-	property real _backgroundWidth: width - controlWidth;
+	property real _backgroundWidth: mainSize - controlWidth;
 	property int backgroundHeight: 6;
-	property string backgroundColor: "#ffc0cb";
-	property string controlColor:  "#CB4154";
+	property string backgroundColor: Style.selectedColor//"#ffc0cb";
+	property string controlColor:  Style.imaginToolsAccentColor//"#CB4154";
 
 	property real backgroundOpacity: 1.;
 
@@ -27,12 +27,14 @@ ControlBase {
 	property real from: 0.0;
 	property real to: 1.0;
 
+	property real mainSize: width//orientation == Qt.Vertical ? height : width
+	property real secondSize: orientation == Qt.Vertical ? width : height
 	property real controlRecXFirst: 0;
-	property real positionFirst: controlRecXFirst/(width - controlWidth);
+	property real positionFirst: controlRecXFirst/(mainSize - controlWidth);
 	property real valueFirst: positionFirst * (to - from) + from;
 
 	property real controlRecXSecond: controlWidth;
-	property real positionSecond: controlRecXSecond/(width - controlWidth);
+	property real positionSecond: controlRecXSecond/(mainSize - controlWidth);
 	property real valueSecond: positionSecond * (to - from) + from;
 
 	property int majorTickInterval: 0;
@@ -40,6 +42,7 @@ ControlBase {
 
 	property bool hasTicks: majorTickInterval > 0;
 	property bool hasIndicator: false;
+	property bool hasTooltip: false;
 	property int majorTickHeight: Style.controlHeightM;
 	property int minorTickHeight: majorTickHeight/2;
 	property int indicatorHeight: 2*Style.controlHeightM;
@@ -68,10 +71,10 @@ ControlBase {
 			ma.canMoveSecond = true;
 		}
 		positionFirst = (valueFirst - from)/(to - from)
-		controlRecXFirst = positionFirst * (width - controlWidth)
+		controlRecXFirst = positionFirst * (mainSize - controlWidth)
 
 		positionSecond = (valueSecond - from)/(to - from)
-		controlRecXSecond = positionSecond * (width - controlWidth)
+		controlRecXSecond = positionSecond * (mainSize - controlWidth)
 
 		setSizeParams();
 
@@ -101,13 +104,13 @@ ControlBase {
 
 		setSizeParams();
 
-		controlRecXFirst = positionFirst * (width - controlWidth)
-		controlRecXSecond = positionSecond * (width - controlWidth)
+		controlRecXFirst = positionFirst * (mainSize - controlWidth)
+		controlRecXSecond = positionSecond * mainSize
 	}
 
 	onWidthChanged: {
-		controlRecXFirst = positionFirst * (width - controlWidth)
-		controlRecXSecond = positionSecond * (width - controlWidth)
+		controlRecXFirst = positionFirst * (mainSize - controlWidth)
+		controlRecXSecond = positionSecond * (mainSize - controlWidth)
 	}
 
 	onTicksPositionChanged: {
@@ -119,12 +122,12 @@ ControlBase {
 
 	onValueFirstChanged: {
 		positionFirst = (valueFirst - from)/(to - from)
-		controlRecXFirst = positionFirst * (width - controlWidth)
+		controlRecXFirst = positionFirst * (mainSize - controlWidth)
 	}
 
 	onValueSecondChanged: {
 		positionSecond = (valueSecond - from)/(to - from)
-		controlRecXSecond = positionSecond * (width - controlWidth)
+		controlRecXSecond = positionSecond * (mainSize - controlWidth)
 	}
 
 	function decoratorChangedFunc(){
@@ -230,12 +233,13 @@ ControlBase {
 		property bool canMoveSecond: false;
 
 		onPressed: {
+			let margin_ = Style.marginM
 			let add = -slider.controlWidth/2;
 			let x_ = mouse.x + add;
 
-			let withinContolXFirst = (mouse.x >= slider.controlRecXFirst && mouse.x <= slider.controlRecXFirst + slider.controlWidth)
-			let withinContolXSecond = (mouse.x >= slider.controlRecXSecond && mouse.x <= slider.controlRecXSecond + slider.controlWidth)
-			let withinContolY = (mouse.y >= slider.controlCenterY - slider.controlHeight/2 && mouse.y<= slider.controlCenterY + slider.controlHeight/2)
+			let withinContolXFirst = (mouse.x >= slider.controlRecXFirst - margin_ && mouse.x <= slider.controlRecXFirst + slider.controlWidth + margin_)
+			let withinContolXSecond = (mouse.x >= slider.controlRecXSecond - margin_ && mouse.x <= slider.controlRecXSecond + slider.controlWidth + margin_)
+			let withinContolY = (mouse.y >= slider.controlCenterY - slider.controlHeight/2 - margin_ && mouse.y<= slider.controlCenterY + slider.controlHeight/2 + margin_)
 			let withinContolFirst = withinContolXFirst && withinContolY
 			let withinContolSecond = withinContolXSecond && withinContolY
 
@@ -380,7 +384,7 @@ ControlBase {
 
 			}
 
-			else  if(!slider.hasIndicator){
+			else if(!slider.hasIndicator && slider.hasTooltip){
 				let withinContolXFirst = (mouse.x >= slider.controlRecXFirst && mouse.x <= slider.controlRecXFirst + slider.controlWidth)
 				let withinContolXSecond = (mouse.x >= slider.controlRecXSecond && mouse.x <= slider.controlRecXSecond + slider.controlWidth)
 				let withinContolY = (mouse.y >= slider.controlCenterY - slider.controlHeight/2 && mouse.y<= slider.controlCenterY + slider.controlHeight/2)

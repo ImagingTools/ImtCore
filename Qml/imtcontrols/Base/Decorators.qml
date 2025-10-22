@@ -991,7 +991,7 @@ StyleComponents {
 					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundHeight;
 					color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.backgroundColor;
 
-					radius: height;
+					radius: 0//height;
 
 					opacity: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundOpacity;
 
