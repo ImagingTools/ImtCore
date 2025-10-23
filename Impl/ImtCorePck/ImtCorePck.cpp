@@ -219,6 +219,11 @@ I_EXPORT_COMPONENT(
 			"Application info controller",
 			"Application Info Controller");
 
+I_EXPORT_COMPONENT(
+			ApplicationInfoDelegator,
+			"Application info delegator",
+			"Application Info Delegator");
+
 
 } // namespace ImtCorePck
 

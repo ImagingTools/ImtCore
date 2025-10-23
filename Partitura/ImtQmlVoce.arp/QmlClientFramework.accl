@@ -2,19 +2,20 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5422" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApplicationInfo" X="1000" Y="125" Note=""/>
+        <Element ComponentName="ApplicationInfoDelegator" X="1025" Y="300" Note=""/>
         <Element ComponentName="ApplicationLocalization" X="225" Y="125" Note=""/>
         <Element ComponentName="Context" X="575" Y="450" Note=""/>
         <Element ComponentName="Language" X="475" Y="200" Note=""/>
         <Element ComponentName="LogFilePath" X="150" Y="375" Note=""/>
         <Element ComponentName="LogSystemLocation" X="150" Y="275" Note=""/>
-        <Element ComponentName="MainWindow" X="1050" Y="450" Note=""/>
+        <Element ComponentName="MainWindow" X="1050" Y="451" Note=""/>
         <Element ComponentName="ObserverQml" X="825" Y="450" Note=""/>
         <Element ComponentName="QuickApplication" X="600" Y="125" Note=""/>
         <Element ComponentName="TextFileLog" X="150" Y="500" Note=""/>
