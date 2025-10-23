@@ -22,6 +22,12 @@ type SdlPoint
 	y: Double!
 }
 
+type SdlRange
+{
+	from: Double!
+	to: Double!
+}
+
 type ParamTypeIds
 {
 	UrlParam: ID
