@@ -37,6 +37,7 @@ ControlBase {
 	property bool canMove: true;
 	property bool canResize: false;
 	property bool decoratorVisible: !decorator_ ? true: decorator_.visible;
+	property bool escapeEnabled: true;
 
 	property bool closeAfterPause: false;
 	property int displayDuration: 2000;
@@ -203,7 +204,7 @@ ControlBase {
 
 	Shortcut {
 		sequence: "Escape";
-		enabled: true;
+		enabled: dialogContainer.escapeEnabled;
 		onActivated: {
 			dialogContainer.finished(Enums.cancel)
 		}

@@ -686,6 +686,8 @@ StyleComponents {
 									anchors.horizontalCenter: parent.horizontalCenter;
 
 									color: parent.color;
+									font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
+
 									text: Math.trunc(sliderItem.baseElement.from + model.index * (sliderItem.baseElement.to - sliderItem.baseElement.from)/majorTickRepeater.count);
 								}
 							}
@@ -705,6 +707,8 @@ StyleComponents {
 
 									anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
 									anchors.horizontalCenter: parent.horizontalCenter;
+
+									font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
 
 									color: parent.color;
 									text: Math.trunc(sliderItem.baseElement.to)
@@ -769,8 +773,6 @@ StyleComponents {
 					height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.backgroundHeight;
 					color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.backgroundColor;
 
-					radius: height;
-
 					opacity: !sliderItem.baseElement ? 0 : sliderItem.baseElement.backgroundOpacity;
 
 					Rectangle{
@@ -803,14 +805,18 @@ StyleComponents {
 						anchors.topMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
 
 						height: parent.width;
-						width: Style.controlHeightM;
+						width: indicatorText.width//Style.controlHeightM;
 						color: Style.textColor//Style.borderColor;
 						property bool isLeft: !sliderItem.baseElement ? false : sliderItem.baseElement.value > sliderItem.baseElement.to/2;
 
 						BaseText{
+							id: indicatorText
+
 							anchors.horizontalCenter: parent.horizontalCenter;
 							anchors.bottom: parent.bottom;
 							anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
+
+							font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
 
 							text: !sliderItem.baseElement ? "" : Math.trunc(sliderItem.baseElement.value)
 						}

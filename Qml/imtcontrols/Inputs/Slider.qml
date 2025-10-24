@@ -14,8 +14,8 @@ ControlBase {
 
 	property real _backgroundWidth: width - controlWidth;
 	property int backgroundHeight: 6;
-	property string backgroundColor: "#ffc0cb";
-	property string controlColor:  "#CB4154";
+	property string backgroundColor: Style.selectedColor//"#ffc0cb";
+	property string controlColor:  Style.imaginToolsAccentColor//"#CB4154";
 
 	property real backgroundOpacity: 1.;
 
@@ -47,6 +47,8 @@ ControlBase {
 	property alias tooltipText: tooltip.text;
 	property alias tooltipItem: tooltip;
 
+	property bool marginsChanged: false
+	property bool hasTooltip: false;
 
 	Component.onCompleted: {
 		correctPositionParams();
@@ -179,6 +181,17 @@ ControlBase {
 			controlCenterY =  majorTickHeight/2
 			height = majorTickHeight/2 + indicatorHeight;
 		}
+
+		if(!marginsChanged && orientation == Qt.Vertical){
+			if(anchors.right !==undefined){
+				anchors.rightMargin += height
+			}
+			else if(anchors.left !==undefined){
+				// anchors.leftMargin += width
+			}
+
+			marginsChanged = true;
+		}
 	}
 
 	MouseArea{
@@ -194,9 +207,10 @@ ControlBase {
 		property real pressedX: 0.0;
 
 		onPressed: {
+			let margin_ = Style.marginM
 			pressedX = mouse.x;
-			let withinContolX = (mouse.x >= slider.controlRecX && mouse.x <= slider.controlRecX + slider.controlWidth)
-			let withinContolY = (mouse.y >= slider.controlCenterY - slider.controlHeight/2 && mouse.y<= slider.controlCenterY + slider.controlHeight/2)
+			let withinContolX = (mouse.x >= slider.controlRecX - margin_ && mouse.x <= slider.controlRecX + slider.controlWidth + margin_)
+			let withinContolY = (mouse.y >= slider.controlCenterY - slider.controlHeight/2 - margin_ && mouse.y<= slider.controlCenterY + slider.controlHeight/2 + margin_)
 			if(withinContolX && withinContolY){
 				ma.canDrag = true;
 			}
@@ -260,7 +274,7 @@ ControlBase {
 				slider.value = slider.position * (slider.to - slider.from) + slider.from;
 			}
 
-			else if(!slider.hasIndicator){
+			else if(!slider.hasIndicator && slider.hasTooltip){
 				let withinContolX = (mouse.x >= slider.controlRecX && mouse.x <= slider.controlRecX + slider.controlWidth)
 				let withinContolY = (mouse.y >= slider.controlCenterY - slider.controlHeight/2 && mouse.y<= slider.controlCenterY + slider.controlHeight/2)
 

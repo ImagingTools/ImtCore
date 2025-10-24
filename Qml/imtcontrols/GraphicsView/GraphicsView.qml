@@ -65,6 +65,7 @@ Rectangle {
 	property alias deltaY: canvas.deltaY;
 	property alias viewMatrix: canvasMatrix;
 	property alias mouseArea: controlArea;
+	property alias canvasAlias: canvas;
 
 	property var hintShapeModel: []
 	property var hintShapePointModel: []
@@ -84,6 +85,7 @@ Rectangle {
 
 	property bool canvasAntialiasing: true
 	property int renderStrategy: Canvas.Threaded
+	property int paintPauseDuration: 10
 
 	signal copySignal(int index);
 	signal pasteSignal(int index);
@@ -910,7 +912,7 @@ Rectangle {
 
 			PauseAnimation {
 				id: requestPaintPause;
-				duration: 10
+				duration: graphicsView.paintPauseDuration
 				onFinished: {
 					canvas.requestPaint();
 				}
