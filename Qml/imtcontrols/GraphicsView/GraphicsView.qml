@@ -36,6 +36,7 @@ Rectangle {
 	property bool restrictZoom: false;
 	property bool restrictMove: false;
 	property bool restrictSelect: false;
+	property bool restrictMouseReacion: false;
 	property bool zoomOnlyInCenter: false;
 	property int restrictMoveMargin: -1;
 	property bool fitToBorders: false;
@@ -565,6 +566,9 @@ Rectangle {
 				if(graphicsView.receiveMouseEvents){
 					graphicsView.mouseClicked(mouse)
 				}
+				if(graphicsView.restrictMouseReacion){
+					return
+				}
 
 				let activeLayer = graphicsView.getActiveLayer()
 
@@ -579,6 +583,10 @@ Rectangle {
 				if(graphicsView.receiveMouseEvents){
 					graphicsView.mousePressed(mouse)
 				}
+				if(graphicsView.restrictMouseReacion){
+					return
+				}
+
 				let activeLayer = graphicsView.getActiveLayer()
 
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
@@ -621,6 +629,10 @@ Rectangle {
 				if(graphicsView.receiveMouseEvents){
 					graphicsView.mouseReleased(mouse)
 				}
+				if(graphicsView.restrictMouseReacion){
+					return
+				}
+
 				let activeLayer = graphicsView.getActiveLayer()
 
 				for (let i = 0; i < activeLayer.shapeModel.length; i++){
@@ -667,6 +679,10 @@ Rectangle {
 				if(graphicsView.receiveMouseEvents){
 					graphicsView.mouseDoubleClicked(mouse)
 				}
+				if(graphicsView.restrictMouseReacion){
+					return
+				}
+
 				wasMoving = false;
 				isPressed = false;
 
@@ -834,6 +850,10 @@ Rectangle {
 				if(graphicsView.receiveMouseEvents){
 					graphicsView.mousePositionChanged(mouse)
 				}
+				if(graphicsView.restrictMouseReacion){
+					return
+				}
+
 				if(!graphicsView.isSelectionMode && controlArea.isPressed){
 					let activeLayer = graphicsView.getActiveLayer()
 
