@@ -42,6 +42,7 @@ class Canvas extends Item {
         ctx.text = (...args)=>{ctx.fillText(...args)}
         ctx.roundedRect = (...args)=>{ctx.roundRect(...args)}
         let originDrawImage = ctx.drawImage
+        let originCreatePattern = ctx.createPattern
         ctx.drawImage = (...args)=>{
             if(typeof args[0] === 'string'){
                 let path = rootPath+'/'+args[0].replaceAll('../','')
@@ -66,6 +67,33 @@ class Canvas extends Item {
                 
             } else {
                 originDrawImage.call(ctx, ...args)
+            }
+            
+        }
+
+        ctx.createPattern = (...args)=>{
+            if(typeof args[0] === 'string'){
+                let path = rootPath+'/'+args[0].replaceAll('../','')
+                if(this.$cache[path]){
+                    args[0] = this.$cache[path]
+                    return originCreatePattern.call(ctx, ...args)
+                } else {
+                    let img = new OriginImage();
+                    img.onload = ()=>{
+                        args[0] = img
+                        this.$cache[path] = img
+                        this.requestPaint()
+                        return originCreatePattern.call(ctx, ...args)
+                    }
+                    img.onerror = ()=>{
+                        img.remove()
+                    }
+
+                    img.src = path.replaceAll('//','/')
+                }
+                
+            } else {
+                return originCreatePattern.call(ctx, ...args)
             }
             
         }
