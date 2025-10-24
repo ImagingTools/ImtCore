@@ -468,6 +468,7 @@ class BaseClass extends QtObject {
 					} else {
 						if (component) {
 							let obj = Qt.createComponent('', 'BaseModel.qml', this).createObject(this)
+							obj.owner = this
 							this[_key] = obj
 						}
 					}
