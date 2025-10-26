@@ -1,7 +1,9 @@
 #pragma once
 
-#include <QObject>
-#include <QVariant>
+
+// Qt includes
+#include <QtCore/QObject>
+#include <QtCore/QVariant>
 
 
 namespace imtbase

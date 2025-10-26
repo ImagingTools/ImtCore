@@ -3,8 +3,11 @@
 #!	Declare a vatiable with schemas SDL_SCHEMES_LIST ##< it is a list of schemas to process
 #!	Include this file include($$PWD/../../../Config/QMake/SdlConfiguration.pri)
 
-
 ################################# General #################################
+
+CONFIG -= qt
+INCLUDEPATH += $$[QT_INSTALL_HEADERS]
+
 win32{
 	QMAKE_RCC = rcc.exe
 	COPY_FILE = copy
@@ -67,15 +70,21 @@ SDL_H_COMPILER.CONFIG = target_predeps
 SDL_H_COMPILER.depends = ${QMAKE_FILE_IN} $${SDL_GENERATOR_BIN}
 QMAKE_EXTRA_COMPILERS += SDL_H_COMPILER
 
+SDL_MOC_COMPILER.name = SDL_MOC_Compiler-$${TARGET}
+SDL_MOC_COMPILER.commands = moc $${SDL_GENERATOR_OUT_SUBFOLDER}/$${TARGET}/SDL/1.0/CPP/${QMAKE_FILE_BASE}.h -o $${SDL_GENERATOR_OUT_SUBFOLDER}/$${TARGET}/SDL/1.0/CPP/moc_${QMAKE_FILE_BASE}.cpp
+SDL_MOC_COMPILER.input = HEADERS
+SDL_MOC_COMPILER.output = $${SDL_GENERATOR_OUT_SUBFOLDER}/$${TARGET}/SDL/1.0/CPP/moc_${QMAKE_FILE_BASE}.cpp
+SDL_MOC_COMPILER.dependency_type = TYPE_C
+SDL_MOC_COMPILER.variable_out = SOURCES
+SDL_MOC_COMPILER.CONFIG = target_predeps
+SDL_MOC_COMPILER.depends = ${QMAKE_FILE_IN} $${SDL_GENERATOR_BIN}
+QMAKE_EXTRA_COMPILERS += SDL_MOC_COMPILER
 
 ################################# QML #################################
-RCC_EXECUTABLE_PATH = $$[QT_HOST_LIBEXECS]/$$QMAKE_RCC
 SDL_QML_GENERATOR_COMMAND_BASE = $$SDL_GENERATOR_BIN $$SDL_GENERATOR_COMMAND_PARAM_MODIFICATORS --generator=QMake -O=$${SDL_GENERATOR_OUT_SUBFOLDER} --config=$${SDL_GENERATOR_QML_CONFIG_PATH} --QML
 
 
 win32 {
-	RCC_EXECUTABLE_PATH = $$[QT_INSTALL_BINS]/$$QMAKE_RCC
-	RCC_EXECUTABLE_PATH ~= s,/,\\,g
 	SDL_OUTPUT_FILES_QML ~= s,/,\\,g
 }
 
