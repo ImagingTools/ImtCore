@@ -32,5 +32,7 @@
         <file alias="imtguigql/GqlBasedOptionManager.qml">GqlBasedOptionManager.qml</file>
 	<file alias="imtguigql/GqlBasedCollectionDocumentManager.qml">GqlBasedCollectionDocumentManager.qml</file>
 	<file alias="imtguigql/GqlCollectionDocManagerPageView.qml">GqlCollectionDocManagerPageView.qml</file>
+	<file alias="imtguigql/RemoteCollectionViewDialog.qml">RemoteCollectionViewDialog.qml</file>
+	<file alias="imtguigql/SelectableCollectionEditor.qml">SelectableCollectionEditor.qml</file>
     </qresource>
 </RCC>

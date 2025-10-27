@@ -46,9 +46,11 @@ Item {
 	property bool visibleMetaInfo: false;
 	property bool headerRightClickEnabled: true;
 	property bool commandsPanelVisible: true
+	property bool loadingDataAfterHeadersReceived: true
 
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
+	property alias contentHeight: container.contentHeight
 	property var registeredFilters: ({})
 
 	signal selectedIndexChanged(int index);
@@ -274,7 +276,6 @@ Item {
 			}
 
 			function onElementsRemoved(elementIds){
-				console.log("onElementsRemoved", elementIds)
 				container.selectionManager.deselect(elementIds)
 				container.table.resetSelection()
 			}
@@ -302,7 +303,9 @@ Item {
 
 				container.collectionFilter.setFilteringInfoIds(filteringIds)
 
-				container.doUpdateGui();
+				if (root.loadingDataAfterHeadersReceived){
+					container.doUpdateGui()
+				}
 			}
 
 			function onElementsReceived(elements){

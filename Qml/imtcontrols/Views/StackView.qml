@@ -6,10 +6,38 @@ Item{
     property int currentIndex: -1
     property alias count: container.pagesModel.count
     property ListModel pagesModel: ListModel{}
+    property bool adaptSizeToCurrentPage: false
 
     signal pageAdded(int index, var item)
     signal pageRemoved(int index, var item)
     signal currentPageChanged(var item)
+
+    onCurrentPageChanged: {
+        itemConnections.target = null
+
+        if (item && adaptSizeToCurrentPage){
+            console.log("onCurrentPageChanged", item.height)
+            width = item.width
+            height = item.height
+            itemConnections.target = item
+        }
+    }
+
+    Connections {
+        id: itemConnections
+        function onHeightChanged(){
+            console.log("itemConnections onHeightChanged", target.height)
+            if (container.adaptSizeToCurrentPage){
+                container.height = target.height
+            }
+        }
+
+        function onWidthChanged(){
+            if (container.adaptSizeToCurrentPage){
+                container.width = target.width
+            }
+        }
+    }
 
     function addPage(comp){
         if (!comp)
@@ -77,8 +105,10 @@ Item{
         anchors.fill: parent
         model: container.pagesModel
 
-        delegate: Loader{
-            anchors.fill: parent
+        delegate: Loader {
+            id: loader
+            anchors.fill: container.adaptSizeToCurrentPage ? undefined : parent
+
             sourceComponent: model.component
             visible: model.index === container.currentIndex
 

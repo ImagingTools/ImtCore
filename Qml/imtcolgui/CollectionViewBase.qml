@@ -22,7 +22,7 @@ ViewBase {
 	
 	property alias filterMenu: filterMenu_;
 	property alias loading: loading_;
-	property bool filterMenuVisible: true
+	property alias filterMenuVisible: filterMenu_.visible
 	property alias pagination: pagination_;
 	property alias elementsCount: tableInternal.elementsCount;
 	property alias tableRowDelegate: tableInternal.rowDelegate
@@ -51,6 +51,7 @@ ViewBase {
 	signal doubleClicked(string id, int index);
 
 	property bool activeFilter: false
+	property int contentHeight: filterMenu_.height + 2 * filterMenu_.anchors.topMargin + (tableInternal.headerHeight + tableInternal.contentHeight) + paginationObj.height
 	
 	Component.onCompleted: {
 		tableInternal.focus = true;
@@ -105,7 +106,7 @@ ViewBase {
 		canResetFilters: collectionViewBaseContainer.canResetFilters
 		complexFilter: collectionViewBaseContainer.collectionFilter;
 		documentFilter: collectionViewBaseContainer.documentCollectionFilter;
-		visible: collectionViewBaseContainer.filterMenuVisible
+		// visible: collectionViewBaseContainer.filterMenuVisible
 
 		onClose: {
 			filterMenu_.visible = false;
@@ -369,8 +370,9 @@ ViewBase {
 		anchors.bottom: parent.bottom;
 		anchors.horizontalCenter: parent.horizontalCenter;
 		width: parent.width;
-		height: collectionViewBaseContainer.hasPagination ? Style.controlHeightM: 0;
+		height: !visible ? 0 : collectionViewBaseContainer.hasPagination ? Style.controlHeightM: 0;
 		color: pagination_.color;
+		visible: pagination_.visible
 		
 		Pagination {
 			id: pagination_;

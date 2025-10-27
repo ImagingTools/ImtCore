@@ -31,3 +31,5 @@ GqlBasedDataModelProvider 1.0 GqlBasedDataModelProvider.qml
 GqlBasedOptionManager 1.0 GqlBasedOptionManager.qml
 GqlBasedCollectionDocumentManager 1.0 GqlBasedCollectionDocumentManager.qml
 GqlCollectionDocManagerPageView 1.0 GqlCollectionDocManagerPageView.qml
+RemoteCollectionViewDialog 1.0 RemoteCollectionViewDialog.qml
+SelectableCollectionEditor 1.0 SelectableCollectionEditor.qml

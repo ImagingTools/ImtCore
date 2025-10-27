@@ -116,8 +116,7 @@ ComplexCollectionFilter{
 	function setTextFilter(filter){
 		if (filter === ""){
 			if (hasTextFilter()){
-				m_textFilter.destroy()
-				m_textFilter = null
+				clearTextFilter()
 			}
 		}
 		else{

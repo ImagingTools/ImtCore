@@ -17,6 +17,7 @@ CollectionView {
 
 	// Invisible fields that will be requested for collection
 	property var additionalFieldIds: ["id", "name"]
+	property var requestedFields: []
 
 	signal removed(string objectId)
 
@@ -66,6 +67,7 @@ CollectionView {
 		CollectionRepresentation {
 			collectionId: root.collectionId;
 			gqlGetListCommandId: root.gqlGetListCommandId
+			requestedFields: root.requestedFields
 
 			additionalFieldIds: root.additionalFieldIds;
 

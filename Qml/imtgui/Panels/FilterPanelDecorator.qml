@@ -11,7 +11,7 @@ DecoratorBase {
 	id: filterPanelDecorator;
 	
 	// width: customFiltersFlickable.width + mainFilters.width + clearAllButton.width
-	height: content.height;
+	height: visible ? content.height : 0
 	
 	property alias contentWidth: content.width;
 	

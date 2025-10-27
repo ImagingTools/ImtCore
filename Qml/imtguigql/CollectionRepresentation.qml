@@ -21,8 +21,9 @@ Item {
 	property TreeItemModel notificationModel: TreeItemModel {}
 	
 	property var additionalFieldIds: []
+	property var requestedFields: []
 
-	signal removed();
+	signal removed()
 	signal elementsRemoved(var elementIds)
 	signal elementSetRemoved()
 	
@@ -55,7 +56,7 @@ Item {
 	ParamsSetController {
 		id: paramsSetController
 	}
-	
+
 	function escapeSpecialChars(jsonString) {
 		return jsonString.replace(/\n/g, "\\n")
 		.replace(/\r/g, "\\r")
@@ -163,6 +164,8 @@ Item {
 			notificationModel.clear()
 			notificationModel = null
 		}
+
+		elementsReceived(elementsModel)
 	}
 	
 	function getElementsRepresentation(){
@@ -406,7 +409,28 @@ Item {
 	CreateSubCollectionInput {
 		id: collectionParams
 	}
-	
+
+	function getRequestedFields(){
+		if (requestedFields.length > 0){
+			return requestedFields
+		}
+
+		let retVal = ["id", "name", "typeId"]
+		
+		if (root.headersModel){
+			for(let i = 0; i < root.headersModel.getItemsCount(); i++){
+				let headerInfo = root.headersModel.get(i).item
+				retVal.push(headerInfo.m_id)
+			}
+		}
+		
+		for (let i = 0; i < root.additionalFieldIds.length; i++){
+			retVal.push(root.additionalFieldIds[i])
+		}
+
+		return retVal
+	}
+
 	GqlRequestSender {
 		id: elementsGqlModel;
 		gqlCommandId: root.gqlGetListCommandId;
@@ -421,22 +445,12 @@ Item {
 			query.AddParam(inputParams);
 			
 			var queryFields = Gql.GqlObject("items");
-			
-			queryFields.InsertField("id");
-			queryFields.InsertField("name");
-			queryFields.InsertField("typeId");
-			
-			if (root.headersModel){
-				for(let i = 0; i < root.headersModel.getItemsCount(); i++){
-					let headerInfo = root.headersModel.get(i).item
-					queryFields.InsertField(headerInfo.m_id)
-				}
+			let requestedFields = root.getRequestedFields()
+
+			for (let i = 0; i < requestedFields.length; ++i){
+				queryFields.InsertField(requestedFields[i])
 			}
 
-			for (let i = 0; i < root.additionalFieldIds.length; i++){
-				queryFields.InsertField(root.additionalFieldIds[i]);
-			}
-			
 			query.AddField(queryFields);
 		}
 		

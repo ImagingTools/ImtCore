@@ -120,6 +120,7 @@
         <file alias="imtcontrols/Models/OptionsListAdapter.qml">Models/OptionsListAdapter.qml</file>
 	<file alias="imtcontrols/Models/OptionsListManager.qml">Models/OptionsListManager.qml</file>
 	<file alias="imtcontrols/Models/NavigableItem.qml">Models/NavigableItem.qml</file>
+	<file alias="imtcontrols/Views/StackViewHeader.qml">Views/StackViewHeader.qml</file>
         <file alias="imtcontrols/Views/TableRowViewer.qml">Views/TableRowViewer.qml</file>
         <file alias="imtcontrols/Views/TableRowDelegateBase.qml">Views/TableRowDelegateBase.qml</file>
         <file alias="imtcontrols/Views/TablePainterRowDelegateBase.qml">Views/TablePainterRowDelegateBase.qml</file>
