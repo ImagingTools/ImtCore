@@ -70,7 +70,7 @@ ViewCommandsDelegateBase {
 	}
 	
 	Connections {
-		target: collectionViewCommandsDelegate.collectionView.documentCollectionFilter
+		target: collectionViewCommandsDelegate.collectionView ? collectionViewCommandsDelegate.collectionView.documentCollectionFilter : null
 		
 		function onFilterChanged(){
 			let documentFilter = collectionViewCommandsDelegate.collectionView.documentCollectionFilter
