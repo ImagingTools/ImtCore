@@ -6,13 +6,14 @@ import imtcontrols 1.0
 ControlBase {
 	id: slider;
 
-	rotation: orientation == Qt.Vertical ? -90 : 0;
-	transformOrigin: Item.TopRight
-
 	decorator: Style.sliderDecorator
 
+	/**
+		\If orientation == Qt.Horizontal width should be set. Height is calculated.
+		\Otherwise height should be set. Width is calculated.
+	*/
 
-	property real _backgroundWidth: width - controlWidth;
+	property real _backgroundWidth: mainSize - controlWidth;
 	property int backgroundHeight: 6;
 	property string backgroundColor: Style.selectedColor//"#ffc0cb";
 	property string controlColor:  Style.imaginToolsAccentColor//"#CB4154";
@@ -24,7 +25,11 @@ ControlBase {
 	property real controlHeight: controlWidth;
 
 	property int orientation: Qt.Horizontal;
-	property real position: controlRecX/(width - controlWidth);
+	property bool isVertical: orientation == Qt.Vertical
+	property real mainSize: orientation == Qt.Vertical ? height : width
+	property real secondSize: orientation == Qt.Vertical ? width : height
+
+	property real position: controlRecX/(mainSize - controlWidth);
 
 	property real from: 0.0;
 	property real to: 1.0;
@@ -41,7 +46,7 @@ ControlBase {
 
 	property int ticksPosition: RelativePosition.verticalCenter
 	property int indicatorPosition: RelativePosition.top
-	property real controlCenterY: height/2;
+	property real controlCenterY: secondSize/2;
 	property int fontSize: Style.fontSizeM;
 
 	property alias tooltipText: tooltip.text;
@@ -58,7 +63,7 @@ ControlBase {
 		}
 
 		position = (value - from)/(to - from)
-		controlRecX = position * (width - controlWidth)
+		controlRecX = position * (mainSize - controlWidth)
 
 		setSizeParams();
 	}
@@ -85,17 +90,17 @@ ControlBase {
 
 		setSizeParams()
 
-		controlRecX = position * (width - controlWidth)
+		controlRecX = position * (mainSize - controlWidth)
 
 	}
 
 	onValueChanged: {
 		position = (value - from)/(to - from)
-		controlRecX = position * (width - controlWidth)
+		controlRecX = position * (mainSize - controlWidth)
 	}
 
 	onWidthChanged: {
-		controlRecX = position * (width - controlWidth)
+		controlRecX = position * (mainSize - controlWidth)
 	}
 
 	onTicksPositionChanged: {
@@ -131,66 +136,62 @@ ControlBase {
 	}
 
 	function setSizeParams(){
-
+		let size
 		if(!hasIndicator && !hasTicks){
 			controlCenterY = controlHeight/2;
-			height = controlHeight;
+			size = controlHeight;
 		}
 		else if(hasIndicator && !hasTicks && indicatorPosition == RelativePosition.bottom){
 			controlCenterY = controlHeight/2;
-			height = controlHeight/2 + indicatorHeight;
+			size = controlHeight/2 + indicatorHeight;
 		}
 		else if(hasIndicator && !hasTicks && indicatorPosition == RelativePosition.top){
 			controlCenterY = indicatorHeight;
-			height = controlHeight/2 + indicatorHeight;
+			size = controlHeight/2 + indicatorHeight;
 		}
 		else if(!hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter){
 			controlCenterY = majorTickHeight/2
-			height = majorTickHeight;
+			size = majorTickHeight;
 		}
 		else if(!hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom){
 			controlCenterY = controlHeight/2;
-			height = controlHeight/2 + majorTickHeight
+			size = controlHeight/2 + majorTickHeight
 		}
 		else if(!hasIndicator && hasTicks && ticksPosition == RelativePosition.top){
 			controlCenterY = majorTickHeight;
-			height = controlHeight/2 + majorTickHeight
+			size = controlHeight/2 + majorTickHeight
 		}
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom && indicatorPosition == RelativePosition.bottom){
 			controlCenterY = controlHeight/2;
-			height = controlHeight/2 + Math.max(majorTickHeight, indicatorHeight);
+			size = controlHeight/2 + Math.max(majorTickHeight, indicatorHeight);
 		}
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.top && indicatorPosition == RelativePosition.top){
 			controlCenterY = Math.max(majorTickHeight, indicatorHeight);
-			height = controlHeight/2 + Math.max(majorTickHeight, indicatorHeight);
+			size = controlHeight/2 + Math.max(majorTickHeight, indicatorHeight);
 		}
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.top && indicatorPosition == RelativePosition.bottom){
 			controlCenterY = majorTickHeight;
-			height = majorTickHeight + indicatorHeight;
+			size = majorTickHeight + indicatorHeight;
 		}
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom && indicatorPosition == RelativePosition.top){
 			controlCenterY = indicatorHeight;
-			height = majorTickHeight + indicatorHeight;
+			size = majorTickHeight + indicatorHeight;
 		}
 
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter && indicatorPosition == RelativePosition.top){
 			controlCenterY = Math.max(indicatorHeight, majorTickHeight/2)
-			height = majorTickHeight/2 + controlCenterY;
+			size = majorTickHeight/2 + controlCenterY;
 		}
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter && indicatorPosition == RelativePosition.bottom){
 			controlCenterY =  majorTickHeight/2
-			height = majorTickHeight/2 + indicatorHeight;
+			size = majorTickHeight/2 + indicatorHeight;
 		}
 
-		if(!marginsChanged && orientation == Qt.Vertical){
-			if(anchors.right !==undefined){
-				anchors.rightMargin += height
-			}
-			else if(anchors.left !==undefined){
-				// anchors.leftMargin += width
-			}
-
-			marginsChanged = true;
+		if(orientation == Qt.Vertical){
+			width = size;
+		}
+		else {
+			height = size;
 		}
 	}
 
@@ -201,25 +202,25 @@ ControlBase {
 
 		hoverEnabled: true;
 		cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-		property int mouseX_prev: 0;
 		property bool canDrag: false;
 		property bool canClick: true;
-		property real pressedX: 0.0;
 
 		onPressed: {
 			let margin_ = Style.marginM
-			pressedX = mouse.x;
-			let withinContolX = (mouse.x >= slider.controlRecX - margin_ && mouse.x <= slider.controlRecX + slider.controlWidth + margin_)
-			let withinContolY = (mouse.y >= slider.controlCenterY - slider.controlHeight/2 - margin_ && mouse.y<= slider.controlCenterY + slider.controlHeight/2 + margin_)
+			let add = -slider.controlWidth/2;
+			let mouseFirstCoord = slider.isVertical ? slider.mainSize - mouse.y : mouse.x
+			let mouseSecondCoord = slider.isVertical ? mouse.x : mouse.y
+
+			let x_ = mouseFirstCoord + add;
+
+			let withinContolX = (mouseFirstCoord >= slider.controlRecX - margin_ && mouseFirstCoord <= slider.controlRecX + slider.controlWidth + margin_)
+			let withinContolY = (mouseSecondCoord >= slider.controlCenterY - slider.controlHeight/2 - margin_ && mouseSecondCoord<= slider.controlCenterY + slider.controlHeight/2 + margin_)
 			if(withinContolX && withinContolY){
 				ma.canDrag = true;
 			}
 			if(tooltip.openST){
 				tooltip.closeTooltip();
 			}
-
-			let add = -slider.controlWidth/2;
-			let x_ = mouse.x + add;
 
 			//if(x_ < (slider.controlRecX -slider.controlWidth/2) || x_ > slider.controlRecX + slider.controlWidth/2){
 				if(x_ <= 0){
@@ -249,7 +250,9 @@ ControlBase {
 
 		onPositionChanged:  {
 			let add = -slider.controlWidth/2;
-			let x_ = mouse.x + add;
+			let mouseFirstCoord = slider.isVertical ? slider.mainSize - mouse.y : mouse.x
+			let mouseSecondCoord = slider.isVertical ? mouse.x : mouse.y
+			let x_ = mouseFirstCoord + add;
 
 			if(ma.canDrag){
 				ma.canClick = false;
@@ -275,8 +278,8 @@ ControlBase {
 			}
 
 			else if(!slider.hasIndicator && slider.hasTooltip){
-				let withinContolX = (mouse.x >= slider.controlRecX && mouse.x <= slider.controlRecX + slider.controlWidth)
-				let withinContolY = (mouse.y >= slider.controlCenterY - slider.controlHeight/2 && mouse.y<= slider.controlCenterY + slider.controlHeight/2)
+				let withinContolX = (mouseFirstCoord >= slider.controlRecX && mouseFirstCoord <= slider.controlRecX + slider.controlWidth)
+				let withinContolY = (mouseSecondCoord >= slider.controlCenterY - slider.controlHeight/2 && mouseSecondCoord<= slider.controlCenterY + slider.controlHeight/2)
 
 				let withinContol = withinContolX && withinContolY
 
@@ -297,17 +300,17 @@ ControlBase {
 		}
 
 		function correctX(argX){
-			if(slider.majorTickInterval > 0){
-				let tickValue = slider.from
-				while (tickValue <= slider.to){
-					let tickPosition = (tickValue - slider.from)/(slider.to - slider.from)
-					let tickX = tickPosition * (slider.width - slider.controlWidth)
-					if(Math.abs((tickX - argX)) < 10){
-						return tickX;
-					}
-					tickValue += slider.majorTickInterval;
-				}
-			}
+			// if(slider.majorTickInterval > 0){
+			// 	let tickValue = slider.from
+			// 	while (tickValue <= slider.to){
+			// 		let tickPosition = (tickValue - slider.from)/(slider.to - slider.from)
+			// 		let tickX = tickPosition * (slider.mainSize - slider.controlWidth)
+			// 		if(Math.abs((tickX - argX)) < 10){
+			// 			return tickX;
+			// 		}
+			// 		tickValue += slider.majorTickInterval;
+			// 	}
+			// }
 
 			return argX;
 		}

@@ -622,7 +622,7 @@ StyleComponents {
 		Item{
 			id: sliderItem;
 
-			width: Style.sizeHintXXXS;
+			width: !baseElement ?  0 :baseElement.width;
 			height: !baseElement ?  0 :baseElement.height;
 
 			property var baseElement: null;
@@ -635,208 +635,219 @@ StyleComponents {
 			property int minorTickInterval: !sliderItem.baseElement ? 0 : sliderItem.baseElement.minorTickInterval
 
 			Item{
-				id: sliderContainer;
+				id: rotationContainer;
 
-				anchors.horizontalCenter: parent.horizontalCenter;
+				anchors.centerIn: parent
 
-				width: parent.width - sliderItem.controlWidth;
-				height: parent.height;
+				transformOrigin: Item.Center
+				rotation: !sliderItem.baseElement ? 0 : sliderItem.baseElement.orientation == Qt.Vertical ? -90 : 0;
 
-				Row {
-					id: majorTickRow;
+				width: !sliderItem.baseElement ? parent.width : sliderItem.baseElement.orientation == Qt.Vertical ? parent.height : parent.width;
+				height:  !sliderItem.baseElement ? parent.height : sliderItem.baseElement.orientation == Qt.Vertical ? parent.width : parent.height;
 
-					y: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlCenterY + correction;
-					property real correction: !sliderItem.baseElement ? 0 : sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? - height/2 :
-																																		   sliderItem.baseElement.ticksPosition == RelativePosition.top ? - height :
-																																																	  sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? 0: 0
+				Item{
+					id: sliderContainer;
 
-					height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.majorTickHeight;
+					anchors.horizontalCenter: parent.horizontalCenter;
 
-					spacing: 0;
+					width: parent.width - sliderItem.controlWidth;
+					height: parent.height;
 
-					visible: !sliderItem.baseElement ? false : sliderItem.baseElement.hasTicks
+					Row {
+						id: majorTickRow;
 
-					property real delegateWidth: 2;
+						y: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlCenterY + correction;
+						property real correction: !sliderItem.baseElement ? 0 : sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? - height/2 :
+																																			   sliderItem.baseElement.ticksPosition == RelativePosition.top ? - height :
+																																																		  sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? 0: 0
 
-					Repeater{
-						id: majorTickRepeater;
+						height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.majorTickHeight;
 
-						model: !sliderItem.baseElement || sliderItem.majorTickInterval <=0 ? 0 : Math.trunc((sliderItem.baseElement.to - sliderItem.baseElement.from)/sliderItem.majorTickInterval)
+						spacing: 0;
 
-						delegate:
-							Item{
-							width: majorTickRepeater.model == 0 ? 0 : sliderContainer.width / majorTickRepeater.model;
-							height: majorTickRow.height;
+						visible: !sliderItem.baseElement ? false : sliderItem.baseElement.hasTicks
 
-							Rectangle{
-								anchors.left: parent.left;
-								anchors.leftMargin: -width/2
-								anchors.bottom: parent.bottom;
-								height: majorTickRow.height //- tickTextLeft.height;
-								width: majorTickRow.delegateWidth;
-								color: Style.borderColor;
+						property real delegateWidth: 2;
 
-								BaseText{
-									id: tickTextLeft;
+						Repeater{
+							id: majorTickRepeater;
 
-									anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
+							model: !sliderItem.baseElement || sliderItem.majorTickInterval <=0 ? 0 : Math.trunc((sliderItem.baseElement.to - sliderItem.baseElement.from)/sliderItem.majorTickInterval)
 
-									anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
+							delegate:
+								Item{
+								width: majorTickRepeater.model == 0 ? 0 : sliderContainer.width / majorTickRepeater.model;
+								height: majorTickRow.height;
 
-									anchors.horizontalCenter: parent.horizontalCenter;
+								Rectangle{
+									anchors.left: parent.left;
+									anchors.leftMargin: -width/2
+									anchors.bottom: parent.bottom;
+									height: majorTickRow.height //- tickTextLeft.height;
+									width: majorTickRow.delegateWidth;
+									color: Style.borderColor;
 
-									color: parent.color;
-									font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
+									BaseText{
+										id: tickTextLeft;
 
-									text: Math.trunc(sliderItem.baseElement.from + model.index * (sliderItem.baseElement.to - sliderItem.baseElement.from)/majorTickRepeater.count);
+										anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
+
+										anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
+
+										anchors.horizontalCenter: parent.horizontalCenter;
+
+										color: parent.color;
+										font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
+
+										text: Math.trunc(sliderItem.baseElement.from + model.index * (sliderItem.baseElement.to - sliderItem.baseElement.from)/majorTickRepeater.count);
+									}
 								}
-							}
-							Rectangle{
-								anchors.right: parent.right;
-								anchors.rightMargin: -width/2
-								anchors.bottom: parent.bottom;
-								height: majorTickRow.height //- tickTextRight.height;
-								width: majorTickRow.delegateWidth;
-								color: Style.borderColor;
-								visible: model.index == majorTickRepeater.count -1;
+								Rectangle{
+									anchors.right: parent.right;
+									anchors.rightMargin: -width/2
+									anchors.bottom: parent.bottom;
+									height: majorTickRow.height //- tickTextRight.height;
+									width: majorTickRow.delegateWidth;
+									color: Style.borderColor;
+									visible: model.index == majorTickRepeater.count -1;
 
-								BaseText{
-									id: tickTextRight;
+									BaseText{
+										id: tickTextRight;
 
-									anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
+										anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-									anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
-									anchors.horizontalCenter: parent.horizontalCenter;
+										anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
+										anchors.horizontalCenter: parent.horizontalCenter;
 
-									font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
+										font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
 
-									color: parent.color;
-									text: Math.trunc(sliderItem.baseElement.to)
+										color: parent.color;
+										text: Math.trunc(sliderItem.baseElement.to)
+									}
+
 								}
-
 							}
 						}
 					}
-				}
-				Row {
-					id: minorTickRow;
+					Row {
+						id: minorTickRow;
 
-					anchors.bottom: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.top ? majorTickRow.bottom : undefined
-					anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? majorTickRow.top : undefined
-					anchors.verticalCenter: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? majorTickRow.verticalCenter : undefined
+						anchors.bottom: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.top ? majorTickRow.bottom : undefined
+						anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? majorTickRow.top : undefined
+						anchors.verticalCenter: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? majorTickRow.verticalCenter : undefined
 
-					height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.minorTickHeight;
+						height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.minorTickHeight;
 
-					spacing: 0;
+						spacing: 0;
 
-					visible: !sliderItem.baseElement ? false : sliderItem.baseElement.hasTicks
+						visible: !sliderItem.baseElement ? false : sliderItem.baseElement.hasTicks
 
-					property real delegateWidth: 1;
-					Repeater{
-						id: minorTickRepeater;
+						property real delegateWidth: 1;
+						Repeater{
+							id: minorTickRepeater;
 
-						model: !sliderItem.baseElement || sliderItem.minorTickInterval <=0 ? 0 : Math.trunc((sliderItem.baseElement.to - sliderItem.baseElement.from)/sliderItem.minorTickInterval)
+							model: !sliderItem.baseElement || sliderItem.minorTickInterval <=0 ? 0 : Math.trunc((sliderItem.baseElement.to - sliderItem.baseElement.from)/sliderItem.minorTickInterval)
 
-						delegate:
-							Item{
-							width: minorTickRepeater.model == 0 ? 0 : sliderContainer.width / minorTickRepeater.model;
-							height: minorTickRow.height;
-
-							Rectangle{
-								anchors.left: parent.left;
-								anchors.leftMargin: -width/2
+							delegate:
+								Item{
+								width: minorTickRepeater.model == 0 ? 0 : sliderContainer.width / minorTickRepeater.model;
 								height: minorTickRow.height;
-								width: minorTickRow.delegateWidth;
-								color: Style.borderColor;
 
-							}
-							Rectangle{
-								anchors.right: parent.right;
-								anchors.rightMargin: -width/2
-								height: minorTickRow.height;
-								width: minorTickRow.delegateWidth;
-								color: Style.borderColor;
-								visible: model.index == minorTickRepeater.count -1;
+								Rectangle{
+									anchors.left: parent.left;
+									anchors.leftMargin: -width/2
+									height: minorTickRow.height;
+									width: minorTickRow.delegateWidth;
+									color: Style.borderColor;
+
+								}
+								Rectangle{
+									anchors.right: parent.right;
+									anchors.rightMargin: -width/2
+									height: minorTickRow.height;
+									width: minorTickRow.delegateWidth;
+									color: Style.borderColor;
+									visible: model.index == minorTickRepeater.count -1;
+								}
 							}
 						}
 					}
-				}
-
-				Rectangle{
-					id: backgroundRec;
-
-					anchors.left: sliderContainer.left;
-					y: !sliderItem.baseElement ? 0 :sliderItem.baseElement.controlCenterY - height/2
-					//anchors.verticalCenter: sliderContainer.verticalCenter;
-
-					width: sliderContainer.width;
-					height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.backgroundHeight;
-					color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.backgroundColor;
-
-					opacity: !sliderItem.baseElement ? 0 : sliderItem.baseElement.backgroundOpacity;
 
 					Rectangle{
-						width: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlRecX;
-						height: backgroundRec.height;
-						radius: backgroundRec.radius;
-						color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.controlColor;
+						id: backgroundRec;
+
+						anchors.left: sliderContainer.left;
+						y: !sliderItem.baseElement ? 0 :sliderItem.baseElement.controlCenterY - height/2
+						//anchors.verticalCenter: sliderContainer.verticalCenter;
+
+						width: sliderContainer.width;
+						height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.backgroundHeight;
+						color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.backgroundColor;
+
+						opacity: !sliderItem.baseElement ? 0 : sliderItem.baseElement.backgroundOpacity;
+
+						Rectangle{
+							width: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlRecX;
+							height: backgroundRec.height;
+							radius: backgroundRec.radius;
+							color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.controlColor;
+						}
+
 					}
 
-				}
 
-
-				Rectangle{
-					id: indicator;
-
-					anchors.horizontalCenter: controlRec.horizontalCenter;
-
-					anchors.bottom: controlRec.bottom;
-					anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRec.height : 0;
-
-					height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorHeight;
-					width: 2;
-					color: Style.textColor//Style.borderColor;
-					visible: !sliderItem.baseElement ? false : sliderItem.baseElement.hasIndicator;
 					Rectangle{
-						anchors.left: parent.right;
-						anchors.leftMargin:  isLeft ? - width : 0;
+						id: indicator;
 
-						anchors.top:  parent.top;
-						anchors.topMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
+						anchors.horizontalCenter: controlRec.horizontalCenter;
 
-						height: parent.width;
-						width: indicatorText.width//Style.controlHeightM;
+						anchors.bottom: controlRec.bottom;
+						anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRec.height : 0;
+
+						height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorHeight;
+						width: 2;
 						color: Style.textColor//Style.borderColor;
-						property bool isLeft: !sliderItem.baseElement ? false : sliderItem.baseElement.value > sliderItem.baseElement.to/2;
+						visible: !sliderItem.baseElement ? false : sliderItem.baseElement.hasIndicator;
+						Rectangle{
+							anchors.left: parent.right;
+							anchors.leftMargin:  isLeft ? - width : 0;
 
-						BaseText{
-							id: indicatorText
+							anchors.top:  parent.top;
+							anchors.topMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
 
-							anchors.horizontalCenter: parent.horizontalCenter;
-							anchors.bottom: parent.bottom;
-							anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
+							height: parent.width;
+							width: indicatorText.width//Style.controlHeightM;
+							color: Style.textColor//Style.borderColor;
+							property bool isLeft: !sliderItem.baseElement ? false : sliderItem.baseElement.value > sliderItem.baseElement.to/2;
 
-							font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
+							BaseText{
+								id: indicatorText
 
-							text: !sliderItem.baseElement ? "" : Math.trunc(sliderItem.baseElement.value)
+								anchors.horizontalCenter: parent.horizontalCenter;
+								anchors.bottom: parent.bottom;
+								anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
+
+								font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
+
+								text: !sliderItem.baseElement ? "" : Math.trunc(sliderItem.baseElement.value)
+							}
 						}
 					}
-				}
 
-				Rectangle{
-					id: controlRec;
+					Rectangle{
+						id: controlRec;
 
-					anchors.verticalCenter: backgroundRec.verticalCenter;
+						anchors.verticalCenter: backgroundRec.verticalCenter;
 
-					x: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlRecX - sliderItem.baseElement.controlWidth/2;
-					width: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlWidth;
-					height: width;
-					radius: width;
-					color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.controlColor;
+						x: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlRecX - sliderItem.baseElement.controlWidth/2;
+						width: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlWidth;
+						height: width;
+						radius: width;
+						color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.controlColor;
 
+					}
 				}
 			}
-
 
 		}
 	}
@@ -847,7 +858,7 @@ StyleComponents {
 		Item{
 			id: rangeSliderItem;
 
-			width: Style.sizeHintXXXS;
+			width: !baseElement ?  0 :baseElement.width;
 			height: !baseElement ?  0 :baseElement.height;
 
 			property var baseElement: null;
@@ -860,252 +871,265 @@ StyleComponents {
 			property int majorTickInterval: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.majorTickInterval
 			property int minorTickInterval: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.minorTickInterval
 
-
 			Item{
-				id: rangeSliderContainer;
+				id: rotationContainer;
 
-				anchors.horizontalCenter: parent.horizontalCenter;
+				anchors.centerIn: parent
 
-				width: parent.width - rangeSliderItem.controlWidth;
-				height: parent.height;
+				transformOrigin: Item.Center
+				rotation: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.orientation == Qt.Vertical ? -90 : 0;
 
-				Row {
-					id: majorTickRow;
+				width: !rangeSliderItem.baseElement ? parent.width : rangeSliderItem.baseElement.orientation == Qt.Vertical ? parent.height : parent.width;
+				height:  !rangeSliderItem.baseElement ? parent.height : rangeSliderItem.baseElement.orientation == Qt.Vertical ? parent.width : parent.height;
 
-					y: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlCenterY + correction;
-					property real correction: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? - height/2 :
-																																		   rangeSliderItem.baseElement.ticksPosition == RelativePosition.top ? - height :
-																																																	  rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? 0: 0
+				Item{
+					id: rangeSliderContainer;
 
-					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.majorTickHeight;
+					anchors.horizontalCenter: parent.horizontalCenter;
 
-					spacing: 0;
+					width: parent.width - rangeSliderItem.controlWidth;
+					height: parent.height;
 
-					visible: !rangeSliderItem.baseElement ? false : rangeSliderItem.baseElement.hasTicks
+					Row {
+						id: majorTickRow;
 
-					property real delegateWidth: 2;
+						y: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlCenterY + correction;
+						property real correction: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? - height/2 :
+																																			   rangeSliderItem.baseElement.ticksPosition == RelativePosition.top ? - height :
+																																																		  rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? 0: 0
 
-					Repeater{
-						id: majorTickRepeater;
+						height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.majorTickHeight;
 
-						model: !rangeSliderItem.baseElement || rangeSliderItem.majorTickInterval <=0 ? 0 : Math.trunc((rangeSliderItem.baseElement.to - rangeSliderItem.baseElement.from)/rangeSliderItem.majorTickInterval)
+						spacing: 0;
 
-						delegate:
-							Item{
-							width: majorTickRepeater.model == 0 ? 0 : rangeSliderContainer.width / majorTickRepeater.model;
-							height: majorTickRow.height;
-							Rectangle{
-								anchors.left: parent.left;
-								anchors.leftMargin: -width/2
+						visible: !rangeSliderItem.baseElement ? false : rangeSliderItem.baseElement.hasTicks
 
+						property real delegateWidth: 2;
+
+						Repeater{
+							id: majorTickRepeater;
+
+							model: !rangeSliderItem.baseElement || rangeSliderItem.majorTickInterval <=0 ? 0 : Math.trunc((rangeSliderItem.baseElement.to - rangeSliderItem.baseElement.from)/rangeSliderItem.majorTickInterval)
+
+							delegate:
+								Item{
+								width: majorTickRepeater.model == 0 ? 0 : rangeSliderContainer.width / majorTickRepeater.model;
 								height: majorTickRow.height;
-								width: majorTickRow.delegateWidth;
-								color: Style.borderColor;
-								BaseText{
-									anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
+								Rectangle{
+									anchors.left: parent.left;
+									anchors.leftMargin: -width/2
 
-									anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
+									height: majorTickRow.height;
+									width: majorTickRow.delegateWidth;
+									color: Style.borderColor;
+									BaseText{
+										anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-									anchors.horizontalCenter: parent.horizontalCenter;
+										anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
 
-									font.pixelSize: !rangeSliderItem.baseElement ? Style.fontSizeM : rangeSliderItem.baseElement.fontSize
+										anchors.horizontalCenter: parent.horizontalCenter;
 
-									color: parent.color;
-									text: Math.trunc(rangeSliderItem.baseElement.from +  model.index * (rangeSliderItem.baseElement.to - rangeSliderItem.baseElement.from)/majorTickRepeater.count);
+										font.pixelSize: !rangeSliderItem.baseElement ? Style.fontSizeM : rangeSliderItem.baseElement.fontSize
+
+										color: parent.color;
+										text: Math.trunc(rangeSliderItem.baseElement.from +  model.index * (rangeSliderItem.baseElement.to - rangeSliderItem.baseElement.from)/majorTickRepeater.count);
+									}
+								}
+								Rectangle{
+									anchors.right: parent.right;
+									anchors.rightMargin: -width/2
+
+									height: majorTickRow.height;
+									width: majorTickRow.delegateWidth;
+
+									color: Style.borderColor;
+									visible: model.index == majorTickRepeater.count -1;
+									BaseText{
+										anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
+
+										anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
+
+										anchors.horizontalCenter: parent.horizontalCenter;
+
+										font.pixelSize: !rangeSliderItem.baseElement ? Style.fontSizeM : rangeSliderItem.baseElement.fontSize
+
+										color: parent.color;
+										text: Math.trunc(rangeSliderItem.baseElement.to)
+									}
 								}
 							}
-							Rectangle{
-								anchors.right: parent.right;
-								anchors.rightMargin: -width/2
+						}
 
-								height: majorTickRow.height;
-								width: majorTickRow.delegateWidth;
+					}
 
-								color: Style.borderColor;
-								visible: model.index == majorTickRepeater.count -1;
-								BaseText{
-									anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
+					Row {
+						id: minorTickRow;
 
-									anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
 
-									anchors.horizontalCenter: parent.horizontalCenter;
+						anchors.bottom: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.top ? majorTickRow.bottom : undefined
+						anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? majorTickRow.top : undefined
+						anchors.verticalCenter: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? majorTickRow.verticalCenter : undefined
 
-									font.pixelSize: !rangeSliderItem.baseElement ? Style.fontSizeM : rangeSliderItem.baseElement.fontSize
+						height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.minorTickHeight;
 
-									color: parent.color;
-									text: Math.trunc(rangeSliderItem.baseElement.to)
+						spacing: 0;
+
+						visible: !rangeSliderItem.baseElement ? false : rangeSliderItem.baseElement.hasTicks
+
+						property real delegateWidth: 1;
+						Repeater{
+							id: minorTickRepeater;
+
+							model: !rangeSliderItem.baseElement || rangeSliderItem.minorTickInterval <=0 ? 0 : Math.trunc((rangeSliderItem.baseElement.to - rangeSliderItem.baseElement.from)/rangeSliderItem.minorTickInterval)
+
+							delegate:
+								Item{
+								width: minorTickRepeater.model == 0 ? 0 : rangeSliderContainer.width / minorTickRepeater.model;
+								height: minorTickRow.height;
+
+								Rectangle{
+									anchors.left: parent.left;
+									anchors.leftMargin: -width/2
+									height: minorTickRow.height;
+									width: minorTickRow.delegateWidth;
+									color: Style.borderColor;
+
+								}
+								Rectangle{
+									anchors.right: parent.right;
+									anchors.rightMargin: -width/2
+									height: minorTickRow.height;
+									width: minorTickRow.delegateWidth;
+									color: Style.borderColor;
+									visible: model.index == minorTickRepeater.count -1;
 								}
 							}
 						}
 					}
-
-				}
-
-				Row {
-					id: minorTickRow;
-
-
-					anchors.bottom: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.top ? majorTickRow.bottom : undefined
-					anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? majorTickRow.top : undefined
-					anchors.verticalCenter: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter ? majorTickRow.verticalCenter : undefined
-
-					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.minorTickHeight;
-
-					spacing: 0;
-
-					visible: !rangeSliderItem.baseElement ? false : rangeSliderItem.baseElement.hasTicks
-
-					property real delegateWidth: 1;
-					Repeater{
-						id: minorTickRepeater;
-
-						model: !rangeSliderItem.baseElement || rangeSliderItem.minorTickInterval <=0 ? 0 : Math.trunc((rangeSliderItem.baseElement.to - rangeSliderItem.baseElement.from)/rangeSliderItem.minorTickInterval)
-
-						delegate:
-							Item{
-							width: minorTickRepeater.model == 0 ? 0 : rangeSliderContainer.width / minorTickRepeater.model;
-							height: minorTickRow.height;
-
-							Rectangle{
-								anchors.left: parent.left;
-								anchors.leftMargin: -width/2
-								height: minorTickRow.height;
-								width: minorTickRow.delegateWidth;
-								color: Style.borderColor;
-
-							}
-							Rectangle{
-								anchors.right: parent.right;
-								anchors.rightMargin: -width/2
-								height: minorTickRow.height;
-								width: minorTickRow.delegateWidth;
-								color: Style.borderColor;
-								visible: model.index == minorTickRepeater.count -1;
-							}
-						}
-					}
-				}
-
-				Rectangle{
-					id: backgroundRec;
-
-					anchors.left: rangeSliderContainer.left;
-					y: !rangeSliderItem.baseElement ? 0 :rangeSliderItem.baseElement.controlCenterY - height/2
-					//anchors.verticalCenter: rangeSliderContainer.verticalCenter;
-
-					width: rangeSliderContainer.width;
-					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundHeight;
-					color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.backgroundColor;
-
-					radius: 0//height;
-
-					opacity: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundOpacity;
 
 					Rectangle{
-						x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXFirst;
-						width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXSecond - rangeSliderItem.baseElement.controlRecXFirst;
-						height: backgroundRec.height;
-						radius: backgroundRec.radius;
+						id: backgroundRec;
+
+						anchors.left: rangeSliderContainer.left;
+						y: !rangeSliderItem.baseElement ? 0 :rangeSliderItem.baseElement.controlCenterY - height/2
+						//anchors.verticalCenter: rangeSliderContainer.verticalCenter;
+
+						width: rangeSliderContainer.width;
+						height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundHeight;
+						color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.backgroundColor;
+
+						radius: 0//height;
+
+						opacity: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundOpacity;
+
+						Rectangle{
+							x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXFirst;
+							width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXSecond - rangeSliderItem.baseElement.controlRecXFirst;
+							height: backgroundRec.height;
+							radius: backgroundRec.radius;
+							color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
+						}
+
+					}
+
+
+					Rectangle{
+						id: indicatorFirst;
+
+						anchors.horizontalCenter: controlRecFirst.horizontalCenter;
+						anchors.bottom: controlRecFirst.bottom;
+						anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRecFirst.height : 0;
+
+						height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorHeight;
+						width: 2;
+						color: Style.textColor//Style.borderColor;
+						visible: !rangeSliderItem.baseElement ? false : rangeSliderItem.baseElement.hasIndicator;
+
+						Rectangle{
+							anchors.right: parent.left;
+							anchors.top:  parent.top;
+							anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
+
+							height: parent.width;
+							width: indicatorFirstText.width;
+							color: Style.textColor//Style.borderColor;
+							BaseText{
+								id: indicatorFirstText
+
+								anchors.horizontalCenter: parent.horizontalCenter;
+								anchors.bottom: parent.bottom;
+								anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
+
+								font.pixelSize: !rangeSliderItem.baseElement ? Style.fontSizeM : rangeSliderItem.baseElement.fontSize
+
+								text: !rangeSliderItem.baseElement ? "" :  Math.trunc(rangeSliderItem.baseElement.valueFirst)
+							}
+						}
+					}
+
+					Rectangle{
+						id: controlRecFirst;
+
+						anchors.verticalCenter: backgroundRec.verticalCenter;
+
+						x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXFirst - rangeSliderItem.baseElement.controlWidth/2;
+						width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlWidth;
+						height: width;
+						radius: width;
 						color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
 					}
 
-				}
-
-
-				Rectangle{
-					id: indicatorFirst;
-
-					anchors.horizontalCenter: controlRecFirst.horizontalCenter;
-					anchors.bottom: controlRecFirst.bottom;
-					anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRecFirst.height : 0;
-
-					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorHeight;
-					width: 2;
-					color: Style.textColor//Style.borderColor;
-					visible: !rangeSliderItem.baseElement ? false : rangeSliderItem.baseElement.hasIndicator;
-
 					Rectangle{
-						anchors.right: parent.left;
-						anchors.top:  parent.top;
-						anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
+						id: indicatorSecond;
 
-						height: parent.width;
-						width: indicatorFirstText.width;
+						anchors.horizontalCenter: controlRecSecond.horizontalCenter;
+						anchors.bottom: controlRecSecond.bottom;
+						anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRecSecond.height : 0;
+
+						height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorHeight;
+						width: 2;
 						color: Style.textColor//Style.borderColor;
-						BaseText{
-							id: indicatorFirstText
+						visible: !rangeSliderItem.baseElement ? false : rangeSliderItem.baseElement.hasIndicator;
 
-							anchors.horizontalCenter: parent.horizontalCenter;
-							anchors.bottom: parent.bottom;
-							anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
+						Rectangle{
+							anchors.left: parent.right;
+							anchors.top:  parent.top;
+							anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
 
-							font.pixelSize: !rangeSliderItem.baseElement ? Style.fontSizeM : rangeSliderItem.baseElement.fontSize
+							height: parent.width;
+							width: indicatorSecondText.width;
+							color: Style.textColor//Style.borderColor;
+							BaseText{
+								id: indicatorSecondText
 
-							text: !rangeSliderItem.baseElement ? "" :  Math.trunc(rangeSliderItem.baseElement.valueFirst)
+								anchors.horizontalCenter: parent.horizontalCenter;
+								anchors.bottom: parent.bottom;
+								anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
+
+								font.pixelSize: !rangeSliderItem.baseElement ? Style.fontSizeM : rangeSliderItem.baseElement.fontSize
+
+								text: !rangeSliderItem.baseElement ? "" : Math.trunc(rangeSliderItem.baseElement.valueSecond)
+							}
 						}
 					}
-				}
-
-				Rectangle{
-					id: controlRecFirst;
-
-					anchors.verticalCenter: backgroundRec.verticalCenter;
-
-					x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXFirst - rangeSliderItem.baseElement.controlWidth/2;
-					width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlWidth;
-					height: width;
-					radius: width;
-					color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
-				}
-
-				Rectangle{
-					id: indicatorSecond;
-
-					anchors.horizontalCenter: controlRecSecond.horizontalCenter;
-					anchors.bottom: controlRecSecond.bottom;
-					anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRecSecond.height : 0;
-
-					height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorHeight;
-					width: 2;
-					color: Style.textColor//Style.borderColor;
-					visible: !rangeSliderItem.baseElement ? false : rangeSliderItem.baseElement.hasIndicator;
 
 					Rectangle{
-						anchors.left: parent.right;
-						anchors.top:  parent.top;
-						anchors.topMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? parent.height - height : 0;
+						id: controlRecSecond;
 
-						height: parent.width;
-						width: indicatorSecondText.width;
-						color: Style.textColor//Style.borderColor;
-						BaseText{
-							id: indicatorSecondText
+						anchors.verticalCenter: backgroundRec.verticalCenter;
 
-							anchors.horizontalCenter: parent.horizontalCenter;
-							anchors.bottom: parent.bottom;
-							anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
+						x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXSecond  - rangeSliderItem.baseElement.controlWidth/2;
+						width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlWidth;
+						height: width;
+						radius: width;
+						color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
 
-							font.pixelSize: !rangeSliderItem.baseElement ? Style.fontSizeM : rangeSliderItem.baseElement.fontSize
-
-							text: !rangeSliderItem.baseElement ? "" : Math.trunc(rangeSliderItem.baseElement.valueSecond)
-						}
 					}
-				}
-
-				Rectangle{
-					id: controlRecSecond;
-
-					anchors.verticalCenter: backgroundRec.verticalCenter;
-
-					x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXSecond  - rangeSliderItem.baseElement.controlWidth/2;
-					width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlWidth;
-					height: width;
-					radius: width;
-					color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
 
 				}
-
 			}
+
+
 		}
 
 	}
