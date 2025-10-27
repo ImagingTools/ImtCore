@@ -1158,6 +1158,14 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		}
 	}
 
+	QString documentIdFilterQuery;
+	if (paramIds.contains("DocumentIdFilter")){
+		iprm::TParamsPtr<imtcol::IDocumentIdFilter> documentFilterParamPtr(&filterParams, "DocumentIdFilter");
+		if (documentFilterParamPtr.IsValid()){
+			CreateDocumentIdFilterQuery(*documentFilterParamPtr.GetPtr(), documentIdFilterQuery);
+		}
+	}
+
 	QString documentFilterQuery;
 	if (paramIds.contains("DocumentFilter")){
 		iprm::TParamsPtr<imtcol::IDocumentCollectionFilter> documentFilterParamPtr(&filterParams, "DocumentFilter");
@@ -1210,6 +1218,14 @@ bool CSqlDatabaseDocumentDelegateComp::CreateFilterQuery(const iprm::IParamsSet&
 		}
 
 		filterQuery += "(" + documentFilterQuery + ")";
+	}
+
+	if (!documentIdFilterQuery.isEmpty()){
+		if (!filterQuery.isEmpty()){
+			filterQuery += " AND ";
+		}
+
+		filterQuery += "(" + documentIdFilterQuery + ")";
 	}
 
 	if (!additionalFilters.isEmpty()){
@@ -1510,6 +1526,40 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentCollectionFilterQuery(
 
 	documentFilterQuery.clear();
 	return false;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
+			const imtcol::IDocumentIdFilter& documentIdFilter,
+			QString& documentIdFilterQuery) const
+{
+	const QByteArrayList documentIds = documentIdFilter.GetDocumentIds();
+	if (documentIds.isEmpty()) {
+		documentIdFilterQuery.clear();
+		return false;
+	}
+
+	QStringList idStrings;
+	idStrings.reserve(documentIds.size());
+
+	for (const QByteArray& id : documentIds){
+		idStrings << QString("'%1'").arg(QString::fromUtf8(id));
+	}
+
+	imtcol::IDocumentIdFilter::ConditionType conditionType = documentIdFilter.GetConditionType();
+	QString conditionStr;
+	switch (conditionType){
+	case imtcol::IDocumentIdFilter::CT_IN:
+		conditionStr = QStringLiteral("IN");
+		break;
+	case imtcol::IDocumentIdFilter::CT_NOT_IN:
+		conditionStr = QStringLiteral("NOT IN");
+		break;
+	}
+	
+	documentIdFilterQuery = QString(R"(root."DocumentId" %0 (%1))").arg(conditionStr, idStrings.join(", "));
+
+	return true;
 }
 
 

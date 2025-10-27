@@ -1,0 +1,16 @@
+schema {
+	namespace: imtbase
+	version: 1.0
+}
+
+enum ConditionType {
+	In
+	NotIn
+}
+
+type DocumentIdFilter {
+	documentIds: [ID]!
+	conditionType: ConditionType!
+}
+
+

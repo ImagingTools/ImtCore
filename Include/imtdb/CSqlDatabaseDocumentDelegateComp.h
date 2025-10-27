@@ -12,6 +12,7 @@
 #include <imtdb/IDependentMetaInfoController.h>
 #include <imtdb/ISqlJsonXPathExtractor.h>
 #include <imtcol/CDocumentCollectionFilter.h>
+#include <imtcol/CDocumentIdFilter.h>
 
 
 namespace imtdb
@@ -174,7 +175,8 @@ protected:
 	virtual QByteArray CreateJoinTablesQuery() const;
 	virtual QByteArray GetCustomColumnsQuery() const;
 	virtual bool CreateDocumentCollectionFilterQuery(const imtcol::IDocumentCollectionFilter& documentCollectionFilter, QString& documentFilterQuery) const;
-	
+	virtual bool CreateDocumentIdFilterQuery(const imtcol::IDocumentIdFilter& documentIdFilter, QString& documentIdFilterQuery) const;
+
 protected:
 	I_ATTR(bool, m_useDataMetaInfoAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);

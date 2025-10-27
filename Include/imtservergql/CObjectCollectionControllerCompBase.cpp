@@ -224,6 +224,7 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 
 	RegisterFilterToSelectionParams(m_documentCollectionFilter, m_documentFilterRepresentationController);
 	RegisterFilterToSelectionParams(m_complexCollectionFilter, m_complexCollectionFilterRepresentationController);
+	RegisterFilterToSelectionParams(m_documentIdFilter, m_documentIdFilterRepresentationController);
 }
 
 

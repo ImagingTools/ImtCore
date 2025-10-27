@@ -20,7 +20,9 @@
 #include <imtserverapp/CParamSetRepresentationController.h>
 #include <imtserverapp/CComplexCollectionFilterRepresentationController.h>
 #include <imtserverapp/CDocumentFilterRepresentationController.h>
+#include <imtserverapp/CDocumentIdFilterRepresentationController.h>
 #include <imtcol/CDocumentCollectionFilter.h>
+#include <imtcol/CDocumentIdFilter.h>
 #include <imtbase/CComplexCollectionFilter.h>
 #include <imtauth/IUserActionManager.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ImtCollection.h>
@@ -330,10 +332,12 @@ protected:
 private:
 	iprm::CParamsSet m_selectionParams;
 	imtcol::CDocumentCollectionFilter m_documentCollectionFilter;
+	imtcol::CDocumentIdFilter m_documentIdFilter;
 	imtbase::CComplexCollectionFilter m_complexCollectionFilter;
 	imtserverapp::CParamSetRepresentationController m_paramSetRepresentationController;
 	imtserverapp::CDocumentFilterRepresentationController m_documentFilterRepresentationController;
 	imtserverapp::CComplexCollectionFilterRepresentationController m_complexCollectionFilterRepresentationController;
+	imtserverapp::CDocumentIdFilterRepresentationController m_documentIdFilterRepresentationController;
 
 protected:
 	I_MULTIATTR(QByteArray, m_replaceableFieldsAttrPtr);

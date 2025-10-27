@@ -90,9 +90,6 @@ Item {
         UserGroupCollectionView {
             productId: administrationContainer.productId;
             documentManager: administrationContainer.documentManager;
-            rolesModel: administrationContainer.rolesModel;
-            groupsModel: administrationContainer.groupsModel;
-            usersModel: administrationContainer.usersModel;
         }
     }
 
