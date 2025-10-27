@@ -1291,7 +1291,7 @@ StyleComponents {
 		Item {
 			id: progressBar;
 
-			width: Style.sizeHintXS;
+			width: !baseElement ? Style.sizeHintXS : baseElement.width;
 			height: progressContainer.y + progressContainer.height;
 
 			clip: true;

@@ -8,6 +8,12 @@ ControlBase {
 
     decorator: Style.progressBarDecorator;
 
+	width: Style.sizeHintXS
+	/**
+		\Height is calculated.
+	*/
+	heightFromDecorator: true;
+
 	property int barHeight: Style.controlHeightS;
 
     property bool hasText: true;
