@@ -80,6 +80,7 @@ ViewCommandsDelegateBase {
 
 	Connections {
 		id: commandsControllerConn;
+		target: null
 
 		function onCommandsChanged(){
 			collectionViewCommandsDelegate.setupContextMenu();
@@ -88,6 +89,7 @@ ViewCommandsDelegateBase {
 
 	Connections {
 		id: collectionConnections;
+		target: null
 
 		function onSelectionChanged(selectedIds, selectedIndexes){
 			collectionViewCommandsDelegate.updateBaseCommandsAccent();
@@ -103,6 +105,7 @@ ViewCommandsDelegateBase {
 
 	Connections {
 		id: elementsConnections;
+		target: null
 
 		function onElementsChanged(){
 			let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
