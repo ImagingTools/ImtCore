@@ -129,8 +129,24 @@ class Canvas extends Item {
     isImageLoading(image){
 
     }
-    loadImage(image){
+    loadImage(image, sourceSize){
+        if(typeof image === 'string'){
+            let path = rootPath+'/'+image.replaceAll('../','')
+            if(!this.$cache[path]){
+                let img = sourceSize ? new OriginImage(sourceSize.width, sourceSize.height) : new OriginImage()
+                img.onload = ()=>{
+                    image = img
+                    this.$cache[path] = img
+                    if(this.$signals.imageLoaded) this.imageLoaded()
+                }
+                img.onerror = ()=>{
+                    img.remove()
+                }
 
+                img.src = path.replaceAll('//','/')
+            }
+            
+        }
     }
     markDirty(area){
 
