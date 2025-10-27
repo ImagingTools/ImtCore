@@ -370,16 +370,15 @@ ViewBase {
 		anchors.bottom: parent.bottom;
 		anchors.horizontalCenter: parent.horizontalCenter;
 		width: parent.width;
-		height: !visible ? 0 : collectionViewBaseContainer.hasPagination ? Style.controlHeightM: 0;
+		height: !visible ? 0 : Style.controlHeightM;
 		color: pagination_.color;
-		visible: pagination_.visible
+		visible: collectionViewBaseContainer.hasPagination
 		
 		Pagination {
 			id: pagination_;
 			anchors.horizontalCenter: parent.horizontalCenter;
 			anchors.verticalCenter: parent.verticalCenter;
 			pagesSize: 1;
-			visible: collectionViewBaseContainer.hasPagination /*&& pagesSize > 1*/;
 
 			onCurrentIndexChanged: {
 				tableInternal.resetSelection();
