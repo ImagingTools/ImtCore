@@ -649,6 +649,7 @@ StyleComponents {
 					id: sliderContainer;
 
 					anchors.horizontalCenter: parent.horizontalCenter;
+					anchors.verticalCenter: parent.verticalCenter;
 
 					width: parent.width - sliderItem.controlWidth;
 					height: parent.height;

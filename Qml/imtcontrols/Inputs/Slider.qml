@@ -150,17 +150,18 @@ ControlBase {
 			size = controlHeight/2 + indicatorHeight;
 		}
 		else if(!hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter){
-			controlCenterY = majorTickHeight/2
-			size = majorTickHeight;
+			controlCenterY = majorTickHeight/2 + fontSize
+			size = majorTickHeight + fontSize;
 		}
 		else if(!hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom){
-			controlCenterY = controlHeight/2;
-			size = controlHeight/2 + majorTickHeight
+			controlCenterY = controlHeight/2
+			size = controlHeight/2 + majorTickHeight + fontSize
 		}
 		else if(!hasIndicator && hasTicks && ticksPosition == RelativePosition.top){
-			controlCenterY = majorTickHeight;
-			size = controlHeight/2 + majorTickHeight
+			controlCenterY = majorTickHeight + fontSize;
+			size = controlHeight/2 + majorTickHeight + fontSize
 		}
+
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom && indicatorPosition == RelativePosition.bottom){
 			controlCenterY = controlHeight/2;
 			size = controlHeight/2 + Math.max(majorTickHeight, indicatorHeight);
@@ -170,12 +171,12 @@ ControlBase {
 			size = controlHeight/2 + Math.max(majorTickHeight, indicatorHeight);
 		}
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.top && indicatorPosition == RelativePosition.bottom){
-			controlCenterY = majorTickHeight;
-			size = majorTickHeight + indicatorHeight;
+			controlCenterY = majorTickHeight + fontSize;
+			size = majorTickHeight + indicatorHeight + fontSize;
 		}
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.bottom && indicatorPosition == RelativePosition.top){
 			controlCenterY = indicatorHeight;
-			size = majorTickHeight + indicatorHeight;
+			size = majorTickHeight + indicatorHeight + fontSize;
 		}
 
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter && indicatorPosition == RelativePosition.top){
@@ -183,8 +184,8 @@ ControlBase {
 			size = majorTickHeight/2 + controlCenterY;
 		}
 		else if(hasIndicator && hasTicks && ticksPosition == RelativePosition.verticalCenter && indicatorPosition == RelativePosition.bottom){
-			controlCenterY =  majorTickHeight/2
-			size = majorTickHeight/2 + indicatorHeight;
+			controlCenterY =  majorTickHeight/2 + fontSize
+			size = majorTickHeight/2 + indicatorHeight + fontSize;
 		}
 
 		if(orientation == Qt.Vertical){
