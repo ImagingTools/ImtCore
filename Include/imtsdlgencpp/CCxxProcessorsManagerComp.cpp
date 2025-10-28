@@ -563,9 +563,8 @@ bool CCxxProcessorsManagerComp::ProcessUnions(
 		Q_ASSERT(unionProcessorPtr != nullptr);
 		for (const imtsdl::CSdlUnion& sdlUinion: unionList){
 			FilePtr headerFilePtr = GetFilePtrForEntry(sdlUinion, headerFiles);
-			Q_ASSERT(headerFilePtr);
 			FilePtr sourceFilePtr = GetFilePtrForEntry(sdlUinion, sourceFiles);
-			Q_ASSERT(sourceFilePtr);
+			Q_ASSERT(headerFilePtr || sourceFilePtr);
 			const bool ok = unionProcessorPtr->ProcessEntry(sdlUinion, headerFilePtr.get(), sourceFilePtr.get(), paramsPtr);
 			if (!ok){
 				SendErrorMessage(0, QString("Unable to process union '%1'").arg(sdlUinion.GetName()));
