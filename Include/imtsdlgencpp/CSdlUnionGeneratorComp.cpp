@@ -40,9 +40,7 @@ bool CSdlUnionGeneratorComp::ProcessEntry(
 
 	const imtsdl::CSdlUnion* sdlUnion = dynamic_cast<const imtsdl::CSdlUnion*>(&sdlEntry);
 	if (sdlUnion == nullptr || headerDevicePtr == nullptr){
-		I_CRITICAL();
-
-		return false;
+		return true;
 	}
 
 	QTextStream stream(headerDevicePtr);

@@ -545,7 +545,7 @@ bool CCxxProcessorsManagerComp::ProcessUnions(
 			const EntryFileMap& sourceFiles,
 			const iprm::IParamsSet* paramsPtr) const
 {
-	if (!m_unionProcessorCompListPtr.IsValid() || !m_sdlUnionListCompPtr.IsValid() || headerFiles.isEmpty()){
+	if (!m_unionProcessorCompListPtr.IsValid() || !m_sdlUnionListCompPtr.IsValid() || (headerFiles.isEmpty() && sourceFiles.isEmpty())){
 		// nothing todo
 		return true;
 	}
