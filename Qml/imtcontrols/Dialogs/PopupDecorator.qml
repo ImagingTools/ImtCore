@@ -57,7 +57,7 @@ DecoratorBase {
 		width: root ? root.width : 0;
 		height: visible ? popupMenuListView.height + 2 * Style.marginXS : false;
 
-		color: Style.baseColor;
+		color: !root.baseElement ? Style.baseColor : root.baseElement.color;//Style.baseColor;
 
 		visible: popupMenuListView.count > 0;
 
@@ -118,10 +118,15 @@ DecoratorBase {
 
 	DropShadow {
 		id: dropShadow;
+
 		anchors.fill: itemBody;
+
 		z: itemBody.z-1
 		horizontalOffset: 3;
 		verticalOffset: root.isUpwards ? -3 : 3;
+
+		visible: !root.baseElement ? false: root.baseElement.hasShadow;
+
 		radius: Style.radiusL;
 		spread: 0;
 		color: Style.shadowColor;

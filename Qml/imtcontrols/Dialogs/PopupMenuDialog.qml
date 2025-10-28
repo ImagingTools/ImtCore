@@ -27,6 +27,9 @@ ControlBase {
 	property int textSize: Style.fontSizeM;
 	property string fontColor: Style.textColor;
 	
+	property string color: Style.baseColor;
+
+	property bool hasShadow: true;
 	property bool hiddenBackground: true;
 	property bool visibleScrollBar: true;
 	property bool moveToEnd: false;

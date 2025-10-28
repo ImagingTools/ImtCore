@@ -20,6 +20,8 @@ ControlBase {
 	property bool checked: false;
 	property bool enabled: true;
 
+	property bool isMenuButton: false;
+
 	property int focusPolicy: Qt.WheelFocus;
 	property int focusReason: -1;
 

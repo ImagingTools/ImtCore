@@ -6,7 +6,7 @@ import imtcontrols 1.0
 DecoratorBase {
 	id: commonButtonDecorator
 
-	width: Math.max(contentWidth + Style.marginM * 2, widthDefault)
+	width: Math.max(content.width + Style.marginM * 2, widthDefault)
 	height: Style.buttonHeightM;
 
 	clip: true;
@@ -35,6 +35,7 @@ DecoratorBase {
 
 	property string tooltipText: baseElement && baseElement.tooltipText !== "" ? baseElement.tooltipText : (textIsCropped ? textObj.text : "");
 	property bool enabled: baseElement ? baseElement.enabled : false;
+	property bool isMenuButton: (!baseElement || baseElement.isMenuButton == undefined) ? false : baseElement.isMenuButton;
 
 	signal mouseEntered(real mouseX, real mouseY);
 	signal mouseExited(real mouseX, real mouseY);
@@ -111,9 +112,9 @@ DecoratorBase {
 		anchors.verticalCenter: commonButtonDecorator.verticalCenter;
 		anchors.horizontalCenter: commonButtonDecorator.horizontalCenter;
 
-		width: iconObj.width + textItem.width + Style.marginM;
+		//width: iconObj.width + textItem.width + Style.marginM;
+		width: iconObj.width + textItem.width + commonButtonDecorator.contentSpacing + commonButtonDecorator.isMenuButton * (arrowIcon.width + commonButtonDecorator.contentSpacing);
 		height: Math.max(iconObj.height, textItem.height)
-
 
 		Image {
 			id: iconObj
@@ -144,7 +145,8 @@ DecoratorBase {
 		Item {
 			id: textItem;
 
-			anchors.centerIn: iconObj && iconObj.visible ? undefined : content;
+			anchors.horizontalCenter: iconObj && iconObj.visible ? undefined : content.horizontalCenter;
+			anchors.horizontalCenterOffset: commonButtonDecorator.isMenuButton ? -(arrowIcon.width + commonButtonDecorator.contentSpacing)/2 : 0
 			anchors.verticalCenter: content.verticalCenter;
 			anchors.left: iconObj && iconObj.visible ? iconObj.right : undefined;
 			anchors.leftMargin: iconObj && iconObj.visible ? commonButtonDecorator.contentSpacing : 0;
@@ -181,6 +183,26 @@ DecoratorBase {
 
 				visible: false;
 			}
+		}
+
+		Image {
+			id: arrowIcon;
+
+			anchors.right: parent.right;
+			anchors.verticalCenter: parent.verticalCenter;
+
+			width: Style.iconSizeXS;
+			height: Style.iconSizeXXS;
+
+			rotation: !commonButtonDecorator.baseElement ? 0 : commonButtonDecorator.baseElement.isOpen ? 180 : 0
+			source:  "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
+
+
+			sourceSize.width: width;
+			sourceSize.height: height;
+
+			visible: commonButtonDecorator.isMenuButton;
+
 		}
 	}
 
