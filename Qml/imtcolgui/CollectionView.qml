@@ -107,6 +107,11 @@ Item {
 	function registerFilter(filterId, filterModel){
 		root.registeredFilters[filterId] = filterModel
 	}
+
+	function setFilterIsEnabled(filterId, enabled){
+		filterMenu.setFilterIsEnabled(filterId, enabled)
+	}
+
 	function doubleClicked(id, index){
 		container.doubleClicked(id, index)
 	}

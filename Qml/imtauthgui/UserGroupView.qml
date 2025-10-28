@@ -2,23 +2,19 @@ import QtQuick 2.12
 import Acf 1.0
 import com.imtcore.imtqml 1.0
 import imtgui 1.0
+import imtguigql 1.0
 import imtcontrols 1.0
 import imtauthGroupsSdl 1.0
 import imtdocgui 1.0
+import imtbaseImtBaseTypesSdl 1.0
+import imtbaseComplexCollectionFilterSdl 1.0
 
 ViewBase {
 	id: container;
-	
-	property TreeItemModel groupsModel: TreeItemModel {}
-	property TreeItemModel rolesModel: TreeItemModel {}
-	property TreeItemModel usersModel: TreeItemModel {}
-	
-	property TreeItemModel copiedGroupsModel: TreeItemModel {}
-	
+
 	property GroupData groupData: model;
-	
 	property string productId;
-	
+
 	function updateGui(){
 		generalGroup.updateGui();
 		usersGroup.updateGui();
@@ -144,183 +140,42 @@ ViewBase {
 					KeyNavigation.backtab: nameInput;
 				}
 				
-				TableElementView {
-					id: parentGroupsTable;
-					
-					name: qsTr("Parent Groups");
-					
-					KeyNavigation.tab: usersTable;
-					KeyNavigation.backtab: descriptionInput;
-					
-					Connections {
-						target: parentGroupsTable.table;
-						
-						function onCheckedItemsChanged(){
-							container.doUpdateModel();
-						}
-						
-						function onHeadersChanged(){
-							target.setColumnContentById("name", groupObjectLinkDelegateComp)
-						}
+				SelectableCollectionEditor {
+					id: groupSelectableCollectionEditor
+					collectionId: "Groups"
+					targetTitle: qsTr("Parent Groups")
+					sourceTitle: qsTr("Adding Parent Group")
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
 					
 					Component {
-						id: groupObjectLinkDelegateComp
-						
-						TextLinkCellDelegate {
-							id: objectLinkDelegate
-							onLinkActivated: {
-								let groupId = table.elements.getData("id", rowIndex)
-								NavigationController.navigate("Administration/Groups/Group/" + groupId)
-							}
-							
-							onReused: {
-								if (table){
-									text = table.elements.getData("name", rowIndex)
-								}
-							}
+						id: fieldFilterComp
+						FieldFilter {
+							m_fieldId: "DocumentId"
+							m_filterValueType: "String"
+							m_filterValue: !container.groupData ? "" : container.groupData.m_id
+							m_filterOperations: ["Not", "Equal"]
 						}
 					}
 					
-					TreeItemModel {
-						id: groupsHeadersModel;
-						
-						function updateHeaders(){
-							groupsHeadersModel.clear();
-							
-							let index = groupsHeadersModel.insertNewItem();
-							
-							groupsHeadersModel.setData("id", "name");
-							groupsHeadersModel.setData("name", qsTr("Group Name"));
-							
-							groupsHeadersModel.refresh();
-							
-							parentGroupsTable.table.checkable = true;
-							parentGroupsTable.table.headers = groupsHeadersModel;
-						}
-						
-						Component.onCompleted: {
-							updateHeaders();
-						}
+					function setSourceAdditionalFilters(collection){
+						let fieldFilter = fieldFilterComp.createObject(collection.collectionFilter)
+						collection.collectionFilter.addFieldFilter(fieldFilter)
 					}
 				}
-				
-				function updateGroupsModel(){
-					container.copiedGroupsModel.copy(container.groupsModel);
-					
-					let objectId = container.groupData.m_id;
-					let removedIndexes = []
-					
-					let childrenIds = []
-					getAllChildrenGroups(objectId, childrenIds);
-					
-					// Get all parent ID-s
-					let parentIds = []
-					let parentGroups = container.groupData.m_parentGroups;
-					let parentGroupIds = parentGroups.split(';')
-					for (let j = 0; j < parentGroupIds.length; j++){
-						getAllParentGroupIds(parentGroupIds[j], parentIds);
-					}
-					
-					for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
-						let id = container.copiedGroupsModel.getData("id", i);
-						if (id === objectId || childrenIds.includes(id)){
-							removedIndexes.push(i);
-						}
-					}
-					
-					let removedCount = 0
-					for (let i = 0; i < removedIndexes.length; i++){
-						container.copiedGroupsModel.removeItem(removedIndexes[i] - removedCount);
-						removedCount++;
-					}
-					
-					parentGroupsTable.table.checkable = true;
-					parentGroupsTable.table.elements = container.copiedGroupsModel;
-				}
-				
-				function getAllChildrenGroups(groupId, retVal){
-					for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
-						let id = container.copiedGroupsModel.getData("id", i);
-						let parentGroups = container.copiedGroupsModel.getData("parentGroups", i);
-						if (parentGroups !== ""){
-							let parentGroupIds = parentGroups.split(';')
-							if (parentGroupIds.includes(groupId)){
-								retVal.push(id);
-								
-								getAllChildrenGroups(id, retVal);
-							}
-						}
-					}
-				}
-				
-				function getAllParentGroupIds(groupId, retVal){
-					for (let i = 0; i < container.copiedGroupsModel.getItemsCount(); i++){
-						let id = container.copiedGroupsModel.getData("id", i);
-						if (id === groupId){
-							let parentGroups = container.copiedGroupsModel.getData("parentGroups", i);
-							if (parentGroups !== ""){
-								let parentGroupsIds = parentGroups.split(';');
-								for (let j = 0; j < parentGroupsIds.length; j++){
-									retVal.push(parentGroupsIds[j])
-									getAllParentGroupIds(parentGroupsIds[j], retVal);
-								}
-							}
-						}
-					}
-				}
-				
+
 				function updateGui(){
 					nameInput.text = container.groupData.m_name;
 					descriptionInput.text = container.groupData.m_description;
-					
-					let parentGroupIds = []
-					let parentGroups = container.groupData.m_parentGroups;
-					if (parentGroups !== ""){
-						parentGroupIds = parentGroups.split(';')
-					}
-					
-					if (!parentGroupsTable.table.elements){
-						updateGroupsModel();
-					}
-					
-					parentGroupsTable.table.uncheckAll();
-					if (parentGroupsTable.table.elements){
-						for (let i = 0; i < parentGroupsTable.table.elements.getItemsCount(); i++){
-							let id = parentGroupsTable.table.elements.getData("id", i);
-							if (parentGroupIds.includes(id)){
-								parentGroupsTable.table.checkItem(i);
-							}
-						}
-					}
+					groupSelectableCollectionEditor.selectedIds = container.groupData.m_parentGroups.slice()
 				}
 				
 				function updateModel(){
 					container.groupData.m_description = descriptionInput.text;
 					container.groupData.m_name = nameInput.text;
-					
-					let selectedGroupIds = []
-					let indexes = parentGroupsTable.table.getCheckedItems();
-					for (let index of indexes){
-						let id = parentGroupsTable.table.elements.getData("id", index);
-						selectedGroupIds.push(id);
-					}
-					
-					selectedGroupIds.sort();
-					
-					container.groupData.m_parentGroups = selectedGroupIds.join(';');
-					
-					if (!parentGroupsTable.table.elements){
-						updateGroupsModel();
-					}
+					container.groupData.m_parentGroups = groupSelectableCollectionEditor.selectedIds.slice()
 				}
-			}
-			
-			GroupHeaderView {
-				width: parent.width;
-				
-				title: qsTr("Users");
-				groupView: usersGroup;
 			}
 			
 			GroupElementView {
@@ -328,210 +183,48 @@ ViewBase {
 				
 				width: parent.width;
 				
-				TableElementView {
-					id: usersTable;
-					
-					KeyNavigation.tab: rolesTable;
-					KeyNavigation.backtab: parentGroupsTable;
-					
-					Component.onCompleted: {
-						usersTable.table.readOnly = container.readOnly;
-					}
-					
-					Component {
-						id: userObjectLinkDelegateComp
-						
-						TextLinkCellDelegate {
-							id: objectLinkDelegate
-							onLinkActivated: {
-								let userId = table.elements.getData("id", rowIndex)
-								NavigationController.navigate("Administration/Users/User/" + userId)
-							}
-							
-							onReused: {
-								if (table){
-									text = table.elements.getData("name", rowIndex)
-								}
-							}
-						}
-					}
-					
-					Connections {
-						target: usersTable.table;
-						
-						function onCheckedItemsChanged(){
-							container.doUpdateModel();
-						}
-						
-						function onHeadersChanged(){
-							target.setColumnContentById("name", userObjectLinkDelegateComp)
-						}
-					}
-				}
-				
-				TreeItemModel {
-					id: headersModel;
-					
-					function updateHeaders(){
-						headersModel.clear();
-						
-						headersModel.insertNewItem();
-						
-						headersModel.setData("id", "name");
-						headersModel.setData("name", qsTr("User Name"));
-						
-						headersModel.refresh();
-						
-						usersTable.table.checkable = true;
-						usersTable.table.headers = headersModel;
-						usersTable.table.elements = container.usersModel;
-					}
-					
-					Component.onCompleted: {
-						updateHeaders();
+				SelectableCollectionEditor {
+					id: userSelectableCollectionEditor
+					collectionId: "Users"
+					targetTitle: qsTr("Users")
+					sourceTitle: qsTr("Adding Users")
+					targetRequestedFields: ["id", "name"]
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
 				}
 				
 				function updateGui(){
-					let userIds = [];
-					let roles = container.groupData.m_users;
-					if (roles !== ""){
-						userIds = roles.split(';');
-					}
-					
-					usersTable.table.uncheckAll();
-					if (usersTable.table.elements){
-						for (let i = 0; i < usersTable.table.elements.getItemsCount(); i++){
-							let id = usersTable.table.elements.getData("id", i);
-							if (userIds.includes(id)){
-								usersTable.table.checkItem(i);
-							}
-						}
-					}
+					userSelectableCollectionEditor.selectedIds = container.groupData.m_users.slice()
 				}
 				
 				function updateModel(){
-					let selectedUserIds = []
-					
-					let indexes = usersTable.table.getCheckedItems();
-					for (let index of indexes){
-						let id = usersTable.table.elements.getData("id", index);
-						selectedUserIds.push(id);
-					}
-					
-					selectedUserIds.sort()
-					
-					let result = selectedUserIds.join(';');
-					container.groupData.m_users = result;
+					container.groupData.m_users = userSelectableCollectionEditor.selectedIds.slice()
 				}
 			}
-			
-			GroupHeaderView {
-				width: parent.width;
-				
-				title: qsTr("Roles");
-				groupView: rolesGroup;
-			}
-			
+
 			GroupElementView {
 				id: rolesGroup;
 				
 				width: parent.width;
 				
-				TableElementView {
-					id: rolesTable;
-					
-					KeyNavigation.tab: nameInput;
-					KeyNavigation.backtab: usersTable;
-					
-					Component.onCompleted: {
-						rolesTable.table.readOnly = container.readOnly;
-					}
-					
-					Component {
-						id: roleObjectLinkDelegateComp
-						
-						TextLinkCellDelegate {
-							id: objectLinkDelegate
-							onLinkActivated: {
-								let roleId = table.elements.getData("id", rowIndex)
-								NavigationController.navigate("Administration/Roles/Role/" + roleId)
-							}
-							
-							onReused: {
-								if (table){
-									text = table.elements.getData("roleName", rowIndex)
-								}
-							}
-						}
-					}
-					
-					Connections {
-						target: rolesTable.table;
-						
-						function onCheckedItemsChanged(){
-							container.doUpdateModel();
-						}
-						
-						function onHeadersChanged(){
-							target.setColumnContentById("roleName", roleObjectLinkDelegateComp)
-						}
+				SelectableCollectionEditor {
+					id: roleSelectableCollectionEditor
+					collectionId: "Roles"
+					targetTitle: qsTr("Roles")
+					sourceTitle: qsTr("Adding Roles")
+					targetRequestedFields: ["roleName", "description"]
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
 				}
-				
-				TreeItemModel {
-					id: rolesHeadersModel;
-					
-					function updateHeaders(){
-						rolesHeadersModel.clear();
-						
-						rolesHeadersModel.insertNewItem();
-						
-						rolesHeadersModel.setData("id", "roleName");
-						rolesHeadersModel.setData("name", qsTr("Role Name"));
-						
-						rolesHeadersModel.refresh();
-						
-						rolesTable.table.checkable = true;;
-						rolesTable.table.elements = container.rolesModel;
-						rolesTable.table.headers = rolesHeadersModel;
-					}
-					
-					Component.onCompleted: {
-						updateHeaders();
-					}
-				}
-				
+
 				function updateGui(){
-					let roleIds = [];
-					let roles = container.groupData.m_roles;
-					if (roles !== ""){
-						roleIds = roles.split(';');
-					}
-					
-					rolesTable.table.uncheckAll();
-					if (rolesTable.table.elements){
-						for (let i = 0; i < rolesTable.table.elements.getItemsCount(); i++){
-							let id = rolesTable.table.elements.getData("id", i);
-							if (roleIds.includes(id)){
-								rolesTable.table.checkItem(i);
-							}
-						}
-					}
+					roleSelectableCollectionEditor.selectedIds = container.groupData.m_roles.slice()
 				}
 				
 				function updateModel(){
-					let selectedRoleIds = []
-					let indexes = rolesTable.table.getCheckedItems();
-					for (let index of indexes){
-						let id = rolesTable.table.elements.getData("id", index);
-						selectedRoleIds.push(id);
-					}
-					
-					selectedRoleIds.sort();
-					
-					let result = selectedRoleIds.join(';');
-					container.groupData.m_roles = result;
+					container.groupData.m_roles = roleSelectableCollectionEditor.selectedIds.slice()
 				}
 			}
 		}

@@ -132,14 +132,14 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 
 	imtauth::IUserInfo::FeatureIds permissions;
 	if (representation.permissions){
-		permissions = representation.permissions->split(';');
+		permissions = representation.permissions->ToList();
 	}
 	permissions.removeAll("");
 	userInfoPtr->SetLocalPermissions(productId, permissions);
 
 	QByteArrayList roleIds;
 	if (representation.roles){
-		roleIds = representation.roles->split(';');
+		roleIds = representation.roles->ToList();
 	}
 	roleIds.removeAll("");
 	if (!roleIds.isEmpty()){
@@ -151,7 +151,7 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 
 	QByteArrayList groupIds;
 	if (representation.groups){
-		groupIds = representation.groups->split(';');
+		groupIds = representation.groups->ToList();
 	}
 	groupIds.removeAll("");
 	for (const QByteArray& groupId : groupIds){

@@ -45,21 +45,13 @@ RemoteCollectionView {
 	function handleSubscription(dataModel){
 		userGroupCollectionViewContainer.doUpdateGui();
 	}
-	
-	property TreeItemModel usersModel;
-	property TreeItemModel rolesModel;
-	property TreeItemModel groupsModel;
-	
+
 	Component {
 		id: userGroupDocumentComp;
 		
 		UserGroupView {
 			id: groupEditor;
-			
-			usersModel: userGroupCollectionViewContainer.usersModel;
-			rolesModel: userGroupCollectionViewContainer.rolesModel;
-			groupsModel: userGroupCollectionViewContainer.groupsModel;
-			
+
 			productId: userGroupCollectionViewContainer.productId;
 			
 			commandsControllerComp: Component {GqlBasedCommandsController {

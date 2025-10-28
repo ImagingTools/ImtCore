@@ -5,6 +5,9 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtauthRolesSdl 1.0
 import imtdocgui 1.0
+import imtguigql 1.0
+import imtbaseComplexCollectionFilterSdl 1.0
+import imtbaseImtBaseTypesSdl 1.0
 
 ViewBase {
 	id: container;
@@ -12,7 +15,6 @@ ViewBase {
 	anchors.fill: parent;
 	
 	property TreeItemModel permissionsModel: TreeItemModel {};
-	property TreeItemModel rolesModel: TreeItemModel {};
 	
 	property string productId: "";
 	
@@ -34,9 +36,7 @@ ViewBase {
 		
 		roleData.m_productId = container.productId;
 	}
-	
-	property TreeItemModel copiedRolesModel: TreeItemModel {}
-	
+
 	DocumentHistoryPanel {
 		id: historyPanel;
 		documentId: container.roleData ? container.roleData.m_id : "";
@@ -146,187 +146,55 @@ ViewBase {
 						}
 					}
 					
-					KeyNavigation.tab: parentRolesTable;
+					KeyNavigation.tab: roleSelectableCollectionEditor;
 					KeyNavigation.backtab: roleIdInput;
 				}
 				
-				TableElementView {
-					id: parentRolesTable;
-					
-					name: qsTr("Parent Roles");
-					visible: parentRolesTable.table ? parentRolesTable.table.elementsCount > 0 : false;
-					
-					KeyNavigation.tab: permissionsGroup;
-					KeyNavigation.backtab: descriptionInput;
-					
-					Component.onCompleted: {
-						parentRolesTable.table.checkable = true;
+				SelectableCollectionEditor {
+					id: roleSelectableCollectionEditor
+					collectionId: "Roles"
+					targetTitle: qsTr("Parent Roles")
+					sourceTitle: qsTr("Adding Parent Role")
+					onSelectionChanged: {
+						container.doUpdateModel()
 					}
 					
 					Component {
-						id: roleObjectLinkDelegateComp
-						
-						TextLinkCellDelegate {
-							id: objectLinkDelegate
-							onLinkActivated: {
-								let roleId = table.elements.getData("id", rowIndex)
-								NavigationController.navigate("Administration/Roles/Role/" + roleId)
-							}
-							
-							onReused: {
-								if (table){
-									text = table.elements.getData("roleName", rowIndex)
-								}
-							}
+						id: fieldFilterComp
+						FieldFilter {
+							m_fieldId: "DocumentId"
+							m_filterValueType: "String"
+							m_filterValue: !container.roleData ? "" : container.roleData.m_id
+							m_filterOperations: ["Not", "Equal"]
 						}
 					}
-					
-					Connections {
-						target: parentRolesTable.table;
-						
-						function onCheckedItemsChanged(){
-							container.doUpdateModel();
-						}
-						
-						function onHeadersChanged(){
-							target.setColumnContentById("roleName", roleObjectLinkDelegateComp)
-						}
+
+					IdParam {
+						id: idParameter
+						m_id: !container.roleData ? "" : container.roleData.m_id
+					}
+
+					function setSourceAdditionalFilters(collection){
+						let fieldFilter = fieldFilterComp.createObject(collection.collectionFilter)
+						collection.collectionFilter.addFieldFilter(fieldFilter)
+
+						collection.registerFilter("ParentListFilter", idParameter)
+						collection.setFilterIsEnabled("ParentListFilter", true)
 					}
 				}
-				
-				TreeItemModel {
-					id: rolesHeadersModel;
-					
-					function updateHeaders(){
-						rolesHeadersModel.clear();
-						
-						let index = rolesHeadersModel.insertNewItem();
-						
-						rolesHeadersModel.setData("id", "roleName");
-						rolesHeadersModel.setData("name", qsTr("Role Name"));
-						
-						rolesHeadersModel.refresh();
-						
-						parentRolesTable.table.headers = rolesHeadersModel;
-					}
-					
-					Component.onCompleted: {
-						updateHeaders();
-					}
-				}
-				
+
 				function updateGui(){
 					roleIdInput.text = container.roleData.m_roleId;
 					roleNameInput.text = container.roleData.m_name;
 					descriptionInput.text = container.roleData.m_description;
-					
-					let parentRolesIds = [];
-					let parentGroups = container.roleData.m_parentRoles;
-					if (parentGroups !== ""){
-						parentRolesIds = parentGroups.split(';')
-					}
-					
-					parentRolesIds.sort();
-					
-					if (!parentRolesTable.table.elements){
-						updateRolesModel();
-					}
-					
-					parentRolesTable.table.uncheckAll();
-					
-					if (parentRolesTable.table.elements){
-						for (let i = 0; i < parentRolesTable.table.elements.getItemsCount(); i++){
-							let id = parentRolesTable.table.elements.getData("id", i);
-							if (parentRolesIds.includes(id)){
-								parentRolesTable.table.checkItem(i);
-							}
-						}
-					}
+					roleSelectableCollectionEditor.selectedIds = container.roleData.m_parentRoles.slice()
 				}
 				
 				function updateModel(){
 					container.roleData.m_roleId = roleIdInput.text;
 					container.roleData.m_name = roleNameInput.text;
 					container.roleData.m_description = descriptionInput.text;
-					
-					let selectedRoleIds = []
-					let indexes = parentRolesTable.table.getCheckedItems();
-					for (let index of indexes){
-						let id = parentRolesTable.table.elements.getData("id", index);
-						selectedRoleIds.push(id);
-					}
-					
-					selectedRoleIds.sort();
-					container.roleData.m_parentRoles = selectedRoleIds.join(';')
-					
-					if (!parentRolesTable.table.elements){
-						updateRolesModel();
-					}
-				}
-				
-				function updateRolesModel(){
-					container.copiedRolesModel.copy(container.rolesModel);
-					
-					let documentId = container.roleData.m_id;
-					
-					// Get all children ID-s
-					let childrenIds = []
-					getAllChildrenRoleIds(documentId, container.copiedRolesModel, childrenIds);
-					
-					// Get all parent ID-s
-					let parentIds = []
-					let parentRoles = container.roleData.m_parentRoles;
-					let parentRolesIds = parentRoles.split(';')
-					for (let j = 0; j < parentRolesIds.length; j++){
-						getAllParentRoleIds(parentRolesIds[j], container.copiedRolesModel, parentIds);
-					}
-					
-					// Indexes for deleting
-					let removedIndexes = []
-					for (let i = 0; i < container.copiedRolesModel.getItemsCount(); i++){
-						let id = container.copiedRolesModel.getData("id", i);
-						if (id === documentId || childrenIds.includes(id)){
-							removedIndexes.push(i);
-						}
-					}
-					
-					let removedCount = 0
-					for (let i = 0; i < removedIndexes.length; i++){
-						container.copiedRolesModel.removeItem(removedIndexes[i] - removedCount);
-						removedCount++;
-					}
-					
-					parentRolesTable.table.elements = container.copiedRolesModel;
-				}
-				
-				function getAllParentRoleIds(roleId, rolesModel, retVal){
-					for (let i = 0; i < rolesModel.getItemsCount(); i++){
-						let id = rolesModel.getData("id", i);
-						if (id === roleId){
-							let parentRoles = rolesModel.getData("parentRoles", i);
-							let parentRolesIds = parentRoles.split(';');
-							for (let j = 0; j < parentRolesIds.length; j++){
-								retVal.push(parentRolesIds[j])
-								getAllParentRoleIds(parentRolesIds[j], rolesModel, retVal);
-							}
-						}
-					}
-				}
-				
-				function getAllChildrenRoleIds(roleId, rolesModel, retVal){
-					for (let i = 0; i < rolesModel.getItemsCount(); i++){
-						let id = rolesModel.getData("id", i);
-						
-						let parentRoles = rolesModel.getData("parentRoles", i);
-						if (parentRoles !== ""){
-							let parentRolesIds = parentRoles.split(';');
-							if (parentRolesIds.includes(roleId)){
-								retVal.push(id);
-								
-								getAllChildrenRoleIds(id, rolesModel, retVal);
-							}
-						}
-					}
+					container.roleData.m_parentRoles = roleSelectableCollectionEditor.selectedIds.slice()
 				}
 			}
 			
@@ -346,7 +214,7 @@ ViewBase {
 					id: permissionsGroup;
 					
 					KeyNavigation.tab: roleNameInput;
-					KeyNavigation.backtab: parentRolesTable;
+					KeyNavigation.backtab: roleSelectableCollectionEditor;
 					
 					Component.onCompleted: {
 						permissionsGroup.treeView.tristate = true;

@@ -1534,9 +1534,15 @@ bool CSqlDatabaseDocumentDelegateComp::CreateDocumentIdFilterQuery(
 			QString& documentIdFilterQuery) const
 {
 	const QByteArrayList documentIds = documentIdFilter.GetDocumentIds();
-	if (documentIds.isEmpty()) {
-		documentIdFilterQuery.clear();
-		return false;
+	if (documentIds.isEmpty()){
+		if (documentIdFilter.GetConditionType() == imtcol::IDocumentIdFilter::ConditionType::CT_IN){
+			documentIdFilterQuery = QStringLiteral("1 = 0");
+		}
+		else{
+			documentIdFilterQuery = QStringLiteral("1 = 1");
+		}
+
+		return true;
 	}
 
 	QStringList idStrings;

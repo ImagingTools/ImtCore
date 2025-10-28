@@ -8,6 +8,7 @@ schema {
 
 import {
 	"../../../../ImtCore/Sdl/imtbase/1.0/ImtCollection.sdl"
+	"../../../../ImtCore/Sdl/imtbase/1.0/ImtBaseTypes.sdl"
 }
 
 input GroupsListInput {
@@ -37,9 +38,9 @@ type GroupData {
 	productId: ID
 	name: String
 	description: String
-	roles: ID
-	users: ID
-	parentGroups: ID
+	roles: [ID]
+	users: [ID]
+	parentGroups: [ID]
 }
 
 input GroupDataInput {

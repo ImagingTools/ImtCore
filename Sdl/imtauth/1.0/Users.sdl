@@ -49,9 +49,9 @@ type UserData {
 	username: ID
 	password: String
 	email: String
-	groups: ID
-	roles: ID
-	permissions: ID
+	groups: [ID]
+	roles: [ID]
+	permissions: [ID]
 	systemInfos: [SystemInfo]
 }
 

@@ -4,13 +4,14 @@
         <VersionInfos>
             <Version Id="0" Number="5430" Description="ACF"/>
             <Version Id="1" Number="2253" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395522" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="PostgresDatabaseObjectCollection" X="600" Y="125" Note=""/>
         <Element ComponentName="Role" X="300" Y="325" Note=""/>
         <Element ComponentName="RoleCollectionAdapter" X="800" Y="325" Note=""/>
+        <Element ComponentName="RoleDatabaseDelegate" X="990" Y="226" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

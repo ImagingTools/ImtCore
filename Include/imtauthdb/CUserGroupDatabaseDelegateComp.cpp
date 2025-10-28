@@ -1,6 +1,10 @@
 #include <imtauthdb/CUserGroupDatabaseDelegateComp.h>
 
 
+// ACF includes
+#include <iprm/IIdParam.h>
+#include <iprm/TParamsPtr.h>
+
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
 #include <imtauth/IUserGroupInfo.h>
@@ -121,6 +125,39 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 	
 	return retVal;
 }
+
+
+QString CUserGroupDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, "ParentListFilter");
+	if (idParamPtr.IsValid()){
+		QByteArray targetId = idParamPtr->GetId();
+		return QString(R"(
+			NOT EXISTS (
+				WITH RECURSIVE descendants AS (
+					SELECT g."DocumentId"
+					FROM "UserGroups" g
+					WHERE g."DocumentId" = '%1'
+					AND g."State" = 'Active'
+				
+					UNION ALL
+					SELECT child."DocumentId"
+					FROM "UserGroups" child
+					JOIN descendants d
+						ON coalesce(child."Document"->'ParentGroups', '[]'::jsonb)
+							? (d."DocumentId")::text
+					WHERE child."State" = 'Active'
+				)
+				SELECT 1
+				FROM descendants d
+				WHERE d."DocumentId" = root."DocumentId"
+			)
+					)").arg(QString::fromUtf8(targetId));
+					}
+
+	return QString();
+}
+
 
 
 } // namespace imtauthdb

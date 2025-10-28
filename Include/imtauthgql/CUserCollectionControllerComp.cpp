@@ -170,15 +170,17 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 
 	imtauth::IUserInfo::FeatureIds permissions;
 	if (representation.permissions){
-		permissions = representation.permissions->split(';');
+		permissions = representation.permissions->ToList();
 	}
+
 	permissions.removeAll("");
 	userInfoPtr->SetLocalPermissions(productId, permissions);
 
 	QByteArrayList roleIds;
 	if (representation.roles){
-		roleIds = representation.roles->split(';');
+		roleIds = representation.roles->ToList();
 	}
+
 	roleIds.removeAll("");
 	if (!roleIds.isEmpty()){
 		userInfoPtr->SetRoles(productId, roleIds);
@@ -189,7 +191,7 @@ bool CUserCollectionControllerComp::FillObjectFromRepresentation(
 
 	QByteArrayList groupIds;
 	if (representation.groups){
-		groupIds = representation.groups->split(';');
+		groupIds = representation.groups->ToList();
 	}
 	groupIds.removeAll("");
 	for (const QByteArray& groupId : groupIds){
@@ -612,15 +614,15 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 
 	QByteArrayList groupList = userInfoPtr->GetGroups();
 	std::sort(groupList.begin(), groupList.end());
-	representationPayload.groups = QByteArray(groupList.join(';'));
+	representationPayload.groups.Emplace().FromList(groupList);
 
 	QByteArrayList roleList = userInfoPtr->GetRoles(productId);
 	std::sort(roleList.begin(), roleList.end());
-	representationPayload.roles = QByteArray(roleList.join(';'));
+	representationPayload.roles.Emplace().FromList(roleList);
 
 	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
 	std::sort(permissions.begin(), permissions.end());
-	representationPayload.permissions = permissions.join(';');
+	representationPayload.permissions.Emplace().FromList(permissions);
 
 	imtsdl::TElementList<sdl::imtauth::Users::CSystemInfo::V1_0> list;
 	imtauth::IUserInfo::SystemInfoList systemInfoList = userInfoPtr->GetSystemInfos();

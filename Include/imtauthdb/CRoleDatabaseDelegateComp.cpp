@@ -2,8 +2,7 @@
 
 
 // ACF includes
-#include <iprm/IEnableableParam.h>
-#include <iprm/CTextParam.h>
+#include <iprm/IIdParam.h>
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
@@ -17,32 +16,6 @@ namespace imtauthdb
 // public methods
 
 // reimplemented (imtdb::CSqlJsonDatabaseDelegateComp)
-
-bool CRoleDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
-{
-	iprm::TParamsPtr<iprm::IEnableableParam> isDefaultParamPtr(&filterParams, "IsDefault");
-	if (isDefaultParamPtr.IsValid()){
-		if (isDefaultParamPtr->IsEnabled()){
-			filterQuery = QString("(\"Document\"->>'IsDefault')::boolean is TRUE");
-		}
-		else{
-			filterQuery = QString("(\"Document\"->>'IsDefault')::boolean is FALSE");
-		}
-	}
-
-	iprm::TParamsPtr<iprm::IEnableableParam> isGuestParamPtr(&filterParams, "IsGuest");
-	if (isGuestParamPtr.IsValid()){
-		if (isGuestParamPtr->IsEnabled()){
-			filterQuery = QString("(\"Document\"->>'IsGuest')::boolean is TRUE");
-		}
-		else{
-			filterQuery = QString("(\"Document\"->>'IsGuest')::boolean is FALSE");
-		}
-	}
-
-	return BaseClass::CreateObjectFilterQuery(filterParams, filterQuery);
-}
-
 
 QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectsQuery(
 			const imtbase::IObjectCollection& collection,
@@ -87,6 +60,38 @@ bool CRoleDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSqlRe
 	}
 
 	return true;
+}
+
+
+QString CRoleDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, "ParentListFilter");
+	if (idParamPtr.IsValid()){
+		QByteArray targetId = idParamPtr->GetId();
+		return QString(R"(
+			NOT EXISTS (
+				WITH RECURSIVE descendants AS (
+					SELECT g."DocumentId"
+					FROM "Roles" g
+					WHERE g."DocumentId" = '%1'
+					AND g."State" = 'Active'
+				
+					UNION ALL
+					SELECT child."DocumentId"
+					FROM "Roles" child
+					JOIN descendants d
+						ON coalesce(child."Document"->'ParentsRoles', '[]'::jsonb)
+							? (d."DocumentId")::text
+					WHERE child."State" = 'Active'
+				)
+				SELECT 1
+				FROM descendants d
+				WHERE d."DocumentId" = root."DocumentId"
+			)
+					)").arg(QString::fromUtf8(targetId));
+					}
+
+	return QString();
 }
 
 

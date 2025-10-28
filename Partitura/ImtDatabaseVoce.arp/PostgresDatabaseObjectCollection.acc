@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5430" Description="ACF"/>
             <Version Id="1" Number="2253" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395522" Description="Qt Framework"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -51,7 +51,7 @@
                     <AttributeInfo Id="ObjectCollectionFactory" Type="Factory" ExportId="ObjectCollectionFactory">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
+                    <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="ObjectDelegate">
                         <Data IsEnabled="true" Value="SqlDatabaseDocumentDelegate"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
@@ -136,6 +136,8 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="CachedObjectCollection" ComponentId="CachedObjectCollection"/>
+        <Component ExportedId="PostgresXPathExtractor" ComponentId="PostgresXPathExtractor"/>
         <Component ExportedId="SqlDatabaseDocumentDelegate" ComponentId="SqlDatabaseDocumentDelegate"/>
+        <Component ExportedId="Types" ComponentId="Types"/>
     </ExportedComponents>
 </Acf>

@@ -33,6 +33,7 @@ public:
 				const istd::IChangeable& object,
 				const imtbase::IOperationContext* operationContextPtr = nullptr,
 				bool useExternDelegate = true) const override;
+	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
 
 private:
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userDatabaseDelegateCompPtr);

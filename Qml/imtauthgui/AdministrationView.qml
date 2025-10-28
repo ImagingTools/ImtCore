@@ -17,10 +17,6 @@ Item {
 	property string productId: AuthorizationController.productId
     property var documentManager: MainDocumentManager.getDocumentManager("Administration");
 
-    property TreeItemModel rolesModel;
-    property TreeItemModel usersModel;
-    property TreeItemModel groupsModel;
-
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", administrationContainer.onLocalizationChanged);
     }
@@ -69,7 +65,6 @@ Item {
         RoleCollectionView {
             productId: administrationContainer.productId;
             documentManager: administrationContainer.documentManager;
-            rolesModel: administrationContainer.rolesModel
         }
     }
 
@@ -79,8 +74,6 @@ Item {
         UserCollectionView {
             productId: administrationContainer.productId;
             documentManager: administrationContainer.documentManager;
-            rolesModel: administrationContainer.rolesModel;
-            groupsModel: administrationContainer.groupsModel;
         }
     }
 
@@ -147,9 +140,6 @@ Item {
 
             let ok = PermissionsController.checkPermission("ViewRoles");
             if (ok){
-                roleCollectionDataProvider.productId = administrationContainer.productId;
-                roleCollectionDataProvider.updateModel();
-
                 multiPageView.addPage("Roles", qsTr("Roles"), roleCollectionComp, "Icons/Role");
             }
             else{
@@ -158,7 +148,6 @@ Item {
 
             ok = PermissionsController.checkPermission("ViewUsers");
             if (ok){
-                userCollectionDataProvider.updateModel();
                 multiPageView.addPage("Users", qsTr("Users"), userCollectionComp, "Icons/Account");
             }
             else{
@@ -167,7 +156,6 @@ Item {
 
             ok = PermissionsController.checkPermission("ViewGroups");
             if (ok){
-                groupCollectionDataProvider.updateModel();
                 multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp, "Icons/MultipleUser");
             }
             else{
@@ -176,30 +164,6 @@ Item {
 
             multiPageView.currentIndex = 0;
             administrationContainer.multiPageUpdated();
-        }
-    }
-
-    RoleCollectionDataProvider {
-        id: roleCollectionDataProvider;
-        productId: administrationContainer.productId;
-
-        onModelUpdated: {
-            administrationContainer.rolesModel = collectionModel;
-        }
-    }
-
-    UserCollectionDataProvider {
-        id: userCollectionDataProvider;
-
-        onModelUpdated: {
-            administrationContainer.usersModel = collectionModel;
-        }
-    }
-
-    GroupCollectionDataProvider {
-        id: groupCollectionDataProvider;
-        onModelUpdated: {
-            administrationContainer.groupsModel = collectionModel;
         }
     }
 }

@@ -44,7 +44,6 @@ RemoteCollectionView {
 		permissionsProvider.updateModel();
 	}
 	
-	property TreeItemModel rolesModel;
 	property TreeItemModel permissionsModel;
 	
 	PermissionsProvider {
@@ -69,7 +68,6 @@ RemoteCollectionView {
 			id: roleEditor;
 			
 			permissionsModel: roleCollectionViewContainer.permissionsModel;
-			rolesModel: roleCollectionViewContainer.rolesModel;
 			productId: roleCollectionViewContainer.productId;
 			
 			commandsControllerComp: Component {GqlBasedCommandsController {

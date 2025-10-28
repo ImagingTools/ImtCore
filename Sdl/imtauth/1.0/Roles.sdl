@@ -38,7 +38,7 @@ type RoleData {
 	description: String
 	roleId: ID
 	productId: ID
-	parentRoles: ID
+	parentRoles: [ID]
 	permissions: ID
 	isDefault: Bool
 	isGuest: Bool

@@ -21,8 +21,6 @@ RemoteCollectionView {
 	
 	property string productId;
 	property var documentManager: null;
-	property TreeItemModel rolesModel;
-	property TreeItemModel groupsModel;
 	
 	signal saved();
 	
@@ -315,9 +313,7 @@ RemoteCollectionView {
 		
 		UserView {
 			id: userEditor;
-			
-			rolesModel: userCollectionViewContainer.rolesModel;
-			groupsModel: userCollectionViewContainer.groupsModel;
+
 			productId: userCollectionViewContainer.productId;
 			
 			Component.onCompleted: {

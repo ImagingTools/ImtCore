@@ -177,7 +177,7 @@ ElementView {
 		m_conditionType: "NotIn"
 	}
 
-	function setSourceAdditionalFilters(collectionFilter){}
+	function setSourceAdditionalFilters(sourceCollectionView){}
 
 	function updateSourceCollection(){
 		if (!sourceCollectionView){
@@ -190,7 +190,7 @@ ElementView {
 		sourceCollectionView.filterMenu.setFilterIsEnabled("DocumentIdFilter", true)
 		documentIdFilter1.m_documentIds = selectedIds
 	
-		setSourceAdditionalFilters(sourceCollectionView.collectionFilter)
+		setSourceAdditionalFilters(sourceCollectionView)
 
 		sourceCollectionView.doUpdateGui()
 	}
@@ -214,7 +214,7 @@ ElementView {
 	}
 
 	function addElementsFromSourceCollection(){
-		if (!root.sourceCollectionView){
+		if (!root || !root.sourceCollectionView){
 			return
 		}
 
@@ -226,7 +226,7 @@ ElementView {
 		root.sourceCollectionView.table.resetSelection()
 		root.selectedIds = root.selectedIds.concat(selectedIds)
 
-		root.selectionChanged()
+		selectionChanged()
 	}
 
 	Component {
@@ -256,7 +256,7 @@ ElementView {
 			}
 
 			Connections {
-				target: root.sourceCollectionView
+				target: root && root.sourceCollectionView ? root.sourceCollectionView : undefined
 				function onSelectionChanged(ids, indexes){
 					remoteCollectionViewDialog.setButtonEnabled(Enums.apply,ids.length > 0)
 				}

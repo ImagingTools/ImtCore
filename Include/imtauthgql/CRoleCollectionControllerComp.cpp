@@ -80,15 +80,14 @@ bool CRoleCollectionControllerComp::FillObjectFromRepresentation(
 	}
 	roleInfoPtr->SetRoleDescription(roleDescription);
 
-	QByteArray parentRoles;
+	QByteArrayList parentRoles;
 	if (roleDataRepresentation.parentRoles){
-		parentRoles = *roleDataRepresentation.parentRoles;
+		parentRoles = roleDataRepresentation.parentRoles->ToList();
 	}
 	if (!parentRoles.isEmpty()){
-		QByteArrayList parentRoleIds = parentRoles.split(';');
-		parentRoleIds.removeAll("");
+		parentRoles.removeAll("");
 
-		for (const QByteArray& parentRoleId : parentRoleIds){
+		for (const QByteArray& parentRoleId : parentRoles){
 			if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
 				errorMessage = QT_TR_NOOP(QString("Unable include role '%1' to the role '%2'. Check the dependencies between them.")
 											.arg(qPrintable(parentRoleId), qPrintable(roleId)));
@@ -414,9 +413,10 @@ bool CRoleCollectionControllerComp::CreateRepresentationFromObject(
 
 	QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
 	std::sort(parentsRolesIds.begin(), parentsRolesIds.end());
-	representationPayload.parentRoles = QByteArray(parentsRolesIds.join(';'));
+	representationPayload.parentRoles.Emplace().FromList(parentsRolesIds);
 
 	imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
+	permissions.removeAll("");
 	std::sort(permissions.begin(), permissions.end());
 	representationPayload.permissions = QByteArray(permissions.join(';'));
 
@@ -443,6 +443,7 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 
 	complexFilter.AddFieldFilter(fieldFilter);
 }
+
 
 
 bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
@@ -478,6 +479,17 @@ bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 	QByteArray objectId = roleInfoPtr->GetObjectUuid();
 	return FillObjectFromRepresentation(roleDataRepresentation, object, objectId, errorMessage);
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CRoleCollectionControllerComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	m_idParamRepresentationControllerPtr.SetPtr(new imtserverapp::CIdParamRepresentationController("ParentListFilter"));
+	RegisterFilterToSelectionParams(m_idParam, *m_idParamRepresentationControllerPtr);
 }
 
 

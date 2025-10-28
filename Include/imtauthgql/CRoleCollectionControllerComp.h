@@ -1,7 +1,11 @@
 #pragma once
 
 
+// ACF includes
+#include <iprm/CIdParam.h>
+
 // ImtCore includes
+#include <imtserverapp/CIdParamRepresentationController.h>
 #include <imtauth/CRole.h>
 #include <imtservergql/CObjectCollectionControllerCompBase.h>
 #include <imtgql/IGqlRequestProvider.h>
@@ -60,13 +64,19 @@ protected:
 				const sdl::imtauth::Roles::CRoleUpdateGqlRequest& roleUpdateRequest,
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
-
 	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const override;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 protected:
 	I_REF(imtgql::IGqlRequestProvider, m_gqlRequestProviderCompPtr);
 	I_ATTR(QByteArray, m_productIdAttrPtr);
 	I_FACT(imtauth::IRole, m_roleInfoFactCompPtr);
+
+private:
+	iprm::CIdParam m_idParam;
+	istd::TDelPtr<imtserverapp::CIdParamRepresentationController> m_idParamRepresentationControllerPtr;
 };
 
 

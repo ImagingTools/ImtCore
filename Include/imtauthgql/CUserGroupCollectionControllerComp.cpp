@@ -67,14 +67,14 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 
 	QByteArrayList userIds;
 	if (groupDataRepresentation.users){
-		userIds = groupDataRepresentation.users->split(';');
+		userIds = groupDataRepresentation.users->ToList();
 	}
 	userIds.removeAll("");
 	userGroupInfoPtr->SetUsers(userIds);
 
 	QByteArrayList roleIds;
 	if (groupDataRepresentation.roles){
-		roleIds = groupDataRepresentation.roles->split(';');
+		roleIds = groupDataRepresentation.roles->ToList();
 	}
 	roleIds.removeAll("");
 
@@ -86,7 +86,7 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 	}
 
 	if (groupDataRepresentation.parentGroups){
-		QByteArrayList groupIds = groupDataRepresentation.parentGroups->split(';');
+		QByteArrayList groupIds = groupDataRepresentation.parentGroups->ToList();
 		for (const QByteArray& parentGroupId : groupIds){
 			if (!parentGroupId.isEmpty()){
 				userGroupInfoPtr->AddParentGroup(parentGroupId);
@@ -396,16 +396,13 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.description = QString(userGroupInfoPtr->GetDescription());
 
 	imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
-	std::sort(userIds.begin(), userIds.end());
-	representationPayload.users = QByteArray(userIds.join(';'));
+	representationPayload.users.Emplace().FromList(userIds);
 
 	imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
-	std::sort(roleIds.begin(), roleIds.end());
-	representationPayload.roles = QByteArray(roleIds.join(';'));
+	representationPayload.roles.Emplace().FromList(roleIds);
 
 	imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
-	std::sort(groupIds.begin(), groupIds.end());
-	representationPayload.parentGroups = QByteArray(groupIds.join(';'));
+	representationPayload.parentGroups.Emplace().FromList(groupIds);
 
 	return true;
 }
