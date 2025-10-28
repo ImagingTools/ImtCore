@@ -10,6 +10,4 @@ QT += websockets
 SOURCES += $$files($$_PRO_FILE_PWD_/../*.c, false)
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtcom
-
 
