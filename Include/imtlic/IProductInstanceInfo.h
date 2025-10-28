@@ -150,6 +150,16 @@ public:
 		Set in use for this product instance.
 	*/
 	virtual void SetInUse(bool inUse) = 0;
+
+	/**
+		Checks whether this product instance is marked for internal use only.
+	*/
+	virtual bool IsInternalUse() const = 0;
+
+	/**
+		Sets whether this product instance is for internal use only.
+	*/
+	virtual void SetInternalUse(bool internalUse) = 0;
 };
 
 

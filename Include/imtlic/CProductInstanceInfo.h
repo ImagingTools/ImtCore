@@ -42,6 +42,8 @@ public:
 	virtual void SetProject(const QByteArray& project) override;
 	virtual bool IsInUse() const override;
 	virtual void SetInUse(bool inUse) override;
+	virtual bool IsInternalUse() const override;
+	virtual void SetInternalUse(bool internalUse) override;
 
 	// reimplemented (imtlic::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseInstances() const override;
@@ -71,6 +73,7 @@ private:
 	QByteArray m_serialNumber;
 	QByteArray m_project;
 	bool m_inUse;
+	bool m_internalUse;
 	LicenseInstances m_licenses;
 	imtbase::CCollectionInfo m_licenseContainerInfo;
 };

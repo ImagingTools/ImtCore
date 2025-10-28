@@ -21,7 +21,8 @@ namespace imtlic
 CProductInstanceInfo::CProductInstanceInfo():
 	m_customerCollectionPtr(nullptr),
 	m_productCollectionPtr(nullptr),
-	m_inUse(false)
+	m_inUse(false),
+	m_internalUse(false)
 {
 }
 
@@ -163,6 +164,22 @@ void CProductInstanceInfo::SetInUse(bool inUse)
 }
 
 
+bool CProductInstanceInfo::IsInternalUse() const
+{
+	return m_internalUse;
+}
+
+
+void CProductInstanceInfo::SetInternalUse(bool internalUse)
+{
+	if (m_internalUse != internalUse){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_internalUse = internalUse;
+	}
+}
+
+
 // reimplemented (imtlic::ILicenseInfoProvider)
 
 const imtbase::ICollectionInfo& CProductInstanceInfo::GetLicenseInstances() const
@@ -211,6 +228,13 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.BeginTag(inUseTag);
 		retVal = retVal && archive.Process(m_inUse);
 		retVal = retVal && archive.EndTag(inUseTag);
+	}
+
+	if (imtCoreVersion >= 15177){
+		iser::CArchiveTag internalUseTag("InternalUse", "Internal Use", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(internalUseTag);
+		retVal = retVal && archive.Process(m_internalUse);
+		retVal = retVal && archive.EndTag(internalUseTag);
 	}
 
 	if (imtCoreVersion >= 7386){
@@ -302,6 +326,7 @@ bool CProductInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMode
 		m_licenses = sourcePtr->m_licenses;
 		m_licenseContainerInfo = sourcePtr->m_licenseContainerInfo;
 		m_inUse = sourcePtr->m_inUse;
+		m_internalUse = sourcePtr->m_internalUse;
 
 		return true;
 	}
@@ -333,6 +358,7 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 	m_licenses.clear();
 	m_licenseContainerInfo.ResetData();
 	m_inUse = false;
+	m_internalUse = false;
 
 	return true;
 }
