@@ -852,6 +852,9 @@ bool CSdlUnionObjectGeneratorComp::ProcessConvertListData(QTextStream& stream, c
 			if (convertedType == "double" || convertedType == "int"){
 				stream << QStringLiteral("retVal += QString::number(val);");
 			}
+			else if (convertedType == "bool"){
+				stream << QStringLiteral("retVal += QString(val ? \"true\" : \"false\");");
+			}
 			else{
 				stream << QStringLiteral("retVal += QString(val);");
 			}
