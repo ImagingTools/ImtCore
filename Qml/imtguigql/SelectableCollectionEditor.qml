@@ -8,39 +8,39 @@ import imtbaseComplexCollectionFilterSdl 1.0
 import imtbaseDocumentIdFilterSdl 1.0
 
 ElementView {
-	id: root
+	id: container
 
 	bottomComp: stackViewComp
-	controlWidth: root.width
+	controlWidth: container.width
 	controlComp: Component {
 		Rectangle {
 			height: Style.itemSizeM
-			width: root.controlWidth - Style.marginXXL
+			width: container.controlWidth - Style.marginXXL
 			color: Style.baseColor
 
 			Connections {
-				target: root.stackView
+				target: container.stackView
 				function onCurrentIndexChanged(){
-					if (root.stackView.currentIndex === 0){
+					if (container.stackView.currentIndex === 0){
 						stackViewHeader.removeHeader("source")
 					}
 
-					if (root.stackView.currentIndex === 1){
-						stackViewHeader.addHeader("source", root.sourceTitle)
+					if (container.stackView.currentIndex === 1){
+						stackViewHeader.addHeader("source", container.sourceTitle)
 					}
 				}
 			}
 			
 			Connections {
-				target: root
+				target: container
 				function onTargetTitleChanged(){
-					stackViewHeader.setHeaderName("target", root.targetTitle)
+					stackViewHeader.setHeaderName("target", container.targetTitle)
 				}
 				function onSourceTitleChanged(){
-					stackViewHeader.setHeaderName("source", root.sourceTitle)
+					stackViewHeader.setHeaderName("source", container.sourceTitle)
 				}
 				function onSourceCollectionViewChanged(){
-					sourceCollectionViewConnections.target = root.sourceCollectionView
+					sourceCollectionViewConnections.target = container.sourceCollectionView
 				}
 			}
 			
@@ -50,12 +50,12 @@ ElementView {
 				anchors.right: buttonsRow.left
 				height: Style.itemSizeM
 				Component.onCompleted: {
-					addHeader("target", root.targetTitle)
+					addHeader("target", container.targetTitle)
 				}
 				
 				onCloseClicked: {
-					root.stackView.setCurrentIndex(0)
-					root.stackView.removePage(1)
+					container.stackView.setCurrentIndex(0)
+					container.stackView.removePage(1)
 					newButton2.enabled = false
 				}
 			}
@@ -71,16 +71,16 @@ ElementView {
 					text: qsTr("New")
 					icon.source: enabled ?	"qrc:/" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal):
 											"qrc:/" + Style.getIconPath("Icons/Add", Icon.State.Off, Icon.Mode.Disabled)
-					visible: !root.stackView ? false : root.stackView.currentIndex === 0
+					visible: !container.stackView ? false : container.stackView.currentIndex === 0
 					onClicked: {
-						if (!root.stackView){
+						if (!container.stackView){
 							return
 						}
 						
 						ModalDialogManager.openDialog(remoteCollectionViewDialogComp)
-						// root.stackView.addPage(remoteCollectionViewComp2)
+						// container.stackView.addPage(remoteCollectionViewComp2)
 						
-						// root.stackView.setCurrentIndex(1)
+						// container.stackView.setCurrentIndex(1)
 					}
 				}
 	
@@ -89,10 +89,10 @@ ElementView {
 					text: qsTr("Add")
 					icon.source: enabled ?	"qrc:/" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal):
 											"qrc:/" + Style.getIconPath("Icons/Add", Icon.State.Off, Icon.Mode.Disabled)
-					visible: !root.stackView ? false : root.stackView.currentIndex === 1
+					visible: !container.stackView ? false : container.stackView.currentIndex === 1
 					enabled: false
 					onClicked: {
-						root.addElementsFromSourceCollection()
+						container.addElementsFromSourceCollection()
 					}
 
 					Connections {
@@ -109,30 +109,30 @@ ElementView {
 					enabled: false
 					icon.source: enabled ?	"qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal):
 											"qrc:/" + Style.getIconPath("Icons/Delete", Icon.State.Off, Icon.Mode.Disabled)
-					visible: !root.stackView ? false : root.stackView.currentIndex === 0
+					visible: !container.stackView ? false : container.stackView.currentIndex === 0
 					onClicked: {
-						if (!root.targetCollectionView){
+						if (!container.targetCollectionView){
 							return
 						}
 	
-						let selectedIds = root.targetCollectionView.getSelectedIds()
+						let selectedIds = container.targetCollectionView.getSelectedIds()
 						if (selectedIds.length <= 0){
 							return
 						}
 	
 						for (let i = 0; i < selectedIds.length; ++i){
-							let index = root.selectedIds.indexOf(selectedIds[i])
+							let index = container.selectedIds.indexOf(selectedIds[i])
 							if (index >= 0){
-								root.selectedIds.splice(index, 1)
+								container.selectedIds.splice(index, 1)
 							}
 						}
 	
-						root.targetCollectionView.table.resetSelection()
-						root.selectionChanged()
+						container.targetCollectionView.table.resetSelection()
+						container.selectionChanged()
 					}
 					
 					Connections {
-						target: root.targetCollectionView
+						target: container.targetCollectionView
 						function onSelectionChanged(ids, indexes){
 							removeButton.enabled = indexes.length > 0
 						}
@@ -167,13 +167,13 @@ ElementView {
 
 	DocumentIdFilter {
 		id: documentIdFilter1
-		m_documentIds: root.selectedIds
+		m_documentIds: container.selectedIds
 		m_conditionType: "In"
 	}
 
 	DocumentIdFilter {
 		id: documentIdFilter2
-		m_documentIds: root.selectedIds
+		m_documentIds: container.selectedIds
 		m_conditionType: "NotIn"
 	}
 
@@ -214,17 +214,17 @@ ElementView {
 	}
 
 	function addElementsFromSourceCollection(){
-		if (!root || !root.sourceCollectionView){
+		if (!container || !container.sourceCollectionView){
 			return
 		}
 
-		let selectedIds = root.sourceCollectionView.getSelectedIds()
+		let selectedIds = container.sourceCollectionView.getSelectedIds()
 		if (selectedIds.length <= 0){
 			return
 		}
 
-		root.sourceCollectionView.table.resetSelection()
-		root.selectedIds = root.selectedIds.concat(selectedIds)
+		container.sourceCollectionView.table.resetSelection()
+		container.selectedIds = container.selectedIds.concat(selectedIds)
 
 		selectionChanged()
 	}
@@ -233,30 +233,30 @@ ElementView {
 		id: remoteCollectionViewDialogComp
 		RemoteCollectionViewDialog {
 			id: remoteCollectionViewDialog
-			title: root.sourceTitle
-			collectionId: root.collectionId
+			title: container.sourceTitle
+			collectionId: container.collectionId
 			Component.onCompleted: {
 				addButton(Enums.apply, qsTr("Add"), false)
 				addButton(Enums.cancel, qsTr("Cancel"), true)
 			}
 
 			onCollectionViewChanged: {
-				root.sourceCollectionView = collectionView
-				root.updateSourceCollection()
+				container.sourceCollectionView = collectionView
+				container.updateSourceCollection()
 			}
 			
 			onStarted: {
-				root.updateSourceCollection()
+				container.updateSourceCollection()
 			}
 
 			onFinished: {
 				if (buttonId === Enums.apply){
-					root.addElementsFromSourceCollection()
+					container.addElementsFromSourceCollection()
 				}
 			}
 
 			Connections {
-				target: root && root.sourceCollectionView ? root.sourceCollectionView : undefined
+				target: container && container.sourceCollectionView ? container.sourceCollectionView : undefined
 				function onSelectionChanged(ids, indexes){
 					remoteCollectionViewDialog.setButtonEnabled(Enums.apply,ids.length > 0)
 				}
@@ -268,9 +268,9 @@ ElementView {
 		id: remoteCollectionViewComp1
 		RemoteCollectionView {
 			id: remoteCollectionView
-			width: root.contentWidth
+			width: container.contentWidth
 			height: contentHeight
-			collectionId: root.collectionId
+			collectionId: container.collectionId
 			commandsControllerComp: null
 			documentCollectionFilter: null
 			canResetFilters: false
@@ -279,13 +279,13 @@ ElementView {
 			tableViewParamsStoredServer: false
 			pagination.visible: false
 			headerRightClickEnabled: false
-			requestedFields: root.targetRequestedFields
+			requestedFields: container.targetRequestedFields
 			Component.onCompleted: {
-				root.targetCollectionView = this
-				root.updateTargetCollection()
+				container.targetCollectionView = this
+				container.updateTargetCollection()
 			}
 			Component.onDestruction: {
-				root.targetCollectionView = null
+				container.targetCollectionView = null
 			}
 
 			onElementsCountChanged: {
@@ -302,8 +302,8 @@ ElementView {
 		id: remoteCollectionViewComp2
 		RemoteCollectionView {
 			id: remoteCollectionView2
-			width: root.contentWidth
-			collectionId: root.collectionId
+			width: container.contentWidth
+			collectionId: container.collectionId
 			commandsControllerComp: null
 			documentCollectionFilter: null
 			canResetFilters: false
@@ -311,13 +311,13 @@ ElementView {
 			tableViewParamsStoredServer: false
 			headerRightClickEnabled: false
 			Component.onCompleted: {
-				root.sourceCollectionView = this
-				root.updateSourceCollection()
+				container.sourceCollectionView = this
+				container.updateSourceCollection()
 				updateHeight()
 			}
 			
 			Component.onDestruction: {
-				root.sourceCollectionView = null
+				container.sourceCollectionView = null
 			}
 			
 			onContentHeightChanged: {
@@ -334,7 +334,7 @@ ElementView {
 			adaptSizeToCurrentPage: true
 
 			Component.onCompleted: {
-				root.stackView = this
+				container.stackView = this
 				addPage(remoteCollectionViewComp1)
 				setCurrentIndex(0)
 			}
