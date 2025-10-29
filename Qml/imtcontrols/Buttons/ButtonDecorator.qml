@@ -146,7 +146,8 @@ DecoratorBase {
 		Item {
 			id: textItem;
 
-			anchors.horizontalCenter: iconObj && iconObj.visible ? undefined : content.horizontalCenter;
+			anchors.centerIn:  iconObj && iconObj.visible ? undefined : content;
+			//anchors.horizontalCenter: iconObj && iconObj.visible ? undefined : content.horizontalCenter;
 			anchors.horizontalCenterOffset: commonButtonDecorator.isMenuButton ? -(arrowIcon.width + commonButtonDecorator.contentSpacing)/2 : 0
 			anchors.verticalCenter: content.verticalCenter;
 			anchors.left: iconObj && iconObj.visible ? iconObj.right : undefined;

@@ -52,7 +52,6 @@ Button{
 			onPopupMenuWidthChanged: {
 				if(popupMenuWidth > width){
 					width = popupMenuWidth
-					popupWidthChanged(popupMenuWidth)
 				}
 			}
 
