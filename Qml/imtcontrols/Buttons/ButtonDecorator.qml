@@ -16,6 +16,7 @@ DecoratorBase {
 	property int contentSpacing: Style.marginM;
 	property int contentLeftMargin: Style.marginM;
 	property alias contentWidth: content.width;
+	property real decoratorWidth: Math.max(content.width + Style.marginM * 2, widthDefault)
 
 	property int widthDefault: 0;
 	property alias icon: iconObj
@@ -232,6 +233,9 @@ DecoratorBase {
 		}
 	}
 
+	function setDecoratorWidth(widthArg){
+		width = widthArg
+	}
 
 }
 

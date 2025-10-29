@@ -14,6 +14,8 @@ Button{
 	property var popup: null;
 
 	property real popupMenuWidth: width
+	property int itemHeight: Style.controlHeightM;
+	property string displayId: "name"
 
 	signal accepted(string buttonId);
 
@@ -25,16 +27,60 @@ Button{
 		console.log("ACCEPTED::", buttonId)
 	}
 
-	property Component delegate: Component {Button{
-			width: menuButton.width
-			text: model.name
 
-			property string id: model.id
+	property Component delegate: Component {PopupMenuDelegate{
+			id: popupDelegate
+
+			decorator: Component{
+				PopupItemDelegateDecorator{
+					maxTextWidth: Style.sizeHintS
+					onDecoratorWidthChanged: {
+						if(decoratorWidth > menuButton.popupMenuWidth){
+							menuButton.popupMenuWidth = decoratorWidth
+						}
+					}
+					property real popupMenuWidth: menuButton.popupMenuWidth
+					onPopupMenuWidthChanged: {
+						if(popupMenuWidth > width){
+							setDecoratorWidth(menuButton.popupMenuWidth)
+						}
+					}
+				}
+			}
+
+			property real popupMenuWidth: menuButton.popupMenuWidth
+			onPopupMenuWidthChanged: {
+				if(popupMenuWidth > width){
+					width = popupMenuWidth
+					popupWidthChanged(popupMenuWidth)
+				}
+			}
+
+			width: menuButton.popupMenuWidth;
+			widthFromDecorator: true;
+			height: menuButton.itemHeight;
+			contentLeftMargin: Style.marginM
+
+			highlighted: menuButton.currentIndex == model.index
+			text: model.item ? model.item[menuButton.displayId] : model[menuButton.displayId]
+
+			selected: menuButton.popup ? menuButton.popup.selectedIndex == model.index : false;
 
 			onClicked: {
-				menuButton.accepted(id)
-				menuButton.close()
+				if (menuButton.popup){
+					let resultId = model.Id || model.id || model.item.m_id || "";
+					//menuButton.popup.finished(resultId, model.index)
+					menuButton.accepted(id)
+					menuButton.close()
+				}
 			}
+
+			onEntered: {
+				if (menuButton.popup){
+					menuButton.popup.selectedIndex = model.index;
+				}
+			}
+
 		}
 	}
 
@@ -42,8 +88,7 @@ Button{
 		let point = menuButton.mapToItem(null, 0, menuButton.height);
 		ModalDialogManager.openDialog(popupMenuComp, {
 										  "x":     point.x,
-										  "model": menuButton.menuModel,
-										  "width": menuButton.width});
+										  "model": menuButton.menuModel})
 
 		isOpen = true;
 
@@ -51,7 +96,6 @@ Button{
 
 	function close(){
 		ModalDialogManager.closeByComp(menuButton.popupMenuComp)
-
 		menuButton.isOpen = false;
 
 	}
@@ -75,27 +119,6 @@ Button{
 		}
 	}
 
-
-	Component.onCompleted: {
-		let index
-		index = testModel.insertNewItem()
-		testModel.setData("id", "button1", index)
-		testModel.setData("name", "Button1", index)
-		index = testModel.insertNewItem()
-		testModel.setData("id", "button2", index)
-		testModel.setData("name", "Button2", index)
-		index = testModel.insertNewItem()
-		testModel.setData("id", "button3", index)
-		testModel.setData("name", "Button3", index)
-
-		menuModel = testModel
-
-	}
-
-	TreeItemModel{
-		id: testModel;
-	}
-
 	property Component popupMenuComp: Component {
 		id: popupMenu;
 
@@ -103,11 +126,9 @@ Button{
 			id: popup;
 
 			opacity:  0;
-			hasShadow: false
-			color: "transparent"
 			delegate: menuButton.delegate;
-			width: menuButton.width;
-			itemHeight: menuButton.height;
+			width: menuButton.popupMenuWidth;
+			itemHeight: menuButton.itemHeight;
 			hiddenBackground: true;
 			shownItemsCount: 5;
 			visibleScrollBar: false;
@@ -145,7 +166,7 @@ Button{
 			}
 
 			onStarted: {
-				//menuButton.popup = popup;
+				menuButton.popup = popup;
 			}
 		}
 	}
