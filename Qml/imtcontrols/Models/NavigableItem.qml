@@ -1,4 +1,4 @@
-import QtQuick
+import QtQuick 2.12
 
 /*!
 	\qmltype NavigableItem
@@ -100,8 +100,6 @@ Item {
 
 		activated(params, restPath, segment)
 
-		console.log("processSegment", segment, restPath)
-		
 		if (restPath.length === 0) {
 			return true
 		}
