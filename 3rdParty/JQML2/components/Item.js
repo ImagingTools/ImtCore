@@ -507,26 +507,26 @@ class Item extends QtObject {
             this.getProperty('y').freeze()
 
             if(this.parent === this.getProperty('anchors').getProperty('centerIn').get()){
-                this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('width'), this.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'), this.getProperty('anchors').getProperty('rightMargin'))
+                this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('width'), this.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'), this.getProperty('anchors').getProperty('rightMargin'), this.getProperty('anchors').getProperty('horizontalCenterOffset'))
                     
                 this.getProperty('x').setCompute(()=>{
-                    return this.getProperty('anchors').getProperty('centerIn').get().getProperty('width').get() / 2 - this.getProperty('width').get() / 2
+                    return this.getProperty('anchors').getProperty('centerIn').get().getProperty('width').get() / 2 - this.getProperty('width').get() / 2 + this.getProperty('anchors').getPropertyValue('horizontalCenterOffset')
                 })
-                this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('height'), this.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'), this.getProperty('anchors').getProperty('bottomMargin'))
+                this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('height'), this.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'), this.getProperty('anchors').getProperty('bottomMargin'), this.getProperty('anchors').getProperty('verticalCenterOffset'))
                     
                 this.getProperty('y').setCompute(()=>{
-                    return this.getProperty('anchors').getProperty('centerIn').get().getProperty('height').get() / 2 - this.getProperty('height').get() / 2
+                    return this.getProperty('anchors').getProperty('centerIn').get().getProperty('height').get() / 2 - this.getProperty('height').get() / 2 + this.getProperty('anchors').getPropertyValue('verticalCenterOffset')
                 })
             } else {
-                this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('width'), this.getProperty('anchors').getProperty('centerIn').get().getProperty('x'), this.getProperty('width'))
+                this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('width'), this.getProperty('anchors').getProperty('centerIn').get().getProperty('x'), this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenterOffset'))
                     
                 this.getProperty('x').setCompute(()=>{
-                    return this.getProperty('anchors').getProperty('centerIn').get().getProperty('x').get() + this.getProperty('anchors').getProperty('centerIn').get().getProperty('width').get() / 2 - this.getProperty('width').get() / 2
+                    return this.getProperty('anchors').getProperty('centerIn').get().getProperty('x').get() + this.getProperty('anchors').getProperty('centerIn').get().getProperty('width').get() / 2 - this.getProperty('width').get() / 2 + this.getProperty('anchors').getPropertyValue('horizontalCenterOffset')
                 })
-                this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('height'), this.getProperty('anchors').getProperty('centerIn').get().getProperty('y'), this.getProperty('height'))
+                this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('height'), this.getProperty('anchors').getProperty('centerIn').get().getProperty('y'), this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenterOffset'))
                     
                 this.getProperty('y').setCompute(()=>{
-                    return this.getProperty('anchors').getProperty('centerIn').get().getProperty('y').get() + this.getProperty('anchors').getProperty('centerIn').get().getProperty('height').get() / 2 - this.getProperty('height').get() / 2
+                    return this.getProperty('anchors').getProperty('centerIn').get().getProperty('y').get() + this.getProperty('anchors').getProperty('centerIn').get().getProperty('height').get() / 2 - this.getProperty('height').get() / 2 + this.getProperty('anchors').getPropertyValue('verticalCenterOffset')
                 })
             }
 
