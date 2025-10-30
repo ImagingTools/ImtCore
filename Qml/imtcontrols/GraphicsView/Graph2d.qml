@@ -16,15 +16,55 @@ Rectangle{
 	property string legendX: "Index"
 	property string legendY: "Value"
 
-	property string lineColor: Style.greenColor;
+	property string lineColor: Style.imaginToolsAccentColor;
+
+	property real gridStepMajorX: 40
+	property real gridStepMajorY: 40
+	property int labelFontSize: fontSizeM//Style.fontSizeXXS
 
 	property var linePoints: [];
-	property bool hasData: false;
+	property int pointCount: linePoints.length
+	property bool hasData: true;
 	property bool canDraw: true;
+
+	property var tooltipValues: []
+	property var labelXValues: []
+	property var labelYValues: []
+
+	property int lableXOriginMargin: 20
+
+	property bool alwaysShowOrigin: false;
 
 
 	function requestPaint() {
 		graphicsView.requestPaint()
+	}
+
+	function getLabelX(xArg){
+		let index = Math.round(Number(xArg) / gridStepMajorX)
+		if(index < 0 || index > (graph.labelXValues.length -1)){
+			return gridShape.getLabelXBase(xArg)
+		}
+		else {
+			return String(labelXValues[index])
+		}
+	}
+
+	function getLabelY(yArg){
+		let index = Math.round(Number(yArg) / gridStepMajorY)
+		if(index < 0 || index > (graph.labelYValues.length -1)){
+			return gridShape.getLabelXBase(yArg)
+		}
+		else {
+			return String(labelYValues[index])
+		}
+	}
+
+	onLinePointsChanged: {
+		requestPaint()
+	}
+	onPointCountChanged: {
+		requestPaint()
 	}
 
 	BaseText{
@@ -70,14 +110,15 @@ Rectangle{
 			}
 		}
 
-		// onPaintTime: {
-		// 	console.log("PAINT_TIME::", time, model.index)
-		// }
-
 		function resize(){
 			if(width > 0 && height > 0){
 				setLayersParams()
-				fitToActiveLayer()
+				if(graph.linePoints.length){
+					fitToActiveLayer()
+				}
+				else {
+					requestPaint()
+				}
 			}
 		}
 
@@ -93,9 +134,14 @@ Rectangle{
 
 			activeLayer.layerMatrix.invertY();
 
+
 			let lineObj = polylineComp.createObject(this);
 			lineObj.color = graph.lineColor
 			activeLayer.addShape(lineObj);
+
+			if(graph.alwaysShowOrigin){
+				activeLayer.addShape(originShape);
+			}
 		}
 
 		function setLayersParams(){
@@ -109,11 +155,11 @@ Rectangle{
 				return
 			}
 
-			let clipRect = Qt.rect(gridShape.labelXWidth, gridShape.legendMargin, width - gridShape.labelXWidth - gridShape.legendMargin, height - gridShape.labelYHeight - gridShape.legendMargin)
+			let clipRect = Qt.rect(gridShape.labelYWidth, gridShape.legendMargin, width - gridShape.labelYWidth - gridShape.legendMargin, height - gridShape.labelXHeight - gridShape.legendMargin)
 			activeLayer.clipRect = clipRect
 
-			activeLayer.layerMatrix.setXTranslation(gridShape.labelXWidth + gridShape.axesOrigin.x)
-			activeLayer.layerMatrix.setYTranslation(height - gridShape.labelYHeight - gridShape.axesOrigin.y)
+			activeLayer.layerMatrix.setXTranslation(gridShape.labelYWidth + gridShape.axesOrigin.x)
+			activeLayer.layerMatrix.setYTranslation(height - gridShape.labelXHeight - gridShape.axesOrigin.y)
 
 		}
 	}
@@ -139,16 +185,31 @@ Rectangle{
 	CoordinateGridShape{
 		id: gridShape;
 
-		labelYHeight: 20
+		labelXHeight: 20
 		cutAxesEnds: true
 		legendMargin: 20;
-		gridStepMajorX: 10
-		gridStepMajorY: 10
+		gridStepMajorX: graph.gridStepMajorX
+		gridStepMajorY: graph.gridStepMajorY
 		canDrawText: true;
 		labelX: ""
 		labelY: ""
-		fontSize: Style.fontSizeXXS
+		fontSize: graph.labelFontSize
+		lableXOriginMargin: graph.lableXOriginMargin
 
+		function getLabelX(xArg){//override
+			return graph.getLabelX(xArg)
+		}
+
+		function getLabelY(yArg){//override
+			return graph.getLabelY(yArg)
+		}
+
+	}
+
+	BoundingBox{
+		id: originShape
+
+		points: [Qt.point(0,0)]
 	}
 
 	Component{
@@ -158,9 +219,27 @@ Rectangle{
 			showNodes: true;
 			points: graph.linePoints;
 
+			isHidden: !graph.linePoints.length
+
+			function getTooltipText(){
+				if(highlightedNodeIndex > (graph.tooltipValues.length -1)){
+					return getTooltipTextBase()
+				}
+				else {
+					let val = graph.tooltipValues[highlightedNodeIndex]
+					let str = "(" + val.x + ", " + val.y + ")"
+					return str
+				}
+			}
+
+			function getTooltipTextBase(){
+				let str = "(" + Number(highlightedNodeCoordinate.x).toFixed(2)  + ", " + Number(highlightedNodeCoordinate.y).toFixed(2) + ")";
+				return str
+			}
+
 			onHighlightedNodeIndexChanged: {
 				if(highlightedNodeIndex > -1){
-					toolTip.text = "(" + Number(highlightedNodeCoordinate.x).toFixed(2)  + ", " + Number(highlightedNodeCoordinate.y).toFixed(2) + ")";
+					toolTip.text = getTooltipText()//"(" + Number(highlightedNodeCoordinate.x).toFixed(2)  + ", " + Number(highlightedNodeCoordinate.y).toFixed(2) + ")";
 					let screenPoint = getScreenPosition(Qt.point(highlightedNodeCoordinate.x, highlightedNodeCoordinate.y))
 					toolTip.closeTooltip()
 					toolTip.show(screenPoint.x, screenPoint.y)
