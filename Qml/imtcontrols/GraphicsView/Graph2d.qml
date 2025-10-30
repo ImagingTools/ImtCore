@@ -87,9 +87,8 @@ Rectangle{
 		text: graph.title
 	}
 
-
-	GraphicsView{
-		id: graphicsView
+	Rectangle{color: "red"
+		id: clipItem
 
 		anchors.top: curveTitle.bottom;
 		anchors.bottom: curveLegendX.top;
@@ -99,84 +98,94 @@ Rectangle{
 		anchors.bottomMargin: Style.marginM
 		anchors.topMargin: 0
 
-		width: graph.hasData && graph.canDraw ? parent.width : 0;
+		clip: true;
 
-		hideScrollbars: true;
-		restrictMove: true;
-		restrictZoom: true;
-		restrictSelect: true;
-		propagateWheelEvents: true;
-		propagateMouseEvents: true
-		hasHoverReaction: true;
+		width: !graph.labelXValues.length ? parent.width : graph.gridStepMajorX * graphicsView.scaleCoeff * graph.xScale * (graph.labelXValues.length -1 + 0.5) + gridShape.labelYWidth + Style.marginM
 
-		//renderStrategy: Canvas.Immediate
+		GraphicsView{
+			id: graphicsView
 
-		property bool compl: false;
-		property bool ready: compl && width > 0 && height > 0
+			height: parent.height
 
-		Component.onCompleted: {
-			compl = true
-		}
-		onReadyChanged: {
-			if(ready){
-				graphicsView.startFunc()
+			width: graph.hasData && graph.canDraw ? graph.width : 0;
+
+			hideScrollbars: true;
+			restrictMove: true;
+			restrictZoom: true;
+			restrictSelect: true;
+			propagateWheelEvents: true;
+			propagateMouseEvents: true
+			hasHoverReaction: true;
+
+			//renderStrategy: Canvas.Immediate
+
+			property bool compl: false;
+			property bool ready: compl && width > 0 && height > 0
+
+			Component.onCompleted: {
+				compl = true
 			}
-		}
-
-		function resize(){
-			if(width > 0 && height > 0){
-				setLayersParams()
-				if(graph.linePoints.length){
-					fitToActiveLayer()
-				}
-				else {
-					requestPaint()
+			onReadyChanged: {
+				if(ready){
+					graphicsView.startFunc()
 				}
 			}
-		}
 
-		function startFunc(){
-			if(!graph.hasData){
-				return
+			function resize(){
+				if(width > 0 && height > 0){
+					setLayersParams()
+					if(graph.linePoints.length){
+						fitToActiveLayer()
+					}
+					else {
+						requestPaint()
+					}
+				}
 			}
 
-			let background = getBackgroundLayer()
-			background.addShape(gridShape);
+			function startFunc(){
+				if(!graph.hasData){
+					return
+				}
 
-			let activeLayer = getActiveLayer()
+				let background = getBackgroundLayer()
+				background.addShape(gridShape);
 
-			activeLayer.layerMatrix.setXScale(graph.xScale)
-			activeLayer.layerMatrix.setYScale(-graph.yScale);
+				let activeLayer = getActiveLayer()
+
+				activeLayer.layerMatrix.setXScale(graph.xScale)
+				activeLayer.layerMatrix.setYScale(-graph.yScale);
 
 
-			let lineObj = polylineComp.createObject(this);
-			lineObj.color = graph.lineColor
-			activeLayer.addShape(lineObj);
+				let lineObj = polylineComp.createObject(this);
+				lineObj.color = graph.lineColor
+				activeLayer.addShape(lineObj);
 
-			if(graph.alwaysShowOrigin){
-				activeLayer.addShape(originShape);
-			}
-		}
-
-		function setLayersParams(){
-			if(!graph.hasData){
-				return
-			}
-
-			let activeLayer = getActiveLayer()
-
-			if(!width || !height || !activeLayer){
-				return
+				if(graph.alwaysShowOrigin){
+					activeLayer.addShape(originShape);
+				}
 			}
 
-			let clipRect = Qt.rect(gridShape.labelYWidth, gridShape.legendMargin, width - gridShape.labelYWidth - gridShape.legendMargin, height - gridShape.labelXHeight - gridShape.legendMargin)
-			activeLayer.clipRect = clipRect
+			function setLayersParams(){
+				if(!graph.hasData){
+					return
+				}
 
-			activeLayer.layerMatrix.setXScale(graph.xScale)
-			activeLayer.layerMatrix.setYScale(-graph.yScale)
-			activeLayer.layerMatrix.setXTranslation(gridShape.labelYWidth + gridShape.axesOrigin.x)
-			activeLayer.layerMatrix.setYTranslation(height - gridShape.labelXHeight - gridShape.axesOrigin.y)
+				let activeLayer = getActiveLayer()
 
+				if(!width || !height || !activeLayer){
+					return
+				}
+
+				let clipRect = Qt.rect(gridShape.labelYWidth, gridShape.legendMargin, width - gridShape.labelYWidth - gridShape.legendMargin, height - gridShape.labelXHeight - gridShape.legendMargin)
+				activeLayer.clipRect = clipRect
+
+				activeLayer.layerMatrix.setXScale(graph.xScale)
+				activeLayer.layerMatrix.setYScale(-graph.yScale)
+				activeLayer.layerMatrix.setXTranslation(gridShape.labelYWidth + gridShape.axesOrigin.x)
+				activeLayer.layerMatrix.setYTranslation(height - gridShape.labelXHeight - gridShape.axesOrigin.y)
+
+			}
 		}
 	}
 
