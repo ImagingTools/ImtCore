@@ -23,6 +23,10 @@ module.exports = {
     Process: require("./Process"),
     BaseClass: require("./BaseClass"),
     BaseModel: require("./BaseModel"),
+
+    SDLObject: require("./SDLObject"),
+    SDLProperty: require("./SDLProperty"),
+
     
     real: require("./Real"),
     double: require("./Double"),

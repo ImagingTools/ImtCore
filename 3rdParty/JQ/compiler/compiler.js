@@ -1078,6 +1078,9 @@ class Instruction {
     getMeta(isRoot = false) {
         let meta = []
         meta.push(`{`)
+
+        let typeInfo = this.getTypeInfo(this.extends)
+
         if (this.defineProperties.length || this.defineSignals.length) {
             for (let defineProperty of this.defineProperties) {
                 let _typeInfo
@@ -1094,20 +1097,44 @@ class Instruction {
 
                 if (typeof defineProperty.value === 'object') {
                     if (_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)) {
-                        meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}},`)
+                        if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
+                            meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, typeTarget:${_typeInfo.path}},`)
+                        } else {
+                            meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}},`)
+                        }
                     } else {
-                        meta.push(`${defineProperty.name}:{type:${_typeInfo.path}},`)
+                        if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
+                            meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty},`)
+                        } else {
+                            meta.push(`${defineProperty.name}:{type:${_typeInfo.path}},`)
+                        }
+                        
                     }
                     continue
                 }
 
                 if (typeof defineProperty.value === 'string') {
-                    meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}'},`)
+                    if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
+                        meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, value:'${defineProperty.value}'},`)
+                    } else {
+                        meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:'${defineProperty.value}'},`)
+                    }
+                    
                 } else {
                     if (_typeInfo.type instanceof QmlFile || _typeInfo.type.isAssignableFrom(QtQml.QObject)) {
-                        meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}},`)
+                        if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
+                            meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, typeTarget:${_typeInfo.path}, value:${defineProperty.value}},`)
+                        } else {
+                            meta.push(`${defineProperty.name}:{type:JQModules.QtQml.variant, typeTarget:${_typeInfo.path}, value:${defineProperty.value}},`)
+                        }
+                        
                     } else {
-                        meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}},`)
+                        if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.SDLObject)) {
+                            meta.push(`${defineProperty.name}:{type:JQModules.QtQml.SDLProperty, value:${defineProperty.value}},`)
+                        } else {
+                            meta.push(`${defineProperty.name}:{type:${_typeInfo.path}, value:${defineProperty.value}},`)
+                        }
+                        
                     }
 
                 }

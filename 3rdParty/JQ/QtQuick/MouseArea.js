@@ -94,6 +94,8 @@ class MouseArea extends Item {
         if(!this.enabled || !this.visible) return
 
         if((this.hoverEnabled && !mouse.target) || (mouse.target === this && this.__pressed)){
+            this.mouseX = mouse.x
+            this.mouseY = mouse.y
             // console.log(this)
             // JQApplication.setCursor(this.cursorShape)
             this.positionChanged(mouse)
@@ -107,6 +109,8 @@ class MouseArea extends Item {
             this.__pressed = true
             this.__self.pressed = true
             if(!this.__entered) this.entered()
+            this.mouseX = mouse.x
+            this.mouseY = mouse.y
             this.pressedChanged(mouse)
 
             if(mouse.accepted) mouse.target = this
@@ -117,6 +121,8 @@ class MouseArea extends Item {
         if(!this.enabled || !this.visible || !(mouse.button & this.acceptedButtons)) return
 
         if(!mouse.target || mouse.target === this){
+            this.mouseX = mouse.x
+            this.mouseY = mouse.y
             this.released(mouse)
         }
     }

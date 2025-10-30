@@ -17,8 +17,8 @@ class Internal extends QtObject {
 		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
     })
 
-	removed = []
-	changeList = []
+	// removed = []
+	// changeList = []
 
 	SLOT_internalModelChanged(name, sender){
 		if (this.isTransaction){
@@ -55,18 +55,20 @@ class Internal extends QtObject {
 		}
 
 		this.isTransaction = false
+		delete this.changeList
 	}
 
 	removeAt(key){
 	// get index if value found otherwise -1
-		let index = this.removed.indexOf(key)
+		let index = this.removed ? this.removed.indexOf(key) : -1
 		if (index > -1) { //if found
 			this.removed.splice(index, 1)
+			if(this.removed.length === 0) delete this.removed
 		}
 	}
 
 	containceInRemoved(key){
-		let index = this.removed.indexOf(key)
+		let index = this.removed ? this.removed.indexOf(key) : -1
 		if (index > -1) {
 			return true
 		}
@@ -134,6 +136,8 @@ class BaseClass extends QtObject {
 			}
 			this[key] = null
 		}
+
+		if(!this._internal.removed) this._internal.removed = []
 		this._internal.removed.push(key)
 	}
 
@@ -266,7 +270,7 @@ class BaseClass extends QtObject {
 			let key = list[i]
 			if(key === '__typename' && this[key] === '') continue
 
-			if (this[key] == null && this._internal.containceInRemoved(key)){
+			if (this._internal.containceInRemoved(key)){
 				continue
 			}
 			if (!isFirst) json += ','
@@ -324,7 +328,7 @@ class BaseClass extends QtObject {
 		let isFirst = true
 		for (let i = 0; i < list.length; i++) {
 			let key = list[i]
-			if (this[key] == null && this._internal.containceInRemoved(key)){
+			if (this._internal.containceInRemoved(key)){
 				continue
 			}
 			if (!isFirst) graphQL += ','
@@ -418,6 +422,9 @@ class BaseClass extends QtObject {
 
 		for (let key in sourceObject) {
 			let _key = "m_" + key[0].toLowerCase() + key.slice(1, key.length)
+
+			this._internal.removeAt(_key)
+
 			if (sourceObject[key] === null){
 				this[_key] = null
 			}

@@ -245,7 +245,7 @@ class Flickable extends Item {
             let deltaY = wheel.angleDelta.y * 4
 
             if(this.flickableDirection === Flickable.AutoFlickDirection || this.flickableDirection === Flickable.AutoFlickIfNeeded){
-                if(this.contentWidth > 0){
+                if(this.contentWidth > 0 && this.contentWidth > this.width){
                     if(deltaX > 0){
                         if(this.contentX + deltaX < this.contentWidth - this.width + this.originX) {
                             this.contentX += deltaX
@@ -261,8 +261,10 @@ class Flickable extends Item {
                             wheel.target = null
                         }
                     }
+                } else {
+                    wheel.target = null
                 }
-                if(this.contentHeight > 0){
+                if(this.contentHeight > 0 && this.contentHeight > this.height){
                     if(deltaY > 0){
                         if(this.contentY + deltaY < this.contentHeight - this.height + this.originY) {
                             this.contentY += deltaY
@@ -278,6 +280,8 @@ class Flickable extends Item {
                             wheel.target = null
                         }
                     }
+                } else {
+                    wheel.target = null
                 }
                 
             }
