@@ -15,6 +15,7 @@ import imtcontrols 1.0
 */
 ControlBase {
 	id: switchCustom
+	objectName: "SwitchButton"
 	
 	decorator: Style.switchDecorator
 	
@@ -199,6 +200,7 @@ ControlBase {
 	
 	MouseArea {
 		id: ma
+		objectName: "MouseArea"
 		anchors.fill: parent
 		hoverEnabled: true
 		cursorShape: Qt.PointingHandCursor

@@ -6,6 +6,7 @@ import imtcontrols 1.0
 
 ControlBase {
 	id: dialogContainer;
+	objectName: "Dialog"
 
 	width:  !decorator_ ? 0 :  decorator_.width ;
 	height:  !decorator_ ? 0 :  decorator_.height ;

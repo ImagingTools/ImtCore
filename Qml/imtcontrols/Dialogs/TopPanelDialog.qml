@@ -6,6 +6,7 @@ import imtcontrols 1.0
 
 Rectangle {
 	id: topPanelDialogContainer;
+	objectName: "TopPanel"
 
 	width: Style.sizeHintXS;
 	height: Style.controlHeightL;
@@ -63,6 +64,7 @@ Rectangle {
 
 	Button {
 		id: closeButton;
+		objectName: "CloseButton"
 
 		anchors.right: topPanelDialogContainer.right;
 		anchors.verticalCenter: topPanelDialogContainer.verticalCenter;

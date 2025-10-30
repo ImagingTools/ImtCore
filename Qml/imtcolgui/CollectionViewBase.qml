@@ -324,6 +324,7 @@ ViewBase {
 
 				ToolButton {
 					id: iconFilter;
+					objectName: "FilterVisible"
 					anchors.centerIn: parent;
 					width: Style.buttonWidthL;
 					height: width;

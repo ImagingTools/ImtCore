@@ -13,6 +13,7 @@ TextInputElementView {
 
     property double value
     property bool popupError: false;
+    controlWidth: Style.sizeHintXS
 
     onVisibleChanged: {
         if (!visible){

@@ -8,6 +8,8 @@ import imtbaseCommandsSdl 1.0
 // !!! Commands with priority = -1 always hidden
 Item {
 	id: commandsItem;
+	objectName: "CommandsView"
+
 	width: contentWidth;
 	height: Style.controlHeightM;
 	
@@ -109,6 +111,7 @@ Item {
 			id: repeater;
 			delegate: Component { Button {
 					id: button;
+					objectName: model.item ? model.item.m_elementId : "Button"
 
 					Connections {
 						target: model.item

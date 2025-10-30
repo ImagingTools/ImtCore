@@ -166,6 +166,7 @@ FocusScope {
 	
 	TextInput {
 		id: textField;
+		objectName: "TextInput"
 		
 		z: parent.z + 1;
 		

@@ -8,6 +8,7 @@ Item {
 
 	width: rowDelegate.width
 	height: Style.controlHeightM
+	objectName: filterId
 
 	property string filterId
 	property string name
@@ -85,6 +86,8 @@ Item {
 
 		Button {
 			id: clearButton
+			objectName: "ClearButton"
+
 			width: filterDelegateBase.height
 			height: width
 			visible: filterDelegateBase.isActive

@@ -162,6 +162,7 @@ Rectangle {
 
 		ToolButton {
 			id: closeButton;
+			objectName: "BackButton"
 			anchors.centerIn: buttonPanel;
 			width: visible ? Style.buttonWidthM: 0;
 			height: width;

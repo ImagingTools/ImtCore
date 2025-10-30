@@ -59,6 +59,7 @@ ElementView {
 
         ComboBox {
             id: cb;
+            objectName: "ComboBox"
 
             width: comboBoxElementView.controlWidth;
             height: comboBoxElementView.controlHeight;

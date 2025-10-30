@@ -297,6 +297,7 @@ DecoratorBase {
 	
 	ToolButton {
 		id: clearAllButton
+		objectName: "ClearAllFilters"
 		anchors.right: parent.right
 		icon.source: enabled ? "qrc:/" + Style.getIconPath("Icons/FilterRemove", Icon.State.On, Icon.Mode.Normal)
 							 : "qrc:/" + Style.getIconPath("Icons/FilterRemove", Icon.State.Off, Icon.Mode.Disabled)

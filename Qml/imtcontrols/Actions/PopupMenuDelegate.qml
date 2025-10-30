@@ -5,6 +5,7 @@ import imtcontrols 1.0
 
 ItemDelegate {
 	id: popupMenuDelegate;
+	objectName: "PopupMenuDelegate"
 	
 	decorator: Style.popupItemDelegateDecorator;
 	

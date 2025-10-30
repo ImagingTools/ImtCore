@@ -5,6 +5,7 @@ import imtcontrols 1.0
 
 ControlBase {
 	id: baseButton;
+	objectName: text.replace(/\s/g, '') + "Button"
 
 	decorator: Style.buttonDecorator
 
@@ -76,6 +77,7 @@ ControlBase {
 
 	MouseArea{
 		id: ma;
+		objectName: "MouseArea"
 
 		anchors.fill: parent;
 

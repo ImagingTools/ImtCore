@@ -6,6 +6,7 @@ import imtcontrols 1.0
 
 ControlBase {
 	id: comboBoxContainer;
+	objectName: "ComboBox"
 
 	decorator: Style.comboBoxDecorator
 
@@ -64,6 +65,7 @@ ControlBase {
 	signal finished(string itemId, int index);
 
 	property Component delegate: Component {PopupMenuDelegate{
+			objectName: text.replace(/\s/g, '')
 			width: comboBoxContainer.width;
 			height: comboBoxContainer.itemHeight;
 			contentLeftMargin: comboBoxContainer.contentLeftMargin;
@@ -226,6 +228,7 @@ ControlBase {
 
 	MouseArea {
 		id: cbMouseArea;
+		objectName: "MouseArea"
 
 		anchors.fill: parent;
 		hoverEnabled: true;

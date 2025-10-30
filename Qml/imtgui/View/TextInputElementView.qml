@@ -85,6 +85,7 @@ ElementView {
 		CustomTextField {
 			width: root.controlWidth;
 			height: root.controlHeight;
+			objectName: "TextField"
 			
 			text: root.text;
 			

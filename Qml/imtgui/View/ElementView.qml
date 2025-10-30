@@ -6,6 +6,7 @@ import imtcontrols 1.0
 
 Rectangle {
 	id: rootElement
+	objectName: name.replace(/\s/g, '') + "ElementView"
 	
 	width: Style.sizeHintXXL
 	height: contentHeight + 2 * Style.marginXL

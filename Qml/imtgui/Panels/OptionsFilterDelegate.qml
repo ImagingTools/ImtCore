@@ -223,6 +223,7 @@ FilterDelegateBase {
 			}
 
 			delegate: Component {PopupMenuDelegate {
+					objectName: text.replace(/\s/g, '')
 					width: popupMenuContainer.width
 					height: popupMenuContainer.itemHeight
 					text: model.item["m_name"]

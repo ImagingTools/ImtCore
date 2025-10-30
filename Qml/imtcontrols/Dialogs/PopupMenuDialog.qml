@@ -8,6 +8,7 @@ import imtcontrols 1.0
 
 ControlBase {
 	id: popupMenuContainer;
+	objectName: "PopupMenuDialog"
 	
 	width: itemWidth;
 	heightFromDecorator: true;

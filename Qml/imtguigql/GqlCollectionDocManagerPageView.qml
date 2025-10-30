@@ -20,6 +20,7 @@ PageContainer {
 	}
 
 	onStartItemSourceCompChanged: {
+		console.log("onStartItemSourceCompChanged")
 		if (startItemSourceComp){
 			documentManagerView_.setCollectionViewComp(pageName, startItemSourceComp)
 		}

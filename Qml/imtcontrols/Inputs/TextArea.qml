@@ -180,6 +180,7 @@ ControlBase {
 
         TextEdit {
             id: textArea;
+            objectName: "TextInput"
 
             anchors.left: parent.left;
             anchors.right: parent.right;

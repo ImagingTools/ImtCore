@@ -5,6 +5,7 @@ import imtcontrols 1.0
 
 Item{
 	id: headerDelegate;
+	objectName: headerId
 
 	property TableBase tableItem
 	property int columnCount: tableItem ? tableItem.columnCount : 0
@@ -271,6 +272,7 @@ Item{
 	////
 	MouseArea {
 		id: headerMa;
+		objectName: "MouseArea"
 
 		anchors.fill: parent;
 

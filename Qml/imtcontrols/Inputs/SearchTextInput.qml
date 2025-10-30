@@ -5,6 +5,7 @@ import imtcontrols 1.0
 
 CustomTextField {
 	id: tfc;
+	objectName: "SearchTextInput"
 
 	textFieldLeftMargin: searchIcon.width + 2 * margin;
 	textFieldRightMargin: iconClear.width + 2 * margin;
@@ -44,6 +45,7 @@ CustomTextField {
 	
 	ToolButton {
 		id: iconClear;
+		objectName: "ClearText"
 		
 		z: 999;
 		
