@@ -16,6 +16,7 @@ BoundingBox {
 	property bool showLine: true
 	property bool isMultiColor: false;
 	property string shapePointBorderColor: color;
+	property bool hasHoverReaction: true;
 
 
 	function draw(ctx, transformMatrixArg){
@@ -101,6 +102,9 @@ BoundingBox {
 	}
 
 	onMousePositionChanged: {
+		if(!hasHoverReaction){
+			return;
+		}
 		let point  = getLogPosition(Qt.point(mouseEvent.x, mouseEvent.y))
 		let foundNodeIndex = findNodeIndex(point)
 		if(foundNodeIndex > -1){

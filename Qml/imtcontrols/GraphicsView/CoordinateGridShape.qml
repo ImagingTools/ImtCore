@@ -35,6 +35,7 @@ BoundingBox {
 	property bool  canDrawText: true;
 	property bool showGridLines: true;
 	property bool showGridFrame: !showGridLines;
+	property bool hasMinorGrid: true;
 
 	property int labelPrecision : 0;
 	property real lableXOriginMargin: 0
@@ -114,18 +115,66 @@ BoundingBox {
 
 		//let hasMinorGrid = scaleCoeff >= 2
 		if(gridShape.showGridLines){
-		let hasMinorGrid = gridShape.gridStepMajorX * scaleCoeff > 40
+			let hasMinorGrid = gridShape.gridStepMajorX * scaleCoeff > 40 && gridShape.hasMinorGrid
+			if(hasMinorGrid){
+				ctx.strokeStyle = gridShape.minorGridColor;
 
-		if(hasMinorGrid){
-			ctx.strokeStyle = gridShape.minorGridColor;
-			let stepMinorX = gridShape.gridStepMinorX
-			let stepMinorY = gridShape.gridStepMinorY
-			//vertical minor lines
-			for(let i = 0; i * stepMinorX < gridShape.viewItem.drawingAreaWidth - labelYWidth + deltaAddX; i++){//vertical lines
-				let x1 = firstVertLineX + labelYWidth + i * stepMinorX;
+				let stepMinorX = gridShape.gridStepMinorX
+				let stepMinorY = gridShape.gridStepMinorY
+				//vertical minor lines
+				for(let i = 0; i * stepMinorX < gridShape.viewItem.drawingAreaWidth - labelYWidth + deltaAddX; i++){//vertical lines
+					let x1 = firstVertLineX + labelYWidth + i * stepMinorX;
+					let y1 =  verticalLineTopY ;
+					let x2 = x1;
+					let y2 = gridShape.viewItem.drawingAreaHeight - labelXHeight ;
+
+					let point1 = getScreenPosition(Qt.point(x1, y1))
+					let point2 = getScreenPosition(Qt.point(x2, y2))
+					x1 = point1.x;
+					y1 = point1.y
+					x2 = point2.x;
+					//y2 = point2.y
+
+					ctx.beginPath()
+					ctx.moveTo(x1, y1);
+					ctx.lineTo(x2, y2);
+					ctx.closePath()
+					ctx.stroke();
+				}
+				//horizontal minor lines
+				for(let i = 0; i * stepMinorY < gridShape.viewItem.drawingAreaHeight - labelXHeight  + deltaAddY; i++){//horizontal lines
+					let x1 = labelYWidth ;
+					let y1 =  gridShape.viewItem.drawingAreaHeight - i * stepMinorY - labelXHeight - firstHorizLineY;
+					let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
+					let y2 =  y1;
+
+					let point1 = getScreenPosition(Qt.point(x1, y1))
+					let point2 = getScreenPosition(Qt.point(x2, y2))
+					//x1 = point1.x;
+					y1 = point1.y
+					x2 = point2.x;
+					y2 = point2.y
+
+					ctx.beginPath()
+					ctx.moveTo(x1, y1);
+					ctx.lineTo(x2, y2);
+					ctx.closePath()
+					ctx.stroke();
+				}
+			}
+
+			//MAJOR GRID
+			ctx.strokeStyle = gridShape.majorGridColor;
+			ctx.globalAlpha = gridShape.majorGridOpacity
+			//vertical major lines
+			for(let i = 0; i * stepX  <= (gridShape.viewItem.drawingAreaWidth  /*- labelYWidth*/ + deltaAddX)/scaleCoeff; i++){//vertical lines
+				if(gridShape.thinningCheck(scaleCoeff, i)){
+					continue
+				}
+				let x1 = firstVertLineX + labelYWidth + i * stepX;
 				let y1 =  verticalLineTopY ;
 				let x2 = x1;
-				let y2 = gridShape.viewItem.drawingAreaHeight - labelXHeight ;
+				let y2 = gridShape.viewItem.drawingAreaHeight  - labelXHeight ;
 
 				let point1 = getScreenPosition(Qt.point(x1, y1))
 				let point2 = getScreenPosition(Qt.point(x2, y2))
@@ -140,11 +189,15 @@ BoundingBox {
 				ctx.closePath()
 				ctx.stroke();
 			}
-			//horizontal minor lines
-			for(let i = 0; i * stepMinorY < gridShape.viewItem.drawingAreaHeight - labelXHeight  + deltaAddY; i++){//horizontal lines
+			//horizontal major lines
+			//ctx.strokeStyle = gridShape.majorGridColor;
+			for(let i = 0; i * stepY <= (gridShape.viewItem.drawingAreaHeight - labelXHeight + deltaAddY)/ scaleMax1 ; i++){//horizontal lines
+				if(gridShape.thinningCheck(scaleCoeff, i)){
+					continue
+				}
 				let x1 = labelYWidth ;
-				let y1 =  gridShape.viewItem.drawingAreaHeight - i * stepMinorY - labelXHeight - firstHorizLineY;
-				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
+				let y1 =  gridShape.viewItem.drawingAreaHeight - i * stepY - labelXHeight - firstHorizLineY;
+				let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
 				let y2 =  y1;
 
 				let point1 = getScreenPosition(Qt.point(x1, y1))
@@ -160,74 +213,75 @@ BoundingBox {
 				ctx.closePath()
 				ctx.stroke();
 			}
-		}
 
-		//MAJOR GRID
-		ctx.strokeStyle = gridShape.majorGridColor;
-		ctx.globalAlpha = gridShape.majorGridOpacity
-		//vertical major lines
-		for(let i = 0; i * stepX  <= (gridShape.viewItem.drawingAreaWidth  /*- labelYWidth*/ + deltaAddX)/scaleCoeff; i++){//vertical lines
-			if(gridShape.thinningCheck(scaleCoeff, i)){
-				continue
+			ctx.globalAlpha = 1
+
+			// completing the grid to zero
+			//MINOR GRID
+			if(hasMinorGrid){
+				//ctx.strokeStyle = "violet"
+				ctx.strokeStyle = gridShape.minorGridColor;
+
+				let stepMinorX = gridShape.gridStepMinorX
+				let stepMinorY = gridShape.gridStepMinorY
+				//vertical minor lines
+				for(let i = 1; i * stepMinorX <= (deltaMinusX)/scaleCoeff + stepX; i++){//vertical lines
+					let x1 = firstVertLineX + labelYWidth - i * stepMinorX;
+					let y1 =  verticalLineTopY ;
+					let x2 = x1;
+					let y2 = gridShape.viewItem.drawingAreaHeight - labelXHeight ;
+
+					let point1 = getScreenPosition(Qt.point(x1, y1))
+					let point2 = getScreenPosition(Qt.point(x2, y2))
+					x1 = point1.x;
+					y1 = point1.y
+					x2 = point2.x;
+					//y2 = point2.y
+
+					ctx.beginPath()
+					ctx.moveTo(x1, y1);
+					ctx.lineTo(x2, y2);
+					ctx.closePath()
+					ctx.stroke();
+				}
+				//horizontal minor lines
+				//ctx.strokeStyle = ctx.strokeStyle = "blue"
+				for(let i = 1; i * stepMinorY <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff); i++){//horizontal lines
+
+					let x1 = labelYWidth ;
+					let y1 =  gridShape.viewItem.drawingAreaHeight + i * stepMinorY - labelXHeight - firstHorizLineY;
+					let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
+					let y2 =  y1;
+
+					let point1 = getScreenPosition(Qt.point(x1, y1))
+					let point2 = getScreenPosition(Qt.point(x2, y2))
+					//x1 = point1.x;
+					y1 = point1.y
+					x2 = point2.x;
+					y2 = point2.y
+
+					ctx.beginPath()
+					ctx.moveTo(x1, y1);
+					ctx.lineTo(x2, y2);
+					ctx.closePath()
+					ctx.stroke();
+				}
 			}
-			let x1 = firstVertLineX + labelYWidth + i * stepX;
-			let y1 =  verticalLineTopY ;
-			let x2 = x1;
-			let y2 = gridShape.viewItem.drawingAreaHeight  - labelXHeight ;
 
-			let point1 = getScreenPosition(Qt.point(x1, y1))
-			let point2 = getScreenPosition(Qt.point(x2, y2))
-			x1 = point1.x;
-			y1 = point1.y
-			x2 = point2.x;
-			//y2 = point2.y
+			ctx.globalAlpha = gridShape.majorGridOpacity
 
-			ctx.beginPath()
-			ctx.moveTo(x1, y1);
-			ctx.lineTo(x2, y2);
-			ctx.closePath()
-			ctx.stroke();
-		}
-		//horizontal major lines
-		//ctx.strokeStyle = gridShape.majorGridColor;
-		for(let i = 0; i * stepY <= (gridShape.viewItem.drawingAreaHeight - labelXHeight + deltaAddY)/ scaleMax1 ; i++){//horizontal lines
-			if(gridShape.thinningCheck(scaleCoeff, i)){
-				continue
-			}
-			let x1 = labelYWidth ;
-			let y1 =  gridShape.viewItem.drawingAreaHeight - i * stepY - labelXHeight - firstHorizLineY;
-			let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
-			let y2 =  y1;
-
-			let point1 = getScreenPosition(Qt.point(x1, y1))
-			let point2 = getScreenPosition(Qt.point(x2, y2))
-			//x1 = point1.x;
-			y1 = point1.y
-			x2 = point2.x;
-			y2 = point2.y
-
-			ctx.beginPath()
-			ctx.moveTo(x1, y1);
-			ctx.lineTo(x2, y2);
-			ctx.closePath()
-			ctx.stroke();
-		}
-
-		ctx.globalAlpha = 1
-
-		// completing the grid to zero
-		//MINOR GRID
-		if(hasMinorGrid){
-			//ctx.strokeStyle = "violet"
-			ctx.strokeStyle = gridShape.minorGridColor;
-			let stepMinorX = gridShape.gridStepMinorX
-			let stepMinorY = gridShape.gridStepMinorY
-			//vertical minor lines
-			for(let i = 1; i * stepMinorX <= (deltaMinusX)/scaleCoeff + stepX; i++){//vertical lines
-				let x1 = firstVertLineX + labelYWidth - i * stepMinorX;
+			//MAJOR GRID
+			//ctx.strokeStyle = "red"
+			ctx.strokeStyle = gridShape.majorGridColor;
+			//vertical major lines
+			for(let i = 1; i * stepX  <= deltaMinusX/scaleCoeff + stepX; i++){//vertical lines
+				if(gridShape.thinningCheck(scaleCoeff, i)){
+					continue
+				}
+				let x1 = firstVertLineX + labelYWidth -i * stepX;
 				let y1 =  verticalLineTopY ;
 				let x2 = x1;
-				let y2 = gridShape.viewItem.drawingAreaHeight - labelXHeight ;
+				let y2 = gridShape.viewItem.drawingAreaHeight  - labelXHeight;
 
 				let point1 = getScreenPosition(Qt.point(x1, y1))
 				let point2 = getScreenPosition(Qt.point(x2, y2))
@@ -241,14 +295,17 @@ BoundingBox {
 				ctx.lineTo(x2, y2);
 				ctx.closePath()
 				ctx.stroke();
-			}
-			//horizontal minor lines
-			//ctx.strokeStyle = ctx.strokeStyle = "blue"
-			for(let i = 1; i * stepMinorY <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff); i++){//horizontal lines
 
+			}
+			//horizontal major lines
+			//ctx.strokeStyle = "green"
+			for(let i = 1; i * stepY <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff) ; i++){//horizontal lines
+				if(gridShape.thinningCheck(scaleCoeff, i)){
+					continue
+				}
 				let x1 = labelYWidth ;
-				let y1 =  gridShape.viewItem.drawingAreaHeight + i * stepMinorY - labelXHeight - firstHorizLineY;
-				let x2 =  gridShape.viewItem.drawingAreaWidth + deltaAddX ;
+				let y1 =  gridShape.viewItem.drawingAreaHeight + i * stepY - labelXHeight - firstHorizLineY;
+				let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
 				let y2 =  y1;
 
 				let point1 = getScreenPosition(Qt.point(x1, y1))
@@ -264,63 +321,8 @@ BoundingBox {
 				ctx.closePath()
 				ctx.stroke();
 			}
-		}
 
-		ctx.globalAlpha = gridShape.majorGridOpacity
-
-		//MAJOR GRID
-		//ctx.strokeStyle = "red"
-		ctx.strokeStyle = gridShape.majorGridColor;
-		//vertical major lines
-		for(let i = 1; i * stepX  <= deltaMinusX/scaleCoeff + stepX; i++){//vertical lines
-			if(gridShape.thinningCheck(scaleCoeff, i)){
-				continue
-			}
-			let x1 = firstVertLineX + labelYWidth -i * stepX;
-			let y1 =  verticalLineTopY ;
-			let x2 = x1;
-			let y2 = gridShape.viewItem.drawingAreaHeight  - labelXHeight;
-
-			let point1 = getScreenPosition(Qt.point(x1, y1))
-			let point2 = getScreenPosition(Qt.point(x2, y2))
-			x1 = point1.x;
-			y1 = point1.y
-			x2 = point2.x;
-			//y2 = point2.y
-
-			ctx.beginPath()
-			ctx.moveTo(x1, y1);
-			ctx.lineTo(x2, y2);
-			ctx.closePath()
-			ctx.stroke();
-
-		}
-		//horizontal major lines
-		//ctx.strokeStyle = "green"
-		for(let i = 1; i * stepY <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff) ; i++){//horizontal lines
-			if(gridShape.thinningCheck(scaleCoeff, i)){
-				continue
-			}
-			let x1 = labelYWidth ;
-			let y1 =  gridShape.viewItem.drawingAreaHeight + i * stepY - labelXHeight - firstHorizLineY;
-			let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
-			let y2 =  y1;
-
-			let point1 = getScreenPosition(Qt.point(x1, y1))
-			let point2 = getScreenPosition(Qt.point(x2, y2))
-			//x1 = point1.x;
-			y1 = point1.y
-			x2 = point2.x;
-			y2 = point2.y
-
-			ctx.beginPath()
-			ctx.moveTo(x1, y1);
-			ctx.lineTo(x2, y2);
-			ctx.closePath()
-			ctx.stroke();
-		}
-
-		ctx.globalAlpha = 1
+			ctx.globalAlpha = 1
 		}
 
 		//AXES BACKGROUND
@@ -356,8 +358,11 @@ BoundingBox {
 
 				//console.log("deltaAddY:: ", y_, deltaAddY, (gridShape.viewItem.drawingAreaHeight - labelXHeight + deltaAddY * scaleCoeff))
 
-				ctx.beginPath()
 				let str = gridShape.getLabelY(String(getLogicalMajorLineY(Number(i * stepY - gridShape.axesOrigin.y + firstHorizLineY).toFixed(gridShape.labelPrecision))))
+				if(str == ""){
+					continue
+				}
+				ctx.beginPath()
 
 				let textLength = ctx.measureText(str).width
 				x_ = x_ - textLength - Style.marginXS
@@ -374,8 +379,12 @@ BoundingBox {
 				let y_ = (gridShape.viewItem.drawingAreaHeight + i * stepY  - labelXHeight - firstHorizLineY)* scaleCoeff
 				y_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).y
 
-				ctx.beginPath()
 				let str = gridShape.getLabelY(String(getLogicalMajorLineY(Number(firstHorizLineY -i * stepY - gridShape.axesOrigin.y).toFixed(gridShape.labelPrecision))))
+				if(str == ""){
+					continue
+				}
+
+				ctx.beginPath()
 
 				let textLength = ctx.measureText(str).width
 				x_ = x_ - textLength - Style.marginXS
@@ -400,8 +409,13 @@ BoundingBox {
 				let x_ = (firstVertLineX + labelYWidth + i * stepX) * scaleCoeff;
 				let y_ = gridShape.viewItem.drawingAreaHeight  - labelXHeight + fontSize + Style.marginXS
 				x_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).x
-				ctx.beginPath()
+
 				let str = gridShape.getLabelX(String(getLogicalMajorLineX(Number(firstVertLineX + i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision))))
+				if(str == ""){
+					continue
+				}
+
+				ctx.beginPath()
 
 				let textLength = ctx.measureText(str).width
 				x_ = x_ - textLength/2
@@ -418,8 +432,12 @@ BoundingBox {
 				let y_ = gridShape.viewItem.drawingAreaHeight  - labelXHeight + fontSize + Style.marginXS
 				x_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).x
 
-				ctx.beginPath()
 				let str = gridShape.getLabelX(String(getLogicalMajorLineX(Number(firstVertLineX -i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision))))
+				if(str == ""){
+					continue
+				}
+
+				ctx.beginPath()
 
 				let textLength = ctx.measureText(str).width
 				x_ = x_ - textLength/2

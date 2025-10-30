@@ -20,7 +20,7 @@ Rectangle{
 
 	property real gridStepMajorX: 40
 	property real gridStepMajorY: 40
-	property int labelFontSize: fontSizeM//Style.fontSizeXXS
+	property int labelFontSize: Style.fontSizeM//Style.fontSizeXXS
 
 	property var linePoints: [];
 	property int pointCount: linePoints.length
@@ -34,6 +34,11 @@ Rectangle{
 	property int lableXOriginMargin: 20
 
 	property bool alwaysShowOrigin: false;
+	property bool hasTooltip: true;
+	property bool hasMinorGrid: true;
+
+	property real xScale: 1
+	property real yScale: 1
 
 
 	function requestPaint() {
@@ -41,9 +46,13 @@ Rectangle{
 	}
 
 	function getLabelX(xArg){
-		let index = Math.round(Number(xArg) / gridStepMajorX)
-		if(index < 0 || index > (graph.labelXValues.length -1)){
+		let index = Math.round(Number(xArg) / gridStepMajorX/ xScale)
+		if(!graph.labelXValues.length){
 			return gridShape.getLabelXBase(xArg)
+		}
+		if(index < 0 || index > (graph.labelXValues.length -1)){
+			let str = ""
+			return str
 		}
 		else {
 			return String(labelXValues[index])
@@ -51,9 +60,13 @@ Rectangle{
 	}
 
 	function getLabelY(yArg){
-		let index = Math.round(Number(yArg) / gridStepMajorY)
-		if(index < 0 || index > (graph.labelYValues.length -1)){
+		let index = Math.round(Number(yArg) / gridStepMajorY / yScale)
+		if(!graph.labelYValues.length){
 			return gridShape.getLabelXBase(yArg)
+		}
+		if(index < 0 || index > (graph.labelYValues.length -1)){
+			let str = ""
+			return str
 		}
 		else {
 			return String(labelYValues[index])
@@ -132,7 +145,8 @@ Rectangle{
 
 			let activeLayer = getActiveLayer()
 
-			activeLayer.layerMatrix.invertY();
+			activeLayer.layerMatrix.setXScale(graph.xScale)
+			activeLayer.layerMatrix.setYScale(-graph.yScale);
 
 
 			let lineObj = polylineComp.createObject(this);
@@ -158,6 +172,8 @@ Rectangle{
 			let clipRect = Qt.rect(gridShape.labelYWidth, gridShape.legendMargin, width - gridShape.labelYWidth - gridShape.legendMargin, height - gridShape.labelXHeight - gridShape.legendMargin)
 			activeLayer.clipRect = clipRect
 
+			activeLayer.layerMatrix.setXScale(graph.xScale)
+			activeLayer.layerMatrix.setYScale(-graph.yScale)
 			activeLayer.layerMatrix.setXTranslation(gridShape.labelYWidth + gridShape.axesOrigin.x)
 			activeLayer.layerMatrix.setYTranslation(height - gridShape.labelXHeight - gridShape.axesOrigin.y)
 
@@ -188,13 +204,14 @@ Rectangle{
 		labelXHeight: 20
 		cutAxesEnds: true
 		legendMargin: 20;
-		gridStepMajorX: graph.gridStepMajorX
-		gridStepMajorY: graph.gridStepMajorY
+		gridStepMajorX: graph.gridStepMajorX * graph.xScale
+		gridStepMajorY: graph.gridStepMajorY * graph.yScale
 		canDrawText: true;
 		labelX: ""
 		labelY: ""
 		fontSize: graph.labelFontSize
 		lableXOriginMargin: graph.lableXOriginMargin
+		hasMinorGrid: graph.hasMinorGrid
 
 		function getLabelX(xArg){//override
 			return graph.getLabelX(xArg)
@@ -220,6 +237,7 @@ Rectangle{
 			points: graph.linePoints;
 
 			isHidden: !graph.linePoints.length
+			hasHoverReaction: graph.hasTooltip
 
 			function getTooltipText(){
 				if(highlightedNodeIndex > (graph.tooltipValues.length -1)){
@@ -238,6 +256,9 @@ Rectangle{
 			}
 
 			onHighlightedNodeIndexChanged: {
+				if(!graph.hasTooltip){
+					return;
+				}
 				if(highlightedNodeIndex > -1){
 					toolTip.text = getTooltipText()//"(" + Number(highlightedNodeCoordinate.x).toFixed(2)  + ", " + Number(highlightedNodeCoordinate.y).toFixed(2) + ")";
 					let screenPoint = getScreenPosition(Qt.point(highlightedNodeCoordinate.x, highlightedNodeCoordinate.y))
