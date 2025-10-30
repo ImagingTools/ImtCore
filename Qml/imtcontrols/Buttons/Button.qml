@@ -45,7 +45,7 @@ ControlBase {
 			// baseButton.focus = true;
 			// baseButton.forceActiveFocus();
 			if (baseButton.checkable){
-				baseButton.checked = !baseButton.checked
+				// baseButton.checked = !baseButton.checked
 				baseButton.toggled()
 			}
 			baseButton.closeTooltip();

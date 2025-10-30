@@ -1,284 +1,145 @@
 import QtQuick 2.0
-
 import Acf 1.0
-import com.imtcore.imtqml 1.0
 import imtcontrols 1.0
 
-
 Item {
-    id: pieChart;
+	id: pieChart
+	width: Style.sizeHintXS
+	height: Style.sizeHintS
 
-	width: Style.sizeHintXXS;
-	height: width;
+	property var segments: [] // [{ value: 40, color: "#4CAF50", label: "Active" }, ...]
+	property bool ring: true
+	property real ringThickness: 0.6
+	property bool clockwise: true
+	property real rotationAngle: -90
+	property bool showLegend: true
+	property bool showPercent: true
+	property bool legendHorizontal: false
 
-    property real percent: 50;
-	property string pieColor: Style.positiveAccentColor;
-	property string pieColor_second:  Style.negativeAccentColor;
-    property bool isRing: true;
-    property bool clockwise: false;
-    property bool visibleText: false;
-    property real rotationAngle: 0;
-	property int fontSize: Style.fontSizeXXL;
-    property string fontFamily: Style.fontFamilyBold;
-    property bool fontBold: false;
-    property real textPositionCoeff: 0.6;
-    property real ringSizeCoeff: 0.6;
-    property alias textPositive: positive.text;
-    property alias textNegative: negative.text;
+	signal chartUpdated()
 
-    onPercentChanged: {canvas.requestPaint();}
-    //visible: (percent===0) ? false: true
+	function getTotalValue() {
+		let total = 0
+		for (let i = 0; i < pieChart.segments.length; ++i)
+			total += pieChart.segments[i].value || 0
+		return total
+	}
 
-    Rectangle{
-        id: whiteCircle;
+	function getPercentText(value) {
+		let total = pieChart.getTotalValue()
+		if (total <= 0 || pieChart.segments.length === 0)
+			return ""
+		let percent = Math.round(value / total * 100)
+		return percent + "%"
+	}
 
-        anchors.centerIn: parent;
+	function updateGui() {
+		let totalValue = pieChart.getTotalValue()
+		if (totalValue <= 0 || pieChart.segments.length === 0)
+			return
+		for (let i = 0; i < pieChart.segments.length; ++i) {
+			let seg = pieChart.segments[i]
+			let percentText = pieChart.getPercentText(seg.value)
+			seg.displayText = seg.value + (percentText ? " (" + percentText + ")" : "")
+		}
+		chartUpdated()
+	}
 
-        visible: pieChart.isRing;
-        radius : parent.width * pieChart.ringSizeCoeff;
-        height: parent.height * pieChart.ringSizeCoeff;
-        width:  parent.width * pieChart.ringSizeCoeff;
-		color: Style.baseColor;
-        z:1;
+	onSegmentsChanged: { updateGui(); canvas.requestPaint() }
+	onWidthChanged: canvas.requestPaint()
+	onHeightChanged: canvas.requestPaint()
+	onRingChanged: canvas.requestPaint()
+	onClockwiseChanged: canvas.requestPaint()
+	onRotationAngleChanged: canvas.requestPaint()
 
-    }
+	Canvas {
+		id: canvas
+		anchors.horizontalCenter: parent.horizontalCenter
+		width: pieChart.height * 0.6
+		height: width
+		antialiasing: true
 
-    Canvas {
-        id: canvas;
+		onPaint: {
+			let ctx = getContext("2d")
+			ctx.reset()
 
-        anchors.centerIn: parent;
+			let cx = width / 2
+			let cy = height / 2
+			let r = width / 2
 
-        width: parent.width;
-        height: parent.height;
-        rotation: pieChart.rotationAngle;
-        property color strokeStyle: pieChart.pieColor; //"#ff8a3d"
-        property color fillStyle: pieChart.pieColor; //"#ff8a3d"
-        property real lineWidth: 1;
+			let total = pieChart.getTotalValue()
+			if (!total)
+				return
 
+			let angle = pieChart.rotationAngle * Math.PI / 180
+			let direction = pieChart.clockwise ? 1 : -1
 
-        onPaint: {
-            var ctx = canvas.getContext('2d');
-            ctx.lineCap = "butt";
-            ctx.lineJoin = "bevel";
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = canvas.strokeStyle;
-            ctx.fillStyle = canvas.fillStyle;
-            ctx.lineWidth = canvas.lineWidth;
+			for (let i = 0; i < pieChart.segments.length; ++i) {
+				let seg = pieChart.segments[i]
+				let portion = (seg.value / total) * 2 * Math.PI * direction
+				let nextAngle = angle + portion
 
-            var r = canvas.width/2 - canvas.lineWidth*2;
+				ctx.beginPath()
+				ctx.moveTo(cx, cy)
+				ctx.arc(cx, cy, r, angle, nextAngle, !pieChart.clockwise)
+				ctx.closePath()
+				ctx.fillStyle = seg.color || "#ccc"
+				ctx.fill()
 
-            if ((pieChart.percent != 100)&&(pieChart.percent != 0))
-            {
-                if(! pieChart.clockwise){
-                    ctx.beginPath();
-                    ctx.arc(canvas.width/2,  canvas.height/2, r, 0, - pieChart.percent * 3.6 * Math.PI/180, true);
-                    ctx.strokeStyle = canvas.strokeStyle;
-                    ctx.lineTo(canvas.width/2, canvas.height/2)
-                    ctx.lineTo(canvas.width - canvas.lineWidth*2, canvas.height/2)
-                    ctx.stroke();
-                    ctx.fill();
-                    ctx.closePath();
+				angle = nextAngle
+			}
 
+			if (pieChart.ring) {
+				let innerR = r * pieChart.ringThickness
+				ctx.beginPath()
+				ctx.arc(cx, cy, innerR, 0, 2 * Math.PI)
+				ctx.fillStyle = "white"
+				ctx.fill()
+			}
+		}
+	}
 
-                    ctx.beginPath();
-                    ctx.strokeStyle = pieChart.pieColor_second; //"black";
-                    ctx.fillStyle = pieChart.pieColor_second; //"black"
-                    ctx.arc(canvas.width/2,  canvas.height/2, r, 2*Math.PI,  (100 - pieChart.percent) * 3.6 * Math.PI/180, false);
+	Column {
+		id: legend
+		anchors.top: canvas.bottom
+		anchors.topMargin: Style.marginM
+		anchors.horizontalCenter: parent.horizontalCenter
+		width: parent.width * 0.9
+		visible: pieChart.showLegend
 
-                    ctx.lineTo(canvas.width/2, canvas.height/2);
-                    ctx.lineTo(canvas.width - canvas.lineWidth*2, canvas.height/2);
-                    ctx.stroke();
-                    ctx.fill();
-                    ctx.closePath();
-                }
+		Repeater {
+			model: pieChart.segments
 
-                else{
+			delegate: Row {
+				height: 20
+				spacing: Style.marginM
 
-                    ctx.beginPath();
-                    ctx.arc(canvas.width/2,  canvas.height/2, r, 2*Math.PI,  pieChart.percent * 3.6 * Math.PI/180, false);
-                    ctx.strokeStyle = canvas.strokeStyle;
-                    ctx.lineTo(canvas.width/2, canvas.height/2);
-                    ctx.lineTo(canvas.width - canvas.lineWidth*2, canvas.height/2);
-                    ctx.stroke();
-                    ctx.fill();
-                    ctx.closePath();
+				Rectangle {
+					anchors.verticalCenter: parent.verticalCenter
+					width: Style.fontSizeM
+					height: 14
+					radius: 3
+					color: modelData.color || "#ccc"
+				}
 
+				Text {
+					anchors.verticalCenter: parent.verticalCenter
+					text: modelData.label || ""
+					color: Style.textColor
+					font.pixelSize: Style.fontSizeM
+					elide: Text.ElideRight
+				}
 
-                    ctx.beginPath();
-                    ctx.strokeStyle = pieChart.pieColor_second; //"black";
-                    ctx.fillStyle = pieChart.pieColor_second; //"black"
-                    ctx.arc(canvas.width/2,  canvas.height/2, r, 0, - (100 - pieChart.percent) * 3.6 * Math.PI/180, true);
-
-                    ctx.lineTo(canvas.width/2, canvas.height/2);
-                    ctx.lineTo(canvas.width - canvas.lineWidth*2, canvas.height/2);
-                    ctx.stroke();
-                    ctx.fill();
-                    ctx.closePath();
-
-                }
-
-            } else if (pieChart.percent ==0)
-            {
-
-                ctx.beginPath();
-				ctx.strokeStyle = pieChart.pieColor_second;
-				ctx.fillStyle = pieChart.pieColor_second;
-                ctx.arc(canvas.width/2,  canvas.height/2, r, 0,  2*Math.PI, true);
-                ctx.stroke();
-                ctx.fill();
-                ctx.closePath();
-
-            } else if (pieChart.percent ==100)
-
-            {
-                ctx.beginPath();
-                ctx.strokeStyle = canvas.strokeStyle;
-                ctx.fillStyle = canvas.fillStyle;
-                ctx.arc(canvas.width/2,  canvas.height/2, r, 0,  2*Math.PI, true);
-                ctx.stroke();
-                ctx.fill();
-                ctx.closePath();
-
-            }
-
-        }
-
-
-    }
-
-    ////////////text///////////////
-
-    Text {
-        id: positive;
-
-        visible: ((pieChart.percent/100 * 360)/2 * Math.PI/180 !==0) && ((pieChart.percent/100 * 360)/2 * Math.PI/180 !== Math.PI)  && pieChart.visibleText;
-        horizontalAlignment: Text.AlignHCenter;
-        verticalAlignment: Text.AlignVCenter;
-        font.pixelSize: pieChart.fontSize;
-        font.bold: pieChart.fontBold;
-        font.family: pieChart.fontFamily;
-        color: "black";
-
-        text: Math.floor(pieChart.percent);
-
-        property real sign: pieChart.clockwise ? -1 : 1;
-        property real r: parent.width/2;
-        property real angle: (pieChart.percent/100 * 360)/2 * Math.PI/180 - positive.sign * pieChart.rotationAngle * Math.PI/180;  //от 0 до 180 градусов
-        property real shiftX: positive.r - positive.width/2;
-        property real shiftY: positive.r - positive.height/2;
-        property real shiftR: positive.r * pieChart.textPositionCoeff;
-
-        property real x_anticlockwise:  (positive.shiftX + positive.shiftR * Math.cos(positive.angle));
-        property real y_anticlockwise : (positive.shiftY - positive.shiftR * Math.sin(positive.angle));
-        property real x_clockwise: (positive.shiftX + positive.shiftR * Math.cos(positive.angle));
-        property real y_clockwise: (positive.shiftY + positive.shiftR * Math.sin(positive.angle));
-
-
-
-        x: pieChart.clockwise ? positive.x_clockwise : positive.x_anticlockwise;
-        y: pieChart.clockwise ? positive.y_clockwise : positive.y_anticlockwise;
-
-    }
-
-    Text {
-        id: negative;
-
-        visible: (((100 - pieChart.percent)/100 * 360)/2 * Math.PI/180 !==0) && (((100 - pieChart.percent)/100 * 360)/2 * Math.PI/180 !== Math.PI) && pieChart.visibleText;
-        horizontalAlignment: Text.AlignHCenter;
-        verticalAlignment: Text.AlignVCenter;
-        color: "black";//"red"
-        font.pixelSize: pieChart.fontSize;
-        font.bold: pieChart.fontBold;
-        font.family: pieChart.fontFamily;
-
-        text: (100 - Math.floor(pieChart.percent));
-
-        property real sign: pieChart.clockwise ? -1 : 1;
-        property real r: parent.width/2;
-        property real angle: ((100 - pieChart.percent)/100 * 360)/2 * Math.PI/180 + negative.sign * pieChart.rotationAngle * Math.PI/180;   //от 0 до 180 градусов
-        property real shiftX: negative.r - negative.width/2;
-        property real shiftY: negative.r - negative.height/2;
-        property real shiftR: negative.r * pieChart.textPositionCoeff;
-
-
-        property real x_anticlockwise: (negative.shiftX + negative.shiftR * Math.cos(negative.angle));
-        property real y_anticlockwise: (negative.shiftY + negative.shiftR * Math.sin(negative.angle));
-
-        property real x_clockwise:  (negative.shiftX + negative.shiftR * Math.cos(negative.angle));
-        property real y_clockwise: (negative.shiftY - negative.shiftR * Math.sin(negative.angle));
-
-        x: pieChart.clockwise ? negative.x_clockwise : negative.x_anticlockwise;
-        y: pieChart.clockwise ? negative.y_clockwise : negative.y_anticlockwise;
-
-
-
-    }
-//
-    Text {
-        id: positive_abs;
-
-        anchors.centerIn: parent;
-
-        visible: pieChart.percent == 100  && pieChart.visibleText;
-        horizontalAlignment: Text.AlignHCenter;
-        verticalAlignment: Text.AlignVCenter;
-        font.pixelSize: pieChart.fontSize;
-        font.bold: pieChart.fontBold;
-        font.family: pieChart.fontFamily;
-		color: Style.textColor;
-
-        text: positive.text;
-
-    }
-
-    Text {
-        id: negative_abs;
-
-        anchors.centerIn: parent;
-
-        visible: pieChart.percent == 0  && pieChart.visibleText;
-        horizontalAlignment: Text.AlignHCenter;
-        verticalAlignment: Text.AlignVCenter;
-        color: "black";//"red"
-        font.pixelSize: pieChart.fontSize;
-        font.bold: pieChart.fontBold;
-        font.family: pieChart.fontFamily;
-
-        text: negative.text;
-
-    }
-
+				Text {
+					anchors.verticalCenter: parent.verticalCenter
+					visible: pieChart.showPercent
+					color: Style.textColor
+					font.pixelSize: Style.fontSizeM
+					text: modelData.displayText || ""
+				}
+			}
+		}
+	}
 }
-
-
-
-//NumberAnimation {
-//    id: anim
-//    target: piechart
-//    property: "percent"
-//    duration: 2000
-//    from: 0; to:100
-//    easing.type: Easing.InOutQuad
-//    onStopped: piechart.percent = 0//start()
-//}
-
-//AUX.Piechart{
-//    id: piechart
-//    anchors.centerIn: parent
-//    visible: true
-//    percent: 0
-//    isRing: true
-//    visibleText: true
-//    textPositionCoeff: 0.8
-//    clockwise: true
-//    rotationAngle: -90
-//    MouseArea{anchors.fill: parent
-//        hoverEnabled: true
-//        cursorShape:containsMouse ? Qt.PointingHandCursor :Qt.ArrowCursor
-//        onClicked: anim.start()
-//    }
-
-//}
-
 
 

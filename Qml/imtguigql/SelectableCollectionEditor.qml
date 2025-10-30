@@ -313,7 +313,6 @@ ElementView {
 			Component.onCompleted: {
 				container.sourceCollectionView = this
 				container.updateSourceCollection()
-				updateHeight()
 			}
 			
 			Component.onDestruction: {

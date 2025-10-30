@@ -11,8 +11,7 @@ OptionsList {
     property string nameKey: "name"
     property string descriptionKey: "description"
 
-    Component {
-        id: optionFactory
+    property Component optionFactory: Component{
         Option {}
     }
     

@@ -17,7 +17,7 @@ RemoteCollectionView {
 	gqlGetListCommandId: "GetUserActions"
 	documentCollectionFilter: null
 	commandsControllerComp: null
-
+	collectionId: "UserActions"
 	Component.onCompleted: {
 		if (PermissionsController.checkPermission("ViewUsers")){
 			registerFieldFilterDelegate("userId", userDelegateFilterComp)
