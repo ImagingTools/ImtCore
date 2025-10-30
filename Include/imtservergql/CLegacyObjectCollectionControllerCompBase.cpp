@@ -1494,12 +1494,12 @@ void CLegacyObjectCollectionControllerCompBase::PrepareFilters(
 		if (timeRangeFilterModelPtr != nullptr){
 			imtbase::CTimeFilterParam* timeFilterParamPtr = new imtbase::CTimeFilterParam();
 
-			if (m_timeFilterParamRepresentationController.GetDataModelFromRepresentation(*timeRangeFilterModelPtr, *timeFilterParamPtr)){
-				filterParams.SetEditableParameter("TimeFilter", timeFilterParamPtr, true);
-			}
-			else{
-				SendWarningMessage(0, QString("Unable to create time range filter param from representation model"));
-			}
+			// if (m_timeFilterParamRepresentationController.GetDataModelFromRepresentation(*timeRangeFilterModelPtr, *timeFilterParamPtr)){
+			// 	filterParams.SetEditableParameter("TimeFilter", timeFilterParamPtr, true);
+			// }
+			// else{
+			// 	SendWarningMessage(0, QString("Unable to create time range filter param from representation model"));
+			// }
 		}
 	}
 

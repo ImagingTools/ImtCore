@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -195,16 +195,13 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Workspace" PackageId="ImtCollectionVoce" ComponentId="MultiDocCollectionPage">
+        <Element Id="Workspace" PackageId="ImtCoreVoce" ComponentId="SingleDocPage">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Alignment" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="32"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="CollectionId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserActions"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CollectionViewQmlPath" Type="Text" ExportId="">
+                    <AttributeInfo Id="FixedItemQmlPath" Type="Text" ExportId="WorkspacePageQmlPath">
                         <Data IsEnabled="true" Value="qrc:/qml/imtauthgui/UserActionCollectionView.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
