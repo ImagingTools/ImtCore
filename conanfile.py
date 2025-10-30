@@ -7,13 +7,12 @@ from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
 from conan.tools.env import Environment, VirtualBuildEnv, VirtualRunEnv
 from conan.tools.build import can_run
-from conan.tools.files import collect_libs, patch, rmdir, update_conandata, move_folder_contents
+from conan.tools.files import collect_libs, update_conandata, move_folder_contents, copy
 from conan.tools.scm import Git
 from conan.errors import ConanInvalidConfiguration, ConanException
-from conans.tools import SVN  # TODO: no svn in conan v2
+
 import os
 import sys
-import shutil
 from pathlib import Path
 import json
 
@@ -48,7 +47,7 @@ class ImtCoreConan(ConanFile):
     exports_sources = ["patches/*"]
     no_copy_source = False
     generators = "CMakeDeps"
-    python_requires = "conantools/0.1.1@gmg/stable"
+    python_requires = "conantools/0.2.0@gmg/stable"
 
     @property
     def _gmgtools(self):
@@ -81,7 +80,7 @@ class ImtCoreConan(ConanFile):
 
     def requirements(self):
         if self.options.qt_package == "conan":
-            self.requires("qt/6.2.4-r2@gmg/system")
+            self.requires("qt/6.8.3-r0@gmg/system")
 
         self.requires("quazip/[~1]@gmg/stable")
         self.requires("openssl/1.1.1u")
@@ -250,39 +249,26 @@ class ImtCoreConan(ConanFile):
         return self._build_folder_suffix(binary=False)
 
     def package(self):
-        source_subfolder = self.source_folder
+        def cp(patterns, path):
+            for p in patterns:
+                copy(self, p, src=os.path.join(self.source_folder, path), dst=os.path.join(self.package_folder, path))
 
-        self.copy("*.*", dst="Config", src=os.path.join(source_subfolder, "Config"))
-        self.copy("*.*", dst="Partitura", src=os.path.join(source_subfolder, "Partitura"))
-        self.copy("*.*", dst="Sdl", src=os.path.join(source_subfolder, "Sdl"))
-        self.copy("*.h", dst="Include", src=os.path.join(source_subfolder, "Include"))
-        self.copy("*.svg", dst="Include", src=os.path.join(source_subfolder, "Include"))
-        self.copy("*.css", dst="Include", src=os.path.join(source_subfolder, "Include"))
-        self.copy("*.theme", dst="Include", src=os.path.join(source_subfolder, "Include"))
-        self.copy("*.cpp", dst="Include", src=os.path.join(source_subfolder, "Include"))
-        self.copy("*.h", dst="Impl", src=os.path.join(source_subfolder, "Impl"))
+        cp(["*.*"], "Config")
+        cp(["*.*"], "Partitura")
+        cp(["*.*"], "Sdl")
+        cp(["*.h", "*.svg", "*.css", "*.theme", "*.cpp"], "Include")
+        cp(["*.h"], "Impl")
 
-        self.copy("*.h", dst="AuxInclude", src=os.path.join(source_subfolder, "AuxInclude"))
-        self.copy("*.cpp", dst="AuxInclude", src=os.path.join(source_subfolder, "AuxInclude"))
-        self.copy("*.qml", dst="AuxInclude", src=os.path.join(source_subfolder, "AuxInclude"))
-        self.copy("*.qrc", dst="AuxInclude", src=os.path.join(source_subfolder, "AuxInclude"))
-        self.copy("qmldir", dst="AuxInclude", src=os.path.join(source_subfolder, "AuxInclude"))
-        self.copy("*.lib", dst="Lib", src=os.path.join(source_subfolder, "Lib"))
-        self.copy(
-            "*.pdb", dst="Lib/" + self._build_folder_suffix(),
-            src=os.path.join(source_subfolder, "AuxInclude"), keep_path=False)
-        self.copy("*.pdb", dst="Lib", src=os.path.join(source_subfolder, "Lib"))
-        self.copy("*.a", dst="Lib", src=os.path.join(source_subfolder, "Lib"))
-        self.copy("*.exe", dst="Bin", src=os.path.join(source_subfolder, "Bin"))
-        self.copy("*.dll", dst="Bin", src=os.path.join(source_subfolder, "Bin"))
-        self.copy("*.pdb", dst="Bin", src=os.path.join(source_subfolder, "Bin"))
-        self.copy("*.arp", dst="Bin", src=os.path.join(source_subfolder, "Bin"))
-        self.copy("*DesignTokenCreator", dst="Bin", src=os.path.join(source_subfolder, "Bin"))
-        self.copy("*DdlCodeCreator", dst="Bin", src=os.path.join(source_subfolder, "Bin"))
-        self.copy("*SdlCodeGenerator", dst="Bin", src=os.path.join(source_subfolder, "Bin"))
+        cp(["*.h", "*.cpp", "*.qml", "*.qrc", "qmldir"], "AuxInclude")
+        cp(["*.lib", "*.pdb", "*.a"], "Lib")
+        copy(self, "*.pdb",
+             src=os.path.join(self.source_folder, "AuxInclude"),
+             dst=os.path.join(self.package_folder, "Lib", self._build_folder_suffix()),
+             keep_path=False)
+        cp(["*.exe", "*.dll", "*.pdb", "*.arp", "*DesignTokenCreator", "*DdlCodeCreator", "*SdlCodeGenerator"], "Bin")
 
         # copy MAC OS bundles
-        self.copy("*.app/*", dst="Bin", src=os.path.join(source_subfolder, "Bin"))
+        cp(["*.app/*"], "Bin")
 
         if self.settings.os == 'Linux':
             from shlex import join
@@ -294,10 +280,10 @@ class ImtCoreConan(ConanFile):
                 self.output.info(f"Removing rpath from {file.name}")
                 self.run(join(["patchelf", "--remove-rpath", str(file)]))
 
-        self.copy("*", dst="Qml", src=os.path.join(source_subfolder, "Qml"))
-        self.copy("*", dst="3rdParty", src=os.path.join(source_subfolder, "3rdParty"))
-        self.copy("*", dst="Install", src=os.path.join(source_subfolder, "Install"))
-        self.copy("*", dst="Include/imtstylecontrolsqml", src=os.path.join(source_subfolder, "Include/imtstylecontrolsqml"))
+        cp(["*"], "Qml")
+        cp(["*"], "3rdParty")
+        cp(["*"], "Install")
+        cp(["*"], "Include/imtstylecontrolsqml")
 
     def _collect_libs(self):
         if self.package_folder is not None:
@@ -326,7 +312,7 @@ class ImtCoreConan(ConanFile):
         # To support editable mode we need explicitly assign same values to conan v2 fields,
         # probably limitation of conan 1.x when using v2 features
         # HACK: we call it in package_info() instead of layout() because deps_cpp_info is needed to calculate the directory name
-        self.cpp.source.includedirs = ["Include", "Impl"]
+        self.cpp.source.includedirs = ["Include", "Impl", "Sdl"]
         self.cpp.build.includedirs = [os.path.join("AuxInclude", self._include_folder_suffix()), os.path.join("AuxInclude", self._include_folder_suffix(), "GeneratedFiles")]
         self.cpp.build.libdirs = self.cpp_info.libdirs
 
