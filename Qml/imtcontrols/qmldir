@@ -204,6 +204,7 @@ GraphicsShapeBase 1.0 ./GraphicsView/GraphicsShapeBase.qml
 CanvasMatrix 1.0 ./GraphicsView/CanvasMatrix.qml
 Matrix3x3 1.0 ./GraphicsView/Matrix3x3.qml
 Graph2d 1.0 ./GraphicsView/Graph2d.qml
+MultiGraph2d 1.0 ./GraphicsView/MultiGraph2d.qml
 
 PolygonShape 1.0 ./GraphicsView/PolygonShape.qml
 RectangleShape 1.0 ./GraphicsView/RectangleShape.qml

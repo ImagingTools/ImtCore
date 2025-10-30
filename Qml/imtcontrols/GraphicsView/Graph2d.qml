@@ -40,9 +40,19 @@ Rectangle{
 	property real xScale: 1
 	property real yScale: 1
 
+	property alias graphicsViewAlias: graphicsView;
+	property alias gridShapeAlias: gridShape;
+
 
 	function requestPaint() {
 		graphicsView.requestPaint()
+	}
+
+	function createLine(){
+		let lineObj = polylineComp.createObject(this);
+		lineObj.color = graph.lineColor
+
+		return lineObj
 	}
 
 	function getLabelX(xArg){
@@ -135,7 +145,8 @@ Rectangle{
 				if(width > 0 && height > 0){
 					setLayersParams()
 					if(graph.linePoints.length){
-						fitToActiveLayer()
+						//fitToActiveLayer()
+						fitToInactivAndActiveLayer()
 					}
 					else {
 						requestPaint()
@@ -156,13 +167,15 @@ Rectangle{
 				activeLayer.layerMatrix.setXScale(graph.xScale)
 				activeLayer.layerMatrix.setYScale(-graph.yScale);
 
+				let inactiveLayer = getInactiveLayer()
+				inactiveLayer.layerMatrix.setXScale(graph.xScale)
+				inactiveLayer.layerMatrix.setYScale(-graph.yScale);
 
-				let lineObj = polylineComp.createObject(this);
-				lineObj.color = graph.lineColor
+				let lineObj =graph.createLine();
 				activeLayer.addShape(lineObj);
 
 				if(graph.alwaysShowOrigin){
-					activeLayer.addShape(originShape);
+					inactiveLayer.addShape(originShape);
 				}
 			}
 
@@ -172,18 +185,27 @@ Rectangle{
 				}
 
 				let activeLayer = getActiveLayer()
+				let inactiveLayer = getInactiveLayer()
 
-				if(!width || !height || !activeLayer){
+				if(!width || !height || !activeLayer||!inactiveLayer){
 					return
 				}
 
 				let clipRect = Qt.rect(gridShape.labelYWidth, gridShape.legendMargin, width - gridShape.labelYWidth - gridShape.legendMargin, height - gridShape.labelXHeight - gridShape.legendMargin)
+
 				activeLayer.clipRect = clipRect
 
 				activeLayer.layerMatrix.setXScale(graph.xScale)
 				activeLayer.layerMatrix.setYScale(-graph.yScale)
 				activeLayer.layerMatrix.setXTranslation(gridShape.labelYWidth + gridShape.axesOrigin.x)
 				activeLayer.layerMatrix.setYTranslation(height - gridShape.labelXHeight - gridShape.axesOrigin.y)
+
+				inactiveLayer.clipRect = clipRect
+
+				inactiveLayer.layerMatrix.setXScale(graph.xScale)
+				inactiveLayer.layerMatrix.setYScale(-graph.yScale)
+				inactiveLayer.layerMatrix.setXTranslation(gridShape.labelYWidth + gridShape.axesOrigin.x)
+				inactiveLayer.layerMatrix.setYTranslation(height - gridShape.labelXHeight - gridShape.axesOrigin.y)
 
 			}
 		}

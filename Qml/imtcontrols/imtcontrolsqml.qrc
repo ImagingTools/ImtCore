@@ -223,6 +223,7 @@
         <file alias="imtcontrols/GraphicsView/CanvasMatrix.qml">GraphicsView/CanvasMatrix.qml</file>
         <file alias="imtcontrols/GraphicsView/Matrix3x3.qml">GraphicsView/Matrix3x3.qml</file>
         <file alias="imtcontrols/GraphicsView/Graph2d.qml">GraphicsView/Graph2d.qml</file>
+        <file alias="imtcontrols/GraphicsView/MultiGraph2d.qml">GraphicsView/MultiGraph2d.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
