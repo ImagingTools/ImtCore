@@ -90,49 +90,10 @@ bool CComplexCollectionFilterRepresentationController::GetSdlRepresentationFromD
 
 	// Time Filter
 	sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0 sdlTimeFilter;
-
 	const imtbase::ITimeFilterParam& timeFilter = complexFilterPtr->GetTimeFilter();
-	imtbase::CTimeRange timeRange = timeFilter.GetTimeRange();
-	sdlTimeFilter.timeRange.emplace();
-	sdlTimeFilter.timeRange->Begin = timeRange.GetBeginTime().toString(Qt::ISODateWithMs);
-	sdlTimeFilter.timeRange->End = timeRange.GetEndTime().toString(Qt::ISODateWithMs);
-
-	imtbase::ITimeFilterParam::TimeUnit timeUnit = timeFilter.GetTimeUnit();
-	switch (timeUnit){
-	case imtbase::ITimeFilterParam::TU_CUSTOM:
-		sdlTimeFilter.timeUnit = "Custom";
-		break;
-	case imtbase::ITimeFilterParam::TU_HOUR:
-		sdlTimeFilter.timeUnit = "Hour";
-		break;
-	case imtbase::ITimeFilterParam::TU_DAY:
-		sdlTimeFilter.timeUnit = "Day";
-		break;
-	case imtbase::ITimeFilterParam::TU_WEEK:
-		sdlTimeFilter.timeUnit = "Week";
-		break;
-	case imtbase::ITimeFilterParam::TU_MONTH:
-		sdlTimeFilter.timeUnit = "Month";
-		break;
-	case imtbase::ITimeFilterParam::TU_YEAR:
-		sdlTimeFilter.timeUnit = "Year";
-		break;
+	if (!m_timeFilterParamRepresentationController.GetSdlRepresentationFromDataModel(sdlTimeFilter, timeFilter)){
+		return false;
 	}
-
-	imtbase::ITimeFilterParam::InterpretationMode mode = timeFilter.GetInterpretationMode();
-	switch (mode){
-	case imtbase::ITimeFilterParam::IM_FOR:
-		sdlTimeFilter.interpretationMode = "For";
-		break;
-	case imtbase::ITimeFilterParam::IM_CURRENT:
-		sdlTimeFilter.interpretationMode = "Current";
-		break;
-	case imtbase::ITimeFilterParam::IM_LAST:
-		sdlTimeFilter.interpretationMode = "Last";
-		break;
-	}
-
-	sdlTimeFilter.unitMultiplier = timeFilter.GetUnitMultiplier();
 	sdlRepresentation.timeFilter = sdlTimeFilter;
 
 	// Distinct fields
@@ -214,72 +175,15 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 
 	complexFilterPtr->AddGroupFilter(targetFilter);
 
-	imtbase::CTimeFilterParam timeFilter;
 	if (sdlRepresentation.timeFilter){
+		imtbase::CTimeFilterParam timeFilter;
 		Filter::CTimeFilter::V1_0 timeFilterSdl = *sdlRepresentation.timeFilter;
-		if (timeFilterSdl.timeRange){
-			sdl::imtbase::ImtBaseTypes::CTimeRange::V1_0 timeRangeSdl = *timeFilterSdl.timeRange;
-
-			QString startRange;
-			if (timeRangeSdl.Begin){
-				startRange = *timeRangeSdl.Begin;
-			}
-			QString endRange;
-			if (timeRangeSdl.End){
-				endRange = *timeRangeSdl.End;
-			}
-			timeFilter.SetTimeRange(imtbase::CTimeRange(
-				QDateTime::fromString(startRange, Qt::ISODateWithMs),
-				QDateTime::fromString(endRange, Qt::ISODateWithMs)));
+		if (!m_timeFilterParamRepresentationController.GetDataModelFromSdlRepresentation(timeFilter, timeFilterSdl)){
+			return false;
 		}
 
-		imtbase::ITimeFilterParam::TimeUnit timeUnit = imtbase::ITimeFilterParam::TU_CUSTOM;
-		if (timeFilterSdl.timeUnit){
-			QString timeUnitStr = *timeFilterSdl.timeUnit;
-
-			if (timeUnitStr == "Custom"){
-				timeUnit = imtbase::ITimeFilterParam::TU_CUSTOM;
-			}
-			else if (timeUnitStr == "Hour"){
-				timeUnit = imtbase::ITimeFilterParam::TU_HOUR;
-			}
-			else if (timeUnitStr == "Day"){
-				timeUnit = imtbase::ITimeFilterParam::TU_DAY;
-			}
-			else if (timeUnitStr == "Week"){
-				timeUnit = imtbase::ITimeFilterParam::TU_WEEK;
-			}
-			else if (timeUnitStr == "Month"){
-				timeUnit = imtbase::ITimeFilterParam::TU_MONTH;
-			}
-			else if (timeUnitStr == "Year"){
-				timeUnit = imtbase::ITimeFilterParam::TU_YEAR;
-			}
-		}
-
-		imtbase::ITimeFilterParam::InterpretationMode interpretationMode = imtbase::ITimeFilterParam::IM_FOR;
-		if (timeFilterSdl.interpretationMode){
-			QString interpretationModeStr = *timeFilterSdl.interpretationMode;
-
-			if (interpretationModeStr == "For"){
-				interpretationMode = imtbase::ITimeFilterParam::IM_FOR;
-			}
-			else if (interpretationModeStr == "Current"){
-				interpretationMode = imtbase::ITimeFilterParam::IM_CURRENT;
-			}
-			else if (interpretationModeStr == "Last"){
-				interpretationMode = imtbase::ITimeFilterParam::IM_LAST;
-			}
-		}
-
-		int multiplier = 1;
-		if (timeFilterSdl.unitMultiplier){
-			multiplier = *timeFilterSdl.unitMultiplier;
-		}
-
-		timeFilter.SetTimeUnit(timeUnit, interpretationMode, multiplier);
+		complexFilterPtr->SetTimeFilter(timeFilter);
 	}
-	complexFilterPtr->SetTimeFilter(timeFilter);
 
 	if (sdlRepresentation.distinctFields){
 		complexFilterPtr->SetDistinctFieldsList(sdlRepresentation.distinctFields->ToList());

@@ -1,9 +1,6 @@
 #include <imtserverapp/CTimeFilterParamRepresentationController.h>
 
 
-// ACF includes
-#include <iprm/ITextParam.h>
-
 // ImtCore includes
 #include <imtbase/ITimeFilterParam.h>
 
@@ -14,119 +11,113 @@ namespace imtserverapp
 
 // public methods
 
-// reimplemented (IRepresentationController)
+// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>)
 
-QByteArray CTimeFilterParamRepresentationController::GetModelId() const
+QByteArray CTimeFilterParamRepresentationController::GetTypeId() const
 {
-	return QByteArray();
+	return QByteArrayLiteral("TimeFilter");
 }
 
 
 bool CTimeFilterParamRepresentationController::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const imtbase::ITimeFilterParam* timeFilterParamPtr = dynamic_cast<const imtbase::ITimeFilterParam*>(&dataModel);
-	return timeFilterParamPtr != nullptr;
+	if (timeFilterParamPtr != nullptr){
+		return true;
+	}
+
+	return false;
 }
 
 
-bool CTimeFilterParamRepresentationController::GetRepresentationFromDataModel(
+bool CTimeFilterParamRepresentationController::GetSdlRepresentationFromDataModel(
+			sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0& sdlRepresentation,
 			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
-			const iprm::IParamsSet* /*paramsPtr*/) const
+			const iprm::IParamsSet* paramsPt) const
 {
-	if (!IsModelSupported(dataModel)){
+	const imtbase::ITimeFilterParam* timeFilterParamPtr = dynamic_cast<const imtbase::ITimeFilterParam*>(&dataModel);
+	if (timeFilterParamPtr == nullptr){
 		return false;
 	}
 
-	const imtbase::ITimeFilterParam* timeFilterParamPtr = dynamic_cast<const imtbase::ITimeFilterParam*>(&dataModel);
-	Q_ASSERT(timeFilterParamPtr != nullptr);
-
-	imtbase::CTreeItemModel* timeRangeModelPtr = representation.AddTreeModel("TimeRange");
-	Q_ASSERT(timeRangeModelPtr != nullptr);
+	sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0 sdlTimeFilter;
 
 	imtbase::CTimeRange timeRange = timeFilterParamPtr->GetTimeRange();
-	timeRangeModelPtr->SetData("Begin", timeRange.GetBeginTime().toString("dd.MM.yyyy hh:mm:ss"));
-	timeRangeModelPtr->SetData("End", timeRange.GetEndTime().toString("dd.MM.yyyy hh:mm:ss"));
+	sdlRepresentation.timeRange.emplace();
+	sdlRepresentation.timeRange->Begin = timeRange.GetBeginTime().toString(Qt::ISODateWithMs);
+	sdlRepresentation.timeRange->End = timeRange.GetEndTime().toString(Qt::ISODateWithMs);
 
-	QString timeUnitStr;
 	imtbase::ITimeFilterParam::TimeUnit timeUnit = timeFilterParamPtr->GetTimeUnit();
-	switch(timeUnit){
+	switch (timeUnit){
 	case imtbase::ITimeFilterParam::TU_CUSTOM:
-		timeUnitStr = "Custom";
+		sdlRepresentation.timeUnit = "Custom";
 		break;
 	case imtbase::ITimeFilterParam::TU_HOUR:
-		timeUnitStr = "Hour";
+		sdlRepresentation.timeUnit = "Hour";
 		break;
 	case imtbase::ITimeFilterParam::TU_DAY:
-		timeUnitStr = "Day";
+		sdlRepresentation.timeUnit = "Day";
 		break;
 	case imtbase::ITimeFilterParam::TU_WEEK:
-		timeUnitStr = "Week";
+		sdlRepresentation.timeUnit = "Week";
 		break;
 	case imtbase::ITimeFilterParam::TU_MONTH:
-		timeUnitStr = "Month";
+		sdlRepresentation.timeUnit = "Month";
 		break;
 	case imtbase::ITimeFilterParam::TU_YEAR:
-		timeUnitStr = "Year";
+		sdlRepresentation.timeUnit = "Year";
 		break;
 	}
 
-	representation.SetData("TimeUnit", timeUnitStr);
-
-	QString interpretationModeStr;
-	imtbase::ITimeFilterParam::InterpretationMode interpretationMode = timeFilterParamPtr->GetInterpretationMode();
-	switch(interpretationMode){
+	imtbase::ITimeFilterParam::InterpretationMode mode = timeFilterParamPtr->GetInterpretationMode();
+	switch (mode){
 	case imtbase::ITimeFilterParam::IM_FOR:
-		timeUnitStr = "For";
+		sdlRepresentation.interpretationMode = "For";
 		break;
 	case imtbase::ITimeFilterParam::IM_CURRENT:
-		timeUnitStr = "Current";
+		sdlRepresentation.interpretationMode = "Current";
 		break;
 	case imtbase::ITimeFilterParam::IM_LAST:
-		timeUnitStr = "Last";
+		sdlRepresentation.interpretationMode = "Last";
 		break;
 	}
 
-	representation.SetData("InterpretationMode", interpretationModeStr);
-	representation.SetData("UnitMultiplier", timeFilterParamPtr->GetUnitMultiplier());
+	sdlRepresentation.unitMultiplier = timeFilterParamPtr->GetUnitMultiplier();
 
 	return true;
 }
 
 
-bool CTimeFilterParamRepresentationController::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& representation,
-			istd::IChangeable& dataModel) const
+bool CTimeFilterParamRepresentationController::GetDataModelFromSdlRepresentation(
+			istd::IChangeable& dataModel,
+			const sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0& sdlRepresentation) const
 {
-	if (!IsModelSupported(dataModel)){
+	imtbase::ITimeFilterParam* timeFilterParamPtr = dynamic_cast<imtbase::ITimeFilterParam*>(&dataModel);
+	if (timeFilterParamPtr == nullptr){
 		return false;
 	}
 
-	imtbase::ITimeFilterParam* timeFilterParamPtr = dynamic_cast<imtbase::ITimeFilterParam*>(&dataModel);
-	Q_ASSERT(timeFilterParamPtr != nullptr);
+	if (sdlRepresentation.timeRange){
+		sdl::imtbase::ImtBaseTypes::CTimeRange::V1_0 timeRangeSdl = *sdlRepresentation.timeRange;
 
-	if (representation.ContainsKey("TimeRange")){
-		imtbase::CTreeItemModel* timeRangeModelPtr = representation.GetTreeItemModel("TimeRange");
-		if (timeRangeModelPtr == nullptr){
-			return false;
+		QString startRange;
+		if (timeRangeSdl.Begin){
+			startRange = *timeRangeSdl.Begin;
 		}
 
-		QString begin = timeRangeModelPtr->GetData("Begin").toString();
-		QString end = timeRangeModelPtr->GetData("End").toString();
+		QString endRange;
+		if (timeRangeSdl.End){
+			endRange = *timeRangeSdl.End;
+		}
 
-		imtbase::CTimeRange* timeRange = new imtbase::CTimeRange;
-
-		QDateTime dateTime = QDateTime::fromString(begin, "dd.MM.yyyy hh:mm:ss");
-
-		timeRange->SetTimeRange(QDateTime::fromString(begin, "dd.MM.yyyy hh:mm:ss"), QDateTime::fromString(end, "dd.MM.yyyy hh:mm:ss"));
-
-		timeFilterParamPtr->SetTimeRange(*timeRange);
+		timeFilterParamPtr->SetTimeRange(imtbase::CTimeRange(
+											 QDateTime::fromString(startRange, Qt::ISODateWithMs),
+											 QDateTime::fromString(endRange, Qt::ISODateWithMs)));
 	}
 
 	imtbase::ITimeFilterParam::TimeUnit timeUnit = imtbase::ITimeFilterParam::TU_CUSTOM;
-
-	if (representation.ContainsKey("TimeUnit")){
-		QString timeUnitStr = representation.GetData("TimeUnit").toString();
+	if (sdlRepresentation.timeUnit){
+		QString timeUnitStr = *sdlRepresentation.timeUnit;
 
 		if (timeUnitStr == "Custom"){
 			timeUnit = imtbase::ITimeFilterParam::TU_CUSTOM;
@@ -149,8 +140,8 @@ bool CTimeFilterParamRepresentationController::GetDataModelFromRepresentation(
 	}
 
 	imtbase::ITimeFilterParam::InterpretationMode interpretationMode = imtbase::ITimeFilterParam::IM_FOR;
-	if (representation.ContainsKey("InterpretationMode")){
-		QString interpretationModeStr = representation.GetData("InterpretationMode").toString();
+	if (sdlRepresentation.interpretationMode){
+		QString interpretationModeStr = *sdlRepresentation.interpretationMode;
 
 		if (interpretationModeStr == "For"){
 			interpretationMode = imtbase::ITimeFilterParam::IM_FOR;
@@ -164,8 +155,8 @@ bool CTimeFilterParamRepresentationController::GetDataModelFromRepresentation(
 	}
 
 	int multiplier = 1;
-	if (representation.ContainsKey("UnitMultiplier")){
-		multiplier = representation.GetData("UnitMultiplier").toInt();
+	if (sdlRepresentation.unitMultiplier){
+		multiplier = *sdlRepresentation.unitMultiplier;
 	}
 
 	timeFilterParamPtr->SetTimeUnit(timeUnit, interpretationMode, multiplier);

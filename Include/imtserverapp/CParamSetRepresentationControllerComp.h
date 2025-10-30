@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtserverapp/TJsonRepresentationControllerCompWrap.h>
+#include <imtserverapp/CParamSetRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/Settings.h>
 
 
@@ -20,8 +21,6 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	const imtserverapp::IJsonRepresentationController* FindSubController(const QByteArray& modelId) const;
-	
 	// reimplemented (imtserverapp::TJsonRepresentationControllerCompWrap<sdl::imtbase::ImtBaseTypes::CParamsSet>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
@@ -33,8 +32,14 @@ protected:
 				istd::IChangeable& dataModel,
 				const sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& sdlRepresentation) const override;
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+
 protected:
 	I_MULTIREF(imtserverapp::IJsonRepresentationController, m_paramRepresentationControllersCompPtr);
+
+private:
+	imtserverapp::CParamSetRepresentationController m_representationController;
 };
 
 

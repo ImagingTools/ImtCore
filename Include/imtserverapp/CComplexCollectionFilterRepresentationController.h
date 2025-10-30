@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtbase/IComplexCollectionFilter.h>
 #include <imtserverapp/TJsonRepresentationControllerWrap.h>
+#include <imtserverapp/CTimeFilterParamRepresentationController.h>
 #include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
@@ -54,6 +55,7 @@ private:
 
 private:
 	static const QMap<int, imtbase::IComplexCollectionFilter::FieldOperation> s_allowableFlagsCombination;
+	imtserverapp::CTimeFilterParamRepresentationController m_timeFilterParamRepresentationController;
 };
 
 

@@ -69,38 +69,42 @@ bool CParamSetRepresentationController::GetSdlRepresentationFromDataModel(
 			}
 
 			if (!m_representationControllersMap.contains(parameterId)){
-				return false;
+				continue;
 			}
 
 			const IJsonRepresentationController* subControllerPtr = m_representationControllersMap[parameterId];
-			if (subControllerPtr != nullptr){
-				QJsonObject parameterRepresentation;
-				if (subControllerPtr->GetRepresentationFromDataModel(*parameterPtr, parameterRepresentation, paramsPtr)){
-					sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter;
-					QJsonDocument jsonDocument(parameterRepresentation);
-					
-					parameter.data = jsonDocument.toJson(QJsonDocument::Compact);
-					
-					IJsonRepresentationController::RepresentationInfo representationInfo = subControllerPtr->GetRepresentationInfo();
-					QByteArray typeId = subControllerPtr->GetTypeId();
-					
-					parameter.id = representationInfo.modelId;
-					parameter.typeId = typeId;
-					
-					QString name = representationInfo.name;
-					QString description = representationInfo.description;
-					
-					if (m_translationManagerPtr != nullptr){
-						name = iqt::GetTranslation(m_translationManagerPtr, name.toUtf8(), languageId, "Attribute");
-						description = iqt::GetTranslation(m_translationManagerPtr, description.toUtf8(), languageId, "Attribute");
-					}
-					
-					parameter.name = name;
-					parameter.description = description;
-					
-					parameterList << parameter;
-				}
+			if (subControllerPtr == nullptr){
+				return false;
 			}
+
+			QJsonObject parameterRepresentation;
+			if (!subControllerPtr->GetRepresentationFromDataModel(*parameterPtr, parameterRepresentation, paramsPtr)){
+				return false;
+			}
+
+			sdl::imtbase::ImtBaseTypes::CParameter::V1_0 parameter;
+			QJsonDocument jsonDocument(parameterRepresentation);
+
+			parameter.data = jsonDocument.toJson(QJsonDocument::Compact);
+
+			IJsonRepresentationController::RepresentationInfo representationInfo = subControllerPtr->GetRepresentationInfo();
+			QByteArray typeId = subControllerPtr->GetTypeId();
+
+			parameter.id = representationInfo.modelId;
+			parameter.typeId = typeId;
+
+			QString name = representationInfo.name;
+			QString description = representationInfo.description;
+
+			if (m_translationManagerPtr != nullptr){
+				name = iqt::GetTranslation(m_translationManagerPtr, name.toUtf8(), languageId, "Attribute");
+				description = iqt::GetTranslation(m_translationManagerPtr, description.toUtf8(), languageId, "Attribute");
+			}
+
+			parameter.name = name;
+			parameter.description = description;
+
+			parameterList << parameter;
 		}
 	}
 

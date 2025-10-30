@@ -1,30 +1,29 @@
 #pragma once
 
 
-// ACF includes
-#include <icomp/CComponentBase.h>
-
 // ImtCore includes
-#include <imtserverapp/IRepresentationController.h>
+#include <imtserverapp/TJsonRepresentationControllerWrap.h>
+#include <GeneratedFiles/imtbasesdl/SDL/1.0/CPP/ComplexCollectionFilter.h>
 
 
 namespace imtserverapp
 {
 
 
-class CTimeFilterParamRepresentationController: virtual public imtserverapp::IRepresentationController
+class CTimeFilterParamRepresentationController:
+			public imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>
 {
 public:
-	// reimplemented (IRepresentationController)
-	virtual QByteArray GetModelId() const override;
+	// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>)
+	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
-	virtual bool GetRepresentationFromDataModel(
+	virtual bool GetSdlRepresentationFromDataModel(
+				sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0& sdlRepresentation,
 				const istd::IChangeable& dataModel,
-				imtbase::CTreeItemModel& representation,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
-	virtual bool GetDataModelFromRepresentation(
-				const imtbase::CTreeItemModel& representation,
-				istd::IChangeable& dataModel) const override;
+	virtual bool GetDataModelFromSdlRepresentation(
+				istd::IChangeable& dataModel,
+				const sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0& sdlRepresentation) const override;
 };
 
 
