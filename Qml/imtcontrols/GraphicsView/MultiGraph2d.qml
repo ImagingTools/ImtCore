@@ -17,9 +17,9 @@ Graph2d{
 		let activeLayer = graphicsViewAlias.getActiveLayer()
 		let line = createLine()
 		line.points = pointsArg
-		// if(colorArg !==undefined){
-		// 	line.color = colorArg;
-		// }
+		if(colorArg !==undefined){
+			line.color = colorArg;
+		}
 
 		let empty = []
 		let ttv = tooltipValuesArg !==undefined ? tooltipValuesArg : empty

@@ -124,9 +124,6 @@ Rectangle{
 		anchors.bottomMargin: Style.marginM
 		anchors.topMargin: 0
 
-		//clip: true;
-
-		// width: !graph.labelXValues.length ? parent.width : graph.gridStepMajorX * graphicsView.scaleCoeff * graph.xScale * (graph.labelXValues.length -1 + 0.5) + gridShape.labelYWidth + Style.marginM
 		width: parent.width
 
 		GraphicsView{
@@ -194,15 +191,10 @@ Rectangle{
 				let gridWidth = width - gridShape.labelYWidth - gridShape.legendMargin - margin
 				maxX = maxX - (gridShape.labelYWidth + gridShape.legendMargin)
 				let scale_ = gridWidth/ maxX
-				//console.log("MaxX:::", maxX, scale_)
-				//if(Math.abs(scale_ - 1) > 0.1){
-
 					graph.xScale = (graph.xScale * scale_)
 					setLayersParams()
 					graph.wasFitToWidth = true
 					requestPaint()
-				//}
-
 			}
 
 			function resize(){
@@ -338,7 +330,7 @@ Rectangle{
 			showNodes: true;
 			points: graph.linePoints;
 
-			isHidden: !graph.linePoints.length
+			isHidden: graph.isMultiGraph ? false : !graph.linePoints.length
 			hasHoverReaction: graph.hasTooltip
 
 			function getTooltipText(){
