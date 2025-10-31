@@ -32,6 +32,7 @@ Rectangle{
 	property var labelYValues: []
 
 	property int lableXOriginMargin: 20
+	property int legendMargin: 0
 
 	property bool alwaysShowOrigin: false;
 	property bool hasTooltip: true;
@@ -122,7 +123,8 @@ Rectangle{
 
 		clip: true;
 
-		width: !graph.labelXValues.length ? parent.width : graph.gridStepMajorX * graphicsView.scaleCoeff * graph.xScale * (graph.labelXValues.length -1 + 0.5) + gridShape.labelYWidth + Style.marginM
+		// width: !graph.labelXValues.length ? parent.width : graph.gridStepMajorX * graphicsView.scaleCoeff * graph.xScale * (graph.labelXValues.length -1 + 0.5) + gridShape.labelYWidth + Style.marginM
+		width: parent.width
 
 		GraphicsView{
 			id: graphicsView
@@ -143,6 +145,7 @@ Rectangle{
 
 			property bool compl: false;
 			property bool ready: compl && width > 0 && height > 0
+
 
 			Component.onCompleted: {
 				compl = true
@@ -182,12 +185,16 @@ Rectangle{
 					}
 				}
 
-				let gridWidth = width - gridShape.labelYWidth - gridShape.legendMargin
-				maxX -= gridShape.labelYWidth
-				let scale_ = gridWidth/ maxX
 
+				//return
+				let margin  =Style.marginL
+				let gridWidth = width - gridShape.labelYWidth - gridShape.legendMargin - margin
+				maxX = maxX - (gridShape.labelYWidth + gridShape.legendMargin)
+				let scale_ = gridWidth/ maxX
+				console.log("MaxX:::", maxX, scale_)
 				if(Math.abs(scale_ - 1) > 0.1){
-					graph.xScale = Math.trunc(graph.xScale * scale_)
+
+					graph.xScale = (graph.xScale * scale_)
 					setLayersParams()
 					graph.wasFitToWidth = true
 					requestPaint()
@@ -219,11 +226,12 @@ Rectangle{
 				background.addShape(gridShape);
 
 				let activeLayer = getActiveLayer()
+				let inactiveLayer = getInactiveLayer()
+
 
 				activeLayer.layerMatrix.setXScale(graph.xScale)
 				activeLayer.layerMatrix.setYScale(-graph.yScale);
 
-				let inactiveLayer = getInactiveLayer()
 				inactiveLayer.layerMatrix.setXScale(graph.xScale)
 				inactiveLayer.layerMatrix.setYScale(-graph.yScale);
 
@@ -293,7 +301,7 @@ Rectangle{
 
 		labelXHeight: 20
 		cutAxesEnds: true
-		legendMargin: 20;
+		legendMargin: graph.legendMargin;
 		gridStepMajorX: graph.gridStepMajorX * graph.xScale
 		gridStepMajorY: graph.gridStepMajorY * graph.yScale
 		canDrawText: true;
@@ -369,9 +377,14 @@ Rectangle{
 		componentMargin: Style.marginS
 	}
 
-	property real xScaleBackup: 1
-	Component.onCompleted: {
-		xScaleBackup = xScale
+	property real xScaleBackup: xScale
+	property bool xScaleBackupWasSet: false
+	onXScaleChanged: {
+		if(!xScaleBackupWasSet){
+			xScaleBackup = xScale
+			xScaleBackupWasSet = true
+
+		}
 	}
 }
 

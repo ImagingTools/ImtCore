@@ -11,10 +11,10 @@ BoundingBox {
 
 	property int labelYWidth: 36;
 	property int labelXHeight: 40;
-	property int gridStepMajorX: 40;
-	property int gridStepMinorX: 10;
-	property int gridStepMajorY: 40;
-	property int gridStepMinorY: 10;
+	property real gridStepMajorX: 40;
+	property real gridStepMinorX: 10;
+	property real gridStepMajorY: 40;
+	property real gridStepMinorY: 10;
 	property real thinningZoomLevel: 0.8;
 	property int fontSize: Style.fontSizeM;
 	property string fontColor: Style.borderColor2;
