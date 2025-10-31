@@ -12,6 +12,8 @@ Rectangle{
 	width: Style.sizeHintM
 	height: width;
 
+	clip: true
+
 	property string title: "Curve"
 	property string legendX: "Index"
 	property string legendY: "Value"
@@ -116,12 +118,13 @@ Rectangle{
 		anchors.top: curveTitle.bottom;
 		anchors.bottom: curveLegendX.top;
 		anchors.left: parent.left;
+		anchors.right: parent.right
 
 		anchors.leftMargin: Style.marginL
 		anchors.bottomMargin: Style.marginM
 		anchors.topMargin: 0
 
-		clip: true;
+		//clip: true;
 
 		// width: !graph.labelXValues.length ? parent.width : graph.gridStepMajorX * graphicsView.scaleCoeff * graph.xScale * (graph.labelXValues.length -1 + 0.5) + gridShape.labelYWidth + Style.marginM
 		width: parent.width
@@ -131,7 +134,7 @@ Rectangle{
 
 			height: parent.height
 
-			width: graph.hasData && graph.canDraw ? graph.width : 0;
+			width: graph.hasData && graph.canDraw ? parent.width : 0;
 
 			hideScrollbars: true;
 			restrictMove: true;
@@ -187,18 +190,18 @@ Rectangle{
 
 
 				//return
-				let margin  =Style.marginL
+				let margin  = Style.marginXXL
 				let gridWidth = width - gridShape.labelYWidth - gridShape.legendMargin - margin
 				maxX = maxX - (gridShape.labelYWidth + gridShape.legendMargin)
 				let scale_ = gridWidth/ maxX
-				console.log("MaxX:::", maxX, scale_)
-				if(Math.abs(scale_ - 1) > 0.1){
+				//console.log("MaxX:::", maxX, scale_)
+				//if(Math.abs(scale_ - 1) > 0.1){
 
 					graph.xScale = (graph.xScale * scale_)
 					setLayersParams()
 					graph.wasFitToWidth = true
 					requestPaint()
-				}
+				//}
 
 			}
 
@@ -276,6 +279,7 @@ Rectangle{
 
 			}
 		}
+
 	}
 
 	BaseText{
@@ -299,7 +303,7 @@ Rectangle{
 	CoordinateGridShape{
 		id: gridShape;
 
-		labelXHeight: 20
+		labelXHeight: 24
 		cutAxesEnds: true
 		legendMargin: graph.legendMargin;
 		gridStepMajorX: graph.gridStepMajorX * graph.xScale
