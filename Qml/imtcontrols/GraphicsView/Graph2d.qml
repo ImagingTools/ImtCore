@@ -91,6 +91,16 @@ Rectangle{
 		}
 	}
 
+	function getTooltipText(pointIndex, lineIndex){
+		let val = graph.tooltipValues[pointIndex]
+		let str = "(" + val.x + ", " + val.y + ")"
+		return str
+	}
+
+	function checkTooltips(pointIndex, lineIndex){
+		return pointIndex <= (graph.tooltipValues.length -1)
+	}
+
 	function reset(){
 		wasFitToWidth = false
 		xScale = xScaleBackup
@@ -333,14 +343,15 @@ Rectangle{
 			isHidden: graph.isMultiGraph ? false : !graph.linePoints.length
 			hasHoverReaction: graph.hasTooltip
 
+			property int lineIndex: 0;
+
 			function getTooltipText(){
-				if(highlightedNodeIndex > (graph.tooltipValues.length -1)){
+				let isBase = !graph.checkTooltips(highlightedNodeIndex, lineIndex)
+				if(isBase){
 					return getTooltipTextBase()
 				}
 				else {
-					let val = graph.tooltipValues[highlightedNodeIndex]
-					let str = "(" + val.x + ", " + val.y + ")"
-					return str
+					return graph.getTooltipText(highlightedNodeIndex, lineIndex)
 				}
 			}
 

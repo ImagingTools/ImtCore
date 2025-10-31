@@ -15,8 +15,10 @@ Graph2d{
 			return;
 		}
 		let activeLayer = graphicsViewAlias.getActiveLayer()
+		let lineIndex  = activeLayer.shapeModel.length
 		let line = createLine()
 		line.points = pointsArg
+		line.lineIndex = lineIndex;
 		if(colorArg !==undefined){
 			line.color = colorArg;
 		}
@@ -78,6 +80,31 @@ Graph2d{
 	function clearLabels(){
 		labelXValues = []
 		labelYValues = []
+	}
+
+	function getTooltipText(pointIndex, lineIndex){//override
+		if(lineIndex > (tooltipValuesArray.length -1)){
+			return "";
+		}
+		let tooltips = tooltipValuesArray[lineIndex]
+		if(pointIndex > (tooltips.length -1)){
+			return "";
+		}
+		let val = tooltips[pointIndex]
+		let str = "(" + val.x + ", " + val.y + ")"
+
+		return str
+	}
+
+	function checkTooltips(pointIndex, lineIndex){
+		if(lineIndex > (tooltipValuesArray.length -1)){
+			return false;
+		}
+		let tooltips = tooltipValuesArray[lineIndex]
+		if(pointIndex > (tooltips.length -1)){
+			return false;
+		}
+		return true;
 	}
 }
 
