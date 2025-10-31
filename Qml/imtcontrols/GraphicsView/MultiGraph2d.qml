@@ -7,50 +7,77 @@ import imtcontrols 1.0
 Graph2d{
 	id: graph;
 
+	isMultiGraph: true;
 	property var tooltipValuesArray: []
 
 	function addLine(pointsArg, colorArg, tooltipValuesArg){
 		if(!pointsArg || !pointsArg.length){
 			return;
 		}
-		let actioveLayer = graphicsViewAlias.getActiveLayer()
+		let activeLayer = graphicsViewAlias.getActiveLayer()
 		let line = createLine()
 		line.points = pointsArg
-		if(colorArg !==undefined){
-			line.color = colorArg;
-		}
+		// if(colorArg !==undefined){
+		// 	line.color = colorArg;
+		// }
 
 		let empty = []
 		let ttv = tooltipValuesArg !==undefined ? tooltipValuesArg : empty
 		tooltipValuesArray.push(ttv)
 
-		actioveLayer.addShape(line)
+		activeLayer.addShape(line)
 
 		requestPaint();
 	}
 
+	function getLine(index){
+		let activeLayer = graphicsViewAlias.getActiveLayer()
+		let shapeModel = activeLayer.shapeModel[index]
+		if(!shapeModel.length || index < 0 || index > shapeModel.length -1){
+			return null
+		}
+
+		return shapeModel[index]
+	}
+
 	function getPoints(index){
-		let actioveLayer = graphicsViewAlias.getActiveLayer()
-		let shapeModel = actioveLayer.shapeModel[index]
+		let activeLayer = graphicsViewAlias.getActiveLayer()
+		let shapeModel = activeLayer.shapeModel[index]
 		if(!shapeModel.length || index < 0 || index > shapeModel.length -1){
 			return []
 		}
-		let line = actioveLayer.shapeModel[index]
+		let line = activeLayer.shapeModel[index]
 
 		return line.points
 	}
 
 	function setPoints(points, index){
-		let actioveLayer = graphicsViewAlias.getActiveLayer()
-		let shapeModel = actioveLayer.shapeModel[index]
+		let activeLayer = graphicsViewAlias.getActiveLayer()
+		let shapeModel = activeLayer.shapeModel[index]
 		if(!shapeModel.length || index < 0 || index > shapeModel.length -1){
 			return false
 		}
-		let line = actioveLayer.shapeModel[index]
+		let line = activeLayer.shapeModel[index]
 
 		line.points = points;
 
 		return true
+	}
+
+	function clear(){
+		clearLines ()
+		clearLabels()
+	}
+
+	function clearLines (){
+		let activeLayer = graphicsViewAlias.getActiveLayer()
+		activeLayer.shapeModel = []
+		tooltipValuesArray = []
+	}
+
+	function clearLabels(){
+		labelXValues = []
+		labelYValues = []
 	}
 }
 

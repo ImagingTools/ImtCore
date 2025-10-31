@@ -107,6 +107,8 @@ Rectangle {
 	signal mouseDoubleClicked(var mouse)
 	signal mousePositionChanged(var mouse)
 
+	signal painted()
+
 	Component.onCompleted: {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
 		Events.subscribeEvent("AppSizeChanged", appSizeChanged)
@@ -184,6 +186,10 @@ Rectangle {
 	function requestPaint(){
 		//console.log("Canvas::requestPaint")
 		requestPaintPause.restart();
+	}
+
+	function paintImmediately(){
+		canvas.requestPaint()
 	}
 
 	function createLayer(layerId){
@@ -477,6 +483,10 @@ Rectangle {
 	function fitToInactivAndActiveLayer(){
 		let activeLayer = getActiveLayer()
 		let inactioveLayer = getInactiveLayer()
+		if(!activeLayer || !inactioveLayer){
+			requestPaint()
+			return;
+		}
 		let activeShapes = activeLayer.shapeModel
 		let inactiveShapes = inactioveLayer.shapeModel
 		let shapeList = []
@@ -1045,12 +1055,15 @@ Rectangle {
 					}
 				}
 
+				graphicsView.painted()
+
 			}//onPaint
 
 			onPainted: {
 				let endPaintTime = new Date().valueOf()
 				//console.log("PAINT TIME:: ", endPaintTime - startPaintTime)
 				graphicsView.paintTime(endPaintTime - startPaintTime)
+				//graphicsView.painted()
 			}
 
 		}//canvas

@@ -36,16 +36,21 @@ Rectangle{
 	property bool alwaysShowOrigin: false;
 	property bool hasTooltip: true;
 	property bool hasMinorGrid: true;
+	property bool isMultiGraph: false;
 
 	property real xScale: 1
 	property real yScale: 1
 
 	property alias graphicsViewAlias: graphicsView;
 	property alias gridShapeAlias: gridShape;
+	property bool ready: graphicsView.ready
+
+	property bool fitToWidth: false;
+	property bool wasFitToWidth: false;
 
 
 	function requestPaint() {
-		graphicsView.requestPaint()
+		graphicsView.resize()
 	}
 
 	function createLine(){
@@ -83,10 +88,17 @@ Rectangle{
 		}
 	}
 
+	function reset(){
+		wasFitToWidth = false
+		xScale = xScaleBackup
+	}
+
 	onLinePointsChanged: {
+		reset()
 		requestPaint()
 	}
 	onPointCountChanged: {
+		reset()
 		requestPaint()
 	}
 
@@ -97,7 +109,7 @@ Rectangle{
 		text: graph.title
 	}
 
-	Rectangle{color: "red"
+	Item{
 		id: clipItem
 
 		anchors.top: curveTitle.bottom;
@@ -141,11 +153,55 @@ Rectangle{
 				}
 			}
 
+			onPainted: {
+				if(graph.fitToWidth && !graph.wasFitToWidth){
+					fitToWidthFunction()
+				}
+			}
+
+			function fitToWidthFunction(){
+				if(graph.wasFitToWidth){
+					return;
+				}
+
+				let activeLayer = getActiveLayer()
+				if(!activeLayer){
+					return;
+				}
+				let maxX = 0
+				let shapeModel = activeLayer.shapeModel
+				for(let i = 0; i < shapeModel.length; i++){
+					let shape = shapeModel[i]
+					let points = shape.points
+					for(let j = 0; j < points.length; j++){
+
+						let currX = shape.getScreenPosition(points[j]).x
+						if(currX > maxX){
+							maxX = currX
+						}
+					}
+				}
+
+				let gridWidth = width - gridShape.labelYWidth - gridShape.legendMargin
+				maxX -= gridShape.labelYWidth
+				let scale_ = gridWidth/ maxX
+
+				if(Math.abs(scale_ - 1) > 0.1){
+					graph.xScale = Math.trunc(graph.xScale * scale_)
+					setLayersParams()
+					graph.wasFitToWidth = true
+					requestPaint()
+				}
+
+			}
+
 			function resize(){
 				if(width > 0 && height > 0){
 					setLayersParams()
-					if(graph.linePoints.length){
-						//fitToActiveLayer()
+					let activeLayer = getActiveLayer()
+					let shapeModel = activeLayer ? activeLayer.shapeModel : null
+					let ok =!graph.isMultiGraph ? graph.linePoints.length : !shapeModel ? false: shapeModel.length
+					if(ok){
 						fitToInactivAndActiveLayer()
 					}
 					else {
@@ -171,12 +227,15 @@ Rectangle{
 				inactiveLayer.layerMatrix.setXScale(graph.xScale)
 				inactiveLayer.layerMatrix.setYScale(-graph.yScale);
 
-				let lineObj =graph.createLine();
-				activeLayer.addShape(lineObj);
+				if(!graph.isMultiGraph){
+					let lineObj =graph.createLine();
+					activeLayer.addShape(lineObj);
+				}
 
 				if(graph.alwaysShowOrigin){
 					inactiveLayer.addShape(originShape);
 				}
+
 			}
 
 			function setLayersParams(){
@@ -308,6 +367,11 @@ Rectangle{
 		timeout: 3000
 		targetItem: graphicsView
 		componentMargin: Style.marginS
+	}
+
+	property real xScaleBackup: 1
+	Component.onCompleted: {
+		xScaleBackup = xScale
 	}
 }
 
