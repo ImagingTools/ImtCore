@@ -1404,8 +1404,7 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool c
 {
 	static const QRegularExpression regexp(
 		R"re((?=(?:[^']*'[^']*')*[^']*$)(?:(?<=\s)|(?<=\()|^)"([^"]+)"(?=(?:::[A-Za-z_][A-Za-z0-9_]*)?[\s=)\,]|$))re"
-		);
-
+	);
 
 	QStringList list;
 
