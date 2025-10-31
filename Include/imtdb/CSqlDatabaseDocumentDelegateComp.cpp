@@ -1402,7 +1402,10 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICom
 
 void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool castToStr) const
 {
-	static const QRegularExpression regexp(R"((?<!')\"[^\"]+\"(?!'))");
+	static const QRegularExpression regexp(
+		R"re((?=(?:[^']*'[^']*')*[^']*$)(?:(?<=\s)|(?<=\()|^)"([^"]+)"(?=(?:::[A-Za-z_][A-Za-z0-9_]*)?[\s=)\,]|$))re"
+		);
+
 
 	QStringList list;
 
