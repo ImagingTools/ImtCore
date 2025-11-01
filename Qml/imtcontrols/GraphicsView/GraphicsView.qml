@@ -108,6 +108,7 @@ Rectangle {
 	signal mousePositionChanged(var mouse)
 
 	signal painted()
+	signal imageLoaded()
 
 	Component.onCompleted: {
 		Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
@@ -224,6 +225,10 @@ Rectangle {
 	}
 	function getToolsLayer(){
 		return getLayer("tools");
+	}
+
+	function loadImage(source){
+		canvas.loadImage(source)
 	}
 
 	Component{
@@ -923,6 +928,7 @@ Rectangle {
 			property int selectedIndex: -1;
 
 			onImageLoaded: {
+				graphicsView.imageLoaded();
 				requestPaintPause.restart();
 			}
 
