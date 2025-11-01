@@ -128,6 +128,7 @@ DecoratorBase {
 
 		ToolButton {
 			id: closeButton;
+			objectName: "CloseButton"
 			anchors.verticalCenter: parent.verticalCenter;
 			width: Style.iconSizeS;
 			height: width;

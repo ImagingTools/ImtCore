@@ -5,6 +5,7 @@ import imtcontrols 1.0
 
 ControlBase {
 	id: tabDelegate;
+	objectName: "Tab" + model.index
 
 	property bool selected: tabPanel ? model.index === tabPanel.selectedIndex : false;
 	property bool firstElement: model.index === 0;
@@ -63,6 +64,8 @@ ControlBase {
 
 	MouseArea {
 		id: ma;
+		objectName: "MouseArea"
+
 		anchors.fill: tabDelegate;
 		cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 		hoverEnabled: true;

@@ -6,6 +6,7 @@ import imtcontrols 1.0
 
 Rectangle {
 	id: tabPanelContainer;
+	objectName: "TabPanel"
 	
 	width: list.width + externButtons.width;
 	height: Style.controlHeightL;

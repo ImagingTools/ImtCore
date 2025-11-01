@@ -5,6 +5,7 @@ import imtcontrols 1.0
 
 Rectangle {
 	id: tableContainer;
+	objectName: "Table"
 
 	color: "transparent";
 
@@ -619,6 +620,7 @@ Rectangle {
 
 	Rectangle {
 		id: headersPanel;
+		objectName: "TableHeaders"
 
 		anchors.left: parent.left;
 		anchors.right: parent.right;

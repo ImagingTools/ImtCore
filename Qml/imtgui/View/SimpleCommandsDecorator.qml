@@ -111,6 +111,8 @@ Item {
 			id: repeater;
 
 			delegate: ToolButton {
+				objectName: commandId + "Button"
+
 				width: visible ? container.buttonSize : 0;
 				height: width;
 

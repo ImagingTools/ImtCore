@@ -6,6 +6,7 @@ import imtcolgui 1.0
 
 ControlBase {
     id: filterContainer;
+    objectName: "FilterMenu"
     
     decorator: Style.filterPanelDecorator
     
