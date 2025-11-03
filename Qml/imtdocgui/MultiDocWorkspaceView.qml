@@ -52,7 +52,13 @@ Item {
 				if (restPath.length >= 1){
 					let documentTypeId = matchedPath
 					let documentId = restPath[0]
+
 					workspaceView.documentManager.openDocument(documentId, documentTypeId)
+				}
+				else{
+					if (params.createNew === true){
+						workspaceView.documentManager.insertNewDocument(matchedPath, "")
+					}
 				}
 			}
 		}

@@ -117,7 +117,7 @@ Rectangle {
 		Item {
 			id: mainPart
 			width: parent.width
-			height: Math.max(textName.height, controlLoader.height)
+			height: textName.height
 			visible: textName.text !== "" || controlLoader.item
 			
 			Text {

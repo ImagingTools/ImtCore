@@ -4,8 +4,8 @@ import imtcontrols 1.0
 
 Item {
 	id: pieChart
-	width: Style.sizeHintXS
-	height: Style.sizeHintS
+	width: Style.sizeHintL
+	height: Style.sizeHintM
 
 	property var segments: [] // [{ value: 40, color: "#4CAF50", label: "Active" }, ...]
 	property bool ring: true
@@ -37,6 +37,18 @@ Item {
 		let totalValue = pieChart.getTotalValue()
 		if (totalValue <= 0 || pieChart.segments.length === 0)
 			return
+
+		pieChart.segments.sort(function(a, b){
+			if (a.value > b.value){
+				return -1
+			}
+			if (a.value < b.value){
+				return 1
+			}
+			return 0
+		}
+		)
+
 		for (let i = 0; i < pieChart.segments.length; ++i) {
 			let seg = pieChart.segments[i]
 			let percentText = pieChart.getPercentText(seg.value)
@@ -109,33 +121,47 @@ Item {
 
 		Repeater {
 			model: pieChart.segments
-
 			delegate: Row {
+				width: legend.width
 				height: 20
 				spacing: Style.marginM
-
+			
 				Rectangle {
-					anchors.verticalCenter: parent.verticalCenter
 					width: Style.fontSizeM
 					height: 14
 					radius: 3
 					color: modelData.color || "#ccc"
+					anchors.verticalCenter: parent.verticalCenter
 				}
 
-				Text {
-					anchors.verticalCenter: parent.verticalCenter
-					text: modelData.label || ""
-					color: Style.textColor
-					font.pixelSize: Style.fontSizeM
-					elide: Text.ElideRight
-				}
-
-				Text {
-					anchors.verticalCenter: parent.verticalCenter
-					visible: pieChart.showPercent
-					color: Style.textColor
-					font.pixelSize: Style.fontSizeM
-					text: modelData.displayText || ""
+				Item {
+					width: parent.width - Style.fontSizeM - 2 * Style.marginM
+					height: parent.height
+			
+					Row {
+						anchors.fill: parent
+						spacing: Style.marginS
+			
+						Text {
+							id: labelText
+							text: modelData.label || ""
+							color: Style.textColor
+							font.pixelSize: Style.fontSizeM
+							elide: Text.ElideRight
+							horizontalAlignment: Text.AlignLeft
+							width: parent.width * 0.6
+						}
+			
+						Text {
+							id: valueText
+							text: modelData.displayText || ""
+							color: Style.textColor
+							font.pixelSize: Style.fontSizeM
+							visible: pieChart.showPercent
+							horizontalAlignment: Text.AlignLeft
+							width: parent.width * 0.4
+						}
+					}
 				}
 			}
 		}

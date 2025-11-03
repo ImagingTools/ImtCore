@@ -141,6 +141,7 @@ TableCellText 1.0 ./Views/TableCellText.qml
 Arrowhead 1.0 ./Views/Arrowhead.qml
 TextLinkCellDelegate 1.0 ./Views/TextLinkCellDelegate.qml
 StackViewHeader 1.0 ./Views/StackViewHeader.qml
+StackedBarChart 1.0 ./Views/StackedBarChart.qml
 
 TableHeaderParamComp 1.0 ./Views/TableHeaderParamComp.qml
 

@@ -9,7 +9,7 @@ namespace imtauth
 
 // reimplemented (imtauth::IPermissionChecker)
 
-bool CCheckPermissionOrComp::CheckPermission(const IUserInfo::FeatureIds &userPermissions, const QByteArrayList &permissionIds)
+bool CCheckPermissionOrComp::CheckPermission(const IUserInfo::FeatureIds& userPermissions, const QByteArrayList& permissionIds)
 {
 	for (const QByteArray& permissionId : permissionIds){
 		if (permissionId == "*"){
