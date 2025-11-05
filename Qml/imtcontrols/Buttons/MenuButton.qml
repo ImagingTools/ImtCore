@@ -16,6 +16,7 @@ Button{
 	property real popupMenuWidth: width
 	property int itemHeight: Style.controlHeightM;
 	property string displayId: "name"
+	property string elementIdName: "id"
 
 	signal accepted(string buttonId);
 
@@ -76,7 +77,7 @@ Button{
 
 			width: menuButton.popupMenuWidth;
 			widthFromDecorator: true;
-			visible: (model.visible == undefined && model.m_visible == undefined) ? true : model.visible !== undefined ? model.visible : model.m_visible
+			visible: (model.visible == undefined && model.item == undefined && model.item.m_visible == undefined) ? true : model.visible !== undefined ? model.visible : model.item.m_visible
 			height: visible ?  menuButton.itemHeight : 0;
 			contentLeftMargin: Style.marginM
 
@@ -87,7 +88,7 @@ Button{
 
 			onClicked: {
 				if (menuButton.popup){
-					let resultId = model.Id || model.id || model.item.m_id || "";
+					let resultId = model.item ? model.item[menuButton.elementIdName] : model[menuButton.elementIdName] ;
 					//menuButton.popup.finished(resultId, model.index)
 					menuButton.accepted(resultId)
 					menuButton.close()
