@@ -8,8 +8,6 @@ import imtbaseCommandsSdl 1.0
 // !!! Commands with priority = -1 always hidden
 Item {
 	id: commandsItem;
-	objectName: "CommandsView"
-
 	width: contentWidth;
 	height: Style.controlHeightM;
 	
@@ -109,9 +107,15 @@ Item {
 		
 		Repeater {
 			id: repeater;
-			delegate: Component { Button {
+			delegate: Component { MenuButton {
 					id: button;
-					objectName: model.item ? model.item.m_elementId : "Button"
+
+					isMenuButton: element.m_subElements.count
+
+					menuModel: element.m_subElements
+
+					displayId: "m_elementName"
+					elementIdName: "m_elementId"
 
 					Connections {
 						target: model.item
@@ -173,17 +177,35 @@ Item {
 						hidden = priority === -1
 					}
 
-					onClicked: {
+					onAccepted: {
 						let params = {}
 						params["x"] = mouseArea.mouseX
 						params["y"] = mouseArea.mouseY
 						params["target"] = button
-						commandsItem.commandActivated(element.m_elementId, params);
+
+						let id
+						if(buttonId == ""){
+							id = element.m_elementId
+						}
+						else {
+							id = buttonId
+							console.log("BUTTON_ID::::::", buttonId)
+						}
+						commandsItem.commandActivated(id, params);
 					}
+
+					// onClicked: {
+					// 	let params = {}
+					// 	params["x"] = mouseArea.mouseX
+					// 	params["y"] = mouseArea.mouseY
+					// 	params["target"] = button
+					// 	commandsItem.commandActivated(element.m_elementId, params);
+					// }
 					
 					onWidthChanged: {
 						maxWidth = Math.max(maxWidth, width);
 					}
+
 				}
 			}
 			
