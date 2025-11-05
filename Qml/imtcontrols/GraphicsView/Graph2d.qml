@@ -49,6 +49,7 @@ Rectangle{
 	property bool ready: graphicsView.ready
 
 	property bool fitToWidth: false;
+
 	property bool wasFitToWidth: false;
 
 
@@ -108,12 +109,20 @@ Rectangle{
 
 	onLinePointsChanged: {
 		reset()
+
+		let activeLayer = graphicsView.getActiveLayer()
+		if(!activeLayer || !activeLayer.shapeModel.length){
+			return
+		}
+		let line = activeLayer.shapeModel[0]
+		line.points = linePoints
 		requestPaint()
 	}
-	onPointCountChanged: {
-		reset()
-		requestPaint()
-	}
+
+	// onPointCountChanged: {
+	// 	reset()
+	// 	requestPaint()
+	// }
 
 	BaseText{
 		id: curveTitle;
@@ -155,6 +164,7 @@ Rectangle{
 
 			property bool compl: false;
 			property bool ready: compl && width > 0 && height > 0
+			property bool lineCreated: false;
 
 
 			Component.onCompleted: {
@@ -181,6 +191,12 @@ Rectangle{
 				if(!activeLayer){
 					return;
 				}
+
+				let ok = !graph.isMultiGraph ? graph.linePoints.length : activeLayer.shapeModel.length
+				if(!ok){
+					return;
+				}
+
 				let maxX = 0
 				let shapeModel = activeLayer.shapeModel
 				for(let i = 0; i < shapeModel.length; i++){
@@ -243,6 +259,9 @@ Rectangle{
 				if(!graph.isMultiGraph){
 					let lineObj =graph.createLine();
 					activeLayer.addShape(lineObj);
+					if(graph.linePoints.length){
+						graphicsView.lineCreated = true;
+					}
 				}
 
 				if(graph.alwaysShowOrigin){
