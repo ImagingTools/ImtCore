@@ -20,7 +20,13 @@ Button{
 	signal accepted(string buttonId);
 
 	onClicked: {
-		accepted(menuModel.getData("id", 0))
+		if(menuModel){
+			let id = menuModel.getData("id", 0) || menuModel.getData("Id", 0) || menuModel.getData("m_id", 0) || ""
+			accepted(id)
+		}
+		else {
+			accepted("")
+		}
 	}
 
 	onAccepted: {
@@ -35,16 +41,29 @@ Button{
 				PopupItemDelegateDecorator{
 					maxTextWidth: Style.sizeHintS
 					onDecoratorWidthChanged: {
-						if(decoratorWidth > menuButton.popupMenuWidth){
-							menuButton.popupMenuWidth = decoratorWidth
+						if(popupDelegate.visible){
+							setPopupWidth()
+						}
+					}
+					onPopupDelegateVisibleChanged: {
+						if(popupDelegateVisible){
+							setPopupWidth()
 						}
 					}
 					property real popupMenuWidth: menuButton.popupMenuWidth
+					property bool popupDelegateVisible : popupDelegate.visible
 					onPopupMenuWidthChanged: {
 						if(popupMenuWidth > width){
 							setDecoratorWidth(menuButton.popupMenuWidth)
 						}
 					}
+
+					function setPopupWidth(){
+						if(decoratorWidth > menuButton.popupMenuWidth){
+							menuButton.popupMenuWidth = decoratorWidth
+						}
+					}
+
 				}
 			}
 
@@ -57,7 +76,8 @@ Button{
 
 			width: menuButton.popupMenuWidth;
 			widthFromDecorator: true;
-			height: menuButton.itemHeight;
+			visible: (model.visible == undefined && model.m_visible == undefined) ? true : model.visible !== undefined ? model.visible : model.m_visible
+			height: visible ?  menuButton.itemHeight : 0;
 			contentLeftMargin: Style.marginM
 
 			highlighted: menuButton.currentIndex == model.index
@@ -69,7 +89,7 @@ Button{
 				if (menuButton.popup){
 					let resultId = model.Id || model.id || model.item.m_id || "";
 					//menuButton.popup.finished(resultId, model.index)
-					menuButton.accepted(id)
+					menuButton.accepted(resultId)
 					menuButton.close()
 				}
 			}
