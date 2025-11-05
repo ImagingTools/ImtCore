@@ -17,21 +17,19 @@ Button{
 	property int itemHeight: Style.controlHeightM;
 	property string displayId: "name"
 	property string elementIdName: "id"
+	property bool mainClickByModel: true
 
 	signal accepted(string buttonId);
 
 	onClicked: {
-		if(menuModel){
-			let id = menuModel.getData("id", 0) || menuModel.getData("Id", 0) || menuModel.getData("m_id", 0) || ""
-			accepted(id)
+		let id = ""
+		if(menuModel && mainClickByModel){
+			id = menuModel.get(0).item !== undefined  ? menuModel.get(0).item[elementIdName] : menuModel.getData(elementIdName,0) !==undefined ? menuModel.getData(elementIdName,0) : "";
 		}
-		else {
-			accepted("")
-		}
+		accepted(id)
 	}
 
 	onAccepted: {
-		console.log("ACCEPTED::", buttonId)
 	}
 
 

@@ -111,8 +111,9 @@ Item {
 					id: button;
 
 					isMenuButton: element.m_subElements.count
+					mainClickByModel : false
 
-					menuModel: element.m_subElements
+					menuModel: isMenuButton ? element.m_subElements : 0
 
 					displayId: "m_elementName"
 					elementIdName: "m_elementId"
@@ -123,6 +124,8 @@ Item {
 							button.checkHidden()
 						}
 					}
+
+
 
 					property bool hidden: false
 					onHiddenChanged: {
@@ -189,7 +192,6 @@ Item {
 						}
 						else {
 							id = buttonId
-							console.log("BUTTON_ID::::::", buttonId)
 						}
 						commandsItem.commandActivated(id, params);
 					}
