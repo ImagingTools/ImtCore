@@ -1189,6 +1189,7 @@ class Instruction {
                 if (path.type === QtQml.Component && assignProperty.value.extends !== 'Component') {
 
                     resultCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,__context,`)
+                    resultCode.add('\n')
 
                     let childTypeInfo = assignProperty.value.getTypeInfo()
                     let childMeta = assignProperty.value.getMeta()
@@ -1199,17 +1200,18 @@ class Instruction {
 
                     let properties = assignProperty.value.getProperties()
 
-                    resultCode.add(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {`)
-                    resultCode.add(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
-                    resultCode.add('static create(parent,properties={},context={},isRoot=true){')
+                    resultCode.add(`(class ${assignProperty.value.className} extends ${childTypeInfo.path} {
+                        static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})
+                        static create(parent,properties={},context={},isRoot=true){
 
-                    resultCode.add(`let __context = JQContext.create(context)`)
+                        let __context = JQContext.create(context)
 
-                    resultCode.add(`let ${assignProperty.value.name} = super.create(parent,properties,context,false)`)
-                    resultCode.add(`${assignProperty.value.name}.__${this.qmlFile.getContextName()} = __context`)
+                        let ${assignProperty.value.name} = super.create(parent,properties,context,false)
+                        ${assignProperty.value.name}.__${this.qmlFile.getContextName()} = __context`)
 
+                    resultCode.add('\n')
                     if (assignProperty.value.id) resultCode.add(`${assignProperty.value.name}.__${this.qmlFile.getContextName()}.${assignProperty.value.id}=${assignProperty.value.name}`)
-                    
+                    resultCode.add('\n')
                     resultCode.add(properties.classCode)
 
 
@@ -1218,58 +1220,86 @@ class Instruction {
 
 
                     // // children 
+                    resultCode.add('\n')
 
                     for (let i = 0; i < assignProperty.value.children.length; i++) {
                         // resultCode.add(`let ${assignProperty.value.children[i].name}=`)
                         resultCode.add(assignProperty.value.children[i].toCode())
+                        resultCode.add('\n')
                     }
 
                     // // children
-
+                    resultCode.add('\n')
                     resultCode.add(properties.lazyCode)
 
+                    resultCode.add('\n')
                     // resultCode.add(assignProperty.value.getConnectedSignals())
                     resultCode.add(`${assignProperty.value.name}.__${assignProperty.value.className}__${assignProperty.value.name}=true`)
 
+                    resultCode.add('\n')
+
                     resultCode.add(`if(isRoot) {${assignProperty.value.name}.__updatePrimaryProperties();${assignProperty.value.name}.__updateProperties();${assignProperty.value.name}.__complete();${assignProperty.value.name}.__completeProperties()}`)
 
+                    resultCode.add('\n')
                     resultCode.add(`return ${assignProperty.value.name}`)
+
+                    resultCode.add('\n')
 
                     resultCode.add('}')
 
+                    resultCode.add('\n')
+
                     resultCode.add('__dynamic=true')
 
+                    resultCode.add('\n')
+
                     resultCode.add(assignProperty.value.getMethods())
+
+                    resultCode.add('\n')
                     resultCode.add(assignProperty.value.getConnectedSignals())
+
+                    resultCode.add('\n')
 
                     resultCode.add(`})`)
 
+                    resultCode.add('\n')
 
                     resultCode.add(`)`)
-
+                    resultCode.add('\n')
 
 
                     
                     if(this.checkDefineProperty(assignProperty.name)){
                         // lazyCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
                         classCode.add(`${assignProperty.value.name}.__addLink()`)
+                        classCode.add('\n')
                         classCode.add(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
+                        classCode.add('\n')
                         lazyCode.add(`${this.name}.__properties['${assignProperty.name}']='JQObject'`)
+                        lazyCode.add('\n')
                     } else {
                         lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${assignProperty.value.name}`)
+                        lazyCode.add('\n')
                     }
                     
                 } else {
                     if(this.checkDefineProperty(assignProperty.name)){
                         // lazyCode.add(`${assignProperty.value.toCode()}`)
                         // lazyCode.add(`${this.name}.__self['${assignProperty.name}']=${assignProperty.value.name}`)
-                        classCode.add(`${assignProperty.value.toCode()}`)
+                        classCode.add('\n')
+                        classCode.add(assignProperty.value.toCode())
+                        classCode.add('\n')
                         // classCode.add(`${assignProperty.value.name}.__addLink()`)
                         classCode.add(`${this.name}.${assignProperty.name}=${assignProperty.value.name}`)
+                        classCode.add('\n')
                         lazyCode.add(`${this.name}.__properties['${assignProperty.name}']='JQObject'`)
+                        lazyCode.add('\n')
                     } else {    
-                        lazyCode.add(`${assignProperty.value.toCode()}`)
+                        lazyCode.add('\n')
+                        lazyCode.add(assignProperty.value.toCode())
+                        lazyCode.add('\n')
                         lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${assignProperty.value.name}`)
+                        lazyCode.add('\n')
                     }
                     
                 }
@@ -1287,37 +1317,48 @@ class Instruction {
                         // aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',${aliasPath.slice(0, aliasPath.length - 1).join('.')}, '${aliasPath[aliasPath.length-1]}')`)
                         aliasCode.add(`JQModules.QtQml.alias.init(${this.name},'${assignProperty.name}',()=>{return ${aliasPath.slice(0, aliasPath.length - 1).join('.')}}, '${aliasPath[aliasPath.length-1]}')`)
                         // code.add(`${this.name}.__getDataQml('${assignProperty.name}').__aliasInit(()=>{return ${stat.value}},(val)=>{${stat.value}=val},properties)`)
+                        aliasCode.add('\n')
                     } else {
                         // lazyCode.add(`'${assignProperty.name}': function(){return ${stat.value}},`)
                         if(names.length > 1){
                             lazyCode.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=function(){return ${stat.value}}`)
+                            lazyCode.add('\n')
                             lazyCode.add(`${this.name}.__properties['${names[0]}']='JQGroup'`)
+                            lazyCode.add('\n')
                         } else {
                             lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=function(){return ${stat.value}}`)
+                            lazyCode.add('\n')
                         }
                         
                     }
                 } else {
                     if(names.length > 1){
                         code.add(`${this.name}['${names[0]}'].__properties['${names[1]}']=${stat.value}`)
+                        code.add('\n')
                         code.add(`${this.name}['${names[0]}'].__updateProperties()`)
+                        code.add('\n')
                     } else {
                         if(this.checkDefineProperty(assignProperty.name)){
                             classCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
+                            classCode.add('\n')
                         } else {
                             // lazyCode.add(`${this.name}.__properties['${assignProperty.name}']=${stat.value}`)
                             lazyCode.add(`${this.name}.${assignProperty.name}=${stat.value}`)
+                            lazyCode.add('\n')
                         }
                         
                     }
                     
                 }
             }
-
+            code.add('\n')
+            lazyCode.add('\n')
+            aliasCode.add('\n')
+            classCode.add('\n')
 
         }
 
-        return { code: code.join('\n'), lazyCode: lazyCode.join('\n') , aliasCode: aliasCode.join('\n'), classCode: classCode.join('\n') }
+        return { code: code, lazyCode: lazyCode , aliasCode: aliasCode, classCode: classCode }
     }
 
     getConnectedSignals() {
@@ -1360,9 +1401,10 @@ class Instruction {
             let stat = this.prepare(connectedSignal.source, { isCompute: false, thisKey: '__self', value: new SourceNode(), local: [connectedSignal.args] })
             code.add(stat.value)
             code.add(`}finally{JQApplication.endUpdate()}}`)
+            code.add('\n')
         }
-
-        return code.join('\n')
+        code.add('\n')
+        return code
     }
 
     getMethods() {
@@ -1377,13 +1419,16 @@ class Instruction {
             }
             let stat = this.prepare(defineMethod.source, { isCompute: false, thisKey: '__self', value: new SourceNode(), local: [] })
             code.add(new SourceNode(null, null, null, stat.value))
+            code.add('\n')
         }
 
         if (typeInfo.typeBase.isAssignableFrom(JQModules.QtQml.Connections)) {
             code.add(`__connectionsInfo = ${JSON.stringify(connectionsInfo)}`)
         }
 
-        return code.join('\n')
+        code.add('\n')
+
+        return code
     }
 
     toComponentCode() {
@@ -1408,7 +1453,7 @@ class Instruction {
                 }
         })).create(${this.parent ? this.parent.name : 'null'},__context,`)
 
-
+        code.add('\n')
         // if (this.parent) {
         //     code.add(`${typeInfo.path}.create(${this.parent.name},`)
         // } else {
@@ -1424,18 +1469,19 @@ class Instruction {
 
         let properties = this.children[0].getProperties()
 
-        code.add(`(class ${this.children[0].className} extends ${childTypeInfo.path} {`)
-        code.add(`static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})`)
-        code.add('static create(parent,properties={},context={},isRoot=true){')
+        code.add(`(class ${this.children[0].className} extends ${childTypeInfo.path} {
+            static meta = Object.assign({}, ${childTypeInfo.path}.meta, ${childMeta})
+            static create(parent,properties={},context={},isRoot=true){
 
-        code.add(`let __context = JQContext.create(context)`)
+            let __context = JQContext.create(context)
 
-        code.add(`let ${this.children[0].name} = super.create(parent,properties,context,false)`)
+            let ${this.children[0].name} = super.create(parent,properties,context,false)
 
-        code.add(`${this.children[0].name}.__${this.qmlFile.getContextName()} = __context`)
+            ${this.children[0].name}.__${this.qmlFile.getContextName()} = __context`)
         
+        code.add('\n')
         if (this.children[0].id) code.add(`${this.children[0].name}.__${this.qmlFile.getContextName()}.${this.children[0].id}=${this.children[0].name}`)
-
+        code.add('\n')
         code.add(properties.classCode) 
 
  
@@ -1445,37 +1491,60 @@ class Instruction {
 
         // // children 
 
+        code.add('\n')
+
         for (let i = 0; i < this.children[0].children.length; i++) {
             // code.add(`let ${this.children[0].children[i].name}=`)
             code.add(this.children[0].children[i].toCode())
+            code.add('\n')
         }
 
         // // children
 
+        code.add('\n')
+
         code.add(properties.lazyCode)
+
+        code.add('\n')
 
         // code.add(this.children[0].getConnectedSignals())
         code.add(`${this.children[0].name}.__${this.children[0].className}__${this.children[0].name}=true`)
 
+        code.add('\n')
         code.add(`if(isRoot) {${this.children[0].name}.__updatePrimaryProperties();${this.children[0].name}.__updateProperties();${this.children[0].name}.__complete();${this.children[0].name}.__completeProperties()}`)
 
+        code.add('\n')
         code.add(`return ${this.children[0].name}`)
+
+        code.add('\n')
 
         code.add('}')
 
+        code.add('\n')
+
         code.add('__dynamic=true')
 
+        code.add('\n')
+
         code.add(this.children[0].getMethods())
+
+        code.add('\n')
         code.add(this.children[0].getConnectedSignals())
 
+        code.add('\n')
+
         code.add(`})`)
+
+        code.add('\n')
 
 
         code.add(`)`)
 
+        code.add('\n')
+
         // if (this.id) code.add(`${this.name}.__context.${this.id}=${this.name}`)
 
-        return code.join('\n')
+        return code
     }
 
     toCode() {
@@ -1509,45 +1578,39 @@ class Instruction {
             static create(parent,properties={},context={},isRoot=true){
                 let ${this.name} = super.create(parent,properties,context,isRoot)
                 ${this.name}.__${this.qmlFile.getContextName()} = context
-                ${id}
+                ${id}`)
 
-                ${properties.classCode}
+        code.add('\n')
 
-                
-                ${properties.aliasCode}
-                ${properties.code}
-                
-                
-                return ${this.name}
-            }
-            ${this.getMethods()}
-            ${this.getConnectedSignals()}
-        })).create(${this.parent ? this.parent.name : 'null'},{JQAbstractModel:()=>{return ${this.targetContext.name}.JQAbstractModel}},__context,false)`)
+        code.add(properties.classCode)      
+        code.add(properties.aliasCode)
+        code.add(properties.code)
+
+        code.add(`return ${this.name}}`)
+        code.add(this.getMethods())
+        code.add(this.getConnectedSignals())
+        code.add(`})).create(${this.parent ? this.parent.name : 'null'},{JQAbstractModel:()=>{return ${this.targetContext.name}.JQAbstractModel}},__context,false)`)
+
+        code.add('\n')
         
         for (let i = 0; i < this.children.length; i++) {
             // childrenCode.add(`let ${this.children[i].name}=`)
             code.add(this.children[i].toCode())
+            code.add('\n')
         }
 
-        // if (this.id) code.add(`${this.name}.__context.${this.id}=${this.name}`)
+        code.add('\n')
 
-        // code.add(this.getMethods())
-
-        
-        // code.add(properties.code)
-
-        // children
-
-        
-
-        // children
 
         code.add(properties.lazyCode)
+
+        code.add('\n')
         
         code.add(`${this.name}.__${this.className}__${this.name}=true`)
-        // code.add(this.getConnectedSignals())
 
-        return code.join('\n')
+        code.add('\n')
+
+        return code
     }
 }
 
@@ -1651,67 +1714,82 @@ class QmlFile {
 
         if (this.singleton) {
             if (this.moduleName) {
-                code.add(`JQModules.${this.moduleName}.${this.instruction.className} = (class extends ${typeInfo.path} {`)
+                code.add(`JQModules.${this.moduleName}.${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
             } else {
-                code.add(`const ${this.instruction.className} = (class extends ${typeInfo.path} {`)
+                code.add(`const ${this.instruction.className} = (class extends ${typeInfo.path} {\n`)
             }
 
-            code.add(`static singleton = true`)
+            code.add(`static singleton = true\n`)
         } else {
-            code.add(`class ${this.instruction.className} extends ${typeInfo.path} {`)
+            code.add(`class ${this.instruction.className} extends ${typeInfo.path} {\n`)
         }
 
         let properties = this.instruction.getProperties()
 
-        code.add(`static cachedComponents = {}`)
+        code.add(`static cachedComponents = {}
 
-        code.add(`static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})`)
+            static meta = Object.assign({}, ${typeInfo.path}.meta, ${meta})
 
-        code.add(`__removeObjectName(){removeObjectName('${this.instruction.className}')}`)
-        code.add(`__addObjectName(){addObjectName('${this.instruction.className}')}`)
+            __removeObjectName(){removeObjectName('${this.instruction.className}')}
+            __addObjectName(){addObjectName('${this.instruction.className}')}
 
-        code.add('static create(parent,properties={},context={},isRoot=true){')
+            static create(parent,properties={},context={},isRoot=true){
 
-        code.add(`let __root = this`)
-        code.add(`let __context = JQContext.create()`)
-        
-        // code.add(`let __currentModule=${this.moduleName ? "JQModules['" + this.moduleName + "']" : 'null'}`)
+            let __root = this
+            let __context = JQContext.create()
 
-        code.add(`let ${this.instruction.name} = super.create(parent,properties,context,false)`)
+            let ${this.instruction.name} = super.create(parent,properties,context,false)
 
-        code.add(`${this.instruction.name}.__${this.getContextName()} = __context`)
-
+            ${this.instruction.name}.__${this.getContextName()} = __context`)
+        code.add('\n')
         if (this.instruction.id) code.add(`${this.instruction.name}.__${this.getContextName()}.${this.instruction.id}=${this.instruction.name}`)
-        
+        code.add('\n')
         code.add(properties.classCode)
 
 
         code.add(properties.aliasCode)
 
+
         code.add(properties.code)
 
+
         // children
+        code.add('\n')
 
         for (let i = 0; i < this.instruction.children.length; i++) {
             // code.add(`let ${this.instruction.children[i].name}=`)
             code.add(this.instruction.children[i].toCode())
+            code.add('\n')
         }
 
         // children
+        code.add('\n')
 
         code.add(properties.lazyCode)
+
+        code.add('\n')
 
         // code.add(this.instruction.getConnectedSignals())
         code.add(`${this.instruction.name}.__${this.instruction.className}__${this.instruction.name}=true`)
 
+        code.add('\n')
+
         code.add(`if(isRoot) {${this.instruction.name}.__updatePrimaryProperties();${this.instruction.name}.__updateProperties();${this.instruction.name}.__complete();${this.instruction.name}.__completeProperties()}`)
 
+        code.add('\n')
         code.add(`return ${this.instruction.name}`)
+        code.add('\n')
 
         code.add('}')
 
+        code.add('\n')
+
         code.add(this.instruction.getMethods())
+
+        code.add('\n')
         code.add(this.instruction.getConnectedSignals())
+
+        code.add('\n')
 
         if (this.singleton) {
             code.add(`}).create()`)
@@ -1719,7 +1797,9 @@ class QmlFile {
             code.add(`}`)
         }
 
-        return code.join('\n')
+        code.add('\n')
+
+        return code
     }
 }
 
