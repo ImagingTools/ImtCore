@@ -164,6 +164,21 @@ I_EXPORT_COMPONENT(
 			"Simple login",
 			"Simple Login");
 
+I_EXPORT_COMPONENT(
+			ClientRequestRoleManager,
+			"Client request role manager",
+			"Client Request Role Manager");
+
+I_EXPORT_COMPONENT(
+			ClientRequestUserManager,
+			"Client request user manager",
+			"Client Request User Manager");
+
+I_EXPORT_COMPONENT(
+			ClientRequestGroupManager,
+			"Client request group manager",
+			"Client Request Group Manager");
+
 
 } // namespace ImtAuthGqlPck
 

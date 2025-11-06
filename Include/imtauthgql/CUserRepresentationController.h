@@ -19,8 +19,8 @@ public:
 	virtual bool FillUserInfoFromRepresentation(
 				const sdl::imtauth::Users::CUserData::V1_0& representation,
 				istd::IChangeable& userObject,
-				imtbase::IObjectCollection& userCollection,
-				QByteArray& userId,
+				imtbase::IObjectCollection* userCollectionPtr,
+				const QByteArray& userId,
 				QString& errorMessage) const;
 };
 

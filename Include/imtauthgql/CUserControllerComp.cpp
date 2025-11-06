@@ -204,7 +204,7 @@ sdl::imtauth::Users::CRegisterUserPayload CUserControllerComp::OnRegisterUser(
 		return sdl::imtauth::Users::CRegisterUserPayload();
 	}
 
-	if (!m_userRepresentationController.FillUserInfoFromRepresentation(userData, *userInfoPtr, *m_userCollectionCompPtr, userId, errorMessage)){
+	if (!m_userRepresentationController.FillUserInfoFromRepresentation(userData, *userInfoPtr, m_userCollectionCompPtr.GetPtr(), userId, errorMessage)){
 		errorMessage = QString("Unable to register user. Error: %1").arg(errorMessage);
 
 		return sdl::imtauth::Users::CRegisterUserPayload();

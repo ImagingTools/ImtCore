@@ -17,8 +17,8 @@ namespace imtauthgql
 bool CUserRepresentationController::FillUserInfoFromRepresentation(
 			const sdl::imtauth::Users::CUserData::V1_0& representation,
 			istd::IChangeable& userObject,
-			imtbase::IObjectCollection& userCollection,
-			QByteArray& userId,
+			imtbase::IObjectCollection* userCollectionPtr,
+			const QByteArray& userId,
 			QString& errorMessage) const
 {
 	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(&userObject);
@@ -57,17 +57,19 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	iprm::CParamsSet filterParam;
 	filterParam.SetEditableParameter("ComplexFilter", &complexFilter);
 
-	imtbase::IObjectCollection::Ids userElementIds = userCollection.GetElementIds(0, -1, &filterParam);
-	for (const imtbase::IObjectCollection::Id& userElementId : userElementIds){
-		if (userElementId != userId){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (userCollection.GetObjectData(userElementId, dataPtr)){
-				const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
-				if (currentUserInfoPtr != nullptr){
-					QByteArray currentUsername = currentUserInfoPtr->GetId();
-					if (currentUsername.toLower() == username.toLower()){
-						errorMessage = QT_TR_NOOP("Username already exists");
-						return false;
+	if (userCollectionPtr != nullptr){
+		imtbase::IObjectCollection::Ids userElementIds = userCollectionPtr->GetElementIds(0, -1, &filterParam);
+		for (const imtbase::IObjectCollection::Id& userElementId : userElementIds){
+			if (userElementId != userId){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (userCollectionPtr->GetObjectData(userElementId, dataPtr)){
+					const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+					if (currentUserInfoPtr != nullptr){
+						QByteArray currentUsername = currentUserInfoPtr->GetId();
+						if (currentUsername.toLower() == username.toLower()){
+							errorMessage = QT_TR_NOOP("Username already exists");
+							return false;
+						}
 					}
 				}
 			}

@@ -36,6 +36,9 @@
 #include <imtauthgql/CUserActionCollectionControllerComp.h>
 #include <imtauthgql/CUserActionMetaInfoDelegateComp.h>
 #include <imtauthgql/CSimpleLoginComp.h>
+#include <imtauthgql/CClientRequestRoleManagerComp.h>
+#include <imtauthgql/CClientRequestUserManagerComp.h>
+#include <imtauthgql/CClientRequestGroupManagerComp.h>
 
 
 /**
@@ -75,6 +78,9 @@ typedef imtauthgql::CRemoteAuthorizationControllerComp RemoteAuthorizationContro
 typedef imtauthgql::CUserActionCollectionControllerComp UserActionCollectionController;
 typedef imtauthgql::CUserActionMetaInfoDelegateComp UserActionMetaInfoDelegate;
 typedef icomp::TModelCompWrap<imtauthgql::CSimpleLoginComp> SimpleLogin;
+typedef imtauthgql::CClientRequestRoleManagerComp ClientRequestRoleManager;
+typedef imtauthgql::CClientRequestUserManagerComp ClientRequestUserManager;
+typedef imtauthgql::CClientRequestGroupManagerComp ClientRequestGroupManager;
 
 
 } // namespace ImtAuthGqlPck
