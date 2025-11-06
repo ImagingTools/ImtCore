@@ -275,6 +275,8 @@ class TreeItemModel extends JSONListModel {
         if(externTreeModel){
             this.beginChanges()
 
+            this.setIsArray(externTreeModel.isArray)
+
             this.clear()
 
             let retVal = true
