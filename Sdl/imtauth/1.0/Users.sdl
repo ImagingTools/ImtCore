@@ -57,6 +57,7 @@ type UserData {
 
 input UserDataInput {
 	id: ID!
+	typeId: ID!
 	productId: ID!
 	item: UserData!
 }

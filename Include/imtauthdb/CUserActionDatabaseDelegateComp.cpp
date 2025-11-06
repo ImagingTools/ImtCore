@@ -20,33 +20,33 @@ QString CUserActionDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm
 {
 	QString filterQuery;
 
-	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
-	if (paramIds.contains("GroupFilter")){
-		iprm::TParamsPtr<imtauth::IUserGroupFilter> filterParamPtr(&filterParams, "GroupFilter");
-		if (filterParamPtr.IsValid()){
-			QByteArray userId = filterParamPtr->GetUserId();
-			QByteArrayList groupIds = filterParamPtr->GetGroupIds();
+	// iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+	// if (paramIds.contains("GroupFilter")){
+	// 	iprm::TParamsPtr<imtauth::IUserGroupFilter> filterParamPtr(&filterParams, "GroupFilter");
+	// 	if (filterParamPtr.IsValid()){
+	// 		QByteArray userId = filterParamPtr->GetUserId();
+	// 		QByteArrayList groupIds = filterParamPtr->GetGroupIds();
 
-			if (!groupIds.isEmpty()){
-				QString array = "array[";
+	// 		if (!groupIds.isEmpty()){
+	// 			QString array = "array[";
 
-				for (int i = 0; i < groupIds.size(); i++){
-					if (i > 0){
-						array += ",";
-					}
+	// 			for (int i = 0; i < groupIds.size(); i++){
+	// 				if (i > 0){
+	// 					array += ",";
+	// 				}
 
-					array += "'" + groupIds[i] + "'";
-				}
+	// 				array += "'" + groupIds[i] + "'";
+	// 			}
 
-				array += "]";
+	// 			array += "]";
 
-				filterQuery += QString(R"((users."Document"->'Groups' ?| %1))").arg(array);
-			}
-			else{
-				filterQuery += QString(R"(users."Document"->>'Id' = '%1')").arg(qPrintable(userId));
-			}
-		}
-	}
+	// 			filterQuery += QString(R"((users."Document"->'Groups' ?| %1))").arg(array);
+	// 		}
+	// 		else{
+	// 			filterQuery += QString(R"(users."Document"->>'Id' = '%1')").arg(qPrintable(userId));
+	// 		}
+	// 	}
+	// }
 
 	return filterQuery;
 }
@@ -54,13 +54,14 @@ QString CUserActionDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm
 
 QByteArray CUserActionDatabaseDelegateComp::CreateJoinTablesQuery() const
 {
-	return QByteArray(R"(
-			LEFT JOIN "Users" AS users
-				ON (
-					users."DocumentId"::text = root."DataMetaInfo"->>'userId'
-					AND users."State" = 'Active'
-				)
-	)");
+	// return QByteArray(R"(
+	// 		LEFT JOIN "Users" AS users
+	// 			ON (
+	// 				users."DocumentId"::text = root."DataMetaInfo"->>'userId'
+	// 				AND users."State" = 'Active'
+	// 			)
+	// )");
+	return QByteArray();
 }
 
 

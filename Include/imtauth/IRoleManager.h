@@ -18,6 +18,7 @@ public:
 	virtual QByteArrayList GetRoleIds() const = 0;
 	virtual IRoleUniquePtr GetRole(const QByteArray& roleId) const = 0;
 	virtual QByteArray CreateRole(
+				const QByteArray& productId,
 				const QString& roleName,
 				const QString& roleDescription = QString(),
 				const QByteArrayList& permissions = QByteArrayList()) = 0;

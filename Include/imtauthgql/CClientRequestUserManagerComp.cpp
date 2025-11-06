@@ -22,18 +22,9 @@ QByteArrayList CClientRequestUserManagerComp::GetUserIds() const
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Users");
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!imtcollection::CGetElementIdsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return QByteArrayList();
-	}
-
-	QString errorMessage;
-	imtcollection::CGetElementIdsPayload payload = SendModelRequest<imtcollection::CGetElementIdsPayload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return QByteArrayList();
-	}
-
-	if (!payload.Version_1_0.HasValue()){
+	imtcollection::CGetElementIdsPayload payload;
+	bool ok = SendModelRequestInternal<imtcollection::GetElementIdsRequestArguments, imtcollection::CGetElementIdsPayload, imtcollection::CGetElementIdsGqlRequest>(arguments, payload);
+	if (!ok){
 		return QByteArrayList();
 	}
 
@@ -45,27 +36,21 @@ QByteArrayList CClientRequestUserManagerComp::GetUserIds() const
 }
 
 
-imtauth::IUserInfoUniquePtr CClientRequestUserManagerComp::GetUser(const QByteArray& userId, const QByteArray& productId) const
+imtauth::IUserInfoUniquePtr CClientRequestUserManagerComp::GetUser(const QByteArray& userId) const
 {
 	namespace userssdl = sdl::imtauth::Users;
 
 	userssdl::UserItemRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = userId;
-	arguments.input.Version_1_0->productId = productId;
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return nullptr;
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	QString errorMessage;
-	userssdl::CUserData payload = SendModelRequest<userssdl::CUserData>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return nullptr;
-	}
-
-	if (!payload.Version_1_0.HasValue()){
+	userssdl::CUserData payload;
+	bool ok = SendModelRequestInternal<userssdl::UserItemRequestArguments, userssdl::CUserData, userssdl::CUserItemGqlRequest>(arguments, payload);
+	if (!ok){
 		return nullptr;
 	}
 
@@ -74,6 +59,7 @@ imtauth::IUserInfoUniquePtr CClientRequestUserManagerComp::GetUser(const QByteAr
 		return nullptr;
 	}
 
+	QString errorMessage;
 	if (!m_userRepresentationController.FillUserInfoFromRepresentation(*payload.Version_1_0, *userInfoPtr, nullptr, userId, errorMessage)){
 		return nullptr;
 	}
@@ -92,55 +78,44 @@ bool CClientRequestUserManagerComp::RemoveUser(const QByteArray& userId)
 	arguments.input.Version_1_0->elementIds->push_back(userId);
 	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Users");
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!imtcollection::CRemoveElementsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+	imtcollection::CRemoveElementsPayload payload;
+	bool ok = SendModelRequestInternal<imtcollection::RemoveElementsRequestArguments, imtcollection::CRemoveElementsPayload, imtcollection::CRemoveElementsGqlRequest>(arguments, payload);
+	if (!ok){
 		return false;
 	}
 
-	QString errorMessage;
-	imtcollection::CRemoveElementsPayload response = SendModelRequest<imtcollection::CRemoveElementsPayload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
+	if (!payload.Version_1_0->success.HasValue()){
 		return false;
 	}
 
-	if (!response.Version_1_0.HasValue()){
-		return false;
-	}
-
-	if (!response.Version_1_0->success.HasValue()){
-		return false;
-	}
-
-	return *response.Version_1_0->success;
+	return *payload.Version_1_0->success;
 }
 
 
-QByteArray CClientRequestUserManagerComp::CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password)
+QByteArray CClientRequestUserManagerComp::CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email)
 {
 	namespace userssdl = sdl::imtauth::Users;
 
 	userssdl::UserAddRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	arguments.input.Version_1_0->typeId = QByteArrayLiteral("User");
 
 	userssdl::CUserData::V1_0 userData;
 	userData.name = userName;
 	userData.username = login;
+	userData.email = email;
+	userData.password = password;
 
 	arguments.input.Version_1_0->item = userData;
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!userssdl::CUserAddGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return QByteArray();
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	QString errorMessage;
-	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload = SendModelRequest<sdl::imtbase::ImtCollection::CAddedNotificationPayload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return QByteArray();
-	}
-
-	if (!payload.Version_1_0.HasValue()){
+	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<userssdl::UserAddRequestArguments, sdl::imtbase::ImtCollection::CAddedNotificationPayload, userssdl::CUserAddGqlRequest>(arguments, payload);
+	if (!ok){
 		return QByteArray();
 	}
 
@@ -162,26 +137,17 @@ bool CClientRequestUserManagerComp::ChangeUserPassword(const QByteArray& login, 
 	arguments.input.Version_1_0->oldPassword = oldPassword;
 	arguments.input.Version_1_0->newPassword = newPassword;
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!userssdl::CChangePasswordGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+	userssdl::CChangePasswordPayload payload;
+	bool ok = SendModelRequestInternal<userssdl::ChangePasswordRequestArguments, userssdl::CChangePasswordPayload, userssdl::CChangePasswordGqlRequest>(arguments, payload);
+	if (!ok){
 		return false;
 	}
 
-	QString errorMessage;
-	userssdl::CChangePasswordPayload response = SendModelRequest<userssdl::CChangePasswordPayload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
+	if (!payload.Version_1_0->success.HasValue()){
 		return false;
 	}
 
-	if (!response.Version_1_0.HasValue()){
-		return false;
-	}
-
-	if (!response.Version_1_0->success.HasValue()){
-		return false;
-	}
-
-	return *response.Version_1_0->success;
+	return *payload.Version_1_0->success;
 }
 
 
@@ -239,10 +205,19 @@ bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId
 }
 
 
-QByteArrayList CClientRequestUserManagerComp::GetUserPermissions(const QByteArray& userId, const QByteArray& productId) const
+QByteArrayList CClientRequestUserManagerComp::GetUserPermissions(const QByteArray& userId) const
 {
-	imtauth::IUserInfoUniquePtr userInfoPtr = GetUser(userId, productId);
+	imtauth::IUserInfoUniquePtr userInfoPtr = GetUser(userId);
 	if (!userInfoPtr.IsValid()){
+		return QByteArrayList();
+	}
+
+	QByteArray productId;
+	if (m_applicationInfoCompPtr.IsValid()){
+		productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
+	if (productId.isEmpty()){
 		return QByteArrayList();
 	}
 
@@ -260,22 +235,17 @@ bool CClientRequestUserManagerComp::GetUserDataSdl(const QByteArray& userId, sdl
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = userId;
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
+	sdl::imtauth::Users::CUserData payload;
+	bool ok = SendModelRequestInternal<userssdl::UserItemRequestArguments, sdl::imtauth::Users::CUserData, userssdl::CUserItemGqlRequest>(arguments, payload);
+	if (!ok){
 		return false;
 	}
 
-	QString errorMessage;
-	sdl::imtauth::Users::CUserData response = SendModelRequest<userssdl::CUserData>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return false;
-	}
-
-	if (!response.Version_1_0.HasValue()){
-		return false;
-	}
-
-	userData = *response.Version_1_0;
+	userData = *payload.Version_1_0;
 
 	return true;
 }
@@ -288,28 +258,52 @@ bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, con
 	userssdl::UserUpdateRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = userId;
+
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
 	arguments.input.Version_1_0->item = userData;
 
+	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<userssdl::UserUpdateRequestArguments, sdl::imtbase::ImtCollection::CUpdatedNotificationPayload, userssdl::CUserUpdateGqlRequest>(arguments, payload);
+	if (!ok){
+		return false;
+	}
+
+	if (!payload.Version_1_0->id){
+		return false;
+	}
+
+	return !payload.Version_1_0->id->isEmpty();
+}
+
+
+template<class Arguments, class Payload, class SdlRequest>
+bool CClientRequestUserManagerComp::SendModelRequestInternal(Arguments arguments, Payload& payload) const
+{
 	imtgql::CGqlRequest gqlRequest;
-	if (!userssdl::CUserUpdateGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+
+	if (m_accessTokenProviderCompPtr.IsValid()){
+		QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken("");
+		gqlRequest.SetHeader("x-authentication-token", accessToken);
+	}
+
+	if (!SdlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
 	QString errorMessage;
-	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload response = SendModelRequest<sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(gqlRequest, errorMessage);
+	payload = SendModelRequest<Payload>(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
 		return false;
 	}
 
-	if (!response.Version_1_0.HasValue()){
+	if (!payload.Version_1_0.HasValue()){
 		return false;
 	}
 
-	if (!response.Version_1_0->id){
-		return false;
-	}
-
-	return !response.Version_1_0->id->isEmpty();
+	return true;
 }
 
 

@@ -66,6 +66,10 @@ imtauth::IRoleUniquePtr CClientRequestRoleManagerComp::GetRole(const QByteArray&
 		productId = *roleData.productId;
 	}
 
+	if (productId.isEmpty()){
+		return nullptr;
+	}
+
 	roleInfoPtr->SetProductId(productId);
 
 	if (roleData.name){
@@ -90,6 +94,7 @@ imtauth::IRoleUniquePtr CClientRequestRoleManagerComp::GetRole(const QByteArray&
 
 
 QByteArray CClientRequestRoleManagerComp::CreateRole(
+			const QByteArray& productId,
 			const QString& roleName,
 			const QString& roleDescription,
 			const QByteArrayList& permissions)
@@ -99,6 +104,7 @@ QByteArray CClientRequestRoleManagerComp::CreateRole(
 	rolessdl::RoleAddRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	arguments.input.Version_1_0->productId = productId;
 
 	rolessdl::CRoleData::V1_0 roleData;
 
@@ -237,11 +243,16 @@ bool CClientRequestRoleManagerComp::RemovePermissionsFromRole(const QByteArray& 
 
 bool CClientRequestRoleManagerComp::GetRoleDataSdl(const QByteArray& roleId, sdl::imtauth::Roles::CRoleData::V1_0& roleData) const
 {
+	if (!m_applicationInfoCompPtr.IsValid()){
+		return false;
+	}
+
 	namespace rolessdl = sdl::imtauth::Roles;
 
 	rolessdl::RoleItemRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = roleId;
+	arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
@@ -266,11 +277,16 @@ bool CClientRequestRoleManagerComp::GetRoleDataSdl(const QByteArray& roleId, sdl
 
 bool CClientRequestRoleManagerComp::SetRoleDataSdl(const QByteArray& roleId, const sdl::imtauth::Roles::CRoleData::V1_0& roleData) const
 {
+	if (!m_applicationInfoCompPtr.IsValid()){
+		return false;
+	}
+
 	namespace rolessdl = sdl::imtauth::Roles;
 
 	rolessdl::RoleUpdateRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = roleId;
+	arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	arguments.input.Version_1_0->item = roleData;
 
 	imtgql::CGqlRequest gqlRequest;

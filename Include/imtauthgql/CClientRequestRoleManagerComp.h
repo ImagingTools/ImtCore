@@ -1,10 +1,13 @@
 #pragma once
 
 
+// ACF includes
+#include <ibase/IApplicationInfo.h>
+
 // ImtCore includes
 #include <imtauth/IRoleManager.h>
+#include <imtauth/IAccessTokenProvider.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <imtauthgql/CUserRepresentationController.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 
 
@@ -22,12 +25,15 @@ public:
 	I_BEGIN_COMPONENT(CClientRequestRoleManagerComp)
 		I_REGISTER_INTERFACE(imtauth::IRoleManager);
 		I_ASSIGN(m_roleFactoryCompPtr, "RoleFactory", "Role factory", true, "RoleFactory");
+		I_ASSIGN(m_accessTokenProviderCompPtr, "AccessTokenProvider", "Access token provider", false, "AccessTokenProvider");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::IRoleManager)
 	virtual QByteArrayList GetRoleIds() const override;
 	virtual imtauth::IRoleUniquePtr GetRole(const QByteArray& roleId) const override;
 	virtual QByteArray CreateRole(
+				const QByteArray& productId,
 				const QString& roleName,
 				const QString& roleDescription = QString(),
 				const QByteArrayList& permissions = QByteArrayList()) override;
@@ -42,6 +48,8 @@ private:
 
 private:
 	I_FACT(imtauth::IRole, m_roleFactoryCompPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
+	I_REF(imtauth::IAccessTokenProvider, m_accessTokenProviderCompPtr);
 };
 
 

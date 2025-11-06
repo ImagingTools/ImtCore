@@ -52,6 +52,10 @@ QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName,
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
 	groupssdl::CGroupData::V1_0 groupData;
 	groupData.description = description;
 	groupData.name = groupName;
@@ -245,6 +249,10 @@ bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, 
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = groupId;
 
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
+
 	imtgql::CGqlRequest gqlRequest;
 	if (!groupssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
@@ -274,6 +282,10 @@ bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, 
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = groupId;
 	arguments.input.Version_1_0->item = groupData;
+
+	if (m_applicationInfoCompPtr.IsValid()){
+		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+	}
 
 	imtgql::CGqlRequest gqlRequest;
 	if (!groupssdl::CGroupUpdateGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

@@ -1,10 +1,13 @@
 #pragma once
 
 
+// ACF includes
+#include <ibase/IApplicationInfo.h>
+
 // ImtCore includes
 #include <imtauth/IUserGroupManager.h>
+#include <imtauth/IAccessTokenProvider.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
-#include <imtauthgql/CUserRepresentationController.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
@@ -22,6 +25,8 @@ public:
 	I_BEGIN_COMPONENT(CClientRequestGroupManagerComp)
 		I_REGISTER_INTERFACE(imtauth::IUserGroupManager);
 		I_ASSIGN(m_userGroupFactoryCompPtr, "UserGroupFactory", "User group factory", true, "UserGroupFactory");
+		I_ASSIGN(m_accessTokenProviderCompPtr, "AccessTokenProvider", "Access token provider", false, "AccessTokenProvider");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::IUserGroupManager)
@@ -39,6 +44,8 @@ private:
 
 private:
 	I_FACT(imtauth::IUserGroupInfo, m_userGroupFactoryCompPtr);
+	I_REF(imtauth::IAccessTokenProvider, m_accessTokenProviderCompPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 
 
