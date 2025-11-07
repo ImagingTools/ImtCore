@@ -68,6 +68,8 @@ Item {
 	signal checkedItemsChanged();
 	signal rightButtonMouseClicked(int mouseX, int mouseY);
 	signal tableViewParamsAccepted();
+
+	signal commandActivated(string commandId);
 	
 	LocalizationEvent {
 		onLocalizationChanged: {
@@ -268,7 +270,9 @@ Item {
 		onCheckedItemsChanged: {
 			root.checkedItemsChanged();
 		}
-		
+		onCommandActivated: {
+			root.commandActivated(commandId)
+		}
 		Connections {
 			target: container.dataController;
 			
