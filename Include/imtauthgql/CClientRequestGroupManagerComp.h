@@ -32,6 +32,7 @@ public:
 	// reimplemented (imtauth::IUserGroupManager)
 	virtual QByteArrayList GetGroupIds() const override;
 	virtual QByteArray CreateGroup(const QString& groupName, const QString& description) override;
+	virtual bool RemoveGroup(const QByteArray& groupId) override;
 	virtual imtauth::IUserGroupInfoUniquePtr GetGroup(const QByteArray& groupId) const override;
 	virtual bool AddUsersToGroup(const QByteArray& groupId, const QByteArrayList& userIds) override;
 	virtual bool RemoveUsersFromGroup(const QByteArray& groupId, const QByteArrayList& userIds) override;
@@ -41,6 +42,9 @@ public:
 private:
 	bool GetGroupDataSdl(const QByteArray& groupId, sdl::imtauth::Groups::CGroupData::V1_0& groupData) const;
 	bool SetGroupDataSdl(const QByteArray& groupId, const sdl::imtauth::Groups::CGroupData::V1_0& groupData) const;
+
+	template<class Arguments, class Payload, class SdlRequest>
+	bool SendModelRequestInternal(Arguments arguments, Payload& payload) const;
 
 private:
 	I_FACT(imtauth::IUserGroupInfo, m_userGroupFactoryCompPtr);

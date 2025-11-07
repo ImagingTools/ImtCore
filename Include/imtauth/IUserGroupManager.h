@@ -17,6 +17,7 @@ class IUserGroupManager: virtual public istd::IPolymorphic
 public:
 	virtual QByteArrayList GetGroupIds() const = 0;
 	virtual QByteArray CreateGroup(const QString& groupName, const QString& description) = 0;
+	virtual bool RemoveGroup(const QByteArray& groupId) = 0;
 	virtual IUserGroupInfoUniquePtr GetGroup(const QByteArray& groupId) const = 0;
 	virtual bool AddUsersToGroup(const QByteArray& groupId, const QByteArrayList& userIds) = 0;
 	virtual bool RemoveUsersFromGroup(const QByteArray& groupId, const QByteArrayList& userIds) = 0;

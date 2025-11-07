@@ -21,18 +21,9 @@ QByteArrayList CClientRequestGroupManagerComp::GetGroupIds() const
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Groups");
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!imtcollection::CGetElementIdsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return QByteArrayList();
-	}
-
-	QString errorMessage;
-	imtcollection::CGetElementIdsPayload payload = SendModelRequest<imtcollection::CGetElementIdsPayload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return QByteArrayList();
-	}
-
-	if (!payload.Version_1_0.HasValue()){
+	imtcollection::CGetElementIdsPayload payload;
+	bool ok = SendModelRequestInternal<imtcollection::GetElementIdsRequestArguments, imtcollection::CGetElementIdsPayload, imtcollection::CGetElementIdsGqlRequest>(arguments, payload);
+	if (!ok){
 		return QByteArrayList();
 	}
 
@@ -51,6 +42,9 @@ QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName,
 	groupssdl::GroupAddRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	arguments.input.Version_1_0->typeId = QByteArrayLiteral("Group");
+	arguments.input.Version_1_0->name = groupName;
+	arguments.input.Version_1_0->description = description;
 
 	if (m_applicationInfoCompPtr.IsValid()){
 		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
@@ -62,18 +56,9 @@ QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName,
 
 	arguments.input.Version_1_0->item = groupData;
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!groupssdl::CGroupAddGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return QByteArray();
-	}
-
-	QString errorMessage;
-	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload = SendModelRequest<sdl::imtbase::ImtCollection::CAddedNotificationPayload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return QByteArray();
-	}
-
-	if (!payload.Version_1_0.HasValue()){
+	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<groupssdl::GroupAddRequestArguments, sdl::imtbase::ImtCollection::CAddedNotificationPayload, groupssdl::CGroupAddGqlRequest>(arguments, payload);
+	if (!ok){
 		return QByteArray();
 	}
 
@@ -82,6 +67,30 @@ QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName,
 	}
 
 	return *payload.Version_1_0->id;
+}
+
+
+bool CClientRequestGroupManagerComp::RemoveGroup(const QByteArray& groupId)
+{
+	namespace imtcollection = sdl::imtbase::ImtCollection;
+
+	imtcollection::RemoveElementsRequestArguments arguments;
+	arguments.input.Version_1_0.Emplace();
+	arguments.input.Version_1_0->elementIds.Emplace();
+	arguments.input.Version_1_0->elementIds->push_back(groupId);
+	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Groups");
+
+	imtcollection::CRemoveElementsPayload payload;
+	bool ok = SendModelRequestInternal<imtcollection::RemoveElementsRequestArguments, imtcollection::CRemoveElementsPayload, imtcollection::CRemoveElementsGqlRequest>(arguments, payload);
+	if (!ok){
+		return false;
+	}
+
+	if (!payload.Version_1_0->success.HasValue()){
+		return false;
+	}
+
+	return *payload.Version_1_0->success;
 }
 
 
@@ -133,6 +142,10 @@ imtauth::IUserGroupInfoUniquePtr CClientRequestGroupManagerComp::GetGroup(const 
 
 bool CClientRequestGroupManagerComp::AddUsersToGroup(const QByteArray& groupId, const QByteArrayList& userIds)
 {
+	if (userIds.isEmpty()){
+		return false;
+	}
+
 	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
@@ -160,6 +173,10 @@ bool CClientRequestGroupManagerComp::AddUsersToGroup(const QByteArray& groupId, 
 
 bool CClientRequestGroupManagerComp::RemoveUsersFromGroup(const QByteArray& groupId, const QByteArrayList& userIds)
 {
+	if (userIds.isEmpty()){
+		return false;
+	}
+
 	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
@@ -187,6 +204,10 @@ bool CClientRequestGroupManagerComp::RemoveUsersFromGroup(const QByteArray& grou
 
 bool CClientRequestGroupManagerComp::AddRolesToGroup(const QByteArray& groupId, const QByteArrayList& roleIds)
 {
+	if (roleIds.isEmpty()){
+		return false;
+	}
+
 	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
@@ -214,6 +235,10 @@ bool CClientRequestGroupManagerComp::AddRolesToGroup(const QByteArray& groupId, 
 
 bool CClientRequestGroupManagerComp::RemoveRolesFromGroup(const QByteArray& groupId, const QByteArrayList& roleIds)
 {
+	if (roleIds.isEmpty()){
+		return false;
+	}
+
 	sdl::imtauth::Groups::CGroupData::V1_0 groupData;
 	bool ok = GetGroupDataSdl(groupId, groupData);
 	if (!ok){
@@ -253,22 +278,13 @@ bool CClientRequestGroupManagerComp::GetGroupDataSdl(const QByteArray& groupId, 
 		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!groupssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+	groupssdl::CGroupData payload;
+	bool ok = SendModelRequestInternal<groupssdl::GroupItemRequestArguments, groupssdl::CGroupData, groupssdl::CGroupItemGqlRequest>(arguments, payload);
+	if (!ok){
 		return false;
 	}
 
-	QString errorMessage;
-	groupssdl::CGroupData response = SendModelRequest<groupssdl::CGroupData>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return false;
-	}
-
-	if (!response.Version_1_0.HasValue()){
-		return false;
-	}
-
-	groupData = *response.Version_1_0;
+	groupData = *payload.Version_1_0;
 
 	return true;
 }
@@ -287,26 +303,45 @@ bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, 
 		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
+	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<groupssdl::GroupUpdateRequestArguments, sdl::imtbase::ImtCollection::CUpdatedNotificationPayload, groupssdl::CGroupUpdateGqlRequest>(arguments, payload);
+	if (!ok){
+		return false;
+	}
+
+	if (!payload.Version_1_0->id){
+		return false;
+	}
+
+	return !payload.Version_1_0->id->isEmpty();
+}
+
+
+template<class Arguments, class Payload, class SdlRequest>
+bool CClientRequestGroupManagerComp::SendModelRequestInternal(Arguments arguments, Payload& payload) const
+{
 	imtgql::CGqlRequest gqlRequest;
-	if (!groupssdl::CGroupUpdateGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+
+	if (m_accessTokenProviderCompPtr.IsValid()){
+		QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken("");
+		gqlRequest.SetHeader("x-authentication-token", accessToken);
+	}
+
+	if (!SdlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
 	QString errorMessage;
-	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload response = SendModelRequest<sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(gqlRequest, errorMessage);
+	payload = SendModelRequest<Payload>(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
 		return false;
 	}
 
-	if (!response.Version_1_0.HasValue()){
+	if (!payload.Version_1_0.HasValue()){
 		return false;
 	}
 
-	if (!response.Version_1_0->id){
-		return false;
-	}
-
-	return !response.Version_1_0->id->isEmpty();
+	return true;
 }
 
 

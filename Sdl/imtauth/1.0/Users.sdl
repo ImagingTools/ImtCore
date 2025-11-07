@@ -60,6 +60,8 @@ input UserDataInput {
 	typeId: ID!
 	productId: ID!
 	item: UserData!
+	name: String
+	description: String
 }
 
 input UserItemInput {

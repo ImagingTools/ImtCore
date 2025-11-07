@@ -46,8 +46,11 @@ type RoleData {
 
 input RoleDataInput {
 	id: ID!
+	typeId: ID!
 	productId: ID!
 	item: RoleData!
+	name: String
+	description: String
 }
 
 input RoleItemInput {

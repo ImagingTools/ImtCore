@@ -45,8 +45,11 @@ type GroupData {
 
 input GroupDataInput {
 	id: ID!
+	typeId: ID!
 	productId: ID!
 	item: GroupData!
+	name: String
+	description: String
 }
 
 input GroupItemInput {

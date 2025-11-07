@@ -46,6 +46,9 @@ private:
 	bool GetRoleDataSdl(const QByteArray& roleId, sdl::imtauth::Roles::CRoleData::V1_0& roleData) const;
 	bool SetRoleDataSdl(const QByteArray& roleId, const sdl::imtauth::Roles::CRoleData::V1_0& roleData) const;
 
+	template<class Arguments, class Payload, class SdlRequest>
+	bool SendModelRequestInternal(Arguments arguments, Payload& payload) const;
+
 private:
 	I_FACT(imtauth::IRole, m_roleFactoryCompPtr);
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);

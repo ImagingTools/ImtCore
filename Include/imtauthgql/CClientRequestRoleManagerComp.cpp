@@ -21,18 +21,9 @@ QByteArrayList CClientRequestRoleManagerComp::GetRoleIds() const
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Roles");
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!imtcollection::CGetElementIdsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return QByteArrayList();
-	}
-
-	QString errorMessage;
-	imtcollection::CGetElementIdsPayload payload = SendModelRequest<imtcollection::CGetElementIdsPayload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return QByteArrayList();
-	}
-
-	if (!payload.Version_1_0.HasValue()){
+	imtcollection::CGetElementIdsPayload payload;
+	bool ok = SendModelRequestInternal<imtcollection::GetElementIdsRequestArguments, imtcollection::CGetElementIdsPayload, imtcollection::CGetElementIdsGqlRequest>(arguments, payload);
+	if (!ok){
 		return QByteArrayList();
 	}
 
@@ -104,7 +95,10 @@ QByteArray CClientRequestRoleManagerComp::CreateRole(
 	rolessdl::RoleAddRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+	arguments.input.Version_1_0->typeId = QByteArrayLiteral("Role");
 	arguments.input.Version_1_0->productId = productId;
+	arguments.input.Version_1_0->name = roleName;
+	arguments.input.Version_1_0->description = roleDescription;
 
 	rolessdl::CRoleData::V1_0 roleData;
 
@@ -118,18 +112,9 @@ QByteArray CClientRequestRoleManagerComp::CreateRole(
 
 	arguments.input.Version_1_0->item = roleData;
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!rolessdl::CRoleAddGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return QByteArray();
-	}
-
-	QString errorMessage;
-	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload = SendModelRequest<sdl::imtbase::ImtCollection::CAddedNotificationPayload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return QByteArray();
-	}
-
-	if (!payload.Version_1_0.HasValue()){
+	sdl::imtbase::ImtCollection::CAddedNotificationPayload payload;
+	bool ok = SendModelRequestInternal<rolessdl::RoleAddRequestArguments, sdl::imtbase::ImtCollection::CAddedNotificationPayload, rolessdl::CRoleAddGqlRequest>(arguments, payload);
+	if (!ok){
 		return QByteArray();
 	}
 
@@ -151,26 +136,17 @@ bool CClientRequestRoleManagerComp::RemoveRole(const QByteArray& roleId)
 	arguments.input.Version_1_0->elementIds->push_back(roleId);
 	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Roles");
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!imtcollection::CRemoveElementsGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+	imtcollection::CRemoveElementsPayload  payload;
+	bool ok = SendModelRequestInternal<imtcollection::RemoveElementsRequestArguments, imtcollection::CRemoveElementsPayload , imtcollection::CRemoveElementsGqlRequest>(arguments, payload);
+	if (!ok){
 		return false;
 	}
 
-	QString errorMessage;
-	imtcollection::CRemoveElementsPayload response = SendModelRequest<imtcollection::CRemoveElementsPayload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
+	if (!payload.Version_1_0->success.HasValue()){
 		return false;
 	}
 
-	if (!response.Version_1_0.HasValue()){
-		return false;
-	}
-
-	if (!response.Version_1_0->success.HasValue()){
-		return false;
-	}
-
-	return *response.Version_1_0->success;
+	return *payload.Version_1_0->success;
 }
 
 
@@ -187,6 +163,10 @@ QByteArrayList CClientRequestRoleManagerComp::GetRolePermissions(const QByteArra
 
 bool CClientRequestRoleManagerComp::AddPermissionsToRole(const QByteArray& roleId, const QByteArrayList& permissions)
 {
+	if (permissions.isEmpty()){
+		return false;
+	}
+
 	sdl::imtauth::Roles::CRoleData::V1_0 roleData;
 	bool ok = GetRoleDataSdl(roleId, roleData);
 	if (!ok){
@@ -214,6 +194,10 @@ bool CClientRequestRoleManagerComp::AddPermissionsToRole(const QByteArray& roleI
 
 bool CClientRequestRoleManagerComp::RemovePermissionsFromRole(const QByteArray& roleId, const QByteArrayList& permissions)
 {
+	if (permissions.isEmpty()){
+		return false;
+	}
+
 	sdl::imtauth::Roles::CRoleData::V1_0 roleData;
 	bool ok = GetRoleDataSdl(roleId, roleData);
 	if (!ok){
@@ -254,22 +238,13 @@ bool CClientRequestRoleManagerComp::GetRoleDataSdl(const QByteArray& roleId, sdl
 	arguments.input.Version_1_0->id = roleId;
 	arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 
-	imtgql::CGqlRequest gqlRequest;
-	if (!rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+	rolessdl::CRoleData payload;
+	bool ok = SendModelRequestInternal<rolessdl::RoleItemRequestArguments, rolessdl::CRoleData, rolessdl::CRoleItemGqlRequest>(arguments, payload);
+	if (!ok){
 		return false;
 	}
 
-	QString errorMessage;
-	rolessdl::CRoleData response = SendModelRequest<rolessdl::CRoleData>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return false;
-	}
-
-	if (!response.Version_1_0.HasValue()){
-		return false;
-	}
-
-	roleData = *response.Version_1_0;
+	roleData = *payload.Version_1_0;
 
 	return true;
 }
@@ -289,28 +264,46 @@ bool CClientRequestRoleManagerComp::SetRoleDataSdl(const QByteArray& roleId, con
 	arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	arguments.input.Version_1_0->item = roleData;
 
+	rolessdl::CRoleData payload;
+	bool ok = SendModelRequestInternal<rolessdl::RoleUpdateRequestArguments, rolessdl::CRoleData, rolessdl::CRoleUpdateGqlRequest>(arguments, payload);
+	if (!ok){
+		return false;
+	}
+
+	if (!payload.Version_1_0->id){
+		return false;
+	}
+
+	return !payload.Version_1_0->id->isEmpty();
+}
+
+
+template<class Arguments, class Payload, class SdlRequest>
+bool CClientRequestRoleManagerComp::SendModelRequestInternal(Arguments arguments, Payload& payload) const
+{
 	imtgql::CGqlRequest gqlRequest;
-	if (!rolessdl::CRoleUpdateGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
+
+	if (m_accessTokenProviderCompPtr.IsValid()){
+		QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken("");
+		gqlRequest.SetHeader("x-authentication-token", accessToken);
+	}
+
+	if (!SdlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return false;
 	}
 
 	QString errorMessage;
-	sdl::imtbase::ImtCollection::CUpdatedNotificationPayload response = SendModelRequest<sdl::imtbase::ImtCollection::CUpdatedNotificationPayload>(gqlRequest, errorMessage);
+	payload = SendModelRequest<Payload>(gqlRequest, errorMessage);
 	if (!errorMessage.isEmpty()){
 		return false;
 	}
 
-	if (!response.Version_1_0.HasValue()){
+	if (!payload.Version_1_0.HasValue()){
 		return false;
 	}
 
-	if (!response.Version_1_0->id){
-		return false;
-	}
-
-	return !response.Version_1_0->id->isEmpty();
+	return true;
 }
-
 
 } // namespace imtauthgql
 

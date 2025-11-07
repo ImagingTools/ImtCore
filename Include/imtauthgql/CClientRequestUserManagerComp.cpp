@@ -100,6 +100,7 @@ QByteArray CClientRequestUserManagerComp::CreateUser(const QString& userName, co
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	arguments.input.Version_1_0->typeId = QByteArrayLiteral("User");
+	arguments.input.Version_1_0->name = userName;
 
 	userssdl::CUserData::V1_0 userData;
 	userData.name = userName;
@@ -153,6 +154,10 @@ bool CClientRequestUserManagerComp::ChangeUserPassword(const QByteArray& login, 
 
 bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, const QByteArrayList& roleIds)
 {
+	if (roleIds.isEmpty()){
+		return false;
+	}
+
 	sdl::imtauth::Users::CUserData::V1_0 userData;
 	bool ok = GetUserDataSdl(userId, userData);
 	if (!ok){
@@ -180,6 +185,10 @@ bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, con
 
 bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId, const QByteArrayList& roleIds)
 {
+	if (roleIds.isEmpty()){
+		return false;
+	}
+
 	sdl::imtauth::Users::CUserData::V1_0 userData;
 	bool ok = GetUserDataSdl(userId, userData);
 	if (!ok){
