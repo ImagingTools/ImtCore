@@ -26,6 +26,7 @@ public:
 	void SetRequestType(RequestType requestType);
 	void SetCommandId(const QByteArray& commandId);
 	QByteArray GetHeader(QByteArray headerId) const;
+	void SetHeader(QByteArray headerId, QByteArray value);
 
 	const CGqlFieldObject& GetFields() const;
 	const CGqlParamObject& GetParams() const;

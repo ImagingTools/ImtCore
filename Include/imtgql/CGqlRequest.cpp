@@ -100,6 +100,16 @@ QByteArray CGqlRequest::GetHeader(QByteArray headerId) const
 }
 
 
+void CGqlRequest::SetHeader(QByteArray headerId, QByteArray value)
+{
+	if (m_gqlContextPtr != nullptr){
+		IGqlContext::Headers headers = m_gqlContextPtr->GetHeaders();
+		headers.insert(headerId, value);
+		m_gqlContextPtr->SetHeaders(headers);
+	}
+}
+
+
 const CGqlFieldObject& CGqlRequest::GetFields() const
 {
 	return m_fields;
