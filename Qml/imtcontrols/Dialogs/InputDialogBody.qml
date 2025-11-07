@@ -13,6 +13,8 @@ Item {
     property Item rootItem: null;
     property alias placeHolderText: inputField.placeHolderText;
 
+	property bool selectTextOnStart: false;
+
     Component.onCompleted: {
         inputField.forceActiveFocus();
     }
@@ -52,9 +54,19 @@ Item {
 
             text: inputDialogBodyContainer.inputValue;
 
+			property bool wasSelectedOnStart: false;
+
             onTextChanged: {
                 inputDialogBodyContainer.inputValue = inputField.text;
+				if(inputDialogBodyContainer.selectTextOnStart && !wasSelectedOnStart){
+					selectAll()
+					wasSelectedOnStart = true;
+				}
             }
+
+			Component.onCompleted: {
+
+			}
 
             onAccepted: {
                 inputDialogBodyContainer.rootItem.buttons.buttonClicked(Enums.ok);

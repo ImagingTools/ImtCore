@@ -13,6 +13,8 @@ Dialog {
 	property int contentWidth: Style.sizeHintXS;
 	
 	property string placeHolderText;
+
+	property bool selectTextOnStart: false;
 	
 	Component.onCompleted: {
 		addButton(Enums.ok, qsTr("OK"), true)
@@ -41,6 +43,7 @@ Dialog {
 			message: inputDialogContainer.message;
 			inputValue: inputDialogContainer.inputValue;
 			placeHolderText: inputDialogContainer.placeHolderText;
+			selectTextOnStart: inputDialogContainer.selectTextOnStart;
 		} }
 }
 

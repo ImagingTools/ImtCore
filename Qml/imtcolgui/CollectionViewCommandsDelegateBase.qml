@@ -679,6 +679,7 @@ ViewCommandsDelegateBase {
 			width: 300;
 			title: qsTr("Rename document");
 			placeHolderText: qsTr("Enter the name")
+			selectTextOnStart: true
 			onFinished: {
 				if (buttonId == Enums.ok){
 					let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();

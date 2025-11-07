@@ -72,6 +72,10 @@ FocusScope {
 		textField.select(from, to)
 	}
 	
+	function selectAll(){
+		textField.selectAll()
+	}
+
 	function setFocus(value){
 		textField.focus = value;
 	}
