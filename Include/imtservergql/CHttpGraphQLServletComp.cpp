@@ -68,8 +68,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 
-	QByteArray userId;
-
 	bool isSuccessful = false;
 
 	imtgql::IGqlContext* gqlContextPtr = nullptr;
@@ -92,10 +90,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(m_lastRequest, accessToken, headers, errorMessage);
 		if (gqlContextPtr != nullptr){
 			m_lastRequest.SetGqlContext(gqlContextPtr);
-
-			if (gqlContextPtr->GetUserInfo() != nullptr){
-				userId = gqlContextPtr->GetUserInfo()->GetId();
-			}
 		}
 		else{
 			SendCriticalMessage(

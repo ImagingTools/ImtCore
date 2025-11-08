@@ -39,7 +39,6 @@ public:
 				const imtgql::IGqlContext::Headers& headers,
 				QString& errorMessage) const override;
 
-
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

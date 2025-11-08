@@ -1,10 +1,6 @@
 #include <imtauthgql/CClientRequestGroupManagerComp.h>
 
 
-// ImtCore includes
-#include <imtgql/CGqlRequest.h>
-
-
 namespace imtauthgql
 {
 
@@ -15,23 +11,7 @@ namespace imtauthgql
 
 QByteArrayList CClientRequestGroupManagerComp::GetGroupIds() const
 {
-	namespace imtcollection = sdl::imtbase::ImtCollection;
-
-	imtcollection::GetElementIdsRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Groups");
-
-	imtcollection::CGetElementIdsPayload payload;
-	bool ok = SendModelRequestInternal<imtcollection::GetElementIdsRequestArguments, imtcollection::CGetElementIdsPayload, imtcollection::CGetElementIdsGqlRequest>(arguments, payload);
-	if (!ok){
-		return QByteArrayList();
-	}
-
-	if (!payload.Version_1_0->elementIds.HasValue()){
-		return QByteArrayList();
-	}
-
-	return payload.Version_1_0->elementIds->ToList();
+	return GetElementIds(QByteArrayLiteral("Groups"));
 }
 
 
@@ -46,13 +26,16 @@ QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName,
 	arguments.input.Version_1_0->name = groupName;
 	arguments.input.Version_1_0->description = description;
 
+	QByteArray productId;
 	if (m_applicationInfoCompPtr.IsValid()){
-		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+		productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
+	arguments.input.Version_1_0->productId = productId;
 
 	groupssdl::CGroupData::V1_0 groupData;
 	groupData.description = description;
 	groupData.name = groupName;
+	groupData.productId = productId;
 
 	arguments.input.Version_1_0->item = groupData;
 
@@ -72,25 +55,7 @@ QByteArray CClientRequestGroupManagerComp::CreateGroup(const QString& groupName,
 
 bool CClientRequestGroupManagerComp::RemoveGroup(const QByteArray& groupId)
 {
-	namespace imtcollection = sdl::imtbase::ImtCollection;
-
-	imtcollection::RemoveElementsRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->elementIds.Emplace();
-	arguments.input.Version_1_0->elementIds->push_back(groupId);
-	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Groups");
-
-	imtcollection::CRemoveElementsPayload payload;
-	bool ok = SendModelRequestInternal<imtcollection::RemoveElementsRequestArguments, imtcollection::CRemoveElementsPayload, imtcollection::CRemoveElementsGqlRequest>(arguments, payload);
-	if (!ok){
-		return false;
-	}
-
-	if (!payload.Version_1_0->success.HasValue()){
-		return false;
-	}
-
-	return *payload.Version_1_0->success;
+	return RemoveElements(QByteArrayLiteral("Groups"), {groupId});
 }
 
 
@@ -112,8 +77,8 @@ imtauth::IUserGroupInfoUniquePtr CClientRequestGroupManagerComp::GetGroup(const 
 	}
 
 	QByteArray productId;
-	if (groupData.productId){
-		productId = *groupData.productId;
+	if (m_applicationInfoCompPtr.IsValid()){
+		productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	if (productId.isEmpty()){
@@ -297,6 +262,7 @@ bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, 
 	groupssdl::GroupUpdateRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = groupId;
+	arguments.input.Version_1_0->typeId = QByteArray("Group");
 	arguments.input.Version_1_0->item = groupData;
 
 	if (m_applicationInfoCompPtr.IsValid()){
@@ -314,34 +280,6 @@ bool CClientRequestGroupManagerComp::SetGroupDataSdl(const QByteArray& groupId, 
 	}
 
 	return !payload.Version_1_0->id->isEmpty();
-}
-
-
-template<class Arguments, class Payload, class SdlRequest>
-bool CClientRequestGroupManagerComp::SendModelRequestInternal(Arguments arguments, Payload& payload) const
-{
-	imtgql::CGqlRequest gqlRequest;
-
-	if (m_accessTokenProviderCompPtr.IsValid()){
-		QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken("");
-		gqlRequest.SetHeader("x-authentication-token", accessToken);
-	}
-
-	if (!SdlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return false;
-	}
-
-	QString errorMessage;
-	payload = SendModelRequest<Payload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return false;
-	}
-
-	if (!payload.Version_1_0.HasValue()){
-		return false;
-	}
-
-	return true;
 }
 
 

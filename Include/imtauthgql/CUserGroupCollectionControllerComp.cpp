@@ -28,6 +28,8 @@ bool CUserGroupCollectionControllerComp::FillObjectFromRepresentation(
 		return false;
 	}
 
+	userGroupInfoPtr->SetId(newObjectId);
+
 	QByteArray productId;
 	if (groupDataRepresentation.productId){
 		productId = *groupDataRepresentation.productId;
@@ -394,6 +396,7 @@ bool CUserGroupCollectionControllerComp::CreateRepresentationFromObject(
 	representationPayload.id = QByteArray(userGroupInfoPtr->GetObjectUuid());
 	representationPayload.name = QString(userGroupInfoPtr->GetName());
 	representationPayload.description = QString(userGroupInfoPtr->GetDescription());
+	representationPayload.productId = productId;
 
 	imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
 	representationPayload.users.Emplace().FromList(userIds);

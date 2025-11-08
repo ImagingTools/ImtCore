@@ -44,6 +44,10 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		return false;
 	}
 
+	if (!m_loggedUserToken.isEmpty()){
+		return false;
+	}
+
 	namespace authsdl = sdl::imtauth::Authorization;
 
 	QByteArray productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
@@ -86,7 +90,10 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			m_userInfoPtr->SetId(*response.Version_1_0->username);
 		}
 		if (response.Version_1_0->permissions){
-			m_userInfoPtr->SetLocalPermissions(productId, response.Version_1_0->permissions->split(';'));
+			QByteArray permissions = *response.Version_1_0->permissions;
+			if (!permissions.isEmpty()){
+				m_userInfoPtr->SetLocalPermissions(productId, response.Version_1_0->permissions->split(';'));
+			}
 		}
 
 		m_userPermissionIds = m_userInfoPtr->GetLocalPermissions(productId);
@@ -117,6 +124,10 @@ bool CSimpleLoginWrapComp::Logout()
 		Q_UNUSED(notifier);
 
 		m_loggedUserId.clear();
+		m_loggedUserToken.clear();
+		m_loggedUserPassword.clear();
+		m_userPermissionIds.clear();
+		m_userInfoPtr.Reset();
 
 		return true;
 	}

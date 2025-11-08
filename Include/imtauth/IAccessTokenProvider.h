@@ -2,14 +2,14 @@
 
 
 // ACF includes
-#include <istd/IPolymorphic.h>
+#include <istd/IChangeable.h>
 
 
 namespace imtauth
 {
 
 
-class IAccessTokenProvider: virtual public istd::IPolymorphic
+class IAccessTokenProvider: virtual public istd::IChangeable
 {
 public:
 	virtual QByteArray GetToken(const QByteArray& userId) const = 0;

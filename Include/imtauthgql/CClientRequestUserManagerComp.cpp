@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRequest.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
 
@@ -16,23 +15,7 @@ namespace imtauthgql
 
 QByteArrayList CClientRequestUserManagerComp::GetUserIds() const
 {
-	namespace imtcollection = sdl::imtbase::ImtCollection;
-
-	imtcollection::GetElementIdsRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Users");
-
-	imtcollection::CGetElementIdsPayload payload;
-	bool ok = SendModelRequestInternal<imtcollection::GetElementIdsRequestArguments, imtcollection::CGetElementIdsPayload, imtcollection::CGetElementIdsGqlRequest>(arguments, payload);
-	if (!ok){
-		return QByteArrayList();
-	}
-
-	if (!payload.Version_1_0->elementIds.HasValue()){
-		return QByteArrayList();
-	}
-
-	return payload.Version_1_0->elementIds->ToList();
+	return GetElementIds(QByteArrayLiteral("Users"));
 }
 
 
@@ -70,25 +53,7 @@ imtauth::IUserInfoUniquePtr CClientRequestUserManagerComp::GetUser(const QByteAr
 
 bool CClientRequestUserManagerComp::RemoveUser(const QByteArray& userId)
 {
-	namespace imtcollection = sdl::imtbase::ImtCollection;
-
-	imtcollection::RemoveElementsRequestArguments arguments;
-	arguments.input.Version_1_0.Emplace();
-	arguments.input.Version_1_0->elementIds.Emplace();
-	arguments.input.Version_1_0->elementIds->push_back(userId);
-	arguments.input.Version_1_0->collectionId = QByteArrayLiteral("Users");
-
-	imtcollection::CRemoveElementsPayload payload;
-	bool ok = SendModelRequestInternal<imtcollection::RemoveElementsRequestArguments, imtcollection::CRemoveElementsPayload, imtcollection::CRemoveElementsGqlRequest>(arguments, payload);
-	if (!ok){
-		return false;
-	}
-
-	if (!payload.Version_1_0->success.HasValue()){
-		return false;
-	}
-
-	return *payload.Version_1_0->success;
+	return RemoveElements(QByteArrayLiteral("Users"), {userId});
 }
 
 
@@ -230,6 +195,9 @@ QByteArrayList CClientRequestUserManagerComp::GetUserPermissions(const QByteArra
 		return QByteArrayList();
 	}
 
+	QByteArrayList products = userInfoPtr->GetProducts();
+	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
+
 	return userInfoPtr->GetPermissions(productId);
 }
 
@@ -267,6 +235,7 @@ bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, con
 	userssdl::UserUpdateRequestArguments arguments;
 	arguments.input.Version_1_0.Emplace();
 	arguments.input.Version_1_0->id = userId;
+	arguments.input.Version_1_0->typeId = QByteArray("User");
 
 	if (m_applicationInfoCompPtr.IsValid()){
 		arguments.input.Version_1_0->productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
@@ -285,34 +254,6 @@ bool CClientRequestUserManagerComp::SetUserDataSdl(const QByteArray& userId, con
 	}
 
 	return !payload.Version_1_0->id->isEmpty();
-}
-
-
-template<class Arguments, class Payload, class SdlRequest>
-bool CClientRequestUserManagerComp::SendModelRequestInternal(Arguments arguments, Payload& payload) const
-{
-	imtgql::CGqlRequest gqlRequest;
-
-	if (m_accessTokenProviderCompPtr.IsValid()){
-		QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken("");
-		gqlRequest.SetHeader("x-authentication-token", accessToken);
-	}
-
-	if (!SdlRequest::SetupGqlRequest(gqlRequest, arguments)){
-		return false;
-	}
-
-	QString errorMessage;
-	payload = SendModelRequest<Payload>(gqlRequest, errorMessage);
-	if (!errorMessage.isEmpty()){
-		return false;
-	}
-
-	if (!payload.Version_1_0.HasValue()){
-		return false;
-	}
-
-	return true;
 }
 
 

@@ -1,13 +1,9 @@
 #pragma once
 
 
-// ACF includes
-#include <ibase/IApplicationInfo.h>
-
 // ImtCore includes
 #include <imtauth/IUserGroupManager.h>
-#include <imtauth/IAccessTokenProvider.h>
-#include <imtclientgql/TClientRequestManagerCompWrap.h>
+#include <imtauthgql/CClientRequestManagerCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
@@ -16,17 +12,15 @@ namespace imtauthgql
 
 
 class CClientRequestGroupManagerComp:
-			public imtclientgql::CClientRequestManagerCompBase,
+			public imtauthgql::CClientRequestManagerCompBase,
 			virtual public imtauth::IUserGroupManager
 {
 public:
-	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
+	typedef imtauthgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CClientRequestGroupManagerComp)
 		I_REGISTER_INTERFACE(imtauth::IUserGroupManager);
 		I_ASSIGN(m_userGroupFactoryCompPtr, "UserGroupFactory", "User group factory", true, "UserGroupFactory");
-		I_ASSIGN(m_accessTokenProviderCompPtr, "AccessTokenProvider", "Access token provider", false, "AccessTokenProvider");
-		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::IUserGroupManager)
@@ -43,13 +37,8 @@ private:
 	bool GetGroupDataSdl(const QByteArray& groupId, sdl::imtauth::Groups::CGroupData::V1_0& groupData) const;
 	bool SetGroupDataSdl(const QByteArray& groupId, const sdl::imtauth::Groups::CGroupData::V1_0& groupData) const;
 
-	template<class Arguments, class Payload, class SdlRequest>
-	bool SendModelRequestInternal(Arguments arguments, Payload& payload) const;
-
 private:
 	I_FACT(imtauth::IUserGroupInfo, m_userGroupFactoryCompPtr);
-	I_REF(imtauth::IAccessTokenProvider, m_accessTokenProviderCompPtr);
-	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 
 

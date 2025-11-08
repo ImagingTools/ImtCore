@@ -1,13 +1,9 @@
 #pragma once
 
 
-// ACF includes
-#include <ibase/IApplicationInfo.h>
-
 // ImtCore includes
 #include <imtauth/IRoleManager.h>
-#include <imtauth/IAccessTokenProvider.h>
-#include <imtclientgql/TClientRequestManagerCompWrap.h>
+#include <imtauthgql/CClientRequestManagerCompBase.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 
 
@@ -16,17 +12,15 @@ namespace imtauthgql
 
 
 class CClientRequestRoleManagerComp:
-			public imtclientgql::CClientRequestManagerCompBase,
+			public imtauthgql::CClientRequestManagerCompBase,
 			virtual public imtauth::IRoleManager
 {
 public:
-	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
+	typedef imtauthgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CClientRequestRoleManagerComp)
 		I_REGISTER_INTERFACE(imtauth::IRoleManager);
 		I_ASSIGN(m_roleFactoryCompPtr, "RoleFactory", "Role factory", true, "RoleFactory");
-		I_ASSIGN(m_accessTokenProviderCompPtr, "AccessTokenProvider", "Access token provider", false, "AccessTokenProvider");
-		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::IRoleManager)
@@ -46,13 +40,8 @@ private:
 	bool GetRoleDataSdl(const QByteArray& roleId, sdl::imtauth::Roles::CRoleData::V1_0& roleData) const;
 	bool SetRoleDataSdl(const QByteArray& roleId, const sdl::imtauth::Roles::CRoleData::V1_0& roleData) const;
 
-	template<class Arguments, class Payload, class SdlRequest>
-	bool SendModelRequestInternal(Arguments arguments, Payload& payload) const;
-
 private:
 	I_FACT(imtauth::IRole, m_roleFactoryCompPtr);
-	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
-	I_REF(imtauth::IAccessTokenProvider, m_accessTokenProviderCompPtr);
 };
 
 

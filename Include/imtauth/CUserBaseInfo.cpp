@@ -92,32 +92,38 @@ void CUserBaseInfo::SetDescription(const QString& description)
 
 IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& productId) const
 {
-	IUserBaseInfo::FeatureIds allPermissions;
+	IUserBaseInfo::FeatureIds allPermissions = GetLocalPermissions(productId);
 
 	if (m_roleProviderPtr != nullptr){
 		RoleIds roleIds;
 		if (productId.isEmpty()){
-			for (const QByteArray& id : m_rolesMap.keys()){
-				RoleIds productRoleIds = m_rolesMap.value(id);
-				roleIds += productRoleIds;
+			for (auto it = m_rolesMap.cbegin(); it != m_rolesMap.cend(); ++it){
+				roleIds += it.value();
 			}
 		}
 		else{
-			if (m_rolesMap.contains(productId)){
-				roleIds = m_rolesMap.value(productId);
+			auto it = m_rolesMap.constFind(productId);
+			if (it != m_rolesMap.cend()){
+				roleIds = it.value();
 			}
 		}
 
-		for (const QByteArray& roleId : roleIds){
+		for (const QByteArray& roleId : std::as_const(roleIds)){
 			istd::TDelPtr<const IRole> rolePtr = m_roleProviderPtr->GetRole(roleId, productId);
 			if (rolePtr.IsValid()){
-				allPermissions += rolePtr->GetPermissions();
+				const IUserBaseInfo::FeatureIds rolePerms = rolePtr->GetPermissions();
+				for (const QByteArray& perm : std::as_const(rolePerms)){
+					if (!allPermissions.contains(perm)){
+						allPermissions << perm;
+					}
+				}
 			}
 		}
 	}
 
 	return allPermissions;
 }
+
 
 
 IUserBaseInfo::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& productId) const

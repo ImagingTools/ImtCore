@@ -115,7 +115,12 @@ IUserBaseInfo::FeatureIds CUserInfo::GetPermissions(const QByteArray& productId)
 		for (const QByteArray& parentGroupId : m_groupIds){
 			IUserGroupInfoSharedPtr parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr.IsValid()){
-				allPermissions += parentGroupPtr->GetPermissions(productId);
+				QByteArrayList groupPermissions = parentGroupPtr->GetPermissions(productId);
+				for (const QByteArray& perm : std::as_const(groupPermissions)){
+					if (!allPermissions.contains(perm)){
+						allPermissions << perm;
+					}
+				}
 			}
 		}
 	}

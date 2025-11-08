@@ -65,14 +65,14 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 	const imtgql::IGqlContext* contextPtr = request.GetRequestContext();
 	if (contextPtr != nullptr){
 		imtgql::IGqlContext::Headers headersMap = contextPtr->GetHeaders();
-		QByteArray productId = headersMap.value("productid");
+		QByteArray productId = headersMap.value(imtbase::s_productIdHeaderId);
 		if (!productId.isEmpty()){
-			networkRequest->setRawHeader("productid", productId);
+			networkRequest->setRawHeader(imtbase::s_productIdHeaderId, productId);
 		}
 
 		QByteArray token = contextPtr->GetToken();
 		if (!token.isEmpty()){
-			networkRequest->setRawHeader("x-authentication-token", token);
+			networkRequest->setRawHeader(imtbase::s_authenticationTokenHeaderId, token);
 		}
 	}
 
