@@ -57,8 +57,11 @@ bool CSlaveSubscriberControllerComp::UnregisterSubscription(const QByteArray& su
 	if (m_publisherMap.contains(subscriptionId)){
 		imtgql::IGqlSubscriberController* publisherPtr = m_publisherMap[subscriptionId];
 		Q_ASSERT(publisherPtr != nullptr);
-
-		return publisherPtr->UnregisterSubscription(subscriptionId);
+		bool res = publisherPtr->UnregisterSubscription(subscriptionId);
+		if(res){
+			m_publisherMap.remove(subscriptionId);
+		}
+		return res;
 	}
 
 	return false;
