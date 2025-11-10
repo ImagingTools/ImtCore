@@ -25,7 +25,7 @@ public:
 
 	// reimplemented (IUserInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetUserList() const override;
-	virtual const IUserInfo* GetUser(const QByteArray& objectId) const override;
+	virtual const imtauth::IUserInfoUniquePtr GetUser(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);

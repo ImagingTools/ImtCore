@@ -99,8 +99,8 @@ IRole::FeatureIds CRole::GetPermissions() const
 
 	if (m_roleInfoProviderPtr != nullptr){
 		for (const QByteArray& roleId : m_parents){
-			istd::TDelPtr<const IRole> roleInfoPtr = m_roleInfoProviderPtr->GetRole(roleId);
-			if (roleInfoPtr != nullptr){
+			IRoleUniquePtr roleInfoPtr = m_roleInfoProviderPtr->GetRole(roleId);
+			if (roleInfoPtr.IsValid()){
 				for (const QByteArray& permissionId : roleInfoPtr->GetPermissions()){
 					if (!allPermissions.contains(permissionId)){
 						allPermissions << permissionId;
@@ -353,9 +353,9 @@ QByteArrayList CRole::GetParentRoles(const QByteArray& roleId) const
 {
 	QByteArrayList retVal;
 	if (m_roleInfoProviderPtr != nullptr){
-		const istd::TDelPtr<IRole> rolePtr(const_cast<IRole*>(m_roleInfoProviderPtr->GetRole(roleId, m_productId)));
-		if (rolePtr != nullptr){
-			GetParentRoleList(*rolePtr, retVal);
+		IRoleUniquePtr roleInfoPtr = m_roleInfoProviderPtr->GetRole(roleId);
+		if (roleInfoPtr.IsValid()){
+			GetParentRoleList(*roleInfoPtr, retVal);
 		}
 	}
 
@@ -370,9 +370,9 @@ void CRole::GetParentRoleList(const IRole &role, QByteArrayList& roleList) const
 	roleList += includedRoles;
 	if (m_roleInfoProviderPtr != nullptr){
 		for (const QByteArray& roleId : includedRoles){
-			const istd::TDelPtr<IRole> rolePtr(const_cast<IRole*>(m_roleInfoProviderPtr->GetRole(roleId, m_productId)));
-			if (rolePtr != nullptr){
-				GetParentRoleList(*rolePtr, roleList);
+			IRoleUniquePtr roleInfoPtr = m_roleInfoProviderPtr->GetRole(roleId);
+			if (roleInfoPtr.IsValid()){
+				GetParentRoleList(*roleInfoPtr, roleList);
 			}
 		}
 	}

@@ -13,8 +13,6 @@
 #include <imtauthgql/CUserGroupCollectionControllerComp.h>
 #include <imtauthgql/CAuthorizationOptionsControllerComp.h>
 #include <imtauthgql/CSessionControllerComp.h>
-#include <imtauthgql/CRemoteRoleInfoProviderComp.h>
-#include <imtauthgql/CRemoteUserGroupInfoProviderComp.h>
 #include <imtauthgql/CClientRequestRemoteSuperuserProviderComp.h>
 #include <imtauthgql/CRemoteSuperuserControllerComp.h>
 #include <imtauthgql/CSimpleLoginWrapComp.h>
@@ -39,6 +37,9 @@
 #include <imtauthgql/CClientRequestRoleManagerComp.h>
 #include <imtauthgql/CClientRequestUserManagerComp.h>
 #include <imtauthgql/CClientRequestGroupManagerComp.h>
+#include <imtauthgql/CClientRequestUserInfoProviderComp.h>
+#include <imtauthgql/CClientRequestRoleInfoProviderComp.h>
+#include <imtauthgql/CClientRequestGroupInfoProviderComp.h>
 
 
 /**
@@ -55,8 +56,6 @@ typedef imtauthgql::CUserControllerComp UserController;
 typedef imtauthgql::CUserGroupCollectionControllerComp UserGroupCollectionController;
 typedef imtauthgql::CAuthorizationOptionsControllerComp AuthorizationOptionsController;
 typedef imtauthgql::CSessionControllerComp SessionController;
-typedef imtauthgql::CRemoteRoleInfoProviderComp RemoteRoleInfoProvider;
-typedef imtauthgql::CRemoteUserGroupInfoProviderComp RemoteUserGroupInfoProvider;
 typedef imtauthgql::CClientRequestRemoteSuperuserProviderComp ClientRequestRemoteSuperuserProvider;
 typedef imtauthgql::CRemoteSuperuserControllerComp RemoteSuperuserController;
 typedef icomp::TModelCompWrap<imtauthgql::CSimpleLoginWrapComp> SimpleLoginWrap;
@@ -81,6 +80,9 @@ typedef icomp::TModelCompWrap<imtauthgql::CSimpleLoginComp> SimpleLogin;
 typedef imtauthgql::CClientRequestRoleManagerComp ClientRequestRoleManager;
 typedef imtauthgql::CClientRequestUserManagerComp ClientRequestUserManager;
 typedef imtauthgql::CClientRequestGroupManagerComp ClientRequestGroupManager;
+typedef imtauthgql::CClientRequestUserInfoProviderComp ClientRequestUserInfoProvider;
+typedef imtauthgql::CClientRequestRoleInfoProviderComp ClientRequestRoleInfoProvider;
+typedef imtauthgql::CClientRequestGroupInfoProviderComp ClientRequestGroupInfoProvider;
 
 
 } // namespace ImtAuthGqlPck

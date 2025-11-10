@@ -26,11 +26,11 @@ const imtbase::ICollectionInfo& CUserGroupInfoProviderComp::GetUserGroupList() c
 }
 
 
-imtauth::IUserGroupInfoSharedPtr CUserGroupInfoProviderComp::GetUserGroup(const QByteArray& groupId) const
+imtauth::IUserGroupInfoSharedPtr CUserGroupInfoProviderComp::GetUserGroup(const QByteArray& groupId, const iprm::IParamsSet* paramsPtr) const
 {
 	if (m_userGroupCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
+		if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr, paramsPtr)){
 			IUserGroupInfoSharedPtr retVal;
 			retVal.SetCastedPtr(dataPtr);
 

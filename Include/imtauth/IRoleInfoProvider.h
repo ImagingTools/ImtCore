@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <iprm/IParamsSet.h>
 #include <istd/IChangeable.h>
 #include <idoc/IDocumentMetaInfo.h>
 
@@ -17,6 +18,7 @@ namespace imtauth
 
 
 class IRole;
+typedef istd::TUniqueInterfacePtr<IRole> IRoleUniquePtr;
 
 
 /**
@@ -40,14 +42,9 @@ public:
 	virtual const imtbase::ICollectionInfo& GetRoleList() const = 0;
 
 	/**
-		Get information for role by Role-ID and Product-ID.
-	*/
-	virtual const imtauth::IRole* GetRole(const QByteArray& roleId, const QByteArray& productId) const = 0;
-
-	/**
 		Get information for role by Object-ID.
 	*/
-	virtual const imtauth::IRole* GetRole(const QByteArray& objectId) const = 0;
+	virtual const imtauth::IRoleUniquePtr GetRole(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 };
 
 

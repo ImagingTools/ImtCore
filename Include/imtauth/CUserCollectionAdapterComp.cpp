@@ -23,14 +23,15 @@ const imtbase::ICollectionInfo& CUserCollectionAdapterComp::GetUserList() const
 }
 
 
-const IUserInfo* CUserCollectionAdapterComp::GetUser(const QByteArray &objectId) const
+const imtauth::IUserInfoUniquePtr CUserCollectionAdapterComp::GetUser(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const
 {
 	if (m_userCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		if (m_userCollectionCompPtr->GetObjectData(objectId, dataPtr, paramsPtr)){
 			const imtauth::IUserInfo* userPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 			if (userPtr != nullptr){
-				return dynamic_cast<const imtauth::IUserInfo*>(userPtr->CloneMe());
+				imtauth::IUserInfoUniquePtr userInfoUniquePtr(dynamic_cast<imtauth::IUserInfo*>(userPtr->CloneMe()));
+				return userInfoUniquePtr.PopInterfacePtr();
 			}
 		}
 	}

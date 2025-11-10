@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CreateSubCollection" X="600" Y="650" Note=""/>
+        <Element ComponentName="ExportObject" X="225" Y="450" Note=""/>
+        <Element ComponentName="GetCollectionHeaders" X="600" Y="150" Note=""/>
+        <Element ComponentName="GetCommands" X="600" Y="250" Note=""/>
+        <Element ComponentName="GetDataMetaInfo" X="975" Y="750" Note=""/>
+        <Element ComponentName="GetElementMetaInfo" X="975" Y="150" Note=""/>
+        <Element ComponentName="GetObjectData" X="975" Y="650" Note=""/>
+        <Element ComponentName="GetObjectTypeId" X="225" Y="550" Note=""/>
+        <Element ComponentName="GetObjectVisualStatus" X="975" Y="250" Note=""/>
+        <Element ComponentName="ImportObject" X="600" Y="450" Note=""/>
+        <Element ComponentName="InsertNewObject" X="600" Y="550" Note=""/>
+        <Element ComponentName="PermissionsJoiner" X="625" Y="50" Note=""/>
+        <Element ComponentName="RemoveElementSet" X="225" Y="250" Note=""/>
+        <Element ComponentName="RemoveElements" X="225" Y="150" Note=""/>
+        <Element ComponentName="RestoreObjectSet" X="600" Y="350" Note=""/>
+        <Element ComponentName="RestoreObjects" X="225" Y="350" Note=""/>
+        <Element ComponentName="SetObjectData" X="975" Y="550" Note=""/>
+        <Element ComponentName="SetObjectDescription" X="975" Y="450" Note=""/>
+        <Element ComponentName="SetObjectName" X="975" Y="350" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

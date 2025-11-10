@@ -50,16 +50,6 @@ I_EXPORT_COMPONENT(
 		"Session Controller");
 
 I_EXPORT_COMPONENT(
-		RemoteRoleInfoProvider,
-		"Remote role info provider",
-		"Remote Role Info Provider");
-
-I_EXPORT_COMPONENT(
-		RemoteUserGroupInfoProvider,
-		"Remote user group info provider",
-		"Remote User Group Info Provider");
-
-I_EXPORT_COMPONENT(
 		ClientRequestRemoteSuperuserProvider,
 		"Remote superuser provider for client requests",
 		"Remote Superuser Provider Client");
@@ -179,6 +169,20 @@ I_EXPORT_COMPONENT(
 			"Client request group manager",
 			"Client Request Group Manager");
 
+I_EXPORT_COMPONENT(
+			ClientRequestUserInfoProvider,
+			"Client request user info provider",
+			"Client Request User Info Provider");
+
+I_EXPORT_COMPONENT(
+			ClientRequestRoleInfoProvider,
+			"Client request role info provider",
+			"Client Request Role Info Provider");
+
+I_EXPORT_COMPONENT(
+			ClientRequestGroupInfoProvider,
+			"Client request group info provider",
+			"Client Request Group Info Provider");
 
 } // namespace ImtAuthGqlPck
 

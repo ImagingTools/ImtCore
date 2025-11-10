@@ -3,7 +3,11 @@
 
 // ACF includes
 #include <istd/IChangeable.h>
+#include <iprm/IParamsSet.h>
 #include <idoc/IDocumentMetaInfo.h>
+
+// ImtCore inludes
+#include <imtauth/IUserInfo.h>
 
 
 namespace imtbase
@@ -14,9 +18,6 @@ namespace imtbase
 
 namespace imtauth
 {
-
-
-class IUserInfo;
 
 
 /**
@@ -42,7 +43,7 @@ public:
 	/**
 		Get information for user.
 	*/
-	virtual const imtauth::IUserInfo* GetUser(const QByteArray& userId) const = 0;
+	virtual const imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 };
 
 

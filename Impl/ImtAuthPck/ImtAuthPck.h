@@ -17,7 +17,6 @@
 #include <imtauth/CRoleComp.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfo.h>
-#include <imtauth/CUserCollection.h>
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoComp.h>
 #include <imtauth/CUserGroupInfoComp.h>
@@ -91,12 +90,6 @@ typedef icomp::TModelCompWrap<
 				iser::ISerializable,
 				istd::IChangeable>> UserVerification;
 typedef icomp::TModelCompWrap<imtauth::CUserGroupInfoComp> UserGroupInfo;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtauth::CUserCollection,
-						imtauth::IUserInfoProvider,
-						imtauth::IUserInfo,
-						iser::ISerializable>> UserCollection;
 typedef imtauth::CUserInfoMetaInfoCreatorComp UserInfoMetaInfoCreator;
 typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
 typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;

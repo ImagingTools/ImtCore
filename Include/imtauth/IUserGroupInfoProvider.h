@@ -23,7 +23,7 @@ class IUserGroupInfoProvider: virtual public istd::IChangeable
 {
 public:
 	virtual const imtbase::ICollectionInfo& GetUserGroupList() const = 0;
-	virtual imtauth::IUserGroupInfoSharedPtr GetUserGroup(const QByteArray& groupId) const = 0;
+	virtual imtauth::IUserGroupInfoSharedPtr GetUserGroup(const QByteArray& groupId, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 };
 
 

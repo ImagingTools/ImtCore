@@ -75,11 +75,6 @@ I_EXPORT_COMPONENT(
 			"User Group Info");
 
 I_EXPORT_COMPONENT(
-			UserCollection,
-			"List of all users",
-			"List of all users");
-
-I_EXPORT_COMPONENT(
 			UserInfoMetaInfoCreator,
 			"User metainfo creator",
 			"User Metainfo Creator");

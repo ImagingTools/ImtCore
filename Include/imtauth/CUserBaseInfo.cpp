@@ -92,7 +92,7 @@ void CUserBaseInfo::SetDescription(const QString& description)
 
 IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& productId) const
 {
-	IUserBaseInfo::FeatureIds allPermissions = GetLocalPermissions(productId);
+	IUserBaseInfo::FeatureIds allPermissions;
 
 	if (m_roleProviderPtr != nullptr){
 		RoleIds roleIds;
@@ -109,9 +109,9 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 		}
 
 		for (const QByteArray& roleId : std::as_const(roleIds)){
-			istd::TDelPtr<const IRole> rolePtr = m_roleProviderPtr->GetRole(roleId, productId);
-			if (rolePtr.IsValid()){
-				const IUserBaseInfo::FeatureIds rolePerms = rolePtr->GetPermissions();
+			imtauth::IRoleUniquePtr roleInfoPtr = m_roleProviderPtr->GetRole(roleId);
+			if (roleInfoPtr.IsValid()){
+				const IUserBaseInfo::FeatureIds rolePerms = roleInfoPtr->GetPermissions();
 				for (const QByteArray& perm : std::as_const(rolePerms)){
 					if (!allPermissions.contains(perm)){
 						allPermissions << perm;

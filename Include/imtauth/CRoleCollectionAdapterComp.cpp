@@ -24,24 +24,15 @@ const imtbase::ICollectionInfo& CRoleCollectionAdapterComp::GetRoleList() const
 }
 
 
-const IRole* CRoleCollectionAdapterComp::GetRole(const QByteArray& roleId, const QByteArray& /*productId*/) const
-{
-	return GetRole(roleId);
-}
-
-
-const IRole* CRoleCollectionAdapterComp::GetRole(const QByteArray& objectId) const
+const imtauth::IRoleUniquePtr CRoleCollectionAdapterComp::GetRole(const QByteArray& objectId, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (m_roleCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_roleCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 			const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 			if (rolePtr != nullptr){
-				istd::TDelPtr<const imtauth::IRole> clonedUserInfoPtr;
-				clonedUserInfoPtr.SetCastedOrRemove(rolePtr->CloneMe());
-				if (clonedUserInfoPtr.IsValid()){
-					return clonedUserInfoPtr.PopPtr();
-				}
+				imtauth::IRoleUniquePtr roleInfoUniquePtr(dynamic_cast<imtauth::IRole*>(rolePtr->CloneMe()));
+				return roleInfoUniquePtr.PopInterfacePtr();
 			}
 		}
 	}
