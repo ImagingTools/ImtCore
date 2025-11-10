@@ -36,6 +36,9 @@ public:
 	virtual QByteArray GetToken() const = 0;
 	virtual void SetToken(const QByteArray& token) = 0;
 
+	virtual QByteArray GetUserId() const = 0;
+	virtual void SetUserId(const QByteArray& userId) = 0;
+
 	virtual imtauth::IUserInfo* GetUserInfo() const = 0;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) = 0;
 

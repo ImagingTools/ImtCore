@@ -132,13 +132,6 @@ bool CUserRepresentationController::FillUserInfoFromRepresentation(
 	}
 	userInfoPtr->SetMail(mail);
 
-	imtauth::IUserInfo::FeatureIds permissions;
-	if (representation.permissions){
-		permissions = representation.permissions->ToList();
-	}
-	permissions.removeAll("");
-	userInfoPtr->SetLocalPermissions(productId, permissions);
-
 	QByteArrayList roleIds;
 	if (representation.roles){
 		roleIds = representation.roles->ToList();

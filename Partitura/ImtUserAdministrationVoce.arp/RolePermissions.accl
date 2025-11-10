@@ -2,23 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GetCollectionHeaders" X="550" Y="375" Note=""/>
+        <Element ComponentName="ObjectCollectionPermissions" X="725" Y="450" Note=""/>
         <Element ComponentName="PermissionsJoiner" X="550" Y="125" Note=""/>
-        <Element ComponentName="RemoveElementSet" X="225" Y="650" Note=""/>
-        <Element ComponentName="RemoveElements" X="200" Y="400" Note=""/>
-        <Element ComponentName="RoleCommands" X="925" Y="500" Note=""/>
-        <Element ComponentName="RoleItem" X="550" Y="500" Note=""/>
+        <Element ComponentName="RoleItem" X="250" Y="425" Note=""/>
         <Element ComponentName="RoleUpdate" X="925" Y="275" Note=""/>
         <Element ComponentName="RolesAdd" X="200" Y="275" Note=""/>
-        <Element ComponentName="RolesCommands" X="925" Y="375" Note=""/>
         <Element ComponentName="RolesList" X="550" Y="275" Note=""/>
-        <Element ComponentName="RolesMetaInfo" X="200" Y="500" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

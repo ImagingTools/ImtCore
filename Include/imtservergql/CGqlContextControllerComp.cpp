@@ -7,7 +7,7 @@
 #include <iprm/IOptionsList.h>
 
 // ImtCore includes
-#include <imtauth/IUserInfo.h>
+#include <imtbase/imtbase.h>
 #include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlContext.h>
 
@@ -26,14 +26,6 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 			const imtgql::IGqlContext::Headers& headers,
 			QString& errorMessage) const
 {
-	QMutexLocker lock(&m_mutex);
-
-	if (!m_userCollectionCompPtr.IsValid()){
-		Q_ASSERT(false);
-
-		return nullptr;
-	}
-
 	if (!m_jwtSessionControllerCompPtr.IsValid()){
 		Q_ASSERT(false);
 		return nullptr;
@@ -47,26 +39,24 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 		return nullptr;
 	}
 
-	const imtauth::IUserInfo* userInfoPtr = nullptr;
-	imtbase::IObjectCollection::DataPtr userDataPtr;
-	if (m_userCollectionCompPtr->GetObjectData(userObjectId, userDataPtr)){
-		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
-	}
-
-	if (userInfoPtr == nullptr){
-		errorMessage = QString("Unable to get a GraphQL context for token '%1'. Error: User with ID '%2' was not found.").arg(qPrintable(token), qPrintable(userObjectId));
-		SendErrorMessage(0, errorMessage, "CGqlContextControllerComp");
-
-		return nullptr;
-	}
-	
 	imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
-
-	gqlContextPtr->SetUserInfo(userInfoPtr);
+	gqlContextPtr->SetUserId(userObjectId);
 	gqlContextPtr->SetToken(token);
+	gqlContextPtr->SetHeaders(headers);
 
-	QByteArray languageId;
-	QByteArray designSchemeId;
+	if (headers.contains(imtbase::s_productIdHeaderId)){
+		QByteArray productId = headers.value(imtbase::s_productIdHeaderId);
+		gqlContextPtr->SetProductId(productId);
+	}
+
+	if (m_userCollectionCompPtr.IsValid()){
+		const imtauth::IUserInfo* userInfoPtr = nullptr;
+		imtbase::IObjectCollection::DataPtr userDataPtr;
+		if (m_userCollectionCompPtr->GetObjectData(userObjectId, userDataPtr)){
+			userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+			gqlContextPtr->SetUserInfo(userInfoPtr);
+		}
+	}
 
 	if (m_userSettingsCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -81,7 +71,8 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 						if (optionListPtr != nullptr){
 							int index = languageParamPtr->GetSelectedOptionIndex();
 							if (index >= 0){
-								languageId = optionListPtr->GetOptionId(index);
+								QByteArray languageId = optionListPtr->GetOptionId(index);
+								gqlContextPtr->SetLanguageId(languageId);
 							}
 						}
 					}
@@ -92,7 +83,8 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 						if (optionListPtr != nullptr){
 							int index = designParamPtr->GetSelectedOptionIndex();
 							if (index >= 0){
-								designSchemeId = optionListPtr->GetOptionId(index);
+								QByteArray designSchemeId = optionListPtr->GetOptionId(index);
+								gqlContextPtr->SetDesignScheme(designSchemeId);
 							}
 						}
 					}
@@ -101,26 +93,7 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 		}
 	}
 
-	gqlContextPtr->SetLanguageId(languageId);
-	gqlContextPtr->SetDesignScheme(designSchemeId);
-	gqlContextPtr->SetHeaders(headers);
-
 	return gqlContextPtr;
-}
-
-
-// protected methods
-
-// reimplemented (icomp::CComponentBase)
-
-void CGqlContextControllerComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	QMutexLocker lock(&m_mutex);
-
-	m_userCollectionCompPtr.EnsureInitialized();
-	Q_ASSERT(m_userCollectionCompPtr.IsValid());
 }
 
 

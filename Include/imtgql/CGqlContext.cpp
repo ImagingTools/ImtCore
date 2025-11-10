@@ -22,7 +22,6 @@ imtgql::CGqlContext::CGqlContext()
 
 imtgql::CGqlContext::~CGqlContext()
 {
-	ResetData();
 }
 
 
@@ -86,6 +85,22 @@ void CGqlContext::SetToken(const QByteArray &token)
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_token = token;
+	}
+}
+
+
+QByteArray CGqlContext::GetUserId() const
+{
+	return m_userId;
+}
+
+
+void CGqlContext::SetUserId(const QByteArray& userId)
+{
+	if (m_userId != userId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_userId = userId;
 	}
 }
 
@@ -155,6 +170,11 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_token);
 	retVal = retVal && archive.EndTag(tokenTag);
 
+	iser::CArchiveTag userIdTag("UserId", "User-ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(userIdTag);
+	retVal = retVal && archive.Process(m_userId);
+	retVal = retVal && archive.EndTag(userIdTag);
+
 	if (m_userInfoPtr != nullptr){
 		iser::CArchiveTag contactTag("UserInfo", "User info", iser::CArchiveTag::TT_GROUP);
 		retVal = retVal && archive.BeginTag(contactTag);
@@ -183,6 +203,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_languageId = sourcePtr->m_languageId;
 		m_designScheme = sourcePtr->m_designScheme;
 		m_token = sourcePtr->m_token;
+		m_userId = sourcePtr->m_userId;
 		m_productId = sourcePtr->m_productId;
 		m_headers = sourcePtr->m_headers;
 
@@ -214,6 +235,8 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_productId.clear();
 	m_designScheme.clear();
 	m_token.clear();
+	m_userId.clear();
+	m_headers.clear();
 
 	return true;
 }

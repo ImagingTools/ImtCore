@@ -8,21 +8,28 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApiClient" X="175" Y="425" Note=""/>
-        <Element ComponentName="CheckPermissionOr" X="950" Y="775" Note=""/>
-        <Element ComponentName="ConnectionStatusSubscriberController" X="1080" Y="400" Note=""/>
-        <Element ComponentName="Demultiplexer" X="600" Y="100" Note=""/>
-        <Element ComponentName="GqlJwtSessionController" X="725" Y="225" Note=""/>
-        <Element ComponentName="GraphQLClientEngine" X="150" Y="550" Note=""/>
-        <Element ComponentName="RemoteControllers" X="600" Y="425" Note=""/>
-        <Element ComponentName="RemoteDocumentRevisionController" X="650" Y="675" Note=""/>
-        <Element ComponentName="RemoteJwtSessionController" X="275" Y="225" Note=""/>
-        <Element ComponentName="RemoteRepositories" X="1050" Y="150" Note=""/>
-        <Element ComponentName="RevisionPermissions" X="375" Y="775" Note=""/>
-        <Element ComponentName="SlaveSubscriberController" X="1060" Y="280" Note=""/>
+        <Element ComponentName="ApiClient" X="600" Y="375" Note=""/>
+        <Element ComponentName="ConnectionSubscriber" X="925" Y="400" Note=""/>
+        <Element ComponentName="DocumentRevision" X="425" Y="475" Note=""/>
+        <Element ComponentName="GqlDemultiplexer" X="275" Y="75" Note=""/>
+        <Element ComponentName="GqlJwtSessionController" X="175" Y="175" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="575" Y="225" Note=""/>
+        <Element ComponentName="RemoteControllers" X="150" Y="600" Note=""/>
+        <Element ComponentName="RemoteJwtSessionController" X="175" Y="325" Note=""/>
+        <Element ComponentName="RemoteRepositories" X="1000" Y="275" Note=""/>
+        <Element ComponentName="SubscriberDemultiplexer" X="925" Y="75" Note=""/>
         <Element ComponentName="Subscription" X="1080" Y="520" Note=""/>
+        <Element ComponentName="UserInfo" X="1050" Y="650" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="DocumentRevision">
+            <PositionMap>
+                <Element ComponentName="CheckPermissionOr" X="850" Y="200" Note=""/>
+                <Element ComponentName="RemoteDocumentRevisionController" X="575" Y="75" Note=""/>
+                <Element ComponentName="RevisionPermissions" X="250" Y="200" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="RemoteControllers">
             <PositionMap>
                 <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>

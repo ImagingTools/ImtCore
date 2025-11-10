@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QMutex>
-
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
@@ -26,8 +23,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlContextControllerComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlContextController);
-		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", true, "SessionCollection");
-		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
 		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", false, "UserSettingsCollection");
 		I_ASSIGN(m_jwtSessionControllerCompPtr, "JwtSessionController", "JWT session controller", false, "JwtSessionController");
 	I_END_COMPONENT;
@@ -39,17 +35,10 @@ public:
 				const imtgql::IGqlContext::Headers& headers,
 				QString& errorMessage) const override;
 
-protected:
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 private:
-	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 	I_REF(imtauth::IJwtSessionController, m_jwtSessionControllerCompPtr);
-
-	mutable QMutex m_mutex;
 };
 
 

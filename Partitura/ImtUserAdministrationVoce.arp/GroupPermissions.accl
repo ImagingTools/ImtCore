@@ -2,22 +2,17 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GroupCommands" X="150" Y="400" Note=""/>
-        <Element ComponentName="GroupItem" X="550" Y="575" Note=""/>
-        <Element ComponentName="GroupUpdate" X="975" Y="425" Note=""/>
-        <Element ComponentName="GroupsAdd" X="975" Y="275" Note=""/>
-        <Element ComponentName="GroupsCommands" X="550" Y="275" Note=""/>
-        <Element ComponentName="GroupsInfo" X="150" Y="275" Note=""/>
-        <Element ComponentName="GroupsList" X="975" Y="575" Note=""/>
-        <Element ComponentName="GroupsMetaInfo" X="150" Y="575" Note=""/>
-        <Element ComponentName="GroupsRemove" X="550" Y="400" Note=""/>
-        <Element ComponentName="GroupsRemove_1" X="550" Y="467" Note=""/>
+        <Element ComponentName="GroupItem" X="200" Y="275" Note=""/>
+        <Element ComponentName="GroupUpdate" X="925" Y="275" Note=""/>
+        <Element ComponentName="GroupsAdd" X="575" Y="275" Note=""/>
+        <Element ComponentName="GroupsList" X="575" Y="400" Note=""/>
+        <Element ComponentName="ObjectCollectionPermissions" X="925" Y="400" Note=""/>
         <Element ComponentName="PermissionsJoiner" X="550" Y="125" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

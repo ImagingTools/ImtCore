@@ -220,6 +220,7 @@
         <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
         <Component ExportedId="UserActionManager" ComponentId="UserActionController/UserActionManager"/>
         <Component ExportedId="UserActionSqlRepository" ComponentId="UserActionController/UserActionSqlRepository"/>
+        <Component ExportedId="UserInfoProvider" ComponentId="PumaClientEngine/UserInfoProvider"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="PumaClientEngine/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaClientEngine/UserSessionRemoteRepository"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>

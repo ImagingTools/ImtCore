@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -20,17 +20,17 @@
         <Element ComponentName="UserGroupInfo" X="475" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="UserCommands">
+            <PositionMap>
+                <Element ComponentName="StandardDocumentCommandsController" X="600" Y="325" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="UsersCommands">
             <PositionMap>
                 <Element ComponentName="CollectionCommands" X="550" Y="475" Note=""/>
                 <Element ComponentName="CollectionCommandsController" X="575" Y="200" Note=""/>
                 <Element ComponentName="Revision" X="950" Y="475" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="UserCommands">
-            <PositionMap>
-                <Element ComponentName="StandardDocumentCommandsController" X="600" Y="325" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

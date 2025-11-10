@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,7 +15,7 @@
         <Element ComponentName="SessionInfo" X="550" Y="750" Note=""/>
         <Element ComponentName="SlaveSubscriberController" X="550" Y="400" Note=""/>
         <Element ComponentName="UserGroupInfo" X="950" Y="575" Note=""/>
-        <Element ComponentName="UserGroupInfoProvider" X="943" Y="204" Note=""/>
+        <Element ComponentName="UserGroupInfoProvider" X="950" Y="200" Note=""/>
         <Element ComponentName="UserInfo" X="550" Y="75" Note=""/>
         <Element ComponentName="UserRemoteRepository" X="550" Y="225" Note=""/>
         <Element ComponentName="UserSessionRemoteRepository" X="575" Y="575" Note=""/>

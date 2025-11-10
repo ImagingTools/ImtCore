@@ -106,7 +106,6 @@ ViewBase {
 		canResetFilters: collectionViewBaseContainer.canResetFilters
 		complexFilter: collectionViewBaseContainer.collectionFilter;
 		documentFilter: collectionViewBaseContainer.documentCollectionFilter;
-		// visible: collectionViewBaseContainer.filterMenuVisible
 
 		onClose: {
 			filterMenu_.visible = false;

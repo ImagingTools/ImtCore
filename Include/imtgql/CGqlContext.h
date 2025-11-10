@@ -24,6 +24,8 @@ public:
 	virtual void SetDesignScheme(const QByteArray& designScheme) override;
 	virtual QByteArray GetToken() const override;
 	virtual void SetToken(const QByteArray& token) override;
+	virtual QByteArray GetUserId() const override;
+	virtual void SetUserId(const QByteArray& userId) override;
 	virtual imtauth::IUserInfo* GetUserInfo() const override;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) override;
 	virtual Headers GetHeaders() const override;
@@ -39,6 +41,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
+	QByteArray m_userId;
 	QByteArray m_productId;
 	QByteArray m_languageId;
 	QByteArray m_designScheme;
