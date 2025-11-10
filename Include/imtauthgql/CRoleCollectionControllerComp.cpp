@@ -445,6 +445,11 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 }
 
 
+bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
+}
+
 
 bool CRoleCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 			const imtgql::CGqlRequest& /*rawGqlRequest*/,

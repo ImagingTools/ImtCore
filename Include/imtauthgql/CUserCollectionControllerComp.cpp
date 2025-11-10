@@ -292,10 +292,10 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserCollectionControlle
 		else{
 			QString roleData;
 			for (const QByteArray& productRoleId: rolesIds){
-				istd::TDelPtr<const imtauth::IRole> rolePtr = m_roleInfoProviderCompPtr->GetRole(productRoleId);
-				if (rolePtr.IsValid()){
-					QString roleName = rolePtr->GetRoleName();
-					QByteArray roleProductId = rolePtr->GetProductId();
+				imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(productRoleId);
+				if (roleInfoPtr.IsValid()){
+					QString roleName = roleInfoPtr->GetRoleName();
+					QByteArray roleProductId = roleInfoPtr->GetProductId();
 					roleData += roleName + " (" + roleProductId + ")\n";
 				}
 			}
@@ -441,7 +441,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 		QByteArrayList resultList;
 		if (m_roleInfoProviderCompPtr.IsValid()){
 			for (const QByteArray& roleId: userInfoPtr->GetRoles(productId)){
-				istd::TDelPtr<const imtauth::IRole> roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
+				imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
 				if (roleInfoPtr.IsValid()){
 					QString roleName = roleInfoPtr->GetRoleName();
 					QString roleDescription = roleInfoPtr->GetRoleDescription();
@@ -690,6 +690,36 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	return FillObjectFromRepresentation(userData, object, objectId, errorMessage);
+}
+
+
+// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+
+bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	// QByteArray ownerRequestUserId;
+	// const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	// if (gqlContextPtr != nullptr){
+	// 	ownerRequestUserId = gqlContextPtr->GetUserId();
+	// }
+
+	// QByteArray commandId = gqlRequest.GetCommandId();
+	// if (commandId == sdl::imtauth::Users::CUserItemGqlRequest::GetCommandId()){
+	// 	sdl::imtauth::Users::CUserItemGqlRequest userItemGqlRequest(gqlRequest, false);
+	// 	if (userItemGqlRequest.IsValid()){
+	// 		const sdl::imtauth::Users::UserItemRequestArguments arguments = userItemGqlRequest.GetRequestedArguments();
+	// 		if (arguments.input.Version_1_0.HasValue()){
+	// 			if (arguments.input.Version_1_0->id.HasValue()){
+	// 				QByteArray requestedUserId = *arguments.input.Version_1_0->id;
+	// 				if (ownerRequestUserId == requestedUserId){
+	// 					return true;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
+
+	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
 }
 
 

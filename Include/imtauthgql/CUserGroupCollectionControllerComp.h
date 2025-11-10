@@ -62,6 +62,9 @@ protected:
 				istd::IChangeable& object,
 				QString& errorMessage) const override;
 
+	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
 protected:
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 	I_REF(imtauth::IUserInfoProvider, m_userInfoProviderCompPtr);

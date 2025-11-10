@@ -206,7 +206,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionCont
 				else{
 					QString usersData;
 					for (const QByteArray& groupUserId : userIds){
-						istd::TDelPtr<const imtauth::IUserInfo> userInfoPtr = m_userInfoProviderCompPtr->GetUser(groupUserId);
+						imtauth::IUserInfoUniquePtr userInfoPtr = m_userInfoProviderCompPtr->GetUser(groupUserId);
 						if (userInfoPtr.IsValid()){
 							QString userName = userInfoPtr->GetName();
 							usersData += userName + "\n";
@@ -231,7 +231,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionCont
 				else{
 					QString rolesData;
 					for (const QByteArray& roleId : roleIds){
-						istd::TDelPtr<const imtauth::IRole> roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
+						imtauth::IRoleUniquePtr roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
 						if (roleInfoPtr.IsValid()){
 							QString roleName = roleInfoPtr->GetRoleName();
 
@@ -449,6 +449,14 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 	}
 
 	return FillObjectFromRepresentation(*representation.Version_1_0, object, objectId, errorMessage);
+}
+
+
+// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+
+bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
 }
 
 
