@@ -213,7 +213,7 @@ Item {
 		function addModel(elements){
 			let result = false;
 			for (let i = 0; i < elements.length; i++){
-				if (elements[i].hidden){
+				if (elements[i].hidden && elements[i].element && elements[i].element.m_visible){
 					insertNewItem({
 									  "id": elements[i].modelData.m_elementId,
 									  "name": elements[i].modelData.m_elementName,

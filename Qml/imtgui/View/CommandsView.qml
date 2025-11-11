@@ -85,7 +85,7 @@ Item {
 			let item = priorityElements[i];
 			if (!item.element || item.priority < 0)
 				continue;
-			
+
 			let elementWidth = item.maxWidth;
 			
 			let projectedWidth = totalWidth > 0 ? totalWidth + spacing + elementWidth : elementWidth;
@@ -124,8 +124,6 @@ Item {
 							button.checkHidden()
 						}
 					}
-
-
 
 					property bool hidden: false
 					onHiddenChanged: {

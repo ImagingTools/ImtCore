@@ -22,7 +22,7 @@ ViewBase {
 	
 	property alias filterMenu: filterMenu_;
 	property alias loading: loading_;
-	property alias filterMenuVisible: filterMenu_.visible
+	property bool filterMenuVisible: true
 	property alias pagination: pagination_;
 	property alias elementsCount: tableInternal.elementsCount;
 	property alias tableRowDelegate: tableInternal.rowDelegate
@@ -106,9 +106,13 @@ ViewBase {
 		canResetFilters: collectionViewBaseContainer.canResetFilters
 		complexFilter: collectionViewBaseContainer.collectionFilter;
 		documentFilter: collectionViewBaseContainer.documentCollectionFilter;
-
+		visible: collectionViewBaseContainer.filterMenuVisible
 		onClose: {
-			filterMenu_.visible = false;
+			collectionViewBaseContainer.filterMenuVisible = false;
+		}
+		
+		onVisibleChanged: {
+			console.log("FilterMenu onVisibleChanged", visible)
 		}
 
 		onFilterChanged: {
@@ -228,7 +232,6 @@ ViewBase {
 			property bool selectionBlock: false
 			
 			onSelectionChanged: {
-				console.log("onSelectionChanged", selectionBlock)
 				if (selectionBlock){
 					return
 				}
@@ -331,7 +334,7 @@ ViewBase {
 					icon.source: collectionViewBaseContainer.activeFilter ? "qrc:/" + Style.getIconPath("Icons/FilterActive", Icon.State.On, Icon.Mode.Selected)
 										 : "qrc:/" + Style.getIconPath("Icons/FilterEdit", Icon.State.On, Icon.Mode.Normal)
 					onClicked: {
-						filterMenu_.visible = !filterMenu_.visible;
+						collectionViewBaseContainer.filterMenuVisible = !collectionViewBaseContainer.filterMenuVisible;
 					}
 					decorator: Component {
 						ToolButtonDecorator {
