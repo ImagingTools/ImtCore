@@ -125,10 +125,12 @@ Button{
 		anchors.bottom: parent.bottom
 		anchors.right: parent.right
 
-		width: Style.iconSizeXS + Style.marginM
+		width: isMenubutton ? Style.iconSizeXS + Style.marginM : 0
 		z: 20
 
-		hoverEnabled: true;
+		visible: isMenuButton
+		enabled: isMenuButton
+		hoverEnabled: visible;
 		cursorShape: Qt.PointingHandCursor
 
 		onClicked: {
