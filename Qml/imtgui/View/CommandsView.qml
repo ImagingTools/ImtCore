@@ -56,11 +56,11 @@ Item {
 	function hasHiddenCommands(){
 		for (let j = 0; j < allElements.length; j++){
 			if (!allElements[j] || !allElements[j].element){
-				continue;
+				continue
 			}
 
-			if (allElements[j].hidden){
-				return true;
+			if (allElements[j].hidden && allElements[j].element.m_visible){
+				return true
 			}
 		}
 		
@@ -76,7 +76,7 @@ Item {
 
 		for (let i = 0; i < priorityElements.length; i++) {
 			let item = priorityElements[i];
-			if (item.element) {
+			if (item.element){
 				item.hidden = true
 			}
 		}
@@ -171,8 +171,7 @@ Item {
 					property int priority: element ? element.m_priority : 0;
 					property int maxWidth: -1;
 					
-					// visible: !element || priority < 0 ? false : element.m_visible;
-					visible: !hidden
+					visible: !hidden //? false : element && element.m_visible
 
 					onPriorityChanged: {
 						hidden = priority === -1
@@ -194,14 +193,6 @@ Item {
 						commandsItem.commandActivated(id, params);
 					}
 
-					// onClicked: {
-					// 	let params = {}
-					// 	params["x"] = mouseArea.mouseX
-					// 	params["y"] = mouseArea.mouseY
-					// 	params["target"] = button
-					// 	commandsItem.commandActivated(element.m_elementId, params);
-					// }
-					
 					onWidthChanged: {
 						maxWidth = Math.max(maxWidth, width);
 					}

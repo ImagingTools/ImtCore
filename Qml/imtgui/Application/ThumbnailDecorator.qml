@@ -94,7 +94,7 @@ Rectangle {
 	
 	MenuPanel {
 		id: menuPanel;
-		z: 999
+		z: 9
 		anchors.left: parent.left;
 		anchors.leftMargin: thumbnailDecoratorContainer.mainMargin;
 		anchors.top: topPanel_.bottom;
