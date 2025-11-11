@@ -184,14 +184,14 @@ DecoratorBase {
             anchors.rightMargin: Style.marginM;
 
             width: buttonsDialog.width;
-            height: buttonsDialog.height + 2* buttonsDialog.anchors.bottomMargin;
+			height: buttonsDialog.height + 2* Style.marginXL//buttonsDialog.anchors.bottomMargin;
 
             DialogButtons {
                 id: buttonsDialog;
 
                 anchors.right: !parent ? undefined : parent.right;
                 anchors.bottom: !parent ? undefined : parent.bottom;
-                anchors.bottomMargin: Style.marginXL;
+				anchors.bottomMargin: Style.marginL;
 
                 buttons: !dialogContainer.baseElement ? 0 : dialogContainer.baseElement.buttonsModel;
 
