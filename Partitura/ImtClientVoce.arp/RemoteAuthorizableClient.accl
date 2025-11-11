@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5423" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -11,7 +11,7 @@
         <Element ComponentName="ClientRequestRemoteSuperuserProvider" X="425" Y="625" Note=""/>
         <Element ComponentName="PumaLoginStatusSubscriber" X="1040" Y="400" Note=""/>
         <Element ComponentName="RemoteSuperuserController" X="525" Y="25" Note=""/>
-        <Element ComponentName="Rights" X="80" Y="400" Note=""/>
+        <Element ComponentName="Rights" X="100" Y="400" Note=""/>
         <Element ComponentName="StandardLoginGui" X="540" Y="140" Note=""/>
         <Element ComponentName="Subscription" X="660" Y="400" Note=""/>
     </PositionMap>

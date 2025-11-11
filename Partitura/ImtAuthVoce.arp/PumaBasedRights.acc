@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5332" Description="ACF"/>
-            <Version Id="1" Number="2230" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5430" Description="ACF"/>
+            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,10 +15,13 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="RemoteRoleInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="RemoteRoleInfoProvider">
+        <Element Id="RemoteRoleInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRoleInfoProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleFactory" Type="Factory" ExportId="">
@@ -27,13 +30,16 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteUserGroupInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="RemoteUserGroupInfoProvider">
+        <Element Id="RemoteUserGroupInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestGroupInfoProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="GroupFactory" Type="Factory" ExportId="">
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="UserGroupInfo"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
