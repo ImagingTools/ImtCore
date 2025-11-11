@@ -19,7 +19,7 @@ ControlBase {
 
 	property int mainMargin: Style.marginS;
 
-    property string selectedColor: "#000000";
+	property string selectedColor: Style.textColor;
 
     property bool autoExclusive: true;
 
