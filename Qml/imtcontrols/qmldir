@@ -70,6 +70,7 @@ PopupItemDelegateDecorator 1.0 ./Dialogs/PopupItemDelegateDecorator.qml
 DialogDecorator 1.0 ./Dialogs/DialogDecorator.qml
 DialogManagerView 1.0 ./Dialogs/DialogManagerView.qml
 CriticalErrorDialog 1.0 ./Dialogs/CriticalErrorDialog.qml
+FileImportDialog 1.0 ./Dialogs/FileImportDialog.qml
 
 Calendar 1.0 ./Inputs/Calendar.qml
 CalendarCellDelegateBase 1.0 ./Inputs/CalendarCellDelegateBase.qml
