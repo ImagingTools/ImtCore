@@ -41,7 +41,7 @@ public:
 	virtual bool CreateSortQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& sortQuery) const override;
 	virtual QByteArray CreateJoinTablesQuery() const override;
 	virtual QByteArray GetCustomColumnsQuery() const override;
-	
+
 private:
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userGroupDatabaseDelegateCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);

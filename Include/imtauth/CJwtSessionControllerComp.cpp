@@ -279,7 +279,7 @@ QByteArray CJwtSessionControllerComp::InsertNewSession(const istd::IChangeable& 
 		return QByteArray();
 	}
 
-	return m_sessionCollectionCompPtr->InsertNewObject("Session", "", "", &object);;
+	return m_sessionCollectionCompPtr->InsertNewObject("Session", "", "", &object);
 }
 
 

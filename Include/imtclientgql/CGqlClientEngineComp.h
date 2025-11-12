@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <ibase/IApplicationInfo.h>
 
 // ImtCore includes
 #include <imtcom/IServerConnectionInterface.h>
@@ -24,6 +25,7 @@ public:
 		I_REGISTER_INTERFACE(imtclientgql::IClientProtocolEngine);
 		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Server connnection settings", true, "ServerConnectionInterface");
 		I_ASSIGN(m_prefixServerAttrPtr, "ServerPrefix", "Prefix Server", false, "/");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", false, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	CGqlClientEngineComp();
@@ -34,6 +36,7 @@ public:
 private:
 	I_ATTR(QByteArray, m_prefixServerAttrPtr);
 	I_REF(imtcom::IServerConnectionInterface, m_serverConnectionCompPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 
 

@@ -37,8 +37,16 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 			if (m_serverConnectionCompPtr->GetUrl(imtcom::IServerConnectionInterface::PT_HTTP, url)){
 				QString urlString = url.toString();
 
+				QByteArray prefix;
 				if (m_prefixServerAttrPtr.IsValid()){
-					QByteArray prefix = *m_prefixServerAttrPtr;
+					prefix  = *m_prefixServerAttrPtr;
+				}
+
+				if (m_applicationInfoCompPtr.IsValid()){
+					prefix = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
+				}
+
+				if (!prefix.isEmpty()){
 					if (!prefix.startsWith('/')){
 						prefix.prepend('/');
 					}
@@ -61,11 +69,11 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 	}
 
 	networkRequest->setUrl(url);
+	qDebug() << "CreateNetworkRequest" << url;
 
 	const imtgql::IGqlContext* contextPtr = request.GetRequestContext();
 	if (contextPtr != nullptr){
-		imtgql::IGqlContext::Headers headersMap = contextPtr->GetHeaders();
-		QByteArray productId = headersMap.value(imtbase::s_productIdHeaderId);
+		QByteArray productId = contextPtr->GetProductId();
 		if (!productId.isEmpty()){
 			networkRequest->setRawHeader(imtbase::s_productIdHeaderId, productId);
 		}

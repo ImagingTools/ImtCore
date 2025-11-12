@@ -25,7 +25,7 @@
 
 
 /**
-	ImtGqlPck package
+	ImtClientGqlPck package
 */
 namespace ImtClientGqlPck
 {
