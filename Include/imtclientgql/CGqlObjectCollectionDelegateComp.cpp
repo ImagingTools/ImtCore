@@ -1,3 +1,4 @@
+
 #include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 
 
@@ -11,14 +12,18 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <imod/TModelWrap.h>
 #include <iprm/IIdParam.h>
+#include <iprm/TParamsPtr.h>
 #include <iser/CJsonMemWriteArchive.h>
 #include <iser/CJsonMemReadArchive.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/CFilterCollectionProxy.h>
 #include <imtbase/COperationContext.h>
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
 
 
 namespace imtclientgql
@@ -158,7 +163,9 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 }
 
 
-imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(const QByteArray& objectId) const
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(
+			const QByteArray& objectId,
+			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!m_collectionIdAttrPtr.IsValid()){
 		return nullptr;
@@ -261,7 +268,8 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectSetRequ
 }
 
 
-imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequest(const iprm::IParamsSet* selectionParamsPtr) const
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequest(
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	if (!m_collectionIdAttrPtr.IsValid()){
 		return nullptr;
@@ -747,6 +755,11 @@ template<class Arguments,class SdlRequest>
 imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGqlRequest(Arguments arguments) const
 {
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest();
+	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (gqlContextPtr != nullptr){
+		requestPtr->SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
+	}
+
 	if (!SdlRequest::SetupGqlRequest(*requestPtr, arguments)){
 		return nullptr;
 	}

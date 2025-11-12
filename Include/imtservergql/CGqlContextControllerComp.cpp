@@ -9,7 +9,9 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtauth/IUserSettings.h>
+#include <imtgql/IRequestContextController.h>
 #include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
 
 
 namespace imtservergql
@@ -44,16 +46,17 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	gqlContextPtr->SetToken(token);
 	gqlContextPtr->SetHeaders(headers);
 
+	imtgql::CGqlRequestContextManager::SetContext(gqlContextPtr);
+
 	if (headers.contains(imtbase::s_productIdHeaderId)){
 		QByteArray productId = headers.value(imtbase::s_productIdHeaderId);
 		gqlContextPtr->SetProductId(productId);
 	}
 
 	if (m_userCollectionCompPtr.IsValid()){
-		const imtauth::IUserInfo* userInfoPtr = nullptr;
 		imtbase::IObjectCollection::DataPtr userDataPtr;
 		if (m_userCollectionCompPtr->GetObjectData(userObjectId, userDataPtr)){
-			userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+			const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
 			gqlContextPtr->SetUserInfo(userInfoPtr);
 		}
 	}

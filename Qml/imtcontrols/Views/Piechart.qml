@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import Acf 1.0
 import imtcontrols 1.0
 
@@ -20,74 +20,60 @@ Item {
 
 	function getTotalValue() {
 		let total = 0
-		for (let i = 0; i < pieChart.segments.length; ++i)
-			total += pieChart.segments[i].value || 0
+		for (let i = 0; i < segments.length; ++i)
+			total += segments[i].value || 0
 		return total
 	}
 
 	function getPercentText(value) {
-		let total = pieChart.getTotalValue()
-		if (total <= 0 || pieChart.segments.length === 0)
+		let total = getTotalValue()
+		if (total <= 0 || segments.length === 0)
 			return ""
 		let percent = Math.round(value / total * 100)
 		return percent + "%"
 	}
 
 	function updateGui() {
-		let totalValue = pieChart.getTotalValue()
-		if (totalValue <= 0 || pieChart.segments.length === 0)
+		let totalValue = getTotalValue()
+		if (totalValue <= 0 || segments.length === 0)
 			return
 
-		pieChart.segments.sort(function(a, b){
-			if (a.value > b.value){
-				return -1
-			}
-			if (a.value < b.value){
-				return 1
-			}
-			return 0
-		}
-		)
+		segments.sort(function(a, b) { return b.value - a.value })
 
-		for (let i = 0; i < pieChart.segments.length; ++i) {
-			let seg = pieChart.segments[i]
-			let percentText = pieChart.getPercentText(seg.value)
+		for (let i = 0; i < segments.length; ++i) {
+			let seg = segments[i]
+			let percentText = getPercentText(seg.value)
 			seg.displayText = seg.value + (percentText ? " (" + percentText + ")" : "")
 		}
 		chartUpdated()
 	}
 
 	onSegmentsChanged: { updateGui(); canvas.requestPaint() }
-	onWidthChanged: canvas.requestPaint()
-	onHeightChanged: canvas.requestPaint()
-	onRingChanged: canvas.requestPaint()
-	onClockwiseChanged: canvas.requestPaint()
-	onRotationAngleChanged: canvas.requestPaint()
 
 	Canvas {
 		id: canvas
-		anchors.horizontalCenter: parent.horizontalCenter
-		width: pieChart.height * 0.6
-		height: width
+		anchors.top: parent.top
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: legend.visible ? legend.top : parent.bottom
+		anchors.bottomMargin: Style.marginM
 		antialiasing: true
 
 		onPaint: {
 			let ctx = getContext("2d")
 			ctx.reset()
 
+			let total = pieChart.getTotalValue()
+			if (total <= 0) return
+
 			let cx = width / 2
 			let cy = height / 2
-			let r = width / 2
-
-			let total = pieChart.getTotalValue()
-			if (!total)
-				return
+			let r = Math.min(width, height) / 2
 
 			let angle = pieChart.rotationAngle * Math.PI / 180
 			let direction = pieChart.clockwise ? 1 : -1
 
-			for (let i = 0; i < pieChart.segments.length; ++i) {
-				let seg = pieChart.segments[i]
+			for (let seg of pieChart.segments) {
 				let portion = (seg.value / total) * 2 * Math.PI * direction
 				let nextAngle = angle + portion
 
@@ -113,11 +99,12 @@ Item {
 
 	Column {
 		id: legend
-		anchors.top: canvas.bottom
-		anchors.topMargin: Style.marginM
+		anchors.bottom: parent.bottom
 		anchors.horizontalCenter: parent.horizontalCenter
 		width: parent.width * 0.9
 		visible: pieChart.showLegend
+
+		clip: true
 
 		Repeater {
 			model: pieChart.segments
@@ -125,7 +112,7 @@ Item {
 				width: legend.width
 				height: 20
 				spacing: Style.marginM
-			
+
 				Rectangle {
 					width: Style.fontSizeM
 					height: 14
@@ -134,38 +121,25 @@ Item {
 					anchors.verticalCenter: parent.verticalCenter
 				}
 
-				Item {
-					width: parent.width - Style.fontSizeM - 2 * Style.marginM
-					height: parent.height
-			
-					Row {
-						anchors.fill: parent
-						spacing: Style.marginS
-			
-						Text {
-							id: labelText
-							text: modelData.label || ""
-							color: Style.textColor
-							font.pixelSize: Style.fontSizeM
-							elide: Text.ElideRight
-							horizontalAlignment: Text.AlignLeft
-							width: parent.width * 0.6
-						}
-			
-						Text {
-							id: valueText
-							text: modelData.displayText || ""
-							color: Style.textColor
-							font.pixelSize: Style.fontSizeM
-							visible: pieChart.showPercent
-							horizontalAlignment: Text.AlignLeft
-							width: parent.width * 0.4
-						}
-					}
+				Text {
+					text: modelData.label || ""
+					color: Style.textColor
+					font.pixelSize: Style.fontSizeM
+					elide: Text.ElideRight
+					width: legend.width * 0.4
+					verticalAlignment: Text.AlignVCenter
+				}
+
+				Text {
+					text: modelData.displayText || ""
+					color: Style.textColor
+					font.pixelSize: Style.fontSizeM
+					visible: pieChart.showPercent
+					elide: Text.ElideRight
+					width: legend.width * 0.4
+					verticalAlignment: Text.AlignVCenter
 				}
 			}
 		}
 	}
 }
-
-

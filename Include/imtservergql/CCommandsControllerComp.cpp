@@ -41,9 +41,9 @@ bool CCommandsControllerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlR
 
 
 sdl::imtbase::Commands::CGuiElementContainer CCommandsControllerComp::OnGetCommands(
-	const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& errorMessage) const
+			const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
 {
 	sdl::imtbase::Commands::CGuiElementContainer::V1_0 response;
 	
@@ -84,13 +84,19 @@ sdl::imtbase::Commands::CGuiElementContainer CCommandsControllerComp::OnGetComma
 }
 
 
+bool CCommandsControllerComp::CheckPermissions(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
+{
+	return true;
+}
+
+
 // private methods
 
 bool CCommandsControllerComp::GetRepresentationFromGuiElementContainer(
-	const imtserverapp::IGuiElementContainer& guiElementContainer,
-	sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
-	const QByteArray languageId,
-	const imtauth::IUserInfo* userInfoPtr) const
+			const imtserverapp::IGuiElementContainer& guiElementContainer,
+			sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
+			const QByteArray languageId,
+			const imtauth::IUserInfo* userInfoPtr) const
 {
 	imtauth::IUserInfo::FeatureIds userPermissions;
 	bool isAdmin = false;

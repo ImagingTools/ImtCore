@@ -162,7 +162,7 @@ const istd::IChangeable* CRemoteGqlCollectionController::GetObjectPtr(const Id& 
 }
 
 
-bool CRemoteGqlCollectionController::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* /*dataConfigurationPtr*/) const
+bool CRemoteGqlCollectionController::GetObjectData(const Id& objectId, DataPtr& dataPtr, const iprm::IParamsSet* dataConfigurationPtr) const
 {
 	if (m_gqlClientPtr == nullptr || m_gqlObjectCollectionDelegatePtr == nullptr){
 		return false;
@@ -172,7 +172,7 @@ bool CRemoteGqlCollectionController::GetObjectData(const Id& objectId, DataPtr& 
 
 	DataPtr retVal = CreateObjectInstance(typeId);
 	if (retVal.IsValid()){
-		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectRequest(objectId));
+		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateGetObjectRequest(objectId, dataConfigurationPtr));
 		if (!requestPtr.isNull()){
 			GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
 			if (!responsePtr.isNull()){
@@ -453,7 +453,7 @@ bool CRemoteGqlCollectionController::SetElementName(const Id& elementId, const Q
 
 	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
 	if (GetObjectInfo(elementId, info)){
-		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectNameRequest(elementId, name, info.version));
+		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectNameRequest(elementId, name, info.version, nullptr));
 		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
 		if (!responsePtr.isNull()){
 			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);
@@ -474,7 +474,7 @@ bool CRemoteGqlCollectionController::SetElementDescription(const Id& elementId, 
 
 	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
 	if (GetObjectInfo(elementId, info)){
-		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectDescriptionRequest(elementId, description, info.version));
+		GqlRequestPtr requestPtr(m_gqlObjectCollectionDelegatePtr->CreateSetObjectDescriptionRequest(elementId, description, info.version, nullptr));
 		GqlResponsePtr responsePtr = m_gqlClientPtr->SendRequest(requestPtr);
 		if (!responsePtr.isNull()){
 			m_gqlObjectCollectionDelegatePtr->GetOperationResult(*responsePtr, retVal);

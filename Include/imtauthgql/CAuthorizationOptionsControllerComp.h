@@ -39,6 +39,9 @@ protected:
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
+	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
 protected:
 	I_REF(iprm::ISelectionParam, m_selectionParamCompPtr);
 };

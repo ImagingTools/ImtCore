@@ -8,6 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="CachedGroupCollection" X="975" Y="750" Note=""/>
+        <Element ComponentName="CachedRoleCollection" X="250" Y="75" Note=""/>
+        <Element ComponentName="CachedUserCollection" X="1000" Y="75" Note=""/>
         <Element ComponentName="GroupRemoteRepository" X="925" Y="400" Note=""/>
         <Element ComponentName="Role" X="200" Y="575" Note=""/>
         <Element ComponentName="RoleCollectionAdapter" X="225" Y="225" Note=""/>

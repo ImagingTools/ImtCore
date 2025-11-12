@@ -69,7 +69,6 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 	}
 
 	networkRequest->setUrl(url);
-	qDebug() << "CreateNetworkRequest" << url;
 
 	const imtgql::IGqlContext* contextPtr = request.GetRequestContext();
 	if (contextPtr != nullptr){

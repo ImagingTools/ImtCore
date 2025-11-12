@@ -697,27 +697,53 @@ bool CUserCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	// QByteArray ownerRequestUserId;
-	// const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	// if (gqlContextPtr != nullptr){
-	// 	ownerRequestUserId = gqlContextPtr->GetUserId();
-	// }
+	QByteArray requestOwnerId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		requestOwnerId = gqlContextPtr->GetUserId();
+	}
 
-	// QByteArray commandId = gqlRequest.GetCommandId();
-	// if (commandId == sdl::imtauth::Users::CUserItemGqlRequest::GetCommandId()){
-	// 	sdl::imtauth::Users::CUserItemGqlRequest userItemGqlRequest(gqlRequest, false);
-	// 	if (userItemGqlRequest.IsValid()){
-	// 		const sdl::imtauth::Users::UserItemRequestArguments arguments = userItemGqlRequest.GetRequestedArguments();
-	// 		if (arguments.input.Version_1_0.HasValue()){
-	// 			if (arguments.input.Version_1_0->id.HasValue()){
-	// 				QByteArray requestedUserId = *arguments.input.Version_1_0->id;
-	// 				if (ownerRequestUserId == requestedUserId){
-	// 					return true;
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
+	QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == sdl::imtauth::Users::CUserItemGqlRequest::GetCommandId()){
+		sdl::imtauth::Users::CUserItemGqlRequest userItemGqlRequest(gqlRequest, false);
+		if (userItemGqlRequest.IsValid()){
+			sdl::imtauth::Users::UserItemRequestArguments arguments = userItemGqlRequest.GetRequestedArguments();
+			if (arguments.input.Version_1_0.HasValue()){
+				if (arguments.input.Version_1_0->id.HasValue()){
+					QByteArray requestedUserId = *arguments.input.Version_1_0->id;
+					if (requestOwnerId == requestedUserId){
+						return true;
+					}
+				}
+			}
+		}
+	}
+	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest::GetCommandId()){
+		sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest getObjectDataGqlRequest(gqlRequest, false);
+		if (getObjectDataGqlRequest.IsValid()){
+			auto arguments = getObjectDataGqlRequest.GetRequestedArguments();
+			if (arguments.input.Version_1_0.HasValue()){
+				if (arguments.input.Version_1_0->objectId.HasValue()){
+					if (requestOwnerId == *arguments.input.Version_1_0->objectId){
+						return true;
+					}
+				}
+			}
+		}
+	}
+	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest::GetCommandId()){
+		sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest getObjectTypeIdGqlRequest(gqlRequest, false);
+		if (getObjectTypeIdGqlRequest.IsValid()){
+			auto arguments = getObjectTypeIdGqlRequest.GetRequestedArguments();
+			if (arguments.input.Version_1_0.HasValue()){
+				if (arguments.input.Version_1_0->objectId.HasValue()){
+					if (requestOwnerId == *arguments.input.Version_1_0->objectId){
+						return true;
+					}
+				}
+			}
+		}
+	}
 
 	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
 }

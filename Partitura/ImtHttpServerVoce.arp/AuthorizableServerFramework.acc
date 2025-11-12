@@ -156,7 +156,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PumaClientEngine/UserRemoteRepository"/>
+                        <Data IsEnabled="true" Value="PumaClientEngine/CachedUserCollection"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -212,6 +212,9 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="PumaClientEngine"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="CachedGroupCollection" ComponentId="PumaClientEngine/CachedGroupCollection"/>
+        <Component ExportedId="CachedRoleCollection" ComponentId="PumaClientEngine/CachedRoleCollection"/>
+        <Component ExportedId="CachedUserCollection" ComponentId="PumaClientEngine/CachedUserCollection"/>
         <Component ExportedId="DatabaseEngine" ComponentId="DatabaseEngine"/>
         <Component ExportedId="FeatureContainer" ComponentId="IdentifiableProductInfo"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="PumaClientEngine/GroupRemoteRepository"/>

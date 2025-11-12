@@ -66,12 +66,11 @@ void CGqlRequest::AddSimpleField(const QByteArray &fieldId)
 }
 
 
-void CGqlRequest::SetGqlContext(const IGqlContext* gqlContext)
-{
+void CGqlRequest::SetGqlContext(IGqlContext* gqlContext){
 	if (m_gqlContextPtr.get() != gqlContext){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_gqlContextPtr.reset(const_cast<IGqlContext*>(gqlContext));
+		m_gqlContextPtr.reset(gqlContext);
 	}
 }
 
@@ -579,8 +578,6 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 	m_commandId.clear();
 	m_params.ResetData();
 	m_fields.ResetData();
-
-	m_gqlContextPtr.reset();
 	m_protocolVersion.clear();
 
 	return true;

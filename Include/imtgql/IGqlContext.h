@@ -47,6 +47,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr<IGqlContext> IGqlContextUniquePtr;
+typedef istd::TSharedInterfacePtr<IGqlContext> IGqlContextSharedPtr;
+
+
 } // namespace imtgql
 
 

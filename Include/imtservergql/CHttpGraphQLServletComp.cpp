@@ -11,6 +11,7 @@
 #include <imtbase/imtbase.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
 #include <imtrest/IProtocolEngine.h>
 
 
@@ -70,7 +71,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	bool isSuccessful = false;
 
-	imtgql::IGqlContext* gqlContextPtr = nullptr;
 	QByteArray accessToken = headers.value(QByteArrayLiteral("x-authentication-token"));
 
 	if (!accessToken.isEmpty() && m_jwtSessionControllerCompPtr.IsValid()){
@@ -84,9 +84,9 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 
+	imtgql::IGqlContext* gqlContextPtr = nullptr;
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
 		QString errorMessage;
-
 		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(m_lastRequest, accessToken, headers, errorMessage);
 		if (gqlContextPtr != nullptr){
 			m_lastRequest.SetGqlContext(gqlContextPtr);
@@ -102,9 +102,9 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 	else if (!headers.isEmpty()){
-		imtgql::CGqlContext* gqlContextImplPtr = new imtgql::CGqlContext();
-		gqlContextImplPtr->SetHeaders(headers);
-		m_lastRequest.SetGqlContext(gqlContextImplPtr);
+		gqlContextPtr = new imtgql::CGqlContext();
+		gqlContextPtr->SetHeaders(headers);
+		m_lastRequest.SetGqlContext(gqlContextPtr);
 	}
 
 	QByteArray responseData;
@@ -126,6 +126,8 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		QString errorType = QStringLiteral("Warning");
 		istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr;
 		sourceItemModelPtr.SetPtr(requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage));
+
+		imtgql::CGqlRequestContextManager::Clear();
 
 		bool isError = false;
 		imtbase::CTreeItemModel rootModel;

@@ -447,6 +447,13 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 
 bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == sdl::imtauth::Roles::CRoleItemGqlRequest::GetCommandId() ||
+		commandId == sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest::GetCommandId() ||
+		commandId == sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest::GetCommandId()){
+		return true;
+	}
+
 	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
 }
 

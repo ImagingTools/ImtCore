@@ -22,7 +22,7 @@ public:
 	void AddParam(const QByteArray& paramId, const CGqlParamObject& param);
 	void AddField(const QByteArray& fieldId, const CGqlFieldObject& field);
 	void AddSimpleField(const QByteArray& fieldId);
-	void SetGqlContext(const imtgql::IGqlContext* gqlContext);
+	void SetGqlContext(IGqlContext* gqlContext);
 	void SetRequestType(RequestType requestType);
 	void SetCommandId(const QByteArray& commandId);
 	QByteArray GetHeader(QByteArray headerId) const;

@@ -576,6 +576,9 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SubscriberDemultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="CachedGroupCollection" ComponentId="RemoteRepositories/CachedGroupCollection"/>
+        <Component ExportedId="CachedRoleCollection" ComponentId="RemoteRepositories/CachedRoleCollection"/>
+        <Component ExportedId="CachedUserCollection" ComponentId="RemoteRepositories/CachedUserCollection"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="RemoteRepositories/GroupRemoteRepository"/>
         <Component ExportedId="RoleRemoteRepository" ComponentId="RemoteRepositories/RoleRemoteRepository"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="RemoteRepositories/UserRemoteRepository"/>

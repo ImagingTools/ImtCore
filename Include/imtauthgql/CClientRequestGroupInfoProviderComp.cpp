@@ -9,6 +9,7 @@
 #include <imtbase/imtbase.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Groups.h>
 
 
@@ -28,7 +29,7 @@ const imtbase::ICollectionInfo& CClientRequestGroupInfoProviderComp::GetUserGrou
 }
 
 
-imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGroup(const QByteArray& groupId, const iprm::IParamsSet* paramsPtr) const
+imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGroup(const QByteArray& groupId, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!m_userGroupFactoryCompPtr.IsValid()){
 		return nullptr;
@@ -48,19 +49,13 @@ imtauth::IUserGroupInfoSharedPtr CClientRequestGroupInfoProviderComp::GetUserGro
 	arguments.input.Version_1_0->productId = productId;
 
 	imtgql::CGqlRequest gqlRequest;
-
-	if (paramsPtr != nullptr){
-		iprm::TParamsPtr<iprm::IIdParam> tokenParamPtr(paramsPtr, imtbase::s_authenticationTokenHeaderId);
-		if (tokenParamPtr.IsValid()){
-			QByteArray token = tokenParamPtr->GetId();
-			imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
-			gqlContextPtr->SetToken(token);
-			gqlRequest.SetGqlContext(gqlContextPtr);
-		}
-	}
-
 	if (!userssdl::CGroupItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return nullptr;
+	}
+
+	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (gqlContextPtr != nullptr){
+		gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
 	}
 
 	QString errorMessage;

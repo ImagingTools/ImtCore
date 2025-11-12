@@ -24,20 +24,21 @@ protected:
 	// reimplemented (sdl::imtbase::Commands::CGraphQlHandlerCompBase)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual sdl::imtbase::Commands::CGuiElementContainer OnGetCommands(
-		const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const override;
-	
+				const sdl::imtbase::Commands::CGetCommandsGqlRequest& getCommandsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
+	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
 private:
 	bool GetRepresentationFromGuiElementContainer(
-		const imtserverapp::IGuiElementContainer& guiElementContainer,
-		sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
-		const QByteArray languageId,
-		const imtauth::IUserInfo* userInfoPtr) const;
+				const imtserverapp::IGuiElementContainer& guiElementContainer,
+				sdl::imtbase::Commands::CGuiElementContainer::V1_0& representation,
+				const QByteArray languageId,
+				const imtauth::IUserInfo* userInfoPtr) const;
 	bool GetRepresentationFromGuiElement(
-		const imtserverapp::IGuiElementModel& guiElementModel,
-		sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
-		const QByteArray languageId) const;
+				const imtserverapp::IGuiElementModel& guiElementModel,
+				sdl::imtbase::Commands::CGuiElementModel::V1_0& representation,
+				const QByteArray languageId) const;
 	QString TranslateName(const QString& name, const QString& context, const QByteArray& languageId) const;
 	
 protected:

@@ -64,6 +64,9 @@ protected:
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
+	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
 private:
 	bool SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const;
 	imtauth::IUserInfoSharedPtr GetUserInfoByLogin(const QByteArray& login) const;

@@ -9,6 +9,7 @@
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
 
 
 namespace imtauthgql
@@ -35,11 +36,9 @@ protected:
 	{
 		imtgql::CGqlRequest gqlRequest;
 	
-		if (m_accessTokenProviderCompPtr.IsValid()){
-			QByteArray accessToken = m_accessTokenProviderCompPtr->GetToken("");
-			imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
-			gqlContextPtr->SetToken(accessToken);
-			gqlRequest.SetGqlContext(gqlContextPtr);
+		imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+		if (gqlContextPtr != nullptr){
+			gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
 		}
 	
 		if (!SdlRequest::SetupGqlRequest(gqlRequest, arguments)){

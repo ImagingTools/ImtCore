@@ -62,7 +62,7 @@ public:
 				const QString& description,
 				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-	virtual imtgql::IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const override;
+	virtual imtgql::IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual imtgql::IGqlRequest* CreateSetObjectRequest(
 				const QByteArray& objectId,
 				const QByteArray& typeId,

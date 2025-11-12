@@ -22,14 +22,6 @@
         <Element ComponentName="UserInfo" X="1050" Y="650" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="DocumentRevision">
-            <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="850" Y="200" Note=""/>
-                <Element ComponentName="RemoteDocumentRevisionController" X="575" Y="75" Note=""/>
-                <Element ComponentName="RevisionPermissions" X="250" Y="200" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="RemoteControllers">
             <PositionMap>
                 <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
@@ -39,6 +31,14 @@
                 <Element ComponentName="RemoteRepresentationController" X="600" Y="200" Note=""/>
                 <Element ComponentName="RemoteUserController" X="250" Y="200" Note=""/>
                 <Element ComponentName="RoleRemoteCollectionController" X="950" Y="550" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="DocumentRevision">
+            <PositionMap>
+                <Element ComponentName="CheckPermissionOr" X="850" Y="200" Note=""/>
+                <Element ComponentName="RemoteDocumentRevisionController" X="575" Y="75" Note=""/>
+                <Element ComponentName="RevisionPermissions" X="250" Y="200" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

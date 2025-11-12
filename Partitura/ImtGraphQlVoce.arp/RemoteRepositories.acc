@@ -10,6 +10,33 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="CachedGroupCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GroupRemoteRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CachedRoleCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleRemoteRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CachedUserCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserRemoteRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="GroupRemoteRepository" PackageId="ImtGraphQlVoce" ComponentId="RemoteRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -76,14 +103,18 @@
         </Element>
         <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
             <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParentRoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleCollectionAdapter"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="RoleCollectionAdapter" PackageId="ImtAuthPck" ComponentId="RoleCollectionAdapter">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RoleRemoteRepository"/>
+                        <Data IsEnabled="true" Value="CachedRoleCollection"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -181,14 +212,21 @@
         </Element>
         <Element Id="UserGroupInfo" PackageId="ImtAuthPck" ComponentId="UserGroupInfo">
             <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleCollectionAdapter"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupInfoProvider"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="UserGroupInfoProvider" PackageId="ImtAuthPck" ComponentId="UserGroupInfoProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GroupRemoteRepository"/>
+                        <Data IsEnabled="true" Value="CachedGroupCollection"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -343,6 +381,9 @@
         <Interface InterfaceId="imtgql::IGqlSubscriberController" ComponentId="SlaveSubscriberController"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="CachedGroupCollection" ComponentId="CachedGroupCollection"/>
+        <Component ExportedId="CachedRoleCollection" ComponentId="CachedRoleCollection"/>
+        <Component ExportedId="CachedUserCollection" ComponentId="CachedUserCollection"/>
         <Component ExportedId="GroupRemoteRepository" ComponentId="GroupRemoteRepository"/>
         <Component ExportedId="Role" ComponentId="Role"/>
         <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleCollectionAdapter"/>

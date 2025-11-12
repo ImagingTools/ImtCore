@@ -10,9 +10,9 @@ namespace imtauthgql
 // reimplemented (sdl::imtauth::AuthorizationOptions::CGraphQlHandlerCompBase)
 
 sdl::imtauth::AuthorizationOptions::CUserManagementPayload CAuthorizationOptionsControllerComp::OnGetUserMode(
-	const sdl::imtauth::AuthorizationOptions::CGetUserModeGqlRequest& /*getUserModeRequest*/,
-	const ::imtgql::CGqlRequest& /*gqlRequest*/,
-	QString& /*errorMessage*/) const
+			const sdl::imtauth::AuthorizationOptions::CGetUserModeGqlRequest& /*getUserModeRequest*/,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	if (!m_selectionParamCompPtr.IsValid()){
 		Q_ASSERT_X(false, "Unable to get an user mode. Error: Reference 'SelectionParam' was not set", "CAuthorizationOptionsControllerComp");
@@ -48,4 +48,19 @@ sdl::imtauth::AuthorizationOptions::CUserManagementPayload CAuthorizationOptions
 }
 
 
+// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+
+bool CAuthorizationOptionsControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == sdl::imtauth::AuthorizationOptions::CGetUserModeGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
+}
+
+
 } // namespace imtauthgql
+
+

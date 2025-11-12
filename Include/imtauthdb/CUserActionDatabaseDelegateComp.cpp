@@ -16,52 +16,9 @@ namespace imtauthdb
 
 // reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
 
-QString CUserActionDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+QString CUserActionDatabaseDelegateComp::CreateAdditionalFiltersQuery(const iprm::IParamsSet& /*filterParams*/) const
 {
-	QString filterQuery;
-
-	// iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
-	// if (paramIds.contains("GroupFilter")){
-	// 	iprm::TParamsPtr<imtauth::IUserGroupFilter> filterParamPtr(&filterParams, "GroupFilter");
-	// 	if (filterParamPtr.IsValid()){
-	// 		QByteArray userId = filterParamPtr->GetUserId();
-	// 		QByteArrayList groupIds = filterParamPtr->GetGroupIds();
-
-	// 		if (!groupIds.isEmpty()){
-	// 			QString array = "array[";
-
-	// 			for (int i = 0; i < groupIds.size(); i++){
-	// 				if (i > 0){
-	// 					array += ",";
-	// 				}
-
-	// 				array += "'" + groupIds[i] + "'";
-	// 			}
-
-	// 			array += "]";
-
-	// 			filterQuery += QString(R"((users."Document"->'Groups' ?| %1))").arg(array);
-	// 		}
-	// 		else{
-	// 			filterQuery += QString(R"(users."Document"->>'Id' = '%1')").arg(qPrintable(userId));
-	// 		}
-	// 	}
-	// }
-
-	return filterQuery;
-}
-
-
-QByteArray CUserActionDatabaseDelegateComp::CreateJoinTablesQuery() const
-{
-	// return QByteArray(R"(
-	// 		LEFT JOIN "Users" AS users
-	// 			ON (
-	// 				users."DocumentId"::text = root."DataMetaInfo"->>'userId'
-	// 				AND users."State" = 'Active'
-	// 			)
-	// )");
-	return QByteArray();
+	return QString();
 }
 
 

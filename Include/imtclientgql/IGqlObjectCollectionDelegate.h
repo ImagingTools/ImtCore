@@ -70,7 +70,7 @@ public:
 				const QString& description,
 				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual imtgql::IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const = 0;
+	virtual imtgql::IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 	virtual imtgql::IGqlRequest* CreateSetObjectRequest(
 				const QByteArray& objectId,
 				const QByteArray& typeId,

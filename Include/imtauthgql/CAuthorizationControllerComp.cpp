@@ -334,6 +334,14 @@ sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogo
 }
 
 
+// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+
+bool CAuthorizationControllerComp::CheckPermissions(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
+{
+	return true;
+}
+
+
 } // namespace imtauthgql
 
 

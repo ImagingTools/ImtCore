@@ -567,6 +567,21 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 }
 
 
+// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
+
+bool CUserControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	QByteArray commandId = gqlRequest.GetCommandId();
+	if (commandId == sdl::imtauth::Users::CCheckSuperuserExistsGqlRequest::GetCommandId() ||
+		commandId == sdl::imtauth::Users::CCreateSuperuserGqlRequest::GetCommandId() ||
+		commandId == sdl::imtauth::Users::CRegisterUserGqlRequest::GetCommandId()){
+		return true;
+	}
+
+	return BaseClass::CheckPermissions(gqlRequest, errorMessage);
+}
+
+
 // private methods
 
 bool CUserControllerComp::SendUserCode(const QByteArray& userId, const imtauth::IUserInfo& userInfo) const

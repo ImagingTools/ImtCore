@@ -831,9 +831,9 @@ imtbase::CTreeItemModel* CLegacyObjectCollectionControllerCompBase::GetHeaders(
 	imtgql::CGqlRequest headersRequest;
 	const imtgql::IGqlContext* gqlContext = gqlRequest.GetRequestContext();
 	if(gqlContext != nullptr){
-		const istd::IChangeable* clonePtr = gqlContext->CloneMe();
+		istd::IChangeable* clonePtr = gqlContext->CloneMe();
 		if(clonePtr != nullptr){
-			const imtgql::IGqlContext* headerGqlContext = dynamic_cast<const imtgql::IGqlContext*>(clonePtr);
+			imtgql::IGqlContext* headerGqlContext = dynamic_cast<imtgql::IGqlContext*>(clonePtr);
 			headersRequest.SetGqlContext(headerGqlContext);
 		}
 	}

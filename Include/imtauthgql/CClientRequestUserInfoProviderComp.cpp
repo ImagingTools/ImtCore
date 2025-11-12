@@ -9,6 +9,7 @@
 #include <imtbase/imtbase.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtgql/CGqlContext.h>
+#include <imtgql/CGqlRequestContextManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
 
 
@@ -28,7 +29,7 @@ const imtbase::ICollectionInfo& CClientRequestUserInfoProviderComp::GetUserList(
 }
 
 
-const imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QByteArray& userId, const iprm::IParamsSet* paramsPtr) const
+const imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QByteArray& userId, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	namespace userssdl = sdl::imtauth::Users;
 
@@ -42,14 +43,9 @@ const imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(co
 
 	imtgql::CGqlRequest gqlRequest;
 
-	if (paramsPtr != nullptr){
-		iprm::TParamsPtr<iprm::IIdParam> tokenParamPtr(paramsPtr, imtbase::s_authenticationTokenHeaderId);
-		if (tokenParamPtr.IsValid()){
-			QByteArray token = tokenParamPtr->GetId();
-			imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
-			gqlContextPtr->SetToken(token);
-			gqlRequest.SetGqlContext(gqlContextPtr);
-		}
+	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (gqlContextPtr != nullptr){
+		gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
 	}
 
 	if (!userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
