@@ -9,7 +9,6 @@
 // ImtCore includes
 #include <imtbase/imtbase.h>
 #include <imtauth/IUserSettings.h>
-#include <imtgql/IRequestContextController.h>
 #include <imtgql/CGqlContext.h>
 #include <imtgql/CGqlRequestContextManager.h>
 
