@@ -153,6 +153,10 @@ bool CSimpleLoginWrapComp::HasRight(
 		return false;
 	}
 
+	if (m_userPermissionIds.isEmpty()){
+		return false;
+	}
+
 	bool retVal = m_checkPermissionCompPtr->CheckPermission(m_userPermissionIds, QByteArrayList() << operationId);
 
 	return retVal;
