@@ -456,11 +456,40 @@ bool CUserGroupCollectionControllerComp::UpdateObjectFromRepresentationRequest(
 
 bool CUserGroupCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	QByteArrayList availableGroupIds;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		QByteArray productId = gqlContextPtr->GetProductId();
+		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			availableGroupIds = userInfoPtr->GetGroups();
+		}
+	}
+
 	QByteArray commandId = gqlRequest.GetCommandId();
 	if (commandId == sdl::imtauth::Groups::CGroupItemGqlRequest::GetCommandId() ||
 		commandId == sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest::GetCommandId() ||
 		commandId == sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest::GetCommandId()){
 		return true;
+	}
+
+	QByteArray groupId;
+	if (commandId == sdl::imtauth::Groups::CGroupItemGqlRequest::GetCommandId()){
+		sdl::imtauth::Groups::CGroupItemGqlRequest groupItemGqlRequest(gqlRequest, false);
+		if (groupItemGqlRequest.IsValid()){
+			auto arguments = groupItemGqlRequest.GetRequestedArguments();
+			if (arguments.input.Version_1_0.HasValue()){
+				if (arguments.input.Version_1_0->id.HasValue()){
+					groupId = *arguments.input.Version_1_0->id;
+				}
+			}
+		}
+	}
+	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest::GetCommandId()){
+		groupId = ExtractObjectIdFromGetObjectTypeIdGqlRequest(gqlRequest);
+	}
+	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest::GetCommandId()){
+		groupId = ExtractObjectIdFromGetObjectDataGqlRequest(gqlRequest);
 	}
 
 	return BaseClass::CheckPermissions(gqlRequest, errorMessage);

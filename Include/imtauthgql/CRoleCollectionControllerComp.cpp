@@ -448,9 +448,36 @@ void CRoleCollectionControllerComp::SetAdditionalFilters(
 bool CRoleCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	QByteArray commandId = gqlRequest.GetCommandId();
-	if (commandId == sdl::imtauth::Roles::CRoleItemGqlRequest::GetCommandId() ||
-		commandId == sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest::GetCommandId() ||
-		commandId == sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest::GetCommandId()){
+	QByteArrayList availableRoleIds;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		QByteArray productId = gqlContextPtr->GetProductId();
+		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+		if (userInfoPtr != nullptr){
+			availableRoleIds = userInfoPtr->GetRoles(productId);
+		}
+	}
+
+	QByteArray roleId;
+	if (commandId == sdl::imtauth::Roles::CRoleItemGqlRequest::GetCommandId()){
+		sdl::imtauth::Roles::CRoleItemGqlRequest roleItemGqlRequest(gqlRequest, false);
+		if (roleItemGqlRequest.IsValid()){
+			auto arguments = roleItemGqlRequest.GetRequestedArguments();
+			if (arguments.input.Version_1_0.HasValue()){
+				if (arguments.input.Version_1_0->id.HasValue()){
+					roleId = *arguments.input.Version_1_0->id;
+				}
+			}
+		}
+	}
+	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest::GetCommandId()){
+		roleId = ExtractObjectIdFromGetObjectTypeIdGqlRequest(gqlRequest);
+	}
+	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest::GetCommandId()){
+		roleId = ExtractObjectIdFromGetObjectDataGqlRequest(gqlRequest);
+	}
+
+	if (availableRoleIds.contains(roleId)){
 		return true;
 	}
 

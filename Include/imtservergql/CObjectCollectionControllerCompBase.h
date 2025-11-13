@@ -313,6 +313,9 @@ protected:
 				const QString& description,
 				const imtgql::CGqlRequest& gqlRequest) const;
 
+	QByteArray ExtractObjectIdFromGetObjectTypeIdGqlRequest(const imtgql::CGqlRequest& gqlRequest) const;
+	QByteArray ExtractObjectIdFromGetObjectDataGqlRequest(const imtgql::CGqlRequest& gqlRequest) const;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 

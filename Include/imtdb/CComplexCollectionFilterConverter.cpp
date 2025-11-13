@@ -134,7 +134,7 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 	}
 	else if (boolTypes.contains(filter.filterValue.type()) && boolOperations.contains(filter.filterOperation)){
 		bool value = filter.filterValue.toBool();
-		QString columnExpr = sqlContext == SC_POSTGRES ? QString("(\"%1\")::bool").arg(qPrintable(filter.fieldId))
+		QString columnExpr = sqlContext == SC_POSTGRES ? QString("coalesce((\"%1\")::bool, false)").arg(qPrintable(filter.fieldId))
 										: QString("\"%1\"").arg(qPrintable(filter.fieldId));
 		retVal = QString("%1 %2 %3").arg(columnExpr, boolOperations[filter.filterOperation], value ? "true" : "false");
 	}

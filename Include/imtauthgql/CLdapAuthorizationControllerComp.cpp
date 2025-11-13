@@ -192,10 +192,11 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 					userInfoPtr.SetCastedOrRemove(const_cast<imtauth::CUserInfo*>(CreateUserInfoFromLdapUser(login)));
 					if (!userInfoPtr.IsValid()){
 						userInfoPtr.SetPtr(new imtauth::CIdentifiableUserInfo);
-
+						userInfoPtr->SetObjectUuid(QUuid::createUuid().toByteArray(QUuid::WithoutBraces));
 						userInfoPtr->SetId(login);
+						userInfoPtr->SetName(login);
 					}
-					
+
 					userObjectId = userInfoPtr->GetObjectUuid();
 
 					imtauth::IUserInfo::SystemInfo systemInfo;

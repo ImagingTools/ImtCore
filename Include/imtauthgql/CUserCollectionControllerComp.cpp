@@ -703,6 +703,7 @@ bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		requestOwnerId = gqlContextPtr->GetUserId();
 	}
 
+	QByteArray requestedUserId;
 	QByteArray commandId = gqlRequest.GetCommandId();
 	if (commandId == sdl::imtauth::Users::CUserItemGqlRequest::GetCommandId()){
 		sdl::imtauth::Users::CUserItemGqlRequest userItemGqlRequest(gqlRequest, false);
@@ -710,39 +711,20 @@ bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 			sdl::imtauth::Users::UserItemRequestArguments arguments = userItemGqlRequest.GetRequestedArguments();
 			if (arguments.input.Version_1_0.HasValue()){
 				if (arguments.input.Version_1_0->id.HasValue()){
-					QByteArray requestedUserId = *arguments.input.Version_1_0->id;
-					if (requestOwnerId == requestedUserId){
-						return true;
-					}
+					requestedUserId = *arguments.input.Version_1_0->id;
 				}
 			}
 		}
 	}
 	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest::GetCommandId()){
-		sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest getObjectDataGqlRequest(gqlRequest, false);
-		if (getObjectDataGqlRequest.IsValid()){
-			auto arguments = getObjectDataGqlRequest.GetRequestedArguments();
-			if (arguments.input.Version_1_0.HasValue()){
-				if (arguments.input.Version_1_0->objectId.HasValue()){
-					if (requestOwnerId == *arguments.input.Version_1_0->objectId){
-						return true;
-					}
-				}
-			}
-		}
+		requestedUserId = ExtractObjectIdFromGetObjectDataGqlRequest(gqlRequest);
 	}
 	else if (commandId == sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest::GetCommandId()){
-		sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest getObjectTypeIdGqlRequest(gqlRequest, false);
-		if (getObjectTypeIdGqlRequest.IsValid()){
-			auto arguments = getObjectTypeIdGqlRequest.GetRequestedArguments();
-			if (arguments.input.Version_1_0.HasValue()){
-				if (arguments.input.Version_1_0->objectId.HasValue()){
-					if (requestOwnerId == *arguments.input.Version_1_0->objectId){
-						return true;
-					}
-				}
-			}
-		}
+		requestedUserId = ExtractObjectIdFromGetObjectTypeIdGqlRequest(gqlRequest);
+	}
+
+	if (requestOwnerId == requestedUserId){
+		return true;
 	}
 
 	return BaseClass::CheckPermissions(gqlRequest, errorMessage);

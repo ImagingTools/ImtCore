@@ -2896,6 +2896,37 @@ void CObjectCollectionControllerCompBase::OnAfterSetObjectDescription(
 }
 
 
+QByteArray CObjectCollectionControllerCompBase::ExtractObjectIdFromGetObjectTypeIdGqlRequest(const imtgql::CGqlRequest& gqlRequest) const
+{
+	sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest getObjectTypeIdGqlRequest(gqlRequest, false);
+	if (getObjectTypeIdGqlRequest.IsValid()){
+		auto arguments = getObjectTypeIdGqlRequest.GetRequestedArguments();
+		if (arguments.input.Version_1_0.HasValue()){
+			if (arguments.input.Version_1_0->objectId.HasValue()){
+				return *arguments.input.Version_1_0->objectId;
+			}
+		}
+	}
+
+	return QByteArray();
+}
+
+
+QByteArray CObjectCollectionControllerCompBase::ExtractObjectIdFromGetObjectDataGqlRequest(const imtgql::CGqlRequest& gqlRequest) const
+{
+	sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest getObjectDataGqlRequest(gqlRequest, false);
+	if (getObjectDataGqlRequest.IsValid()){
+		auto arguments = getObjectDataGqlRequest.GetRequestedArguments();
+		if (arguments.input.Version_1_0.HasValue()){
+			if (arguments.input.Version_1_0->objectId.HasValue()){
+				return *arguments.input.Version_1_0->objectId;
+			}
+		}
+	}
+
+	return QByteArray();
+}
+
 bool CObjectCollectionControllerCompBase::SerializeObject(
 			istd::IChangeable& object,
 			QByteArray& objectData) const
