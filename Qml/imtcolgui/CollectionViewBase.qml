@@ -375,7 +375,7 @@ ViewBase {
 		width: parent.width;
 		height: !visible ? 0 : Style.controlHeightM;
 		color: pagination_.color;
-		visible: collectionViewBaseContainer.hasPagination
+		visible: pagination_.visible && collectionViewBaseContainer.hasPagination
 		
 		Pagination {
 			id: pagination_;
