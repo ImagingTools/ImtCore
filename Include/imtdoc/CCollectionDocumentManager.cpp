@@ -226,7 +226,7 @@ imtdoc::IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocume
 	}
 
 	workingDocument.objectId =
-		collectionPtr->InsertNewObject(workingDocument.objectTypeId, "", "", workingDocument.objectPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocument.objectTypeId, QUuid::createUuid().toByteArray(QUuid::WithoutBraces), "", workingDocument.objectPtr.GetPtr());
 
 	if (!workingDocument.objectId.isEmpty()){
 		workingDocument.isDirty = false;
