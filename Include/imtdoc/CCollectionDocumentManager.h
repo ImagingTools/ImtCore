@@ -32,11 +32,14 @@ public:
 	virtual DocumentList GetOpenedDocumentList(const QByteArray& userId) const override;
 	virtual QByteArray CreateNewDocument(const QByteArray& userId, const QByteArray& documentTypeId) override;
 	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) override;
-	virtual bool GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
-	virtual bool SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
+	virtual OperationStatus GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const override;
+	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) override;
+	virtual OperationStatus GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const override;
+	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) override;
 	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) override;
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) override;
-	virtual idoc::IUndoManager* GetDocumentUndoManager(const QByteArray& userId, const QByteArray& documentId) const override;
+	virtual OperationStatus GetDocumentUndoManager(
+		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -47,9 +50,11 @@ public:
 protected:
 	struct WorkingDocument;
 
+	bool ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const;
 	void OnUndoManagerChanged(int modelId);
 	int GetUndoManagerNextModelId(const QByteArray& userId);
 	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
+	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
 	void InitializeDocumentObservers(
 		WorkingDocument& document,
@@ -64,6 +69,7 @@ protected:
 	{
 		QByteArray objectId;
 		QByteArray objectTypeId;
+		QString documentName;
 		istd::IChangeableSharedPtr objectPtr;
 		idoc::IUndoManagerSharedPtr undoManagerPtr;
 		bool isDirty;
@@ -83,7 +89,7 @@ protected:
 	};
 
 	typedef QMap<QByteArray, WorkingDocument> WorkingDocumentList;
-	QMap<QByteArray, WorkingDocumentList> m_userDocuments;
+	mutable QMap<QByteArray, WorkingDocumentList> m_userDocuments;
 	mutable QRecursiveMutex m_mutex;
 
 	UndoManagerObserver m_undoManagerObserver;

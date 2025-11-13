@@ -20,6 +20,7 @@ public:
 	{
 		CF_NEW_DOCUMENT_CREATED = 170000,
 		CF_DOCUMENT_OPENED,
+		CF_DOCUMENT_RENAMED,
 		CF_DOCUMENT_CHANGED,
 		CF_DOCUMENT_UNDO_CHANGED,
 		CF_DOCUMENT_SAVED,
@@ -39,6 +40,7 @@ public:
 		QByteArray documentId;
 		QByteArray objectId;
 		QByteArray objectTypeId;
+		QString documentName;
 		bool isDirty;
 	};
 	typedef QList<DocumentInfo> DocumentList;
@@ -72,6 +74,9 @@ public:
 	static const QByteArray CN_DOCUMENT_OPENED;
 	typedef DocumentNotification DocumentOpenedInfo;
 
+	static const QByteArray CN_DOCUMENT_RENAMED;
+	typedef DocumentNotification DocumentRenamedInfo;
+
 	static const QByteArray CN_DOCUMENT_CHANGED;
 	typedef DocumentNotification DocumentChangedInfo;
 
@@ -94,12 +99,14 @@ public:
 			collection:///objectId				- for single collection document manager (or default collection)
 	*/
 	virtual QByteArray OpenDocument(const QByteArray& userId, const QUrl& url) = 0;
-	virtual bool GetDocumentData(const QByteArray & userId, const QByteArray & documentId, istd::IChangeableSharedPtr& documentPtr) const = 0;
-	virtual bool SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
+	virtual OperationStatus GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const = 0;
+	virtual OperationStatus SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) = 0;
+	virtual OperationStatus GetDocumentData(const QByteArray & userId, const QByteArray & documentId, istd::IChangeableSharedPtr& documentPtr) const = 0;
+	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
 	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
-	virtual idoc::IUndoManager* GetDocumentUndoManager(
-		const QByteArray& userId, const QByteArray& documentId) const = 0;
+	virtual OperationStatus GetDocumentUndoManager(
+		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const = 0;
 };
 
 

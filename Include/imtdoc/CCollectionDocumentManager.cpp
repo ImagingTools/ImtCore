@@ -26,7 +26,7 @@ CCollectionDocumentManager::CCollectionDocumentManager()
 
 // reimplemented (imtdoc::IDocumentManager)
 
-imtdoc::IDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList(
+IDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList(
 	const QByteArray& userId) const
 {
 	QMutexLocker locker(&m_mutex);
@@ -159,35 +159,93 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 }
 
 
-bool CCollectionDocumentManager::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
+IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentName(const QByteArray& userId, const QByteArray& documentId, QString& documentName) const
 {
+	OperationStatus retVal;
+
 	QMutexLocker locker(&m_mutex);
 
-	if (m_userDocuments.contains(userId) && m_userDocuments[userId].contains(documentId)) {
-		documentPtr.SetPtr(m_userDocuments[userId][documentId].objectPtr->CloneMe());
-
-		return documentPtr.IsValid();
+	if (!ValidateInputParams(userId, documentId, retVal)){
+		return retVal;
 	}
 
-	return false;
+	documentName = m_userDocuments[userId][documentId].documentName;
+
+	return retVal;
 }
 
 
-bool CCollectionDocumentManager::SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document)
+IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentName(const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
+	OperationStatus retVal;
+
 	QMutexLocker locker(&m_mutex);
 
-	if (m_userDocuments.contains(userId) && m_userDocuments[userId].contains(documentId)){
-		return m_userDocuments[userId][documentId].objectPtr->CopyFrom(document);
+	if (!ValidateInputParams(userId, documentId, retVal)){
+		return retVal;
 	}
 
-	return false;
+	QByteArray objectId = m_userDocuments[userId][documentId].objectId;
+	if (!objectId.isEmpty()){
+		imtbase::IObjectCollection* collectionPtr = GetCollection();
+		if (collectionPtr == nullptr){
+			return OS_FAILED;
+		}
+
+		if (!collectionPtr->SetElementName(objectId, documentName)) {
+			return OS_FAILED;
+		}
+	}
+
+	DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
+	Q_ASSERT(notificationPtr != nullptr);
+	if (notificationPtr != nullptr){
+		istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_RENAMED);
+		changeSet.SetChangeInfo(CN_DOCUMENT_RENAMED, QVariant::fromValue(*notificationPtr));
+		istd::CChangeNotifier notifier(this, &changeSet);
+	}
+
+	m_userDocuments[userId][documentId].documentName = documentName;
+
+	return OS_OK;
 }
 
 
-imtdoc::IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
+IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
+{
+	OperationStatus retVal;
+
+	QMutexLocker locker(&m_mutex);
+
+	if (!ValidateInputParams(userId, documentId, retVal)){
+		return retVal;
+	}
+
+	documentPtr.SetPtr(m_userDocuments[userId][documentId].objectPtr->CloneMe());
+
+	return documentPtr.IsValid() ? OS_OK : OS_FAILED;
+}
+
+
+IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document)
+{
+	OperationStatus retVal;
+
+	QMutexLocker locker(&m_mutex);
+
+	if (!ValidateInputParams(userId, documentId, retVal)){
+		return retVal;
+	}
+
+	return m_userDocuments[userId][documentId].objectPtr->CopyFrom(document) ? OS_OK : OS_FAILED;
+}
+
+
+IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
+	OperationStatus retVal;
+
 	imtbase::IObjectCollection* collectionPtr = GetCollection();
 	if (collectionPtr == nullptr) {
 		return OS_FAILED;
@@ -195,20 +253,16 @@ imtdoc::IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocume
 
 	QMutexLocker locker(&m_mutex);
 
-	if (!m_userDocuments.contains(userId)) {
-		return OS_INVALID_USER_ID;
-	}
-
-	if (!m_userDocuments[userId].contains(documentId)) {
-		return OS_INVALID_DOCUMENT_ID;
+	if (!ValidateInputParams(userId, documentId, retVal)){
+		return retVal;
 	}
 
 	WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
 
 	if (!workingDocument.objectId.isEmpty()) {
-		bool retVal = collectionPtr->SetObjectData(workingDocument.objectId, *workingDocument.objectPtr);
+		bool res = collectionPtr->SetObjectData(workingDocument.objectId, *workingDocument.objectPtr);
 
-		if (retVal){
+		if (res){
 			workingDocument.isDirty = false;
 
 			DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
@@ -222,11 +276,11 @@ imtdoc::IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocume
 			workingDocument.undoManagerPtr->StoreDocumentState();
 		}
 
-		return retVal ? OS_OK : OS_FAILED;
+		return res ? OS_OK : OS_FAILED;
 	}
 
 	workingDocument.objectId =
-		collectionPtr->InsertNewObject(workingDocument.objectTypeId, QUuid::createUuid().toByteArray(QUuid::WithoutBraces), "", workingDocument.objectPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocument.objectTypeId, workingDocument.documentName, "", workingDocument.objectPtr.GetPtr());
 
 	if (!workingDocument.objectId.isEmpty()){
 		workingDocument.isDirty = false;
@@ -246,17 +300,15 @@ imtdoc::IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocume
 }
 
 
-imtdoc::IDocumentManager::OperationStatus CCollectionDocumentManager::CloseDocument(
+IDocumentManager::OperationStatus CCollectionDocumentManager::CloseDocument(
 	const QByteArray& userId, const QByteArray& documentId)
 {
+	OperationStatus retVal;
+
 	QMutexLocker locker(&m_mutex);
 
-	if (!m_userDocuments.contains(userId)) {
-		return OS_INVALID_USER_ID;
-	}
-
-	if (!m_userDocuments[userId].contains(documentId)) {
-		return OS_INVALID_DOCUMENT_ID;
+	if (!ValidateInputParams(userId, documentId, retVal)){
+		return retVal;
 	}
 
 	DocumentClosedNotification notification;
@@ -280,16 +332,22 @@ imtdoc::IDocumentManager::OperationStatus CCollectionDocumentManager::CloseDocum
 }
 
 
-idoc::IUndoManager* CCollectionDocumentManager::GetDocumentUndoManager(
-	const QByteArray& userId, const QByteArray& documentId) const
+IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentUndoManager(
+	const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const
 {
+	undoManagerPtr = nullptr;
+
+	OperationStatus retVal;
+
 	QMutexLocker locker(&m_mutex);
 
-	if (m_userDocuments.contains(userId) && m_userDocuments[userId].contains(documentId)) {
-		return m_userDocuments[userId][documentId].undoManagerPtr.GetPtr();
+	if (!ValidateInputParams(userId, documentId, retVal)){
+		return retVal;
 	}
 
-	return nullptr;
+	undoManagerPtr = m_userDocuments[userId][documentId].undoManagerPtr.GetPtr();
+
+	return OS_OK;
 }
 
 
@@ -325,6 +383,24 @@ void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IC
 
 
 // protected methods
+
+bool CCollectionDocumentManager::ValidateInputParams(const QByteArray& userId, const QByteArray& documentId, OperationStatus& status) const
+{
+	if (!m_userDocuments.contains(userId)){
+		status = OS_INVALID_USER_ID;
+
+		return false;
+	}
+
+	if (!m_userDocuments[userId].contains(documentId)){
+		status = OS_INVALID_DOCUMENT_ID;
+
+		return false;
+	}
+
+	return true;
+}
+
 
 void CCollectionDocumentManager::OnUndoManagerChanged(int modelId)
 {
@@ -399,8 +475,7 @@ int CCollectionDocumentManager::GetUndoManagerNextModelId(const QByteArray& user
 
 
 CCollectionDocumentManager::WorkingDocument* CCollectionDocumentManager::FindDocument(
-	const QByteArray& userId,
-	const QByteArray& documentId)
+	const QByteArray& userId, const QByteArray& documentId)
 {
 	if (m_userDocuments.contains(userId)){
 		if (m_userDocuments[userId].contains(documentId)){
@@ -409,6 +484,13 @@ CCollectionDocumentManager::WorkingDocument* CCollectionDocumentManager::FindDoc
 	}
 
 	return nullptr;
+}
+
+
+const CCollectionDocumentManager::WorkingDocument* CCollectionDocumentManager::FindDocument(
+	const QByteArray& userId, const QByteArray& documentId) const
+{
+	return const_cast<CCollectionDocumentManager*>(this)->FindDocument(userId, documentId);
 }
 
 
@@ -474,6 +556,7 @@ IDocumentManager::DocumentNotificationPtr CCollectionDocumentManager::CreateDocu
 		retVal->userId = userId;
 		retVal->documentId = documentId;
 		retVal->objectId = document.objectId;
+		retVal->documentName = document.documentName;
 		retVal->isDirty = document.isDirty;
 	}
 

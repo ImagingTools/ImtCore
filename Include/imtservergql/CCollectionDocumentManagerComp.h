@@ -50,6 +50,14 @@ protected:
 		const sdl::imtbase::CollectionDocumentManager::COpenDocumentGqlRequest& openDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
+	virtual sdl::imtbase::CollectionDocumentManager::CDocumentInfo OnGetDocumentName(
+		const sdl::imtbase::CollectionDocumentManager::CGetDocumentNameGqlRequest& getDocumentNameRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const override;
+	virtual sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus OnSetDocumentName(
+		const sdl::imtbase::CollectionDocumentManager::CSetDocumentNameGqlRequest& setDocumentNameRequest,
+		const ::imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const override;
 	virtual sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus OnSaveDocument(
 		const sdl::imtbase::CollectionDocumentManager::CSaveDocumentGqlRequest& saveDocumentRequest,
 		const ::imtgql::CGqlRequest& gqlRequest,

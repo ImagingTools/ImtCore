@@ -13,6 +13,7 @@ import {
 enum EDocumentOperation{
 	NewDocumentCreated
 	DocumentOpened
+	DocumentRenamed
 	DocumentChanged
 	DocumentSaved
 	DocumentClosed
@@ -34,17 +35,18 @@ type CollectionId {
 }
 
 type ObjectId {
-	collectionId: ID
+	collectionId: ID!
 	id: ID!
 }
 
 type DocumentId {
-	collectionId: ID
+	collectionId: ID!
 	id: ID!
 }
 
 type DocumentInfo {
 	documentId: ID!
+	documentName: String!
 	objectTypeId: ID!
 	objectId: ID!
 	isDirty: Bool!
@@ -55,7 +57,7 @@ type DocumentList {
 }
 
 type DocumentTypeId {
-	collectionId: ID
+	collectionId: ID!
 	typeId: ID!
 }
 
@@ -65,9 +67,10 @@ type DocumentManagerNotification {
 	objectId: ID
 }
 
-type Query {
-	GetOpenedDocumentList(input: CollectionId): DocumentList!
-	GetUndoInfo(input: DocumentId): UndoInfo!
+type SetDocumentNameInput {
+	collectionId: ID!
+	documentId: ID!
+	documentName: String!
 }
 
 type CollectionUndoRedoInput {
@@ -75,9 +78,16 @@ type CollectionUndoRedoInput {
 	undoRedoInput: UndoRedoInput!
 }
 
+type Query {
+	GetOpenedDocumentList(input: CollectionId): DocumentList!
+	GetDocumentName(input: DocumentId): DocumentInfo!
+	GetUndoInfo(input: DocumentId): UndoInfo!
+}
+
 type Mutation {
 	CreateNewDocument(input: DocumentTypeId): DocumentId!
 	OpenDocument(input: ObjectId): DocumentId!
+	SetDocumentName(input: SetDocumentNameInput): DocumentOperationStatus!
 	SaveDocument(input: DocumentId): DocumentOperationStatus!
 	CloseDocument(input: DocumentId): DocumentOperationStatus!
 	DoUndo(input: CollectionUndoRedoInput): UndoStatus!

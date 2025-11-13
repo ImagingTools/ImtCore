@@ -9,8 +9,8 @@ namespace imtservergql
 
 // reimplemented (CGraphQlHandlerCompBase)
 
-sdl::imtbase::CollectionDocumentManager::CDocumentList CCollectionDocumentManagerComp::OnGetOpenedDocumentList(
-	const sdl::imtbase::CollectionDocumentManager::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
+CDM::CDocumentList CCollectionDocumentManagerComp::OnGetOpenedDocumentList(
+	const CDM::CGetOpenedDocumentListGqlRequest& getOpenedDocumentListRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -39,7 +39,10 @@ sdl::imtbase::CollectionDocumentManager::CDocumentList CCollectionDocumentManage
 }
 
 
-sdl::imtbase::CollectionDocumentManager::CDocumentId CCollectionDocumentManagerComp::OnCreateNewDocument(const sdl::imtbase::CollectionDocumentManager::CCreateNewDocumentGqlRequest& createNewDocumentRequest,const::imtgql::CGqlRequest& gqlRequest,QString& errorMessage) const
+CDM::CDocumentId CCollectionDocumentManagerComp::OnCreateNewDocument(
+	const CDM::CCreateNewDocumentGqlRequest& createNewDocumentRequest,
+	const::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
 	CDM::CDocumentId retVal;
 
@@ -73,8 +76,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentId CCollectionDocumentManagerC
 }
 
 
-sdl::imtbase::CollectionDocumentManager::CDocumentId CCollectionDocumentManagerComp::OnOpenDocument(
-	const sdl::imtbase::CollectionDocumentManager::COpenDocumentGqlRequest& openDocumentRequest,
+CDM::CDocumentId CCollectionDocumentManagerComp::OnOpenDocument(
+	const CDM::COpenDocumentGqlRequest& openDocumentRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -112,8 +115,116 @@ sdl::imtbase::CollectionDocumentManager::CDocumentId CCollectionDocumentManagerC
 }
 
 
-sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CCollectionDocumentManagerComp::OnSaveDocument(
-	const sdl::imtbase::CollectionDocumentManager::CSaveDocumentGqlRequest& saveDocumentRequest,
+CDM::CDocumentInfo CCollectionDocumentManagerComp::OnGetDocumentName(
+	const CDM::CGetDocumentNameGqlRequest& getDocumentNameRequest,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
+{
+	CDM::CDocumentInfo retVal;
+
+	const auto& arguments = getDocumentNameRequest.GetRequestedArguments();
+	const auto& info = getDocumentNameRequest.GetRequestInfo();
+
+	auto documentId = arguments.input.Version_1_0;
+	if (!documentId || !documentId->id){
+		errorMessage = "Invalid GQL request params";
+
+		return retVal;
+	}
+
+	QByteArray userId = GetUserId(gqlRequest);
+	if (userId.isEmpty()){
+		errorMessage = "Unable to get user ID from context";
+
+		return retVal;
+	}
+
+
+	QString name;
+	OperationStatus status = GetNonConstThis()->GetDocumentName(userId, *documentId->id, name);
+
+	switch (status){
+	case imtdoc::IDocumentManager::OS_OK:
+	{
+		const WorkingDocument* documentPtr = FindDocument(userId, *documentId->id);
+		Q_ASSERT(documentPtr != nullptr);
+
+		retVal.Version_1_0.emplace();
+		retVal.Version_1_0->documentId = *documentId->id;
+		retVal.Version_1_0->documentName = documentPtr->documentName;
+		retVal.Version_1_0->isDirty = documentPtr->isDirty;
+		retVal.Version_1_0->objectId = documentPtr->objectId;
+		retVal.Version_1_0->objectTypeId = documentPtr->objectTypeId;
+		break;
+	}
+	case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
+		errorMessage = "Invalid user ID";
+		break;
+	case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
+		errorMessage = "Invalid document ID";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+
+	return retVal;
+}
+
+
+CDM::CDocumentOperationStatus CCollectionDocumentManagerComp::OnSetDocumentName(
+	const CDM::CSetDocumentNameGqlRequest& setDocumentNameRequest,
+	const ::imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
+{
+	CDM::CDocumentOperationStatus retVal;
+
+	const auto& arguments = setDocumentNameRequest.GetRequestedArguments();
+	const auto& info = setDocumentNameRequest.GetRequestInfo();
+
+	auto documentId = arguments.input.Version_1_0;
+	if (!documentId || !documentId->documentId || !documentId->documentName){
+		errorMessage = "Invalid GQL request params";
+
+		return retVal;
+	}
+
+	QByteArray userId = GetUserId(gqlRequest);
+	if (userId.isEmpty()){
+		errorMessage = "Unable to get user ID from context";
+
+		return retVal;
+	}
+
+	retVal.Version_1_0.emplace();
+
+	switch (GetNonConstThis()->SetDocumentName(userId, *documentId->documentId, *documentId->documentName)){
+	case imtdoc::IDocumentManager::OS_OK:
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;
+		break;
+	case imtdoc::IDocumentManager::OS_INVALID_USER_ID:
+		errorMessage = "Invalid user ID";
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidUserId;
+		break;
+	case imtdoc::IDocumentManager::OS_INVALID_DOCUMENT_ID:
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::InvalidDocumentId;
+		errorMessage = "Invalid document ID";
+		break;
+	case imtdoc::IDocumentManager::OS_FAILED:
+		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Failed;
+		errorMessage = "Failed to set document name";
+		break;
+	default:
+		Q_ASSERT(false);
+		break;
+	}
+
+	return retVal;
+}
+
+
+CDM::CDocumentOperationStatus CCollectionDocumentManagerComp::OnSaveDocument(
+	const CDM::CSaveDocumentGqlRequest& saveDocumentRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -164,8 +275,8 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CCollectionDoc
 }
 
 
-sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CCollectionDocumentManagerComp::OnCloseDocument(
-	const sdl::imtbase::CollectionDocumentManager::CCloseDocumentGqlRequest& closeDocumentRequest,
+CDM::CDocumentOperationStatus CCollectionDocumentManagerComp::OnCloseDocument(
+	const CDM::CCloseDocumentGqlRequest& closeDocumentRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -213,7 +324,7 @@ sdl::imtbase::CollectionDocumentManager::CDocumentOperationStatus CCollectionDoc
 
 
 sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerComp::OnGetUndoInfo(
-	const sdl::imtbase::CollectionDocumentManager::CGetUndoInfoGqlRequest& getUndoInfoRequest,
+	const CDM::CGetUndoInfoGqlRequest& getUndoInfoRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -290,7 +401,7 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerComp::OnGetUndoIn
 
 
 sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerComp::OnDoUndo(
-	const sdl::imtbase::CollectionDocumentManager::CDoUndoGqlRequest& doUndoRequest,
+	const CDM::CDoUndoGqlRequest& doUndoRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -366,7 +477,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerComp::OnDoUndo(
 
 
 sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerComp::OnDoRedo(
-	const sdl::imtbase::CollectionDocumentManager::CDoRedoGqlRequest& doRedoRequest,
+	const CDM::CDoRedoGqlRequest& doRedoRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
@@ -442,7 +553,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerComp::OnDoRedo(
 
 
 sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerComp::OnResetUndo(
-	const sdl::imtbase::CollectionDocumentManager::CResetUndoGqlRequest& resetUndoRequest,
+	const CDM::CResetUndoGqlRequest& resetUndoRequest,
 	const::imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {

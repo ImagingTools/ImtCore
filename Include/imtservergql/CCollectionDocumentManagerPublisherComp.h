@@ -32,8 +32,6 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
-
-
 	template<class Representation>
 	void PublishRepresentation(
 		const QByteArray& commandId,
@@ -43,7 +41,6 @@ private:
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 };
-
 
 
 // privte methods

@@ -61,6 +61,12 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 
 		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentOpened;
 	}
+	else if (map.contains(imtdoc::IDocumentManager::CN_DOCUMENT_RENAMED)){
+		Q_ASSERT(map.values(imtdoc::IDocumentManager::CN_DOCUMENT_RENAMED).size() == 1);
+		varChanged = map.value(imtdoc::IDocumentManager::CN_DOCUMENT_RENAMED);
+
+		sdlNotificationV1.documentOperation = sdl::imtbase::CollectionDocumentManager::EDocumentOperation::DocumentRenamed;
+	}
 	else if (map.contains(imtdoc::IDocumentManager::CN_DOCUMENT_CHANGED)){
 		Q_ASSERT(map.values(imtdoc::IDocumentManager::CN_DOCUMENT_CHANGED).size() == 1);
 		varChanged = map.value(imtdoc::IDocumentManager::CN_DOCUMENT_CHANGED);
