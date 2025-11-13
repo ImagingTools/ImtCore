@@ -133,6 +133,7 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 			info.userId = userId;
 			info.documentId = retVal;
 			info.objectId = objectId;
+			info.documentName = collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			info.isDirty = false;
 
 			QMutexLocker locker(&m_mutex);
