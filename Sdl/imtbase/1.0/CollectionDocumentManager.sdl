@@ -35,12 +35,12 @@ type CollectionId {
 }
 
 type ObjectId {
-	collectionId: ID!
+        collectionId: ID
 	id: ID!
 }
 
 type DocumentId {
-	collectionId: ID!
+        collectionId: ID
 	id: ID!
 }
 
@@ -57,7 +57,7 @@ type DocumentList {
 }
 
 type DocumentTypeId {
-	collectionId: ID!
+        collectionId: ID
 	typeId: ID!
 }
 
@@ -68,7 +68,7 @@ type DocumentManagerNotification {
 }
 
 type SetDocumentNameInput {
-	collectionId: ID!
+        collectionId: ID
 	documentId: ID!
 	documentName: String!
 }
