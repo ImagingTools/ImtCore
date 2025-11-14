@@ -110,9 +110,13 @@ class FileDialog extends Item {
     }
     $visibleChanged(){
         if(this.getPropertyValue('visible')){
+            if(this.$dom) this.$dom.setAttribute('visible', '')
+
             this.$input.value = ""
             this.$input.click()
             this.getProperty('visible').reset(false)
+        } else {
+            if(this.$dom) this.$dom.removeAttribute('visible')
         }
     }
 
