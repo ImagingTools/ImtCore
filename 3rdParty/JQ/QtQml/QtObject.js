@@ -3,6 +3,7 @@ const PropertyAuto = require("./PropertyAuto")
 const Var = require("./Var")
 const Int = require("./Int")
 const List = require("./List")
+const ProxyProperty = require("./ProxyProperty")
 const Signal = require("./Signal")
 const QtFunctions = require("../Qt/functions")
 
@@ -11,8 +12,8 @@ class QtObject extends QObject {
         model: {type:Var, auto: true, value:undefined, },
         modelData: { type: Var, auto: true, value: undefined },
         index: {type:Int, value:0, },
-        children: {type:List, },
-        resources: {type:List, },
+        children: {type:ProxyProperty, },
+        resources: {type:ProxyProperty, },
         data: {type:List, },
         
         modelChanged: {type:Signal, args:[]},
@@ -72,6 +73,35 @@ class QtObject extends QObject {
         return obj
     }
 
+    PROXY__get__children(){
+        return this.__proxy.data.filter(obj => obj instanceof JQModules.QtQuick.Item)
+    }
+    PROXY__set__children(value){
+        
+    }
+    PROXY__get__resources(){
+        return this.__proxy.data.filter(obj => !(obj instanceof JQModules.QtQuick.Item))
+    }
+    PROXY__set__resources(value){
+
+    }
+
+    // get children(){
+    //     return this.__proxy.data.filter(obj => obj instanceof JQModules.QtQuick.Item)
+    // }
+
+    // set children(value){
+        
+    // }
+
+    // get resources(){
+    //     return this.__proxy.data.filter(obj => !(obj instanceof JQModules.QtQuick.Item))
+    // }
+
+    // set resources(value){
+        
+    // }
+
     SLOT_JQAbstractModelChanged(oldValue, newValue){
         if(this.constructor.meta.model.auto){
             this.model = newValue
@@ -113,8 +143,8 @@ class QtObject extends QObject {
         index = this.data.indexOf(child)
         if(index >= 0) this.data.__splice(index, 1)
 
-        index = this.resources.indexOf(child)
-        if(index >= 0) this.resources.__splice(index, 1)
+        // index = this.resources.indexOf(child)
+        // if(index >= 0) this.resources.__splice(index, 1)
     }
 
     __addChild(child){
@@ -123,59 +153,59 @@ class QtObject extends QObject {
         index = this.data.indexOf(child)
         if(index < 0) this.data.__push(child)
 
-        index = this.resources.indexOf(child)
-        if(index < 0) this.resources.__push(child)
+        // index = this.resources.indexOf(child)
+        // if(index < 0) this.resources.__push(child)
     }
 
-    SLOT_childrenChanged(...args){
-        if(args.length === 3){
-            let leftTop = args[0]
-            let bottonRight = args[1]
-            let roles = args[2]
+    // SLOT_childrenChanged(...args){
+    //     if(args.length === 3){
+    //         let leftTop = args[0]
+    //         let bottonRight = args[1]
+    //         let roles = args[2]
 
-            if(roles === 'append'){
-                for(let i = leftTop; i < bottonRight; i++){
-                    this.children[i].setParent(this)
-                }
-            }
-        } else {
-            let oldValue = args[0]
-            let newValue = args[1]
+    //         if(roles === 'append'){
+    //             for(let i = leftTop; i < bottonRight; i++){
+    //                 this.children[i].setParent(this)
+    //             }
+    //         }
+    //     } else {
+    //         let oldValue = args[0]
+    //         let newValue = args[1]
 
-            for(let child of oldValue){
-                if(newValue.indexOf(child) < 0) this.__removeChild(child)
-            }
+    //         for(let child of oldValue){
+    //             if(newValue.indexOf(child) < 0) this.__removeChild(child)
+    //         }
 
-            for(let child of newValue){
-                child.setParent(this)
-            }
-        }
-    }
+    //         for(let child of newValue){
+    //             child.setParent(this)
+    //         }
+    //     }
+    // }
 
-    SLOT_resourcesChanged(leftTop, bottonRight, roles){
-        if(args.length === 3){
-            let leftTop = args[0]
-            let bottonRight = args[1]
-            let roles = args[2]
+    // SLOT_resourcesChanged(leftTop, bottonRight, roles){
+    //     if(args.length === 3){
+    //         let leftTop = args[0]
+    //         let bottonRight = args[1]
+    //         let roles = args[2]
 
-            if(roles === 'append'){
-                for(let i = leftTop; i < bottonRight; i++){
-                    this.resources[i].setParent(this)
-                }
-            }
-        } else {
-            let oldValue = args[0]
-            let newValue = args[1]
+    //         if(roles === 'append'){
+    //             for(let i = leftTop; i < bottonRight; i++){
+    //                 this.resources[i].setParent(this)
+    //             }
+    //         }
+    //     } else {
+    //         let oldValue = args[0]
+    //         let newValue = args[1]
 
-            for(let child of oldValue){
-                if(newValue.indexOf(child) < 0) this.__removeChild(child)
-            }
+    //         for(let child of oldValue){
+    //             if(newValue.indexOf(child) < 0) this.__removeChild(child)
+    //         }
 
-            for(let child of newValue){
-                child.setParent(this)
-            }
-        }
-    }
+    //         for(let child of newValue){
+    //             child.setParent(this)
+    //         }
+    //     }
+    // }
 
     SLOT_dataChanged(leftTop, bottonRight, roles){
         if(args.length === 3){

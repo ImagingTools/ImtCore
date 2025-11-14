@@ -148,37 +148,37 @@ class Item extends QtObject {
         super.__complete()
     }
 
-    __removeChild(child){
-        let index = -1
+    // __removeChild(child){
+    //     let index = -1
 
-        index = this.data.indexOf(child)
-        if(index >= 0) this.data.__splice(index, 1)
+    //     index = this.data.indexOf(child)
+    //     if(index >= 0) this.data.__splice(index, 1)
 
-        if(child instanceof Item){
-            index = this.children.indexOf(child)
-            if(index >= 0) this.children.__splice(index, 1)
-        } else {
-            index = this.resources.indexOf(child)
-            if(index >= 0) this.resources.__splice(index, 1)
-        }
-    }
+    //     if(child instanceof Item){
+    //         index = this.children.indexOf(child)
+    //         if(index >= 0) this.children.__splice(index, 1)
+    //     } else {
+    //         index = this.resources.indexOf(child)
+    //         if(index >= 0) this.resources.__splice(index, 1)
+    //     }
+    // }
 
-    __addChild(child){
-        let index = -1
+    // __addChild(child){
+    //     let index = -1
 
-        index = this.data.indexOf(child)
-        if(index < 0) this.data.__push(child)
+    //     index = this.data.indexOf(child)
+    //     if(index < 0) this.data.__push(child)
 
-        if(child instanceof Item){
-            index = this.children.indexOf(child)
+    //     if(child instanceof Item){
+    //         index = this.children.indexOf(child)
 
-            if(index < 0) this.children.__push(child)
-        } else {
-            index = this.resources.indexOf(child)
+    //         if(index < 0) this.children.__push(child)
+    //     } else {
+    //         index = this.resources.indexOf(child)
 
-            if(index < 0) this.resources.__push(child)
-        }
-    }
+    //         if(index < 0) this.resources.__push(child)
+    //     }
+    // }
 
     __getDOM(){
         let dom = this.__DOM

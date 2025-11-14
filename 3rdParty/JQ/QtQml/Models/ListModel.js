@@ -72,17 +72,14 @@ class ListModel extends QtObject {
     }
 
     __removeChild(child){
-        let index = -1
+        // let index = -1
 
-        index = this.resources.indexOf(child)
-        if(index >= 0) this.resources.__splice(index, 1)
+        // index = this.resources.indexOf(child)
+        // if(index >= 0) this.resources.__splice(index, 1)
     }
 
     __addChild(child){
         let index = -1
-
-        index = this.resources.indexOf(child)
-        if(index < 0) this.resources.__push(child)
 
         if(child instanceof ListElement){
             index = this.data.indexOf(child)

@@ -29,11 +29,61 @@ class Dialog extends QtObject {
         rejected: {type:Signal, args:[]},
     })
 
+    __getDOM(){
+        let dom = this.__DOM
+        if(dom) {
+            return dom
+        } else {
+            dom = document.createElement('input')
+            dom.type = 'file'
+            dom.style.display = 'none'
+            this.__DOM = dom
+
+            this.__DOM.addEventListener('change', (e)=>{this.__change(e)})
+            return dom
+        }
+    }
+
+    __change(){
+
+    }
+
+    __setDOMStyle(style){
+        let dom = this.__DOM
+
+        if(dom) {
+            for(let name in style){
+                dom.style[name] = style[name]
+            }
+        }
+    }
+
+    __connectDOM(target){
+        let dom = this.__getDOM()
+        if(target && dom){
+            if(target instanceof JQModules.QtQuick.Item){
+                target.__getDOM().appendChild(dom)
+            } else {
+                target.appendChild(dom)
+            }
+        }
+    }
+
+    SLOT_parentChanged(oldValue, newValue){
+        super.SLOT_parentChanged(oldValue, newValue)
+        this.__connectDOM(newValue)
+    }
+
     accept(){}
     close(){}
     done(result){}
     open(){}
     reject(){}
+
+    destroy(){
+        this.__DOM.remove()
+        super.destroy()
+    }
 }
 
 
