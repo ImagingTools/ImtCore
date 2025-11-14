@@ -374,4 +374,28 @@ QtObject {
 
 		return angle;
 	}
+
+	function darkenColor(hex, factor){
+		if (!hex || typeof hex !== "string")
+			return hex;
+
+		if (hex.charAt(0) === "#")
+			hex = hex.substring(1);
+
+		var r = parseInt(hex.substring(0, 2), 16);
+		var g = parseInt(hex.substring(2, 4), 16);
+		var b = parseInt(hex.substring(4, 6), 16);
+
+		r = Math.max(0, Math.min(255, r / factor));
+		g = Math.max(0, Math.min(255, g / factor));
+		b = Math.max(0, Math.min(255, b / factor));
+
+		let toHex =  function(v) {
+			var h = Math.round(v).toString(16);
+			return h.length < 2 ? "0" + h : h;
+		}
+
+		return "#" + toHex(r) + toHex(g) + toHex(b);
+	}
+
 }

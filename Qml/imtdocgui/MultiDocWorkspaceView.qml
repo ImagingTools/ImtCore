@@ -36,16 +36,6 @@ Item {
 	}
 
 	NavigableItem {
-		id: firstTabNavigation
-		forwardRest: false
-		onActivated: {
-			if (restPath.length <= 1){
-				tabView.currentIndex = 0
-			}
-		}
-	}
-
-	NavigableItem {
 		id: navigableItem
 		onActivated: {
 			if (workspaceView.documentManager){
@@ -59,6 +49,9 @@ Item {
 					if (params.createNew === true){
 						workspaceView.documentManager.insertNewDocument(matchedPath, "")
 					}
+					else{
+						tabView.currentIndex = 0
+					}
 				}
 			}
 		}
@@ -70,7 +63,6 @@ Item {
 		
 		function onTypeIdChanged(){
 			navigableItem.parentSegment = target.typeId
-			firstTabNavigation.paths = [target.typeId]
 		}
 		
 		function onDocumentTypeIdRegistered(documentTypeId){
@@ -117,6 +109,8 @@ Item {
 				tabIndex = tabView.tabModel.count - 1
 			}
 
+			console.log("onDocumentAdded", tabIndex)
+			
 			tabView.currentIndex = tabIndex
 		}
 

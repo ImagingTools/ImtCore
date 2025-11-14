@@ -64,6 +64,7 @@ Item {
 		\param matchedPath The path segment that matched this Navigable
 	*/
 	signal activated(var params, var restPath, string matchedPath)
+	signal parentActivated(var params)
 
 	Component.onCompleted: {
 		internal.tryRegister()
@@ -94,35 +95,40 @@ Item {
 	
 	function processSegment(segment, params, restPath) {
 		if (!segmentIsSupported(segment)) {
-			console.error("Unable to process segment '"+segment+"'. Supported segments: '"+paths+"'")
+			console.error("Unable to process segment '" + segment + "'. Supported segments: '" + paths + "'")
 			return false
 		}
 
 		activated(params, restPath, segment)
 
-		if (restPath.length === 0) {
-			return true
-		}
-
-		if (!forwardRest){
-			return true
-		}
-
-		let next = restPath[0]
+		let hasRest = restPath.length > 0
+		let next = hasRest ? restPath[0] : ""
 		let delivered = false
+
 		for (let i = 0; i < NavigationController.navigableItems.length; ++i) {
 			let child = NavigationController.navigableItems[i]
-			if (child.parentSegment === segment && child.segmentIsSupported(next)) {
+			if (child.parentSegment !== segment)
+				continue
+
+			child.parentActivated(params)
+
+			if (!delivered && forwardRest && hasRest && child.segmentIsSupported(next)) {
 				child.processSegment(next, params, restPath.slice(1))
 				delivered = true
-				break
 			}
 		}
+
+		if (!hasRest)
+			return true
+
+		if (!forwardRest)
+			return true
 
 		if (!delivered) {
 			NavigationController.setPending(segment, restPath, params)
 		}
-
+	
 		return true
 	}
+
 }

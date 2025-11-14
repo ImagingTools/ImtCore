@@ -202,6 +202,7 @@ ElementView {
 			return
 		}
 
+		targetCollectionView.hasPagination = selectedIds.length > 25
 		targetCollectionView.collectionFilter.clearAllFilters()
 		
 		targetCollectionView.registerFilter("DocumentIdFilter", documentIdFilter1)
@@ -277,9 +278,9 @@ ElementView {
 			filterMenuVisible: false
 			loadingDataAfterHeadersReceived: false
 			tableViewParamsStoredServer: false
-			pagination.visible: false
 			headerRightClickEnabled: false
 			requestedFields: container.targetRequestedFields
+			hasPagination: false
 			Component.onCompleted: {
 				container.targetCollectionView = this
 				container.updateTargetCollection()
@@ -288,10 +289,6 @@ ElementView {
 				container.targetCollectionView = null
 			}
 
-			onElementsCountChanged: {
-				pagination.visible = elementsCount >= 25
-			}
-			
 			onContentHeightChanged: {
 				height = contentHeight
 			}
