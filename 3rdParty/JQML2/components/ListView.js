@@ -71,6 +71,7 @@ class ListView extends Flickable {
         for(let i = data.length - 1; i >= 0; i--){
             if(data[i] instanceof QObject) data[i].$complete()
         }
+        this.$anchorsUpdate()
     }
 
     itemAtIndex(index){
