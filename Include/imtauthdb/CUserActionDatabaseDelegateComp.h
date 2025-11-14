@@ -21,6 +21,7 @@ public:
 protected:
 	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
 	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const override;
+	virtual QByteArray CreateJoinTablesQuery() const override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

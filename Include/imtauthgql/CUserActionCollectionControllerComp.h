@@ -28,7 +28,10 @@ protected:
 				const sdl::imtauth::UserActions::CGetUserActionsGqlRequest& getUserActionsRequest,
 				sdl::imtauth::UserActions::CUserActionItemData::V1_0& representationObject,
 				QString& errorMessage) const override;
-	virtual void SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const override;
+	void SetAdditionalFilters(
+				const imtgql::CGqlRequest& gqlRequest,
+				const imtgql::CGqlParamObject& viewParamsGql,
+				iprm::CParamsSet* filterParamsPtr) const override;
 
 private:
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);

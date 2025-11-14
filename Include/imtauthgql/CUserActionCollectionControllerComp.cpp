@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtauth/IUserRecentAction.h>
 #include <imtauth/CUserInfo.h>
+#include <imtauth/CUserGroupFilter.h>
 
 
 namespace imtauthgql
@@ -136,11 +137,18 @@ bool CUserActionCollectionControllerComp::CreateRepresentationFromObject(
 }
 
 
-void CUserActionCollectionControllerComp::SetAdditionalFilters(const imtgql::CGqlRequest& gqlRequest, imtbase::CComplexCollectionFilter& complexFilter) const
+void CUserActionCollectionControllerComp::SetAdditionalFilters(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlParamObject& /*viewParamsGql*/,
+			iprm::CParamsSet* filterParamsPtr) const
 {
+	if (filterParamsPtr == nullptr){
+		return;
+	}
+
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
-		const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(gqlContextPtr->GetUserInfo());
+		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
 			if (!userInfoPtr->IsAdmin()){
 				QByteArray productId = gqlRequest.GetHeader("productid");
@@ -152,10 +160,10 @@ void CUserActionCollectionControllerComp::SetAdditionalFilters(const imtgql::CGq
 				}
 
 				if (!viewAllUserActions){
-					imtbase::IComplexCollectionFilter::FieldFilter userFieldFilter;
-					userFieldFilter.fieldId = "userId";
-					userFieldFilter.filterValue = userInfoPtr->GetObjectUuid();
-					complexFilter.AddFieldFilter(userFieldFilter);
+					istd::TDelPtr<imtauth::CUserGroupFilter> groupFilterPtr = new imtauth::CUserGroupFilter();
+					groupFilterPtr->SetUserId(userInfoPtr->GetId());
+					groupFilterPtr->SetGroupIds(userInfoPtr->GetGroups());
+					filterParamsPtr->SetEditableParameter("GroupFilter", groupFilterPtr.PopPtr(), true);
 				}
 			}
 		}
