@@ -64,6 +64,9 @@ class FileDialog extends Item {
         this.$input.type = 'file'
         this.getDom().appendChild(this.$input)
 
+        this.$dom.setAttribute('unvisible', '')
+        this.$dom.removeAttribute('visible', '')
+
         this.$input.addEventListener('change', (e)=>{
             if(this.getPropertyValue('selectMultiple')){
                 this.getProperty('fileUrls').reset(e.target.files)
@@ -110,13 +113,19 @@ class FileDialog extends Item {
     }
     $visibleChanged(){
         if(this.getPropertyValue('visible')){
-            if(this.$dom) this.$dom.setAttribute('visible', '')
+            if(this.$dom) {
+                this.$dom.setAttribute('visible', '')
+                this.$dom.removeAttribute('unvisible', '')
+            }
 
             this.$input.value = ""
             this.$input.click()
             this.getProperty('visible').reset(false)
         } else {
-            if(this.$dom) this.$dom.removeAttribute('visible')
+            if(this.$dom) {
+                this.$dom.setAttribute('unvisible', '')
+                this.$dom.removeAttribute('visible', '')
+            }
         }
     }
 

@@ -412,9 +412,15 @@ class Item extends QtObject {
     $visibleChanged(){
         let currentValue = this.getPropertyValue('visible')
         if(currentValue){
-            if(this.$dom) this.$dom.setAttribute('visible', '')
+            if(this.$dom) {
+                this.$dom.setAttribute('visible', '')
+                this.$dom.removeAttribute('unvisible', '')
+            }
         } else {
-            if(this.$dom) this.$dom.removeAttribute('visible')
+            if(this.$dom) {
+                this.$dom.setAttribute('unvisible', '')
+                this.$dom.removeAttribute('visible')
+            }
         }
         
         this.setStyle({ display: currentValue ? Item.defaultCSS.display : 'none' })
