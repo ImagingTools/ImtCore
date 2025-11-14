@@ -1,7 +1,8 @@
 import QtQuick 2.15
 import Acf 1.0
+import imtcontrols 1.0
 
-Item {
+Item{
 	id: chart
 
 	property var bars: [] // [{ label: "29 Oct", segments: [{label:"Trial", value:10, color:"#4CAF50"}, ...]}]
@@ -14,21 +15,24 @@ Item {
 	property bool showValues: false
 	property bool showLegend: true
 	property bool legendHorizontal: true
-	property int ySteps: 1 // кол-во делений по оси Y
+	property int ySteps: 1
 	property string xLabel: "Date"
 	property string yLabel: "Count"
 
 	property var legendItems: []
 
-	onBarsChanged: {
+	property var segmentsRects: []
+	property var hoveredSegment: null
+
+	onBarsChanged:{
 		buildLegend()
 		canvas.requestPaint()
 	}
 
-	function buildLegend() {
-		let map = {}
-		for (let bar of bars) {
-			for (let seg of bar.segments || []) {
+	function buildLegend(){
+		let map ={}
+		for (let bar of bars){
+			for (let seg of bar.segments || []){
 				if (!map[seg.label])
 					map[seg.label] = seg.color || "#ccc"
 			}
@@ -39,8 +43,27 @@ Item {
 		legendItems = result
 	}
 
-	// === Диаграмма ===
-	Canvas {
+	Rectangle{
+		id: tooltip
+		width: tooltipText.width + 2*Style.marginS
+		height: tooltipText.height + 2*Style.marginXS
+		color:  Style.baseColor
+		radius: Style.radiusS
+		visible: false
+		z: 99999
+		border.width: Style.buttonBorderWidth
+		border.color: Style.borderColor
+
+		Text{
+			id: tooltipText
+			anchors.centerIn: parent
+			color: Style.textColor
+			font.family: Style.fontFamily
+			font.pixelSize: Style.fontSizeM
+		}
+	}
+
+	Canvas{
 		id: canvas
 		anchors.top: parent.top
 		anchors.left: parent.left
@@ -49,13 +72,15 @@ Item {
 		anchors.bottomMargin: Style.marginM
 		antialiasing: true
 
-		onPaint: {
+		onPaint:{
 			let ctx = getContext("2d")
 			ctx.reset()
-		
+
+			chart.segmentsRects = []
+
 			if (!chart.bars || chart.bars.length === 0)
 				return
-		
+
 			let totalBars = chart.bars.length
 			let availableWidth = chart.width
 			let offsetBottom = 35
@@ -63,10 +88,9 @@ Item {
 			let availableHeight = canvas.height - offsetBottom - 15
 			let baseY = canvas.height - offsetBottom
 			let contentWidth = availableWidth - offsetLeft - 10
-		
-			// === вычисляем максимум ===
+
 			let globalMax = 0
-			for (let b of chart.bars) {
+			for (let b of chart.bars){
 				let total = 0
 				for (let s of b.segments)
 					total += s.value
@@ -74,20 +98,16 @@ Item {
 			}
 			if (globalMax <= 0)
 				globalMax = 1
-		
-			// === шаг ===
+
 			let stepValue = chart.ySteps || 1
 			let axisMax = Math.ceil(globalMax / stepValue) * stepValue
 			let ySteps = axisMax / stepValue
-			let stepHeight = availableHeight / ySteps
-		
-			// === ширина баров ===
+
 			let spacingRatio = 0.4
 			let barWidth = contentWidth / (totalBars * (1 + spacingRatio) + spacingRatio)
 			let spacing = barWidth * spacingRatio
 			let offsetX = offsetLeft + spacing
-		
-			// === оси ===
+
 			ctx.strokeStyle = chart.axisColor
 			ctx.lineWidth = 1
 			ctx.beginPath()
@@ -96,38 +116,51 @@ Item {
 			ctx.moveTo(offsetLeft, baseY)
 			ctx.lineTo(availableWidth - 10, baseY)
 			ctx.stroke()
-		
-			// === деления по Y ===
+
 			ctx.font = chart.labelFontSize + "px sans-serif"
 			ctx.fillStyle = chart.textColor
 			ctx.textAlign = "right"
 			ctx.textBaseline = "middle"
-		
 			ctx.strokeStyle = chart.gridColor
 			ctx.lineWidth = 0.5
-		
-			for (let value = 0; value <= axisMax; value += stepValue) {
+
+			for (let value = 0; value <= axisMax; value += stepValue){
 				let y = baseY - (value / axisMax) * availableHeight
+
 				ctx.beginPath()
 				ctx.moveTo(offsetLeft, y)
 				ctx.lineTo(availableWidth - 10, y)
 				ctx.stroke()
+
 				ctx.fillText(value.toString(), offsetLeft - 6, y)
 			}
-		
-			// === бары ===
-			for (let i = 0; i < totalBars; i++) {
+
+			for (let i = 0; i < totalBars; i++){
 				let bar = chart.bars[i]
 				let x = offsetX + i * (barWidth + spacing)
 				let y = baseY
-		
-				for (let seg of bar.segments) {
+
+				for (let seg of bar.segments){
 					let segHeight = (seg.value / axisMax) * availableHeight
 					y -= segHeight
-					ctx.fillStyle = seg.color || "#ccc"
+
+					if (chart.hoveredSegment === seg){
+						ctx.fillStyle = Functions.darkenColor(seg.color,1.4)
+					} else{
+						ctx.fillStyle = seg.color || "#ccc"
+					}
+
 					ctx.fillRect(x, y, barWidth, segHeight)
-		
-					if (chart.showValues && seg.value > 0) {
+
+					chart.segmentsRects.push({
+						seg: seg,
+						x: x,
+						y: y,
+						w: barWidth,
+						h: segHeight
+					})
+
+					if (chart.showValues && seg.value > 0){
 						ctx.fillStyle = chart.textColor
 						ctx.font = chart.labelFontSize + "px sans-serif"
 						ctx.textAlign = "center"
@@ -135,39 +168,34 @@ Item {
 						ctx.fillText(seg.value, x + barWidth / 2, y + segHeight / 2)
 					}
 				}
-		
+
 				ctx.fillStyle = chart.textColor
 				ctx.font = chart.labelFontSize + "px sans-serif"
 				ctx.textAlign = "center"
 				ctx.textBaseline = "top"
 				ctx.fillText(bar.label, x + barWidth / 2, baseY + 6)
 			}
-		
-			// === подпись оси Y ===
+
 			ctx.save()
 			ctx.translate(10, baseY - availableHeight / 2)
 			ctx.rotate(-Math.PI / 2)
 			ctx.textAlign = "center"
 			ctx.textBaseline = "middle"
-			ctx.font = "bold " + (chart.labelFontSize + 2) + "px sans-serif"
+			ctx.font = (chart.labelFontSize + 2) + "px sans-serif"
 			ctx.fillStyle = chart.textColor
-			ctx.fillText(chart.yLabel || "Count", 0, 0)
+			ctx.fillText(chart.yLabel, 0, 0)
 			ctx.restore()
-		
-			// === подпись оси X ===
-			ctx.font = "bold " + (chart.labelFontSize + 2) + "px sans-serif"
+
+			ctx.font = (chart.labelFontSize + 2) + "px sans-serif"
 			ctx.textAlign = "center"
 			ctx.textBaseline = "top"
 			ctx.fillStyle = chart.textColor
-			
-			let xLabelMargin = 25  // расстояние между осью X и подписью
+			let xLabelMargin = 25
 			ctx.fillText(chart.xLabel, offsetLeft + contentWidth / 2, baseY + xLabelMargin)
 		}
-
 	}
 
-	// === Легенда ===
-	Flow {
+	Flow{
 		id: legend
 		width: parent.width
 		spacing: Style.spacingM
@@ -175,25 +203,79 @@ Item {
 		anchors.horizontalCenter: parent.horizontalCenter
 		visible: chart.showLegend
 
-		Repeater {
+		Repeater{
 			model: chart.legendItems
 
-			delegate: Row {
+			delegate: Row{
 				spacing: Style.marginM
-				Rectangle {
+				Rectangle{
 					width: 12
 					height: 12
 					radius: 3
 					color: modelData.color
 					anchors.verticalCenter: parent.verticalCenter
 				}
-				Text {
+				Text{
 					text: modelData.label
 					color: chart.textColor
 					font.pixelSize: chart.labelFontSize
 					anchors.verticalCenter: parent.verticalCenter
 				}
 			}
+		}
+	}
+
+	// === Обработка мыши ===
+	MouseArea{
+		anchors.fill: chart
+		hoverEnabled: true
+		preventStealing: true
+
+		onPositionChanged:{
+			let mX = mouse.x
+			let mY = mouse.y
+
+			let hovered = null
+
+			for (let r of chart.segmentsRects){
+				if (mX >= r.x && mX <= r.x + r.w &&
+					mY >= r.y && mY <= r.y + r.h){
+					hovered = r.seg
+					break
+				}
+			}
+
+			if (hovered !== chart.hoveredSegment){
+				chart.hoveredSegment = hovered
+				canvas.requestPaint()
+			}
+
+			if (hovered){
+				tooltipText.text = hovered.label + ": " + hovered.value
+			
+				let padding = 10
+				let x = mouse.x + padding
+				let y = mouse.y + padding
+			
+				if (x + tooltip.width > canvas.width)
+					x = canvas.width - tooltip.width
+			
+				if (y + tooltip.height > canvas.height)
+					y = canvas.height - tooltip.height
+
+				tooltip.x = x
+				tooltip.y = y
+				tooltip.visible = true
+			}
+			else{
+				tooltip.visible = false
+			}
+		}
+
+		onExited:{
+			tooltip.visible = false
+			chart.hoveredSegment = null
+			canvas.requestPaint()
 		}
 	}
 
