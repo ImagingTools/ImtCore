@@ -105,6 +105,8 @@ class Item extends QtObject {
             pointerEvents: 'none',
             touchAction: 'none',
         })
+
+        this.$dom.setAttribute('visible', 'true')
         
         if(parent){
             // this.getProperty('visible').setOriginCompute(()=>{this.getProperty('visible').subscribe(this.getProperty('parent').get().getProperty('visible')); return this.getProperty('parent').get().getProperty('visible').get()})
@@ -409,6 +411,7 @@ class Item extends QtObject {
 
     $visibleChanged(){
         let currentValue = this.getPropertyValue('visible')
+        if(this.$dom) this.$dom.setAttribute('visible', currentValue ? 'true' : 'false')
         this.setStyle({ display: currentValue ? Item.defaultCSS.display : 'none' })
 
         for(let child of this.children){
