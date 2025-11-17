@@ -567,6 +567,34 @@ sdl::imtauth::Users::CCreateSuperuserPayload CUserControllerComp::OnCreateSuperu
 }
 
 
+sdl::imtauth::Users::CUserObjectId CUserControllerComp::OnGetUserObjectId(
+			const sdl::imtauth::Users::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& errorMessage) const
+{
+	sdl::imtauth::Users::CUserObjectId response;
+
+	sdl::imtauth::Users::GetUserObjectIdRequestArguments arguments = getUserObjectIdRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0.HasValue()){
+		errorMessage = QString("Unable to get user object-ID. Error: GraphQL version is invalid");
+		return response;
+	}
+
+	if (!arguments.input.Version_1_0->login.HasValue()){
+		errorMessage = QString("Unable to get user object-ID. Error: Login field is invalid");
+		return response;
+	}
+
+	QByteArray login = *arguments.input.Version_1_0->login;
+	QByteArray objectId = GetUserIdByLogin(login);
+
+	response.Version_1_0.Emplace();
+	response.Version_1_0->objectId = objectId;
+
+	return response;
+}
+
+
 // reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 
 bool CUserControllerComp::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const

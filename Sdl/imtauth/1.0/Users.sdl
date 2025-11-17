@@ -151,6 +151,14 @@ type SendEmailCodePayload {
 	message: String
 }
 
+input UserLogin {
+	login: ID!
+}
+
+type UserObjectId {
+	objectId: ID!
+}
+
 type Query {
 	UsersList (input:UsersListInput): UsersListPayload!
 	UserItem (input: UserItemInput): UserData!
@@ -158,6 +166,7 @@ type Query {
 	SendEmailCode (input: SendEmailCodeInput): SendEmailCodePayload!
 	CheckEmailCode (input: CheckEmailCodeInput): CheckEmailCodePayload!
 	CheckSuperuserExists (input: CheckSuperuserInput): CheckSuperuserPayload!
+	GetUserObjectId (input: UserLogin): UserObjectId!
 }
 
 type Mutation {

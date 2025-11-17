@@ -19,6 +19,28 @@ QByteArrayList CClientRequestUserManagerComp::GetUserIds() const
 }
 
 
+QByteArray CClientRequestUserManagerComp::GetUserObjectId(const QByteArray& login) const
+{
+	namespace userssdl = sdl::imtauth::Users;
+
+	userssdl::GetUserObjectIdRequestArguments arguments;
+	arguments.input.Version_1_0.Emplace();
+	arguments.input.Version_1_0->login = login;
+
+	userssdl::CUserObjectId payload;
+	bool ok = SendModelRequestInternal<userssdl::GetUserObjectIdRequestArguments, userssdl::CUserObjectId, userssdl::CGetUserObjectIdGqlRequest>(arguments, payload);
+	if (!ok){
+		return nullptr;
+	}
+
+	if (!payload.Version_1_0->objectId.HasValue()){
+		return QByteArray();
+	}
+
+	return *payload.Version_1_0->objectId;
+}
+
+
 imtauth::IUserInfoUniquePtr CClientRequestUserManagerComp::GetUser(const QByteArray& userId) const
 {
 	namespace userssdl = sdl::imtauth::Users;
@@ -117,7 +139,7 @@ bool CClientRequestUserManagerComp::ChangeUserPassword(const QByteArray& login, 
 }
 
 
-bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, const QByteArrayList& roleIds)
+bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, const QByteArray& productId, const QByteArrayList& roleIds)
 {
 	if (roleIds.isEmpty()){
 		return false;
@@ -148,7 +170,7 @@ bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, con
 }
 
 
-bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId, const QByteArrayList& roleIds)
+bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId, const QByteArray& productId, const QByteArrayList& roleIds)
 {
 	if (roleIds.isEmpty()){
 		return false;
@@ -179,16 +201,11 @@ bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId
 }
 
 
-QByteArrayList CClientRequestUserManagerComp::GetUserPermissions(const QByteArray& userId) const
+QByteArrayList CClientRequestUserManagerComp::GetUserPermissions(const QByteArray& userId, const QByteArray& productId) const
 {
 	imtauth::IUserInfoUniquePtr userInfoPtr = GetUser(userId);
 	if (!userInfoPtr.IsValid()){
 		return QByteArrayList();
-	}
-
-	QByteArray productId;
-	if (m_applicationInfoCompPtr.IsValid()){
-		productId = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_APPLICATION_ID).toUtf8();
 	}
 
 	if (productId.isEmpty()){
@@ -199,6 +216,44 @@ QByteArrayList CClientRequestUserManagerComp::GetUserPermissions(const QByteArra
 	QByteArrayList permissions = userInfoPtr->GetPermissions(productId);
 
 	return userInfoPtr->GetPermissions(productId);
+}
+
+
+bool CClientRequestUserManagerComp::GetUserAuthSystem(const QByteArray& login, imtauth::IUserInfo::SystemInfo& systemInfo) const
+{
+	QByteArray objectId = GetUserObjectId(login);
+	if (objectId.isEmpty()){
+		return false;
+	}
+
+	sdl::imtauth::Users::CUserData::V1_0 userData;
+	bool ok = GetUserDataSdl(objectId, userData);
+	if (!ok){
+		return false;
+	}
+
+	if (!userData.systemInfos.HasValue()){
+		return false;
+	}
+
+	if (userData.systemInfos->isEmpty()){
+		return false;
+	}
+
+	QList<sdl::imtauth::Users::CSystemInfo::V1_0> infos = userData.systemInfos->ToList();
+	if (infos[0].id){
+		systemInfo.systemId = *infos[0].id;
+	}
+
+	if (infos[0].name){
+		systemInfo.systemName = *infos[0].name;
+	}
+
+	if (infos[0].enabled){
+		systemInfo.enabled = *infos[0].enabled;
+	}
+
+	return true;
 }
 
 

@@ -74,6 +74,7 @@ private:
 	QByteArray m_loggedUserToken;
 	QByteArrayList m_userPermissionIds;
 	imtauth::IUserInfoSharedPtr m_userInfoPtr;
+	imtgql::IGqlContextSharedPtr m_gqlContextSharedPtr;
 
 protected:
 	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);

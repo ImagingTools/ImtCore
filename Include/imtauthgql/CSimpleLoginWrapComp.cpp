@@ -6,9 +6,11 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlContext.h>
 #include <imtqml/CGqlModel.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Authorization.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Users.h>
+#include <imtgql/CGqlRequestContextManager.h>
 
 
 namespace imtauthgql
@@ -102,6 +104,12 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			m_loggedUserToken = *response.Version_1_0->token;
 		}
 		imtqml::CGqlModel::SetGlobalAccessToken(m_loggedUserToken);
+
+		m_gqlContextSharedPtr.Reset();
+		m_gqlContextSharedPtr = new imtgql::CGqlContext();
+		m_gqlContextSharedPtr->SetToken(m_loggedUserToken);
+	
+		imtgql::CGqlRequestContextManager::SetContext(m_gqlContextSharedPtr.GetPtr());
 
 		if (response.Version_1_0->username){
 			istd::CChangeNotifier notifier(this);

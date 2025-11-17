@@ -63,6 +63,10 @@ protected:
 				const sdl::imtauth::Users::CCreateSuperuserGqlRequest& createSuperuserRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::Users::CUserObjectId OnGetUserObjectId(
+				const sdl::imtauth::Users::CGetUserObjectIdGqlRequest& getUserObjectIdRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

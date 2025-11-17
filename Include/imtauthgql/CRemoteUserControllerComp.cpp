@@ -109,6 +109,15 @@ sdl::imtauth::Users::CCreateSuperuserPayload CRemoteUserControllerComp::OnCreate
 }
 
 
+sdl::imtauth::Users::CUserObjectId CRemoteUserControllerComp::OnGetUserObjectId(
+			const sdl::imtauth::Users::CGetUserObjectIdGqlRequest& /*getUserObjectIdRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::imtauth::Users::CUserObjectId>(gqlRequest, errorMessage);
+}
+
+
 } // namespace imtauthgql
 
 

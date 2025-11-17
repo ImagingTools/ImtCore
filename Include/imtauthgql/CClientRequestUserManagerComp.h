@@ -25,13 +25,15 @@ public:
 
 	// reimplemented (imtauth::IUserManager)
 	virtual QByteArrayList GetUserIds() const override;
+	virtual QByteArray GetUserObjectId(const QByteArray& login) const override;
 	virtual imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId) const override;
 	virtual bool RemoveUser(const QByteArray& userId) override;
 	virtual QByteArray CreateUser(const QString& userName, const QByteArray& login, const QByteArray& password, const QString& email) override;
 	virtual bool ChangeUserPassword(const QByteArray& userId, const QByteArray& oldPassword, const QByteArray& newPassword) override;
-	virtual bool AddRolesToUser(const QByteArray& userId, const QByteArrayList& roleIds) override;
-	virtual bool RemoveRolesFromUser(const QByteArray& userId, const QByteArrayList& roleIds) override;
-	virtual QByteArrayList GetUserPermissions(const QByteArray& userId) const override;
+	virtual bool AddRolesToUser(const QByteArray& userId, const QByteArray& productId, const QByteArrayList& roleIds) override;
+	virtual bool RemoveRolesFromUser(const QByteArray& userId, const QByteArray& productId, const QByteArrayList& roleIds) override;
+	virtual QByteArrayList GetUserPermissions(const QByteArray& userId, const QByteArray& productId) const override;
+	virtual bool GetUserAuthSystem(const QByteArray& login, imtauth::IUserInfo::SystemInfo& systemInfo) const override;
 
 private:
 	bool GetUserDataSdl(const QByteArray& userId, sdl::imtauth::Users::CUserData::V1_0& userData) const;
