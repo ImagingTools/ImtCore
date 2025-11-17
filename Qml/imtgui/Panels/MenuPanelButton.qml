@@ -45,6 +45,7 @@ ControlBase {
 
         MouseArea{
             id: ma;
+            objectName: "MouseArea"
 
             anchors.fill: parent;
 

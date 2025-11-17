@@ -177,6 +177,7 @@ Rectangle {
 
 	property Component delegate: Component {
 		MenuPanelButton {
+			objectName: model["id"] + "Button"
 			Component.onCompleted: {
 				if (model.index === 0 && menuPanel.activePageIndex === -1){
 					this.clicked();
@@ -254,6 +255,7 @@ Rectangle {
 
 			delegate: Component {
 				MenuPanelButton {
+					objectName: model["id"] + "Button"
 					text:  model["name"];
 					textColor: Style.textColor;
 					menuPanelRef: menuPanel;
@@ -282,6 +284,7 @@ Rectangle {
 
 			delegate: Component {
 				MenuPanelButton {
+					objectName: model["id"] + "Button"
 					text:  model["name"];
 					textColor: Style.textColor;
 					menuPanelRef: menuPanel;
