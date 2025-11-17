@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
+#include <imtgql/CGqlRequestContextManager.h>
 #include <GeneratedFiles/imtauthsdl/SDL/1.0/CPP/Roles.h>
 
 
@@ -38,6 +39,11 @@ const imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const 
 
 	QString errorMessage;
 	imtgql::CGqlRequest gqlRequest;
+
+	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
+	if (gqlContextPtr != nullptr){
+		gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
+	}
 
 	if (!rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){
 		return nullptr;

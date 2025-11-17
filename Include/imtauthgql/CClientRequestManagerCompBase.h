@@ -23,7 +23,6 @@ public:
 	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CClientRequestManagerCompBase)
-		I_ASSIGN(m_accessTokenProviderCompPtr, "AccessTokenProvider", "Access token provider", false, "AccessTokenProvider");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
@@ -40,7 +39,7 @@ protected:
 		if (gqlContextPtr != nullptr){
 			gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
 		}
-	
+
 		if (!SdlRequest::SetupGqlRequest(gqlRequest, arguments)){
 			return false;
 		}
@@ -59,7 +58,6 @@ protected:
 	}
 
 protected:
-	I_REF(imtauth::IAccessTokenProvider, m_accessTokenProviderCompPtr);
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 

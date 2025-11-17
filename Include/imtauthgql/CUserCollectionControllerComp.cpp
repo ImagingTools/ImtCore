@@ -723,7 +723,7 @@ bool CUserCollectionControllerComp::CheckPermissions(const imtgql::CGqlRequest& 
 		requestedUserId = ExtractObjectIdFromGetObjectTypeIdGqlRequest(gqlRequest);
 	}
 
-	if (requestOwnerId == requestedUserId){
+	if (!requestOwnerId.isEmpty() && requestOwnerId == requestedUserId){
 		return true;
 	}
 

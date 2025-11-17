@@ -13,6 +13,7 @@
         <Element ComponentName="GetCollectionHeaders" X="600" Y="150" Note=""/>
         <Element ComponentName="GetCommands" X="600" Y="250" Note=""/>
         <Element ComponentName="GetDataMetaInfo" X="975" Y="750" Note=""/>
+        <Element ComponentName="GetElementIds" X="225" Y="650" Note=""/>
         <Element ComponentName="GetElementMetaInfo" X="975" Y="150" Note=""/>
         <Element ComponentName="GetObjectData" X="975" Y="650" Note=""/>
         <Element ComponentName="GetObjectTypeId" X="225" Y="550" Note=""/>

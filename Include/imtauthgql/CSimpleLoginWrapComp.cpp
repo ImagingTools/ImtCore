@@ -108,6 +108,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 		m_gqlContextSharedPtr.Reset();
 		m_gqlContextSharedPtr = new imtgql::CGqlContext();
 		m_gqlContextSharedPtr->SetToken(m_loggedUserToken);
+		m_gqlContextSharedPtr->SetProductId(productId);
 	
 		imtgql::CGqlRequestContextManager::SetContext(m_gqlContextSharedPtr.GetPtr());
 
@@ -136,6 +137,8 @@ bool CSimpleLoginWrapComp::Logout()
 		m_loggedUserPassword.clear();
 		m_userPermissionIds.clear();
 		m_userInfoPtr.Reset();
+		m_gqlContextSharedPtr.Reset();
+		imtgql::CGqlRequestContextManager::SetContext(nullptr);
 
 		return true;
 	}
