@@ -84,6 +84,14 @@ Item {
 			container.commandsDelegate.commandHandle("Remove");
 		}
 	}
+
+	Shortcut {
+		sequence: "F2"
+		enabled: root.visible
+		onActivated: {
+			container.commandsDelegate.commandHandle("Rename")
+		}
+	}
 	
 	onWidthChanged: {
 		if (!visibleMetaInfo){
@@ -248,7 +256,7 @@ Item {
 	
 	CollectionViewBase {
 		id: container;
-		
+
 		anchors.top: parent.top;
 		anchors.bottom: parent.bottom;
 		anchors.left: parent.left;
@@ -272,6 +280,7 @@ Item {
 		}
 		onCommandActivated: {
 			root.commandActivated(commandId)
+			console.log(commandId)
 		}
 		Connections {
 			target: container.dataController;
@@ -506,6 +515,8 @@ Item {
 			text: qsTr("Please select an item for showing additional informations");
 		}
 	}
+
+
 }
 
 

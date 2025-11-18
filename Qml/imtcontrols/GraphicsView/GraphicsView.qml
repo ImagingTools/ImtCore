@@ -1117,14 +1117,14 @@ Rectangle {
 		}
 	}
 
-	Shortcut {
-		sequence: "F2";
-		enabled: true;
-		onActivated: {
-			console.log("F2");
-			graphicsView.renameSignal(canvas.selectedIndex);
-		}
-	}
+	// Shortcut {
+	// 	sequence: "F2";
+	// 	enabled: true;
+	// 	onActivated: {
+	// 		//console.log("F2");
+	// 		graphicsView.renameSignal(canvas.selectedIndex);
+	// 	}
+	// }
 
 	Shortcut {
 		sequence: "Ctrl+0";
