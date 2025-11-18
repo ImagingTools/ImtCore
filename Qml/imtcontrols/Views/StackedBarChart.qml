@@ -84,7 +84,7 @@ Item{
 			let totalBars = chart.bars.length
 			let availableWidth = chart.width
 			let offsetBottom = 35
-			let offsetLeft = 35
+			let offsetLeft = 45
 			let availableHeight = canvas.height - offsetBottom - 15
 			let baseY = canvas.height - offsetBottom
 			let contentWidth = availableWidth - offsetLeft - 10
@@ -183,7 +183,7 @@ Item{
 			ctx.textBaseline = "middle"
 			ctx.font = (chart.labelFontSize + 2) + "px sans-serif"
 			ctx.fillStyle = chart.textColor
-			ctx.fillText(chart.yLabel, 0, 0)
+			ctx.fillText(chart.yLabel, 0, -3)
 			ctx.restore()
 
 			ctx.font = (chart.labelFontSize + 2) + "px sans-serif"

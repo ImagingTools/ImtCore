@@ -44,7 +44,7 @@ Rectangle {
 	property int nameMargin: Style.marginXL
 	property int contentHeight: content.height
 	property int controlHeight: Style.controlHeightM
-	
+
 	onFocusChanged: {
 		if (controlItem){
 			controlItem.focus = focus
@@ -102,9 +102,9 @@ Rectangle {
 		id: content
 		anchors.verticalCenter: parent.verticalCenter
 		anchors.left: parent.left
-		anchors.leftMargin: rootElement.contentMargin
+		anchors.leftMargin: Style.marginXL
 		anchors.right: parent.right
-		anchors.rightMargin: rootElement.contentMargin
+		anchors.rightMargin: Style.marginXL
 		spacing: rootElement.contentMargin
 		objectName: "ElementView"
 		

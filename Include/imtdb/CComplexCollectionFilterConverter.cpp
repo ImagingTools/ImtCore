@@ -9,7 +9,7 @@ namespace imtdb
 {
 
 
-QSet<int> numericTypes({ QMetaType::LongLong, QMetaType::ULongLong, QMetaType::Double });
+QSet<int> numericTypes({ QMetaType::LongLong, QMetaType::ULongLong, QMetaType::Double, QMetaType::Int });
 QMap<imtbase::IComplexCollectionFilter::FieldOperation, QString> numericOperations({
 	{imtbase::IComplexCollectionFilter::FO_EQUAL, "="},
 	{imtbase::IComplexCollectionFilter::FO_NOT_EQUAL, "!="},
@@ -91,6 +91,10 @@ QString CComplexCollectionFilterConverter::ProcessColumn(const imtbase::IComplex
 		QString type;
 
 		switch (filter.filterValue.type()){
+		case QMetaType::Int:
+			filterValue = QString::number(filter.filterValue.toInt(&isOk));
+			type = "int";
+			break;
 		case QMetaType::LongLong:
 			filterValue = QString::number(filter.filterValue.toLongLong(&isOk));
 			type = "int";
