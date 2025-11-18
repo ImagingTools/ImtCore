@@ -82,6 +82,11 @@ Item {
 				ctx.arc(cx, cy, r, angle, nextAngle, !pieChart.clockwise)
 				ctx.closePath()
 				ctx.fillStyle = seg.color || "#ccc"
+				let isHovered = (ma.highlightedSegment === seg)
+				ctx.fillStyle = isHovered
+						? Functions.darkenColor(seg.color, 1.4)
+						: seg.color || "#ccc"
+				
 				ctx.fill()
 
 				angle = nextAngle
@@ -142,4 +147,118 @@ Item {
 			}
 		}
 	}
+
+	Rectangle {
+		id: tooltip
+		visible: false
+		z: 9999
+		color: Style.baseColor
+		radius: Style.radiusS
+		border.width: Style.buttonBorderWidth
+		border.color: Style.borderColor
+	
+		Text {
+			id: tooltipText
+			anchors.centerIn: parent
+			color: Style.textColor
+			font.pixelSize: Style.fontSizeM
+			font.family: Style.fontFamily
+		}
+	
+		width: tooltipText.width + 2*Style.marginS
+		height: tooltipText.height + 2*Style.marginXS
+	}
+	
+	MouseArea {
+		id: ma
+		anchors.fill: parent
+		hoverEnabled: true
+		preventStealing: true
+	
+		property var highlightedSegment: null
+	
+		onPositionChanged: {
+			let mx = mouse.x
+			let my = mouse.y
+	
+			let cx = canvas.width / 2
+			let cy = canvas.height / 2
+			let dx = mx - cx
+			let dy = my - cy
+			let dist = Math.sqrt(dx*dx + dy*dy)
+	
+			let r = Math.min(canvas.width, canvas.height) / 2
+			let innerR = pieChart.ring ? r * pieChart.ringThickness : 0
+
+			if (dist > r || dist < innerR) {
+				highlightedSegment = null
+				tooltip.visible = false
+				canvas.requestPaint()
+				return
+			}
+	
+			let angle = Math.atan2(dy, dx)
+			if (angle < -Math.PI/2) angle += 2*Math.PI
+	
+			let start = pieChart.rotationAngle * Math.PI/180
+			let dir = pieChart.clockwise ? 1 : -1
+	
+			let total = pieChart.getTotalValue()
+			let cur = start
+	
+			let found = null
+	
+			for (let seg of pieChart.segments) {
+				let portion = (seg.value / total) * 2*Math.PI * dir
+				let next = cur + portion
+	
+				let a1 = cur
+				let a2 = next
+	
+				let norm = angle
+	
+				if (dir === 1) {
+					if (norm >= a1 && norm <= a2)
+						found = seg
+				} else {
+					if (norm <= a1 && norm >= a2)
+						found = seg
+				}
+	
+				cur = next
+			}
+	
+			if (highlightedSegment !== found) {
+				highlightedSegment = found
+				canvas.requestPaint()
+			}
+	
+			if (found) {
+				tooltipText.text = found.label + ": " + found.value
+	
+				let pad = 10
+				let tx = mx + pad
+				let ty = my + pad
+	
+				if (tx + tooltip.width > canvas.width)
+					tx = canvas.width - tooltip.width
+	
+				if (ty + tooltip.height > canvas.height)
+					ty = canvas.height - tooltip.height
+	
+				tooltip.x = tx
+				tooltip.y = ty
+				tooltip.visible = true
+			} else {
+				tooltip.visible = false
+			}
+		}
+	
+		onExited: {
+			highlightedSegment = null
+			tooltip.visible = false
+			canvas.requestPaint()
+		}
+	}
+	
 }

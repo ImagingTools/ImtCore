@@ -9,7 +9,6 @@ Item{
 	property color axisColor: "#999"
 	property color gridColor: "#ddd"
 	property color textColor: Style.textColor
-	property real barSpacing: Style.spacingM
 	property real barWidth: 28
 	property real labelFontSize: Style.fontSizeXS
 	property bool showValues: false
@@ -225,7 +224,6 @@ Item{
 		}
 	}
 
-	// === Обработка мыши ===
 	MouseArea{
 		anchors.fill: chart
 		hoverEnabled: true
