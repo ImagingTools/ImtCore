@@ -270,7 +270,7 @@ class BaseClass extends QtObject {
 			let key = list[i]
 			if(key === '__typename' && this[key] === '') continue
 
-			if (this._internal.containceInRemoved(key)){
+			if (this[key] == null && this._internal.containceInRemoved(key)){
 				continue
 			}
 			if (!isFirst) json += ','
@@ -328,7 +328,7 @@ class BaseClass extends QtObject {
 		let isFirst = true
 		for (let i = 0; i < list.length; i++) {
 			let key = list[i]
-			if (this._internal.containceInRemoved(key)){
+			if (this[key] == null && this._internal.containceInRemoved(key)){
 				continue
 			}
 			if (!isFirst) graphQL += ','

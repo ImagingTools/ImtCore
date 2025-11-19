@@ -55,7 +55,7 @@ class QWebSocket extends QtObject {
         }
 
         this.status = QWebSocket.Connecting
-        this.__socket = new WebSocket(this.url)
+        this.__socket = new WebSocket(this.url.replaceAll('#jqdebug', ''))
         this.__socket.onopen = () => {
             this.status = QWebSocket.Open
         }
