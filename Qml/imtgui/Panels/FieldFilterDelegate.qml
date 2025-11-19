@@ -81,7 +81,9 @@ OptionsFilterDelegate {
 		internal.prevSelectedIds = optionIds
 		internal.prevSelectedIndexes = optionIndexes
 
-		collectionFilter.filterChanged()
+		if (!beQuiet){
+			collectionFilter.filterChanged()
+		}
 	}
 	
 	function setFieldFilterForOption(optionId, fieldFilter){

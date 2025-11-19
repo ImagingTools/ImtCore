@@ -10,7 +10,6 @@ Item{
 	property color gridColor: "#ddd"
 	property color textColor: Style.textColor
 	property real barWidth: 28
-	property real labelFontSize: Style.fontSizeXS
 	property bool showValues: false
 	property bool showLegend: true
 	property bool legendHorizontal: true
@@ -21,7 +20,9 @@ Item{
 	property var legendItems: []
 
 	property var segmentsRects: []
-	property var hoveredSegment: null
+
+	property bool legendClickable: false
+	signal legendClicked(string id, string label, string color, int value)
 
 	onBarsChanged:{
 		buildLegend()
@@ -71,6 +72,8 @@ Item{
 		anchors.bottomMargin: Style.marginM
 		antialiasing: true
 
+		property string highlightedLegendId
+
 		onPaint:{
 			let ctx = getContext("2d")
 			ctx.reset()
@@ -116,7 +119,7 @@ Item{
 			ctx.lineTo(availableWidth - 10, baseY)
 			ctx.stroke()
 
-			ctx.font = chart.labelFontSize + "px sans-serif"
+			ctx.font =  Style.fontSizeXS + "px sans-serif"
 			ctx.fillStyle = chart.textColor
 			ctx.textAlign = "right"
 			ctx.textBaseline = "middle"
@@ -143,7 +146,8 @@ Item{
 					let segHeight = (seg.value / axisMax) * availableHeight
 					y -= segHeight
 
-					if (chart.hoveredSegment === seg){
+					let isHighlighted = (seg.label === canvas.highlightedLegendId);
+					if (isHighlighted){
 						ctx.fillStyle = Functions.darkenColor(seg.color,1.4)
 					} else{
 						ctx.fillStyle = seg.color || "#ccc"
@@ -161,7 +165,7 @@ Item{
 
 					if (chart.showValues && seg.value > 0){
 						ctx.fillStyle = chart.textColor
-						ctx.font = chart.labelFontSize + "px sans-serif"
+						ctx.font = Style.fontSizeXS + "px sans-serif"
 						ctx.textAlign = "center"
 						ctx.textBaseline = "middle"
 						ctx.fillText(seg.value, x + barWidth / 2, y + segHeight / 2)
@@ -169,7 +173,7 @@ Item{
 				}
 
 				ctx.fillStyle = chart.textColor
-				ctx.font = chart.labelFontSize + "px sans-serif"
+				ctx.font = Style.fontSizeXS + "px sans-serif"
 				ctx.textAlign = "center"
 				ctx.textBaseline = "top"
 				ctx.fillText(bar.label, x + barWidth / 2, baseY + 6)
@@ -180,16 +184,16 @@ Item{
 			ctx.rotate(-Math.PI / 2)
 			ctx.textAlign = "center"
 			ctx.textBaseline = "middle"
-			ctx.font = (chart.labelFontSize + 2) + "px sans-serif"
+			ctx.font = (Style.fontSizeXS + 2) + "px sans-serif"
 			ctx.fillStyle = chart.textColor
 			ctx.fillText(chart.yLabel, 0, -3)
 			ctx.restore()
 
-			ctx.font = (chart.labelFontSize + 2) + "px sans-serif"
+			ctx.font = (Style.fontSizeXS + 2) + "px sans-serif"
 			ctx.textAlign = "center"
 			ctx.textBaseline = "top"
 			ctx.fillStyle = chart.textColor
-			let xLabelMargin = 25
+			let xLabelMargin = 23
 			ctx.fillText(chart.xLabel, offsetLeft + contentWidth / 2, baseY + xLabelMargin)
 		}
 	}
@@ -197,7 +201,7 @@ Item{
 	Flow{
 		id: legend
 		width: parent.width
-		spacing: Style.spacingM
+		spacing: Style.spacingL
 		anchors.bottom: parent.bottom
 		anchors.horizontalCenter: parent.horizontalCenter
 		visible: chart.showLegend
@@ -208,24 +212,51 @@ Item{
 			delegate: Row{
 				spacing: Style.marginM
 				Rectangle{
-					width: 12
-					height: 12
-					radius: 3
+					width: Style.fontSizeXS
+					height: Style.fontSizeXS
+					radius: Style.radiusS
 					color: modelData.color
 					anchors.verticalCenter: parent.verticalCenter
 				}
+
 				Text{
+					id: labelText
 					text: modelData.label
-					color: chart.textColor
-					font.pixelSize: chart.labelFontSize
+					color: chart.legendClickable ? "#0b5ed7":chart.textColor
+					font.pixelSize: Style.fontSizeS
 					anchors.verticalCenter: parent.verticalCenter
+
+					MouseArea{
+						id: legendMouse
+						anchors.fill: labelText
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						visible: chart.legendClickable
+					
+						onEntered:{
+							canvas.highlightedLegendId = modelData.label
+							canvas.requestPaint()
+						}
+
+						onExited:{
+							if (!ma.containsMouse){
+								canvas.highlightedLegendId = ""
+								canvas.requestPaint()
+							}
+						}
+
+						onClicked:{
+							chart.legendClicked(modelData.id, modelData.label, modelData.color, modelData.value)
+						}
+					}
 				}
 			}
 		}
 	}
 
 	MouseArea{
-		anchors.fill: chart
+		id: ma
+		anchors.fill: canvas
 		hoverEnabled: true
 		preventStealing: true
 
@@ -243,11 +274,13 @@ Item{
 				}
 			}
 
-			if (hovered !== chart.hoveredSegment){
-				chart.hoveredSegment = hovered
-				canvas.requestPaint()
+			canvas.highlightedLegendId = ""
+			if (hovered !== null){
+				canvas.highlightedLegendId = hovered.label
 			}
-
+			
+			canvas.requestPaint()
+			
 			if (hovered){
 				tooltipText.text = hovered.label + ": " + hovered.value
 			
@@ -272,7 +305,7 @@ Item{
 
 		onExited:{
 			tooltip.visible = false
-			chart.hoveredSegment = null
+			canvas.highlightedLegendId = ""
 			canvas.requestPaint()
 		}
 	}

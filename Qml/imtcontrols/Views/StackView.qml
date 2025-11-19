@@ -16,7 +16,6 @@ Item{
         itemConnections.target = null
 
         if (item && adaptSizeToCurrentPage){
-            console.log("onCurrentPageChanged", item.height)
             width = item.width
             height = item.height
             itemConnections.target = item
@@ -26,7 +25,6 @@ Item{
     Connections {
         id: itemConnections
         function onHeightChanged(){
-            console.log("itemConnections onHeightChanged", target.height)
             if (container.adaptSizeToCurrentPage){
                 container.height = target.height
             }

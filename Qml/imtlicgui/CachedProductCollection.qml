@@ -65,6 +65,21 @@ CollectionDataProvider {
 
 		return null
 	}
+
+	function getProductIdByName(productName){
+		if (!collectionModel){
+			return ""
+		}
+
+		for (let i = 0; i < collectionModel.getItemsCount(); ++i){
+			let name = collectionModel.getData(ProductItemTypeMetaInfo.s_name, i);
+			if (name === productName){
+				return collectionModel.getData(ProductItemTypeMetaInfo.s_id, i);
+			}
+		}
+
+		return ""
+	}
 }
 
 

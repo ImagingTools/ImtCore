@@ -24,6 +24,10 @@ Item {
 
 	signal clearFilter()
 	signal openFilter()
+	
+	onReadOnlyChanged: {
+		console.log("FilterDelegateBase.qml onReadOnlyChanged", readOnly)
+	}
 
 	Connections {
 		target: filterDelegateBase.collectionFilter

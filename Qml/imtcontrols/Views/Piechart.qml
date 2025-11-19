@@ -2,7 +2,7 @@ import QtQuick 2.15
 import Acf 1.0
 import imtcontrols 1.0
 
-Item {
+Item{
 	id: pieChart
 	width: Style.sizeHintL
 	height: Style.sizeHintM
@@ -14,18 +14,19 @@ Item {
 	property real rotationAngle: -90
 	property bool showLegend: true
 	property bool showPercent: true
-	property bool legendHorizontal: false
+	property bool legendClickable: false
 
 	signal chartUpdated()
+	signal legendClicked(string id, string label, string color, int value)
 
-	function getTotalValue() {
+	function getTotalValue(){
 		let total = 0
 		for (let i = 0; i < segments.length; ++i)
 			total += segments[i].value || 0
 		return total
 	}
 
-	function getPercentText(value) {
+	function getPercentText(value){
 		let total = getTotalValue()
 		if (total <= 0 || segments.length === 0)
 			return ""
@@ -33,24 +34,28 @@ Item {
 		return percent + "%"
 	}
 
-	function updateGui() {
+	function updateGui(){
 		let totalValue = getTotalValue()
 		if (totalValue <= 0 || segments.length === 0)
 			return
 
-		segments.sort(function(a, b) { return b.value - a.value })
+		segments.sort(function(a, b){ return b.value - a.value })
 
-		for (let i = 0; i < segments.length; ++i) {
+		for (let i = 0; i < segments.length; ++i){
 			let seg = segments[i]
 			let percentText = getPercentText(seg.value)
+			if (!seg.id){
+				seg.id = String(i)
+			}
+
 			seg.displayText = seg.value + (percentText ? " (" + percentText + ")" : "")
 		}
 		chartUpdated()
 	}
 
-	onSegmentsChanged: { updateGui(); canvas.requestPaint() }
+	onSegmentsChanged:{ updateGui(); canvas.requestPaint() }
 
-	Canvas {
+	Canvas{
 		id: canvas
 		anchors.top: parent.top
 		anchors.left: parent.left
@@ -59,7 +64,7 @@ Item {
 		anchors.bottomMargin: Style.marginM
 		antialiasing: true
 
-		onPaint: {
+		onPaint:{
 			let ctx = getContext("2d")
 			ctx.reset()
 
@@ -73,7 +78,7 @@ Item {
 			let angle = pieChart.rotationAngle * Math.PI / 180
 			let direction = pieChart.clockwise ? 1 : -1
 
-			for (let seg of pieChart.segments) {
+			for (let seg of pieChart.segments){
 				let portion = (seg.value / total) * 2 * Math.PI * direction
 				let nextAngle = angle + portion
 
@@ -82,7 +87,12 @@ Item {
 				ctx.arc(cx, cy, r, angle, nextAngle, !pieChart.clockwise)
 				ctx.closePath()
 				ctx.fillStyle = seg.color || "#ccc"
-				let isHovered = (ma.highlightedSegment === seg)
+
+				let isHovered = false
+				if (ma.hoveredId !== ""){
+					isHovered = ma.hoveredId === seg.id
+				}
+
 				ctx.fillStyle = isHovered
 						? Functions.darkenColor(seg.color, 1.4)
 						: seg.color || "#ccc"
@@ -92,7 +102,7 @@ Item {
 				angle = nextAngle
 			}
 
-			if (pieChart.ring) {
+			if (pieChart.ring){
 				let innerR = r * pieChart.ringThickness
 				ctx.beginPath()
 				ctx.arc(cx, cy, innerR, 0, 2 * Math.PI)
@@ -102,7 +112,7 @@ Item {
 		}
 	}
 
-	Column {
+	Column{
 		id: legend
 		anchors.bottom: parent.bottom
 		anchors.horizontalCenter: parent.horizontalCenter
@@ -111,34 +121,62 @@ Item {
 
 		clip: true
 
-		Repeater {
+		Repeater{
 			model: pieChart.segments
-			delegate: Row {
+			delegate: Row{
 				width: legend.width
 				height: 20
 				spacing: Style.marginM
 
-				Rectangle {
-					width: Style.fontSizeM
-					height: 14
-					radius: 3
-					color: modelData.color || "#ccc"
+				Rectangle{
 					anchors.verticalCenter: parent.verticalCenter
+					width: Style.fontSizeXS
+					height: Style.fontSizeXS
+					radius: Style.radiusS
+					color: modelData.color || "#ccc"
 				}
 
-				Text {
+				Text{
+					id: labelText
+					anchors.verticalCenter: parent.verticalCenter
+					verticalAlignment: Text.AlignVCenter
 					text: modelData.label || ""
-					color: Style.textColor
-					font.pixelSize: Style.fontSizeM
+					color: pieChart.legendClickable ? "#0b5ed7": Style.textColor
+					font.pixelSize: Style.fontSizeS
 					elide: Text.ElideRight
 					width: legend.width * 0.4
-					verticalAlignment: Text.AlignVCenter
+
+					MouseArea{
+						id: legendMouse
+						width: labelText.width
+						height: labelText.height
+						hoverEnabled: true
+						cursorShape: Qt.PointingHandCursor
+						visible: pieChart.legendClickable
+					
+						onEntered:{
+							ma.hoveredId = modelData.id
+							canvas.requestPaint()
+						}
+					
+						onExited:{
+							if (!ma.containsMouse){
+								ma.hoveredId = ""
+								canvas.requestPaint()
+							}
+						}
+					
+						onClicked:{
+							pieChart.legendClicked(modelData.id, modelData.label, modelData.color, modelData.value)
+						}
+					}
 				}
 
-				Text {
+				Text{
+					anchors.verticalCenter: parent.verticalCenter
 					text: modelData.displayText || ""
 					color: Style.textColor
-					font.pixelSize: Style.fontSizeM
+					font.pixelSize: Style.fontSizeS
 					visible: pieChart.showPercent
 					elide: Text.ElideRight
 					width: legend.width * 0.4
@@ -148,7 +186,7 @@ Item {
 		}
 	}
 
-	Rectangle {
+	Rectangle{
 		id: tooltip
 		visible: false
 		z: 9999
@@ -157,7 +195,7 @@ Item {
 		border.width: Style.buttonBorderWidth
 		border.color: Style.borderColor
 	
-		Text {
+		Text{
 			id: tooltipText
 			anchors.centerIn: parent
 			color: Style.textColor
@@ -169,15 +207,15 @@ Item {
 		height: tooltipText.height + 2*Style.marginXS
 	}
 	
-	MouseArea {
+	MouseArea{
 		id: ma
-		anchors.fill: parent
+		anchors.fill: canvas
 		hoverEnabled: true
 		preventStealing: true
 	
-		property var highlightedSegment: null
+		property string hoveredId: ""
 	
-		onPositionChanged: {
+		onPositionChanged:{
 			let mx = mouse.x
 			let my = mouse.y
 	
@@ -190,8 +228,8 @@ Item {
 			let r = Math.min(canvas.width, canvas.height) / 2
 			let innerR = pieChart.ring ? r * pieChart.ringThickness : 0
 
-			if (dist > r || dist < innerR) {
-				highlightedSegment = null
+			if (dist > r || dist < innerR){
+				hoveredId = ""
 				tooltip.visible = false
 				canvas.requestPaint()
 				return
@@ -208,7 +246,7 @@ Item {
 	
 			let found = null
 	
-			for (let seg of pieChart.segments) {
+			for (let seg of pieChart.segments){
 				let portion = (seg.value / total) * 2*Math.PI * dir
 				let next = cur + portion
 	
@@ -217,10 +255,12 @@ Item {
 	
 				let norm = angle
 	
-				if (dir === 1) {
+				if (dir === 1){
 					if (norm >= a1 && norm <= a2)
 						found = seg
-				} else {
+					
+				}
+				else{
 					if (norm <= a1 && norm >= a2)
 						found = seg
 				}
@@ -228,12 +268,12 @@ Item {
 				cur = next
 			}
 	
-			if (highlightedSegment !== found) {
-				highlightedSegment = found
+			if (found !== null){
+				hoveredId = found.id
 				canvas.requestPaint()
 			}
 	
-			if (found) {
+			if (found){
 				tooltipText.text = found.label + ": " + found.value
 	
 				let pad = 10
@@ -249,13 +289,14 @@ Item {
 				tooltip.x = tx
 				tooltip.y = ty
 				tooltip.visible = true
-			} else {
+			}
+			else{
 				tooltip.visible = false
 			}
 		}
 	
-		onExited: {
-			highlightedSegment = null
+		onExited:{
+			hoveredId = ""
 			tooltip.visible = false
 			canvas.requestPaint()
 		}

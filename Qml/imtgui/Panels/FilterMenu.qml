@@ -50,6 +50,16 @@ ControlBase {
         }
     }
 
+    function getFilterDelegate(filterId){
+        for (let i = 0; i < filtersModel.count; i++){
+            if (filtersModel.get(i).id === filterId){
+                return filtersModel.get(i).item
+            }
+        }
+
+        return null
+    }
+
     function setFilterDependency(filterId, dependsOnFilterId){
         if (filterId in filterDependencies){
             filterDependencies[filterId].push(dependsOnFilterId)

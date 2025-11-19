@@ -142,6 +142,8 @@ DecoratorBase {
 							item.collectionFilter = filterPanelDecorator.complexFilter
 							item.documentFilter = filterPanelDecorator.documentFilter
 							item.filterMenu = filterPanelDecorator.baseElement
+
+							filterPanelDecorator.baseElement.filtersModel.setProperty(model.index, "item", item)
 						}
 						
 						Connections {

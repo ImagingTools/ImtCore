@@ -13,7 +13,7 @@ FilterDelegateBase {
 
 	property int visibleItemCount: 5
 
-	signal optionSelectionChanged(var optionIds, var optionIndexes)
+	signal optionSelectionChanged(var optionIds, var optionIndexes, bool beQuiet)
 
 	onCollectionFilterChanged: {
 		if (collectionFilter && selectionParam && internal.delaySignal){
@@ -42,9 +42,20 @@ FilterDelegateBase {
 		property bool block: false
 	}
 
-	function setSelectedIndex(index){
+	function setSelectedId(optionId, beQuiet){
+		let optionIndex = getOptionIndex(optionId)
+		if (optionIndex >= 0){
+			setSelectedIndex(optionIndex, beQuiet)
+		}
+	}
+
+	function setSelectedIndex(index, beQuiet){
 		if (!selectionParam){
 			return
+		}
+
+		if (!beQuiet){
+			beQuiet = false
 		}
 
 		internal.block = true
@@ -52,24 +63,22 @@ FilterDelegateBase {
 		let optionIds = []
 		let optionIndexes = []
 		if (index >= 0){
-			if (index !== selectionParam.m_selectedIndex){
-				selectionParam.m_selectedIndex = index
-				optionIds = [getOptionId(index)]
-				optionIndexes = [index]
-			}
+			selectionParam.m_selectedIndex = index
+			optionIds = [getOptionId(index)]
+			optionIndexes = [index]
 		}
 		else{
 			selectionParam.m_selectedIndex = -1
 		}
-		
+
 		if (!collectionFilter){
 			internal.block = false
 			internal.delaySignal = true
 			return
 		}
-		
-		optionSelectionChanged(optionIds, optionIndexes)
-		
+
+		optionSelectionChanged(optionIds, optionIndexes, beQuiet)
+
 		internal.block = false
 	}
 

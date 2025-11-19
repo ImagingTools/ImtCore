@@ -31,7 +31,8 @@ Item {
 	property string contentColor: Style.backgroundColor2
 
 	property bool commandsPanelVisible: true
-	
+	property int commandsPanelHeight: Style.controlHeightM + 2 * Style.marginM
+
 	signal commandsModelChanged(var commandsModel)
 	signal commandActivated(string commandId)
 	signal modelDataChanged(var view, var model)
@@ -91,7 +92,7 @@ Item {
 		anchors.top: alertPanel.bottom;
 		anchors.left: parent.left;
 		anchors.right: parent.right;
-		height: visible ? Style.controlHeightM + 2 * Style.marginM : 0;
+		height: visible ? viewBase.commandsPanelHeight : 0;
 		objectName: "ViewBase";
 		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
 		
