@@ -52,6 +52,7 @@ Rectangle{
 
 	property bool wasFitToWidth: false;
 
+	property int legendFontSize: Style.fontSizeM
 
 	function requestPaint() {
 		graphicsView.resize()
@@ -309,6 +310,7 @@ Rectangle{
 		anchors.bottom: parent.bottom;
 		anchors.horizontalCenter: parent.horizontalCenter;
 		text: graph.legendX
+		font.pixelSize: graph.legendFontSize
 	}
 	BaseText{
 		id: curveLegendY;
@@ -318,6 +320,7 @@ Rectangle{
 		anchors.verticalCenter: parent.verticalCenter;
 		rotation: -90;
 		text: graph.legendY
+		font.pixelSize: graph.legendFontSize
 	}
 
 

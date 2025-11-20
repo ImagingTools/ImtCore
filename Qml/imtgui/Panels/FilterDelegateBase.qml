@@ -22,7 +22,7 @@ Item {
 	property alias mainButton: mainButton_
 	property alias clearButton: clearButton_
 
-	signal clearFilter()
+	signal clearFilter(bool beQiuet)
 	signal openFilter()
 	
 	onReadOnlyChanged: {
@@ -37,8 +37,8 @@ Item {
 			}
 		}
 
-		function onCleared(){
-			filterDelegateBase.clearFilter()
+		function onCleared(beQiuet){
+			filterDelegateBase.clearFilter(beQiuet)
 		}
 	}
 

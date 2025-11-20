@@ -62,6 +62,8 @@ ViewCommandsDelegateBase {
 			if (collectionView.dataController){
 				controllerConnections.target = collectionView.dataController;
 			}
+
+			updateBaseCommandsAccent()
 		}
 	}
 

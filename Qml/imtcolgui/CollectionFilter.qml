@@ -84,7 +84,7 @@ ComplexCollectionFilter{
 		\qmlsignal cleared
 		Emitted when the filter is cleared.
 	*/
-	signal cleared()
+	signal cleared(bool beQiuet)
 
 	signal fieldFilterAdded(string fieldId, var fieldValue)
 	signal fieldFilterRemoved(string fieldId)
@@ -334,13 +334,13 @@ ComplexCollectionFilter{
 		\qmlmethod void clearAllFilters()
 		Clears all filters: sorting, fields, time, and distinct filters.
 	*/
-	function clearAllFilters(){
+	function clearAllFilters(beQiuet){
 		clearSortFilter()
 		clearFieldsFilter()
 		clearTimeFilter()
 		clearDistinctFilter()
 		clearTextFilter()
-		cleared()
+		cleared(beQiuet)
 	}
 
 	/*!

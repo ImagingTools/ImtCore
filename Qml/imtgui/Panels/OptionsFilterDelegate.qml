@@ -209,7 +209,7 @@ FilterDelegateBase {
 	}
 
 	onClearFilter: {
-		setSelectedIndex(-1)
+		setSelectedIndex(-1, beQiuet)
 	}
 
 	Component {
