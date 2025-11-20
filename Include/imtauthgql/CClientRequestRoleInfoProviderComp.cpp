@@ -79,10 +79,6 @@ const imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const 
 		roleInfoPtr->SetRoleDescription(*payload.Version_1_0->description);
 	}
 
-	if (payload.Version_1_0->description){
-		roleInfoPtr->SetRoleDescription(*payload.Version_1_0->description);
-	}
-
 	if (payload.Version_1_0->isDefault){
 		roleInfoPtr->SetDefault(*payload.Version_1_0->isDefault);
 	}
