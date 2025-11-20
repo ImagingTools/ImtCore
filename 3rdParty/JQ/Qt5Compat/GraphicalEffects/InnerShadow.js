@@ -57,12 +57,12 @@ class InnerShadow extends Item {
     }
 
     __updateShadow(){
-        // if(this.source && this.visible){
-        //     let rgba = this.__getDataQml('color').__toRGBA()
-        //     this.source.__setDOMStyle({
-        //         boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity}) inset`
-        //     })
-        // }
+        if(this.source && this.visible){
+            let rgba = Color.getRGBA(this.__proxy, 'color', this.__self.constructor.meta.color)
+            this.source.__setDOMStyle({
+                boxShadow: `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity}) inset`
+            })
+        }
     }
 }
 
