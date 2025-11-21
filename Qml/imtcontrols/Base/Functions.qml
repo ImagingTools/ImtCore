@@ -398,4 +398,21 @@ QtObject {
 		return "#" + toHex(r) + toHex(g) + toHex(b);
 	}
 
+
+	/*!
+		Compares the floating point value \c a and \c b and returns \c true if they are considered equal, otherwise \c false.
+		\note that comparing values where either \c a or \c b is 0.0 will not work, nor does comparing values where one of the values is NaN or infinity.
+			If one of the values is always 0.0, use \c fuzzyIsNull instead. If one of the values is likely to be 0.0, one solution is to add 1.0 to both values.
+		\sa fuzzyIsNull
+	*/
+	function fuzzyCompare(a, b, tolerance){
+		if(!tolerance){
+			tolerance = 100000
+		}
+		return (Math.abs(a - b) * tolerance) <= Math.min(Math.abs(a), Math.abs(b))
+	}
+
+	function fuzzyIsNull(a){
+		return Math.abs(a) <= 0.00001;
+	}
 }
