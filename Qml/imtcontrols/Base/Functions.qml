@@ -12,6 +12,10 @@ QtObject {
 		return Math.round(parseFloat(digit) * Math.pow(10,precision)) / Math.pow(10,precision)
 	}
 
+	function isFloatNumber(value) {
+		return typeof value === 'number' && (value % 1 !== 0);
+	}
+
 
 	function formatDigit(number_, decimalRoundupPrecision){
 		let numberString = String(number_).replace(",",".")
@@ -222,8 +226,15 @@ QtObject {
 	}
 
 	function hasElementInList(listArg, valueArg){
+		let isArgFloat = isFloatNumber(valueArg)
 		for (let i = 0; i < listArg.length; ++i){
-			if (listArg[i] == valueArg){
+			let listElement = listArg[i]
+			if (isArgFloat) {
+				if (isFloatNumber(listElement) && fuzzyCompare(valueArg, listElement)) {
+					return true
+				}
+			}
+			else if (listElement === valueArg){
 				return true
 			}
 		}
