@@ -572,6 +572,7 @@ StyleComponents {
 				id: backgroundRec;
 
 				anchors.left: switchItem.left;
+				anchors.leftMargin: !switchItem.baseElement ? 0 : !switchItem.baseElement.isLeftText ? 0 : switchText.width  + switchItem.baseElement.mainMargin;
 				anchors.verticalCenter: switchItem.verticalCenter;
 
 				width: switchItem.backgroundWidth;
@@ -589,7 +590,7 @@ StyleComponents {
 
 				anchors.verticalCenter: switchItem.verticalCenter;
 
-				x: !switchItem.baseElement ? 0 : switchItem.baseElement.controlRecX;
+				x: !switchItem.baseElement ? 0 : backgroundRec.x + switchItem.baseElement.controlRecX;
 				width: switchItem.height;
 				height: width;
 				radius: width;
