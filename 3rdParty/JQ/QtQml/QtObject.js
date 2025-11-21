@@ -20,6 +20,7 @@ class QtObject extends QObject {
         childrenChanged: {type:Signal, args:[]},
         resourcesChanged: {type:Signal, args:[]},
         dataChanged: {type:Signal, args:[]},
+        indexChanged: {type:Signal, args:[]},
 
         'Component.completed': {type:Signal, args:[]},
         'Component.destruction': {type:Signal, args:[]},

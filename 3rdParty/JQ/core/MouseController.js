@@ -165,7 +165,7 @@ module.exports = {
             event.originX = e.pageX
             event.originY = e.pageY
 
-            // if(!event.target) JQApplication.setCursor(QtEnums.ArrowCursor)
+            JQApplication.setCursor('unset')
 
             if(event.pressed){
                 if(Math.abs(event.startX - event.originX) > 15) event.wasDragX = true

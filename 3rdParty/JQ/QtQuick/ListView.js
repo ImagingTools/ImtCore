@@ -353,6 +353,23 @@ class ListView extends Flickable {
             item.visibleChanged.connect(() => {
                 JQApplication.updateLater(this)
             })
+            item.indexChanged.connect(() => {
+                let _index = this.__items.indexOf(item)
+                if (this.orientation === ListView.Horizontal) {
+                    if(_index > 0){
+                        item.x = this.__items[_index - 1].x + this.__items[_index - 1].width + this.spacing
+                    } else {
+                        item.x = this.originX
+                    }
+                } else {
+                    if(_index > 0){
+                        item.y = this.__items[_index - 1].y + this.__items[_index - 1].height + this.spacing
+                    } else {
+                        item.y = this.originY
+                    }
+                }
+                JQApplication.updateLater(this)
+            })
 
             item.x = itemInfo.x
             item.y = itemInfo.y

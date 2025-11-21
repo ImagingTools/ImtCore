@@ -97,7 +97,7 @@ class MouseArea extends Item {
             this.mouseX = mouse.x
             this.mouseY = mouse.y
             // console.log(this)
-            // JQApplication.setCursor(this.cursorShape)
+            JQApplication.setCursor(this.cursorShape)
             this.positionChanged(mouse)
         }
     }

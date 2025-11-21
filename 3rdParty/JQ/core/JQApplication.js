@@ -245,9 +245,21 @@ module.exports = {
     },
 
     setCursor(cursorShape){
+        if(!this.isCursorChanged){
+            this.root.__setDOMStyle({
+                pointerEvents: 'all',
+                cursor: cursorShape
+            })
+            this.isCursorChanged = true
+        }
+    },
+
+    resetCursor(){
         this.root.__setDOMStyle({
-            cursor: cursorShape
+            pointerEvents: 'all',
+            cursor: 'unset'
         })
+        delete this.isCursorChanged
     },
 
     beginUpdate: function(){
