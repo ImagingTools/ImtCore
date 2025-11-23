@@ -1124,7 +1124,9 @@ bool CSqlDatabaseDocumentDelegateComp::CreateSortQuery(const imtbase::IComplexCo
 {
 	bool retVal = BaseClass::CreateSortQuery(collectionFilter, sortQuery);
 
-	SubstituteFieldIds(sortQuery, false);
+	if (!sortQuery.isEmpty()) {
+		SubstituteFieldIds(sortQuery, false);
+	}
 
 	return retVal;
 }
@@ -1371,8 +1373,9 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITim
 bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const imtbase::IComplexCollectionFilter& collectionFilter, QString& filterQuery) const
 {
 	filterQuery = CComplexCollectionFilterConverter::CreateSqlFilterQuery(collectionFilter, CComplexCollectionFilterConverter::SC_POSTGRES);
-
-	SubstituteFieldIds(filterQuery);
+	if (!filterQuery.isEmpty()) {
+		SubstituteFieldIds(filterQuery);
+	}
 
 	return true;
 }
@@ -1402,7 +1405,9 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICom
 
 void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool castToStr) const
 {
-	static const QRegularExpression regexp(
+	Q_ASSERT(!query.isEmpty());
+
+	const QRegularExpression regexp(
 		R"re((?=(?:[^']*'[^']*')*[^']*$)(?:(?<=\s)|(?<=\()|^)"([^"]+)"(?=(?:::[A-Za-z_][A-Za-z0-9_]*)?[\s=)\,]|$))re"
 	);
 
@@ -1417,7 +1422,8 @@ void CSqlDatabaseDocumentDelegateComp::SubstituteFieldIds(QString& query, bool c
 		list.append(capturedList.first());
 	}
 #else
-	for (const QRegularExpressionMatch& match : regexp.globalMatch(query)){
+	auto results = regexp.globalMatch(query);
+	for (const QRegularExpressionMatch& match : results){
 		QStringList capturedList = match.capturedTexts();
 		list.append(capturedList.first());
 	}

@@ -93,15 +93,11 @@ void CCompositeObjectViewComp::CreateView()
 		int factoryCount = qMin(m_objectViewFactoryListCompPtr.GetCount(), m_objectTypeAttrPtr.GetCount());
 		for (int factoryCounter = 0; factoryCounter < factoryCount; factoryCounter++){
 			if (objectTypeId == m_objectTypeAttrPtr[factoryCounter]){
-				icomp::IComponent* viewComponentPtr = m_objectViewFactoryListCompPtr.CreateComponent(factoryCounter);
-				iqtgui::IGuiObject* viewGuiObjectPtr = m_objectViewFactoryListCompPtr.ExtractInterface(viewComponentPtr);
-				imod::IObserver* viewObserverPtr = m_objectObserverFactoryListCompPtr.ExtractInterface(viewComponentPtr);
+				icomp::IComponentSharedPtr viewComponentPtr = m_objectViewFactoryListCompPtr.CreateComponent(factoryCounter);
+				iqtgui::IGuiObject* viewGuiObjectPtr = m_objectViewFactoryListCompPtr.ExtractInterface(viewComponentPtr.get());
+				imod::IObserver* viewObserverPtr = m_objectObserverFactoryListCompPtr.ExtractInterface(viewComponentPtr.get());
 				
 				if (viewObserverPtr == nullptr){
-					if (viewComponentPtr != nullptr){
-						delete viewComponentPtr;
-					}
-
 					break;
 				}
 
@@ -128,8 +124,8 @@ void CCompositeObjectViewComp::CreateView()
 							if (objectFromExtendId == currentObjectId){
 								objectFromExtendPtr = objectProviderPtr->GetObjectPtr(objectFromExtendId);
 								if (objectFromExtendPtr != nullptr){
-									icomp::IComponent* viewExtenderComponentPtr = m_viewExtendersCompPtr.CreateComponent(extenderCounter);
-									imtgui::IViewExtender* viewExtenderPtr = dynamic_cast<imtgui::IViewExtender*>(viewExtenderComponentPtr);
+									icomp::IComponentSharedPtr viewExtenderComponentPtr = m_viewExtendersCompPtr.CreateComponent(extenderCounter);
+									imtgui::IViewExtender* viewExtenderPtr = dynamic_cast<imtgui::IViewExtender*>(viewExtenderComponentPtr.get());
 									Q_ASSERT(viewExtenderPtr != nullptr);
 
 									viewExtenderPtr->AddItems(viewObserverPtr, objectFromExtendPtr);
@@ -149,19 +145,13 @@ void CCompositeObjectViewComp::DestroyView()
 {
 	m_objectIds.clear();
 
-	for (icomp::IComponent* viewExtenderPtr : m_viewExtenders){
-		delete viewExtenderPtr;
-	}
-
 	m_viewExtenders.clear();
 
-	for (icomp::IComponent* viewComponentPtr : m_views){
-		iqtgui::IGuiObject* viewGuiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewComponentPtr);
+	for (icomp::IComponentSharedPtr viewComponentPtr : m_views){
+		iqtgui::IGuiObject* viewGuiObjectPtr = CompCastPtr<iqtgui::IGuiObject>(viewComponentPtr.get());
 		if (viewGuiObjectPtr != nullptr){
 			viewGuiObjectPtr->DestroyGui();
 		}
-	
-		delete viewComponentPtr;
 	}
 
 	m_views.clear();

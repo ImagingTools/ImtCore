@@ -128,7 +128,7 @@ ICollectionViewDelegate* CObjectCollectionViewComp::GetViewDelegatePtr(const QBy
 			return m_viewDelegateMap[typeId];
 		}
 		else{
-			QByteArray componentId = GetComponentId(GetComponentContext());
+			QByteArray componentId = GetComponentId(GetComponentContext().get());
 			Q_ASSERT_X(false, qPrintable(QString("%1").arg(__LINE__)), qPrintable(QString("Type-ID of the view delegate: '%1' not found, %2").arg(qPrintable(typeId)).arg(qPrintable(componentId))));
 		}
 	}

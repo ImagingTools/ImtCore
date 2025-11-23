@@ -86,7 +86,7 @@ private Q_SLOTS:
 	void OnRepresentationCreated();
 
 private:
-	typedef istd::TSmartPtr<icomp::IComponent> RepresentationCompPtr;
+	typedef icomp::IComponentSharedPtr RepresentationCompPtr;
 
 	class EventProviderObserver: public imod::TSingleModelObserverBase<imtlog::IEventProvider>
 	{

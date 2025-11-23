@@ -67,8 +67,8 @@ private:
 	I_MULTIFACT(imtgui::IViewExtender, m_viewExtendersCompPtr);
 
 	QList<QByteArray> m_objectIds;
-	QList<icomp::IComponent*> m_views;
-	QList<icomp::IComponent*> m_viewExtenders;
+	QList<icomp::IComponentSharedPtr> m_views;
+	QList<icomp::IComponentSharedPtr> m_viewExtenders;
 };
 
 

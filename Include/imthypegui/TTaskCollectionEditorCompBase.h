@@ -176,7 +176,7 @@ protected:
 	typedef QMap<QByteArray, imod::IObserver*> ObserversMap;
 	ObserversMap m_observersMap;
 
-	typedef QMap<QByteArray, istd::TSmartPtr<iqtgui::IGuiObject>> EditorsMap;
+	typedef QMap<QByteArray, iqtgui::IGuiObjectSharedPtr> EditorsMap;
 	EditorsMap m_editorsMap;
 
 	typedef QMap<QByteArray, int> TypeToIndexMap;

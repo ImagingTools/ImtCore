@@ -85,10 +85,7 @@ istd::IChangeableUniquePtr CObjectCollectionComp::CreateObjectInstance(const QBy
 	int factoryIndex = m_typeIdsAttrPtr.FindValue(typeId);
 	if (factoryIndex >= 0){
 		if (factoryIndex < m_objectFactoriesCompPtr.GetCount()){
-			icomp::IComponent* compPtr = m_objectFactoriesCompPtr.CreateComponent(factoryIndex);
-			return istd::IChangeableUniquePtr(compPtr, [compPtr, this](){
-				return m_objectFactoriesCompPtr.ExtractInterface(compPtr);
-			});
+			return m_objectFactoriesCompPtr.CreateInstance(factoryIndex);
 		}
 	}
 

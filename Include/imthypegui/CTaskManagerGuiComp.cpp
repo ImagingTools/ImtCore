@@ -240,8 +240,8 @@ void CTaskManagerGuiComp::OnGuiCreated()
 		const QByteArray editorTypeId = m_editorTypeIdsAttrPtr[i];
 		Q_ASSERT(!editorTypeId.isEmpty());
 
-		icomp::IComponent* editorComponentPtr = m_taskEditorsFactCompPtr.CreateComponent(i);
-		if (editorComponentPtr == nullptr){
+		iqtgui::IGuiObjectSharedPtr editorPtr = m_taskEditorsFactCompPtr.CreateInstance(i);
+		if (!editorPtr.IsValid()){
 			m_editorsMap.clear();
 			m_observersMap.clear();
 			m_typeToStackIndexMap.clear();
@@ -249,13 +249,12 @@ void CTaskManagerGuiComp::OnGuiCreated()
 			return;
 		}
 
-		iqtgui::IGuiObject* editorPtr = m_taskEditorsFactCompPtr.ExtractInterface(editorComponentPtr);
-		Q_ASSERT(editorPtr != NULL);
+		icomp::IComponent* editorComponentPtr = dynamic_cast<icomp::IComponent*>(editorPtr.GetBasePtr().get());
 
 		imod::IObserver* observerPtr = m_taskObserversFactCompPtr.ExtractInterface(editorComponentPtr);
 		Q_ASSERT(observerPtr != NULL);
 
-		m_editorsMap[editorTypeId].SetPtr(editorPtr);
+		m_editorsMap[editorTypeId] = editorPtr;
 		m_observersMap[editorTypeId] = observerPtr;
 		m_typeToStackIndexMap[editorTypeId] = i + 1;
 

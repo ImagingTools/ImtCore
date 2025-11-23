@@ -29,6 +29,10 @@ public:
 };
 
 
+typedef istd::TUniqueInterfacePtr< IViewExtender> IViewExtenderUniquePtr;
+typedef istd::TSharedInterfacePtr< IViewExtender> IViewExtenderSharedPtr;
+
+
 } // namespace imtgui
 
 

@@ -123,7 +123,7 @@ bool CDesignManagerComp::ApplyDesignScheme(const QByteArray& themeId)
 {
 	bool retVal = true;
 
-	qDebug() << (qPrintable(QString("%1: Start applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext()))).arg(qPrintable(themeId))));
+	qDebug() << (qPrintable(QString("%1: Start applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext().get()))).arg(qPrintable(themeId))));
 
 	imtstyle::CImtStyle* imtStylePtr = imtstyle::CImtStyle::GetInstance();
 	Q_ASSERT(imtStylePtr != nullptr);
@@ -143,7 +143,7 @@ bool CDesignManagerComp::ApplyDesignScheme(const QByteArray& themeId)
 	appPtr->setProperty("ThemeId", themeId);
 	QCoreApplication::postEvent(QCoreApplication::instance(), new iqt::CDesignThemeEvent(themeId));
 
-	qDebug() << (qPrintable(QString("%1: Finished applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext()))).arg(qPrintable(themeId))));
+	qDebug() << (qPrintable(QString("%1: Finished applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext().get()))).arg(qPrintable(themeId))));
 
 	return retVal;
 }

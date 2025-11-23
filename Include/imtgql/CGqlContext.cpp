@@ -121,6 +121,9 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 			if (clonedUserPtr != nullptr){
 				m_userInfoPtr.reset(dynamic_cast<imtauth::IUserInfo*>(clonedUserPtr));
 			}
+			else {
+				Q_ASSERT(false);
+			}
 		}
 	}
 }

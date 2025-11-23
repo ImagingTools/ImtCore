@@ -43,7 +43,7 @@ bool CDocumentIdFilterRepresentationController::IsModelSupported(const istd::ICh
 bool CDocumentIdFilterRepresentationController::GetSdlRepresentationFromDataModel(
 			sdl::imtbase::DocumentIdFilter::CDocumentIdFilter::V1_0& sdlRepresentation,
 			const istd::IChangeable& dataModel,
-			const iprm::IParamsSet* paramsPtr) const
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	const imtcol::IDocumentIdFilter* documentIdFilterPtr = dynamic_cast<const imtcol::IDocumentIdFilter*>(&dataModel);
 	if (documentIdFilterPtr == nullptr){

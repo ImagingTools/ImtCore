@@ -120,7 +120,7 @@ void CRepresentationControllerCompBase::OnRepresentationCreated()
 			m_representationQueue.clear();
 			locker.unlock();			
 
-			istd::IChangeable* representationPtr = m_representationFactPtr.ExtractInterface(representationCompPtr.GetPtr());
+			istd::IChangeable* representationPtr = m_representationFactPtr.ExtractInterface(representationCompPtr.get());
 			if (representationPtr != nullptr){
 				m_representationCompPtr->CopyFrom(*representationPtr);
 			}
@@ -178,8 +178,8 @@ void CRepresentationControllerCompBase::Worker::run()
 
 			if (jobTimeRange.IsClosed()){
 				RepresentationCompPtr representationCompPtr(m_parent.m_representationFactPtr.CreateComponent());
-				if (representationCompPtr.IsValid()){
-					istd::IChangeable* representationPtr = m_parent.m_representationFactPtr.ExtractInterface(representationCompPtr.GetPtr());
+				if (representationCompPtr != nullptr){
+					istd::IChangeable* representationPtr = m_parent.m_representationFactPtr.ExtractInterface(representationCompPtr.get());
 					if (representationPtr != nullptr){
 						m_parent.m_messageFilterParamsCompPtr->SetFilterTimeRange(jobTimeRange);
 

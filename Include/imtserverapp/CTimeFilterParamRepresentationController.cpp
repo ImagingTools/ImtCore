@@ -33,7 +33,7 @@ bool CTimeFilterParamRepresentationController::IsModelSupported(const istd::ICha
 bool CTimeFilterParamRepresentationController::GetSdlRepresentationFromDataModel(
 			sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0& sdlRepresentation,
 			const istd::IChangeable& dataModel,
-			const iprm::IParamsSet* paramsPt) const
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	const imtbase::ITimeFilterParam* timeFilterParamPtr = dynamic_cast<const imtbase::ITimeFilterParam*>(&dataModel);
 	if (timeFilterParamPtr == nullptr){

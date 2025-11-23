@@ -935,12 +935,7 @@ istd::IChangeableUniquePtr CFileCollectionCompBase::CreateDataObject(const QByte
 	}
 
 	if ((factoryIndex >= 0) && factoryIndex < m_objectFactoryListCompPtr.GetCount()){
-		icomp::IComponent* compPtr = m_objectFactoryListCompPtr.CreateComponent(factoryIndex);
-		return istd::IChangeableUniquePtr(
-					compPtr,
-					[this, compPtr](){
-						return m_objectFactoryListCompPtr.ExtractInterface(compPtr);
-					});
+		return m_objectFactoryListCompPtr.CreateInstance(factoryIndex);
 	}
 
 	return istd::IChangeableUniquePtr();
