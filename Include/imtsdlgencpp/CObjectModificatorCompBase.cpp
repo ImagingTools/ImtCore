@@ -832,8 +832,11 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
 	// reset pointer for object
+	const QString variableName = field.GetId();
+	const QString variableCheckName = QStringLiteral("is%1Read").arg(GetCapitalizedValue(field.GetId()));
+
 	FeedStreamHorizontally(stream, hIndents);
-	stream << field.GetId();
+	stream << variableName;
 	stream << QStringLiteral(" = ");
 	structNameConverter.addVersion = true;
 	stream << structNameConverter.GetString();
@@ -842,11 +845,11 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 
 	// read from object
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const bool is");
-	stream << GetCapitalizedValue(field.GetId());
-	stream << QStringLiteral("Read = ");
+	stream << QStringLiteral("const bool ");
+	stream << variableCheckName;
+	stream << QStringLiteral(" = ");
 
-	WriteMethodCall(stream, (optional ? MT_OPT_READ : MT_READ), field.GetId(), true);
+	WriteMethodCall(stream, (optional ? MT_OPT_READ : MT_READ), variableName, true);
 	stream << '(' ;
 	AddContainerValueReadFromObject(stream, field, QString(), hIndents);
 	stream << ')' << ';';
@@ -855,9 +858,9 @@ void CObjectModificatorCompBase::AddCustomFieldReadFromObjectImplCode(
 
 	// reading checks
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!is");
-	stream << GetCapitalizedValue(field.GetId());
-	stream << QStringLiteral("Read){");
+	stream << QStringLiteral("if (!");
+	stream << variableCheckName;
+	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
 	AddErrorReport(stream, QStringLiteral("Unable to read field: '%3'"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));

@@ -97,7 +97,7 @@ static bool CompareDirectories(const QString& dir1, const QString& dir2) {
 
 void GetPrecessorAndExec(CImtSdlGenTest& testSuite, const QByteArray& processorName, iprm::IParamsSet* processorParamsPtr = nullptr)
 {
-	iproc::IProcessor* processorPtr = testSuite.GetInterface<iproc::IProcessor>(processorName);
+	auto* processorPtr = testSuite.GetInterface<iproc::IProcessor>(processorName);
 	QCOMPARE_NE(processorPtr, nullptr);
 
 	iproc::IProcessor::TaskState execResult = processorPtr->DoProcessing(processorParamsPtr, nullptr, nullptr);
@@ -109,7 +109,7 @@ void PrepareSuite(CImtSdlGenTest& testSuite, const QDir& outputDir)
 {
 	testSuite.EnsureAutoInitComponentsCreated();
 
-	imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	auto* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 	QVERIFY(argParserPtr != nullptr);
 
 
@@ -137,7 +137,7 @@ void ExecuteTest(
 	QVERIFY(QFileInfo::exists(s_testDataDirectoryPath + '/' + schemaFileName));
 
 
-	imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	auto* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 	QCOMPARE_NE(argParserPtr, nullptr);
 
 	argParserPtr->SetSchemaFilePath(s_testDataDirectoryPath + '/' + schemaFileName);
@@ -193,7 +193,7 @@ void CSdlGenTest::TestBasicSchema()
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite, m_tempOutputDir);
 
-	imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 	argParserPtr->SetCppEnabled();
 	argParserPtr->SetGqlEnabled();
 	argParserPtr->SetQmlEnabled(false);
@@ -206,7 +206,7 @@ void CSdlGenTest::TestComplexCollectionFilter()
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite, m_tempOutputDir);
 
-	imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 	argParserPtr->SetCppEnabled();
 	argParserPtr->SetGqlEnabled();
 	argParserPtr->SetQmlEnabled();
@@ -219,7 +219,7 @@ void CSdlGenTest::TestUnion()
 	CImtSdlGenTest testSuite;
 	PrepareSuite(testSuite, m_tempOutputDir);
 
-	imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+	auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 	argParserPtr->SetCppEnabled();
 	argParserPtr->SetGqlEnabled();
 	argParserPtr->SetQmlEnabled();
@@ -234,7 +234,7 @@ void CSdlGenTest::TestComplexUnion()
 		CImtSdlGenTest testSuite;
 		PrepareSuite(testSuite, m_tempOutputDir);
 
-		imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+		auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 		argParserPtr->SetCppEnabled();
 		argParserPtr->SetGqlEnabled();
 		argParserPtr->SetQmlEnabled(false);
@@ -246,7 +246,7 @@ void CSdlGenTest::TestComplexUnion()
 		CImtSdlGenTest testSuite;
 		PrepareSuite(testSuite, m_tempOutputDir);
 
-		imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+		auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 		argParserPtr->SetCppEnabled();
 		argParserPtr->SetGqlEnabled();
 		argParserPtr->SetQmlEnabled(false);
@@ -263,7 +263,7 @@ void CSdlGenTest::PrinterTest()
 		CImtSdlGenTest testSuite;
 		PrepareSuite(testSuite, m_tempOutputDir);
 
-		imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+		auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 		argParserPtr->SetCppEnabled();
 		argParserPtr->SetGqlEnabled();
 		argParserPtr->SetQmlEnabled(false);
@@ -275,7 +275,7 @@ void CSdlGenTest::PrinterTest()
 		CImtSdlGenTest testSuite;
 		PrepareSuite(testSuite, m_tempOutputDir);
 
-		imtsdl::ISdlEditableProcessArgumentsParser* argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
+		auto argParserPtr = testSuite.GetInterface<imtsdl::ISdlEditableProcessArgumentsParser>();
 		argParserPtr->SetCppEnabled();
 		argParserPtr->SetGqlEnabled();
 		argParserPtr->SetQmlEnabled(false);

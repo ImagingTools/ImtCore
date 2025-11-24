@@ -32,7 +32,7 @@ bool CSdlEnumGeneratorComp::ProcessEntry(
 	Q_ASSERT(m_customSchemaParamsCompPtr.IsValid());
 	Q_ASSERT(m_dependentSchemaListCompPtr.IsValid());
 
-	const imtsdl::CSdlEnum* sdlEnum = dynamic_cast<const imtsdl::CSdlEnum*>(&sdlEntry);
+	const auto* sdlEnum = dynamic_cast<const imtsdl::CSdlEnum*>(&sdlEntry);
 	if (sdlEnum == nullptr){
 		return false;
 	}
@@ -85,11 +85,12 @@ bool CSdlEnumGeneratorComp::ProcessEntry(
 
 	for (const auto& enumValue: sdlEnum->GetValues()){
 		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("QString Get") << GetCapitalizedValue(enumValue.first);
+		stream << QStringLiteral("static QString Get") << GetCapitalizedValue(enumValue.first);
 		stream << QStringLiteral("() { return \"") << enumValue.first;
 		stream << QStringLiteral("\"; }");
 		FeedStream(stream, 1, false);
 	}
+	FeedStream(stream, 1, false);
 
 	// signals of class
 	stream << QStringLiteral("signals:");

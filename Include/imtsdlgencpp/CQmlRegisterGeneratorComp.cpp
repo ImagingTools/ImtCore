@@ -1,6 +1,4 @@
 #include "CQmlRegisterGeneratorComp.h"
-#include "imtsdl/CSdlEntryBase.h"
-#include "istd/istd.h"
 
 
 // C includes
@@ -11,13 +9,13 @@
 #include <QtCore/QTextStream>
 
 //Acf includes
-#include <istd/CSystem.h>
+#include <istd/istd.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/COptionsManager.h>
-#include <ifile/CFileNameParam.h>
 
 // ImtCore includes
 #include <imtsdl/CSdlType.h>
+#include <imtsdl/CSdlEntryBase.h>
 
 
 namespace imtsdlgencpp
@@ -95,6 +93,7 @@ bool CQmlRegisterGeneratorComp::ProcessEntry (
 	}
 
 	QTextStream stream(headerDevicePtr);
+	FeedStream(stream, 2, false);
 
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	stream << QStringLiteral("#ifdef QT_QML_LIB");

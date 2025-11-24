@@ -52,11 +52,12 @@ class EnumStatusCode: public QObject
 	Q_PROPERTY(QString FAILED READ GetFAILED NOTIFY FAILEDChanged)
 
 protected:
-	QString GetNONE() { return "NONE"; }
-	QString GetOK() { return "OK"; }
-	QString GetWARNING() { return "WARNING"; }
-	QString GetNOK() { return "NOK"; }
-	QString GetFAILED() { return "FAILED"; }
+	static QString GetNONE() { return "NONE"; }
+	static QString GetOK() { return "OK"; }
+	static QString GetWARNING() { return "WARNING"; }
+	static QString GetNOK() { return "NOK"; }
+	static QString GetFAILED() { return "FAILED"; }
+
 signals:
 	void NONEChanged();
 	void OKChanged();
@@ -177,56 +178,57 @@ class EnumErrorCode: public QObject
 	Q_PROPERTY(QString AREA_GAP_LENGTH READ GetAREA_GAP_LENGTH NOTIFY AREA_GAP_LENGTHChanged)
 
 protected:
-	QString GetOK() { return "OK"; }
-	QString GetTOO_WIDE() { return "TOO_WIDE"; }
-	QString GetTOLERANCE() { return "TOLERANCE"; }
-	QString GetTOO_NARROW() { return "TOO_NARROW"; }
-	QString GetNO_DATA_GAP() { return "NO_DATA_GAP"; }
-	QString GetGAP() { return "GAP"; }
-	QString GetTOO_HIGH() { return "TOO_HIGH"; }
-	QString GetTOO_LOW() { return "TOO_LOW"; }
-	QString GetTOO_FEW() { return "TOO_FEW"; }
-	QString GetTOO_MUCH() { return "TOO_MUCH"; }
-	QString GetWRONG_DOT_DIAMETER() { return "WRONG_DOT_DIAMETER"; }
-	QString GetWRONG_DOT_POSITION() { return "WRONG_DOT_POSITION"; }
-	QString GetMISSING_DOTS() { return "MISSING_DOTS"; }
-	QString GetWRONG_DOT_DISTANCE() { return "WRONG_DOT_DISTANCE"; }
-	QString GetAREA_TOO_LARGE() { return "AREA_TOO_LARGE"; }
-	QString GetTOTALAREA_TOO_LARGE() { return "TOTALAREA_TOO_LARGE"; }
-	QString GetBORDERAREA_TOO_LARGE() { return "BORDERAREA_TOO_LARGE"; }
-	QString GetWRONG_DOT_AREA() { return "WRONG_DOT_AREA"; }
-	QString GetWRONG_DOT_AREA_ONHEIGHT() { return "WRONG_DOT_AREA_ONHEIGHT"; }
-	QString GetWRONG_DOT_VOLUME() { return "WRONG_DOT_VOLUME"; }
-	QString GetWRONG_DOT_HEIGHT() { return "WRONG_DOT_HEIGHT"; }
-	QString GetCONTOUR_MEASUREMENT_ERROR() { return "CONTOUR_MEASUREMENT_ERROR"; }
-	QString GetTOO_BRIGHT() { return "TOO_BRIGHT"; }
-	QString GetTOO_DARK() { return "TOO_DARK"; }
-	QString GetCOUNT_ERROR() { return "COUNT_ERROR"; }
-	QString GetZ_DISTANCE_HIGH() { return "Z_DISTANCE_HIGH"; }
-	QString GetZ_DISTANCE_LOW() { return "Z_DISTANCE_LOW"; }
-	QString GetNOT_SYMMETRICAL() { return "NOT_SYMMETRICAL"; }
-	QString GetREFERENCE_3D_ERROR() { return "REFERENCE_3D_ERROR"; }
-	QString GetCOLOR_ERROR() { return "COLOR_ERROR"; }
-	QString GetPATTERN_COUNT() { return "PATTERN_COUNT"; }
-	QString GetPATTERN_POSITION() { return "PATTERN_POSITION"; }
-	QString GetPATTERN_ROTATION() { return "PATTERN_ROTATION"; }
-	QString GetCENTERLINE() { return "CENTERLINE"; }
-	QString GetCALIB_ERROR_COMP() { return "CALIB_ERROR_COMP"; }
-	QString GetCALIB_INVALID_COMP() { return "CALIB_INVALID_COMP"; }
-	QString GetCALIB_NOZZLE_MOVED() { return "CALIB_NOZZLE_MOVED"; }
-	QString GetCONTOUR_NOT_FOUND() { return "CONTOUR_NOT_FOUND"; }
-	QString GetCONTOUR_TOO_WIDE() { return "CONTOUR_TOO_WIDE"; }
-	QString GetCONTOUR_TOO_NARROW() { return "CONTOUR_TOO_NARROW"; }
-	QString GetCONTOUR_GLUE_MOVED() { return "CONTOUR_GLUE_MOVED"; }
-	QString GetCONTOUR_INVALID_POLY() { return "CONTOUR_INVALID_POLY"; }
-	QString GetREFERENCE_NOT_FOUND() { return "REFERENCE_NOT_FOUND"; }
-	QString GetREFERENCE_INVALID_REF() { return "REFERENCE_INVALID_REF"; }
-	QString GetREFERENCE_POS_MOVED() { return "REFERENCE_POS_MOVED"; }
-	QString GetREFERENCE_DIST_MOVED() { return "REFERENCE_DIST_MOVED"; }
-	QString GetAREA_NOT_FOUND() { return "AREA_NOT_FOUND"; }
-	QString GetAREA_GLUE_FOUND() { return "AREA_GLUE_FOUND"; }
-	QString GetAREA_GLUE_MOVED() { return "AREA_GLUE_MOVED"; }
-	QString GetAREA_GAP_LENGTH() { return "AREA_GAP_LENGTH"; }
+	static QString GetOK() { return "OK"; }
+	static QString GetTOO_WIDE() { return "TOO_WIDE"; }
+	static QString GetTOLERANCE() { return "TOLERANCE"; }
+	static QString GetTOO_NARROW() { return "TOO_NARROW"; }
+	static QString GetNO_DATA_GAP() { return "NO_DATA_GAP"; }
+	static QString GetGAP() { return "GAP"; }
+	static QString GetTOO_HIGH() { return "TOO_HIGH"; }
+	static QString GetTOO_LOW() { return "TOO_LOW"; }
+	static QString GetTOO_FEW() { return "TOO_FEW"; }
+	static QString GetTOO_MUCH() { return "TOO_MUCH"; }
+	static QString GetWRONG_DOT_DIAMETER() { return "WRONG_DOT_DIAMETER"; }
+	static QString GetWRONG_DOT_POSITION() { return "WRONG_DOT_POSITION"; }
+	static QString GetMISSING_DOTS() { return "MISSING_DOTS"; }
+	static QString GetWRONG_DOT_DISTANCE() { return "WRONG_DOT_DISTANCE"; }
+	static QString GetAREA_TOO_LARGE() { return "AREA_TOO_LARGE"; }
+	static QString GetTOTALAREA_TOO_LARGE() { return "TOTALAREA_TOO_LARGE"; }
+	static QString GetBORDERAREA_TOO_LARGE() { return "BORDERAREA_TOO_LARGE"; }
+	static QString GetWRONG_DOT_AREA() { return "WRONG_DOT_AREA"; }
+	static QString GetWRONG_DOT_AREA_ONHEIGHT() { return "WRONG_DOT_AREA_ONHEIGHT"; }
+	static QString GetWRONG_DOT_VOLUME() { return "WRONG_DOT_VOLUME"; }
+	static QString GetWRONG_DOT_HEIGHT() { return "WRONG_DOT_HEIGHT"; }
+	static QString GetCONTOUR_MEASUREMENT_ERROR() { return "CONTOUR_MEASUREMENT_ERROR"; }
+	static QString GetTOO_BRIGHT() { return "TOO_BRIGHT"; }
+	static QString GetTOO_DARK() { return "TOO_DARK"; }
+	static QString GetCOUNT_ERROR() { return "COUNT_ERROR"; }
+	static QString GetZ_DISTANCE_HIGH() { return "Z_DISTANCE_HIGH"; }
+	static QString GetZ_DISTANCE_LOW() { return "Z_DISTANCE_LOW"; }
+	static QString GetNOT_SYMMETRICAL() { return "NOT_SYMMETRICAL"; }
+	static QString GetREFERENCE_3D_ERROR() { return "REFERENCE_3D_ERROR"; }
+	static QString GetCOLOR_ERROR() { return "COLOR_ERROR"; }
+	static QString GetPATTERN_COUNT() { return "PATTERN_COUNT"; }
+	static QString GetPATTERN_POSITION() { return "PATTERN_POSITION"; }
+	static QString GetPATTERN_ROTATION() { return "PATTERN_ROTATION"; }
+	static QString GetCENTERLINE() { return "CENTERLINE"; }
+	static QString GetCALIB_ERROR_COMP() { return "CALIB_ERROR_COMP"; }
+	static QString GetCALIB_INVALID_COMP() { return "CALIB_INVALID_COMP"; }
+	static QString GetCALIB_NOZZLE_MOVED() { return "CALIB_NOZZLE_MOVED"; }
+	static QString GetCONTOUR_NOT_FOUND() { return "CONTOUR_NOT_FOUND"; }
+	static QString GetCONTOUR_TOO_WIDE() { return "CONTOUR_TOO_WIDE"; }
+	static QString GetCONTOUR_TOO_NARROW() { return "CONTOUR_TOO_NARROW"; }
+	static QString GetCONTOUR_GLUE_MOVED() { return "CONTOUR_GLUE_MOVED"; }
+	static QString GetCONTOUR_INVALID_POLY() { return "CONTOUR_INVALID_POLY"; }
+	static QString GetREFERENCE_NOT_FOUND() { return "REFERENCE_NOT_FOUND"; }
+	static QString GetREFERENCE_INVALID_REF() { return "REFERENCE_INVALID_REF"; }
+	static QString GetREFERENCE_POS_MOVED() { return "REFERENCE_POS_MOVED"; }
+	static QString GetREFERENCE_DIST_MOVED() { return "REFERENCE_DIST_MOVED"; }
+	static QString GetAREA_NOT_FOUND() { return "AREA_NOT_FOUND"; }
+	static QString GetAREA_GLUE_FOUND() { return "AREA_GLUE_FOUND"; }
+	static QString GetAREA_GLUE_MOVED() { return "AREA_GLUE_MOVED"; }
+	static QString GetAREA_GAP_LENGTH() { return "AREA_GAP_LENGTH"; }
+
 signals:
 	void OKChanged();
 	void TOO_WIDEChanged();
@@ -314,17 +316,18 @@ class EnumMeasurementType: public QObject
 	Q_PROPERTY(QString OUT_OF_BOUND READ GetOUT_OF_BOUND NOTIFY OUT_OF_BOUNDChanged)
 
 protected:
-	QString GetNONE() { return "NONE"; }
-	QString GetWIDTH() { return "WIDTH"; }
-	QString GetBRIGHTNESS() { return "BRIGHTNESS"; }
-	QString GetDISTANCE() { return "DISTANCE"; }
-	QString GetDISPLACEMENT() { return "DISPLACEMENT"; }
-	QString GetHEIGHT() { return "HEIGHT"; }
-	QString GetSYMMETRY() { return "SYMMETRY"; }
-	QString GetVOLUME() { return "VOLUME"; }
-	QString GetVOLUMERATE() { return "VOLUMERATE"; }
-	QString GetLENGTH() { return "LENGTH"; }
-	QString GetOUT_OF_BOUND() { return "OUT_OF_BOUND"; }
+	static QString GetNONE() { return "NONE"; }
+	static QString GetWIDTH() { return "WIDTH"; }
+	static QString GetBRIGHTNESS() { return "BRIGHTNESS"; }
+	static QString GetDISTANCE() { return "DISTANCE"; }
+	static QString GetDISPLACEMENT() { return "DISPLACEMENT"; }
+	static QString GetHEIGHT() { return "HEIGHT"; }
+	static QString GetSYMMETRY() { return "SYMMETRY"; }
+	static QString GetVOLUME() { return "VOLUME"; }
+	static QString GetVOLUMERATE() { return "VOLUMERATE"; }
+	static QString GetLENGTH() { return "LENGTH"; }
+	static QString GetOUT_OF_BOUND() { return "OUT_OF_BOUND"; }
+
 signals:
 	void NONEChanged();
 	void WIDTHChanged();
@@ -361,11 +364,12 @@ class EnumMeasurementUnit: public QObject
 	Q_PROPERTY(QString pixel READ GetPixel NOTIFY PixelChanged)
 
 protected:
-	QString GetNONE() { return "NONE"; }
-	QString GetMm() { return "mm"; }
-	QString GetMm3() { return "mm3"; }
-	QString GetMm3_mm() { return "mm3_mm"; }
-	QString GetPixel() { return "pixel"; }
+	static QString GetNONE() { return "NONE"; }
+	static QString GetMm() { return "mm"; }
+	static QString GetMm3() { return "mm3"; }
+	static QString GetMm3_mm() { return "mm3_mm"; }
+	static QString GetPixel() { return "pixel"; }
+
 signals:
 	void NONEChanged();
 	void MmChanged();
@@ -392,9 +396,10 @@ class EnumGeometryType: public QObject
 	Q_PROPERTY(QString CIRCLE READ GetCIRCLE NOTIFY CIRCLEChanged)
 
 protected:
-	QString GetLINE() { return "LINE"; }
-	QString GetPOLYGON() { return "POLYGON"; }
-	QString GetCIRCLE() { return "CIRCLE"; }
+	static QString GetLINE() { return "LINE"; }
+	static QString GetPOLYGON() { return "POLYGON"; }
+	static QString GetCIRCLE() { return "CIRCLE"; }
+
 signals:
 	void LINEChanged();
 	void POLYGONChanged();
@@ -534,10 +539,10 @@ public:
 	CPointObject(QObject* parent = nullptr);
 
 	QVariant GetX();
-	void SetX(QVariant v);
+	void SetX(const QVariant& v);
 	Q_INVOKABLE bool hasX();
 	QVariant GetY();
-	void SetY(QVariant v);
+	void SetY(const QVariant& v);
 	Q_INVOKABLE bool hasY();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -548,9 +553,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void xChanged();
-void yChanged();
-	void finished();
+	void xChanged();
+	void yChanged();
 
 protected:
 };
@@ -566,10 +570,10 @@ class CPointObjectList: public ::imtsdl::TListModelBase<sdl::complextest::Comple
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion1::CPoint::V1_0, sdl::complextest::ComplexUnion1::CPointObject> BaseClass;
 
-	CPointObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CPointObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion1::CPointObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion1::CPointObjectList* copyMe();
@@ -582,7 +586,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -605,21 +610,21 @@ public:
 	CGeometryObject(QObject* parent = nullptr);
 
 	QVariant GetGeometryType();
-	void SetGeometryType(QVariant v);
+	void SetGeometryType(const QVariant& v);
 	Q_INVOKABLE bool hasGeometryType();
 	QVariant GetRadius();
-	void SetRadius(QVariant v);
+	void SetRadius(const QVariant& v);
 	Q_INVOKABLE bool hasRadius();
 	QVariant GetPoints();
-	void SetPoints(QVariant v);
+	void SetPoints(const QVariant& v);
 	Q_INVOKABLE bool hasPoints();
 	Q_INVOKABLE void createPoints();
 	QVariant GetRequiredPoints();
-	void SetRequiredPoints(QVariant v);
+	void SetRequiredPoints(const QVariant& v);
 	Q_INVOKABLE bool hasRequiredPoints();
 	Q_INVOKABLE void createRequiredPoints();
 	QVariant GetOptionalPoints();
-	void SetOptionalPoints(QVariant v);
+	void SetOptionalPoints(const QVariant& v);
 	Q_INVOKABLE bool hasOptionalPoints();
 	Q_INVOKABLE void createOptionalPoints();
 	// CItemModelBase implemented
@@ -631,12 +636,11 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void geometryTypeChanged();
-void radiusChanged();
-void pointsChanged();
-void requiredPointsChanged();
-void optionalPointsChanged();
-	void finished();
+	void geometryTypeChanged();
+	void radiusChanged();
+	void pointsChanged();
+	void requiredPointsChanged();
+	void optionalPointsChanged();
 
 protected:
 	QVariant m_pointsQObjectPtr;
@@ -655,10 +659,10 @@ class CGeometryObjectList: public ::imtsdl::TListModelBase<sdl::complextest::Com
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion1::CGeometry::V1_0, sdl::complextest::ComplexUnion1::CGeometryObject> BaseClass;
 
-	CGeometryObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CGeometryObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion1::CGeometryObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion1::CGeometryObjectList* copyMe();
@@ -671,9 +675,12 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
+
+
 #ifdef QT_QML_LIB
 [[maybe_unused]] static void RegisterQmlTypes()
 {

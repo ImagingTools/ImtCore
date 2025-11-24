@@ -1584,13 +1584,13 @@ bool CPrinterList::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		int dataCount = dataModel->GetItemsCount();
 		imtsdl::TElementList<CPrinterBase::V1_0> dataList;
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
-			CPrinterBase::V1_0 data;
-			if (!data.ReadFromModel(*dataModel, dataIndex)){
+			CPrinterBase::V1_0 t_data;
+			if (!t_data.ReadFromModel(*dataModel, dataIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
-			dataList << data;
+			dataList << t_data;
 		}
 		data = dataList;
 
@@ -1607,13 +1607,13 @@ bool CPrinterList::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 		int dataCount = dataModel->GetItemsCount();
 		imtsdl::TElementList<CPrinterBase::V1_0> dataList;
 		for (int dataIndex = 0; dataIndex < dataCount; ++dataIndex){
-			CPrinterBase::V1_0 data;
-			if (!data.OptReadFromModel(*dataModel, dataIndex)){
+			CPrinterBase::V1_0 t_data;
+			if (!t_data.OptReadFromModel(*dataModel, dataIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "data").toLocal8Bit().constData();)
 
 				return false;
 			}
-			dataList << data;
+			dataList << t_data;
 		}
 		data = dataList;
 
@@ -2004,7 +2004,7 @@ QVariant CPrinterSpecificationBaseObject::GetName()
 }
 
 
-void CPrinterSpecificationBaseObject::SetName(QVariant v)
+void CPrinterSpecificationBaseObject::SetName(const QVariant& v)
 {
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
@@ -2081,13 +2081,13 @@ QString CPrinterSpecificationBaseObject::getJSONKeyForProperty(const QString& pr
 
 
 
-bool CPrinterSpecificationBaseObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CPrinterSpecificationBaseObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CPrinterSpecificationBaseObjectList::getItemsCount()
+int CPrinterSpecificationBaseObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -2164,7 +2164,7 @@ void sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::clear()
 QVariant sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
+	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -2191,7 +2191,7 @@ QVariant CLinkObject::GetLink()
 }
 
 
-void CLinkObject::SetLink(QVariant v)
+void CLinkObject::SetLink(const QVariant& v)
 {
 	Version_1_0->link = v.value<QString>().toUtf8();
 	linkChanged();
@@ -2268,13 +2268,13 @@ QString CLinkObject::getJSONKeyForProperty(const QString& propertyName) const
 
 
 
-bool CLinkObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CLinkObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CLinkObjectList::getItemsCount()
+int CLinkObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -2351,7 +2351,7 @@ void sdl::modsdl::PrinterBase::CLinkObjectList::clear()
 QVariant sdl::modsdl::PrinterBase::CLinkObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::modsdl::PrinterBase::CLinkObject* itemPtr = item.value<sdl::modsdl::PrinterBase::CLinkObject*>();
+	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CLinkObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -2381,7 +2381,7 @@ QVariant CPrinterBaseObject::GetName()
 }
 
 
-void CPrinterBaseObject::SetName(QVariant v)
+void CPrinterBaseObject::SetName(const QVariant& v)
 {
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
@@ -2416,7 +2416,7 @@ QVariant CPrinterBaseObject::GetSpecification()
 }
 
 
-void CPrinterBaseObject::SetSpecification(QVariant v)
+void CPrinterBaseObject::SetSpecification(const QVariant& v)
 {
 	if (v.isValid()){
 		if (const CPrinterSpecificationBaseObject* val = v.value<const CPrinterSpecificationBaseObject*>()){
@@ -2465,7 +2465,7 @@ QVariant CPrinterBaseObject::GetSimpleTest()
 }
 
 
-void CPrinterBaseObject::SetSimpleTest(QVariant v)
+void CPrinterBaseObject::SetSimpleTest(const QVariant& v)
 {
 	if (v.isValid()){
 		if (const QString* val = v.value<const QString*>()){
@@ -2516,7 +2516,7 @@ QVariant CPrinterBaseObject::GetMixedTest()
 }
 
 
-void CPrinterBaseObject::SetMixedTest(QVariant v)
+void CPrinterBaseObject::SetMixedTest(const QVariant& v)
 {
 	if (v.isValid()){
 		if (const QString* val = v.value<const QString*>()){
@@ -2620,13 +2620,13 @@ QString CPrinterBaseObject::getJSONKeyForProperty(const QString& propertyName) c
 
 
 
-bool CPrinterBaseObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CPrinterBaseObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CPrinterBaseObjectList::getItemsCount()
+int CPrinterBaseObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -2703,7 +2703,7 @@ void sdl::modsdl::PrinterBase::CPrinterBaseObjectList::clear()
 QVariant sdl::modsdl::PrinterBase::CPrinterBaseObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::modsdl::PrinterBase::CPrinterBaseObject* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
+	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -2734,7 +2734,7 @@ QVariant CPrinterListObject::GetData()
 	if (Version_1_0->data.has_value()){
 		if (!m_dataQObjectPtr.isValid()){
 			m_dataQObjectPtr = CreateObject("data");
-			sdl::modsdl::PrinterBase::CPrinterBaseObjectList* itemPtr = m_dataQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>();
+			auto itemPtr = m_dataQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>();
 			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->data;
 		}
 		return m_dataQObjectPtr;
@@ -2744,7 +2744,7 @@ QVariant CPrinterListObject::GetData()
 }
 
 
-void CPrinterListObject::SetData(QVariant v)
+void CPrinterListObject::SetData(const QVariant& v)
 {
 	if (v.isValid()){
 		sdl::modsdl::PrinterBase::CPrinterBaseObjectList* itemPtr = v.value<sdl::modsdl::PrinterBase::CPrinterBaseObjectList*>();
@@ -2838,13 +2838,13 @@ QString CPrinterListObject::getJSONKeyForProperty(const QString& propertyName) c
 
 
 
-bool CPrinterListObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CPrinterListObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CPrinterListObjectList::getItemsCount()
+int CPrinterListObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -2921,7 +2921,7 @@ void sdl::modsdl::PrinterBase::CPrinterListObjectList::clear()
 QVariant sdl::modsdl::PrinterBase::CPrinterListObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::modsdl::PrinterBase::CPrinterListObject* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
+	auto* itemPtr = item.value<sdl::modsdl::PrinterBase::CPrinterListObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);

@@ -613,9 +613,11 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 	const QString sdlNamespace = m_originalSchemaNamespaceCompPtr->GetText();
 	CStructNamespaceConverter structNameConverter(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
 
+	const QString variableName = field.GetId();
+	const QString variableCheckName = QStringLiteral("is%1Read").arg(GetCapitalizedValue(field.GetId()));
 	// reset pointer for object
 	FeedStreamHorizontally(stream, hIndents);
-	stream << field.GetId();
+	stream << variableName;
 	stream << QStringLiteral(" = ");
 	structNameConverter.addVersion = true;
 	stream << structNameConverter.GetString();
@@ -624,10 +626,10 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 
 	// read from model
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("const bool is");
-	stream << GetCapitalizedValue(field.GetId());
-	stream << QStringLiteral("Readed = ");
-	stream << field.GetId();
+	stream << QStringLiteral("const bool ");
+	stream << variableCheckName;
+	stream << QStringLiteral(" = ");
+	stream << variableName;
 	stream << QStringLiteral("->ReadFromModel(");
 	stream <<  QStringLiteral("*");
 	stream << GetDecapitalizedValue(field.GetId());
@@ -636,9 +638,9 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelImplCode(
 
 	// reading checks
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("if (!is");
-	stream << GetCapitalizedValue(field.GetId());
-	stream << QStringLiteral("Readed){");
+	stream << QStringLiteral("if (!");
+	stream << variableCheckName;
+	stream << QStringLiteral("){");
 	FeedStream(stream, 1, false);
 
 	AddErrorReport(stream, QStringLiteral("Unable to read field '%3'"), hIndents + 1, QStringList({QString("\"%1\"").arg(field.GetId())}));
@@ -852,6 +854,9 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetItemsCount();");
 	FeedStream(stream, 1, false);
 
+	const QString variableName = GetTemVariableWrappedValue(field);
+	const QString variableCheckName = QStringLiteral("is%1Read").arg(GetCapitalizedValue(field.GetId()));
+
 	// value checks
 	if (field.IsNonEmpty()){
 		FeedStreamHorizontally(stream, hIndents);
@@ -964,7 +969,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	}
 	else{
 		stream << OptListConvertTypeWithNamespace(field, sdlNamespace, *m_sdlTypeListCompPtr, *m_sdlEnumListCompPtr, *m_sdlUnionListCompPtr, false);
-		stream << ' ' << GetDecapitalizedValue(field.GetId());
+		stream << ' ' << variableName;
 		stream << QStringLiteral(" = ");
 		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetData(QByteArray(), ");
 		stream << indexVariableName << QStringLiteral(").");
@@ -981,7 +986,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 		stream << GetDecapitalizedValue(field.GetId()) + QStringLiteral("Data") << ';';
 	}
 	else{
-		stream << GetDecapitalizedValue(field.GetId()) << ';';
+		stream << variableName << ';';
 	}
 	FeedStream(stream, 1, false);
 
@@ -1186,16 +1191,18 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	FeedStream(stream, 1, false);
 
 	// inLoop: declare temp var
+	const QString variableName = GetTemVariableWrappedValue(field);
+	const QString variableCheckName = QStringLiteral("is%1Read").arg(GetCapitalizedValue(field.GetId()));
 	FeedStreamHorizontally(stream, hIndents + 1);
 	structNameConverter.listWrap = false;
 	stream << structNameConverter.GetString();
-	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
+	stream << ' ' << variableName << ';';
 	FeedStream(stream, 1, false);
 
 	// inLoop: read and checks
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("if (!");
-	stream << GetDecapitalizedValue(field.GetId());
+	stream << variableName;
 	stream << QStringLiteral(".");
 	if (optional){
 		stream << QStringLiteral("Opt");
@@ -1220,7 +1227,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	stream << listVariableName;
 
 	stream << QStringLiteral(" << ");
-	stream << GetDecapitalizedValue(field.GetId()) << ';';
+	stream << variableName << ';';
 	FeedStream(stream, 1, false);
 
 	// inLoop: end

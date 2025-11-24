@@ -4698,13 +4698,13 @@ bool COptionsList::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		int optionsCount = optionsModel->GetItemsCount();
 		imtsdl::TElementList<COption::V1_0> optionsList;
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
-			COption::V1_0 options;
-			if (!options.ReadFromModel(*optionsModel, optionsIndex)){
+			COption::V1_0 t_options;
+			if (!t_options.ReadFromModel(*optionsModel, optionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
-			optionsList << options;
+			optionsList << t_options;
 		}
 		options = optionsList;
 
@@ -4731,13 +4731,13 @@ bool COptionsList::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model
 		int optionsCount = optionsModel->GetItemsCount();
 		imtsdl::TElementList<COption::V1_0> optionsList;
 		for (int optionsIndex = 0; optionsIndex < optionsCount; ++optionsIndex){
-			COption::V1_0 options;
-			if (!options.OptReadFromModel(*optionsModel, optionsIndex)){
+			COption::V1_0 t_options;
+			if (!t_options.OptReadFromModel(*optionsModel, optionsIndex)){
 				I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "options").toLocal8Bit().constData();)
 
 				return false;
 			}
-			optionsList << options;
+			optionsList << t_options;
 		}
 		options = optionsList;
 
@@ -5205,8 +5205,8 @@ bool CSelectionParam::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 	::imtbase::CTreeItemModel* constraintsDataModelPtr = model.GetTreeItemModel("constraints", modelIndex);
 	if (constraintsDataModelPtr != nullptr){
 		constraints = COptionsList::V1_0();
-		const bool isConstraintsReaded = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
-		if (!isConstraintsReaded){
+		const bool isConstraintsRead = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
+		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
@@ -5227,8 +5227,8 @@ bool CSelectionParam::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 	::imtbase::CTreeItemModel* constraintsDataModelPtr = model.GetTreeItemModel("constraints", modelIndex);
 	if (constraintsDataModelPtr != nullptr){
 		constraints = COptionsList::V1_0();
-		const bool isConstraintsReaded = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
-		if (!isConstraintsReaded){
+		const bool isConstraintsRead = constraints->ReadFromModel(*constraintsDataModelPtr, modelIndex);
+		if (!isConstraintsRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "constraints").toLocal8Bit().constData();)
 
 			return false;
@@ -6011,8 +6011,8 @@ bool CBackupSettings::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
 	if (schedulerParamDataModelPtr != nullptr){
 		schedulerParam = CSchedulerParam::V1_0();
-		const bool isSchedulerParamReaded = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
-		if (!isSchedulerParamReaded){
+		const bool isSchedulerParamRead = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
+		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
@@ -6033,8 +6033,8 @@ bool CBackupSettings::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 	::imtbase::CTreeItemModel* schedulerParamDataModelPtr = model.GetTreeItemModel("schedulerParam", modelIndex);
 	if (schedulerParamDataModelPtr != nullptr){
 		schedulerParam = CSchedulerParam::V1_0();
-		const bool isSchedulerParamReaded = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
-		if (!isSchedulerParamReaded){
+		const bool isSchedulerParamRead = schedulerParam->ReadFromModel(*schedulerParamDataModelPtr, modelIndex);
+		if (!isSchedulerParamRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "schedulerParam").toLocal8Bit().constData();)
 
 			return false;
@@ -7390,8 +7390,8 @@ bool CParamsSet::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 		int paramIdsCount = paramIdsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> paramIdsList;
 		for (int paramIdsIndex = 0; paramIdsIndex < paramIdsCount; ++paramIdsIndex){
-			QByteArray paramIds = paramIdsModel->GetData(QByteArray(), paramIdsIndex).toByteArray();
-			paramIdsList << paramIds;
+			QByteArray t_paramIds = paramIdsModel->GetData(QByteArray(), paramIdsIndex).toByteArray();
+			paramIdsList << t_paramIds;
 		}
 		paramIds = paramIdsList;
 
@@ -7402,8 +7402,8 @@ bool CParamsSet::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 		int paramTypeIdsCount = paramTypeIdsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> paramTypeIdsList;
 		for (int paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsCount; ++paramTypeIdsIndex){
-			QByteArray paramTypeIds = paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).toByteArray();
-			paramTypeIdsList << paramTypeIds;
+			QByteArray t_paramTypeIds = paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).toByteArray();
+			paramTypeIdsList << t_paramTypeIds;
 		}
 		paramTypeIds = paramTypeIdsList;
 
@@ -7414,8 +7414,8 @@ bool CParamsSet::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 		int paramNamesCount = paramNamesModel->GetItemsCount();
 		imtsdl::TElementList<QString> paramNamesList;
 		for (int paramNamesIndex = 0; paramNamesIndex < paramNamesCount; ++paramNamesIndex){
-			QString paramNames = paramNamesModel->GetData(QByteArray(), paramNamesIndex).toString();
-			paramNamesList << paramNames;
+			QString t_paramNames = paramNamesModel->GetData(QByteArray(), paramNamesIndex).toString();
+			paramNamesList << t_paramNames;
 		}
 		paramNames = paramNamesList;
 
@@ -7426,8 +7426,8 @@ bool CParamsSet::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 		int paramDescriptionsCount = paramDescriptionsModel->GetItemsCount();
 		imtsdl::TElementList<QString> paramDescriptionsList;
 		for (int paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsCount; ++paramDescriptionsIndex){
-			QString paramDescriptions = paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).toString();
-			paramDescriptionsList << paramDescriptions;
+			QString t_paramDescriptions = paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).toString();
+			paramDescriptionsList << t_paramDescriptions;
 		}
 		paramDescriptions = paramDescriptionsList;
 
@@ -7438,8 +7438,8 @@ bool CParamsSet::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int
 		int parametersCount = parametersModel->GetItemsCount();
 		imtsdl::TElementList<QString> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
-			QString parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
-			parametersList << parameters;
+			QString t_parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
+			parametersList << t_parameters;
 		}
 		parameters = parametersList;
 
@@ -7456,8 +7456,8 @@ bool CParamsSet::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 		int paramIdsCount = paramIdsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> paramIdsList;
 		for (int paramIdsIndex = 0; paramIdsIndex < paramIdsCount; ++paramIdsIndex){
-			QByteArray paramIds = paramIdsModel->GetData(QByteArray(), paramIdsIndex).toByteArray();
-			paramIdsList << paramIds;
+			QByteArray t_paramIds = paramIdsModel->GetData(QByteArray(), paramIdsIndex).toByteArray();
+			paramIdsList << t_paramIds;
 		}
 		paramIds = paramIdsList;
 
@@ -7468,8 +7468,8 @@ bool CParamsSet::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 		int paramTypeIdsCount = paramTypeIdsModel->GetItemsCount();
 		imtsdl::TElementList<QByteArray> paramTypeIdsList;
 		for (int paramTypeIdsIndex = 0; paramTypeIdsIndex < paramTypeIdsCount; ++paramTypeIdsIndex){
-			QByteArray paramTypeIds = paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).toByteArray();
-			paramTypeIdsList << paramTypeIds;
+			QByteArray t_paramTypeIds = paramTypeIdsModel->GetData(QByteArray(), paramTypeIdsIndex).toByteArray();
+			paramTypeIdsList << t_paramTypeIds;
 		}
 		paramTypeIds = paramTypeIdsList;
 
@@ -7480,8 +7480,8 @@ bool CParamsSet::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 		int paramNamesCount = paramNamesModel->GetItemsCount();
 		imtsdl::TElementList<QString> paramNamesList;
 		for (int paramNamesIndex = 0; paramNamesIndex < paramNamesCount; ++paramNamesIndex){
-			QString paramNames = paramNamesModel->GetData(QByteArray(), paramNamesIndex).toString();
-			paramNamesList << paramNames;
+			QString t_paramNames = paramNamesModel->GetData(QByteArray(), paramNamesIndex).toString();
+			paramNamesList << t_paramNames;
 		}
 		paramNames = paramNamesList;
 
@@ -7492,8 +7492,8 @@ bool CParamsSet::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 		int paramDescriptionsCount = paramDescriptionsModel->GetItemsCount();
 		imtsdl::TElementList<QString> paramDescriptionsList;
 		for (int paramDescriptionsIndex = 0; paramDescriptionsIndex < paramDescriptionsCount; ++paramDescriptionsIndex){
-			QString paramDescriptions = paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).toString();
-			paramDescriptionsList << paramDescriptions;
+			QString t_paramDescriptions = paramDescriptionsModel->GetData(QByteArray(), paramDescriptionsIndex).toString();
+			paramDescriptionsList << t_paramDescriptions;
 		}
 		paramDescriptions = paramDescriptionsList;
 
@@ -7504,8 +7504,8 @@ bool CParamsSet::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, 
 		int parametersCount = parametersModel->GetItemsCount();
 		imtsdl::TElementList<QString> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
-			QString parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
-			parametersList << parameters;
+			QString t_parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
+			parametersList << t_parameters;
 		}
 		parameters = parametersList;
 
@@ -8144,8 +8144,8 @@ bool CMimeType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 		int treeCount = treeModel->GetItemsCount();
 		imtsdl::TElementList<QString> treeList;
 		for (int treeIndex = 0; treeIndex < treeCount; ++treeIndex){
-			QString tree = treeModel->GetData(QByteArray(), treeIndex).toString();
-			treeList << tree;
+			QString t_tree = treeModel->GetData(QByteArray(), treeIndex).toString();
+			treeList << t_tree;
 		}
 		tree = treeList;
 
@@ -8169,8 +8169,8 @@ bool CMimeType::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model, int 
 		int parametersCount = parametersModel->GetItemsCount();
 		imtsdl::TElementList<QString> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
-			QString parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
-			parametersList << parameters;
+			QString t_parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
+			parametersList << t_parameters;
 		}
 		parameters = parametersList;
 
@@ -8192,8 +8192,8 @@ bool CMimeType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		int treeCount = treeModel->GetItemsCount();
 		imtsdl::TElementList<QString> treeList;
 		for (int treeIndex = 0; treeIndex < treeCount; ++treeIndex){
-			QString tree = treeModel->GetData(QByteArray(), treeIndex).toString();
-			treeList << tree;
+			QString t_tree = treeModel->GetData(QByteArray(), treeIndex).toString();
+			treeList << t_tree;
 		}
 		tree = treeList;
 
@@ -8214,8 +8214,8 @@ bool CMimeType::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& model, i
 		int parametersCount = parametersModel->GetItemsCount();
 		imtsdl::TElementList<QString> parametersList;
 		for (int parametersIndex = 0; parametersIndex < parametersCount; ++parametersIndex){
-			QString parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
-			parametersList << parameters;
+			QString t_parameters = parametersModel->GetData(QByteArray(), parametersIndex).toString();
+			parametersList << t_parameters;
 		}
 		parameters = parametersList;
 
@@ -8715,7 +8715,7 @@ QVariant CTimeRangeObject::GetBegin()
 }
 
 
-void CTimeRangeObject::SetBegin(QVariant v)
+void CTimeRangeObject::SetBegin(const QVariant& v)
 {
 	Version_1_0->Begin = v.value<QString>();
 	beginChanged();
@@ -8738,7 +8738,7 @@ QVariant CTimeRangeObject::GetEnd()
 }
 
 
-void CTimeRangeObject::SetEnd(QVariant v)
+void CTimeRangeObject::SetEnd(const QVariant& v)
 {
 	Version_1_0->End = v.value<QString>();
 	endChanged();
@@ -8818,13 +8818,13 @@ QString CTimeRangeObject::getJSONKeyForProperty(const QString& propertyName) con
 
 
 
-bool CTimeRangeObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CTimeRangeObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CTimeRangeObjectList::getItemsCount()
+int CTimeRangeObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -8901,7 +8901,7 @@ void sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CTimeRangeObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CTimeRangeObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -8932,7 +8932,7 @@ QVariant CSdlSizeObject::GetWidth()
 }
 
 
-void CSdlSizeObject::SetWidth(QVariant v)
+void CSdlSizeObject::SetWidth(const QVariant& v)
 {
 	Version_1_0->width = v.value<double>();
 	widthChanged();
@@ -8955,7 +8955,7 @@ QVariant CSdlSizeObject::GetHeight()
 }
 
 
-void CSdlSizeObject::SetHeight(QVariant v)
+void CSdlSizeObject::SetHeight(const QVariant& v)
 {
 	Version_1_0->height = v.value<double>();
 	heightChanged();
@@ -9035,13 +9035,13 @@ QString CSdlSizeObject::getJSONKeyForProperty(const QString& propertyName) const
 
 
 
-bool CSdlSizeObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CSdlSizeObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CSdlSizeObjectList::getItemsCount()
+int CSdlSizeObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -9118,7 +9118,7 @@ void sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CSdlSizeObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSdlSizeObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSdlSizeObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -9149,7 +9149,7 @@ QVariant CSdlPointObject::GetX()
 }
 
 
-void CSdlPointObject::SetX(QVariant v)
+void CSdlPointObject::SetX(const QVariant& v)
 {
 	Version_1_0->x = v.value<double>();
 	xChanged();
@@ -9172,7 +9172,7 @@ QVariant CSdlPointObject::GetY()
 }
 
 
-void CSdlPointObject::SetY(QVariant v)
+void CSdlPointObject::SetY(const QVariant& v)
 {
 	Version_1_0->y = v.value<double>();
 	yChanged();
@@ -9252,13 +9252,13 @@ QString CSdlPointObject::getJSONKeyForProperty(const QString& propertyName) cons
 
 
 
-bool CSdlPointObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CSdlPointObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CSdlPointObjectList::getItemsCount()
+int CSdlPointObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -9335,7 +9335,7 @@ void sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CSdlPointObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CSdlPointObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSdlPointObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSdlPointObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -9378,7 +9378,7 @@ QVariant CParamTypeIdsObject::GetUrlParam()
 }
 
 
-void CParamTypeIdsObject::SetUrlParam(QVariant v)
+void CParamTypeIdsObject::SetUrlParam(const QVariant& v)
 {
 	Version_1_0->UrlParam = v.value<QString>().toUtf8();
 	urlParamChanged();
@@ -9401,7 +9401,7 @@ QVariant CParamTypeIdsObject::GetIdParam()
 }
 
 
-void CParamTypeIdsObject::SetIdParam(QVariant v)
+void CParamTypeIdsObject::SetIdParam(const QVariant& v)
 {
 	Version_1_0->IdParam = v.value<QString>().toUtf8();
 	idParamChanged();
@@ -9424,7 +9424,7 @@ QVariant CParamTypeIdsObject::GetTextParam()
 }
 
 
-void CParamTypeIdsObject::SetTextParam(QVariant v)
+void CParamTypeIdsObject::SetTextParam(const QVariant& v)
 {
 	Version_1_0->TextParam = v.value<QString>().toUtf8();
 	textParamChanged();
@@ -9447,7 +9447,7 @@ QVariant CParamTypeIdsObject::GetTextView()
 }
 
 
-void CParamTypeIdsObject::SetTextView(QVariant v)
+void CParamTypeIdsObject::SetTextView(const QVariant& v)
 {
 	Version_1_0->TextView = v.value<QString>().toUtf8();
 	textViewChanged();
@@ -9470,7 +9470,7 @@ QVariant CParamTypeIdsObject::GetSelectionParam()
 }
 
 
-void CParamTypeIdsObject::SetSelectionParam(QVariant v)
+void CParamTypeIdsObject::SetSelectionParam(const QVariant& v)
 {
 	Version_1_0->SelectionParam = v.value<QString>().toUtf8();
 	selectionParamChanged();
@@ -9493,7 +9493,7 @@ QVariant CParamTypeIdsObject::GetSchedulerParam()
 }
 
 
-void CParamTypeIdsObject::SetSchedulerParam(QVariant v)
+void CParamTypeIdsObject::SetSchedulerParam(const QVariant& v)
 {
 	Version_1_0->SchedulerParam = v.value<QString>().toUtf8();
 	schedulerParamChanged();
@@ -9516,7 +9516,7 @@ QVariant CParamTypeIdsObject::GetBackupSettings()
 }
 
 
-void CParamTypeIdsObject::SetBackupSettings(QVariant v)
+void CParamTypeIdsObject::SetBackupSettings(const QVariant& v)
 {
 	Version_1_0->BackupSettings = v.value<QString>().toUtf8();
 	backupSettingsChanged();
@@ -9539,7 +9539,7 @@ QVariant CParamTypeIdsObject::GetDatabaseAccessSettings()
 }
 
 
-void CParamTypeIdsObject::SetDatabaseAccessSettings(QVariant v)
+void CParamTypeIdsObject::SetDatabaseAccessSettings(const QVariant& v)
 {
 	Version_1_0->DatabaseAccessSettings = v.value<QString>().toUtf8();
 	databaseAccessSettingsChanged();
@@ -9562,7 +9562,7 @@ QVariant CParamTypeIdsObject::GetParamsSet()
 }
 
 
-void CParamTypeIdsObject::SetParamsSet(QVariant v)
+void CParamTypeIdsObject::SetParamsSet(const QVariant& v)
 {
 	Version_1_0->ParamsSet = v.value<QString>().toUtf8();
 	paramsSetChanged();
@@ -9585,7 +9585,7 @@ QVariant CParamTypeIdsObject::GetFileNameParam()
 }
 
 
-void CParamTypeIdsObject::SetFileNameParam(QVariant v)
+void CParamTypeIdsObject::SetFileNameParam(const QVariant& v)
 {
 	Version_1_0->FileNameParam = v.value<QString>().toUtf8();
 	fileNameParamChanged();
@@ -9608,7 +9608,7 @@ QVariant CParamTypeIdsObject::GetIntegerParam()
 }
 
 
-void CParamTypeIdsObject::SetIntegerParam(QVariant v)
+void CParamTypeIdsObject::SetIntegerParam(const QVariant& v)
 {
 	Version_1_0->IntegerParam = v.value<QString>().toUtf8();
 	integerParamChanged();
@@ -9631,7 +9631,7 @@ QVariant CParamTypeIdsObject::GetDoubleParam()
 }
 
 
-void CParamTypeIdsObject::SetDoubleParam(QVariant v)
+void CParamTypeIdsObject::SetDoubleParam(const QVariant& v)
 {
 	Version_1_0->DoubleParam = v.value<QString>().toUtf8();
 	doubleParamChanged();
@@ -9654,7 +9654,7 @@ QVariant CParamTypeIdsObject::GetPasswordParam()
 }
 
 
-void CParamTypeIdsObject::SetPasswordParam(QVariant v)
+void CParamTypeIdsObject::SetPasswordParam(const QVariant& v)
 {
 	Version_1_0->PasswordParam = v.value<QString>().toUtf8();
 	passwordParamChanged();
@@ -9677,7 +9677,7 @@ QVariant CParamTypeIdsObject::GetEnableableParam()
 }
 
 
-void CParamTypeIdsObject::SetEnableableParam(QVariant v)
+void CParamTypeIdsObject::SetEnableableParam(const QVariant& v)
 {
 	Version_1_0->EnableableParam = v.value<QString>().toUtf8();
 	enableableParamChanged();
@@ -9793,13 +9793,13 @@ QString CParamTypeIdsObject::getJSONKeyForProperty(const QString& propertyName) 
 
 
 
-bool CParamTypeIdsObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CParamTypeIdsObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CParamTypeIdsObjectList::getItemsCount()
+int CParamTypeIdsObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -9876,7 +9876,7 @@ void sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CParamTypeIdsObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CParamTypeIdsObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CParamTypeIdsObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -9945,7 +9945,7 @@ QVariant CUrlParamObject::GetScheme()
 }
 
 
-void CUrlParamObject::SetScheme(QVariant v)
+void CUrlParamObject::SetScheme(const QVariant& v)
 {
 	Version_1_0->scheme = v.value<QString>();
 	schemeChanged();
@@ -9968,7 +9968,7 @@ QVariant CUrlParamObject::GetHost()
 }
 
 
-void CUrlParamObject::SetHost(QVariant v)
+void CUrlParamObject::SetHost(const QVariant& v)
 {
 	Version_1_0->host = v.value<QString>();
 	hostChanged();
@@ -9991,7 +9991,7 @@ QVariant CUrlParamObject::GetPort()
 }
 
 
-void CUrlParamObject::SetPort(QVariant v)
+void CUrlParamObject::SetPort(const QVariant& v)
 {
 	Version_1_0->port = v.value<int>();
 	portChanged();
@@ -10014,7 +10014,7 @@ QVariant CUrlParamObject::GetPath()
 }
 
 
-void CUrlParamObject::SetPath(QVariant v)
+void CUrlParamObject::SetPath(const QVariant& v)
 {
 	Version_1_0->path = v.value<QString>();
 	pathChanged();
@@ -10100,13 +10100,13 @@ QString CUrlParamObject::getJSONKeyForProperty(const QString& propertyName) cons
 
 
 
-bool CUrlParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CUrlParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CUrlParamObjectList::getItemsCount()
+int CUrlParamObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -10183,7 +10183,7 @@ void sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CUrlParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CUrlParamObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CUrlParamObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CUrlParamObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -10219,7 +10219,7 @@ QVariant CIdParamObject::GetId()
 }
 
 
-void CIdParamObject::SetId(QVariant v)
+void CIdParamObject::SetId(const QVariant& v)
 {
 	Version_1_0->id = v.value<QString>().toUtf8();
 	idChanged();
@@ -10296,13 +10296,13 @@ QString CIdParamObject::getJSONKeyForProperty(const QString& propertyName) const
 
 
 
-bool CIdParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CIdParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CIdParamObjectList::getItemsCount()
+int CIdParamObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -10379,7 +10379,7 @@ void sdl::imtbase::ImtBaseTypes::CIdParamObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CIdParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CIdParamObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CIdParamObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CIdParamObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -10406,7 +10406,7 @@ QVariant CTextParamObject::GetText()
 }
 
 
-void CTextParamObject::SetText(QVariant v)
+void CTextParamObject::SetText(const QVariant& v)
 {
 	Version_1_0->text = v.value<QString>();
 	textChanged();
@@ -10483,13 +10483,13 @@ QString CTextParamObject::getJSONKeyForProperty(const QString& propertyName) con
 
 
 
-bool CTextParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CTextParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CTextParamObjectList::getItemsCount()
+int CTextParamObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -10566,7 +10566,7 @@ void sdl::imtbase::ImtBaseTypes::CTextParamObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CTextParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CTextParamObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CTextParamObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CTextParamObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -10593,7 +10593,7 @@ QVariant CEnableableParamObject::GetValue()
 }
 
 
-void CEnableableParamObject::SetValue(QVariant v)
+void CEnableableParamObject::SetValue(const QVariant& v)
 {
 	Version_1_0->value = v.value<bool>();
 	valueChanged();
@@ -10670,13 +10670,13 @@ QString CEnableableParamObject::getJSONKeyForProperty(const QString& propertyNam
 
 
 
-bool CEnableableParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CEnableableParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CEnableableParamObjectList::getItemsCount()
+int CEnableableParamObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -10753,7 +10753,7 @@ void sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CEnableableParamObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CEnableableParamObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CEnableableParamObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -10780,7 +10780,7 @@ QVariant CIntegerParamObject::GetValue()
 }
 
 
-void CIntegerParamObject::SetValue(QVariant v)
+void CIntegerParamObject::SetValue(const QVariant& v)
 {
 	Version_1_0->value = v.value<int>();
 	valueChanged();
@@ -10857,13 +10857,13 @@ QString CIntegerParamObject::getJSONKeyForProperty(const QString& propertyName) 
 
 
 
-bool CIntegerParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CIntegerParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CIntegerParamObjectList::getItemsCount()
+int CIntegerParamObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -10940,7 +10940,7 @@ void sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CIntegerParamObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CIntegerParamObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CIntegerParamObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -10967,7 +10967,7 @@ QVariant CDoubleParamObject::GetValue()
 }
 
 
-void CDoubleParamObject::SetValue(QVariant v)
+void CDoubleParamObject::SetValue(const QVariant& v)
 {
 	Version_1_0->value = v.value<double>();
 	valueChanged();
@@ -11044,13 +11044,13 @@ QString CDoubleParamObject::getJSONKeyForProperty(const QString& propertyName) c
 
 
 
-bool CDoubleParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CDoubleParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CDoubleParamObjectList::getItemsCount()
+int CDoubleParamObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -11127,7 +11127,7 @@ void sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CDoubleParamObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CDoubleParamObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CDoubleParamObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -11157,7 +11157,7 @@ QVariant COptionObject::GetId()
 }
 
 
-void COptionObject::SetId(QVariant v)
+void COptionObject::SetId(const QVariant& v)
 {
 	Version_1_0->id = v.value<QString>().toUtf8();
 	idChanged();
@@ -11180,7 +11180,7 @@ QVariant COptionObject::GetName()
 }
 
 
-void COptionObject::SetName(QVariant v)
+void COptionObject::SetName(const QVariant& v)
 {
 	Version_1_0->name = v.value<QString>();
 	nameChanged();
@@ -11203,7 +11203,7 @@ QVariant COptionObject::GetDescription()
 }
 
 
-void COptionObject::SetDescription(QVariant v)
+void COptionObject::SetDescription(const QVariant& v)
 {
 	Version_1_0->description = v.value<QString>();
 	descriptionChanged();
@@ -11226,7 +11226,7 @@ QVariant COptionObject::GetEnabled()
 }
 
 
-void COptionObject::SetEnabled(QVariant v)
+void COptionObject::SetEnabled(const QVariant& v)
 {
 	Version_1_0->enabled = v.value<bool>();
 	enabledChanged();
@@ -11312,13 +11312,13 @@ QString COptionObject::getJSONKeyForProperty(const QString& propertyName) const
 
 
 
-bool COptionObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool COptionObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int COptionObjectList::getItemsCount()
+int COptionObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -11395,7 +11395,7 @@ void sdl::imtbase::ImtBaseTypes::COptionObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::COptionObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::COptionObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::COptionObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::COptionObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -11433,7 +11433,7 @@ QVariant COptionsListObject::GetTotalCount()
 }
 
 
-void COptionsListObject::SetTotalCount(QVariant v)
+void COptionsListObject::SetTotalCount(const QVariant& v)
 {
 	Version_1_0->totalCount = v.value<int>();
 	totalCountChanged();
@@ -11456,7 +11456,7 @@ QVariant COptionsListObject::GetOffset()
 }
 
 
-void COptionsListObject::SetOffset(QVariant v)
+void COptionsListObject::SetOffset(const QVariant& v)
 {
 	Version_1_0->offset = v.value<int>();
 	offsetChanged();
@@ -11474,7 +11474,7 @@ QVariant COptionsListObject::GetOptions()
 	if (Version_1_0->options.has_value()){
 		if (!m_optionsQObjectPtr.isValid()){
 			m_optionsQObjectPtr = CreateObject("options");
-			sdl::imtbase::ImtBaseTypes::COptionObjectList* itemPtr = m_optionsQObjectPtr.value<sdl::imtbase::ImtBaseTypes::COptionObjectList*>();
+			auto itemPtr = m_optionsQObjectPtr.value<sdl::imtbase::ImtBaseTypes::COptionObjectList*>();
 			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->options;
 		}
 		return m_optionsQObjectPtr;
@@ -11484,7 +11484,7 @@ QVariant COptionsListObject::GetOptions()
 }
 
 
-void COptionsListObject::SetOptions(QVariant v)
+void COptionsListObject::SetOptions(const QVariant& v)
 {
 	if (v.isValid()){
 		sdl::imtbase::ImtBaseTypes::COptionObjectList* itemPtr = v.value<sdl::imtbase::ImtBaseTypes::COptionObjectList*>();
@@ -11584,13 +11584,13 @@ QString COptionsListObject::getJSONKeyForProperty(const QString& propertyName) c
 
 
 
-bool COptionsListObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool COptionsListObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int COptionsListObjectList::getItemsCount()
+int COptionsListObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -11667,7 +11667,7 @@ void sdl::imtbase::ImtBaseTypes::COptionsListObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::COptionsListObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::COptionsListObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::COptionsListObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::COptionsListObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -11701,7 +11701,7 @@ QVariant CSelectionParamObject::GetSelectedIndex()
 }
 
 
-void CSelectionParamObject::SetSelectedIndex(QVariant v)
+void CSelectionParamObject::SetSelectedIndex(const QVariant& v)
 {
 	Version_1_0->selectedIndex = v.value<int>();
 	selectedIndexChanged();
@@ -11719,7 +11719,7 @@ QVariant CSelectionParamObject::GetConstraints()
 	if (Version_1_0->constraints.has_value()){
 		if (!m_constraintsQObjectPtr.isValid()){
 			m_constraintsQObjectPtr = CreateObject("constraints");
-			sdl::imtbase::ImtBaseTypes::COptionsListObject* itemPtr = m_constraintsQObjectPtr.value<sdl::imtbase::ImtBaseTypes::COptionsListObject*>();
+			auto itemPtr = m_constraintsQObjectPtr.value<sdl::imtbase::ImtBaseTypes::COptionsListObject*>();
 			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->constraints;
 		}
 		return m_constraintsQObjectPtr;
@@ -11729,7 +11729,7 @@ QVariant CSelectionParamObject::GetConstraints()
 }
 
 
-void CSelectionParamObject::SetConstraints(QVariant v)
+void CSelectionParamObject::SetConstraints(const QVariant& v)
 {
 	if (v.isValid()){
 		sdl::imtbase::ImtBaseTypes::COptionsListObject* itemPtr = v.value<sdl::imtbase::ImtBaseTypes::COptionsListObject*>();
@@ -11826,13 +11826,13 @@ QString CSelectionParamObject::getJSONKeyForProperty(const QString& propertyName
 
 
 
-bool CSelectionParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CSelectionParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CSelectionParamObjectList::getItemsCount()
+int CSelectionParamObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -11909,7 +11909,7 @@ void sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CSelectionParamObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSelectionParamObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSelectionParamObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -11940,7 +11940,7 @@ QVariant CSchedulerParamObject::GetStartTime()
 }
 
 
-void CSchedulerParamObject::SetStartTime(QVariant v)
+void CSchedulerParamObject::SetStartTime(const QVariant& v)
 {
 	Version_1_0->startTime = v.value<QString>();
 	startTimeChanged();
@@ -11963,7 +11963,7 @@ QVariant CSchedulerParamObject::GetInterval()
 }
 
 
-void CSchedulerParamObject::SetInterval(QVariant v)
+void CSchedulerParamObject::SetInterval(const QVariant& v)
 {
 	Version_1_0->interval = v.value<int>();
 	intervalChanged();
@@ -12043,13 +12043,13 @@ QString CSchedulerParamObject::getJSONKeyForProperty(const QString& propertyName
 
 
 
-bool CSchedulerParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CSchedulerParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CSchedulerParamObjectList::getItemsCount()
+int CSchedulerParamObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -12126,7 +12126,7 @@ void sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -12152,7 +12152,7 @@ QVariant CBackupSettingsObject::GetSchedulerParam()
 	if (Version_1_0->schedulerParam.has_value()){
 		if (!m_schedulerParamQObjectPtr.isValid()){
 			m_schedulerParamQObjectPtr = CreateObject("schedulerParam");
-			sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* itemPtr = m_schedulerParamQObjectPtr.value<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>();
+			auto itemPtr = m_schedulerParamQObjectPtr.value<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>();
 			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->schedulerParam;
 		}
 		return m_schedulerParamQObjectPtr;
@@ -12162,7 +12162,7 @@ QVariant CBackupSettingsObject::GetSchedulerParam()
 }
 
 
-void CBackupSettingsObject::SetSchedulerParam(QVariant v)
+void CBackupSettingsObject::SetSchedulerParam(const QVariant& v)
 {
 	if (v.isValid()){
 		sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* itemPtr = v.value<sdl::imtbase::ImtBaseTypes::CSchedulerParamObject*>();
@@ -12199,7 +12199,7 @@ QVariant CBackupSettingsObject::GetFolderPath()
 }
 
 
-void CBackupSettingsObject::SetFolderPath(QVariant v)
+void CBackupSettingsObject::SetFolderPath(const QVariant& v)
 {
 	Version_1_0->folderPath = v.value<QString>();
 	folderPathChanged();
@@ -12282,13 +12282,13 @@ QString CBackupSettingsObject::getJSONKeyForProperty(const QString& propertyName
 
 
 
-bool CBackupSettingsObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CBackupSettingsObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CBackupSettingsObjectList::getItemsCount()
+int CBackupSettingsObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -12365,7 +12365,7 @@ void sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CBackupSettingsObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CBackupSettingsObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CBackupSettingsObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -12400,7 +12400,7 @@ QVariant CDatabaseAccessSettingsObject::GetDbName()
 }
 
 
-void CDatabaseAccessSettingsObject::SetDbName(QVariant v)
+void CDatabaseAccessSettingsObject::SetDbName(const QVariant& v)
 {
 	Version_1_0->dbName = v.value<QString>();
 	dbNameChanged();
@@ -12423,7 +12423,7 @@ QVariant CDatabaseAccessSettingsObject::GetHost()
 }
 
 
-void CDatabaseAccessSettingsObject::SetHost(QVariant v)
+void CDatabaseAccessSettingsObject::SetHost(const QVariant& v)
 {
 	Version_1_0->host = v.value<QString>();
 	hostChanged();
@@ -12446,7 +12446,7 @@ QVariant CDatabaseAccessSettingsObject::GetPort()
 }
 
 
-void CDatabaseAccessSettingsObject::SetPort(QVariant v)
+void CDatabaseAccessSettingsObject::SetPort(const QVariant& v)
 {
 	Version_1_0->port = v.value<int>();
 	portChanged();
@@ -12469,7 +12469,7 @@ QVariant CDatabaseAccessSettingsObject::GetDbPath()
 }
 
 
-void CDatabaseAccessSettingsObject::SetDbPath(QVariant v)
+void CDatabaseAccessSettingsObject::SetDbPath(const QVariant& v)
 {
 	Version_1_0->dbPath = v.value<QString>();
 	dbPathChanged();
@@ -12492,7 +12492,7 @@ QVariant CDatabaseAccessSettingsObject::GetUsername()
 }
 
 
-void CDatabaseAccessSettingsObject::SetUsername(QVariant v)
+void CDatabaseAccessSettingsObject::SetUsername(const QVariant& v)
 {
 	Version_1_0->username = v.value<QString>();
 	usernameChanged();
@@ -12515,7 +12515,7 @@ QVariant CDatabaseAccessSettingsObject::GetPassword()
 }
 
 
-void CDatabaseAccessSettingsObject::SetPassword(QVariant v)
+void CDatabaseAccessSettingsObject::SetPassword(const QVariant& v)
 {
 	Version_1_0->password = v.value<QString>();
 	passwordChanged();
@@ -12607,13 +12607,13 @@ QString CDatabaseAccessSettingsObject::getJSONKeyForProperty(const QString& prop
 
 
 
-bool CDatabaseAccessSettingsObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CDatabaseAccessSettingsObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CDatabaseAccessSettingsObjectList::getItemsCount()
+int CDatabaseAccessSettingsObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -12690,7 +12690,7 @@ void sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -12733,7 +12733,7 @@ QVariant CFileNameParamObject::GetPathType()
 }
 
 
-void CFileNameParamObject::SetPathType(QVariant v)
+void CFileNameParamObject::SetPathType(const QVariant& v)
 {
 	Version_1_0->pathType = v.value<int>();
 	pathTypeChanged();
@@ -12756,7 +12756,7 @@ QVariant CFileNameParamObject::GetPath()
 }
 
 
-void CFileNameParamObject::SetPath(QVariant v)
+void CFileNameParamObject::SetPath(const QVariant& v)
 {
 	Version_1_0->path = v.value<QString>();
 	pathChanged();
@@ -12836,13 +12836,13 @@ QString CFileNameParamObject::getJSONKeyForProperty(const QString& propertyName)
 
 
 
-bool CFileNameParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CFileNameParamObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CFileNameParamObjectList::getItemsCount()
+int CFileNameParamObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -12919,7 +12919,7 @@ void sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CFileNameParamObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CFileNameParamObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CFileNameParamObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -12957,7 +12957,7 @@ QVariant CParamsSetObject::GetParamIds()
 }
 
 
-void CParamsSetObject::SetParamIds(QVariant v)
+void CParamsSetObject::SetParamIds(const QVariant& v)
 {
 	Version_1_0->paramIds->clear(); 
 	for (const auto& tempValue: v.value<QList<QString>>()){
@@ -12989,7 +12989,7 @@ QVariant CParamsSetObject::GetParamTypeIds()
 }
 
 
-void CParamsSetObject::SetParamTypeIds(QVariant v)
+void CParamsSetObject::SetParamTypeIds(const QVariant& v)
 {
 	Version_1_0->paramTypeIds->clear(); 
 	for (const auto& tempValue: v.value<QList<QString>>()){
@@ -13021,7 +13021,7 @@ QVariant CParamsSetObject::GetParamNames()
 }
 
 
-void CParamsSetObject::SetParamNames(QVariant v)
+void CParamsSetObject::SetParamNames(const QVariant& v)
 {
 	Version_1_0->paramNames->clear(); 
 	for (const auto& tempValue: v.value<QList<QString>>()){
@@ -13053,7 +13053,7 @@ QVariant CParamsSetObject::GetParamDescriptions()
 }
 
 
-void CParamsSetObject::SetParamDescriptions(QVariant v)
+void CParamsSetObject::SetParamDescriptions(const QVariant& v)
 {
 	Version_1_0->paramDescriptions->clear(); 
 	for (const auto& tempValue: v.value<QList<QString>>()){
@@ -13085,7 +13085,7 @@ QVariant CParamsSetObject::GetParameters()
 }
 
 
-void CParamsSetObject::SetParameters(QVariant v)
+void CParamsSetObject::SetParameters(const QVariant& v)
 {
 	Version_1_0->parameters->clear(); 
 	for (const auto& tempValue: v.value<QList<QString>>()){
@@ -13179,13 +13179,13 @@ QString CParamsSetObject::getJSONKeyForProperty(const QString& propertyName) con
 
 
 
-bool CParamsSetObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CParamsSetObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CParamsSetObjectList::getItemsCount()
+int CParamsSetObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -13262,7 +13262,7 @@ void sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CParamsSetObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CParamsSetObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CParamsSetObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CParamsSetObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -13305,7 +13305,7 @@ QVariant CMimeTypeObject::GetType()
 }
 
 
-void CMimeTypeObject::SetType(QVariant v)
+void CMimeTypeObject::SetType(const QVariant& v)
 {
 	Version_1_0->type = v.value<QString>();
 	typeChanged();
@@ -13332,7 +13332,7 @@ QVariant CMimeTypeObject::GetTree()
 }
 
 
-void CMimeTypeObject::SetTree(QVariant v)
+void CMimeTypeObject::SetTree(const QVariant& v)
 {
 	Version_1_0->tree->clear(); 
 	for (const auto& tempValue: v.value<QList<QString>>()){
@@ -13360,7 +13360,7 @@ QVariant CMimeTypeObject::GetSubType()
 }
 
 
-void CMimeTypeObject::SetSubType(QVariant v)
+void CMimeTypeObject::SetSubType(const QVariant& v)
 {
 	Version_1_0->subType = v.value<QString>();
 	subTypeChanged();
@@ -13383,7 +13383,7 @@ QVariant CMimeTypeObject::GetSuffix()
 }
 
 
-void CMimeTypeObject::SetSuffix(QVariant v)
+void CMimeTypeObject::SetSuffix(const QVariant& v)
 {
 	Version_1_0->suffix = v.value<QString>();
 	suffixChanged();
@@ -13410,7 +13410,7 @@ QVariant CMimeTypeObject::GetParameters()
 }
 
 
-void CMimeTypeObject::SetParameters(QVariant v)
+void CMimeTypeObject::SetParameters(const QVariant& v)
 {
 	Version_1_0->parameters->clear(); 
 	for (const auto& tempValue: v.value<QList<QString>>()){
@@ -13504,13 +13504,13 @@ QString CMimeTypeObject::getJSONKeyForProperty(const QString& propertyName) cons
 
 
 
-bool CMimeTypeObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CMimeTypeObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CMimeTypeObjectList::getItemsCount()
+int CMimeTypeObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -13587,7 +13587,7 @@ void sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::clear()
 QVariant sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::imtbase::ImtBaseTypes::CMimeTypeObject* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CMimeTypeObject*>();
+	auto* itemPtr = item.value<sdl::imtbase::ImtBaseTypes::CMimeTypeObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);

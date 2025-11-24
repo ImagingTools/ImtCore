@@ -1119,10 +1119,10 @@ public:
 	CTimeRangeObject(QObject* parent = nullptr);
 
 	QVariant GetBegin();
-	void SetBegin(QVariant v);
+	void SetBegin(const QVariant& v);
 	Q_INVOKABLE bool hasBegin();
 	QVariant GetEnd();
-	void SetEnd(QVariant v);
+	void SetEnd(const QVariant& v);
 	Q_INVOKABLE bool hasEnd();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1133,9 +1133,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void beginChanged();
-void endChanged();
-	void finished();
+	void beginChanged();
+	void endChanged();
 
 protected:
 };
@@ -1151,10 +1150,10 @@ class CTimeRangeObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtBas
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CTimeRange::V1_0, sdl::imtbase::ImtBaseTypes::CTimeRangeObject> BaseClass;
 
-	CTimeRangeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CTimeRangeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CTimeRangeObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CTimeRangeObjectList* copyMe();
@@ -1167,7 +1166,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1187,10 +1187,10 @@ public:
 	CSdlSizeObject(QObject* parent = nullptr);
 
 	QVariant GetWidth();
-	void SetWidth(QVariant v);
+	void SetWidth(const QVariant& v);
 	Q_INVOKABLE bool hasWidth();
 	QVariant GetHeight();
-	void SetHeight(QVariant v);
+	void SetHeight(const QVariant& v);
 	Q_INVOKABLE bool hasHeight();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1201,9 +1201,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void widthChanged();
-void heightChanged();
-	void finished();
+	void widthChanged();
+	void heightChanged();
 
 protected:
 };
@@ -1219,10 +1218,10 @@ class CSdlSizeObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseT
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CSdlSize::V1_0, sdl::imtbase::ImtBaseTypes::CSdlSizeObject> BaseClass;
 
-	CSdlSizeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CSdlSizeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CSdlSizeObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CSdlSizeObjectList* copyMe();
@@ -1235,7 +1234,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1255,10 +1255,10 @@ public:
 	CSdlPointObject(QObject* parent = nullptr);
 
 	QVariant GetX();
-	void SetX(QVariant v);
+	void SetX(const QVariant& v);
 	Q_INVOKABLE bool hasX();
 	QVariant GetY();
-	void SetY(QVariant v);
+	void SetY(const QVariant& v);
 	Q_INVOKABLE bool hasY();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1269,9 +1269,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void xChanged();
-void yChanged();
-	void finished();
+	void xChanged();
+	void yChanged();
 
 protected:
 };
@@ -1287,10 +1286,10 @@ class CSdlPointObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtBase
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CSdlPoint::V1_0, sdl::imtbase::ImtBaseTypes::CSdlPointObject> BaseClass;
 
-	CSdlPointObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CSdlPointObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CSdlPointObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CSdlPointObjectList* copyMe();
@@ -1303,7 +1302,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1335,46 +1335,46 @@ public:
 	CParamTypeIdsObject(QObject* parent = nullptr);
 
 	QVariant GetUrlParam();
-	void SetUrlParam(QVariant v);
+	void SetUrlParam(const QVariant& v);
 	Q_INVOKABLE bool hasUrlParam();
 	QVariant GetIdParam();
-	void SetIdParam(QVariant v);
+	void SetIdParam(const QVariant& v);
 	Q_INVOKABLE bool hasIdParam();
 	QVariant GetTextParam();
-	void SetTextParam(QVariant v);
+	void SetTextParam(const QVariant& v);
 	Q_INVOKABLE bool hasTextParam();
 	QVariant GetTextView();
-	void SetTextView(QVariant v);
+	void SetTextView(const QVariant& v);
 	Q_INVOKABLE bool hasTextView();
 	QVariant GetSelectionParam();
-	void SetSelectionParam(QVariant v);
+	void SetSelectionParam(const QVariant& v);
 	Q_INVOKABLE bool hasSelectionParam();
 	QVariant GetSchedulerParam();
-	void SetSchedulerParam(QVariant v);
+	void SetSchedulerParam(const QVariant& v);
 	Q_INVOKABLE bool hasSchedulerParam();
 	QVariant GetBackupSettings();
-	void SetBackupSettings(QVariant v);
+	void SetBackupSettings(const QVariant& v);
 	Q_INVOKABLE bool hasBackupSettings();
 	QVariant GetDatabaseAccessSettings();
-	void SetDatabaseAccessSettings(QVariant v);
+	void SetDatabaseAccessSettings(const QVariant& v);
 	Q_INVOKABLE bool hasDatabaseAccessSettings();
 	QVariant GetParamsSet();
-	void SetParamsSet(QVariant v);
+	void SetParamsSet(const QVariant& v);
 	Q_INVOKABLE bool hasParamsSet();
 	QVariant GetFileNameParam();
-	void SetFileNameParam(QVariant v);
+	void SetFileNameParam(const QVariant& v);
 	Q_INVOKABLE bool hasFileNameParam();
 	QVariant GetIntegerParam();
-	void SetIntegerParam(QVariant v);
+	void SetIntegerParam(const QVariant& v);
 	Q_INVOKABLE bool hasIntegerParam();
 	QVariant GetDoubleParam();
-	void SetDoubleParam(QVariant v);
+	void SetDoubleParam(const QVariant& v);
 	Q_INVOKABLE bool hasDoubleParam();
 	QVariant GetPasswordParam();
-	void SetPasswordParam(QVariant v);
+	void SetPasswordParam(const QVariant& v);
 	Q_INVOKABLE bool hasPasswordParam();
 	QVariant GetEnableableParam();
-	void SetEnableableParam(QVariant v);
+	void SetEnableableParam(const QVariant& v);
 	Q_INVOKABLE bool hasEnableableParam();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1385,21 +1385,20 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void urlParamChanged();
-void idParamChanged();
-void textParamChanged();
-void textViewChanged();
-void selectionParamChanged();
-void schedulerParamChanged();
-void backupSettingsChanged();
-void databaseAccessSettingsChanged();
-void paramsSetChanged();
-void fileNameParamChanged();
-void integerParamChanged();
-void doubleParamChanged();
-void passwordParamChanged();
-void enableableParamChanged();
-	void finished();
+	void urlParamChanged();
+	void idParamChanged();
+	void textParamChanged();
+	void textViewChanged();
+	void selectionParamChanged();
+	void schedulerParamChanged();
+	void backupSettingsChanged();
+	void databaseAccessSettingsChanged();
+	void paramsSetChanged();
+	void fileNameParamChanged();
+	void integerParamChanged();
+	void doubleParamChanged();
+	void passwordParamChanged();
+	void enableableParamChanged();
 
 protected:
 };
@@ -1415,10 +1414,10 @@ class CParamTypeIdsObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::Imt
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CParamTypeIds::V1_0, sdl::imtbase::ImtBaseTypes::CParamTypeIdsObject> BaseClass;
 
-	CParamTypeIdsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CParamTypeIdsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CParamTypeIdsObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CParamTypeIdsObjectList* copyMe();
@@ -1431,7 +1430,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1453,16 +1453,16 @@ public:
 	CUrlParamObject(QObject* parent = nullptr);
 
 	QVariant GetScheme();
-	void SetScheme(QVariant v);
+	void SetScheme(const QVariant& v);
 	Q_INVOKABLE bool hasScheme();
 	QVariant GetHost();
-	void SetHost(QVariant v);
+	void SetHost(const QVariant& v);
 	Q_INVOKABLE bool hasHost();
 	QVariant GetPort();
-	void SetPort(QVariant v);
+	void SetPort(const QVariant& v);
 	Q_INVOKABLE bool hasPort();
 	QVariant GetPath();
-	void SetPath(QVariant v);
+	void SetPath(const QVariant& v);
 	Q_INVOKABLE bool hasPath();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1473,11 +1473,10 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void schemeChanged();
-void hostChanged();
-void portChanged();
-void pathChanged();
-	void finished();
+	void schemeChanged();
+	void hostChanged();
+	void portChanged();
+	void pathChanged();
 
 protected:
 };
@@ -1493,10 +1492,10 @@ class CUrlParamObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtBase
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CUrlParam::V1_0, sdl::imtbase::ImtBaseTypes::CUrlParamObject> BaseClass;
 
-	CUrlParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CUrlParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CUrlParamObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CUrlParamObjectList* copyMe();
@@ -1509,7 +1508,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1528,7 +1528,7 @@ public:
 	CIdParamObject(QObject* parent = nullptr);
 
 	QVariant GetId();
-	void SetId(QVariant v);
+	void SetId(const QVariant& v);
 	Q_INVOKABLE bool hasId();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1539,8 +1539,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void idChanged();
-	void finished();
+	void idChanged();
 
 protected:
 };
@@ -1556,10 +1555,10 @@ class CIdParamObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseT
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CIdParam::V1_0, sdl::imtbase::ImtBaseTypes::CIdParamObject> BaseClass;
 
-	CIdParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CIdParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CIdParamObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CIdParamObjectList* copyMe();
@@ -1572,7 +1571,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1591,7 +1591,7 @@ public:
 	CTextParamObject(QObject* parent = nullptr);
 
 	QVariant GetText();
-	void SetText(QVariant v);
+	void SetText(const QVariant& v);
 	Q_INVOKABLE bool hasText();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1602,8 +1602,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void textChanged();
-	void finished();
+	void textChanged();
 
 protected:
 };
@@ -1619,10 +1618,10 @@ class CTextParamObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtBas
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CTextParam::V1_0, sdl::imtbase::ImtBaseTypes::CTextParamObject> BaseClass;
 
-	CTextParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CTextParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CTextParamObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CTextParamObjectList* copyMe();
@@ -1635,7 +1634,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1654,7 +1654,7 @@ public:
 	CEnableableParamObject(QObject* parent = nullptr);
 
 	QVariant GetValue();
-	void SetValue(QVariant v);
+	void SetValue(const QVariant& v);
 	Q_INVOKABLE bool hasValue();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1665,8 +1665,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void valueChanged();
-	void finished();
+	void valueChanged();
 
 protected:
 };
@@ -1682,10 +1681,10 @@ class CEnableableParamObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CEnableableParam::V1_0, sdl::imtbase::ImtBaseTypes::CEnableableParamObject> BaseClass;
 
-	CEnableableParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CEnableableParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CEnableableParamObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CEnableableParamObjectList* copyMe();
@@ -1698,7 +1697,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1717,7 +1717,7 @@ public:
 	CIntegerParamObject(QObject* parent = nullptr);
 
 	QVariant GetValue();
-	void SetValue(QVariant v);
+	void SetValue(const QVariant& v);
 	Q_INVOKABLE bool hasValue();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1728,8 +1728,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void valueChanged();
-	void finished();
+	void valueChanged();
 
 protected:
 };
@@ -1745,10 +1744,10 @@ class CIntegerParamObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::Imt
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CIntegerParam::V1_0, sdl::imtbase::ImtBaseTypes::CIntegerParamObject> BaseClass;
 
-	CIntegerParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CIntegerParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CIntegerParamObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CIntegerParamObjectList* copyMe();
@@ -1761,7 +1760,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1780,7 +1780,7 @@ public:
 	CDoubleParamObject(QObject* parent = nullptr);
 
 	QVariant GetValue();
-	void SetValue(QVariant v);
+	void SetValue(const QVariant& v);
 	Q_INVOKABLE bool hasValue();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1791,8 +1791,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void valueChanged();
-	void finished();
+	void valueChanged();
 
 protected:
 };
@@ -1808,10 +1807,10 @@ class CDoubleParamObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtB
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CDoubleParam::V1_0, sdl::imtbase::ImtBaseTypes::CDoubleParamObject> BaseClass;
 
-	CDoubleParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CDoubleParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CDoubleParamObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CDoubleParamObjectList* copyMe();
@@ -1824,7 +1823,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1846,16 +1846,16 @@ public:
 	COptionObject(QObject* parent = nullptr);
 
 	QVariant GetId();
-	void SetId(QVariant v);
+	void SetId(const QVariant& v);
 	Q_INVOKABLE bool hasId();
 	QVariant GetName();
-	void SetName(QVariant v);
+	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetDescription();
-	void SetDescription(QVariant v);
+	void SetDescription(const QVariant& v);
 	Q_INVOKABLE bool hasDescription();
 	QVariant GetEnabled();
-	void SetEnabled(QVariant v);
+	void SetEnabled(const QVariant& v);
 	Q_INVOKABLE bool hasEnabled();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1866,11 +1866,10 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void idChanged();
-void nameChanged();
-void descriptionChanged();
-void enabledChanged();
-	void finished();
+	void idChanged();
+	void nameChanged();
+	void descriptionChanged();
+	void enabledChanged();
 
 protected:
 };
@@ -1886,10 +1885,10 @@ class COptionObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTy
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::COption::V1_0, sdl::imtbase::ImtBaseTypes::COptionObject> BaseClass;
 
-	COptionObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit COptionObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::COptionObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::COptionObjectList* copyMe();
@@ -1902,7 +1901,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1923,13 +1923,13 @@ public:
 	COptionsListObject(QObject* parent = nullptr);
 
 	QVariant GetTotalCount();
-	void SetTotalCount(QVariant v);
+	void SetTotalCount(const QVariant& v);
 	Q_INVOKABLE bool hasTotalCount();
 	QVariant GetOffset();
-	void SetOffset(QVariant v);
+	void SetOffset(const QVariant& v);
 	Q_INVOKABLE bool hasOffset();
 	QVariant GetOptions();
-	void SetOptions(QVariant v);
+	void SetOptions(const QVariant& v);
 	Q_INVOKABLE bool hasOptions();
 	Q_INVOKABLE void createOptions();
 	// CItemModelBase implemented
@@ -1941,10 +1941,9 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void totalCountChanged();
-void offsetChanged();
-void optionsChanged();
-	void finished();
+	void totalCountChanged();
+	void offsetChanged();
+	void optionsChanged();
 
 protected:
 	QVariant m_optionsQObjectPtr;
@@ -1961,10 +1960,10 @@ class COptionsListObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtB
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::COptionsList::V1_0, sdl::imtbase::ImtBaseTypes::COptionsListObject> BaseClass;
 
-	COptionsListObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit COptionsListObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::COptionsListObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::COptionsListObjectList* copyMe();
@@ -1977,7 +1976,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1997,10 +1997,10 @@ public:
 	CSelectionParamObject(QObject* parent = nullptr);
 
 	QVariant GetSelectedIndex();
-	void SetSelectedIndex(QVariant v);
+	void SetSelectedIndex(const QVariant& v);
 	Q_INVOKABLE bool hasSelectedIndex();
 	QVariant GetConstraints();
-	void SetConstraints(QVariant v);
+	void SetConstraints(const QVariant& v);
 	Q_INVOKABLE bool hasConstraints();
 	Q_INVOKABLE void createConstraints();
 	// CItemModelBase implemented
@@ -2012,9 +2012,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void selectedIndexChanged();
-void constraintsChanged();
-	void finished();
+	void selectedIndexChanged();
+	void constraintsChanged();
 
 protected:
 	QVariant m_constraintsQObjectPtr;
@@ -2031,10 +2030,10 @@ class CSelectionParamObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::I
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CSelectionParam::V1_0, sdl::imtbase::ImtBaseTypes::CSelectionParamObject> BaseClass;
 
-	CSelectionParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CSelectionParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CSelectionParamObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CSelectionParamObjectList* copyMe();
@@ -2047,7 +2046,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2067,10 +2067,10 @@ public:
 	CSchedulerParamObject(QObject* parent = nullptr);
 
 	QVariant GetStartTime();
-	void SetStartTime(QVariant v);
+	void SetStartTime(const QVariant& v);
 	Q_INVOKABLE bool hasStartTime();
 	QVariant GetInterval();
-	void SetInterval(QVariant v);
+	void SetInterval(const QVariant& v);
 	Q_INVOKABLE bool hasInterval();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -2081,9 +2081,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void startTimeChanged();
-void intervalChanged();
-	void finished();
+	void startTimeChanged();
+	void intervalChanged();
 
 protected:
 };
@@ -2099,10 +2098,10 @@ class CSchedulerParamObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::I
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CSchedulerParam::V1_0, sdl::imtbase::ImtBaseTypes::CSchedulerParamObject> BaseClass;
 
-	CSchedulerParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CSchedulerParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CSchedulerParamObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CSchedulerParamObjectList* copyMe();
@@ -2115,7 +2114,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2135,11 +2135,11 @@ public:
 	CBackupSettingsObject(QObject* parent = nullptr);
 
 	QVariant GetSchedulerParam();
-	void SetSchedulerParam(QVariant v);
+	void SetSchedulerParam(const QVariant& v);
 	Q_INVOKABLE bool hasSchedulerParam();
 	Q_INVOKABLE void createSchedulerParam();
 	QVariant GetFolderPath();
-	void SetFolderPath(QVariant v);
+	void SetFolderPath(const QVariant& v);
 	Q_INVOKABLE bool hasFolderPath();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -2150,9 +2150,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void schedulerParamChanged();
-void folderPathChanged();
-	void finished();
+	void schedulerParamChanged();
+	void folderPathChanged();
 
 protected:
 	QVariant m_schedulerParamQObjectPtr;
@@ -2169,10 +2168,10 @@ class CBackupSettingsObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::I
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CBackupSettings::V1_0, sdl::imtbase::ImtBaseTypes::CBackupSettingsObject> BaseClass;
 
-	CBackupSettingsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CBackupSettingsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CBackupSettingsObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CBackupSettingsObjectList* copyMe();
@@ -2185,7 +2184,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2209,22 +2209,22 @@ public:
 	CDatabaseAccessSettingsObject(QObject* parent = nullptr);
 
 	QVariant GetDbName();
-	void SetDbName(QVariant v);
+	void SetDbName(const QVariant& v);
 	Q_INVOKABLE bool hasDbName();
 	QVariant GetHost();
-	void SetHost(QVariant v);
+	void SetHost(const QVariant& v);
 	Q_INVOKABLE bool hasHost();
 	QVariant GetPort();
-	void SetPort(QVariant v);
+	void SetPort(const QVariant& v);
 	Q_INVOKABLE bool hasPort();
 	QVariant GetDbPath();
-	void SetDbPath(QVariant v);
+	void SetDbPath(const QVariant& v);
 	Q_INVOKABLE bool hasDbPath();
 	QVariant GetUsername();
-	void SetUsername(QVariant v);
+	void SetUsername(const QVariant& v);
 	Q_INVOKABLE bool hasUsername();
 	QVariant GetPassword();
-	void SetPassword(QVariant v);
+	void SetPassword(const QVariant& v);
 	Q_INVOKABLE bool hasPassword();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -2235,13 +2235,12 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void dbNameChanged();
-void hostChanged();
-void portChanged();
-void dbPathChanged();
-void usernameChanged();
-void passwordChanged();
-	void finished();
+	void dbNameChanged();
+	void hostChanged();
+	void portChanged();
+	void dbPathChanged();
+	void usernameChanged();
+	void passwordChanged();
 
 protected:
 };
@@ -2257,10 +2256,10 @@ class CDatabaseAccessSettingsObjectList: public ::imtsdl::TListModelBase<sdl::im
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettings::V1_0, sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObject> BaseClass;
 
-	CDatabaseAccessSettingsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CDatabaseAccessSettingsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CDatabaseAccessSettingsObjectList* copyMe();
@@ -2273,7 +2272,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2293,10 +2293,10 @@ public:
 	CFileNameParamObject(QObject* parent = nullptr);
 
 	QVariant GetPathType();
-	void SetPathType(QVariant v);
+	void SetPathType(const QVariant& v);
 	Q_INVOKABLE bool hasPathType();
 	QVariant GetPath();
-	void SetPath(QVariant v);
+	void SetPath(const QVariant& v);
 	Q_INVOKABLE bool hasPath();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -2307,9 +2307,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void pathTypeChanged();
-void pathChanged();
-	void finished();
+	void pathTypeChanged();
+	void pathChanged();
 
 protected:
 };
@@ -2325,10 +2324,10 @@ class CFileNameParamObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::Im
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CFileNameParam::V1_0, sdl::imtbase::ImtBaseTypes::CFileNameParamObject> BaseClass;
 
-	CFileNameParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CFileNameParamObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CFileNameParamObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CFileNameParamObjectList* copyMe();
@@ -2341,7 +2340,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2364,19 +2364,19 @@ public:
 	CParamsSetObject(QObject* parent = nullptr);
 
 	QVariant GetParamIds();
-	void SetParamIds(QVariant v);
+	void SetParamIds(const QVariant& v);
 	Q_INVOKABLE bool hasParamIds();
 	QVariant GetParamTypeIds();
-	void SetParamTypeIds(QVariant v);
+	void SetParamTypeIds(const QVariant& v);
 	Q_INVOKABLE bool hasParamTypeIds();
 	QVariant GetParamNames();
-	void SetParamNames(QVariant v);
+	void SetParamNames(const QVariant& v);
 	Q_INVOKABLE bool hasParamNames();
 	QVariant GetParamDescriptions();
-	void SetParamDescriptions(QVariant v);
+	void SetParamDescriptions(const QVariant& v);
 	Q_INVOKABLE bool hasParamDescriptions();
 	QVariant GetParameters();
-	void SetParameters(QVariant v);
+	void SetParameters(const QVariant& v);
 	Q_INVOKABLE bool hasParameters();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -2387,12 +2387,11 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void paramIdsChanged();
-void paramTypeIdsChanged();
-void paramNamesChanged();
-void paramDescriptionsChanged();
-void parametersChanged();
-	void finished();
+	void paramIdsChanged();
+	void paramTypeIdsChanged();
+	void paramNamesChanged();
+	void paramDescriptionsChanged();
+	void parametersChanged();
 
 protected:
 };
@@ -2408,10 +2407,10 @@ class CParamsSetObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtBas
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0, sdl::imtbase::ImtBaseTypes::CParamsSetObject> BaseClass;
 
-	CParamsSetObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CParamsSetObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CParamsSetObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CParamsSetObjectList* copyMe();
@@ -2424,7 +2423,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2447,19 +2447,19 @@ public:
 	CMimeTypeObject(QObject* parent = nullptr);
 
 	QVariant GetType();
-	void SetType(QVariant v);
+	void SetType(const QVariant& v);
 	Q_INVOKABLE bool hasType();
 	QVariant GetTree();
-	void SetTree(QVariant v);
+	void SetTree(const QVariant& v);
 	Q_INVOKABLE bool hasTree();
 	QVariant GetSubType();
-	void SetSubType(QVariant v);
+	void SetSubType(const QVariant& v);
 	Q_INVOKABLE bool hasSubType();
 	QVariant GetSuffix();
-	void SetSuffix(QVariant v);
+	void SetSuffix(const QVariant& v);
 	Q_INVOKABLE bool hasSuffix();
 	QVariant GetParameters();
-	void SetParameters(QVariant v);
+	void SetParameters(const QVariant& v);
 	Q_INVOKABLE bool hasParameters();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -2470,12 +2470,11 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void typeChanged();
-void treeChanged();
-void subTypeChanged();
-void suffixChanged();
-void parametersChanged();
-	void finished();
+	void typeChanged();
+	void treeChanged();
+	void subTypeChanged();
+	void suffixChanged();
+	void parametersChanged();
 
 protected:
 };
@@ -2491,10 +2490,10 @@ class CMimeTypeObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::ImtBase
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ImtBaseTypes::CMimeType::V1_0, sdl::imtbase::ImtBaseTypes::CMimeTypeObject> BaseClass;
 
-	CMimeTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CMimeTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ImtBaseTypes::CMimeTypeObject* item);
 	Q_INVOKABLE sdl::imtbase::ImtBaseTypes::CMimeTypeObjectList* copyMe();
@@ -2507,9 +2506,12 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
+
+
 #ifdef QT_QML_LIB
 [[maybe_unused]] static void RegisterQmlTypes()
 {

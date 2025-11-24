@@ -1022,40 +1022,40 @@ public:
 	CResultObject(QObject* parent = nullptr);
 
 	QVariant GetAreaResult();
-	void SetAreaResult(QVariant v);
+	void SetAreaResult(const QVariant& v);
 	Q_INVOKABLE bool hasAreaResult();
 	QVariant GetExpectedMinValue();
-	void SetExpectedMinValue(QVariant v);
+	void SetExpectedMinValue(const QVariant& v);
 	Q_INVOKABLE bool hasExpectedMinValue();
 	QVariant GetExpectedMaxValue();
-	void SetExpectedMaxValue(QVariant v);
+	void SetExpectedMaxValue(const QVariant& v);
 	Q_INVOKABLE bool hasExpectedMaxValue();
 	QVariant GetMeasuredValue();
-	void SetMeasuredValue(QVariant v);
+	void SetMeasuredValue(const QVariant& v);
 	Q_INVOKABLE bool hasMeasuredValue();
 	QVariant GetMinMeasuredValue();
-	void SetMinMeasuredValue(QVariant v);
+	void SetMinMeasuredValue(const QVariant& v);
 	Q_INVOKABLE bool hasMinMeasuredValue();
 	QVariant GetMaxMeasuredValue();
-	void SetMaxMeasuredValue(QVariant v);
+	void SetMaxMeasuredValue(const QVariant& v);
 	Q_INVOKABLE bool hasMaxMeasuredValue();
 	QVariant GetMeanMeasuredValue();
-	void SetMeanMeasuredValue(QVariant v);
+	void SetMeanMeasuredValue(const QVariant& v);
 	Q_INVOKABLE bool hasMeanMeasuredValue();
 	QVariant GetMeasurementType();
-	void SetMeasurementType(QVariant v);
+	void SetMeasurementType(const QVariant& v);
 	Q_INVOKABLE bool hasMeasurementType();
 	QVariant GetMeasurementUnit();
-	void SetMeasurementUnit(QVariant v);
+	void SetMeasurementUnit(const QVariant& v);
 	Q_INVOKABLE bool hasMeasurementUnit();
 	QVariant GetLength();
-	void SetLength(QVariant v);
+	void SetLength(const QVariant& v);
 	Q_INVOKABLE bool hasLength();
 	QVariant GetErrorType();
-	void SetErrorType(QVariant v);
+	void SetErrorType(const QVariant& v);
 	Q_INVOKABLE bool hasErrorType();
 	QVariant GetGeometry();
-	void SetGeometry(QVariant v);
+	void SetGeometry(const QVariant& v);
 	Q_INVOKABLE bool hasGeometry();
 	Q_INVOKABLE void createGeometry();
 	// CItemModelBase implemented
@@ -1067,19 +1067,18 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void areaResultChanged();
-void expectedMinValueChanged();
-void expectedMaxValueChanged();
-void measuredValueChanged();
-void minMeasuredValueChanged();
-void maxMeasuredValueChanged();
-void meanMeasuredValueChanged();
-void measurementTypeChanged();
-void measurementUnitChanged();
-void lengthChanged();
-void errorTypeChanged();
-void geometryChanged();
-	void finished();
+	void areaResultChanged();
+	void expectedMinValueChanged();
+	void expectedMaxValueChanged();
+	void measuredValueChanged();
+	void minMeasuredValueChanged();
+	void maxMeasuredValueChanged();
+	void meanMeasuredValueChanged();
+	void measurementTypeChanged();
+	void measurementUnitChanged();
+	void lengthChanged();
+	void errorTypeChanged();
+	void geometryChanged();
 
 protected:
 	QVariant m_geometryQObjectPtr;
@@ -1096,10 +1095,10 @@ class CResultObjectList: public ::imtsdl::TListModelBase<sdl::complextest::Compl
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResult::V1_0, sdl::complextest::ComplexUnion2::CResultObject> BaseClass;
 
-	CResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CResultObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CResultObjectList* copyMe();
@@ -1112,7 +1111,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1135,20 +1135,20 @@ public:
 	CAreaObject(QObject* parent = nullptr);
 
 	QVariant GetAreaName();
-	void SetAreaName(QVariant v);
+	void SetAreaName(const QVariant& v);
 	Q_INVOKABLE bool hasAreaName();
 	QVariant GetStatus();
-	void SetStatus(QVariant v);
+	void SetStatus(const QVariant& v);
 	Q_INVOKABLE bool hasStatus();
 	QVariant GetIconPosition();
-	void SetIconPosition(QVariant v);
+	void SetIconPosition(const QVariant& v);
 	Q_INVOKABLE bool hasIconPosition();
 	Q_INVOKABLE void createIconPosition();
 	QVariant GetErrorType();
-	void SetErrorType(QVariant v);
+	void SetErrorType(const QVariant& v);
 	Q_INVOKABLE bool hasErrorType();
 	QVariant GetResults();
-	void SetResults(QVariant v);
+	void SetResults(const QVariant& v);
 	Q_INVOKABLE bool hasResults();
 	Q_INVOKABLE void createResults();
 	// CItemModelBase implemented
@@ -1160,12 +1160,11 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void areaNameChanged();
-void statusChanged();
-void iconPositionChanged();
-void errorTypeChanged();
-void resultsChanged();
-	void finished();
+	void areaNameChanged();
+	void statusChanged();
+	void iconPositionChanged();
+	void errorTypeChanged();
+	void resultsChanged();
 
 protected:
 	QVariant m_iconPositionQObjectPtr;
@@ -1183,10 +1182,10 @@ class CAreaObjectList: public ::imtsdl::TListModelBase<sdl::complextest::Complex
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CArea::V1_0, sdl::complextest::ComplexUnion2::CAreaObject> BaseClass;
 
-	CAreaObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CAreaObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CAreaObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CAreaObjectList* copyMe();
@@ -1199,7 +1198,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1220,13 +1220,13 @@ public:
 	CAnalyzerObject(QObject* parent = nullptr);
 
 	QVariant GetAnalyzerName();
-	void SetAnalyzerName(QVariant v);
+	void SetAnalyzerName(const QVariant& v);
 	Q_INVOKABLE bool hasAnalyzerName();
 	QVariant GetAnalyzerResult();
-	void SetAnalyzerResult(QVariant v);
+	void SetAnalyzerResult(const QVariant& v);
 	Q_INVOKABLE bool hasAnalyzerResult();
 	QVariant GetAreas();
-	void SetAreas(QVariant v);
+	void SetAreas(const QVariant& v);
 	Q_INVOKABLE bool hasAreas();
 	Q_INVOKABLE void createAreas();
 	// CItemModelBase implemented
@@ -1238,10 +1238,9 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void analyzerNameChanged();
-void analyzerResultChanged();
-void areasChanged();
-	void finished();
+	void analyzerNameChanged();
+	void analyzerResultChanged();
+	void areasChanged();
 
 protected:
 	QVariant m_areasQObjectPtr;
@@ -1258,10 +1257,10 @@ class CAnalyzerObjectList: public ::imtsdl::TListModelBase<sdl::complextest::Com
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CAnalyzer::V1_0, sdl::complextest::ComplexUnion2::CAnalyzerObject> BaseClass;
 
-	CAnalyzerObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CAnalyzerObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CAnalyzerObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CAnalyzerObjectList* copyMe();
@@ -1274,7 +1273,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1297,19 +1297,19 @@ public:
 	CInspectionObject(QObject* parent = nullptr);
 
 	QVariant GetID();
-	void SetID(QVariant v);
+	void SetID(const QVariant& v);
 	Q_INVOKABLE bool hasID();
 	QVariant GetTypeID();
-	void SetTypeID(QVariant v);
+	void SetTypeID(const QVariant& v);
 	Q_INVOKABLE bool hasTypeID();
 	QVariant GetName();
-	void SetName(QVariant v);
+	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetStatus();
-	void SetStatus(QVariant v);
+	void SetStatus(const QVariant& v);
 	Q_INVOKABLE bool hasStatus();
 	QVariant GetAnalyzers();
-	void SetAnalyzers(QVariant v);
+	void SetAnalyzers(const QVariant& v);
 	Q_INVOKABLE bool hasAnalyzers();
 	Q_INVOKABLE void createAnalyzers();
 	// CItemModelBase implemented
@@ -1321,12 +1321,11 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void iDChanged();
-void typeIDChanged();
-void nameChanged();
-void statusChanged();
-void analyzersChanged();
-	void finished();
+	void iDChanged();
+	void typeIDChanged();
+	void nameChanged();
+	void statusChanged();
+	void analyzersChanged();
 
 protected:
 	QVariant m_analyzersQObjectPtr;
@@ -1343,10 +1342,10 @@ class CInspectionObjectList: public ::imtsdl::TListModelBase<sdl::complextest::C
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CInspection::V1_0, sdl::complextest::ComplexUnion2::CInspectionObject> BaseClass;
 
-	CInspectionObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CInspectionObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CInspectionObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CInspectionObjectList* copyMe();
@@ -1359,7 +1358,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1384,25 +1384,25 @@ public:
 	CProductOverviewObject(QObject* parent = nullptr);
 
 	QVariant GetProductID();
-	void SetProductID(QVariant v);
+	void SetProductID(const QVariant& v);
 	Q_INVOKABLE bool hasProductID();
 	QVariant GetName();
-	void SetName(QVariant v);
+	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetStatus();
-	void SetStatus(QVariant v);
+	void SetStatus(const QVariant& v);
 	Q_INVOKABLE bool hasStatus();
 	QVariant GetPartSerialNumber();
-	void SetPartSerialNumber(QVariant v);
+	void SetPartSerialNumber(const QVariant& v);
 	Q_INVOKABLE bool hasPartSerialNumber();
 	QVariant GetTimestamp();
-	void SetTimestamp(QVariant v);
+	void SetTimestamp(const QVariant& v);
 	Q_INVOKABLE bool hasTimestamp();
 	QVariant GetProductImage();
-	void SetProductImage(QVariant v);
+	void SetProductImage(const QVariant& v);
 	Q_INVOKABLE bool hasProductImage();
 	QVariant GetInspections();
-	void SetInspections(QVariant v);
+	void SetInspections(const QVariant& v);
 	Q_INVOKABLE bool hasInspections();
 	Q_INVOKABLE void createInspections();
 	// CItemModelBase implemented
@@ -1414,14 +1414,13 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void productIDChanged();
-void nameChanged();
-void statusChanged();
-void partSerialNumberChanged();
-void timestampChanged();
-void productImageChanged();
-void inspectionsChanged();
-	void finished();
+	void productIDChanged();
+	void nameChanged();
+	void statusChanged();
+	void partSerialNumberChanged();
+	void timestampChanged();
+	void productImageChanged();
+	void inspectionsChanged();
 
 protected:
 	QVariant m_inspectionsQObjectPtr;
@@ -1438,10 +1437,10 @@ class CProductOverviewObjectList: public ::imtsdl::TListModelBase<sdl::complexte
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CProductOverview::V1_0, sdl::complextest::ComplexUnion2::CProductOverviewObject> BaseClass;
 
-	CProductOverviewObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CProductOverviewObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CProductOverviewObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CProductOverviewObjectList* copyMe();
@@ -1454,7 +1453,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1474,10 +1474,10 @@ public:
 	CLocalizedTextObject(QObject* parent = nullptr);
 
 	QVariant GetText();
-	void SetText(QVariant v);
+	void SetText(const QVariant& v);
 	Q_INVOKABLE bool hasText();
 	QVariant GetLocale();
-	void SetLocale(QVariant v);
+	void SetLocale(const QVariant& v);
 	Q_INVOKABLE bool hasLocale();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1488,9 +1488,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void textChanged();
-void localeChanged();
-	void finished();
+	void textChanged();
+	void localeChanged();
 
 protected:
 };
@@ -1506,10 +1505,10 @@ class CLocalizedTextObjectList: public ::imtsdl::TListModelBase<sdl::complextest
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CLocalizedText::V1_0, sdl::complextest::ComplexUnion2::CLocalizedTextObject> BaseClass;
 
-	CLocalizedTextObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CLocalizedTextObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CLocalizedTextObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CLocalizedTextObjectList* copyMe();
@@ -1522,7 +1521,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1543,13 +1543,13 @@ public:
 	CCoordinatesObject(QObject* parent = nullptr);
 
 	QVariant GetX();
-	void SetX(QVariant v);
+	void SetX(const QVariant& v);
 	Q_INVOKABLE bool hasX();
 	QVariant GetY();
-	void SetY(QVariant v);
+	void SetY(const QVariant& v);
 	Q_INVOKABLE bool hasY();
 	QVariant GetZ();
-	void SetZ(QVariant v);
+	void SetZ(const QVariant& v);
 	Q_INVOKABLE bool hasZ();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1560,10 +1560,9 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void xChanged();
-void yChanged();
-void zChanged();
-	void finished();
+	void xChanged();
+	void yChanged();
+	void zChanged();
 
 protected:
 };
@@ -1579,10 +1578,10 @@ class CCoordinatesObjectList: public ::imtsdl::TListModelBase<sdl::complextest::
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCoordinates::V1_0, sdl::complextest::ComplexUnion2::CCoordinatesObject> BaseClass;
 
-	CCoordinatesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CCoordinatesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCoordinatesObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCoordinatesObjectList* copyMe();
@@ -1595,7 +1594,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1615,10 +1615,10 @@ public:
 	CExtendedMetaDataObject(QObject* parent = nullptr);
 
 	QVariant GetKey();
-	void SetKey(QVariant v);
+	void SetKey(const QVariant& v);
 	Q_INVOKABLE bool hasKey();
 	QVariant GetValue();
-	void SetValue(QVariant v);
+	void SetValue(const QVariant& v);
 	Q_INVOKABLE bool hasValue();
 	Q_INVOKABLE void createValue();
 	// CItemModelBase implemented
@@ -1630,9 +1630,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void keyChanged();
-void valueChanged();
-	void finished();
+	void keyChanged();
+	void valueChanged();
 
 protected:
 	QVariant m_valueQObjectPtr;
@@ -1649,10 +1648,10 @@ class CExtendedMetaDataObjectList: public ::imtsdl::TListModelBase<sdl::complext
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CExtendedMetaData::V1_0, sdl::complextest::ComplexUnion2::CExtendedMetaDataObject> BaseClass;
 
-	CExtendedMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CExtendedMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CExtendedMetaDataObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CExtendedMetaDataObjectList* copyMe();
@@ -1665,7 +1664,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1691,29 +1691,29 @@ public:
 	CResultMetaDataObject(QObject* parent = nullptr);
 
 	QVariant GetResultId();
-	void SetResultId(QVariant v);
+	void SetResultId(const QVariant& v);
 	Q_INVOKABLE bool hasResultId();
 	QVariant GetCreationTime();
-	void SetCreationTime(QVariant v);
+	void SetCreationTime(const QVariant& v);
 	Q_INVOKABLE bool hasCreationTime();
 	QVariant GetPartId();
-	void SetPartId(QVariant v);
+	void SetPartId(const QVariant& v);
 	Q_INVOKABLE bool hasPartId();
 	QVariant GetProductId();
-	void SetProductId(QVariant v);
+	void SetProductId(const QVariant& v);
 	Q_INVOKABLE bool hasProductId();
 	QVariant GetName();
-	void SetName(QVariant v);
+	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetClassification();
-	void SetClassification(QVariant v);
+	void SetClassification(const QVariant& v);
 	Q_INVOKABLE bool hasClassification();
 	QVariant GetDescription();
-	void SetDescription(QVariant v);
+	void SetDescription(const QVariant& v);
 	Q_INVOKABLE bool hasDescription();
 	Q_INVOKABLE void createDescription();
 	QVariant GetExtendedMetaData();
-	void SetExtendedMetaData(QVariant v);
+	void SetExtendedMetaData(const QVariant& v);
 	Q_INVOKABLE bool hasExtendedMetaData();
 	Q_INVOKABLE void createExtendedMetaData();
 	// CItemModelBase implemented
@@ -1725,15 +1725,14 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void resultIdChanged();
-void creationTimeChanged();
-void partIdChanged();
-void productIdChanged();
-void nameChanged();
-void classificationChanged();
-void descriptionChanged();
-void extendedMetaDataChanged();
-	void finished();
+	void resultIdChanged();
+	void creationTimeChanged();
+	void partIdChanged();
+	void productIdChanged();
+	void nameChanged();
+	void classificationChanged();
+	void descriptionChanged();
+	void extendedMetaDataChanged();
 
 protected:
 	QVariant m_descriptionQObjectPtr;
@@ -1751,10 +1750,10 @@ class CResultMetaDataObjectList: public ::imtsdl::TListModelBase<sdl::complextes
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CResultMetaData::V1_0, sdl::complextest::ComplexUnion2::CResultMetaDataObject> BaseClass;
 
-	CResultMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CResultMetaDataObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CResultMetaDataObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CResultMetaDataObjectList* copyMe();
@@ -1767,7 +1766,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1790,19 +1790,19 @@ public:
 	COverallResultValuesObject(QObject* parent = nullptr);
 
 	QVariant GetName();
-	void SetName(QVariant v);
+	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetValueId();
-	void SetValueId(QVariant v);
+	void SetValueId(const QVariant& v);
 	Q_INVOKABLE bool hasValueId();
 	QVariant GetMeasuredValue();
-	void SetMeasuredValue(QVariant v);
+	void SetMeasuredValue(const QVariant& v);
 	Q_INVOKABLE bool hasMeasuredValue();
 	QVariant GetLowLimit();
-	void SetLowLimit(QVariant v);
+	void SetLowLimit(const QVariant& v);
 	Q_INVOKABLE bool hasLowLimit();
 	QVariant GetHighLimit();
-	void SetHighLimit(QVariant v);
+	void SetHighLimit(const QVariant& v);
 	Q_INVOKABLE bool hasHighLimit();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -1813,12 +1813,11 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void nameChanged();
-void valueIdChanged();
-void measuredValueChanged();
-void lowLimitChanged();
-void highLimitChanged();
-	void finished();
+	void nameChanged();
+	void valueIdChanged();
+	void measuredValueChanged();
+	void lowLimitChanged();
+	void highLimitChanged();
 
 protected:
 };
@@ -1834,10 +1833,10 @@ class COverallResultValuesObjectList: public ::imtsdl::TListModelBase<sdl::compl
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::COverallResultValues::V1_0, sdl::complextest::ComplexUnion2::COverallResultValuesObject> BaseClass;
 
-	COverallResultValuesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit COverallResultValuesObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::COverallResultValuesObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::COverallResultValuesObjectList* copyMe();
@@ -1850,7 +1849,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1871,15 +1871,15 @@ public:
 	CUnionTestingTypeObject(QObject* parent = nullptr);
 
 	QVariant GetSimpleUnion();
-	void SetSimpleUnion(QVariant v);
+	void SetSimpleUnion(const QVariant& v);
 	Q_INVOKABLE bool hasSimpleUnion();
 	Q_INVOKABLE void createSimpleUnion();
 	QVariant GetComplexUnion();
-	void SetComplexUnion(QVariant v);
+	void SetComplexUnion(const QVariant& v);
 	Q_INVOKABLE bool hasComplexUnion();
 	Q_INVOKABLE void createComplexUnion();
 	QVariant GetMixedUnion();
-	void SetMixedUnion(QVariant v);
+	void SetMixedUnion(const QVariant& v);
 	Q_INVOKABLE bool hasMixedUnion();
 	Q_INVOKABLE void createMixedUnion();
 	// CItemModelBase implemented
@@ -1891,10 +1891,9 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void simpleUnionChanged();
-void complexUnionChanged();
-void mixedUnionChanged();
-	void finished();
+	void simpleUnionChanged();
+	void complexUnionChanged();
+	void mixedUnionChanged();
 
 protected:
 	QVariant m_simpleUnionQObjectPtr;
@@ -1913,10 +1912,10 @@ class CUnionTestingTypeObjectList: public ::imtsdl::TListModelBase<sdl::complext
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CUnionTestingType::V1_0, sdl::complextest::ComplexUnion2::CUnionTestingTypeObject> BaseClass;
 
-	CUnionTestingTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CUnionTestingTypeObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CUnionTestingTypeObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CUnionTestingTypeObjectList* copyMe();
@@ -1929,7 +1928,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -1952,21 +1952,21 @@ public:
 	CCDMResultVarRecursiveObject(QObject* parent = nullptr);
 
 	QVariant GetDataModelTitle();
-	void SetDataModelTitle(QVariant v);
+	void SetDataModelTitle(const QVariant& v);
 	Q_INVOKABLE bool hasDataModelTitle();
 	QVariant GetDataModelVersion();
-	void SetDataModelVersion(QVariant v);
+	void SetDataModelVersion(const QVariant& v);
 	Q_INVOKABLE bool hasDataModelVersion();
 	QVariant GetResultMetaData();
-	void SetResultMetaData(QVariant v);
+	void SetResultMetaData(const QVariant& v);
 	Q_INVOKABLE bool hasResultMetaData();
 	Q_INVOKABLE void createResultMetaData();
 	QVariant GetResultContent();
-	void SetResultContent(QVariant v);
+	void SetResultContent(const QVariant& v);
 	Q_INVOKABLE bool hasResultContent();
 	Q_INVOKABLE void createResultContent();
 	QVariant GetOverallResultValues();
-	void SetOverallResultValues(QVariant v);
+	void SetOverallResultValues(const QVariant& v);
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void createOverallResultValues();
 	// CItemModelBase implemented
@@ -1978,12 +1978,11 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void dataModelTitleChanged();
-void dataModelVersionChanged();
-void resultMetaDataChanged();
-void resultContentChanged();
-void overallResultValuesChanged();
-	void finished();
+	void dataModelTitleChanged();
+	void dataModelVersionChanged();
+	void resultMetaDataChanged();
+	void resultContentChanged();
+	void overallResultValuesChanged();
 
 protected:
 	QVariant m_resultMetaDataQObjectPtr;
@@ -2002,10 +2001,10 @@ class CCDMResultVarRecursiveObjectList: public ::imtsdl::TListModelBase<sdl::com
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarRecursive::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject> BaseClass;
 
-	CCDMResultVarRecursiveObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CCDMResultVarRecursiveObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultVarRecursiveObjectList* copyMe();
@@ -2018,7 +2017,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2041,20 +2041,20 @@ public:
 	CCDMResultVarStringObject(QObject* parent = nullptr);
 
 	QVariant GetDataModelTitle();
-	void SetDataModelTitle(QVariant v);
+	void SetDataModelTitle(const QVariant& v);
 	Q_INVOKABLE bool hasDataModelTitle();
 	QVariant GetDataModelVersion();
-	void SetDataModelVersion(QVariant v);
+	void SetDataModelVersion(const QVariant& v);
 	Q_INVOKABLE bool hasDataModelVersion();
 	QVariant GetResultMetaData();
-	void SetResultMetaData(QVariant v);
+	void SetResultMetaData(const QVariant& v);
 	Q_INVOKABLE bool hasResultMetaData();
 	Q_INVOKABLE void createResultMetaData();
 	QVariant GetResultContent();
-	void SetResultContent(QVariant v);
+	void SetResultContent(const QVariant& v);
 	Q_INVOKABLE bool hasResultContent();
 	QVariant GetOverallResultValues();
-	void SetOverallResultValues(QVariant v);
+	void SetOverallResultValues(const QVariant& v);
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void createOverallResultValues();
 	// CItemModelBase implemented
@@ -2066,12 +2066,11 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void dataModelTitleChanged();
-void dataModelVersionChanged();
-void resultMetaDataChanged();
-void resultContentChanged();
-void overallResultValuesChanged();
-	void finished();
+	void dataModelTitleChanged();
+	void dataModelVersionChanged();
+	void resultMetaDataChanged();
+	void resultContentChanged();
+	void overallResultValuesChanged();
 
 protected:
 	QVariant m_resultMetaDataQObjectPtr;
@@ -2089,10 +2088,10 @@ class CCDMResultVarStringObjectList: public ::imtsdl::TListModelBase<sdl::comple
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResultVarString::V1_0, sdl::complextest::ComplexUnion2::CCDMResultVarStringObject> BaseClass;
 
-	CCDMResultVarStringObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CCDMResultVarStringObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultVarStringObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultVarStringObjectList* copyMe();
@@ -2105,7 +2104,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2128,21 +2128,21 @@ public:
 	CCDMResultObject(QObject* parent = nullptr);
 
 	QVariant GetDataModelTitle();
-	void SetDataModelTitle(QVariant v);
+	void SetDataModelTitle(const QVariant& v);
 	Q_INVOKABLE bool hasDataModelTitle();
 	QVariant GetDataModelVersion();
-	void SetDataModelVersion(QVariant v);
+	void SetDataModelVersion(const QVariant& v);
 	Q_INVOKABLE bool hasDataModelVersion();
 	QVariant GetResultMetaData();
-	void SetResultMetaData(QVariant v);
+	void SetResultMetaData(const QVariant& v);
 	Q_INVOKABLE bool hasResultMetaData();
 	Q_INVOKABLE void createResultMetaData();
 	QVariant GetResultContent();
-	void SetResultContent(QVariant v);
+	void SetResultContent(const QVariant& v);
 	Q_INVOKABLE bool hasResultContent();
 	Q_INVOKABLE void createResultContent();
 	QVariant GetOverallResultValues();
-	void SetOverallResultValues(QVariant v);
+	void SetOverallResultValues(const QVariant& v);
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void createOverallResultValues();
 	// CItemModelBase implemented
@@ -2154,12 +2154,11 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void dataModelTitleChanged();
-void dataModelVersionChanged();
-void resultMetaDataChanged();
-void resultContentChanged();
-void overallResultValuesChanged();
-	void finished();
+	void dataModelTitleChanged();
+	void dataModelVersionChanged();
+	void resultMetaDataChanged();
+	void resultContentChanged();
+	void overallResultValuesChanged();
 
 protected:
 	QVariant m_resultMetaDataQObjectPtr;
@@ -2178,10 +2177,10 @@ class CCDMResultObjectList: public ::imtsdl::TListModelBase<sdl::complextest::Co
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCDMResult::V1_0, sdl::complextest::ComplexUnion2::CCDMResultObject> BaseClass;
 
-	CCDMResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CCDMResultObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCDMResultObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCDMResultObjectList* copyMe();
@@ -2194,7 +2193,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2213,7 +2213,7 @@ public:
 	CPointsInCoordinateFormatObject(QObject* parent = nullptr);
 
 	QVariant GetPointAsCoordinates();
-	void SetPointAsCoordinates(QVariant v);
+	void SetPointAsCoordinates(const QVariant& v);
 	Q_INVOKABLE bool hasPointAsCoordinates();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -2224,8 +2224,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void pointAsCoordinatesChanged();
-	void finished();
+	void pointAsCoordinatesChanged();
 
 protected:
 };
@@ -2241,10 +2240,10 @@ class CPointsInCoordinateFormatObjectList: public ::imtsdl::TListModelBase<sdl::
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CPointsInCoordinateFormat::V1_0, sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject> BaseClass;
 
-	CPointsInCoordinateFormatObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CPointsInCoordinateFormatObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CPointsInCoordinateFormatObjectList* copyMe();
@@ -2257,7 +2256,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2278,13 +2278,13 @@ public:
 	CCollectionViewParamsTestObject(QObject* parent = nullptr);
 
 	QVariant GetCount();
-	void SetCount(QVariant v);
+	void SetCount(const QVariant& v);
 	Q_INVOKABLE bool hasCount();
 	QVariant GetOffset();
-	void SetOffset(QVariant v);
+	void SetOffset(const QVariant& v);
 	Q_INVOKABLE bool hasOffset();
 	QVariant GetFilterModel();
-	void SetFilterModel(QVariant v);
+	void SetFilterModel(const QVariant& v);
 	Q_INVOKABLE bool hasFilterModel();
 	Q_INVOKABLE void createFilterModel();
 	// CItemModelBase implemented
@@ -2296,10 +2296,9 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void countChanged();
-void offsetChanged();
-void filterModelChanged();
-	void finished();
+	void countChanged();
+	void offsetChanged();
+	void filterModelChanged();
 
 protected:
 	QVariant m_filterModelQObjectPtr;
@@ -2316,10 +2315,10 @@ class CCollectionViewParamsTestObjectList: public ::imtsdl::TListModelBase<sdl::
 public:
 	typedef ::imtsdl::TListModelBase<sdl::complextest::ComplexUnion2::CCollectionViewParamsTest::V1_0, sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject> BaseClass;
 
-	CCollectionViewParamsTestObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CCollectionViewParamsTestObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObject* item);
 	Q_INVOKABLE sdl::complextest::ComplexUnion2::CCollectionViewParamsTestObjectList* copyMe();
@@ -2332,7 +2331,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -2679,6 +2679,8 @@ protected:
 	virtual CProductOverview OnGetLastProductionResults(const CGetLastProductionResultsGqlRequest& getLastProductionResultsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 	virtual CCDMResult OnGetLastProductionResultsCDM(const CGetLastProductionResultsCDMGqlRequest& getLastProductionResultsCDMRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
+
+
 
 
 #ifdef QT_QML_LIB

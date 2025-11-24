@@ -58,8 +58,8 @@ bool CDigitalPrinterSpecification::V1_0::ReadFromModel(const ::imtbase::CTreeIte
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
-		const bool isBaseReaded = base->ReadFromModel(*baseDataModelPtr, modelIndex);
-		if (!isBaseReaded){
+		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
+		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
@@ -91,8 +91,8 @@ bool CDigitalPrinterSpecification::V1_0::OptReadFromModel(const ::imtbase::CTree
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
 		base = PrinterBase::CPrinterSpecificationBase::V1_0();
-		const bool isBaseReaded = base->ReadFromModel(*baseDataModelPtr, modelIndex);
-		if (!isBaseReaded){
+		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
+		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
@@ -594,8 +594,8 @@ bool CDigitalPrinter::V1_0::ReadFromModel(const ::imtbase::CTreeItemModel& model
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
 		base = PrinterBase::CPrinterBase::V1_0();
-		const bool isBaseReaded = base->ReadFromModel(*baseDataModelPtr, modelIndex);
-		if (!isBaseReaded){
+		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
+		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
@@ -627,8 +627,8 @@ bool CDigitalPrinter::V1_0::OptReadFromModel(const ::imtbase::CTreeItemModel& mo
 	::imtbase::CTreeItemModel* baseDataModelPtr = model.GetTreeItemModel("base", modelIndex);
 	if (baseDataModelPtr != nullptr){
 		base = PrinterBase::CPrinterBase::V1_0();
-		const bool isBaseReaded = base->ReadFromModel(*baseDataModelPtr, modelIndex);
-		if (!isBaseReaded){
+		const bool isBaseRead = base->ReadFromModel(*baseDataModelPtr, modelIndex);
+		if (!isBaseRead){
 			I_IF_DEBUG(qWarning() << QString("%1:%2 Error: Unable to read field '%3'").arg(__FILE__, QString::number(__LINE__), "base").toLocal8Bit().constData();)
 
 			return false;
@@ -1090,7 +1090,7 @@ QVariant CDigitalPrinterSpecificationObject::GetBase()
 	if (Version_1_0->base.has_value()){
 		if (!m_baseQObjectPtr.isValid()){
 			m_baseQObjectPtr = CreateObject("base");
-			sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* itemPtr = m_baseQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
+			auto itemPtr = m_baseQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
 			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->base;
 		}
 		return m_baseQObjectPtr;
@@ -1100,7 +1100,7 @@ QVariant CDigitalPrinterSpecificationObject::GetBase()
 }
 
 
-void CDigitalPrinterSpecificationObject::SetBase(QVariant v)
+void CDigitalPrinterSpecificationObject::SetBase(const QVariant& v)
 {
 	if (v.isValid()){
 		sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* itemPtr = v.value<sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject*>();
@@ -1141,7 +1141,7 @@ QVariant CDigitalPrinterSpecificationObject::GetPrintingTechnology()
 }
 
 
-void CDigitalPrinterSpecificationObject::SetPrintingTechnology(QVariant v)
+void CDigitalPrinterSpecificationObject::SetPrintingTechnology(const QVariant& v)
 {
 	Version_1_0->printingTechnology.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
@@ -1229,13 +1229,13 @@ QString CDigitalPrinterSpecificationObject::getJSONKeyForProperty(const QString&
 
 
 
-bool CDigitalPrinterSpecificationObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CDigitalPrinterSpecificationObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CDigitalPrinterSpecificationObjectList::getItemsCount()
+int CDigitalPrinterSpecificationObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -1312,7 +1312,7 @@ void sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObjectList::clear(
 QVariant sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObject* itemPtr = item.value<sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObject*>();
+	auto* itemPtr = item.value<sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);
@@ -1338,7 +1338,7 @@ QVariant CDigitalPrinterObject::GetBase()
 	if (Version_1_0->base.has_value()){
 		if (!m_baseQObjectPtr.isValid()){
 			m_baseQObjectPtr = CreateObject("base");
-			sdl::modsdl::PrinterBase::CPrinterBaseObject* itemPtr = m_baseQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
+			auto itemPtr = m_baseQObjectPtr.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
 			if (itemPtr != nullptr) itemPtr->Version_1_0 = Version_1_0->base;
 		}
 		return m_baseQObjectPtr;
@@ -1348,7 +1348,7 @@ QVariant CDigitalPrinterObject::GetBase()
 }
 
 
-void CDigitalPrinterObject::SetBase(QVariant v)
+void CDigitalPrinterObject::SetBase(const QVariant& v)
 {
 	if (v.isValid()){
 		sdl::modsdl::PrinterBase::CPrinterBaseObject* itemPtr = v.value<sdl::modsdl::PrinterBase::CPrinterBaseObject*>();
@@ -1389,7 +1389,7 @@ QVariant CDigitalPrinterObject::GetPrintingTechnology()
 }
 
 
-void CDigitalPrinterObject::SetPrintingTechnology(QVariant v)
+void CDigitalPrinterObject::SetPrintingTechnology(const QVariant& v)
 {
 	Version_1_0->printingTechnology.emplace();
 	QMetaEnum metaEnum = QMetaEnum::fromType<sdl::modsdl::DigitalPrinter::PrintingTechnology>();
@@ -1477,13 +1477,13 @@ QString CDigitalPrinterObject::getJSONKeyForProperty(const QString& propertyName
 
 
 
-bool CDigitalPrinterObjectList::containsKey(const QString& /*nameId*/, int /*index*/)
+bool CDigitalPrinterObjectList::containsKey(const QString& /*nameId*/, int /*index*/) const
 {
 	return true;
 }
 
 
-int CDigitalPrinterObjectList::getItemsCount()
+int CDigitalPrinterObjectList::getItemsCount() const
 {
 	return rowCount();
 }
@@ -1560,7 +1560,7 @@ void sdl::modsdl::DigitalPrinter::CDigitalPrinterObjectList::clear()
 QVariant sdl::modsdl::DigitalPrinter::CDigitalPrinterObjectList::getData(const QString& nameId, int index)
 {
 	QVariant item = GetOrCreateCachedObject(index);
-	sdl::modsdl::DigitalPrinter::CDigitalPrinterObject* itemPtr = item.value<sdl::modsdl::DigitalPrinter::CDigitalPrinterObject*>();
+	auto* itemPtr = item.value<sdl::modsdl::DigitalPrinter::CDigitalPrinterObject*>();
 	if (itemPtr == nullptr) return QVariant();
 	if (nameId == "item" && Version_1_0.has_value() && index >= 0 && index < Version_1_0->count()){
 		return QVariant::fromValue(item);

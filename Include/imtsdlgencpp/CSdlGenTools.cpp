@@ -2,7 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QRegularExpression>
 
@@ -12,7 +11,6 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
-#include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlType.h>
 #include <imtsdl/CSdlRequest.h>
@@ -103,35 +101,35 @@ QString CSdlGenTools::CStructNamespaceConverter::GetString() const
 		namespaceEntryPtr = typeForFieldPtr.get();
 	}
 
-	const imtsdl::CSdlType* sdlTypePtr = dynamic_cast<const imtsdl::CSdlType*>(namespaceEntryPtr);
+	const auto* sdlTypePtr = dynamic_cast<const imtsdl::CSdlType*>(namespaceEntryPtr);
 	if (sdlTypePtr != nullptr){
 		retVal += 'C';
 		retVal +=  imtsdl::CSdlTools::GetCapitalizedValue(sdlTypePtr->GetName());
 	}
 
-	const imtsdl::CSdlDocumentType* sdlDocumentTypePtr = dynamic_cast<const imtsdl::CSdlDocumentType*>(namespaceEntryPtr);
+	const auto* sdlDocumentTypePtr = dynamic_cast<const imtsdl::CSdlDocumentType*>(namespaceEntryPtr);
 	if (sdlDocumentTypePtr != nullptr){
 		retVal += 'C';
 		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlDocumentTypePtr->GetName());
 	}
 
-	const imtsdl::CSdlRequest* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(namespaceEntryPtr);
+	const auto* sdlRequestPtr = dynamic_cast<const imtsdl::CSdlRequest*>(namespaceEntryPtr);
 	if (sdlRequestPtr != nullptr){
 
 		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlRequestPtr->GetName());
 		retVal += QStringLiteral("GqlRequest");
 	}
 
-	const imtsdl::CSdlEnum* sdlEnumPtr = dynamic_cast<const imtsdl::CSdlEnum*>(namespaceEntryPtr);
+	auto sdlEnumPtr = dynamic_cast<const imtsdl::CSdlEnum*>(namespaceEntryPtr);
 	if (sdlEnumPtr != nullptr){
 		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlEnumPtr->GetName());
 	}
 
-	const imtsdl::CSdlUnion* sdlUnionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(namespaceEntryPtr);
+	const auto* sdlUnionPtr = dynamic_cast<const imtsdl::CSdlUnion*>(namespaceEntryPtr);
 	if (sdlUnionPtr != nullptr){
 		retVal += imtsdl::CSdlTools::GetCapitalizedValue(sdlUnionPtr->GetName());
 	}
-	// versions does NOT exists for enumerators and unions
+	// versions does NOT exist for enumerators and unions
 	if ((sdlEnumPtr == nullptr && sdlUnionPtr == nullptr) && addVersion){
 		retVal += QStringLiteral("::");
 		retVal += GetSdlEntryVersion(*namespaceEntryPtr);
@@ -244,10 +242,9 @@ QString CSdlGenTools::GetSchemaVerstionString(const iprm::IParamsSet& schemaPara
 		retVal += QStringLiteral("V");
 	}
 
-	QString versionName;
 	iprm::TParamsPtr<iprm::ITextParam> versionNameParamPtr(&schemaParams, imtsdl::SdlCustomSchemaKeys::VersionName.toUtf8());
 	if (versionNameParamPtr.IsValid()){
-		versionName = versionNameParamPtr->GetText();
+		QString versionName = versionNameParamPtr->GetText();
 		retVal += versionName;
 	}
 	else {
@@ -457,10 +454,11 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 	bool isUnion = false;
 
 	const QString convertedType = imtsdl::CSdlTools::ConvertTypeOrEnumOrUnion(sdlField, enumList, unionList, &isCustom, nullptr, &isArray, &isEnum, &isUnion);
-	std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBase = imtsdl::CSdlTools::GetSdlTypeOrEnumOrUnionForField(sdlField,
-																						  typeList,
-																						  enumList,
-																						  unionList);
+	std::shared_ptr<imtsdl::CSdlEntryBase> sdlEntryBase = imtsdl::CSdlTools::GetSdlTypeOrEnumOrUnionForField(
+		sdlField,
+		typeList,
+		enumList,
+		unionList);
 
 	QString sdlNamespace;
 	if (sdlEntryBase != nullptr){
@@ -499,7 +497,6 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 		}
 	}
 	else if(isArray){
-
 		retVal = sdlNamespace;
 		retVal += QStringLiteral("::C") + sdlField.GetType();
 		retVal += QStringLiteral("ObjectList");
@@ -522,6 +519,12 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 	}
 
 	return retVal;
+}
+
+
+QString CSdlGenTools::GetTemVariableWrappedValue(const QString& variableName)
+{
+	return QStringLiteral("t_%1").arg(imtsdl::CSdlTools::GetDecapitalizedValue(variableName));
 }
 
 

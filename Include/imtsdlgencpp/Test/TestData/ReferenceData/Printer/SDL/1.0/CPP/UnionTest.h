@@ -47,8 +47,9 @@ class EnumLinkStatus: public QObject
 	Q_PROPERTY(QString CLOSE READ GetCLOSE NOTIFY CLOSEChanged)
 
 protected:
-	QString GetOPEN() { return "OPEN"; }
-	QString GetCLOSE() { return "CLOSE"; }
+	static QString GetOPEN() { return "OPEN"; }
+	static QString GetCLOSE() { return "CLOSE"; }
+
 signals:
 	void OPENChanged();
 	void CLOSEChanged();
@@ -297,10 +298,10 @@ public:
 	CCoordsObject(QObject* parent = nullptr);
 
 	QVariant GetX();
-	void SetX(QVariant v);
+	void SetX(const QVariant& v);
 	Q_INVOKABLE bool hasX();
 	QVariant GetY();
-	void SetY(QVariant v);
+	void SetY(const QVariant& v);
 	Q_INVOKABLE bool hasY();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -311,9 +312,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void xChanged();
-void yChanged();
-	void finished();
+	void xChanged();
+	void yChanged();
 
 protected:
 };
@@ -329,10 +329,10 @@ class CCoordsObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::UnionTest:
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CCoords::V1_0, sdl::modsdl::UnionTest::CCoordsObject> BaseClass;
 
-	CCoordsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CCoordsObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CCoordsObject* item);
 	Q_INVOKABLE sdl::modsdl::UnionTest::CCoordsObjectList* copyMe();
@@ -345,7 +345,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -364,7 +365,7 @@ public:
 	CPrinterSpecificationBaseObject(QObject* parent = nullptr);
 
 	QVariant GetName();
-	void SetName(QVariant v);
+	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -375,8 +376,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void nameChanged();
-	void finished();
+	void nameChanged();
 
 protected:
 };
@@ -392,10 +392,10 @@ class CPrinterSpecificationBaseObjectList: public ::imtsdl::TListModelBase<sdl::
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CPrinterSpecificationBase::V1_0, sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject> BaseClass;
 
-	CPrinterSpecificationBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CPrinterSpecificationBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CPrinterSpecificationBaseObject* item);
 	Q_INVOKABLE sdl::modsdl::UnionTest::CPrinterSpecificationBaseObjectList* copyMe();
@@ -408,7 +408,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -429,13 +430,13 @@ public:
 	CLinkObject(QObject* parent = nullptr);
 
 	QVariant GetLink();
-	void SetLink(QVariant v);
+	void SetLink(const QVariant& v);
 	Q_INVOKABLE bool hasLink();
 	QVariant GetStatus();
-	void SetStatus(QVariant v);
+	void SetStatus(const QVariant& v);
 	Q_INVOKABLE bool hasStatus();
 	QVariant GetStatusList();
-	void SetStatusList(QVariant v);
+	void SetStatusList(const QVariant& v);
 	Q_INVOKABLE bool hasStatusList();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -446,10 +447,9 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void linkChanged();
-void statusChanged();
-void statusListChanged();
-	void finished();
+	void linkChanged();
+	void statusChanged();
+	void statusListChanged();
 
 protected:
 };
@@ -465,10 +465,10 @@ class CLinkObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::C
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CLink::V1_0, sdl::modsdl::UnionTest::CLinkObject> BaseClass;
 
-	CLinkObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CLinkObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CLinkObject* item);
 	Q_INVOKABLE sdl::modsdl::UnionTest::CLinkObjectList* copyMe();
@@ -481,7 +481,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -503,18 +504,18 @@ public:
 	CPrinterBaseObject(QObject* parent = nullptr);
 
 	QVariant GetName();
-	void SetName(QVariant v);
+	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetLinkList();
-	void SetLinkList(QVariant v);
+	void SetLinkList(const QVariant& v);
 	Q_INVOKABLE bool hasLinkList();
 	Q_INVOKABLE void createLinkList();
 	QVariant GetSpecification();
-	void SetSpecification(QVariant v);
+	void SetSpecification(const QVariant& v);
 	Q_INVOKABLE bool hasSpecification();
 	Q_INVOKABLE void createSpecification();
 	QVariant GetSpecificationList();
-	void SetSpecificationList(QVariant v);
+	void SetSpecificationList(const QVariant& v);
 	Q_INVOKABLE bool hasSpecificationList();
 	Q_INVOKABLE void createSpecificationList();
 	// CItemModelBase implemented
@@ -526,11 +527,10 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void nameChanged();
-void linkListChanged();
-void specificationChanged();
-void specificationListChanged();
-	void finished();
+	void nameChanged();
+	void linkListChanged();
+	void specificationChanged();
+	void specificationListChanged();
 
 protected:
 	QVariant m_linkListQObjectPtr;
@@ -549,10 +549,10 @@ class CPrinterBaseObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::Union
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::UnionTest::CPrinterBase::V1_0, sdl::modsdl::UnionTest::CPrinterBaseObject> BaseClass;
 
-	CPrinterBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CPrinterBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::UnionTest::CPrinterBaseObject* item);
 	Q_INVOKABLE sdl::modsdl::UnionTest::CPrinterBaseObjectList* copyMe();
@@ -565,7 +565,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -701,6 +702,8 @@ protected:
 	// abstract methods
 	virtual PrinterSpecification OnGetSpecifications(const CGetSpecificationsGqlRequest& getSpecificationsRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
+
+
 
 
 #ifdef QT_QML_LIB

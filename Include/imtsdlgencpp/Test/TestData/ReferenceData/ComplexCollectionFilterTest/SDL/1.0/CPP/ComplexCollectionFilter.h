@@ -53,10 +53,11 @@ class EnumValueType: public QObject
 	Q_PROPERTY(QString Bool READ GetBool NOTIFY BoolChanged)
 
 protected:
-	QString GetInteger() { return "Integer"; }
-	QString GetNumber() { return "Number"; }
-	QString GetString() { return "String"; }
-	QString GetBool() { return "Bool"; }
+	static QString GetInteger() { return "Integer"; }
+	static QString GetNumber() { return "Number"; }
+	static QString GetString() { return "String"; }
+	static QString GetBool() { return "Bool"; }
+
 signals:
 	void IntegerChanged();
 	void NumberChanged();
@@ -86,11 +87,12 @@ class EnumFilterOperation: public QObject
 	Q_PROPERTY(QString Contains READ GetContains NOTIFY ContainsChanged)
 
 protected:
-	QString GetNot() { return "Not"; }
-	QString GetEqual() { return "Equal"; }
-	QString GetLess() { return "Less"; }
-	QString GetGreater() { return "Greater"; }
-	QString GetContains() { return "Contains"; }
+	static QString GetNot() { return "Not"; }
+	static QString GetEqual() { return "Equal"; }
+	static QString GetLess() { return "Less"; }
+	static QString GetGreater() { return "Greater"; }
+	static QString GetContains() { return "Contains"; }
+
 signals:
 	void NotChanged();
 	void EqualChanged();
@@ -115,8 +117,9 @@ class EnumLogicalOperation: public QObject
 	Q_PROPERTY(QString Or READ GetOr NOTIFY OrChanged)
 
 protected:
-	QString GetAnd() { return "And"; }
-	QString GetOr() { return "Or"; }
+	static QString GetAnd() { return "And"; }
+	static QString GetOr() { return "Or"; }
+
 signals:
 	void AndChanged();
 	void OrChanged();
@@ -427,17 +430,17 @@ public:
 	CTimeFilterObject(QObject* parent = nullptr);
 
 	QVariant GetTimeRange();
-	void SetTimeRange(QVariant v);
+	void SetTimeRange(const QVariant& v);
 	Q_INVOKABLE bool hasTimeRange();
 	Q_INVOKABLE void createTimeRange();
 	QVariant GetTimeUnit();
-	void SetTimeUnit(QVariant v);
+	void SetTimeUnit(const QVariant& v);
 	Q_INVOKABLE bool hasTimeUnit();
 	QVariant GetInterpretationMode();
-	void SetInterpretationMode(QVariant v);
+	void SetInterpretationMode(const QVariant& v);
 	Q_INVOKABLE bool hasInterpretationMode();
 	QVariant GetUnitMultiplier();
-	void SetUnitMultiplier(QVariant v);
+	void SetUnitMultiplier(const QVariant& v);
 	Q_INVOKABLE bool hasUnitMultiplier();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -448,11 +451,10 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void timeRangeChanged();
-void timeUnitChanged();
-void interpretationModeChanged();
-void unitMultiplierChanged();
-	void finished();
+	void timeRangeChanged();
+	void timeUnitChanged();
+	void interpretationModeChanged();
+	void unitMultiplierChanged();
 
 protected:
 	QVariant m_timeRangeQObjectPtr;
@@ -469,10 +471,10 @@ class CTimeFilterObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::Compl
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0, sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject> BaseClass;
 
-	CTimeFilterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CTimeFilterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ComplexCollectionFilter::CTimeFilterObject* item);
 	Q_INVOKABLE sdl::imtbase::ComplexCollectionFilter::CTimeFilterObjectList* copyMe();
@@ -485,7 +487,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -505,10 +508,10 @@ public:
 	CFieldSortingInfoObject(QObject* parent = nullptr);
 
 	QVariant GetFieldId();
-	void SetFieldId(QVariant v);
+	void SetFieldId(const QVariant& v);
 	Q_INVOKABLE bool hasFieldId();
 	QVariant GetSortingOrder();
-	void SetSortingOrder(QVariant v);
+	void SetSortingOrder(const QVariant& v);
 	Q_INVOKABLE bool hasSortingOrder();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -519,9 +522,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void fieldIdChanged();
-void sortingOrderChanged();
-	void finished();
+	void fieldIdChanged();
+	void sortingOrderChanged();
 
 protected:
 };
@@ -537,10 +539,10 @@ class CFieldSortingInfoObjectList: public ::imtsdl::TListModelBase<sdl::imtbase:
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfo::V1_0, sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject> BaseClass;
 
-	CFieldSortingInfoObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CFieldSortingInfoObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObject* item);
 	Q_INVOKABLE sdl::imtbase::ComplexCollectionFilter::CFieldSortingInfoObjectList* copyMe();
@@ -553,7 +555,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -575,16 +578,16 @@ public:
 	CFieldFilterObject(QObject* parent = nullptr);
 
 	QVariant GetFieldId();
-	void SetFieldId(QVariant v);
+	void SetFieldId(const QVariant& v);
 	Q_INVOKABLE bool hasFieldId();
 	QVariant GetFilterValue();
-	void SetFilterValue(QVariant v);
+	void SetFilterValue(const QVariant& v);
 	Q_INVOKABLE bool hasFilterValue();
 	QVariant GetFilterValueType();
-	void SetFilterValueType(QVariant v);
+	void SetFilterValueType(const QVariant& v);
 	Q_INVOKABLE bool hasFilterValueType();
 	QVariant GetFilterOperations();
-	void SetFilterOperations(QVariant v);
+	void SetFilterOperations(const QVariant& v);
 	Q_INVOKABLE bool hasFilterOperations();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -595,11 +598,10 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void fieldIdChanged();
-void filterValueChanged();
-void filterValueTypeChanged();
-void filterOperationsChanged();
-	void finished();
+	void fieldIdChanged();
+	void filterValueChanged();
+	void filterValueTypeChanged();
+	void filterOperationsChanged();
 
 protected:
 };
@@ -615,10 +617,10 @@ class CFieldFilterObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::Comp
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ComplexCollectionFilter::CFieldFilter::V1_0, sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject> BaseClass;
 
-	CFieldFilterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CFieldFilterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ComplexCollectionFilter::CFieldFilterObject* item);
 	Q_INVOKABLE sdl::imtbase::ComplexCollectionFilter::CFieldFilterObjectList* copyMe();
@@ -631,7 +633,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -652,15 +655,15 @@ public:
 	CGroupFilterObject(QObject* parent = nullptr);
 
 	QVariant GetFieldFilters();
-	void SetFieldFilters(QVariant v);
+	void SetFieldFilters(const QVariant& v);
 	Q_INVOKABLE bool hasFieldFilters();
 	Q_INVOKABLE void createFieldFilters();
 	QVariant GetGroupFilters();
-	void SetGroupFilters(QVariant v);
+	void SetGroupFilters(const QVariant& v);
 	Q_INVOKABLE bool hasGroupFilters();
 	Q_INVOKABLE void createGroupFilters();
 	QVariant GetLogicalOperation();
-	void SetLogicalOperation(QVariant v);
+	void SetLogicalOperation(const QVariant& v);
 	Q_INVOKABLE bool hasLogicalOperation();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -671,10 +674,9 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void fieldFiltersChanged();
-void groupFiltersChanged();
-void logicalOperationChanged();
-	void finished();
+	void fieldFiltersChanged();
+	void groupFiltersChanged();
+	void logicalOperationChanged();
 
 protected:
 	QVariant m_fieldFiltersQObjectPtr;
@@ -692,10 +694,10 @@ class CGroupFilterObjectList: public ::imtsdl::TListModelBase<sdl::imtbase::Comp
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ComplexCollectionFilter::CGroupFilter::V1_0, sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject> BaseClass;
 
-	CGroupFilterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CGroupFilterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ComplexCollectionFilter::CGroupFilterObject* item);
 	Q_INVOKABLE sdl::imtbase::ComplexCollectionFilter::CGroupFilterObjectList* copyMe();
@@ -708,7 +710,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -730,19 +733,19 @@ public:
 	CComplexCollectionFilterObject(QObject* parent = nullptr);
 
 	QVariant GetSortingInfo();
-	void SetSortingInfo(QVariant v);
+	void SetSortingInfo(const QVariant& v);
 	Q_INVOKABLE bool hasSortingInfo();
 	Q_INVOKABLE void createSortingInfo();
 	QVariant GetFieldsFilter();
-	void SetFieldsFilter(QVariant v);
+	void SetFieldsFilter(const QVariant& v);
 	Q_INVOKABLE bool hasFieldsFilter();
 	Q_INVOKABLE void createFieldsFilter();
 	QVariant GetTimeFilter();
-	void SetTimeFilter(QVariant v);
+	void SetTimeFilter(const QVariant& v);
 	Q_INVOKABLE bool hasTimeFilter();
 	Q_INVOKABLE void createTimeFilter();
 	QVariant GetDistinctFields();
-	void SetDistinctFields(QVariant v);
+	void SetDistinctFields(const QVariant& v);
 	Q_INVOKABLE bool hasDistinctFields();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -753,11 +756,10 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void sortingInfoChanged();
-void fieldsFilterChanged();
-void timeFilterChanged();
-void distinctFieldsChanged();
-	void finished();
+	void sortingInfoChanged();
+	void fieldsFilterChanged();
+	void timeFilterChanged();
+	void distinctFieldsChanged();
 
 protected:
 	QVariant m_sortingInfoQObjectPtr;
@@ -776,10 +778,10 @@ class CComplexCollectionFilterObjectList: public ::imtsdl::TListModelBase<sdl::i
 public:
 	typedef ::imtsdl::TListModelBase<sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilter::V1_0, sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject> BaseClass;
 
-	CComplexCollectionFilterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CComplexCollectionFilterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObject* item);
 	Q_INVOKABLE sdl::imtbase::ComplexCollectionFilter::CComplexCollectionFilterObjectList* copyMe();
@@ -792,9 +794,12 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
+
+
 #ifdef QT_QML_LIB
 [[maybe_unused]] static void RegisterQmlTypes()
 {

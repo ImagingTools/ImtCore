@@ -3,12 +3,8 @@
 // Qt includes
 #include <QtCore/QSet>
 
-// ACF includes
-#include <icomp/TReferenceMember.h>
-
 // ImtCore includes
 #include <imtsdl/imtsdl.h>
-#include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/ISdlTypeListProvider.h>
 #include <imtsdl/ISdlEnumListProvider.h>
 #include <imtsdl/ISdlUnionListProvider.h>
@@ -118,14 +114,26 @@ public:
 									  const imtsdl::SdlEnumList& enumList,
 									  const imtsdl::SdlUnionList& unionList,
 									  bool withPointer = true);
+
+	[[nodiscard]] static QString GetTemVariableWrappedValue(const QString& variableName);
+
+	[[nodiscard]] static QString GetTemVariableWrappedValue(const imtsdl::CSdlField& sdlField);
 };
 
+
+// inline methods
 
 template<class SdlEntryClass>
 inline QString CSdlGenTools::GetSdlEntryVersion(const SdlEntryClass& entry, bool addVPrefix)
 {
 	return GetSchemaVerstionString(entry.GetSchemaParams(), addVPrefix);
 }
+
+inline QString CSdlGenTools::GetTemVariableWrappedValue(const imtsdl::CSdlField& sdlField)
+{
+	return GetTemVariableWrappedValue(sdlField.GetId());
+}
+
 
 
 } // namespace imtsdlgencpp

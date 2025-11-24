@@ -272,7 +272,7 @@ public:
 	CPrinterSpecificationBaseObject(QObject* parent = nullptr);
 
 	QVariant GetName();
-	void SetName(QVariant v);
+	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -283,8 +283,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void nameChanged();
-	void finished();
+	void nameChanged();
 
 protected:
 };
@@ -300,10 +299,10 @@ class CPrinterSpecificationBaseObjectList: public ::imtsdl::TListModelBase<sdl::
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::PrinterBase::CPrinterSpecificationBase::V1_0, sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject> BaseClass;
 
-	CPrinterSpecificationBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CPrinterSpecificationBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObject* item);
 	Q_INVOKABLE sdl::modsdl::PrinterBase::CPrinterSpecificationBaseObjectList* copyMe();
@@ -316,7 +315,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -335,7 +335,7 @@ public:
 	CLinkObject(QObject* parent = nullptr);
 
 	QVariant GetLink();
-	void SetLink(QVariant v);
+	void SetLink(const QVariant& v);
 	Q_INVOKABLE bool hasLink();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -346,8 +346,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void linkChanged();
-	void finished();
+	void linkChanged();
 
 protected:
 };
@@ -363,10 +362,10 @@ class CLinkObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::PrinterBase:
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::PrinterBase::CLink::V1_0, sdl::modsdl::PrinterBase::CLinkObject> BaseClass;
 
-	CLinkObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CLinkObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::PrinterBase::CLinkObject* item);
 	Q_INVOKABLE sdl::modsdl::PrinterBase::CLinkObjectList* copyMe();
@@ -379,7 +378,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -401,18 +401,18 @@ public:
 	CPrinterBaseObject(QObject* parent = nullptr);
 
 	QVariant GetName();
-	void SetName(QVariant v);
+	void SetName(const QVariant& v);
 	Q_INVOKABLE bool hasName();
 	QVariant GetSpecification();
-	void SetSpecification(QVariant v);
+	void SetSpecification(const QVariant& v);
 	Q_INVOKABLE bool hasSpecification();
 	Q_INVOKABLE void createSpecification();
 	QVariant GetSimpleTest();
-	void SetSimpleTest(QVariant v);
+	void SetSimpleTest(const QVariant& v);
 	Q_INVOKABLE bool hasSimpleTest();
 	Q_INVOKABLE void createSimpleTest();
 	QVariant GetMixedTest();
-	void SetMixedTest(QVariant v);
+	void SetMixedTest(const QVariant& v);
 	Q_INVOKABLE bool hasMixedTest();
 	Q_INVOKABLE void createMixedTest();
 	// CItemModelBase implemented
@@ -424,11 +424,10 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void nameChanged();
-void specificationChanged();
-void simpleTestChanged();
-void mixedTestChanged();
-	void finished();
+	void nameChanged();
+	void specificationChanged();
+	void simpleTestChanged();
+	void mixedTestChanged();
 
 protected:
 	QVariant m_specificationQObjectPtr;
@@ -447,10 +446,10 @@ class CPrinterBaseObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::Print
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::PrinterBase::CPrinterBase::V1_0, sdl::modsdl::PrinterBase::CPrinterBaseObject> BaseClass;
 
-	CPrinterBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CPrinterBaseObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::PrinterBase::CPrinterBaseObject* item);
 	Q_INVOKABLE sdl::modsdl::PrinterBase::CPrinterBaseObjectList* copyMe();
@@ -463,7 +462,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -482,7 +482,7 @@ public:
 	CPrinterListObject(QObject* parent = nullptr);
 
 	QVariant GetData();
-	void SetData(QVariant v);
+	void SetData(const QVariant& v);
 	Q_INVOKABLE bool hasData();
 	Q_INVOKABLE void createData();
 	// CItemModelBase implemented
@@ -494,8 +494,7 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void dataChanged();
-	void finished();
+	void dataChanged();
 
 protected:
 	QVariant m_dataQObjectPtr;
@@ -512,10 +511,10 @@ class CPrinterListObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::Print
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::PrinterBase::CPrinterList::V1_0, sdl::modsdl::PrinterBase::CPrinterListObject> BaseClass;
 
-	CPrinterListObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CPrinterListObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::PrinterBase::CPrinterListObject* item);
 	Q_INVOKABLE sdl::modsdl::PrinterBase::CPrinterListObjectList* copyMe();
@@ -528,7 +527,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -733,6 +733,8 @@ protected:
 	// abstract methods
 	virtual CPrinterList OnGetPrinters(const CGetPrintersGqlRequest& getPrintersRequest, const ::imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
+
+
 
 
 #ifdef QT_QML_LIB

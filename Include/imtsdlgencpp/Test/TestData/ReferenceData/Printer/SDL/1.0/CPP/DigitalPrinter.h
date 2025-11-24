@@ -49,8 +49,9 @@ class EnumPrintingTechnology: public QObject
 	Q_PROPERTY(QString Toner READ GetToner NOTIFY TonerChanged)
 
 protected:
-	QString GetInkjet() { return "Inkjet"; }
-	QString GetToner() { return "Toner"; }
+	static QString GetInkjet() { return "Inkjet"; }
+	static QString GetToner() { return "Toner"; }
+
 signals:
 	void InkjetChanged();
 	void TonerChanged();
@@ -183,11 +184,11 @@ public:
 	CDigitalPrinterSpecificationObject(QObject* parent = nullptr);
 
 	QVariant GetBase();
-	void SetBase(QVariant v);
+	void SetBase(const QVariant& v);
 	Q_INVOKABLE bool hasBase();
 	Q_INVOKABLE void createBase();
 	QVariant GetPrintingTechnology();
-	void SetPrintingTechnology(QVariant v);
+	void SetPrintingTechnology(const QVariant& v);
 	Q_INVOKABLE bool hasPrintingTechnology();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -198,9 +199,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void baseChanged();
-void printingTechnologyChanged();
-	void finished();
+	void baseChanged();
+	void printingTechnologyChanged();
 
 protected:
 	QVariant m_baseQObjectPtr;
@@ -217,10 +217,10 @@ class CDigitalPrinterSpecificationObjectList: public ::imtsdl::TListModelBase<sd
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecification::V1_0, sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObject> BaseClass;
 
-	CDigitalPrinterSpecificationObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CDigitalPrinterSpecificationObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObject* item);
 	Q_INVOKABLE sdl::modsdl::DigitalPrinter::CDigitalPrinterSpecificationObjectList* copyMe();
@@ -233,7 +233,8 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
 
@@ -253,11 +254,11 @@ public:
 	CDigitalPrinterObject(QObject* parent = nullptr);
 
 	QVariant GetBase();
-	void SetBase(QVariant v);
+	void SetBase(const QVariant& v);
 	Q_INVOKABLE bool hasBase();
 	Q_INVOKABLE void createBase();
 	QVariant GetPrintingTechnology();
-	void SetPrintingTechnology(QVariant v);
+	void SetPrintingTechnology(const QVariant& v);
 	Q_INVOKABLE bool hasPrintingTechnology();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
@@ -268,9 +269,8 @@ public:
 	Q_INVOKABLE QString getJSONKeyForProperty(const QString& propertyName) const override;
 
 signals:
-void baseChanged();
-void printingTechnologyChanged();
-	void finished();
+	void baseChanged();
+	void printingTechnologyChanged();
 
 protected:
 	QVariant m_baseQObjectPtr;
@@ -287,10 +287,10 @@ class CDigitalPrinterObjectList: public ::imtsdl::TListModelBase<sdl::modsdl::Di
 public:
 	typedef ::imtsdl::TListModelBase<sdl::modsdl::DigitalPrinter::CDigitalPrinter::V1_0, sdl::modsdl::DigitalPrinter::CDigitalPrinterObject> BaseClass;
 
-	CDigitalPrinterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
+	explicit CDigitalPrinterObjectList(QObject* parent = nullptr): BaseClass(parent) {}
 
-	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/);
-Q_INVOKABLE int getItemsCount();
+	Q_INVOKABLE bool containsKey(const QString& /*nameId*/, int /*index*/) const;
+	Q_INVOKABLE int getItemsCount() const;
 	Q_INVOKABLE QVariantMap get(int row) const override;
 	Q_INVOKABLE void append(sdl::modsdl::DigitalPrinter::CDigitalPrinterObject* item);
 	Q_INVOKABLE sdl::modsdl::DigitalPrinter::CDigitalPrinterObjectList* copyMe();
@@ -303,9 +303,12 @@ Q_INVOKABLE int getItemsCount();
 	Q_INVOKABLE void remove(int index) override;
 	Q_INVOKABLE void clear() override;
 	Q_INVOKABLE QVariant getData(const QString& nameId, int index) override;
-	signals:
+
+signals:
 	void countChanged();
 };
+
+
 #ifdef QT_QML_LIB
 [[maybe_unused]] static void RegisterQmlTypes()
 {
