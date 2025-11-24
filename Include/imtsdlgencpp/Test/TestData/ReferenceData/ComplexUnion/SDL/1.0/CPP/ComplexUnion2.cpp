@@ -20314,7 +20314,7 @@ QString CExtendedMetaDataUnionTypeObjectList::toJson()
 
 		if (item.canConvert<bool>()){
 			bool val = item.value<bool>();
-			retVal += QString(val);
+			retVal += QString(val ? "true" : "false");
 		}
 
 		if (item.canConvert<QString>()){
@@ -20352,7 +20352,7 @@ QString CExtendedMetaDataUnionTypeObjectList::toGraphQL()
 
 		if (item.canConvert<bool>()){
 			bool val = item.value<bool>();
-			retVal += QString(val);
+			retVal += QString(val ? "true" : "false");
 		}
 
 		if (item.canConvert<QString>()){
@@ -20569,7 +20569,7 @@ QString CExtendedMetaDataUnionSimpleTypeObjectList::toJson()
 
 		if (item.canConvert<bool>()){
 			bool val = item.value<bool>();
-			retVal += QString(val);
+			retVal += QString(val ? "true" : "false");
 		}
 
 		if (item.canConvert<QString>()){
@@ -20602,7 +20602,7 @@ QString CExtendedMetaDataUnionSimpleTypeObjectList::toGraphQL()
 
 		if (item.canConvert<bool>()){
 			bool val = item.value<bool>();
-			retVal += QString(val);
+			retVal += QString(val ? "true" : "false");
 		}
 
 		if (item.canConvert<QString>()){
