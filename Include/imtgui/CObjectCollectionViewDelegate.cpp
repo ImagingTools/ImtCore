@@ -348,7 +348,7 @@ const imtbase::ICollectionInfo& CObjectCollectionViewDelegate::GetSummaryInforma
 
 bool CObjectCollectionViewDelegate::GetSummaryInformation(
 			const QByteArray& objectId,
-			const QVector<QByteArray> fieldIds,
+			const QVector<QByteArray>& fieldIds,
 			ObjectMetaInfo& objectMetaInfo) const
 {
 	if (m_collectionPtr == nullptr){

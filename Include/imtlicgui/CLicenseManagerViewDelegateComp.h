@@ -34,7 +34,7 @@ public:
 	virtual QString RenameObject(const QByteArray& objectId, const QString& newName) const override;
 	virtual bool GetSummaryInformation(
 				const QByteArray& objectId,
-				const QVector<QByteArray> fieldIds,
+				const QVector<QByteArray>& fieldIds,
 				ObjectMetaInfo& objectMetaInfo) const override;
 
 protected:

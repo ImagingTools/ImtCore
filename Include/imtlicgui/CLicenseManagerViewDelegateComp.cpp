@@ -80,7 +80,7 @@ QString CLicenseManagerViewDelegateComp::RenameObject(const QByteArray& objectId
 
 bool CLicenseManagerViewDelegateComp::GetSummaryInformation(
 			const QByteArray& objectId,
-			const QVector<QByteArray> fieldIds,
+			const QVector<QByteArray>& fieldIds,
 			ObjectMetaInfo& objectMetaInfo) const
 {
 	if (m_collectionPtr == nullptr){

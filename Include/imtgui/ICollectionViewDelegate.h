@@ -199,7 +199,7 @@ public:
 
 	virtual bool GetSummaryInformation(
 				const QByteArray& objectId,
-				const QVector<QByteArray> fieldIds,
+				const QVector<QByteArray>& fieldIds,
 				ObjectMetaInfo& objectMetaInfo) const = 0;
 
 	/**

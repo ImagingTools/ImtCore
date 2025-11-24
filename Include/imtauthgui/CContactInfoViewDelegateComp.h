@@ -21,7 +21,7 @@ public:
 	// reimplemented (ICollectionViewDelegate)
 	virtual bool GetSummaryInformation(
 				const QByteArray& objectId,
-				const QVector<QByteArray> fieldIds,
+				const QVector<QByteArray>& fieldIds,
 				ObjectMetaInfo& objectMetaInfo) const override;
 	virtual bool IsCommandSupported(int commandId) const override;
 

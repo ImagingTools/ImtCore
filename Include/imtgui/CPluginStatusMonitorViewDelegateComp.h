@@ -62,7 +62,7 @@ public:
 	virtual const imtbase::ICollectionInfo& GetSummaryInformationTypes() const override;
 	virtual bool GetSummaryInformation(
 				const QByteArray& objectId,
-				const QVector<QByteArray> fieldIds,
+				const QVector<QByteArray>& fieldIds,
 				ObjectMetaInfo& objectMetaInfo) const override;
 	virtual HeaderInfo GetSummaryInformationHeaderInfo(const QByteArray& informationId) const override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;

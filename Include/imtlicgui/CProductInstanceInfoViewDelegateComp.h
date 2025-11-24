@@ -39,7 +39,7 @@ public:
 	// reimplemented (imtgui::ICollectionViewDelegate)
 	virtual bool GetSummaryInformation(
 				const QByteArray& objectId,
-				const QVector<QByteArray> fieldIds,
+				const QVector<QByteArray>& fieldIds,
 				ObjectMetaInfo& objectMetaInfo) const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 

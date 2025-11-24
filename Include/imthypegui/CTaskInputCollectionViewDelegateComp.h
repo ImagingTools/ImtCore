@@ -24,7 +24,7 @@ public:
 	// reimplemented (ICollectionViewDelegate)
 	virtual bool GetSummaryInformation(
 				const QByteArray& objectId,
-				const QVector<QByteArray> fieldIds,
+				const QVector<QByteArray>& fieldIds,
 				ObjectMetaInfo& objectMetaInfo) const override;
 	virtual QAbstractItemDelegate* GetColumnItemDelegate(const QByteArray& columnId) const override;
 	virtual void OnColumnItemDelegateEditFinished(const QByteArray& objectId, const QByteArray& columnId, const QVariant& newValue) const override;

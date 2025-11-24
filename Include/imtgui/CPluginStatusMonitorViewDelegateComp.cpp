@@ -127,7 +127,7 @@ const imtbase::ICollectionInfo& CPluginStatusMonitorViewDelegateComp::GetSummary
 
 bool CPluginStatusMonitorViewDelegateComp::GetSummaryInformation(
 			const QByteArray& objectId,
-			const QVector<QByteArray> fieldIds,
+			const QVector<QByteArray>& fieldIds,
 			ObjectMetaInfo& objectMetaInfo) const
 {
 	static QIcon none(":/Icons/StateUnknown");
