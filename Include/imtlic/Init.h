@@ -1,3 +1,6 @@
+#pragma once
+
+
 // ImtCore includes
 #include <imtbase/Init.h>
 #include <imtlic/IProductInfo.h>
