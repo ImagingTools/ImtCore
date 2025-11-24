@@ -17,6 +17,7 @@ Rectangle {
 	radius: Style.radiusM
 	
 	color: Style.baseColor
+	property alias contentSpacing: content.spacing
 
 	property int titleFontSize:  Style.fontSizeXL;
 	

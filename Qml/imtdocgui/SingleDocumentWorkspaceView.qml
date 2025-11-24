@@ -151,6 +151,16 @@ Rectangle {
 		headersModel.addHeader(UuidGenerator.generateUUID(), name)
 	}
 
+	function addPage(viewComp, name){
+		if (!documentManager){
+			console.error("Unable to add the initial item to single document view. Error: Document manager is invalid");
+			return;
+		}
+
+		stackView.addPage(viewComp);
+		headersModel.addHeader(UuidGenerator.generateUUID(), name)
+	}
+
 	Item {
 		id: buttonPanel;
 		anchors.top: parent.top;

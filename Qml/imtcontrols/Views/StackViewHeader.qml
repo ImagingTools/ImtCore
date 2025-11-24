@@ -27,6 +27,12 @@ Item {
         
         return -1;
     }
+
+	function popHeader(){
+		if (headersModel.count > 0){
+			removeHeader(headersModel.get(headersModel.count - 1).id)
+		}
+	}
     
     function removeHeader(id){
         for (let i = 0; i < headersModel.count; i++){

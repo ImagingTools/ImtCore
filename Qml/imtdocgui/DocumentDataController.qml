@@ -44,7 +44,6 @@ QtObject {
 	}
 	
 	function getDocumentModel(){
-		return documentModel;
 	}
 	
 	function getDocumentDescription(){

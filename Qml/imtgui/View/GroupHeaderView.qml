@@ -20,6 +20,7 @@ Rectangle {
 	property int leftPadding: 0
 	property int rightPadding: Style.marginM
 	property int bottomPadding: 0
+	property Item controlItem: controlLoader.item
 	property Component controlComp: baseControlComp
 	
 	onOpenedChanged: {

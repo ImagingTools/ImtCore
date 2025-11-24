@@ -29,6 +29,7 @@
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseComplexCollectionFilterSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseDocumentCollectionFilterSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseDocumentRevisionSdl",
+        "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseDocumentIdFilterSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseCollectionDocumentManagerSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseUndoManagerSdl",
         "${IMTCOREDIR_BUILD}\\AuxInclude\\Qt6_VC17_x64\\GeneratedFiles\\imtbasesdl\\SDL\\1.0\\QML\\imtbaseMimeTypeSdl",
