@@ -30,10 +30,12 @@ public:
 
 
 class CDatabaseEngineComp:
+			public QObject,
 			virtual public CDatabaseEngineAttr,
 			virtual public IDatabaseEngine,
 			virtual public IDatabaseServerConnectionChecker
 {
+	Q_OBJECT
 public:
 	typedef CDatabaseEngineAttr BaseClass;
 
@@ -141,6 +143,9 @@ private:
 	{
 		return &component.m_workingAccessSettings;
 	}
+
+private Q_SLOTS:
+	void OnThreadFinished();
 
 private:
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);

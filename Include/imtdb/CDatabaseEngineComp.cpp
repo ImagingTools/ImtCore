@@ -91,7 +91,11 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 }
 
 
-QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError, bool isForwardOnly) const
+QSqlQuery CDatabaseEngineComp::ExecSqlQuery(
+			const QByteArray& queryString,
+			const QVariantMap& bindValues,
+			QSqlError* sqlError,
+			bool isForwardOnly) const
 {
 	if (!EnsureDatabaseConnected(sqlError)){
 		return QSqlQuery();
@@ -145,7 +149,11 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QString& filePath, QSq
 }
 
 
-QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QString& filePath, const QVariantMap& bindValues, QSqlError* sqlError, bool isForwardOnly) const
+QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(
+			const QString& filePath,
+			const QVariantMap& bindValues,
+			QSqlError* sqlError,
+			bool isForwardOnly) const
 {
 	QFile sqlQuetyFile(filePath);
 
@@ -419,7 +427,11 @@ void CDatabaseEngineComp::OnComponentDestroyed()
 
 bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 {
-	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
+	QString databaseConnectionName = GetConnectionName();
+	QSqlDatabase databaseConnection = QSqlDatabase::database(databaseConnectionName);
+
+	QThread* threadPtr = QThread::currentThread();
+	connect(threadPtr, &QThread::finished, this, &CDatabaseEngineComp::OnThreadFinished, Qt::DirectConnection);
 
 	bool isOpened = databaseConnection.isOpen();
 	if (!isOpened){
@@ -751,6 +763,16 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 		return false;
 	}
 	return true;
+}
+
+
+// private slots
+
+void CDatabaseEngineComp::OnThreadFinished()
+{
+	QString connectionName = GetConnectionName();
+
+	QSqlDatabase::removeDatabase(connectionName);
 }
 
 
