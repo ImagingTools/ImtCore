@@ -212,6 +212,20 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentName(co
 }
 
 
+const istd::IChangeable* CCollectionDocumentManager::GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const
+{
+	OperationStatus retVal;
+
+	QMutexLocker locker(&m_mutex);
+
+	if (!ValidateInputParams(userId, documentId, retVal)){
+		return nullptr;
+	}
+
+	return m_userDocuments[userId][documentId].objectPtr.GetPtr();
+}
+
+
 IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
 {
 	OperationStatus retVal;
