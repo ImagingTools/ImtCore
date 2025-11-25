@@ -230,48 +230,8 @@ DecoratorBase {
 	Component {
 		id: timeDelegateFilterComp
 		
-		FilterDelegateBase {
-			id: timeDelegateFilter
+		TimeFilterDelegate {
 			name: qsTr("Date")
-			onClearFilter: {
-				timeDelegateFilter.mainButtonText = name
-				timeDelegateFilter.isActive = false
-				timeFilter.clear()
-				
-				if (filterPanelDecorator.complexFilter){
-					if (filterPanelDecorator.complexFilter.hasTimeFilter()){
-						filterPanelDecorator.complexFilter.clearTimeFilter()
-						filterPanelDecorator.complexFilter.filterChanged()
-					}
-				}
-			}
-			
-			onOpenFilter: {
-				var point = mapToItem(null, x, y + height);
-				ModalDialogManager.openDialog(timeFilterParamComp, {"x": point.x, "y": point.y, "timeFilter": timeFilter});
-			}
-			
-			Component {
-				id: timeFilterParamComp;
-				
-				TimeFilterParamView {
-					onAccepted: {
-						if (filterPanelDecorator.complexFilter){
-							filterPanelDecorator.complexFilter.setTimeFilter(this.timeFilter);
-							filterPanelDecorator.complexFilter.filterChanged()
-						}
-						
-						ModalDialogManager.closeByComp(timeFilterParamComp);
-						timeDelegateFilter.isActive = true;
-						
-						timeDelegateFilter.mainButtonText = name
-					}
-					
-					onCancelled: {
-						timeDelegateFilter.clearFilter()
-					}
-				}
-			}
 		}
 	}
 

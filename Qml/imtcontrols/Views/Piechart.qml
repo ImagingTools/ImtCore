@@ -64,12 +64,31 @@ Item{
 		anchors.bottomMargin: Style.marginM
 		antialiasing: true
 
-		onPaint:{
+		onPaint: {
 			let ctx = getContext("2d")
 			ctx.reset()
 
 			let total = pieChart.getTotalValue()
-			if (total <= 0) return
+
+			if (total <= 0 || pieChart.segments.length === 0) {
+				let cx = width / 2
+				let cy = height / 2
+				let r = Math.min(width, height) / 2 - 2
+
+				ctx.beginPath()
+				ctx.arc(cx, cy, r, 0, 2 * Math.PI)
+				ctx.strokeStyle = "#999"
+				ctx.lineWidth = 1
+				ctx.stroke()
+
+				ctx.fillStyle = "#999"
+				ctx.font = "14px sans-serif"
+				ctx.textAlign = "center"
+				ctx.textBaseline = "middle"
+				ctx.fillText("No Data", cx, cy)
+
+				return
+			}
 
 			let cx = width / 2
 			let cy = height / 2
@@ -86,19 +105,14 @@ Item{
 				ctx.moveTo(cx, cy)
 				ctx.arc(cx, cy, r, angle, nextAngle, !pieChart.clockwise)
 				ctx.closePath()
-				ctx.fillStyle = seg.color || "#ccc"
 
-				let isHovered = false
-				if (ma.hoveredId !== ""){
-					isHovered = ma.hoveredId === seg.id
-				}
+				let isHovered = ma.hoveredId !== "" && ma.hoveredId === seg.id
 
 				ctx.fillStyle = isHovered
 						? Functions.darkenColor(seg.color, 1.4)
 						: seg.color || "#ccc"
-				
-				ctx.fill()
 
+				ctx.fill()
 				angle = nextAngle
 			}
 

@@ -15,24 +15,17 @@ PopupView {
 		
 	property TimeFilter timeFilter: TimeFilter {}
 	property alias listView: listView;
-	property alias treeModel: treeModel;
 	
 	property Component buttonDecorator: ButtonDecorator {
 				color: Style.backgroundColor2;
 			}
 
 	property int fontSize: Style.fontSizeM;
-	property var datePickerParams;
-	
+
+	property bool canTimeRangeEdit: true
+
 	signal accepted(string id, string name);
 	signal cancelled();
-	
-	TreeItemModel {
-		id: treeModel;
-		Component.onCompleted: {
-			root.updateViewModel();
-		}
-	}
 	
 	onTimeFilterChanged: {
 		updateGui();
@@ -69,57 +62,67 @@ PopupView {
 		let unit = timeFilter.m_timeUnit;
 		let mode = timeFilter.m_interpretationMode;
 		
-		for (let i = 0; i < treeModel.getItemsCount(); i++){
-			let id = treeModel.getData("id", i);
-			let interpretationMode = treeModel.getData("InterpretationMode", i);
-			if (unit == id && interpretationMode == mode){
+		for (let i = 0; i < presetModel.count; i++){
+			if (unit === presetModel.get(i).unit && mode === presetModel.get(i).mode){
 				listView.currentIndex = i;
 				break;
 			}
 		}
 	}
-	
-	function updateViewModel(){
-		treeModel.clear();
-		
-		let index = treeModel.insertNewItem();
-		treeModel.setData("id", "Hour", index);
-		treeModel.setData("name", qsTr("Last hour"), index);
-		treeModel.setData("InterpretationMode", "For", index);
-		
-		index = treeModel.insertNewItem();
-		treeModel.setData("id", "Day", index);
-		treeModel.setData("name", qsTr("Today"), index);
-		treeModel.setData("InterpretationMode", "Current", index);
-		
-		index = treeModel.insertNewItem();
-		treeModel.setData("id", "Week", index);
-		treeModel.setData("name", qsTr("This week"), index);
-		treeModel.setData("InterpretationMode", "Current", index);
-		
-		index = treeModel.insertNewItem();
-		treeModel.setData("id", "Month", index);
-		treeModel.setData("name", qsTr("This month"), index);
-		treeModel.setData("InterpretationMode", "Current", index);
-		
-		index = treeModel.insertNewItem();
-		treeModel.setData("id", "Month", index);
-		treeModel.setData("name", qsTr("Last month"), index);
-		treeModel.setData("InterpretationMode", "Last", index);
-		
-		index = treeModel.insertNewItem();
-		treeModel.setData("id", "Year", index);
-		treeModel.setData("name", qsTr("This year"), index);
-		treeModel.setData("InterpretationMode", "Current", index);
-		
-		index = treeModel.insertNewItem();
-		treeModel.setData("id", "Year", index);
-		treeModel.setData("name", qsTr("Last year"), index);
-		treeModel.setData("InterpretationMode", "Last", index);
-		
-		listView.model = treeModel;
+
+	function setItemName(index, name){
+		if (index < 0 || index >= presetModel.count){
+			return
+		}
+
+		presetModel.setProperty(index, "name", name)
 	}
-	
+
+	function setItemVisible(index, visible){
+		if (index < 0 || index >= presetModel.count){
+			return
+		}
+
+		presetModel.setProperty(index, "visible", visible)
+	}
+
+	function setItemUnit(index, unit){
+		if (index < 0 || index >= presetModel.count){
+			return
+		}
+
+		presetModel.setProperty(index, "unit", unit)
+	}
+
+	function setItemMode(index, mode){
+		if (index < 0 || index >= presetModel.count){
+			return
+		}
+
+		presetModel.setProperty(index, "mode", mode)
+	}
+
+	function addItem(unit, name, mode, index){
+		if (index === undefined){
+			index = presetModel.count
+		}
+
+		presetModel.insert(index, {id: unit, unit: unit, name: name,mode: mode,visible: true})
+	}
+
+	ListModel {
+		id: presetModel
+		Component.onCompleted: {
+			root.addItem("Hour", qsTr("Last hour"), "For")
+			root.addItem("Day", qsTr("Today"), "Current")
+			root.addItem("Week", qsTr("This week"), "Current")
+			root.addItem("Month", qsTr("This month"), "Current")
+			root.addItem("Month", qsTr("Last month"), "Last")
+			root.addItem("Year", qsTr("This year"), "Current")
+			root.addItem("Year", qsTr("Last year"), "Last")
+		}
+	}
+
 	Rectangle {
 		id: background;
 		anchors.fill: parent;
@@ -157,136 +160,145 @@ PopupView {
 			ListView {
 				id: listView;
 				width: parent.width;
-				height: 30 * count;
+				height: contentHeight
 				boundsBehavior: Flickable.StopAtBounds;
 				interactive: false;
+				model: presetModel
 				delegate: Component {
 					PopupMenuDelegate {
+						height: visible ? Style.controlHeightM : 0
 						text: model.name;
 						highlighted: listView.currentIndex === model.index;
 						selected: mouseArea.containsMouse;
 						font.pixelSize: root.fontSize
+						visible: model.visible
 						onClicked: {
 							listView.currentIndex = model.index;
-							// root.model.clear();
-							
-							root.timeFilter.m_timeUnit = model.id;
-							root.timeFilter.m_interpretationMode = model.InterpretationMode;
 
-							root.accepted(model.id, model.name);
+							root.timeFilter.m_timeUnit = model.unit;
+							root.timeFilter.m_interpretationMode = model.mode;
+
+							root.accepted(model.unit, model.name);
 						}
 					}
 				}
 			}
 			
-			Rectangle {
-				id: separator;
-				width: parent.width;
-				height: 1;
-				color: Style.borderColor;
-			}
-			
-			BaseText {
-				text: qsTr("From");
-				width: parent.width;
-				font.pixelSize: root.fontSize
-			}
-			
-			Item {
-				id: selectDateItem;
-				width: parent.width;
-				height: Style.controlHeightM;
-				visible: !fromDateItem.visible;
-				
-				Button {
+			Column {
+				width: content.width
+				spacing: content.spacing
+				visible: root.canTimeRangeEdit
+				Rectangle {
+					id: separator;
 					width: parent.width;
-					height: parent.height;
-					text: qsTr("Select a date");
-					onClicked: {
-						fromDateItem.visible = true;
-						toDatePicker.setCurrentDay();
-					}
-					
-					decorator: root.buttonDecorator;
+					height: 1;
+					color: Style.borderColor;
 				}
-			}
-			
-			Item {
-				id: fromDateItem;
-				width: parent.width;
-				height: Style.controlHeightM;
-				visible: false;
-
-				DateInput {
-					id: fromDatePicker;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					hasTitle: false
-					width: parent.width;
-				}
-			}
-			
-			BaseText {
-				text: qsTr("To");
-				width: parent.width;
-				font.pixelSize: root.fontSize
-			}
-			
-			Item {
-				width: parent.width;
-				height: Style.controlHeightM;
 				
-				DateInput {
-					id: toDatePicker;
-					anchors.horizontalCenter: parent.horizontalCenter;
-					hasTitle: false
+				BaseText {
+					text: qsTr("From");
 					width: parent.width;
+					font.pixelSize: root.fontSize
 				}
-			}
-			
-			Item {
-				width: parent.width;
-				height: Style.controlHeightM;
 				
-				Row {
-					anchors.horizontalCenter: parent.horizontalCenter;
+				Item {
+					id: selectDateItem;
+					width: parent.width;
 					height: Style.controlHeightM;
-					spacing: Style.marginM;
+					visible: !fromDateItem.visible;
 					
 					Button {
-						id: applyButton;
-						text: qsTr("Apply");
-						enabled: fromDateItem.visible;
+						width: parent.width;
+						height: parent.height;
+						text: qsTr("Select a date");
 						onClicked: {
-							if (!root.timeFilter.hasTimeRange()){
-								root.timeFilter.createTimeRange()
-							}
-
-							root.timeFilter.m_timeRange.m_begin = fromDatePicker.selectedDate.toISOString()
-							root.timeFilter.m_timeRange.m_end = toDatePicker.selectedDate.toISOString()
-							
-							root.accepted("TimeRange", fromDatePicker.getDateAsString() + " -> " + toDatePicker.getDateAsString());
-						}
-						
-						decorator: root.buttonDecorator;
-					}
-					
-					Button {
-						id: clearButton;
-						text: qsTr("Clear");
-						enabled: fromDateItem.visible;
-						onClicked: {
-							fromDateItem.visible = false;
-							fromDatePicker.showCurrentDate();
-							toDatePicker.showCurrentDate();
-							listView.currentIndex = -1;
-							
-							root.cancelled();
+							fromDateItem.visible = true;
+							toDatePicker.setCurrentDay();
 						}
 						
 						decorator: root.buttonDecorator;
 					}
 				}
+				
+				Item {
+					id: fromDateItem;
+					width: parent.width;
+					height: Style.controlHeightM;
+					visible: false;
+	
+					DateInput {
+						id: fromDatePicker;
+						anchors.horizontalCenter: parent.horizontalCenter;
+						hasTitle: false
+						width: parent.width;
+					}
+				}
+				
+				BaseText {
+					text: qsTr("To");
+					width: parent.width;
+					font.pixelSize: root.fontSize
+				}
+				
+				Item {
+					width: parent.width;
+					height: Style.controlHeightM;
+					
+					DateInput {
+						id: toDatePicker;
+						anchors.horizontalCenter: parent.horizontalCenter;
+						hasTitle: false
+						width: parent.width;
+					}
+				}
+				
+				Item {
+					width: parent.width;
+					height: Style.controlHeightM;
+					
+					Row {
+						anchors.horizontalCenter: parent.horizontalCenter;
+						height: Style.controlHeightM;
+						spacing: Style.marginM;
+						
+						Button {
+							id: applyButton;
+							text: qsTr("Apply");
+							enabled: fromDateItem.visible;
+							onClicked: {
+								if (!root.timeFilter.hasTimeRange()){
+									root.timeFilter.createTimeRange()
+								}
+	
+								root.timeFilter.m_timeRange.m_begin = fromDatePicker.selectedDate.toISOString()
+								root.timeFilter.m_timeRange.m_end = toDatePicker.selectedDate.toISOString()
+								
+								root.accepted("TimeRange", fromDatePicker.getDateAsString() + " -> " + toDatePicker.getDateAsString());
+							}
+							
+							decorator: root.buttonDecorator;
+						}
+						
+						Button {
+							id: clearButton;
+							text: qsTr("Clear");
+							enabled: fromDateItem.visible;
+							onClicked: {
+								fromDateItem.visible = false;
+								fromDatePicker.showCurrentDate();
+								toDatePicker.showCurrentDate();
+								listView.currentIndex = -1;
+								
+								root.cancelled();
+							}
+							
+							decorator: root.buttonDecorator;
+						}
+					}
+				}
 			}
+
+
 		}
 	}
 	

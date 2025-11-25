@@ -7,6 +7,7 @@ Rectangle {
 	id: menuPanel;
 
 	width: buttonWidth;
+	objectName: "MenuPanel"
 
 	clip: true;
 

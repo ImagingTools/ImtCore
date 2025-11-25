@@ -24,10 +24,6 @@ Item {
 
 	signal clearFilter(bool beQiuet)
 	signal openFilter()
-	
-	onReadOnlyChanged: {
-		console.log("FilterDelegateBase.qml onReadOnlyChanged", readOnly)
-	}
 
 	Connections {
 		target: filterDelegateBase.collectionFilter
