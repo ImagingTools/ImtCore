@@ -59,23 +59,23 @@ class Window extends QtObject {
         index = this.data.indexOf(child)
         if(index >= 0) this.data.__splice(index, 1)
 
-        if(child instanceof Item){
-            index = this.children.indexOf(child)
-            if(index >= 0) this.children.__splice(index, 1)
-        } else {
-            index = this.resources.indexOf(child)
-            if(index >= 0) this.resources.__splice(index, 1)
-        }
+        // if(child instanceof Item){
+        //     index = this.children.indexOf(child)
+        //     if(index >= 0) this.children.__splice(index, 1)
+        // } else {
+        //     index = this.resources.indexOf(child)
+        //     if(index >= 0) this.resources.__splice(index, 1)
+        // }
     }
 
     __addChild(child){
         this.data.__push(child)
 
-        if(child instanceof Item){
-            this.children.__push(child)
-        } else {
-            this.data.__push(child)
-        }
+        // if(child instanceof Item){
+        //     this.children.__push(child)
+        // } else {
+        //     this.data.__push(child)
+        // }
     }
 
     __getDOM(){

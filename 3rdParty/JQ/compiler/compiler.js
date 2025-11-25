@@ -1187,7 +1187,6 @@ class Instruction {
                 }
 
                 if (path.type === QtQml.Component && assignProperty.value.extends !== 'Component') {
-
                     resultCode.add(`let ${assignProperty.value.name}=JQModules.QtQml.Component.create(null,__context,`)
                     resultCode.add('\n')
 
@@ -1451,7 +1450,7 @@ class Instruction {
                     ${this.id ? this.name+'.__'+this.qmlFile.getContextName()+'.'+this.id+'='+this.name : ''}
                     return ${this.name}
                 }
-        })).create(${this.parent ? this.parent.name : 'null'},__context,`)
+        })).create(${this.parent ? this.parent.name : 'null'},${this.targetContext.name}.__${this.qmlFile.getContextName()},`)
 
         code.add('\n')
         // if (this.parent) {
