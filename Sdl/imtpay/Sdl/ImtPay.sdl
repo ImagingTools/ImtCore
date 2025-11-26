@@ -48,7 +48,7 @@ type Receipt {
 	paymentsPlace: String
 	machineNumber: String
 	operatorData: Operator
-	client: Client
+	clients: [Client]
 	items: [Item!]!
 	payments: [Payment]
 	transactionId: String

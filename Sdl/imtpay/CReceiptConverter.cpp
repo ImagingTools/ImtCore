@@ -189,58 +189,66 @@ bool CReceiptConverter::CreateSdlFromParams(sdl::imtpay::ImtPay::CReceipt::V1_0&
 		receipt.operatorData = receiptOperator;
 	}
 
-	// set client
-	iprm::TParamsPtr<iprm::IParamsSet> clientParamsPtr(&params, ReceiptParamKeys::Client, false);
-	if (clientParamsPtr.IsValid()){
+	// set clients
+	iprm::TParamsPtr<iprm::IParamsManager> clientsParamsManagerPtr(&params, ReceiptParamKeys::Clients, false);
+	Q_ASSERT(clientsParamsManagerPtr.IsValid());
+	const int clientsCount = clientsParamsManagerPtr->GetParamsSetsCount();
+	imtsdl::TElementList<ImtPayV1::CClient::V1_0> clientList;
+	for (int clientIndex = 0; clientIndex < clientsCount; ++clientIndex){
 		ImtPayV1::CClient::V1_0 clientInfo;
 
-		iprm::TParamsPtr<iprm::ITextParam> addressParamPtr(&*clientParamsPtr, ReceiptClientKeys::Address, false);
+		iprm::IParamsSet* clientItemParamsSetPtr = clientsParamsManagerPtr->GetParamsSet(clientIndex);
+		Q_ASSERT(clientItemParamsSetPtr != nullptr);
+
+		iprm::TParamsPtr<iprm::ITextParam> addressParamPtr(&*clientItemParamsSetPtr, ReceiptClientKeys::Address, false);
 		if (addressParamPtr.IsValid()){
 			clientInfo.address = addressParamPtr->GetText();
 		}
 
-		iprm::TParamsPtr<iprm::ITextParam> eMailParamPtr(&*clientParamsPtr, ReceiptClientKeys::EMail, false);
+		iprm::TParamsPtr<iprm::ITextParam> eMailParamPtr(&*clientItemParamsSetPtr, ReceiptClientKeys::EMail, false);
 		if (eMailParamPtr.IsValid()){
 			clientInfo.eMail = eMailParamPtr->GetText();
 		}
 
-		iprm::TParamsPtr<iprm::ITextParam>phoneNumberParamPtr(&*clientParamsPtr, ReceiptClientKeys::PhoneNumber, false);
+		iprm::TParamsPtr<iprm::ITextParam>phoneNumberParamPtr(&*clientItemParamsSetPtr, ReceiptClientKeys::PhoneNumber, false);
 		if (phoneNumberParamPtr.IsValid()){
 			clientInfo.phoneNumber = phoneNumberParamPtr->GetText();
 		}
 
-		iprm::TParamsPtr<iprm::ITextParam> nameParamPtr(&*clientParamsPtr, ReceiptClientKeys::Name, false);
+		iprm::TParamsPtr<iprm::ITextParam> nameParamPtr(&*clientItemParamsSetPtr, ReceiptClientKeys::Name, false);
 		if (nameParamPtr.IsValid()){
 			clientInfo.name = nameParamPtr->GetText();
 		}
 
-		iprm::TParamsPtr<iprm::ITextParam> birthDateParamPtr(&*clientParamsPtr, ReceiptClientKeys::BirthDate, false);
+		iprm::TParamsPtr<iprm::ITextParam> birthDateParamPtr(&*clientItemParamsSetPtr, ReceiptClientKeys::BirthDate, false);
 		if (birthDateParamPtr.IsValid()){
 			clientInfo.birthDate = birthDateParamPtr->GetText();
 		}
 
-		iprm::TParamsPtr<iprm::ITextParam> citizenshipParamPtr(&*clientParamsPtr, ReceiptClientKeys::Citizenship, false);
+		iprm::TParamsPtr<iprm::ITextParam> citizenshipParamPtr(&*clientItemParamsSetPtr, ReceiptClientKeys::Citizenship, false);
 		if (citizenshipParamPtr.IsValid()){
 			clientInfo.citizenship = citizenshipParamPtr->GetText();
 		}
 
-		iprm::TParamsPtr<iprm::ITextParam> identityDocumentCodeParamPtr(&*clientParamsPtr, ReceiptClientKeys::IdentityDocumentCode, false);
+		iprm::TParamsPtr<iprm::ITextParam> identityDocumentCodeParamPtr(&*clientItemParamsSetPtr, ReceiptClientKeys::IdentityDocumentCode, false);
 		if (identityDocumentCodeParamPtr.IsValid()){
 			clientInfo.identityDocumentCode = identityDocumentCodeParamPtr->GetText();
 		}
 
-		iprm::TParamsPtr<iprm::ITextParam> identityDocumentDataParamPtr(&*clientParamsPtr, ReceiptClientKeys::IdentityDocumentData, false);
+		iprm::TParamsPtr<iprm::ITextParam> identityDocumentDataParamPtr(&*clientItemParamsSetPtr, ReceiptClientKeys::IdentityDocumentData, false);
 		if (identityDocumentDataParamPtr.IsValid()){
 			clientInfo.identityDocumentData = identityDocumentDataParamPtr->GetText();
 		}
 
-		iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&*clientParamsPtr, ReceiptClientKeys::Id, false);
+		iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&*clientItemParamsSetPtr, ReceiptClientKeys::Id, false);
 		if (idParamPtr.IsValid()){
 			clientInfo.id = idParamPtr->GetId();
 		}
 
-		receipt.client = clientInfo;
+		clientList << clientInfo;
 	}
+
+	receipt.clients = clientList;
 
 	// set items
 	iprm::TParamsPtr<iprm::IParamsManager> itemsParamsManagerPtr(&params, ReceiptParamKeys::Items);
@@ -449,27 +457,35 @@ bool CReceiptConverter::CreateParamsFromSdl(iprm::IParamsSet& params, const sdl:
 		}
 	}
 
-	// set client
-	if (receipt.client){
-		iprm::IParamsSet* clientParamsPtr = dynamic_cast<iprm::IParamsSet*>(params.GetEditableParameter(ReceiptParamKeys::Client));
-		if (clientParamsPtr != nullptr){
-			ImtPayV1::CClient::V1_0 clientInfo = *receipt.client;
-			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::Address, *clientInfo.address);
-			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::EMail, *clientInfo.eMail);
-			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::PhoneNumber, *clientInfo.phoneNumber);
-			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::Name, *clientInfo.name);
-			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::BirthDate, *clientInfo.birthDate);
-			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::Citizenship, *clientInfo.citizenship);
-			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::IdentityDocumentCode, *clientInfo.identityDocumentCode);
-			SetTextForParamsSet(*clientParamsPtr, ReceiptClientKeys::IdentityDocumentData, *clientInfo.identityDocumentData);
+	// set clients
+	Q_ASSERT_X(receipt.clients.HasValue(), __func__, "Receipt clients expected but missing");
+	const imtsdl::TElementList<ImtPayV1::CClient::V1_0> receiptClientList = *receipt.clients;
+	iprm::IParamsManager* clientsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Clients));
+	if (!receiptClientList.isEmpty() && clientsParamsManagerPtr != nullptr){
+		for (const istd::TSharedNullable<ImtPayV1::CClient::V1_0>& receiptClient: receiptClientList){
+			const int insertedParamsIndex = clientsParamsManagerPtr->InsertParamsSet();
+			Q_ASSERT(insertedParamsIndex >= 0);
 
-			iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(clientParamsPtr->GetEditableParameter( ReceiptClientKeys::Id));
+			iprm::IParamsSet* paymentClientParamsSetPtr = clientsParamsManagerPtr->GetParamsSet(insertedParamsIndex);
+			Q_ASSERT(paymentClientParamsSetPtr != nullptr);
+
+			SetTextForParamsSet(*paymentClientParamsSetPtr, ReceiptClientKeys::Address, *receiptClient->address);
+			SetTextForParamsSet(*paymentClientParamsSetPtr, ReceiptClientKeys::EMail, *receiptClient->eMail);
+			SetTextForParamsSet(*paymentClientParamsSetPtr, ReceiptClientKeys::PhoneNumber, *receiptClient->phoneNumber);
+			SetTextForParamsSet(*paymentClientParamsSetPtr, ReceiptClientKeys::Name, *receiptClient->name);
+			SetTextForParamsSet(*paymentClientParamsSetPtr, ReceiptClientKeys::BirthDate, *receiptClient->birthDate);
+			SetTextForParamsSet(*paymentClientParamsSetPtr, ReceiptClientKeys::Citizenship, *receiptClient->citizenship);
+			SetTextForParamsSet(*paymentClientParamsSetPtr, ReceiptClientKeys::IdentityDocumentCode, *receiptClient->identityDocumentCode);
+			SetTextForParamsSet(*paymentClientParamsSetPtr, ReceiptClientKeys::IdentityDocumentData, *receiptClient->identityDocumentData);
+
+			iprm::IIdParam* idParamPtr = dynamic_cast<iprm::IIdParam*>(paymentClientParamsSetPtr->GetEditableParameter( ReceiptClientKeys::Id));
 			if (idParamPtr != nullptr){
-				idParamPtr->SetId(clientInfo.id->toUtf8());
+				idParamPtr->SetId(receiptClient->id->toUtf8());
 			}
 		}
 	}
 
+	// set items
 	Q_ASSERT_X(receipt.items.HasValue(), __func__, "Receipt items expected but missing");
 	const imtsdl::TElementList<ImtPayV1::CItem::V1_0> receiptItemList = *receipt.items;
 	iprm::IParamsManager* itemsParamsManagerPtr = dynamic_cast<iprm::IParamsManager*>(params.GetEditableParameter(ReceiptParamKeys::Items));

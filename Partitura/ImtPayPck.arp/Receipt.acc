@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5406" Description="ACF"/>
-            <Version Id="1" Number="2250" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5422" Description="ACF"/>
+            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
             <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -11,8 +11,17 @@
     <Keywords></Keywords>
     <ElementsList>
         <Element Id="Client" PackageId="ImtPayPck" ComponentId="Client">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="Clients" PackageId="BasePck" ComponentId="ParamsManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParamsSetFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Client"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="Item" PackageId="ImtPayPck" ComponentId="Item">
@@ -68,7 +77,7 @@
                                 <Value>PaymentsPlace</Value>
                                 <Value>MachineNumber</Value>
                                 <Value>Operator</Value>
-                                <Value>Client</Value>
+                                <Value>Clients</Value>
                                 <Value>Items</Value>
                                 <Value>Payments</Value>
                                 <Value>TransactionId</Value>
@@ -83,7 +92,7 @@
                                 <Value>PaymentsPlace</Value>
                                 <Value>MachineNumber</Value>
                                 <Value>Operator</Value>
-                                <Value>Client</Value>
+                                <Value>Clients</Value>
                                 <Value>Items</Value>
                                 <Value>Payments</Value>
                                 <Value>TransactionId</Value>
