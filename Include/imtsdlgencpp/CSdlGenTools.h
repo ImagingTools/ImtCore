@@ -115,9 +115,9 @@ public:
 									  const imtsdl::SdlUnionList& unionList,
 									  bool withPointer = true);
 
-	[[nodiscard]] static QString GetTemVariableWrappedValue(const QString& variableName);
+	[[nodiscard]] static QString GetTempVariableWrappedValue(const QString& variableName);
 
-	[[nodiscard]] static QString GetTemVariableWrappedValue(const imtsdl::CSdlField& sdlField);
+	[[nodiscard]] static QString GetTempVariableWrappedValue(const imtsdl::CSdlField& sdlField);
 };
 
 
@@ -129,9 +129,9 @@ inline QString CSdlGenTools::GetSdlEntryVersion(const SdlEntryClass& entry, bool
 	return GetSchemaVerstionString(entry.GetSchemaParams(), addVPrefix);
 }
 
-inline QString CSdlGenTools::GetTemVariableWrappedValue(const imtsdl::CSdlField& sdlField)
+inline QString CSdlGenTools::GetTempVariableWrappedValue(const imtsdl::CSdlField& sdlField)
 {
-	return GetTemVariableWrappedValue(sdlField.GetId());
+	return GetTempVariableWrappedValue(sdlField.GetId());
 }
 
 

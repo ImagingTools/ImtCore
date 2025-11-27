@@ -854,7 +854,7 @@ void CSdlClassTreeModelModificatorComp::AddPrimitiveArrayFieldReadFromModelImplC
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetItemsCount();");
 	FeedStream(stream, 1, false);
 
-	const QString variableName = GetTemVariableWrappedValue(field);
+	const QString variableName = GetTempVariableWrappedValue(field);
 	const QString variableCheckName = QStringLiteral("is%1Read").arg(GetCapitalizedValue(field.GetId()));
 
 	// value checks
@@ -1191,7 +1191,7 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadFromModelImplCod
 	FeedStream(stream, 1, false);
 
 	// inLoop: declare temp var
-	const QString variableName = GetTemVariableWrappedValue(field);
+	const QString variableName = GetTempVariableWrappedValue(field);
 	const QString variableCheckName = QStringLiteral("is%1Read").arg(GetCapitalizedValue(field.GetId()));
 	FeedStreamHorizontally(stream, hIndents + 1);
 	structNameConverter.listWrap = false;

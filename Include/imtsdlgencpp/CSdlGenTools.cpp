@@ -522,7 +522,7 @@ QString CSdlGenTools::GetQObjectTypeName(const imtsdl::CSdlField& sdlField,
 }
 
 
-QString CSdlGenTools::GetTemVariableWrappedValue(const QString& variableName)
+QString CSdlGenTools::GetTempVariableWrappedValue(const QString& variableName)
 {
 	return QStringLiteral("t_%1").arg(imtsdl::CSdlTools::GetDecapitalizedValue(variableName));
 }
