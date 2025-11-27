@@ -126,39 +126,43 @@ Item{
 		}
 	}
 
-	Column{
+	Flow {
 		id: legend
+		width: parent.width
 		anchors.bottom: parent.bottom
 		anchors.horizontalCenter: parent.horizontalCenter
-		width: parent.width * 0.9
 		visible: pieChart.showLegend
 
 		clip: true
 
 		Repeater{
 			model: pieChart.segments
-			delegate: Row{
-				width: legend.width
+			delegate: Item {
+				width: legend.width / 2
 				height: 20
-				spacing: Style.marginM
 
-				Rectangle{
+				Rectangle {
+					id: colorRect
+					anchors.left: parent.left
 					anchors.verticalCenter: parent.verticalCenter
 					width: Style.fontSizeXS
-					height: Style.fontSizeXS
+					height: width
 					radius: Style.radiusS
 					color: modelData.color || "#ccc"
 				}
 
 				Text{
 					id: labelText
+					anchors.left: colorRect.right
+					anchors.leftMargin: Style.marginM
+					anchors.right: percentText.left
+					anchors.rightMargin: Style.marginM
 					anchors.verticalCenter: parent.verticalCenter
 					verticalAlignment: Text.AlignVCenter
-					text: modelData.label || ""
+					text: modelData.label
 					color: pieChart.legendClickable ? "#0b5ed7": Style.textColor
 					font.pixelSize: Style.fontSizeS
 					elide: Text.ElideRight
-					width: legend.width * 0.4
 
 					MouseArea{
 						id: legendMouse
@@ -187,13 +191,15 @@ Item{
 				}
 
 				Text{
+					id: percentText
+					anchors.right: parent.right
+					anchors.rightMargin: Style.marginM
 					anchors.verticalCenter: parent.verticalCenter
 					text: modelData.displayText || ""
 					color: Style.textColor
 					font.pixelSize: Style.fontSizeS
 					visible: pieChart.showPercent
 					elide: Text.ElideRight
-					width: legend.width * 0.4
 					verticalAlignment: Text.AlignVCenter
 				}
 			}

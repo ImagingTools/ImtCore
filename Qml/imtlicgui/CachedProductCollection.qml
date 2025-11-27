@@ -80,6 +80,23 @@ CollectionDataProvider {
 
 		return ""
 	}
+
+	function getProductIdByLicenseId(licenseId){
+		for (let i = 0; i < collectionModel.getItemsCount(); ++i){
+			let productId = collectionModel.getData(ProductItemTypeMetaInfo.s_id, i)
+			let licensesModel = collectionModel.getData(ProductItemTypeMetaInfo.s_licenses, i)
+			if (licensesModel){
+				for (let j = 0; j < licensesModel.getItemsCount(); ++j){
+					let id = licensesModel.getData("id", j)
+					if (licenseId === id){
+						return productId
+					}
+				}
+			}
+		}
+
+		return ""
+	}
 }
 
 

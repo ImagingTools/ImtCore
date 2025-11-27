@@ -58,20 +58,20 @@ ViewBase {
 	}
 	
 	Connections {
-		target: collectionViewBaseContainer.collectionFilter;
+		target: collectionViewBaseContainer.collectionFilter
 		
 		function onFilterChanged(){
 			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
-			collectionViewBaseContainer.doUpdateGui();
+			collectionViewBaseContainer.doUpdateGui()
 		}
 	}
 	
 	Connections {
-		target: collectionViewBaseContainer.documentCollectionFilter;
+		target: collectionViewBaseContainer.documentCollectionFilter
 		
 		function onFilterChanged(){
 			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
-			collectionViewBaseContainer.doUpdateGui();
+			collectionViewBaseContainer.doUpdateGui()
 		}
 	}
 	
@@ -109,10 +109,6 @@ ViewBase {
 		visible: collectionViewBaseContainer.filterMenuVisible
 		onClose: {
 			collectionViewBaseContainer.filterMenuVisible = false;
-		}
-		
-		onVisibleChanged: {
-			console.log("FilterMenu onVisibleChanged", visible)
 		}
 
 		onFilterChanged: {

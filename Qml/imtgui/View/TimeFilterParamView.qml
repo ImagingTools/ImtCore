@@ -113,9 +113,7 @@ PopupView {
 	ListModel {
 		id: presetModel
 		Component.onCompleted: {
-			root.addItem("Hour", qsTr("Last hour"), "For")
-			root.addItem("Day", qsTr("Today"), "Current")
-			root.addItem("Week", qsTr("This week"), "Current")
+			root.addItem("Week", qsTr("Last 7 Days"), "For")
 			root.addItem("Month", qsTr("This month"), "Current")
 			root.addItem("Month", qsTr("Last month"), "Last")
 			root.addItem("Year", qsTr("This year"), "Current")
