@@ -212,11 +212,17 @@ Rectangle{
 					}
 				}
 
-
-				//return
 				let margin  = Style.marginXXL
 				let gridWidth = width - gridShape.labelYWidth - gridShape.legendMargin - margin
+				if (gridWidth < 0){
+					return
+				}
+
 				maxX = maxX - (gridShape.labelYWidth + gridShape.legendMargin)
+				if (gridWidth <= 0 || maxX <= 0){
+					return
+				}
+
 				let scale_ = gridWidth/ maxX
 					graph.xScale = (graph.xScale * scale_)
 					setLayersParams()

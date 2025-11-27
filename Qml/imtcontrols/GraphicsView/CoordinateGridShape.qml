@@ -64,6 +64,10 @@ BoundingBox {
 	}
 
 	function draw(ctx, transformMatrixArg){
+		if (gridShape.viewItem.drawingAreaWidth < 0 || gridShape.viewItem.drawingAreaHeight < 0){
+			return
+		}
+
 		let deltaX = transformMatrixArg.xTranslation();
 		let deltaY = transformMatrixArg.yTranslation();
 		let scaleCoeff = transformMatrixArg.xScale();
