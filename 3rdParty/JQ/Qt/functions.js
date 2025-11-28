@@ -279,7 +279,26 @@ module.exports = {
             }
         }
 
-        if(!cls){
+        if(!cls || !cls.isAssignableFrom){
+            for(let key in JQModules){
+                cls = JQModules[key]
+
+                for(let i = 0; i < path.length; i++){
+                    if(cls){
+                        let name = path[i]
+                        if(name in cls){
+                            cls = cls[name]
+                        } else if(name in JQModules){
+                            cls = JQModules[name]
+                        }
+                    } else {
+                        cls = JQModules[path[i]]
+                    }
+                }
+            }
+        }
+
+        if(!cls || !cls.isAssignableFrom){
             try {
                 cls = eval(className)
             } catch (error) {
@@ -289,6 +308,8 @@ module.exports = {
         
 
         if(cls && cls.isAssignableFrom && cls.isAssignableFrom(JQModules.QtBase.BaseObject)) return JQModules.QtQml.Component.create(null, {}, cls)
+
+        console.error(`${source} is not founded`)
 
         // let cls = currentModule
         // try {
