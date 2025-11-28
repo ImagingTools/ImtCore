@@ -136,21 +136,18 @@ bool CGqlPublisherCompBase::PushDataToSubscriber(
 	imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(networkRequest, imtrest::IProtocolEngine::SC_OK, body, reponseTypeId).PopInterfacePtr());
 	if (!responsePtr.IsValid()){
 		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Response is invalid"), "CGqlPublisherCompBase");
-		
 		return false;
 	}
 
 	const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest.GetRequestId());
 	if (sender == nullptr){
 		SendErrorMessage(0, QString("Unable to send response to subscriber. Error: Cannot found sender for request ID '%1'").arg(qPrintable(networkRequest.GetRequestId())), "CGqlPublisherCompBase");
-		
 		return false;
 	}
 
 	bool retVal = sender->SendResponse(responsePtr);
 	if (!retVal){
 		QString message = QString("Unable to send response to subscriber. Data: '%1'").arg(qPrintable(data));
-
 		SendErrorMessage(0, message, "CGqlPublisherCompBase");
 	}
 

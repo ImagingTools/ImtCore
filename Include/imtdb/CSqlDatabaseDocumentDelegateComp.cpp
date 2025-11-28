@@ -1397,7 +1397,9 @@ bool CSqlDatabaseDocumentDelegateComp::CreateTextFilterQuery(const imtbase::ICom
 		textFilterQuery += QStringLiteral(R"("%1" ILIKE '%%2%')").arg(QString::fromUtf8(fieldId), textFilter);
 	}
 
-	SubstituteFieldIds(textFilterQuery);
+	if (!textFilterQuery.isEmpty()){
+		SubstituteFieldIds(textFilterQuery);
+	}
 
 	return true;
 }

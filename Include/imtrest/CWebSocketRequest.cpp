@@ -29,7 +29,6 @@ CWebSocketRequest::CWebSocketRequest(const IRequestServlet& handler, const IProt
 			:m_state(RS_NON_STARTED),
 			m_requestHandlerPtr(&handler),
 			m_engine(engine)
-
 {
 	m_requestId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 }
@@ -182,7 +181,6 @@ void CWebSocketRequest::SetMethodType(MethodType methodType)
 
 QByteArray CWebSocketRequest::GetQueryId() const
 {
-	// return m_queryId;
 	return m_requestId;
 }
 
@@ -193,6 +191,7 @@ void CWebSocketRequest::RegisterRequestEventHandler(IRequestEventHandler* reques
 
 	m_requestEventHandlers.append(requestEventHandler);
 }
+
 
 void CWebSocketRequest::SetCommandId(const QByteArray& commandId)
 {

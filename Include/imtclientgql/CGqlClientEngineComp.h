@@ -23,7 +23,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlClientEngineComp);
 		I_REGISTER_INTERFACE(imtclientgql::IClientProtocolEngine);
-		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Server connnection settings", true, "ServerConnectionInterface");
+		I_ASSIGN(m_serverConnectionCompPtr, "ServerConnectionInterface", "Server connnection settings", false, "ServerConnectionInterface");
 		I_ASSIGN(m_prefixServerAttrPtr, "ServerPrefix", "Prefix Server", false, "/");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", false, "ApplicationInfo");
 	I_END_COMPONENT;

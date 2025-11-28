@@ -48,21 +48,19 @@ protected:
 
 protected:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
-	I_REF(imtgql::IGqlRequestHandler, m_requestHandlerCompPtr);
 	I_REF(imtrest::IRequestManager, m_requestManagerCompPtr);
-	I_ATTR(QByteArray, m_requestHandlerCommandIdAtrPtr);
 
 	struct RequestNetworks
 	{
 		imtgql::CGqlRequest gqlRequest;
-		QMap<QByteArray, const imtrest::IRequest*> networkRequests;
+		QMap<QByteArray, const imtrest::IRequest*> networkRequests; // Subscription-ID -> NetworkRequest
 
 		RequestNetworks()
 			:gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION)
 		{
 		}
 	};
-	
+
 	QList<RequestNetworks> m_registeredSubscribers;
 };
 

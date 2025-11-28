@@ -136,11 +136,13 @@ void CWebSocketThread::OnWebSocketTextMessage(const QString& textMessage)
 		if (webSocketRequest == nullptr){
 			return;
 		}
+
 		webSocketRequest->SetBody(textMessage.toUtf8());
 
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
 		if (methodType == CWebSocketRequest::MT_START){
 			newRequestPtr.PopPtr();
+			webSocketRequest->setParent(m_socket);
 			if (m_server != nullptr){
 				m_server->RegisterSender(webSocketRequest->GetRequestId(), webSocketPtr);
 			}
