@@ -65,7 +65,17 @@ Item {
             }
 
 			Component.onCompleted: {
+				pause.start()
+			}
 
+			PauseAnimation {
+				id: pause
+				duration: 500
+				onFinished: {
+					if(inputField.text == ""){
+						inputField.wasSelectedOnStart = true;
+					}
+				}
 			}
 
             onAccepted: {
