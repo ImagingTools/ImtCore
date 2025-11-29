@@ -112,13 +112,13 @@ void CHttpRequest::SetMethodType(const MethodType& methodType)
 	int method = 0;
 	switch (methodType){
 	case MT_POST:
-		method = 3;
+		method = HTTP_POST;
 		break;
 	case MT_GET:
-		method = 2;
+		method = HTTP_GET;
 		break;
 	case MT_PUT:
-		method = 4;
+		method = HTTP_PUT;
 		break;
 	default:
 		break;
