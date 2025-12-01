@@ -75,6 +75,7 @@ Graph2d{
 		let activeLayer = graphicsViewAlias.getActiveLayer()
 		activeLayer.shapeModel = []
 		tooltipValuesArray = []
+		requestPaint();
 	}
 
 	function clearLabels(){
