@@ -7,6 +7,7 @@ ControlBase {
 	id: checkBox;
 
 	decorator: Style.checkBoxDecorator
+	height: Style.itemSizeS;
 
 	property string text: "";
 

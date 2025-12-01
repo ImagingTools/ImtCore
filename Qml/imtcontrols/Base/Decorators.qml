@@ -469,7 +469,7 @@ StyleComponents {
 			id: checkBoxItem;
 
 			width: checkBoxText.text == "" ? checkRect.width : checkRect.width + checkBoxText.width + checkBoxItem.mainMargin;
-			height: Style.itemSizeS;
+			height: !baseElement ? 0 : baseElement.height
 
 			property var baseElement: null;
 
