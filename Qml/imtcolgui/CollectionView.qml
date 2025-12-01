@@ -356,6 +356,7 @@ Item {
 		
 		QtObject {
 			id: internal;
+			property bool updateGuiRequired: false
 			function filterMenuActivate(){
 				if (container.hasFilter){
 					// container.filterMenuVisible = !container.filterMenuVisible;
@@ -382,6 +383,13 @@ Item {
 		onDoubleClicked: {
 			root.onEdit(id, index)
 		}
+
+		onVisibleChanged: {
+			if (visible && internal.updateGuiRequired){
+				doUpdateGui()
+				internal.updateGuiRequired = false
+			}
+		}
 		
 		onFilterChanged: {
 			root.onFilterChanged(filterId, filterValue);
@@ -393,20 +401,24 @@ Item {
 
 		Component {
 			id: paramsSetComp
-			ParamsSet{
-
+			ParamsSet {
 			}
 		}
 
 		function doUpdateGui(){
+			if (!visible){
+				internal.updateGuiRequired = true
+				return
+			}
+
 			let count = -1;
 			let offset = 0;
-			
+
 			if (hasPagination){
 				count = pagination.countElements;
 				offset = pagination.currentIndex * count;
 			}
-			
+
 			if (dataController){
 				let documentFilter = null
 				if (documentCollectionFilter && !documentCollectionFilter.isEmpty()){

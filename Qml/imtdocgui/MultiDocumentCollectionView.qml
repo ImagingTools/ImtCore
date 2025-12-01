@@ -15,6 +15,9 @@ Item {
 
 	property ObjectVisualStatusProvider visualStatusProvider: null
 
+	signal startLoading(string documentId)
+	signal stopLoading(string documentId)
+
 	onCollectionViewChanged: {
 		if (collectionView){
 			collectionView.documentManager = documentManager
@@ -113,7 +116,7 @@ Item {
 		target: workspaceView.documentManager
 
 		function onStartGetOpenedDocumentList(){
-			loading.start()
+			globalLoading.start()
 		}
 
 		function onOpenedDocumentListReceived(documentInfoList){
@@ -136,20 +139,20 @@ Item {
 				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId)
 			}
 
-			loading.stop()
+			globalLoading.stop()
 		}
 
 		function onOpenedDocumentListReceiveFailed(message){
-			loading.stop()
+			globalLoading.stop()
 			ModalDialogManager.showErrorDialog(message)
 		}
 
 		function onDocumentGuiUpdated(documentId, representation){
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onStartUpdateRepresentation(documentId, representation){
-			loading.start()
+			workspaceView.startLoading(documentId)
 		}
 
 		function onDocumentRepresentationUpdated(documentId, representation){
@@ -175,57 +178,56 @@ Item {
 
 		// Open document signals
 		function onStartOpenDocument(documentId, typeId){
-			loading.start()
+			workspaceView.startLoading(documentId)
 		}
 
 		function onDocumentOpened(documentId, typeId){
-			// loading.stop()
-
 			tabView.addTab(documentId, "", stackViewComp, "", "", true)
 			tabView.currentIndex = tabView.tabModel.count - 1
 		}
 
 		function onOpenDocumentFailed(documentId, message){
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 			ModalDialogManager.showErrorDialog(message)
 		}
 
 		// Close document signals
 		function onStartCloseDocument(documentId){
-			loading.start()
+			workspaceView.startLoading(documentId)
 		}
 
 		function onDocumentClosed(documentId){
 			tabView.removeTab(documentId)
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onCloseDocumentFailed(documentId, message){
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 			ModalDialogManager.showErrorDialog(message)
+			onDocumentClosed(documentId)
 		}
 
 		// Save document signals
 		function onStartSaveDocument(documentId){
-			loading.start()
+			workspaceView.startLoading(documentId)
 		}
 
 		function onDocumentSaved(documentId){
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 		}
 
 		function onSaveDocumentFailed(documentId, message){
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 			ModalDialogManager.showErrorDialog(message)
 		}
 
 		// Create document signals
 		function onStartCreateDocument(documentTypeId){
-			loading.start()
+			// loading.start()
 		}
 
 		function onCreateDocumentFailed(documentTypeId, message){
-			loading.stop()
+			// loading.stop()
 			ModalDialogManager.showErrorDialog(message)
 		}
 
@@ -237,7 +239,7 @@ Item {
 
 			tabView.currentIndex = tabView.tabModel.count - 1
 
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 		}
 
 		// Undo info signals
@@ -250,13 +252,13 @@ Item {
 		}
 
 		function onUndoInfoReceiveFailed(documentId, message){
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 			ModalDialogManager.showErrorDialog(message)
 		}
 
 		// Undo signals
 		function onStartUndo(documentId, steps){
-			loading.start()
+			workspaceView.startLoading(documentId)
 		}
 
 		function onUndoDone(documentId){
@@ -264,13 +266,13 @@ Item {
 		}
 
 		function onUndoFailed(documentId, message){
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 			ModalDialogManager.showErrorDialog(message)
 		}
 
 		// Redo signals
 		function onStartRedo(documentId, steps){
-			loading.start()
+			workspaceView.startLoading(documentId)
 		}
 
 		function onRedoDone(documentId){
@@ -278,7 +280,7 @@ Item {
 		}
 
 		function onRedoFailed(documentId, message){
-			loading.stop()
+			workspaceView.stopLoading(documentId)
 			ModalDialogManager.showErrorDialog(message)
 		}
 
@@ -362,6 +364,7 @@ Item {
 	Component {
 		id: stackViewComp
 		StackView {
+			id: stackView
 			anchors.fill: parent
 
 			property string documentId
@@ -432,6 +435,31 @@ Item {
 					}
 				}
 			}
+
+			Connections {
+				target: workspaceView
+				function onStartLoading(documentId){
+					if (documentId !== stackView.documentId){
+						return
+					}
+
+					loading.start()
+				}
+				function onStopLoading(documentId){
+					if (documentId !== stackView.documentId){
+						return
+					}
+
+					loading.stop()
+				}
+			}
+
+			Loading {
+				id: loading
+				z: parent.z + 1
+				anchors.fill: parent
+				visible: false
+			}
 		}
 	}
 
@@ -465,7 +493,7 @@ Item {
 	}
 
 	Loading {
-		id: loading
+		id: globalLoading
 		anchors.top: parent.top
 		anchors.topMargin: Style.controlHeightL
 		anchors.left: parent.left

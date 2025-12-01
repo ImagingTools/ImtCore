@@ -263,10 +263,18 @@ Rectangle {
 	}
 
 	function setSortingInfo(headerId, sortOrder){
-		currentHeaderId = headerId;
-		currentSortOrder = sortOrder;
-		
-		sortingChanged(currentHeaderId, currentSortOrder);
+		currentHeaderId = headerId
+		currentSortOrder = sortOrder
+		sortingChanged(currentHeaderId, currentSortOrder)
+	}
+
+	function clearSortingInfo(beQiuet){
+		currentHeaderId = ""
+		currentSortOrder = ""
+
+		if (!beQiuet){
+			sortingChanged(currentHeaderId, currentSortOrder)
+		}
 	}
 
 	function setDecorators(){

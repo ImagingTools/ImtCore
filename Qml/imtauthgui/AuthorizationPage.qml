@@ -44,7 +44,7 @@ Rectangle {
 			passwordTextInput.text = "";
 			loginTextInput.text = "";
 
-			loginTextInput.focus = true;
+			loginTextInput.forceActiveFocus()
 		}
 	}
 

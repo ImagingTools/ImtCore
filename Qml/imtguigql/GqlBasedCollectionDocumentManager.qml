@@ -287,7 +287,7 @@ DocumentManagerBase {
 						root.closeDocumentFailed(root.closeDocumentRequest.documentId, qsTr("Invalid document-ID"))
 					}
 					else if (m_status === "Failed"){
-						root.closeDocumentFailed(root.closeDocumentRequest.documentId, qsTr("Save document failed"))
+						root.closeDocumentFailed(root.closeDocumentRequest.documentId, qsTr("Close document failed"))
 					}
 				}
 			}

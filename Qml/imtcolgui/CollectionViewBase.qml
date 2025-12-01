@@ -61,8 +61,17 @@ ViewBase {
 		target: collectionViewBaseContainer.collectionFilter
 		
 		function onFilterChanged(){
+			let sortingInfo = target.getSortingInfo()
+			if (sortingInfo){
+				tableInternal.setSortingInfo(sortingInfo.m_fieldId, sortingInfo.m_sortingOrder)
+			}
+
 			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
 			collectionViewBaseContainer.doUpdateGui()
+		}
+
+		function onCleared(beQiuet){
+			tableInternal.clearSortingInfo(beQiuet)
 		}
 	}
 	
