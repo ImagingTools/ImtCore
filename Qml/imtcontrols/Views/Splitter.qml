@@ -11,7 +11,7 @@ Rectangle {
 	property int type: 0x1;
 	property bool isPressed: false;
 	property int leftLimit: 0;
-	property int rightLimit: parent ? parent.widht - width : 1000000;
+	property int rightLimit: parent ? parent.width - width : 1000000;
 	property real leftLimitMargin: Style.spacingXXXL
 	property real rightLimitMargin: Style.spacingXXXL
 
