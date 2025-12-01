@@ -812,8 +812,31 @@ class Instruction {
                         if (i < tree[2].length - 1) stat.value.add(',')
                     }
 
+                    let ids = new Set()
+                    let context = new Set()
+
+                    for(let name of Object.keys(this.qmlFile.context)){
+                        let found = false
+
+                        if(tree[2].indexOf(name) >= 0){
+                            found = true
+                            break
+                        }
+
+                        for (let local of stat.local) {
+                            if (local.indexOf(name) >= 0) {
+                                found = true
+                                break
+                            }
+                        }
+                        if(!found){
+                            ids.add(name)
+                            context.add(`__self.__${this.qmlFile.getContextName()}.${name}`)
+                        } 
+                    }
+
                     stat.value.add(')')
-                    stat.value.add('{let __self=this;try{JQApplication.beginUpdate();')
+                    stat.value.add(`{let __self=this;let [${Array.from(ids).join(',')}] = [${Array.from(context).join(',')}];try{JQApplication.beginUpdate();`)
                     stat.local.push(local)
                     this.prepare(tree[3], stat)
                     let index = stat.local.indexOf(local)
@@ -1377,20 +1400,50 @@ class Instruction {
             }
             let args = this.getSignalArgs(signalName)
             connectedSignal.args = []
-            if (args)
-                for (let arg of args) {
-                    connectedSignal.args.push(arg.replaceAll('`', ''))
+
+            let ids = new Set()
+            let context = new Set()
+
+            if (args){
+                if(args.length){
+                    for (let arg of args) {
+                        connectedSignal.args.push(arg.replaceAll('`', ''))
+                    }
+
+                    for(let name of Object.keys(this.qmlFile.context)){
+                        if(connectedSignal.args.indexOf(name) < 0){
+                            ids.add(name)
+                            context.add(`__self.__${this.qmlFile.getContextName()}.${name}`)
+                        }
+                    }
+                } else {
+                    for(let name of Object.keys(this.qmlFile.context)){
+                        ids.add(name)
+                        context.add(`__self.__${this.qmlFile.getContextName()}.${name}`)
+                    }
                 }
+            } else {
+                for(let name of Object.keys(this.qmlFile.context)){
+                    ids.add(name)
+                    context.add(`__self.__${this.qmlFile.getContextName()}.${name}`)
+                }
+            }
+                
+
+            
+            
 
             if(signalName.indexOf('.') >= 0){
                 code.add(`'SLOT_${signalName}'(${connectedSignal.args.join(',')}){
                     let __self = this
+                    let [${Array.from(ids).join(',')}] = [${Array.from(context).join(',')}]
                     if(super['SLOT_${signalName}']) super['SLOT_${signalName}'](...arguments)
                     if(!this.__${this.className}__${this.name}) return
                     try{JQApplication.beginUpdate();`)
             } else {
                 code.add(`SLOT_${signalName}(${connectedSignal.args.join(',')}){
                     let __self = this
+                    let [${Array.from(ids).join(',')}] = [${Array.from(context).join(',')}]
                     if(super.SLOT_${signalName}) super.SLOT_${signalName}(...arguments)
                     if(!this.__${this.className}__${this.name}) return
                     try{JQApplication.beginUpdate();`)
