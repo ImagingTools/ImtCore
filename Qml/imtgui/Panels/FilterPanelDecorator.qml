@@ -270,7 +270,7 @@ DecoratorBase {
 		visible: filterPanelDecorator.canResetFilters
 		onClicked: {
 			if (filterPanelDecorator.complexFilter){
-				filterPanelDecorator.complexFilter.clearAllFilters()
+				filterPanelDecorator.complexFilter.clearAllFilters(true)
 				filterPanelDecorator.complexFilter.filterChanged()
 			}
 		}

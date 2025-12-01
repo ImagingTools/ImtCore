@@ -349,7 +349,7 @@ ComplexCollectionFilter{
 	*/
 	function clearSortFilter(){
 		if (hasSortingInfo()){
-			m_sortingInfo.clear()
+			removeSortingInfo()
 		}
 	}
 
