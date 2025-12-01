@@ -184,6 +184,12 @@ I_EXPORT_COMPONENT(
 			"Client request group info provider",
 			"Client Request Group Info Provider");
 
+I_EXPORT_COMPONENT(
+			ClientRequestTokenBasedPermissionsProvider,
+			"Client request token based permissions provider",
+			"Client Request Token Permissions Provider");
+
+
 } // namespace ImtAuthGqlPck
 
 

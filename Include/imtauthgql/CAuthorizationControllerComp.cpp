@@ -317,7 +317,7 @@ sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogo
 
 	response.Version_1_0.emplace();
 
-	sdl::imtauth::Authorization::CLogoutInput arguments = logoutRequest.GetRequestedArguments().input;
+	sdl::imtauth::Authorization::CTokenInput arguments = logoutRequest.GetRequestedArguments().input;
 
 	QByteArray accessToken = gqlContextPtr->GetToken();
 	if (m_jwtSessionControllerCompPtr.IsValid()){
@@ -329,6 +329,55 @@ sdl::imtauth::Authorization::CLogoutPayload CAuthorizationControllerComp::OnLogo
 	}
 
 	response.Version_1_0->ok = true;
+
+	return response;
+}
+
+
+sdl::imtauth::Authorization::CPermissionList CAuthorizationControllerComp::OnGetPermissions(
+			const sdl::imtauth::Authorization::CGetPermissionsGqlRequest& getPermissionsRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
+{
+	sdl::imtauth::Authorization::CPermissionList response;
+
+	if (!m_userCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Component 'UserCollection' was not set", "CAuthorizationControllerComp");
+		return response;
+	}
+
+	if (!m_jwtSessionControllerCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Component 'JwtSessionControlle' was not set", "CAuthorizationControllerComp");
+		return response;
+	}
+
+	sdl::imtauth::Authorization::CTokenInput arguments = getPermissionsRequest.GetRequestedArguments().input;
+	if (!arguments.Version_1_0.HasValue()){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	QByteArray token;
+	if (arguments.Version_1_0->accessToken.HasValue()){
+		token = *arguments.Version_1_0->accessToken;
+	}
+
+	QByteArray userId = m_jwtSessionControllerCompPtr->GetUserFromJwt(token);
+
+	const imtauth::IUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+	}
+
+	if (userInfoPtr == nullptr){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	response.Version_1_0.Emplace();
+	QByteArrayList permissions = userInfoPtr->GetPermissions();
+	response.Version_1_0->permissions.Emplace().FromList(permissions);
 
 	return response;
 }

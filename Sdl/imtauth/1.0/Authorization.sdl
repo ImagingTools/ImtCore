@@ -20,7 +20,7 @@ input AuthorizationInput {
 	productId: ID
 }
 
-input LogoutInput {
+input TokenInput {
 	accessToken: ID!
 }
 
@@ -28,11 +28,16 @@ type LogoutPayload {
 	ok: Boolean
 }
 
+type PermissionList {
+	permissions: [ID]!
+}
+
 type Query {
 	Authorization (input: AuthorizationInput): AuthorizationPayload!
 	UserToken (input: AuthorizationInput): AuthorizationPayload!
+	GetPermissions (input: TokenInput): PermissionList!
 }
 
 type Mutation {
-	Logout (input: LogoutInput): LogoutPayload!
+	Logout (input: TokenInput): LogoutPayload!
 }

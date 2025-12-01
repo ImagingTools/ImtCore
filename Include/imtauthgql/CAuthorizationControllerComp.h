@@ -53,6 +53,10 @@ protected:
 				const sdl::imtauth::Authorization::CLogoutGqlRequest& logoutRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
+	virtual sdl::imtauth::Authorization::CPermissionList OnGetPermissions(
+				const sdl::imtauth::Authorization::CGetPermissionsGqlRequest& getPermissionsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 	// reimplemented (imtservergql::CPermissibleGqlRequestHandlerComp)
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

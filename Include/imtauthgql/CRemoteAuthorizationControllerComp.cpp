@@ -36,6 +36,15 @@ sdl::imtauth::Authorization::CLogoutPayload CRemoteAuthorizationControllerComp::
 }
 
 
+sdl::imtauth::Authorization::CPermissionList CRemoteAuthorizationControllerComp::OnGetPermissions(
+			const sdl::imtauth::Authorization::CGetPermissionsGqlRequest& /*getPermissionsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::imtauth::Authorization::CPermissionList>(gqlRequest, errorMessage);
+}
+
+
 } // namespace imtauthgql
 
 
