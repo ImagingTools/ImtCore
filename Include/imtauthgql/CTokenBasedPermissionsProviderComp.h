@@ -1,9 +1,6 @@
 #pragma once
 
 
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
-
 // ImtCore includes
 #include <imtauth/ITokenBasedPermissionsProvider.h>
 #include <imtclientgql/TClientRequestManagerCompWrap.h>
@@ -13,7 +10,9 @@ namespace imtauthgql
 {
 
 
-class CTokenBasedPermissionsProviderComp: public imtclientgql::CClientRequestManagerCompBase, virtual public imtauth::ITokenBasedPermissionsProvider
+class CTokenBasedPermissionsProviderComp:
+			public imtclientgql::CClientRequestManagerCompBase,
+			virtual public imtauth::ITokenBasedPermissionsProvider
 {
 public:
 	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
