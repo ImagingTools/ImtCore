@@ -38,9 +38,7 @@ class AbstractItemModel {
 
         if(data){
             for(let key in data){
-                if(data[key] instanceof QObject){
-                    data[key].__addLink()
-                }
+                recursiveAddLink(data[key])
                 model[key] = data[key]
             }
         }
