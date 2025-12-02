@@ -20,7 +20,7 @@ class FileDialog extends Dialog {
         currentFile: { type: String, value: ''},
         currentFiles: { type: Var, value: undefined},
         fileMode: { type: Int, value: FileDialog.OpenFile},
-        file: { type: Var, value: undefined},
+        file: { type: Var, value: ''},
         files: { type: Var, value: undefined},
         options: { type: Var, value: undefined},
         rejectLabel: { type: String, value: ''},
