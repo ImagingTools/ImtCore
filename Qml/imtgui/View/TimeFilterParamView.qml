@@ -9,7 +9,7 @@ import imtbaseComplexCollectionFilterSdl 1.0
 
 PopupView {
 	id: root;
-	
+	objectName: "TimeFilterParamView"
 	width: 260;
 	height: content.height + 2 * Style.marginM;
 		
@@ -170,6 +170,7 @@ PopupView {
 						selected: mouseArea.containsMouse;
 						font.pixelSize: root.fontSize
 						visible: model.visible
+						objectName: model.unit + "_" + model.mode
 						onClicked: {
 							listView.currentIndex = model.index;
 
