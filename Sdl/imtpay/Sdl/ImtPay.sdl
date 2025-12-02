@@ -64,9 +64,15 @@ input ReceiptRequest {
 	viewParams: CollectionViewParams
 }
 
+type AbonentItem {
+	id: ID
+	name: String
+}
+
 type ReceiptItem {
 	receipt: Receipt!
 	date: Integer	#< UNIX TIME
+	abonents: [AbonentItem]
 }
 
 type ReceiptReply {
