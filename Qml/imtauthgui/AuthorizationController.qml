@@ -265,8 +265,7 @@ QtObject {
 	property GqlSdlRequestSender logoutGqlSender: GqlSdlRequestSender {
 		gqlCommandId: ImtauthAuthorizationSdlCommandIds.s_logout;
 		inputObjectComp: Component {
-			LogoutInput {
-			}
+			TokenInput {}
 		}
 		sdlObjectComp: Component {
 			LogoutPayload {
