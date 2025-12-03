@@ -26,6 +26,7 @@ QtObject {
 	property Component passwordParamEditorComp: Component {PasswordParamEditor {}}
 	property Component integerParamEditorComp: Component { IntegerParamEditor {}}
 	property Component doubleParamEditorComp: Component { DoubleParamEditor {}}
+	property Component constrainedDoubleParamEditorComp: Component { ConstrainedDoubleParamEditor{}}
 	property Component enableableParamEditorComp: Component { EnableableParamEditor {}}
 	property Component serverConnectionParamEditorComp: Component { ServerConnectionParamEditor {}}
 	
@@ -42,6 +43,7 @@ QtObject {
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_passwordParam, passwordParamEditorComp)
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_integerParam, integerParamEditorComp)
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_doubleParam, doubleParamEditorComp)
+		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_constrainedDoubleParam, constrainedDoubleParamEditorComp)
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_enableableParam, enableableParamEditorComp)
 		registerParamEditor(ParamTypeIdsTypeMetaInfo.s_serverConnectionParam, serverConnectionParamEditorComp)
 	}

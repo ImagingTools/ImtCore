@@ -41,7 +41,9 @@ type ParamTypeIds
 	ParamsSet: ID
 	FileNameParam: ID
 	IntegerParam: ID
+	ConstrainedIntegerParam: ID
 	DoubleParam: ID
+	ConstrainedDoubleParam: ID
 	PasswordParam: ID
 	EnableableParam: ID
 	ServerConnectionParam: ID
