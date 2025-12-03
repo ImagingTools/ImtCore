@@ -91,9 +91,23 @@ type IntegerParam
 	value: Integer
 }
 
+type ConstrainedIntegerParam
+{
+	value: Integer!
+	minValue: IntegerParam
+	maxValue: IntegerParam
+}
+
 type DoubleParam
 {
 	value: Double
+}
+
+type ConstrainedDoubleParam
+{
+	value: Double!
+	minValue: DoubleParam
+	maxValue: DoubleParam
 }
 
 type Option
