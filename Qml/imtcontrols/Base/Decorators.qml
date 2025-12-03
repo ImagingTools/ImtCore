@@ -687,14 +687,14 @@ StyleComponents {
 									anchors.bottom: parent.bottom;
 									height: majorTickRow.height //- tickTextLeft.height;
 									width: majorTickRow.delegateWidth;
-									color: Style.borderColor;
+									color: Style.borderColor2;
 
 									BaseText{
 										id: tickTextLeft;
 
 										anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-										anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
+										anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height - 2: 0
 
 										anchors.horizontalCenter: parent.horizontalCenter;
 
@@ -710,7 +710,7 @@ StyleComponents {
 									anchors.bottom: parent.bottom;
 									height: majorTickRow.height //- tickTextRight.height;
 									width: majorTickRow.delegateWidth;
-									color: Style.borderColor;
+									color: Style.borderColor2;
 									visible: model.index == majorTickRepeater.count -1;
 
 									BaseText{
@@ -718,7 +718,7 @@ StyleComponents {
 
 										anchors.top: !sliderItem.baseElement ? undefined : sliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-										anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
+										anchors.topMargin: !sliderItem.baseElement ? 0 : (sliderItem.baseElement.ticksPosition == RelativePosition.top || sliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height  - 2 : 0
 										anchors.horizontalCenter: parent.horizontalCenter;
 
 										font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
@@ -760,7 +760,7 @@ StyleComponents {
 									anchors.leftMargin: -width/2
 									height: minorTickRow.height;
 									width: minorTickRow.delegateWidth;
-									color: Style.borderColor;
+									color: Style.borderColor2;
 
 								}
 								Rectangle{
@@ -768,7 +768,7 @@ StyleComponents {
 									anchors.rightMargin: -width/2
 									height: minorTickRow.height;
 									width: minorTickRow.delegateWidth;
-									color: Style.borderColor;
+									color: Style.borderColor2;
 									visible: model.index == minorTickRepeater.count -1;
 								}
 							}
@@ -804,7 +804,7 @@ StyleComponents {
 						anchors.horizontalCenter: controlRec.horizontalCenter;
 
 						anchors.bottom: controlRec.bottom;
-						anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRec.height : 0;
+						anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height - 2 + controlRec.height : 0;
 
 						height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorHeight;
 						width: 2;
@@ -827,7 +827,7 @@ StyleComponents {
 
 								anchors.horizontalCenter: parent.horizontalCenter;
 								anchors.bottom: parent.bottom;
-								anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height : 0;
+								anchors.bottomMargin: !sliderItem.baseElement ? 0 : sliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? - height - 2 : 0;
 
 								font.pixelSize: !sliderItem.baseElement ? Style.fontSizeM : sliderItem.baseElement.fontSize
 
@@ -923,11 +923,11 @@ StyleComponents {
 
 									height: majorTickRow.height;
 									width: majorTickRow.delegateWidth;
-									color: Style.borderColor;
+									color: Style.borderColor2;
 									BaseText{
 										anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-										anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
+										anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height - 2 : 0
 
 										anchors.horizontalCenter: parent.horizontalCenter;
 
@@ -944,12 +944,12 @@ StyleComponents {
 									height: majorTickRow.height;
 									width: majorTickRow.delegateWidth;
 
-									color: Style.borderColor;
+									color: Style.borderColor2;
 									visible: model.index == majorTickRepeater.count -1;
 									BaseText{
 										anchors.top: !rangeSliderItem.baseElement ? undefined : rangeSliderItem.baseElement.ticksPosition == RelativePosition.bottom ? parent.bottom : parent.top;
 
-										anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height : 0
+										anchors.topMargin: !rangeSliderItem.baseElement ? 0 : (rangeSliderItem.baseElement.ticksPosition == RelativePosition.top || rangeSliderItem.baseElement.ticksPosition == RelativePosition.verticalCenter)? -height - 2 : 0
 
 										anchors.horizontalCenter: parent.horizontalCenter;
 
@@ -994,7 +994,7 @@ StyleComponents {
 									anchors.leftMargin: -width/2
 									height: minorTickRow.height;
 									width: minorTickRow.delegateWidth;
-									color: Style.borderColor;
+									color: Style.borderColor2;
 
 								}
 								Rectangle{
@@ -1002,7 +1002,7 @@ StyleComponents {
 									anchors.rightMargin: -width/2
 									height: minorTickRow.height;
 									width: minorTickRow.delegateWidth;
-									color: Style.borderColor;
+									color: Style.borderColor2;
 									visible: model.index == minorTickRepeater.count -1;
 								}
 							}
@@ -1040,7 +1040,7 @@ StyleComponents {
 
 						anchors.horizontalCenter: controlRecFirst.horizontalCenter;
 						anchors.bottom: controlRecFirst.bottom;
-						anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRecFirst.height : 0;
+						anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height - 2 + controlRecFirst.height : 0;
 
 						height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorHeight;
 						width: 2;
@@ -1086,7 +1086,7 @@ StyleComponents {
 
 						anchors.horizontalCenter: controlRecSecond.horizontalCenter;
 						anchors.bottom: controlRecSecond.bottom;
-						anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height + controlRecSecond.height : 0;
+						anchors.bottomMargin: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorPosition == RelativePosition.bottom ? -height - 2 + controlRecSecond.height : 0;
 
 						height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.indicatorHeight;
 						width: 2;
