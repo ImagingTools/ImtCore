@@ -24,6 +24,7 @@ public:
 		CF_DOCUMENT_CHANGED,
 		CF_DOCUMENT_UNDO_CHANGED,
 		CF_DOCUMENT_SAVED,
+		CF_DOCUMENT_SAVED_AS,
 		CF_DOCUMENT_CLOSED
 	};
 
@@ -86,6 +87,9 @@ public:
 	static const QByteArray CN_DOCUMENT_SAVED;
 	typedef DocumentNotification DocumentSavedInfo;
 
+	static const QByteArray CN_DOCUMENT_SAVED_AS;
+	typedef DocumentNotification DocumentSavedAsInfo;
+
 	static const QByteArray CN_DOCUMENT_CLOSED;
 	typedef DocumentClosedNotification DocumentClosedInfo;
 
@@ -104,7 +108,7 @@ public:
 	virtual const istd::IChangeable* GetDocumentPtr(const QByteArray& userId, const QByteArray& documentId) const = 0;
 	virtual OperationStatus GetDocumentData(const QByteArray & userId, const QByteArray & documentId, istd::IChangeableSharedPtr& documentPtr) const = 0;
 	virtual OperationStatus SetDocumentData(const QByteArray& userId, const QByteArray& documentId, const istd::IChangeable& document) = 0;
-	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
+	virtual OperationStatus SaveDocument(const QByteArray& userId, const QByteArray& documentId, const QString& documentName) = 0;
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
 	virtual OperationStatus GetDocumentUndoManager(
 		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const = 0;

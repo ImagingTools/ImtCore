@@ -186,7 +186,13 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentName(co
 		return retVal;
 	}
 
-	QByteArray objectId = m_userDocuments[userId][documentId].objectId;
+	WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
+
+	if (workingDocument.documentName == documentName){
+		return OS_OK;
+	}
+
+	QByteArray objectId = workingDocument.objectId;
 	if (!objectId.isEmpty()){
 		imtbase::IObjectCollection* collectionPtr = GetCollection();
 		if (collectionPtr == nullptr){
@@ -198,6 +204,8 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentName(co
 		}
 	}
 
+	workingDocument.documentName = documentName;
+
 	DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
 	Q_ASSERT(notificationPtr != nullptr);
 	if (notificationPtr != nullptr){
@@ -205,8 +213,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentName(co
 		changeSet.SetChangeInfo(CN_DOCUMENT_RENAMED, QVariant::fromValue(*notificationPtr));
 		istd::CChangeNotifier notifier(this, &changeSet);
 	}
-
-	m_userDocuments[userId][documentId].documentName = documentName;
 
 	return OS_OK;
 }
@@ -252,12 +258,26 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentData(co
 		return retVal;
 	}
 
-	return m_userDocuments[userId][documentId].objectPtr->CopyFrom(document) ? OS_OK : OS_FAILED;
+	bool res = m_userDocuments[userId][documentId].objectPtr->CopyFrom(document);
+
+	if (res) {
+		DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
+		Q_ASSERT(notificationPtr != nullptr);
+		if (notificationPtr != nullptr){
+			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
+			changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
+			istd::CChangeNotifier notifier(this, &changeSet);
+		}
+
+		return OS_OK;
+	}
+
+	return OS_FAILED;
 }
 
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
-	const QByteArray& userId, const QByteArray& documentId)
+	const QByteArray& userId, const QByteArray& documentId, const QString& documentName)
 {
 	OperationStatus retVal;
 
@@ -275,6 +295,32 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
 
 	if (!workingDocument.objectId.isEmpty()) {
+		// Create copy of the object
+		if (!documentName.isEmpty() && workingDocument.documentName != documentName){
+			QByteArray newObjectId = collectionPtr->InsertNewObject(workingDocument.objectTypeId, documentName, "", workingDocument.objectPtr.GetPtr());
+
+			if (newObjectId.isEmpty()){
+				return OS_FAILED;
+			}
+
+			workingDocument.objectId = newObjectId;
+			workingDocument.documentName = documentName;
+			workingDocument.isDirty = false;
+
+			DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
+			Q_ASSERT(notificationPtr != nullptr);
+			if (notificationPtr != nullptr){
+				istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_SAVED_AS);
+				changeSet.SetChangeInfo(CN_DOCUMENT_SAVED_AS, QVariant::fromValue(*notificationPtr));
+				istd::CChangeNotifier notifier(this, &changeSet);
+			}
+
+			workingDocument.undoManagerPtr->StoreDocumentState();
+
+			return OS_OK;
+		}
+
+		// Update object
 		bool res = collectionPtr->SetObjectData(workingDocument.objectId, *workingDocument.objectPtr);
 
 		if (res){
@@ -294,10 +340,16 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 		return res ? OS_OK : OS_FAILED;
 	}
 
+	// Create new object
+	if (documentName.isEmpty()){
+		return OS_FAILED;
+	}
+
 	workingDocument.objectId =
 		collectionPtr->InsertNewObject(workingDocument.objectTypeId, workingDocument.documentName, "", workingDocument.objectPtr.GetPtr());
 
 	if (!workingDocument.objectId.isEmpty()){
+		workingDocument.documentName = documentName;
 		workingDocument.isDirty = false;
 
 		DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);

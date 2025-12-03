@@ -233,8 +233,8 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerComp::OnSaveDocument(
 	const auto& arguments = saveDocumentRequest.GetRequestedArguments();
 	const auto& info = saveDocumentRequest.GetRequestInfo();
 
-	auto documentId = arguments.input.Version_1_0;
-	if (!documentId || !documentId->id){
+	auto saveDocumentInput = arguments.input.Version_1_0;
+	if (!saveDocumentInput || !saveDocumentInput->documentId || !saveDocumentInput->documentName){
 		errorMessage = "Invalid GQL request params";
 
 		return retVal;
@@ -249,7 +249,8 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerComp::OnSaveDocument(
 
 	retVal.Version_1_0.emplace();
 
-	OperationStatus status = GetNonConstThis()->SaveDocument(userId, *documentId->id);
+	OperationStatus status = GetNonConstThis()->SaveDocument(
+		userId, *saveDocumentInput->documentId, *saveDocumentInput->documentName);
 	switch (status){
 	case imtdoc::IDocumentManager::OS_OK:
 		retVal.Version_1_0->status = CDM::EDocumentOperationStatus::Success;

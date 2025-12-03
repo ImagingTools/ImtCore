@@ -11,6 +11,7 @@ const QByteArray IDocumentManager::CN_DOCUMENT_RENAMED = QByteArrayLiteral("imtd
 const QByteArray IDocumentManager::CN_DOCUMENT_CHANGED = QByteArrayLiteral("imtdoc:IDocumentManager::DocumentChanged");
 const QByteArray IDocumentManager::CN_DOCUMENT_UNDO_CHANGED = QByteArrayLiteral("imtdoc:IDocumentManager::DocumentUndoChanged");
 const QByteArray IDocumentManager::CN_DOCUMENT_SAVED = QByteArrayLiteral("imtdoc:IDocumentManager::DocumentSaved");
+const QByteArray IDocumentManager::CN_DOCUMENT_SAVED_AS = QByteArrayLiteral("imtdoc:IDocumentManager::DocumentSavedAs");
 const QByteArray IDocumentManager::CN_DOCUMENT_CLOSED = QByteArrayLiteral("imtdoc:IDocumentManager::DocumentClosed");
 
 

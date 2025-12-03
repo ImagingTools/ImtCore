@@ -35,12 +35,12 @@ type CollectionId {
 }
 
 type ObjectId {
-        collectionId: ID
+	collectionId: ID
 	id: ID!
 }
 
 type DocumentId {
-        collectionId: ID
+	collectionId: ID
 	id: ID!
 }
 
@@ -57,7 +57,7 @@ type DocumentList {
 }
 
 type DocumentTypeId {
-        collectionId: ID
+	collectionId: ID
 	typeId: ID!
 }
 
@@ -68,7 +68,7 @@ type DocumentManagerNotification {
 }
 
 type SetDocumentNameInput {
-        collectionId: ID
+	collectionId: ID
 	documentId: ID!
 	documentName: String!
 }
@@ -76,6 +76,12 @@ type SetDocumentNameInput {
 type CollectionUndoRedoInput {
 	collectionId: ID
 	undoRedoInput: UndoRedoInput!
+}
+
+type SaveDocumentInput {
+	collectionId: ID
+	documentId: ID!
+	documentName: String!
 }
 
 type Query {
@@ -88,7 +94,7 @@ type Mutation {
 	CreateNewDocument(input: DocumentTypeId): DocumentId!
 	OpenDocument(input: ObjectId): DocumentId!
 	SetDocumentName(input: SetDocumentNameInput): DocumentOperationStatus!
-	SaveDocument(input: DocumentId): DocumentOperationStatus!
+	SaveDocument(input: SaveDocumentInput): DocumentOperationStatus!
 	CloseDocument(input: DocumentId): DocumentOperationStatus!
 	DoUndo(input: CollectionUndoRedoInput): UndoStatus!
 	DoRedo(input: CollectionUndoRedoInput): UndoStatus!
