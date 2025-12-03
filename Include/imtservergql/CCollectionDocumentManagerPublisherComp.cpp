@@ -134,6 +134,7 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 
 		userId = notification.userId;
 
+		sdlNotificationV1.documentName = notification.documentName;
 		sdlNotificationV1.documentId = notification.documentId;
 		sdlNotificationV1.objectId = notification.objectId;
 	}
@@ -143,6 +144,7 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 
 		userId = notification.userId;
 
+		sdlNotificationV1.documentName = notification.documentId;
 		sdlNotificationV1.documentId = notification.documentId;
 	}
 	else{

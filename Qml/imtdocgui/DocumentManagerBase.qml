@@ -35,6 +35,7 @@ QtObject {
 	signal resetUndoDone(string documentId)
 	signal resetUndoFailed(string documentId, string message)
 
+	signal requestDocumentName(string documentId, string typeId)
 	signal documentNameChanged(string documentId, string oldName, string newName)
 	signal documentIsDirtyChanged(string documentId, bool isDirty)
 
@@ -43,8 +44,7 @@ QtObject {
 	signal undoInfoReceiveFailed(string documentId, string message)
 
 	// typeOperation: NewDocumentCreated, DocumentOpened, DocumentChanged, DocumentSaved, DocumentClosed
-	// hasChanges - has document changes
-	signal documentManagerChanged(string typeOperation, string objectId, string documentId)
+	signal documentManagerChanged(string typeOperation, string objectId, string documentId, string documentName)
 	signal startUpdateRepresentation(string documentId, var representation)
 	signal documentRepresentationUpdated(string documentId, var representation)
 	signal documentGuiUpdated(string documentId, var representation)
@@ -252,8 +252,11 @@ QtObject {
 	}
 
 	function setDocumentName(documentId, name){
+		console.log("setDocumentName", documentId, name)
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
+			console.log("set cachedDocumentNames", documentId, name)
+			__internal.cachedDocumentNames[documentId] = name
 			return ""
 		}
 
@@ -354,6 +357,7 @@ QtObject {
 	property QtObject __internal: QtObject {
 		property var documentTypeEditors: ({}) // DocumentTypeId -> [{View Type 1}, {View Type 2}]
 		property var openedDocuments: [] // Array of objects {id, name, model, view, isDirty}
+		property var cachedDocumentNames: ({}) // DocumentId -> Name
 
 		property Component documentDataFactory: Component{ 
 			QtObject{
@@ -367,6 +371,7 @@ QtObject {
 				property var views: ({})
 				property DocumentDecorator documentDecorator: DocumentDecorator {
 					documentId: documentData.id
+					documentName: documentData.name
 					documentTypeId: documentData.typeId
 					documentManager: root
 					onViewRegistered: {
@@ -402,6 +407,11 @@ QtObject {
 			let documentData = documentDataFactory.createObject(root)
 			documentData.id = id
 			documentData.typeId = typeId
+
+			if (id in root.__internal.cachedDocumentNames){
+				documentData.name = root.__internal.cachedDocumentNames[id]
+				delete root.__internal.cachedDocumentNames[id]
+			}
 
 			if (!isNew){
 				isNew = false

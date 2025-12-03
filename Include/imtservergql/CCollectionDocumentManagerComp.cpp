@@ -27,6 +27,7 @@ CDM::CDocumentList CCollectionDocumentManagerComp::OnGetOpenedDocumentList(
 			sdlInfo.Version_1_0.emplace();
 
 			sdlInfo.Version_1_0->documentId = info.documentId;
+			sdlInfo.Version_1_0->documentName = info.documentName;
 			sdlInfo.Version_1_0->objectId = info.objectId;
 			sdlInfo.Version_1_0->objectTypeId = info.objectTypeId;
 			sdlInfo.Version_1_0->isDirty = info.isDirty;

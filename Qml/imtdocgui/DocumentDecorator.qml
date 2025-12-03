@@ -6,6 +6,7 @@ QtObject {
 	id: root
 
 	property string documentId
+	property string documentName
 	property string documentTypeId
 	property var documentManager: null
 
@@ -79,6 +80,19 @@ QtObject {
 
 			if (typeOperation === EDocumentOperationEnum.s_documentChanged){
 				root.updateRepresentationForAllViews()
+			}
+		}
+
+		function onDocumentNameChanged(documentId, oldName, newName){
+			if (documentId !== root.documentId){
+				return
+			}
+
+			root.documentName = newName
+
+			if (root._internal.saveRequested){
+				root._internal.saveRequested = false
+				root.onSave()
 			}
 		}
 	}
@@ -184,7 +198,13 @@ QtObject {
 			return
 		}
 
-		documentManager.saveDocument(documentId)
+		if (documentName.length === 0){
+			_internal.saveRequested = true
+			documentManager.requestDocumentName(documentId, documentTypeId)
+		}
+		else{
+			documentManager.saveDocument(documentId, documentName)
+		}
 	}
 
 	function updateRepresentationForAllViews(){
@@ -209,5 +229,6 @@ QtObject {
 
 	property QtObject _internal: QtObject {
 		property var requestUpdateViews: []
+		property bool saveRequested: false
 	}
 }

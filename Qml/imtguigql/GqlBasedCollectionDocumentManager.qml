@@ -15,12 +15,11 @@ DocumentManagerBase {
 		}
 
 		onMessageReceived: {
-			console.log("Document Manager onMessageReceived")
 			let objectId = data.getData("objectId")
 			let documentId = data.getData("documentId")
+			let documentName = data.getData("documentName")
 			let operation = data.getData("documentOperation")
-
-			root.documentManagerChanged(operation, objectId, documentId)
+			root.documentManagerChanged(operation, objectId, documentId, documentName)
 		}
 	}
 
@@ -78,14 +77,15 @@ DocumentManagerBase {
 		createDocumentRequest.send(documentTypeIdInput)
 	}
 
-	function saveDocument(documentId){
+	function saveDocument(documentId, documentName){
 		startSaveDocument(documentId)
 
-		documentIdInput.m_id = documentId
-		documentIdInput.m_collectionId = collectionId
+		saveDocumentInput.m_documentId = documentId
+		saveDocumentInput.m_documentName= documentName
+		saveDocumentInput.m_collectionId = collectionId
 		saveDocumentRequest.documentId = documentId
 
-		saveDocumentRequest.send(documentIdInput)
+		saveDocumentRequest.send(saveDocumentInput)
 	}
 
 	function closeDocument(documentId){
@@ -175,6 +175,7 @@ DocumentManagerBase {
 	property CollectionId collectionIdInput: CollectionId {}
 	property ObjectId objectIdInput: ObjectId {}
 	property DocumentId documentIdInput: DocumentId {}
+	property SaveDocumentInput saveDocumentInput: SaveDocumentInput {}
 	property DocumentTypeId documentTypeIdInput: DocumentTypeId {}
 	property CollectionUndoRedoInput collectionUndoRedoInput: CollectionUndoRedoInput {}
 	property UndoRedoInput undoRedoInput: UndoRedoInput {}

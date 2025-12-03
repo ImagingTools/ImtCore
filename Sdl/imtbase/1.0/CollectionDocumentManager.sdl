@@ -64,6 +64,7 @@ type DocumentTypeId {
 type DocumentManagerNotification {
 	documentOperation: EDocumentOperation!
 	documentId: ID!
+	documentName: String!
 	objectId: ID
 }
 

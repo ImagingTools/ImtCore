@@ -41,6 +41,7 @@ IDocumentManager::DocumentList CCollectionDocumentManager::GetOpenedDocumentList
 			DocumentInfo info;
 			info.documentId = id;
 			info.objectId = workingDocument.objectId;
+			info.documentName = workingDocument.documentName;
 			info.objectTypeId = workingDocument.objectTypeId;
 			info.isDirty = workingDocument.isDirty;
 
@@ -146,6 +147,7 @@ QByteArray CCollectionDocumentManager::OpenDocument(const QByteArray& userId, co
 				istd::CChangeNotifier notifier(this, &changeSet);
 
 				document.objectId = objectId;
+				document.documentName = info.documentName;
 				document.objectTypeId = objectTypeId;
 				document.objectPtr = dataPtr;
 				document.undoManagerPtr = undoManagerPtr;

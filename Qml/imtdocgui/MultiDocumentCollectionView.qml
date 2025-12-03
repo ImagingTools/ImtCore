@@ -111,9 +111,27 @@ Item {
 		}
 	}
 
+	Component {
+		id: inputDialogComp
+		InputDialog {
+			title: qsTr("Document Name")
+			placeHolderText: qsTr("Enter the document name")
+			property string documentId
+			onFinished: {
+				if (buttonId === Enums.ok){
+					workspaceView.documentManager.setDocumentName(documentId, inputValue)
+				}
+			}
+		}
+	}
+
 	Connections {
 		id: connections
 		target: workspaceView.documentManager
+
+		function onRequestDocumentName(documentId, documentTypeId){
+			ModalDialogManager.openDialog(inputDialogComp, {documentId: documentId})
+		}
 
 		function onStartGetOpenedDocumentList(){
 			globalLoading.start()
@@ -124,6 +142,7 @@ Item {
 				let documentInfo = documentInfoList.get(i).item
 				let objectId = documentInfo.m_objectId
 				let documentId = documentInfo.m_documentId
+				let documentName = documentInfo.m_documentName
 				let objectTypeId = documentInfo.m_objectTypeId
 				let isDirty = documentInfo.m_isDirty
 
@@ -131,12 +150,12 @@ Item {
 					workspaceView.documentManager.documentCreated(documentId, objectTypeId)
 				}
 				else{
-					workspaceView.updateDocumentName(objectId, documentId)
+					workspaceView.documentManager.setDocumentName(documentId, documentName)
 					workspaceView.documentManager.documentOpened(documentId, objectTypeId)
 				}
 
 				workspaceView.documentManager.getUndoInfo(documentId)
-				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId)
+				workspaceView.documentManager.documentManagerChanged(EDocumentOperationEnum.s_documentChanged, objectId, documentId, documentName)
 			}
 
 			globalLoading.stop()
@@ -159,12 +178,12 @@ Item {
 			// loading.stop()
 		}
 
-		function onDocumentManagerChanged(typeOperation, objectId, documentId, hasChanges){
+		function onDocumentManagerChanged(typeOperation, objectId, documentId, documentName){
 			if (typeOperation === EDocumentOperationEnum.s_documentClosed){
 				tabView.removeTab(documentId)
 			}
 			else if (typeOperation === EDocumentOperationEnum.s_documentOpened || typeOperation === EDocumentOperationEnum.s_documentSaved){
-				workspaceView.updateDocumentName(objectId, documentId)
+				workspaceView.documentManager.setDocumentName(documentId, documentName)
 			}
 		}
 
@@ -182,8 +201,9 @@ Item {
 		}
 
 		function onDocumentOpened(documentId, typeId){
-			tabView.addTab(documentId, "", stackViewComp, "", "", true)
+			tabView.addTab(documentId, "", stackViewComp, "", "", false)
 			tabView.currentIndex = tabView.tabModel.count - 1
+			workspaceView.updateTabName(documentId)
 		}
 
 		function onOpenDocumentFailed(documentId, message){
@@ -223,19 +243,14 @@ Item {
 
 		// Create document signals
 		function onStartCreateDocument(documentTypeId){
-			// loading.start()
 		}
 
 		function onCreateDocumentFailed(documentTypeId, message){
-			// loading.stop()
 			ModalDialogManager.showErrorDialog(message)
 		}
 
 		function onDocumentCreated(documentId, documentTypeId){
-			// let documentEditorComp = workspaceView.documentManager.getDocumentEditorFactory(documentTypeId)
-			let defaultName = workspaceView.documentManager.getDefaultDocumentName()
-			workspaceView.documentManager.setDocumentName(documentId, defaultName)
-			tabView.addTab(documentId, defaultName, stackViewComp, "", "", false)
+			tabView.addTab(documentId, "", stackViewComp, "", "", false)
 
 			tabView.currentIndex = tabView.tabModel.count - 1
 
@@ -310,7 +325,7 @@ Item {
 	}
 
 	function setCollectionViewComp(name, collectionViewComp){
-		tabView.addTab(UuidGenerator.generateUUID(), name, collectionViewComp)
+		tabView.addTab(UuidGenerator.generateUUID(), name, collectionViewComp, false)
 		tabView.currentIndex = 0
 	}
 
