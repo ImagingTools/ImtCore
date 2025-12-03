@@ -459,6 +459,8 @@ Item {
 				z: parent.z + 1
 				anchors.fill: parent
 				visible: false
+
+				opacity: 0
 			}
 		}
 	}
