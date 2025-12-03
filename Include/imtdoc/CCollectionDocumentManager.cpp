@@ -341,10 +341,6 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 	}
 
 	// Create new object
-	if (documentName.isEmpty()){
-		return OS_FAILED;
-	}
-
 	workingDocument.objectId =
 		collectionPtr->InsertNewObject(workingDocument.objectTypeId, workingDocument.documentName, "", workingDocument.objectPtr.GetPtr());
 
