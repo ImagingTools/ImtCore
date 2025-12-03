@@ -1473,7 +1473,17 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 		schemaPrefix = QString("%1.").arg(qPrintable(*m_tableSchemaAttrPtr));
 	}
 
-	return QString("SELECT * FROM %0\"%1\" as root WHERE (%2) AND \"%3\" = '%4' ORDER BY %5 DESC;")
+	return QString(R"(
+			SELECT root.*, root1."TimeStamp" as "Added"
+			FROM %0 "%1" as root
+			LEFT JOIN LATERAL (
+				SELECT *
+				FROM "%1" AS root1
+				WHERE root."%3" = root1."%3" 
+					AND %5 = 1
+				LIMIT 1
+			) AS root1 ON true
+			WHERE (%2) AND root."%3" = '%4' ORDER BY %5 DESC;)")
 			.arg(
 				schemaPrefix,
 				QString::fromUtf8(*m_tableNameAttrPtr),
