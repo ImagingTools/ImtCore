@@ -15,8 +15,8 @@ ControlBase {
 
 	property real _backgroundWidth: mainSize - controlWidth;
 	property int backgroundHeight: 6;
-	property string backgroundColor: Style.selectedColor//"#ffc0cb";
-	property string controlColor:  Style.imaginToolsAccentColor//"#CB4154";
+	property string backgroundColor: Style.backgroundColor//Style.selectedColor
+	property string controlColor:  Style.imaginToolsAccentColor
 
 	property real backgroundOpacity: 1.;
 
@@ -53,7 +53,7 @@ ControlBase {
 	property int ticksPosition: RelativePosition.verticalCenter;
 	property int indicatorPosition: RelativePosition.top
 	property real controlCenterY: secondSize/2;
-	property int fontSize: Style.fontSizeM;
+	property int fontSize: Style.fontSizeXXS;
 
 	property alias tooltipText: tooltip.text;
 	property alias tooltipItem: tooltip;
