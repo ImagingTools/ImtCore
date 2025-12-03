@@ -61,6 +61,11 @@ FocusScope {
 			if (event.key === Qt.Key_Escape){
 				containerTextField.cancelled();
 			}
+			else if (event.key === Qt.Key_Delete && textField.selectedText !== ""){
+				textField.remove(textField.selectionStart, textField.selectionEnd);
+
+				containerTextField.editingFinished();
+			}
 		}
 	}
 
@@ -168,6 +173,7 @@ FocusScope {
 		}
 	}
 	
+
 	TextInput {
 		id: textField;
 		objectName: "TextInput"
