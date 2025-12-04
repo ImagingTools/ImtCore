@@ -107,14 +107,45 @@ Item {
 				centerCommands.hasHiddenCommands() ||
 				rightCommands.hasHiddenCommands();
 	}
+
+	function computeMaxWidth(role, left, center, right, full) {
+		let hasLeft = left > 0;
+		let hasCenter = center > 0;
+		let hasRight = right > 0;
+		let visible = (hasLeft ? 1 : 0) + (hasCenter ? 1 : 0) + (hasRight ? 1 : 0);
 	
+		// Left || Center || Right
+		if (visible === 1)
+			return full;
+	
+		// Left && Center && Right
+		if (visible === 3) {
+			if (role === "center") return full * 0.4;
+			return full * 0.3;
+		}
+	
+		// Center && (Left || Right)
+		if (hasCenter) {
+			if (role === "center") return full * 0.4
+			return full * 0.3
+		}
+	
+		// (Left && Right)
+		return full * 0.5;
+	}
+
 	CommandsView {
 		id: leftCommands;
 		anchors.left: parent.left;
 		anchors.leftMargin: Style.marginM;
-		maximumWidth: (centerCommands.commandsCount > 0 ?
-						   centerCommands.x :
-						   rightCommands.commandsCount > 0 ? rightCommands.x : commandsItem.width) - button.width - leftCommands.anchors.leftMargin;
+		maximumWidth: commandsItem.computeMaxWidth(
+			"left",
+			leftCommands.visibleCommandsCount,
+			centerCommands.visibleCommandsCount,
+			rightCommands.visibleCommandsCount,
+			commandsItem.width
+		)
+
 		visible: !timer.running
 		onCommandActivated: {
 			commandsItem.commandActivated(commandId, params);
@@ -128,9 +159,14 @@ Item {
 	CommandsView {
 		id: centerCommands;
 		anchors.horizontalCenter: parent.horizontalCenter;
-		maximumWidth: (rightCommands.commandsCount > 0 ?
-						   rightCommands.x - centerCommands.x - (button.visible ? button.width : 0):
-						   commandsItem.width - centerCommands.x) - button.width;
+		maximumWidth: commandsItem.computeMaxWidth(
+			"center",
+			leftCommands.visibleCommandsCount,
+			centerCommands.visibleCommandsCount,
+			rightCommands.visibleCommandsCount,
+			commandsItem.width
+		)
+
 		visible: !timer.running
 		onCommandActivated: {
 			commandsItem.commandActivated(commandId, params);
@@ -145,7 +181,14 @@ Item {
 		id: rightCommands;
 		anchors.right: button.left;
 		anchors.rightMargin: Style.marginM;
-		maximumWidth: (commandsItem.width - (centerCommands.x + centerCommands.contentWidth)) - button.width;
+		maximumWidth: commandsItem.computeMaxWidth(
+			"right",
+			leftCommands.visibleCommandsCount,
+			centerCommands.visibleCommandsCount,
+			rightCommands.visibleCommandsCount,
+			commandsItem.width
+		)
+
 		visible: !timer.running
 		onCommandActivated: {
 			commandsItem.commandActivated(commandId, params);

@@ -33,7 +33,8 @@ Item {
 	property string negativeAccentColor: Style.errorTextColor;
 	
 	property alias commandsCount: repeater.count;
-	
+	property int visibleCommandsCount: commandsCount
+
 	// params["x"] = X coord click
 	// params["y"] = Y coord click
 	// params["target"] = button reference
@@ -82,6 +83,8 @@ Item {
 			}
 		}
 
+		visibleCommandsCount = 0
+		
 		for (let i = 0; i < priorityElements.length; i++) {
 			let item = priorityElements[i];
 			if (!item.element || item.priority < 0)
@@ -93,6 +96,7 @@ Item {
 			
 			if (projectedWidth <= maxWidth) {
 				item.hidden = false
+				visibleCommandsCount++
 				totalWidth = projectedWidth;
 			}
 			else {
