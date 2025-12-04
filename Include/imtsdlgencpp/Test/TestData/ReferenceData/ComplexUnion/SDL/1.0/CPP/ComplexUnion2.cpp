@@ -15247,8 +15247,19 @@ bool CResultObject::hasGeometry()
 
 
 void CResultObject::createGeometry()
-{	Version_1_0->Geometry.emplace();
+{
+	Version_1_0->Geometry.emplace();
 
+}
+
+
+void CResultObject::ResetGeometry()
+{
+	auto* itemPtr = m_geometryQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_geometryQObjectPtr = QVariant();
 }
 
 
@@ -15581,8 +15592,19 @@ bool CAreaObject::hasIconPosition()
 
 
 void CAreaObject::createIconPosition()
-{	Version_1_0->IconPosition.emplace();
+{
+	Version_1_0->IconPosition.emplace();
 
+}
+
+
+void CAreaObject::ResetIconPosition()
+{
+	auto* itemPtr = m_iconPositionQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_iconPositionQObjectPtr = QVariant();
 }
 
 
@@ -15655,8 +15677,19 @@ bool CAreaObject::hasResults()
 
 
 void CAreaObject::createResults()
-{	Version_1_0->Results.emplace();
+{
+	Version_1_0->Results.emplace();
 
+}
+
+
+void CAreaObject::ResetResults()
+{
+	auto* itemPtr = m_resultsQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_resultsQObjectPtr = QVariant();
 }
 
 
@@ -15948,8 +15981,19 @@ bool CAnalyzerObject::hasAreas()
 
 
 void CAnalyzerObject::createAreas()
-{	Version_1_0->Areas.emplace();
+{
+	Version_1_0->Areas.emplace();
 
+}
+
+
+void CAnalyzerObject::ResetAreas()
+{
+	auto* itemPtr = m_areasQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_areasQObjectPtr = QVariant();
 }
 
 
@@ -16274,8 +16318,19 @@ bool CInspectionObject::hasAnalyzers()
 
 
 void CInspectionObject::createAnalyzers()
-{	Version_1_0->Analyzers.emplace();
+{
+	Version_1_0->Analyzers.emplace();
 
+}
+
+
+void CInspectionObject::ResetAnalyzers()
+{
+	auto* itemPtr = m_analyzersQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_analyzersQObjectPtr = QVariant();
 }
 
 
@@ -16660,8 +16715,19 @@ bool CProductOverviewObject::hasInspections()
 
 
 void CProductOverviewObject::createInspections()
-{	Version_1_0->Inspections.emplace();
+{
+	Version_1_0->Inspections.emplace();
 
+}
+
+
+void CProductOverviewObject::ResetInspections()
+{
+	auto* itemPtr = m_inspectionsQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_inspectionsQObjectPtr = QVariant();
 }
 
 
@@ -17414,8 +17480,19 @@ bool CExtendedMetaDataObject::hasValue()
 
 
 void CExtendedMetaDataObject::createValue()
-{	Version_1_0->value.emplace();
+{
+	Version_1_0->value.emplace();
 
+}
+
+
+void CExtendedMetaDataObject::ResetValue()
+{
+	auto* itemPtr = m_valueQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_valueQObjectPtr = QVariant();
 }
 
 
@@ -17771,8 +17848,19 @@ bool CResultMetaDataObject::hasDescription()
 
 
 void CResultMetaDataObject::createDescription()
-{	Version_1_0->description.emplace();
+{
+	Version_1_0->description.emplace();
 
+}
+
+
+void CResultMetaDataObject::ResetDescription()
+{
+	auto* itemPtr = m_descriptionQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_descriptionQObjectPtr = QVariant();
 }
 
 
@@ -17813,8 +17901,19 @@ bool CResultMetaDataObject::hasExtendedMetaData()
 
 
 void CResultMetaDataObject::createExtendedMetaData()
-{	Version_1_0->extendedMetaData.emplace();
+{
+	Version_1_0->extendedMetaData.emplace();
 
+}
+
+
+void CResultMetaDataObject::ResetExtendedMetaData()
+{
+	auto* itemPtr = m_extendedMetaDataQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_extendedMetaDataQObjectPtr = QVariant();
 }
 
 
@@ -18389,8 +18488,19 @@ bool CUnionTestingTypeObject::hasSimpleUnion()
 
 
 void CUnionTestingTypeObject::createSimpleUnion()
-{	Version_1_0->simpleUnion.emplace();
+{
+	Version_1_0->simpleUnion.emplace();
 
+}
+
+
+void CUnionTestingTypeObject::ResetSimpleUnion()
+{
+	auto* itemPtr = m_simpleUnionQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_simpleUnionQObjectPtr = QVariant();
 }
 
 
@@ -18442,8 +18552,19 @@ bool CUnionTestingTypeObject::hasComplexUnion()
 
 
 void CUnionTestingTypeObject::createComplexUnion()
-{	Version_1_0->complexUnion.emplace();
+{
+	Version_1_0->complexUnion.emplace();
 
+}
+
+
+void CUnionTestingTypeObject::ResetComplexUnion()
+{
+	auto* itemPtr = m_complexUnionQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_complexUnionQObjectPtr = QVariant();
 }
 
 
@@ -18505,8 +18626,19 @@ bool CUnionTestingTypeObject::hasMixedUnion()
 
 
 void CUnionTestingTypeObject::createMixedUnion()
-{	Version_1_0->mixedUnion.emplace();
+{
+	Version_1_0->mixedUnion.emplace();
 
+}
+
+
+void CUnionTestingTypeObject::ResetMixedUnion()
+{
+	auto* itemPtr = m_mixedUnionQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_mixedUnionQObjectPtr = QVariant();
 }
 
 
@@ -18773,8 +18905,19 @@ bool CCDMResultVarRecursiveObject::hasResultMetaData()
 
 
 void CCDMResultVarRecursiveObject::createResultMetaData()
-{	Version_1_0->resultMetaData.emplace();
+{
+	Version_1_0->resultMetaData.emplace();
 
+}
+
+
+void CCDMResultVarRecursiveObject::ResetResultMetaData()
+{
+	auto* itemPtr = m_resultMetaDataQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_resultMetaDataQObjectPtr = QVariant();
 }
 
 
@@ -18815,8 +18958,19 @@ bool CCDMResultVarRecursiveObject::hasResultContent()
 
 
 void CCDMResultVarRecursiveObject::createResultContent()
-{	Version_1_0->resultContent.emplace();
+{
+	Version_1_0->resultContent.emplace();
 
+}
+
+
+void CCDMResultVarRecursiveObject::ResetResultContent()
+{
+	auto* itemPtr = m_resultContentQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_resultContentQObjectPtr = QVariant();
 }
 
 
@@ -18857,8 +19011,19 @@ bool CCDMResultVarRecursiveObject::hasOverallResultValues()
 
 
 void CCDMResultVarRecursiveObject::createOverallResultValues()
-{	Version_1_0->overallResultValues.emplace();
+{
+	Version_1_0->overallResultValues.emplace();
 
+}
+
+
+void CCDMResultVarRecursiveObject::ResetOverallResultValues()
+{
+	auto* itemPtr = m_overallResultValuesQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_overallResultValuesQObjectPtr = QVariant();
 }
 
 
@@ -19146,8 +19311,19 @@ bool CCDMResultVarStringObject::hasResultMetaData()
 
 
 void CCDMResultVarStringObject::createResultMetaData()
-{	Version_1_0->resultMetaData.emplace();
+{
+	Version_1_0->resultMetaData.emplace();
 
+}
+
+
+void CCDMResultVarStringObject::ResetResultMetaData()
+{
+	auto* itemPtr = m_resultMetaDataQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_resultMetaDataQObjectPtr = QVariant();
 }
 
 
@@ -19220,8 +19396,19 @@ bool CCDMResultVarStringObject::hasOverallResultValues()
 
 
 void CCDMResultVarStringObject::createOverallResultValues()
-{	Version_1_0->overallResultValues.emplace();
+{
+	Version_1_0->overallResultValues.emplace();
 
+}
+
+
+void CCDMResultVarStringObject::ResetOverallResultValues()
+{
+	auto* itemPtr = m_overallResultValuesQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_overallResultValuesQObjectPtr = QVariant();
 }
 
 
@@ -19506,8 +19693,19 @@ bool CCDMResultObject::hasResultMetaData()
 
 
 void CCDMResultObject::createResultMetaData()
-{	Version_1_0->resultMetaData.emplace();
+{
+	Version_1_0->resultMetaData.emplace();
 
+}
+
+
+void CCDMResultObject::ResetResultMetaData()
+{
+	auto* itemPtr = m_resultMetaDataQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_resultMetaDataQObjectPtr = QVariant();
 }
 
 
@@ -19548,8 +19746,19 @@ bool CCDMResultObject::hasResultContent()
 
 
 void CCDMResultObject::createResultContent()
-{	Version_1_0->resultContent.emplace();
+{
+	Version_1_0->resultContent.emplace();
 
+}
+
+
+void CCDMResultObject::ResetResultContent()
+{
+	auto* itemPtr = m_resultContentQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_resultContentQObjectPtr = QVariant();
 }
 
 
@@ -19590,8 +19799,19 @@ bool CCDMResultObject::hasOverallResultValues()
 
 
 void CCDMResultObject::createOverallResultValues()
-{	Version_1_0->overallResultValues.emplace();
+{
+	Version_1_0->overallResultValues.emplace();
 
+}
+
+
+void CCDMResultObject::ResetOverallResultValues()
+{
+	auto* itemPtr = m_overallResultValuesQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_overallResultValuesQObjectPtr = QVariant();
 }
 
 
@@ -20064,8 +20284,19 @@ bool CCollectionViewParamsTestObject::hasFilterModel()
 
 
 void CCollectionViewParamsTestObject::createFilterModel()
-{	Version_1_0->filterModel.emplace();
+{
+	Version_1_0->filterModel.emplace();
 
+}
+
+
+void CCollectionViewParamsTestObject::ResetFilterModel()
+{
+	auto* itemPtr = m_filterModelQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_filterModelQObjectPtr = QVariant();
 }
 
 

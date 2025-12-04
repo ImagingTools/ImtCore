@@ -1742,8 +1742,19 @@ bool CGeometryObject::hasPoints()
 
 
 void CGeometryObject::createPoints()
-{	Version_1_0->Points.emplace();
+{
+	Version_1_0->Points.emplace();
 
+}
+
+
+void CGeometryObject::ResetPoints()
+{
+	auto* itemPtr = m_pointsQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_pointsQObjectPtr = QVariant();
 }
 
 
@@ -1784,8 +1795,19 @@ bool CGeometryObject::hasRequiredPoints()
 
 
 void CGeometryObject::createRequiredPoints()
-{	Version_1_0->RequiredPoints.emplace();
+{
+	Version_1_0->RequiredPoints.emplace();
 
+}
+
+
+void CGeometryObject::ResetRequiredPoints()
+{
+	auto* itemPtr = m_requiredPointsQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_requiredPointsQObjectPtr = QVariant();
 }
 
 
@@ -1826,8 +1848,19 @@ bool CGeometryObject::hasOptionalPoints()
 
 
 void CGeometryObject::createOptionalPoints()
-{	Version_1_0->OptionalPoints.emplace();
+{
+	Version_1_0->OptionalPoints.emplace();
 
+}
+
+
+void CGeometryObject::ResetOptionalPoints()
+{
+	auto* itemPtr = m_optionalPointsQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_optionalPointsQObjectPtr = QVariant();
 }
 
 

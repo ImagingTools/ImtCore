@@ -3290,8 +3290,19 @@ bool CPrinterBaseObject::hasLinkList()
 
 
 void CPrinterBaseObject::createLinkList()
-{	Version_1_0->linkList.emplace();
+{
+	Version_1_0->linkList.emplace();
 
+}
+
+
+void CPrinterBaseObject::ResetLinkList()
+{
+	auto* itemPtr = m_linkListQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_linkListQObjectPtr = QVariant();
 }
 
 
@@ -3355,8 +3366,19 @@ bool CPrinterBaseObject::hasSpecification()
 
 
 void CPrinterBaseObject::createSpecification()
-{	Version_1_0->specification.emplace();
+{
+	Version_1_0->specification.emplace();
 
+}
+
+
+void CPrinterBaseObject::ResetSpecification()
+{
+	auto* itemPtr = m_specificationQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_specificationQObjectPtr = QVariant();
 }
 
 
@@ -3397,8 +3419,19 @@ bool CPrinterBaseObject::hasSpecificationList()
 
 
 void CPrinterBaseObject::createSpecificationList()
-{	Version_1_0->specificationList.emplace();
+{
+	Version_1_0->specificationList.emplace();
 
+}
+
+
+void CPrinterBaseObject::ResetSpecificationList()
+{
+	auto* itemPtr = m_specificationListQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_specificationListQObjectPtr = QVariant();
 }
 
 

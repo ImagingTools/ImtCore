@@ -187,6 +187,7 @@ public:
 	void SetBase(const QVariant& v);
 	Q_INVOKABLE bool hasBase();
 	Q_INVOKABLE void createBase();
+	void ResetBase();
 	QVariant GetPrintingTechnology();
 	void SetPrintingTechnology(const QVariant& v);
 	Q_INVOKABLE bool hasPrintingTechnology();
@@ -257,6 +258,7 @@ public:
 	void SetBase(const QVariant& v);
 	Q_INVOKABLE bool hasBase();
 	Q_INVOKABLE void createBase();
+	void ResetBase();
 	QVariant GetPrintingTechnology();
 	void SetPrintingTechnology(const QVariant& v);
 	Q_INVOKABLE bool hasPrintingTechnology();

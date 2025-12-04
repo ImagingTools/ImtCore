@@ -433,6 +433,7 @@ public:
 	void SetTimeRange(const QVariant& v);
 	Q_INVOKABLE bool hasTimeRange();
 	Q_INVOKABLE void createTimeRange();
+	void ResetTimeRange();
 	QVariant GetTimeUnit();
 	void SetTimeUnit(const QVariant& v);
 	Q_INVOKABLE bool hasTimeUnit();
@@ -658,10 +659,12 @@ public:
 	void SetFieldFilters(const QVariant& v);
 	Q_INVOKABLE bool hasFieldFilters();
 	Q_INVOKABLE void createFieldFilters();
+	void ResetFieldFilters();
 	QVariant GetGroupFilters();
 	void SetGroupFilters(const QVariant& v);
 	Q_INVOKABLE bool hasGroupFilters();
 	Q_INVOKABLE void createGroupFilters();
+	void ResetGroupFilters();
 	QVariant GetLogicalOperation();
 	void SetLogicalOperation(const QVariant& v);
 	Q_INVOKABLE bool hasLogicalOperation();
@@ -736,14 +739,17 @@ public:
 	void SetSortingInfo(const QVariant& v);
 	Q_INVOKABLE bool hasSortingInfo();
 	Q_INVOKABLE void createSortingInfo();
+	void ResetSortingInfo();
 	QVariant GetFieldsFilter();
 	void SetFieldsFilter(const QVariant& v);
 	Q_INVOKABLE bool hasFieldsFilter();
 	Q_INVOKABLE void createFieldsFilter();
+	void ResetFieldsFilter();
 	QVariant GetTimeFilter();
 	void SetTimeFilter(const QVariant& v);
 	Q_INVOKABLE bool hasTimeFilter();
 	Q_INVOKABLE void createTimeFilter();
+	void ResetTimeFilter();
 	QVariant GetDistinctFields();
 	void SetDistinctFields(const QVariant& v);
 	Q_INVOKABLE bool hasDistinctFields();

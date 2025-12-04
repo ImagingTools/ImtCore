@@ -1122,8 +1122,19 @@ bool CDigitalPrinterSpecificationObject::hasBase()
 
 
 void CDigitalPrinterSpecificationObject::createBase()
-{	Version_1_0->base.emplace();
+{
+	Version_1_0->base.emplace();
 
+}
+
+
+void CDigitalPrinterSpecificationObject::ResetBase()
+{
+	auto* itemPtr = m_baseQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_baseQObjectPtr = QVariant();
 }
 
 
@@ -1370,8 +1381,19 @@ bool CDigitalPrinterObject::hasBase()
 
 
 void CDigitalPrinterObject::createBase()
-{	Version_1_0->base.emplace();
+{
+	Version_1_0->base.emplace();
 
+}
+
+
+void CDigitalPrinterObject::ResetBase()
+{
+	auto* itemPtr = m_baseQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_baseQObjectPtr = QVariant();
 }
 
 

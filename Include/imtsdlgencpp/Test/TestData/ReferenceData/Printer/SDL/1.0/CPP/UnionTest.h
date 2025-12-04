@@ -510,14 +510,17 @@ public:
 	void SetLinkList(const QVariant& v);
 	Q_INVOKABLE bool hasLinkList();
 	Q_INVOKABLE void createLinkList();
+	void ResetLinkList();
 	QVariant GetSpecification();
 	void SetSpecification(const QVariant& v);
 	Q_INVOKABLE bool hasSpecification();
 	Q_INVOKABLE void createSpecification();
+	void ResetSpecification();
 	QVariant GetSpecificationList();
 	void SetSpecificationList(const QVariant& v);
 	Q_INVOKABLE bool hasSpecificationList();
 	Q_INVOKABLE void createSpecificationList();
+	void ResetSpecificationList();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;

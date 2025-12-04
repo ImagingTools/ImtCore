@@ -2448,8 +2448,19 @@ bool CPrinterBaseObject::hasSpecification()
 
 
 void CPrinterBaseObject::createSpecification()
-{	Version_1_0->specification.emplace();
+{
+	Version_1_0->specification.emplace();
 
+}
+
+
+void CPrinterBaseObject::ResetSpecification()
+{
+	auto* itemPtr = m_specificationQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_specificationQObjectPtr = QVariant();
 }
 
 
@@ -2497,8 +2508,19 @@ bool CPrinterBaseObject::hasSimpleTest()
 
 
 void CPrinterBaseObject::createSimpleTest()
-{	Version_1_0->simpleTest.emplace();
+{
+	Version_1_0->simpleTest.emplace();
 
+}
+
+
+void CPrinterBaseObject::ResetSimpleTest()
+{
+	auto* itemPtr = m_simpleTestQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_simpleTestQObjectPtr = QVariant();
 }
 
 
@@ -2548,8 +2570,19 @@ bool CPrinterBaseObject::hasMixedTest()
 
 
 void CPrinterBaseObject::createMixedTest()
-{	Version_1_0->mixedTest.emplace();
+{
+	Version_1_0->mixedTest.emplace();
 
+}
+
+
+void CPrinterBaseObject::ResetMixedTest()
+{
+	auto* itemPtr = m_mixedTestQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_mixedTestQObjectPtr = QVariant();
 }
 
 
@@ -2772,8 +2805,19 @@ bool CPrinterListObject::hasData()
 
 
 void CPrinterListObject::createData()
-{	Version_1_0->data.emplace();
+{
+	Version_1_0->data.emplace();
 
+}
+
+
+void CPrinterListObject::ResetData()
+{
+	auto* itemPtr = m_dataQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_dataQObjectPtr = QVariant();
 }
 
 

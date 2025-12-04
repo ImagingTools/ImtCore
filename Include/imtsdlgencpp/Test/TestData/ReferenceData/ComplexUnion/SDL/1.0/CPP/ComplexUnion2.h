@@ -1058,6 +1058,7 @@ public:
 	void SetGeometry(const QVariant& v);
 	Q_INVOKABLE bool hasGeometry();
 	Q_INVOKABLE void createGeometry();
+	void ResetGeometry();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1144,6 +1145,7 @@ public:
 	void SetIconPosition(const QVariant& v);
 	Q_INVOKABLE bool hasIconPosition();
 	Q_INVOKABLE void createIconPosition();
+	void ResetIconPosition();
 	QVariant GetErrorType();
 	void SetErrorType(const QVariant& v);
 	Q_INVOKABLE bool hasErrorType();
@@ -1151,6 +1153,7 @@ public:
 	void SetResults(const QVariant& v);
 	Q_INVOKABLE bool hasResults();
 	Q_INVOKABLE void createResults();
+	void ResetResults();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1229,6 +1232,7 @@ public:
 	void SetAreas(const QVariant& v);
 	Q_INVOKABLE bool hasAreas();
 	Q_INVOKABLE void createAreas();
+	void ResetAreas();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1312,6 +1316,7 @@ public:
 	void SetAnalyzers(const QVariant& v);
 	Q_INVOKABLE bool hasAnalyzers();
 	Q_INVOKABLE void createAnalyzers();
+	void ResetAnalyzers();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1405,6 +1410,7 @@ public:
 	void SetInspections(const QVariant& v);
 	Q_INVOKABLE bool hasInspections();
 	Q_INVOKABLE void createInspections();
+	void ResetInspections();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1621,6 +1627,7 @@ public:
 	void SetValue(const QVariant& v);
 	Q_INVOKABLE bool hasValue();
 	Q_INVOKABLE void createValue();
+	void ResetValue();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1712,10 +1719,12 @@ public:
 	void SetDescription(const QVariant& v);
 	Q_INVOKABLE bool hasDescription();
 	Q_INVOKABLE void createDescription();
+	void ResetDescription();
 	QVariant GetExtendedMetaData();
 	void SetExtendedMetaData(const QVariant& v);
 	Q_INVOKABLE bool hasExtendedMetaData();
 	Q_INVOKABLE void createExtendedMetaData();
+	void ResetExtendedMetaData();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1874,14 +1883,17 @@ public:
 	void SetSimpleUnion(const QVariant& v);
 	Q_INVOKABLE bool hasSimpleUnion();
 	Q_INVOKABLE void createSimpleUnion();
+	void ResetSimpleUnion();
 	QVariant GetComplexUnion();
 	void SetComplexUnion(const QVariant& v);
 	Q_INVOKABLE bool hasComplexUnion();
 	Q_INVOKABLE void createComplexUnion();
+	void ResetComplexUnion();
 	QVariant GetMixedUnion();
 	void SetMixedUnion(const QVariant& v);
 	Q_INVOKABLE bool hasMixedUnion();
 	Q_INVOKABLE void createMixedUnion();
+	void ResetMixedUnion();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -1961,14 +1973,17 @@ public:
 	void SetResultMetaData(const QVariant& v);
 	Q_INVOKABLE bool hasResultMetaData();
 	Q_INVOKABLE void createResultMetaData();
+	void ResetResultMetaData();
 	QVariant GetResultContent();
 	void SetResultContent(const QVariant& v);
 	Q_INVOKABLE bool hasResultContent();
 	Q_INVOKABLE void createResultContent();
+	void ResetResultContent();
 	QVariant GetOverallResultValues();
 	void SetOverallResultValues(const QVariant& v);
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void createOverallResultValues();
+	void ResetOverallResultValues();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -2050,6 +2065,7 @@ public:
 	void SetResultMetaData(const QVariant& v);
 	Q_INVOKABLE bool hasResultMetaData();
 	Q_INVOKABLE void createResultMetaData();
+	void ResetResultMetaData();
 	QVariant GetResultContent();
 	void SetResultContent(const QVariant& v);
 	Q_INVOKABLE bool hasResultContent();
@@ -2057,6 +2073,7 @@ public:
 	void SetOverallResultValues(const QVariant& v);
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void createOverallResultValues();
+	void ResetOverallResultValues();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -2137,14 +2154,17 @@ public:
 	void SetResultMetaData(const QVariant& v);
 	Q_INVOKABLE bool hasResultMetaData();
 	Q_INVOKABLE void createResultMetaData();
+	void ResetResultMetaData();
 	QVariant GetResultContent();
 	void SetResultContent(const QVariant& v);
 	Q_INVOKABLE bool hasResultContent();
 	Q_INVOKABLE void createResultContent();
+	void ResetResultContent();
 	QVariant GetOverallResultValues();
 	void SetOverallResultValues(const QVariant& v);
 	Q_INVOKABLE bool hasOverallResultValues();
 	Q_INVOKABLE void createOverallResultValues();
+	void ResetOverallResultValues();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;
@@ -2287,6 +2307,7 @@ public:
 	void SetFilterModel(const QVariant& v);
 	Q_INVOKABLE bool hasFilterModel();
 	Q_INVOKABLE void createFilterModel();
+	void ResetFilterModel();
 	// CItemModelBase implemented
 	Q_INVOKABLE QString toJson() const override;
 	Q_INVOKABLE virtual bool createFromJson(const QString& json) override;

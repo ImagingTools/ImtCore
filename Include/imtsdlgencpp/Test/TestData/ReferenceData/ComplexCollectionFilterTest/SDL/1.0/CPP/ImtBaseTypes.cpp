@@ -11554,8 +11554,19 @@ bool COptionsListObject::hasOptions()
 
 
 void COptionsListObject::createOptions()
-{	Version_1_0->options.emplace();
+{
+	Version_1_0->options.emplace();
 
+}
+
+
+void COptionsListObject::ResetOptions()
+{
+	auto* itemPtr = m_optionsQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_optionsQObjectPtr = QVariant();
 }
 
 
@@ -11799,8 +11810,19 @@ bool CSelectionParamObject::hasConstraints()
 
 
 void CSelectionParamObject::createConstraints()
-{	Version_1_0->constraints.emplace();
+{
+	Version_1_0->constraints.emplace();
 
+}
+
+
+void CSelectionParamObject::ResetConstraints()
+{
+	auto* itemPtr = m_constraintsQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_constraintsQObjectPtr = QVariant();
 }
 
 
@@ -12232,8 +12254,19 @@ bool CBackupSettingsObject::hasSchedulerParam()
 
 
 void CBackupSettingsObject::createSchedulerParam()
-{	Version_1_0->schedulerParam.emplace();
+{
+	Version_1_0->schedulerParam.emplace();
 
+}
+
+
+void CBackupSettingsObject::ResetSchedulerParam()
+{
+	auto* itemPtr = m_schedulerParamQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_schedulerParamQObjectPtr = QVariant();
 }
 
 

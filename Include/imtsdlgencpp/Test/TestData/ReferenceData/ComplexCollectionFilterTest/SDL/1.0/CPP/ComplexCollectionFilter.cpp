@@ -3349,8 +3349,19 @@ bool CTimeFilterObject::hasTimeRange()
 
 
 void CTimeFilterObject::createTimeRange()
-{	Version_1_0->timeRange.emplace();
+{
+	Version_1_0->timeRange.emplace();
 
+}
+
+
+void CTimeFilterObject::ResetTimeRange()
+{
+	auto* itemPtr = m_timeRangeQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_timeRangeQObjectPtr = QVariant();
 }
 
 
@@ -4150,8 +4161,19 @@ bool CGroupFilterObject::hasFieldFilters()
 
 
 void CGroupFilterObject::createFieldFilters()
-{	Version_1_0->fieldFilters.emplace();
+{
+	Version_1_0->fieldFilters.emplace();
 
+}
+
+
+void CGroupFilterObject::ResetFieldFilters()
+{
+	auto* itemPtr = m_fieldFiltersQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_fieldFiltersQObjectPtr = QVariant();
 }
 
 
@@ -4192,8 +4214,19 @@ bool CGroupFilterObject::hasGroupFilters()
 
 
 void CGroupFilterObject::createGroupFilters()
-{	Version_1_0->groupFilters.emplace();
+{
+	Version_1_0->groupFilters.emplace();
 
+}
+
+
+void CGroupFilterObject::ResetGroupFilters()
+{
+	auto* itemPtr = m_groupFiltersQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_groupFiltersQObjectPtr = QVariant();
 }
 
 
@@ -4451,8 +4484,19 @@ bool CComplexCollectionFilterObject::hasSortingInfo()
 
 
 void CComplexCollectionFilterObject::createSortingInfo()
-{	Version_1_0->sortingInfo.emplace();
+{
+	Version_1_0->sortingInfo.emplace();
 
+}
+
+
+void CComplexCollectionFilterObject::ResetSortingInfo()
+{
+	auto* itemPtr = m_sortingInfoQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_sortingInfoQObjectPtr = QVariant();
 }
 
 
@@ -4493,8 +4537,19 @@ bool CComplexCollectionFilterObject::hasFieldsFilter()
 
 
 void CComplexCollectionFilterObject::createFieldsFilter()
-{	Version_1_0->fieldsFilter.emplace();
+{
+	Version_1_0->fieldsFilter.emplace();
 
+}
+
+
+void CComplexCollectionFilterObject::ResetFieldsFilter()
+{
+	auto* itemPtr = m_fieldsFilterQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_fieldsFilterQObjectPtr = QVariant();
 }
 
 
@@ -4535,8 +4590,19 @@ bool CComplexCollectionFilterObject::hasTimeFilter()
 
 
 void CComplexCollectionFilterObject::createTimeFilter()
-{	Version_1_0->timeFilter.emplace();
+{
+	Version_1_0->timeFilter.emplace();
 
+}
+
+
+void CComplexCollectionFilterObject::ResetTimeFilter()
+{
+	auto* itemPtr = m_timeFilterQObjectPtr.value<QObject*>();
+	if (itemPtr != nullptr){
+		itemPtr->deleteLater();
+	}
+	m_timeFilterQObjectPtr = QVariant();
 }
 
 
