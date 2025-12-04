@@ -4,9 +4,9 @@ import Acf 1.0
 Rectangle {
 	id: root;
 
-	color: Style.backgroundColor;
-
 	property int indicatorSize: 50;
+	property alias background: backgroundRec;
+	color: "transparent"
 
 	function start(){
 		root.visible = width >= square.width && height >= square.height
@@ -14,6 +14,14 @@ Rectangle {
 
 	function stop(){
 		root.visible = false;
+	}
+
+	Rectangle {
+		id: backgroundRec;
+
+		anchors.fill: parent;
+
+		color: Style.backgroundColor;
 	}
 
 	Item { // square

@@ -475,7 +475,7 @@ Item {
 				anchors.fill: parent
 				visible: false
 
-				opacity: 0
+				background.opacity: 0
 			}
 		}
 	}
