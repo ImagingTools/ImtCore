@@ -1480,7 +1480,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 				SELECT *
 				FROM "%1" AS root1
 				WHERE root."%3" = root1."%3" 
-					AND %5 = 1
+					AND %6 = 1
 				LIMIT 1
 			) AS root1 ON true
 			WHERE (%2) AND root."%3" = '%4' ORDER BY %5 DESC;)")
@@ -1490,7 +1490,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 				documentFilterQuery,
 				QString::fromUtf8(s_documentIdColumn),
 				QString::fromUtf8(objectId),
-				CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, "root")
+				CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, "root"),
+				CreateJsonExtractSql(s_revisionInfoColumn, s_revisionNumberKey, QMetaType::Int, "root1")
 				).toUtf8();
 }
 
