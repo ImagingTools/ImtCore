@@ -106,7 +106,15 @@ class BaseModel extends ListModel {
 							}
 
 							if (typeof item[key][k] === "string"){
-								graphQL += "\"" + item[key][k] + "\""
+								let data = item[key][k]
+
+								data = data.replace(/\\/g, "\\\\")
+								data = data.replace(/\"/g, "\\\"")
+								data = data.replace(/\r/g, "\\\\r")
+								data = data.replace(/\n/g, "\\\\n")
+								data = data.replace(/\t/g, "\\\\t")
+
+								graphQL += "\"" + data + "\""
 							}
 							else{
 								graphQL += item[key][k]
@@ -120,10 +128,19 @@ class BaseModel extends ListModel {
 					}
 				} else {
 					let value = item[key]
+
+					if(typeof value === 'string'){
+						value = value.replace(/\\/g, "\\\\")
+						value = value.replace(/\"/g, "\\\"")
+						value = value.replace(/\r/g, "\\\\r")
+						value = value.replace(/\n/g, "\\\\n")
+						value = value.replace(/\t/g, "\\\\t")
+					}
+
 					if (value === undefined){
 						value = null
 					}
-					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + item[key] + '"' : value)
+					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + value + '"' : value)
 				}
 				if(j < list.length - 1) graphQL += ','
 			}
