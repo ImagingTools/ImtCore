@@ -152,7 +152,7 @@ Item {
 		}
 		
 		onCommandsCountChanged: {
-			timer.restart();
+			timer.restart()
 		}
 	}
 	

@@ -39,7 +39,7 @@ Item {
 	// params["y"] = Y coord click
 	// params["target"] = button reference
 	signal commandActivated(string commandId, var params);
-	
+
 	onCommandsModelChanged: {
 		if (commandsModel && commandsModel.m_subElements){
 			repeater.model = commandsModel.m_subElements;
@@ -87,7 +87,7 @@ Item {
 		
 		for (let i = 0; i < priorityElements.length; i++) {
 			let item = priorityElements[i];
-			if (!item.element || item.priority < 0)
+			if (!item.element || item.priority < 0 || !item.element.m_visible)
 				continue;
 
 			let elementWidth = item.maxWidth;
@@ -128,7 +128,14 @@ Item {
 						target: model.item
 						function onModelChanged(){
 							button.checkHidden()
+							commandsItem.checkWidth()
 						}
+
+						// function onM_visibleChanged(){
+						// 	if (!target.visible){
+						// 		commandsItem.visibleCommandsCount--
+						// 	}
+						// }
 					}
 
 					property bool hidden: false
