@@ -1645,6 +1645,9 @@ bool CPrinterList::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 
 bool CPrinterList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
+	if (gqlObject.ContainsParam("data")){
+		data.emplace();
+	}
 	if (gqlObject.ContainsParam("data") && (gqlObject.GetObjectsCount("data") > 0)){
 		const qsizetype dataElementsCount = gqlObject.GetObjectsCount("data");
 		data = imtsdl::TElementList<CPrinterBase::V1_0>();
@@ -1670,6 +1673,9 @@ bool CPrinterList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 
 bool CPrinterList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
+	if (gqlObject.ContainsParam("data")){
+		data.emplace();
+	}
 	if (gqlObject.ContainsParam("data") && (gqlObject.GetObjectsCount("data") > 0)){
 		const qsizetype dataElementsCount = gqlObject.GetObjectsCount("data");
 		data = imtsdl::TElementList<CPrinterBase::V1_0>();

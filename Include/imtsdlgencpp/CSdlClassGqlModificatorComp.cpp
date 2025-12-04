@@ -257,6 +257,26 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 
 	uint hIndents = horizontalIndents;
 	FeedStreamHorizontally(stream, hIndents);
+
+	if (expected && isArray && !field.IsNonEmpty()){ ///< if array could be empty emplace property
+		stream << QStringLiteral("if (");
+		stream << GetContainerObjectVariableName();
+		stream << QStringLiteral(".ContainsParam(\"");
+		stream << field.GetId();
+		stream << QStringLiteral("\")){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents + 1);
+		stream << field.GetId();
+		stream << QStringLiteral(".emplace();");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+		stream << '}';
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, hIndents);
+	}
 	stream << QStringLiteral("if (");
 	if (!expected){
 		stream << '!';
@@ -266,6 +286,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 	stream << QStringLiteral(".ContainsParam(\"");
 	stream << field.GetId();
 	stream << QStringLiteral("\")");
+
 	if (!isArray && !isUnion){
 		if (expected){
 			stream << QStringLiteral(" && ");
@@ -275,7 +296,6 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		}
 		stream << '(';
 	}
-
 
 	if (isArray && !isUserType && !isUnion){ // array of scalars
 		if (expected){
@@ -290,6 +310,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		stream << field.GetId();
 		stream << QStringLiteral("\"].isNull())");
 	}
+
 	else if (isArray && !isUnion){
 		if (expected){
 			stream << QStringLiteral(" && (");
@@ -315,6 +336,7 @@ bool CSdlClassGqlModificatorComp::AddContainerValueCheckConditionBegin(QTextStre
 		}
 		stream << QStringLiteral("= nullptr");
 	}
+
 	else if (!isUnion){
 		stream << GetContainerObjectVariableName();
 		stream << QStringLiteral("[\"");

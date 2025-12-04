@@ -829,6 +829,9 @@ bool CGeometry::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		RequiredPoints->append(tempRequiredPoints);
 	}
 
+	if (gqlObject.ContainsParam("OptionalPoints")){
+		OptionalPoints.emplace();
+	}
 	if (gqlObject.ContainsParam("OptionalPoints") && (gqlObject.GetObjectsCount("OptionalPoints") > 0)){
 		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("optionalPoints");
 		OptionalPoints = imtsdl::TElementList<CPoint::V1_0>();
@@ -876,6 +879,9 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		Radius = gqlObject["Radius"].toDouble();
 	}
 
+	if (gqlObject.ContainsParam("Points")){
+		Points.emplace();
+	}
 	if (gqlObject.ContainsParam("Points") && (gqlObject.GetObjectsCount("Points") > 0)){
 		const qsizetype pointsElementsCount = gqlObject.GetObjectsCount("points");
 		Points = imtsdl::TElementList<CPoint::V1_0>();
@@ -919,6 +925,9 @@ bool CGeometry::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		}
 	}
 
+	if (gqlObject.ContainsParam("OptionalPoints")){
+		OptionalPoints.emplace();
+	}
 	if (gqlObject.ContainsParam("OptionalPoints") && (gqlObject.GetObjectsCount("OptionalPoints") > 0)){
 		const qsizetype optionalPointsElementsCount = gqlObject.GetObjectsCount("optionalPoints");
 		OptionalPoints = imtsdl::TElementList<CPoint::V1_0>();

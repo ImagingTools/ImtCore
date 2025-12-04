@@ -4785,6 +4785,9 @@ bool COptionsList::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		offset = gqlObject["offset"].toInt();
 	}
 
+	if (gqlObject.ContainsParam("options")){
+		options.emplace();
+	}
 	if (gqlObject.ContainsParam("options") && (gqlObject.GetObjectsCount("options") > 0)){
 		const qsizetype optionsElementsCount = gqlObject.GetObjectsCount("options");
 		options = imtsdl::TElementList<COption::V1_0>();
@@ -4818,6 +4821,9 @@ bool COptionsList::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		offset = gqlObject["offset"].toInt();
 	}
 
+	if (gqlObject.ContainsParam("options")){
+		options.emplace();
+	}
 	if (gqlObject.ContainsParam("options") && (gqlObject.GetObjectsCount("options") > 0)){
 		const qsizetype optionsElementsCount = gqlObject.GetObjectsCount("options");
 		options = imtsdl::TElementList<COption::V1_0>();
@@ -7563,6 +7569,9 @@ bool CParamsSet::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObject
 
 bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
+	if (gqlObject.ContainsParam("paramIds")){
+		paramIds.emplace();
+	}
 	if (gqlObject.ContainsParam("paramIds") && !(gqlObject["paramIds"].isNull())){
 		const QVariant paramIdsData = gqlObject["paramIds"];
 		const QVariantList paramIdsDataList = paramIdsData.toList();
@@ -7574,6 +7583,9 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
+	if (gqlObject.ContainsParam("paramTypeIds")){
+		paramTypeIds.emplace();
+	}
 	if (gqlObject.ContainsParam("paramTypeIds") && !(gqlObject["paramTypeIds"].isNull())){
 		const QVariant paramTypeIdsData = gqlObject["paramTypeIds"];
 		const QVariantList paramTypeIdsDataList = paramTypeIdsData.toList();
@@ -7585,6 +7597,9 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
+	if (gqlObject.ContainsParam("paramNames")){
+		paramNames.emplace();
+	}
 	if (gqlObject.ContainsParam("paramNames") && !(gqlObject["paramNames"].isNull())){
 		const QVariant paramNamesData = gqlObject["paramNames"];
 		const QVariantList paramNamesDataList = paramNamesData.toList();
@@ -7596,6 +7611,9 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
+	if (gqlObject.ContainsParam("paramDescriptions")){
+		paramDescriptions.emplace();
+	}
 	if (gqlObject.ContainsParam("paramDescriptions") && !(gqlObject["paramDescriptions"].isNull())){
 		const QVariant paramDescriptionsData = gqlObject["paramDescriptions"];
 		const QVariantList paramDescriptionsDataList = paramDescriptionsData.toList();
@@ -7607,6 +7625,9 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
+	if (gqlObject.ContainsParam("parameters")){
+		parameters.emplace();
+	}
 	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
 		const QVariantList parametersDataList = parametersData.toList();
@@ -7624,6 +7645,9 @@ bool CParamsSet::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 
 bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
+	if (gqlObject.ContainsParam("paramIds")){
+		paramIds.emplace();
+	}
 	if (gqlObject.ContainsParam("paramIds") && !(gqlObject["paramIds"].isNull())){
 		const QVariant paramIdsData = gqlObject["paramIds"];
 		const QVariantList paramIdsDataList = paramIdsData.toList();
@@ -7635,6 +7659,9 @@ bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
+	if (gqlObject.ContainsParam("paramTypeIds")){
+		paramTypeIds.emplace();
+	}
 	if (gqlObject.ContainsParam("paramTypeIds") && !(gqlObject["paramTypeIds"].isNull())){
 		const QVariant paramTypeIdsData = gqlObject["paramTypeIds"];
 		const QVariantList paramTypeIdsDataList = paramTypeIdsData.toList();
@@ -7646,6 +7673,9 @@ bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
+	if (gqlObject.ContainsParam("paramNames")){
+		paramNames.emplace();
+	}
 	if (gqlObject.ContainsParam("paramNames") && !(gqlObject["paramNames"].isNull())){
 		const QVariant paramNamesData = gqlObject["paramNames"];
 		const QVariantList paramNamesDataList = paramNamesData.toList();
@@ -7657,6 +7687,9 @@ bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
+	if (gqlObject.ContainsParam("paramDescriptions")){
+		paramDescriptions.emplace();
+	}
 	if (gqlObject.ContainsParam("paramDescriptions") && !(gqlObject["paramDescriptions"].isNull())){
 		const QVariant paramDescriptionsData = gqlObject["paramDescriptions"];
 		const QVariantList paramDescriptionsDataList = paramDescriptionsData.toList();
@@ -7668,6 +7701,9 @@ bool CParamsSet::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
+	if (gqlObject.ContainsParam("parameters")){
+		parameters.emplace();
+	}
 	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
 		const QVariantList parametersDataList = parametersData.toList();
@@ -8270,6 +8306,9 @@ bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 	}
 	type = gqlObject["type"].toString();
 
+	if (gqlObject.ContainsParam("tree")){
+		tree.emplace();
+	}
 	if (gqlObject.ContainsParam("tree") && !(gqlObject["tree"].isNull())){
 		const QVariant treeData = gqlObject["tree"];
 		const QVariantList treeDataList = treeData.toList();
@@ -8292,6 +8331,9 @@ bool CMimeType::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		suffix = gqlObject["suffix"].toString();
 	}
 
+	if (gqlObject.ContainsParam("parameters")){
+		parameters.emplace();
+	}
 	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
 		const QVariantList parametersDataList = parametersData.toList();
@@ -8313,6 +8355,9 @@ bool CMimeType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		type = gqlObject["type"].toString();
 	}
 
+	if (gqlObject.ContainsParam("tree")){
+		tree.emplace();
+	}
 	if (gqlObject.ContainsParam("tree") && !(gqlObject["tree"].isNull())){
 		const QVariant treeData = gqlObject["tree"];
 		const QVariantList treeDataList = treeData.toList();
@@ -8332,6 +8377,9 @@ bool CMimeType::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		suffix = gqlObject["suffix"].toString();
 	}
 
+	if (gqlObject.ContainsParam("parameters")){
+		parameters.emplace();
+	}
 	if (gqlObject.ContainsParam("parameters") && !(gqlObject["parameters"].isNull())){
 		const QVariant parametersData = gqlObject["parameters"];
 		const QVariantList parametersDataList = parametersData.toList();

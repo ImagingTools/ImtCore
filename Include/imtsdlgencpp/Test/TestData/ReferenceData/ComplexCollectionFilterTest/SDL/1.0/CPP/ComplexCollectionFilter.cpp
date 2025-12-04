@@ -1333,6 +1333,9 @@ bool CFieldFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
+	if (gqlObject.ContainsParam("filterOperations")){
+		filterOperations.emplace();
+	}
 	if (gqlObject.ContainsParam("filterOperations") && !(gqlObject["filterOperations"].isNull())){
 		const QVariant filterOperationsData = gqlObject["filterOperations"];
 		const QVariantList filterOperationsDataList = filterOperationsData.toList();
@@ -2042,6 +2045,9 @@ bool CGroupFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObject& gqlObje
 
 bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
+	if (gqlObject.ContainsParam("fieldFilters")){
+		fieldFilters.emplace();
+	}
 	if (gqlObject.ContainsParam("fieldFilters") && (gqlObject.GetObjectsCount("fieldFilters") > 0)){
 		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
 		fieldFilters = imtsdl::TElementList<CFieldFilter::V1_0>();
@@ -2061,6 +2067,9 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		}
 	}
 
+	if (gqlObject.ContainsParam("groupFilters")){
+		groupFilters.emplace();
+	}
 	if (gqlObject.ContainsParam("groupFilters") && (gqlObject.GetObjectsCount("groupFilters") > 0)){
 		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
 		groupFilters = imtsdl::TElementList<CGroupFilter::V1_0>();
@@ -2104,6 +2113,9 @@ bool CGroupFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 
 bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
+	if (gqlObject.ContainsParam("fieldFilters")){
+		fieldFilters.emplace();
+	}
 	if (gqlObject.ContainsParam("fieldFilters") && (gqlObject.GetObjectsCount("fieldFilters") > 0)){
 		const qsizetype fieldFiltersElementsCount = gqlObject.GetObjectsCount("fieldFilters");
 		fieldFilters = imtsdl::TElementList<CFieldFilter::V1_0>();
@@ -2123,6 +2135,9 @@ bool CGroupFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
+	if (gqlObject.ContainsParam("groupFilters")){
+		groupFilters.emplace();
+	}
 	if (gqlObject.ContainsParam("groupFilters") && (gqlObject.GetObjectsCount("groupFilters") > 0)){
 		const qsizetype groupFiltersElementsCount = gqlObject.GetObjectsCount("groupFilters");
 		groupFilters = imtsdl::TElementList<CGroupFilter::V1_0>();
@@ -2781,6 +2796,9 @@ bool CComplexCollectionFilter::V1_0::WriteToGraphQlObject(::imtgql::CGqlParamObj
 
 bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
+	if (gqlObject.ContainsParam("sortingInfo")){
+		sortingInfo.emplace();
+	}
 	if (gqlObject.ContainsParam("sortingInfo") && (gqlObject.GetObjectsCount("sortingInfo") > 0)){
 		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
 		sortingInfo = imtsdl::TElementList<CFieldSortingInfo::V1_0>();
@@ -2820,6 +2838,9 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 		}
 	}
 
+	if (gqlObject.ContainsParam("distinctFields")){
+		distinctFields.emplace();
+	}
 	if (gqlObject.ContainsParam("distinctFields") && !(gqlObject["distinctFields"].isNull())){
 		const QVariant distinctFieldsData = gqlObject["distinctFields"];
 		const QVariantList distinctFieldsDataList = distinctFieldsData.toList();
@@ -2837,6 +2858,9 @@ bool CComplexCollectionFilter::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlP
 
 bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObject)
 {
+	if (gqlObject.ContainsParam("sortingInfo")){
+		sortingInfo.emplace();
+	}
 	if (gqlObject.ContainsParam("sortingInfo") && (gqlObject.GetObjectsCount("sortingInfo") > 0)){
 		const qsizetype sortingInfoElementsCount = gqlObject.GetObjectsCount("sortingInfo");
 		sortingInfo = imtsdl::TElementList<CFieldSortingInfo::V1_0>();
@@ -2876,6 +2900,9 @@ bool CComplexCollectionFilter::V1_0::OptReadFromGraphQlObject(const ::imtgql::CG
 		}
 	}
 
+	if (gqlObject.ContainsParam("distinctFields")){
+		distinctFields.emplace();
+	}
 	if (gqlObject.ContainsParam("distinctFields") && !(gqlObject["distinctFields"].isNull())){
 		const QVariant distinctFieldsData = gqlObject["distinctFields"];
 		const QVariantList distinctFieldsDataList = distinctFieldsData.toList();

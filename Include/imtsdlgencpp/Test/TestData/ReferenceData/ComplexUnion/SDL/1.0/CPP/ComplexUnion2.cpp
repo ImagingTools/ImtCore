@@ -4463,6 +4463,9 @@ bool CArea::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 		}
 	}
 
+	if (gqlObject.ContainsParam("Results")){
+		Results.emplace();
+	}
 	if (gqlObject.ContainsParam("Results") && (gqlObject.GetObjectsCount("Results") > 0)){
 		const qsizetype resultsElementsCount = gqlObject.GetObjectsCount("results");
 		Results = imtsdl::TElementList<CResult::V1_0>();
@@ -5658,6 +5661,9 @@ bool CAnalyzer::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gql
 		return false;
 	}
 
+	if (gqlObject.ContainsParam("Areas")){
+		Areas.emplace();
+	}
 	if (gqlObject.ContainsParam("Areas") && (gqlObject.GetObjectsCount("Areas") > 0)){
 		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("areas");
 		Areas = imtsdl::TElementList<CArea::V1_0>();
@@ -5711,6 +5717,9 @@ bool CAnalyzer::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& 
 		}
 	}
 
+	if (gqlObject.ContainsParam("Areas")){
+		Areas.emplace();
+	}
 	if (gqlObject.ContainsParam("Areas") && (gqlObject.GetObjectsCount("Areas") > 0)){
 		const qsizetype areasElementsCount = gqlObject.GetObjectsCount("areas");
 		Areas = imtsdl::TElementList<CArea::V1_0>();
@@ -6447,6 +6456,9 @@ bool CInspection::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& g
 		return false;
 	}
 
+	if (gqlObject.ContainsParam("Analyzers")){
+		Analyzers.emplace();
+	}
 	if (gqlObject.ContainsParam("Analyzers") && (gqlObject.GetObjectsCount("Analyzers") > 0)){
 		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("analyzers");
 		Analyzers = imtsdl::TElementList<CAnalyzer::V1_0>();
@@ -6508,6 +6520,9 @@ bool CInspection::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject
 		}
 	}
 
+	if (gqlObject.ContainsParam("Analyzers")){
+		Analyzers.emplace();
+	}
 	if (gqlObject.ContainsParam("Analyzers") && (gqlObject.GetObjectsCount("Analyzers") > 0)){
 		const qsizetype analyzersElementsCount = gqlObject.GetObjectsCount("analyzers");
 		Analyzers = imtsdl::TElementList<CAnalyzer::V1_0>();
@@ -7338,6 +7353,9 @@ bool CProductOverview::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObje
 	}
 	ProductImage = gqlObject["ProductImage"].toString();
 
+	if (gqlObject.ContainsParam("Inspections")){
+		Inspections.emplace();
+	}
 	if (gqlObject.ContainsParam("Inspections") && (gqlObject.GetObjectsCount("Inspections") > 0)){
 		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("inspections");
 		Inspections = imtsdl::TElementList<CInspection::V1_0>();
@@ -7407,6 +7425,9 @@ bool CProductOverview::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		ProductImage = gqlObject["ProductImage"].toString();
 	}
 
+	if (gqlObject.ContainsParam("Inspections")){
+		Inspections.emplace();
+	}
 	if (gqlObject.ContainsParam("Inspections") && (gqlObject.GetObjectsCount("Inspections") > 0)){
 		const qsizetype inspectionsElementsCount = gqlObject.GetObjectsCount("inspections");
 		Inspections = imtsdl::TElementList<CInspection::V1_0>();
@@ -9609,6 +9630,9 @@ bool CResultMetaData::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
+	if (gqlObject.ContainsParam("extendedMetaData")){
+		extendedMetaData.emplace();
+	}
 	if (gqlObject.ContainsParam("extendedMetaData") && (gqlObject.GetObjectsCount("extendedMetaData") > 0)){
 		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
 		extendedMetaData = imtsdl::TElementList<CExtendedMetaData::V1_0>();
@@ -9668,6 +9692,9 @@ bool CResultMetaData::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamOb
 		}
 	}
 
+	if (gqlObject.ContainsParam("extendedMetaData")){
+		extendedMetaData.emplace();
+	}
 	if (gqlObject.ContainsParam("extendedMetaData") && (gqlObject.GetObjectsCount("extendedMetaData") > 0)){
 		const qsizetype extendedMetaDataElementsCount = gqlObject.GetObjectsCount("extendedMetaData");
 		extendedMetaData = imtsdl::TElementList<CExtendedMetaData::V1_0>();
@@ -11813,6 +11840,9 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 	}
 
 	if (gqlObject.ContainsParam("resultContent")){
+		resultContent.emplace();
+	}
+	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
@@ -11846,6 +11876,9 @@ bool CCDMResultVarRecursive::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
+	if (gqlObject.ContainsParam("overallResultValues")){
+		overallResultValues.emplace();
+	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
@@ -11890,6 +11923,9 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 	}
 
 	if (gqlObject.ContainsParam("resultContent")){
+		resultContent.emplace();
+	}
+	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
@@ -11923,6 +11959,9 @@ bool CCDMResultVarRecursive::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGql
 		}
 	}
 
+	if (gqlObject.ContainsParam("overallResultValues")){
+		overallResultValues.emplace();
+	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
@@ -12649,6 +12688,9 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		}
 	}
 
+	if (gqlObject.ContainsParam("resultContent")){
+		resultContent.emplace();
+	}
 	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
@@ -12660,6 +12702,9 @@ bool CCDMResultVarString::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamO
 		}
 	}
 
+	if (gqlObject.ContainsParam("overallResultValues")){
+		overallResultValues.emplace();
+	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
@@ -12703,6 +12748,9 @@ bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
+	if (gqlObject.ContainsParam("resultContent")){
+		resultContent.emplace();
+	}
 	if (gqlObject.ContainsParam("resultContent") && !(gqlObject["resultContent"].isNull())){
 		const QVariant resultContentData = gqlObject["resultContent"];
 		const QVariantList resultContentDataList = resultContentData.toList();
@@ -12714,6 +12762,9 @@ bool CCDMResultVarString::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlPar
 		}
 	}
 
+	if (gqlObject.ContainsParam("overallResultValues")){
+		overallResultValues.emplace();
+	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
@@ -13452,6 +13503,9 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 	}
 
 	if (gqlObject.ContainsParam("resultContent")){
+		resultContent.emplace();
+	}
+	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
@@ -13485,6 +13539,9 @@ bool CCDMResult::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gq
 		}
 	}
 
+	if (gqlObject.ContainsParam("overallResultValues")){
+		overallResultValues.emplace();
+	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();
@@ -13529,6 +13586,9 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 	}
 
 	if (gqlObject.ContainsParam("resultContent")){
+		resultContent.emplace();
+	}
+	if (gqlObject.ContainsParam("resultContent")){
 		const QList<const ::imtgql::CGqlParamObject*> resultContentDataList = gqlObject.GetParamArgumentObjectPtrList("resultContent");
 		const qsizetype resultContentElementsCount = resultContentDataList.size();
 		resultContent = imtsdl::TElementList<complextest::ComplexUnion2::CDMResultUnionType>();
@@ -13562,6 +13622,9 @@ bool CCDMResult::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject&
 		}
 	}
 
+	if (gqlObject.ContainsParam("overallResultValues")){
+		overallResultValues.emplace();
+	}
 	if (gqlObject.ContainsParam("overallResultValues") && (gqlObject.GetObjectsCount("overallResultValues") > 0)){
 		const qsizetype overallResultValuesElementsCount = gqlObject.GetObjectsCount("overallResultValues");
 		overallResultValues = imtsdl::TElementList<COverallResultValues::V1_0>();

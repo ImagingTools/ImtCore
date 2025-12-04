@@ -990,6 +990,9 @@ bool CLink::V1_0::ReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlObje
 		}
 	}
 
+	if (gqlObject.ContainsParam("statusList")){
+		statusList.emplace();
+	}
 	if (gqlObject.ContainsParam("statusList") && !(gqlObject["statusList"].isNull())){
 		const QVariant statusListData = gqlObject["statusList"];
 		const QVariantList statusListDataList = statusListData.toList();
@@ -1038,6 +1041,9 @@ bool CLink::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObject& gqlO
 		}
 	}
 
+	if (gqlObject.ContainsParam("statusList")){
+		statusList.emplace();
+	}
 	if (gqlObject.ContainsParam("statusList") && !(gqlObject["statusList"].isNull())){
 		const QVariant statusListData = gqlObject["statusList"];
 		const QVariantList statusListDataList = statusListData.toList();
@@ -1926,6 +1932,9 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		name = gqlObject["name"].toString();
 	}
 
+	if (gqlObject.ContainsParam("linkList")){
+		linkList.emplace();
+	}
 	if (gqlObject.ContainsParam("linkList") && (gqlObject.GetObjectsCount("linkList") > 0)){
 		const qsizetype linkListElementsCount = gqlObject.GetObjectsCount("linkList");
 		linkList = imtsdl::TElementList<CLink::V1_0>();
@@ -1978,6 +1987,9 @@ bool CPrinterBase::V1_0::OptReadFromGraphQlObject(const ::imtgql::CGqlParamObjec
 		}
 	}
 
+	if (gqlObject.ContainsParam("specificationList")){
+		specificationList.emplace();
+	}
 	if (gqlObject.ContainsParam("specificationList")){
 		const QList<const ::imtgql::CGqlParamObject*> specificationListDataList = gqlObject.GetParamArgumentObjectPtrList("specificationList");
 		const qsizetype specificationListElementsCount = specificationListDataList.size();
