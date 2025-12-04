@@ -506,7 +506,7 @@ CollectionViewCommandsDelegateBase {
 						id: loading;
 						anchors.fill: parent;
 						visible: false
-						color: Style.backgroundColor2
+						background.color: Style.backgroundColor2
 					}
 				}
 			}

@@ -185,7 +185,7 @@ Rectangle {
 		id: loading;
 		anchors.fill: parent;
 		visible: false;
-		color: Style.baseColor;
+		background.color: Style.baseColor;
 	}
 }
 

@@ -307,6 +307,6 @@ ViewBase {
 		id: loading;
 		anchors.fill: parent;
 		visible: getProfileRequest.state == "Loading" || setProfileRequest.state == "Loading";
-		color: Style.backgroundColor2;
+		background.color: Style.backgroundColor2;
 	}
 }

@@ -151,7 +151,7 @@ DecoratorBase {
 		id: loading;
 		anchors.fill: bg;
 		indicatorSize: Style.controlHeightS;
-		color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent";
+		background.color: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent";
 		visible: false;
 	}
 }

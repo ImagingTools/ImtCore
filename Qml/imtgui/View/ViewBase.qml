@@ -31,6 +31,7 @@ Item {
 	property string contentColor: Style.backgroundColor2
 
 	property bool commandsPanelVisible: true
+	property bool commandsSeparatorVisible: true
 	property int commandsPanelHeight: Style.controlHeightM + 2 * Style.marginM
 
 	signal commandsModelChanged(var commandsModel)
@@ -115,7 +116,7 @@ Item {
 		width: parent.width;
 		height: visible ? 1 : 0;
 		color: Style.borderColor;
-		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null;
+		visible: !viewBase.commandsPanelVisible ? false : headerViewLoader.item && viewBase.commandsController != null && viewBase.commandsSeparatorVisible
 		objectName: "ViewBase";
 	}
 	

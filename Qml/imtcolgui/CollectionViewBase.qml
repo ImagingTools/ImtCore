@@ -369,7 +369,7 @@ ViewBase {
 	Loading {
 		id: loading_;
 		anchors.fill: backgroundTable;
-		color: Style.baseColor;
+		background.color: Style.baseColor;
 		visible: false;
 	}
 	

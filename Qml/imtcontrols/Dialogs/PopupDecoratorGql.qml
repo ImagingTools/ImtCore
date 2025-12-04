@@ -268,7 +268,7 @@ DecoratorBase {
 
 			indicatorSize: Math.min(parent.height - 2 * Style.marginS, 50)
 
-			color: itemBody.color;
+			background.color: itemBody.color;
 		}
 	}
 

@@ -102,7 +102,7 @@ Rectangle {
 		width: parent.width;
 		height: Style.sizeHintXXS;
 		indicatorSize: Style.controlHeightS;
-		color: container.color;
+		background.color: container.color;
 		visible: false;
 	}
 }
