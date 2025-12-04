@@ -42,6 +42,8 @@ BoundingBox {
 
 	property CanvasMatrix labelMatrix: CanvasMatrix{};
 
+	property real xScale: 1
+	property real yScale: 1
 
 	function getLogicalMajorLineX(lineX){
 		return lineX
@@ -78,6 +80,8 @@ BoundingBox {
 
 		let deltaMinusX = deltaX > 0 ? deltaX : 0
 		let deltaMinusY = deltaY < 0 ? -deltaY : 0
+
+		let addToDeltaX = 0.5 * gridShape.viewItem.drawingAreaWidth * (scaleCoeff - 1) >= 0 ? 0.5 * gridShape.viewItem.drawingAreaWidth * (scaleCoeff - 1) : 0
 
 		let stepX = gridShape.gridStepMajorX;
 		let stepY = gridShape.gridStepMajorY;
@@ -220,8 +224,10 @@ BoundingBox {
 
 			ctx.globalAlpha = 1
 
-			// completing the grid to zero
-			//MINOR GRID
+
+			// COMPLETING THE GRID TO ZERO
+
+			// MINOR GRID
 			if(hasMinorGrid){
 				//ctx.strokeStyle = "violet"
 				ctx.strokeStyle = gridShape.minorGridColor;
@@ -229,7 +235,7 @@ BoundingBox {
 				let stepMinorX = gridShape.gridStepMinorX
 				let stepMinorY = gridShape.gridStepMinorY
 				//vertical minor lines
-				for(let i = 1; i * stepMinorX <= (deltaMinusX)/scaleCoeff + stepX; i++){//vertical lines
+				for(let i = 1; i * stepMinorX <= (deltaMinusX + addToDeltaX)/scaleCoeff + stepX; i++){//vertical lines
 					let x1 = firstVertLineX + labelYWidth - i * stepMinorX;
 					let y1 =  verticalLineTopY ;
 					let x2 = x1;
@@ -249,7 +255,7 @@ BoundingBox {
 					ctx.stroke();
 				}
 				//horizontal minor lines
-				//ctx.strokeStyle = ctx.strokeStyle = "blue"
+				//ctx.strokeStyle  = "blue"
 				for(let i = 1; i * stepMinorY <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff); i++){//horizontal lines
 
 					let x1 = labelYWidth ;
@@ -278,7 +284,7 @@ BoundingBox {
 			//ctx.strokeStyle = "red"
 			ctx.strokeStyle = gridShape.majorGridColor;
 			//vertical major lines
-			for(let i = 1; i * stepX  <= deltaMinusX/scaleCoeff + stepX; i++){//vertical lines
+			for(let i = 1; i * stepX  <= (deltaMinusX + addToDeltaX)/scaleCoeff + stepX ; i++){//vertical lines
 				if(gridShape.thinningCheck(scaleCoeff, i)){
 					continue
 				}
@@ -307,6 +313,7 @@ BoundingBox {
 				if(gridShape.thinningCheck(scaleCoeff, i)){
 					continue
 				}
+
 				let x1 = labelYWidth ;
 				let y1 =  gridShape.viewItem.drawingAreaHeight + i * stepY - labelXHeight - firstHorizLineY;
 				let x2 =  (gridShape.viewItem.drawingAreaWidth  + deltaAddX)/scaleCoeff ;
@@ -360,9 +367,7 @@ BoundingBox {
 				let y_ = (gridShape.viewItem.drawingAreaHeight - i * stepY - labelXHeight - firstHorizLineY)* scaleCoeff
 				y_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).y
 
-				//console.log("deltaAddY:: ", y_, deltaAddY, (gridShape.viewItem.drawingAreaHeight - labelXHeight + deltaAddY * scaleCoeff))
-
-				let str = gridShape.getLabelY(String(getLogicalMajorLineY(Number(i * stepY - gridShape.axesOrigin.y + firstHorizLineY).toFixed(gridShape.labelPrecision))))
+				let str = gridShape.getLabelY(String(getLogicalMajorLineY(Number(i * Math.round(stepY/gridShape.yScale) - gridShape.axesOrigin.y + firstHorizLineY).toFixed(gridShape.labelPrecision))))
 				if(str == ""){
 					continue
 				}
@@ -383,7 +388,7 @@ BoundingBox {
 				let y_ = (gridShape.viewItem.drawingAreaHeight + i * stepY  - labelXHeight - firstHorizLineY)* scaleCoeff
 				y_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).y
 
-				let str = gridShape.getLabelY(String(getLogicalMajorLineY(Number(firstHorizLineY -i * stepY - gridShape.axesOrigin.y).toFixed(gridShape.labelPrecision))))
+				let str = gridShape.getLabelY(String(getLogicalMajorLineY(Number(firstHorizLineY -i * Math.round(stepY/gridShape.yScale) - gridShape.axesOrigin.y).toFixed(gridShape.labelPrecision))))
 				if(str == ""){
 					continue
 				}
@@ -414,7 +419,7 @@ BoundingBox {
 				let y_ = gridShape.viewItem.drawingAreaHeight  - labelXHeight + fontSize + Style.marginXS
 				x_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).x
 
-				let str = gridShape.getLabelX(String(getLogicalMajorLineX(Number(firstVertLineX + i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision))))
+				let str = gridShape.getLabelX(String(getLogicalMajorLineX(Number(firstVertLineX + i * Math.round(stepX/gridShape.xScale) - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision))))
 				if(str == ""){
 					continue
 				}
@@ -428,7 +433,7 @@ BoundingBox {
 				ctx.closePath()
 			}
 			// completing label x to zero
-			for(let i = 0; i * stepX  <= deltaMinusX/scaleCoeff + stepX; i++){
+			for(let i = 0; i * stepX  <= (deltaMinusX + addToDeltaX)/scaleCoeff + stepX; i++){
 				if(gridShape.thinningCheck(scaleCoeff, i)){
 					continue
 				}
@@ -436,7 +441,7 @@ BoundingBox {
 				let y_ = gridShape.viewItem.drawingAreaHeight  - labelXHeight + fontSize + Style.marginXS
 				x_ = LinearAlgebra.transformPoint2d(Qt.point(x_, y_), labelMatrix.matrix).x
 
-				let str = gridShape.getLabelX(String(getLogicalMajorLineX(Number(firstVertLineX -i * stepX - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision))))
+				let str = gridShape.getLabelX(String(getLogicalMajorLineX(Number(firstVertLineX -i * Math.round(stepX/gridShape.xScale) - gridShape.axesOrigin.x).toFixed(gridShape.labelPrecision))))
 				if(str == ""){
 					continue
 				}

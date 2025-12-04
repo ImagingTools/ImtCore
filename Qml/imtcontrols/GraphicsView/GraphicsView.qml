@@ -855,7 +855,7 @@ Rectangle {
 			}
 
 			onPositionSignal: {
-				if(graphicsView.isSelectionMode){
+				if(graphicsView.isSelectionMode || graphicsView.isPointsEditMode){
 					positionChangedPause.position = position;
 					positionChangedPause.restart();
 				}

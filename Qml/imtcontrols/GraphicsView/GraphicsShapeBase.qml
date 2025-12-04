@@ -15,6 +15,7 @@ QtObject {
 	property bool isTouched: false;
 	property bool isSelected: false;
 	property bool canSelect: false;
+	property bool isEditable: true;
 	property bool showNodes: false;
 	property bool showControlPoints: false;
 	property int touchedNodeIndex: -1;

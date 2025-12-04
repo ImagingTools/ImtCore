@@ -9,6 +9,7 @@ BoundingBox {
 	id: polylineShape;
 
 	property string color: "#000000";
+	property string selectionColor: DesignScheme.selectionColor;
 	property var colorList: [];
 	property int lineWidth: 1;
 	property real shapePointSize: DesignScheme.shapePointSize;
@@ -33,6 +34,11 @@ BoundingBox {
 			return;
 		}
 
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash(lineDashArray)
+		}
+
+
 		ctx.strokeStyle = isSelected ? DesignScheme.selectionColor : polylineShape.color;
 		ctx.lineWidth = lineWidth
 		ctx.beginPath()
@@ -47,6 +53,9 @@ BoundingBox {
 			}
 		}
 		ctx.stroke();
+		if(lineDashArray.length && !isSelected){
+			ctx.setLineDash([])
+		}
 		ctx.closePath();
 	}
 
@@ -119,10 +128,12 @@ BoundingBox {
 	}
 
 	function isInside(xArg, yArg){
-		let margin = Style.marginL / viewItem.viewMatrix.xScale();
-		let mousePoint = getLogPosition(Qt.point(xArg, yArg))
+		let margin = Style.marginL
+		let mousePoint = Qt.point(xArg, yArg)
 		for(let i = 0; i < points.length-1; i++){
-			let nearestPoint = AnalyticGeometry.nearestPointOnLine2d(mousePoint, points[i], points[i+1], true);
+			let currentPoint = getScreenPosition(points[i])
+			let nextPoint = getScreenPosition(points[i+1])
+			let nearestPoint = AnalyticGeometry.nearestPointOnLine2d(mousePoint, currentPoint, nextPoint, true);
 			let dist = AnalyticGeometry.distanceBetweenPoints2d(mousePoint, nearestPoint)
 
 			if(dist < margin){

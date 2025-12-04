@@ -41,6 +41,8 @@ Rectangle{
 	property bool hasMinorGrid: true;
 	property bool isMultiGraph: false;
 
+	property var rightLimit;
+
 	property real xScale: 1
 	property real yScale: 1
 
@@ -54,8 +56,25 @@ Rectangle{
 
 	property int legendFontSize: Style.fontSizeM
 
+	property alias hasLeftButtonMenu: graphicsView.hasLeftButtonMenu;
+	property alias hasRightButtonMenu: graphicsView.hasRightButtonMenu;
+	property alias restrictMove: graphicsView.restrictMove;
+	property alias restrictZoom: graphicsView.restrictZoom;
+	property alias restrictSelect: graphicsView.restrictSelect;
+	property alias hideScrollbars: graphicsView.hideScrollbars;
+
+
 	function requestPaint() {
 		graphicsView.resize()
+	}
+
+	function fitToView(){
+		graphicsView.fitToInactivAndActiveLayer();
+	}
+
+	function setEditMode(mode){
+		graphicsView.isPointsEditMode = mode
+		graphicsView.restrictSelect = mode
 	}
 
 	function createLine(){
@@ -94,6 +113,10 @@ Rectangle{
 	}
 
 	function getTooltipText(pointIndex, lineIndex){
+		let ok = checkTooltips(pointIndex, lineIndex)
+		if(!ok){
+			return ""
+		}
 		let val = graph.tooltipValues[pointIndex]
 		let str = "(" + val.x + ", " + val.y + ")"
 		return str
@@ -183,6 +206,10 @@ Rectangle{
 				}
 			}
 
+			function fitToActiveLayer(){
+				fitToInactivAndActiveLayer()
+			}
+
 			function fitToWidthFunction(){
 				if(graph.wasFitToWidth){
 					return;
@@ -209,6 +236,13 @@ Rectangle{
 						if(currX > maxX){
 							maxX = currX
 						}
+					}
+				}
+
+				if(graph.rightLimit !== undefined){
+					let rightLimitScreen = rightLimitShape.getScreenPosition(rightLimitShape.points[0]).x
+					if(rightLimitScreen > maxX){
+						maxX = rightLimitScreen
 					}
 				}
 
@@ -274,6 +308,10 @@ Rectangle{
 				if(graph.alwaysShowOrigin){
 					inactiveLayer.addShape(originShape);
 				}
+				if(graph.rightLimit !== undefined){
+					rightLimitShape.points = [graph.rightLimit]
+					inactiveLayer.addShape(rightLimitShape);
+				}
 
 			}
 
@@ -338,6 +376,8 @@ Rectangle{
 		legendMargin: graph.legendMargin;
 		gridStepMajorX: graph.gridStepMajorX * graph.xScale
 		gridStepMajorY: graph.gridStepMajorY * graph.yScale
+		xScale: graph.xScale
+		yScale: graph.yScale
 		canDrawText: true;
 		labelX: ""
 		labelY: ""
@@ -361,6 +401,10 @@ Rectangle{
 		points: [Qt.point(0,0)]
 	}
 
+	BoundingBox{
+		id: rightLimitShape
+	}
+
 	Component{
 		id: polylineComp
 
@@ -374,12 +418,12 @@ Rectangle{
 			property int lineIndex: 0;
 
 			function getTooltipText(){
-				let isBase = !graph.checkTooltips(highlightedNodeIndex, lineIndex)
-				if(isBase){
+				let str = graph.getTooltipText(highlightedNodeIndex, lineIndex)
+				if(str == ""){
 					return getTooltipTextBase()
 				}
 				else {
-					return graph.getTooltipText(highlightedNodeIndex, lineIndex)
+					return str
 				}
 			}
 

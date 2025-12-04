@@ -9,7 +9,7 @@ QtObject {
 	property real shapeSelectedPointSize: 6;
 	property int boundingBoxLineWidth: 2;
 	property int boundingBoxControlPointLineWidth: 1;
-	property int boundingBoxControlPointRadius: 6;
+	property int boundingBoxControlPointRadius: 5;
 	property string boundingBoxBorderColor: "#3a3b3b"
 
 	property int selectionLineWidth: 4;

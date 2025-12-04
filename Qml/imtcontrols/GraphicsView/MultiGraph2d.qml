@@ -10,7 +10,7 @@ Graph2d{
 	isMultiGraph: true;
 	property var tooltipValuesArray: []
 
-	function addLine(pointsArg, colorArg, tooltipValuesArg){
+	function addLine(pointsArg, colorArg, showNodesArg, isEditableArg, lineDashArrayArg, tooltipValuesArg){
 		if(!pointsArg || !pointsArg.length){
 			return;
 		}
@@ -21,6 +21,19 @@ Graph2d{
 		line.lineIndex = lineIndex;
 		if(colorArg !==undefined){
 			line.color = colorArg;
+		}
+		if(showNodesArg !==undefined){
+			line.showNodes = showNodesArg
+		}
+		if(isEditableArg !==undefined){
+			//line.isEditable = isEditableArg//??
+			line.canSelect = isEditableArg
+		}
+		else {
+			line.canSelect = true;
+		}
+		if(lineDashArrayArg !==undefined){
+			line.lineDashArray = lineDashArrayArg
 		}
 
 		let empty = []
@@ -44,7 +57,7 @@ Graph2d{
 
 	function getPoints(index){
 		let activeLayer = graphicsViewAlias.getActiveLayer()
-		let shapeModel = activeLayer.shapeModel[index]
+		let shapeModel = activeLayer.shapeModel
 		if(!shapeModel.length || index < 0 || index > shapeModel.length -1){
 			return []
 		}
@@ -55,7 +68,7 @@ Graph2d{
 
 	function setPoints(points, index){
 		let activeLayer = graphicsViewAlias.getActiveLayer()
-		let shapeModel = activeLayer.shapeModel[index]
+		let shapeModel = activeLayer.shapeModel
 		if(!shapeModel.length || index < 0 || index > shapeModel.length -1){
 			return false
 		}
