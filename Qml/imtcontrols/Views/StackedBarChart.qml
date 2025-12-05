@@ -29,19 +29,35 @@ Item{
 		canvas.requestPaint()
 	}
 
-	function buildLegend(){
-		let map ={}
-		for (let bar of bars){
-			for (let seg of bar.segments || []){
-				if (!map[seg.label])
-					map[seg.label] = seg.color || "#ccc"
+	function buildLegend() {
+		let map = {}   // label -> { color, totalValue }
+	
+		for (let bar of bars) {
+			for (let seg of bar.segments || []) {
+				if (!map[seg.label]) {
+					map[seg.label] = {
+						color: seg.color || "#ccc",
+						total: 0
+					}
+				}
+				map[seg.label].total += seg.value || 0
 			}
 		}
+	
 		let result = []
-		for (let key in map)
-			result.push({ label: key, color: map[key] })
+		for (let key in map) {
+			result.push({
+				label: key,
+				total: map[key].total,
+				color: map[key].color
+			})
+		}
+
+		result.sort(function(a, b){ return b.total - a.total} )
+
 		legendItems = result
 	}
+	
 
 	Rectangle{
 		id: tooltip
@@ -221,7 +237,7 @@ Item{
 
 				Text{
 					id: labelText
-					text: modelData.label
+					text: modelData.label + " (" + modelData.total + ")"
 					color: chart.legendClickable ? "#0b5ed7":chart.textColor
 					font.pixelSize: Style.fontSizeS
 					anchors.verticalCenter: parent.verticalCenter
