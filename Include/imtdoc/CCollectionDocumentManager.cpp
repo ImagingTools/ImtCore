@@ -344,7 +344,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SaveDocument(
 
 	// Create new object
 	workingDocument.objectId =
-		collectionPtr->InsertNewObject(workingDocument.objectTypeId, workingDocument.documentName, "", workingDocument.objectPtr.GetPtr());
+		collectionPtr->InsertNewObject(workingDocument.objectTypeId, documentName, "", workingDocument.objectPtr.GetPtr());
 
 	if (!workingDocument.objectId.isEmpty()){
 		workingDocument.documentName = documentName;
