@@ -432,7 +432,7 @@ Item {
 					if (root.filterMenu.enabledFilters[filterKey]){
 						let filterModel = root.registeredFilters[filterKey]
 						if (filterModel){
-							paramsSetController.addParam(filterKey, filterKey, "", "", Functions.escapeSpecialChars(filterModel.toJson()))
+							paramsSetController.addParam(filterKey, filterKey, "", "", filterModel.toJson())
 						}
 					}
 				}

@@ -75,7 +75,7 @@ Item {
 	
 	Timer {
 		id: timer;
-		interval: 200;
+		interval: 50
 		onTriggered: {
 			if (commandsItem){
 				commandsItem.checkCommandsWidth();

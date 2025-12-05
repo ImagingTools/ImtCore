@@ -7,6 +7,7 @@ import imtauthUsersSdl 1.0
 
 Rectangle {
 	id: authPageContainer;
+	objectName: "AuthorizationPage"
 
 	color: "transparent";
 
@@ -187,6 +188,7 @@ Rectangle {
 
 			CustomTextField {
 				id: loginTextInput;
+				objectName: "LoginInput"
 
 				width: Style.sizeHintXS;
 				height: Style.controlHeightM;
@@ -239,6 +241,7 @@ Rectangle {
 
 			CustomTextField {
 				id: passwordTextInput;
+				objectName: "PasswordInput"
 
 				width: Style.sizeHintXS;
 				height: Style.controlHeightM;
@@ -272,6 +275,7 @@ Rectangle {
 
 				ToolButton {
 					id: eyeButton;
+					objectName: "EyeButton"
 
 					anchors.verticalCenter: parent.verticalCenter;
 					anchors.right: parent.right;
@@ -401,7 +405,8 @@ Rectangle {
 
 				Button{
 					id: loginButton;
-
+					objectName: "LoginButton"
+					
 					anchors.centerIn: parent;
 					width: Style.buttonWidthXXL;
 					height: Style.controlHeightM;

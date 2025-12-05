@@ -57,24 +57,16 @@ Item {
 		id: paramsSetController
 	}
 
-	function escapeSpecialChars(jsonString) {
-		return jsonString.replace(/\n/g, "\\n")
-		.replace(/\r/g, "\\r")
-		.replace(/\t/g, "\\t")
-		.replace(/\f/g, "\\f")
-		.replace(/"/g, '\\"');
-	}
-
 	function createSelectionParams(collectionFilter, documentFilter){
 		let selectionParams = selectionParamsComp.createObject(root)
 		paramsSetController.paramsSet = selectionParams
 
 		if (collectionFilter){
-			paramsSetController.addParam("ComplexFilter", "ComplexFilter", "", "",  escapeSpecialChars(collectionFilter.toJson()))
+			paramsSetController.addParam("ComplexFilter", "ComplexFilter", "", "",  collectionFilter.toJson())
 		}
 
 		if (documentFilter){
-			paramsSetController.addParam("DocumentFilter", "DocumentFilter", "", "", escapeSpecialChars(documentFilter.toJson()))
+			paramsSetController.addParam("DocumentFilter", "DocumentFilter", "", "", documentFilter.toJson())
 		}
 
 		return selectionParams
