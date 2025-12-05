@@ -85,7 +85,7 @@ Rectangle{
 	}
 
 	function getLabelX(xArg){
-		let index = Math.round(Number(xArg) / gridStepMajorX/ xScale)
+		let index = Math.round(Number(xArg) / gridStepMajorX)
 		if(!graph.labelXValues.length){
 			return gridShape.getLabelXBase(xArg)
 		}
@@ -99,7 +99,7 @@ Rectangle{
 	}
 
 	function getLabelY(yArg){
-		let index = Math.round(Number(yArg) / gridStepMajorY / yScale)
+		let index = Math.round(Number(yArg) / gridStepMajorY)
 		if(!graph.labelYValues.length){
 			return gridShape.getLabelXBase(yArg)
 		}
