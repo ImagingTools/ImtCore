@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5436" Description="ACF"/>
+            <Version Id="1" Number="2254" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -25,18 +25,18 @@
         <EmbededRegistry Id="RemoteControllers">
             <PositionMap>
                 <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
-                <Element ComponentName="RemoteAuthorizationController" X="939" Y="188" Note=""/>
+                <Element ComponentName="RemoteAuthorizationController" X="775" Y="350" Note=""/>
                 <Element ComponentName="RemoteCollectionController" X="575" Y="550" Note=""/>
-                <Element ComponentName="RemoteCommandsController" X="575" Y="375" Note=""/>
-                <Element ComponentName="RemoteRepresentationController" X="600" Y="200" Note=""/>
-                <Element ComponentName="RemoteUserController" X="250" Y="200" Note=""/>
-                <Element ComponentName="RoleRemoteCollectionController" X="950" Y="550" Note=""/>
+                <Element ComponentName="RemoteCommandsController" X="400" Y="400" Note=""/>
+                <Element ComponentName="RemoteRepresentationController" X="250" Y="275" Note=""/>
+                <Element ComponentName="RemoteUserController" X="150" Y="175" Note=""/>
+                <Element ComponentName="RoleRemoteCollectionController" X="1000" Y="550" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
         <EmbededRegistry Id="DocumentRevision">
             <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="850" Y="200" Note=""/>
+                <Element ComponentName="CheckPermissionOr" X="900" Y="200" Note=""/>
                 <Element ComponentName="RemoteDocumentRevisionController" X="575" Y="75" Note=""/>
                 <Element ComponentName="RevisionPermissions" X="250" Y="200" Note=""/>
             </PositionMap>

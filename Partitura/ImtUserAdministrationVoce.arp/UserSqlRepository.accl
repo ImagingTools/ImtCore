@@ -2,20 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5436" Description="ACF"/>
+            <Version Id="1" Number="2254" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="CachedObjectCollection" X="550" Y="675" Note=""/>
-        <Element ComponentName="JsonSerializer" X="175" Y="350" Note=""/>
         <Element ComponentName="Repository" X="550" Y="550" Note=""/>
-        <Element ComponentName="SqlDatabaseDocumentDelegate" X="575" Y="350" Note=""/>
+        <Element ComponentName="SqlDatabaseDocumentDelegate" X="550" Y="275" Note=""/>
         <Element ComponentName="Types" X="550" Y="125" Note=""/>
         <Element ComponentName="UserCollectionAdapter" X="200" Y="550" Note=""/>
-        <Element ComponentName="UserInfo" X="875" Y="350" Note=""/>
-        <Element ComponentName="UsersSqlPathExtractor" X="900" Y="550" Note=""/>
+        <Element ComponentName="UserInfo" X="925" Y="125" Note=""/>
+        <Element ComponentName="UsersSqlPathExtractor" X="925" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

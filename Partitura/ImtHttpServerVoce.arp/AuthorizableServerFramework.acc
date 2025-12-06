@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5430" Description="ACF"/>
-            <Version Id="1" Number="2253" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395264" Description="Qt Framework"/>
+            <Version Id="0" Number="5436" Description="ACF"/>
+            <Version Id="1" Number="2254" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395266" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -223,7 +223,6 @@
         <Component ExportedId="RoleRemoteRepository" ComponentId="PumaClientEngine/RoleRemoteRepository"/>
         <Component ExportedId="UserActionManager" ComponentId="UserActionController/UserActionManager"/>
         <Component ExportedId="UserActionSqlRepository" ComponentId="UserActionController/UserActionSqlRepository"/>
-        <Component ExportedId="UserInfoProvider" ComponentId="PumaClientEngine/UserInfoProvider"/>
         <Component ExportedId="UserRemoteRepository" ComponentId="PumaClientEngine/UserRemoteRepository"/>
         <Component ExportedId="UserSessionRemoteRepository" ComponentId="PumaClientEngine/UserSessionRemoteRepository"/>
         <Component ExportedId="WebSocketServerFramework" ComponentId="WebSocketServerFramework"/>
