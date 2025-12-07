@@ -9,6 +9,15 @@ namespace imtclientgql
 
 // reimplemented (sdl::imtbase::DocumentRevision::CGraphQlHandlerCompBase)
 
+sdl::imtbase::ImtCollection::CDuplicateElementsPayload CRemoteObjectCollectionControllerComp::OnDuplicateElements(
+			const sdl::imtbase::ImtCollection::CDuplicateElementsGqlRequest& /*duplicateElementsRequest*/,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	return SendModelRequest<sdl::imtbase::ImtCollection::CDuplicateElementsPayload>(gqlRequest, errorMessage);
+}
+
+
 sdl::imtbase::ImtCollection::CVisualStatus CRemoteObjectCollectionControllerComp::OnGetObjectVisualStatus(
 			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& /*getObjectVisualStatusRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,

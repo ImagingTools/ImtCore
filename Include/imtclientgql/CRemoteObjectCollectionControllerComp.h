@@ -21,6 +21,10 @@ public:
 
 protected:
 	// reimplemented (sdl::imtbase::DocumentRevision::CGraphQlHandlerCompBase)
+	virtual sdl::imtbase::ImtCollection::CDuplicateElementsPayload OnDuplicateElements(
+				const sdl::imtbase::ImtCollection::CDuplicateElementsGqlRequest& duplicateElementsRequest,
+				const ::imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 	virtual sdl::imtbase::ImtCollection::CVisualStatus OnGetObjectVisualStatus(
 				const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 				const ::imtgql::CGqlRequest& gqlRequest,

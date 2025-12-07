@@ -2,14 +2,65 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5422" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395522" Description="Qt Framework"/>
+            <Version Id="0" Number="5434" Description="ACF"/>
+            <Version Id="1" Number="2255" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="Duplicate" PackageId="ImtCoreVoce" ComponentId="Command">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Alignment" Type="Integer" ExportId="DuplicateAlignment">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Duplicate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Id[]" ExportId="DuplicatePermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Description" Type="Text" ExportId="DuplicateDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="String" ExportId="DuplicateIconPath">
+                        <Data IsEnabled="true" Value="Icons/Duplicate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="IsDuplicateEnabled">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="IsDuplicateVisible">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="DuplicateCommandName">
+                        <Data IsEnabled="true" Value="Duplicate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Priority" Type="Integer" ExportId="DuplicatePriority">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Status" Type="Text" ExportId="DuplicateStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubCommands" Type="Reference[]" ExportId="DuplicateSubCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TracingConfiguration" Type="Reference" ExportId="TracingConfiguration">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Edit" PackageId="ImtCoreVoce" ComponentId="Command">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -138,6 +189,7 @@
                                 <Value>RemoveAll</Value>
                                 <Value>Restore</Value>
                                 <Value>RestoreAll</Value>
+                                <Value>Duplicate</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -466,6 +518,7 @@
         <Interface InterfaceId="istd::IChangeable" ComponentId="Group"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="Duplicate" ComponentId="Duplicate"/>
         <Component ExportedId="Edit" ComponentId="Edit"/>
         <Component ExportedId="Export" ComponentId="Export"/>
         <Component ExportedId="Import" ComponentId="Import"/>

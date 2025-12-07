@@ -286,6 +286,16 @@ type CreateSubCollectionPayload {
 	items: [SubCollectionItem]
 }
 
+type DuplicateElementsPayload {
+	success: Boolean
+}
+
+input DuplicateElementsInput {
+	name: String # If only one element is duplicated
+	collectionId: ID!
+	elementIds: [ID]!
+}
+
 type Query {
 	GetObjectVisualStatus (input: ObjectVisualStatusInput): VisualStatus!
 	GetObjectTypeId (input: GetObjectTypeIdInput): GetObjectTypeIdPayload!
@@ -300,6 +310,7 @@ type Query {
 }
 
 type Mutation {
+	DuplicateElements (input: DuplicateElementsInput): DuplicateElementsPayload!
 	RemoveElements (input: RemoveElementsInput): RemoveElementsPayload!
 	RemoveElementSet (input: RemoveElementSetInput): RemoveElementSetPayload!
 	RestoreObjects (input: RestoreObjectsInput): RestoreObjectsPayload!

@@ -2,12 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5422" Description="ACF"/>
-            <Version Id="1" Number="2252" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395522" Description="Qt Framework"/>
+            <Version Id="0" Number="5434" Description="ACF"/>
+            <Version Id="1" Number="2255" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="Duplicate" X="425" Y="525" Note=""/>
         <Element ComponentName="Edit" X="325" Y="350" Note=""/>
         <Element ComponentName="Export" X="1075" Y="350" Note=""/>
         <Element ComponentName="Group" X="600" Y="100" Note=""/>
@@ -15,7 +16,7 @@
         <Element ComponentName="New" X="125" Y="350" Note=""/>
         <Element ComponentName="Remove" X="525" Y="350" Note=""/>
         <Element ComponentName="RemoveAll" X="700" Y="350" Note=""/>
-        <Element ComponentName="Restore" X="675" Y="525" Note=""/>
+        <Element ComponentName="Restore" X="625" Y="525" Note=""/>
         <Element ComponentName="RestoreAll" X="850" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

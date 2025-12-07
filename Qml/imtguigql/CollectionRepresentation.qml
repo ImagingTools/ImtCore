@@ -38,6 +38,9 @@ Item {
 	signal visualStatusReceived(string objectId, string icon, string text, string description)
 	signal visualStatusReceiveFailed(string objectId, string errorMessage)
 
+	signal elementsDuplicated()
+	signal elementsDuplicateFailed(string message)
+
 	signal beginUpdate();
 	signal endUpdate();
 
@@ -96,6 +99,11 @@ Item {
 		objectVisualStatusInput.m_objectId = id
 		objectVisualStatusInput.m_typeId = typeId
 		getObjectVisualStatusRequest.send(objectVisualStatusInput)
+	}
+
+	function duplicateElements(elementIds){
+		duplicateElementsInput.m_elementIds = elementIds
+		duplicateElementsRequest.send(duplicateElementsInput)
 	}
 
 	onCollectionIdChanged: {
@@ -226,6 +234,32 @@ Item {
 	GetElementMetaInfoInput {
 		id: getElementMetaInfoInput
 		m_collectionId: root.collectionId
+	}
+
+	DuplicateElementsInput {
+		id: duplicateElementsInput
+		m_collectionId: root.collectionId
+	}
+
+	GqlSdlRequestSender {
+		id: duplicateElementsRequest
+		gqlCommandId: ImtbaseImtCollectionSdlCommandIds.s_duplicateElements
+		sdlObjectComp: Component {
+			DuplicateElementsPayload {
+				onFinished: {
+					if (m_success){
+						root.elementsDuplicated()
+					}
+					else{
+						root.elementsDuplicateFailed("")
+					}
+				}
+			}
+		}
+
+		function getHeaders(){
+			return root.getHeaders();
+		}
 	}
 
 	GqlSdlRequestSender {

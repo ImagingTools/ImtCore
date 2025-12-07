@@ -82,6 +82,7 @@ CollectionView {
 	}
 
 	Component.onCompleted: {
+		table.setSortingInfo("timeStamp", "DESC")
 		table.saveWidth.connect(root.tableViewParamsAccepted)
 		Events.subscribeEvent("UpdateAllModels", root.receiveRemoteChanges);
 	}

@@ -78,9 +78,6 @@ ElementView {
 						}
 						
 						ModalDialogManager.openDialog(remoteCollectionViewDialogComp)
-						// container.stackView.addPage(remoteCollectionViewComp2)
-						
-						// container.stackView.setCurrentIndex(1)
 					}
 				}
 	

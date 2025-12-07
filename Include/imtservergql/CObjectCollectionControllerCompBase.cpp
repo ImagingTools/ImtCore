@@ -230,6 +230,72 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 
 // reimplemented (sdl::imtbase::ImtCollection::CGraphQlHandlerCompBase)
 
+sdl::imtbase::ImtCollection::CDuplicateElementsPayload CObjectCollectionControllerCompBase::OnDuplicateElements(
+			const sdl::imtbase::ImtCollection::CDuplicateElementsGqlRequest& duplicateElementsRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	sdl::imtbase::ImtCollection::CDuplicateElementsPayload response;
+
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT_X(false, "Attribute 'ObjectCollection' was not set", "CObjectCollectionControllerCompBase");
+		return response;
+	}
+
+	sdl::imtbase::ImtCollection::DuplicateElementsRequestArguments arguments = duplicateElementsRequest.GetRequestedArguments();
+	if (!arguments.input.Version_1_0){
+		Q_ASSERT(false);
+		return response;
+	}
+
+	QByteArrayList elementIds;
+	if (arguments.input.Version_1_0->elementIds.HasValue()){
+		elementIds = arguments.input.Version_1_0->elementIds->ToList();
+	}
+
+	QString name;
+	if (!arguments.input.Version_1_0->name.HasValue()){
+		name = *arguments.input.Version_1_0->name;
+	}
+
+	if (elementIds.isEmpty()){
+		errorMessage = QString("Unable to duplicate elements. Error: Element-IDs is empty");
+		return response;
+	}
+
+	response.Version_1_0.Emplace();
+	response.Version_1_0->success = false;
+
+	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
+
+	int count = elementIds.size();
+	for (const QByteArray& elementId : elementIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr)){
+			istd::TDelPtr<istd::IChangeable> clonedObjectPtr = dataPtr->CloneMe();
+			if (clonedObjectPtr.IsValid()){
+				QString duplicateName;
+				QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementId);
+
+				if (count == 1){
+					duplicateName = name;
+				}
+				else{
+					QString elementName = m_objectCollectionCompPtr->GetElementInfo(elementId, imtbase::ICollectionInfo::EIT_NAME).toString();
+					duplicateName = elementName + " Copy";
+				}
+
+				m_objectCollectionCompPtr->InsertNewObject(typeId, duplicateName, "", clonedObjectPtr.GetPtr());
+			}
+		}
+	}
+
+	response.Version_1_0->success = true;
+
+	return response;
+}
+
+
 sdl::imtbase::ImtCollection::CVisualStatus CObjectCollectionControllerCompBase::OnGetObjectVisualStatus(
 			const sdl::imtbase::ImtCollection::CGetObjectVisualStatusGqlRequest& getObjectVisualStatusRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
@@ -1723,6 +1789,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	QByteArray objectId = inputParamPtr->GetParamArgumentValue("id").toByteArray();
 	QString name = GetObjectNameFromRequest(gqlRequest);
+	QString description = inputParamPtr->GetParamArgumentValue("description").toString();
 
 	imtbase::IObjectCollection::DataPtr savedObjectPtr;
 	if (!m_objectCollectionCompPtr->GetObjectData(objectId, savedObjectPtr)){
@@ -1758,6 +1825,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		if (currentName != name){
 			m_objectCollectionCompPtr->SetElementName(objectId, name);
 		}
+	}
+
+	QString currentDescription = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+	if (currentDescription != description){
+		m_objectCollectionCompPtr->SetElementDescription(objectId, description);
 	}
 
 	QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);

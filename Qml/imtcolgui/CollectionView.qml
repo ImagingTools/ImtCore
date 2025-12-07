@@ -157,6 +157,12 @@ Item {
 			container.dataController.restoreObjectSet(filter);
 		}
 	}
+
+	function duplicateElements(elementIds){
+		if (container.dataController){
+			container.dataController.duplicateElements(elementIds)
+		}
+	}
 	
 	function setElementName(elementId, name){
 		container.setElementName(elementId, name);

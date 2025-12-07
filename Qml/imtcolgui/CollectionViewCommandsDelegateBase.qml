@@ -220,6 +220,15 @@ ViewCommandsDelegateBase {
 
 			let canEdit = commandsController.commandExists("Edit");
 			let canRemove = commandsController.commandExists("Remove");
+			let canDuplicate = commandsController.commandExists("Duplicate");
+
+			if (canDuplicate){
+				let index = contextMenuModel.insertNewItem();
+
+				contextMenuModel.setData("id", "Duplicate", index);
+				contextMenuModel.setData("name", qsTr("Duplicate"), index);
+				contextMenuModel.setData("icon", "Icons/Duplicate", index);
+			}
 
 			if (canEdit){
 				let index = contextMenuModel.insertNewItem();
@@ -328,6 +337,11 @@ ViewCommandsDelegateBase {
 		}
 
 		ModalDialogManager.openDialog(restoreAllDialogComp, {message: message});
+	}
+
+	function onDuplicate(params){
+		let elementIds = collectionViewCommandsDelegate.collectionView.getSelectedIds()
+		collectionViewCommandsDelegate.collectionView.duplicateElements(elementIds)
 	}
 
 	// importObject(typeId, name, description, b64encoded, ext, additionalParamsObj) - signature in dataController
@@ -608,6 +622,9 @@ ViewCommandsDelegateBase {
 			}
 			else if (commandId === "RestoreAll"){
 				onRestoreAll(params);
+			}
+			else if (commandId === "Duplicate"){
+				onDuplicate(params);
 			}
 		}
 
