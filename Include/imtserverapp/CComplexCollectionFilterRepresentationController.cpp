@@ -150,23 +150,30 @@ bool CComplexCollectionFilterRepresentationController::GetDataModelFromSdlRepres
 	for (const istd::TSharedNullable<Filter::CFieldSortingInfo::V1_0>& sourceSortingItem  : std::as_const(sourceSorting)){
 		imtbase::IComplexCollectionFilter::FieldSortingInfo fieldSorting;
 
-		if (sourceSortingItem->fieldId){
+		if (sourceSortingItem->fieldId && !sourceSortingItem->fieldId->isEmpty()){
 			fieldSorting.fieldId = sourceSortingItem->fieldId->toLatin1();
-		}
+			if (sourceSortingItem->sortingOrder){
+				QString order = *sourceSortingItem->sortingOrder;
+				if (!order.isEmpty()){
+					if (order == "ASC"){
+						fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
+					}
+					else if (order == "DESC"){
+						fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_DESC;
+					}
+					else {
+						return false;
+					}
 
-		if (sourceSortingItem->sortingOrder && (*sourceSortingItem->sortingOrder == "ASC")){
-			fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_ASC;
+					sorting.append(fieldSorting);
+				}
+			}
 		}
-		else if (sourceSortingItem->sortingOrder && (*sourceSortingItem->sortingOrder == "DESC")){
-			fieldSorting.sortingOrder = imtbase::IComplexCollectionFilter::SO_DESC;
-		}
-		else{
-			return false;
-		}
-
-		sorting.append(fieldSorting);
 	}
-	complexFilterPtr->SetSortingInfo(sorting);
+
+	if (!sorting.isEmpty()){
+		complexFilterPtr->SetSortingInfo(sorting);
+	}
 
 	imtbase::IComplexCollectionFilter::GroupFilter targetFilter;
 	if (!GetGroupFilterFromSdlRepresentation(sourceFilter, targetFilter)){
