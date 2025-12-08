@@ -8,6 +8,7 @@ import imtdocgui 1.0
 
 Item {
     id: administrationContainer;
+    objectName: "AdministrationView"
 
     anchors.fill: parent;
 
@@ -98,7 +99,6 @@ Item {
             parentSegment: "Administration"
             paths: ["Roles", "Users", "Groups"]
             onActivated: {
-                console.log("AdministrationView onActivated", restPath, matchedPath)
                 let index = paths.indexOf(matchedPath)
                 multiPageView.block = true
                 multiPageView.currentIndex = index

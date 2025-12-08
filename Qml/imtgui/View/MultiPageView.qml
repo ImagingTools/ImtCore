@@ -132,6 +132,7 @@ Item {
                 boundsBehavior: Flickable.StopAtBounds;
 
                 delegate: ItemDelegate {
+                    objectName: model.id
                     text: model.name;
                     iconSource: model.icon ? "../../../" + Style.getIconPath(model.icon, Icon.State.On, Icon.Mode.Normal) : ""
                     highlighted: root.currentIndex === model.index;
