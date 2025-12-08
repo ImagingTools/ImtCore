@@ -119,9 +119,9 @@ bool CTestInfo::CopyFrom(const IChangeable &object, CompatibilityMode mode)
 }
 
 
-istd::IChangeable *CTestInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CTestInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CTestInfo> clonePtr(new CTestInfo);
+	istd::IChangeableUniquePtr clonePtr(new CTestInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}

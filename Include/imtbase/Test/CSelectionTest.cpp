@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include "CSelectionTest.h"
 
 
@@ -152,7 +172,7 @@ void CSelectionTest::CloneMeSingleSelectTest()
 {
 	imtbase::CSelection singleSelection(imtbase::ISelection::SelectionMode::SM_SINGLE);
 	singleSelection.SetSelectedIds(m_testSingleSelectedIds);
-	imtbase::CSelection* singleSelectionPtr = dynamic_cast<imtbase::CSelection*>(singleSelection.CloneMe());
+	auto singleSelectionPtr = singleSelection.CloneMe();
 	QVERIFY2(singleSelection.IsEqual(*singleSelectionPtr), qPrintable(QString("Function CSelection::CloneMe is failed with clone single-select")));
 }
 
@@ -161,7 +181,7 @@ void CSelectionTest::CloneMeMultiSelectTest()
 {
 	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	multiSelection.SetSelectedIds(m_testMultiSelectedIds);
-	imtbase::CSelection* multiSelectionPtr = dynamic_cast<imtbase::CSelection*>(multiSelection.CloneMe());
+	auto multiSelectionPtr = multiSelection.CloneMe();
 	QVERIFY2(multiSelection.IsEqual(*multiSelectionPtr), qPrintable(QString("Function CSelection::CloneMe is failed with clone multi-select")));
 }
 
