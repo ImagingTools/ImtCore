@@ -74,7 +74,7 @@ Item {
 	function checkWidth(){
 		let maxWidth = Math.max(0, maximumWidth);
 		let totalWidth = 0;
-		let spacing = content_.spacing;
+		let spacing = 1.3*content_.spacing;
 
 		for (let i = 0; i < priorityElements.length; i++) {
 			let item = priorityElements[i];
