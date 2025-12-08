@@ -258,10 +258,10 @@ Rectangle{
 				}
 
 				let scale_ = gridWidth/ maxX
-					graph.xScale = (graph.xScale * scale_)
-					setLayersParams()
-					graph.wasFitToWidth = true
-					requestPaint()
+				graph.xScale = (graph.xScale * scale_)
+				setLayersParams()
+				graph.wasFitToWidth = true
+				requestPaint()
 			}
 
 			function resize(){
@@ -270,6 +270,9 @@ Rectangle{
 					let activeLayer = getActiveLayer()
 					let shapeModel = activeLayer ? activeLayer.shapeModel : null
 					let ok =!graph.isMultiGraph ? graph.linePoints.length : !shapeModel ? false: shapeModel.length
+					if(graph.fitToWidth){
+						graph.wasFitToWidth = false
+					}
 					if(ok){
 						fitToInactivAndActiveLayer()
 					}
@@ -345,7 +348,6 @@ Rectangle{
 
 			}
 		}
-
 	}
 
 	BaseText{
