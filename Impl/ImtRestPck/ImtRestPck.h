@@ -24,6 +24,7 @@
 #include <imtrest/CBinaryDataProviderComp.h>
 #include <imtrest/CIconDataProviderComp.h>
 #include <imtrest/CHttpFileUploadServletComp.h>
+#include <imtrest/CUdpServerComp.h>
 
 
 /**
@@ -50,7 +51,7 @@ typedef imtrest::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;
 typedef imtrest::CBinaryDataProviderComp BinaryDataProvider;
 typedef imtrest::CIconDataProviderComp IconDataProvider;
 typedef imtrest::CHttpFileUploadServletComp HttpFileUploadServlet;
-
+typedef imtrest::CUdpServerComp UdpServer;
 
 } // namespace ImtRestPck
 

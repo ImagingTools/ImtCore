@@ -102,6 +102,10 @@ I_EXPORT_COMPONENT(
 			"Http temp file storage servlet",
 			"Http Servlet File");
 
+I_EXPORT_COMPONENT(
+	UdpServer,
+	"UDP-server",
+	"UDP Connection Server");
 
 } // namespace ImtRestPck
 
