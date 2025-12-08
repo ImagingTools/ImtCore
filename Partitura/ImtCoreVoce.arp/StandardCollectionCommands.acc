@@ -32,7 +32,7 @@
                         <Data IsEnabled="true" Value="Icons/Duplicate"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="IsDuplicateEnabled">
-                        <Data IsEnabled="true" Value="true"/>
+                        <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="IsDuplicateVisible">
                         <Data IsEnabled="true" Value="true"/>

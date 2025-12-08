@@ -204,6 +204,7 @@ ViewCommandsDelegateBase {
 			commandsController.setCommandIsEnabled("Revision", selection.length === 1 && !showingDisableObjects);
 			commandsController.setCommandIsEnabled("Restore", selection.length > 0 && showingDisableObjects);
 			commandsController.setCommandIsEnabled("RestoreAll", showingDisableObjects);
+			commandsController.setCommandIsEnabled("Duplicate", selection.length > 0 && !showingDisableObjects);
 		}
 	}
 
@@ -341,7 +342,12 @@ ViewCommandsDelegateBase {
 
 	function onDuplicate(params){
 		let elementIds = collectionViewCommandsDelegate.collectionView.getSelectedIds()
-		collectionViewCommandsDelegate.collectionView.duplicateElements(elementIds)
+		if (elementIds.length === 1){
+			ModalDialogManager.openDialog(duplicateNameDialog, {})
+		}
+		else{
+			collectionViewCommandsDelegate.collectionView.duplicateElements(elementIds, "")
+		}
 	}
 
 	// importObject(typeId, name, description, b64encoded, ext, additionalParamsObj) - signature in dataController
@@ -687,6 +693,27 @@ ViewCommandsDelegateBase {
 
 				if (collectionViewCommandsDelegate.collectionView){
 					collectionViewCommandsDelegate.collectionView.table.forceActiveFocus();
+				}
+			}
+		}
+	}
+
+	Component {
+		id: duplicateNameDialog
+		ImtControls.InputDialog {
+			width: 300;
+			title: qsTr("Duplicate Name");
+			placeHolderText: qsTr("Enter the duplicate name")
+			selectTextOnStart: true
+			onFinished: {
+				if (buttonId == Enums.ok){
+					let elementIds = collectionViewCommandsDelegate.collectionView.getSelectedIds()
+					console.log("elementIds", elementIds)
+					if (elementIds.length !== 1){
+						return
+					}
+
+					collectionViewCommandsDelegate.collectionView.duplicateElements(elementIds, inputValue)
 				}
 			}
 		}

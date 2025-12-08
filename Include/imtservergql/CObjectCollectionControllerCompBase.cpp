@@ -254,7 +254,7 @@ sdl::imtbase::ImtCollection::CDuplicateElementsPayload CObjectCollectionControll
 	}
 
 	QString name;
-	if (!arguments.input.Version_1_0->name.HasValue()){
+	if (arguments.input.Version_1_0->name.HasValue()){
 		name = *arguments.input.Version_1_0->name;
 	}
 

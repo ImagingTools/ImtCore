@@ -101,8 +101,9 @@ Item {
 		getObjectVisualStatusRequest.send(objectVisualStatusInput)
 	}
 
-	function duplicateElements(elementIds){
+	function duplicateElements(elementIds, name){
 		duplicateElementsInput.m_elementIds = elementIds
+		duplicateElementsInput.m_name = name
 		duplicateElementsRequest.send(duplicateElementsInput)
 	}
 

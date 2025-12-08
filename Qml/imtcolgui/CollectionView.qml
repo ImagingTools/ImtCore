@@ -158,9 +158,9 @@ Item {
 		}
 	}
 
-	function duplicateElements(elementIds){
+	function duplicateElements(elementIds, name){
 		if (container.dataController){
-			container.dataController.duplicateElements(elementIds)
+			container.dataController.duplicateElements(elementIds, name)
 		}
 	}
 	
