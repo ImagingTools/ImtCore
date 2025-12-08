@@ -113,7 +113,7 @@ QList<imtsdl::IncludeDirective> CGqlCollectionControllerBaseClassGeneratorComp::
 }
 
 
-bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const
+bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, QIODevice* headerDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QTextStream ifStream(headerDevicePtr);
 
@@ -251,7 +251,7 @@ bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessHeaderClassFile(cons
 }
 
 
-bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const
+bool CGqlCollectionControllerBaseClassGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlDocumentType& sdlDocumentType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QTextStream ifStream(sourceDevicePtr);
 

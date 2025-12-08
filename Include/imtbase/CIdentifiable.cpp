@@ -94,11 +94,11 @@ bool CIdentifiable::IsEqual(const istd::IChangeable& object) const
 }
 
 
-istd::IChangeable* CIdentifiable::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CIdentifiable::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CIdentifiable> clonePtr(new CIdentifiable());
+	istd::IChangeableUniquePtr clonePtr(new CIdentifiable());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

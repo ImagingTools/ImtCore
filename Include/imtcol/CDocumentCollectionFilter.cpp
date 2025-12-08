@@ -101,11 +101,11 @@ bool CDocumentCollectionFilter::CopyFrom(const IChangeable& object, Compatibilit
 }
 
 
-istd::IChangeable* CDocumentCollectionFilter::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CDocumentCollectionFilter::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CDocumentCollectionFilter> clonePtr(new CDocumentCollectionFilter());
+	istd::IChangeableUniquePtr clonePtr(new CDocumentCollectionFilter());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

@@ -176,7 +176,7 @@ bool CProductInfo::Serialize(iser::IArchive& archive)
 
 			if (m_featureInfoProviderPtr != nullptr){
 				for (const QByteArray& featureId : featureIds){
-					istd::TDelPtr<const IFeatureInfo> featureInfoPtr = m_featureInfoProviderPtr->GetFeatureInfo(featureId);
+					IFeatureInfoSharedPtr featureInfoPtr = m_featureInfoProviderPtr->GetFeatureInfo(featureId);
 					if (featureInfoPtr.IsValid()){
 						AddFeature(featureId, *featureInfoPtr.GetPtr());
 					}

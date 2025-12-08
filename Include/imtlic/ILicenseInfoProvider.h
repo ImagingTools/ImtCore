@@ -33,7 +33,7 @@ public:
 	/**
 		Get license info for the given ID.
 	*/
-	virtual const imtlic::ILicenseDefinition* GetLicenseInfo(const QByteArray& licenseId) const = 0;
+	virtual istd::TUniqueInterfacePtr<imtlic::ILicenseDefinition> GetLicenseInfo(const QByteArray& licenseId) const = 0;
 };
 
 

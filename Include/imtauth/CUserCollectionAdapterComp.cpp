@@ -5,6 +5,7 @@
 #include <imtbase/CCollectionInfo.h>
 #include <imtauth/IUserInfo.h>
 
+
 namespace imtauth
 {
 
@@ -23,15 +24,17 @@ const imtbase::ICollectionInfo& CUserCollectionAdapterComp::GetUserList() const
 }
 
 
-const imtauth::IUserInfoUniquePtr CUserCollectionAdapterComp::GetUser(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const
+imtauth::IUserInfoUniquePtr CUserCollectionAdapterComp::GetUser(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const
 {
 	if (m_userCollectionCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_userCollectionCompPtr->GetObjectData(objectId, dataPtr, paramsPtr)){
 			const imtauth::IUserInfo* userPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 			if (userPtr != nullptr){
-				imtauth::IUserInfoUniquePtr userInfoUniquePtr(dynamic_cast<imtauth::IUserInfo*>(userPtr->CloneMe()));
-				return userInfoUniquePtr.PopInterfacePtr();
+				imtauth::IUserInfoUniquePtr userInfoUniquePtr;
+				userInfoUniquePtr.MoveCastedPtr(userPtr->CloneMe());
+
+				return userInfoUniquePtr;
 			}
 		}
 	}

@@ -43,7 +43,7 @@ public:
 	/**
 		Get information for user.
 	*/
-	virtual const imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
+	virtual imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 };
 
 

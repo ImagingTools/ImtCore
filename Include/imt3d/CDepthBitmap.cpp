@@ -423,11 +423,11 @@ bool CDepthBitmap::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CDepthBitmap::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CDepthBitmap::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CDepthBitmap> clonePtr(new CDepthBitmap);
+	istd::IChangeableUniquePtr clonePtr(new CDepthBitmap);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return NULL;

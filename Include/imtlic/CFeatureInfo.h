@@ -32,9 +32,9 @@ public:
 	virtual bool IsPermission() const override;
 	virtual const IFeatureInfo* GetParentFeature() const override;
 	virtual QByteArrayList GetSubFeatureIds(int maxDepth = -1) const override;
-	virtual const IFeatureInfo* GetSubFeature(const QByteArray& subfeatureId, int maxDepth = -1) const override;
-	virtual const istd::TPointerVector<const IFeatureInfo>& GetSubFeatures() const override;
-	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) override;
+	virtual FeatureInfoPtr GetSubFeature(const QByteArray& subfeatureId, int maxDepth = -1) const override;
+	virtual const FeatureInfoList& GetSubFeatures() const override;
+	virtual bool InsertSubFeature(FeatureInfoPtr subFeatureInfo) override;
 	virtual void DeleteSubFeature(const QByteArray& subFeatureId) override;
 	virtual QByteArrayList GetDependencies() const override;
 
@@ -48,12 +48,12 @@ public:
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual bool IsEqual(const IChangeable& object) const override;
-	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
 	void GetSubFeaturesRecursive(const FeatureInfoList& subFeatures, int maxDepth, int currentDepth, QByteArrayList& featureList) const;
-	const IFeatureInfo* GetSubFeatureRecursive(const FeatureInfoList& subFeatures, const QByteArray& subfeatureId, int maxDepth, int currentDepth = 1) const;
+	IFeatureInfo::FeatureInfoPtr GetSubFeatureRecursive(const FeatureInfoList& subFeatures, const QByteArray& subfeatureId, int maxDepth, int currentDepth = 1) const;
 
 protected:
 	QByteArray m_id;

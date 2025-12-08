@@ -667,7 +667,7 @@ idoc::MetaInfoPtr CFileRepositoryComp::GetElementMetaInfo(const Id& elementId, i
 		return idoc::MetaInfoPtr();
 	}
 
-	metaInfoPtr.SetCastedOrRemove(fileItemInfo.GetCollectionMetaInfo().CloneMe());
+	metaInfoPtr.MoveCastedPtr(fileItemInfo.GetCollectionMetaInfo().CloneMe());
 
 	return metaInfoPtr;
 }

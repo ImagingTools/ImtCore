@@ -171,12 +171,12 @@ bool CPointCloud3d::IsEqual(const IChangeable & object) const
 }
 
 
-istd::IChangeable* CPointCloud3d::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CPointCloud3d::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CPointCloud3d> clonePtr(new CPointCloud3d());
+	istd::IChangeableUniquePtr clonePtr(new CPointCloud3d());
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

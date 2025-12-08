@@ -236,11 +236,11 @@ bool CDatabaseAccessSettings::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CDatabaseAccessSettings::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CDatabaseAccessSettings::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CDatabaseAccessSettings> clonePtr(new CDatabaseAccessSettings);
+	istd::IChangeableUniquePtr clonePtr(new CDatabaseAccessSettings);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

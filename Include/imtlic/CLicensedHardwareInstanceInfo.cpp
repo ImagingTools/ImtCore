@@ -115,11 +115,11 @@ bool CLicensedHardwareInstanceInfo::CopyFrom(const IChangeable& object, Compatib
 }
 
 
-istd::IChangeable* CLicensedHardwareInstanceInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CLicensedHardwareInstanceInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CLicensedHardwareInstanceInfo> clonePtr(new CLicensedHardwareInstanceInfo());
+	istd::IChangeableUniquePtr clonePtr(new CLicensedHardwareInstanceInfo());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

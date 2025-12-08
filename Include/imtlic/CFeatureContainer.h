@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
+#include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/CFeatureInfo.h>
 
 
@@ -20,7 +21,7 @@ public:
 	/**
 		Find feature object using feature-ID (not the collection of the feature)
 	*/
-	const IFeatureInfo* FindFeatureById(const QByteArray& featureId) const;
+	IFeatureInfoSharedPtr FindFeatureById(const QByteArray& featureId) const;
 
 	/**
 		Get collection-ID using feature-ID.
@@ -29,7 +30,7 @@ public:
 
 	// reimplemented (IFeatureInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
-	virtual const IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const override;
+	virtual IFeatureInfoSharedPtr GetFeatureInfo(const QByteArray& featureId) const override;
 };
 
 

@@ -180,12 +180,12 @@ bool CTextLabel::IsEqual(const IChangeable & object) const
 }
 
 
-istd::IChangeable* CTextLabel::CloneMe(CompatibilityMode mode) const 
+istd::IChangeableUniquePtr CTextLabel::CloneMe(CompatibilityMode mode) const 
 {
-	istd::TDelPtr<CTextLabel> clonePtr(new CTextLabel);
+	istd::IChangeableUniquePtr clonePtr(new CTextLabel);
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

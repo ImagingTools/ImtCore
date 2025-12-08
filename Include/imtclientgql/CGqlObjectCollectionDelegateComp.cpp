@@ -45,7 +45,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectTypeIdRequ
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::GetObjectTypeIdRequestArguments,
-				sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CGetObjectTypeIdGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -62,7 +62,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectInfoReques
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::GetElementInfoRequestArguments,
-				sdl::imtbase::ImtCollection::CGetElementInfoGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CGetElementInfoGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -79,7 +79,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectMetaInfoRe
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::GetElementMetaInfoRequestArguments,
-				sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -96,7 +96,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectDataMetaIn
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::GetDataMetaInfoRequestArguments,
-				sdl::imtbase::ImtCollection::CGetDataMetaInfoGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CGetDataMetaInfoGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -159,7 +159,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::InsertNewObjectRequestArguments,
-				sdl::imtbase::ImtCollection::CInsertNewObjectGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CInsertNewObjectGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -178,7 +178,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::GetObjectDataRequestArguments,
-				sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CGetObjectDataGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -217,7 +217,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::SetObjectDataRequestArguments,
-				sdl::imtbase::ImtCollection::CSetObjectDataGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CSetObjectDataGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -238,7 +238,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectsReques
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::RemoveElementsRequestArguments,
-				sdl::imtbase::ImtCollection::CRemoveElementsGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CRemoveElementsGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -264,7 +264,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectSetRequ
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::RemoveElementSetRequestArguments,
-				sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CRemoveElementSetGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -290,7 +290,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementCountRequ
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::GetElementsCountRequestArguments,
-				sdl::imtbase::ImtCollection::CGetElementsCountGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CGetElementsCountGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -320,7 +320,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::GetElementIdsRequestArguments,
-				sdl::imtbase::ImtCollection::CGetElementIdsGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CGetElementIdsGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -350,7 +350,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionReq
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::CreateSubCollectionRequestArguments,
-				sdl::imtbase::ImtCollection::CCreateSubCollectionGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CCreateSubCollectionGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -372,7 +372,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectNameReques
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::SetObjectNameRequestArguments,
-				sdl::imtbase::ImtCollection::CSetObjectNameGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CSetObjectNameGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -394,7 +394,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptio
 
 	return CreateGqlRequest<
 				sdl::imtbase::ImtCollection::SetObjectDescriptionRequestArguments,
-				sdl::imtbase::ImtCollection::CSetObjectDescriptionGqlRequest>(arguments);
+				sdl::imtbase::ImtCollection::CSetObjectDescriptionGqlRequest>(arguments).PopInterfacePtr();
 }
 
 
@@ -581,7 +581,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 					}
 	
 					if (!metaInfoPtr.IsValid()){
-						metaInfoPtr.SetCastedOrRemove(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
+						metaInfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 					}
 	
 					Q_ASSERT(metaInfoPtr.IsValid());
@@ -649,7 +649,7 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 {
 	ResponseData data;
 	imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
-	if (!requestPtr.isNull()){
+	if (requestPtr.IsValid()){
 		data.commandId = requestPtr->GetCommandId();
 	}
 
@@ -752,19 +752,19 @@ bool CGqlObjectCollectionDelegateComp::GetParamsSetRepresentation(
 
 
 template<class Arguments,class SdlRequest>
-imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGqlRequest(Arguments arguments) const
+istd::TUniqueInterfacePtr<imtgql::IGqlRequest> CGqlObjectCollectionDelegateComp::CreateGqlRequest(Arguments arguments) const
 {
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest();
 	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
 	if (gqlContextPtr != nullptr){
-		requestPtr->SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
+		requestPtr->SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe().PopInterfacePtr()));
 	}
 
 	if (!SdlRequest::SetupGqlRequest(*requestPtr, arguments)){
 		return nullptr;
 	}
 
-	return requestPtr;
+	return istd::TUniqueInterfacePtr<imtgql::IGqlRequest>(requestPtr);
 }
 
 

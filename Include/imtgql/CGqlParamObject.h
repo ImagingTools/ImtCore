@@ -47,7 +47,7 @@ public:
 
 	// reimplemented (iser::IChangeable)
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
@@ -55,8 +55,8 @@ protected:
 
 protected:
 	QMap<QByteArray, QVariant> m_simpleParams;
-	QMap<QByteArray, istd::TSmartPtr<CGqlParamObject>> m_objectParams;
-	QMap<QByteArray, QList<istd::TSmartPtr<CGqlParamObject>>> m_objectParamsArray;
+	QMap<QByteArray, istd::TSharedInterfacePtr<CGqlParamObject>> m_objectParams;
+	QMap<QByteArray, QList<istd::TSharedInterfacePtr<CGqlParamObject>>> m_objectParamsArray;
 	QByteArray m_objectId;
 	CGqlParamObject* m_parentPtr;
 };

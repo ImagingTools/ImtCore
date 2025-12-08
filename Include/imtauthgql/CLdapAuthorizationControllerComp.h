@@ -38,7 +38,7 @@ protected:
 				const QByteArray& productId,
 				bool isDefault,
 				bool isGuest) const;
-	const imtauth::CUserInfo* CreateUserInfoFromLdapUser(const QByteArray& ldapUserId) const;
+	virtual istd::TUniqueInterfacePtr<imtauth::IUserInfo> CreateUserInfoFromLdapUser(const QByteArray& ldapUserId) const;
 
 	// reimplemented (CAuthorizationControllerComp)
 	virtual sdl::imtauth::Authorization::CAuthorizationPayload OnAuthorization(

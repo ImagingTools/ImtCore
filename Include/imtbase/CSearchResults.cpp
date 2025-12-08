@@ -107,7 +107,7 @@ bool CSearchResults::Serialize(iser::IArchive& archive)
 
 // reimplemented (iser::IChangeable)
 
-bool CSearchResults::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CSearchResults::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CSearchResults* sourcePtr = dynamic_cast<const CSearchResults*>(&object);
 	if (sourcePtr != nullptr){
@@ -137,18 +137,18 @@ bool CSearchResults::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CSearchResults::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CSearchResults::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CSearchResults> clonePtr(new CSearchResults);
+	istd::IChangeableUniquePtr clonePtr(new CSearchResults);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;
 }
 
 
-bool CSearchResults::ResetData(CompatibilityMode mode)
+bool CSearchResults::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

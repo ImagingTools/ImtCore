@@ -55,11 +55,11 @@ int CObjectCollection::GetSupportedOperations() const
 }
 
 
-istd::IChangeable* CObjectCollection::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CObjectCollection::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CObjectCollection> clonePtr(new CObjectCollection());
+	istd::IChangeableUniquePtr clonePtr(new CObjectCollection());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

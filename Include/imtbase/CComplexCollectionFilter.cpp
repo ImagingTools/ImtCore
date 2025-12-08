@@ -232,11 +232,11 @@ bool CComplexCollectionFilter::IsEqual(const IChangeable &object) const
 }
 
 
-istd::IChangeable* CComplexCollectionFilter::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CComplexCollectionFilter::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CComplexCollectionFilter> clonePtr(new CComplexCollectionFilter);
+	istd::IChangeableUniquePtr clonePtr(new CComplexCollectionFilter);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

@@ -23,7 +23,7 @@ const imtbase::ICollectionInfo& CClientRequestRoleInfoProviderComp::GetRoleList(
 }
 
 
-const imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const
+imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const QByteArray& objectId, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!m_applicationInfoCompPtr.IsValid()){
 		return nullptr;
@@ -42,7 +42,7 @@ const imtauth::IRoleUniquePtr CClientRequestRoleInfoProviderComp::GetRole(const 
 
 	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
 	if (gqlContextPtr != nullptr){
-		gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
+		gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe().PopInterfacePtr()));
 	}
 
 	if (!rolessdl::CRoleItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

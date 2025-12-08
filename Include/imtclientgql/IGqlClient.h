@@ -16,8 +16,8 @@ namespace imtclientgql
 class IGqlClient: virtual public istd::IPolymorphic
 {
 public:
-	typedef QSharedPointer<imtgql::IGqlRequest> GqlRequestPtr;
-	typedef QSharedPointer<imtgql::IGqlResponse> GqlResponsePtr;
+	typedef istd::TSharedInterfacePtr<imtgql::IGqlRequest> GqlRequestPtr;
+	typedef istd::TSharedInterfacePtr<imtgql::IGqlResponse> GqlResponsePtr;
 
 	/**
 		Send a request to the server.

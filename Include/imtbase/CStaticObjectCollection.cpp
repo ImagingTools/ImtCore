@@ -19,7 +19,7 @@ void CStaticObjectCollection::SetObject(const QByteArray& objectId, DataPtr obje
 {
 	ObjectInfo* objectInfoPtr = GetObjectInfo(objectId);
 	if (objectInfoPtr != nullptr){
-		objectInfoPtr->dataPtr = objectPtr;
+		objectInfoPtr->dataPtr.SetManagedPtr(objectPtr);
 	}
 }
 
@@ -33,7 +33,7 @@ QByteArray CStaticObjectCollection::RegisterObject(
 {
 	ObjectInfo info;
 
-	info.dataPtr = objectPtr;
+	info.dataPtr.SetManagedPtr(objectPtr);
 	info.description = description;
 	info.name = name;
 	info.typeId = typeId;
@@ -86,11 +86,11 @@ int CStaticObjectCollection::GetSupportedOperations() const
 }
 
 
-istd::IChangeable* CStaticObjectCollection::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CStaticObjectCollection::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CStaticObjectCollection> clonePtr(new CStaticObjectCollection());
+	istd::IChangeableUniquePtr clonePtr(new CStaticObjectCollection());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

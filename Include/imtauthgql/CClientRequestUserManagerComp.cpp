@@ -139,7 +139,7 @@ bool CClientRequestUserManagerComp::ChangeUserPassword(const QByteArray& login, 
 }
 
 
-bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, const QByteArray& productId, const QByteArrayList& roleIds)
+bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, const QByteArray& /*productId*/, const QByteArrayList& roleIds)
 {
 	if (roleIds.isEmpty()){
 		return false;
@@ -170,7 +170,7 @@ bool CClientRequestUserManagerComp::AddRolesToUser(const QByteArray& userId, con
 }
 
 
-bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId, const QByteArray& productId, const QByteArrayList& roleIds)
+bool CClientRequestUserManagerComp::RemoveRolesFromUser(const QByteArray& userId, const QByteArray& /*productId*/, const QByteArrayList& roleIds)
 {
 	if (roleIds.isEmpty()){
 		return false;

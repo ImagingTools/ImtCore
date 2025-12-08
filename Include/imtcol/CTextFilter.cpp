@@ -92,11 +92,11 @@ bool CTextFilter::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 }
 
 
-istd::IChangeable* CTextFilter::CloneMe(CompatibilityMode /*mode*/) const
+istd::IChangeableUniquePtr CTextFilter::CloneMe(CompatibilityMode /*mode*/) const
 {
-	istd::TDelPtr<CTextFilter> clonePtr(new CTextFilter());
+	istd::IChangeableUniquePtr clonePtr(new CTextFilter());
 	if (clonePtr->CopyFrom(*this)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

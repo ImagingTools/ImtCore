@@ -224,11 +224,11 @@ bool CUserRecentAction::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable *CUserRecentAction::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CUserRecentAction::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CUserRecentAction> clonePtr(new CUserRecentAction);
+	istd::IChangeableUniquePtr clonePtr(new CUserRecentAction);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

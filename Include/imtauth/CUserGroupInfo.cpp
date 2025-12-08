@@ -192,11 +192,11 @@ bool CUserGroupInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mod
 }
 
 
-istd::IChangeable *CUserGroupInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CUserGroupInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CUserGroupInfo> clonePtr(new CUserGroupInfo);
+	istd::IChangeableUniquePtr clonePtr(new CUserGroupInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

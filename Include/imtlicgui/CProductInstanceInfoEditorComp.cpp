@@ -334,8 +334,8 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 				const imtbase::ICollectionInfo& licenseList = licensingInfoPtr->GetLicenseList();
 				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
 				for (const QByteArray& collectionId : licenseCollectionIds){
-					const imtlic::ILicenseDefinition* licenseInfoPtr = licensingInfoPtr->GetLicenseInfo(collectionId);
-					if (licenseInfoPtr != nullptr){
+					istd::TUniqueInterfacePtr<imtlic::ILicenseDefinition> licenseInfoPtr = licensingInfoPtr->GetLicenseInfo(collectionId);
+					if (licenseInfoPtr.IsValid()){
 						QString licenseName = licenseInfoPtr->GetLicenseName();
 						QByteArray licenseId = licenseInfoPtr->GetLicenseId();
 

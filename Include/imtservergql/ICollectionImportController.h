@@ -21,7 +21,7 @@ public:
 		QString path; // Filled by CollectionImportController
 		int size;
 		QByteArray objectTypeId;
-		std::shared_ptr<iprm::IParamsSet> additionalParams;
+		iprm::IParamsSetSharedPtr additionalParams;
 	};
 
 	struct SessionInfo
@@ -29,7 +29,7 @@ public:
 		QByteArray sessionId;
 		QByteArray collectionId;
 		std::vector<FileInfo> files;
-		std::shared_ptr<iprm::IParamsSet> additionalParams;
+		iprm::IParamsSetSharedPtr additionalParams;
 	};
 
 	virtual bool BeginCollectionImportSession(const SessionInfo& sessionInfo, QString& errorMessage) = 0;

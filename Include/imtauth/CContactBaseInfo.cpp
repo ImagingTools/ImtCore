@@ -176,11 +176,11 @@ bool CContactBaseInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 }
 
 
-istd::IChangeable* CContactBaseInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CContactBaseInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CContactBaseInfo> clonePtr(new CContactBaseInfo);
+	istd::IChangeableUniquePtr clonePtr(new CContactBaseInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

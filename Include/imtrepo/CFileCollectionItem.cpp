@@ -193,7 +193,7 @@ bool CFileCollectionItem::CopyFrom(const istd::IChangeable& object, Compatibilit
 		m_typeId = sourceItemPtr->m_typeId;
 
 		if (sourceItemPtr->m_contentsMetaInfoPtr.IsValid()){
-			m_contentsMetaInfoPtr.SetCastedOrRemove(sourceItemPtr->m_contentsMetaInfoPtr->CloneMe());
+			m_contentsMetaInfoPtr.MoveCastedPtr(sourceItemPtr->m_contentsMetaInfoPtr->CloneMe());
 			if (!m_contentsMetaInfoPtr.IsValid()){
 				return false;
 			}

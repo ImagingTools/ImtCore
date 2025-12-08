@@ -149,11 +149,11 @@ bool CTableViewParam::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CTableViewParam::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+istd::IChangeableUniquePtr CTableViewParam::CloneMe(istd::IChangeable::CompatibilityMode mode) const
 {
-	istd::TDelPtr<CTableViewParam> clonePtr(new CTableViewParam());
+	istd::IChangeableUniquePtr clonePtr(new CTableViewParam());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

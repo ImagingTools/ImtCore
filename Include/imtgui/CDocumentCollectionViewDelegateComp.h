@@ -212,7 +212,7 @@ private:
 	I_REF(iqtgui::IGuiObject, m_informationViewCompPtr);
 
 private:
-	ifile::IFileMetaInfoProvider::MetaInfoPtr m_selectedMetaInfoPtr;
+	idoc::MetaInfoPtr m_selectedMetaInfoPtr;
 
 	ObjectPersistenceProxy m_collectionPersistence;
 

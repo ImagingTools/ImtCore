@@ -112,11 +112,11 @@ bool CUserConnectionInfo::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable *CUserConnectionInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CUserConnectionInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CUserConnectionInfo> clonePtr(new CUserConnectionInfo);
+	istd::IChangeableUniquePtr clonePtr(new CUserConnectionInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

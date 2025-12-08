@@ -80,7 +80,7 @@ private:
 	I_REF(imod::IObserver, m_editDialogObserverCompPtr);
 
 private:
-	ifile::IFileMetaInfoProvider::MetaInfoPtr m_selectedMetaInfoPtr;
+	idoc::MetaInfoPtr m_selectedMetaInfoPtr;
 };
 
 

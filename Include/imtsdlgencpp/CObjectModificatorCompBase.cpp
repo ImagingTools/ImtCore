@@ -72,7 +72,7 @@ void CObjectModificatorCompBase::WriteSetValueToStruct(
 
 // reimplemented (CSdlClassModificatorBaseComp)
 
-bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const
+bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& /*sdlType*/, QIODevice* headerDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QTextStream ofStream(headerDevicePtr);
 
@@ -114,7 +114,7 @@ bool CObjectModificatorCompBase::ProcessHeaderClassFile(const imtsdl::CSdlType& 
 }
 
 
-bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const
+bool CObjectModificatorCompBase::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QTextStream ofStream(sourceDevicePtr);
 
@@ -1209,7 +1209,7 @@ void CObjectModificatorCompBase:: AddCustomArrayFieldReadToObjectImplCode(
 }
 
 
-QString CObjectModificatorCompBase::GetUnionListElementType(bool forScalar) const
+QString CObjectModificatorCompBase::GetUnionListElementType(bool /*forScalar*/) const
 {
 	return QStringLiteral("QVariant");
 }

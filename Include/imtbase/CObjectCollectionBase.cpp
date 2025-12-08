@@ -164,7 +164,7 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 	}
 
 	if (storageId.isEmpty()){
-		info.dataPtr.SetPtr(CreateDataObject(typeId));
+		info.dataPtr.TakeOver(CreateDataObject(typeId));
 		if (info.dataPtr.IsValid()){
 			if (defaultValuePtr != nullptr){
 				if (!info.dataPtr->CopyFrom(*defaultValuePtr)){
@@ -182,17 +182,17 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 			}
 
 			if (dataMetaInfoPtr != nullptr){
-				info.contentsMetaInfoPtr.SetCastedOrRemove(dataMetaInfoPtr->CloneMe());
+				info.contentsMetaInfoPtr.MoveCastedPtr(dataMetaInfoPtr->CloneMe());
 			}
 		}
 	}
 	else{
-		istd::TDelPtr<imtbase::CObjectLink> linkPtr = new CObjectLink;
+		istd::TUniqueInterfacePtr<imtbase::CObjectLink> linkPtr = new CObjectLink;
 		linkPtr->SetCollectionPtr(storagePtr);
 		linkPtr->SetFactoryId(typeId);
 		linkPtr->SetObjectUuid(storageId);
 
-		info.dataPtr.SetPtr(linkPtr.PopPtr());
+		info.dataPtr.TakeOver(linkPtr);
 		info.description = description;
 		info.name = name;
 		info.typeId = s_externalLinkTypeId;
@@ -482,7 +482,7 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) con
 			}
 
 			if (objectInfo.contentsMetaInfoPtr.IsValid()){
-				metaInfoPtr.SetCastedOrRemove(objectInfo.contentsMetaInfoPtr->CloneMe());
+				metaInfoPtr.MoveCastedPtr(objectInfo.contentsMetaInfoPtr->CloneMe());
 			}
 		}
 	}
@@ -588,7 +588,7 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId,
 				return externalStoragePtr->GetElementMetaInfo(externalObjectId);
 			}
 
-			metaInfoPtr.SetCastedOrRemove(objectInfo.collectionItemMetaInfo.CloneMe());
+			metaInfoPtr.MoveCastedPtr(objectInfo.collectionItemMetaInfo.CloneMe());
 		}
 	}
 
@@ -755,7 +755,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 
 		istd::IChangeable* objectPtr = nullptr;
 		if (!archive.IsStoring()){
-			elementInfo.dataPtr.SetPtr(CreateDataObject(elementInfo.typeId));
+			elementInfo.dataPtr.TakeOver(CreateDataObject(elementInfo.typeId));
 
 			objectPtr = elementInfo.dataPtr.GetPtr();
 		}
@@ -880,7 +880,7 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 
 					if (sourceObjectPtr != nullptr){
 						if (!targetInfoPtr->dataPtr.IsValid()){
-							targetInfoPtr->dataPtr.SetPtr(CreateDataObject(typeId));
+							targetInfoPtr->dataPtr.TakeOver(CreateDataObject(typeId));
 						}
 
 						if (targetInfoPtr->dataPtr.IsValid()){

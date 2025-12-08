@@ -283,12 +283,12 @@ bool CItem::IsEqual(const istd::IChangeable& object) const
 }
 
 
-istd::IChangeable* CItem::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CItem::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CItem> clonePtr(new CItem);
+	istd::IChangeableUniquePtr clonePtr(new CItem);
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

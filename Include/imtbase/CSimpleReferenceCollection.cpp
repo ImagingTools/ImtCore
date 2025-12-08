@@ -275,11 +275,11 @@ bool CSimpleReferenceCollection::IsEqual(const istd::IChangeable& object) const
 }
 
 
-istd::IChangeable* CSimpleReferenceCollection::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CSimpleReferenceCollection::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CSimpleReferenceCollection> clonePtr( new CSimpleReferenceCollection);
+	istd::IChangeableUniquePtr clonePtr( new CSimpleReferenceCollection);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return NULL;

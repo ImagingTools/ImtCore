@@ -15,7 +15,7 @@ namespace imtgql
 class IGqlResponse: virtual public istd::IChangeable
 {
 public:
-	typedef QSharedPointer<IGqlRequest> GqlRequestPtr;
+	typedef istd::TSharedInterfacePtr<IGqlRequest> GqlRequestPtr;
 	typedef QList<QVariantMap> ErrorEntryList;
 
 	virtual GqlRequestPtr GetOriginalRequest() const = 0;

@@ -22,7 +22,7 @@ public:
 	void AddParam(const QByteArray& paramId, const CGqlParamObject& param);
 	void AddField(const QByteArray& fieldId, const CGqlFieldObject& field);
 	void AddSimpleField(const QByteArray& fieldId);
-	void SetGqlContext(IGqlContext* gqlContext);
+	void SetGqlContext(imtgql::IGqlContextSharedPtr gqlContext);
 	void SetRequestType(RequestType requestType);
 	void SetCommandId(const QByteArray& commandId);
 	QByteArray GetHeader(QByteArray headerId) const;
@@ -56,7 +56,7 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
@@ -93,7 +93,7 @@ protected:
 	CGqlParamObject* m_activeGqlObjectPtr;
 	CGqlFieldObject* m_activeFieldObjectPtr;
 	QList<CGqlParamObject*> m_objectArrayList;
-	std::shared_ptr<imtgql::IGqlContext> m_gqlContextPtr;
+	imtgql::IGqlContextSharedPtr m_gqlContextPtr;
 	QList<QByteArray> m_activeArrayIds;
 
 	static const QHash<QByteArray, imtgql::IGqlRequest::RequestType> s_requestNameMap;

@@ -82,11 +82,11 @@ bool CCollectionObjectContext::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CCollectionObjectContext::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CCollectionObjectContext::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CCollectionObjectContext> clonePtr(new CCollectionObjectContext);
+	istd::IChangeableUniquePtr clonePtr(new CCollectionObjectContext);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

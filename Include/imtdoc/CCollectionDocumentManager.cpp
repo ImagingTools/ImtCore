@@ -244,7 +244,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentData(co
 		return retVal;
 	}
 
-	documentPtr.SetPtr(m_userDocuments[userId][documentId].objectPtr->CloneMe());
+	documentPtr.MoveCastedPtr(m_userDocuments[userId][documentId].objectPtr->CloneMe());
 
 	return documentPtr.IsValid() ? OS_OK : OS_FAILED;
 }

@@ -265,11 +265,11 @@ bool CTextTable::IsEqual(const IChangeable & object) const
 }
 
 
-istd::IChangeable* CTextTable::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CTextTable::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CTextTable> clonePtr(new CTextTable());
+	istd::IChangeableUniquePtr clonePtr(new CTextTable());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

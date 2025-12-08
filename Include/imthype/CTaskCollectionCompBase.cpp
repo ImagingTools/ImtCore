@@ -261,7 +261,7 @@ QByteArray CTaskCollectionCompBase::InsertNewObject(
 			workingName = newName + QString(" - %1").arg(nameCounter++);
 		}
 
-		newTask.taskPtr.SetPtr(newTaskPtr);
+		newTask.taskPtr.TakeOver(newTaskPtr);
 		newTask.typeId = typeId;
 		newTask.name = workingName;
 		newTask.description = description;
@@ -620,7 +620,7 @@ bool CTaskCollectionCompBase::CopyFrom(const IChangeable& object, CompatibilityM
 				newTask.userDefinedTaskId = sourceTask.userDefinedTaskId;
 				newTask.inputId = sourceTask.inputId;
 
-				newTask.taskPtr.SetPtr(newTaskPtr);
+				newTask.taskPtr.TakeOver(newTaskPtr);
 				if (!newTask.taskPtr->CopyFrom(*sourceTask.taskPtr)){
 					return false;
 				}
@@ -753,7 +753,7 @@ bool CTaskCollectionCompBase::Serialize(iser::IArchive& archive)
 					OnTaskCreated(*newTaskPtr);
 
 					serializablePtr = dynamic_cast<iser::ISerializable*>(newTaskPtr.GetPtr());
-					task.taskPtr.SetPtr(newTaskPtr);
+					task.taskPtr.TakeOver(newTaskPtr);
 
 					imthype::ITaskCollectionContext* contextPtr = QueryInterface<imthype::ITaskCollectionContext>(task.taskPtr.GetPtr());
 					if (contextPtr != nullptr){
@@ -863,7 +863,7 @@ void CTaskCollectionCompBase::OnComponentCreated()
 			task.isEnabled = true;
 			task.name = name;
 			task.taskFlags = OF_ALL & ~OF_SUPPORT_DELETE;
-			task.taskPtr.SetOptionalPtr(supplierPtr);
+			task.taskPtr.SetUnmanagedPtr(supplierPtr);
 			task.typeId = typeId;
 			task.typeName = typeName;
 			task.uuid = uuid;

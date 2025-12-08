@@ -5,7 +5,7 @@ namespace imtgql
 {
 
 
-thread_local std::shared_ptr<IGqlContext> CGqlRequestContextManager::s_context;
+thread_local istd::TSharedInterfacePtr<IGqlContext> CGqlRequestContextManager::s_context;
 
 
 } // namespace imtgql

@@ -48,7 +48,7 @@ public:
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
-	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 
 protected:
 	// reimplemented (CObjectCollectionBase)

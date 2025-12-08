@@ -121,7 +121,7 @@ private:
 	bool GetParamsSetRepresentation(const iprm::IParamsSet& paramsSet, sdl::imtbase::ImtBaseTypes::CParamsSet::V1_0& representation) const;
 
 	template<class Arguments,class SdlRequest>
-	imtgql::IGqlRequest* CreateGqlRequest(Arguments arguments) const;
+	istd::TUniqueInterfacePtr<imtgql::IGqlRequest> CreateGqlRequest(Arguments arguments) const;
 
 private:
 	imtserverapp::CParamSetRepresentationController m_paramSetRepresentationController;

@@ -55,7 +55,7 @@ void CSmtpClientComp::ClearData()
 
 	m_socketPtr.reset();
 	m_textStreamPtr.reset();
-	m_smtpMessagePtr.reset();
+	m_smtpMessagePtr.Reset();
 
 	m_message.clear();
 }
@@ -122,7 +122,7 @@ bool CSmtpClientComp::SendEmail(const ISmtpMessage& smtpMessage) const
 
 	m_currentMailSendState = MS_INIT;
 
-	m_smtpMessagePtr.reset(dynamic_cast<const ISmtpMessage*>(smtpMessage.CloneMe()));
+	m_smtpMessagePtr.MoveCastedPtr(smtpMessage.CloneMe());
 
 	QString host = GetHost();
 	int port = GetPort();
@@ -252,14 +252,14 @@ void CSmtpClientComp::OnReadyRead()
 	}
 	else if (m_currentMailSendState == MS_MAIL && code == RC_AUTHENTIFICATION_SUCCESSFUL)
 	{
-		if (m_smtpMessagePtr != nullptr){
+		if (m_smtpMessagePtr.IsValid()){
 			SendCommand(QString("MAIL FROM:<%1>").arg(m_smtpMessagePtr->GetFrom()));
 			m_currentMailSendState = MS_RCPT;
 		}
 	}
 	else if (m_currentMailSendState == MS_RCPT && code == RC_OK)
 	{
-		if (m_smtpMessagePtr != nullptr){
+		if (m_smtpMessagePtr.IsValid()){
 			SendCommand(QString("RCPT TO:<%1>").arg(m_smtpMessagePtr->GetTo()));
 			m_currentMailSendState = MS_DATA;
 		}

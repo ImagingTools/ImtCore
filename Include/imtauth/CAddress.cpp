@@ -176,11 +176,11 @@ bool CAddress::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CAddress::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CAddress::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CAddress> clonePtr(new CAddress);
+	istd::IChangeableUniquePtr clonePtr(new CAddress);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

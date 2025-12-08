@@ -147,12 +147,12 @@ bool CSelection::IsEqual(const IChangeable & object) const
 }
 
 
-istd::IChangeable* CSelection::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CSelection::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CSelection> clonePtr(new CSelection());
+	istd::IChangeableUniquePtr clonePtr(new CSelection());
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

@@ -33,10 +33,10 @@ const imtauth::IUserVerification* CUserVerificationControllerComp::GetVerificati
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_userVerificationCollectionCompPtr->GetObjectData(verificationId, dataPtr)){
 		if (dataPtr.IsValid()){
-			istd::TDelPtr<const imtauth::IUserVerification> userVerificationInfoPtr;
-			userVerificationInfoPtr.SetCastedOrRemove(dataPtr->CloneMe());
+			istd::TUniqueInterfacePtr<const imtauth::IUserVerification> userVerificationInfoPtr;
+			userVerificationInfoPtr.MoveCastedPtr(dataPtr->CloneMe());
 
-			return userVerificationInfoPtr.PopPtr();
+			return userVerificationInfoPtr.PopInterfacePtr();
 		}
 	}
 

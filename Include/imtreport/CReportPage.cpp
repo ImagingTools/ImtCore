@@ -216,12 +216,12 @@ bool CReportPage::IsEqual(const IChangeable & object) const
 }
 
 
-istd::IChangeable* CReportPage::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CReportPage::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CReportPage> clonePtr(new CReportPage());
+	istd::IChangeableUniquePtr clonePtr(new CReportPage());
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

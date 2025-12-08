@@ -266,11 +266,12 @@ bool CCollectionInfo::IsEqual(const IChangeable & object) const
 	return false;
 }
 
-istd::IChangeable* CCollectionInfo::CloneMe(CompatibilityMode mode) const
+
+istd::IChangeableUniquePtr CCollectionInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CCollectionInfo> clonePtr(new CCollectionInfo());
+	istd::IChangeableUniquePtr clonePtr(new CCollectionInfo());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

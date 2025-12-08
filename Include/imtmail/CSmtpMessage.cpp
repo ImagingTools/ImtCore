@@ -145,11 +145,11 @@ bool CSmtpMessage::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CSmtpMessage::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CSmtpMessage::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CSmtpMessage> clonePtr(new CSmtpMessage);
+	istd::IChangeableUniquePtr clonePtr(new CSmtpMessage);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

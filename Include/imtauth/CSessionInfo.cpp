@@ -159,11 +159,11 @@ bool CSessionInfo::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CSessionInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CSessionInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CSessionInfo> clonePtr(new CSessionInfo);
+	istd::IChangeableUniquePtr clonePtr(new CSessionInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

@@ -72,11 +72,11 @@ bool CObjectTypeIdFilter::CopyFrom(const IChangeable& object, CompatibilityMode 
 }
 
 
-istd::IChangeable* CObjectTypeIdFilter::CloneMe(CompatibilityMode /*mode*/) const
+istd::IChangeableUniquePtr CObjectTypeIdFilter::CloneMe(CompatibilityMode /*mode*/) const
 {
-	istd::TDelPtr<CObjectTypeIdFilter> clonePtr(new CObjectTypeIdFilter());
+	istd::IChangeableUniquePtr clonePtr(new CObjectTypeIdFilter());
 	if (clonePtr->CopyFrom(*this)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

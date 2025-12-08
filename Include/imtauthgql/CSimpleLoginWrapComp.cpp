@@ -184,13 +184,13 @@ QByteArray CSimpleLoginWrapComp::GetToken(const QByteArray& /*userId*/) const
 
 // reimplemented (imtauth::IUserPermissionsController)
 
-QByteArrayList CSimpleLoginWrapComp::GetPermissions(const QByteArray& userId) const
+QByteArrayList CSimpleLoginWrapComp::GetPermissions(const QByteArray& /*userId*/) const
 {
 	return m_userPermissionIds;
 }
 
 
-void CSimpleLoginWrapComp::SetPermissions(const QByteArray& userId, const QByteArrayList& permissions)
+void CSimpleLoginWrapComp::SetPermissions(const QByteArray& /*userId*/, const QByteArrayList& permissions)
 {
 	if (m_userPermissionIds != permissions){
 		istd::CChangeNotifier notifier(this);

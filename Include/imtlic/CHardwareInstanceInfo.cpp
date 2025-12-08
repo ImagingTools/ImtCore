@@ -128,11 +128,11 @@ bool CHardwareInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMod
 }
 
 
-istd::IChangeable* CHardwareInstanceInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CHardwareInstanceInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CHardwareInstanceInfo> clonePtr(new CHardwareInstanceInfo());
+	istd::IChangeableUniquePtr clonePtr(new CHardwareInstanceInfo());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

@@ -50,9 +50,9 @@ bool CCollectionImportControllerComp::BeginCollectionImportSession(const Session
 		file.tempFileId = m_fileManagerCompPtr->AddFileItem(sessionPtr->tempFileSessionId, fileInfo.name, fileInfo.id);
 		file.path = m_fileManagerCompPtr->GetPath(sessionPtr->tempFileSessionId, file.tempFileId);
 
-		if (fileInfo.additionalParams != nullptr){
-			file.additionalParams.reset(dynamic_cast<iprm::IParamsSet*>(fileInfo.additionalParams->CloneMe()));
-			if (file.additionalParams == nullptr){
+		if (fileInfo.additionalParams.IsValid()){
+			file.additionalParams.MoveCastedPtr(fileInfo.additionalParams->CloneMe());
+			if (!file.additionalParams.IsValid()){
 				return false;
 			}
 		}
@@ -119,9 +119,9 @@ bool CCollectionImportControllerComp::CancelCollectionImportSession(const QByteA
 
 
 IFileUploadHandler::FilelUploadStatus CCollectionImportControllerComp::ReceiveFileChunk(
-	const QByteArray& fileId,
-	const istd::CIntRange& range,
-	const QByteArray& data)
+			const QByteArray& fileId,
+			const istd::CIntRange& range,
+			const QByteArray& data)
 {
 	QByteArray sessionId = FindSession(fileId);
 

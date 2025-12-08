@@ -9,7 +9,7 @@ namespace imtlic
 {
 
 
-const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray& featureId) const
+imtlic::IFeatureInfoSharedPtr CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray& featureId) const
 {
 	if (!m_featureCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -17,7 +17,11 @@ const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray& f
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_featureCollectionCompPtr->GetObjectData(featureId, dataPtr)){
-		return dynamic_cast<const IFeatureInfo*>(dataPtr.GetPtr()->CloneMe());
+		IFeatureInfoSharedPtr retVal;
+
+		retVal.SetCastedPtr(dataPtr);
+
+		return retVal;
 	}
 
 	return nullptr;

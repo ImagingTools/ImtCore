@@ -253,11 +253,11 @@ void CProductInfoFileGeneratorComp::WriteFeatureInfo(
 		}
 	}
 	
-	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
-	if (!subFeatures.IsEmpty()){
-		for (int i = 0; i < subFeatures.GetCount(); i++){
-			const imtlic::IFeatureInfo* subFeatureInfoPtr = subFeatures.GetAt(i);
-			if (subFeatureInfoPtr != nullptr){
+	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	if (!subFeatures.isEmpty()){
+		for (int i = 0; i < subFeatures.count(); i++){
+			imtlic::IFeatureInfoSharedPtr subFeatureInfoPtr = subFeatures.at(i);
+			if (subFeatureInfoPtr.IsValid()){
 				WriteNewLine(out, 1);
 				WriteFeatureInfo(out, *subFeatureInfoPtr, "");
 

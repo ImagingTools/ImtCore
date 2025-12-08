@@ -84,7 +84,7 @@ IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequ
 		if (m_queryDataMap.contains(key)){
 			imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
 			responsePtr->SetResponseData(m_queryDataMap.value(key));
-			retVal.reset(responsePtr);
+			retVal.SetPtr(responsePtr);
 
 			m_queryDataMap.remove(key);
 

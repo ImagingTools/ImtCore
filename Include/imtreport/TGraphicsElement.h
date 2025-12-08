@@ -38,7 +38,7 @@ public:
 
 	// reimplemented (istd::IChangeable)
 	virtual bool CopyFrom(const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 };
 
 
@@ -96,12 +96,12 @@ bool TGraphicsElement<Object2dType>::CopyFrom(const istd::IChangeable& object, C
 
 
 template <class Object2dType>
-istd::IChangeable* TGraphicsElement<Object2dType>::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr TGraphicsElement<Object2dType>::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<TGraphicsElement<Object2dType> > clonePtr(new TGraphicsElement<Object2dType>);
+	istd::IChangeableUniquePtr clonePtr(new TGraphicsElement<Object2dType>);
 	if (clonePtr->CopyFrom(*this, mode))
 	{
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

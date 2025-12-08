@@ -24,7 +24,7 @@ public:
 
 	// reimplemented (imtbase::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseList() const override;
-	virtual const imtlic::ILicenseDefinition* GetLicenseInfo(const QByteArray& licenseId) const override;
+	virtual istd::TUniqueInterfacePtr<imtlic::ILicenseDefinition> GetLicenseInfo(const QByteArray& licenseId) const override;
 };
 
 

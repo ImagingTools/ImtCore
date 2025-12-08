@@ -132,7 +132,7 @@ QByteArray CSqlStructureDelegateComp::CreateInsertNewObjectQuery(
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, documentDataPtr)){
 		istd::IChangeable* document = documentDataPtr.GetPtr();
 		if (document != nullptr){
-			istd::TSmartPtr<idoc::IDocumentMetaInfo> documentMetaInfoPtr;
+			idoc::MetaInfoPtr documentMetaInfoPtr;
 			if (m_metaInfoCreatorCompPtr->CreateMetaInfo(document, "", documentMetaInfoPtr)){
 				name = documentMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString();
 				description = documentMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();

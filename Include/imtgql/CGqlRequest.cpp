@@ -66,11 +66,12 @@ void CGqlRequest::AddSimpleField(const QByteArray &fieldId)
 }
 
 
-void CGqlRequest::SetGqlContext(IGqlContext* gqlContext){
-	if (m_gqlContextPtr.get() != gqlContext){
+void CGqlRequest::SetGqlContext(imtgql::IGqlContextSharedPtr gqlContext)
+{
+	if (m_gqlContextPtr.GetPtr() != gqlContext.GetPtr()){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_gqlContextPtr.reset(gqlContext);
+		m_gqlContextPtr = gqlContext;
 	}
 }
 
@@ -92,6 +93,7 @@ QByteArray CGqlRequest::GetHeader(QByteArray headerId) const
 	const IGqlContext* gqlContext = GetRequestContext();
 	if (gqlContext != nullptr){
 		IGqlContext::Headers headers = gqlContext->GetHeaders();
+
 		return headers.value(headerId.toLower());
 	}
 
@@ -101,9 +103,10 @@ QByteArray CGqlRequest::GetHeader(QByteArray headerId) const
 
 void CGqlRequest::SetHeader(QByteArray headerId, QByteArray value)
 {
-	if (m_gqlContextPtr != nullptr){
+	if (m_gqlContextPtr.IsValid()){
 		IGqlContext::Headers headers = m_gqlContextPtr->GetHeaders();
 		headers.insert(headerId, value);
+
 		m_gqlContextPtr->SetHeaders(headers);
 	}
 }
@@ -197,7 +200,7 @@ QByteArray CGqlRequest::GetQuery() const
 
 const IGqlContext* CGqlRequest::GetRequestContext() const
 {
-	return m_gqlContextPtr.get();
+	return m_gqlContextPtr.GetPtr();
 }
 
 
@@ -560,11 +563,11 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 }
 
 
-istd::IChangeable* CGqlRequest::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+istd::IChangeableUniquePtr CGqlRequest::CloneMe(istd::IChangeable::CompatibilityMode mode) const
 {
-	istd::TDelPtr<CGqlRequest> clonePtr(new CGqlRequest(m_requestType));
+	istd::IChangeableUniquePtr clonePtr(new CGqlRequest(m_requestType));
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

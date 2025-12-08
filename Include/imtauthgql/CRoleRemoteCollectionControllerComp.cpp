@@ -33,8 +33,8 @@ QString CRoleRemoteCollectionControllerComp::GetPermissionName(const QByteArray&
 			if (featureInfoPtr != nullptr){
 				for (imtbase::ICollectionInfo::Id& subFeatureId : featureInfoPtr->GetSubFeatureIds()){
 					if (permissionId == subFeatureId){
-						const imtlic::IFeatureInfo* subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
-						if (subFeatureInfoPtr != nullptr){
+						imtlic::IFeatureInfoSharedPtr subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
+						if (subFeatureInfoPtr.IsValid()){
 							return subFeatureInfoPtr->GetFeatureName();
 						}
 					}

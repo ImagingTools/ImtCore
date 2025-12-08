@@ -37,7 +37,7 @@ protected:
 	
 		imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
 		if (gqlContextPtr != nullptr){
-			gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
+			gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe().PopInterfacePtr()));
 		}
 
 		if (!SdlRequest::SetupGqlRequest(gqlRequest, arguments)){

@@ -145,11 +145,11 @@ bool CServiceConnectionInfo::CopyFrom(const IChangeable& object, CompatibilityMo
 }
 
 
-istd::IChangeable* CServiceConnectionInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CServiceConnectionInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CServiceConnectionInfo> clonePtr(new CServiceConnectionInfo);
+	istd::IChangeableUniquePtr clonePtr(new CServiceConnectionInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

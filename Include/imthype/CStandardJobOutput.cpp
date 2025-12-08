@@ -304,11 +304,11 @@ bool CStandardJobOutput::IsEqual(const istd::IChangeable& object) const
 }
 
 
-istd::IChangeable* CStandardJobOutput::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CStandardJobOutput::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CStandardJobOutput> clonePtr( new CStandardJobOutput);
+	istd::IChangeableUniquePtr clonePtr(new CStandardJobOutput);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return NULL;

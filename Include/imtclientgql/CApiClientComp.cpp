@@ -26,7 +26,7 @@ CApiClientComp::CApiClientComp()
 
 IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr, imtbase::IUrlParam* urlParam) const
 {
-	if (requestPtr.isNull()){
+	if (!requestPtr.IsValid()){
 		return IGqlClient::GqlResponsePtr(nullptr);
 	}
 
@@ -53,7 +53,7 @@ IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr,
 
 						imtgql::CGqlResponse* responsePtr(new imtgql::CGqlResponse(requestPtr));
 						responsePtr->SetResponseData(payload);
-						retVal.reset(responsePtr);
+						retVal.SetPtr(responsePtr);
 
 						category = istd::IInformationProvider::IC_INFO;
 					}

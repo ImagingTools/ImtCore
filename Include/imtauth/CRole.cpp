@@ -317,12 +317,12 @@ bool CRole::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 }
 
 
-istd::IChangeable* CRole::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CRole::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<imtauth::CRole> clonePtr(new CRole());
+	istd::IChangeableUniquePtr clonePtr(new CRole());
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

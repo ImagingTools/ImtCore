@@ -29,7 +29,7 @@ const imtbase::ICollectionInfo& CClientRequestUserInfoProviderComp::GetUserList(
 }
 
 
-const imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QByteArray& userId, const iprm::IParamsSet* /*paramsPtr*/) const
+imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(const QByteArray& userId, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	namespace userssdl = sdl::imtauth::Users;
 
@@ -45,7 +45,7 @@ const imtauth::IUserInfoUniquePtr CClientRequestUserInfoProviderComp::GetUser(co
 
 	imtgql::IGqlContext* gqlContextPtr = imtgql::CGqlRequestContextManager::GetContext();
 	if (gqlContextPtr != nullptr){
-		gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe()));
+		gqlRequest.SetGqlContext(dynamic_cast<imtgql::IGqlContext*>(gqlContextPtr->CloneMe().PopInterfacePtr()));
 	}
 
 	if (!userssdl::CUserItemGqlRequest::SetupGqlRequest(gqlRequest, arguments)){

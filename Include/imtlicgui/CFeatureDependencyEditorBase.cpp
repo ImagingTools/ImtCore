@@ -52,8 +52,8 @@ void CFeatureDependencyEditorBase::OnFeaturePackageCollectionUpdate()
 
 				imtbase::ICollectionInfo::Ids featureIds = packagePtr->GetFeatureList().GetElementIds();
 				for (const QByteArray& featureId : featureIds){
-					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureId);
-					if (featureInfoPtr != nullptr){
+					imtlic::IFeatureInfoSharedPtr featureInfoPtr = packagePtr->GetFeatureInfo(featureId);
+					if (featureInfoPtr.IsValid()){
 						FeatureDescription featureDescription;
 
 						featureDescription.id = featureInfoPtr->GetFeatureId();

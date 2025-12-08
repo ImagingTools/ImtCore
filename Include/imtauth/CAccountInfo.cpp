@@ -235,11 +235,11 @@ bool CAccountInfo::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CAccountInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CAccountInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CAccountInfo> clonePtr(new CAccountInfo);
+	istd::IChangeableUniquePtr clonePtr(new CAccountInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

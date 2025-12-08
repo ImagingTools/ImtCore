@@ -1,13 +1,13 @@
 #pragma once
 
 
-// ACF includes
-#include <istd/TPointerVector.h>
-#include <istd/TDelPtr.h>
-#include <iser/IObject.h>
+// Qt includes
+#include <QtCore/QSet>
+#include <QtCore/QVector>
 
-//ImtCore includes
-#include <imtlic/IFeatureInfoProvider.h>
+// ACF includes
+#include <idoc/IDocumentMetaInfo.h>
+#include <iser/IObject.h>
 
 
 namespace imtlic
@@ -30,6 +30,8 @@ public:
 	};
 
 	typedef QSet<QByteArray> FeatureIds;
+	typedef istd::TSharedInterfacePtr<IFeatureInfo> FeatureInfoPtr;
+	typedef QVector<FeatureInfoPtr> FeatureInfoList;
 
 	/**
 		Get the feature ID.
@@ -71,17 +73,17 @@ public:
 		Get sub feature for this feature.
 		\param maxDepth	traversation depth for tree iteration. negative value means unlimited depth.
 	*/
-	virtual const IFeatureInfo* GetSubFeature(const QByteArray& subfeatureId, int maxDepth = -1) const = 0;
+	virtual FeatureInfoPtr GetSubFeature(const QByteArray& subfeatureId, int maxDepth = -1) const = 0;
 
 	/**
 		Get sub features for this feature.
 	*/
-	virtual const istd::TPointerVector<const IFeatureInfo>& GetSubFeatures() const  = 0;
+	virtual const FeatureInfoList& GetSubFeatures() const  = 0;
 
 	/**
 		Insert sub feature.
 	*/
-	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) = 0;
+	virtual bool InsertSubFeature(FeatureInfoPtr subFeatureInfo) = 0;
 
 	/**
 		Remove sub feature.
@@ -95,7 +97,6 @@ public:
 };
 
 
-typedef istd::TPointerVector<const IFeatureInfo> FeatureInfoList;
 typedef istd::TUniqueInterfacePtr<IFeatureInfo> IFeatureInfoUniquePtr;
 typedef istd::TSharedInterfacePtr<IFeatureInfo> IFeatureInfoSharedPtr;
 

@@ -107,19 +107,19 @@ void CGqlContext::SetUserId(const QByteArray& userId)
 
 imtauth::IUserInfo* CGqlContext::GetUserInfo() const
 {
-	return m_userInfoPtr.get();
+	return m_userInfoPtr.GetPtr();
 }
 
 
 void CGqlContext::SetUserInfo(const imtauth::IUserInfo* userInfoPtr)
 {
-	if (m_userInfoPtr.get() != userInfoPtr){
+	if (m_userInfoPtr.GetPtr() != userInfoPtr){
 		istd::CChangeNotifier changeNotifier(this);
 
 		if (userInfoPtr != nullptr){
-			IChangeable* clonedUserPtr = userInfoPtr->CloneMe();
-			if (clonedUserPtr != nullptr){
-				m_userInfoPtr.reset(dynamic_cast<imtauth::IUserInfo*>(clonedUserPtr));
+			istd::IChangeableUniquePtr clonedUserPtr = userInfoPtr->CloneMe();
+			if (clonedUserPtr.IsValid()){
+				m_userInfoPtr.MoveCastedPtr(clonedUserPtr);
 			}
 			else {
 				Q_ASSERT(false);
@@ -178,7 +178,7 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_userId);
 	retVal = retVal && archive.EndTag(userIdTag);
 
-	if (m_userInfoPtr != nullptr){
+	if (m_userInfoPtr.IsValid()){
 		iser::CArchiveTag contactTag("UserInfo", "User info", iser::CArchiveTag::TT_GROUP);
 		retVal = retVal && archive.BeginTag(contactTag);
 		retVal = retVal && m_userInfoPtr->Serialize(archive);
@@ -210,7 +210,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_productId = sourcePtr->m_productId;
 		m_headers = sourcePtr->m_headers;
 
-		SetUserInfo(sourcePtr->m_userInfoPtr.get());
+		SetUserInfo(sourcePtr->m_userInfoPtr.GetPtr());
 
 		return true;
 	}
@@ -219,11 +219,11 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 }
 
 
-istd::IChangeable* CGqlContext::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CGqlContext::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CGqlContext> clonePtr(new CGqlContext);
+	istd::IChangeableUniquePtr clonePtr(new CGqlContext);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

@@ -23,8 +23,8 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtgql::CGqlRequest> gqlRequestPtr;
-	gqlRequestPtr.SetCastedOrRemove(gqlRequest.CloneMe());
+	istd::TUniqueInterfacePtr<imtgql::CGqlRequest> gqlRequestPtr;
+	gqlRequestPtr.MoveCastedPtr(gqlRequest.CloneMe());
 
 	if (!gqlRequestPtr.IsValid()){
 		errorMessage = QString("GraphQL-request could not be copied").toUtf8();
@@ -44,8 +44,8 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 
 	const imtgql::CGqlParamObject* inputParam = gqlRequestPtr->GetParamObject("input");
 	if (inputParam != nullptr){
-		istd::TDelPtr<imtgql::CGqlParamObject> newInputParamPtr;
-		newInputParamPtr.SetCastedOrRemove(inputParam->CloneMe());
+		istd::TUniqueInterfacePtr<imtgql::CGqlParamObject> newInputParamPtr;
+		newInputParamPtr.MoveCastedPtr(inputParam->CloneMe());
 		if (!newInputParamPtr.IsValid()){
 			errorMessage = QString("Creation of input parameters related to the GraphQL-request failed").toUtf8();
 			SendErrorMessage(0, errorMessage, "CGqlRemoteRepresentationControllerComp");
@@ -63,10 +63,11 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		gqlRequestPtr->AddParam("input", inputGqlObject);
 	}
 
-	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(dynamic_cast<imtgql::IGqlRequest*>(gqlRequestPtr->CloneMe()));
-	if (!requestPtr.isNull()){
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr;
+	requestPtr.MoveCastedPtr(gqlRequestPtr->CloneMe());
+	if (requestPtr.IsValid()){
 		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
-		if (!responsePtr.isNull()){
+		if (responsePtr.IsValid()){
 			return CreateTreeItemModelFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
 	}

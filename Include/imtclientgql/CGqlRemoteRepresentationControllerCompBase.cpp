@@ -25,10 +25,11 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 		return nullptr;
 	}
 
-	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(dynamic_cast<imtgql::IGqlRequest*>(gqlRequest.CloneMe()));
-	if (!requestPtr.isNull()){
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr;
+	requestPtr.MoveCastedPtr(gqlRequest.CloneMe());
+	if (requestPtr.IsValid()){
 		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
-		if (!responsePtr.isNull()){
+		if (responsePtr.IsValid()){
 			return CreateTreeItemModelFromResponse(gqlRequest.GetCommandId(), *responsePtr);
 		}
 		else{
@@ -51,7 +52,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeI
 		QJsonObject dataObject = document.object();
 
 		imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
-		if (requestPtr.isNull()){
+		if (!requestPtr.IsValid()){
 			return nullptr;
 		}
 

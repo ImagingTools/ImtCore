@@ -23,7 +23,7 @@ const imtbase::ICollectionInfo& CLicenseInfoProviderComp::GetLicenseList() const
 }
 
 
-const imtlic::ILicenseDefinition* CLicenseInfoProviderComp::GetLicenseInfo(const QByteArray& licenseId) const
+istd::TUniqueInterfacePtr<imtlic::ILicenseDefinition> CLicenseInfoProviderComp::GetLicenseInfo(const QByteArray& licenseId) const
 {
 	imtbase::ICollectionInfo::Ids productIds = m_productCollectionCompPtr->GetElementIds();
 	for (const imtbase::ICollectionInfo::Id& productId : productIds){
@@ -31,9 +31,13 @@ const imtlic::ILicenseDefinition* CLicenseInfoProviderComp::GetLicenseInfo(const
 		if (m_productCollectionCompPtr->GetObjectData(productId, dataPtr)){
 			const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
 			if (productPtr != nullptr){
-				const imtlic::ILicenseDefinition* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
-				if (licenseInfoPtr != nullptr){
-					return dynamic_cast<const imtlic::ILicenseDefinition*>(licenseInfoPtr->CloneMe());
+				istd::TUniqueInterfacePtr<imtlic::ILicenseDefinition> licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
+				if (licenseInfoPtr.IsValid()){
+					istd::TUniqueInterfacePtr<imtlic::ILicenseDefinition> retVal;
+
+					retVal.MoveCastedPtr(licenseInfoPtr->CloneMe());
+
+					return retVal;
 				}
 			}
 		}

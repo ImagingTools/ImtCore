@@ -44,7 +44,7 @@ public:
 	/**
 		Get information for role by Object-ID.
 	*/
-	virtual const imtauth::IRoleUniquePtr GetRole(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
+	virtual imtauth::IRoleUniquePtr GetRole(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 };
 
 

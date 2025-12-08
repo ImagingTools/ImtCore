@@ -142,7 +142,7 @@ sdl::imtbase::ImtCollection::CVisualStatus CUserGroupCollectionControllerComp::O
 sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CUserGroupCollectionControllerComp::OnGetElementMetaInfo(
 			const sdl::imtbase::ImtCollection::CGetElementMetaInfoGqlRequest& getElementMetaInfoRequest,
 			const ::imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload response;
 	response.Version_1_0.Emplace();

@@ -121,11 +121,11 @@ bool CUrlParam::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CUrlParam::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+istd::IChangeableUniquePtr CUrlParam::CloneMe(istd::IChangeable::CompatibilityMode mode) const
 {
-	istd::TDelPtr<CUrlParam> clonePtr(new CUrlParam);
+	istd::IChangeableUniquePtr clonePtr(new CUrlParam);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

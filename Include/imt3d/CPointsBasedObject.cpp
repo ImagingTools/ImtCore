@@ -226,12 +226,12 @@ bool CPointsBasedObject::IsEqual(const IChangeable & object) const
 }
 
 
-istd::IChangeable* CPointsBasedObject::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CPointsBasedObject::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CPointsBasedObject> clonePtr(new CPointsBasedObject());
+	istd::IChangeableUniquePtr clonePtr(new CPointsBasedObject());
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

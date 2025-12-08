@@ -173,11 +173,11 @@ bool COperationDescription::CopyFrom(const IChangeable& object, CompatibilityMod
 }
 
 
-istd::IChangeable* COperationDescription::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr COperationDescription::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<COperationDescription> clonePtr(new COperationDescription);
+	istd::IChangeableUniquePtr clonePtr(new COperationDescription);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

@@ -144,11 +144,11 @@ bool CAddressTypeInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 }
 
 
-istd::IChangeable* CAddressTypeInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CAddressTypeInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CAddressTypeInfo> clonePtr(new CAddressTypeInfo);
+	istd::IChangeableUniquePtr clonePtr(new CAddressTypeInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

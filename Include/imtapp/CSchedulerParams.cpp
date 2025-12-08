@@ -110,11 +110,11 @@ bool CSchedulerParams::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CSchedulerParams::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CSchedulerParams::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CSchedulerParams> clonePtr(new CSchedulerParams);
+	istd::IChangeableUniquePtr clonePtr(new CSchedulerParams);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

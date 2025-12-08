@@ -66,7 +66,7 @@ void CGqlFieldObject::InsertField(const QByteArray &fieldId)
 
 void CGqlFieldObject::InsertField(const QByteArray &fieldId, const CGqlFieldObject& object)
 {
-	istd::TSmartPtr<CGqlFieldObject> objectPtr(new CGqlFieldObject());
+	istd::TSharedInterfacePtr<CGqlFieldObject> objectPtr(new CGqlFieldObject());
 	*objectPtr = object;
 	objectPtr->m_parentPtr = this;
 	RemoveField(fieldId);
@@ -76,7 +76,7 @@ void CGqlFieldObject::InsertField(const QByteArray &fieldId, const CGqlFieldObje
 
 void CGqlFieldObject::InsertFragment(const QByteArray& typeId, const CGqlFieldFragment& object)
 {
-	istd::TSmartPtr<CGqlFieldFragment> fragmentPtr(new CGqlFieldFragment());
+	istd::TSharedInterfacePtr<CGqlFieldFragment> fragmentPtr(new CGqlFieldFragment());
 	*fragmentPtr = object;
 	fragmentPtr->m_parentPtr = this;
 	RemoveField(typeId);
@@ -159,10 +159,10 @@ bool CGqlFieldObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 
 		QByteArrayList keys = sourcePtr->m_objectFields.keys();
 		for (const QByteArray& key : keys){
-			istd::TSmartPtr<CGqlFieldObject> sourceObject = sourcePtr->m_objectFields.value(key);
+			istd::TSharedInterfacePtr<CGqlFieldObject> sourceObject = sourcePtr->m_objectFields.value(key);
 
-			istd::TSmartPtr<CGqlFieldObject> gqlObject;
-			gqlObject.SetCastedOrRemove(sourceObject->CloneMe());
+			istd::TSharedInterfacePtr<CGqlFieldObject> gqlObject;
+			gqlObject.MoveCastedPtr(sourceObject->CloneMe());
 			if (!gqlObject.IsValid()){
 				return false;
 			}
@@ -174,10 +174,10 @@ bool CGqlFieldObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 
 		keys = sourcePtr->m_fragmentFields.keys();
 		for (const QByteArray& key : keys){
-			istd::TSmartPtr<CGqlFieldFragment> sourceObject = sourcePtr->m_fragmentFields.value(key);
+			istd::TSharedInterfacePtr<CGqlFieldFragment> sourceObject = sourcePtr->m_fragmentFields.value(key);
 
-			istd::TSmartPtr<CGqlFieldFragment> gqlFragment;
-			gqlFragment.SetCastedOrRemove(sourceObject->CloneMe());
+			istd::TSharedInterfacePtr<CGqlFieldFragment> gqlFragment;
+			gqlFragment.MoveCastedPtr(sourceObject->CloneMe());
 			if (!gqlFragment.IsValid()){
 				return false;
 			}
@@ -192,11 +192,11 @@ bool CGqlFieldObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 }
 
 
-istd::IChangeable* CGqlFieldObject::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CGqlFieldObject::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CGqlFieldObject> clonePtr(new CGqlFieldObject);
+	istd::IChangeableUniquePtr clonePtr(new CGqlFieldObject);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

@@ -84,7 +84,7 @@ bool CLoginEvent::CopyFrom(const istd::IChangeable& object, istd::IChangeable::C
 }
 
 
-istd::IChangeable* CLoginEvent::CloneMe(istd::IChangeable::CompatibilityMode /*mode*/) const
+istd::IChangeableUniquePtr CLoginEvent::CloneMe(istd::IChangeable::CompatibilityMode /*mode*/) const
 {
 	return new CLoginEvent(
 				m_loginEventInfo,

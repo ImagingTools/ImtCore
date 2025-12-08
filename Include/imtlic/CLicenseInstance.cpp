@@ -98,11 +98,11 @@ bool CLicenseInstance::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 }
 
 
-istd::IChangeable* CLicenseInstance::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CLicenseInstance::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CLicenseInstance> clonePtr(new CLicenseInstance);
+	istd::IChangeableUniquePtr clonePtr(new CLicenseInstance);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

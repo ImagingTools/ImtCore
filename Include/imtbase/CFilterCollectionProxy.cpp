@@ -89,7 +89,7 @@ ICollectionInfo::Id CFilterCollectionProxy::InsertNewObject(
 	}
 
 	if (dataMetaInfoPtr != nullptr){
-		info.contentsMetaInfoPtr.SetCastedOrRemove(dataMetaInfoPtr->CloneMe());
+		info.contentsMetaInfoPtr.MoveCastedPtr(dataMetaInfoPtr->CloneMe());
 	}
 
 	if (InsertObjectIntoCollection(info)){
@@ -138,11 +138,11 @@ int CFilterCollectionProxy::GetSupportedOperations() const
 }
 
 
-istd::IChangeable* CFilterCollectionProxy::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CFilterCollectionProxy::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CFilterCollectionProxy> clonePtr(new CFilterCollectionProxy(m_parent, m_isObjectProxy));
+	istd::IChangeableUniquePtr clonePtr(new CFilterCollectionProxy(m_parent, m_isObjectProxy));
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

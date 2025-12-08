@@ -67,7 +67,7 @@ QList<imtsdl::IncludeDirective> CGqlWrapClassCodeGeneratorComp::GetIncludeDirect
 
 // private methods
 
-bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRequest& sdlRequest, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const
+bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRequest& sdlRequest, QIODevice* headerDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QTextStream ifStream(headerDevicePtr);
 
@@ -151,7 +151,7 @@ bool CGqlWrapClassCodeGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlRe
 }
 
 
-bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRequest& sdlRequest, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const
+bool CGqlWrapClassCodeGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlRequest& sdlRequest, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QTextStream ifStream(sourceDevicePtr);
 

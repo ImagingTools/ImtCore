@@ -640,7 +640,9 @@ imtbase::IObjectCollectionUniquePtr CFileCollectionCompBase::CreateSubCollection
 	int objectsCount = count >= 0 ? qMin(count, m_files.count()) : m_files.count();
 
 	for (int fileIndex = offset; fileIndex < objectsCount; ++fileIndex){
-		collectionPtr->InsertNewObject(m_files[fileIndex].GetTypeId(), m_files[fileIndex].GetName(), "", m_files[fileIndex].CloneMe());
+		istd::IChangeableUniquePtr fileCopyPtr = m_files[fileIndex].CloneMe();
+
+		collectionPtr->InsertNewObject(m_files[fileIndex].GetTypeId(), m_files[fileIndex].GetName(), "", fileCopyPtr.GetPtr());
 	}
 
 	m_filesLock.unlock();
@@ -703,7 +705,7 @@ idoc::MetaInfoPtr CFileCollectionCompBase::GetDataMetaInfo(const Id& objectId) c
 
 	idoc::MetaInfoPtr contentsMetaInfoPtr = item.GetContentsMetaInfo();
 	if (contentsMetaInfoPtr.IsValid()){
-		metaInfoPtr.SetCastedOrRemove(contentsMetaInfoPtr->CloneMe());
+		metaInfoPtr.MoveCastedPtr(contentsMetaInfoPtr->CloneMe());
 	}
 
 	return metaInfoPtr;
@@ -795,7 +797,7 @@ idoc::MetaInfoPtr CFileCollectionCompBase::GetElementMetaInfo(const Id& elementI
 	// Get meta-information from cache:
 	CFileCollectionItem& item = m_files[fileIndex];
 
-	metaInfoPtr.SetCastedOrRemove(item.GetCollectionMetaInfo().CloneMe());
+	metaInfoPtr.MoveCastedPtr(item.GetCollectionMetaInfo().CloneMe());
 
 	return metaInfoPtr;
 }

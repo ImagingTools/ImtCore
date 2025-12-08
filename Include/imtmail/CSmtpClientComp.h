@@ -96,7 +96,7 @@ private:
 
 private:
 	mutable std::unique_ptr<QSslSocket> m_socketPtr;
-	mutable std::unique_ptr<const ISmtpMessage> m_smtpMessagePtr;
+	mutable istd::TUniqueInterfacePtr<ISmtpMessage> m_smtpMessagePtr;
 	std::unique_ptr<QTextStream> m_textStreamPtr;
 	mutable int m_currentMailSendState;
 	mutable QString m_message;

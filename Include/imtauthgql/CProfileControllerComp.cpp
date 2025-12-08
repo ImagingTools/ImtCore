@@ -133,8 +133,8 @@ sdl::imtauth::Profile::CProfileData CProfileControllerComp::OnGetProfile(
 					if (featureInfoPtr != nullptr){
 						for (imtbase::ICollectionInfo::Id& subFeatureId : featureInfoPtr->GetSubFeatureIds()){
 							if (permissions.contains(subFeatureId)){
-								const imtlic::IFeatureInfo* subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
-								if (subFeatureInfoPtr != nullptr){
+								imtlic::IFeatureInfoSharedPtr subFeatureInfoPtr = featureInfoPtr->GetSubFeature(subFeatureId);
+								if (subFeatureInfoPtr.IsValid()){
 									sdl::imtauth::Profile::CPermissionInfo::V1_0 info;
 
 									info.id = QByteArray(subFeatureInfoPtr->GetFeatureId());

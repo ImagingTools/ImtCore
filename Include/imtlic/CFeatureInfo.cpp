@@ -143,25 +143,25 @@ QByteArrayList CFeatureInfo::GetSubFeatureIds(int maxDepth) const
 }
 
 
-const IFeatureInfo* CFeatureInfo::GetSubFeature(const QByteArray& subfeatureId, int maxDepth) const
+IFeatureInfo::FeatureInfoPtr CFeatureInfo::GetSubFeature(const QByteArray& subfeatureId, int maxDepth) const
 {
 	return GetSubFeatureRecursive(m_subFeatures, subfeatureId, maxDepth);
 }
 
 
-const istd::TPointerVector<const IFeatureInfo>& CFeatureInfo::GetSubFeatures() const
+const IFeatureInfo::FeatureInfoList& CFeatureInfo::GetSubFeatures() const
 {
 	return m_subFeatures;
 }
 
 
-bool CFeatureInfo::InsertSubFeature(const IFeatureInfo* subFeatureInfo)
+bool CFeatureInfo::InsertSubFeature(FeatureInfoPtr subFeatureInfo)
 {
 	bool retVal = false;
-	if (this != subFeatureInfo){
+	if (this != subFeatureInfo.GetPtr()){
 		istd::CChangeNotifier notifier(this);
 
-		m_subFeatures.PushBack(subFeatureInfo);
+		m_subFeatures.push_back(subFeatureInfo);
 
 		retVal = true;
 	}
@@ -172,14 +172,14 @@ bool CFeatureInfo::InsertSubFeature(const IFeatureInfo* subFeatureInfo)
 
 void CFeatureInfo::DeleteSubFeature(const QByteArray& subFeatureId)
 {
-	for (int i = 0; i < m_subFeatures.GetCount(); i++){
-		const IFeatureInfo* subFeatureInfoPtr = m_subFeatures.GetAt(i);
+	for (int i = 0; i < m_subFeatures.size(); i++){
+		FeatureInfoPtr subFeatureInfoPtr = m_subFeatures.at(i);
 		QByteArray featureId = subFeatureInfoPtr->GetFeatureId();
 
 		if (subFeatureId == featureId){
 			istd::CChangeNotifier notifier(this);
 
-			m_subFeatures.Remove(subFeatureInfoPtr);
+			m_subFeatures.removeAt(i);
 
 			break;
 		}
@@ -245,24 +245,24 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 	iser::CArchiveTag subFeaturesTag("SubFeatures", "Subfeatures of the feature", iser::CArchiveTag::TT_MULTIPLE);
 	iser::CArchiveTag subfeatureTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &subFeaturesTag);
 
-	int subfeaturesCount = m_subFeatures.GetCount();
+	int subfeaturesCount = m_subFeatures.count();
 
 	retVal = retVal && archive.BeginMultiTag(subFeaturesTag, subfeatureTag, subfeaturesCount);
 
 	if (!archive.IsStoring()){
-		int oldSubfeaturesCount = m_subFeatures.GetCount();
+		int oldSubfeaturesCount = m_subFeatures.count();
 
-		m_subFeatures.SetCount(subfeaturesCount);
+		m_subFeatures.resize(subfeaturesCount);
 
 		for (int i = oldSubfeaturesCount; i < subfeaturesCount; ++i){
-			m_subFeatures.SetElementAt(i, new imod::TModelWrap<CFeatureInfo>());
+			m_subFeatures[i] = new imod::TModelWrap<CFeatureInfo>();
 		}
 	}
 
-	for (int i = 0; i < m_subFeatures.GetCount(); i++){
-		const IFeatureInfo* featureInfoPtr = m_subFeatures.GetAt(i);
+	for (int i = 0; i < m_subFeatures.count(); i++){
+		FeatureInfoPtr featureInfoPtr = m_subFeatures[i];
 		retVal = retVal && archive.BeginTag(subfeatureTag);
-		retVal = retVal && const_cast<IFeatureInfo*>(featureInfoPtr)->Serialize(archive);
+		retVal = retVal && featureInfoPtr->Serialize(archive);
 		retVal = retVal && archive.EndTag(subfeatureTag);
 	}
 
@@ -292,19 +292,19 @@ bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 		m_optional = sourcePtr->m_optional;
 		m_dependencies =  sourcePtr->m_dependencies;
 
-		m_subFeatures.Reset();
+		m_subFeatures.clear();
 
-		int subfeaturesCount = sourcePtr->m_subFeatures.GetCount();
+		int subfeaturesCount = sourcePtr->m_subFeatures.count();
 
-		m_subFeatures.SetCount(subfeaturesCount);
+		m_subFeatures.resize(subfeaturesCount);
 
 		for (int i = 0; i < subfeaturesCount; ++i){
-			m_subFeatures.SetElementAt(i, new imod::TModelWrap<CFeatureInfo>());
+			m_subFeatures[i] = new imod::TModelWrap<CFeatureInfo>();
 		}
 
 		for (int i = 0; i < subfeaturesCount; ++i){
-			IFeatureInfo* featureInfoPtr = const_cast<IFeatureInfo*>(m_subFeatures.GetAt(i));
-			bool result = featureInfoPtr->CopyFrom(*sourcePtr->m_subFeatures.GetAt(i));
+			FeatureInfoPtr featureInfoPtr = m_subFeatures[i];
+			bool result = featureInfoPtr->CopyFrom(*sourcePtr->m_subFeatures[i]);
 			if (!result){
 				return false;
 			}
@@ -325,13 +325,13 @@ bool CFeatureInfo::IsEqual(const IChangeable& object) const
 	if (sourcePtr != nullptr){
 		const FeatureInfoList& subFeatures = sourcePtr->GetSubFeatures();
 
-		if (m_subFeatures.GetCount() != subFeatures.GetCount()){
+		if (m_subFeatures.count() != subFeatures.count()){
 			return false;
 		}
 
-		for (int i = 0; i < subFeatures.GetCount(); i++){
-			const IFeatureInfo* sourceFeatureInfoPtr = subFeatures.GetAt(i);
-			bool result = sourceFeatureInfoPtr->IsEqual(*m_subFeatures.GetAt(i));
+		for (int i = 0; i < subFeatures.count(); i++){
+			FeatureInfoPtr sourceFeatureInfoPtr = subFeatures.at(i);
+			bool result = sourceFeatureInfoPtr->IsEqual(*m_subFeatures.at(i));
 			if (!result){
 				return false;
 			}
@@ -349,11 +349,11 @@ bool CFeatureInfo::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CFeatureInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CFeatureInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CFeatureInfo> clonePtr(new CFeatureInfo);
+	istd::IChangeableUniquePtr clonePtr(new CFeatureInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;
@@ -367,7 +367,7 @@ bool CFeatureInfo::ResetData(CompatibilityMode /*mode*/)
 	m_id.clear();
 	m_name.clear();
 	m_description.clear();
-	m_subFeatures.Reset();
+	m_subFeatures.clear();
 	m_parentFeaturePtr = nullptr;
 	m_dependencies.clear();
 	m_optional = false;
@@ -382,16 +382,16 @@ void CFeatureInfo::GetSubFeaturesRecursive(const FeatureInfoList& subFeatures, i
 		return;
 	}
 
-	for (int i = 0; i < subFeatures.GetCount(); i++){
-		const IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
-		if (featureInfoPtr != nullptr){
+	for (int i = 0; i < subFeatures.count(); i++){
+		FeatureInfoPtr featureInfoPtr = subFeatures.at(i);
+		if (featureInfoPtr.IsValid()){
 			QByteArray featureId = featureInfoPtr->GetFeatureId();
 
 			featureList << featureId;
 
 			const FeatureInfoList& subfeatureInfoList = featureInfoPtr->GetSubFeatures();
 
-			if (!subfeatureInfoList.IsEmpty()){
+			if (!subfeatureInfoList.isEmpty()){
 				GetSubFeaturesRecursive(subfeatureInfoList, maxDepth, currentDepth + 1, featureList);
 			}
 		}
@@ -399,14 +399,14 @@ void CFeatureInfo::GetSubFeaturesRecursive(const FeatureInfoList& subFeatures, i
 }
 
 
-const IFeatureInfo* CFeatureInfo::GetSubFeatureRecursive(const FeatureInfoList& subFeatures, const QByteArray& subfeatureId, int maxDepth, int currentDepth) const
+IFeatureInfo::FeatureInfoPtr CFeatureInfo::GetSubFeatureRecursive(const FeatureInfoList& subFeatures, const QByteArray& subfeatureId, int maxDepth, int currentDepth) const
 {
 	if (maxDepth != -1 && maxDepth < currentDepth){
 		return nullptr;
 	}
 
-	for (int i = 0; i < subFeatures.GetCount(); i++){
-		const IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
+	for (int i = 0; i < subFeatures.count(); i++){
+		FeatureInfoPtr featureInfoPtr = subFeatures.at(i);
 		QByteArray featureId = featureInfoPtr->GetFeatureId();
 
 		if (featureId == subfeatureId){
@@ -414,8 +414,8 @@ const IFeatureInfo* CFeatureInfo::GetSubFeatureRecursive(const FeatureInfoList& 
 		}
 
 		const FeatureInfoList& subfeatureInfoList = featureInfoPtr->GetSubFeatures();
-		const IFeatureInfo* subFeatureInfoPtr = GetSubFeatureRecursive(subfeatureInfoList, subfeatureId, maxDepth, currentDepth + 1);
-		if (subFeatureInfoPtr != nullptr){
+		FeatureInfoPtr subFeatureInfoPtr = GetSubFeatureRecursive(subfeatureInfoList, subfeatureId, maxDepth, currentDepth + 1);
+		if (subFeatureInfoPtr.IsValid()){
 			return subFeatureInfoPtr;
 		}
 	}

@@ -29,7 +29,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (IFeatureInfoProvider)
-	virtual const IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const override;
+	virtual imtlic::IFeatureInfoSharedPtr GetFeatureInfo(const QByteArray& featureId) const override;
 	virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
 
 protected:

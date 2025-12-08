@@ -232,11 +232,11 @@ bool CAddressElementInfo::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CAddressElementInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CAddressElementInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CAddressElementInfo> clonePtr(new CAddressElementInfo);
+	istd::IChangeableUniquePtr clonePtr(new CAddressElementInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

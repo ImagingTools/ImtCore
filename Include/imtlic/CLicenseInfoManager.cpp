@@ -21,9 +21,19 @@ const imtbase::ICollectionInfo& CLicenseInfoManager::GetLicenseList() const
 }
 
 
-const imtlic::ILicenseDefinition* CLicenseInfoManager::GetLicenseInfo(const QByteArray& licenseId) const
+istd::TUniqueInterfacePtr<imtlic::ILicenseDefinition> CLicenseInfoManager::GetLicenseInfo(const QByteArray& licenseId) const
 {
-	return dynamic_cast<const imtlic::ILicenseDefinition*>(m_collection.GetObjectPtr(licenseId));
+	DataPtr licenseDataPtr;
+
+	if (m_collection.GetObjectData(licenseId, licenseDataPtr)) {
+		istd::TUniqueInterfacePtr<imtlic::ILicenseDefinition> retVal;
+		
+		retVal.SetPtr(licenseDataPtr.GetBasePtr().get(), dynamic_cast<imtlic::ILicenseDefinition*>(licenseDataPtr.GetPtr()));
+
+		return retVal;
+	}
+
+	return nullptr;
 }
 
 

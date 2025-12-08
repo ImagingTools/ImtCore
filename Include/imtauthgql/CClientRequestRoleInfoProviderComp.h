@@ -29,7 +29,7 @@ public:
 protected:
 	// reimplemented (imtauth::IRoleInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetRoleList() const override;
-	virtual const imtauth::IRoleUniquePtr GetRole(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const override;
+	virtual imtauth::IRoleUniquePtr GetRole(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 protected:
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);

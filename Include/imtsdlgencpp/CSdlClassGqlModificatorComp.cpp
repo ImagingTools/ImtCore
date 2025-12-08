@@ -669,7 +669,7 @@ CSdlUnionConverter::ConversionType CSdlClassGqlModificatorComp::GetUnionArrayCon
 }
 
 
-void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool optional, quint16 hIndents) const
+void CSdlClassGqlModificatorComp::AddUnionFieldValueReadFromObject(QTextStream& stream, const imtsdl::CSdlField& field, bool /*optional*/, quint16 hIndents) const
 {
 	bool hasComplexTypes = false;
 	bool hasScalarTypes = false;

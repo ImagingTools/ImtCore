@@ -23,7 +23,7 @@ bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromValue(
 
 	QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 	for (const QByteArray& featureCollectionId : featureCollectionIds){
-		const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(packagePtr->GetFeatureInfo(featureCollectionId));
+		const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(packagePtr->GetFeatureInfo(featureCollectionId).GetPtr());
 		if (featureInfoPtr != nullptr){
 			istd::TDelPtr<imtbase::CTreeItemModel> featureModelPtr(new imtbase::CTreeItemModel);
 
@@ -84,19 +84,19 @@ bool CFeaturePackageRepresentationControllerComp::CreateRepresentationModelFromF
 	representationModel.SetData("Dependencies", featureInfo.GetDependencies().join(';'));
 	representationModel.SetData("ChildModel", 0);
 
-	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
-	if (!subFeatures.IsEmpty()){
+	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	if (!subFeatures.isEmpty()){
 		imtbase::CTreeItemModel* childModelPtr = representationModel.AddTreeModel("ChildModel");
 		Q_ASSERT(childModelPtr != nullptr);
 
-		for (int i = 0; i < subFeatures.GetCount(); i++){
-			const imtlic::IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
-			if (featureInfoPtr == nullptr){
+		for (int i = 0; i < subFeatures.count(); i++){
+			imtlic::IFeatureInfoSharedPtr featureInfoPtr = subFeatures.at(i);
+			if (!featureInfoPtr.IsValid()){
 				errorMessage = QString("Unable to create representation model for invalid subfeature. Parent feature id: %1.").arg(qPrintable(featureId));
 				return false;
 			}
 
-			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr);
+			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr.GetPtr());
 			Q_ASSERT(subFeatureInfoPtr != nullptr);
 
 			imtbase::CTreeItemModel subFeatureRepresentationModel;

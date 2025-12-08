@@ -36,9 +36,12 @@ protected:
 			return SdlClass();
 		}
 
-		imtclientgql::IGqlClient::GqlRequestPtr requestPtr(dynamic_cast<imtgql::IGqlRequest*>(request.CloneMe()));
-		if (requestPtr.isNull()){
+		imtclientgql::IGqlClient::GqlRequestPtr requestPtr;
+		
+		requestPtr.MoveCastedPtr(request.CloneMe());
+		if (!requestPtr.IsValid()){
 			errorMessage = QString("Request is invalid");
+
 			return SdlClass();
 		}
 
@@ -47,7 +50,7 @@ protected:
 
 		IGqlClient::GqlRequestPtr gqlRequestPtr(requestPtr);
 		IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(gqlRequestPtr);
-		if (responsePtr.isNull()){
+		if (!responsePtr.IsValid()){
 			errorMessage = QString("Response is invalid");
 			return response;
 		}

@@ -130,15 +130,15 @@ bool CFeatureCollectionControllerComp::CreateRepresentationModelFromFeatureInfo(
 	featureRepresentationData.isPermission = isPermission;
 
 	imtsdl::TElementList<sdl::imtlic::Features::CFeatureData::V1_0> subFeatureDataList;
-	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
-	if (!subFeatures.IsEmpty()){
-		for (int i = 0; i < subFeatures.GetCount(); i++){
-			const imtlic::IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
-			if (featureInfoPtr == nullptr){
+	const imtlic::IFeatureInfo::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	if (!subFeatures.isEmpty()){
+		for (int i = 0; i < subFeatures.count(); i++){
+			imtlic::IFeatureInfoSharedPtr featureInfoPtr = subFeatures.at(i);
+			if (!featureInfoPtr.IsValid()){
 				return false;
 			}
 
-			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr);
+			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr.GetPtr());
 			Q_ASSERT(subFeatureInfoPtr != nullptr);
 
 			sdl::imtlic::Features::CFeatureData::V1_0 subfeatureData;

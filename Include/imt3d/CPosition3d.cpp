@@ -137,12 +137,12 @@ bool CPosition3d::IsEqual(const istd::IChangeable& object) const
 }
 
 
-istd::IChangeable* CPosition3d::CloneMe(CompatibilityMode mode) const 
+istd::IChangeableUniquePtr CPosition3d::CloneMe(CompatibilityMode mode) const 
 {
-	istd::TDelPtr<CPosition3d> clonePtr(new CPosition3d);
+	istd::IChangeableUniquePtr clonePtr(new CPosition3d);
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return NULL;

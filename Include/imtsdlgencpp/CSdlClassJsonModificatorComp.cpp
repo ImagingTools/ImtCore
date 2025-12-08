@@ -343,7 +343,7 @@ CSdlUnionConverter::ConversionType CSdlClassJsonModificatorComp::GetUnionArrayCo
 void CSdlClassJsonModificatorComp::AddUnionFieldValueReadFromObject(
 			QTextStream& stream,
 			const imtsdl::CSdlField& field,
-			bool optional,
+			bool /*optional*/,
 			quint16 hIndents) const
 {
 	bool hasComplexTypes = false;

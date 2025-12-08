@@ -98,13 +98,13 @@ const imtbase::ISearchResults* CObjectCollectionControllerCompBase::Search(const
 	if (gqlRequestProviderPtr != nullptr){
 		const imtgql::IGqlRequest* gqlRequestPtr = gqlRequestProviderPtr->GetGqlRequest();
 		if (gqlRequestPtr != nullptr){
-			istd::TDelPtr<imtgql::IGqlContext> gqlContextPtr;
-			gqlContextPtr.SetCastedOrRemove(gqlRequestPtr->GetRequestContext()->CloneMe());
+			istd::TUniqueInterfacePtr<imtgql::IGqlContext> gqlContextPtr;
+			gqlContextPtr.MoveCastedPtr(gqlRequestPtr->GetRequestContext()->CloneMe());
 			if (!gqlContextPtr.IsValid()){
 				return nullptr;
 			}
 
-			gqlRequest.SetGqlContext(gqlContextPtr.PopPtr());
+			gqlRequest.SetGqlContext(gqlContextPtr.PopInterfacePtr());
 		}
 	}
 
@@ -232,7 +232,7 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 
 sdl::imtbase::ImtCollection::CDuplicateElementsPayload CObjectCollectionControllerCompBase::OnDuplicateElements(
 			const sdl::imtbase::ImtCollection::CDuplicateElementsGqlRequest& duplicateElementsRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CDuplicateElementsPayload response;
@@ -272,7 +272,7 @@ sdl::imtbase::ImtCollection::CDuplicateElementsPayload CObjectCollectionControll
 	for (const QByteArray& elementId : elementIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(elementId, dataPtr)){
-			istd::TDelPtr<istd::IChangeable> clonedObjectPtr = dataPtr->CloneMe();
+			istd::IChangeableUniquePtr clonedObjectPtr = dataPtr->CloneMe();
 			if (clonedObjectPtr.IsValid()){
 				QString duplicateName;
 				QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(elementId);
@@ -909,7 +909,7 @@ sdl::imtbase::ImtCollection::CGetObjectTypeIdPayload CObjectCollectionController
 
 
 sdl::imtbase::ImtCollection::CGetCollectionHeadersPayload CObjectCollectionControllerCompBase::OnGetCollectionHeaders(
-			const sdl::imtbase::ImtCollection::CGetCollectionHeadersGqlRequest& getCollectionHeadersRequest,
+			const sdl::imtbase::ImtCollection::CGetCollectionHeadersGqlRequest& /*getCollectionHeadersRequest*/,
 			const ::imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -1276,7 +1276,7 @@ sdl::imtbase::ImtCollection::CGetDataMetaInfoPayload CObjectCollectionController
 sdl::imtbase::ImtCollection::CGetElementInfoPayload CObjectCollectionControllerCompBase::OnGetElementInfo(
 			const sdl::imtbase::ImtCollection::CGetElementInfoGqlRequest& getElementInfoRequest,
 			const ::imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	sdl::imtbase::ImtCollection::CGetElementInfoPayload::V1_0 response;
 
@@ -1378,7 +1378,7 @@ sdl::imtbase::ImtCollection::CGetElementMetaInfoPayload CObjectCollectionControl
 
 sdl::imtbase::ImtCollection::CCreateSubCollectionPayload CObjectCollectionControllerCompBase::OnCreateSubCollection(
 			const sdl::imtbase::ImtCollection::CCreateSubCollectionGqlRequest& createSubCollectionRequest,
-			const ::imtgql::CGqlRequest& gqlRequest,
+			const ::imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CCreateSubCollectionPayload::V1_0 response;
@@ -2674,8 +2674,8 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 				QByteArray parameterId = *parameter.id;
 				const iser::ISerializable* parameterPtr = m_selectionParams.GetParameter(parameterId);
 				if (parameterPtr != nullptr){
-					istd::TDelPtr<iser::ISerializable> filterParameterPtr;
-					filterParameterPtr.SetCastedOrRemove(parameterPtr->CloneMe());
+					iser::ISerializableUniquePtr filterParameterPtr;
+					filterParameterPtr.MoveCastedPtr(parameterPtr->CloneMe());
 					if (filterParameterPtr.IsValid()){
 						if (parameterId == m_complexCollectionFilterRepresentationController.GetTypeId()){
 							imtbase::CComplexCollectionFilter* complexFilterPtr = dynamic_cast<imtbase::CComplexCollectionFilter*>(filterParameterPtr.GetPtr());
@@ -2685,7 +2685,7 @@ void CObjectCollectionControllerCompBase::PrepareFilters(
 							}
 						}
 
-						filterParams.SetEditableParameter(parameterId, filterParameterPtr.PopPtr(), true);
+						filterParams.SetEditableParameter(parameterId, filterParameterPtr);
 					}
 				}
 			}

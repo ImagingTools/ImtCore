@@ -80,11 +80,11 @@ bool CCompanyInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*
 }
 
 
-istd::IChangeable *CCompanyInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CCompanyInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CCompanyInfo> clonePtr(new CCompanyInfo);
+	istd::IChangeableUniquePtr clonePtr(new CCompanyInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

@@ -84,7 +84,7 @@ QByteArray CLdapAuthorizationControllerComp::InsertNewIdentifiableRoleInfo(
 }
 
 
-const imtauth::CUserInfo* CLdapAuthorizationControllerComp::CreateUserInfoFromLdapUser(const QByteArray& ldapUserId) const
+istd::TUniqueInterfacePtr<imtauth::IUserInfo> CLdapAuthorizationControllerComp::CreateUserInfoFromLdapUser(const QByteArray& ldapUserId) const
 {
 #ifdef Q_OS_WIN
 	LPUSER_INFO_3 userInfo3BufPtr = NULL;
@@ -187,9 +187,9 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 					defaultRoleId = InsertNewIdentifiableRoleInfo("Default", "Default", "Default role", productId, true, false);
 				}
 
-				istd::TDelPtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
+				istd::TUniqueInterfacePtr<imtauth::CIdentifiableUserInfo> userInfoPtr;
 				if (userObjectId.isEmpty()){
-					userInfoPtr.SetCastedOrRemove(const_cast<imtauth::CUserInfo*>(CreateUserInfoFromLdapUser(login)));
+					userInfoPtr.MoveCastedPtr(CreateUserInfoFromLdapUser(login));
 					if (!userInfoPtr.IsValid()){
 						userInfoPtr.SetPtr(new imtauth::CIdentifiableUserInfo);
 						userInfoPtr->SetObjectUuid(QUuid::createUuid().toByteArray(QUuid::WithoutBraces));
@@ -215,7 +215,7 @@ sdl::imtauth::Authorization::CAuthorizationPayload CLdapAuthorizationControllerC
 				else{
 					imtbase::IObjectCollection::DataPtr dataPtr;
 					if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
-						userInfoPtr.SetCastedOrRemove(dataPtr.GetPtr()->CloneMe());
+						userInfoPtr.MoveCastedPtr(dataPtr.GetPtr()->CloneMe());
 						if (userInfoPtr.IsValid()){
 							QByteArrayList products = userInfoPtr->GetProducts();
 							if (!products.contains(productId)){

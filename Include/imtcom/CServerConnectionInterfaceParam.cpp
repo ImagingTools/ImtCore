@@ -197,7 +197,7 @@ bool CServerConnectionInterfaceParam::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CServerConnectionInterfaceParam::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CServerConnectionInterfaceParam::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CServerConnectionInterfaceParam> retVal(new CServerConnectionInterfaceParam);
 	if (retVal->CopyFrom(*this, mode)){

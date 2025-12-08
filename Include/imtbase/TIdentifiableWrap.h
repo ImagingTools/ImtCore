@@ -27,7 +27,7 @@ public:
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual bool IsEqual(const istd::IChangeable& object) const override;
-	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 };
 
@@ -79,11 +79,11 @@ bool TIdentifiableWrap<Base>::IsEqual(const istd::IChangeable& object) const
 
 
 template<class Base>
-istd::IChangeable* TIdentifiableWrap<Base>::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr TIdentifiableWrap<Base>::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<TIdentifiableWrap<Base>> clonePtr(new TIdentifiableWrap<Base>());
+	istd::IChangeableUniquePtr clonePtr(new TIdentifiableWrap<Base>());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

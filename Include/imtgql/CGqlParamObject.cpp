@@ -104,7 +104,7 @@ void CGqlParamObject::InsertParam(const QByteArray &paramId, const CGqlEnum &val
 
 void CGqlParamObject::InsertParam(const QByteArray &paramId, const CGqlParamObject& object)
 {
-	istd::TSmartPtr<CGqlParamObject> objectPtr(new CGqlParamObject());
+	istd::TSharedInterfacePtr<CGqlParamObject> objectPtr(new CGqlParamObject());
 	*objectPtr = object;
 	objectPtr->m_parentPtr = this;
 	RemoveParam(paramId);
@@ -114,9 +114,9 @@ void CGqlParamObject::InsertParam(const QByteArray &paramId, const CGqlParamObje
 
 void CGqlParamObject::InsertParam(const QByteArray &paramId, const QList<CGqlParamObject> objectList)
 {
-	QList<istd::TSmartPtr<CGqlParamObject>> objectPtrList;
+	QList<istd::TSharedInterfacePtr<CGqlParamObject>> objectPtrList;
 	for (int i = 0; i < objectList.count(); i++){
-		istd::TSmartPtr<CGqlParamObject> objectPtr(new CGqlParamObject());
+		istd::TSharedInterfacePtr<CGqlParamObject> objectPtr(new CGqlParamObject());
 		*objectPtr = objectList[i];
 		objectPtr->m_parentPtr = this;
 		objectPtrList.append(objectPtr);
@@ -130,11 +130,11 @@ CGqlParamObject* CGqlParamObject::AppendParamToArray(const QByteArray& paramId, 
 {
 	CGqlParamObject* retVal = nullptr;
 	if (!m_objectParamsArray.contains(paramId)){
-		QList<istd::TSmartPtr<CGqlParamObject>> emptyList;
+		QList<istd::TSharedInterfacePtr<CGqlParamObject>> emptyList;
 		m_objectParamsArray.insert(paramId, emptyList);
 	}
 
-	istd::TSmartPtr<CGqlParamObject> objectPtr(new CGqlParamObject());
+	istd::TSharedInterfacePtr<CGqlParamObject> objectPtr(new CGqlParamObject());
 	*objectPtr = object;
 	objectPtr->m_parentPtr = this;
 	m_objectParamsArray[paramId].append(objectPtr);
@@ -221,10 +221,10 @@ bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 
 		QByteArrayList keys = sourcePtr->m_objectParams.keys();
 		for (const QByteArray& key : keys){
-			istd::TSmartPtr<CGqlParamObject> sourceObject = sourcePtr->m_objectParams.value(key);
+			istd::TSharedInterfacePtr<CGqlParamObject> sourceObject = sourcePtr->m_objectParams.value(key);
 
-			istd::TSmartPtr<CGqlParamObject> gqlObject;
-			gqlObject.SetCastedOrRemove(sourceObject->CloneMe());
+			istd::TSharedInterfacePtr<CGqlParamObject> gqlObject;
+			gqlObject.MoveCastedPtr(sourceObject->CloneMe());
 			if (!gqlObject.IsValid()){
 				return false;
 			}
@@ -236,11 +236,11 @@ bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 
 		QByteArrayList objectParamsArrayKeys = sourcePtr->m_objectParamsArray.keys();
 		for (const QByteArray& key : objectParamsArrayKeys){
-			QList<istd::TSmartPtr<CGqlParamObject>> value;
-			QList<istd::TSmartPtr<CGqlParamObject>> sourceValue = sourcePtr->m_objectParamsArray.value(key);
-			for (const istd::TSmartPtr<CGqlParamObject>& sourceObject : sourceValue){
-				istd::TSmartPtr<CGqlParamObject> emptyObject;
-				emptyObject.SetCastedOrRemove(sourceObject->CloneMe());
+			QList<istd::TSharedInterfacePtr<CGqlParamObject>> value;
+			QList<istd::TSharedInterfacePtr<CGqlParamObject>> sourceValue = sourcePtr->m_objectParamsArray.value(key);
+			for (const istd::TSharedInterfacePtr<CGqlParamObject>& sourceObject : sourceValue){
+				istd::TSharedInterfacePtr<CGqlParamObject> emptyObject;
+				emptyObject.MoveCastedPtr(sourceObject->CloneMe());
 				if (!emptyObject.IsValid()){
 					return false;
 				}
@@ -258,11 +258,11 @@ bool CGqlParamObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 }
 
 
-istd::IChangeable* CGqlParamObject::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CGqlParamObject::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CGqlParamObject> clonePtr(new CGqlParamObject);
+	istd::IChangeableUniquePtr clonePtr(new CGqlParamObject);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

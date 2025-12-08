@@ -175,11 +175,11 @@ bool CCollectionFilter::IsEqual(const IChangeable &object) const
 }
 
 
-istd::IChangeable* CCollectionFilter::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CCollectionFilter::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CCollectionFilter> clonePtr(new CCollectionFilter);
+	istd::IChangeableUniquePtr clonePtr(new CCollectionFilter);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

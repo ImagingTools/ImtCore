@@ -335,11 +335,11 @@ bool CProductInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMode
 }
 
 
-istd::IChangeable* CProductInstanceInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CProductInstanceInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CProductInstanceInfo> clonePtr(new CProductInstanceInfo);
+	istd::IChangeableUniquePtr clonePtr(new CProductInstanceInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

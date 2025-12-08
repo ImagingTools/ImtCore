@@ -136,11 +136,11 @@ bool imtauth::CUserSettings::CopyFrom(const IChangeable& object, CompatibilityMo
 }
 
 
-istd::IChangeable* imtauth::CUserSettings::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr imtauth::CUserSettings::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CUserSettings> clonePtr(new CUserSettings);
+	istd::IChangeableUniquePtr clonePtr(new CUserSettings);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

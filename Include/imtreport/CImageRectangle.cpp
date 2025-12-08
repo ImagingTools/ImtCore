@@ -95,12 +95,12 @@ bool CImageRectangle::IsEqual(const IChangeable & object) const
 }
 
 
-istd::IChangeable* CImageRectangle::CloneMe(CompatibilityMode mode) const 
+istd::IChangeableUniquePtr CImageRectangle::CloneMe(CompatibilityMode mode) const 
 {
-	istd::TDelPtr<CImageRectangle> clonePtr(new CImageRectangle);
+	istd::IChangeableUniquePtr clonePtr(new CImageRectangle);
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

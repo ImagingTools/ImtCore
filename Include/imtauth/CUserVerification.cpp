@@ -158,11 +158,11 @@ bool CUserVerification::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CUserVerification::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CUserVerification::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CUserVerification> clonePtr(new CUserVerification);
+	istd::IChangeableUniquePtr clonePtr(new CUserVerification);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

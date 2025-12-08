@@ -446,11 +446,11 @@ bool CUserBaseInfo::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable *CUserBaseInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CUserBaseInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CUserBaseInfo> clonePtr(new CUserBaseInfo);
+	istd::IChangeableUniquePtr clonePtr(new CUserBaseInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

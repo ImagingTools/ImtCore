@@ -111,7 +111,7 @@ int CDeviceInstanceListAdapterComp::GetSupportedOperations() const
 }
 
 
-istd::IChangeable* CDeviceInstanceListAdapterComp::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CDeviceInstanceListAdapterComp::CloneMe(CompatibilityMode mode) const
 {
 	if (m_deviceControllerCompPtr.IsValid()){
 		return m_deviceControllerCompPtr->GetDeviceInstanceList().CloneMe(mode);

@@ -18,7 +18,7 @@ namespace imtsdlgencpp
 
 // reimplemented (CSdlClassModificatorBaseComp)
 
-bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& sdlType, QIODevice* headerDevicePtr, const iprm::IParamsSet* paramsPtr) const
+bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSdlType& /*sdlType*/, QIODevice* headerDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QTextStream ofStream(headerDevicePtr);
 
@@ -41,7 +41,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const imtsdl::CSd
 	return true;
 }
 
-bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* paramsPtr) const
+bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const imtsdl::CSdlType& sdlType, QIODevice* sourceDevicePtr, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QTextStream ofStream(sourceDevicePtr);
 

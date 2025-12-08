@@ -139,11 +139,11 @@ bool CBackupSettings::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CBackupSettings::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CBackupSettings::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CBackupSettings> clonePtr(new CBackupSettings);
+	istd::IChangeableUniquePtr clonePtr(new CBackupSettings);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

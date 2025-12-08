@@ -4,6 +4,9 @@
 // ACF includes
 #include <idoc/IDocumentMetaInfo.h>
 
+// ImtCore includes
+#include <imtlic/IFeatureInfo.h>
+
 
 namespace imtbase
 {
@@ -13,9 +16,6 @@ namespace imtbase
 
 namespace imtlic
 {
-
-
-class IFeatureInfo;
 
 
 /**
@@ -40,7 +40,7 @@ public:
 	/**
 		Get feature info.
 	*/
-	virtual const IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const = 0;
+	virtual IFeatureInfoSharedPtr GetFeatureInfo(const QByteArray& featureId) const = 0;
 };
 
 

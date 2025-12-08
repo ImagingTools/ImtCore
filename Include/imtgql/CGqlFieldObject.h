@@ -42,15 +42,15 @@ public:
 
 	// reimplemented (iser::IChangeable)
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 protected:
 	void RemoveField(const QByteArray& fieldId);
 
 protected:
 	QList<QByteArray> m_emptyFields;
-	QMap<QByteArray, istd::TSmartPtr<CGqlFieldObject>> m_objectFields; // map <fieldId, smart<CGqlFieldObject>>
-	QMap<QByteArray,  istd::TSmartPtr<CGqlFieldFragment>> m_fragmentFields; // map <typeId, smart<FieldFragment>>
+	QMap<QByteArray, istd::TSharedInterfacePtr<CGqlFieldObject>> m_objectFields; // map <fieldId, smart<CGqlFieldObject>>
+	QMap<QByteArray,  istd::TSharedInterfacePtr<CGqlFieldFragment>> m_fragmentFields; // map <typeId, smart<FieldFragment>>
 	CGqlFieldObject* m_parentPtr;
 };
 

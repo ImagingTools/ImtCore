@@ -30,7 +30,7 @@ public:
 protected:
 	// reimplemented (imtauth::IUserInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetUserList() const override;
-	virtual const imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId, const iprm::IParamsSet* paramsPtr) const override;
+	virtual imtauth::IUserInfoUniquePtr GetUser(const QByteArray& userId, const iprm::IParamsSet* paramsPtr) const override;
 	
 protected:
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);

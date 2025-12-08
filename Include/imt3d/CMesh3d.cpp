@@ -206,12 +206,12 @@ bool CMesh3d::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CMesh3d::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CMesh3d::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CMesh3d> clonePtr(new CMesh3d());
+	istd::IChangeableUniquePtr clonePtr(new CMesh3d());
 
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

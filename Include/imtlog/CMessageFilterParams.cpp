@@ -91,11 +91,11 @@ bool CMessageFilterParams::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CMessageFilterParams::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+istd::IChangeableUniquePtr CMessageFilterParams::CloneMe(istd::IChangeable::CompatibilityMode mode) const
 {
-	istd::TDelPtr<CMessageFilterParams> clonePtr(new CMessageFilterParams());
+	istd::IChangeableUniquePtr clonePtr(new CMessageFilterParams());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

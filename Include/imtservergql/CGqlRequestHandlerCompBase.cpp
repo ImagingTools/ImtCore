@@ -33,7 +33,7 @@ imtbase::CTreeItemModel* CGqlRequestHandlerCompBase::CreateResponse(const imtgql
 
 // protected methods
 
-iprm::IParamsSet* CGqlRequestHandlerCompBase::CreateContextParams(const imtgql::CGqlRequest& /*gqlRequest*/) const
+iprm::IParamsSetUniquePtr CGqlRequestHandlerCompBase::CreateContextParams(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	return nullptr;
 }

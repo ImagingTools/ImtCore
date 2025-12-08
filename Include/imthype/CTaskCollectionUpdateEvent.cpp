@@ -103,11 +103,11 @@ bool CTaskCollectionUpdateEvent::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CTaskCollectionUpdateEvent::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CTaskCollectionUpdateEvent::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CTaskCollectionUpdateEvent> clonePtr(new CTaskCollectionUpdateEvent);
+	istd::IChangeableUniquePtr clonePtr(new CTaskCollectionUpdateEvent);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

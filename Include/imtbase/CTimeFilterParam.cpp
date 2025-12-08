@@ -212,11 +212,11 @@ bool CTimeFilterParam::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CTimeFilterParam::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+istd::IChangeableUniquePtr CTimeFilterParam::CloneMe(istd::IChangeable::CompatibilityMode mode) const
 {
-	istd::TDelPtr<CTimeFilterParam> clonePtr(new CTimeFilterParam());
+	istd::IChangeableUniquePtr clonePtr(new CTimeFilterParam());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

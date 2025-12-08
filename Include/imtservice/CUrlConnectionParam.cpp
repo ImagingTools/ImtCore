@@ -142,11 +142,11 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 }
 
 
-istd::IChangeable* CUrlConnectionParam::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CUrlConnectionParam::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CUrlConnectionParam> clonePtr(new CUrlConnectionParam);
+	istd::IChangeableUniquePtr clonePtr(new CUrlConnectionParam);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

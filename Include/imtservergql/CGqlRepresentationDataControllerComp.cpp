@@ -1,7 +1,7 @@
 #include <imtservergql/CGqlRepresentationDataControllerComp.h>
 
 
-// ACF includer
+// ACF include
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
 #include <iprm/CIdParam.h>
@@ -31,7 +31,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentat
 	imtbase::CTreeItemModel* representationPtr = rootModelPtr->AddTreeModel("data");
 	Q_ASSERT(representationPtr != nullptr);
 
-	istd::TDelPtr<iprm::IParamsSet> representationParamsPtr(CreateContextParams(gqlRequest));
+	iprm::IParamsSetUniquePtr representationParamsPtr = CreateContextParams(gqlRequest);
 
 	bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_dataModelCompPtr, *representationPtr, representationParamsPtr.GetPtr());
 	if (result){
@@ -103,7 +103,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 }
 
 
-iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
+iprm::IParamsSetUniquePtr CGqlRepresentationDataControllerComp::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
 {
 	QByteArray productId;
 	const imtgql::CGqlParamObject* inputParamPtr = gqlRequest.GetParamObject("input");
@@ -115,16 +115,16 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 		productId = gqlRequest.GetHeader("productid");
 	}
 
-	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();
+	std::unique_ptr<iprm::CParamsSet> paramsPtr(new imod::TModelWrap<iprm::CParamsSet>());
 	if (gqlRequest.GetRequestContext() != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			istd::TDelPtr<imtauth::IUserInfo> userInfoParamPtr;
+			istd::TUniqueInterfacePtr<iser::ISerializable> userInfoParamPtr;
 
-			userInfoParamPtr.SetCastedOrRemove(userInfoPtr->CloneMe());
+			userInfoParamPtr.MoveCastedPtr(userInfoPtr->CloneMe());
 			Q_ASSERT(userInfoParamPtr.IsValid());
 
-			paramsPtr->SetEditableParameter("UserInfo", userInfoParamPtr.PopPtr(), true);
+			paramsPtr->SetEditableParameter("UserInfo", userInfoParamPtr);
 		}
 
 		iprm::CIdParam* languageIdParamPtr = new iprm::CIdParam();
@@ -138,7 +138,7 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 		paramsPtr->SetEditableParameter("ProductId", productIdParamPtr, true);
 	}
 
-	return paramsPtr.PopPtr();
+	return paramsPtr.release();
 }
 
 

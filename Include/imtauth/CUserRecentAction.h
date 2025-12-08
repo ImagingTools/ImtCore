@@ -34,7 +34,7 @@ public:
 	// reimplemented (iser::IChangeable)
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual bool IsEqual(const IChangeable& object) const override;
-	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
@@ -42,7 +42,7 @@ private:
 	ActionTypeInfo m_actionTypeInfo;
 	TargetInfo m_targetInfo;
 	QDateTime m_timestamp;
-	istd::TSmartPtr<iprm::IParamsSet> m_paramsPtr;
+	istd::TSharedInterfacePtr<iprm::IParamsSet> m_paramsPtr;
 };
 
 

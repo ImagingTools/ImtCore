@@ -27,7 +27,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessEntry(
 				const imtsdl::CSdlEntryBase& sdlEntry,
 				QIODevice* headerDevicePtr,
 				QIODevice* sourceDevicePtr,
-				const iprm::IParamsSet* paramsPtr) const
+				const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_sdlRequestListCompPtr.IsValid());
@@ -65,7 +65,7 @@ QList<imtsdl::IncludeDirective> CGqlHandlerBaseClassGeneratorComp::GetIncludeDir
 
 
 
-bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlEntryBase& sdlEntry, QIODevice* headerDevicePtr) const
+bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSdlEntryBase& /*sdlEntry*/, QIODevice* headerDevicePtr) const
 {
 	QTextStream ifStream(headerDevicePtr);
 
@@ -121,7 +121,7 @@ bool CGqlHandlerBaseClassGeneratorComp::ProcessHeaderClassFile(const imtsdl::CSd
 }
 
 
-bool CGqlHandlerBaseClassGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlEntryBase& sdlEntry, QIODevice* sourceDevicePtr) const
+bool CGqlHandlerBaseClassGeneratorComp::ProcessSourceClassFile(const imtsdl::CSdlEntryBase& /*sdlEntry*/, QIODevice* sourceDevicePtr) const
 {
 	QTextStream ifStream(sourceDevicePtr);
 

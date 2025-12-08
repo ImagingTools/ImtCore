@@ -118,11 +118,11 @@ bool CPersonBaseInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 }
 
 
-istd::IChangeable* CPersonBaseInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CPersonBaseInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CPersonBaseInfo> clonePtr(new CPersonBaseInfo);
+	istd::IChangeableUniquePtr clonePtr(new CPersonBaseInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

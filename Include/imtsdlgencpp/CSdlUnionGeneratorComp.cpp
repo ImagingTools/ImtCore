@@ -30,7 +30,7 @@ bool CSdlUnionGeneratorComp::ProcessEntry(
 			const imtsdl::CSdlEntryBase& sdlEntry,
 			QIODevice* headerDevicePtr,
 			QIODevice* /*sourceDevicePtr*/,
-			const iprm::IParamsSet* paramsPtr) const
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	Q_ASSERT(m_argumentParserCompPtr.IsValid());
 	Q_ASSERT(m_originalSchemaNamespaceCompPtr.IsValid());

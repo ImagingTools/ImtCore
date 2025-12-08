@@ -18,31 +18,25 @@ public:
 	static void SetContext(const imtgql::IGqlContext* contextPtr)
 	{
 		if (contextPtr == nullptr) {
-			s_context.reset();
+			s_context.Reset();
 			return;
 		}
 
-		IGqlContext* clonedPtr = dynamic_cast<IGqlContext*>(contextPtr->CloneMe());
-		if (clonedPtr != nullptr){
-			s_context = std::shared_ptr<IGqlContext>(clonedPtr);
-		}
-		else{
-			s_context.reset();
-		}
+		s_context.MoveCastedPtr(contextPtr->CloneMe());
 	}
 
 	static IGqlContext* GetContext()
 	{
-		return s_context.get();
+		return s_context.GetPtr();
 	}
 
 	static void Clear()
 	{
-		s_context.reset();
+		s_context.Reset();
 	}
 
 private:
-	static thread_local std::shared_ptr<IGqlContext> s_context;
+	static thread_local istd::TSharedInterfacePtr<IGqlContext> s_context;
 };
 
 

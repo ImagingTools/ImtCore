@@ -95,11 +95,11 @@ bool CProductLicensingInfo::CopyFrom(const IChangeable& object, CompatibilityMod
 }
 
 
-istd::IChangeable* CProductLicensingInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CProductLicensingInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CProductLicensingInfo> clonePtr(new CProductLicensingInfo);
+	istd::IChangeableUniquePtr clonePtr(new CProductLicensingInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

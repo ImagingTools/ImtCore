@@ -141,11 +141,11 @@ bool CFont::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CFont::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CFont::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CFont> clonePtr(new CFont());
+	istd::IChangeableUniquePtr clonePtr(new CFont());
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

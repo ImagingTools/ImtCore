@@ -96,8 +96,8 @@ bool CJwtSessionControllerComp::RefreshToken(
 		return false;
 	}
 
-	istd::TDelPtr<imtauth::ISession> clonedSessionInfo;
-	clonedSessionInfo.SetCastedOrRemove(sessionInfoPtr->CloneMe());
+	istd::TUniqueInterfacePtr<imtauth::ISession> clonedSessionInfo;
+	clonedSessionInfo.MoveCastedPtr(sessionInfoPtr->CloneMe());
 	if (!clonedSessionInfo.IsValid()){
 		return false;
 	}

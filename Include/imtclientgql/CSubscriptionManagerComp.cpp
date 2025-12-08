@@ -144,7 +144,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		case imtrest::CWebSocketRequest::MT_CONNECTION_ACK:
 			for (const QByteArray& subscriptionId : m_registeredClients.keys()){
 				if (m_registeredClients[subscriptionId].m_status == imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION){
-					istd::TDelPtr<istd::IChangeable> objectPtr(m_registeredClients[subscriptionId].m_request.CloneMe());
+					istd::IChangeableUniquePtr objectPtr(m_registeredClients[subscriptionId].m_request.CloneMe());
 					locker.unlock();
 					imtgql::CGqlRequest* requestPtr = dynamic_cast<imtgql::CGqlRequest*>(objectPtr.GetPtr());
 					if (requestPtr != nullptr){
@@ -303,8 +303,8 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 
 			imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
 			responsePtr->SetResponseData(responseData);
-			retVal.reset(responsePtr);
 
+			retVal.SetPtr(responsePtr);
 
 			return retVal;
 		}

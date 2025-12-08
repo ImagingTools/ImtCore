@@ -125,11 +125,11 @@ bool CObjectLink::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CObjectLink::CloneMe(istd::IChangeable::CompatibilityMode mode) const
+istd::IChangeableUniquePtr CObjectLink::CloneMe(istd::IChangeable::CompatibilityMode mode) const
 {
-	istd::TDelPtr<CObjectLink> clonePtr(new CObjectLink);
+	istd::IChangeableUniquePtr clonePtr(new CObjectLink);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;

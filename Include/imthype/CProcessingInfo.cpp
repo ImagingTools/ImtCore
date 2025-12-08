@@ -210,11 +210,11 @@ bool CProcessingInfo::IsEqual(const istd::IChangeable & object) const
 }
 
 
-istd::IChangeable* CProcessingInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CProcessingInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CProcessingInfo> clonePtr( new CProcessingInfo);
+	istd::IChangeableUniquePtr clonePtr( new CProcessingInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return NULL;

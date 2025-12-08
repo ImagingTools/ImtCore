@@ -13,13 +13,13 @@ CFeatureContainer::CFeatureContainer()
 }
 
 
-const IFeatureInfo* CFeatureContainer::FindFeatureById(const QByteArray& featureId) const
+IFeatureInfoSharedPtr CFeatureContainer::FindFeatureById(const QByteArray& featureId) const
 {
 	imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
 	for (QByteArray id : featureIds){
-		const IFeatureInfo* featurePtr = GetFeatureInfo(id);
-		Q_ASSERT(featurePtr != nullptr);
-		if (featurePtr != nullptr){
+		IFeatureInfoSharedPtr featurePtr = GetFeatureInfo(id);
+		Q_ASSERT(featurePtr.IsValid());
+		if (featurePtr.IsValid()){
 			if (featurePtr->GetFeatureId() == featureId){
 				return featurePtr;
 			}
@@ -39,9 +39,9 @@ QByteArray CFeatureContainer::GetFeatureCollectionId(const QByteArray& featureId
 {
 	imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
 	for (QByteArray id : featureIds){
-		const IFeatureInfo* featurePtr = GetFeatureInfo(id);
-		Q_ASSERT(featurePtr != nullptr);
-		if (featurePtr != nullptr){
+		IFeatureInfoSharedPtr featurePtr = GetFeatureInfo(id);
+		Q_ASSERT(featurePtr.IsValid());
+		if (featurePtr.IsValid()){
 			if (featurePtr->GetFeatureId() == featureId){
 				return id;
 			}
@@ -60,9 +60,18 @@ const imtbase::ICollectionInfo& CFeatureContainer::GetFeatureList() const
 }
 
 
-const IFeatureInfo* CFeatureContainer::GetFeatureInfo(const QByteArray& featureId) const
+IFeatureInfoSharedPtr CFeatureContainer::GetFeatureInfo(const QByteArray& featureId) const
 {
-	return dynamic_cast<const IFeatureInfo*>(m_collection.GetObjectPtr(featureId));
+	DataPtr dataPtr;
+	if (m_collection.GetObjectData(featureId, dataPtr)) {
+		IFeatureInfoSharedPtr retVal;
+
+		retVal.SetCastedPtr(dataPtr);
+
+		return retVal;
+	}
+
+	return IFeatureInfoSharedPtr();
 }
 
 

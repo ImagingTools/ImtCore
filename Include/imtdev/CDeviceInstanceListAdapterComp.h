@@ -40,7 +40,7 @@ public:
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const;
-	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const;
+	virtual istd::IChangeableUniquePtr CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

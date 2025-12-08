@@ -222,11 +222,11 @@ bool CDeviceInstanceBase::VersionInfo::CopyFrom(const IChangeable& object, Compa
 }
 
 
-istd::IChangeable* CDeviceInstanceBase::VersionInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeableUniquePtr CDeviceInstanceBase::VersionInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<istd::IChangeable> clonePtr(new VersionInfo);
+	istd::IChangeableUniquePtr clonePtr(new VersionInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
+		return clonePtr;
 	}
 
 	return nullptr;
