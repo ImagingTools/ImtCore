@@ -29,7 +29,7 @@ public:
 
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
-    virtual MethodType GetMethodType() const override;
+	virtual MethodType GetMethodType() const override;
 public:
 	virtual bool ParseDeviceData(QIODevice& device) override;
 	QUdpSocket *m_socket;

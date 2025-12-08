@@ -81,7 +81,7 @@ private:
 	bool EnsureServerStarted();
 
 private Q_SLOTS:
-	void readPendingDatagrams();
+	void ReadPendingDatagrams();
 
 private:
 	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);

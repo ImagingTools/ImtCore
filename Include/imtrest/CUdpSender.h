@@ -8,6 +8,7 @@
 #include <imtrest/ISender.h>
 #include <imtrest/CUdpRequest.h>
 
+
 namespace imtrest
 {
 
@@ -17,14 +18,15 @@ class CUdpSender: public QObject, virtual public ISender
 	Q_OBJECT
 public:
 	CUdpSender(CUdpRequest* request);
+
 	// reimplemented (ISender)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
 	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
 
 private:
-	QUdpSocket *m_socket;
+	QUdpSocket* m_socket;
 	QHostAddress m_address;
-	unsigned int m_port;
+	unsigned int m_port = 0;
 };
 
 

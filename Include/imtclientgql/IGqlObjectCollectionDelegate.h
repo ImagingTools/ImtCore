@@ -41,7 +41,7 @@ public:
 			this version must be passed in the request. The version is used to synchronize
 			simultaneous access to a document by multiple clients.
 		*/
-			int version;
+		int version;
 	};
 	typedef QList<ObjectInfo> ObjectInfoList;
 

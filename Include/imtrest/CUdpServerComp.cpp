@@ -12,9 +12,9 @@
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/ISender.h>
-
 #include <imtrest/CUdpRequest.h>
 #include <imtrest/CUdpSender.h>
+
 
 namespace imtrest
 {
@@ -41,6 +41,7 @@ imtrest::IRequestServlet* CUdpServerComp::GetRequestServlet()
 
 	return m_requestHandlerCompPtr.GetPtr();
 }
+
 
 // protected methods
 
@@ -95,12 +96,14 @@ bool CUdpServerComp::StartServer()
 	return EnsureServerStarted();
 }
 
+
 bool CUdpServerComp::StopServer()
 {
 	m_udpSocket.close();
 
 	return true;
 }
+
 
 IServer::ServerStatus CUdpServerComp::GetServerStatus() const
 {
@@ -113,26 +116,36 @@ IServer::ServerStatus CUdpServerComp::GetServerStatus() const
 bool CUdpServerComp::StartListening(const QHostAddress &address, quint16 port)
 {
 	if(m_udpSocket.bind(QHostAddress::LocalHost, port)){
-		connect(&m_udpSocket, &QUdpSocket::readyRead,
-				this, &CUdpServerComp::readPendingDatagrams);
+		connect(
+					&m_udpSocket,
+					&QUdpSocket::readyRead,
+					this,
+					&CUdpServerComp::ReadPendingDatagrams);
 		return true;
 	}
-	else
 
 	return false;
 }
 
-void CUdpServerComp::readPendingDatagrams()
+
+void CUdpServerComp::ReadPendingDatagrams()
 {
 	while (m_udpSocket.hasPendingDatagrams()) {
 		QNetworkDatagram datagram = m_udpSocket.receiveDatagram();
-		CUdpRequest req(*m_requestHandlerCompPtr.GetPtr(),*m_protocolEngineCompPtr.GetPtr(),
-						&m_udpSocket, datagram.senderAddress(), datagram.senderPort());
+		CUdpRequest req(
+					*m_requestHandlerCompPtr.GetPtr(),
+					*m_protocolEngineCompPtr.GetPtr(),
+					&m_udpSocket,
+					datagram.senderAddress(),
+					datagram.senderPort());
+
 		m_requests.PushBack(&req);
+
 		ConstResponsePtr resp = m_requestHandlerCompPtr->ProcessRequest(req, datagram.data());
 		//m_udpSocket.writeDatagram(datagram.makeReply(resp->GetData()));
 	}
 }
+
 
 bool CUdpServerComp::EnsureServerStarted()
 {

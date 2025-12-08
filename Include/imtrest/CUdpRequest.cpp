@@ -16,7 +16,7 @@ CUdpRequest::CUdpRequest(const IRequestServlet& handler,
 				QUdpSocket *socket,
 				QHostAddress address,
 				unsigned int port)
-    :CHttpRequest(handler, engine)
+	:CHttpRequest(handler, engine)
 {
 	m_socket = socket;
 	m_address = address;
@@ -26,8 +26,9 @@ CUdpRequest::CUdpRequest(const IRequestServlet& handler,
 
 CUdpRequest::MethodType CUdpRequest::GetMethodType() const
 {
-    return MT_POST;
+	return MT_POST;
 }
+
 
 // reimplemented (IRequest)
 
@@ -36,21 +37,22 @@ IRequest::RequestState CUdpRequest::GetState() const
 	return m_state;
 }
 
+
 // protected methods
 
 bool CUdpRequest::ParseDeviceData(QIODevice& device)
 {
-    QByteArray data = device.readAll();
+	QByteArray data = device.readAll();
 
-    m_body = data;
+	m_body = data;
 
-    m_state = RS_MESSAGE_COMPLETE;
+	m_state = RS_MESSAGE_COMPLETE;
 
-    if (!data.isEmpty()){
-        m_data += data;
-    }
+	if (!data.isEmpty()){
+		m_data += data;
+	}
 
-    return true;
+	return true;
 }
 
 
