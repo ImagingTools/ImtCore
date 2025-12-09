@@ -23,6 +23,8 @@ QtObject {
 	signal loggedOut();
 	signal changePasswordSuccessfully();
 	signal changePasswordFailed();
+	signal registerSuccessfully();
+	signal registerFailed();
 	
 	property XmlHttpRequestProxy requestProxy: XmlHttpRequestProxy {
 		onForbidden: {
@@ -236,7 +238,14 @@ QtObject {
 		sdlObjectComp: Component {
 			RegisterUserPayload {
 				onFinished: {
-					ModalDialogManager.showInfoDialog(qsTr("The user has been successfully registered"));
+					if (m_id != ""){
+						ModalDialogManager.showInfoDialog(qsTr("The user has been successfully registered"));
+						root.registerSuccessfully();
+					}
+					else{
+						root.registerFailed();
+					}
+
 				}
 			}
 		}
