@@ -67,6 +67,7 @@ void CUdpServerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+
 	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
 		EnsureServerStarted();
 	}
@@ -81,6 +82,7 @@ const ISender* CUdpServerComp::GetSender(const QByteArray& requestId) const
 		if (m_requests.GetAt(i)->GetRequestId() == requestId){
 			CUdpSender *sender;
 			sender = new CUdpSender(m_requests.GetAt(i));
+			//m_requests.(i);
 			return sender;
 		}
 	}
@@ -121,6 +123,7 @@ bool CUdpServerComp::StartListening(const QHostAddress &address, quint16 port)
 					&QUdpSocket::readyRead,
 					this,
 					&CUdpServerComp::ReadPendingDatagrams);
+		qDebug()<<"Udp server start for port"<<port;
 		return true;
 	}
 

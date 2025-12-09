@@ -31,18 +31,18 @@ bool CUdpSender::SendResponse(ConstResponsePtr& response) const
 		return false;
 	}
 
-	int protocolStatusCode = -1;
-	QByteArray statusLiteral;
+	// int protocolStatusCode = -1;
+	// QByteArray statusLiteral;
 
-	bool retVal = response->GetProtocolEngine().GetProtocolStatusCode(response->GetStatusCode(), protocolStatusCode, statusLiteral);
-	if (!retVal){
-		return false;
-	}
+	// bool retVal = response->GetProtocolEngine().GetProtocolStatusCode(response->GetStatusCode(), protocolStatusCode, statusLiteral);
+	// if (!retVal){
+	// 	return false;
+	// }
 
 	const QByteArray& contentData = response->GetData();
-	retVal = m_socket->writeDatagram(contentData,m_address,m_port);
 
-	return false;
+
+	return m_socket->writeDatagram(contentData,m_address,m_port);
 }
 
 
