@@ -96,6 +96,29 @@ Item {
                         }
                     }
                 }
+
+				BaseText{
+					id: textSize
+
+					anchors.left: parent.left
+					anchors.leftMargin: numberTextField.textFieldLeftMargin
+
+					visible: false
+
+					text: numberTextField.text
+				}
+
+				BaseText{
+					id: unitsText
+
+					anchors.verticalCenter: parent.verticalCenter
+					anchors.left: textSize.right
+					anchors.leftMargin: Style.marginXS
+
+					visible: !spinBox.baseElement ? false : spinBox.baseElement.units !== ""
+
+					text: spinBox.baseElement ? spinBox.baseElement.units : ""
+				}
             }
         }
         

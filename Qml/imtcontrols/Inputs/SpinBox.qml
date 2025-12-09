@@ -21,6 +21,7 @@ ControlBase{
     property bool wrap: false
 
     property string icon: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
+	property string units: ""
 
     function increase(){
         if (value + stepSize <= to){
