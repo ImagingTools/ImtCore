@@ -298,8 +298,9 @@ Rectangle {
 
 	}
 
-	function findObject(mouseX, mouseY){
+	function findObject(mouseX, mouseY, selectionCodition){
 		//console.log("findObject", mouseX, mouseY)
+
 		canvas.setViewMatrixParams();
 
 		if(graphicsView.isEditMode && canvas.selectedShapeCount){
@@ -314,6 +315,9 @@ Rectangle {
 
 				for(let j = 0; j < shapeModel.length; j++){
 					let shape = shapeModel[j];
+					if(!shape.canSelect && selectionCodition){
+						continue
+					}
 
 					//let isInside =  shape.isInside(mouseX, mouseY)
 					let isInside = graphicsView.isEditMode && shape.isSelected ? shape.isInsideBoundingBox(mouseX, mouseY) : shape.isInside(mouseX, mouseY)
@@ -611,7 +615,7 @@ Rectangle {
 
 				let found = false;
 				if(!(mouse.modifiers & Qt.ControlModifier) && !graphicsView.restrictSelect){// without Ctrl
-					let shape = graphicsView.findObject(mouse.x, mouse.y)
+					let shape = graphicsView.findObject(mouse.x, mouse.y, true)
 					if(shape !== null){
 						found = true;
 						if(canvas.selectedShapeCount < 2){
