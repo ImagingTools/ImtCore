@@ -491,13 +491,14 @@ bool CGqlSchemaParser::ProcessMutation()
 
 bool CGqlSchemaParser::ProcessSubscription()
 {
-	bool retVal = false;
+	bool retVal = true;
 		SendLogMessage(
-				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				istd::IInformationProvider::InformationCategory::IC_WARNING,
 				0,
-				QString("Process subscription is not implemented yet"),
+				QString("Process subscription is not implemented yet and will be ignored"),
 				"CGqlSchemaParser");
-	Q_ASSERT(retVal);
+	QByteArray dummy;
+	retVal = ReadToDelimeter("}", dummy);
 
 	return retVal;
 }
