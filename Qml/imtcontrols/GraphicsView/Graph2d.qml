@@ -74,7 +74,9 @@ Rectangle{
 
 	function setEditMode(mode){
 		graphicsView.isPointsEditMode = mode
-		graphicsView.restrictSelect = mode
+		graphicsView.isSelectionMode = !mode
+		graphicsView.restrictSelect = !mode
+
 	}
 
 	function createLine(){
