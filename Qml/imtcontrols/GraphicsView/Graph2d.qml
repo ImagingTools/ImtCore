@@ -76,7 +76,21 @@ Rectangle{
 		graphicsView.isPointsEditMode = mode
 		graphicsView.isSelectionMode = !mode
 		graphicsView.restrictSelect = !mode
-
+		if(!mode){
+			let wasClearSelection = false;
+			let activeLayer  = graphicsView.getActiveLayer()
+			let shapeModel = activeLayer.shapeModel;
+			for(let j = 0; j < shapeModel.length; j++){
+				let shape = shapeModel[j];
+				if(shape.isSelected){
+					shape.isSelected = false;
+					wasClearSelection = true;
+				}
+			}
+			if(wasClearSelection){
+				graphicsView.requestPaint()
+			}
+		}
 	}
 
 	function createLine(){
