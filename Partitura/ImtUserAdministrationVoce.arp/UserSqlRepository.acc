@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5436" Description="ACF"/>
-            <Version Id="1" Number="2254" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="5442" Description="ACF"/>
+            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -112,6 +112,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="UserGroupInfoProvider" PackageId="ImtAuthPck" ComponentId="UserGroupInfoProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
@@ -121,8 +130,8 @@
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="UserGroupProvider">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupInfoProvider"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

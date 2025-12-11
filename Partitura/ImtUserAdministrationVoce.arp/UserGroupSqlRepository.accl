@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5436" Description="ACF"/>
-            <Version Id="1" Number="2254" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="395266" Description="Qt Framework"/>
+            <Version Id="0" Number="5442" Description="ACF"/>
+            <Version Id="1" Number="2256" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="395264" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -13,6 +13,7 @@
         <Element ComponentName="Repository" X="575" Y="550" Note=""/>
         <Element ComponentName="SqlDatabaseDocumentDelegate" X="575" Y="325" Note=""/>
         <Element ComponentName="Types" X="575" Y="125" Note=""/>
+        <Element ComponentName="UserCollectionAdapter" X="200" Y="550" Note=""/>
         <Element ComponentName="UserGroupInfo" X="950" Y="325" Note=""/>
         <Element ComponentName="UserGroupInfoProvider" X="925" Y="550" Note=""/>
     </PositionMap>
