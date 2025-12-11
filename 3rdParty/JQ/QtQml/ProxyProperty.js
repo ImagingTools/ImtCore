@@ -20,7 +20,7 @@ class SDLProperty extends BaseObject {
      * @param {Object} meta
      */
     static set(target, name, value, meta){
-        let oldValue = target[name]
+        let oldValue = target.__proxy[name]
         target['PROXY__set__'+name](value)
 
         if(oldValue !== value){

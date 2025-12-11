@@ -77,31 +77,32 @@ class QtObject extends QObject {
     PROXY__get__children(){
         return this.__proxy.data.filter(obj => obj instanceof JQModules.QtQuick.Item)
     }
-    PROXY__set__children(value){
-        
+    PROXY__set__children(newValue){
+        let oldValue = this.__proxy.children
+
+        for(let child of oldValue){
+            if(newValue.indexOf(child) < 0) this.__proxy.__removeChild(child)
+        }
+
+        for(let child of newValue){
+            child.setParent(this.__proxy)
+        }
     }
     PROXY__get__resources(){
         return this.__proxy.data.filter(obj => !(obj instanceof JQModules.QtQuick.Item))
     }
-    PROXY__set__resources(value){
+    PROXY__set__resources(newValue){
+        let oldValue = this.__proxy.resources
 
+        for(let child of oldValue){
+            if(newValue.indexOf(child) < 0) this.__proxy.__removeChild(child)
+        }
+
+        for(let child of newValue){
+            child.setParent(this.__proxy)
+        }
     }
 
-    // get children(){
-    //     return this.__proxy.data.filter(obj => obj instanceof JQModules.QtQuick.Item)
-    // }
-
-    // set children(value){
-        
-    // }
-
-    // get resources(){
-    //     return this.__proxy.data.filter(obj => !(obj instanceof JQModules.QtQuick.Item))
-    // }
-
-    // set resources(value){
-        
-    // }
 
     SLOT_JQAbstractModelChanged(oldValue, newValue){
         if(this.constructor.meta.model.auto){
