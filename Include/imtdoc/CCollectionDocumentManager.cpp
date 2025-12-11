@@ -236,7 +236,7 @@ const istd::IChangeable* CCollectionDocumentManager::GetDocumentPtr(const QByteA
 
 IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentData(const QByteArray& userId, const QByteArray& documentId, istd::IChangeableSharedPtr& documentPtr) const
 {
-	OperationStatus retVal;
+	OperationStatus retVal = OS_FAILED;
 
 	QMutexLocker locker(&m_mutex);
 
@@ -244,9 +244,18 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentData(co
 		return retVal;
 	}
 
-	documentPtr.MoveCastedPtr(m_userDocuments[userId][documentId].objectPtr->CloneMe());
+	WorkingDocument& workingDocument = m_userDocuments[userId][documentId];
 
-	return documentPtr.IsValid() ? OS_OK : OS_FAILED;
+	documentPtr = CreateObject(workingDocument.objectTypeId);
+	if (!documentPtr.IsValid()) {
+		return OS_FAILED;
+	}
+
+	if (!documentPtr->CopyFrom(*m_userDocuments[userId][documentId].objectPtr)) {
+		return OS_FAILED;
+	}
+
+	return retVal;
 }
 
 
