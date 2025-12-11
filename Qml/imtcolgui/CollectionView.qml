@@ -51,7 +51,6 @@ Item {
 	property alias canResetFilters: container.canResetFilters;
 	property int metaInfoWidth: Style.sizeHintXXS;
 	property alias contentHeight: container.contentHeight
-	property var registeredFilters: ({})
 
 	signal selectedIndexChanged(int index);
 	signal elementsChanged();
@@ -115,11 +114,15 @@ Item {
 	}
 
 	function registerFilter(filterId, filterModel){
-		root.registeredFilters[filterId] = filterModel
+		filterMenu.registeredFilters[filterId] = filterModel
 	}
 
 	function setFilterIsEnabled(filterId, enabled){
 		filterMenu.setFilterIsEnabled(filterId, enabled)
+	}
+
+	function clearAllFilters(beQuiet){
+		filterMenu.clearAllFilters(beQuiet)
 	}
 
 	function doubleClicked(id, index){
@@ -286,7 +289,6 @@ Item {
 		}
 		onCommandActivated: {
 			root.commandActivated(commandId)
-			console.log(commandId)
 		}
 		Connections {
 			target: container.dataController;
@@ -363,23 +365,12 @@ Item {
 		QtObject {
 			id: internal;
 			property bool updateGuiRequired: false
-			function filterMenuActivate(){
-				if (container.hasFilter){
-					// container.filterMenuVisible = !container.filterMenuVisible;
-				}
-			}
 		}
 		
 		Component.onCompleted: {
-			Events.subscribeEvent("FilterActivated", internal.filterMenuActivate);
-			
 			if (dataControllerComp){
 				dataController = dataControllerComp.createObject(container);
 			}
-		}
-		
-		Component.onDestruction: {
-			Events.unSubscribeEvent("FilterActivated", internal.filterMenuActivate);
 		}
 
 		onRightButtonMouseClicked: {
@@ -395,10 +386,6 @@ Item {
 				doUpdateGui()
 				internal.updateGuiRequired = false
 			}
-		}
-		
-		onFilterChanged: {
-			root.onFilterChanged(filterId, filterValue);
 		}
 
 		ParamsSetController {
@@ -434,9 +421,9 @@ Item {
 				let paramsSet = paramsSetComp.createObject(this)
 				paramsSetController.paramsSet = paramsSet
 
-				for (let filterKey in root.registeredFilters){
+				for (let filterKey in root.filterMenu.registeredFilters){
 					if (root.filterMenu.enabledFilters[filterKey]){
-						let filterModel = root.registeredFilters[filterKey]
+						let filterModel = root.filterMenu.registeredFilters[filterKey]
 						if (filterModel){
 							paramsSetController.addParam(filterKey, filterKey, "", "", filterModel.toJson())
 						}

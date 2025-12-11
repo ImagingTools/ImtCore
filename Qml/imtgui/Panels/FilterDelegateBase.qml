@@ -15,26 +15,18 @@ Item {
 	property string mainButtonText: name
 	property bool isActive: false
 	property bool readOnly: false
-	property CollectionFilter collectionFilter: null
-	property DocCollectionFilter documentFilter: null
 	property FilterMenu filterMenu: null
 
 	property alias mainButton: mainButton_
 	property alias clearButton: clearButton_
 
-	signal clearFilter(bool beQiuet)
+	signal clearFilter(bool beQuiet)
 	signal openFilter()
 
 	Connections {
-		target: filterDelegateBase.collectionFilter
-		function onFilterChanged(){
-			if (filterDelegateBase.collectionFilter){
-				filterDelegateBase.collectionFilter.isEmpty()
-			}
-		}
-
-		function onCleared(beQiuet){
-			filterDelegateBase.clearFilter(beQiuet)
+		target: filterDelegateBase.filterMenu ? filterDelegateBase.filterMenu: null
+		function onClearAllFilters(beQuiet){
+			filterDelegateBase.clearFilter(beQuiet)
 		}
 	}
 
@@ -63,6 +55,7 @@ Item {
 					textColor: filterDelegateBase.isActive ? Style.baseColor : Style.textColor
 					border.width: filterDelegateBase.isActive ? 0 : 1
 					opacity: mainButton_.hovered ? 0.85 : 1
+					maxTextWidth: Style.sizeHintXS
 
 					Rectangle {
 						id: helpRectangle

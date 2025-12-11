@@ -20,7 +20,9 @@ ControlBase {
     signal close()
     signal clear()
     signal filterChanged()
+    signal clearAllFilters(bool beQuiet)
 
+    property var registeredFilters: ({})
     property var filterDependencies: ({})
     property ListModel filtersModel: ListModel {}
     
@@ -31,6 +33,18 @@ ControlBase {
 
     onDocumentFilterChanged: {
         setFilterIsEnabled("DocumentFilter", documentFilter !== null)
+    }
+
+    function hasActiveFilter(){
+        for (let i = 0; i < filtersModel.count; i++){
+            if (filtersModel.get(i).item){
+                if (filtersModel.get(i).item.isActive){
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 
     function setFilterIsEnabled(filterId, enabled){

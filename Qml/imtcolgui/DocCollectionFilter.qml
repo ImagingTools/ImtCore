@@ -21,7 +21,7 @@ Doc.DocumentCollectionFilter {
 		m_documentId = documentId
 	}
 
-	function clear(){
+	function clear(beQuiet){
 		m_documentId = ""
 		m_documentStates = []
 	}

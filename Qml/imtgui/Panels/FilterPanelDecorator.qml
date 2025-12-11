@@ -55,26 +55,29 @@ DecoratorBase {
 	}
 
 	Connections {
-		target: filterPanelDecorator.complexFilter
+		target: filterPanelDecorator.baseElement
 		function onFilterChanged(){
-			clearAllButton.enabled = !filterPanelDecorator.complexFilter.isEmpty()
+			clearAllButton.enabled = !filterPanelDecorator.complexFilter.isEmpty() || target.hasActiveFilter()
 			let textFilter = filterPanelDecorator.complexFilter.getTextFilter()
 			tfc.text = textFilter
 		}
 
-		function onCleared(){
+		function onClearAllFilters(beQuiet){
 			tfc.clear()
 		}
 	}
 
-	TimeFilter {
-		id: timeFilter;
-		
-		function clear(){
-			removeTimeRange()
-			removeTimeUnit()
-			removeInterpretationMode()
-			removeUnitMultiplier()
+	Connections {
+		target: filterPanelDecorator.complexFilter
+		function onFilterChanged(){
+			filterPanelDecorator.baseElement.filterChanged()
+		}
+	}
+
+	Connections {
+		target: filterPanelDecorator.documentFilters
+		function onFilterChanged(){
+			filterPanelDecorator.baseElement.filterChanged()
 		}
 	}
 
@@ -139,8 +142,15 @@ DecoratorBase {
 						sourceComponent: model.comp
 						onLoaded: {
 							item.filterId = model.id
-							item.collectionFilter = filterPanelDecorator.complexFilter
-							item.documentFilter = filterPanelDecorator.documentFilter
+
+							if (item.collectionFilter !== undefined){
+								item.collectionFilter = filterPanelDecorator.complexFilter
+							}
+
+							if (item.documentFilter !== undefined){
+								item.documentFilter = filterPanelDecorator.documentFilter
+							}
+
 							item.filterMenu = filterPanelDecorator.baseElement
 
 							filterPanelDecorator.baseElement.filtersModel.setProperty(model.index, "item", item)
@@ -150,14 +160,20 @@ DecoratorBase {
 							target: filterPanelDecorator
 							function onComplexFilterChanged(){
 								if (delegateLoader.item){
-									delegateLoader.item.collectionFilter = filterPanelDecorator.complexFilter
+									if (delegateLoader.item.collectionFilter !== undefined){
+										delegateLoader.item.collectionFilter = filterPanelDecorator.complexFilter
+									}
+
 									delegateLoader.item.filterMenu = filterPanelDecorator.baseElement
 								}
 							}
 							
 							function onDocumentFilterChanged(){
 								if (delegateLoader.item){
-									delegateLoader.item.documentFilter = filterPanelDecorator.documentFilter
+									if (delegateLoader.item.documentFilter !== undefined){
+										delegateLoader.item.documentFilter = filterPanelDecorator.documentFilter
+									}
+
 									delegateLoader.item.filterMenu = filterPanelDecorator.baseElement
 								}
 							}
@@ -200,6 +216,8 @@ DecoratorBase {
 			id: stateDelegateFilter
 			name: qsTr("Document State")
 
+			property DocCollectionFilter documentFilter: null
+			
 			Component.onCompleted: {
 				createAndAddOption("Active", qsTr("Active"), "", true)
 				createAndAddOption("Disabled", qsTr("Disabled"), "", true)
@@ -229,9 +247,22 @@ DecoratorBase {
 	
 	Component {
 		id: timeDelegateFilterComp
-		
+
 		TimeFilterDelegate {
-			name: qsTr("Date")
+			name: qsTr("Creation Date")
+			onCleared: {
+				if (filterPanelDecorator.complexFilter){
+					if (filterPanelDecorator.complexFilter.hasTimeFilter()){
+						filterPanelDecorator.complexFilter.clearTimeFilter()
+					}
+				}
+			}
+
+			onAccepted: {
+				if (filterPanelDecorator.complexFilter){
+					filterPanelDecorator.complexFilter.setTimeFilter(this.timeFilter)
+				}
+			}
 		}
 	}
 
@@ -269,10 +300,8 @@ DecoratorBase {
 		tooltipText: qsTr("Reset all filters")
 		visible: filterPanelDecorator.canResetFilters
 		onClicked: {
-			if (filterPanelDecorator.complexFilter){
-				filterPanelDecorator.complexFilter.clearAllFilters(true)
-				filterPanelDecorator.complexFilter.filterChanged()
-			}
+			filterPanelDecorator.baseElement.clearAllFilters(true)
+			filterPanelDecorator.baseElement.filterChanged()
 		}
 		decorator: Component {
 			ToolButtonDecorator {

@@ -268,11 +268,11 @@ Rectangle {
 		sortingChanged(currentHeaderId, currentSortOrder)
 	}
 
-	function clearSortingInfo(beQiuet){
+	function clearSortingInfo(beQuiet){
 		currentHeaderId = ""
 		currentSortOrder = ""
 
-		if (!beQiuet){
+		if (!beQuiet){
 			sortingChanged(currentHeaderId, currentSortOrder)
 		}
 	}

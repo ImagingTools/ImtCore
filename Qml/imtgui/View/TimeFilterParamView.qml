@@ -13,7 +13,7 @@ PopupView {
 	width: 260;
 	height: content.height + 2 * Style.marginM;
 		
-	property TimeFilter timeFilter: TimeFilter {}
+	property TimeFilter timeFilter: null
 	property alias listView: listView;
 	
 	property Component buttonDecorator: ButtonDecorator {
@@ -24,16 +24,20 @@ PopupView {
 
 	property bool canTimeRangeEdit: true
 
-	signal accepted(string id, string name);
-	signal cancelled();
+	// signal accepted(string id, string name)
+	signal timeRangeChanged(string begin, string end)
+	signal timeUnitChanged(string mode, string unit)
+	signal cancelled()
 	
 	onTimeFilterChanged: {
 		updateGui();
 	}
 	
 	function updateGui(){
-		if (!timeFilter.hasTimeRange()){
-			timeFilter.createTimeRange()
+		listView.currentIndex = -1
+		
+		if (!timeFilter){
+			return
 		}
 
 		if (timeFilter.m_timeRange){
@@ -57,7 +61,6 @@ PopupView {
 			toDatePicker.setDate(toDate);
 		}
 		
-		listView.currentIndex = -1;
 		
 		let unit = timeFilter.m_timeUnit;
 		let mode = timeFilter.m_interpretationMode;
@@ -114,10 +117,10 @@ PopupView {
 		id: presetModel
 		Component.onCompleted: {
 			root.addItem("Week", qsTr("Last 7 Days"), "For")
-			root.addItem("Month", qsTr("This month"), "Current")
-			root.addItem("Month", qsTr("Last month"), "Last")
-			root.addItem("Year", qsTr("This year"), "Current")
-			root.addItem("Year", qsTr("Last year"), "Last")
+			root.addItem("Month", qsTr("This Month"), "Current")
+			root.addItem("Month", qsTr("Last Month"), "Last")
+			root.addItem("Year", qsTr("This Year"), "Current")
+			root.addItem("Year", qsTr("Last Year"), "Last")
 		}
 	}
 
@@ -173,11 +176,7 @@ PopupView {
 						objectName: model.unit + "_" + model.mode
 						onClicked: {
 							listView.currentIndex = model.index;
-
-							root.timeFilter.m_timeUnit = model.unit;
-							root.timeFilter.m_interpretationMode = model.mode;
-
-							root.accepted(model.unit, model.name);
+							root.timeUnitChanged(model.mode, model.unit)
 						}
 					}
 				}
@@ -211,8 +210,8 @@ PopupView {
 						height: parent.height;
 						text: qsTr("Select a date");
 						onClicked: {
-							fromDateItem.visible = true;
-							toDatePicker.setCurrentDay();
+							fromDateItem.visible = true
+							toDatePicker.showCurrentDate()
 						}
 						
 						decorator: root.buttonDecorator;
@@ -265,14 +264,7 @@ PopupView {
 							text: qsTr("Apply");
 							enabled: fromDateItem.visible;
 							onClicked: {
-								if (!root.timeFilter.hasTimeRange()){
-									root.timeFilter.createTimeRange()
-								}
-	
-								root.timeFilter.m_timeRange.m_begin = fromDatePicker.selectedDate.toISOString()
-								root.timeFilter.m_timeRange.m_end = toDatePicker.selectedDate.toISOString()
-								
-								root.accepted("TimeRange", fromDatePicker.getDateAsString() + " -> " + toDatePicker.getDateAsString());
+								root.timeRangeChanged(fromDatePicker.selectedDate.toISOString(), toDatePicker.selectedDate.toISOString())
 							}
 							
 							decorator: root.buttonDecorator;
@@ -284,20 +276,17 @@ PopupView {
 							enabled: fromDateItem.visible;
 							onClicked: {
 								fromDateItem.visible = false;
-								fromDatePicker.showCurrentDate();
-								toDatePicker.showCurrentDate();
-								listView.currentIndex = -1;
-								
-								root.cancelled();
+								fromDatePicker.showCurrentDate()
+								toDatePicker.showCurrentDate()
+								listView.currentIndex = -1
+								root.cancelled()
 							}
 							
-							decorator: root.buttonDecorator;
+							decorator: root.buttonDecorator
 						}
 					}
 				}
 			}
-
-
 		}
 	}
 	

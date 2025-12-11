@@ -150,9 +150,10 @@ ComplexCollectionFilter{
 		Returns the first sorting info item or null if not set.
 	*/
 	function getSortingInfo(){
-		if (m_sortingInfo.length > 0){
+		if (hasSortingInfo() && m_sortingInfo.length > 0){
 			return m_sortingInfo.get(0).item
 		}
+
 		return null
 	}
 

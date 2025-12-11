@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
 import imtbaseImtBaseTypesSdl 1.0
 import imtbaseComplexCollectionFilterSdl 1.0
 
@@ -12,6 +13,7 @@ FilterDelegateBase {
 	}
 
 	property int visibleItemCount: 5
+	property CollectionFilter collectionFilter: null
 
 	signal optionSelectionChanged(var optionIds, var optionIndexes, bool beQuiet)
 
@@ -23,7 +25,20 @@ FilterDelegateBase {
 			internal.delaySignal = false
 		}
 	}
-	
+
+	Connections {
+		target: filterDelegate.collectionFilter
+		function onFilterChanged(){
+			if (filterDelegate.collectionFilter){
+				filterDelegate.collectionFilter.isEmpty()
+			}
+		}
+
+		function onCleared(beQiuet){
+			filterDelegate.clearFilter(beQiuet)
+		}
+	}
+
 	Connections {
 		id: filterConnections
 		target: filterDelegate.selectionParam
@@ -209,7 +224,7 @@ FilterDelegateBase {
 	}
 
 	onClearFilter: {
-		setSelectedIndex(-1, beQiuet)
+		setSelectedIndex(-1, beQuiet)
 	}
 
 	Component {

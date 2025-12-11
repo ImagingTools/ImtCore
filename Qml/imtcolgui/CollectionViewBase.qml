@@ -56,31 +56,11 @@ ViewBase {
 	Component.onCompleted: {
 		tableInternal.focus = true;
 	}
-	
-	Connections {
-		target: collectionViewBaseContainer.collectionFilter
-		
-		function onFilterChanged(){
-			let sortingInfo = target.getSortingInfo()
-			if (sortingInfo){
-				tableInternal.setSortingInfo(sortingInfo.m_fieldId, sortingInfo.m_sortingOrder)
-			}
 
-			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
-			collectionViewBaseContainer.doUpdateGui()
-		}
-
-		function onCleared(beQiuet){
-			tableInternal.clearSortingInfo(beQiuet)
-		}
-	}
-	
-	Connections {
-		target: collectionViewBaseContainer.documentCollectionFilter
-		
-		function onFilterChanged(){
-			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
-			collectionViewBaseContainer.doUpdateGui()
+	QtObject {
+		id: internal
+		function checkActiveFilter(){
+			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter() || collectionViewBaseContainer.filterMenu.hasActiveFilter()
 		}
 	}
 	
@@ -121,8 +101,28 @@ ViewBase {
 		}
 
 		onFilterChanged: {
-			collectionViewBaseContainer.activeFilter = collectionViewBaseContainer.hasActiveFilter()
+			let collectioFilter = collectionViewBaseContainer.collectionFilter
+			if (collectioFilter){
+				let sortingInfo = collectioFilter.getSortingInfo()
+				if (sortingInfo){
+					tableInternal.setSortingInfo(sortingInfo.m_fieldId, sortingInfo.m_sortingOrder)
+				}
+			}
+
+			internal.checkActiveFilter()
 			collectionViewBaseContainer.doUpdateGui();
+		}
+
+		onClearAllFilters: {
+			if (collectionViewBaseContainer.collectionFilter){
+				collectionViewBaseContainer.collectionFilter.clearAllFilters(beQuiet)
+			}
+
+			if (collectionViewBaseContainer.documentCollectionFilter){
+				collectionViewBaseContainer.documentCollectionFilter.clear(beQuiet)
+			}
+
+			tableInternal.clearSortingInfo(beQuiet)
 		}
 	}
 
