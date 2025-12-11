@@ -161,7 +161,7 @@ bool CSqliteJsonDatabaseDelegateComp::CreatePaginationQuery(int offset, int coun
 }
 
 
-bool CSqliteJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/) const
+bool CSqliteJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/, const QString& /*fieldId*/) const
 {
 	return true;
 }

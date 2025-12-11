@@ -14,6 +14,9 @@ class CTimeFilterParamRepresentationController:
 			public imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>
 {
 public:
+	CTimeFilterParamRepresentationController();
+	CTimeFilterParamRepresentationController(const QByteArray& filterId, const QString& filterName = QString(), const QString& filterDescription = QString());
+
 	// reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>)
 	virtual QByteArray GetTypeId() const override;
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;

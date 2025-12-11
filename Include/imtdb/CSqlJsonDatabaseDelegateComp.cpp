@@ -451,7 +451,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 }
 
 
-bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
+bool CSqlJsonDatabaseDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& /*timeFieldId*/) const
 {
 	QString addedStrQuery = QString(R"((SELECT "LastModified" FROM "%1" as temp WHERE "RevisionNumber" = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))").arg(qPrintable(*m_tableNameAttrPtr));
 	switch (timeFilter.GetTimeUnit()){

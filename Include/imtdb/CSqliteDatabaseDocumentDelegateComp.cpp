@@ -151,7 +151,7 @@ bool CSqliteDatabaseDocumentDelegateComp::CreatePaginationQuery(int offset, int 
 }
 
 
-bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery) const
+bool CSqliteDatabaseDocumentDelegateComp::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& timeFilter, QString& timeFilterQuery, const QString& /*fieldId*/) const
 {
 	QString addedStrQuery = QString(R"((SELECT "TimeStamp" FROM "%1" as temp WHERE %2 = 1 AND root."DocumentId" = temp."DocumentId" LIMIT 1))")
 	.arg(

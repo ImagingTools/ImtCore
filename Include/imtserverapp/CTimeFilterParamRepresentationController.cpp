@@ -11,6 +11,25 @@ namespace imtserverapp
 
 // public methods
 
+CTimeFilterParamRepresentationController::CTimeFilterParamRepresentationController()
+{
+	m_modelId = QByteArrayLiteral("TimeFilter");
+	m_name = QStringLiteral("Time Filter");
+	m_description = QStringLiteral("Time filter");
+}
+
+
+CTimeFilterParamRepresentationController::CTimeFilterParamRepresentationController(
+			const QByteArray& filterId,
+			const QString& filterName,
+			const QString& filterDescription)
+{
+	m_modelId = filterId;
+	m_name = filterName;
+	m_description = filterDescription;
+}
+
+
 // reimplemented (imtserverapp::TJsonRepresentationControllerWrap<sdl::imtbase::ComplexCollectionFilter::CTimeFilter::V1_0>)
 
 QByteArray CTimeFilterParamRepresentationController::GetTypeId() const

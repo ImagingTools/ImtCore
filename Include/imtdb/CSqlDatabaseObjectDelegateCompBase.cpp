@@ -530,7 +530,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IC
 }
 
 
-bool CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/) const
+bool CSqlDatabaseObjectDelegateCompBase::CreateTimeFilterQuery(const imtbase::ITimeFilterParam& /*timeFilter*/, QString& /*timeFilterQuery*/, const QString& /*timeFieldId*/) const
 {
 	/// Implementation meant for derived classes
 
