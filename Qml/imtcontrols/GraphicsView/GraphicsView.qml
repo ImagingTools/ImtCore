@@ -27,7 +27,7 @@ Rectangle {
 
 	property real scaleStep: 0.1;
 	property real minZoomLevel: -1;
-	property real maxZoomLevel: 20;
+	property real maxZoomLevel: 1000;
 	property var translateXPositiveLimit;
 	property var translateYPositiveLimit;
 	property var translateXNegativeLimit;
@@ -77,6 +77,13 @@ Rectangle {
 	property bool hasRightButtonMenu: false;
 	property var leftMenuCoordinates: Qt.point(Style.marginM, Style.marginS);
 	property var rightMenuCoordinates: Qt.point(width - Style.marginL - Style.buttonWidthL, Style.marginS);
+	property bool leftMenuIsOpen: false
+	property bool rightMenuIsOpen: false
+
+	property bool hasZoomInButton: true;
+	property bool hasZoomOutButton: true;
+	property bool hasFitToViewButton: true;
+	property bool hasResetViewButton: true;
 
 	property bool propagateWheelEvents: false;
 	property bool propagateMouseEvents: false;
@@ -1236,12 +1243,16 @@ Rectangle {
 		clip: true;
 		visible: leftMenuButton.visible;
 
-		property bool isOpen: false;
+		property bool isOpen: graphicsView.leftMenuIsOpen;
+		property bool canRunAnim: !graphicsView.leftMenuIsOpen;
 		onIsOpenChanged: {
 			if(isOpen){
-				leftMenuWidthAnim.from = leftMenuButtonPanel.width;
-				leftMenuWidthAnim.to = leftMenuButtonRow.width + 2*leftMenuButtonRow.anchors.leftMargin;
-				leftMenuWidthAnim.start()
+				if(canRunAnim){
+					leftMenuWidthAnim.from = leftMenuButtonPanel.width;
+					leftMenuWidthAnim.to = leftMenuButtonRow.width + 2*leftMenuButtonRow.anchors.leftMargin;
+					leftMenuWidthAnim.start()
+				}
+				canRunAnim = true
 			}
 			else {
 				leftMenuWidthAnim.from = leftMenuButtonPanel.width;
@@ -1268,6 +1279,13 @@ Rectangle {
 			height: leftMenuButton.height
 			spacing: Style.marginXS;
 
+			onWidthChanged: {
+				if(graphicsView.leftMenuIsOpen){
+					leftMenuButtonPanel.width = leftMenuButtonRow.width + 2*leftMenuButtonRow.anchors.leftMargin;
+				}
+
+			}
+
 			Button{
 				id: selectModeButton;
 
@@ -1279,6 +1297,9 @@ Rectangle {
 				property bool isActive: graphicsView.isSelectionMode;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/Pointer", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+
+				tooltipText: qsTr("Selection mode")
+
 				onClicked: {
 					graphicsView.isSelectionMode = true;
 					graphicsView.isEditMode = false;
@@ -1286,6 +1307,8 @@ Rectangle {
 					graphicsView.isPointsAdditionMode = false;
 					graphicsView.isPointsDeletionMode = false;
 				}
+
+
 			}
 			Button{
 				id: editModeButton;
@@ -1298,6 +1321,8 @@ Rectangle {
 				property bool isActive: graphicsView.isEditMode;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/Edit", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+
+				tooltipText: qsTr("Edit mode")
 				onClicked: {
 					graphicsView.isSelectionMode = false;
 					graphicsView.isEditMode = true;
@@ -1317,6 +1342,7 @@ Rectangle {
 				property bool isActive: graphicsView.isPointsEditMode;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/PointsMove", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+				tooltipText: qsTr("Edit points mode")
 				onClicked: {
 					graphicsView.isSelectionMode = false;
 					graphicsView.isEditMode = false;
@@ -1336,6 +1362,7 @@ Rectangle {
 				property bool isActive: graphicsView.isPointsAdditionMode;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/PointsAdd", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+				tooltipText: qsTr("Add points mode")
 				onClicked: {
 					graphicsView.isSelectionMode = false;
 					graphicsView.isEditMode = false;
@@ -1355,6 +1382,7 @@ Rectangle {
 				property bool isActive: graphicsView.isPointsDeletionMode;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/PointsSub", Icon.State.On, isActive ? Icon.Mode.Normal : Icon.Mode.Disabled)
+				tooltipText: qsTr("Delete points mode")
 				onClicked: {
 					graphicsView.isSelectionMode = false;
 					graphicsView.isEditMode = false;
@@ -1414,12 +1442,17 @@ Rectangle {
 		clip: true;
 		visible: rightMenuButton.visible;
 
-		property bool isOpen: false;
+		property bool isOpen: graphicsView.rightMenuIsOpen;
+		property bool canRunAnim: !graphicsView.rightMenuIsOpen;
+
 		onIsOpenChanged: {
 			if(isOpen){
-				rightMenuWidthAnim.from = rightMenuButtonPanel.height;
-				rightMenuWidthAnim.to = rightMenuButtonColumn.height + 2*rightMenuButtonColumn.anchors.topMargin;
-				rightMenuWidthAnim.start()
+				if(canRunAnim){
+					rightMenuWidthAnim.from = rightMenuButtonPanel.height;
+					rightMenuWidthAnim.to = rightMenuButtonColumn.height + 2*rightMenuButtonColumn.anchors.topMargin;
+					rightMenuWidthAnim.start()
+				}
+				canRunAnim = true
 			}
 			else {
 				rightMenuWidthAnim.from = rightMenuButtonPanel.height;
@@ -1446,6 +1479,12 @@ Rectangle {
 			width: rightMenuButton.width
 			spacing: Style.marginXS;
 
+			onHeightChanged: {
+				if(graphicsView.rightMenuIsOpen){
+					rightMenuButtonPanel.height = rightMenuButtonColumn.height + 2*rightMenuButtonColumn.anchors.topMargin
+				}
+			}
+
 			Button{
 				id: zoomIncreaseButton;
 
@@ -1453,6 +1492,10 @@ Rectangle {
 				height: width;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/ZoomIn", Icon.State.On, Icon.Mode.Normal)
+
+				tooltipText: qsTr("Zoom in")
+				visible: graphicsView.hasZoomInButton
+
 				onClicked: {
 				}
 				onPressed: {
@@ -1470,6 +1513,9 @@ Rectangle {
 				height: width;
 
 				iconSource: "../../../" + Style.getIconPath("Icons/ZoomOut", Icon.State.On, Icon.Mode.Normal)
+				tooltipText: qsTr("Zoom out")
+				visible: graphicsView.hasZoomOutButton
+
 				onClicked: {
 
 				}
@@ -1484,18 +1530,6 @@ Rectangle {
 			}
 
 			Button{
-				id: fitToScreenButton;
-
-				width: parent.width;
-				height: width;
-
-				iconSource: "../../../" + Style.getIconPath("Icons/ZoomToFit", Icon.State.On, Icon.Mode.Normal)
-				onClicked: {
-					graphicsView.fitToActiveLayer()
-				}
-			}
-
-			Button{
 				id: resetViewButton;
 
 				width: parent.width;
@@ -1503,14 +1537,29 @@ Rectangle {
 
 				//iconSource: "../../../" + Style.getIconPath("Icons/ZoomReset", Icon.State.On, Icon.Mode.Normal)
 				iconSource: "../../../" + Style.getIconPath("Icons/FitToScreen", Icon.State.On, Icon.Mode.Normal)
+				tooltipText: qsTr("Reset view")
+				visible: graphicsView.hasResetViewButton
+
 				onClicked: {
 					graphicsView.resetView(true);
 				}
-
 			}
 
-		}
+			Button{
+				id: fitToScreenButton;
 
+				width: parent.width;
+				height: width;
+
+				iconSource: "../../../" + Style.getIconPath("Icons/ZoomToFit", Icon.State.On, Icon.Mode.Normal)
+				tooltipText: qsTr("Fit to view")
+				visible: graphicsView.hasFitToViewButton
+
+				onClicked: {
+					graphicsView.fitToActiveLayer()
+				}
+			}
+		}
 
 		PauseAnimation {
 			id: zoomInAnim;

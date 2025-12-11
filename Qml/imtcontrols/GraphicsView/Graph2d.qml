@@ -56,6 +56,9 @@ Rectangle{
 
 	property int legendFontSize: Style.fontSizeM
 
+	property bool setMinZoomByFitToView: false
+	property bool restrictFitByResize: false
+
 	property alias hasLeftButtonMenu: graphicsView.hasLeftButtonMenu;
 	property alias hasRightButtonMenu: graphicsView.hasRightButtonMenu;
 	property alias restrictMove: graphicsView.restrictMove;
@@ -199,12 +202,15 @@ Rectangle{
 			propagateWheelEvents: true;
 			propagateMouseEvents: true
 			hasHoverReaction: true;
+			hasResetViewButton: false
 
 			//renderStrategy: Canvas.Immediate
 
 			property bool compl: false;
 			property bool ready: compl && width > 0 && height > 0
 			property bool lineCreated: false;
+
+			property bool firstResize: true;
 
 
 			Component.onCompleted: {
@@ -285,16 +291,23 @@ Rectangle{
 					setLayersParams()
 					let activeLayer = getActiveLayer()
 					let shapeModel = activeLayer ? activeLayer.shapeModel : null
-					let ok =!graph.isMultiGraph ? graph.linePoints.length : !shapeModel ? false: shapeModel.length
+					let ok = !firstResize ? false : !graph.isMultiGraph ? graph.linePoints.length : !shapeModel ? false: shapeModel.length
 					if(graph.fitToWidth){
 						graph.wasFitToWidth = false
 					}
 					if(ok){
 						fitToInactivAndActiveLayer()
+						if(graph.setMinZoomByFitToView){
+							minZoomLevel = scaleCoeff
+						}
 					}
 					else {
 						requestPaint()
 					}
+				}
+
+				if(graph.restrictFitByResize){
+					firstResize = false;
 				}
 			}
 
