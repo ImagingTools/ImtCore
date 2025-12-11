@@ -143,6 +143,8 @@ BoundingBox {
 					x2 = point2.x;
 					//y2 = point2.y
 
+					y1 = legendMargin > -1 ? legendMargin : 0
+
 					ctx.beginPath()
 					ctx.moveTo(x1, y1);
 					ctx.lineTo(x2, y2);
@@ -176,7 +178,7 @@ BoundingBox {
 			ctx.globalAlpha = gridShape.majorGridOpacity
 			//vertical major lines
 			for(let i = 0; i * stepX  <= (gridShape.viewItem.drawingAreaWidth  /*- labelYWidth*/ + deltaAddX)/scaleCoeff; i++){//vertical lines
-				if(gridShape.thinningCheck(scaleCoeff, i)){
+				if(gridShape.thinningCheck(scaleCoeff, i, gridShape.gridStepMajorX)){
 					continue
 				}
 				let x1 = firstVertLineX + labelYWidth + i * stepX;
@@ -191,6 +193,8 @@ BoundingBox {
 				x2 = point2.x;
 				//y2 = point2.y
 
+				y1 = legendMargin > -1 ? legendMargin : 0
+
 				ctx.beginPath()
 				ctx.moveTo(x1, y1);
 				ctx.lineTo(x2, y2);
@@ -200,7 +204,7 @@ BoundingBox {
 			//horizontal major lines
 			//ctx.strokeStyle = gridShape.majorGridColor;
 			for(let i = 0; i * stepY <= (gridShape.viewItem.drawingAreaHeight - labelXHeight + deltaAddY)/ scaleMax1 ; i++){//horizontal lines
-				if(gridShape.thinningCheck(scaleCoeff, i)){
+				if(gridShape.thinningCheck(scaleCoeff, i, gridShape.gridStepMajorY)){
 					continue
 				}
 				let x1 = labelYWidth ;
@@ -248,6 +252,8 @@ BoundingBox {
 					x2 = point2.x;
 					//y2 = point2.y
 
+					y1 = legendMargin > -1 ? legendMargin : 0
+
 					ctx.beginPath()
 					ctx.moveTo(x1, y1);
 					ctx.lineTo(x2, y2);
@@ -285,7 +291,7 @@ BoundingBox {
 			ctx.strokeStyle = gridShape.majorGridColor;
 			//vertical major lines
 			for(let i = 1; i * stepX  <= (deltaMinusX + addToDeltaX)/scaleCoeff + stepX ; i++){//vertical lines
-				if(gridShape.thinningCheck(scaleCoeff, i)){
+				if(gridShape.thinningCheck(scaleCoeff, i, gridShape.gridStepMajorX)){
 					continue
 				}
 				let x1 = firstVertLineX + labelYWidth -i * stepX;
@@ -300,6 +306,8 @@ BoundingBox {
 				x2 = point2.x;
 				//y2 = point2.y
 
+				y1 = legendMargin > -1 ? legendMargin : 0
+
 				ctx.beginPath()
 				ctx.moveTo(x1, y1);
 				ctx.lineTo(x2, y2);
@@ -310,7 +318,7 @@ BoundingBox {
 			//horizontal major lines
 			//ctx.strokeStyle = "green"
 			for(let i = 1; i * stepY <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff) ; i++){//horizontal lines
-				if(gridShape.thinningCheck(scaleCoeff, i)){
+				if(gridShape.thinningCheck(scaleCoeff, i, gridShape.gridStepMajorY)){
 					continue
 				}
 
@@ -360,7 +368,7 @@ BoundingBox {
 			labelMatrix.setYTranslation(deltaY);
 
 			for(let i = 1; i * stepY * scaleCoeff < (gridShape.viewItem.drawingAreaHeight - labelXHeight + deltaAddY) * scaleCoeff / scaleMax1; i++){
-				if(gridShape.thinningCheck(scaleCoeff, i)){
+				if(gridShape.thinningCheck(scaleCoeff, i, gridShape.gridStepMajorY)){
 					continue
 				}
 				let x_ = labelYWidth;
@@ -381,7 +389,7 @@ BoundingBox {
 			}
 			// completing label y to zero
 			for(let i = 0; i * stepY  <= (deltaMinusY + gridShape.viewItem.drawingAreaHeight) / (scaleCoeff); i++){
-				if(gridShape.thinningCheck(scaleCoeff, i)){
+				if(gridShape.thinningCheck(scaleCoeff, i, gridShape.gridStepMajorY)){
 					continue
 				}
 				let x_ = labelYWidth;
@@ -412,7 +420,7 @@ BoundingBox {
 			labelMatrix.setXTranslation(deltaX);
 
 			for(let i = 1; i * stepX  <= (gridShape.viewItem.drawingAreaWidth - labelYWidth + deltaAddX)/scaleCoeff; i++){
-				if(gridShape.thinningCheck(scaleCoeff, i)){
+				if(gridShape.thinningCheck(scaleCoeff, i, gridShape.gridStepMajorX)){
 					continue
 				}
 				let x_ = (firstVertLineX + labelYWidth + i * stepX) * scaleCoeff;
@@ -434,7 +442,7 @@ BoundingBox {
 			}
 			// completing label x to zero
 			for(let i = 0; i * stepX  <= (deltaMinusX + addToDeltaX)/scaleCoeff + stepX; i++){
-				if(gridShape.thinningCheck(scaleCoeff, i)){
+				if(gridShape.thinningCheck(scaleCoeff, i, gridShape.gridStepMajorX)){
 					continue
 				}
 				let x_ = (firstVertLineX + labelYWidth - i * stepX) * scaleCoeff;
@@ -544,16 +552,40 @@ BoundingBox {
 
 	}
 
-	function thinningCheck(scaleCoeff, i){
-		let ok = false;
-		if(scaleCoeff < gridShape.thinningZoomLevel && i%2 !== 0){
-			ok = true
-		}
-		if(scaleCoeff < gridShape.thinningZoomLevel/2 && i%(2*2) !== 0){
-			ok = true;
+	function thinningCheck(scaleCoeff, index, stepArg){
+
+		if(index == 0){
+			return false
 		}
 
-		return ok;
+		let minStep = 40
+		let condition = stepArg * scaleCoeff < minStep
+
+		let val =  (minStep / (stepArg * scaleCoeff))
+
+		if(condition && index%2 !== 0){
+			return true;
+		}
+
+		if(index%2 == 0){
+			let degree = 0
+			let tempVal = val
+			let result_2 = val/2
+			while(tempVal > 1){
+				tempVal = tempVal/2
+				if(tempVal >= 1){
+					degree++
+				}
+			}
+			let coeff = Math.pow(2, degree)
+			condition = stepArg * scaleCoeff < minStep/coeff
+
+			if(condition && (index/coeff)%2 !== 0){
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
 

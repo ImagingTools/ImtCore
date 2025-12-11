@@ -22,6 +22,8 @@ Rectangle{
 
 	property real gridStepMajorX: 40
 	property real gridStepMajorY: 40
+	property real gridStepMinorX: 10
+	property real gridStepMinorY: 10
 	property int labelFontSize: Style.fontSizeM//Style.fontSizeXXS
 
 	property var linePoints: [];
@@ -416,6 +418,8 @@ Rectangle{
 		legendMargin: graph.legendMargin;
 		gridStepMajorX: graph.gridStepMajorX * graph.xScale
 		gridStepMajorY: graph.gridStepMajorY * graph.yScale
+		gridStepMinorX: graph.gridStepMinorX * graph.xScale
+		gridStepMinorY: graph.gridStepMinorY * graph.yScale
 		xScale: graph.xScale
 		yScale: graph.yScale
 		canDrawText: true;
