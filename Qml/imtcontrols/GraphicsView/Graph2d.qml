@@ -247,8 +247,13 @@ Rectangle{
 					return;
 				}
 
+
 				let maxX = 0
+				let minX = 100000000
 				let shapeModel = activeLayer.shapeModel
+				if(!shapeModel.length){
+					return
+				}
 				for(let i = 0; i < shapeModel.length; i++){
 					let shape = shapeModel[i]
 					let points = shape.points
@@ -257,6 +262,9 @@ Rectangle{
 						let currX = shape.getScreenPosition(points[j]).x
 						if(currX > maxX){
 							maxX = currX
+						}
+						if(currX < minX){
+							minX = currX
 						}
 					}
 				}
@@ -268,22 +276,23 @@ Rectangle{
 					}
 				}
 
+				let delta = maxX - minX
+
 				let margin  = Style.marginXXL
 				let gridWidth = width - gridShape.labelYWidth - gridShape.legendMargin - margin
-				if (gridWidth < 0){
+				if (gridWidth <= 0){
 					return
 				}
 
-				maxX = maxX - (gridShape.labelYWidth + gridShape.legendMargin)
 				if (gridWidth <= 0 || maxX <= 0){
 					return
 				}
 
-				let scale_ = gridWidth/ maxX
+				let scale_ = gridWidth/ delta
 				graph.xScale = (graph.xScale * scale_)
 				setLayersParams()
 				graph.wasFitToWidth = true
-				requestPaint()
+				graphicsView.requestPaint()
 			}
 
 			function resize(){
