@@ -133,8 +133,19 @@ CollectionViewCommandsDelegateBase{
 
 		let indexes = collectionView.table.getSelectedIndexes()
 		for (let i = 0; i < indexes.length; ++i){
+			if (!elementsModel.containsKey("id", indexes[i])){
+				console.error("Unable to edit element. Field: 'id' does not exists in the table model")
+				return
+			}
+
+			if (!elementsModel.containsKey("typeId", indexes[i])){
+				console.error("Unable to edit element. Field: 'typeId' does not exists in the table model")
+				return
+			}
+
 			let itemId = elementsModel.getData("id", indexes[i]);
 			let typeId = elementsModel.getData("typeId", indexes[i]);
+
 			documentManager.openDocument(typeId, itemId)
 		}
 	}
@@ -146,7 +157,6 @@ CollectionViewCommandsDelegateBase{
 		}
 
 		let documentTypeIds = getRegisteredDocumentTypeIds()
-		console.log("onNew documentTypeIds", documentTypeIds)
 		if (documentTypeIds.length === 0){
 			console.error("Unable to create new document. Type-ID is empty")
 			return
