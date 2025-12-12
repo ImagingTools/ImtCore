@@ -44,6 +44,7 @@ Rectangle{
 	property bool isMultiGraph: false;
 
 	property var rightLimit;
+	property var leftLimit;
 
 	property real xScale: 1
 	property real yScale: 1
@@ -348,7 +349,10 @@ Rectangle{
 					}
 				}
 
-				if(graph.alwaysShowOrigin){
+				if(graph.alwaysShowOrigin || graph.leftLimit !==undefined){
+					if(graph.leftLimit !==undefined){
+						originShape.points = [graph.leftLimit]
+					}
 					inactiveLayer.addShape(originShape);
 				}
 				if(graph.rightLimit !== undefined){
