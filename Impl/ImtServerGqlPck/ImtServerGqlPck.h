@@ -37,7 +37,7 @@
 #include <imtservergql/CGqlCollectionImportControllerComp.h>
 #include <imtservergql/CCollectionImportControllerComp.h>
 #include <imtservergql/CCollectionImportJobParamsFillerComp.h>
-#include <imtservergql/CCollectionDocumentManagerComp.h>
+#include <imtservergql/CCollectionDocumentManagerControllerComp.h>
 #include <imtservergql/CCollectionDocumentManagerPublisherComp.h>
 
 
@@ -78,7 +78,7 @@ typedef imtservergql::CProgressManagerPublisherComp ProgressManagerPublisher;
 typedef imtservergql::CGqlCollectionImportControllerComp GqlCollectionImportController;
 typedef imtservergql::CCollectionImportControllerComp CollectionImportController;
 typedef imtservergql::CCollectionImportJobParamsFillerComp CollectionImportJobParamsFiller;
-typedef icomp::TModelCompWrap<imtservergql::CCollectionDocumentManagerComp> CollectionDocumentManager;
+typedef imtservergql::CCollectionDocumentManagerControllerComp CollectionDocumentManagerController;
 typedef ibase::TModelObserverCompWrap<imtservergql::CCollectionDocumentManagerPublisherComp> CollectionDocumentManagerPublisher;
 
 

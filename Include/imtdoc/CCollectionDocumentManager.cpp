@@ -83,7 +83,6 @@ QByteArray CCollectionDocumentManager::CreateNewDocument(const QByteArray& userI
 		changeSet.SetChangeInfo(CN_NEW_DOCUMENT_CREATED, QVariant::fromValue(info));
 		istd::CChangeNotifier notifier(this, &changeSet);
 
-		WorkingDocument& document = m_userDocuments[userId][retVal];
 		document.objectTypeId = documentTypeId;
 		document.objectPtr = objectPtr;
 		document.undoManagerPtr = undoManagerPtr;
@@ -427,7 +426,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentUndoMan
 
 // reimplemented (iser::ISerializable)
 
-bool CCollectionDocumentManager::Serialize(iser::IArchive& archive)
+bool CCollectionDocumentManager::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }
@@ -435,7 +434,7 @@ bool CCollectionDocumentManager::Serialize(iser::IArchive& archive)
 
 // reimplemented (imod::CMultiModelObserverBase)
 
-void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& changeSet)
+void CCollectionDocumentManager::OnUpdate(imod::IModel* modelPtr, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	for (const QByteArray& userId : m_userDocuments.keys()){
 		WorkingDocumentList& documents = m_userDocuments[userId];
@@ -648,7 +647,7 @@ CCollectionDocumentManager::UndoManagerObserver::UndoManagerObserver(CCollection
 
 // protected methods of the embedded class UndoManagerObserver
 
-void CCollectionDocumentManager::UndoManagerObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CCollectionDocumentManager::UndoManagerObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.OnUndoManagerChanged(modelId);
 }

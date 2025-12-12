@@ -3,11 +3,10 @@
 
 // ACF includes
 #include <idoc/IDocumentManager.h>
-#include <idoc/IUndoManager.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtdoc/CCollectionDocumentManager.h>
+#include <imtdoc/IDocumentManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/CollectionDocumentManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>
 
@@ -17,24 +16,16 @@ namespace imtservergql
 
 
 namespace CDM = sdl::imtbase::CollectionDocumentManager;
-namespace UM = sdl::imtbase::UndoManager;
 
 
-class CCollectionDocumentManagerComp:
-	public sdl::imtbase::CollectionDocumentManager::CGraphQlHandlerCompBase,
-	public imtdoc::CCollectionDocumentManager
+class CCollectionDocumentManagerControllerComp: public sdl::imtbase::CollectionDocumentManager::CGraphQlHandlerCompBase
 {
 public:
 	typedef sdl::imtbase::CollectionDocumentManager::CGraphQlHandlerCompBase BaseClass;
-	typedef imtdoc::CCollectionDocumentManager BaseClass2;
 
-	I_BEGIN_COMPONENT(CCollectionDocumentManagerComp)
-		I_REGISTER_INTERFACE(imtdoc::IDocumentManager)
-		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "CollectiondId");
-		I_ASSIGN_MULTI_0(m_objectTypeIdAttrPtr, "ObjectTypeId", "Object type ID", false);
-		I_ASSIGN(m_collectionCompPtr, "Collection", "Collection", false, "");
-		I_ASSIGN(m_undoManagerFactPtr, "UndoManager", "Undo manager", false, "UndoManager");
-		I_ASSIGN_MULTI_0(m_objectFactPtr, "ObjectFactory", "Object factory", false);
+	I_BEGIN_COMPONENT(CCollectionDocumentManagerControllerComp)
+		I_ASSIGN(m_documentManagerCompPtr, "CollectionDocumentManager", "Collection-related document manager", true, "CollectionDocumentManager");
+		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "ID of the underlaying document collection", true, "");
 	I_END_COMPONENT
 
 protected:
@@ -83,26 +74,19 @@ protected:
 		const ::imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const override;
 
-	// reimplemented (imtdoc::CCollectionDocumentManager)
-	virtual imtbase::IObjectCollection* GetCollection() const override;
-	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const override;
-	virtual idoc::IUndoManagerSharedPtr CreateUndoManager() const override;
-
 	// reimplemented (::imtservergql::CPermissibleGqlRequestHandlerComp)
 	bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
 private:
-	imtdoc::CCollectionDocumentManager* GetNonConstThis() const;
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 	QByteArray GetUserId(const ::imtgql::CGqlRequest& gqlRequest) const;
 
 private:
+	I_REF(imtdoc::IDocumentManager, m_documentManagerCompPtr);
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
-	I_MULTIATTR(QByteArray, m_objectTypeIdAttrPtr);
-	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
-	I_FACT(idoc::IUndoManager, m_undoManagerFactPtr);
-	I_MULTIFACT(istd::IChangeable, m_objectFactPtr);
 };
 
 
 } // namespace imtservergql
+
+

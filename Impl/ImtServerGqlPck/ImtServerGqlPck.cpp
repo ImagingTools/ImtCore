@@ -165,8 +165,8 @@ I_EXPORT_COMPONENT(
 			"Collection Import Job Params Filler");
 
 I_EXPORT_COMPONENT(
-			CollectionDocumentManager,
-			"Collection document manager",
+			CollectionDocumentManagerController,
+			"Server-side document manager based on document collection",
 			"Collection Document Manager");
 
 I_EXPORT_COMPONENT(
