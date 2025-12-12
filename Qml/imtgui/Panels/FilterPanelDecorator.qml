@@ -9,7 +9,7 @@ import imtbaseImtBaseTypesSdl 1.0
 
 DecoratorBase {
 	id: filterPanelDecorator;
-	
+	objectName: "FilterPanel"
 	// width: customFiltersFlickable.width + mainFilters.width + clearAllButton.width
 	height: visible ? content.height : 0
 	
@@ -249,6 +249,7 @@ DecoratorBase {
 		id: timeDelegateFilterComp
 
 		TimeFilterDelegate {
+			objectName: "CreationDateFilter"
 			name: qsTr("Creation Date")
 			onCleared: {
 				if (filterPanelDecorator.complexFilter){

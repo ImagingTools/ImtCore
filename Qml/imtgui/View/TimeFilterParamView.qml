@@ -154,6 +154,7 @@ PopupView {
 		
 		Column {
 			id: content;
+			objectName: "TimeUnitView"
 			anchors.verticalCenter: parent.verticalCenter;
 			width: parent.width;
 			spacing: Style.marginM;
@@ -183,6 +184,7 @@ PopupView {
 			}
 			
 			Column {
+				objectName: "TimeRangeView"
 				width: content.width
 				spacing: content.spacing
 				visible: root.canTimeRangeEdit

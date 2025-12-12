@@ -252,10 +252,8 @@ QtObject {
 	}
 
 	function setDocumentName(documentId, name){
-		console.log("setDocumentName", documentId, name)
 		let index = getDocumentIndexByDocumentId(documentId)
 		if (index < 0){
-			console.log("set cachedDocumentNames", documentId, name)
 			__internal.cachedDocumentNames[documentId] = name
 			return ""
 		}
@@ -374,11 +372,6 @@ QtObject {
 					documentName: documentData.name
 					documentTypeId: documentData.typeId
 					documentManager: root
-					onViewRegistered: {
-						if (documentData.isNew){
-							// view.doUpdateModel()
-						}
-					}
 				}
 
 				signal viewAdded(string viewTypeId, var view)
