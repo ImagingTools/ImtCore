@@ -9,8 +9,6 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
-
-// GmgRosa
 #include <imtdoc/CCollectionDocumentManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/DocumentManager.h>
 #include <imtbasesdl/SDL/1.0/CPP/UndoManager.h>

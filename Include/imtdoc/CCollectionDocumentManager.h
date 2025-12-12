@@ -12,8 +12,6 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-
-// GmgCore includes
 #include <imtdoc/IDocumentManager.h>
 
 
@@ -21,9 +19,9 @@ namespace imtdoc
 {
 
 
-class CCollectionDocumentManager :
-	protected imod::TMultiModelObserverBase<istd::IChangeable>,
-	virtual public imtdoc::IDocumentManager
+class CCollectionDocumentManager:
+			protected imod::TMultiModelObserverBase<istd::IChangeable>,
+			virtual public imtdoc::IDocumentManager
 {
 public:
 	CCollectionDocumentManager();
@@ -57,9 +55,7 @@ protected:
 	WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId);
 	const WorkingDocument* FindDocument(const QByteArray& userId, const QByteArray& documentId) const;
 	bool FindDocument(int undoManagerModelId, QByteArray& outUserId, QByteArray& outDocumentId);
-	void InitializeDocumentObservers(
-		WorkingDocument& document,
-		const QByteArray& userId);
+	void InitializeDocumentObservers(WorkingDocument& document, const QByteArray& userId);
 
 	virtual imtbase::IObjectCollection* GetCollection() const = 0;
 	virtual istd::IChangeableSharedPtr CreateObject(const QByteArray& typeId) const = 0;
@@ -101,3 +97,5 @@ private:
 
 
 } // namespace imtdoc
+
+

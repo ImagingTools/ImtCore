@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace gmgrosagql
+namespace imtservergql
 {
 
 
@@ -17,7 +17,8 @@ namespace gmgrosagql
 		typedef ns::CDoUndoGqlRequest DoUndoGqlRequest; \
 		typedef ns::CDoRedoGqlRequest DoRedoGqlRequest; \
 		typedef ns::CResetUndoGqlRequest ResetUndoGqlRequest; \
-	} // namespace gmgrosagql
+	}
+
+} // namespace imtservergql
 
 
-} // namespace gmgrosagql
