@@ -17,6 +17,8 @@ ItemDelegate {
 	property Item containerItem: null;
 	property Item rootItem: null;
 	property int contentLeftMargin: Style.marginM;
+
+	enabled: (model.m_enabled !==undefined && model.m_enabled == false) ? false : true;
 	
 	onHeightChanged: {
 		internal.checkSeparator();
