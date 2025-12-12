@@ -55,3 +55,4 @@ int CCollectionDocumentManagerComp::GetObjectFactoryIndex(const QByteArray& type
 
 } // namespace imtdoc
 
+

@@ -20,9 +20,9 @@ namespace imtlicgql
 
 
 sdl::imtbase::ImtCollection::CImportObjectPayload CProductCollectionControllerComp::OnImportObject(
-		const sdl::imtbase::ImtCollection::CImportObjectGqlRequest& importObjectRequest,
-		const ::imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			const sdl::imtbase::ImtCollection::CImportObjectGqlRequest& importObjectRequest,
+			const ::imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	sdl::imtbase::ImtCollection::CImportObjectPayload response = BaseClass::OnImportObject(importObjectRequest, gqlRequest, errorMessage);
 	if (response.Version_1_0 && response.Version_1_0->success){
@@ -71,10 +71,10 @@ sdl::imtbase::ImtCollection::CImportObjectPayload CProductCollectionControllerCo
 
 
 void CProductCollectionControllerComp::OnAfterSetObjectName(
-	const QByteArray& objectId,
-	const QString& oldName,
-	const QString& newName,
-	const imtgql::CGqlRequest& /*gqlRequest*/) const
+			const QByteArray& objectId,
+			const QString& /*oldName*/,
+			const QString& newName,
+			const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -99,10 +99,10 @@ void CProductCollectionControllerComp::OnAfterSetObjectName(
 // reimplemented (sdl::imtlic::Products::CProductCollectionControllerCompBase)
 
 bool CProductCollectionControllerComp::CreateRepresentationFromObject(
-		const imtbase::IObjectCollectionIterator& objectCollectionIterator,
-		const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
-		sdl::imtlic::Products::CProductItem::V1_0& representationObject,
-		QString& errorMessage) const
+			const imtbase::IObjectCollectionIterator& objectCollectionIterator,
+			const sdl::imtlic::Products::CProductsListGqlRequest& productsListRequest,
+			sdl::imtlic::Products::CProductItem::V1_0& representationObject,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Unable to create representation from object. Error: Attribute 'm_objectCollectionCompPtr' was not set");
@@ -222,9 +222,9 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 
 istd::IChangeableUniquePtr CProductCollectionControllerComp::CreateObjectFromRepresentation(
-		const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
-		QByteArray& newObjectId,
-		QString& errorMessage) const
+			const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
+			QByteArray& newObjectId,
+			QString& errorMessage) const
 {
 	if (!m_productInfoFactCompPtr.IsValid()){
 		errorMessage = QString("Unable to create object from representation. Error: Attribute 'm_productInfoFactCompPtr' was not set");
@@ -256,10 +256,10 @@ istd::IChangeableUniquePtr CProductCollectionControllerComp::CreateObjectFromRep
 
 
 bool CProductCollectionControllerComp::CreateRepresentationFromObject(
-		const istd::IChangeable& data,
-		const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
-		sdl::imtlic::Products::CProductData::V1_0& representationPayload,
-		QString& errorMessage) const
+			const istd::IChangeable& data,
+			const sdl::imtlic::Products::CProductItemGqlRequest& productItemRequest,
+			sdl::imtlic::Products::CProductData::V1_0& representationPayload,
+			QString& errorMessage) const
 {
 	imtlic::CIdentifiableProductInfo* productInfoPtr = const_cast<imtlic::CIdentifiableProductInfo*>(dynamic_cast<const imtlic::CIdentifiableProductInfo*>(&data));
 	if (productInfoPtr == nullptr){
@@ -297,10 +297,10 @@ bool CProductCollectionControllerComp::CreateRepresentationFromObject(
 
 
 bool CProductCollectionControllerComp::UpdateObjectFromRepresentationRequest(
-		const imtgql::CGqlRequest& /*rawGqlRequest*/,
-		const sdl::imtlic::Products::CProductUpdateGqlRequest& productUpdateRequest,
-		istd::IChangeable& object,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& /*rawGqlRequest*/,
+			const sdl::imtlic::Products::CProductUpdateGqlRequest& productUpdateRequest,
+			istd::IChangeable& object,
+			QString& errorMessage) const
 {
 	imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(&object);
 	if (productInfoPtr == nullptr){
@@ -369,10 +369,10 @@ QString CProductCollectionControllerComp::GetExportFileName(const QByteArray& ob
 // private methods
 
 bool CProductCollectionControllerComp::FillObjectFromRepresentation(
-		const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
-		istd::IChangeable& object,
-		QByteArray& objectId,
-		QString& errorMessage) const
+			const sdl::imtlic::Products::CProductData::V1_0& productDataRepresentation,
+			istd::IChangeable& object,
+			QByteArray& objectId,
+			QString& errorMessage) const
 {
 	imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(&object);
 	if (productInfoPtr == nullptr){
