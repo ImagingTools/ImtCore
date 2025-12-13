@@ -346,7 +346,7 @@ bool CUserCollectionControllerComp::CreateRepresentationFromObject(
 {
 	QByteArray objectId = objectCollectionIterator.GetObjectId();
 
-	imtauth::IUserInfo* contextUserInfoPtr = nullptr;
+	const imtauth::IUserInfo* contextUserInfoPtr = nullptr;
 	const imtgql::IGqlContext* gqlContextPtr = usersListRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		contextUserInfoPtr = gqlContextPtr->GetUserInfo();

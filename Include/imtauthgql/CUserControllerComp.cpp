@@ -88,7 +88,7 @@ sdl::imtauth::Users::CChangePasswordPayload CUserControllerComp::OnChangePasswor
 
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
-		imtauth::IUserInfo* contextUserInfoPtr = gqlContextPtr->GetUserInfo();
+		const imtauth::IUserInfo* contextUserInfoPtr = gqlContextPtr->GetUserInfo();
 		if (contextUserInfoPtr != nullptr){
 			ok = contextUserInfoPtr->IsAdmin();
 		}

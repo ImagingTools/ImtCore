@@ -227,7 +227,7 @@ sdl::imtbase::DocumentRevision::CDeleteRevisionResponse CDocumentRevisionControl
 
 	const imtgql::IGqlContext* gqlContextPtr = deleteRevisionRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
-		imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
 			if (!userInfoPtr->IsAdmin()){
 				errorMessage = QString("Unable to delete revision. Error: Invalid permission for user '%1'").arg(userInfoPtr->GetName());

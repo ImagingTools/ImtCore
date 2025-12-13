@@ -105,7 +105,7 @@ void CGqlContext::SetUserId(const QByteArray& userId)
 }
 
 
-imtauth::IUserInfo* CGqlContext::GetUserInfo() const
+const imtauth::IUserInfo* CGqlContext::GetUserInfo() const
 {
 	return m_userInfoPtr.GetPtr();
 }

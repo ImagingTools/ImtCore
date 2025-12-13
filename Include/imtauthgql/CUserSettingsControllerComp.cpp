@@ -41,7 +41,7 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	QByteArray userId;
 	if (gqlContextPtr != nullptr){
-		imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
 			userId = userInfoPtr->GetId();
 		}
@@ -124,7 +124,7 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 	const imtgql::IGqlContext* gqlContextPtr = request.GetRequestContext();
 	QByteArray userId;
 	if (gqlContextPtr != nullptr){
-		imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+		const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
 			userId = userInfoPtr->GetId();
 		}

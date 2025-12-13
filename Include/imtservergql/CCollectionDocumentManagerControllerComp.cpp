@@ -615,7 +615,7 @@ QByteArray CCollectionDocumentManagerControllerComp::GetUserId(const ::imtgql::C
 {
 	const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 	if (contextPtr != nullptr){
-		imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+		const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
 			return userInfoPtr->GetId();
 		}

@@ -40,7 +40,7 @@ imtbase::IOperationContext* COperationContextControllerComp::CreateOperationCont
 		return nullptr;
 	}
 
-	imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(requestContextPtr->GetUserInfo());
+	const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(requestContextPtr->GetUserInfo());
 	if (userInfoPtr == nullptr){
 		SendErrorMessage(0, QString("Unable to create operation context. Error:  User info from GraphQL context is invalid"), "COperationContextControllerComp");
 

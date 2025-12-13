@@ -26,7 +26,7 @@ public:
 	virtual void SetToken(const QByteArray& token) override;
 	virtual QByteArray GetUserId() const override;
 	virtual void SetUserId(const QByteArray& userId) override;
-	virtual imtauth::IUserInfo* GetUserInfo() const override;
+	virtual const imtauth::IUserInfo* GetUserInfo() const override;
 	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) override;
 	virtual Headers GetHeaders() const override;
 	virtual void SetHeaders(const Headers headers) override;
