@@ -23,16 +23,13 @@ public:
 	virtual const imtbase::IObjectCollection* GetCollection() const = 0;
 
 	template <class Object>
-	inline bool GetLinkedObject(std::shared_ptr<Object>& dataObject) const
+	inline bool GetLinkedObject(istd::TSharedInterfacePtr<Object>& dataObject) const
 	{
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (GetLinkedObject(dataPtr)){
-			istd::TDelPtr<Object> objectPtr;
-			objectPtr.SetCastedOrRemove(dataPtr->CloneMe());
+			dataObject.MoveCastedPtr(dataPtr->CloneMe());
 
-			dataObject.reset(objectPtr.PopPtr());
-
-			return (dataObject != nullptr);
+			return dataObject.IsValid();
 		}
 
 		return false;
