@@ -33,17 +33,23 @@ Item {
 	property string negativeAccentColor: Style.errorTextColor;
 	
 	property alias commandsCount: repeater.count;
-	property int visibleCommandsCount: commandsCount
 
 	// params["x"] = X coord click
 	// params["y"] = Y coord click
 	// params["target"] = button reference
 	signal commandActivated(string commandId, var params);
+	signal updateWidth()
 
 	onCommandsModelChanged: {
 		if (commandsModel && commandsModel.m_subElements){
 			repeater.model = commandsModel.m_subElements;
 		}
+	}
+
+	QtObject {
+		id: internal
+		property int initializedButtons: 0
+		property bool layoutReady: false
 	}
 
 	// Clear view
@@ -54,7 +60,23 @@ Item {
 		allElements = []
 		priorityElements = []
 	}
-	
+
+	function calcVisibleCommandsCount(){
+		let retVal = 0
+
+		for (let j = 0; j < allElements.length; j++){
+			if (!allElements[j] || !allElements[j].element){
+				continue
+			}
+
+			if (allElements[j].element.m_visible){
+				retVal++
+			}
+		}
+
+		return retVal
+	}
+
 	function hasHiddenCommands(){
 		for (let j = 0; j < allElements.length; j++){
 			if (!allElements[j] || !allElements[j].element){
@@ -68,14 +90,19 @@ Item {
 		
 		return false;
 	}
-	
+
 	// The function checks whether the commands fit into the maximum width of this view
 	// If they do not fit, then we hide the command with the lowest priority
 	function checkWidth(){
+		if (!internal.layoutReady){
+			return
+		}
+
 		let maxWidth = Math.max(0, maximumWidth);
 		let totalWidth = 0;
 		let spacing = 1.3*content_.spacing;
 
+		console.log("checkWidth", maxWidth)
 		for (let i = 0; i < priorityElements.length; i++) {
 			let item = priorityElements[i];
 			if (item.element){
@@ -83,8 +110,6 @@ Item {
 			}
 		}
 
-		visibleCommandsCount = 0
-		
 		for (let i = 0; i < priorityElements.length; i++) {
 			let item = priorityElements[i];
 			if (!item.element || item.priority < 0 || !item.element.m_visible)
@@ -96,7 +121,6 @@ Item {
 			
 			if (projectedWidth <= maxWidth) {
 				item.hidden = false
-				visibleCommandsCount++
 				totalWidth = projectedWidth;
 			}
 			else {
@@ -109,9 +133,15 @@ Item {
 		id: content_;
 		height: commandsItem.height;
 		spacing: Style.marginM;
-		
+		onWidthChanged: {
+			if (visible){
+				// commandsItem.updateWidth()
+			}
+		}
+
 		Repeater {
 			id: repeater;
+
 			delegate: Component { MenuButton {
 					id: button;
 					objectName: model.item ? model.item.m_elementId + "Button" : "Button"
@@ -130,12 +160,6 @@ Item {
 							button.checkHidden()
 							commandsItem.checkWidth()
 						}
-
-						// function onM_visibleChanged(){
-						// 	if (!target.visible){
-						// 		commandsItem.visibleCommandsCount--
-						// 	}
-						// }
 					}
 
 					property bool hidden: false
@@ -207,9 +231,17 @@ Item {
 					}
 
 					onWidthChanged: {
-						maxWidth = Math.max(maxWidth, width);
+						if (visible){
+							maxWidth = Math.max(maxWidth, width);
+							if (maxWidth > 0){
+								internal.initializedButtons++
+								if (internal.initializedButtons === commandsItem.commandsCount) {
+									internal.layoutReady = true
+									commandsItem.updateWidth()
+								}
+							}
+						}
 					}
-
 				}
 			}
 			
