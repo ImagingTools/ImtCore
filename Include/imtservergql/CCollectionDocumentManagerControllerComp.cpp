@@ -21,20 +21,18 @@ CDM::CDocumentList CCollectionDocumentManagerControllerComp::OnGetOpenedDocument
 	if (m_documentManagerCompPtr.IsValid()){
 		QByteArray userId = GetUserId(gqlRequest);
 
-		if (!userId.isEmpty()){
-			imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
-			for (const imtdoc::IDocumentManager::DocumentInfo& info : list){
-				CDM::CDocumentInfo sdlInfo;
-				sdlInfo.Version_1_0.emplace();
+		imtdoc::IDocumentManager::DocumentList list = m_documentManagerCompPtr->GetOpenedDocumentList(userId);
+		for (const imtdoc::IDocumentManager::DocumentInfo& info : list){
+			CDM::CDocumentInfo sdlInfo;
+			sdlInfo.Version_1_0.emplace();
 
-				sdlInfo.Version_1_0->documentId = info.documentId;
-				sdlInfo.Version_1_0->documentName = info.documentName;
-				sdlInfo.Version_1_0->objectId = info.objectId;
-				sdlInfo.Version_1_0->objectTypeId = info.objectTypeId;
-				sdlInfo.Version_1_0->isDirty = info.isDirty;
+			sdlInfo.Version_1_0->documentId = info.documentId;
+			sdlInfo.Version_1_0->documentName = info.documentName;
+			sdlInfo.Version_1_0->objectId = info.objectId;
+			sdlInfo.Version_1_0->objectTypeId = info.objectTypeId;
+			sdlInfo.Version_1_0->isDirty = info.isDirty;
 
-				retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
-			}
+			retVal.Version_1_0->documentList->append(sdlInfo.Version_1_0);
 		}
 	}
 
@@ -60,9 +58,7 @@ CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnCreateNewDocument(
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
@@ -98,9 +94,7 @@ CDM::CDocumentId CCollectionDocumentManagerControllerComp::OnOpenDocument(
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	QUrl url(QString("collection:///%1").arg(*objectId->id));
@@ -138,9 +132,7 @@ CDM::CDocumentInfo CCollectionDocumentManagerControllerComp::OnGetDocumentName(
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
@@ -190,9 +182,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSetDoc
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	retVal.Version_1_0.emplace();
@@ -243,9 +233,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnSaveDo
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	retVal.Version_1_0.emplace();
@@ -296,9 +284,7 @@ CDM::CDocumentOperationStatus CCollectionDocumentManagerControllerComp::OnCloseD
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	retVal.Version_1_0.emplace();
@@ -351,11 +337,7 @@ sdl::imtbase::UndoManager::CUndoInfo CCollectionDocumentManagerControllerComp::O
 
 	QByteArray userId = GetUserId(gqlRequest);
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		retVal.Version_1_0->status->status = sdl::imtbase::UndoManager::EUndoStatus::Failed;
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
@@ -427,11 +409,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerControllerComp:
 	QByteArray userId = GetUserId(gqlRequest);
 
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::InvalidUserId;
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
@@ -500,11 +478,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerControllerComp:
 	QByteArray userId = GetUserId(gqlRequest);
 
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::InvalidUserId;
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {
@@ -563,11 +537,7 @@ sdl::imtbase::UndoManager::CUndoStatus CCollectionDocumentManagerControllerComp:
 	QByteArray userId = GetUserId(gqlRequest);
 
 	if (userId.isEmpty()){
-		errorMessage = "Unable to get user-ID from context";
-
-		retVal.Version_1_0->status = sdl::imtbase::UndoManager::EUndoStatus::InvalidUserId;
-
-		return retVal;
+		SendWarningMessage(0, "Unable to get user-ID from context");
 	}
 
 	if (m_documentManagerCompPtr.IsValid()) {

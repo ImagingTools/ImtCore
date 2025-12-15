@@ -16,7 +16,7 @@ namespace ImtDocPck
 {
 
 
-typedef imtdoc::CCollectionDocumentManagerComp CollectionDocumentManager;
+typedef icomp::TModelCompWrap<imtdoc::CCollectionDocumentManagerComp> CollectionDocumentManager;
 
 
 } // namespace ImtDocPck

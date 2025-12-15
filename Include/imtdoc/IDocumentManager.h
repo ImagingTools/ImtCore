@@ -7,6 +7,7 @@
 // ACF includes
 #include <idoc/IUndoManager.h>
 #include <iser/ISerializable.h>
+#include <imod/IObserver.h>
 
 
 namespace imtdoc
@@ -112,6 +113,8 @@ public:
 	virtual OperationStatus CloseDocument(const QByteArray& userId, const QByteArray& documentId) = 0;
 	virtual OperationStatus GetDocumentUndoManager(
 		const QByteArray& userId, const QByteArray& documentId, idoc::IUndoManager*& undoManagerPtr) const = 0;
+	virtual OperationStatus RegisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) = 0;
+	virtual OperationStatus UnregisterDocumentObserver(const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer) = 0;
 };
 
 

@@ -151,8 +151,6 @@ void CCollectionDocumentManagerPublisherComp::OnUpdate(const istd::IChangeable::
 		return;
 	}
 
-	Q_ASSERT(!userId.isEmpty());
-
 	PublishRepresentation(
 		QByteArrayLiteral("On") + *m_collectionIdAttrPtr + QByteArrayLiteral("DocumentChanged"),
 		userId,

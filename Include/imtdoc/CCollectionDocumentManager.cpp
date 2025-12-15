@@ -270,19 +270,7 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::SetDocumentData(co
 
 	bool res = m_userDocuments[userId][documentId].objectPtr->CopyFrom(document);
 
-	if (res) {
-		DocumentNotificationPtr notificationPtr = CreateDocumentNotification(userId, documentId);
-		Q_ASSERT(notificationPtr != nullptr);
-		if (notificationPtr != nullptr){
-			istd::IChangeable::ChangeSet changeSet(CF_DOCUMENT_CHANGED);
-			changeSet.SetChangeInfo(CN_DOCUMENT_CHANGED, QVariant::fromValue(*notificationPtr));
-			istd::CChangeNotifier notifier(this, &changeSet);
-		}
-
-		return OS_OK;
-	}
-
-	return OS_FAILED;
+	return res ? OS_OK : OS_FAILED;
 }
 
 
@@ -419,6 +407,64 @@ IDocumentManager::OperationStatus CCollectionDocumentManager::GetDocumentUndoMan
 	}
 
 	undoManagerPtr = m_userDocuments[userId][documentId].undoManagerPtr.GetPtr();
+
+	return OS_OK;
+}
+
+
+IDocumentManager::OperationStatus CCollectionDocumentManager::RegisterDocumentObserver(
+	const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer)
+{
+	istd::IChangeableSharedPtr objectPtr;
+	{
+		QMutexLocker locker(&m_mutex);
+
+		OperationStatus retVal;
+		if (!ValidateInputParams(userId, documentId, retVal)){
+			return retVal;
+		}
+
+		objectPtr = m_userDocuments[userId][documentId].objectPtr;
+	}
+
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(objectPtr.GetPtr());
+	if (modelPtr == nullptr){
+		return OS_FAILED;
+	}
+
+	if (modelPtr->IsAttached(&observer)){
+		return OS_FAILED;
+	}
+
+	return modelPtr->AttachObserver(&observer) ? OS_OK : OS_FAILED;
+}
+
+
+IDocumentManager::OperationStatus CCollectionDocumentManager::UnregisterDocumentObserver(
+	const QByteArray& userId, const QByteArray& documentId, imod::IObserver& observer)
+{
+	istd::IChangeableSharedPtr objectPtr;
+	{
+		QMutexLocker locker(&m_mutex);
+
+		OperationStatus retVal;
+		if (!ValidateInputParams(userId, documentId, retVal)){
+			return retVal;
+		}
+
+		objectPtr = m_userDocuments[userId][documentId].objectPtr;
+	}
+
+	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(objectPtr.GetPtr());
+	if (modelPtr == nullptr){
+		return OS_FAILED;
+	}
+
+	if (!modelPtr->IsAttached(&observer)){
+		return OS_FAILED;
+	}
+
+	modelPtr->DetachObserver(&observer);
 
 	return OS_OK;
 }
