@@ -4,11 +4,11 @@ include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 target_link_libraries(${PROJECT_NAME}
 	imtrepo
 	imtcom
-	imtdoc
 	imtrest
 	imtfile
 	imtservergql
 	imtserverapp
+	imtdoc
 	imthype
 	imtgql
 	imtcol
