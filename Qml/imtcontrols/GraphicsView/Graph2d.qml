@@ -291,7 +291,7 @@ Rectangle{
 					return
 				}
 
-				let scale_ = gridWidth/ delta
+				let scale_ = delta > 0 ? gridWidth/ delta : 1
 				graph.xScale = (graph.xScale * scale_)
 				setLayersParams()
 				graph.wasFitToWidth = true

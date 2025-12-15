@@ -445,9 +445,18 @@ Rectangle {
 			}
 		}
 
-		let zoomX = (clipRectWidth - margin_)/((maxX - minX)!==0 ? Math.abs(maxX - minX) : 1)
-		let zoomY = (clipRectHeight - margin_)/((maxY - minY)!==0 ? Math.abs(maxY - minY) : 1)
-		let zoom = Math.min(zoomX, zoomY)
+		let zoomX = 1
+		let zoomY = 1
+		let zoom
+		let tolerance = 0.0001
+		if((maxX - minX) > tolerance && (maxY - minY) > tolerance){
+			zoomX = (clipRectWidth - margin_)/((maxX - minX)!==0 ? Math.abs(maxX - minX) : 1)
+			zoomY = (clipRectHeight - margin_)/((maxY - minY)!==0 ? Math.abs(maxY - minY) : 1)
+			zoom = Math.min(zoomX, zoomY)
+		}
+		else {
+			zoom = 1.05
+		}
 
 		graphicsView.setZoom(zoom)
 
