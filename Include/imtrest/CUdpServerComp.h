@@ -82,6 +82,7 @@ private:
 
 private Q_SLOTS:
 	void ReadPendingDatagrams();
+    void SendedResponse(QByteArray);
 
 private:
 	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);

@@ -20,6 +20,7 @@ CUdpSender::CUdpSender(CUdpRequest* request)
 	m_socket = request->m_socket;
 	m_address = request->m_address;
 	m_port = request->m_port;
+    m_requestId = request->GetRequestId();
 }
 
 
@@ -31,18 +32,11 @@ bool CUdpSender::SendResponse(ConstResponsePtr& response) const
 		return false;
 	}
 
-	// int protocolStatusCode = -1;
-	// QByteArray statusLiteral;
-
-	// bool retVal = response->GetProtocolEngine().GetProtocolStatusCode(response->GetStatusCode(), protocolStatusCode, statusLiteral);
-	// if (!retVal){
-	// 	return false;
-	// }
-
 	const QByteArray& contentData = response->GetData();
+    bool result =m_socket->writeDatagram(contentData,m_address,m_port);
+    Q_EMIT sended(m_requestId);
 
-
-	return m_socket->writeDatagram(contentData,m_address,m_port);
+    return result;
 }
 
 

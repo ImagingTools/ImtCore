@@ -78,11 +78,12 @@ void CUdpServerComp::OnComponentCreated()
 
 const ISender* CUdpServerComp::GetSender(const QByteArray& requestId) const
 {
+    if(m_requests.GetCount()==0) return nullptr;
 	for (int i=0;i< m_requests.GetCount();i++){
 		if (m_requests.GetAt(i)->GetRequestId() == requestId){
 			CUdpSender *sender;
 			sender = new CUdpSender(m_requests.GetAt(i));
-			//m_requests.(i);
+            connect(sender,SIGNAL(CUdpSender::sended(QByteArray)),this,SLOT(&CUdpServerComp::SendedResponse(QByteArray)));
 			return sender;
 		}
 	}
@@ -117,7 +118,7 @@ IServer::ServerStatus CUdpServerComp::GetServerStatus() const
 
 bool CUdpServerComp::StartListening(const QHostAddress &address, quint16 port)
 {
-	if(m_udpSocket.bind(QHostAddress::LocalHost, port)){
+    if(m_udpSocket.bind(QHostAddress::Any, port)){
 		connect(
 					&m_udpSocket,
 					&QUdpSocket::readyRead,
@@ -133,22 +134,34 @@ bool CUdpServerComp::StartListening(const QHostAddress &address, quint16 port)
 
 void CUdpServerComp::ReadPendingDatagrams()
 {
+    int i;
 	while (m_udpSocket.hasPendingDatagrams()) {
 		QNetworkDatagram datagram = m_udpSocket.receiveDatagram();
-		CUdpRequest req(
+        CUdpRequest*req = new CUdpRequest(
 					*m_requestHandlerCompPtr.GetPtr(),
 					*m_protocolEngineCompPtr.GetPtr(),
 					&m_udpSocket,
 					datagram.senderAddress(),
 					datagram.senderPort());
 
-		m_requests.PushBack(&req);
-
-		ConstResponsePtr resp = m_requestHandlerCompPtr->ProcessRequest(req, datagram.data());
+         m_requests.PushBack(req);
+        QByteArray data =datagram.data();
+        qDebug()<<"UDP datagramma"<<data.toHex();
+        req->SetBody(data);
+        ConstResponsePtr resp = m_requestHandlerCompPtr->ProcessRequest(*req, datagram.data());
 		//m_udpSocket.writeDatagram(datagram.makeReply(resp->GetData()));
 	}
 }
 
+
+void CUdpServerComp::SendedResponse(QByteArray requestId)
+{
+    for (int i=0;i< m_requests.GetCount();i++){
+        if (m_requests.GetAt(i)->GetRequestId() == requestId){
+            m_requests.RemoveAt(i);
+        }
+    }
+}
 
 bool CUdpServerComp::EnsureServerStarted()
 {
