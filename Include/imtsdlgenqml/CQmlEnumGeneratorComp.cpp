@@ -282,7 +282,7 @@ bool CQmlEnumGeneratorComp::AddQrcEntry(const imtsdl::CSdlEnum& sdlEnum, iprm::C
 
 		return false;
 	}
-
+	
 	return true;
 }
 

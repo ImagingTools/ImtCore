@@ -54,7 +54,7 @@ istd::IChangeable* CReportDocument::InsertPage(
 		m_documentPages.insert(position, newPage);
 	}
 
-	return pageContentPtr;
+	return newPage.pagePtr.GetPtr();
 }
 
 
