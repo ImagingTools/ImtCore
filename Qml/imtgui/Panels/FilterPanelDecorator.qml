@@ -75,7 +75,7 @@ DecoratorBase {
 	}
 
 	Connections {
-		target: filterPanelDecorator.documentFilters
+		target: filterPanelDecorator.documentFilter
 		function onFilterChanged(){
 			filterPanelDecorator.baseElement.filterChanged()
 		}
@@ -217,7 +217,7 @@ DecoratorBase {
 			name: qsTr("Document State")
 
 			property DocCollectionFilter documentFilter: null
-			
+
 			Component.onCompleted: {
 				createAndAddOption("Active", qsTr("Active"), "", true)
 				createAndAddOption("Disabled", qsTr("Disabled"), "", true)
