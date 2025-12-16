@@ -675,7 +675,7 @@ class ListView extends Flickable {
             }
         }
 
-        if(this.getProperty('contentWIdth').subscribers.indexOf(this.getProperty('width')) >= 0){
+        if(this.getProperty('contentWidth').subscribers.indexOf(this.getProperty('width')) >= 0){
             this.getProperty('width').updating = false
             this.getProperty('width').update()
         }
