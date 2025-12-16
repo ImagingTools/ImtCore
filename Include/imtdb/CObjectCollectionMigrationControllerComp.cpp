@@ -4,8 +4,6 @@
 // Qt includes
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
-// #include <QtCore/QDir>
-// #include <QtCore/QRegularExpression>
 
 
 namespace imtdb
@@ -15,7 +13,6 @@ namespace imtdb
 // protected methods
 
 // reimplemented (imtdb::IMigrationController)
-
 
 bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, const istd::CIntRange& subRange) const
 {
@@ -40,14 +37,14 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 	if (subRange.IsValid()){
 		endIndex = subRange.GetMaxValue();
 	}
-	
+
 	QFile scriptFile(":/SQL/CreateCollectionTable.sql");
 	if (!scriptFile.open(QFile::ReadOnly)){
 		SendErrorMessage(0, QT_TR_NOOP(QString("Collection table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
-		
+
 		return false;
 	}
-	
+
 	QByteArray createTableQuery = scriptFile.readAll();
 	scriptFile.close();
 
@@ -56,14 +53,14 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 		if (sqlDatabaseObjectDelegatePtr == nullptr){
 			continue;
 		}
-		
+
 		QByteArray query = createTableQuery;
 		QByteArray tableScheme = sqlDatabaseObjectDelegatePtr->GetTableScheme();
 
 		if (!tableScheme.isEmpty()){
 			query.replace("${TableScheme}", tableScheme);
 		}
-		else {
+		else{
 			query.replace("${TableScheme}", "public");
 		}
 
@@ -79,10 +76,10 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 						<< "\n\t| Query: " << query;
 
 			SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Table could not be created"
-												   "\n\t| Error: %1"
-												   "\n\t| Query: %2")
-											   .arg(sqlError.text(), qPrintable(query))));
-			
+													"\n\t| Error: %1"
+													"\n\t| Query: %2")
+												.arg(sqlError.text(), qPrintable(query))));
+
 			return false;
 		}
 	}

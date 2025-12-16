@@ -87,11 +87,13 @@ void CUserActionDatabaseDelegateComp::OnComponentCreated()
 				SendErrorMessage(0, QT_TR_NOOP(QString("Collection table creation script '%1'could not be loaded").arg(scriptFile.fileName())));
 				return;
 			}
-	
+
 			QByteArray createTableQuery = scriptFile.readAll();
 			scriptFile.close();
-	
+
 			createTableQuery.replace("${TableName}", tableName.toUtf8());
+			createTableQuery.replace("${TableScheme}", "public");
+
 			QSqlError sqlError;
 			m_databaseEngineCompPtr->ExecSqlQuery(createTableQuery, &sqlError);
 	
@@ -102,9 +104,9 @@ void CUserActionDatabaseDelegateComp::OnComponentCreated()
 							<< "\n\t| Query: " << createTableQuery;
 	
 				SendErrorMessage(0, QT_TR_NOOP(QString("\n\t| Table could not be created"
-													   "\n\t| Error: %1"
-													   "\n\t| Query: %2")
-												   .arg(sqlError.text(), qPrintable(createTableQuery))));
+														"\n\t| Error: %1"
+														 "\n\t| Query: %2")
+													.arg(sqlError.text(), qPrintable(createTableQuery))));
 			}
 		}
 	}
