@@ -77,7 +77,7 @@ Item {
 		id: timer;
 		interval: 50
 		onTriggered: {
-			if (commandsItem){
+			if (commandsItem.visible){
 				commandsItem.checkCommandsWidth();
 				commandsItem.checkButtonVisible();
 			}

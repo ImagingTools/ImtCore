@@ -48,8 +48,15 @@ Item {
 
 	QtObject {
 		id: internal
-		property int initializedButtons: 0
 		property bool layoutReady: false
+		property var initializedButtons: []
+
+		function checkNeedUpdateWidth(){
+			if (internal.initializedButtons.length === repeater.count){
+				internal.layoutReady = true
+				commandsItem.updateWidth()
+			}
+		}
 	}
 
 	// Clear view
@@ -94,7 +101,7 @@ Item {
 	// The function checks whether the commands fit into the maximum width of this view
 	// If they do not fit, then we hide the command with the lowest priority
 	function checkWidth(){
-		if (!internal.layoutReady){
+		if (!internal.layoutReady || commandsCount === 0){
 			return
 		}
 
@@ -102,7 +109,6 @@ Item {
 		let totalWidth = 0;
 		let spacing = 1.3*content_.spacing;
 
-		console.log("checkWidth", maxWidth)
 		for (let i = 0; i < priorityElements.length; i++) {
 			let item = priorityElements[i];
 			if (item.element){
@@ -128,19 +134,17 @@ Item {
 			}
 		}
 	}
-	
+
 	Row {
 		id: content_;
 		height: commandsItem.height;
 		spacing: Style.marginM;
-		onWidthChanged: {
-			if (visible){
-				// commandsItem.updateWidth()
-			}
-		}
 
 		Repeater {
 			id: repeater;
+			onCountChanged: {
+				internal.checkNeedUpdateWidth()
+			}
 
 			delegate: Component { MenuButton {
 					id: button;
@@ -231,14 +235,11 @@ Item {
 					}
 
 					onWidthChanged: {
-						if (visible){
-							maxWidth = Math.max(maxWidth, width);
-							if (maxWidth > 0){
-								internal.initializedButtons++
-								if (internal.initializedButtons === commandsItem.commandsCount) {
-									internal.layoutReady = true
-									commandsItem.updateWidth()
-								}
+						maxWidth = Math.max(maxWidth, width);
+						if (maxWidth > 0 && element){
+							if (!internal.initializedButtons.includes(element.m_elementId)){
+								internal.initializedButtons.push(element.m_elementId)
+								internal.checkNeedUpdateWidth()
 							}
 						}
 					}
