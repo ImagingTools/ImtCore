@@ -178,7 +178,7 @@ QtObject {
 	function getAccessToken(){
 		return userTokenProvider.accessToken;
 	}
-	
+
 	function setAccessToken(token){
 		if (userTokenProvider.isTokenGlobal){
 			userTokenProvider.authorizationGqlModel.SetGlobalAccessToken(token);
@@ -303,9 +303,10 @@ QtObject {
 						
 						root.setAccessToken(m_userSession.m_accessToken);
 						
-						if (Qt.platform.os == "web"){
+						if (Qt.platform.os === "web"){
 							XMLHttpRequest.QMLAuthToken = m_userSession.m_accessToken
 							XMLHttpRequest.QMLAuthRefreshToken = m_userSession.m_refreshToken
+							root.saveDataToStorage()
 						}
 					}
 				}

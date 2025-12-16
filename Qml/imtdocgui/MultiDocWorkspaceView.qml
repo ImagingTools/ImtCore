@@ -175,6 +175,10 @@ Item {
 		}
 	}
 	
+	function setCurrentTabIndex(index){
+		tabView.currentIndex = index
+	}
+
 	function openErrorDialog(message){
 		ModalDialogManager.showErrorDialog(message)
 	}
