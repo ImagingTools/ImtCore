@@ -11,6 +11,15 @@ class BaseModel extends ListModel {
 		internalModelChanged: { type:Signal, args: ['name', 'sender'] },
     })
 
+	escapeSpecialChars(jsonString) {
+		return jsonString.replace(/\\/g, "\\\\")
+		.replace(/\"/g, "\\\"")
+		.replace(/\n/g, "\\n")
+		.replace(/\r/g, "\\r")
+		.replace(/\t/g, "\\t")
+		.replace(/\f/g, "\\f")
+	}
+
 	getProperties(item){
 		let meta = item.__self.constructor.meta
 		let list = []
@@ -48,7 +57,7 @@ class BaseModel extends ListModel {
 							}
 
 							if (typeof item[key][k] === "string"){
-								json += "\"" + item[key][k] + "\""
+								json += "\"" + this.escapeSpecialChars(item[key][k]) + "\""
 							}
 							else{
 								json += item[key][k]
@@ -67,8 +76,7 @@ class BaseModel extends ListModel {
 					}
 					let safeValue = item[key]
 					if (typeof safeValue === 'string'){
-						safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
-						safeValue = safeValue.replace(/\"/g,'\u005C"')
+						safeValue = this.escapeSpecialChars(safeValue)
 					}
 
 					json += '"' + item.getJSONKeyForProperty(key) + '":' + (typeof item[key] === 'string' ? '"' + safeValue + '"' : value)
@@ -107,7 +115,7 @@ class BaseModel extends ListModel {
 							}
 
 							if (typeof item[key][k] === "string"){
-								graphQL += "\"" + item[key][k] + "\""
+								graphQL += "\"" + this.escapeSpecialChars(item[key][k]) + "\""
 							}
 							else{
 								graphQL += item[key][k]
@@ -124,7 +132,8 @@ class BaseModel extends ListModel {
 					if (value === undefined){
 						value = null
 					}
-					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + item[key] + '"' : value)
+
+					graphQL += item.getJSONKeyForProperty(key) + ':' + (typeof item[key] === 'string' ? '"' + this.escapeSpecialChars(item[key]) + '"' : value)
 				}
 				if(j < list.length - 1) graphQL += ','
 			}

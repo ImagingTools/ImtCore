@@ -310,8 +310,7 @@ class BaseClass extends QtObject {
 				}
 				let safeValue = this[key]
 				if (typeof safeValue === 'string') {
-					safeValue = safeValue.replace(/\\/g, '\u005C\u005C')
-					safeValue = safeValue.replace(/\"/g, '\u005C"')
+					safeValue = this.escapeSpecialChars(safeValue)
 				}
 
 				json += '"' + this.getJSONKeyForProperty(key) + '":' + (typeof this[key] === 'string' ? '"' + safeValue + '"' : value)
@@ -345,7 +344,7 @@ class BaseClass extends QtObject {
 						}
 
 						if (typeof this[key][j] === "string") {
-							graphQL += "\"" + this[key][j] + "\""
+							graphQL += "\"" + this.escapeSpecialChars(this[key][j]) + "\""
 						}
 						else {
 							graphQL += this[key][j]
@@ -366,15 +365,9 @@ class BaseClass extends QtObject {
 				graphQL += this.getJSONKeyForProperty(key) + ':';
 				if (typeof this[key] === 'string') {
 					let data = this[key];
-
-					data = data.replace(/\\/g, "\\\\")
-					data = data.replace(/\"/g, "\\\"")
-					data = data.replace(/\r/g, "\\\\r")
-					data = data.replace(/\n/g, "\\\\n")
-					data = data.replace(/\t/g, "\\\\t")
-
+					
 					graphQL += '"'
-					graphQL += data
+					graphQL += this.escapeSpecialChars(data)
 					graphQL += '"'
 				}
 				else {
@@ -389,7 +382,7 @@ class BaseClass extends QtObject {
 	fromJSON(json) {
 		let obj;
 		try {
-			obj = JSON.parse(this.escapeSpecialChars(json))
+			obj = JSON.parse(json.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t").replace(/\f/g, "\\f"))
 		} catch (e) {
 			console.error(e)
 			return false
@@ -399,7 +392,9 @@ class BaseClass extends QtObject {
 	}
 
 	escapeSpecialChars(jsonString) {
-		return jsonString.replace(/\n/g, "\\n")
+		return jsonString.replace(/\\/g, "\\\\")
+		.replace(/\"/g, "\\\"")
+		.replace(/\n/g, "\\n")
 		.replace(/\r/g, "\\r")
 		.replace(/\t/g, "\\t")
 		.replace(/\f/g, "\\f")
