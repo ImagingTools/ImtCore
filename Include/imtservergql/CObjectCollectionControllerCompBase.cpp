@@ -600,7 +600,10 @@ sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload CObjectCollectionContr
 		return sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload();
 	}
 
+	istd::CChangeGroup changeGroup(m_objectCollectionCompPtr.GetPtr());
 	if (!m_objectCollectionCompPtr->SetElementDescription(objectId, description)){
+		changeGroup.Reset();
+
 		errorMessage = QString("Unable to set description '%1' for element with ID: '%2'").arg(description, QString::fromUtf8(objectId));
 		return sdl::imtbase::ImtCollection::CSetObjectDescriptionPayload();
 	}
