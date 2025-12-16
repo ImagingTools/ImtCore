@@ -276,6 +276,16 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableName() const
 }
 
 
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetTableScheme() const
+{
+	if (m_tableSchemaAttrPtr.IsValid()){
+		return *m_tableSchemaAttrPtr;
+	}
+
+	return QByteArray();
+}
+
+
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateRestoreObjectsQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const imtbase::ICollectionInfo::Ids& /*objectIds*/,

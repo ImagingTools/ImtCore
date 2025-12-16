@@ -5,7 +5,7 @@ BEGIN
    END IF;
 END $$;
 
-CREATE TABLE IF NOT EXISTS "${TableName}"
+CREATE TABLE IF NOT EXISTS ${TableScheme}."${TableName}"
 (
     "Id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "DocumentId" UUID NOT NULL,
@@ -21,14 +21,14 @@ CREATE TABLE IF NOT EXISTS "${TableName}"
 );
 
 CREATE INDEX IF NOT EXISTS "${TableName}DocumentIdIndex"
-    ON public."${TableName}" USING btree
+    ON ${TableScheme}."${TableName}" USING btree
     ("DocumentId" ASC NULLS LAST)
     TABLESPACE pg_default;
 
 CREATE INDEX IF NOT EXISTS "${TableName}StateIndex"
-    ON public."${TableName}" USING btree
+    ON ${TableScheme}."${TableName}" USING btree
     ("State" ASC NULLS LAST)
     TABLESPACE pg_default;
 
 CREATE INDEX IF NOT EXISTS "${TableName}RevisionNumberIndex"
-    ON public."${TableName}" ((("RevisionInfo"->>'RevisionNumber')::int));
+    ON ${TableScheme}."${TableName}" ((("RevisionInfo"->>'RevisionNumber')::int));

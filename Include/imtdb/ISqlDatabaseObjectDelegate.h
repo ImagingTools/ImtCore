@@ -58,6 +58,11 @@ public:
 		Get name of the collection table in the SQL database.
 	*/
 	virtual QByteArray GetTableName() const = 0;
+
+	/**
+		Get scheme of the collection table in the SQL database.
+	*/
+	virtual QByteArray GetTableScheme() const = 0;
 };
 
 

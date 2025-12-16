@@ -58,6 +58,14 @@ bool CObjectCollectionMigrationControllerComp::DoMigration(int& resultRevision, 
 		}
 		
 		QByteArray query = createTableQuery;
+		QByteArray tableScheme = sqlDatabaseObjectDelegatePtr->GetTableScheme();
+
+		if (!tableScheme.isEmpty()){
+			query.replace("${TableScheme}", tableScheme);
+		}
+		else {
+			query.replace("${TableScheme}", "public");
+		}
 
 		query.replace("${TableName}", sqlDatabaseObjectDelegatePtr->GetTableName());
 
