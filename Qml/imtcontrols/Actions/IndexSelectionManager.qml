@@ -37,125 +37,145 @@ QtObject {
 		\param selectedIndexes The new array of selected item indexes.
 	*/
 	signal selectionChanged(var selectedIndexes)
-	
+
+	/* ---------- Helpers ---------- */
+
+	function arraysEqual(a, b){
+		if (a.length !== b.length)
+			return false
+
+		for (let i = 0; i < a.length; ++i){
+			if (a[i] !== b[i])
+				return false
+		}
+		return true
+	}
+
+	function emitIfChanged(prev, beQuiet){
+		if (arraysEqual(prev, selectedIndexes))
+			return
+
+		if (!beQuiet)
+			selectionChanged(selectedIndexes)
+	}
+
+	/* ---------- API ---------- */
+
 	/*!
 		\qmlmethod void singleSelect(int index)
-		Selects a single item by its index, clearing any previous selection.
-		Also updates \l focusedIndex and \l firstSelectedIndex to the selected index.
-		Emits the \l selectionChanged signal.
-		\param index The index of the item to select.
 	*/
 	function singleSelect(index, beQuiet){
+		let prev = selectedIndexes.slice()
+
+		if (prev.length === 1 && prev[0] === index)
+			return
+
 		selectedIndexes = [index]
 		focusedIndex = index
 		firstSelectedIndex = index
-		if (!beQuiet){
-			selectionChanged(selectedIndexes)
-		}
+
+		emitIfChanged(prev, beQuiet)
 	}
-	
+
 	/*!
 		\qmlmethod void toggleSelect(int index)
-		Toggles the selection state of the item with the specified index.
-		If the item is not selected, it is added to the selection.
-		If it is already selected, it is removed.
-		Updates \l focusedIndex and \l firstSelectedIndex to the toggled index.
-		Emits the \l selectionChanged signal.
-		\param index The index of the item to toggle.
 	*/
 	function toggleSelect(index, beQuiet){
+		let prev = selectedIndexes.slice()
 		let idx = selectedIndexes.indexOf(index)
+
 		if (idx === -1){
 			selectedIndexes.push(index)
-		} 
+		}
 		else{
+			if (!multiSelect && selectedIndexes.length === 1)
+				return
+
 			selectedIndexes.splice(idx, 1)
 		}
+
+		if (arraysEqual(prev, selectedIndexes))
+			return
+
 		focusedIndex = index
 		firstSelectedIndex = index
-		if (!beQuiet){
+
+		if (!beQuiet)
 			selectionChanged(selectedIndexes)
-		}
 	}
-	
+
 	/*!
 		\qmlmethod void selectMultiple(array indexes)
-		Selects multiple items by their indexes.
-		Does nothing if \l multiSelect is false.
-		Updates \l selectedIndexes with the provided indexes.
-		Sets \l focusedIndex to the last index in the array and \l firstSelectedIndex to the first.
-		Emits the \l selectionChanged signal.
-		\param indexes An array of item indexes to select.
 	*/
 	function selectMultiple(indexes, beQuiet){
-		if (!beQuiet){
-			beQuiet = false
-		}
+		if (!multiSelect)
+			return
 
-		if (!multiSelect) return
-		selectedIndexes = indexes.slice()
-		if (indexes.length > 0){
-			focusedIndex = indexes[indexes.length - 1]
-			firstSelectedIndex = indexes[0]
-		} else {
+		let prev = selectedIndexes.slice()
+		let next = indexes.slice()
+
+		if (arraysEqual(prev, next))
+			return
+
+		selectedIndexes = next
+
+		if (next.length > 0){
+			focusedIndex = next[next.length - 1]
+			firstSelectedIndex = next[0]
+		}
+		else{
 			focusedIndex = -1
 			firstSelectedIndex = -1
 		}
-		
-		if (!beQuiet){
+
+		if (!beQuiet)
 			selectionChanged(selectedIndexes)
-		}
 	}
-	
+
+	/*!
+		\qmlmethod void rangeSelect(int from, int to)
+	*/
+	function rangeSelect(from, to, beQuiet){
+		if (!multiSelect)
+			return
+
+		let start = Math.min(from, to)
+		let end = Math.max(from, to)
+
+		let range = []
+		for (let i = start; i <= end; ++i)
+			range.push(i)
+
+		if (arraysEqual(selectedIndexes, range))
+			return
+
+		selectedIndexes = range
+		firstSelectedIndex = from
+		focusedIndex = to
+
+		if (!beQuiet)
+			selectionChanged(selectedIndexes)
+	}
+
 	/*!
 		\qmlmethod void clear()
-		Clears the current selection and resets \l focusedIndex and \l firstSelectedIndex.
-		Emits the \l selectionChanged signal.
 	*/
 	function clear(beQuiet){
-		if (!beQuiet){
-			beQuiet = false
-		}
+		if (selectedIndexes.length === 0)
+			return
 
 		selectedIndexes = []
 		focusedIndex = -1
 		firstSelectedIndex = -1
 
-		if (!beQuiet){
+		if (!beQuiet)
 			selectionChanged(selectedIndexes)
-		}
 	}
-	
+
 	/*!
 		\qmlmethod bool isSelected(int index)
-		Returns true if the item with the given index is currently selected, otherwise returns false.
-		\param index The index to check for selection.
-		\return true if selected, false otherwise.
 	*/
 	function isSelected(index){
 		return selectedIndexes.indexOf(index) !== -1
-	}
-	
-	/*!
-		\qmlmethod void rangeSelect(int from, int to)
-		Selects all indexes from `from` to `to` (inclusive).
-	*/
-	function rangeSelect(from, to, beQuiet){
-		if (!multiSelect) return
-		
-		let start = Math.min(from, to)
-		let end = Math.max(from, to)
-		let range = []
-		for (let i = start; i <= end; ++i){
-			range.push(i)
-		}
-		
-		selectedIndexes = range
-		firstSelectedIndex = from
-		focusedIndex = to
-
-		if (!beQuiet){
-			selectionChanged(selectedIndexes)
-		}
 	}
 }
