@@ -366,13 +366,6 @@ ViewBase {
 		}
 	}
 	
-	Loading {
-		id: loading_;
-		anchors.fill: backgroundTable;
-		background.color: Style.baseColor;
-		visible: false;
-	}
-	
 	Rectangle {
 		id: paginationObj;
 		anchors.bottom: parent.bottom;
@@ -398,5 +391,15 @@ ViewBase {
 				collectionViewBaseContainer.doUpdateGui();
 			}
 		}
+	}
+
+	Loading {
+		id: loading_;
+		anchors.top: filterMenu_.top
+		anchors.left: parent.left
+		anchors.right: parent.right
+		anchors.bottom: paginationObj.bottom
+		background.color: Style.backgroundColor2
+		visible: false;
 	}
 }
