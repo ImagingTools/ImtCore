@@ -1476,7 +1476,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetObjectSelectionQuery(const QByte
 			FROM %0 "%1" as root
 			LEFT JOIN LATERAL (
 				SELECT *
-				FROM "%1" AS root1
+				FROM %0 "%1" AS root1
 				WHERE root."%3" = root1."%3" 
 					AND %6 = 1
 				LIMIT 1
