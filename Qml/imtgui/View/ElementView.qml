@@ -103,9 +103,9 @@ Rectangle {
 		id: content
 		anchors.verticalCenter: parent.verticalCenter
 		anchors.left: parent.left
-		anchors.leftMargin: Style.marginXL
+		anchors.leftMargin: rootElement.contentMargin
 		anchors.right: parent.right
-		anchors.rightMargin: Style.marginXL
+		anchors.rightMargin: rootElement.contentMargin
 		spacing: rootElement.contentMargin
 		objectName: "ElementView"
 		
@@ -180,6 +180,7 @@ Rectangle {
 				}
 			}
 		}
+
 	}
 }
 
