@@ -33,9 +33,6 @@ bool CQmlGuiCompBase::IsGuiCreated() const
 bool CQmlGuiCompBase::CreateGui(QWidget* parentPtr)
 {
 	if (m_quickWidget == nullptr){
-#if QT_VERSION > 0x060000
-		QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
-#endif
 		m_quickWidget = new QQuickWidget(parentPtr);
 		m_quickWidget->setContentsMargins(0, 0, 0, 0);
 		
