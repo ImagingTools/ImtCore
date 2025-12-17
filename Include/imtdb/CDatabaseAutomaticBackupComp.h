@@ -32,7 +32,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDatabaseAutomaticBackupComp);
-		I_ASSIGN(m_databaseLoginSettingsCompPtr, "DatabaseLoginSettings", "Database login settings", true, "DatabaseLoginSettings");
+		I_ASSIGN(m_databaseLoginSettingsCompPtr, "DatabaseLoginSettings", "Database login settings", false, "DatabaseLoginSettings");
 		I_ASSIGN(m_backupSettingsCompPtr, "BackupSettings", "Backup settings", false, "BackupSettings");
 		I_ASSIGN(m_programAttrPtr, "Program", "Program name", true, "Program");
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval for backup timer (in msec)", true, 60000);

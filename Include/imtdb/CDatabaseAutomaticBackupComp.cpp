@@ -131,10 +131,6 @@ bool CDatabaseAutomaticBackupComp::Backup()
 
 void CDatabaseAutomaticBackupComp::CleanupOldBackups(const QString& backupFolderPath)
 {
-	if (!m_databaseLoginSettingsCompPtr.IsValid()){
-		return;
-	}
-
 	// Maximum number of backups to keep
 	if (*m_maxBackupCountAttrPtr < 0){
 		return;
