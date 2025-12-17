@@ -114,7 +114,7 @@ Rectangle {
 		
 		function onDocumentOpeningFailed(documentId, message){
 			Events.sendEvent("StopLoading")
-			root.openErrorDialog(message)
+			// root.openErrorDialog(message)
 		}
 		
 		function onTryCloseDirtyDocument(documentId, callback){
