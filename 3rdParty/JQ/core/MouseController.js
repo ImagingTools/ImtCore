@@ -277,19 +277,20 @@ module.exports = {
 
     click: function(e){
         if(this.event && this.event.target){
+            let event = this.event
             JQApplication.beginUpdate()
 
-            this.event.originX = e.pageX
-            this.event.originY = e.pageY
-            this.event.relative(this.event.target)
+            event.originX = e.pageX
+            event.originY = e.pageY
+            event.relative(event.target)
             if(e.timeStamp - this.timeStamp > 300){
                 this.timeStamp = e.timeStamp
-                this.event.target.__onMouseClick(this.event)
+                event.target.__onMouseClick(event)
             } else {
-                this.event.target.__onMouseDblClick(this.event)
+                event.target.__onMouseDblClick(event)
             }
             
-            this.event.target.__onMouseLeave(this.event)
+            event.target.__onMouseLeave(event)
 
             JQApplication.endUpdate()
         }
