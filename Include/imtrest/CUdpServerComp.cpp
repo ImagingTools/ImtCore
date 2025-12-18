@@ -83,7 +83,7 @@ const ISender* CUdpServerComp::GetSender(const QByteArray& requestId) const
 		if (m_requests.GetAt(i)->GetRequestId() == requestId){
 			CUdpSender *sender;
 			sender = new CUdpSender(m_requests.GetAt(i));
-            connect(sender,SIGNAL(CUdpSender::sended(QByteArray)),this,SLOT(&CUdpServerComp::SendedResponse(QByteArray)));
+            connect(sender, &CUdpSender::sended, this, &CUdpServerComp::SendedResponse);
 			return sender;
 		}
 	}
