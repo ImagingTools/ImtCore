@@ -22,7 +22,6 @@ public:
 
 	I_BEGIN_COMPONENT(CCollectionDocumentManagerComp)
 		I_REGISTER_INTERFACE(imtdoc::IDocumentManager)
-		I_ASSIGN(m_collectionIdAttrPtr, "CollectionId", "Collection ID", true, "");
 		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIdList", "List of the object type-IDs according to the list of factories ('ObjectFactories')", true);
 		I_ASSIGN(m_collectionCompPtr, "Collection", "Document collection containing related documents", true, "Collection");
 		I_ASSIGN(m_undoManagerFactPtr, "UndoManager", "Factory of the undo manager", false, "UndoManager");
@@ -39,7 +38,6 @@ private:
 	int GetObjectFactoryIndex(const QByteArray& typeId) const;
 
 private:
-	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
 	I_FACT(idoc::IUndoManager, m_undoManagerFactPtr);
